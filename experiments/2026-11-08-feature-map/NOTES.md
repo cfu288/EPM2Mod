@@ -57,3 +57,18 @@ Claims re-checked by hand against the disassembly before compiling them into the
   The mode-controller tables `gui[]` 0x7E83F70C and `raw[]` 0x7E844CC0 were re-dumped by hand: they give 19 pairs, art GUI 8–17 → 100–109, 18 → 119, 19 → 120, and nothing for 110–118.
 - **09b: the Fragmented random generator is xorshift32. Confirmed:** 0x7E54594F is `x ^= x<<13; x ^= x>>17; x ^= x<<5` and maps 0 to 1.
 - **09 cross-body: E-PL7 Exif writer 0x7DE40D28. Confirmed by hand:** case 111 stores 12, 115 stores 23, 117 stores 28 and 118 stores 29 (Fish Eye, Sparkle, Reflection, Fragmented in ExifTool's table).
+
+## Second pass: re-checking every "hidden" feature (sections 10a–10f)
+
+The art-filter deep dive (section 09) showed that the first pass named features from strings and assumed reachability. Every feature marked hidden, dormant, stub, unknown or "active (inferred)" in `docs/firmware-map.md` is now re-checked with the same method:
+1. read the code;
+2. trace reachability (menu tables, mode-controller value tables, setting writes, model and hardware gates, debug shells);
+3. compare across bodies;
+4. use external sources only as corroboration;
+5. give each earlier claim a verdict.
+
+Resources built for this pass, outside the repo:
+- function databases for E-PL5 1.6, E-PL6 1.4, E-P5 1.8, E-M10 1.4, E-PL7 1.4, E-M5 II 4.1 and PEN-F 3.1 (`fwmap.py --fw/--base/--out`);
+- each body's English UI strings, from `scripts/lang_dump_en.py`. It reads the block-1 directory and solves each language blob's load base, e.g. E-PM2 0xBFF3D000 / 1970 ids, E-P5 0xBFF2A200 / 2317, PEN-F 0xA2CE3C00 / 2892.
+
+English-string counts not present in the E-PM2: E-PL5 0 (block 1 identical), E-PL6 71, E-P5 544, E-M10 651, E-PL7 672, E-M5 II 979, PEN-F 1199. Shared block-1 text proves nothing about whether a body offers a feature.
