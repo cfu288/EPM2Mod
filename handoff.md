@@ -29,19 +29,20 @@ See `docs/camera-log.md`.
 - `experiments/YYYY-MM-DD-slug/NOTES.md`: ad-hoc work. Current one: `2026-11-08-disassembly/`.
 - Background research: `../reports/Olympus firmware modding landscape.md` and `../research_notes/Olympus firmware modding landscape/`.
 
-## Next steps
+## Current focus (updated 2026-11-08, later session)
 
-1. **Get objdump built.** The sandbox classifier blocked the agent from compiling downloaded source. Ask the user to run `! /path/to/epm2-tools/scripts/build-binutils-mn10300.sh`, or to add a permission rule. Don't work around the block.
-2. **Check the disassembly.** Disassemble the `[firmup]` updater code (block 0 around 0x3250xx) and confirm clean `-m am33-2` output.
-3. **Confirm the runtime base address,** estimated at 0x7E421020. `mov imm32` string pointers should land on string starts.
-4. **Read the movie-limit routine** at block-0 offsets 0x2CCEC0 / 0x2CCF00. This is the E-P5's camera-tested patch site, which exists once in the E-PM2. It is believed to be the 29-min limit (`mov 1740` / `mov 7200`; the recommended new value is 32400). Confirm it from the code before writing a patch.
-5. **Improve build.py, as agreed in principle:**
-   - Pattern-based ops that fail unless there is exactly 1 match.
-   - Runtime-address input.
-   - Typed u16/u32 values.
-   - Overlap detection between stacked specs.
-6. Write `patches/movie-limit.json`, show the user the exact byte diff and the reasoning, then they flash it and the result goes in the camera log.
-7. **Later, with user approval:** Ghidra plus the third-party MN10300 plugin (txt231/GhidraMn10300 or michaelbrandi/ghidra-mn103-extension) for a decompiler. This needs a JDK and runs third-party code, so ask first.
+**The user redirected the work to mapping and learning the firmware, not patching.** Do not write patches or flash builds unless the user asks again.
+
+Done:
+- objdump (mn10300) is built in `~/opt/mn10300/bin`. HOME is now `/home/agent`.
+- The runtime base 0x7E421020 is verified.
+- `tools/fwmap.py` builds a function database of block 0 (`build` takes about 40 s, then `fn`/`str`/`range`/`xref`/`tasks`).
+- **The full map is in `docs/firmware-map.md`.** It covers architecture, regions, block contents, the updater's checks, a feature inventory and open questions. Detail is in `experiments/2026-11-08-feature-map/sections/01–08`, and hand spot checks are in that folder's `NOTES.md`.
+
+Possible next steps (ask the user which):
+1. Work through the open questions in `docs/firmware-map.md` §6: menu reachability of AVCHD, interval shooting and art filters; how the time limit ends a recording; input 0x1709; USB connection types.
+2. Ghidra plus a third-party MN10300 plugin for a decompiler. This needs a JDK and runs third-party code, so ask first.
+3. The `build.py` improvements and `patches/movie-limit.json` from the earlier plan, only if the user returns to patching. Facts for that: only `mov 1740,a3` (0x2CCF00) matters, because the 7200 path is already capped by 4 GiB.
 
 ## Working rules and user preferences
 
