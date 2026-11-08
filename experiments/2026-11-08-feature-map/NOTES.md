@@ -14,9 +14,12 @@
 ## Fixed points
 
 - **Task names:** block-0 offset 0x4D222. Records of u16 id + char[24], 147 names, sorted by name.
-- **Task configuration:** block-0 offset 0x17D9C. Records of 28 bytes `{entry, pri, stack size, stack, cfg_id, attr, exinf}`, 139 tasks.
-  - The name id is `cfg_id − 2` up to SPC_TIMER. The last rows are named from their strings; `fwmap.py tasks` applies this.
-  - Checked against each entry's strings: e.g. FIRMUP_CLI → `[firmup]Mount Err:`, PLAY_SOUND → `play_regist_bgm in`.
+- **Task configuration:** block-0 offset 0x17CBC. Records of 28 bytes `{entry, pri, stack size, stack, cfg_id, attr, exinf}`, 147 tasks.
+  - The name id is `(cfg_id & 0x7FFF) − 2` for every row (`fwmap.py tasks`).
+  - Rows 0x8086–0x808D (bit 15 set) come first and carry their own stack address: PWR_STANDBY, GATEWAY, MOV_BRIDGE, AUD_BRIDGE, AUD_BRIDGE_LITE_CPU0, ART, C3D_BRIDGE ×2.
+  - cfg_id 1 has no name. The last row (cfg_id 0) is USRTEST_D. MOV_EDIT is the only name without a row; its strings are in the code of IMG0_LOCAL (0x7E6D4597), and BOOT_CPU0's code (0x7E53A4A4) prints `[pwr_standby]`.
+  - Checked against the strings of each entry: e.g. FIRMUP_CLI → `[firmup]Mount Err:`, PLAY_SOUND → `play_regist_bgm in`, MOV_BRIDGE → `[MOV_BRIDGE] task terminate:`.
+  - Correction: the first version of this table started at 0x17D9C, missed the 8 flagged rows, and renamed the last rows from their strings. Section 03 found the ART row at 0x17D48.
 - **Second object table:** block-0 offset 0x1C448. IDs 0x9005–0x900F and 0x1001–0x101E with explicit stacks at 0x604E…. Not decoded yet.
 - **Default interrupt vector table:** block-0 offset 0x4CDD0; every entry points to 0x7E44ACB0.
 - **OS wrappers:** `OlyTa*` (task), `OlyEv*` (event flag), `OlyQe*` (queue), `OlySm*` (semaphore). The OS is uITRON.
@@ -32,3 +35,5 @@ Claims re-checked by hand against the disassembly before compiling them into the
 
 - **02 (firmware update): the model check accepts the E-PL5 id for main packages. Confirmed.** In worker 0x7E543DDE, `fw_kind == 69` ('E') at 0x7E543E9C → maker check 0x7E506C83 → `cmp 4112` (0x1010) at 0x7E543ED8, then `cmp 4096` (0x1000) at 0x7E543EE9; either one passes. The other kinds compare with 4112 only. The accessor 0x7E506C06 reads header bytes 2–3 big-endian. Together with `E100????BIN` in the file-name table, this means the updater would **not** reject an E-PL5 main package. The camera-safety rule against E-PL5 files on the card is therefore a needed protection.
 - **02: the descramble matches `tools/oetool.py`.** The per-word byte order in the section equals LANES (1,3,0,2 | 6,4,7,5 | 11,10,9,8 | 13,14,12,15) followed by NOT of every word, which is the XOR 0xFF that oetool applies.
+- **03 (camera core): CAM_MAIN is an empty task. Confirmed:** its entry 0x7E62970B is a single `retf [],0`. The task table really starts 3 rows earlier than first assumed, at 0x17CBC. Confirmed; `fwmap.py tasks` is fixed.
+- **03: `udfu01 N,reg` behaves as multiply-by-N.** Ring indexing in 0x7E45F14D uses `udfu01 12,d1` with 12-byte entries. This fits the ×30 and ×600 reading in the movie time-limit routine; that reading is still not proven there.

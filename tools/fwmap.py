@@ -327,24 +327,23 @@ def cmd_xref(a):
 
 
 TASK_NAMES = 0x4D222   # v1.6 block-0 offset: records of u16 id + char[24], sorted by name
-TASK_CFG = 0x17D9C     # v1.6 block-0 offset: records {entry, pri, stack size, stack, cfg_id, attr, exinf}
+TASK_CFG = 0x17CBC     # v1.6 block-0 offset: records {entry, pri, stack size, stack, cfg_id, attr, exinf}
 
 
 def cmd_tasks(a):
-    """Name id = cfg_id - 2 holds up to SPC_TIMER (cfg 0x84); the rows after it are named from their strings."""
+    """Name id = (cfg_id & 0x7FFF) - 2 for every row. Rows with bit 15 set (0x8086-0x808D) give their own
+    stack address. The last row has cfg_id 0 and is the one left-over name, USRTEST_D."""
     _, b = block()
     u32 = lambda o: int.from_bytes(b[o:o + 4], "little")
     names, p = {}, TASK_NAMES
     while all(32 < c < 127 for c in b[p + 2:p + 4]):
         names[int.from_bytes(b[p:p + 2], "little")] = b[p + 2:p + 26].split(b"\0")[0].decode()
         p += 26
-    tail = {0x8E: "MOV_EDIT", 0x8F: "PWR_STANDBY", 0x90: "CPUCONN_CPU0", 0x91: "USRTEST_A",
-            0x92: "USRTEST_B", 0x93: "USRTEST_C", 0x00: "USRTEST_D"}
     print("cfg_id\tname\tentry\tpri\tstack")
     o = TASK_CFG
     while u32(o):
         entry, pri, stk, cfg = u32(o), u32(o + 4), u32(o + 8), u32(o + 16)
-        name = tail.get(cfg) or names.get(cfg - 2, "?")
+        name = "USRTEST_D" if cfg == 0 else names.get((cfg & 0x7FFF) - 2, "?")
         print(f"{cfg:#06x}\t{name}\t{entry:08x}\t{pri}\t{stk:#x}")
         o += 28
 

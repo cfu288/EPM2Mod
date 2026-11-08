@@ -164,4 +164,175 @@ Sensor modes (verified table 0x7E7ABDA0, key = mode+1): 0 HS, 1 HSSC, 2 MSSC, 3 
 - **SDET (verified entry 0x7E662DCB; content inferred):** iAuto scene detection. Its dump at 0x7E663B54 has state, scene, tone_rev, aozora (blue sky), highsat, near, up_portrait, led, y_data_state, yc422_addr. The debug command at 0x7E6637F2 (`dbgscnmode`) lists the scene types PORTRAIT, SCENERY, SCENERY_PORTRAIT, NIGHT_SHOT, NIGHT_SHOT_PORTRAIT, NIGHT_SHOT_MACRO, EVENING_SUN, SPORTS, MACRO, SPOT_LIGHT, UNDERWATER_SNAP, PROGRAM, and also gyakkou (backlight). It dumps data files `ST/CO/IA%02d%02d%02dBIN`, `MDETDATA` (0x7E6672F3). 0x7E667400–0x7E675000 has about 200 functions without strings. **Inferred:** the detection algorithm library.
 - **IMG_PRECON (verified, 0x7E55F9B6, outside range):** a message server with no strings. Command 0–4 goes to 0x7E55FAE8, 0x7E55FE1E, 0x7E55FF91, 0x7E55FFA3, 0x7E580A54(0/1). It replies with OlyQeWr if the message has a reply queue. The handlers read settings (0x7E457C75) and call into the TAKE region. The name suggests image pre-conditioning before capture (inferred).
 
-<!-- REC / ART / FACE sections appended below -->
+
+## 8. Still recording pipeline (REC_*; rec_3d.c, rec_jpeg.c, rec_misc.c, rec_view.c)
+
+**Framework (verified).**
+- Each REC task loops on one queue, using OlyQeRd 0x7E7185C6 and OlyQeWr 0x7E7185D8.
+- A job is a 228-byte message. Receive is 0x7E70B56B, forward to the next stage is 0x7E70B5BF, and reply is 0x7E70B53E. The reply is 12 bytes `{u16 status, …}` sent to the queue id at msg+12.
+- Field names come from the REC_MAIN dump 0x7E70B614: `com, usMode, fnSetPercent, ulHandle[0..5], usMedia, usDst, usSrc, usWhole/Area*, usWideCnt, usCompDir, usMultiNum, usMultiGain[4], usNoRecord, usPicBkt[i], usDst2`.
+- Status values 0x1F80–0x1FFF end a loop with "Abnormal Terminate". 0x1F01 means aborted and 0x1F02 means the cancel failed.
+
+| Task | Entry | Queue (id var → id, verified) | Role |
+|---|---|---|---|
+| REC_MAIN | 0x7E70B435 | 0x7E43ED6C → 0x58 | Router. The `com` jump table is at 0x7E851DC4 (0..26) and the com→mode table at 0x7E851E30. |
+| REC_PREPRO | 0x7E718878 | ED70 → 0x5A (still), ED6E → 0x59 (view) | `REC PREPRO make` 0x7E7189AF, multi-exposure Bayer 0x7E718EDA. com 19 → REC_VIEW, else → REC_IMAGE. |
+| REC_IMAGE | 0x7E712955 | ED6A → 0x57 | precon (calls the IMG_PRECON code at 0x7E55FA55), bracket, apical, e-portrait, art, make image |
+| REC_FILE | 0x7E712270 | ED68 → 0x56 | `REC FILE make` 0x7E712313: entry/open/write/close/leave 0x7E714203/0x7E71472B/0x7E7143C8/0x7E7144CF/0x7E7145EB |
+| REC_VIEW | 0x7E71A315 | ED74 → 0x5C | rec-view images, under semaphore 0x7E43EABA |
+| REC_SOUND | 0x7E71B612 | ED72 → 0x5B | usMode 0x4001 `REC WAVE START`, 0x4002 `REC WAVE SAVE` (voice memo, inferred) |
+| REC_EXT | 0x7E711EB1 | EE24 → 0xB4 | usMode 0x3001: 640×480 Y image from Bayer (`REC MISC BAYER2Y` 0x7E715769). Purpose unknown. |
+
+**REC_MAIN com (verified):**
+- 16/17/18: still job to PREPRO / cancel one / cancel all. Record_Media usMode 0x1001, Record_Picture_Bracket 0x100D, AbortAll = 18.
+- 19/20/21: view job / cancel one / cancel all (Abort_RecView = 21).
+- 22/23/24: EXT.
+- 25/26: SOUND / abort.
+- 0: reply 0. Any other value: reply 0x1F10.
+
+**One shot, in order (verified unless marked):**
+1. The UI calls `api_rec_Take_Ready`/`Take_Picture` (funcno 6/11 → TAKE_MAIN). The exposure happens there and in cam.c (§1, §4).
+2. The UI then calls `api_rec_Record_Media` (0x7E6882EC, funcno 13 → queue 0x58). REC_MAIN routes com 16 to REC_PREPRO.
+3. REC_PREPRO sends the job to REC_IMAGE.
+4. REC_IMAGE:
+   - `REC PRECON` 0x7E7188D2 (for handle field +17132 ∈ {1,2,8}).
+   - `REC_BRACKET_ENTRY` 0x7E70FFFD (prints "bkt start") and `bracket_update` 0x7E7100D7.
+   - `REC IMAGE pre` 0x7E712BB8: REC_APICAL_EXEC 0x7E70D637, CSKIN_PRE 0x7E70ED0D, MULTIEXP 0x7E716E54/0x7E7171EC.
+   - Then by usMode: 0x1009 e-portrait 0x7E70EE20/0x7E70F134; 0x1003 0x7E712DF2; 0x100F make + file. Default: art exec 0x7E70E687 (`art_SendRequest`), `rec_make_image_still_view` 0x7E712D8B, `REC_MAKE_IMAGE` 0x7E712D11.
+   - It posts app event 0x040800F0 ("rec view ready", inferred) and forwards to REC_FILE.
+5. **REC_MAKE_IMAGE** switches on the file type at msg+112:
+   - 1 = **JPEG** `REC JPG EXEC` 0x7E712EBF: image 0x7E712F5D, header 0x7E7130F7, prim 0x7E713657, prim small 0x7E713CCE, thumbnail 0x7E719DAF.
+   - 3 = **ORF/RAW** 0x7E71945A: buffer = setting 53140/idx 55 + 0x18AE000 bytes, then `REC ORF image` 0x7E7194A9 and `REC ORF header` 0x7E71969F.
+   - **Inferred:** RAW+JPEG is take-handle +16386 == 5, giving two outputs (string `REC BRACKET UPDATE RAWJEPG-EXIF` 0x7E710209).
+6. REC_FILE writes the file and replies.
+
+**Bracketing (verified).** usMode 0x100D makes REC_BRACKET_ENTRY count the non-zero `usPicBkt[]` (msg+154). One exposure is rendered into several outputs. **Inferred:** this is ART BKT / picture-mode bracketing (`artbkt_cnt` in 0x7E5C69E6). AE/ISO/WB bracketing is in the TAKE/strobe modules (`bktNumMax`, `mode_bracket_iso`), not in REC. `api_rec_Get_Bracket_Information` (0x7E68BD97, 659 instructions) builds the list for the UI.
+
+**3D (rec_3d.c 0x7E70BDF4–0x7E70D55E).**
+- **Verified dispatch:** handle +17132 == 12 → 0x7E70BD7F: `rec_3d_lens_art_exec`, then `rec_3d_write_mpo` 0x7E70BF3C, then free. REC_VIEW has `rec_3d_lens_view` 0x7E70BDF4.
+- **Inferred from names:** an MPO writer for 3D photo, and a 3D-lens path (two images on one sensor; `rec_cam_convert_3d_lens_offset_x/y`). `api_rec_Start_Take_3d` is at 0x7E68B98A.
+
+**Other rec modules (names verified, roles inferred):**
+- REC APICAL 0x7E70D637–0x7E70DA2F (shadow/DR adjustment)
+- rec_art_* 0x7E70DC24–0x7E70EC2E
+- REC_BEAUTY/CSKIN 0x7E70ED0D–0x7E70FFFD (e-Portrait)
+- MULTIEXP 0x7E716E54–0x7E717EA9
+- REC NR 0x7E717FE9–0x7E7183CC
+- REC MISC YC2YC/YC2VIEW/YC2JPG/BAYER2YC/FD MAKE Y 0x7E714ABC–0x7E71631A
+- `rec write/dbginfo/trace/dump` shell 0x7E710EB9
+
+## 9. Art filters and effects (art_*.c, 0x7E71BC93–0x7E72CF39)
+
+**Tasks (verified).**
+
+| Task | Entry | Loop / work |
+|---|---|---|
+| ART (scheduler) | 0x7E729E25 | Task row at 0x7E438D68: {0x7E729E25, pri 11, stack 0x1CC0, cfg 0x808B}. It is just before the table that tasks.tsv starts from, so **tasks.tsv does not list it**. The loop is `art_get_msg` 0x7E729FB2 / `art_send_msg` 0x7E72A0B0. |
+| ART_IMG_CM | 0x7E72985D | queue id at 0x7E43EE1E → 0xB1. `art_img_cm_exec` 0x7E7299E5 → IMG_PARAM/IMG_SAT_PARAM; `art_img_cm_dma_exec` 0x7E729A6F → IMGDMA_CTRL. Image-ASIC worker. |
+| ART_IMG_CS | 0x7E729AF8 | queue 0x7E43EE20 → 0xB2. The same structure. `art_img_exec` 0x7E7223B9 picks CS when ctx+84 bit 28 is set, CM otherwise. |
+| ART_IMG_CF | 0x7E729684 | `art_img_cf_exec` 0x7E7297FF → CPU kernel 0x7E5475FC (no strings). Only star-light pass 5 sends to it. |
+| art_sub (2nd object table id 0x900C) | 0x7E72CC23 | ldata / gainmap / dio_gainmap / whiteedge_gainmap 0x7E72CDD5…0x7E72CF39 |
+
+**Inferred:** CM/CS are the main and sub image-engine lanes. CF is a CPU function.
+
+**Dispatch (verified).**
+1. Callers: still `rec_art_set_artmode` 0x7E70E222 (+3D/view variants), and movie `mov_art_exec` 0x7E6CCFD2. Each calls `art_IsSupportType` 0x7E71BC93 and then `art_SendRequest` 0x7E71BD1B.
+2. `art_set_filter` 0x7E72A346 builds a chain of at most 4 slots `{state, fn}`:
+   - slot 0: `art_stl2ycc` 0x7E72BB61 (or `stl2ycc2` 0x7E72BBC6 for codes 74/104/96/165);
+   - then the filter from `art_set_func_filter` 0x7E72A562 (hash table 0x7E85C45C, key = code−72);
+   - then effects from `art_set_func_effect` 0x7E72A6B0.
+3. `art_call_filterfunc` 0x7E72A997 runs the slots in order.
+4. Each module runs its pass table through `art_com_pass_exec` 0x7E7285A4. Records are `{require_mask, done_bit, fn}`; a pass runs when its requirements are done.
+5. The menu number goes to an internal code through `art_GetFilterType` 0x7E71BD94 (d0 = 100..120, d1 = variant; jump table 0x7E854A24). The name table is at 0x7E7FE240 (45 × 16 bytes, ends "NOT ART").
+
+| Menu id | Internal code(s) (variant 1/2/3) | Module (top fn) | Name (inferred) |
+|---|---|---|---|
+| 100 | 70 / 102 | none (ISP params only) | Pop Art I/II |
+| 101, 113 | 69 | none (soft-focus effect slot) | Soft Focus |
+| 102 | 71 / 145 | none | Pale&Light Color I/II |
+| 103 | 72 | none | Light Tone |
+| 104 | 74 / 104 | art_filter_06_rough_monochrome 0x7E7229A3 (9 passes) | Grainy Film I/II |
+| 105 | 73 / 106 / 108 | art_effect_20_pinhole 0x7E720332 | Pin Hole I/II/**III** |
+| 106 | 86 | art_filter_09_diorama 0x7E72385C (9) | Diorama |
+| 107 | 85 / 167 | none | Cross Process I/II |
+| 108 | 91 | art_filter_0e_gentle_sepia 0x7E7244AE (3) | Gentle Sepia |
+| 109 | 96 / 165 | art_filter_14_dramatic_tone 0x7E724786 (12, uses art_nr and ldata) | Dramatic Tone I/II |
+| 110 | 145 | none | Tender Light |
+| 111 / 112 / 114 / 116 | 75 / 84 / 117 / 119 | **none** | Fish Eye / Drawing / Rock / Watercolor |
+| 115 | 118 | art_effect_10_star_light 0x7E71E705 (5 + CF) | Crystal |
+| 117 | 151 | art_filter_1c_mirror 0x7E726F53 (2) | Mirror |
+| 118 | 153 | art_filter_1d_composite 0x7E727103 (4) | Composite |
+| 119 | 163 / 169 | art_filter_19_artclearline 0x7E7259A9 (13) | Key Line I/II ("Ligne Claire") |
+| 120 | 181 / 182 | art_filter_21_pastelart 0x7E7275D4 (11) | Pastel I/II |
+
+**Effects (verified, flag index at request +8+2i, chain order star → soft → frame → pinhole → white edge):**
+
+| Flag | Module | Top fn |
+|---|---|---|
+| 0 | art_effect_10_star_light | 0x7E71E705 |
+| 1 | art_effect_40_soft_focus | 0x7E72169C |
+| 2 | art_effect_20_pinhole | 0x7E720332 |
+| 3 | art_effect_30_frame | 0x7E720964 |
+| 4 | art_effect_50_white_edge | 0x7E721EA9 |
+
+- **Verified:** pinhole is dropped when the filter is already 73/106/108.
+- **Verified:** the frame effect decodes JPEG frame resources (`art_frame_*` 0x7E721294…, `ART_FRAME_MOVIE_SD/HD/FHD`).
+
+**Present in code but not in the E-PM2 menu (inferred; GUI not traced):**
+- Full CPU modules exist for Crystal (118), Mirror (151), Composite (153), Pastel I/II (181/182) and Pin Hole III (108).
+- Fish Eye, Drawing, Rock, Watercolor and a stand-alone Tender Light have menu ids and names only.
+- `art_chk_type` 0x7E71C0E1 accepts 151/153 for only one mode.
+
+**Debug shell (verified):** `art tsksts/filtlist/temp/debug/switch/frame/disp/dbgall/tout/off/dump` (help at 0x7E854BB4).
+
+## 10. Face detection (FACE_MAIN, FACE_FD, FACE_PT0, DISP_FRAME)
+
+**Objects (verified, created in 0x7E6FC27E):**
+- Queues FACE_EXEC (id var 0x7E43ECF2 → 0x1B), FACE_FD (0x7E43ECF4 → 0x1C), FACE_POST and FACE_PT1.
+- Semaphore FACE_DATA.
+- Event flags FACE_FD, FACE_MOV and FACE_PT (0x7E43EC46).
+- The wrappers are named `Face<QR|QW|SE|WE|CE|SS|WS><obj>`, at 0x7E6FC46C–0x7E6FC91A.
+
+| Task | Entry | Loop (verified) | Role |
+|---|---|---|---|
+| FACE_MAIN | 0x7E6F45B8 | FaceQRMa. State byte 0x605B2A40. In state 0: cmd 1 start (→ FD cmd 0), cmd 4 set image (address + geometry at 0x605B2A28–3C → FD cmd 1), cmd 5 → 0x7E6FBF38, cmd 11 → 0x7E6F4739. In state 1: cmd 2 stop. Error 0x8708. | control |
+| FACE_FD | 0x7E6F82C8 | FaceQRFd. cmd 0 → live FD 0x7E6F9DB9; cmd 1 → still-image FD 0x7E6FA248. | detector |
+| FACE_PT0 | 0x7E6FC973 | waits for the FACE_PT event, then 0x7E6FC999 / 0x7E6FC9F4 | facial parts (eyes) |
+| DISP_FRAME | 0x7E6B3989 | Reads settings 12417/34145/55153. Waits on flag 0x7E43EC24. State 0/1/2 (0x605AFA7C) → 0x7E6B3B66/0x7E6B3BAF/0x7E6B3C11. | AF/face frame overlay |
+
+**Live loop (verified call order in 0x7E6F9DB9):**
+1. Re-post the job to its own FD queue (it repeats each pass).
+2. Wait for FD done (FaceWEFd).
+3. Take FACE_DATA, store results, release it.
+4. Set the PT event, which wakes FACE_PT0.
+5. 0x7E6B3ACE sets bit 16 on DISP_FRAME's flag when DISP_FRAME is in state 1.
+6. 0x7E6C35A7 calls into the movie code.
+
+**Senders (verified):**
+- TAKE_FUNC (0x7E5963F9, 0x7E596AB7, 0x7E595AD0) sends start/stop through 0x7E598DED.
+- REC CSKIN pre 0x7E70ED0D and `REC FACE get data` 0x7E712137 send cmd 4 (still-image FD for e-Portrait).
+- Playback `play_face_detect_face` 0x7E942E34 and red-eye 0x7E94318E also send.
+
+**Consumers (verified):**
+- TAKE/AF read face results through 0x7E6FB603.
+- The UI reads through `api_rec_Get_Rec_Face_Number`/`Get_Rec_Face_Rect_Area` (0x7E68A726/0x7E68A4E4 → 0x7E5A13A1).
+- EXP_MOVIE does face-weighted AE (§7b).
+
+**Inferred:**
+- FD is a hardware engine fed by DMA (control block `ulInAddr, ucDmaMode, ucDtMinSize, ucDtDir, ucThreshold` dumped at 0x7E6F97D3).
+- PT uses Omron OKAO (`OKAO_DeletePtResult`, `OKAO_FreeWMemoryArea` near 0x7E6FBCB0).
+- Per-face results are `center_x/y, size, angle, confidence, pose`. PT adds eye positions; "EYE AF ON/OFF" is at 0x7E6F9A26, so PT supports eye-priority AF.
+- `api_rec_dummy_Get_Smile_Face_Detect` exists only as a string, so smile detection is stubbed out.
+
+## Open questions
+
+1. CAM_MAIN is a `retf` stub. Is it ever started (sta_tsk)? Does any code use its 0x40-byte stack?
+2. What do the cam.c COM_GET/READY_ON/SETUP/SETDOWN handlers do in detail? What is the full COM_SET item list (RAM table 0x602A2758 maps item → handler class)?
+3. What are the EXP_MOVIE message codes 0x500–0x1402 called, and who sends them? Where are P/A/S/M and the metering-mode selection (TAKE_EXPOSE)?
+4. Is MMIO 0x9A1000F4–0x100 really a software-interrupt trigger? Which interrupt vector runs the four deferred-call rings?
+5. Which tasks own API queues 0x50, 0x22, 0x9E, 0x03, 0x09? What does the second completion table (0x7E7C8C2C) do per funcno?
+6. Live Bulb/Live Time: where is the update interval and display-refresh logic (0x7E65E000–0x7E661900, no strings)? Is Live Bulb reachable from the E-PM2 menus? This was not checked against the GUI.
+7. REC: what are take-handle fields +17132 (1/2/8/12) and +16386 (5 = RAW+JPEG?), and usModes 0x1002/3/4/7/8? What is REC_EXT's 640×480 Y image for?
+8. Art: what do the CPU kernels 0x7E5475FC/0x7E547A7A compute? What is request type 3 (two filters: ART BKT?)? Which menu ids 100–120 does the E-PM2 GUI expose (Pin Hole III, Crystal, Pastel, Mirror, Composite)?
+9. Face: what are FACE_MAIN cmds 5/11, FACE_POST/FACE_PT1 and DISP_FRAME states 0/1/2? Who sets the FD-done event (ISR?)?
+10. SDET: the algorithm block 0x7E667400–0x7E675000 (about 200 functions without strings), and how the SDET result reaches `api_rec_Get_I_Auto_Scene`.
