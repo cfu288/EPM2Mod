@@ -14,13 +14,13 @@
 ## Fixed points
 
 - **Task names:** block-0 offset 0x4D222. Records of u16 id + char[24], 147 names, sorted by name.
-- **Task configuration:** block-0 offset 0x17CBC. Records of 28 bytes `{entry, pri, stack size, stack, cfg_id, attr, exinf}`, 147 tasks.
-  - The name id is `(cfg_id & 0x7FFF) − 2` for every row (`fwmap.py tasks`).
-  - Rows 0x8086–0x808D (bit 15 set) come first and carry their own stack address: PWR_STANDBY, GATEWAY, MOV_BRIDGE, AUD_BRIDGE, AUD_BRIDGE_LITE_CPU0, ART, C3D_BRIDGE ×2.
-  - cfg_id 1 has no name. The last row (cfg_id 0) is USRTEST_D. MOV_EDIT is the only name without a row; its strings are in the code of IMG0_LOCAL (0x7E6D4597), and BOOT_CPU0's code (0x7E53A4A4) prints `[pwr_standby]`.
-  - Checked against the strings of each entry: e.g. FIRMUP_CLI → `[firmup]Mount Err:`, PLAY_SOUND → `play_regist_bgm in`, MOV_BRIDGE → `[MOV_BRIDGE] task terminate:`.
-  - Correction: the first version of this table started at 0x17D9C, missed the 8 flagged rows, and renamed the last rows from their strings. Section 03 found the ART row at 0x17D48.
-- **Second object table:** block-0 offset 0x1C448. IDs 0x9005–0x900F and 0x1001–0x101E with explicit stacks at 0x604E…. Not decoded yet.
+- **Task configuration (CPU0):** block-0 offset 0x17CB0. Records of 28 bytes `{id, attr, exinf, entry, pri, stack size, stack}`, 147 tasks, ending with a zero record.
+  - Name = `names[(id & 0x7FFF) − 1]`, checked against the boot code's `OlyTaSt(id)` labels (section 01): S_SHELL = 0x3C, MOV_EDIT = 0x84, CPUCONN = 0x8F.
+  - Exceptions: 0x8085 (entry 0x7E5065EF) is DBG_OUT in the boot code but PWR_STANDBY in the name table. ID 1 (entry 0x7E44A043, attr 2 = TA_ACT) is the boot task, while the name table says DBG_OUT.
+  - Proof of the layout: the only TA_ACT row is the boot task; a zero id ends the table; 0x8085 sits right before the first entry.
+  - `fwmap.py tasks` prints both tables.
+  - Correction history: first read at 0x17D9C, then at 0x17CBC with a `cfg_id − 2` rule. Both were one field off; section 01 found the real layout.
+- **Task configuration (CPU1):** block-0 offset 0x1C490, same layout, 30 tasks. Bit 12 of the id marks CPU1, and `OlyTaSt` forwards such ids to the other core. Names come from the boot code's labels (section 01): DBG_MESS1, MOV_AVCHD/MOV_AVCHDI/MOV_ENCODE, ART_SUB, C3D_EXE, CPUCONN1, an 11-task worker pool (entry 0x7EE8FBB1), and the CPU1 boot task 0x1001.
 - **Default interrupt vector table:** block-0 offset 0x4CDD0; every entry points to 0x7E44ACB0.
 - **OS wrappers:** `OlyTa*` (task), `OlyEv*` (event flag), `OlyQe*` (queue), `OlySm*` (semaphore). The OS is uITRON.
 - **Settings getter:** `0x7E457C75(id, a0=0, d1=index)`, with 2,168 call sites. Example: the movie routine reads id 26225 (format) and id 33105/index 7.
@@ -42,3 +42,5 @@ Claims re-checked by hand against the disassembly before compiling them into the
 - **04 (movie): where the time limit stops recording. Confirmed.** 0x7E6EE006 (called each frame from 0x7E6EE9BC, which the QT/AVCHD encode paths call): if the flag at 0x605B1FA2 == 1 and the frame count (96,ctx) ≥ 30 and the limit (40,ctx) ≤ count − 15, it sets state 5, clears the recording flags, logs `[AVCHD] APPEVENT RECMOVIE_TIME_LIMIT` and posts event 0x04070026. The stop fires 15 frames after the limit. The log tag says AVCHD, but the function is shared.
 - **04: the time-limit units are settled.** The rates are bitrate/4096 (512-byte sectors per second). The MOV overhead of 375 sectors/s × 512 = 192,000 B/s, which is exactly 48 kHz × 2 channels × 16-bit PCM. This replaces the "inferred" units in `../2026-11-08-disassembly/NOTES.md`.
 - **05 (Bluetooth): the BT gate is a hardware input. Confirmed.** 0x7E91367A (22 callers in the BT code) calls the status reader 0x7E509CA3 with signal 5897 (0x1709) and returns 1 only if the signal reads 0. That is an active-low input, consistent with an accessory-detect pin. On a body with no accessory port the stack would never start (inferred: the pin level on an E-PM2 board is not known).
+- **08 (libraries): 0x7EEE1020–0x7F021020 is read-only data, not code. Confirmed:** it disassembles as `break`/`clr`/`movbu (0x0)` noise, and 1,337 "functions" plus 1,644 call edges from it were false. Fix: `fwmap.py` now also marks pages whose aligned words are mostly small ints or addresses as data (907 pages; real code pages score ~0.08 against the 0.6 threshold). **The function database must be rebuilt** for this to take effect; that is deferred until all investigators finish, so section numbers so far use the old database.
+- **01 (platform) corrected the task-table layout.** Checked in the raw bytes; see the fixed points above.

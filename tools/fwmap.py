@@ -21,7 +21,8 @@ Stages:
 3. Index: functions.tsv, calls.tsv (caller->callee), strrefs.tsv (function -> string it loads),
    ptrs.tsv (aligned data word -> function or string it points to), fnidx.tsv (offsets into functions.txt).
 
-Pages (4 KiB) whose bytes are mostly NUL-terminated printable strings are "data" pages.
+Pages (4 KiB) whose bytes are mostly NUL-terminated printable strings, or whose aligned words are mostly
+small integers and addresses (pointer tables, vtables), are "data" pages.
 Calls decoded inside data pages are discarded.
 """
 import argparse, bisect, collections, os, re, subprocess, sys
@@ -52,8 +53,22 @@ def string_index(data):
         for p in range(m.start() // PAGE, (m.end() - 1) // PAGE + 1):
             lo, hi = max(m.start(), p * PAGE), min(m.end(), (p + 1) * PAGE)
             cover[p] += hi - lo
-    data_pages = {p for p, c in cover.items() if c > PAGE // 2}
+    data_pages = {p for p, c in cover.items() if c > PAGE // 2} | table_pages(data)
     return strings, data_pages
+
+
+def table_pages(data, base=None, share=0.6):
+    """Pages where most aligned words look like table data: small ints, -1..-0xFFFF, or addresses in
+    block 0, RAM (0x60..) or uncached RAM (0xA0..). Code pages score about 0.08 (median); 0.6 is safe."""
+    base = disasm.BASE if base is None else base
+    pages = set()
+    for p in range(len(data) // PAGE):
+        words = [int.from_bytes(data[o:o + 4], "little") for o in range(p * PAGE, (p + 1) * PAGE, 4)]
+        hits = sum(1 for v in words if v < 0x10000 or v >= 0xFFFF0000 or base <= v < base + len(data)
+                   or 0x60000000 <= v < 0x62000000 or 0xA0000000 <= v < 0xA2000000)
+        if hits > share * len(words):
+            pages.add(p)
+    return pages
 
 
 def iter_insns(lines):
@@ -327,25 +342,33 @@ def cmd_xref(a):
 
 
 TASK_NAMES = 0x4D222   # v1.6 block-0 offset: records of u16 id + char[24], sorted by name
-TASK_CFG = 0x17CBC     # v1.6 block-0 offset: records {entry, pri, stack size, stack, cfg_id, attr, exinf}
+TASK_CFG = 0x17CB0     # v1.6 block-0 offset: CPU0 records {id, attr, exinf, entry, pri, stack size, stack}
+TASK_CFG_CPU1 = 0x1C490  # same layout; ids with bit 12 set run on the second core
+# Where the boot code's own OlyTaSt() check label disagrees with the name table (see feature-map section 01).
+TASK_LABELS = {0x8085: "DBG_OUT (name table: PWR_STANDBY)", 0x0001: "boot task (name table: DBG_OUT)",
+               # CPU1 has no name table; these are the boot code's check labels.
+               0x9004: "DBG_MESS1", 0x9005: "TSK_FACE_PT1", 0x9006: "IMG_ART_P", 0x9007: "MOV_AVCHD",
+               0x9008: "MOV_AVCHDI", 0x900B: "ART_SUB", 0x900C: "MOV_ENCODE", 0x900D: "C3D_BRG_C0L_C1P",
+               0x900E: "C3D_BRG_C1P_C0L", 0x1001: "CPU1 boot task", 0x1002: "C3D_EXE", 0x1003: "SCHEAPDBG",
+               0x1010: "CPUCONN1"}
 
 
 def cmd_tasks(a):
-    """Name id = (cfg_id & 0x7FFF) - 2 for every row. Rows with bit 15 set (0x8086-0x808D) give their own
-    stack address. The last row has cfg_id 0 and is the one left-over name, USRTEST_D."""
+    """Name = name_table[(id & 0x7FFF) - 1], checked against OlyTaSt labels in the boot code.
+    attr 2 = TA_ACT (started at boot). A record with id 0 ends each table."""
     _, b = block()
     u32 = lambda o: int.from_bytes(b[o:o + 4], "little")
     names, p = {}, TASK_NAMES
     while all(32 < c < 127 for c in b[p + 2:p + 4]):
         names[int.from_bytes(b[p:p + 2], "little")] = b[p + 2:p + 26].split(b"\0")[0].decode()
         p += 26
-    print("cfg_id\tname\tentry\tpri\tstack")
-    o = TASK_CFG
-    while u32(o):
-        entry, pri, stk, cfg = u32(o), u32(o + 4), u32(o + 8), u32(o + 16)
-        name = "USRTEST_D" if cfg == 0 else names.get((cfg & 0x7FFF) - 2, "?")
-        print(f"{cfg:#06x}\t{name}\t{entry:08x}\t{pri}\t{stk:#x}")
-        o += 28
+    print("cpu\tid\tname\tentry\tpri\tstack\tattr")
+    for cpu, o in ((0, TASK_CFG), (1, TASK_CFG_CPU1)):
+        while u32(o):
+            tid, attr, entry, pri, stk = u32(o), u32(o + 4), u32(o + 12), u32(o + 16), u32(o + 20)
+            name = TASK_LABELS.get(tid) or (names.get((tid & 0x7FFF) - 1, "?") if cpu == 0 else "?")
+            print(f"{cpu}\t{tid:#06x}\t{name}\t{entry:08x}\t{pri}\t{stk:#x}\t{attr}")
+            o += 28
 
 
 def main():
