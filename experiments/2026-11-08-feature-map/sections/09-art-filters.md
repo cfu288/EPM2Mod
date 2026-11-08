@@ -93,7 +93,13 @@ All bodies below were downloaded from the `ep5-fw-reverse` archive and checked a
 
 ## 5. Open questions
 
-1. What the still pipeline does with a stored 110–118 set from a debug shell, for example whether `art_chk_type` 0x7E71C0E1 or `art_IsSupportType` rejects it. 09b found that 151 and 153 are accepted only when req+2 == 3.
+1. **Which still paths could run a hidden filter.** `art_IsSupportType` 0x7E71BC93 runs `art_chk_submode`, `art_chk_proccont`, `art_chk_type` (→ `art_chk_type_rec` 0x7E71C0E1 / `art_chk_type_mov`), `art_chk_effect` and `art_chk_effect_monotorn`. `art_chk_type_rec` switches on the request's processing type (req+2) and accepts only codes that have a module (verified):
+   - **Type 1:** 69, 73/106/108, 74/104, 86, 96/165, **118 (Sparkle)**, 163/169, 91, 181/182.
+   - **Type 2:** 73/106/108, 96/165, 163/169, 91, 181/182.
+   - **Type 3:** the type-1 list plus **151 (Reflection) and 153 (Fragmented)**.
+   - **Types 4/5:** as type 1 without 118. **Type 6:** only 67.
+
+   So Sparkle would be processed by an ordinary type-1 request, and Reflection and Fragmented only by type-3 requests. Codes without a module (Fish Eye, Drawing, Punk, compact Watercolor) are never in these lists, so they fall to the ISP-only path. Still open: which caller sets req+2 = 3. In `rec_art_set_artmode` 0x7E70E222 it comes from the caller's second argument, and its callers (still, 3D, view and 3D-view exec, REC VIEW) were not traced back to that value.
 2. Whether a compact Olympus firmware (e.g. SZ-31MR, TG-820) uses the same internal codes; this would confirm the 112/113/114/116 names.
 3. Whether the Fragmented mask buffer really overflows for 16:9 and 1:1 (`art_buff_alloc` rounding).
 4. The Watercolor I/II difference inside the image-engine preset tables (indices 10–13).
