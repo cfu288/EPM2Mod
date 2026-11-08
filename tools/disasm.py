@@ -29,8 +29,8 @@ def objdump_path():
     sys.exit("mn10300 objdump not found; run scripts/build-binutils-mn10300.sh")
 
 
-def block_file(fw, blk):
-    cache = os.path.join(ROOT, "build", "blocks", f"{os.path.basename(fw)}.block{blk}.bin")
+def block_file(fw, blk, cache_dir=None):
+    cache = os.path.join(cache_dir or os.path.join(ROOT, "build", "blocks"), f"{os.path.basename(fw)}.block{blk}.bin")
     if not os.path.exists(cache) or os.path.getmtime(cache) < os.path.getmtime(fw):
         blocks, _ = oetool.parse(open(fw, "rb").read())
         os.makedirs(os.path.dirname(cache), exist_ok=True)

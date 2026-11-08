@@ -7,6 +7,7 @@
     python3 tools/fwmap.py range 0x7E6C3000 0x7E6CB000   # functions in a range with their first strings
     python3 tools/fwmap.py xref 0x7E80E86F       # code and data references to an address
     python3 tools/fwmap.py tasks                 # uITRON task table (v1.6 offsets)
+    python3 tools/fwmap.py --fw OTHER.BIN --base 0x7E101020 --out DIR build   # another body (any command)
 
 Stages:
 1. Function starts from two sources:
@@ -34,6 +35,8 @@ sys.path.insert(0, os.path.join(ROOT, "tools"))
 import disasm  # noqa: E402  (objdump path, block cache, BASE)
 
 OUT = os.path.join(ROOT, "build", "map")
+FW = disasm.DEFAULT_FW   # --fw, --base and --out override these three for other bodies or versions
+BASE = disasm.BASE
 BIN = os.path.expanduser("~/opt/mn10300/bin")
 PAGE = 0x1000
 INSN = re.compile(r"^\s*([0-9a-f]+):\t(?:[0-9a-f ]+\t)?(\S+)\s*(.*)$")  # raw bytes column optional
@@ -43,14 +46,15 @@ NUM = re.compile(r"(?<![\w(<])(-?0x[0-9a-f]+|-?\d+)(?![\w)>])")
 
 
 def block():
-    path = disasm.block_file(disasm.DEFAULT_FW, 0)
+    cache = None if FW == disasm.DEFAULT_FW else os.path.join(OUT, "blocks")
+    path = disasm.block_file(FW, 0, cache)
     return path, open(path, "rb").read()
 
 
 def string_index(data, base=None):
     """Map offset -> string for every NUL-terminated printable run of 4+ chars, and the data pages.
     Pages are numbered by runtime address (addr // PAGE)."""
-    base = disasm.BASE if base is None else base
+    base = BASE if base is None else base
     strings, cover = {}, collections.Counter()
     for m in STR.finditer(data):
         strings[m.start()] = m.group()[:-1].decode("latin-1")
@@ -64,7 +68,7 @@ def string_index(data, base=None):
 def table_pages(data, base=None, share=0.6):
     """Pages where most aligned words look like table data: small ints, -1..-0xFFFF, or addresses in
     block 0, RAM (0x60..) or uncached RAM (0xA0..). Code pages score about 0.08 (median); 0.6 is safe."""
-    base = disasm.BASE if base is None else base
+    base = BASE if base is None else base
     pages = set()
     for p in range(base // PAGE, (base + len(data) - 1) // PAGE + 1):
         lo, hi = max(0, p * PAGE - base), min(len(data) - 3, (p + 1) * PAGE - base)
@@ -236,7 +240,7 @@ def stage_ptrs(data, base, strings, starts, code_pages):
 
 def cmd_build(a):
     os.makedirs(OUT, exist_ok=True)
-    base = disasm.BASE
+    base = BASE
     path, data = block()
     strings, data_pages = string_index(data)
     print(f"strings {len(strings)}, data pages {len(data_pages)}/{len(data) // PAGE + 1}")
@@ -246,7 +250,7 @@ def cmd_build(a):
     # (task entries, vtable methods) have no call targets of their own.
     code_pages = set(range(base // PAGE, (base + len(data) - 1) // PAGE + 1)) - data_pages
     ptr_starts = stage_ptr_starts(data, base, code_pages)
-    tsk_starts = task_starts(data, base)
+    tsk_starts = task_starts(data, base) if FW == disasm.DEFAULT_FW else set()  # tables are v1.6 offsets
     starts = sorted(call_starts | ptr_starts | tsk_starts | data_run_starts(base, data_pages))
     with open(os.path.join(OUT, "starts.tsv"), "w") as f:
         f.write("addr\tsource\n")
@@ -324,7 +328,7 @@ def cmd_str(a):
     for off in sorted(strings):
         t = strings[off]
         if rx.search(t):
-            addr = disasm.BASE + off
+            addr = BASE + off
             u = " ".join(sorted(users[addr])[:12])
             d = " ".join(sorted(tables[addr])[:6])
             print(f"{addr:08x}  {t[:120]!r}  fn: {u or '-'}" + (f"  data: {d}" if d else ""))
@@ -362,7 +366,7 @@ def cmd_xref(a):
     needle = t.to_bytes(4, "little")
     i = data.find(needle)
     while i >= 0:
-        print(f"raw   bytes at {disasm.BASE + i:08x} (offset {i:#x}{', unaligned' if i % 4 else ''})")
+        print(f"raw   bytes at {BASE + i:08x} (offset {i:#x}{', unaligned' if i % 4 else ''})")
         i = data.find(needle, i + 1)
 
 
@@ -397,7 +401,11 @@ def cmd_tasks(a):
 
 
 def main():
+    global FW, BASE, OUT
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--fw", default=disasm.DEFAULT_FW, help="firmware .BIN (default: stock E-PM2 v1.6)")
+    ap.add_argument("--base", default=hex(disasm.BASE), help="runtime base of block 0")
+    ap.add_argument("--out", default=OUT, help="database directory")
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("build")
     sub.add_parser("tasks")
@@ -415,6 +423,7 @@ def main():
     p = sub.add_parser("xref")
     p.add_argument("addr")
     a = ap.parse_args()
+    FW, BASE, OUT = os.path.abspath(a.fw), int(a.base, 0), os.path.abspath(a.out)
     {"build": cmd_build, "fn": cmd_fn, "str": cmd_str, "range": cmd_range, "xref": cmd_xref,
      "tasks": cmd_tasks}[a.cmd](a)
 
