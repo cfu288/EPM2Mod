@@ -25,3 +25,10 @@
 ## Layout by region (256 KiB buckets; tags = most frequent string prefixes)
 
 See `sections/` for each subsystem. A summary is in `../../docs/firmware-map.md` once compiled.
+
+## Spot checks of investigator sections
+
+Claims re-checked by hand against the disassembly before compiling them into the map.
+
+- **02 (firmware update): the model check accepts the E-PL5 id for main packages. Confirmed.** In worker 0x7E543DDE, `fw_kind == 69` ('E') at 0x7E543E9C → maker check 0x7E506C83 → `cmp 4112` (0x1010) at 0x7E543ED8, then `cmp 4096` (0x1000) at 0x7E543EE9; either one passes. The other kinds compare with 4112 only. The accessor 0x7E506C06 reads header bytes 2–3 big-endian. Together with `E100????BIN` in the file-name table, this means the updater would **not** reject an E-PL5 main package. The camera-safety rule against E-PL5 files on the card is therefore a needed protection.
+- **02: the descramble matches `tools/oetool.py`.** The per-word byte order in the section equals LANES (1,3,0,2 | 6,4,7,5 | 11,10,9,8 | 13,14,12,15) followed by NOT of every word, which is the XOR 0xFF that oetool applies.
