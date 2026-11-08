@@ -4,9 +4,11 @@
 
 ## Method
 
-- `tools/fwmap.py build` makes a function database in `build/map/` (git-ignored):
-  - 66,094 functions. 54,567 start at `call` targets; 11,526 more are pointer targets that start with a `movm` prologue.
-  - 305,768 call edges, 42,922 code→string references, and an index of data-table pointers.
+- `tools/fwmap.py build` makes a function database in `build/map/` (git-ignored). Current numbers, after the data-page fixes below:
+  - 66,169 entries: 52,613 start at `call` targets, 13,466 more are pointer targets with a `movm` prologue, plus the task-table entries. 85 entries are "data blocks" that mark where runs of data pages start.
+  - 302,507 call edges and 42,916 code→string references, plus an index of data-table pointers.
+  - Pages are 4 KiB aligned to runtime addresses. A page is data if more than half its bytes are strings or more than 60% of its words look like table entries.
+  - The investigator sections were written against the first database (66,094 entries). All but 3 of the 1,354 function starts they cite are still starts; the 3 are in data ranges that sections 05 and 01 themselves identify as data.
 - Query commands: `fn ADDR [--dis]`, `str REGEX`, `range LO HI`, `xref ADDR`, `tasks`.
 - **Link-order property (verified):** the code of each source file is contiguous, and its strings are laid out in the same order. There are zero inversions across 1,149 file-name references. So a function's strings place it in the link order, and unlabeled functions between two functions of one module belong to that module.
 - Runtime base 0x7E421020 (verified: see `../2026-11-08-disassembly/NOTES.md`).
@@ -44,3 +46,5 @@ Claims re-checked by hand against the disassembly before compiling them into the
 - **05 (Bluetooth): the BT gate is a hardware input. Confirmed.** 0x7E91367A (22 callers in the BT code) calls the status reader 0x7E509CA3 with signal 5897 (0x1709) and returns 1 only if the signal reads 0. That is an active-low input, consistent with an accessory-detect pin. On a body with no accessory port the stack would never start (inferred: the pin level on an E-PM2 board is not known).
 - **08 (libraries): 0x7EEE1020–0x7F021020 is read-only data, not code. Confirmed:** it disassembles as `break`/`clr`/`movbu (0x0)` noise, and 1,337 "functions" plus 1,644 call edges from it were false. Fix: `fwmap.py` now also marks pages whose aligned words are mostly small ints or addresses as data (907 pages; real code pages score ~0.08 against the 0.6 threshold). **The function database must be rebuilt** for this to take effect; that is deferred until all investigators finish, so section numbers so far use the old database.
 - **01 (platform) corrected the task-table layout.** Checked in the raw bytes; see the fixed points above.
+- **Database fixes after section 08:** (1) table pages counted as data; (2) pages aligned to runtime addresses — the BASIC overlay starts at runtime 0x7F05C000, which was 0x20 bytes before the end of an offset-aligned page, so it had been swallowed into a 160 KiB padding block; (3) every non-data page counts as code for pointer targets, because pages of pointer-only functions (e.g. USRSTART_FIRST 0x7E504AF9) have no call targets; (4) task-table entries are function starts. 168 call edges from mixed pointer/data pages in 0x7EEE–0x7F02 remain; they are noise (0.06%).
+- **07 (GUI): block-1 string ids. Confirmed:** in the English table (blob at block-1 offset 0x3781E0, pointer array 0x38B758, load address 0xBFF3D000), id 207 → 0xBFF3E0AA → offset 0x37928A = `Pixel Mapping`. That is the string the camera-tested pixel-hacking patch changed. The setter 0x7E457CED has 211 call sites, as claimed.

@@ -12,6 +12,7 @@ Stages:
 1. Function starts from two sources:
    - "call": targets of direct `call` instructions decoded in a linear objdump sweep
      (`call` on MN103 sets up the callee frame, so its target is a function entry);
+   - "task": entries of the uITRON task tables;
    - "ptr": aligned data words that point into code at a function prologue. Functions reached
      only through pointers (vtables, callbacks, task entries) set up their own frame, so they start
      with `movm [regs],(sp)` (0xCF). One-instruction stubs (`retf`/`ret`) and `add -N,sp` entries
@@ -21,7 +22,8 @@ Stages:
 3. Index: functions.tsv, calls.tsv (caller->callee), strrefs.tsv (function -> string it loads),
    ptrs.tsv (aligned data word -> function or string it points to), fnidx.tsv (offsets into functions.txt).
 
-Pages (4 KiB) whose bytes are mostly NUL-terminated printable strings, or whose aligned words are mostly
+Pages (4 KiB, aligned to runtime addresses: overlays such as BASIC start on runtime 4 KiB boundaries,
+and the base is 0x...020) whose bytes are mostly NUL-terminated printable strings, or whose aligned words are mostly
 small integers and addresses (pointer tables, vtables), are "data" pages.
 Calls decoded inside data pages are discarded.
 """
@@ -45,15 +47,17 @@ def block():
     return path, open(path, "rb").read()
 
 
-def string_index(data):
-    """Map offset -> string for every NUL-terminated printable run of 4+ chars, plus per-page coverage."""
+def string_index(data, base=None):
+    """Map offset -> string for every NUL-terminated printable run of 4+ chars, and the data pages.
+    Pages are numbered by runtime address (addr // PAGE)."""
+    base = disasm.BASE if base is None else base
     strings, cover = {}, collections.Counter()
     for m in STR.finditer(data):
         strings[m.start()] = m.group()[:-1].decode("latin-1")
-        for p in range(m.start() // PAGE, (m.end() - 1) // PAGE + 1):
-            lo, hi = max(m.start(), p * PAGE), min(m.end(), (p + 1) * PAGE)
-            cover[p] += hi - lo
-    data_pages = {p for p, c in cover.items() if c > PAGE // 2} | table_pages(data)
+        lo_a, hi_a = base + m.start(), base + m.end()
+        for p in range(lo_a // PAGE, (hi_a - 1) // PAGE + 1):
+            cover[p] += min(hi_a, (p + 1) * PAGE) - max(lo_a, p * PAGE)
+    data_pages = {p for p, c in cover.items() if c > PAGE // 2} | table_pages(data, base)
     return strings, data_pages
 
 
@@ -62,11 +66,12 @@ def table_pages(data, base=None, share=0.6):
     block 0, RAM (0x60..) or uncached RAM (0xA0..). Code pages score about 0.08 (median); 0.6 is safe."""
     base = disasm.BASE if base is None else base
     pages = set()
-    for p in range(len(data) // PAGE):
-        words = [int.from_bytes(data[o:o + 4], "little") for o in range(p * PAGE, (p + 1) * PAGE, 4)]
+    for p in range(base // PAGE, (base + len(data) - 1) // PAGE + 1):
+        lo, hi = max(0, p * PAGE - base), min(len(data) - 3, (p + 1) * PAGE - base)
+        words = [int.from_bytes(data[o:o + 4], "little") for o in range(lo, hi, 4)]
         hits = sum(1 for v in words if v < 0x10000 or v >= 0xFFFF0000 or base <= v < base + len(data)
                    or 0x60000000 <= v < 0x62000000 or 0xA0000000 <= v < 0xA2000000)
-        if hits > share * len(words):
+        if words and hits > share * len(words):
             pages.add(p)
     return pages
 
@@ -100,9 +105,9 @@ def stage_starts(linear, base, size, data_pages):
     with open(linear) as f:
         for a, op, arg in iter_insns(f):
             t = call_target(op, arg)
-            if t is not None and base <= t < base + size and (a - base) // PAGE not in data_pages:
+            if t is not None and base <= t < base + size and a // PAGE not in data_pages:
                 callers[t].add(a)
-    return {t for t in callers if (t - base) // PAGE not in data_pages}
+    return {t for t in callers if t // PAGE not in data_pages}
 
 
 PROLOGUE = (b"\xcf",)                       # movm [regs],(sp)
@@ -114,7 +119,7 @@ def stage_ptr_starts(data, base, code_pages):
     words = [int.from_bytes(data[o:o + 4], "little") for o in range(0, size - 3, 4)]
 
     def codeptr(v):
-        return base <= v < base + size and (v - base) // PAGE in code_pages
+        return base <= v < base + size and v // PAGE in code_pages
 
     for i, v in enumerate(words):
         if not codeptr(v):
@@ -122,16 +127,32 @@ def stage_ptr_starts(data, base, code_pages):
         head = data[v - base:v - base + 2]
         if head.startswith(PROLOGUE):
             starts.add(v)
-        elif head.startswith(WEAK_ENTRY) and (i * 4) // PAGE not in code_pages:
+        elif head.startswith(WEAK_ENTRY) and (base + i * 4) // PAGE not in code_pages:
             near = [w for w in words[max(0, i - 1):i + 2] if w != v and codeptr(w) and abs(w - v) < 0x800]
             if not near:
                 starts.add(v)
     return starts
 
 
+def task_starts(data, base):
+    """Entries of the CPU0 and CPU1 uITRON task tables (v1.6 offsets, see cmd_tasks)."""
+    u32 = lambda o: int.from_bytes(data[o:o + 4], "little")
+    starts = set()
+    for o in (TASK_CFG, TASK_CFG_CPU1):
+        while u32(o):
+            starts.add(u32(o + 12))
+            o += 28
+    return starts
+
+
+def data_run_starts(base, data_pages):
+    """First address of each run of data pages, so no function runs on into data."""
+    return {max(base, p * PAGE) for p in data_pages if p - 1 not in data_pages}
+
+
 def stage_elf(path, base, size, starts):
     asm = os.path.join(OUT, "fn.s")
-    edges = [base] + [s for s in starts if s > base] + [base + size]
+    edges = sorted({base, base + size} | {s for s in starts if base < s < base + size})
     with open(asm, "w") as f:
         f.write("\t.am33_2\n\t.text\n")
         for lo, hi in zip(edges, edges[1:]):
@@ -158,14 +179,14 @@ def stage_index(dis, base, size, strings, data_pages):
             m = SYM.match(line)
             if m:
                 cur = int(m.group(1), 16)
-                funcs[cur] = {"n": 0, "data": (cur - base) // PAGE in data_pages, "pos": here}
+                funcs[cur] = {"n": 0, "data": cur // PAGE in data_pages, "pos": here}
                 continue
             m = INSN.match(line)
             if not m or cur is None:
                 continue
             a, op, arg = int(m.group(1), 16), m.group(2), m.group(3)
             funcs[cur]["n"] += 1
-            if funcs[cur]["data"]:
+            if funcs[cur]["data"] or a // PAGE in data_pages:
                 continue
             t = call_target(op, arg)
             if t is not None:
@@ -204,7 +225,7 @@ def stage_ptrs(data, base, strings, starts, code_pages):
     with open(os.path.join(OUT, "ptrs.tsv"), "w") as f:
         f.write("word_addr\ttarget\tkind\n")
         for o in range(0, len(data) - 3, 4):
-            if o // PAGE in code_pages:
+            if (base + o) // PAGE in code_pages:
                 continue
             v = int.from_bytes(data[o:o + 4], "little")
             if v in starts:
@@ -218,16 +239,20 @@ def cmd_build(a):
     base = disasm.BASE
     path, data = block()
     strings, data_pages = string_index(data)
-    print(f"strings {len(strings)}, data pages {len(data_pages)}/{len(data) // PAGE}")
+    print(f"strings {len(strings)}, data pages {len(data_pages)}/{len(data) // PAGE + 1}")
     linear = stage_linear(path, base)
     call_starts = stage_starts(linear, base, len(data), data_pages)
-    code_pages = {(t - base) // PAGE for t in call_starts}
+    # Every page that is not data counts as code: pages holding only pointer-reached functions
+    # (task entries, vtable methods) have no call targets of their own.
+    code_pages = set(range(base // PAGE, (base + len(data) - 1) // PAGE + 1)) - data_pages
     ptr_starts = stage_ptr_starts(data, base, code_pages)
-    starts = sorted(call_starts | ptr_starts)
+    tsk_starts = task_starts(data, base)
+    starts = sorted(call_starts | ptr_starts | tsk_starts | data_run_starts(base, data_pages))
     with open(os.path.join(OUT, "starts.tsv"), "w") as f:
         f.write("addr\tsource\n")
         for t in starts:
-            src = "+".join(k for k, ss in (("call", call_starts), ("ptr", ptr_starts)) if t in ss)
+            src = "+".join(k for k, ss in (("call", call_starts), ("ptr", ptr_starts), ("task", tsk_starts))
+                           if t in ss) or "data"
             f.write(f"{t:08x}\t{src}\n")
     print(f"function starts {len(starts)} (call {len(call_starts)}, ptr {len(ptr_starts)}, "
           f"ptr-only {len(ptr_starts - call_starts)})")
