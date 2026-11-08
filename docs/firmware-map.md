@@ -3,6 +3,7 @@
 A map of what the main firmware contains and where. This is for learning only: nothing here was patched or flashed.
 
 - **Labels:** **verified** = read in the code or bytes; **inferred** = from strings, names or layout only. Every claim keeps the label from the section it came from.
+- **Second pass:** every hidden/dormant/stub/unknown feature was re-checked against the code, the menu value tables and 8 bodies (section 10, `10-hidden-features.md`). The table rows below carry those verdicts.
 - **Sources:** the eight subsystem sections in `experiments/2026-11-08-feature-map/sections/` hold the detail and addresses. Hand spot checks are in that folder's `NOTES.md`.
 - **Addresses:** runtime addresses. Block-0 offset = address − 0x7E421020 (base verified).
 - **Tools:** `tools/fwmap.py build` builds the function database (about 66k functions). Then use `fn`, `str`, `range`, `xref` and `tasks`. `tools/disasm.py` disassembles any range.
@@ -82,7 +83,7 @@ A map of what the main firmware contains and where. This is for learning only: n
 | AE in live view/movie | Active | EXP_MOVIE 0x7E68F0DD | 18×18 BV grid, face weighting, flicker detection (inf) | 03 |
 | iAuto scene detection | Active (inf) | SDET 0x7E662DCB | 12 scene types (inf) | 03 |
 | AF, 8 AF types, movie AF | Active | TAKE_FOCUS, FCS_MOVIE 0x7E610A65 | AF types from strings (inf) | 02 |
-| Face and eye detection | Active | FACE_MAIN/FD/PT0, DISP_FRAME | Eye step probably uses Omron OKAO (inf); smile detection is stubbed | 03 |
+| Face and eye detection | Active | FACE_MAIN/FD/PT0, DISP_FRAME | Eye step probably uses Omron OKAO (inf). Smile detection is **absent** (orphan name string only) | 03, 10b |
 | Live Bulb / Live Time | Active | `cam_still_live_bulb.c` | Phase tables verified; update-interval code not found | 03 |
 | Still pipeline | Active | REC_MAIN → REC_PREPRO → REC_IMAGE → REC_FILE | JPEG = 1, ORF = 3; bracketing over one exposure | 03 |
 | Multi exposure | Active | SequencePartsMultiExposure; `api_rec_Bayer_MultiExp` | One stub call, but the real function is used | 06 |
@@ -90,9 +91,10 @@ A map of what the main firmware contains and where. This is for learning only: n
 | Art filters (12 in the E-PM2 menu: stored picture modes 100–109, 119 Key Line, 120 Watercolor) | Active | ART task 0x7E729E25; GUI↔stored tables 0x7E83F70C/0x7E844CC0; `art_GetFilterType` 0x7E71BD94 | Watercolor = `art_filter_21_pastel_art` (internal name "pastel"), Exif 33/34. Pop Art, Pale&Light, Light Tone, Cross Process use no code module (ISP only) | 09, 03 |
 | Hidden art menu ids 110–118: Olympus compact "Magic Filters" (Fish Eye, Drawing, Soft Focus 2, Punk, Sparkle, compact Watercolor, Reflection, Fragmented) | Dormant | ids 111/115/117/118 named by the E-PL7 Exif writer (12/23/28/29); modules: Sparkle = star_light, Reflection = mirror (empty), Fragmented = composite (works: random tile scatter) | No GUI value, no colorTone name, no Exif value in E-PM2; reachable only via debug shells. Never in any PEN/OM-D menu checked (8 bodies) | 09, 09a, 09b |
 | Art effects (star light, pin hole, frame, soft focus, white edge) | Active (inf) | `art_effect_10…50` | Frame effect uses block 3 | 03, 08 |
-| Panorama (PC-stitched assist) | Active (inf) | SequencePartsPanorama | In-camera stitching is stubbed | 06 |
-| 3D photo (MPO) | Dormant (inf) | rec_3d.c, CmpSts_3dImageController | Combine step stubbed | 03, 06 |
-| Interval shooting / time-lapse movie | Dormant (inf) | Guard 0x7E969C11 (info 482), `startIntervalShooting` 0x7E98849B, time-lapse builder (MOV_EDIT task 0x7E6D4597) | Complete code. No menu record sets 482; every constant write of 482 stores 0. Myset and PTP paths not traced | 04, 06, 07 |
+| Panorama (PC-stitched assist) | Active | SCN 14; SequencePartsPanorama | In-camera stitching absent (stub/no code) on all 8 bodies | 06, 10b |
+| 3D Photo (MPO) | **Hardware-gated** | SCN 115 (selectable); `checkConnect3DLens` 0x7ECD7899 | Complete with a 3D lens; two-shot mode is a stub (three empty functions) | 10b |
+| Interval shooting / time-lapse movie | **Dormant-complete** | Guard 0x7E969C11 (info 482), time-lapse builder 0x7E6D4597 | All code present; only the top-menu row is missing (E-PL6 inserts "Time Lapse Settings" after Multiple Exposure). Shipped on E-PL6, E-P5, E-M10, E-PL7 | 10a |
+| HDR bracketing (HDR BKT, info 476) | Probably Active (inf) | Bracketing panel (group 15) | No code hides the row; exposures only, no HDR merge. Check on camera | 10a |
 | Built-in and external flash | Active | STB_SEQ/EXTERNAL/CHARGE/ASSIST | Mapped from strings mostly (inf) | 02 |
 
 ### Movie
@@ -101,12 +103,12 @@ A map of what the main firmware contains and where. This is for learning only: n
 |---|---|---|---|---|
 | MOV (H.264) 1080/720, Fine/Normal | Active | settings 26225 = 3, 34145 = 6 / 3, 33105[7] | 20/17 and 13/10 Mb/s | 04 |
 | Motion JPEG AVI 720p/VGA (also 320×240, 160×120 in code) | Active | `mov_rec_MJPEG.c` | 2 GiB cap; duration from setting 25812 | 04 |
-| AVCHD (1080) | Unknown | Full record and playback path; CPU1 tasks MOV_AVCHD/AVCHDI | Whether the E-PM2 menu offers it is open | 04 |
+| AVCHD (1080) | **Hidden (debug-only)** | Full record/playback path; CPU1 MOV_AVCHD/AVCHDI | Not in the movie-quality list (info 45: 6 entries, MOV/MJPEG only) on any of the 8 bodies | 04, 10c |
 | Time limit 29 min / 4 GiB | Active | Computed at 0x7E6EDE08 (frame count); checked every frame at 0x7E6EE006 → event `RECMOVIE_TIME_LIMIT` | Hand-checked; fires 15 frames after the limit. Units: 512-byte sectors/s; audio overhead = 48 kHz stereo PCM. No file splitting | 04 |
 | Movie effects: multi echo, one-shot echo, art fade | Active (inf for menu) | "KDG" engine, commands 70001–70003 | Fade 500 ms / 2000 ms | 04 |
 | Movie art filters | Active | Picture modes 100–120 → art codes 70–183 | | 04 |
-| "PSP" multi-window live-view composite | Unknown | `mov_func_PSP.c` | Meaning of PSP unknown | 04 |
-| Movie cut/trim, still-from-movie | Absent | — | Only the time-lapse builder exists | 04 |
+| "PSP" multi-window live view | Dormant (inf) | `mov_func_PSP.c`; API 0x7E988CDB | Background layer of a 4-window live view; reachable from `sdk api` only; probably the precursor of Photo Story (E-PL7+) | 10c |
+| Movie cut/trim, still-from-movie | Absent | — | Only the time-lapse builder exists. (Movie tele-converter code does exist; reachability not traced, 10c) | 04, 10c |
 
 ### Playback and editing
 
@@ -114,10 +116,11 @@ A map of what the main firmware contains and where. This is for learning only: n
 |---|---|---|---|---|
 | Playback engine | Active | PLAY_MAIN 0x7E93BABF → LOAD/IMAGE/SOUND (table 0x7EBB6510) | | 05 |
 | 23 edit modes (mono/sepia, trim, red-eye, shadow adjust, rotate, resize, image overlay, aspect, e-Portrait, RAW edit…) | Active (most) | Edit table 0x7EBB8D88; Edit*Component classes | Visibility per mode in section 06 table | 05, 06 |
-| 3D (MPO) playback | Dormant (inf) | `play_load_mpo.c` | | 05 |
+| 3D (MPO) playback | Partial (likely Active on a 3D HDMI TV) | `play_load_mpo.c`, 3D slideshow type, HDMI 3D query, "3D Show" panel | | 10d |
 | Slideshow with BGM, BGM import | Active | `:\BGM\*.WAV`, ≤ 14 files; `play_regist_bgm` | Import needs an Olympus authentication chunk (`IKEY`) | 05 |
 | Playback transitions | Active | EFFECT/EFFECT_EXE | index zoom, fade, touch scroll… | 05 |
-| Photo Surfing, Event View, Collage, person/GPS search | Stub | 46 `api_oldb_dummy_*` | Hand-checked: log and return 1 | 06 |
+| Photo Surfing, Event View, Collage, person/GPS search | Stub | 46 `api_oldb_dummy_*` | Stub backend and no GUI path; no real backend on any of the 8 bodies | 06, 10d |
+| Light box, opening-screen registration | Light box Active; opening screen Stub | `StDispLightBox*` (23 GUI calls); `api_play_dummy_Regist_Play_Rom` | | 10d |
 | Calendar, light box, index, select, reserve print (DPOF), protect, erase | Active (inf) | Play*/Edit* components | | 06 |
 
 ### Audio
@@ -126,6 +129,7 @@ A map of what the main firmware contains and where. This is for learning only: n
 |---|---|---|---|---|
 | Codec WM8946, record/play, speaker | Active | AUD_MAIN 0x7E95BB4F | Shares a serial bus with the HDMI chip | 05 |
 | DSP: wind cut, 32-coefficient ReTune, 5-band EQ, DRC, notches (incl. lens-zoom notch) | Active (inf for use) | coefficients from settings 29858–30354 etc. | Notches probably cut lens/stabiliser noise (inf) | 05 |
+| Wind noise reduction | Active | Custom Menu, info 434 → prm 0x7871 | Selects wind cut 0x7E951BDE or a plain high-pass filter | 10d |
 | Audio watchdog | Active | AUD_WATCH_DOG | Force-stops on stalled audio DMA | 05 |
 
 ### Connectivity
@@ -138,8 +142,8 @@ A map of what the main firmware contains and where. This is for learning only: n
 | Touch panel (and its own firmware update) | Active | TOUCHPANEL 0x7E6BCF84 | | 08 |
 | Eye-Fi | Active (inf) | EYEFI task, card control files | | 02, 08 |
 | FlashAir "SmartPhone Connection" (SPC) | Active (inf) | SPC_MAIN 0x7F0A7AF7 | Edits `\SD_WLAN\CONFIG` | 07, 08 |
-| Bluetooth via PENPAL ("cube") | Dormant (inf) | BT_CTRL 0x7E8FF96E, BlueSDK stack, OBEX/OBEX_ACP | Gate 0x7E91367A needs active-low input 0x1709 (hand-checked). The E-PM2 has no accessory port (product knowledge). The stack would load a Broadcom patch, support BIP/OPP/FTP and Apple iAP with an MFi chip | 05 |
-| EVF VF-2/VF-3, accessory-port menu | Dormant (inf) | Accessory-port menu in the top-level table | No port on this body | 07, 08 |
+| Bluetooth via PENPAL ("cube") | **Hardware-gated** | BT_CTRL 0x7E8FF96E, gate 0x7E91367A | Gate = "Cube" bit of the external-device byte, set only when accessory ID 0x0103 answers. Whether the E-PM2 has the port cannot be told from firmware (E-PL5 tables identical) | 05, 10e |
+| EVF, SEMA-1, accessory-port menu | Hardware-gated; menu hidden by setting default | Accessory-ID scan 0x7E464850; info 394 = 0 hides the menu | Same as E-PL5 | 10e |
 | IEEE 1394 | Stub | PC_I1394, PC_1394PNP | Drain their queue and exit | 08 |
 
 ### Platform, debug and service
@@ -147,12 +151,12 @@ A map of what the main firmware contains and where. This is for learning only: n
 | Feature | Status | Where | Notes | § |
 |---|---|---|---|---|
 | Boot sequence | Active | Boot task 0x7E44A043 → Usr0 (≈60 tasks) → USRSTART_* | Firmware-update boot path at 0x7E503DD4 / 0x7E544A6F | 01, 02 |
-| S_SHELL system monitor | Hidden | 0x7E44E972, serial port at 0x987000xx | ps, memory dump/put, OS objects, bus/DRAM tools | 01 |
-| U_SHELL (54 command families) | Hidden | table 0x7E7332B4 | Also reachable over USB via ADJ op 0x902B | 01, 08 |
+| S_SHELL system monitor | Hidden | 0x7E44E972; serial ports 0x9870/0x9830 (chosen by config byte 0x8FF00080) | Started every boot; needs physical UART access | 01, 10f |
+| U_SHELL (54 command families) | Hidden | table 0x7E7332B4 | Also over USB via ADJ op 0x902B: no model/setting/password gate, only a Storage/PTP connection and an ADJ session | 01, 10f |
 | `mov`, `movp`, `movc`, `lens`, `cam`, `prmdbg`, `GUI Debug`, `sdk api` (635 commands) shells | Hidden | sections list each table | `prmdbg` can read/write any setting and save or erase banks | 01, 03, 04, 06, 07 |
-| BASIC interpreter | Hidden | BAS_MAIN 0x7F05C000 | Line-number BASIC; `api(code,a,b)` calls the camera API. `RCUOLYMP/*.RCU` scripts load from card, can be saved to flash and reload at boot | 01 |
+| BASIC interpreter | Hidden | BAS_MAIN 0x7F05C000 | Card scripts load only via the GUI debug menu or `sdk api`; a script saved to flash with the `ucr.` header runs at every BAS_RCU_SRV start | 01, 10f |
 | Factory adjustment over PTP (ADJ) | Hidden | `adj_p15740_p.c`, 16 vendor ops 0x9005–0x902B | | 01, 08 |
-| Self-adjust from card files (ADJSLF) | Hidden | ADJSLF 0x7F087004 | `/NNNPRMnn/`, `wb_lv001.csv`, `*Calib.prm` | 01 |
+| Self-adjust from card files (ADJSLF) | Dormant on shipped cameras (inf) | ADJSLF 0x7F087004 | Gated by PRM_MODE_SHIPS_ENABLE (prm 0x0DB1) = 0 plus wake reason SELF_ADJUST | 01, 10f |
 | Settings store | Active | getter 0x7E457C75, setter 0x7E457CED | 1,800 prm tags in 6 storage classes; table in `07-settings.tsv` | 07 |
 | Level gauge, rotation | Active | PER_SLOPE, PER_ROTATE | SPI accelerometer | 01 |
 | Developer test tasks | Dormant | USRTEST_A–D (`Hello World!!!`) | | 01 |
@@ -181,7 +185,7 @@ A map of what the main firmware contains and where. This is for learning only: n
 
 ## 6. Main open questions
 
-1. Which E-PM2 menu items exist for AVCHD and interval shooting (info 482 via Myset or PTP). (Art filters: answered in section 09.) The Custom Menu A–J item lists are built in code and not yet recovered.
+1. Answered in sections 09/10: art filters, AVCHD (no menu value) and interval shooting (no menu row). Still open: whether HDR BKT shows on the camera, and how SS_DEBUGMENU is entered (section 10).
 2. How the app ends a recording after `RECMOVIE_TIME_LIMIT`, and why Olympus specifies 22 min for Full HD Fine when the code's figure is 26.6 min.
 3. The level of input 0x1709 on an E-PM2 board (would the Bluetooth stack ever start?).
 4. The EXP_MOVIE message codes, Live Bulb timing, IMG_PRECON and WB_MOV (no strings).

@@ -76,3 +76,5 @@ English-string counts not present in the E-PM2: E-PL5 0 (block 1 identical), E-P
 - **10b: 3D Photo is selectable. Confirmed.** The SCN list (u8) at 0x7E84976D is the 23 entries `9 67 11 17 8 12 18 47 40 46 41 23 49 31 21 26 14 20 29 110 111 112 115`.
 - **10c: AVCHD is not in the movie-quality list. Confirmed.** The info-45 record 0x7E84A554 holds raw[] 0x7E846500 and gui[] 0x7E83F890, i.e. 6 entries {quality, format, F/N}: (6,3,1) (6,3,2) (3,3,1) (3,3,2) (3,1,2) (4,1,2). There is no format 2.
 - **10e: the E-PL5 carries the same menus and accessory tables. Confirmed:** the E-PM2 top menu table (370 B) is byte-identical in the E-PL5 at 0x7EFFEA28, and the accessory ID/config tables (148 B) at 0x7E4C7264. The sub-item table is not byte-identical; no claim depends on it.
+- **10d: Wind Noise Reduction is a user setting. Confirmed:** 0x7E95136C reads prm 30833 (0x7871); a non-zero value calls wind cut 0x7E951BDE, otherwise the other branch is taken.
+- **10f: the ADJ accept table. Confirmed:** 0x7F0D25A2 holds 22 {op, flag} pairs (0x1002/0x1003/0x1014–0x1017 and vendor ops 0x9005–0x902B, including 0x902B).

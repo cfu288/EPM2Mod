@@ -62,10 +62,79 @@ Detail is in 10a–10f. Coordinator spot checks are in `../NOTES.md`.
 | IEEE 1394 | Stub | **Stub (confirmed)** | |
 | Firmware-update files | 9 types | **Card update only in the boot-time update mode** (power-on cause + the "OK" key status). The menu loads lens/flash files only | |
 
-### Playback (10d) and debug/service (10f)
+### Playback (10d)
 
-*Pending; added when those sections are finished.*
+| Feature | First pass | Now | Evidence (key) |
+|---|---|---|---|
+| Photo Surfing, Event View, Collection, Collage, person/GPS search | Stub | **Stub backend AND no GUI path** (verified). Fails safe. None of the 8 bodies has a real backend or English text | No API interface, operation class, sdk group or GUI string |
+| Light box | Active (inf) / unknown | **CORRECTED → Active**: a full single-play sub-state with 23 GUI call sites (menu entry inferred) | |
+| Calendar, index, select, print order (DPOF), protect, erase | Active (inf) | **Active (verified GUI calls)** | |
+| Edit: aspect, colour, trim, resize, shadow, red-eye, e-Portrait, RAW, image overlay | Active (most) | **Active (verified, 9 interfaces)** | |
+| EditCalendar, CopyPicture, PlayPanorama, PlayContinuous, PlayCw, EventView components | unknown | **Dormant**: no requester | |
+| 23 edit modes | Active (most) | **Partly corrected**: 4 Bluetooth modes Dormant; picture registration a Stub; 2 unresolved | |
+| 3D (MPO) playback | Dormant | **CORRECTED → Partial, likely Active on a 3D HDMI TV** (MPO loader, 3D slideshow type, HDMI 3D query, "3D Show" panel verified) | |
+| BGM import | Active | **Active (confirmed)**: menu flow "BGM Import"; only Olympus-authenticated WAVs | |
+| Slideshow, transitions | inferred | **Active (verified)** | |
+| Opening screen (registered picture) | inferred | **CORRECTED → Stub** (dummy registration API) | |
+| Audio DSP | Active (inf) | **Split**: wind cut is user-switched (Custom Menu "Wind Noise Reduction", prm 0x7871; checked by hand). ReTune/EQ/notches/DRC are fixed tables | |
+
+### Debug and service (10f)
+
+| Feature | First pass | Now | Evidence (key) |
+|---|---|---|---|
+| S_SHELL | serial port; "CPU0 regs" | **Hidden; started every boot.** CORRECTED: 0x9870/0x9830 are two serial *ports* chosen by a config byte, not two CPUs. Only physical UART access is needed | |
+| U_SHELL (54 families) and the shells behind it (`prmdbg`, `app`, `sdk api`, `mov`, `lens`, `cam`) | Hidden | **Confirmed.** Reached only via the S_SHELL `:` mode or USB | |
+| U_SHELL over USB (ADJ 0x902B) | reachable | **Confirmed, gate traced.** No model, setting or password gate: it needs only a Storage/PTP connection type and an ADJ session. Accept table of 22 {op, flag} pairs includes 0x902B (checked by hand); identical on 7 bodies | ADJ op 0x900D also writes settings directly |
+| BASIC + RCU scripts | card load, flash autoload | **Confirmed. Trigger:** the card load comes from the GUI debug menu or `sdk api`, not at boot. A script saved in flash with the `ucr.` header runs at every BAS_RCU_SRV start | |
+| BASIC overlay "loaded on demand" | on demand | **CORRECTED (inferred strong)**: loaded in normal use (the same step starts the movie tasks) | |
+| ADJSLF / self-adjust menu | trigger unknown | **Gated by the factory flag** PRM_MODE_SHIPS_ENABLE (prm 0x0DB1) = 0 plus wake reason SELF_ADJUST. Dormant on a shipped camera (inferred) | |
+| SS_DEBUGMENU | entry unknown | **Contents found** (Life Test, BASIC script register/erase, Color setting). **Entry still unresolved** | |
+| Version-check menu | "hidden" | **CORRECTED (inferred)**: probably the normal Setup › Firmware screen | |
+| USRTEST_A–D | dormant | **Dormant (confirmed)**: nothing starts them | |
 
 ## What changed overall
 
-*Filled in after all six sections are compiled.*
+About 20 earlier claims were wrong or incomplete. They fall into three kinds:
+
+1. **"Dormant/hidden" that is really reachable or hardware-gated:**
+   - 3D Photo (selectable; needs a 3D lens);
+   - 3D playback (HDMI 3D);
+   - light box;
+   - the accessory-port menu (a setting default, not removed);
+   - HDR BKT (probably offered).
+2. **"Unknown" or "active" that is really hidden:**
+   - AVCHD (no menu value on any body);
+   - "PSP", the precursor of Photo Story;
+   - the opening-screen registration (stub);
+   - the X3C USB mode (no requester).
+3. **Wrong mechanism or detail:**
+   - the PENPAL gate is an accessory-ID bit, not a raw pin;
+   - the S_SHELL ports;
+   - smile detection is absent, not stubbed;
+   - the movie tele-converter exists;
+   - the BASIC overlay is loaded in normal use;
+   - section 06's "menu code" range is the shooting state controller.
+
+**Confirmed as hidden or dormant, with the reason now known:**
+
+| Feature | Why it is hidden |
+|---|---|
+| Interval shooting / time-lapse | Only the menu row is missing; it shipped on E-PL6/E-P5/E-M10/E-PL7 |
+| Art Magic Filters | Section 09 |
+| Picture-database modes | No backend and no GUI on any body |
+| Bluetooth/PENPAL, EVF | Accessory gate |
+| Self-adjust | Factory flag |
+| USRTEST tasks | Nothing starts them |
+
+**What the firmware cannot settle:**
+- **Whether the E-PM2 has an accessory port.** The E-PL5 carries identical tables, so only the hardware can tell.
+- **Whether HDR BKT appears on the camera.**
+- **How SS_DEBUGMENU is entered.**
+
+## Open questions (cross-section)
+
+1. Is HDR BKT visible in Shooting Menu 2 › Bracketing on a real E-PM2? (A 5-second check on the camera.)
+2. How is SS_DEBUGMENU entered, and which power-on cause gives wake reason 9 (self-adjust)?
+3. What is the X3C PTP mode? (The opcode set is known; it has no requester.)
+4. Which key or event opens light box, 3D Show and BGM Import (GUI handler tables 0x7EFD5E00 / 0x7EFD6754 / 0x7EFD7AA4)?
+5. Custom Menu A–J item lists: the record table at 0x7EFF8250 (10d) is a candidate.

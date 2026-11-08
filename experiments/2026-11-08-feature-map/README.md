@@ -30,6 +30,13 @@ A static study of the Olympus PEN E-PM2 main firmware, v1.6, to learn what it co
 - **Stubbed:** the picture database behind Photo Surfing, Event View and person/GPS search.
 - **Movie limit.** It is computed once at record start, from rates in 512-byte sectors per second with 48 kHz PCM audio as the overhead. It is then checked every frame (0x7E6EE006). There is no file splitting.
 
+**Second pass (section 10)** corrected about 20 first-pass claims:
+- 3D Photo is selectable (it needs a 3D lens).
+- AVCHD has no menu value on any body.
+- Interval shooting lacks only its menu row; it shipped on the E-PL6.
+- The accessory port cannot be decided from firmware.
+- Light box and 3D playback are reachable.
+
 ## Files here
 
 | File | What it is |
@@ -45,6 +52,7 @@ A static study of the Olympus PEN E-PM2 main firmware, v1.6, to learn what it co
 | [`sections/07-settings.tsv`](sections/07-settings.tsv) | All 1,800 settings tags: storage class, type, count, default |
 | [`sections/08-connectivity-libs-blocks.md`](sections/08-connectivity-libs-blocks.md) | USB/PTP/MTP/PictBridge, HDMI, Eye-Fi/FlashAir, libraries, blocks 2/3, stabiliser MCU |
 | [`sections/09-art-filters.md`](sections/09-art-filters.md) | Art filters: the shipped 12, the hidden Magic Filters, and how they evolved across 8 bodies. Detail in `09a-art-gui.md` and `09b-art-algorithms.md` |
+| [`sections/10-hidden-features.md`](sections/10-hidden-features.md) | **Second pass:** every hidden/dormant/stub feature re-checked (code, menu value tables, 8 bodies). Detail in `10a`–`10f` (timed shooting, shooting modes, movie, playback, connectivity, debug/service) |
 | [`scripts/`](scripts/) | Scripts for the cross-body art comparison (base finder, Exif-table decoder, enum and name scans) |
 | [`tasks.tsv`](tasks.tsv) | All 177 tasks (both CPUs): id, name, entry, priority, stack. Made by `fwmap.py tasks` |
 | [`modules.tsv`](modules.tsv) | The 152 source files in link order, with their code ranges |
