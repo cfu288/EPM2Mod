@@ -18,7 +18,7 @@ Helper scripts: `/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/pl
 
 - The rows start with IDs 0x8085–0x808D (bit 15 set, explicit stacks at 0x604DEB80…0x604E2840). Then come IDs 1…0x84 and 0x8E…0x93. A zero record follows at 0x18CC4.
 - ID 1 (`entry 0x7E44A043`, pri 1) is the only row with attr = 2 (TA_ACT: auto-start). It is the boot task. **[V]**
-- **This disagrees with the corrected `tasks.tsv`.** That file puts `cfg_id` *after* the entry, so its numbers are one row off from the real IDs. Evidence for the layout above (all **[V]**):
+- *Coordinator note: resolved. `tasks.tsv` and `fwmap.py tasks` now use this layout (commit d3166e6).* This disagreed with the earlier `tasks.tsv`. That file puts `cfg_id` *after* the entry, so its numbers are one row off from the real IDs. Evidence for the layout above (all **[V]**):
   - The boot code calls `OlyTaSt(60)` with check label "S_SHELL". ID 60 is entry 0x7E44E972, which prints `S_SHELL`/`:-) `. In tasks.tsv, ID 60 would be SC_TTIMER.
   - `OlyTaSt(0x84)` has the label "MOV_EDIT". ID 0x84 is entry 0x7E6D4597, which prints `[MOV_EDIT]`. tasks.tsv calls this entry IMG0_LOCAL.
   - `OlyTaSt(0x8F)` has the label "CPUCONN0", and entry 0x7E505A22 is CPUCONN on both CPUs.

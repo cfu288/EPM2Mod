@@ -24,9 +24,9 @@ The file is `OLY_E_101_<ver>_0000_0000.BIN`, 43,319,360 bytes. It holds four "OE
 |---|---|---|---|---|---|---|
 | 0 | 0x100 | 0x402C0000 | 14,155,712 | main code (MN103, uITRON); runtime base 0x7E421020 (verified, see experiments/2026-11-08-disassembly) | no | no |
 | 1 | 0x101 | 0x43C40000 | 22,937,536 | languages and fonts (UTF-16LE string tables, one per language) | yes | **yes** |
-| 2 | 0x106 | 0x45220000 | 2,490,304 | ? | yes | yes |
-| 3 | 0x104 | 0x45480000 | 3,669,952 | pictures | yes | yes |
-| tail | `OM` | — | 65,600 | Renesas H8 sub-MCU | yes | model ID + checksum differ |
+| 2 | 0x106 | 0x45220000 | 2,490,304 | "ARTFIL": 6-bit noise texture for the Grainy Film art filter | yes | yes |
+| 3 | 0x104 | 0x45480000 | 3,669,952 | "FRAME": 8 JPEG frame overlays, one per aspect and size | yes | yes |
+| tail | `OM` | — | 65,600 | Renesas H8 firmware of the image-stabiliser controller ("BC") | yes | model ID + checksum differ |
 
 ## Useful locations (v1.6)
 
@@ -37,3 +37,5 @@ The file is `OLY_E_101_<ver>_0000_0000.BIN`, 43,319,360 bytes. It holds four "OE
 ## Provenance
 
 See [../firmware/README.md](../firmware/README.md) and [verification.md](verification.md).
+
+Block contents and the updater's checks: see [firmware-map.md](firmware-map.md) and `experiments/2026-11-08-feature-map/sections/02-*.md`, `08-*.md`.

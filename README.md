@@ -19,9 +19,10 @@ Flash `build/<name>.BIN` as `DCOLYMP/E1019999.BIN`, hold OK and power on. Full s
 |---|---|
 | `tools/oetool.py` | OE container: `info`, `unpack`, `pack`, `patch` (recomputes checksums) |
 | `tools/build.py` | applies JSON patch specs to a stock BIN → `build/` |
+| `tools/disasm.py`, `tools/fwmap.py` | MN103 disassembly (GNU objdump, `scripts/build-binutils-mn10300.sh`) and the block-0 function database with `fn`/`str`/`range`/`xref`/`tasks` queries |
 | `patches/` | one spec per mod, with a status and expected hash once camera-tested |
 | `firmware/` | stock and reference BINs (git-ignored), `SHA256SUMS`, provenance |
-| `docs/` | [flashing](docs/flashing.md), [camera log](docs/camera-log.md), [format](docs/firmware-format.md), [verification](docs/verification.md), [conventions](docs/conventions.md) |
+| `docs/` | [firmware map](docs/firmware-map.md) (what the firmware contains and where), [flashing](docs/flashing.md), [camera log](docs/camera-log.md), [format](docs/firmware-format.md), [verification](docs/verification.md), [conventions](docs/conventions.md) |
 | `experiments/` | dated ad-hoc work; promote results into tools/patches/docs |
 | `tests/` | unittest suite |
 
