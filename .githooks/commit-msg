@@ -1,0 +1,11 @@
+#!/bin/sh
+# Enforce Conventional Commits on the subject line. Enable: git config core.hooksPath .githooks
+subject=$(head -n1 "$1")
+pattern='^(feat|fix|docs|test|refactor|chore|build|ci|perf|style|revert|exp)(\([a-z0-9._/-]+\))?!?: .+'
+case "$subject" in Merge\ *|fixup!\ *|squash!\ *) exit 0 ;; esac
+if ! printf '%s' "$subject" | grep -Eq "$pattern"; then
+  echo "commit-msg: subject must follow Conventional Commits, e.g. 'feat(patch/movie-limit): raise cap'" >&2
+  echo "  got: $subject" >&2
+  echo "  types: feat fix docs test refactor chore build ci perf style revert exp" >&2
+  exit 1
+fi

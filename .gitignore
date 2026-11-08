@@ -1,0 +1,17 @@
+# firmware and build outputs are never committed
+*.BIN
+*.bin
+*.lzma
+build/
+firmware/**/*
+!firmware/README.md
+!firmware/SHA256SUMS
+!firmware/*/
+!firmware/*/*/
+
+# experiment outputs
+experiments/**/out/
+
+__pycache__/
+*.pyc
+.DS_Store
