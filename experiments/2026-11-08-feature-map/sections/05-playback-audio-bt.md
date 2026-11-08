@@ -23,7 +23,8 @@ Labels: **verified** = read in the code or bytes; **inferred** = from strings, n
 | 0x7EBA6B03–0x7EBE1020 | Strings and rodata for all of the above (e.g. `play_apical.c` at 0x7EBB66D7) | verified |
 
 **Key result.** In this firmware, **"cube" is the code name of the Bluetooth/PENPAL feature** (verified).
-The BT API refuses with `cube is disable\n` when the accessory is not there. The EXP-layer wrappers are named `api_cube_*_BT_*` (0x7E676693–0x7E676DA6) and call the `[btc api]` functions. The playback edit `play_cube_bt_resize` makes the image that is sent.
+The BT API refuses with `cube is disable\n` when the I/O-expander input 0x1709 is in its "active" state (see §3.0).
+**Probably dormant on the E-PM2:** this body has no accessory port (coordinator note). The BT code is shared with the E-PL5. Nothing here shows it running on this body. The EXP-layer wrappers are named `api_cube_*_BT_*` (0x7E676693–0x7E676DA6) and call the `[btc api]` functions. The playback edit `play_cube_bt_resize` makes the image that is sent.
 
 ---
 
@@ -188,13 +189,24 @@ WAV read/write: `aud_tool_wav_*` 0x7E960B7B–0x7E9614C1 (RIFF / LIST INFO INAM 
 
 ---
 
-## 3. Bluetooth (PENPAL PP-1, code name "cube")
+## 3. Bluetooth (PENPAL PP-1, code name "cube"); probably dormant on the E-PM2
+
+### 3.0 What enables it (verified code path; hardware meaning inferred)
+- Every BT entry point (22 callers: all `[btc api]` functions, module power-up 0x7E8FE4B0, deinit 0x7E8FE5A9, the stack-event handler 0x7E8FFB15, the UART receive path 0x7E912F55) first calls **`cube_enabled` 0x7E91367A**.
+  That function returns 1 only when `0x7E509CA3(0x1709) == 0`. If it returns 0, the caller prints `cube is disable` and returns.
+- 0x7E509CA3 is the generic status-signal reader (it is also used for `APPEVENT_TRIG1 STATUS`). ID **0x1709** is entry 4 of status group 11 (descriptor 0x7E735628 → list 0x7E7353C0; IDs 0x1706/0x1708/0x1709/0x170A/0x170C/0x170E; state bytes in RAM at 0x604F3BF0).
+  The other IDs of this group are read by `per_gio_ioe_read` 0x7E50C517, so group 11 holds **I/O-expander (IOE) input pins**. The software override 0x7E50A6F2 only acts on status IDs 2 and 12, not on 0x1709.
+  So the gate is a **hardware input line, not a model check or a menu setting** (verified as far as the IOE table). Inferred: the PENPAL detect line of the accessory port.
+- The BT tasks are in the static task table (139 rows), so they exist at boot. But the module is only brought up on request: `bt_comm_start` 0x7E8FD075 → 0x7E901260 → 0x7E8FE4B0.
+  0x7E8FE4B0 checks `cube_enabled` **before** the HCI reset, the patch-RAM download (0x7E8FE226 → `bt_config_set`) and the BD_ADDR write (verified branch at 0x7E8FE506).
+  Not verified: what level IOE pin 0x1709 has on an E-PM2 board, and whether the E-PM2 GUI ever offers the BT menu. No model-ID check was found on this path.
+
 
 ### 3.1 Layers (verified call chain)
 `DevBlu_Bluetooth` C++ methods (0x7EBA29E3–0x7EBA3243, vtable 0x7EC91628: sendImage, searchDevice, requestPairing, sendPinCode, receiveImage, getPairingDeviceList, setMyDeviceName, …)
 → EXP layer `api_cube_*` (0x7E676693–0x7E676DA6)
 → `[btc api]` 0x7E8FD075–0x7E8FD82A
-→ BT_CTRL task → Blue SDK → HCI over UART → Broadcom controller in the accessory.
+→ BT_CTRL task → Blue SDK → HCI over UART → Broadcom controller in the accessory (on bodies that have an accessory port).
 Each API function also has a second caller, the debug shell `demo` 0x7E9035A8 (`bluetooth feature's demo`).
 
 **api_cube functions** (names verified): Start/End_BT_Communication; Start_BT_Communication_Send/Recive/Pairing; Abort; Set_BT_PIN_CODE; Start_BT_Data_Send / Data_Receive; Accept_BT_Data_Receive; Get_BT_Transfer_Progress; Get/Delete/Change_Name of the pairing information; Get_BT_Pairing_Regist_Number; Delete_All_BT_Infomation; Get/Set_BT_MySelf_Name; Get_BT_Search_Device_Number/Info; Stop_BT_Search_Device; Regist_BT_Pairing_Device; Calculate_Transfer_PictureSize (0x7E676E9F → `play_cube_resize_judge` 0x7E93D5D1).
@@ -273,6 +285,7 @@ So SERV is a small **publish/subscribe service for camera state changes**. Which
 ---
 
 ## Open questions
+0. Does IOE input 0x1709 exist on the E-PM2 board, and at what level? Does any E-PM2 GUI path reach `api_cube_*`? (This would confirm that BT is dormant.)
 1. `play_pocket_*` (edit 0x84): which menu item is it? And edit 0x8F "sns flag": is it share-order or an Eye-Fi/FlashAir flag?
 2. What `play_dig_wide` (draw 0x80/0x81) and the "wide" paths of the Apical and other edits handle (panorama? 16:9?). `play_util_chk_wide` 0x7E93D0DD has 16 callers.
 3. The image sizes for BT sending: the size tables are in RAM (0x602AB98C/B4/DC, three aspect groups), and the modes use 1536 and 1024. Find where these tables are initialized.
