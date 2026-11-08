@@ -1,7 +1,9 @@
 # firmware and build outputs are never committed
-*.BIN
-*.bin
-*.lzma
+# (case-insensitive: files also pass through macOS, where Foo.Bin and foo.bin are the same file)
+*.[Bb][Ii][Nn]
+*.[Ll][Zz][Mm][Aa]
+*.[Zz][Ii][Pp]
+*.7z
 build/
 firmware/**/*
 !firmware/README.md
@@ -9,9 +11,14 @@ firmware/**/*
 !firmware/*/
 !firmware/*/*/
 
+# assembler/linker output from the disassembly tools, if written outside build/
+*.o
+*.elf
+
 # experiment outputs
 experiments/**/out/
 
 __pycache__/
 *.pyc
+.venv/
 .DS_Store
