@@ -1,0 +1,11 @@
+{
+  "name": "pixel-hacking",
+  "description": "Proof of concept: rename the Custom Menu > J. Utility entry 'Pixel Mapping' to 'Pixel Hacking' in all 16 language tables. Text only; no code change.",
+  "status": "camera-tested 2026-11-08 (works)",
+  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+  "ops": [
+    {"type": "utf16-replace-all", "block": 1, "old": "Pixel Mapping", "new": "Pixel Hacking", "count": 16}
+  ],
+  "expected_sha256": "20fbb83f17dadc4b3a216ae3b4854e3d061f62144473c5274cd11c3621e53867"
+}
