@@ -22,7 +22,7 @@ The file is `OLY_E_101_<ver>_0000_0000.BIN`, 43,319,360 bytes. It holds four "OE
 
 | # | Kind | Addr | Length | Contents | Same across v1.1–v1.6? | Same as E-PL5 v1.6? |
 |---|---|---|---|---|---|---|
-| 0 | 0x100 | 0x402C0000 | 14,155,712 | main code (MN103, uITRON); runtime base ≈ 0x7E421020 | no | no |
+| 0 | 0x100 | 0x402C0000 | 14,155,712 | main code (MN103, uITRON); runtime base 0x7E421020 (verified, see experiments/2026-11-08-disassembly) | no | no |
 | 1 | 0x101 | 0x43C40000 | 22,937,536 | languages and fonts (UTF-16LE string tables, one per language) | yes | **yes** |
 | 2 | 0x106 | 0x45220000 | 2,490,304 | ? | yes | yes |
 | 3 | 0x104 | 0x45480000 | 3,669,952 | pictures | yes | yes |
@@ -31,7 +31,7 @@ The file is `OLY_E_101_<ver>_0000_0000.BIN`, 43,319,360 bytes. It holds four "OE
 ## Useful locations (v1.6)
 
 - Block 0 at 0x3250xx: the `[firmup]` updater strings and `DCOLYMP`. At 0x324d88: the pattern table `S101????BIN … E101????BIN … E100????BIN …`.
-- Block 0 at 0x2CCEC0 and 0x2CCF00: the camera-tested E-P5 patch site, likely the 29-min movie limit (see the landscape report).
+- Block 0 at 0x2CCEC0 and 0x2CCF00: `mov 7200,a3` and `mov 1740,a3` in the movie recording-limit routine (0x2CCDE8–0x2CCF7C; confirmed from the code).
 - Block 1, English table near 0x379000: menu labels such as "Pixel Mapping" (0x37928a).
 
 ## Provenance

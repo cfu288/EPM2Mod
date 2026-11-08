@@ -8,7 +8,7 @@
 Notes:
 - MN103 has variable-length instructions, so starting mid-instruction gives garbage until it resyncs.
   Use --before to start earlier, and trust output only after the first clean line.
-- The runtime base (BASE) is an estimate from a string-pointer scan (see docs/firmware-format.md).
+- The runtime base (BASE) is verified by string pointers in the movie routine (see docs/firmware-format.md).
 """
 import argparse, os, shutil, subprocess, sys
 
@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.join(ROOT, "tools"))
 import oetool  # noqa: E402
 
 DEFAULT_FW = os.path.join(ROOT, "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN")
-BASE = 0x7E421020  # E-PM2 v1.6 block 0 runtime base (estimate)
+BASE = 0x7E421020  # E-PM2 v1.6 block 0 runtime base (verified)
 OBJDUMP_CANDIDATES = [os.path.expanduser("~/opt/mn10300/bin/mn10300-elf-objdump"), "mn10300-elf-objdump"]
 
 
