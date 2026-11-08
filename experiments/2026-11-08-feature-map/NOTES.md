@@ -72,3 +72,7 @@ Resources built for this pass, outside the repo:
 - each body's English UI strings, from `scripts/lang_dump_en.py`. It reads the block-1 directory and solves each language blob's load base, e.g. E-PM2 0xBFF3D000 / 1970 ids, E-P5 0xBFF2A200 / 2317, PEN-F 0xA2CE3C00 / 2892.
 
 English-string counts not present in the E-PM2: E-PL5 0 (block 1 identical), E-PL6 71, E-P5 544, E-M10 651, E-PL7 672, E-M5 II 979, PEN-F 1199. Shared block-1 text proves nothing about whether a body offers a feature.
+- **10a: interval shooting is missing only its menu row. Confirmed.** E-PM2 top menu (36 rows from 0x7EFFE13C): `… 182, 526, 262 …`, and 1357 is absent. E-PL6 1.4: the run `182, 1357, 526, 262` at 0x7EFFF8BE.
+- **10b: 3D Photo is selectable. Confirmed.** The SCN list (u8) at 0x7E84976D is the 23 entries `9 67 11 17 8 12 18 47 40 46 41 23 49 31 21 26 14 20 29 110 111 112 115`.
+- **10c: AVCHD is not in the movie-quality list. Confirmed.** The info-45 record 0x7E84A554 holds raw[] 0x7E846500 and gui[] 0x7E83F890, i.e. 6 entries {quality, format, F/N}: (6,3,1) (6,3,2) (3,3,1) (3,3,2) (3,1,2) (4,1,2). There is no format 2.
+- **10e: the E-PL5 carries the same menus and accessory tables. Confirmed:** the E-PM2 top menu table (370 B) is byte-identical in the E-PL5 at 0x7EFFEA28, and the accessory ID/config tables (148 B) at 0x7E4C7264. The sub-item table is not byte-identical; no claim depends on it.
