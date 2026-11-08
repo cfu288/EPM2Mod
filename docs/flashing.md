@@ -25,7 +25,7 @@ This procedure is **confirmed on the E-PM2** (see [camera-log.md](camera-log.md)
 
 If the camera boots straight to live view at step 4, the file wasn't recognised and nothing was written. The fallback name is `E1011600.BIN`, but it may be ignored as an equal version.
 
-**Never** put an E-PL5 file (`E100…`) on the card. The E-PM2 firmware contains the `E100` pattern too, and nobody knows whether it checks the model.
+**Never** put an E-PL5 file (`E100…`) on the card. The E-PM2 updater searches for `E100????BIN` and accepts the E-PL5 model id 0x1000 for main packages (verified in code, see [firmware-map.md](firmware-map.md) §2), so it would not reject one. Check that header bytes 2–3 read `10 10` before every flash.
 
 ## Sources (checked 2026-11-08)
 
