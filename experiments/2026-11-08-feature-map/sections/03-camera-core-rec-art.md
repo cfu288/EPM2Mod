@@ -245,6 +245,8 @@ Sensor modes (verified table 0x7E7ABDA0, key = mode+1): 0 HS, 1 HSSC, 2 MSSC, 3 
 4. Each module runs its pass table through `art_com_pass_exec` 0x7E7285A4. Records are `{require_mask, done_bit, fn}`; a pass runs when its requirements are done.
 5. The menu number goes to an internal code through `art_GetFilterType` 0x7E71BD94 (d0 = 100..120, d1 = variant; jump table 0x7E854A24). The name table is at 0x7E7FE240 (45 × 16 bytes, ends "NOT ART").
 
+*Coordinator note: the menu ids and codes below are verified, but several **names** are wrong. Watercolor is 120 (pastel_art), not 116, and 110–118 are compact "Magic Filters" (115 Sparkle, 117 Reflection, 118 Fragmented). See [09-art-filters.md](09-art-filters.md).*
+
 | Menu id | Internal code(s) (variant 1/2/3) | Module (top fn) | Name (inferred) |
 |---|---|---|---|
 | 100 | 70 / 102 | none (ISP params only) | Pop Art I/II |

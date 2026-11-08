@@ -87,8 +87,8 @@ A map of what the main firmware contains and where. This is for learning only: n
 | Still pipeline | Active | REC_MAIN → REC_PREPRO → REC_IMAGE → REC_FILE | JPEG = 1, ORF = 3; bracketing over one exposure | 03 |
 | Multi exposure | Active | SequencePartsMultiExposure; `api_rec_Bayer_MultiExp` | One stub call, but the real function is used | 06 |
 | e-Portrait | Active | SequencePartsEportrait, CmpSts_EPortraitShootingEditer | Beauty-preview helpers are stubbed | 06 |
-| Art filters (12 in the E-PM2 menu) | Active | ART task 0x7E729E25; filter-code table maps 21 menu ids | Pop Art, Pale&Light Color, Light Tone and Cross Process use no code module (inf: done by image-processor settings) | 03, 07 |
-| Art filter code not in the E-PM2 menu: modules `art_effect_10_star_light` (menu id 115), `art_filter_1c_mirror` (117), `art_filter_1d_composite` (118), `art_filter_21_pastel_art` (120, two variants), and a third Pin Hole variant (code 108) | Dormant (inf) | Dispatch switch at 0x7E72A635 loads each entry; Mirror has its own pass table 0x7E85A56C (`art_mirror_pass1/2`) | Module names verified from strings. User-facing names (section 03 says Crystal, Mirror, Composite, Pastel) are **inferred**: no name table exists in block 0, and English block 1 has no such labels. The E-PM2 menu lists 12 filters (section 07) | 03, 07 |
+| Art filters (12 in the E-PM2 menu: stored picture modes 100–109, 119 Key Line, 120 Watercolor) | Active | ART task 0x7E729E25; GUI↔stored tables 0x7E83F70C/0x7E844CC0; `art_GetFilterType` 0x7E71BD94 | Watercolor = `art_filter_21_pastel_art` (internal name "pastel"), Exif 33/34. Pop Art, Pale&Light, Light Tone, Cross Process use no code module (ISP only) | 09, 03 |
+| Hidden art menu ids 110–118: Olympus compact "Magic Filters" (Fish Eye, Drawing, Soft Focus 2, Punk, Sparkle, compact Watercolor, Reflection, Fragmented) | Dormant | ids 111/115/117/118 named by the E-PL7 Exif writer (12/23/28/29); modules: Sparkle = star_light, Reflection = mirror (empty), Fragmented = composite (works: random tile scatter) | No GUI value, no colorTone name, no Exif value in E-PM2; reachable only via debug shells. Never in any PEN/OM-D menu checked (8 bodies) | 09, 09a, 09b |
 | Art effects (star light, pin hole, frame, soft focus, white edge) | Active (inf) | `art_effect_10…50` | Frame effect uses block 3 | 03, 08 |
 | Panorama (PC-stitched assist) | Active (inf) | SequencePartsPanorama | In-camera stitching is stubbed | 06 |
 | 3D photo (MPO) | Dormant (inf) | rec_3d.c, CmpSts_3dImageController | Combine step stubbed | 03, 06 |
@@ -181,7 +181,7 @@ A map of what the main firmware contains and where. This is for learning only: n
 
 ## 6. Main open questions
 
-1. Which E-PM2 menu items exist for AVCHD, interval shooting (info 482 via Myset or PTP), and each art filter id. The Custom Menu A–J item lists are built in code and not yet recovered.
+1. Which E-PM2 menu items exist for AVCHD and interval shooting (info 482 via Myset or PTP). (Art filters: answered in section 09.) The Custom Menu A–J item lists are built in code and not yet recovered.
 2. How the app ends a recording after `RECMOVIE_TIME_LIMIT`, and why Olympus specifies 22 min for Full HD Fine when the code's figure is 26.6 min.
 3. The level of input 0x1709 on an E-PM2 board (would the Bluetooth stack ever start?).
 4. The EXP_MOVIE message codes, Live Bulb timing, IMG_PRECON and WB_MOV (no strings).

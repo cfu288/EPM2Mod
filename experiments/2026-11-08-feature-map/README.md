@@ -24,7 +24,7 @@ A static study of the Olympus PEN E-PM2 main firmware, v1.6, to learn what it co
   - factory self-calibration from card files.
 - **Dormant (complete code, no known way in on this body):**
   - interval shooting and time-lapse;
-  - four art-filter code modules that the menu does not list (star light, mirror, composite, pastel art), plus a third Pin Hole variant;
+  - Olympus compact-camera "Magic Filters" in the art engine, with no way to select them: Fragmented (fully working), Sparkle, Reflection (an empty skeleton) and placeholders for Fish Eye, Drawing, Punk and others (section 09);
   - Bluetooth/PENPAL, gated on a hardware input;
   - 3D photo.
 - **Stubbed:** the picture database behind Photo Surfing, Event View and person/GPS search.
@@ -44,6 +44,8 @@ A static study of the Olympus PEN E-PM2 main firmware, v1.6, to learn what it co
 | [`sections/07-gui-menus-settings.md`](sections/07-gui-menus-settings.md) | Settings system, menu tables, language-string format, hidden menus |
 | [`sections/07-settings.tsv`](sections/07-settings.tsv) | All 1,800 settings tags: storage class, type, count, default |
 | [`sections/08-connectivity-libs-blocks.md`](sections/08-connectivity-libs-blocks.md) | USB/PTP/MTP/PictBridge, HDMI, Eye-Fi/FlashAir, libraries, blocks 2/3, stabiliser MCU |
+| [`sections/09-art-filters.md`](sections/09-art-filters.md) | Art filters: the shipped 12, the hidden Magic Filters, and how they evolved across 8 bodies. Detail in `09a-art-gui.md` and `09b-art-algorithms.md` |
+| [`scripts/`](scripts/) | Scripts for the cross-body art comparison (base finder, Exif-table decoder, enum and name scans) |
 | [`tasks.tsv`](tasks.tsv) | All 177 tasks (both CPUs): id, name, entry, priority, stack. Made by `fwmap.py tasks` |
 | [`modules.tsv`](modules.tsv) | The 152 source files in link order, with their code ranges |
 | [`regions.txt`](regions.txt) | Strings and tasks per 256 KiB region. Made from the **first** database, before the task-table and data-page fixes, so its task names are out of date. Use it as a rough guide only |
