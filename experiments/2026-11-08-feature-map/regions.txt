@@ -1,0 +1,109 @@
+# 256 KiB buckets of block 0: function count, task entries, most frequent string tags
+7e421020-7e461020 fns  1044 tasks: DBG_OUT,PER_CCD_TEMP_MAIN,S_SHELL,SYSFMEM
+     ccd_temp:10, OlEv:5, OlTa:5, OSDB:5, OlSm:4, ram_addr:4, OlQe:3, read_status:3, Mode_Bank0:3, acc_spi:3, CACH1_HIGH:2, CACH0_HIGH:2, CACH0_LOW:2, CACH1_LOW:2, IMG_TCPL:2, IMG_YC2:2, IMG_YC1:2, CDU_M:2, CDU_Y:2, CDU_C:2
+7e461020-7e4a1020 fns   489 tasks: HPROC_PROC,PER_IN,PER_PCONT,PER_WDT,PER_ROTATE,PER_SLOPE,PER_EYE_SENSOR,PER_SCPU_POLLING
+     IOE:16, HANDLER_PROC:14, queueif_test:8, SYS WANA:6, INT_RTC:6, ROTATE:4, SYSCLK:4, IOEC:3, setalrm_s:3, WATERDET:3, set_mode:2, wait_flg:2, get_sec:2, get_ms:2, get_state:2, per_ems:1, per_gio_cfg_read:1, DBG_PER_GIO_ASIC_IOCNTROL:1, PER_GIO_IOE:1, func_test_end:1
+7e4a1020-7e4e1020 fns    17 tasks: 
+     FLSH:1
+7e4e1020-7e521020 fns  1126 tasks: LED_SCREEN,LENS_ASKDATA,LENS_MAIN,SC_TTIMER,U_SHELL,UI_IN,UI_OUT,UI_SCREEN,USRSTART_FIFTH,USRSTART_FIRST,USRSTART_FOURTH,USRSTART_THIRD,PROCLOG,USR_FAST_APP,CPUCONN_CPU0,USRTEST_A,USRTEST_B,USRTEST_C,USRTEST_D
+     MOT_COM:27, MAG_COM:22, EV_SEM:9, TM_SEM:5, ui_jogdial:4, prm_chg:4, UI_OUT:3, Oimf:3, scheap_small_free:3, scheap_large_free:3, jogdial_callback_rdcount_event:3, ch_1:3, ch_2:3, ch1_plschg_cnt:3, ch2_plschg_cnt:3, MG_SEM:3, ANY_USE:3, TP_SEM:3, TskA_DLY:2, TskB_OQW:2
+7e521020-7e561020 fns  1568 tasks: BC_MAIN,BCHK_BATT,BCHK_MAIN,FIRMUP_CLI,FIRMUP_SRV,IMG_PRECON,LENS_FIRM_UP,LENS_FLASH,LENS_FOCUS_LIMIT,ZOOM,PWR_STANDBY
+     firmup:86, option:5, BC FUP:5, dbgmode:4, current_consumption:4, value:4, command:3, val1:3, device:3, serial_number:3, firm_version:3, av_effect:3, focal_length_official:3, focal_length_effect:3, focal_length_official_a:3, focal_length_effect_a:3, pwr_standby:3, damage info:3, LENS_INFO_CURRENT_CONSUMPTION:2, lens_dbgflg:2
+7e561020-7e5a1020 fns  1092 tasks: ?,TAKE_EXPOSE,TAKE_FOCUS,TAKE_FUNC,TAKE_FUNC_CP,TAKE_MAIN,WB_MOV
+     TakeExp:93, af_type:9, take:4, TakeFcs:4, img_l0:3, trigger_ready:3, trigger_lock:3, special_af_frame:3, fcs_pkt:3, clip_x:2, clip_y:2, lv_mode:2, frame_num:2, in_focus:2, mode_focus:2, mode_saf_mf:2, mode_movie:2, mode_af_tracking:2, special_af_frame_mag:2, special_af_frame_x:2
+7e5a1020-7e5e1020 fns  1890 tasks: DCFPROC_SUB,FILECLBK,FILEFGND,STB_CHARGE,STB_EXTERNAL,STB_SEQ,EYEFI
+     stb_expose:9, stb_icharge:8, test_search:5, expose_setting:5, stbdata1_ave:5, fileif_fseek:4, ext_stb_gv:4, stb_popup:4, PRM_STB_TEST_VAL_1:4, PRM_STB_TEST_VAL_2:4, JOB:3, dcfnum_exec:3, fileif_filesize_get:3, flash_under:3, stb_flash:3, abort_req:2, HDR:2, dcffnode_count:2, filedbg_dcfmnt:2, filedbg_rw_operation:2
+7e5e1020-7e621020 fns   584 tasks: FCS_MOVIE,STB_ASSIST_FUNC
+     sp_frame:14, fcs_lens_mfts_get_lens_rslt:8, Not_Focused:7, cR1:5, AREA_S:5, bv:4, PEAK_CNTRL_OK:4, PEAK_CNTRL_NG:4, stb_illuminator:3, contrast_setting:3, INDX_POS_REV:3, rtn_val:3, fcs_lens_mfts_chk_lens_stop:3, fcs_lens_mfts_chk_lens_stop2:3, Current_Zoom_Position:2, af_buff:2, lens_info:2, FCS_DBG:2, sl_hpf_chng_th:2, LD_Inf:2
+7e621020-7e661020 fns  2185 tasks: CAM_MAIN
+     cam_imgdev:47, MI_RES:42, EV_SEM:9, SH_RES:9, APT_PST:8, CAM_PW:7, cam_still_func:7, APT_EXE:5, spot_calc_forcus_pos:4, OPTIONS:4, COM_SET:4, CAM_CL:3, AE_SEM:3, MI_CLS:3, MI_MEM:3, SH_MEM:3, cam_still_live_bulb:3, Fe1s:2, OPT_RTRY:2, ct:2
+7e661020-7e6a1020 fns  1880 tasks: EXP_MOVIE,SDET
+     exp:255, exp_debug:219, Disp_LayerCustom:85, Set_LayerCustom_Data:84, Set_Image_Areas:50, Start_Play_Movie_Ext:38, Resume_Play_Movie_Ext:38, Play_MoviePicture_Slideshow:29, Notify_C3d_Img_Load_Finish:23, RecView_MultiExp:22, Clear_Skin_Execute:22, Clear_Skin_Recview:19, RecView_Picture_Bracket:19, Record_Media:18, Start_Play_Movie:17, Play_Movie_By_Time:17, Clear_Skin_Ready:17, Draw_Image:17, Draw_Image_EditRaw:17, Disp_Sync_Update_Img:16
+7e6a1020-7e6e1020 fns  1753 tasks: HDMI,MOV_TASK,MOVART_TASK,DISP_FRAME,MOVCOLOR,DISPLAY,TOUCHPANEL,MOV_PLAY,MOVCOLOR_SUB,MOV_EDIT
+     disp_sync:99, QT:81, MOV:58, AVCHD:53, MOV_KDG:51, MOV_ART:48, mov_buff:34, QT_FILE:34, exp:33, MOV_BRIDGE:33, MOOV:32, MOV_EDIT:29, MOV_DEBUG:28, mov:27, layer1_iofo:23, layer2_iofo:23, MOV_AVCHD:21, MOV_CMD:20, analyze_play_atoms:15, TP:14
+7e6e1020-7e721020 fns  1698 tasks: FACE_FD,FACE_MAIN,MOVDISP_TASK,MOVREC_TASK,MOVSUPPLY_TASK,REC_FILE,REC_IMAGE,REC_MAIN,REC_PREPRO,REC_SOUND,REC_VIEW,FACE_PT0,MOVREC_FILE,MOV_PLAY_AVF,MOV_PLAY_AVI,REC_EXT,MOV_SUB_TASK
+     analyze_chunk:52, MOVSUPPLY:48, rec:42, analyze CLIP:38, MOV_REC_AVCHD:36, MOV_FILE:25, art_effect_10_star_light:24, analyze_chunk_simplicity:18, MOV_REC:13, avsca_error:12, MOV_AVCHD:10, analyze CLIPb:10, send_playpost_packet:10, strf_auds_format_check:10, QT:10, mov:9, search_thum:8, is_sound_play:6, get_memory:6, AVCHD:6
+7e721020-7e761020 fns   510 tasks: ART_IMG_CM,ART_IMG_CS,ART_IMG_CF
+     art_filter_19_artclearline:16, art_filter_14_dramatic_tone:13, art_filter_21_pastelart:13, art_filter_06_rough_monochrome:10, art_stl2ycc:9, art_filter_09_diorama:8, art_effect_40_soft_focus:6, art_effect_50_white_edge:4, art_img_cf_exec:4, art_filter_1d_composite:3, art_frame_make:2, art_frame_check_param:2, art_frame_get_res_ID:2, art_frame_analyze_jpeg_header:2, art_frame_decord_jpeg:2, art_frame_disp_jpeg_revision:2, art_frame_free:2, art_soft_focus_pass1:2, art_soft_focus_pass2:2, art_soft_focus_pass3:2
+7e761020-7e7a1020 fns    57 tasks: 
+     
+7e7a1020-7e7e1020 fns     1 tasks: 
+     
+7e7e1020-7e821020 fns    60 tasks: 
+     
+7e821020-7e861020 fns    81 tasks: 
+     
+7e861020-7e8a1020 fns   270 tasks: FIRMUP_LED
+     firmup:1, SW_ON:1
+7e8a1020-7e8e1020 fns     6 tasks: 
+     
+7e8e1020-7e921020 fns   661 tasks: SERV_MAIN,BT_CTRL,BTIAP_TSKID,EFFECT,EFFECT_EXE
+     bt_config_set:28, cp_sign_len:5, cp_auth_stat:5, BT:5, bt_pairing_mode:5, SEC_UserConfirm:5, BTC_TMR:5, ack_code:5, btc api:4, STK_CB:4, cp_RcvError:4, cp_RcvCommand:4, cp_chal_len:3, btc:3, bt_dev_hci_reset:3, bt_dev_wrt_addr:3, bt_dev_upd_baud:3, cp_open:3, TSK_BT_CTRL:2, BTC_WaiF:2
+7e921020-7e961020 fns  1588 tasks: AUD_MAIN,PLAY_IMAGE,PLAY_LOAD,PLAY_MAIN,PLAY_SOUND,AUD_LATE_RISER,AUD_COPY_DATA,BTSTK_TSKID,BTTIM_TSKID,BTEVU_TSKID,BTAPL_TSKID,OBEX,OBEX_ACP
+     re_tune_cxx:32, notch_a:24, notch_m:24, se1_notch_a:14, se1_notch_m:14, Width_x:11, Width_y:11, OBEX:10, input_device:10, param_read:10, ACP:9, play_apical:9, mono_stereo:9, output_device:9, rec_or_play:9, copy_area_info:9, play_draw_normal:8, DEBUG_AUD_LATE_RISER:8, wav_type:7, post_end:7
+7e961020-7e9a1020 fns  3722 tasks: AUD_WATCH_DOG,HIGHLEVEL_MAIN
+     IN:25, OUT:25, ASSERT:14, info_area:8, CBC_TOUCH_EVENT:7, TraSh:6, CBC_PLAY_SINGLE_FRAME:6, CBC_TRANSFER_IMAGE:5, TOUCH_INFO:4, CBC_ERASE_ALL:4, CBC_PROTECT_ALL:4, OLY_TRUE:3, OLY_FALSE:3, highlight_color:3, shadow_color:3, FWK:3, CBS_START_RECORDING_MOVIE:3, CBC_EDIT_RESIZE:3, CBC_SOUND_CTRL:3, ERR:2
+7e9a1020-7e9e1020 fns  1596 tasks: 
+     OLY_TRUE:49, OLY_FALSE:49, DIRECTION_UP:30, DIRECTION_DOWN:30, DIRECTION_LEFT:28, DIRECTION_RIGHT:28, API_MEDIA_INTERNAL:16, API_MEDIA_SD_CARD:16, API_MEDIA_EXTERNAL:16, GET_HISTOGRAM:12, API_MOVIE_KEY:7, API_CUSTOM_KEY:7, API_CUSTOM2_KEY:7, API_POWER_KEY:6, API_1ST_RELEASE:6, API_2ND_RELEASE:6, API_UP_KEY:6, API_DOWN_KEY:6, API_LEFT_KEY:6, API_RIGHT_KEY:6
+7e9e1020-7ea21020 fns  2448 tasks: 
+     CapImg_ImagePlayer:354, chls:292, CapThr_ThroughImage:129, ASSERT:55, CapThr:31, CapImg:29, image_area:16, CapMed_MediaController:9, CapMed_MediaInfo:8, CapMed_MediaManager:8, bgm_processing_type:7, BM_NULL_:7, get_face_pos_info:7, app_check_media_flash_air:6, app_background_comp_photo_alloc:6, menu_area:6, app_background_get_face_area:6, app_background_get_face_area_3_4:6, get_focus_pos_info:6, max_pos:6
+7ea21020-7ea61020 fns  4084 tasks: 
+     chls:109, CapPlt_PlayTrimming:33, CapMes_MultiExposureScale:24, CapRev_RecView:19, oldb_Get_Pic_Info:17, chls_oldb_Get_Gps_Area_Next:15, chls_oldb_Get_Gps_Area_Relevant_Pic:15, ASSERT:15, CapTak_TakeHandle:13, chls_oldb_DB_Write_After:12, chls_oldb_Get_Collage_View_Contents_Eventno:12, chls_oldb_Get_Collection_Contents_Collectionno:12, chls_oldb_Get_Index_View_Contents_Eventno:12, chls_oldb_Get_Person_Contents_Personno:12, chls_oldb_DB_Object_Copy:10, chls_oldb_DB_Write_Before:10, chls_oldb_Get_Gps_Area_Pic:10, chls_oldb_Get_Relevant_Pic_YMD:10, chls_oldb_Get_Event_View_Contents_Eventno:9, chls_oldb_Get_Relevant_Pic_GPS:9
+7ea61020-7eaa1020 fns  3336 tasks: 
+     ASSERT:50, CmpSqp_SequencePartsMultiExposure:40, Cap_PlayMovie:33, CapPPnr_PlayPanorama:29, CmpSqp_SequencePartsBase:27, CmpSts_LiveViewZoomController:24, CmpSts_EPortraitShootingEditer:20, CmpRecView:20, CmpSts_3dImageController:12, CmpSts_RecViewController:9, Cmp_ShootingComponentBase:9, Cmp_StillShootingComponentBase:9, rcvStartIntervalShootingIn_active:9, CmpSqp_SequencePartsPanorama:9, rcvRecordingDoneIn_active:8, Cap_PlaySlide:7, Cap_SlideShow:6, CmpShc_ShootingSequenceBase:6, cmp:6, startIntervalShooting_First:6
+7eaa1020-7eae1020 fns  3349 tasks: 
+     Cmp_PlayComponentBase:212, Cmp_Play:137, CmpEImg_EditImageOverlayComponent:57, CmpERaw_EditRawComponent:49, CmpEBea_EditBeautyComponent:44, is_reserve_print:26, is_recording:26, CmpEAsp_EditAspectComponent:26, CmpECol_EditColorComponent:26, CmpERed_EditRedeyeComponent:20, CmpERes_EditResizeComponent:14, CmpESha_EditShadowComponent:14, CmpCst_Function:13, CmpCPic_CopyPictureComponent:12, CmpERot_EditRotateComponent:12, edit_landmark_start:9, firmware_make_image:8, src_size:8, dst_size:8, CmpEPro_EditProtectComponent:7
+7eae1020-7eb21020 fns  2917 tasks: 
+     Cmp_PlayComponentBase:299, Cmp_Play:95, CmpETri_EditTrimmingComponent:69, chls:56, CmpESha_EditShadowComponent:20, CmpEra_ErasePicComponent:19, is_reserve_print:18, is_recording:18, app_select_display_execute:15, Cmp_PlaySingleComponentBase:15, COMPLETE_PROPRIETARY:14, SEND_AFTERACK:14, SEND_AFTERNACK:14, playsound_set_volume:7, pos_str:6, app_play_idle_erase:6, CmpPCal_PlayCalendarComponent:5, playsound_start_play:5, trim_pic_size:4, playcalendar_start:4
+7eb21020-7eb61020 fns  3070 tasks: 
+     chls:296, Cmp_PlayComponentBase:180, Cmp_Play:105, CmpPSel_PlaySelectComponent:57, CmpPli_PlayIndexComponent:23, is_reserve_print:22, is_recording:22, onekoma_move_current_continuous:22, CmpPLgh_PlayLightBoxComponent:20, photsurf_start_select_person:16, Disp_Change_OutputDimensions_Exec:14, start_scroll_fast:14, movie_idle_play_updisp:12, Cmp_PlaySingleComponentBase:10, CmpPRec_PlayRecordComponent:10, API_ERROR_FAIL:9, movie_end:9, movie_step_move_end:8, playrecord_record:8, touch_handling:8
+7eb61020-7eba1020 fns  3822 tasks: 
+     Cmp_PlayComponentBase:76, Cmp_Play:50, CmpRPri_ReservePrintComponent:37, CmpSts_MfAssist:30, CmpSOve_SelectOverlayComponent:19, CmpPls_PlaySingleComponent:16, is_reserve_print:10, is_recording:10, can_move_current_start:8, DevMed_MediaControl:8, start_single_move_current:6, Disp_Change_OutputDimensions_Exec:6, DevAef_AEAFCtrl:6, Get_ExifTag_Data:4, Start_Target_Sound:4, CmpPSld_PlaySlideShowComponent:4, playsound_set_volume:4, move_current_start:4, get_zoom_frame:3, menu_area:3
+7eba1020-7ebe1020 fns   690 tasks: 
+     DevBlu_Bluetooth:38, BMQ_REFDTQ:3, BF_Timer:2, BTM_ACTTSK:2, BFA_DLYTSK:1, BFA_SUSTSK:1, BSE_ACRTSK:1, BSE_DELSEM:1, BSE_SIGSEM:1, BSE_ISISEM:1, BSE_TWISEM:1, BMQ_ACRDTQ:1, BMQ_DELDTQ:1, BMQ_RCVDTQ:1, BMQ_SNDDTQ:1, BTM_ACRFLG:1, BTM_TWIFLG:1, BEF_ACRFLG:1, BEF_DELFLG:1, BEF_SETFLG:1
+7ebe1020-7ec21020 fns     2 tasks: 
+     
+7ec21020-7ec61020 fns    10 tasks: 
+     
+7ec61020-7eca1020 fns    12 tasks: 
+     
+7eca1020-7ece1020 fns  1125 tasks: CA_MAIN
+     OUT:103, SET:17, GET:10, OSDDBG:9, OSDDRAW:9, child_state:5, direct_mode:4, TARGET_AF_CTRL_OFF:3, CAM_APP:2, PC_APP:2, START_MODE_DIRECT:2, OSD_CONTROL:1, getc_adrs:1, get_stat:1, init_stat:1, OSD_DRV:1, osddraw_exec_dot:1, osddraw_exec_line:1, SEND_START_APP:1, SEND_END_APP:1
+7ece1020-7ed21020 fns  2039 tasks: 
+     GUI App:322, GUI gpi:5, GuiTouch:4, rcv_info:2, dbg_output_force_type:2, GUI App protect:2, GUI App picmode:2, APP_CA_GUI_COMM:1, appdbg_param1:1, appdbg_param2:1, is_appdbg_sleep_disable:1, dbg_output_force:1, GUI_Evnt:1, GUI_Data:1, DEF_QUE:1, Genifa:1, GPI_GPIEVT_SEM:1, GPI_GPITIM_SEM:1, GPI_GPIEVT_FLAG:1, GPI_TIM_TASK:1
+7ed21020-7ed61020 fns  1701 tasks: 
+     GUI App:39
+7ed61020-7eda1020 fns  1293 tasks: 
+     GUI App:122, GUI App lv:66, GUI App SPC:2
+7eda1020-7ede1020 fns  1309 tasks: 
+     GUI App:185, GUI:44, GUI App SPC:40, GUI App FuncMenu:18, GuiTouch:15, GUI Debug:13, Draw:6, GUI App Version:3, Event:3, GUI App pro:2, SsRec_Cursor_Entry:2, Warning_Viewer:2, ChgStat:2, Utility:2, GUI Menu:2, Gui App:1, GUI Warning:1, GUI App version:1, GuiState:1, GUI App warning:1
+7ede1020-7ee21020 fns  1830 tasks: 
+     GUI App:94, GUI:5, userMenu:3, gl_TextureMatrix:3, EVT_GUI_END_PLAY_SINGLE_DISPLAY:2, API_ERROR_FAIL:2, GUI App protect:2, GUI App Version:2, GuiTouch:1, GUI ALLWB:1, API_SUCCESS:1, EVT_GUI_END_PLAY_SINGLE_DISPLAY1:1, EVT_GUI_END_PLAY_SINGLE_DISPLAY2:1, EVT_GUI_END_PLAY_SINGLE_DISPLAY3:1, EVT_PRM_UP_KOMA_SELECT_READY_SINGLE_MODE:1, EVT_PRM_UP_KOMA_SELECT_FINISH_DRAW:1, EVT_PRM_UP_KOMA_SELECT_ERASE_SELECTED_PIC:1, GUI App proc:1, gl_ModelViewMatrix:1, gl_ProjectionMatrix:1
+7ee21020-7ee61020 fns  1162 tasks: 
+     
+7ee61020-7eea1020 fns  2821 tasks: 
+     ST_NORMAL:3
+7eea1020-7eee1020 fns  1542 tasks: 
+     
+7eee1020-7ef21020 fns   980 tasks: 
+     
+7ef21020-7ef61020 fns    73 tasks: 
+     
+7ef61020-7efa1020 fns    70 tasks: 
+     
+7efa1020-7efe1020 fns   102 tasks: 
+     
+7efe1020-7f021020 fns   112 tasks: 
+     
+7f021020-7f061020 fns   243 tasks: BAS_MAIN,BAS_RCU_SRV
+     API_IF_:2, do_for2:2, srch_eq:2, Api_If_To_Code:1, do_cmd:1, expr_222:1, expr_x:1, rcu_api_upload:1, bas_rcu_load:1, src_addr:1, load_addr:1, load_size:1, flash_mem:1, rcu_srv:1, rcu_proc:1, rcu_serv_upload:1, md3d_hi_dbg:1, md3d_dmp_dbg:1
+7f061020-7f0a1020 fns  1453 tasks: ADJ,ADJSLF,DPS_MAIN,PC_1394PNP,PC_EVENT,PC_HOSTCOM,PC_I1394,PC_PTP,PC_UAM,PC_USB,PC_USBPNP,PC_USBSRV,PC_XXX,SAICAS,TPC,TPC_DATA,PTPCOM,PTPASYNC,TPC_LANG,C3D_EXE_BRIDGE
+     adj:10, TPC_COM:9, TPCFirmup:9, read_exec:6, TPC:5, write_exec:5, TPC_OLPTPAPI:4, USB:4, tpc_com:3, PC_XXX:3, ADJ_EXQR:2, TPC DPST:2, tpc_olptp_op:2, tpc_ptp_com_SendEvent:2, usb_que_read:2, host_send_data_packet_post:2, usb_que_write:2, EP0_CSR_REG:2, EP_CONFIG_REG:2, OUT_WRT_CNT_REG:2
+7f0a1020-7f0e1020 fns   554 tasks: C3D,C3D_UPDATE,SPC_MAIN,SPC_TIMER
+     isdio_write_command:9, SPC_APE:5, dB_Gain_Sv:4, len_of_arg:3, ADJ_BPF_:3, TA_FadeOut:2, Gr_Room:2, P3D_Photo_:2, Gr_Photo_:2, isdio_read_register:2, num_of_res_sts_queue_supp:2, status_reg:2, spc_ctrl_req:2, chk_flashair:2, spc_ctrl_init_prm:2, spc_ctrl_connect:2, spc_ctrl_disconnect:2, spc_ctrl_write_ssid:2, spc_ctrl_write_networkkey:2, spc_ctrl_write_config:2
+7f0e1020-7f121020 fns    40 tasks: 
+     
+7f121020-7f161020 fns    26 tasks: 
+     
+7f161020-7f1a1020 fns     1 tasks: 
+     
