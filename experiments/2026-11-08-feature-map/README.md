@@ -24,7 +24,7 @@ A static study of the Olympus PEN E-PM2 main firmware, v1.6, to learn what it co
   - factory self-calibration from card files.
 - **Dormant (complete code, no known way in on this body):**
   - interval shooting and time-lapse;
-  - six art filters that are not in the menu (Crystal, Mirror, Composite, Pastel I/II, Pin Hole III);
+  - four art-filter code modules that the menu does not list (star light, mirror, composite, pastel art), plus a third Pin Hole variant;
   - Bluetooth/PENPAL, gated on a hardware input;
   - 3D photo.
 - **Stubbed:** the picture database behind Photo Surfing, Event View and person/GPS search.
