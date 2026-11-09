@@ -128,3 +128,6 @@ English-string counts not present in the E-PM2: E-PL5 0 (block 1 identical), E-P
 - **15a (GUI pages): three claims checked.**
   - **Confirmed:** `openPage` 0x7EDCBE97 loads 0x7EFE4E14, 0x7EFE5614, 0x7EFE5A14 (and 0x7EFE6214, a fourth address the section doesn't list). getListPage 0x7EDC7DBA has 5 callers.
   - **Not confirmed as stated:** "0x7EFED8F4 is an identical copy of the touch table 0x7EFE4058". The first 13 words match (0x7EDE12C5, 0x7EDDDE22, 0x7EDDDF93 …), but from word 13 the first table holds non-pointer words (0x003F009A …) while the second holds zeros. Audit A8 will check this.
+- **15c (app statecharts): two claims. Confirmed:**
+  - `evTraCmpPly_NotifySelectDisplayExecuteEnd` and `…NotifySelectExecuteEnd` are named in receive traces (0x7EB109D3, 0x7EABA04x).
+  - The original running handler 0x7EB14F8E is 1,500 B with 21 callers.
