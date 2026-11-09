@@ -100,13 +100,13 @@ Overheads (**verified** constants; meaning **inferred**):
 | MOV_AVCHD (2nd table, entry 0x7E6D4E01) | 0x7E6D4F1C | AVCHD record + play commands to AVSCA. **Verified** strings |
 | MOOV (2nd table, 0x7E6D568F) | 0x7E6D56FA | QT moov/stream writer: DFS_Stream*, ring buffer. **Verified** strings |
 | QT ENCODE (2nd table, 0x7E6D554A) | — | "[QT] ENCODE Abort Packet". **Verified** string |
-| MOV_BRIDGE (cfg 0x8088, pri 4) | 0x7E6CE4AC | The loop reads its DTQ (0x7E6DDB14) and calls the handler 0x7E6CE517, which routes AVCHD_RECORD_*/MEDIA_WRITE/FILE_OPEN/CLOSE and PLAY_* between app, MOV_AVCHD and file. "task terminate" is printed in 0x7E6CE47B. **Verified** |
+| MOV_BRIDGE (cfg ~~0x8088~~ 0x8087, pri 4: record 0x7E438D08 = {0x8087, 0, 0, 0x7E6CE4AC, 4, 0x400, 0x604DF780}, and Usr3 starts it with the id at 0x7E43E94C (coverage C4 (L1 2026-11-09))) | 0x7E6CE4AC | The loop reads its DTQ (0x7E6DDB14) and calls the handler 0x7E6CE517, which routes AVCHD_RECORD_*/MEDIA_WRITE/FILE_OPEN/CLOSE and PLAY_* between app, MOV_AVCHD and file. "task terminate" is printed in 0x7E6CE47B. **Verified** |
 | MOV_SUB_TASK | 0x7E6F43E2 | Runs `img_exec_sub` jobs (0x7E6DAC97). **Verified** |
 | MOVART_TASK | 0x7E6CBEBC | img_exec + `mov_kdg_exec` (movie effects). **Verified** |
 | MOVCOLOR / MOVCOLOR_SUB | 0x7E6D0906 / 0x7E6D11EB | Colour calc with hysteresis (§3.4). **Verified** strings |
-| "IMG0_LOCAL" (cfg 0x8E, pri 11) | 0x7E6D4597 | The config table names this task IMG0_LOCAL, but its code prints `[MOV_EDIT]`. It is the time-lapse AVI builder (§5.3). MOV_EDIT has no config row of its own; "MOV_EDIT" appears only as a queue name (0x7E50518C). **Verified** |
+| ~~"IMG0_LOCAL" (cfg 0x8E, pri 11)~~ MOV_EDIT (cfg 0x84, pri 11) (L1 2026-11-09) | 0x7E6D4597 | ~~The config table names this task IMG0_LOCAL, but its code prints `[MOV_EDIT]`.~~ Its code prints `[MOV_EDIT]`. It is the time-lapse AVI builder (§5.3). ~~MOV_EDIT has no config row of its own; "MOV_EDIT" appears only as a queue name (0x7E50518C).~~ Its record 0x7E439C20 is {0x84, 0, 0, 0x7E6D4597, 11, 0x400, 0}, and Usr3 starts id 0x84 with the label `MOV_EDIT` (0x7E505289). 0x8E is the id of the next record: the {entry, pri, size, stack, id} layout puts every id one record too late. IMG0_LOCAL is task 0x808D at 0x7E575D41 (IMG library) (tasks.tsv) (coverage C4 (L1 2026-11-09)). **Verified** |
 
-The second-table entries come from 28-byte records at 0x7E43D4BC…; the IDs 0x9008/0x9009/0x900D assume the main table's `{entry, pri, size, stack, id, …}` layout (**inferred**). The queue names (MOV_BRIDGE, MOV_AVCHD, MOV_AVCHDI, MOVREC_FILE, MOV_ENCODE, MOV_REC, MOV_EDIT, MOV_P_IMG, MOV_PLAY, MOV_SPLY, MOV_DISP) are created at 0x7E50518C. **Verified** strings.
+The second-table entries come from 28-byte records at 0x7E43D4BC…; the IDs ~~0x9008/0x9009/0x900D assume the main table's `{entry, pri, size, stack, id, …}` layout (**inferred**)~~ are 0x9007 (0x7E6D4E01), 0x9008 (0x7E6D568F) and 0x900C (0x7E6D554A): the records are {id, 0, 0, entry, pri, size, stack}, and Usr3 labels these ids MOV_AVCHD, MOV_AVCHDI and MOV_ENCODE (**verified** bytes, coverage C4 (L1 2026-11-09)). The queue names (MOV_BRIDGE, MOV_AVCHD, MOV_AVCHDI, MOVREC_FILE, MOV_ENCODE, MOV_REC, MOV_EDIT, MOV_P_IMG, MOV_PLAY, MOV_SPLY, MOV_DISP) are created at 0x7E50518C. **Verified** strings.
 
 **MOV_CMD numbers** (MOV_TASK table, **verified**; names from the `[MOV] CMD …` strings and the `mov exec` names):
 
@@ -231,7 +231,7 @@ All rows are **verified** from the strcmp chain in 0x7E6D15A0. Help text: 0x7E80
 - **Not found in this range:** wind-noise reduction or a recording-level setting. ALC attack/decay strings (`*alc_atk`, `*alc_dcy`) exist in the audio module at 0x7E952119, outside this scope. **Verified absence by string search here.**
 
 ### 5.3 MOV_EDIT = time-lapse movie builder
-- It runs in the task the config table names IMG0_LOCAL (entry 0x7E6D4597, cfg 0x8E). **Verified.**
+- It runs in ~~the task the config table names IMG0_LOCAL (entry 0x7E6D4597, cfg 0x8E)~~ task 0x84 MOV_EDIT (entry 0x7E6D4597; §2 table) (coverage C4 (L1 2026-11-09)). **Verified.**
 - `mov_edit_check_param` 0x7E6D493D accepts only quality 3 (720p), sound disabled (`MOVREC_SOUND_DISABLE`), kind MJPEG and fps ∈ {1,2,3,5,6,10,15,30}. Otherwise it returns 0xFF01. **Verified.**
 - Flow: `record_start` 0x7E6D46BE → `record_make` 0x7E6D47BC (per YC frame) → `record_end` 0x7E6D4839. It uses the MJPEG `userstop_for_edit` state. **Verified.**
 - The app API `api_play_Create_TimeLapseMovie` 0x7E686E96 logs exactly these fields (quality, record_sound, movie_kind, fps, compression). It reaches MOV_EDIT through the generic `api_exec` queue (**inferred** link).

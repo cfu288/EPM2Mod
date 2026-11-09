@@ -52,6 +52,12 @@ first_fn	last_fn	source_file	fns_naming_file	placement	name_string
 7e6efab5	7e6f1bb6	mov_rec_MJPEG.c	3	direct	7e80fa7c
 7e6f287b	7e6f287b	mov_rec_file.c	0	string-order	7e81124f
 7e6f43e2	7e6f43e2	mov_sub.c	1	direct	7e81193d
+7e6f459d	7e6fca3c	FACE_* [unnamed]	0	inferred-L1 (L1 2026-11-09)	-
+7e6fca60	7e707854	mcon [unnamed]	0	inferred-L1 (13e bounds) (L1 2026-11-09)	-
+7e707880	7e707a1b	IMGDMA add [unnamed]	0	inferred-L1 (L1 2026-11-09)	-
+7e707a9d	7e70828f	[unnamed] (IMG-library helpers)	0	inferred-L1 (L1 2026-11-09)	-
+7e708312	7e70b198	Exif/MakerNote writer [unnamed]	0	inferred-L1 (L1 2026-11-09)	-
+7e70b3f8	7e70bd7f	rec main (REC_MAIN) [unnamed]	0	inferred-L1 (L1 2026-11-09)	-
 7e70bdf4	7e70d2f5	rec_3d.c	5	direct	7e851eaa
 7e713657	7e713cce	rec_jpeg.c	2	direct	7e853bb0
 7e7166ec	7e7166ec	rec_misc.c	1	direct	7e853daa
@@ -172,4 +178,4 @@ first_fn	last_fn	source_file	fns_naming_file	placement	name_string
 7ede2aab	7ede2aab	2CNL.cpp	1	direct	7eff6764
 7eea132e	7eea1a23	CAvpiAsoAudioSource.cpp	11	direct	7f02ff0d
 7eea9802	7eeaa153	CAvpiVsoVideoSource.cpp	11	direct	7f0309a0
-7f084d3f	7f084ef6	adj_p15740_p.c	2	direct	7f0d2cb8
+7f084a00	7f08526f	adj_p15740_p.c	2	direct: names in 7f084d3f/7f084ef6; extent inferred-L1 (DeviceProp layer, 01 §7) (L1 2026-11-09)	7f0d2cb8

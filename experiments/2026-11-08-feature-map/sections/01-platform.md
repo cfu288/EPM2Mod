@@ -1,6 +1,6 @@
 # 01 — Platform: OS, boot, drivers, debug facilities, BASIC, factory adjustment
 
-Scope: 0x7E421020–0x7E521020, plus BASIC (0x7F05C000–0x7F06B000) and ADJ/ADJSLF (0x7F080000–0x7F087xxx, 0x7F0A7Cxx–0x7F0AB000).
+Scope: 0x7E421020–~~0x7E521020~~ 0x7E521132 (the 1-MB window edge 0x7E521020 falls inside the lens function 0x7E520E2D, which takes the lens event codes such as 0x02001516 and ends with `ret` at 0x7E521130) (L1 2026-11-09), plus BASIC (0x7F05C000–0x7F06B000) and ADJ/ADJSLF (0x7F080000–0x7F087xxx, ~~0x7F0A7Cxx–0x7F0AB000~~ 0x7F0A7CA5–0x7F0D257C, §7 (L1 2026-11-09)).
 Labels: **[V]** = verified (I read the code or bytes and they show this). **[I]** = inferred (from strings, names or layout only).
 Helper scripts: `/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/platform/` (`seq.py`, `cmdtbl.py`, `rstr.py`, `rword.py`, `deep.py`).
 
@@ -20,7 +20,7 @@ Helper scripts: `/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/pl
 - ID 1 (`entry 0x7E44A043`, pri 1) is the only row with attr = 2 (TA_ACT: auto-start). It is the boot task. **[V]**
 - *Coordinator note: resolved. `tasks.tsv` and `fwmap.py tasks` now use this layout (commit a165ec5).* This disagreed with the earlier `tasks.tsv`. That file puts `cfg_id` *after* the entry, so its numbers are one row off from the real IDs. Evidence for the layout above (all **[V]**):
   - The boot code calls `OlyTaSt(60)` with check label "S_SHELL". ID 60 is entry 0x7E44E972, which prints `S_SHELL`/`:-) `. In tasks.tsv, ID 60 would be SC_TTIMER.
-  - `OlyTaSt(0x84)` has the label "MOV_EDIT". ID 0x84 is entry 0x7E6D4597, which prints `[MOV_EDIT]`. tasks.tsv calls this entry IMG0_LOCAL.
+  - `OlyTaSt(0x84)` has the label "MOV_EDIT". ID 0x84 is entry 0x7E6D4597, which prints `[MOV_EDIT]`. ~~tasks.tsv calls this entry IMG0_LOCAL.~~ The current tasks.tsv has 0x0084 MOV_EDIT for it, and 04 now uses this layout (coverage C4) (L1 2026-11-09).
   - `OlyTaSt(0x8F)` has the label "CPUCONN0", and entry 0x7E505A22 is CPUCONN on both CPUs.
   - TA_ACT is on 0x7E44A043. That entry runs all of the boot code.
 - The entry names in tasks.tsv agree with mine for IDs 1…0x84. The name table (0x4D222) agrees with `names[ID-1]`. The exceptions:
@@ -213,7 +213,7 @@ Other drivers in the range have shell hooks only: RTC, IOE/IOEC (I/O expander ov
 - **Soft-timer API** 0x7E465081–0x7E465582: `tmr_start` 0x7E4650A2 (124 sites), `tmr_stop` 0x7E4650DD (39) **[V]**; **PER_PCONT client side** 0x7E465D10–0x7E466886 (PWM duty 0x7E466435/0x7E466448) **[V edges; I]** (D3 2026-11-09).
 - **BT UART adapter** 0x7E46B24E–0x7E46B3D0 (← BT 0x7E9135F2/0x7E9136E5; calls SIO open 0x7E467EED and the UART attach 0x7E46967C) **[V]** (D3 2026-11-09).
 - **USR_FAST_APP step handlers** 0x7E5025C3–0x7E503A6D; **CPUCONN remote kernel calls** 0x7E505A93–0x7E505F2F (`needs_remote` 0x7E505A93 is called by the Oly* kernel wrappers 0x7E449030…0x7E4494A1; send-and-wait 0x7E505D91) **[V]** (D3 2026-11-09).
-- **UI_SCREEN task** 0x7E50DD29 and the UI_OUT back half to 0x7E50F7F1; the MEC core 0x7E514648–0x7E5167EB (`mec_alloc` 0x7E51470B, 143 sites; update/free 0x7E51483B, 119) and the MEC sequence steps 0x7E518E91–0x7E51BA08 **[V]** (D3 2026-11-09).
+- **UI_SCREEN task** 0x7E50DD29 and the UI_OUT back half to 0x7E50F7F1; the MEC core 0x7E514648–0x7E5167EB (`mec_alloc` 0x7E51470B, 143 sites; update/free 0x7E51483B, 119) and the MEC sequence steps 0x7E518E91–0x7E51BA08 **[V]** (D3 2026-11-09). **MEC layer below the handlers (coverage C4, [V]) (L1 2026-11-09):** the MEC init 0x7E517791 passes RAM 0x604F63FC to 0x7E518FBD, which fills a 12-entry operation table (0x7E51902A, 0x7E5191E5, 0x7E51921D, 0x7E51945B, 0x7E519662 = MAG STOP at slot 4, …, 0x7E519C89); the step timers come from `mec_timer.c` (start 0x7E51BAC5 → soft timer 0x7E4650A2; its error path 0x7E51BE62 logs `mec_timer.c`). Example: step 0x7E519A05 waits for `mec_ev` event 33, then arms MEC timers 16 and 17.
 - Still open: the 4-command dispatcher 0x7E463376 (callers camera core 0x7E626C76 and EXP_MOVIE 0x7E6A1021…) **[I, weak]** (D3 2026-11-09).
 
 ## 6. Flash memory (SYSFMEM, [flashmem])
@@ -240,7 +240,7 @@ Other drivers in the range have shell hooks only: RTC, IOE/IOEC (I/O expander ov
 **ADJ** (ID 2, entry 0x7F080000, in overlay B, started by Usr4).
 - Waits on flag `ADJ_WaiF` and queue `ADJ_SQR`. Commands 0/3/6/7 → 0x7F0801E6/21F/228/256. **[V]**
 - Requests reach the op handler `0x7F080284`. **[V]** That they come from the USB/PTP side through TPC queue `QTPCADJR` is **[I]**.
-- The source file is `adj_p15740_p.c` (P15740 = PTP). `0x7F080284` checks that the opcode is 0x1002–0x902B. It hashes `(op−0x1001) & 31` into the table at 0x7F0D2850. **[V]**
+- ~~The source file is `adj_p15740_p.c` (P15740 = PTP).~~ The file name `adj_p15740_p.c` (P15740 = PTP) is logged only by `get_MediaKind` 0x7F084D3F and `set_MediaKind` 0x7F084EF6 (vendor property 0xD028). **[I] (L1 2026-11-09):** the file is probably only the DeviceProp layer 0x7F084A00–0x7F085286. Its dispatchers 0x7F084A00 (← 0x7F080479), 0x7F084A6C (← 0x7F0804AB), 0x7F084AD8 (← 0x7F0804DD) and 0x7F084B77 (← 0x7F0804FE) switch on properties 0xD023–0xD028, and every function up to 0x7F08526F is called only from this layer. Its rodata (tables 0x7F0D2B88–0x7F0D2CB6, the `[adj_p15740_p.c]` strings 0x7F0D2CB8–0x7F0D2D75, the Set dispatch table 0x7F0D2D78–0x7F0D2DF7) is a separate block after the rodata of 0x7F080000–0x7F084855 (`ADJ_*` and `[adj]` strings 0x7F0D263A–0x7F0D283C, tables 0x7F0D2850–0x7F0D2B4C). The op handler 0x7F080284 logs with the prefix `[adj]`, so the call chain alone does not put it in `adj_p15740_p.c` (modules.tsv row updated). `0x7F080284` checks that the opcode is 0x1002–0x902B. It hashes `(op−0x1001) & 31` into the table at 0x7F0D2850. **[V]**
 
 | opcode | handler | notes |
 |---|---|---|
@@ -260,14 +260,14 @@ Other drivers in the range have shell hooks only: RTC, IOE/IOEC (I/O expander ov
 - External calls from ADJ reach these subsystems **[V]**: prm settings, flash, mechanical shutter (0x7E518Cxx), lens (0x7E51E…/0x7E532…), level/accelerometer (0x7E469Dxx), rotate, strobe (0x7E5E2xxx, "strobe timeout"), battery check, cam.c, exp, audio (0x7E95Cxxx), and the jog/key event paths. That these are what the factory adjusts is **[I]**.
 
 **ADJSLF** (ID 3, entry 0x7F087004). Started by Usr2 bit 24, ~~called from `api_adj_Check_Execute_Self_Adjust` (0x7E675F05)~~. **[V]** **D3 (V):** 0x7E675F05 calls Usr2 (through 0x7E68CD13) with 0xFFFFFF, which loads overlays A and B but does not set bit 24; the only mask with bit 24 seen is 0x1000000 from slot 3 0x7EBA13F6 of vtable 0x7EC90B30 (caller not traced; 15d §4.4) (D3 2026-11-09).
-- Reads queue `ADJSLF_EQR` and calls `0x7F0A7CC1`, the engine at 0x7F0A7Cxx–0x7F0AB000.
+- Reads queue `ADJSLF_EQR` and calls `0x7F0A7CC1`, the engine at ~~0x7F0A7Cxx–0x7F0AB000~~ **0x7F0A7CA5–0x7F0D257C** (coverage C4 (L1 2026-11-09)). The first function 0x7F0A7CA5 is called by the ADJSLF init 0x7F086FF5 (← Usr2 0x7E505005) and follows SPC's task starter 0x7F0A7C6B. The string users run on to the per-unit sequences `Sense` 0x7F0CB8DD, `SenseMG5`, `Defect`, `Spectra`, `BvCCD`, `BCShake`, `BCCenter`, `AUDIO`, `AFLED` and `Shutter` 0x7F0D23F5, whose `ret` at 0x7F0D257A is the last code in overlay B (0xFF bytes, then rodata from 0x7F0D2580). **[V]** for the two edges, **[I]** that every function between them is ADJSLF. Inside it: the result-CSV identity writer 0x7F0A8E8F and the card-file open 0x7F0A9083 (coverage C4 review 4).
 - The engine logs PTP-style calls: OpenSession, Set/ResetDeviceProperty, GetExtDeviceInfo, `GetCalibData/SetCalibData(tag)`, DisposeExposeOnlyCapture, ContTFT/ContAFAE/ContIAF, MDN/MDI/MDO, SetPrePro.
 - It uses card files: `/%03dPRM%02d/`, `wb_lv001.csv`, `%sCalib.prm`, `MNF99991.JPG`, `AFBV9311.JPG`, CSV output.
 - So it is an in-camera client ("CAPI") that runs adjustment sequences from the card without a PC. **[I]**
 
 ## Open questions
 
-1. **Task ID layout disagrees with the coordinator's tasks.tsv.** I find `{id, attr, exinf, entry, …}` starting at 0x17CB0. The evidence is the boot-time `OlyTaSt` labels and TA_ACT on 0x7E44A043 (§1). Under this layout, IDs 0x8085/0x7E5065EF ("DBG_OUT" in the code vs PWR_STANDBY in the name table) and 0x84/0x7E6D4597 (MOV_EDIT, not IMG0_LOCAL) need a decision.
+1. **Task ID layout disagrees with the coordinator's tasks.tsv.** I find `{id, attr, exinf, entry, …}` starting at 0x17CB0. The evidence is the boot-time `OlyTaSt` labels and TA_ACT on 0x7E44A043 (§1). Under this layout, IDs 0x8085/0x7E5065EF ("DBG_OUT" in the code vs PWR_STANDBY in the name table) and 0x84/0x7E6D4597 (MOV_EDIT, not IMG0_LOCAL) need a decision. **(L1 2026-11-09):** the coordinator's tasks.tsv now uses this layout (0x8087 MOV_BRIDGE, 0x84 MOV_EDIT, 0x808D IMG0_LOCAL), and section 04 was corrected to match (coverage C4 review 1).
 2. What sets the USR_FAST_APP flag bits after 0x01/0x08, and when does the app call Usr2 (bits 0, 1, 24) during normal use?
 3. Meaning of flash src 0x4039D000 (boot read) compared with the 0x80xxxxxx fmem addresses, and the layout of the 0x40xxxxxx ROM map.
 4. The runtime API_IF_/APPEVENT_ name tables used by BASIC (RAM 0x602C…), and which API codes `api()` accepts (0x7E67F3E6).

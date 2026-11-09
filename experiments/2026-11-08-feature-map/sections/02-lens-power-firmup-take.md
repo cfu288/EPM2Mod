@@ -1,6 +1,6 @@
 # 02 — Lens, power, firmware update, shooting control, strobe, files
 
-Scope: block 0 runtime 0x7E521020–0x7E621020, plus the code these tasks call elsewhere (FIRMUP_LED at 0x7E880xxx, boot task 0x7E503DD4, lens debug shell 0x7E524xxx). E-PM2 v1.6.
+Scope: block 0 runtime ~~0x7E521020–0x7E621020~~ 0x7E521133–0x7E6211E0 (the 1-MB window on function edges: the lens function 0x7E520E2D ends at 0x7E521132 and the fcs function 0x7E620C6F at 0x7E6211E0) (L1 2026-11-09), plus the code these tasks call elsewhere (FIRMUP_LED at 0x7E880xxx, boot task 0x7E503DD4, lens debug shell 0x7E524xxx). E-PM2 v1.6.
 
 **Labels.** **verified** = I read the disassembly or bytes and they show it. **inferred** = from strings, names, layout or consistency only.
 
@@ -164,7 +164,7 @@ The USB flow (inferred from order): `[TPCFirmup]FirmwareCheck` sends type 3 (che
 - **Data asked from the lens** (`lens data` 0x7E526702 and dumps 0x7E5268F4–0x7E528D01): LENS_INFO_STATE (zoom/focus encoder, object distance, av_effect), CHARACTER (name, focal_length_w/t, serial_number, firm_version), CHARACTER_ZM (per zoom step: focal_length_center, av_official/av_effect min/max), MAKERNOTE, SHADING, DISTORTION (c3/c5/c7), FOURTHIRDS (version, kbps), IS (flact_k*, lat_mag_k*), LAF, SYNC (wobble/aperture speeds), LIFTM, WOB_MAG, 3D, EZ (power zoom encoder), PANA/OLY private flags, LENS_OIS, CURRENT_CONSUMPTION (still/movie, units 100 mA). Adapter variants `_A`. **inferred** (strings only).
 - **Power zoom**: `[lens_zoom]` dump 0x7E538B0C prints focal_length_official/effect current/min/max (and `_a` adapter). **inferred**.
 - **Movie AF / `fcs_lens_mfts_*`** (FCS_MOVIE area): get_lens_rslt 0x7E5ED006/0x7E5F6C2D/0x7E609DFA, iaf_chg 0x7E609DFA, set_speed 0x7E60A3DE, scan_chg_speed(_multi) 0x7E60BC39/0x7E60B908, stop_lens 0x7E60C919, stop_scan_ft 0x7E60CDE5, stop_lens_wob 0x7E60D20F, stop_lens_force 0x7E60D5B9, scan_lens 0x7E60D90F, scan_only_lens 0x7E60DFF4, scan_lens_wob 0x7E60E308, move_lens 0x7E60E648, move_lens_ofset(_vd/_vd_sim) 0x7E60EAB7–0x7E60EF1E, chk_lens_stop(2) 0x7E60F2DC/0x7E60F7ED. FCS_MOVIE task 0x7E610A65 (`FCS_QUEUE_RECIEVE`, `FCS_RES_QUEUE_WRITE`). **inferred** from strings (functions placed by string refs).
-- Lens state events (0x7E520BB3/0x7E520C46): STATE_FOCALLEN, FOCUSRING, LENSDIAL, LENS_TROUBLE, RANGE_FOCUS, LENS_IS_SW, CAMON/OFF_AF_STOP, LENSCUSTOM. **inferred**.
+- Lens state events (0x7E520BB3/0x7E520C46): STATE_FOCALLEN, FOCUSRING, LENSDIAL, LENS_TROUBLE, RANGE_FOCUS, LENS_IS_SW, CAMON/OFF_AF_STOP, LENSCUSTOM. **inferred**. **Lens status word 0x604F6580 (coverage C4, verified code) (L1 2026-11-09):** bit 28 is latched into 0x604F8F50 (`and 0x10000000; lsr 28` at 0x7E520422) and returned by the getter 0x7E52233A (only for a new-protocol lens, 0x7E52237F/0x7E52239E); FCS 0x7E6106FD and SDET 0x7E6634F7/0x7E663663 treat a non-zero value as "AF not available" (inferred: an MF-clutch state). Bit 29 (tested at 0x7E520799, together with bit 1 and a mask) sends event 0x02001516 when it sets and 0x02011516 when it clears (the CAMON/CAMOFF_AF_STOP pair) to 0x7E520E2D.
 
 ## 3. Battery, power, damage
 
@@ -202,6 +202,7 @@ The USB flow (inferred from order): `[TPCFirmup]FirmwareCheck` sends type 3 (che
 ## 5. Strobe
 
 - **STB_CHARGE** 0x7E5DFF5E (`stb_icharge …`): charging of the internally-powered strobe; state dump 0x7E5E0549, A/D check `ERR STOP/OK %3d [A/D]` 0x7E5E0896. **STB_EXTERNAL** 0x7E5DCA31 (`stb_external.c`): hot-shoe flash detect/remove by ID (0x7E5DD174), mode/state events (0x7E5DDEA6–0x7E5DE11A), serial `TX_DATA/RX_DATA` (0x7E5DC0F7), LED video light (0x7E5DDAD8), strobe firmup (1.9). **STB_SEQ** 0x7E5D8E94: firing sequence. **STB_ASSIST_FUNC** 0x7E5E1E94: calls illuminator 0x7E5E0FA4, popup 0x7E5E1B45 (`auto pup status`), charge control 0x7E5E14D8 (`stb internal chrgrge on/off/restart/pause`, low/normal mode) — callees **verified**, roles **inferred**.
+- **Red-eye pre-flash (coverage C4, verified code) (L1 2026-11-09):** STB_SEQ 0x7E5D8E94 runs `stb_expose` 0x7E5D0E12 for message type 1 and the pre-flash train 0x7E5D6726 for type 16. The train fires N = prm 0xD4D2 (54482) flashes from the external or internal strobe (0x7E5D67E6 → `strobe_light_exec` 0x7E5E2419); each one waits for a 33-ms soft timer that sets the event `STB_REDEYE` (id at 0x7E43EBDA). Then it waits (900 − 33·N) ms, so the train always lasts about 0.9 s (inferred from the arithmetic).
 - Debug: `stb …` (0x7E5DB015: init, con/coff/cpau/cres, cloop, cset (stop/ok A/D thresholds), manual, full, redeye, popup (1 manual, 2 auto, 11/12 via queue), adget, expose …), `stb ext` (EEPROM read/write, RESET, READY_VOLTAGE …), `stbd prm 1|2 val` sets **PRM_STB_TEST_VAL_1/2** (0x7E5DADE1). **inferred**. E-PM2 has no built-in flash; the "internal" path most likely serves the bundled clip-on FL-LM1 (**inferred**).
 
 ## 6. Files, DCF numbering, Eye-Fi
@@ -209,6 +210,7 @@ The USB flow (inferred from order): `[TPCFirmup]FirmwareCheck` sends type 3 (che
 - **DCF init** 0x7E5AF0EA: 548 node pool, default folder number 100 with suffix `xxxOLYMP` (0x7E793BDC) and default file name `P1010001JPG` (0x7E793C34); path format `%c:\DCIM\%s\%s` (0x7E5AF8D6). **verified** constants; naming rule P + month (1–C) + day + number is **inferred**.
 - **DCFNUM commands** (0x7E5C816A): MOUNT, RECNUM, RECNODE, FORMAT, DELMOUNT, UNMOUNT, RECNUM2, RECCANCEL, CLEARFLASH, RECABORT. Settings `PRM_DCFNUM_FOLDER/FILE` 0x7E5C6065; `dcfnum_exec` 0x7E5C6CB4; shell `dcfnum/resetnum/eyefi` 0x7E5C5750. **inferred**.
 - **Tasks**: DCFPROC_SUB 0x7E5B34CE, FILECLBK 0x7E5C1B4E (file callbacks), FILEFGND 0x7E5C4E90 (waits event, runs 0x7E5C4DD3), EYEFI 0x7E5C1981. **verified** entries; roles **inferred**.
+- **EYEFI request protocol (coverage C4, verified code) (L1 2026-11-09):** the client stubs 0x7E5C0B07, 0x7E5C0B34, 0x7E5C0B60, 0x7E5C0B8C and 0x7E5C0BB9 send commands 0x200001, 0x200003, 0x200004, 0x200005 and 0x200006 synchronously (`Oimf` 0x7E50689F) to the queue whose id is at 0x7E43ED00. They return the reply word, or 0x9417 when the send fails. 0x200005 (0x7E5C0B8C) is the get-file-status request of `eyefi_get_file_status…` 0x7E5C71A1 and `api_media_Get_Eyefi_File_Status` 0x7E680A84. The receiver 0x7E5C0A7B dispatches 0x200001–0x200007.
 - **Eye-Fi**: creates an `EyeFi` directory on the card (0x7E5ABE5B), validates card parameters (`Invalid EyeFiCard parameter...` 0x7E5AC0B8…), reads MAC token, `eyefi_enable_operation`/`wrap_disable` (0x7E5C715F), per-file status (0x7E5C71A1); E_EYEFI/S_EYEFI (0x7E5C0BFF). **inferred**.
 
 ## Open questions

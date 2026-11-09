@@ -1,6 +1,6 @@
 # 06 — C++ application layer: shooting and playback components, picture database
 
-**Scope:** block 0, about 0x7E966000–0x7EBA1020 (HIGHLEVEL_MAIN and the C++ code it runs), plus the framework base code at 0x7EBA0000–0x7EBA8000 that this code uses.
+**Scope:** block 0, ~~about 0x7E966000–0x7EBA1020~~ 0x7E965FD1–0x7EBA0AA8 (HIGHLEVEL_MAIN and the C++ code it runs; the regions-table row) (L1 2026-11-09), plus the framework base code at ~~0x7EBA0000–0x7EBA8000~~ 0x7EBA0AA9–0x7EBA7BC0 (`Dev*` part 2 and the OXF runtime, 13c §1) (L1 2026-11-09) that this code uses.
 **Labels:** **verified** means I read the code or bytes. **inferred** means the claim comes from strings, names or layout only.
 Helper scripts are in the scratch dir (`.../scratchpad/app/`: `vt.py` dumps vtables, `cmdtbl.py` finds command tables, `vtref.py` finds code that loads a vtable).
 
@@ -41,7 +41,7 @@ Helper scripts are in the scratch dir (`.../scratchpad/app/`: `vt.py` dumps vtab
 - Each event class has an 18-word vtable. Example: vtable 0x7EBDD058, built by constructor 0x7E970EE8. The constructor writes the event id as a u16 at `+4` (11964 here).
 - Slot 2 (0x7E970F1B) is `isTypeOf(id)`. It compares the id with 11964, then calls the parent class's check 0x7E96C3F1. This is a hand-made RTTI.
 - Slot 3 is `getId` = 0x7E966B30 (`movhu (4,a0),d0`). ~~930 data words point to 0x7E966B30~~ **1,273 data words point to 0x7E966B30** (each followed by slot 4 = 0x7E966B37), so there are **1,273 event vtables with 1,268 distinct ids**; 250 of the classes are never constructed (13c §4) (D1 2026-11-09).
-- ~~Most event vtables are in 0x7EBCE000–0x7EBF0000.~~ The event vtables span **0x7EBC0000–0x7EC92200**; only 45% lie in 0x7EBCE000–0x7EBF0000. The constructors sit in each package's module (559 of them in Cap/Cmp code), not in TraShareTakeStatus. 0x7E96B000–0x7E9823AB is not an "event constructor" range: of its 2,603 functions, 1,388 are event methods; the rest is operation-class code (`OlyHfwLowApiWrap`, `OlyHfwOpeLevel`, `OlyHfwOpePlyCom`, `OlyHfwOpePlyMov` and reactive classes; 13c §4, §7) (D1 2026-11-09). (`Tra` = transition framework, **inferred**.)
+- ~~Most event vtables are in 0x7EBCE000–0x7EBF0000.~~ The event vtables span **0x7EBC0000–0x7EC92200**; only 45% lie in 0x7EBCE000–0x7EBF0000. The constructors sit in each package's module (559 of them in Cap/Cmp code), not in TraShareTakeStatus. ~~0x7E96B000–0x7E9823AB~~ 0x7E96B02F–0x7E9823AA (the old range on function edges: 0x7E96B000 is inside 0x7E96AFE2 and 0x7E9823AB starts the next function) (L1 2026-11-09) is not an "event constructor" range: of its 2,603 functions, 1,388 are event methods; the rest is operation-class code (`OlyHfwLowApiWrap`, `OlyHfwOpeLevel`, `OlyHfwOpePlyCom`, `OlyHfwOpePlyMov` and reactive classes; 13c §4, §7) (D1 2026-11-09). (`Tra` = transition framework, **inferred**.)
 
 **OS wrapper "HLS" (verified strings + code):**
 - Functions 0x7E967A99–0x7E9690EE (`HLS_CRE/DLE/SEE/WAE` for events, `HLS_CRQ2/REQ1/WRQ1` for queues, `HLS_*S` for semaphores, `HLS_IST/SLT/WKT` for tasks).
@@ -57,8 +57,8 @@ Helper scripts are in the scratch dir (`.../scratchpad/app/`: `vt.py` dumps vtab
 | `Cmp_PlayComponentBase` | base constructor **0x7EB0A5E7**; 58-slot vtable **0x7EC6F70C** (slots 52–57: `sound_state`, `playsound_set_volume`) | **verified**: 10 derived constructors call it (next row) |
 | Derived constructors (vtable they load) | 0x7EAAB4B8 (0x7EC59A00), 0x7EAAE3C3 (0x7EC5A360), 0x7EAB160C (0x7EC5B144), 0x7EB055F9 (0x7EC6C1C0), 0x7EB1A7E6 (0x7EC70B48), 0x7EB28B48 (0x7EC74F9C), 0x7EB3E58B (0x7EC7A16C), 0x7EB4264A (0x7EC7DDCC), 0x7EB54718 (0x7EC81A90), 0x7EB6C601 (0x7EC861B8) | **verified** call edges. ~~Which file each belongs to is **inferred**: they sit near the module boundaries of Function, PlayCommon, BackgroundControl, Calendar, Continuous, Evcollection, Panorama (×2), Select and SlideShow.~~ **Classes (D3 2026-11-09, 15c class index, V):** PCom (PlayCommon), Bgc (BackgroundControl), CCom (CameraCommon), PCol (Collage), PCw, PEvV (EventView), PPnr (Panorama), PPho (Photosurf), `Cmp_PlaySingleComponentBase` 0x7EB54718 (the next base of a linear chain, 13c §3) and PSou (Sound) |
 | `Cmp_ShootingComponentBase` / `Cmp_StillShootingComponentBase` | 0x7EA7A486 / 0x7EA8001A | **inferred** (strings) |
-| Category (`Ctg_ComponentSwitcher` 0x7EB9473A, 5 vtable refs) | 0x7EB94000–0x7EBA0000 | **inferred** |
-| Transition manager (`Com_ActiveTransitionManagerBufferd`; strings `newCapabilityStart`, `previousCapabilityEnd`) | 0x7EB8A000–0x7EB8C000. The same area also holds `Cab_CameraBase` and the standby/shoot/play/function mode machine (Com_ framework 0x7EB84345–0x7EB8C265, 13c §6) (D1 2026-11-09) (A5 2026-11-09) | **inferred**: the components start and stop capabilities through "transitions" |
+| Category (`Ctg_ComponentSwitcher` 0x7EB9473A, 5 vtable refs) | ~~0x7EB94000–0x7EBA0000~~ 0x7EB93423–0x7EBA0AA8 (all categories, from the function-mode category getInstance 0x7EB93423; 14c §1) (L1 2026-11-09) | **inferred** |
+| Transition manager (`Com_ActiveTransitionManagerBufferd`; strings `newCapabilityStart`, `previousCapabilityEnd`) | ~~0x7EB8A000–0x7EB8C000~~ inside the `Cab_CameraBase` facade 0x7EB89214–0x7EB8C264 (15c class index; the manager's ctor is 0x7EB8AD37 and its strings are used by 0x7EB8AE7F, 0x7EB8BB28 and 0x7EB8BB9B) (L1 2026-11-09). The same area also holds `Cab_CameraBase` and the standby/shoot/play/function mode machine (Com_ framework 0x7EB84345–0x7EB8C265, 13c §6) (D1 2026-11-09) (A5 2026-11-09) | **inferred**: the components start and stop capabilities through "transitions" |
 
 **Caveat:** `vtref.py` counts vtable slots as consecutive code-range words, so packed vtables can make the count too high. Treat the 58/35/288 slot counts as upper bounds.
 
@@ -183,7 +183,9 @@ Helper scripts are in the scratch dir (`.../scratchpad/app/`: `vt.py` dumps vtab
 - This shared code base comes from Olympus compacts (Tough/SH series with GPS and "ib"-style event and person browsing).
 - On the E-PM2 the DB is compiled out, so every DB-backed play mode is dormant.
 
-## 5. API enums and the `sdk api` test shell (0x7E99A000–0x7E9C0000)
+## 5. API enums and the `sdk api` test shell (~~0x7E99A000–0x7E9C0000~~ handlers 0x7E99A7CF–0x7E9BFA7D) (L1 2026-11-09)
+
+**Range (L1 2026-11-09, verified table words):** the lowest `sdk` sub-command handler is 0x7E99A7CF (table 0x7EBF0FA0); helpers such as `Adapter Info` 0x7E99A6A8 (← 0x7E99A940) come before it, so the shell code starts a little earlier. The `sdk api` handlers of the 635-entry table run from 0x7E9A171D to 0x7E9BF9E5; the word after the table (0x7EBF9F4C) points to 0x7E9BFA44, which ends at 0x7E9BFA7D, and the OlyApi getters start at 0x7E9BFA7E.
 
 **Shell structure (verified):**
 - The debug shell's `sdk` sub-command table is at **0x7EBF0FA0**: `{name*, fn*}` pairs.

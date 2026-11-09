@@ -108,7 +108,7 @@ The **mode controller** layer `0x7E6FEA5F` sits between the GUI and Get_CameraIn
 - 128 buckets at 0x605B9750, from 505 ROM records of 20 bytes at **0x7E84A0B8** (`{u16 info, u16 flags, ptr, ptr, ...}`). ~~The pointers lead to per-mode availability matrices. These are probably "mcon_if_check_selectable" / "Search_Mode_Conflict". **(inferred)**~~ The pointers are the raw/GUI value arrays (13e §3.1). Availability is the separate 92-record conflict table **0x7E825DA8** ("Search_Mode_Conflict", 13e §2.2) (D1 2026-11-09).
 
 ### 2.2 GUI access path (verified)
-The GUI never calls prm or Get_CameraInfo directly (0 call sites in 0x7ECA1020–0x7EE21020). It does `obj = 0x7E9C9E9A()` (a singleton at 0x602B2504; vtable 0x7EC0F2E4 has 29 slots) and calls through the vtable:
+The GUI never calls prm or Get_CameraInfo directly (0 call sites in the GUI code ~~0x7ECA1020–0x7EE21020~~ 0x7ECCB800–0x7EE02094; recount (L1 2026-11-09): none of the 2,027 call sites of 0x7E67F822/0x7E67F882/0x7E67FC52/0x7E67FC78/0x7E6803BC is in it). It does `obj = 0x7E9C9E9A()` (a singleton at 0x602B2504; vtable 0x7EC0F2E4 has 29 slots) and calls through the vtable:
 - slot 0 = setSetting (0x7E9CA978, `setSetting is Unresponsive`)
 - slot 1 = getSetting (0x7E9CA19C → 0x7E9E76BE → 0x7E6FCABA → 0x7E6FEA5F → Get_CameraInfo)
 - slot 8 = check (0x7E9C9F24; wrapper 0x7EE01F3E)
