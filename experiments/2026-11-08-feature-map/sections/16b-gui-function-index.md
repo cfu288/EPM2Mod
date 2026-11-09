@@ -1,172 +1,121 @@
-# 16b. GUI and CA_MAIN function index 0x7ECCB800–0x7EE02094 (E-PM2 v1.6, round D4)
+# 16b. GUI and CA_MAIN function index 0x7ECCB800–0x7EE02094 (E-PM2 v1.6, rounds D4–D5)
 
 Scope: one row per function for the GUI, the GUI toolkit and the camera app (CA_MAIN / appCaller) code before it. It builds on 13d (toolkit, Ss engine, registries), 14e (slots, DC, shapes) and 15a (pages, panels, touch). The index is `16b-gui-function-index.tsv`.
 
 - **Labels:** **V** = read in code, bytes or a decoded table; **I** = inferred (position, callers, name order).
-- **Scratch:** `$S/d4/gui/`. Build order: `core.py` (map DB) → `api.py` (OlyApi vtables) → `vt.py`, `cls.py`, `fact.py` (vtables, ctor chains, factory types) → `ca.py`, `ca2.py` (CA tables) → `tables.py` (15a TSV, registries, settings, strings) → `idx.py` (rules, effects in `eff.py`, names in `known.py`) → `mktsv.py OUT`. Verification dumps: `ver.py`, `final_sample.txt`, `final2.txt`, `final3.txt`, `final4.txt`.
+- **Scratch:** `$S/d5/gui/` (D4 copy plus D5 changes). Build order: `core.py` → `api.py` (OlyApi vtables; names from `apiname.py`) → `vt.py`, `cls.py`, `fact.py` → `ca.py`, `ca2.py` → `tables.py` → `drawobj.py` (draw-object types) → `idx.py` (rules; effects `eff.py`, names `known.py`, D5 structures `d5rules.py`, small-code describer `micro.py`) → `mktsv.py OUT`. Metric: `classify.py TSV`.
 
 ## 1. Area and boundaries (V unless marked)
 
 | Range | Component | Basis |
 |---|---|---|
-| 0x7ECCB800–~0x7ECCFFFF | CA_MAIN OSD layer: `[OSD_CONTROL]`/`[OSDDRAW]`/`[OSDDBG]` strings in 32 functions 0x7ECCB8F9–0x7ECCF9C2, debug shell 0x7ECCBA45, MMIO 0x9AA000xx writes (end is a round bound, I) | strings |
-| ~0x7ECD0000–0x7ECD257E | CA application core: `applicationChanger` 0x7ECD0002, sub-app loop 0x7ECD0DC7, function table 0x7EED0BBC (44 entries, loaded by 0x7ECD1886; its entries log key-judge strings such as `KEY_1ST_JUDGE_NG`, I), two classes with vt 0x7EED02AC / 0x7EED03BC (ctors 0x7ECD05B3 / 0x7ECD11F2; strings `StartProc`, `PcApp:sub-app start proc`) | strings, tables |
-| 0x7ECD257F–0x7ECE39B9 | **CA sub-app handlers**: all 489 CA row handlers lie here, mixed with `*SubAppMdl*`/`*SubAppModule*` modules and the sub-app classes (§2.2) | CA tables |
-| 0x7ECE39BA–~0x7ECE6E04 | appCaller: getInstance 0x7ECE39D2 (RAM 0x602B4BF4, 128 B, ctor 0x7ECE3A0A, vt 0x7EEEC80C, 21 slots: `startThrough`, `stopThrough`, `getExposeMode`, …), `setCameraAppData` 0x7ECE3DCD, CA trace print 0x7ECE631E | code, strings |
-| 0x7ECE6E05–0x7ECEC798 | GuiCallerImp (ctor 0x7ECE6E05, vt 0x7EEF4AE4; sendEvent 0x7ECE6E27), GE message layer (0x7ECE7597/0x7ECE75C3), GPI display layer | 13d §1 |
-| 0x7ECEC799–0x7ECEE1D4 | GUI pools, UTF-16 helpers, CTouchPnl; touch singleton getInstance 0x7ECED84E (RAM 0x602B5EB4, 64 B, 267 callers) | 13d §1 |
-| 0x7ECEE1D5–0x7ECFF982 | toolkit core, widget base, C/D parts, renderers, DC, geometry | 14e §1 |
-| 0x7ECFF983–0x7ED16F17 | **GUI controller singletons** (getInstance + strings): CCommon 0x7ECFF983 (RAM 0x602B6038); 92-B singleton 0x7ED01D91 (RAM 0x602B6040); CGuiDrawCtrl 0x7ED01DFD (0x602B6044); BackGroundCtrl wrapper 0x7ED022EE (0x602B6048); CPlayCalendar 0x7ED02438 (0x602B6050); CPlayIndex 0x7ED02C53 (0x602B6054, 3,300 B); play-start chooser 0x7ED053D9 (0x602B6058); CPlayLightBox 0x7ED0595E (0x602B605C); **CPlayMovie 0x7ED07225** (0x602B6060); CPlaySingleFrame 0x7ED08FA7 (0x602B6064); CPlayZoom 0x7ED0F04C (0x602B606C); CRec 0x7ED0FF47 (0x602B6070) | ranges = [ctor, next ctor) (I) |
-| 0x7ED16F18–0x7ED37DA9 | factory class 0x0105, factory, CreatePanel, app window, widgets, **draw-object family** (19 classes, ctors 0x7ED1F4F4–0x7ED221E1, base vt 0x7EF10EA4, 19 slots each; slot 18 has the empty-notify-map shape `cmp 0x18FF → −1`) | vtables |
-| 0x7ED37DAA–0x7ED82275 | 114 panel classes. Class k = [ctor_k, ctor_k+1) over **all 114** factory ctors (table 0x7EF0F3B0), not only the 98 numbered ones (§4.1) | factory table |
+| 0x7ECCB800–~0x7ECCFFFF | CA_MAIN OSD layer (`[OSD_CONTROL]`/`[OSDDRAW]` strings, debug shell 0x7ECCBA45; end is a round bound, I) | strings |
+| ~0x7ECD0000–0x7ECD257E | CA application core: `applicationChanger` 0x7ECD0002, sub-app loop 0x7ECD0DC7, function table 0x7EED0BBC (44 entries) | strings, tables |
+| 0x7ECD257F–0x7ECE39B9 | **CA sub-app handlers** (all 489 CA row handlers), sub-app classes, **boot-warning chooser 0x7ECD6031** (§2.4) | CA tables |
+| 0x7ECE39BA–~0x7ECE6E04 | appCaller (getInstance 0x7ECE39D2, RAM 0x602B4BF4, vt 0x7EEEC80C), CA trace print 0x7ECE631E | code |
+| 0x7ECE6E05–0x7ECEC798 | GuiCallerImp (vt 0x7EEF4AE4), GE message layer (0x7ECE7597 build / 0x7ECE75C3 post), **GPI display layer** (§2.6) | 13d §1 |
+| 0x7ECEC799–0x7ECEE1D4 | GUI pools, UTF-16 helpers, CTouchPnl (getInstance 0x7ECED84E) | 13d §1 |
+| 0x7ECEE1D5–0x7ECFF982 | toolkit core (root, **data model** §2.3, generic list, screen, container), widget base, C/D parts, renderers, DC, geometry | 14e §1 |
+| 0x7ECFF983–0x7ED16F17 | GUI controller singletons CCommon … CRec (16b D4 table; ranges = [ctor, next ctor), I) | strings |
+| 0x7ED16C72–0x7ED17B8A | **panel layout path**: post-create layout, display-variant change, layout tables A/B (§2.5) | code |
+| 0x7ED16F18–0x7ED37DA9 | factory, CreatePanel, app window, widgets, **draw-object family** 0x7ED1F4F4–0x7ED22E5C (§2.2), drawing engine | vtables |
+| 0x7ED37DAA–0x7ED82275 | 114 panel classes, class k = [ctor_k, ctor_k+1) over the factory table 0x7EF0F3B0 | factory table |
 | 0x7ED82276–0x7EDC15AF | statechart engine, WinMain, Ss handlers, IGui_Controler, Actuator/Viewer objects | 13d §4 |
-| 0x7EDC15B0–0x7EE02094 | guiUtility, menu-page framework, pages, GuiTouch, USB-connect screen | 15a §1 |
+| 0x7EDC15B0–0x7EE02094 | guiUtility (with the **trace ring buffer** §2.7), menu-page framework, pages, GuiTouch, USB-connect screen | 15a §1 |
 
-## 2. Tables decoded completely (V)
+## 2. Tables and structures (V unless marked)
 
-### 2.1 Ss descriptor matrices (13d §4.1 format)
-- All 17 descriptors at 0x7EFB8BCC: 2,912 non-default (SS, state, event) cells, 1,360 handler functions, 224 entry and 105 exit slots. 203 handler entry points are not DB function starts; their containing DB function says "contains / also contains Ss handler(s) merged by fwmap".
-- **Action** = the handler's return value (13d return rule: 0 stay, 1–255 state, `(ss<<8)|state` switch). The rules, in order:
-  1. a constant in d0 at a reachable `ret`;
-  2. the constants written to the register that is moved to d0 before `ret` (only if every write to it is a constant);
-  3. for `call X ; [ext] ; ret` or `call X ; bra L ; L: [ext] ; ret`, the result of X: for X in the Ss range, X's constants (one level); for X in a controller class, X's constants below 0x1200;
-  4. `asl 8 ; or` before `ret` gives "(SS<<8)|state assembled from locals" (constants stored to those stack slots, when they are found).
-- The shared stay action 0x7EDA2654 (`clr d0; retf`) counts as "stay".
-- Effects are listed after `does:`: ShowPanelEx(n), PostEventToCA(code, info) with names from 0x7EEEFFD0 / 0x7EEF05E4, self-post events (names 0x7EFDEF78), DM get/set block, get/setSetting(id, label from 07-settings.tsv), page key calls (current page RAM 0x602BCF04 vt+12, d0 = key), openPage, OlyApi `Class::method`, posted GM ids (names 0x7EFDFDA8).
-- Result over the handler rows: 946 give constant actions, 53 a named callee result, 283 only "a state computed in the handler" (open, §5).
-- TSV rows `SS_x[states]/0xEVENT` (1,484): one row per (SS, event, handler), states grouped.
+### 2.1 Unchanged from D4
+- **Ss descriptor matrices** 0x7EFB8BCC (17 descriptors, 2,912 cells, 1,360 handlers). Action = handler return (13d return rule; one level of Ss callees; controller callees below 0x1200).
+- **CA sub-app tables:** descriptors `{state, rows, count}`, rows `{event, GUI code, next, handler}`; event names 0x7EEEF378; six common tables (Boot 0x7EED8D4C, Misc 0x7EED92DC, Pc 0x7EEDA340, Play 0x7EEDB0C0, PlayHdmi 0x7EEDBB08, Shooting* 0x7EEEAF04). 4,177 + 190 rows, 489 handlers.
+- Vtables (574 runs, 442 ctor-stored), C++ ctor table 0x7F033AC8, openPage cases, list registry 0x7EFE180C, Actuator/Viewer registry 0x7EFC5408, 15a touch rows.
 
-### 2.2 CA sub-app state tables
-- **Descriptor arrays** `{u32 state, u32 rows, u32 count}` (12 B), registered by the sub-app classes. **Rows** `{u32 event, u32 GUI code, u32 next state, u32 handler}` (16 B).
-  - next = 1 means "no change";
-  - GUI code 0/1 = none; any other code k is mapped to a GUI event through `{k, event}` 0x7EEF3434 (0x7FFF = none);
-  - handler may be NULL (pure GUI-code forwarding).
-- **CA event names:** the 392 `{u32 event, char*}` pairs at 0x7EEEF378–0x7EEEFFB7 (OLY_* keys/devices 0x01, TOUCH_* 0x02, CBK_* callbacks 0x03, GUI_* codes 0x04, MNG_* 0x05, CAM_START_* 0x06, SUB_EVENT_* 0x09, …).
-- **Sub-app names:** from the `search X` cases of 0x7ECE29C6 and the `command XCommon` classes.
+### 2.2 GUI draw-object family (new)
+- **Factory** 0x7ED1AFF9 = app window vt slot 197: type d0 0x2000–0x2012 → jump table 0x7EF0FF30 → `operator new` 0x7ED1F597 (GUI pool with the app-window pool bytes) → ctor → channel mask (slot 10) and layer bytes (slot 12) → import track (slot 1). Deleter 0x7ED1F5BE.
+- **Base** ctor 0x7ED1F4F4, vt 0x7EF10EA4 (19 slots). Fields: +4, +8 pointers; +12 channel mask; +16..+18 bytes (layer ids +17/+18, registered with app window vt+248). Derived effect objects add +20 track array, +24 value (<<15 fixed point), +28 per-tick step.
+- **Slot dictionary** (base / derived): 0 returns the deleter (derived calls base first); **1 import track(count d0, resource a1)**: pool-allocate +20 and copy the records whose mask matches +12 (base returns 1); 2 returns 1; **3 release track** (pool free); **4 apply keyframe d1** (effect types: +24 = key<<15, step +28 from 20-B time records; widget-property types such as 0x2003 set the target widget a1, which must be type 0x8003); **5 tick**: +24 += +28, returns 1 if +24>>15 changed (base returns 0); 6/7 set/get +4; 8/9 set/get +8; 10/11 set/get mask +12; 12/13 set/get layer bytes; 14 pre-draw, **15 draw on surface a1 in rect d0**, 16 post-draw (base: return 1); 17 message filter (−1); 18 empty notify map (`cmp 0x18FF`, −1). V on the base and on type 0x200C; the other types' slot roles are I where the byte signature (`asr 15`, pool free) is not checked.
+- **Types** (type: size, ctor, vt): 0x2000 100 B 0x7ED22306 0x7EF11448 (own 56-slot class, I: container); 0x2001 56 0x7ED20484; 0x2002 36 0x7ED20D18; 0x2003 24 0x7ED1FC5F; 0x2004 24 0x7ED221E1; 0x2005 76 0x7ED21440; 0x2006 68 0x7ED21D58; 0x2007 36 0x7ED20FD1; 0x2008 40 0x7ED211DA; 0x2009 32 0x7ED1F600; 0x200A 32 0x7ED21783; 0x200B 36 0x7ED2009F; **0x200C 32 0x7ED202AF = keyframed 4-neighbour blur** (slot 15 → 0x7ED362AA, N = +24>>15; C6 F058/F059); 0x200D 40 0x7ED21937; 0x200E–0x2010 28 B (0x7ED1FF71, 0x7ED1FD98, 0x7ED1F7D5); 0x2011 64 0x7ED1F987; 0x2012 28 0x7ED21C09. Effect callees of slot 15 (I where unread): 0x200B 0x7ED360BB, 0x200D 0x7ED3655A, 0x200F 0x7ED3571D, 0x2010 0x7ED359D6, 0x2011 0x7ED36A6F, 0x2012 colour fill via 0x7ECFE9CF, 0x2009 empty 0x7ED359D3.
 
-| Id | Sub-app | States | Rows | Id | Sub-app | States | Rows |
-|---|---|---|---|---|---|---|---|
-| 0x10 | Boot (0x7EED8F2C) | 5 | 12 | 0x55 | Shooting3D | 2 | 65 |
-| 0x20 | Misc (0x7EED9DBC) | 9 | 157 | 0x56 | ShootingAssist | 1 | 22 |
-| 0x30 | Play (0x7EEDB990) | 7 | 107 | 0x57 | ShootingMenu (0x7EEE10B4) | 6 | 134 |
-| 0x40 | PlayHdmi (0x7EEDC7E8) | 8 | 175 | 0x58 | ShootingModeDirect | 14 | 554 |
-| 0x50 | ShootingCommon | 6 | 74 | 0x59 | ShootingFuncDirect | 21 | 415 |
-| 0x51 | ShootingStill | 10 | 331 | 0x5A | ShootingLvMagnify | 13 | 808 |
-| 0x52 | ShootingPanorama | 3 | 97 | 0x5B | ShootingInterval | 5 | 204 |
-| 0x53 | ShootingMovie | 6 | 318 | 0x5C | ShootingMvTelecon (0x7EEEAE98) | 9 | 501 |
-| 0x54 | ShootingLvGuide | 1 | 65 | 0x60 | Pc (0x7EEDAD70) | 13 | 138 |
+### 2.3 GUI data model singleton (new; links 07 §5)
+- getInstance **0x7ECEF5DC** → RAM **0x602B5EB8** (28 B, ctor 0x7ECEF685, vt 0x7EEF54C8, dtor 0x7ECEF6A6/0x7ECEF6A9). Fields: u16 +4 capacity 16; +8 slot table of 16-B slots `{get hook, set hook, buffer, size}`; u16 +12 block count; +16 listener list.
+- init 0x7ECEF608/0x7ECEF6DF (count ≤ 256, once), shutdown 0x7ECEF622, **get body 0x7ECEF760** (behind the 07 get 0x7ECEF64F), **set body 0x7ECEF7D9** (behind set 0x7ECEF667: copy, mark the block dirty in every listener 0x7ECEFDEF, optional notify 0x7ECEF8A7 → GM 0x1900 to each listener window 0x7ECEFE24). Hooks in RAM 0x602B5728/572C (init/term) and 0x602B5730/5734 (lock/unlock).
+- Generic doubly linked list (12-B nodes {next, prev, item}, GUI pool 5): init 0x7ECEF905, destroy 0x7ECEF911, append 0x7ECEF932, remove 0x7ECEF99F, begin 0x7ECEFACB, next 0x7ECEFAE9.
 
-- **Six "common" row tables** apply in any state of a sub-app. The count is loaded by the class's command function.
+### 2.4 CA_MAIN boot-warning chooser (new)
+- **0x7ECD6031** tests in order card 0x7ECD63D7, date 0x7ECD64B7, lens 0x7ECD64F0, AVCHD 0x7ECD654A; logs `error Card/Date/Lens/AVCHD`, else `error none` and clears the **warning code RAM 0x605EFDCC** (reset 0x7ECD6018 also clears 0x605EFDD0).
+- Codes: 6/7 card state (MediaCtrl::getMediaStateInfo queries through 0x7ECD3583), 10 `movie full`, 11 `movie full_still`, 8 `still full`; 9 date not set (unless the date screen 0x7ECD5D42 is opened, gated by 0x7ECD636E = C6 F055); 1–4 lens/mirror (`isMirrorSetup`, lens state vt+76, getSetting(26) = 115); 12 AVCHD error.
 
-  | Sub-app | Table | Rows | Loaded by |
-  |---|---|---|---|
-  | Boot | 0x7EED8D4C | 18 | 0x7ECDF7A1 |
-  | Misc | 0x7EED92DC | 17 | 0x7ECE0056 |
-  | Pc | 0x7EEDA340 | 25 | 0x7ECE07DE |
-  | Play | 0x7EEDB0C0 | 34 | 0x7ECE1370 |
-  | PlayHdmi | 0x7EEDBB08 | 31 | 0x7ECE1B03 |
-  | all Shooting* | 0x7EEEAF04 | 65 | 0x7ECE2341, ShootingCommon class vt 0x7EEEB740 |
+### 2.5 Panel layout tables (new; C6 F061)
+- **Table A 0x7EF03C08**: 114 rows `{u32 panel type 0x6000+k, fn(variant d0)}` (53 distinct fns): per-type layout set-up of RAM layout blocks. **Table B 0x7EF03F98**: 114 rows `{type, fn(variant d0, panel a0)}` (63 fns): re-layout of a live panel.
+- 0x7ED16C72(panel index, panel) runs A[index] at post-create with the **display variant** RAM 0x602B61F4; 0x7ED16CB1(0..2) changes the variant and re-lays out the top panel (0x7ED16CEF) and all panels (0x7ED16D58); lookups 0x7ED16EAB (A) / 0x7ED16EC8 (B); panel type = vt+8 + 0x5FFF (0x7ED16EE5). The variant is set from CCommon output-change paths (I: TFT/EVF/HDMI).
 
-- Totals: 4,177 state rows + 190 common rows; 489 handler functions (2,425 rows with a handler).
-- TSV rows `CA Sub[states]/0xEVENT` (2,336): one per (sub-app, event, handler, next, code), states grouped.
+### 2.6 GPI display layer (new, partial)
+- 0x7ECE842E (from 0x7ECE83E9 ← WinMain) builds a 16-entry layer-driver op table and 3 layer descriptors at RAM **0x605F56D0** (160 B each: u16 id, 720 × 480, bpp, stride at +144, ops copied to +76). Ops present: 0 0x7ECE879F, 1 0x7ECE87DD, 2 0x7ECE9168, 4 0x7ECE893D, 5 0x7ECE882B, 7 0x7ECE8CE4, 9 0x7ECE89D7, 11 0x7ECE92BD, 12 0x7ECE91DD (`GPISetPalette`), 14 0x7ECE932D, 15 0x7ECE935A. What ops 0–11 do is open.
 
-### 2.3 Other tables used
-- **Vtables:** 574 function-pointer runs referenced by code immediates. 442 of them are stored by a ctor (`mov VT,dN ; mov dN,(aX)`). A run is cut at the next stored vtable.
-  - Slot role = the dictionary of the class that introduces the slot (root, container, screen, widget, panel base, page grand-base / base / list page); ctor chains come from the ctor's first call.
-  - Class names come from the factory types (0x7EF0F3B0), the 15a panel/page rows, `X::` strings in own slots, `command X`, or the string before the vtable.
-- **Function tables without a ctor:** jump tables (the referencing function has `jmp (aN)` and the targets have no callers) give "switch case k". `{key, case}` hash switches (e.g. 0x7EED5254 in 0x7ECD7A61) give "case block (key k)". Other runs give "function table entry k".
-- **Others:** C++ ctor table 0x7F033AC8 (33 static initialisers; their `{-1, fn}` member records give "member fn: pmf record RAM X"); openPage cases and the list registry 0x7EFE180C; the Actuator/Viewer registry 0x7EFC5408; the 15a touch-action rows; ptrs.tsv data words.
-- **OlyApi** (44 getters, 13d §6.2): ctor → vtable → each slot's `0xGGCCMM` constant → MM-th `Class::method` string. The method names are **I** (name-order rule; see §4.3).
+### 2.7 GUI trace ring buffer (new; C6 F066)
+- 120 records × 16 B at *RAM 0x6069FCCC, index 0x6069FCD0: init 0x7EDC42C0 (480 words), next record 0x7EDC42F7, address (i mod 120)×16 0x7EDC430D. Kind 1 {1, d0, d1, a0} = state change (0x7EDC4606 from hook 0x7EDC4205); kind 2 {2, tag, d1, a0} 0x7EDC461D with caller tags 1 WinMain RDSTDoEvent, 2 PostEventToCA, 3 ShowPanel, 4 palette, 6 BackGroundCtrl, 7 JPEG/black-screen, 8 CGuiDrawCtrl, 9 guiEventFilter (tag 5 = 0x7EDC6F56). Dump 0x7EDC4323 (`[ChgStat]`, `[Main] RDSTDoEvent`, …).
+
+### 2.8 OlyApi names (fixed rule)
+- Each OlyApi slot function passes its id `0xGGCCMM` to **0x7E96E5F0**, which returns the name from a 3-level table at RAM **0x602B1F10** (`.data`): group G−1 → class C−1 → method M−1. The index now reads the name there (V). The old rule ("M-th `Class::method` string in string order") was off for **MediaCtrl only**: the string `MediaCtrl::unmountMedia ` has a trailing space, so the regex skipped it and every later MediaCtrl name moved one place. 16 MediaCtrl slots changed name (e.g. vt+40 = unlockProtectAll, **vt+44 = transferImageAll**, vt+60 = cancelTransferImageAll). This settles the D4 open question: 15a is right. CustomPrint was already right (vt+60 canPrint 0x5031D, vt+84 getPrintCount 0x50320).
 
 ## 3. Rules (first match gives the primary role; effects and returns are appended)
-1. **ss / ss-entry / ss-merged:** a Ss handler, entry or exit (§2.1).
-2. **ca / ca-merged:** a CA row handler (§2.2). The handler's own name is added when its first string is a unique identifier (CA functions log their own name through 0x7ECE631E).
-3. **ctortab / jtab / hsw:** a static initialiser; a switch case block split off by fwmap.
-4. **doc:** a function named in 13d/14e/15a/10f or read here (`known.py` ROLEDESC, 124 entries).
-5. **touch:** a 15a touch-action row.
-6. **vt:** `<class> vt slot k (+4k) = <slot role>`, with "shared by n vtables".
-   - Root slots added here (V, from the OnMessage case table 0x7EEF5228): msg 1 → +228 then **+396 (slot 99)**; msg 2 → **+216 (54)**; 0x1006 GM_USER → +232 (58); 0x1103 GM_DELETECHILD → **+240 (60)**; 0x1300/0x1301/0x1302 → **+324/+328/+332 (81–83)**; 0x1901/0x1902 GM_DB_* → **+400 (100) OnDBUpdate**.
-   - Panel slots: 91 = post-create init (114 of 116 override it; it binds the resource table through 0x7ED16C72 and fetches children); 129 = getChild(i) (bounds-checked +792 array; V).
-   - Actuator/Viewer-type objects (ctor calls 0x7ED8BBA6): slot 0 = Update (I).
-7. **openpage / listreg / actreg / 15a:** page getters, list factories, registry creators, 15a fn rows.
-8. **ctor:** stores vtable V (ctor or dtor of the class).
-9. **str:** `named X` (the first `Class::method`, `doCmd_*` or unique identifier string, skipping OlyApi names) or `logs '…'`.
-10. **shape** (from reachable code only):
-
-    | Shape | Bytes / instructions |
-    |---|---|
-    | field getter / setter | `mov(hu) (N,a0),d0 ; retf` / `mov d0,(N,a0) ; retf` |
-    | RAM getter / setter | `mov (60xxxxxx),d0 ; retf` / store to 0x60xxxxxx |
-    | constant return | `mov N,d0 ; retf`, `clr d0 ; retf` |
-    | thunk | `jmp X` |
-    | this-adjust thunk | `mov (N,a0),a0 ; jmp X` |
-    | getInstance | `fc a0 RAM ; cmp 0,a0 ; bne ; mov SIZE,d0 ; call 0x7EBA62DB ; call ctor ; store` |
-    | creator | `new SIZE ; ctor ; ret` |
-    | short wrapper | ≤ 12 insns, 1–2 calls (log calls ignored) |
-    | OlyApi wrapper | `call getter ; mov (a0),a1 ; mov (NN,a1),a1 ; calls (a1)`, ≤ 40 insns |
-
-11. **pmf / imm / dataw:** a pointer-to-member target; address taken by code; listed in a data table.
-12. **range / ctrl-range:** a private method of the panel, page class or controller class whose code range contains it, with its caller's role.
-13. **caller:** `helper of 0xC (<C's role>)`; chains of helpers are followed to the first non-helper (3 passes).
-- **fwmap notes:** "fwmap merged n unreachable stub(s) after its return" marks code after an unconditional return that no branch reaches (DB merges; 14e §5 D). It is not applied to functions with an indirect `jmp (aN)`.
+1. **ss / ss-entry / ss-merged / ss-body**: Ss handler, entry, exit, or the body behind a handler pointer entry. **D5:** the row adds one level of non-Ss callee effects (`via 0xT: …`), e.g. 0x7EDB4CBC `via 0x7ED07A1D: getSetting(100), setSetting, PlaySound::setVolume`.
+2. **ca / ca-merged / ca-body**: CA row handler; **D5:** the body behind a 3–5-byte handler pointer entry gets "body of CA row handler 0xA" (78 rows).
+3. **struct** (D5): a role from §2.2–2.8 or a C6 review row (`d5rules.py`, 90 rows).
+4. **hsw** (fixed): a case block only if (a) the table user ends with `jmp (aN)` (in itself or the next DB function), (b) the target does not start with `movm`, (c) the table is cut at the user's `cmp END,aN` bound. The row gives the switch value when the user subtracts a bias (`mov −N,dX; add`), e.g. 0x7EED5254 keys are value − 21. A key-0 row is the empty-slot/default target. **ftab**: a `{key, fn}` table whose targets are called (`calls (aN)`) or have a prologue gives "function-table entry" (no row needs it now: its only target 0x7EE01FF5 has a struct role).
+5. **doc / touch / jtab / ctortab** as in D4.
+6. **vt**: `<class> vt slot k = <slot role>`; D5 adds the draw-object dictionary (§2.2), class names for the data model, appCaller and GuiCallerImp, and **"body of … vt slot k (its pointer entry is 0xA)"**.
+7. **pentry** (D5, 511 rows): a DB function of ≤ 4 instructions that only does `movm`/`add −N,sp`/stack stores and falls into the next function is the **pointer entry** of that body (direct `call`s enter the body; pointers enter at the `movm`).
+8. **layout** (D5): table A/B entries (§2.5), also through pointer entries (115 rows).
+9. openpage / listreg / actreg / 15a, ctor, str, shape, api wrapper, pmf/imm/dataw as in D4.
+10. **synth** (D5, 1,693 rows; only when no rule above gave a role): a behaviour sentence from the verified call effects: `updates child widgets (visibility, label text, …) from <DM blocks / settings / OlyApi>`, `read-modify-write of DM block N`, `setSetting(id)`, `ShowPanelEx(n)`, `post GM x`, `PostEventToCA(code)`, `draws with the DC (…)`, and for functions ≤ 160 B `predicate on <inputs>: returns 0/1` or `reads <inputs>`.
+11. **code** (D5, 280 rows): exact behaviour of straight-line code (≤ 14 instructions, no conditional branch), e.g. `sets a0+108 = d0; sets a0+120 (u16) = d1; calls 0x7E500D33; returns 1`.
+12. range / ctrl-range / caller as in D4; the caller's text is now in brackets.
+- **Return values (fixed):** a constant that is also stored to memory just before `ret` is reported only if some caller reads d0 after the call (fixes "returns 4000" on 0x7ED89B73 and the C6 F061 "returns 403" class; 227 rows changed).
+- **Split-off exit blocks (D5):** a 1–2-instruction `ret` fragment with no callers, no vtable use and no pointer entry is "split-off exit block of the preceding code", not "empty method" (0x7ECD7D5B, 0x7ED11E9F).
+- **Merged vtable methods (fixed):** a DB function that contains other vtable targets says "also holds N more vtable method(s) merged by fwmap" with their slots (334 rows), e.g. 0x7ED1F53A holds 7 base draw-object methods (C6 F057).
 
 ## 4. Coverage, error rate, corrections
 
-### 4.1 Coverage (measured on the final TSV)
-- 11,586 function rows (all non-data, non-suspect functions in the range); **0 blank**.
-- Primary rule counts:
+### 4.1 Coverage (measured with `classify.py` on all 11,586 function rows; 0 blank)
+| Class | D4 TSV | D5 TSV |
+|---|---|---|
+| **specific** (table, slot role, string name, documented/decoded structure, exact shape) | 6,298 (54.4 %) | 7,038 (60.7 %) |
+| **behavioural** (rule 10, role sentence from verified calls) | — | 1,693 (14.6 %) |
+| **exact code** (rule 11) | — | 280 (2.4 %) |
+| partial (own effects/returns/logs, no role) | 2,954 (25.5 %) | 960 (8.3 %) |
+| **context only** (caller, class range, unnamed slot, address taken) | 2,334 (20.1 %) | 1,615 (13.9 %) |
 
-  | Rule | Rows | Rule | Rows |
-  |---|---|---|---|
-  | vt | 3,121 | ca | 489 |
-  | shape | 1,406 | ctor | 433 |
-  | caller | 1,334 | pmf | 298 |
-  | range | 1,167 | ss-entry | 284 |
-  | ss | 1,158 | ctrl-range | 257 |
-  | str | 773 | other | 866 |
+- Specific + behavioural + exact code: 54.4 % → **77.8 %**. V/I: 8,820/2,766 → 9,205/2,381.
+- Context share by area (D4 → D5): toolkit core–geometry 47 → 28 %, factory/widgets/draw objects 40 → 26 %, controllers 23 → 14 %, panels 12 → 7 %, pages/guiUtility 16 → 12 %, CA_MAIN 15 → 13 %; **GE/GPI 55 → 48 % and pools/UTF-16 60 → 59 % are still the weakest**.
+- Diff against the D4 TSV: 5,175 rows changed text (truncation ignored): 584 context → specific, 1,693 partial/context → behavioural, 280 → exact code, 159 partial → specific; 21 partial → context and 1 specific → partial are measurement effects of longer rows, not lost content.
 
-- **Specific** (table, vtable, string, shape or documented): **74 %**. **Weak** (caller / range / data-word / address-taken only): 26 %.
-- Weak share by area: pools 64 %, renderers/DC/geometry 58 %, panels 47 %, GE/GPI 47 %, controllers 38 %, guiUtility 36 %, page framework 34 %, toolkit core 22 %, pages 21 %, GuiTouch 17 %, IGui 15 %, CA_MAIN 11 %, Ss areas 2–3 %.
-- V 8,820 / I 2,766.
-- Weak rows still give the class, the caller's role and the verified effects (`does:`).
+### 4.2 Measured error rate (error = any false claim, read in the disassembly)
+| Sample | Rows | Errors |
+|---|---|---|
+| D5 spot check of changed rows (seed 5150) | 10 | 1: 0x7ECEFD68 said "a dirty bitmap"; it allocates two (+12, +16). Fixed |
+| **D5 final, fresh random (seed 90210)** | 30 | **1 (3.3 %)**: 0x7ED89B73 "returns 4000" (stored to +76; no caller reads d0). Fixed by the return rule above. Not false but thin: 6 context-only rows |
+| D5 confirmation after the fix (seed 31337) | 10 | 0 |
 
-### 4.2 Measured error rate (30 random function rows per sample, read in the disassembly; error = any false claim)
-| Sample | Rule set | Errors | Errors found (all fixed) |
-|---|---|---|---|
-| dev 1+2 (30) | early | 3 | a vtable treated as a jump table; vtables cut at every immediate (0x7F0032B8); unnumbered panel classes put in panel 55 |
-| A (seed 4242) | after dev fixes | 4/30 = 13 % | wrong own name (OlyApi log taken as name, 0x7ED00250); "returns 0" for a 0/1 register; wrong result source for an Ss handler; a trace-log call shown as "short wrapper" |
-| B (seed 777) | after A fixes | 1/30 = 3.3 % | 0x7EDC3BCC printf argument wrongly described |
-| C (seed 2026) | final, before 2 small fixes | 1/30 = 3.3 % | a call argument counted as a stored state constant (0x7EDB5A18) |
+- One more defect found and fixed during the check: the small-code describer split `mov d0,(108,a0)` at the wrong comma and missed stores (no false claim had resulted).
 
-- Found while checking Ss actions (spot check): following every Ss callee added constants that are not returned (0x7EDA968C). The fix is to follow only callees whose result is returned (§2.1), and it was re-checked on 6 handlers.
-- **Final measured rate: 1/30 (3.3 %) on sample C.** Its error is fixed, but no new sample was drawn after that fix.
-- About a quarter of all rows are weak (correct but generic).
-
-### 4.3 Corrections
-1. **15a panel rows:** the row "panel 55 GCPnl_Zoom 0x7ED7932E–0x7ED7F6D4" also holds the 16 unnumbered panel classes. GCPnl_Zoom is 0x7ED7932E–0x7ED7A79E. The unnumbered classes (type: ctor) are 0x605B: 0x7ED7A79F, 0x605D: 0x7ED7B07A, 0x6062: 0x7ED7B250, 0x6008: 0x7ED7B4B3, 0x6060: 0x7ED7B8CC, 0x605E: 0x7ED7BBEB, 0x605C: 0x7ED7BE74, 0x6003: 0x7ED7C0C5, 0x6007: 0x7ED7C5B7, 0x601E: 0x7ED7C93E, 0x6033: 0x7ED7E21A, 0x6070: 0x7ED7E533, 0x605F: 0x7ED7E77B, 0x6061: 0x7ED7E98D, 0x6001: 0x7ED7ED04 and 0x6071: 0x7ED7F445 (factory table 0x7EF0F3B0). The end of the last one is 0x7ED7F6D4.
-2. **14e §4.3:** the RAW-edit page vtable is **0x7F0032C0** (ctor 0x7EDF779C, base userCommonWizard1NRightAligned 0x7EDED9DD). 0x7F0032B8 is a separate 2-slot object (ctor 0x7EDF6295, base ctor 0x7ED8BBA6; slot 0 0x7EDF6447 writes DM blocks 37/29/30).
-3. **15a page-class rows:** `end` is exclusive (the next class's ctor). For example, 0x7EDC8AD0 is the list-base ctor, not part of the pages-639 class.
-4. **13d §1 CA_MAIN:** add the CA table catalogue (§2.2), the six common tables and the handler span 0x7ECD257F–0x7ECE39B9. The appCaller object is at 0x7ECE39D2/0x7ECE3A0A, below the "~0x7ECE4000" bound.
-5. **13d §1 controller row:** add CPlayCalendar, CPlayLightBox, **CPlayMovie** (review C5 weakest 1), the play-start chooser and the 92-B singleton, with the RAM slots of §1.
-6. **13d §2.3 / 14e §2.1:** add root slots 54, 58, 60, 81–83, 91, 99 and 100 (rule 6), and panel slot 129.
-7. **New helpers** (V):
-   - 0x7ECE631E: CA trace print, 447 callers; the module word is at a0 and the text in a1; it is gated by 0x7ECE6408;
-   - 0x7EDC3BCC: GUI printf; the format is the first stack argument; it prints when RAM 0x602BC60C ≥ 2 (0x7EDC3A50 prints at ≥ 1);
-   - 0x7ED16C72: per-panel resource initialiser, table 0x7EF04808;
-   - 0x7ED8BC18: `{key, value}` table search.
-8. **13d §4.1 tool note:** 203 (not 213) Ss handler entry points are not function starts in the current map.
+### 4.3 Corrections to older sections
+1. **16b D4 row/md 0x7ED16C72:** the table is **0x7EF03C08** (not 0x7EF04808) and there is a second table B 0x7EF03F98 (§2.5).
+2. **16b D4 OlyApi names (and 13d §6.2 if it uses the name order):** MediaCtrl names were one slot off (§2.8). 15a §2.2 (pages 511/513 call vt+44 = transferImageAll) is right.
+3. **16b D4 hsw rows:** 0x7EE01FF5 is a real function (setting-id redirect of 0x7EE01F66, C6 F070); 0x7ECD7D5B is past the table bound of 0x7EED5254. The other 56 hsw rows were re-checked by rule 4.
+4. **07 §5 data model:** add getInstance 0x7ECEF5DC, ctor, slot layout, get/set bodies, listener bitmaps and the GM 0x1900 notify (§2.3).
+5. **13d §2.2 / 14e:** WinMain slot 197 is the draw-object factory, not an unnamed slot (§2.2).
+6. **16b D4 §1 "draw-object family (19 classes, ctors 0x7ED1F4F4–0x7ED221E1)":** 18 classes derive from 0x7EF10EA4; type 0x2000 (ctor 0x7ED22306) has its own 56-slot vtable.
 
 ## 5. Open questions
-1. 283 Ss handlers return a value that the rules do not resolve (stack or second-register paths). Their TSV row lists the calls involved.
-2. **OlyApi names are I.** For MediaCtrl the name-order rule gives vt+40 = 0x10C11 transferImageAll and vt+44 = 0x10C12 **cancelTransferImageAll**. But pages 511/513 call vt+44 with (2, 4, callback), which fits transferImageAll (15a §2.2). Either 15a or the name order is off by one for this class.
-3. About 600 own vtable slots (widgets, screen, draw-object family, page own slots) have no role beyond their effects. The draw-object family 0x7EF10EA4 and the image table 0x7EFB13BC (round-4 weakest 1) need a slot dictionary.
-4. CA state names: only sub-app and event names exist (no per-state name table was found). The meaning of "GUI code" values 0x84/0x85 in Misc rows (no GUI event in 0x7EEF3434) is open.
-5. The GE/GPI layer, the renderers and the pools are still 47–64 % weak (no strings; callers only).
+1. 283 Ss handlers return a value the rules do not resolve (unchanged).
+2. Draw-object types other than 0x200C: what effect each slot-15 callee draws (I labels in §2.2) and which widgets the property types animate.
+3. GPI layer-driver ops 0–11 and the GE queue internals (0x7ECE74D7–0x7ECE80C5) have no roles (48 % context).
+4. CA state names: no per-state name table; GUI codes 0x84/0x85 in Misc rows (unchanged).
+5. The display-variant values 0/1/2 of RAM 0x602B61F4 (I: output device).
 
-## Known rule errors found by coverage round C6 (2026-11-09)
-
-Rows fixed in the TSV: 0x7EE01FF5, 0x7ED16C72 and 0x7ECEF6A6.
-- **The `hsw` hash-switch rule:** it labelled a whole function (own prologue, called through `calls (a0)`) as a case block. Its table 0x7F01170C is a linear {key, fn} table. Treat other `hsw` rows marked V as unconfirmed until rerun.
-- **The OlyApi "slot vt+N = (N/4+1)-th name" order rule:** it fails for CustomPrint (vt+60 is canPrint, vt+84 is getPrintCount). Read the API id inside the slot target instead. The MediaCtrl vt+44 doubt (transferImageAll vs cancelTransferImageAll) has the same cause.
-- **Rows that are context only:** "private method" and "helper of X" rows for panel and page code give context, not a role.
-- **Undescribed structures:** the GUI draw-object family (factory 0x7ED1AFF9, types 0x2000–0x2012; e.g. 0x200C is an animated blur effect) and the GUI trace ring buffer (120 × 16 B) have no descriptions.
+## Known rule errors (open)
+- **Behavioural rule (10):** the sentence lists inputs and sinks, not their order or conditions; on big functions it is a summary, not a role.
+- **Draw-object slot roles** for types without the `asr 15` signature come from slot position only (I).
+- **Partial-to-context drift:** rows longer than 340 characters lose their trailing `does:` part in the TSV.
+- Fixed in D5 and removed from this list: the `hsw` rule (§3 rule 4), the OlyApi name-order rule (§2.8), "returns N" for stored constants, the "merged 1 unreachable stub" undercount, and Ss rows without callee effects (rule 1). Context-only "private method"/"helper of" rows for panels and pages are reduced (panels 12 → 7 %) but remain where no effect is visible.
