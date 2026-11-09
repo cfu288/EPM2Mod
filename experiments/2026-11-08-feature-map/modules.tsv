@@ -46,8 +46,7 @@ first_fn	last_fn	source_file	fns_naming_file	placement	name_string
 7e6d15a0	7e6d19b7	mov_os.c	2	direct	7e800743
 7e6d664a	7e6d6959	mov_func_H264_file.c	2	direct	7e804551
 7e6d76f3	7e6d7ae4	mov_func_PSP.c	3	direct	7e804d33
-7e6daf9a	7e6daf9a	mov_img.c	0	string-order	7e806f06
-7e6dbc3c	7e6dcb0d	mov_kdg.c	5	direct	7e807421
+7e6daf9a	7e6dcb0d	mov_kdg.c	5	direct; first_fn = mov_kdg_init 0x7E6DAF9A (logs «[MOV_KDG] mov_kdg_init() in»), as 04 §3.2; the old mov_img.c row (string-order, 0 naming fns) put mov_img.c on this function (D7 2026-11-09)	7e807421
 7e6ddbe5	7e6ddd15	mov_paint.c	2	direct	7e8079b3
 7e6efab5	7e6f1bb6	mov_rec_MJPEG.c	3	direct	7e80fa7c
 7e6f287b	7e6f287b	mov_rec_file.c	0	string-order	7e81124f
