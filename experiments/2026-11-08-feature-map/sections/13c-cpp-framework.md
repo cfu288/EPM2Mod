@@ -237,7 +237,7 @@ The CmpSqp_* sequence parts (`Base`, `Eportrait`, `MultiExposure`, `Otwb`, `Pano
    - Ctors sit in each package's module (559 of them in Cap/Cmp code), not "in TraShareTakeStatus".
 3. **"Event constructors 0x7E96B000–0x7E9823AB" is wrong as a range label.**
    - Of the 2,603 functions there, 1,388 are event methods (ctor/isTypeOf/dtor, 26 KB of 95 KB).
-   - The rest is operation-class code: `OlyHfwLowApiWrap` 0x7E974E7F–0x7E975704, `OlyHfwOpeLevel` 0x7E9782AF–0x7E97858C, `OlyHfwOpePlyCom` 0x7E97B27A–0x7E97C487, `OlyHfwOpePlyMov` 0x7E981663–0x7E981F92, plus Tra classes with timeouts (e.g. 0x7E977ADA–0x7E977D6F).
+   - The rest is operation-class code: `OlyHfwLowApiWrap` 0x7E974E7F–0x7E975704, `OlyHfwOpeLevel` 0x7E9782AF–0x7E97858C, `OlyHfwOpePlyCom` 0x7E97B27A–0x7E97C487, `OlyHfwOpePlyMov` 0x7E981663–0x7E981F92, plus reactive classes such as the one with 1-second timeouts at 0x7E977ADA–0x7E977D6F (class name unknown).
    - The event-code runs are listed in §4.
 4. **The OXF reactive base vtable is 0x7EC91FE8**, not 0x7EC6C320. 0x7EC6C320 is a derived component vtable (slot 0 = 0x7EB08A15). Slot 15 = getCurrentEvent; slot 6 = takeEvent; slots 32/33 = rootState_entDef/dispatchEvent.
 5. **OXF ends at ~0x7EBA7BB5.** 0x7EBA7BC1–0x7EBAC000 is a face-library extension (§1), not OXF. The device classes start at 0x7EBA0AA9 (Ctg ends there), not 0x7EBA1020.
