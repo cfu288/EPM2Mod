@@ -20,7 +20,7 @@ first_fn	last_fn	source_file	fns_naming_file	placement	name_string
 7e67e783	7e67e783	api_exec.c	1	direct	7e7c8a39
 7e6c3955	7e6ca669	mov.c	6	direct	7e7fd372
 7e6cb9b8	7e6cb9b8	mov_apical.c	1	direct	7e7fdd68
-7e6cbfd3	7e6cbfd3	mov_art.c	0	string-order	7e7fe50f
+7e6cbebc	7e6cd6b8	mov_art.c	5	direct	7e7fe510
 7e6d15a0	7e6d19b7	mov_os.c	2	direct	7e800743
 7e6d664a	7e6d6959	mov_func_H264_file.c	2	direct	7e804551
 7e6d76f3	7e6d7ae4	mov_func_PSP.c	3	direct	7e804d33
@@ -149,5 +149,5 @@ first_fn	last_fn	source_file	fns_naming_file	placement	name_string
 7eba56ec	7eba56ec	ntos.cpp	0	string-order	7ec91bbc
 7ede2aab	7ede2aab	2CNL.cpp	1	direct	7eff6764
 7eea132e	7eea1a23	CAvpiAsoAudioSource.cpp	11	direct	7f02ff0d
-7eea9c45	7eea9c45	CAvpiVsoVideoSource.cpp	0	string-order	7f03099f
+7eea9802	7eeaa153	CAvpiVsoVideoSource.cpp	11	direct	7f0309a0
 7f084d3f	7f084ef6	adj_p15740_p.c	2	direct	7f0d2cb8

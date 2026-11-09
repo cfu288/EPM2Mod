@@ -61,6 +61,9 @@ def string_index(data, base=None):
     strings, cover = {}, collections.Counter()
     for m in STR.finditer(data):
         strings[m.start()] = m.group()[:-1].decode("latin-1")
+        if data[m.start()] == 0x7E and (m.start() + 1) % 4 == 0 and m.end() - m.start() > 5:
+            # '~' here is usually the high byte of a 0x7Exxxxxx pointer word just before an aligned string
+            strings[m.start() + 1] = strings[m.start()][1:]
         lo_a, hi_a = base + m.start(), base + m.end()
         for p in range(lo_a // PAGE, (hi_a - 1) // PAGE + 1):
             cover[p] += min(hi_a, (p + 1) * PAGE) - max(lo_a, p * PAGE)
