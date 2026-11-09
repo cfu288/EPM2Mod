@@ -9,6 +9,8 @@
 #   - a line that says the range is data, approximate ("~", "about", "round") or a span inside one function.
 import bisect, csv, glob, os, re, sys
 
+if any(a.startswith('-') for a in sys.argv[1:]):
+    sys.exit(__doc__ or 'usage: boundary_lint.py [REPO] [OUT_TSV]')
 repo = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..')
 out = sys.argv[2] if len(sys.argv) > 2 else None
 blk = open(os.path.join(repo, 'build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin'), 'rb').read()
