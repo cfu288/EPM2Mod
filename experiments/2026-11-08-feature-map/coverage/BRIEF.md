@@ -18,7 +18,14 @@ You are testing how well a firmware map explains the real code. Assume the map i
   - 13e mode controller and TAKE sequencer;
   - 13f drivers and the MMIO/IRQ map.
 
-  Use the byte/instruction signatures in 13c and 13d to classify framework and GUI glue.
+  Since round C2, there are also:
+  - 14a 3D graphics (GL/engine/libpng/zlib/C3D), with 14a-gl-entry-points.tsv;
+  - 14b string-less platform and camera-core code (sc library, WB module, cam_*.c files, MEC);
+  - 14c app-layer protocols (boot protocol, event router, shutter→TAKE path, capabilities), with 14c-event-ids-extra.tsv;
+  - 14d data runs and embedded payloads, with 14d-false-functions.tsv;
+  - 14e GUI widget methods and GUI app shapes.
+
+  Use the byte/instruction signatures in 13c, 13d, 14a, 14c and 14e to classify framework, GUI and C3D glue. build/map/functions.tsv column 9 (`suspect`) flags probable data decoded as code.
 
 **Tools** (run from /path/to/epm2-tools):
 - `python3 tools/fwmap.py fn ADDR [--dis] | str REGEX | range LO HI | xref ADDR`

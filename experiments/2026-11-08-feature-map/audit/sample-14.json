@@ -1,0 +1,212 @@
+[
+ {
+  "id": "14a-15",
+  "section": "14a-c3d-graphics.md",
+  "line": 15,
+  "text": "| **0x7EE02095\u20130x7EE294B4** | **DMP EGL/GL library** (OpenGL ES 1.1 + OES + DMP extensions) | 672 | verified. The previous function 0x7EE01FF5 is GUI code (it reads info 109/279/44; 10 data words 0x7F011710\u2026). 0x7EE02095 is the library init, called only from the overlay port 0x7F0A3838. The last function 0x7EE2946D is the body of `glPointSize` and ends at 0x7EE294B4. All 1,055 loads of the GL context pointer 0x602BE994 lie in 0x7EE026DC\u20130x7EE2946F |"
+ },
+ {
+  "id": "14a-16",
+  "section": "14a-c3d-graphics.md",
+  "line": 16,
+  "text": "| **0x7EE294B5\u20130x7EE5B5BB** | **3D engine core** (file loaders, GL render backend, 28-type ref-counted object runtime, maths) | ~950 | verified layer edges (\u00a72.2). Its object release 0x7EE47412 and type table 0x7F02AA14 are used only here (and by 20 C3D call sites) |"
+ },
+ {
+  "id": "14a-18",
+  "section": "14a-c3d-graphics.md",
+  "line": 18,
+  "text": "| **0x7EE5D00D\u20130x7EE5F5F2** | **libpng 1.2.37** (read side) | 80 | verified. 0x7EE5D00D uses the `read_data_fn`/`write_data_fn` string. 0x7EE5F5AB (memcmp-like) and 0x7EE5F5EC (getter of +308) are called only by libpng or PNG glue |"
+ },
+ {
+  "id": "14a-19",
+  "section": "14a-c3d-graphics.md",
+  "line": 19,
+  "text": "| **0x7EE5F5F3\u20130x7EE619C6** | **zlib 1.2.3** (crc32 0x7EE5F5F3 \u2192 table 0x7F02BE7C; inflate 0x7EE5FE61; `zmemcpy` 0x7EE619AC; stubs 0x7EE619BF/0x7EE619C4) | 14 | verified. crc32 starts with `buf == NULL \u2192 0` and the `endian = 1` test |"
+ },
+ {
+  "id": "14a-219",
+  "section": "14a-c3d-graphics.md",
+  "line": 219,
+  "text": "- **Context heap** (verified): 0x7EE8F212 sets up an allocator pair. alloc **0x7EE8F248** calls `allocator->vt[0](size + 4)` and keeps a 4-byte tag; free **0x7EE8F269** calls `vt[2]`. Small helpers 0x7EE8F081\u20130x7EE8F4F3: memory copy 0x7EE8F3A9, string 0x7EE8F46C/0x7EE8F488, LUT user 0x7EE8F321."
+ },
+ {
+  "id": "14a-257",
+  "section": "14a-c3d-graphics.md",
+  "line": 257,
+  "text": "- **Not C3D:** `play_gpu_draw` (`play_gpu.c`, 0x7E943DDE), the playback GPU resize and rotate, and the `set_effect_3d_overlap` transition. Neither calls GL or C3D (verified for GL: no caller). How they reach the GPU is an open question."
+ },
+ {
+  "id": "14a-321",
+  "section": "14a-c3d-graphics.md",
+  "line": 321,
+  "text": "8. **13b \u00a71, the AVPI row.** \"0x7EE63000 to 0x7EE8F4F3 \u2026 callers only in the C3D API (0x7EE61A\u20130x7EE62F)\". This is true in substance, but that code is the C3D class system itself, from 0x7EE619C7. Its outside callers are only overlay-B functions (verified with `pages.py`)."
+ },
+ {
+  "id": "14b-12",
+  "section": "14b-unlabelled-platform-camera.md",
+  "line": 12,
+  "text": "2. **Camera error codes carry a module byte (V).** cam_damage codes are 0x0A_MM_xxxx. MM groups by address range: 0x10 cam.c (0x7E628161\u20130x7E628CD5), 0x18 aperture, 0x03 contrast, 0x26 cam shell, 0x2A debug monitor, **0x15 0x7E6369CA only**, **0x12 0x7E636A04\u20130x7E63B766** (frame + frame_sync), 0x17 imgdev, 0x25 CAMLNS, **0x28 0x7E640F3E**, **0x16 0x7E641C2E\u20130x7E642097**, **0x1E MI 0x7E642325**, 0x1B SPRDRV, 0x27 cam_sem, 0x1A shutter 0x7E6557CE, 0x13 still/live bulb, 0x24 cam_timer. The ids are per subsystem, not strictly per file (0x12 covers frame and frame_sync)."
+ },
+ {
+  "id": "14b-21",
+  "section": "14b-unlabelled-platform-camera.md",
+  "line": 21,
+  "text": "| 0x7E508DA7\u20130x7E508F81 | UI side: beep request layer 0x7E508DA7\u20130x7E508EAE (callers UI_OUT 0x7E50D7CD/0x7E50D88B/0x7E50D93A), `ui` shell `beep` 0x7E508EDA and `help` 0x7E508F14 (table 0x7E734DEC: led 0x7E50D6F0, beep, key 0x7E50AD9C, jog 0x7E50996C, remo 0x7E50917F, help) | V |"
+ },
+ {
+  "id": "14b-32",
+  "section": "14b-unlabelled-platform-camera.md",
+  "line": 32,
+  "text": "| 0x7E642325\u20130x7E6437F1+ | cam_mirror.c (`MI_*`; id 0x1E) | V |"
+ },
+ {
+  "id": "14b-50",
+  "section": "14b-unlabelled-platform-camera.md",
+  "line": 50,
+  "text": "- **Pattern (V):** each wrapper is 14 bytes, `mov imm32,a0` (alloc) or `a1` (free), then `call 0x7E507395` (alloc) or `0x7E5073B8` (free) and `ret [],4`. Both lock with 0x7E436593 and 0x7E431316/0x7E4313FE and call the pool function by pointer."
+ },
+ {
+  "id": "14b-144",
+  "section": "14b-unlabelled-platform-camera.md",
+  "line": 144,
+  "text": "- **cam_list.c 0x7E640858\u20130x7E640F52 (V):** list library. Create 0x7E640858 (\u2190 cam.c init 0x7E628161, frame-sync 0x7E63A0EE); push/pop/peek 0x7E640961, 0x7E6409B7, 0x7E640A0D, 0x7E640A51, 0x7E640A79, 0x7E640B0B \u2026 (\u2190 cam.c packet lists, frame sync); error helper 0x7E640F3E (id 0x28)."
+ },
+ {
+  "id": "14b-151",
+  "section": "14b-unlabelled-platform-camera.md",
+  "line": 151,
+  "text": "- **cam_mem.c 0x7E641BB8\u20130x7E642324 (V):**"
+ },
+ {
+  "id": "14b-177",
+  "section": "14b-unlabelled-platform-camera.md",
+  "line": 177,
+  "text": "| **MEC command layer** (MAG_COM / MOT_COM), 0x7E517791\u20130x7E518BBA (V) | Init 0x7E517791 creates the locks `ANY_USE`/`MAG_COM`/`MOT_COM` (0x7E516C32). Open/close 0x7E51783A/0x7E51785A are ref-counted: the first open \u2192 MEC timing unit 0x7E50F8F3, the last close \u2192 0x7E50F96F. **Submit 0x7E51787B(a0 req)**: code = u16 +0, class = byte +9 (0 MOT, 2 PWR, else MAG); jump table 0x7E7379C0; a bad code \u2192 0x1500A001. Names from the printer 0x7E51256F: **MOT** 0 ON, 1 OFF, 2 OPENRDY, 3 OPENCHG, 4 CLOSCHG, 5 INTIAL, 7 F_READY, 8 F_OPCHG, 9 N_READY, 16 ABORT; **MAG** 10 ON, 11 OFF, 12 SET, 13 START (NML/DRK, TV, TIME), 14 STOP, 15 MG3_CHG; **PWR** 17 ON, 18 OFF. Handlers 0x7E517952 \u2026 0x7E518ABE in that order. Each builds a driver request with \"done\" and \"event\" callbacks (e.g. MAG START 0x7E518664 \u2192 0x7E518684, callbacks **0x7E5186EA = F006** and 0x7E518731). The done callback releases the lock by name (0x7E516D50) and calls the client's +16. `Shutter Client [0x%02x]` 0x7E518BBA \u2190 `mec` monitor 0x7E510C3A. The `mec` shell has `mec shutter set [expose_time us]`, `mec still [num] [time]`, `mec lsnc \u2026` (0x7E510943). Reading (I): MAG = curtain-hold magnets, MOT = charge motor |"
+ },
+ {
+  "id": "14c-16",
+  "section": "14c-app-protocols.md",
+  "line": 16,
+  "text": "| **0x7EB84345\u20130x7EB85562** | **Com_EvSenderManager (static module, no `this`)**: sender 0x7EB84345 (4,143 B; maps APP_EVENT codes to 41 event classes 16070\u202627522; only caller HLS_EVENT 0x7E96DD58), \"set wait code\" 0x7EB85398/0x7EB8543C (callers CapThr 0x7EA1D60D/0x7EA1D68E), `Com_EvSenderManager buffer overflow!` 0x7EB854E0. All use globals 0x602B48A8\u20130x602B48E0 | V |"
+ },
+ {
+  "id": "14c-98",
+  "section": "14c-app-protocols.md",
+  "line": 98,
+  "text": "- **APP_EVENT path (V):** tasks and drivers post `(code, value)` through 0x7E880EFF (118 callers, e.g. the 3D stub's 0xF00F0000). HLS_EVENT 0x7E96DD58 (`RECV APP_EVENT [%08X][%08X]`) takes each one and first offers it to **Com_EvSenderManager** 0x7EB84345 (code \u2192 event class, sent to the registered receiver or buffered). If that does not consume it, 0x7E96DE42 forwards it to EVFW subscribers (`EVFW TO`), else keeps it in a backup list (`NOT FOUND EVFW BACKUP`, `EVFW FROM BACKUP`)."
+ },
+ {
+  "id": "14c-113",
+  "section": "14c-app-protocols.md",
+  "line": 113,
+  "text": "| 7 | Black-out ON: 0x7EA97FF5 (`BLACK:ON`, trace 0x04000001, PaintBlack flag **0x602B0D20 = 1** via 0x7E96ADC8) \u2192 part+364 = CapDpc iface slot **26** (+104) \u2192 0x7E9EE967 \u2192 display device (+256) vt+172 = `startPaintBlack` **0x7EB8D5AD**. BLACK:OFF siblings: 0x7EA8FBBA \u2192 slot 24 (+96) \u2192 device vt+156 = `setPaintBlackFlag` 0x7EB8D45A; 0x7EA900E6 \u2192 slot 14 (+56) \u2192 device vt+80 = `endPaintBlack` 0x7EB8CDC1. Display-device vtables 0x7EC8DEDC / 0x7EC8E57C (base/derived) | V |"
+ },
+ {
+  "id": "14c-134",
+  "section": "14c-app-protocols.md",
+  "line": 134,
+  "text": "- **CapMed_MediaInfo** 0x7EA104DE\u20130x7EA10D3D: per-slot status update 0x7EA10735 (F032), category map 0x7EA1082F, init chart 0x7EA10A66, `pMediaInfo(NULL)` iface guard 0x7EA10C4F, teardown 0x7EA17103 (F033) (V)."
+ },
+ {
+  "id": "14c-143",
+  "section": "14c-app-protocols.md",
+  "line": 143,
+  "text": "- **Mechanism (V):** 22 GUI static initialisers in the C++ ctor table **0x7F033AC4\u20130x7F033B7B** (46 entries) fill RAM tables of 8-byte pointer-to-member records `{\u22121, method}`; for 21 of them exactly one other function loads the table base (the dispatcher). Example: 0x7ED98B95 fills **77** records at **0x602BC070\u20130x602BC2D7**; the dispatcher 0x7ED99847 (vtable word 0x7EFD101C) clears its output fields and calls all 77 in order (`cmp 77,d2` loop), then writes data-model values (0x7ECEF667). Other tables (init \u2192 base, n, dispatcher): 0x7ED86DA6 \u2192 0x602BB094 (22, 0x7ED87077, `IGui_Controler`); 0x7ED8ECE2 \u2192 0x602BB7CC (18); 0x7ED8F435 \u2192 0x602BB8DC (59); 0x7ED912E5 \u2192 0x602BBAB4 (42); 0x7ED9319E \u2192 0x602BBCA0 (60); 0x7ED94F0D \u2192 0x602BBE80 (43); 0x7ED9D151 \u2192 0x602BC2D8 (46, 0x7ED9D844); 0x7EDC2829 \u2192 0x602BC5A4 (3, `Warning_Viewer::Update`); 13 smaller ones (1\u20137 records). fwmap shows 0 callers for all these methods because the only reference is the `mov imm32` inside the initialiser."
+ },
+ {
+  "id": "14c-144",
+  "section": "14c-app-protocols.md",
+  "line": 144,
+  "text": "- **Live Bulb (V):** record 49 at **0x602BC278** (not 0x602BA478 as F060 says) = 0x7ED9C8FB, which calls `Shooting::getLiveBulbInfo`. That API (OlyHfwOpeShoot 0x7E984DDE) returns minute/second from `api_rec_Get_Bulb_Exp_Time` (TAKE 0x7E5A624F) and `nowcount` = `api_rec_Get_Bulb_Lv_Count` (u16 0x605178BE), `maxcount` = info 696 (prm 0xD721)."
+ },
+ {
+  "id": "14c-145",
+  "section": "14c-app-protocols.md",
+  "line": 145,
+  "text": "- **Update chain (V):** GUI table 0x7EEDE0C0\u2026 (16-byte records `{code, 1, 1, handler}`) binds `updateLiveBulb` 0x7ECDF300 to codes 0x01000002 and 0x0200001A \u2192 API object slot 66 (+264; I: OlyApiShooting, its vtable word 0x7EC0F59C is next to F028's 0x7EC0F610) \u2192 0x7E9CC9EC \u2192 OlyHfwOpeShoot 0x7E98A2B5 \u2192 event **12039** \u2192 SequencePartsBase 0x7EA8E955: if Live Bulb is running and `info 696 \u2212 CapTak slot 42 \u2265 1`, `TAKEPIC_BULB_LV_UPDATE_send` 0x7EA985D7 \u2192 CapTak slot 105 (+420) \u2192 `api_rec_Update_Bulb_Lv` 0x7E68C46D \u2192 TAKE_MAIN message **19** \u2192 TAKE event table 0x7E790060 (records `{event, handler}`, end 0xFFFF): event 0x38 \u2192 0x7E5A2C01 increments 0x605178BE and sends 0x0408003A; events 0x1B/0x1C \u2192 start 0x7E5A2A6F (copies 4 request words to 0x605178C0\u2013CC); 0x1D \u2192 0x7E5A2B4C (stores a pointer at 0x605178D0, used by the end step 0x7E5A2C31). The result goes back as `evTraResShtUpdateLiveBulb` (0x7EA941E5) / `CBS_UPDATE_LIVEBULB` (254)."
+ },
+ {
+  "id": "14d-27",
+  "section": "14d-data-and-blobs.md",
+  "line": 27,
+  "text": "| **0x7E8DA000\u20130x7E8F3113** | **`.data` init image, 102,676 bytes.** The reset code first loads it from flash 0x40779000 to 0xBE8DA000 (0x7E421247). Then it copies it to **RAM 0x602A9B40\u20130x602C2C53** with {src 0x7E8DA000, dst 0x602A9B40, size 0x7E8F3114\u22120x7E8DA000} \u2192 0x7E425FA8 (0x7E4212B8\u20130x7E4212E0). **ROM = RAM + 0x1E6304C0.** Code never loads these ROM addresses; only the reset code does. | V |"
+ },
+ {
+  "id": "14d-28",
+  "section": "14d-data-and-blobs.md",
+  "line": 28,
+  "text": "| 0x7E8F3114\u20130x7E8F57FF | 0xFF | V |"
+ },
+ {
+  "id": "14d-31",
+  "section": "14d-data-and-blobs.md",
+  "line": 31,
+  "text": "| 0x7ECB083C\u20130x7ECB0887 | Segment-2 static-constructor table (19 pointers). | V |"
+ },
+ {
+  "id": "14d-299",
+  "section": "14d-data-and-blobs.md",
+  "line": 299,
+  "text": "| \"0x7EBA1020\u20130x7ECA0000 \u2026 data from about 0x7EBAC000\" | Rodata starts at **0x7EBABF90**. The tail 0x7EC92318\u20130x7ECB083B is the OKAO Smart Skin LUTs, not GUI data (V) |"
+ },
+ {
+  "id": "14d-301",
+  "section": "14d-data-and-blobs.md",
+  "line": 301,
+  "text": "| Map \u00a71 \"Overlays: part of block 0 is copied from flash at boot\" | Add the `.data` image copy by the reset code (\u00a71) and the constructor walker 0x7E44B6B0 with one table per segment (V) |"
+ },
+ {
+  "id": "14d-304",
+  "section": "14d-data-and-blobs.md",
+  "line": 304,
+  "text": "- The OKAO PT models end at 0x7E86DD5F (\u00a73.6). 0x7E86DD80\u20130x7E8808BF is the ORF CMIO blob (V)."
+ },
+ {
+  "id": "14d-306",
+  "section": "14d-data-and-blobs.md",
+  "line": 306,
+  "text": "- The DB size of 0x7E731532 (2,766) is wrong. The function ends at 0x7E731584 (V)."
+ },
+ {
+  "id": "14e-15",
+  "section": "14e-gui-methods.md",
+  "line": 15,
+  "text": "| 0x7ECF4C68\u20130x7ECF5450 | Widget base 0x8000 (143 slots, \u00a72.2), including the frame-animation engine 0x7ECF50C8\u20130x7ECF5441 | V |"
+ },
+ {
+  "id": "14e-50",
+  "section": "14e-gui-methods.md",
+  "line": 50,
+  "text": "| 64\u201368 | bit 0x2000 (+256/+260), bit 0x1000 (+264/+268); +272 clears both | V |"
+ },
+ {
+  "id": "14e-88",
+  "section": "14e-gui-methods.md",
+  "line": 88,
+  "text": "| **0x8005** | 204, 195 | 0x7ED2DF2F (324 instructions) | **key press +208 0x7ED2E94C** (468 instructions, UTF-16 helpers), +216, focus +108 0x7ED2F562 (reselects the image) | **images +160 normal / +164 focused / +168 disabled**, picked by 0x7ED2E363. u16 +128/+130/+184/+186/+188/+190, 8-byte +136, dwords +176/+180, caption +172 (slot 188), **status bits 0x10000\u20130x1000000** (slots 161\u2013178), text layout slots 185/186 | **Captioned image button / text field.** Bit 16 (focus) selects the image; vt+88 = 0 (disabled) selects +168. Bit **0x1000000**: DrawSelf draws the caption as `*` \u00d7 length, a **password mask** (V, 0x7ED2E070). Bit **0x10000**: when the widget is not focused, DrawSelf rebuilds the caption with 0x7ED2F453, which uses the UTF-16 digits `0123456789` at 0x7EF146DC (I: a numeric display mode). C2 F058 is slot 163, the 0x10000 setter |"
+ },
+ {
+  "id": "14e-102",
+  "section": "14e-gui-methods.md",
+  "line": 102,
+  "text": "- C-parts: OnDraw (slot 40) calls exactly one renderer each (V): C001 \u2192 FillRect 0x7ECFB5F9 (I: a filled rect); C002 \u2192 0x7ED319B4; C003 \u2192 0x7ED34FE9 (slanted fill); C004 \u2192 0x7ED35160 (tests bit 1 of part+64); C005 \u2192 0x7ED3534D."
+ },
+ {
+  "id": "14e-130",
+  "section": "14e-gui-methods.md",
+  "line": 130,
+  "text": "- Bits 0x20000/0x40000 have the same setter shape; 0x80000 has no invalidate. Container +464 tests parent type 260 = 0x104 (V)."
+ },
+ {
+  "id": "14e-254",
+  "section": "14e-gui-methods.md",
+  "line": 254,
+  "text": "- **F060 0x7ED9C8FB is entry 65, at 0x602BC278.** C2 gave RAM 0x602BA478; that address has no reference in the image (V)."
+ },
+ {
+  "id": "14e-266",
+  "section": "14e-gui-methods.md",
+  "line": 266,
+  "text": "- Slot 38 0x7EDF79A4 passes the constants 913 and 197 (V). Read as string ids, they are \"Exit\" and \"Set\" (I: an Exit/Set dialog)."
+ }
+]
