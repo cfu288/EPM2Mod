@@ -25,6 +25,12 @@ You are testing how well a firmware map explains the real code. Assume the map i
   - 14d data runs and embedded payloads, with 14d-false-functions.tsv;
   - 14e GUI widget methods and GUI app shapes.
 
+  Since round C3, there are also **function-level indexes** (TSV, columns `addr_or_id kind role evidence V/I`). Grep them for your function's address and for its containing table or range:
+  - 15a GUI pages, panels, touch handlers and Ss states: 15a-gui-pages.tsv;
+  - 15b camera core, mdet, cam_set, callbacks, command and dispatch tables: 15b-camera-core-index.tsv;
+  - 15c app-layer class index and statecharts: 15c-class-index.tsv and 15c-event-id-fixes.tsv;
+  - 15d Bluetooth HCI, HDMI/EDID, DPS and platform gaps: 15d-protocols-platform.tsv.
+
   Use the byte/instruction signatures in 13c, 13d, 14a, 14c and 14e to classify framework, GUI and C3D glue. build/map/functions.tsv column 9 (`suspect`) flags probable data decoded as code.
 
 **Tools** (run from /path/to/epm2-tools):
