@@ -75,7 +75,7 @@
 
 **Why the same code appears in many files (inferred, strong):** Rhapsody **statechart inheritance**. A derived class's chart includes the base chart's states, and the generator re-emits their code in every derived class. Examples: the "go to Idle on 12067" handler exists 73 times (F053 0x7EB1FBE1 in the base calls getCurrentEvent through the vtable; the copies F054 0x7EB366D0 and F057 0x7EB6B6C1 call 0x7EBA6D64 directly and differ only in offsets and call displacements). The Cap init states (§4.3) are re-emitted in each Cap class. This replaces section 06's "inlined from a header or macro".
 
-**Shape catalogue.** Counts are from `classify.py` over the 32,799 functions in 0x7E966000–0x7EBA4868 (heuristic, verified per sample). 72% fall in a pattern class; the remaining 28% is real feature logic.
+**Shape catalogue.** Counts are from `classify.py` over the 32,799 functions in the scan window 0x7E966000–0x7EBA4868 (a count window, not a module edge; app code starts at 0x7E966A17) (heuristic, verified per sample). 72% fall in a pattern class; the remaining 28% is real feature logic.
 
 | Shape (count) | Signature (instructions; bytes where fixed) | Role |
 |---|---|---|
