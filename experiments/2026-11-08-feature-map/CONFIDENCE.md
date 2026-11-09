@@ -51,6 +51,27 @@ A region that fails a round gets a deep dive, then a **new** blind sample. The s
 | 0x7EE2–0x7EEE libraries / C3D | — | not sampled | | pending C1 |
 | 0x7F05–0x7F0B BASIC / ADJ / USB / SPC | — | A1 ok | | pending C1 |
 
+## Coverage by region, rounds C4 + C5 (160 functions, after D3 and the L1 boundary cleanup)
+
+| Region | n | Explained | Partly | Unexpl. | Contra. | Not-code | E % | E+P % |
+|---|---|---|---|---|---|---|---|---|
+| 0x7E42–0x7E52 platform, drivers, libs | 5 | 0 | 5 | 0 | 0 | 0 | 0 | 100 |
+| 0x7E52–0x7E62 lens, firmup, IMG, WB, TAKE | 17 | 5 | 12 | 0 | 0 | 0 | 29 | 100 |
+| 0x7E62–0x7E73 camera core, movie, rec, face | 25 | 10 | 14 | 0 | 1 | 0 | 40 | 96 |
+| 0x7E73–0x7E8F rodata, .data | 2 | 0 | 0 | 0 | 0 | 2 | 0 | 0 |
+| 0x7E8F–0x7E96 playback, audio, BT | 11 | 3 | 8 | 0 | 0 | 0 | 27 | 100 |
+| 0x7E96–0x7EBA C++ app layer | 54 | 24 | 29 | 0 | 1 | 0 | 44 | 98 |
+| 0x7ECC–0x7EE0 GUI | 30 | 4 | 24 | 1 | 1 | 0 | 13 | 93 |
+| 0x7EE0–0x7EE8 3D / GL / C3D | 5 | 1 | 4 | 0 | 0 | 0 | 20 | 100 |
+| 0x7EE8–0x7EEC AVPI | 4 | 1 | 3 | 0 | 0 | 0 | 25 | 100 |
+| 0x7F05–0x7F0F overlays A/B | 7 | 2 | 5 | 0 | 0 | 0 | 28 | 100 |
+
+**Reading (C4 + C5):**
+- **Placement:** explained+partly is ≥ 93 % in every code region. C5 alone is 100 %, with 0 contradicted.
+- **Explained share (function-level role):** highest in the C++ app layer (44 %) and the camera core (40 %), where the shape catalogues and indexes apply; lowest in the GUI (13 %) and the platform drivers (0 of 5).
+- **The two C4/C5 contradictions** (camera core, app layer) were both range labels and are fixed. The GUI contradiction (C4, GuiTouch end) is fixed too.
+- **Samples are small:** per-region n is 2–54.
+
 ## Coverage by region, rounds C2 + C3 (159 functions, after D1)
 
 | Region | n | Explained | Partly | Unexpl. | Contra. | Not-code | E % | E+P % |
