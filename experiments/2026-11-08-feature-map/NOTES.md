@@ -102,3 +102,9 @@ English-string counts not present in the E-PM2: E-PL5 0 (block 1 identical), E-P
   - `PRM_CAM_SPECTRUM_%s_R` exists (0x7F0DEBA8).
 
   So the "mirror = DSLR stub" reading in 03 is withdrawn: it drives MOT_* shutter-charge requests (14b §6).
+- **14a (C3D/graphics): three claims. Confirmed:**
+  - The `{name, fn}` table starts at 0x7F023B8C with `eglGetError` → 0x7EE08680, and the word before it is not a pair.
+  - The string `1.2.37` is present (libpng).
+  - `PlaySlideShow::canSlideShowGPU` / `startSlideShowGPU` exist.
+
+  So C3D = the GPU slideshow.
