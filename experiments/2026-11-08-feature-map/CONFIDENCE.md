@@ -2,19 +2,22 @@
 
 **Goal:** high confidence in how each part of the firmware works, checked by adversarial review.
 
-## Status (2026-11-09, after round A10)
+## Status (2026-11-09, after rounds A11 and C6; work paused for user review)
 
 | Criterion | Result | Met? |
 |---|---|---|
-| Breadth: ≥ 80 % explained or partly in a fresh blind sample | C5: **100 %** (80/80) | yes |
-| No contradictions in a fresh blind sample | C5: **0** (C2–C4 had 2–4, all range labels; fixed by the L1 boundary lint) | yes |
-| ≥ 50 % explained (function-level role) | C5: **32.5 %**; flat at 25–33 % since C2 | **no** |
-| 0 wrong in the latest claim audit of each section | 01–08 (A1), 11 and 12 (A10), 13a–f (A5), 14a/b/d/e (A6), 14c (A7), 15a/15d (A8), 15c (A10): **0 wrong**. 09a/09b, 10d/10e and 15b had wrong claims in A10; fixed but **not yet resampled** | mostly |
-| Boundary lint (`scripts/boundary_lint.py`) | 1,323 ranges; **15 hard hits**, each explained in `audit/fixes-L1-b.md` §3 or as a span or data run | yes |
+| Breadth: ≥ 80 % explained or partly in a fresh blind sample | C6 96 %, C5 100 % | yes |
+| ≥ 50 % explained (function-level role) | C6 **47.5 %** (C5 32.5 %, C2–C4 25–30 %); the 16a–16d per-function indexes moved it | just short |
+| 0 contradicted in a fresh blind sample | C5 0; C6 **2**, both rule-made index rows, fixed | no in C6 (fixed after) |
+| 0 wrong in the latest claim audit of each section | 0 wrong in the latest audit of 01–08, 09a, 10d, 10e, 11, 12, 13a–f, 14a–e, 15a–d; 09b had 1 wrong in A11 (fixed: Sparkle's engine cases) | all but 09b |
+| Boundary lint | 11 hard hits, all spans inside a function or data runs | yes |
 
-**What still fails, and why.**
-- **The explained share:** a random function gets a specific role from the map about a third of the time. The map places all of them correctly, and the shape catalogues and indexes (13c/14c/15a–15d) explain the generated and framework code. What remains is ~74,500 functions of feature logic, driver internals and GUI methods with no strings, one role at a time.
-- **Error-prone claims:** the claims most often wrong in audits are "all/only/none/every" statements in the dense indexes (15b, 09, 10).
+**Explained share per round:** C1 12.5 %, C2 29 %, C3 25 %, C4 30 %, C5 32.5 %, C6 47.5 %. With n = 80 per round, each figure is ± ~10 points (95 %).
+
+**Where the remaining gap is:**
+- The app layer is explained almost everywhere (C6 batch 3: 15/15 app functions).
+- The GUI methods, platform drivers and storage internals, and the 3D/C3D/AVPI range (no 16x index) are the weak parts.
+- The generated indexes have known rule errors, listed at the end of each 16x section.
 
 ## What "high confidence" means here
 
@@ -47,6 +50,7 @@ A region that fails a round gets a deep dive, then a **new** blind sample. The s
 | A10 | Claim audit: first audit of 09/10, resample of 11/12/15b/15c | 62 claims, seed 20261118 | 34 correct, 23 minor, **5 wrong**: 09a-78 (info 111 *is* written with constant ids, via mcon), 09b-161 (40 `cmp 108` sites, not 2), 10d-109 (the edit-mode jump table does not map every mode), 10e-87 (status reads are ADJ op 0x9005, not 0x902A), 15b-60 (two of the "MEC submit or timer" handlers are stubs). **11, 12, 15c: 0 wrong.** New finding (checked by coordinator): after the getShippingInfo(4) gate, 0x7EDFD69B posts PostEventToCA(11, 11), the VER_MENU → VerCheck trigger that 10f/13d called unknown (`audit/check-A10-1..4.md`) |
 | A11 | Re-audit of 09a, 09b, 10d, 10e, 15b after A10 fixes | 30 claims, seed 20261119; completeness claims checked by full scan | 23 correct, 6 minor, **1 wrong**: 09b-148 ("the image-engine code does not branch on 118" is false: three jump tables at 0x7E78C254/C514/C8E4 give art codes 118 and 122 their own cases with their own parameter tables), which weakens 09b's "Crystal configures nothing different". **09a, 10d, 10e, 15b: 0 wrong** (`audit/check-A11.md`) |
 | F1 | Corrections pass after D1 | 52 items | 11 section-11 fixes + 41 D1 fixes applied, 1 rejected (13a no-registers claim); log `audit/fixes-D1.md` |
+| C6 | Coverage after the D4 per-function indexes (16a–16d) | 80 functions never used in C1–C5, seed 6109 | **38 explained (47.5 %)**, 39 partly, 0 unexplained, **2 contradicted**, 1 not-code (already in 14d-false-functions). Explained+partly 96 %. Both contradictions are rule-made index rows: 16 pool allocators labelled "step callbacks" (15b → 16d), and 0x7EE01FF5 labelled a hash-switch case block; both fixed, and the rule errors are listed in each 16x section. Index rows checked by reviewers: 41 right, 2 wrong, 30 context only, 7 not in any index. By batch: app layer 15/15 explained, GUI weakest. `coverage/round6-review1..4.md` |
 | C5 | Coverage, whole block 0, after the L1 boundary cleanup | 80 functions never used in C1–C4, seed 5109 | **Breadth and contradiction criteria MET; explained not met.** 26 explained (32.5 %), 54 partly, 0 unexplained, **0 contradicted**, 0 not-code. Explained+partly **100 %**. Side errors found in neighbouring map text (not counted): the CA misc sub-app table is `{event, flag, next_state, handler}` from 0x7EED93EC, so VERCHK = 0x06000009 (10f/13d gave wrong event ids); CA code 11 = GUI_END_MENU; 13f SIO hook tables; 04 strh/strf field lists; event 3344 has a second use; the BTTIM row. `coverage/round5-review1..4.md` |
 | C4 | Coverage, whole block 0, after D3 | 80 new functions, seed 4109 (one C1–C3 overlap replaced) | **FAIL.** 24 explained (30 %), 50 partly, 1 unexplained, **3 contradicted**, 2 not-code (both already in 14d-false-functions). Explained+partly 92.5 %. Contradictions: the "Exif writer" at 0x7E707880 is the IMGDMA add-job module (checked: caller prints `IMGDMA_ADD_YC/BAYER/RGB`, table 0x7E84EE68); a 15c class range swallows a helper singleton (0x7E96C7F9); the GuiTouch end is one function late (0x7EDE15EE is the USB-connect screen getInstance). `coverage/round4-review1..4.md` |
 | L1 | Boundary lint, all sections and the map | every code range ≥ 64 B | 1,302 ranges; **242 start or end inside a function** (`scripts/boundary_lint.py`, `audit/boundary-lint-1.tsv`). Many are round-number approximations written as exact. This explains most coverage contradictions since C2 |
