@@ -61,7 +61,7 @@ A static study of the Olympus PEN E-PM2 main firmware, v1.6, to learn what it co
 | [`coverage/`](coverage/) | Blind coverage samples and reviews |
 | [`scripts/`](scripts/) | Cross-body art comparison scripts, plus `audit_sample.py` and `coverage_sample.py` for the adversarial reviews |
 | [`tasks.tsv`](tasks.tsv) | All 177 tasks (both CPUs): id, name, entry, priority, stack. Made by `fwmap.py tasks` |
-| [`modules.tsv`](modules.tsv) | 165 source files (and inferred `cam_*.c`/`sc`/`wb` rows) in link order, with their code ranges |
+| [`modules.tsv`](modules.tsv) | 179 source files (and inferred `cam_*.c`/`sc`/`wb` rows) in link order, with their code ranges |
 | [`regions.txt`](regions.txt) | Strings and tasks per 256 KiB region. Made from the **first** database, before the task-table and data-page fixes, so its task names are out of date. Use it as a rough guide only |
 
 Related: [`../2026-11-08-disassembly/NOTES.md`](../2026-11-08-disassembly/NOTES.md) (base address check and first reading of the movie time-limit routine) and [`docs/firmware-format.md`](../../docs/firmware-format.md) (container format).
