@@ -220,7 +220,7 @@ Each API function also has a second caller, the debug shell `demo` 0x7E9035A8 (`
 |---|---|---|
 | BT_CTRL | 0x7E8FF96E | Waits on flag 0x7E43EC4E, mask 0x1F. 0x10 → timer `bt_ctrl_timer_timeout` 0x7E901462. 0x08 → stack-event queue 0x7E43EDF0 → 0x7E8FFB15 (inquiry results, ACL connect, service query, pairing mode, HCI errors). 0x01 → iAP response 0x7E91B4F5 / 0x7E91CD59. 0x02/0x04 → request queue 0x7E43EDEE → 0x7E900560 (API requests, OPP/BIP). |
 | BTSTK_TSKID | 0x7E92F5F7 | Stack loop: calls 0x7E915C4A, then waits on flag 0x7E43EC48 (10 s timeout) while the run flag 0x602AEEBD = 1 |
-| BTTIM_TSKID | 0x7E92F345 | Stack tick: counter at 0x7DAF2F5C, one-shot callback, health check 0x7E9014C6 every 100 ticks |
+| BTTIM_TSKID | 0x7E92F345 | Stack tick: counter at 0x7DAF2F5C, one-shot callback. On every tick it calls 0x7E9014C6, a getter (`mov (0x605C8850),d0; retf`) of the BT_CTRL timer's remaining time (0x7E92F3A4). Only while that is ≠ 0 does it count ticks; every 100th tick it calls 0x7E9013BC, which subtracts the elapsed time from 0x605C8850 and at 0 sets event-flag bit 0x10 (flag id at 0x7E43EC4E; I: the BT_CTRL timer timeout, cf. `[BTC_TMR] bt_ctrl_timer_timeout` in 0x7E901462) (C5 2026-11-09) |
 | BTEVU_TSKID | 0x7E9375B4 | Waits on flag 0x7E43EC4A (mask 14, 1 s); runs HCI/transport events (0x7E913984) |
 | BTAPL_TSKID | 0x7E923FD2 | One shot: if bit 0 (`btst 1` (audit 2026-11-09)) of 0x602AEE98 → 0x7E923B0F (a Blue SDK test client: `OLYMPUS BlueSDK a4`, BIP put of `OLYMPUS_TST_OBJ`); bit 1 (`btst 2` (audit 2026-11-09)) → an empty stub. Inferred: a vendor sample/test application. |
 | BTIAP_TSKID | 0x7E91A0C2 | iAP transfer: flag 0x7E43EC54, mask 0xFF; retry `DevDataTransfer`, `DevDataTransfer timeout!!!` |

@@ -61,7 +61,7 @@
 | 30 (+120) | 0x7EBA69A4 | consume. It runs the null-transition loop 0x7EBA6B03 ("Infinite Loop of null transitions"), skips id −5, then calls **slot 33** (or slot 31 for a triggered operation). |
 | 32 (+128) | 0x7EBA6A8B | **rootState_entDef**: overridden by every generated class |
 | 33 (+132) | 0x7EBA6AA8 | **rootState_dispatchEvent**: overridden by every generated class |
-| 35–37 | (Com_ only) | added by the Com_ base: 35 = 0x7EB87078, **36 (+144) = getName()**, 37 (+148) = delegate reactive (used by Com_ takeEvent) |
+| 35–37 | (Com_ only) | added by the Com_ base: 35 = **`dumpState(level)`** 0x7EB87078 (`%s, [%s]` / `%s, state=%d`; CM overrides it with 0x7EA7CB15, which reuses the body at 0x7EB8707D and sends event 14381 to every sub-component and capability), **36 (+144) = getName()**, 37 (+148) = delegate reactive (used by Com_ takeEvent) (C5 2026-11-09) |
 
 **Global 0x602B4A88 (verified use):** when it is non-zero, gen, takeEvent and the thread use alternative slots (26 instead of 30, 23 instead of 6). **Inferred:** this is Rhapsody's animation/instrumented mode; it is normally 0.
 

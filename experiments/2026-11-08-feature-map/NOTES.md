@@ -132,3 +132,6 @@ English-string counts not present in the E-PM2: E-PL5 0 (block 1 identical), E-P
   - `evTraCmpPly_NotifySelectDisplayExecuteEnd` and `…NotifySelectExecuteEnd` are named in receive traces (0x7EB109D3, 0x7EABA04x).
   - The original running handler 0x7EB14F8E is 1,500 B with 21 callers.
 - **Correction to my 15a note above:** the touch handler table is 13 words long (slot 0 + 12 handlers), and the area tables before it also match byte for byte (0x7EFED634–0x7EFED8F3 = 0x7EFE3D98–0x7EFE4057), per the A8 fix pass. So "identical copy" was right; my 16/80-word comparison ran past the table end.
+- **A9/C5 fix pass: the CA misc table and the firmware chain. Confirmed:**
+  - Rows at 0x7EED946C/7C/8C are {0x06000009, 1, 0x2006, 0x7ECE0653}, {0x0600000A, 1, 0x2007, 0x7ECE067B} and {0x0600000B, 0x85, 0x2008, 0x7ECE06C0 startFirmupSubAppStateMisc}.
+  - The shooting row 0x7EEE0BF4 is {0x0400000B, 1, 1, startShooting 0x7ECDCB10}.

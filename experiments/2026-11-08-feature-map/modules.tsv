@@ -58,9 +58,9 @@ first_fn	last_fn	source_file	fns_naming_file	placement	name_string
 7e707a9d	7e70828f	[unnamed] (IMG-library helpers)	0	inferred-L1 (L1 2026-11-09)	-
 7e708312	7e70b198	Exif/MakerNote writer [unnamed]	0	inferred-L1 (L1 2026-11-09)	-
 7e70b3f8	7e70bd7f	rec main (REC_MAIN) [unnamed]	0	inferred-L1 (L1 2026-11-09)	-
-7e70bdf4	7e70d2f5	rec_3d.c	5	direct	7e851eaa
+7e70bdf4	7e70d51e	rec_3d.c	5	direct; last_fn = rec_3d_free 0x7E70D51E (V name; the last fn naming the file is 0x7E70D2F5), as 03 §8	7e851eaa (C5 2026-11-09)
 7e713657	7e713cce	rec_jpeg.c	2	direct	7e853bb0
-7e7166ec	7e7166ec	rec_misc.c	1	direct	7e853daa
+7e714a2a	7e7166ec	rec_misc.c	1	direct; first_fn = rec_misc_nr_stl2yc 0x7E714A2A (V name), REC MISC fns 0x7E714ABC-0x7E71631A inside, as 03 §8	7e853daa (C5 2026-11-09)
 7e71ad72	7e71b0c3	rec_view.c	2	direct	7e854708
 7e71e899	7e71ee5f	art_effect_10_star_light.c	4	direct	7e857144
 7e720441	7e7207d8	art_effect_20_pinhole.c	3	direct	7e8576b5
@@ -88,7 +88,7 @@ first_fn	last_fn	source_file	fns_naming_file	placement	name_string
 7e945dd7	7e946041	play_load.c	2	direct	7ebbbd2b
 7e946a29	7e946a29	play_load_movie.c	1	direct	7ebbc0c7
 7e946f16	7e946f16	play_load_mpo.c	1	direct	7ebbc1ce
-7e947893	7e947893	play_load_raw.c	1	direct	7ebbc4a6
+7e94764f	7e947dbe	play_load_raw.c	1	direct; extent from play_load_raw_* fn names (raw_header_check 0x7E94764F ... read_wb_data 0x7E947DBE); only 0x7E947893 names the file	7ebbc4a6 (C5 2026-11-09)
 7e94832d	7e94832d	play_multi_raw.c	1	direct	7ebbc86b
 7e94928f	7e94928f	play_redeye.c	1	direct	7ebbcddc
 7e949741	7e949741	play_regist.c	1	direct	7ebbcf20

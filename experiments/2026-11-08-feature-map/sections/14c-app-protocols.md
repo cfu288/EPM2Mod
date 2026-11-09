@@ -66,7 +66,7 @@ Every Cap class follows one pattern (verified on CapBoo, CapFls, CapTak, CapPls,
 | CM member | Observer class / update() | Event made | Registered on | Notified by |
 |---|---|---|---|---|
 | +328 | Com_ 0x7EB85DC3 / 0x7EB85DDF | **3346** init OK | CapBoo & CapFls iface slot 0 | Cap init chart, state 2 on 11562 (13c §4.3) |
-| +424 | Com_ 0x7EB86084 / 0x7EB860A0 | **3344** init error | slot 2 of both | init chart on 11563 |
+| +424 | Com_ 0x7EB86084 / 0x7EB860A0 | **3344** init error (3344 has a second use: sub-transitions send it to their owner +160 on every evTraStop, see 14c-event-ids-extra.tsv) | slot 2 of both | init chart on 11563 (C5 2026-11-09) |
 | +376 | 0x7EA7E595 / 0x7EA7E5B5 | **12063** boot step done | CapBoo slots 9/10 (lists BootManager+224/+228) | BootManager states 7/10/12 |
 | +352 | 0x7EA7E52A / 0x7EA7E54A | **12069** strobe state | CapFls slots 9–13 (Fls+356/+376/+380/+384/+388) | §2.3 |
 | +448 | 0x7EA7E600 / 0x7EA7E620 | **12068** flash mode re-applied | CapFls slot 14 (Fls+396) | §2.3 |

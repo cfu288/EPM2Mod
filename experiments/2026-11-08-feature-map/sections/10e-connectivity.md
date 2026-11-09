@@ -145,8 +145,8 @@ The E-M10 and E-PL7 also lack an accessory port (product knowledge) but still ca
    | 2 | 4 | Print path |
 
    - If the state is 0 and info 4018 (FLASH 0x0DA1 `PRM_MODE_DPS_ENABLE`) = 0, the state becomes 1.
-   - `checkPcMode` 0x7ECE0E8A turns the state into GUI events: 0 → 0x9000010 (select), 3/4 → 0x9000012 (print), 5/6 → 0x9000013, otherwise 0x9000011 (PC).
-   - `startPc` 0x7ECE09FC passes mode 2 for MTP, otherwise 1, to a DeviceLink connect.
+   - `checkPcMode` 0x7ECE0E8A turns the state into CA sub-app events (not GUI events) of PC state 0x6000 (descriptor 0x7EEDAD70 = {0x6000, 0x7EEDA4D0, 6}, `{event, flag, next, handler}` rows): 0 → 0x9000010 (select; next state 0x6002, no handler), 3/4 → 0x9000012 (print, 0x7ECE0F8A), 5/6 → 0x9000013 (0x7ECE100E), otherwise 0x9000011 (PC, `startPc` 0x7ECE0F29). (C5 2026-11-09)
+   - `startPc` is 0x7ECE0F29 (string `startPc`). It calls `connect` 0x7ECE09FC (string `connect`) with the PC state from 0x605EFE80 (getter 0x7ECE09F3); `connect` passes mode 2 when that value is 2 (MTP), otherwise 1, to a DeviceLink connect. (C5 2026-11-09)
 3. **App device links.** The factory 0x7EBA33C0 builds four link objects (vtables 0x7EC916F4/18/3C/60):
 
    | Link | Calls | TPC type |

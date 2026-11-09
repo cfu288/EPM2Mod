@@ -216,7 +216,7 @@ Sensor modes (verified table 0x7E7ABDA0, key = mode+1): 0 HS, 1 HSSC, 2 MSSC, 3 
 
 **Bracketing (verified).** usMode 0x100D makes REC_BRACKET_ENTRY count the non-zero `usPicBkt[]` (msg+154). One exposure is rendered into several outputs. **Inferred:** this is ART BKT / picture-mode bracketing (`artbkt_cnt` in 0x7E5C69E6). AE/ISO/WB bracketing is in the TAKE/strobe modules (`bktNumMax`, `mode_bracket_iso`), not in REC. `api_rec_Get_Bracket_Information` (0x7E68BD97, 659 instructions) builds the list for the UI.
 
-**3D (rec_3d.c 0x7E70BDF4–0x7E70D55E).**
+**3D (rec_3d.c 0x7E70BDF4–0x7E70D55D: from `rec_3d_lens_view` 0x7E70BDF4 to the end of `rec_3d_free` 0x7E70D51E, 64 B; the last function that names `rec_3d.c` is 0x7E70D2F5; I: the unnamed 0x7E70D55E (89 B, called only by the 3D dispatch 0x7E70BD7F) may belong too).** (C5 2026-11-09)
 - **Verified dispatch:** handle +17132 == 12 → 0x7E70BD7F: `rec_3d_lens_art_exec`, then `rec_3d_write_mpo` 0x7E70BF3C, then free. REC_VIEW has `rec_3d_lens_view` 0x7E70BDF4.
 - **Inferred from names:** an MPO writer for 3D photo, and a 3D-lens path (two images on one sensor; `rec_cam_convert_3d_lens_offset_x/y`). `api_rec_Start_Take_3d` is at 0x7E68B98A.
 
@@ -226,7 +226,7 @@ Sensor modes (verified table 0x7E7ABDA0, key = mode+1): 0 HS, 1 HSSC, 2 MSSC, 3 
 - REC_BEAUTY/CSKIN 0x7E70ED0D–0x7E70FFFD (e-Portrait)
 - MULTIEXP 0x7E716E54–0x7E717EA9
 - REC NR 0x7E717FE9–0x7E7183CC
-- REC MISC YC2YC/YC2VIEW/YC2JPG/BAYER2YC/FD MAKE Y 0x7E714ABC–0x7E71631A
+- rec_misc.c 0x7E714A2A–0x7E7166EC (V names): `rec_misc_nr_stl2yc` 0x7E714A2A, REC MISC YC2YC/YC2VIEW/YC2JPG/BAYER2YC/BAYER2Y/FILLDATA/FD MAKE Y 0x7E714ABC–0x7E71631A, `rec_misc_yc2jpg_small` 0x7E715071, `rec_misc_bayer_copy` 0x7E715A4F, and `rec_misc_stl2yc` 0x7E7166EC (the only function that names `rec_misc.c`) (C5 2026-11-09)
 - `rec write/dbginfo/trace/dump` shell 0x7E710EB9
 
 ## 9. Art filters and effects (art_*.c, 0x7E71BC93–0x7E72CF39)

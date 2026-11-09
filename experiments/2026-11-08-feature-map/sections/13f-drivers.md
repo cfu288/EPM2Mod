@@ -208,7 +208,7 @@ Round D1 deep dive. Scope: the driver code in 0x7E421020–~0x7E521020 (the regi
 | 5 | 0x98700000 | 87, 88 | **console port 0** (S_SHELL) |
 
 - **Driver layers** (V for the flow, I for the names):
-  - **Open and configure** 0x7E467EED (C1 F002). Interrupt attach 0x7E467E1A, from the IRQ tables 0x7E4C8188, 0x7E4C8218 and 0x7E4C8260. Per-channel mode hooks are in table 0x7E4C82F0.
+  - **Open and configure** 0x7E467EED (C1 F002). Interrupt attach 0x7E467E1A, from the IRQ tables 0x7E4C8188, 0x7E4C8218 and 0x7E4C8260. Three 3-entry hook tables follow, indexed by the channel **mode** byte (0x60417508 + 8·ch + 1), not by the channel: **open** hooks 0x7E4C82F0 {0x7E467F5D, 0x7E468053, 0x7E468130} (`asl2 d2; mov 0x7E4C82F0,a0; mov (d2,a0),a1; calls (a1)` at 0x7E467F4D–0x7E467F58); **write** hooks 0x7E4C82FC {0x7E46834D, 0x7E468424, 0x7E468578} (dispatcher 0x7E468324, 5 callers); and 0x7E4C8308 {0x7E468DD7, 0x7E468F09, 0x7E468712}, which the channel interrupt handler 0x7E468CE9 (12 per-channel callers) calls when status bit 0x800 is set (that handler also indexes 0x7E4C831C; role of both I: interrupt-side hooks). (C5 2026-11-09)
   - **Bus ownership** `sio_request(ch, fn a0, arg a1)` 0x7E469961 (19 callers). If the channel is idle it marks it busy and calls `fn(arg)` at once (returns 0). Otherwise it queues one of 2 slots (returns 2) or refuses (returns 1).
   - `sio_release(ch)` 0x7E4699F9 (21 callers) masks the channel IRQs (0x7E468B97) and runs the next queued `fn`. The state lives at RAM 0x60419F00 + ch·20.
   - The client callback does the transfer. `<<SIO SEM STATUS>>` 0x7E469A9A prints FLAG/Q_READ/Q_WRITE/FUNC/OPEN/CLOSE.

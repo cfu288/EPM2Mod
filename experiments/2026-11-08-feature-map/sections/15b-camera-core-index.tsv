@@ -14,8 +14,8 @@ addr_or_id	kind	role	evidence	V/I
 0x7E65156C	function	cam_set run-set-list(d0 list type, a0 owner object (list +16), a1 done (list +20); d1 passed through to list +28): allocates a list of FrameType d0 (0x7E65210C), records it in the 20-slot table 0x6055EEF8, executes it (0x7E6513CF), then list-done 0x7E651B0E or FC 7 (0x7E651483(7))	code (A8)	V
 0x7E651B7A	function	cam_set FC-7 distributor (1426 B): sends the list's FunctionList entries to the module setters (aperture 0x7E62B513, 0x7E62BC40, contrast 0x7E62CBF2, imgdev 0x7E63BE31, lens 0x7E64024C, 0x7E64A34A, 0x7E64D5D3, sg 0x7E652BEA, strobe 0x7E661DA6); the dump 0x7E6521C9 names the 44 FunctionList flags (sync_setting_sg ... lens_setting)	callees; strings	V callees, I mapping
 0x7E651839-0x7E6519A2	family	cam_set per-module completion stubs (10 x 39-41 B): decrement the list's pending count (+42), call one module's finish (sg 0x7E652C6D, 0x7E64D64B, 0x7E62BCCA, contrast 0x7E62CCAB, 0x7E64A3B8, imgdev 0x7E63BE35, shutter 0x7E655869, aperture 0x7E62B5B3, strobe 0x7E661E2D, lens 0x7E64027B), then list-done 0x7E651B0E	code	V
-0x7E6515C0-0x7E651644	family	cam_set list-done callbacks (7 x 22 B): release the list (0x7E652171) and set bit 2 or 4 of the sequence's cam_ev object (ids 32-37, 54)	code	V
-0x7E65165A-0x7E65181E	family	cam_set frame-command done callbacks (21 x 27 B, pointer-only): free the frame request (0x7E641D60) and set bit 2, 4 or 8 of the sequence's cam_ev object (ids 32-40, 54-56; 0x7E63589A); 0x7E6517FA only frees	code	V
+0x7E6515C0-0x7E651644	family	cam_set list-done callbacks (7 x 22 B): release the list (0x7E652171) and OR flag mask 0x2 or 0x4 into the sequence's cam_ev object (ids 32-37, 54; 0x7E63589A)	code	V (A9 2026-11-09)
+0x7E65165A-0x7E65181E	family	cam_set frame-command done callbacks, 18 functions: 16 x 27-B pointer-only stubs free the frame request (0x7E641D60) and OR flag mask 0x2, 0x4 or 0x8 into the cam_ev object's flag word (ids 32-40, 54-56; 0x7E63589A, `or` at 0x7E635C75); 0x7E65179E (11 B) only releases a list (0x7E652171; used by COM_SET 0x7E650721); 0x7E6517FA (36 B) frees the request and calls the owner's done at +20 (used by code 100, 0x7E650C85)	code; disasm 0x7E65165A-0x7E651838	V (A9 2026-11-09)
 0x7E650CFE-0x7E65137A	family	cam_set sequences (13 functions, 85-236 B): event-driven state machines on one cam_ev object each (ids 32-41, 54-56); each step re-arms itself (0x7E6356C3/0x7E6359B1) and issues the next frame command or set list	code (fcmds.py)	V
 0x7E652AF3-0x7E6557CD	range	cam_sg.c (I: alphabetical after cam_set.c, E-PL7 `sg ... cam_sg.c / cam_sgdrv.c`; FunctionList names sg_*): module byte 0x00 (0x0A00xxxx); init 0x7E652AF3 (<- cam_set init); 0x7E653AB1 attaches IRQs 4, 5, 6 -> ISRs 0x7E655548/0x7E6555C6/0x7E655644; command filter 0x7E652CEB (hash 0x7E7BB5D4: 5, 6, 7, 9, 18, 19, 129-133) called from frame handlers 0x7E637CA4...; setters 0x7E652BEA/0x7E652C6D (<- set list)	codes; call graph	V code, I name
 0x7E6557CE-0x7E6561D9	range	cam_shutter.c (SH_RES/SH_MEM; module 0x1A): open 0x7E655834/close 0x7E655869, command filter 0x7E6558AD (hash 0x7E7BBAAC: 5, 6, 7, 11, 12, 145-149 -> MEC submit 0x7E51787B of SH request objects), SH_RES post/release pairs 0x7E655A84-0x7E655C1F, MEC shutter-client callbacks 0x7E655FC4-0x7E656177 (-> 0x7E518BF2)	strings; calls	V
@@ -128,7 +128,7 @@ addr_or_id	kind	role	evidence	V/I
 0x7E667472	trk-api	tracking start/init (1.5 KB): reads prm, clears state	caller TAKE 0x7E59A88D	V
 0x7E667A7A	trk	tracking init helper	caller 0x7E667472	V
 0x7E667C44	trk	tracking reset: reads AF frame 0x7E611AAE; error 0x31000602	callers 0x7E6673A6/0x7E6682E6	V
-0x7E667CAA	trk	lens input (0x7E52B2FE)	callers 0x7E667472/0x7E66AA4A	V
+0x7E667CAA	trk	coordinate conversion for tracking, not a lens-state input: calls 0x7E52B2FE with frame limits 319/239. 0x7E52B2FE is one half of the coordinate-map pair (other half 0x7E52B0F1) that the `bay2yc`/`yc2bay` test shell 0x7E52BC73 calls through 0x7E52BBEC (limits 320/240); I: lens-distortion coordinate map	callers 0x7E667472/0x7E66AA4A; fn 0x7E52BBEC	V (role of 0x7E52B2FE I) (C5 2026-11-09)
 0x7E667D06	trk	face input (FACE 0x7E6FB54A)	callers 0x7E667472/0x7E6682E6	V
 0x7E667D32	trk	face input, second part (0x7E6FB561/0x7E6FB581)	callers 0x7E667472/0x7E6682E6	V
 0x7E667E19	trk	float scaling of the target box to frame size (0x7E6CA93D)	float helpers	V
@@ -230,15 +230,15 @@ addr_or_id	kind	role	evidence	V/I
 0x7E671B19	ems2	mdet_ems2 job-layer helper (member by range and call graph)	graph.py internal callers	I
 0x7E671BEE	ems2	mdet_ems2 job-layer helper (member by range and call graph)	graph.py internal callers	I
 0x7E671CC3	ems2-start	mdet_ems2 job start: set callback, EMS2 0x7E46012D + 0x7E460810	pattern	V
-0x7E671E92	ems2-cb	mdet_ems2 completion callback: decode EMS2 results (0x7E460DB8/0x7E460FC2/0x7E46118C), chain next start	movm entry, loaded by preceding start	V
+0x7E671E92	ems2-cb	mdet_ems2 completion callback, chain end: decode EMS2 results (0x7E460DB8/0x7E46118C), then 0x7E672308 -> analysis 0x7E672896 -> user callback *(0x605970F0) (= 0x7E6686D0 from tracking open); no next start	movm entry, loaded by start 0x7E671CC3	V (A9 2026-11-09)
 0x7E6721E5	ems2	mdet_ems2 job-layer helper (member by range and call graph)	graph.py internal callers	I
-0x7E672308	ems2	EMS2 result unpack -> 0x7E672896	caller 0x7E671E92	V
+0x7E672308	ems2	EMS2 result unpack -> 0x7E672896, then calls user callback *(0x605970F0); not a start	caller 0x7E671E92	V (A9 2026-11-09)
 0x7E67249F	ems2	post from tracking -> 0x7E67253F	caller 0x7E66891E	V
 0x7E67253F	ems2-start	mdet_ems2 job start: set callback, EMS2 0x7E46012D + 0x7E460810	pattern	V
-0x7E6725C6	ems2-cb	mdet_ems2 completion callback: decode EMS2 results (0x7E460DB8/0x7E460FC2/0x7E46118C), chain next start	movm entry, loaded by preceding start	V
+0x7E6725C6	ems2-cb	mdet_ems2 completion callback, chain end: decode EMS2 results (0x7E460DB8), analysis 0x7E672896, then user callback *(0x605970F4) (= 0x7E6689F3); no next start	movm entry, loaded by start 0x7E67253F	V (A9 2026-11-09)
 0x7E6727BC	log	debug logger: ems2 5164 B/record (kind 1)	strings datsz...	V
 0x7E67283D	ems2-start	mdet_ems2 job start: set callback, EMS2 0x7E46012D + 0x7E460810	pattern	V
-0x7E67287A	cb	mdet_ems2 error/stop callback (0x7E4600DC/0x7E460109)	loaded at 0x7E672851	V
+0x7E67287A	cb	mdet_ems2 callback of the last start 0x7E67283D, chain end: 28 B, no movm, no decoder; calls 0x7E460109 and 0x7E4600DC, then user callback *(0x605970F8) (= 0x7E66C1AF, stop)	loaded at 0x7E672851	V (A9 2026-11-09)
 0x7E672896	ems2	EMS2 result analysis (5.3 KB, 155 globals)	callers 0x7E672308/0x7E6725C6	V
 0x7E673D53	unit	unit: debug snapshot to ST/CO logs	caller 0x7E673F9A	V
 0x7E673DA9	unit	unit: snapshot pointers (0x7E673E0E/0x7E673E60)	caller 0x7E673F9A	V
@@ -555,7 +555,7 @@ lens tag Mr1/	tag	trace tag of 0x7E53774C	strrefs	V (string); role I
 0x6607	error	LENS_FIRM_UP error (0x604F943C): cmd 6 failed	immediates in the step functions	V
 0x6608	error	LENS_FIRM_UP error (0x604F943C): cmd 7 (identify) failed	immediates in the step functions	V
 0x6609	error	LENS_FIRM_UP error (0x604F943C): read-back mismatch on the 4th consecutive compare (count 0x604F9398 > 3)	immediates in the step functions (A8)	V
-0x6610	error	LENS_FIRM_UP error (0x604F943C): protocol type not determined	immediates in the step functions	V
+0x6610	error	LENS_FIRM_UP error (0x604F943C): protocol type not usable: both protocol flags 1 (reported at once by 0x7E52FE8C), or no flag after the 4th failed probe (count 0x604F939A > 3, 0x7E5304BA)	immediates in the step functions	V (A9 2026-11-09)
 0x7E5307C7	fn	verify bypass: flag 0x604F9444 = 1 when the lens id (record +564) is 0x21001-0x21004 and its u16 = 0x1000; then 0x7E5303E1 skips the read-back compare	code	V; why I
 lens fw cmd 0 / 0x1000	slot	class-7 command byte 0x70 (6-B payload: kind, +4, +16/+17) (type 1) / 0x60 (type 2)	hash 0x7E7416F4 in 0x7E52ED80, key = cmd+1; header byte 0xF0	V
 lens fw cmd 1 / 0x1001	slot	class-7 command byte 0x71 (type 1) / 0x61 (type 2)	hash 0x7E7416F4 in 0x7E52ED80, key = cmd+1; header byte 0xF0	V
@@ -628,14 +628,14 @@ STB_EXTERNAL event 0x1000	slot	executor 0x7E5DCC5C (`EXT mode_set`): 0x7E5DCF03:
 ADCONV request	struct	52 B: +0 u8 channel, +1 u8 type (1; 0xF1 = special, 0x7E45BADC), +2 u16, +4 u32, +8 u32 (per-request: 1500/5 in 0x7E45E38D and 0x7E5394B5, 1500/4 in 0x7F080BEC, 750/5 MEC 0x7E5175C9, 750/2 ADC-key 0x7E50B1B4, 750/1 0x7E4589DC), +12 result buffer, +16 u8 (1), +17 u8 (0xFF), +32 async callback, +36, +40 sync marker, +44 u8. Completion 0x7E45CCA1: +32 set -> call it (0x7E45CC95); else if +40 set -> copy the request to 0x6041538C and set event flag 0x7E43EBB2	builders 0x7E45E38D, 0x7E5394B5, 0x7E4589F4 (A8)	V; field meanings I
 ADCONV channel 4	slot	mode 1, mask 0x01; user: battery (0x7E539481 <- 0x7E539E6A; callers pass 4)	table 0x7E4C4908 (9 x 16 B)	V (users I where ?)
 ADCONV channel 13	slot	mode 1, mask 0x02; user: power/battery area 0x7E53918F passes 13	table 0x7E4C4908 (9 x 16 B)	V (users I where ?)
-ADCONV channel 15	slot	mode 1, mask 0x04; user: ccd_temp sensor temperature 0x7E45E27F/E2B5/E556 (<- 0x7E45E206)	table 0x7E4C4908 (9 x 16 B)	V (users I where ?)
-ADCONV channel 22	slot	mode 1, mask 0x08; user: ?	table 0x7E4C4908 (9 x 16 B)	V (users I where ?)
+ADCONV channel 15	slot	mode 1, mask 0x04; user: ccd_temp sensor temperature 0x7E45E27F (builder 0x7E45E38D; <- 0x7E45E206). ccd_temp also uses 34 (0x7E45E2B5) and 41 (0x7E45E556)	table 0x7E4C4908 (9 x 16 B)	V (users I where ?) (A9 2026-11-09)
+ADCONV channel 22	slot	mode 1, mask 0x08; user: ADC key 0x7E50B1B4 (channel from table 0x7E7354CC entry 0, byte +4 = 0x16)	table 0x7E4C4908 (9 x 16 B)	V (users I where ?) (A9 2026-11-09)
 ADCONV channel 21	slot	mode 1, mask 0x10; user: ?	table 0x7E4C4908 (9 x 16 B)	V (users I where ?)
 ADCONV channel 38	slot	mode 1, mask 0x20; user: MEC layer 0x7E5175C9 (callback 0x7E517643)	table 0x7E4C4908 (9 x 16 B)	V (users I where ?)
-ADCONV channel 34	slot	mode 1, mask 0x40; user: per_acc accelerometer 0x7E458A47 (request 0x60414908; check 0x7E458938 `ACC:I2C NG?`)	table 0x7E4C4908 (9 x 16 B)	V (users I where ?)
-ADCONV channel 41	slot	mode 1, mask 0x80; user: ?	table 0x7E4C4908 (9 x 16 B)	V (users I where ?)
-ADCONV channel 39	slot	mode 9, mask 0x20; user: ?	table 0x7E4C4908 (9 x 16 B)	V (users I where ?)
-ADCONV callers	list	UI ADC keys/dial 0x7E50B1B4, 0x7E50B356, 0x7E50B512, 0x7E50B576, 0x7E50B5DF, 0x7E50B877 (callback F002 0x7E50B724 at +32); battery 0x7E539481; ccd_temp 0x7E45E27F/E2B5/E556; accelerometer 0x7E458A47; MEC 0x7E5175C9, 0x7E45BABE (<- 0x7E517671), 0x7E45BADC (<- 0x7E51773D); QPERIN-area pointer fn 0x7E463BAF; ADJ/USB 0x7F080BEC; internal 0x7E45B783 (<- ADCONV shell, QPWRSTANDBY 0x7E53A4A4), 0x7E45B969, 0x7E45BA13, 0x7E45CA67	calls.tsv	V
+ADCONV channel 34	slot	mode 1, mask 0x40; users: per_acc accelerometer 0x7E458A47 (builder 0x7E4589DC, request 0x60414908; check 0x7E458938 `ACC:I2C NG?`) and ccd_temp 0x7E45E2B5 (builder 0x7E45E3CF)	table 0x7E4C4908 (9 x 16 B)	V (users I where ?) (A9 2026-11-09)
+ADCONV channel 41	slot	mode 1, mask 0x80; user: ccd_temp 0x7E45E556 (builder 0x7E45E411 `mov 41,d0; movbu d0,(a0)`; <- 0x7E45E206)	table 0x7E4C4908 (9 x 16 B)	V (users I where ?) (A9 2026-11-09)
+ADCONV channel 39	slot	mode 9, mask 0x20; user: MEC 0x7E51773D (`mov 39,d0; call 0x7E45BADC`; static request 0x60414BA8, type 0xF1)	table 0x7E4C4908 (9 x 16 B)	V (users I where ?) (A9 2026-11-09)
+ADCONV callers	list	UI ADC keys/dial 0x7E50B1B4, 0x7E50B356, 0x7E50B512, 0x7E50B576, 0x7E50B5DF, 0x7E50B877 (+32 callback: 0x7E50B2F5 set only by the init 0x7E50B1B4; 0x7E50B606 or F002 0x7E50B724 set by 0x7E50B356; the other four resubmit); battery 0x7E539481; ccd_temp 0x7E45E27F/E2B5/E556; accelerometer 0x7E458A47; MEC 0x7E5175C9, 0x7E45BABE (<- 0x7E517671), 0x7E45BADC (<- 0x7E51773D); QPERIN-area pointer fn 0x7E463BAF; ADJ/USB 0x7F080BEC; internal 0x7E45B783 (<- ADCONV shell, QPWRSTANDBY 0x7E53A4A4), 0x7E45B969, 0x7E45BA13, 0x7E45CA67	calls.tsv	V (A9 2026-11-09)
 0x7E7BD480[12]	cell	still state table: status 1, event column 0 -> handler 0x7E657577; u16 +4 = 2 (next status, I: bounded by the row count at 0x7E65D73E)	table bytes; row stride 96 B	V handler; I next-status
 0x7E7BD480[22]	cell	still state table: status 1, event column 10 -> handler 0x7E65793C; u16 +4 = 1 (next status, I: bounded by the row count at 0x7E65D73E)	table bytes; row stride 96 B	V handler; I next-status
 0x7E7BD480[23]	cell	still state table: status 1, event column 11 -> handler 0x7E65793C; u16 +4 = 1 (next status, I: bounded by the row count at 0x7E65D73E)	table bytes; row stride 96 B	V handler; I next-status
