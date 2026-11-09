@@ -1,0 +1,374 @@
+[
+ {
+  "id": "09-59",
+  "section": "09-art-filters.md",
+  "line": 59,
+  "text": "- **Verified for the bold Exif values.** In the E-PL7 writer 0x7DE40D28, case 111 stores 12, 115 stores 23, 117 stores 28 and 118 stores 29. In the E-PM2 and E-P5 writers, 111\u2013118 all go to the default case and write no art value."
+ },
+ {
+  "id": "09-96",
+  "section": "09-art-filters.md",
+  "line": 96,
+  "text": "1. **Which still paths could run a hidden filter.** `art_IsSupportType` 0x7E71BC93 runs `art_chk_submode`, `art_chk_proccont`, `art_chk_type` (\u2192 `art_chk_type_rec` 0x7E71C0E1 / `art_chk_type_mov`), `art_chk_effect` and `art_chk_effect_monotorn`. `art_chk_type_rec` switches on the request's processing type (req+2) and accepts only codes that have a module (verified):"
+ },
+ {
+  "id": "09a-12",
+  "section": "09a-art-gui.md",
+  "line": 12,
+  "text": "- mcon has a value-list table of 505 records of 20 bytes at **0x7E84A0B8**, found by a 128-bucket hash at RAM 0x605B9750 (`0x7E70782A`). The record layout (verified from the users 0x7E707147, 0x7E7071EF, 0x7E7070B4 and 0x7E70708D) is: `+0 u16 info`, `+2 u16 variant key` (128 = default), `+4 ptr raw[]`, `+8 ptr gui[] (u32)`, `+12 u16 total bytes`, `+14 u16 element size`, `+16 u8 clamp` (1 = stop at the ends, 0 = wrap), `+17 u8 type` (1 = u8, 2 = s8, 3 = s16 nearest match, 4 = s16 exact, 5 = u16, 6 = composite) (13e \u00a73.1) (D1 2026-11-09)."
+ },
+ {
+  "id": "09a-33",
+  "section": "09a-art-gui.md",
+  "line": 33,
+  "text": "- GUI value 4 is not used. Info 509 and 510 (tag 0xDF31[0], [1]; composite partners 511 and 512, tag 0xDF41) have **identical** tables, at mcon records 0x7E84A5F4 and 0x7E84A608 (verified). Their prm hints `_current_edit_info` suggest the RAW-edit picture mode (inferred)."
+ },
+ {
+  "id": "09a-57",
+  "section": "09a-art-gui.md",
+  "line": 57,
+  "text": "| ART BKT | info 414\u2013423 \u2192 100\u2013109, 424 \u2192 119, 469 \u2192 120 (coordinator-verified builder 0x7EA7633A / 0x7EA9528D). Each info is a 0/1 flag (mcon records 0x7E84C278\u20260x7E84C354, raw [0, 1]) | the same 12 filters |"
+ },
+ {
+  "id": "09a-68",
+  "section": "09a-art-gui.md",
+  "line": 68,
+  "text": "- **If 0x9481 holds 110\u2013118** (consequences verified from the code above; end result inferred):"
+ },
+ {
+  "id": "09a-78",
+  "section": "09a-art-gui.md",
+  "line": 78,
+  "text": "- There are no constant-id writes of 111 or 0x9481: 0 prm sets, 0 Set_CameraInfo and 0 GUI setSetting with a constant id (07-settings.tsv, verified earlier). All writes are table-driven, through mcon."
+ },
+ {
+  "id": "09b-57",
+  "section": "09b-art-algorithms.md",
+  "line": 57,
+  "text": "- **Verified:** op type 21 (desc+194) is the same image-engine job that `[movp]copy` 0x7E6E3161 uses. So it is a"
+ },
+ {
+  "id": "09b-76",
+  "section": "09b-art-algorithms.md",
+  "line": 76,
+  "text": "- **Verified:** `art_chk_type` 0x7E71C0E1 accepts 151/153 only when req+2==3 (block 0x7E71C1BA). They are"
+ },
+ {
+  "id": "09b-145",
+  "section": "09b-art-algorithms.md",
+  "line": 145,
+  "text": "- **Verified:** the star module range 0x7E71E705\u20130x7E72032F contains no compare with 118. Its `(6,aX)` reads are"
+ },
+ {
+  "id": "09b-158",
+  "section": "09b-art-algorithms.md",
+  "line": 158,
+  "text": "- **Verified:** 73, 106 and 108 all go to case 0x7E72A615 \u2192 `art_effect_20_pinhole` 0x7E720332."
+ },
+ {
+  "id": "09b-161",
+  "section": "09b-art-algorithms.md",
+  "line": 161,
+  "text": "- **Verified:** the only other `cmp 108` sites are a numeric threshold at 0x7E551E93 and printf `%l` at 0x7F0A3479."
+ },
+ {
+  "id": "10-39",
+  "section": "10-hidden-features.md",
+  "line": 39,
+  "text": "| Art effects | Active (inf) | **Active (verified).** One effect at a time from a per-filter list | Values at 0x7EFE8664 |"
+ },
+ {
+  "id": "10a-59",
+  "section": "10a-shooting-timed.md",
+  "line": 59,
+  "text": "- Panel 637 is in the panel factory hash 0x7EFE5814 and opens the generic sub-item panel 0x7EDE1E3D (verified)."
+ },
+ {
+  "id": "10a-65",
+  "section": "10a-shooting-timed.md",
+  "line": 65,
+  "text": "- 0x7EFF8DF4 is the child list of **GUI panel 91** (record 0x7EFFAB2C). The values 482 and 483 there are panel ids, not info ids (verified)."
+ },
+ {
+  "id": "10a-118",
+  "section": "10a-shooting-timed.md",
+  "line": 118,
+  "text": "- The E-M10, E-PL7, E-M5 II and PEN-F have a top-menu **HDR** item (verified rows at 0x7E5B1CA6 for the E-M10 and 0x7E5DAACE for the E-PL7) and `MODE_HDR1_HDR2_JUDGE_NG`."
+ },
+ {
+  "id": "10a-144",
+  "section": "10a-shooting-timed.md",
+  "line": 144,
+  "text": "- **Custom self-timer (verified).** Panel 629 holds Frame 473 (1\u201310), Timer 475 (1\u201330 s) and Interval 474 (5, 10, 20, 30; units inferred as 0.1 s). It is used by the drive-list entries with info 0 = 5 (GUI 24, 25). `KIND_CUSTOM_INTERVAL` is at 0x7EA981DB. Active."
+ },
+ {
+  "id": "10b-22",
+  "section": "10b-shooting-modes.md",
+  "line": 22,
+  "text": "- The draw loop has no per-entry skip and no model or lens test. So all 23 entries are shown and selectable (verified for 0x7EDDA6CA; the mcon reset hooks for info 280 were not traced)."
+ },
+ {
+  "id": "10b-27",
+  "section": "10b-shooting-modes.md",
+  "line": 27,
+  "text": "| 1 | 9 | Portrait (242) | PORTRAIT \u2014 **verified** (SDET `dbgscnmode` 0x7E6637F2 prints name + code) |"
+ },
+ {
+  "id": "10b-39",
+  "section": "10b-shooting-modes.md",
+  "line": 39,
+  "text": "| 20\u201322 | 110, 111, 112 | Fisheye Effect / Wide-Angle / Macro (converters FCON-P01, WCON-P01, MCON-P01) | ATTACHMENT_FISH_EYE/WIDE/MACRO (inferred; `get_scene_program` 0x7EB100BC returns 22/23/24 from lens names \"FCON\"/\"WCON\"/\"MCON\", verified) |"
+ },
+ {
+  "id": "10b-60",
+  "section": "10b-shooting-modes.md",
+  "line": 60,
+  "text": "- The 12 names in `dbgscnmode` are PORTRAIT 9, SCENERY 11, SCENERY_PORTRAIT 17, NIGHT_SHOT 12, NIGHT_SHOT_PORTRAIT 18, NIGHT_SHOT_MACRO 156, EVENING_SUN 21, SPORTS 8, MACRO 23, SPOT_LIGHT 157, UNDERWATER_SNAP 50, PROGRAM 3 (verified immediates at bytes 0x7E663939\u20130x7E6639E8 inside the function 0x7E6637F2 (L1 2026-11-09))."
+ },
+ {
+  "id": "10b-92",
+  "section": "10b-shooting-modes.md",
+  "line": 92,
+  "text": "- Bit 0x40 (value 64, bit 6; `or 64` (audit 2026-11-09)) is set when the lens info is \u2265 0x102A and RAM flag 0x604F67AC bit 0x200000 is set. The lens debug `LENS_INFO_3D` 0x7E5288EB prints convergence_angle and baseline_length (verified strings), so this is a 3D-lens test (inferred, strong)."
+ },
+ {
+  "id": "10c-41",
+  "section": "10c-movie.md",
+  "line": 41,
+  "text": "- **Other writers (verified, static):** 07-settings.tsv lists 0 constant prm sets and 0 Set_CameraInfo calls for 26225 or 34145. I checked the 31 constant loads of 26225/34145 in code: all are reads (getter 0x7E457C75, or the address getter 0x7E457C52 at 0x7E6B39A3)."
+ },
+ {
+  "id": "10c-113",
+  "section": "10c-movie.md",
+  "line": 113,
+  "text": "- `startMultiThrough` has two callers, 0x7E9CB473 and 0x7E9CC4D3. Both are vtable methods of the API controller (vtable 0x7EC0F494, slots +0x2C and +0xD4), and the `sdk api` shell names `setMultiThroughMode`, `startMultiThrough` and `getMultiThroughCursor` (0x7EBF88F8\u2026). So the feature is reachable from the `sdk api` debug shell (verified table; not run)."
+ },
+ {
+  "id": "10c-157",
+  "section": "10c-movie.md",
+  "line": 157,
+  "text": "- **Refinement to 04 \u00a71.3 (verified, 0x7E6EF1FB / 0x7E6EF13A):**"
+ },
+ {
+  "id": "10c-166",
+  "section": "10c-movie.md",
+  "line": 166,
+  "text": "- **Mapping (verified):** `mov_art` 0x7E6CBFD3 reads **prm 38017 = 0x9481** (Picture Mode) and **prm 49169**. It maps with two jump tables, 0x7E7FF05C (still codes) and 0x7E7FF008 (movie codes; the movie path calls it through 0x7E6CBFC7 with bit 0 set). The movie-code table is:"
+ },
+ {
+  "id": "10c-171",
+  "section": "10c-movie.md",
+  "line": 171,
+  "text": "- **Selection:** movie has no own art list. Picture Mode in movie is the same prm 0x9481. Its only GUI write path is the 19-entry info-111 list (09a; also E-PL5/E-P5), which offers the 12 shipped filters. So the hidden ids 110\u2013118 cannot be chosen for movie either (verified by the absence of any other mcon list holding 100\u2013120, 09a `scan.py`)."
+ },
+ {
+  "id": "10d-24",
+  "section": "10d-playback.md",
+  "line": 24,
+  "text": "| Audio DSP | Active (inf for use) | **CORRECTED (split)** | **Wind cut is user-switched:** Custom Menu \"Wind Noise Reduction\" (info 434 \u2192 prm 0x7871) selects windcut or plain HPF (verified). ReTune, 5-band EQ, notches, DF1 and 3D use **fixed ROM-class settings**. The notch pattern follows movie quality. DRC uses 2 CPRAM values | \u2014 |"
+ },
+ {
+  "id": "10d-109",
+  "section": "10d-playback.md",
+  "line": 109,
+  "text": "- `api_picfile_Check_Create_PictureFile` 0x7E683DB6 maps API modes 1..33 to these internal modes (jump table 0x7E7CF458; for example \u2192 132, 129, 8, 10, 11, 14, 133, 16, 131, 7, 12, 1, 2). The size check therefore knows every mode, including 0x85 (verified)."
+ },
+ {
+  "id": "10d-130",
+  "section": "10d-playback.md",
+  "line": 130,
+  "text": "- **Code (verified, \u00a705):** `play_rom_chk_bgm` 0x7E94A62D allows \u2264 14 files of \u2264 6,145,024 bytes, and `aud_tool_wav_judge_OLYMPUS_authentication` must return 2. `play_regist_bgm` 0x7E9499A6 writes the WAV to flash and the entry to blob setting 0xE001."
+ },
+ {
+  "id": "10d-135",
+  "section": "10d-playback.md",
+  "line": 135,
+  "text": "- The import is user-driven from the menu. It is not run by the updater or at boot. `play_rom_chk_bgm` has one caller, `play_rom_main_exec` 0x7E94A33D, whose only caller is the PLAY_LOAD task 0x7E9456C5 (verified). The request is built by `api_play_Check_BGM_File` 0x7E686B22. I did not trace which callers reach that function."
+ },
+ {
+  "id": "10d-156",
+  "section": "10d-playback.md",
+  "line": 156,
+  "text": "- Info 434 \u2192 prm **0x7871** (mcon values 0/2/6/10, verified)."
+ },
+ {
+  "id": "10e-34",
+  "section": "10e-connectivity.md",
+  "line": 34,
+  "text": "- **What 0x1709 is (verified):** the status-name table at **0x7E8DA174\u20130x7E8DA330** holds records `{u32 id, char *name}`, e.g. (4, \"O  k\"), (0x100, \"Trg1\"). Part of it:"
+ },
+ {
+  "id": "10e-87",
+  "section": "10e-connectivity.md",
+  "line": 87,
+  "text": "- **ADJ:** the service op 0x902A (case code 0x7F080B39\u20130x7F080BC2 inside the function 0x7F08056A (L1 2026-11-09)) reads 0x1706/0x1708/0x1709/0x170A/0x170C and prints `cube is disable` (factory test, verified reads)."
+ },
+ {
+  "id": "10e-111",
+  "section": "10e-connectivity.md",
+  "line": 111,
+  "text": "- **What decides support:** the accessory-ID scan in \u00a71.2 (verified). Evf1/Evf2/Evf3 are three EVF classes (IDs 0x0101/0x0202/0x0322). Mapping them to VF-2/VF-3/(VF-4) is **inferred** from `EVF_TYPE_VF2/VF3` and `vf-2/vf-3 Version:`."
+ },
+ {
+  "id": "10e-127",
+  "section": "10e-connectivity.md",
+  "line": 127,
+  "text": "- \"Connection to Smartphone\" (1719/1720) is a Playback-menu row at **0x7EFFE1DC**, kind 0x100 (verified)."
+ },
+ {
+  "id": "10e-195",
+  "section": "10e-connectivity.md",
+  "line": 195,
+  "text": "| Card update mode (FIRMUP_CLI) | All 9 entries: S, A, M, V, D, T, E/G/H/W/E100, DATE/PICTURE1JPG, N | Boot only. 0x7E544A6F needs a power-on factor of 12 / 0x01000002 / 0x01000001 **and** 0x602A9B54 = 0. 0x7E505694 clears that byte when status 4 reads 0 and 0x7E45D893() \u2260 9. Status 4 is **\"O  k\"** in the name table (verified), so this is probably the OK key held at power-on (**inferred**). The power-on factor values are not decoded | Hidden / service |"
+ },
+ {
+  "id": "10f-69",
+  "section": "10f-debug-service.md",
+  "line": 69,
+  "text": "- `api_comm_Start_Communication_Storage` 0x7E6763A2 sends type **0** to TPC (verified). DPS sends 1 and MTP sends 4."
+ },
+ {
+  "id": "10f-77",
+  "section": "10f-debug-service.md",
+  "line": 77,
+  "text": "- The 22-op ADJ accept table is **byte-identical in all 7 bodies** (`adjtbl.py`: E-PL5 0x7F0D25A2, E-P5 0x7EEE01CE, E-M10 0x7E88D356, E-PL7 0x7E8888EA, E-M5 II 0x60D825CE, PEN-F 0x60D624A2) (verified)."
+ },
+ {
+  "id": "10f-104",
+  "section": "10f-debug-service.md",
+  "line": 104,
+  "text": "- **What the info ids are (07-settings.tsv, verified):** info 4012 = prm **0x0DB1 `PRM_MODE_SHIPS_ENABLE`** (FLASH, default 0). Info 4017 = prm 0x5781 (ROM constant, value 0). So the arg \u2260 0 path can never pass on the E-PM2, and the arg 0 path passes only while the ship flag is 0."
+ },
+ {
+  "id": "10f-124",
+  "section": "10f-debug-service.md",
+  "line": 124,
+  "text": "- **Entry: found (13d \u00a74.3, verified code) (D1 2026-11-09).** A Setup dialog method 0x7EDFD665 (inferred: Monitor Adjust) checks key code 4 and `IOlyApiMaintenance` getShippingInfo(4); only if it returns 1 does it post EVT_REQ_START_VERSION_CHECK 0x9628. SS_MENU_MAIN state 4 maps 0x9628 to state 6 `ID_ST_HIDE_MODE`. There a counter at RAM 0x602BC480 steps on Up \u2192 Down \u2192 Left \u2192 Right \u2192 shutter half-press \u2192 shutter full-press (0\u21921\u21922\u21923\u21927\u21928), and OK with counter 8 returns 0x0A01 = SS 10 state 1 (bytes 0x7EDABA14\u20130x7EDABA54 inside the handler 0x7EDAB9FE (L1 2026-11-09)). Whether a retail body passes the getShippingInfo(4) gate is **not known**."
+ },
+ {
+  "id": "10f-138",
+  "section": "10f-debug-service.md",
+  "line": 138,
+  "text": "- **Verified:** `startShooting` 0x7ECDCB10 reads rcv_info.info from the **second** word of the CA event (a3 = a1+4) and maps info **11 \u2192 param 12 (VERCHK)** and 12 \u2192 param 13 (CAM_MISC_FIRMUP). (A4 2026-11-09)"
+ },
+ {
+  "id": "11-16",
+  "section": "11-version-history.md",
+  "line": 16,
+  "text": "| 1.3 (Oct 9 2014) | AF precision with the 40-150 F2.8 PRO | **One real code change** (0x7E6232ED): a lens-ID and lens-protocol test picks a different AF parameter set. Plus version constants | **Yes** (code verified; the 40-150 link inferred) |"
+ },
+ {
+  "id": "11-19",
+  "section": "11-version-history.md",
+  "line": 19,
+  "text": "| 1.6 (Oct 23 2018) | AF with Panasonic H-ES200 / H-ES50200 | **AF position variables widened from 16 to 32 bits** across the AF code (~0x7E5E3000\u2013~0x7E627000, page-rounded (L1 2026-11-09)); \"focus position\" is inferred from the `fcs_*` names. A new saturating clamp at 39 sites: 38 clamp to [\u221232768, 32767], one (0x7E60A5EE) to [0, 32767]. AF structs grow. Code from 0x7E626937 to about 0x7E76EA1F shifts by +0x2AC; code from 0x7E8F1C68 on does not move (audit 2026-11-09) | **Yes** (code verified; the link to these lenses inferred) |"
+ },
+ {
+  "id": "11-115",
+  "section": "11-version-history.md",
+  "line": 115,
+  "text": "- **What the value is (partly inferred).** All six sites build a request for 0x7F0A4A48 (v1.3/v1.4; 0x7F0A4A20 in v1.5/v1.6) with d0=0, d1=13 read / 14 write (13 at 5 sites, 14 at 1, in the write command), a1=iSDIO register address such as 0x603/0x440, stack = length, **stack+8 = 19/18**. The builder stores that value at request +24, then queues the request through 0x7E5CB393 (v1.3/v1.4; 0x7E5CBA12 in v1.5/v1.6) to the card driver (verified) (audit 2026-11-09). What field +24 means to the SD driver was not traced."
+ },
+ {
+  "id": "11-132",
+  "section": "11-version-history.md",
+  "line": 132,
+  "text": "- In v1.4, 0x7F08CC99 (46 bytes) copies the host-supplied string (length byte \u00d7 2 bytes, bounded only by the 8-bit length) to RAM 0x602C1A98 with memcpy 0x7E5081FA, then returns 0x2001. In v1.5 it is `mov 0x2001,d0; retf`: it answers OK and stores nothing (verified). The 40-byte shrink shifts the later overlay code by \u22120x28; the call at 0x7F08B5DE differs only in its register-save operands."
+ },
+ {
+  "id": "11-174",
+  "section": "11-version-history.md",
+  "line": 174,
+  "text": "- **Candidate only:** Windows 10 (1.5): the stubbed PTP property 0xD406 handler (code verified, link inferred) (audit 2026-11-09)."
+ },
+ {
+  "id": "12-36",
+  "section": "12-exposure-af-files.md",
+  "line": 36,
+  "text": "| Exposure-mode switch | 0x7E6945EF | Program code 6 or 58 \u2192 0x7E69464B (manual path). Any other code \u2192 0x7E6947C1 (auto path). Then 0x7E694F5D, 0x7E6951A6, 0x7E695591. Mode byte 90 \u2192 0x7E69474D | verified |"
+ },
+ {
+  "id": "12-78",
+  "section": "12-exposure-af-files.md",
+  "line": 78,
+  "text": "- **The still result holds every metering candidate.** The block printed by 0x7E69EDF3 (`exp_cal_still[bv]`; capture block +60) holds the six BVs at +0\u2026+10 (spot, esp, ave, ave2, cntr, arnd), then face_num (u8 +200), mode (u8 +201) and bv_std (u16 +202). `gyako` (\u9006\u5149, backlight \u2014 translation, inferred) is a byte from capture block +336, passed in d0 (audit 2026-11-09; verified offsets)."
+ },
+ {
+  "id": "12-213",
+  "section": "12-exposure-af-files.md",
+  "line": 213,
+  "text": "- **How an IFD is written:** each one comes from a pointer list of 12-byte tag templates `{u16 tag, u16 type, u32 byte_length, u32 struct_offset}`. The templates are at 0x7E84EF20\u20130x7E8503FB (445 \u00d7 12 bytes) and the lists at 0x7E8503FC\u20130x7E851663; the last list (FocusInfo, 85 entries) starts at 0x7E851510 (audit 2026-11-09). The generic writer 0x7E708AAB copies from struct+offset. Tags 256\u201337500 that hold offsets get special cases (verified)."
+ },
+ {
+  "id": "12-249",
+  "section": "12-exposure-af-files.md",
+  "line": 249,
+  "text": "- **ORF values** (0x7E71969F, verified constants). Most are IFD0; CFAPattern is Exif tag 0xA302 (struct+2407) and ValidBits is ImageProcessing 0x0611 (struct+4360) (audit 2026-11-09). \"12-bit in 16-bit containers\" is inferred from ValidBits 12 and BitsPerSample 16:"
+ },
+ {
+  "id": "12-260",
+  "section": "12-exposure-af-files.md",
+  "line": 260,
+  "text": "- **Sensor capture packing:** the cam debug at 0x7E62F370 offers \"12 = 12bit\" and \"pack up / pack down\" (verified strings). This is probably the in-memory format, not the file format (inferred; audit 2026-11-09)."
+ },
+ {
+  "id": "15b-57",
+  "section": "15b-camera-core-index.md",
+  "line": 57,
+  "text": "| cam_mirror.c | 0x7E642459 | hash 0x7E7B18B8: 1, 2, 5, 6, 9, 10, 145\u2013152 (roles 14b \u00a75) |"
+ },
+ {
+  "id": "15b-60",
+  "section": "15b-camera-core-index.md",
+  "line": 60,
+  "text": "| cam_shutter.c | 0x7E6558AD | hash 0x7E7BBAAC: 5, 6, 7, 11, 12, 145\u2013149 (each \u2192 MEC submit 0x7E51787B of an SH request object, or cam timer 0x7E6623CB) |"
+ },
+ {
+  "id": "15b-73",
+  "section": "15b-camera-core-index.md",
+  "line": 73,
+  "text": "| 8 | 0x7E650CCD | COM_GET: copy the current setting block (18 + 9 words, from 0x7E649822) to the caller |"
+ },
+ {
+  "id": "15b-94",
+  "section": "15b-camera-core-index.md",
+  "line": 94,
+  "text": "- Set-list FrameTypes (10, 16, 34\u201337, 54, 57\u201359, 62, 63, 65) are a separate number space from frame commands. As frame-command codes, 11 of the 13 values are default slots of 0x7E7AE744; 54 \u2192 0x7E636B40 and 57 \u2192 0x7E636B63 are handled entries (V). (A8 2026-11-09)"
+ },
+ {
+  "id": "15b-169",
+  "section": "15b-camera-core-index.md",
+  "line": 169,
+  "text": "- *ems2 callback* (0x7E670FB8, 0x7E671208, 0x7E67132B, 0x7E671506, 0x7E671683): `movm`, 0 callers, a result decoder 0x7E460DB8/0x7E460FC2/0x7E46118C, then a direct call to the next start. **Chain ends (V):** three callbacks end a chain instead. 0x7E671E92 (loaded by start 0x7E671CC3) decodes (0x7E460DB8, 0x7E46118C) and calls 0x7E672308 (not a start: it runs the analysis 0x7E672896, then calls the user callback *(0x605970F0)). 0x7E6725C6 (loaded by 0x7E67253F) decodes (0x7E460DB8), runs 0x7E672896 and calls *(0x605970F4). 0x7E67287A (loaded by the last start 0x7E67283D; 28 B, `add -4,sp`, no `movm`, no decoder) calls 0x7E460109 and 0x7E4600DC, then *(0x605970F8). The open 0x7E670647 stores these three user callbacks from its argument (+4/+8/+12); the tracking open 0x7E6673A6 passes 0x7E6686D0, 0x7E6689F3 and 0x7E66C1AF. (A9 2026-11-09)"
+ },
+ {
+  "id": "15c-94",
+  "section": "15c-app-statecharts.md",
+  "line": 94,
+  "text": "| 3 Idle (0x7EA7E266) | 11761 \u2192 9 | \u2014 |"
+ },
+ {
+  "id": "15c-127",
+  "section": "15c-app-statecharts.md",
+  "line": 127,
+  "text": "| 11 (0x7EB78C84) | if CapIod (+332) vt+12 says active: GEN **5761** to it; else self 12067 | 12067 \u2192 9 |"
+ },
+ {
+  "id": "15c-141",
+  "section": "15c-app-statecharts.md",
+  "line": 141,
+  "text": "- **Region +1280** (0x7EAF1E59): 23 (entry 0x7EAF1E7F GENs **3615** to +1256 = CapPbr) \u21c4 24 on 7079/13791 (`CmpPictBridge Abort Success`)."
+ },
+ {
+  "id": "15c-158",
+  "section": "15c-app-statecharts.md",
+  "line": 158,
+  "text": "- So an owner routes an `evTraReq*` request to the sub-transition whose list holds that id. F049 0x7EB85867 clears the list."
+ },
+ {
+  "id": "15c-170",
+  "section": "15c-app-statecharts.md",
+  "line": 170,
+  "text": "| Com_ActiveTransitionManagerBufferd 0x7EB8AD37 (vt 0x7EC8C708) | stub `retf` 0x7EB8AE46 | **13361** while the helper is in state 4: the entries of states 7 (0x7EB8B66F, region +316) and 8 (0x7EB8B8EA, region +312) push the static prototype 0x605EF18C (a copy of 13361, built by 0x7EB85D2A from ctor 0x7E96C3D3) onto +144 through 0x7E966C01; the exit code 0x7EB8B458 removes it through 0x7E966CCE. Cab_CameraBase uses it: initRelations 0x7EB893EA sets Cab +276 = facade+128 (the Bufferd member built by 0x7EB8924F), and 0x7EB896CA calls 0x7EB857CA on (+276) (A8 2026-11-09) |"
+ }
+]
