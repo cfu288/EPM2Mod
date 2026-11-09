@@ -1,0 +1,278 @@
+[
+ {
+  "id": "13a-126",
+  "section": "13a-libraries-runtime.md",
+  "line": 126,
+  "text": "| 0x7E501012 / 0x7E50106D / 0x7E50107C / 0x7E50108C | | 50, 63, 70, 102 | double \u2192 short / int / ushort / uint (core 0x7E501022) | V |"
+ },
+ {
+  "id": "13a-138",
+  "section": "13a-libraries-runtime.md",
+  "line": 138,
+  "text": "| 0x7E5018DD | 11 | 107 | fneg | V |"
+ },
+ {
+  "id": "13a-166",
+  "section": "13a-libraries-runtime.md",
+  "line": 166,
+  "text": "| 0x7E544AA9 | IMG init | \u2190 Usr0 0x7E503DD4. Creates objects 102 and 105\u2013108 (0x7E463C8E), the IMG_END flags (0x7E55EB2D) and buffers (0x7E54D59A); starts two tasks (0x7E449541) | V |"
+ },
+ {
+  "id": "13a-175",
+  "section": "13a-libraries-runtime.md",
+  "line": 175,
+  "text": "| | (b) 0x7E560ACF \u2192 table **0x7E789604** (colour/tone parameter handlers); | | V |"
+ },
+ {
+  "id": "13a-179",
+  "section": "13a-libraries-runtime.md",
+  "line": 179,
+  "text": "| 0x7E546973\u20130x7E5486B4 | art CPU kernels (e.g. 0x7E5475FC = the ART_IMG_CF kernel of section 03; 0x7E548351 = mask-job builder of 09b) | art only | V |"
+ },
+ {
+  "id": "13a-189",
+  "section": "13a-libraries-runtime.md",
+  "line": 189,
+  "text": "| **0x7E55ECD8\u20130x7E55F959** | **pixel-defect correction kernels**: replace a pixel by the mean of its 4 same-colour Bayer neighbours (\u00b12 columns, \u00b12 rows). 8-bit table 0x7E789230\u20130x7E7892AC (32 slots; slots 0x7E78926C and 0x7E7892AC point at empty `retf` stubs 0x7E55F1E7 / 0x7E55F521 that the database misses), 16-bit table 0x7E7892B0 (15). Lists from prm 0x70C4/0x70D4 (ROM) and **0x7044 `PRM_CCD_FIRST_PIXELDEFECT_ADDRESS`**, 0x7052 `\u2026_SIZE`, **0x7144 `\u2026_ADDRESS2`**, 0x7084/0x7092 (iterator 0x7E55ED89) | \u2190 IMG_PRECON cmd 0 (0x7E55FAE8), MOV 0x7E6D0805 | V |"
+ },
+ {
+  "id": "13a-196",
+  "section": "13a-libraries-runtime.md",
+  "line": 196,
+  "text": "| 0x7E575C3F\u20130x7E575E13 | `img_l0` post (mailbox 0x7E436467 / 0x7E434C5C, error `IMG_SYSTEM_ERR!!!`) and the **IMG0_LOCAL task** 0x7E575D41 (receive job \u2192 execute 0x7E575E13 \u2192 reply); CPU1 twin 0x7E575DB8 | task tables 0x7E43D5F0 (twin) | V |"
+ },
+ {
+  "id": "13a-264",
+  "section": "13a-libraries-runtime.md",
+  "line": 264,
+  "text": "- Code compares on art codes 96/97/165/166 and 117/121 (0x7E560B85). 09b lists compares on 181\u2013184 (0x7E5659EB, 0x7E566813, 0x7E56826A, 0x7E5689A6) (verified). The table that P+89 indexes is still not found."
+ },
+ {
+  "id": "13b-41",
+  "section": "13b-libraries-face-av.md",
+  "line": 41,
+  "text": "| 0x7E72CFA1 / 0x7E72CFBE | `OKAO_SetWMemoryArea` / `OKAO_SetBMemoryArea`(ptr, size) | They init pool 0x602AE508 / 0x602AE518 through 0x7E72CFED/0x7E72D003 \u2192 0x7E72D01D. Return \u22123 for NULL/0 and \u22121 if too small (verified) |"
+ },
+ {
+  "id": "13b-42",
+  "section": "13b-libraries-face-av.md",
+  "line": 42,
+  "text": "| 0x7E72CFDB / 0x7E72CFE4 | `OKAO_FreeWMemoryArea` / `OKAO_FreeBMemoryArea` | Name verified: 0x7E6FBCB0 prints these strings when they fail. They clear the 16-byte pool descriptors |"
+ },
+ {
+  "id": "13b-47",
+  "section": "13b-libraries-face-av.md",
+  "line": 47,
+  "text": "| 0x7E72D9AE / 0x7E72DA05 | `OKAO_CreatePointer` / `OKAO_DeletePointer` | 96-byte handle, magic 0xECBC5054. Create copies 48 default bytes from 0x7E85D08F. The delete name is verified by string |"
+ },
+ {
+  "id": "13b-208",
+  "section": "13b-libraries-face-av.md",
+  "line": 208,
+  "text": "- **Mask & 6** creates PT plus the contour module. The contour create is a stub that returns NULL, so this path always returns 0x8707. **Eye-retouch modules 2 and 4 are therefore dead** (verified: the stubs are 0x7E6FB6E3 and 0x7E6FB71E)."
+ },
+ {
+  "id": "13b-237",
+  "section": "13b-libraries-face-av.md",
+  "line": 237,
+  "text": "2. **A second OKAO block:** 0x7EBA7BC1\u20130x7EBABF8D is OKAO **Smart Skin**, not OXF. The C1 note \"OXF runs on to ~0x7EBA9xxx\" is wrong: OXF ends at ~0x7EBA7BC0. Verified."
+ },
+ {
+  "id": "13b-239",
+  "section": "13b-libraries-face-av.md",
+  "line": 239,
+  "text": "4. **The overlay-A face library is red-eye correction**, with cmd 5 sent by `play_face_redeye_adjust`. It is not \"face scoring\". **F076's score is the blue ratio** (byte 0 = B). Overlay-A code ends at **0x7F0691C5**, not 0x7F069000. Verified."
+ },
+ {
+  "id": "13b-240",
+  "section": "13b-libraries-face-av.md",
+  "line": 240,
+  "text": "5. **\u00a709b open question 1** (\"0x7F0687C4 writes the art composite descriptor +284\") is wrong. 0x7F0687C4 is the red-eye pixel correction, reached only from FACE cmd 5. Verified reachability; role inferred."
+ },
+ {
+  "id": "13b-242",
+  "section": "13b-libraries-face-av.md",
+  "line": 242,
+  "text": "7. **\u00a703 \"PT uses OKAO\":** confirmed and extended. FD itself is the hardware engine at 0x99600000, driven by 0x7E6F8062\u20130x7E6F82C7 (verified addresses). OKAO is used **only** for PT (live eyes), for Smart Skin (cmd 11) and, inferred, for red-eye (cmd 5). **FACE_MAIN cmds 5/11 are now named** (\u00a703 open question 9)."
+ },
+ {
+  "id": "13c-12",
+  "section": "13c-cpp-framework.md",
+  "line": 12,
+  "text": "| 0x7E96B000\u20130x7E9EA000 | `Tra*` event package + `OlyHfwOpe*`/`OlyHfwLowApiWrap` operation classes + event classes they declare; `sdk api` shell and `OlyApi*` (06 \u00a75) | verified (string tags + event scan) |"
+ },
+ {
+  "id": "13c-16",
+  "section": "13c-cpp-framework.md",
+  "line": 16,
+  "text": "| 0x7EB8C265\u2013~0x7EB93A80 | `Dev*` device classes, part 1: display device (`api_disp_*`, `allocDisplayHandle`), `DevAef_AEAFCtrl`, `DevCls` (clear-skin rec view), effects, LED, `DevMed_MediaControl`, `DevRec` | verified (`api_*` callees, strings) |"
+ },
+ {
+  "id": "13c-18",
+  "section": "13c-cpp-framework.md",
+  "line": 18,
+  "text": "| 0x7EBA0AA9\u20130x7EBA4867 | `Dev*` device classes, part 2: anti-shake, image handle, HDMI/CEC, histogram, Exif, picture files, `DevBlu_Bluetooth`, **USB-communication device**, DPS-T, DPS, pixel mapping, picture-file creation (\u00a75.4) | verified |"
+ },
+ {
+  "id": "13c-34",
+  "section": "13c-cpp-framework.md",
+  "line": 34,
+  "text": "| Memory | operator new 0x7EBA62DB (6,006 sites) / 0x7EBA62E3; delete 0x7EBA62EB (963) / 0x7EBA62F3; all go to 0x7EBA797A/0x7EBA7984 \u2192 0x7E6810AE/0x7E6810F0 | verified |"
+ },
+ {
+  "id": "13c-37",
+  "section": "13c-cpp-framework.md",
+  "line": 37,
+  "text": "| Framework events | ids \u22125 (0x7EBA6E24), \u22126 (0x7EBA6E50), \u22121 (0x7EBA6E7C), \u22129 (0x7EBA6EAD); vtables 0x7EC92080\u20130x7EC921A0 | verified ids |"
+ },
+ {
+  "id": "13c-40",
+  "section": "13c-cpp-framework.md",
+  "line": 40,
+  "text": "| Start-up | 0x7EBA78B3 (from 0x7E966A17), `mainThread` entry 0x7EBA792C | verified |"
+ },
+ {
+  "id": "13c-209",
+  "section": "13c-cpp-framework.md",
+  "line": 209,
+  "text": "| **0x7EBA3310\u20130x7EBA36F6** | **USB-communication device**. Accessors 0x7EBA3310/333C/3368/3394 (called by CapPbr 0x7EA58AF3 and CapCom 0x7EA51A8C) lead to ctor **0x7EBA33C0**. The ctor builds 4 mode sub-objects with 9-slot vtables: **DPS 0x7EC916F4, MTP 0x7EC91718, Storage 0x7EC9173C, generic 0x7EC91760**, and 8 observer lists at +48\u2026+188. Slot 2 = `api_comm_End_Communication_<mode>`, slot 6 = `api_comm_Start_Communication_<mode>` (F060 0x7EBA35C2 = DPS start), slots 3/5/7 = `api_media_Initial_Strage` / `Mount_USB_Strage` | verified |"
+ },
+ {
+  "id": "13c-210",
+  "section": "13c-cpp-framework.md",
+  "line": 210,
+  "text": "| 0x7EBA36F7\u20130x7EBA414D | DPS-T device (vtable 0x7EC91784; 16 small methods, then `api_dpst_Dpst_*` Req/Send for DPOF, print, reserve) | verified |"
+ },
+ {
+  "id": "13d-14",
+  "section": "13d-gui-toolkit.md",
+  "line": 14,
+  "text": "| 0x7ECA1020\u2013~0x7ECC8000 | Mostly data: ramp/LUT tables (0x7ECA6000\u2026) and a 108 KB block at 0x7ECB1000. The DB's \"function\" 0x7ECAD443 (15 KB) is probably data | verified bytes; the role of the data is inferred |"
+ },
+ {
+  "id": "13d-17",
+  "section": "13d-gui-toolkit.md",
+  "line": 17,
+  "text": "| 0x7ECEC000\u20130x7ECEE1D5 | GUI memory pools (alloc 0x7ECEC905, free 0x7ECEC9CB); UTF-16 helpers (`wcscpy` 0x7ECED793, `wcslen` 0x7ECED7BB, compare 0x7ECED75C); CTouchPnl (0x7ECEDE30). The GUI data-model get/set 0x7ECEF64F/0x7ECEF667 (section 07) sits just after the root class | verified code |"
+ },
+ {
+  "id": "13d-24",
+  "section": "13d-gui-toolkit.md",
+  "line": 24,
+  "text": "| 0x7ED86DA0\u20130x7EDA0410 | Live-view controller `IGui_Controler` (0x7ED87077, 0x7ED87397); Actuator/Viewer objects of the registry 0x7EFC5408 (`Func_Scp_Actuator`, `Input_String_Actuator`, `Rec_View_Viewer`) | verified strings |"
+ },
+ {
+  "id": "13d-66",
+  "section": "13d-gui-toolkit.md",
+  "line": 66,
+  "text": "- **Pools (verified):** GUI pool alloc/free 0x7ECFF1D8/0x7ECFF1E4, selected by the bytes at object +28/+29 (slot +244 sets, +248 reads)."
+ },
+ {
+  "id": "13d-121",
+  "section": "13d-gui-toolkit.md",
+  "line": 121,
+  "text": "- **Drawing engine (verified call graph):** 0x7ECF5000\u20130x7ECFF000 and 0x7ED2F000\u20130x7ED37DAA. It calls nothing outside the toolkit except memcpy 0x7E500D33, memset 0x7E500D73 and the UTF-16 helpers. Resource lookups:"
+ },
+ {
+  "id": "13d-135",
+  "section": "13d-gui-toolkit.md",
+  "line": 135,
+  "text": "- **Resource record (44 bytes, verified):** `{u16 type, u16 k+1, u32 rects \u2192 0x7EF0D7F0 + 16\u00b7k, u16 7, \u2026, u16 layer (1/2/3), 0xFFFE, \u2026, 100, 100}`. The rect pair is two `{x, y, w, h}` rects, e.g. 800\u00d7600 or 720\u00d7480. **Inferred:** the two rects are for two outputs."
+ },
+ {
+  "id": "13d-156",
+  "section": "13d-gui-toolkit.md",
+  "line": 156,
+  "text": "- Panel **signature (verified):** the ctor is `call 0x7ED23C27 ; mov VT,d0 ; mov d0,(a2) ; \u2026zero the child array at +792\u2026 ; [call 0x7ED01DFD ; call 0x7ED01F7C/0x7ED01FBA]`."
+ },
+ {
+  "id": "13d-218",
+  "section": "13d-gui-toolkit.md",
+  "line": 218,
+  "text": "- **BGM Import (verified structure).** No Ss row handles it. It is a userMenu item: vtable 0x7F00095C, slot 0x7EDF26B2 loads string 1782 and calls ShowPanelEx(111). Its callback 0x7EDF2BA1 logs `OlyApiSoundCtrl::registImportSound()`. It runs inside SS_MENU_MAIN (Slideshow > BGM, inferred)."
+ },
+ {
+  "id": "13e-12",
+  "section": "13e-mcon-sequencers.md",
+  "line": 12,
+  "text": "| TAKE_MAIN sequencer engine | 0x7E58204D\u20130x7E582602 | state table 0x7E790860 (27 \u00d7 20 B), names 0x7E790758 | V |"
+ },
+ {
+  "id": "13e-15",
+  "section": "13e-mcon-sequencers.md",
+  "line": 15,
+  "text": "| Light-source selection (strobe assist) | 0x7E5E2258\u20130x7E5E2418 (+ 0x7E5E1B11, 0x7E5DEBAD) | \u2013 | V |"
+ },
+ {
+  "id": "13e-132",
+  "section": "13e-mcon-sequencers.md",
+  "line": 132,
+  "text": "- **The 27 states** of 0x7E790860 `{u32 id, ptr name, ptr entry, ptr A, ptr B}`, with the sends verified at the given addresses. Command names use the corrected numbering of \u00a74.2."
+ },
+ {
+  "id": "13e-161",
+  "section": "13e-mcon-sequencers.md",
+  "line": 161,
+  "text": "- **Flash selection 0x7E5D1659** (`check_select`; inputs onoff, ae_chg, mode_stb_expose, general, rc_mode, after_movie) (V):"
+ },
+ {
+  "id": "13e-236",
+  "section": "13e-mcon-sequencers.md",
+  "line": 236,
+  "text": "1. **Section 05 \u00a75:** \"SERV_S1 \u2026 called through 0x7E68CCBD from the REC (0x7E701D27)\" is **wrong** (V)."
+ },
+ {
+  "id": "13e-249",
+  "section": "13e-mcon-sequencers.md",
+  "line": 249,
+  "text": "4. **Section 10a:** the 60-byte records are per-setting operation records. The cited hooks (0x7E7039C4, 0x7E703986, 0x7E703540) are their **+24** post-write hooks (V)."
+ },
+ {
+  "id": "13f-81",
+  "section": "13f-drivers.md",
+  "line": 81,
+  "text": "| 0x98100000, 0x98100400 | Two identical small units. Regs +0, +8, +10, +44, +48. **Not identified** | Toggled bit 0x10 in the SRAM standby code. Also used by 0x7E95EFC8 (`aud_tool_ac3`) and 0x7EEC6822 (V) | \u2013 | \u2013 |"
+ },
+ {
+  "id": "13f-82",
+  "section": "13f-drivers.md",
+  "line": 82,
+  "text": "| 0x98200000, 0x98300000, 0x98400000, 0x98500000, 0x98600000, 0x98700000 | **SIO / UART channels**, logical ch 0, 1, 4, 2, 3, 5 (see 2.3) | ROM table 0x7E4C7F48 (V) | 77\u201390 | 0x7E467D99\u20130x7E469BD1 |"
+ },
+ {
+  "id": "13f-88",
+  "section": "13f-drivers.md",
+  "line": 88,
+  "text": "| 0x98E00000 | **System controller**, always-on domain | See 2.6 (V) | 120, 121 | 0x7E45D1F3\u20130x7E45D9F1, 0x7E425F44 |"
+ },
+ {
+  "id": "13f-90",
+  "section": "13f-drivers.md",
+  "line": 90,
+  "text": "| 0x99000000 | **SD card host** (agent SD) | `SDERR cmd`, `CBSY`, register dump `IRQ02_STATUS \u2026 MIC_CONFIG0` (V) | 93, 95 | 0x7E5CBD83\u20130x7E5CC42F |"
+ },
+ {
+  "id": "13f-95",
+  "section": "13f-drivers.md",
+  "line": 95,
+  "text": "| 0x99700000 | DBGS debug support (NMI address watch) | `SHOW DBGS SETTING`, `[ADDRESS SETTING]` (V) | \u2013 | 0x7E45EA87\u20130x7E45ED2A |"
+ },
+ {
+  "id": "13f-105",
+  "section": "13f-drivers.md",
+  "line": 105,
+  "text": "| 0x9A200000 | Strobe (flash) controller | `STB_REG_FLS_ARST/SRST/CAUSE\u2026` (V) | 1 | 0x7E5DB655\u20130x7E5DBFDE |"
+ },
+ {
+  "id": "13f-106",
+  "section": "13f-drivers.md",
+  "line": 106,
+  "text": "| 0x9A300000 | **MEC** timing unit, 2 channels (`ch_1/ch_2 reset/start/abort`) | Callers in the `mec` code 0x7E51339A, 0x7E514434, 0x7E5167EC (V) | 2 | 0x7E50F7F2\u20130x7E5107D9 |"
+ },
+ {
+  "id": "13f-230",
+  "section": "13f-drivers.md",
+  "line": 230,
+  "text": "| FILEFGND task 0x7E5C4E90 | \u2014 | A generic job runner (V). It waits on queue (0x7E43EB7E) and drains a 32-entry ring of 12-byte `{fn, arg, u16 d0, u16 kind}` jobs at 0x60545454: kind 0 `fn()`, 1 `fn(a0)`, 2 `fn(a0,d0)`. Jobs are posted by 0x7E5C4E2C/37/42. Job thunks 0x7E5C4EBC\u2026 unpack `{ret, a0, d0, d1, a1}` and call the file-wrapper layer |"
+ }
+]
