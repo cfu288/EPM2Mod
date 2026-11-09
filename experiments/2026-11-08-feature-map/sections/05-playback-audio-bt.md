@@ -9,7 +9,7 @@ Labels: **verified** = read in the code or bytes; **inferred** = from strings, n
 
 | Range | Contents | Basis |
 |---|---|---|
-| 0x7E8E1020–0x7E8F57FF | Data, not code: a table of C++ method-name pointers (e.g. 0x7E8E1584 → `OpeningScreen::regist`, 0x7E8E156C → `SoundCtrl::registImportSound`), more pointer tables, 0xFF padding (0x7E8F3298…). The "functions" the database finds here call wild targets (0x5C49DBCC…). | verified (bytes) |
+| 0x7E8E1020–0x7E8F57FF | Data, not code: a table of C++ method-name pointers (e.g. 0x7E8E1584 → `OpeningScreen::regist`, 0x7E8E156C → `SoundCtrl::registImportSound`), more pointer tables, 0xFF padding (0x7E8F3298…). **Corrected (D2 2026-11-09):** this is the second part of the `.data` init image 0x7E8DA000–0x7E8F3113, which the reset code copies to RAM 0x602A9B40; the 0xFF padding starts at 0x7E8F3114 (14d §1, §3.8). The "functions" the database finds here call wild targets (0x5C49DBCC…). | verified (bytes) |
 | 0x7E8F5800–0x7E8F5CE8 | CIC driver (`CIC_MUTEX`, `CIC_END`). It is used by `play_cic_decode_raw` 0x7E93D10F (`CicCtrl->ulCompAddr / ulRawAddr`). | inferred: RAW decompression codec |
 | 0x7E8F5CE9–0x7E8F904E | EFFECT / EFFECT_EXE: transitions in playback | verified |
 | 0x7E8F9031–0x7E8F926E | SERV_MAIN (init 0x7E8F9031, task entry 0x7E8F904F (audit 2026-11-09)): a service that broadcasts state notices | verified |
@@ -295,5 +295,5 @@ So SERV is a small **publish/subscribe service for camera state changes**. Which
 5. Maximum paired devices, and where `bt_info_file_t` is stored (a file on internal flash?).
 6. The meaning of the DSP setting IDs (29858–30354, 13393/13409, 56004): factory-adjusted or fixed? And the meaning of movie quality 3/6 for `ims_active_pattern`.
 7. PLAY_SOUND sub-commands 1, 2, 4 (voice memo vs. BGM vs. preview), and what PLAY_MAIN cmd 3 (0x7E6DDE3E) does in the MOV code.
-8. The 0x7E8E3E3C–0x7E8F57FF block: what the data is (it may include the 0xFF-padded BT or CIC tables).
+8. The 0x7E8E3E3C–0x7E8F57FF block: what the data is (it may include the 0xFF-padded BT or CIC tables). Answered: it is the `.data` init image (to 0x7E8F3113; code uses the RAM copy at address − 0x1E6304C0), then 0xFF (14d §3.8) (D2 2026-11-09).
 9. The mapping of EFFECT_EXE bits to the six effect types.

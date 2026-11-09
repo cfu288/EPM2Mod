@@ -25,7 +25,7 @@ scratchpad (`conn/ptptab.py`, `conn/adjtab.py`, `conn/sigscan.py`, `conn/libprof
    **zlib 1.2.3 inflate**, and the AV middleware (MP4 mux/demux plug-ins). **0x7EEE1020–0x7F021020 is rodata, not code**:
    strings and vtables of the CA/GUI C++ layer, plus the libpng/zlib tables and the GL/DMP names. The function DB's ~1,500 "functions" there are spurious. (verified)
 8. **There is a DMP (Digital Media Professionals) OpenGL-ES-class GPU driver** (`glBeginQueryDMP`, `gl_PVLightAmbDMP`, …)
-   at about 0x7EE15060. C3D renders with it. The firmware is dual-core: the same block-0 code runs on CPU0 and CPU1 (it checks a CPU id at 0x8050), and C3D talks across through the C3D_BRIDGE_* tasks. (verified / inferred, see C3D)
+   at about 0x7EE15060 (**corrected (D2 2026-11-09):** 0x7EE15060 is only its uniform-table builder; the library is 0x7EE02095–0x7EE294B4, 14a §2.1). C3D renders with it. The firmware is dual-core: the same block-0 code runs on CPU0 and CPU1 (it checks a CPU id at 0x8050), and C3D talks across through the C3D_BRIDGE_* tasks. (verified / inferred, see C3D)
 
 ---
 
@@ -174,7 +174,7 @@ The E-PM2 has no FireWire hardware. The 1394 slot exists only so the shared task
 - **CEC**: `api_tft_Enable/Disable_CEC_Protocol`, `Get_CEC_ConnectStatus`. The TV remote reaches the GUI as `EV_PUSH_CEC_UP/DOWN/LEFT/RIGHT/OK/RED/GREEN/BLUE/YELLOW`, and TV power-off as `EV_CEC_POWEROFF`. (strings)
 - **DISPLAY task** (0x7E6AEAD2): output routing `0:IDLE/1:TFT/2:NTSC/3:PAL/4:HDMI/5:EVF`, two OSD layers + image layer (`I43DM_*` modes), gamma, backlight duty (`[duty] OLED/EVF`), and panel SIO.
   Also `DISP_ADJ_EXT_PORT` / `adj_ext_port_tmds_exe`: the accessory-port EVF video appears to use a TMDS-type link with its own calibration (`outevf_tmds_measurement`). (inferred)
-- **TOUCHPANEL task** (0x7E6BCF84): gestures TOUCH/LPRESS/LIFT-OFF/TAP/SLIDE/DTAP are sent to "HLS". It has swivel parameters and a **touch-controller firmware bootloader** (`Initiate Bootload`, `Write Block`, `Please 12sec wait`). Factory touch calibration goes through ADJSLF (`PCODE_TP_CALIB`, `TPVercheck`). (strings)
+- **TOUCHPANEL task** (0x7E6BCF84): gestures TOUCH/LPRESS/LIFT-OFF/TAP/SLIDE/DTAP are sent to "HLS". It has swivel parameters and a **touch-controller firmware bootloader** (`Initiate Bootload`, `Write Block`, `Please 12sec wait`). **D2 (D2 2026-11-09):** this is the host side of a Cypress TTSP-style bootloader (I, strong). 0x7E6BD8B6 sends the 470-record image 0x7E7F0F78 over SIO ch2 (I²C mode, I) to address 0x24. It runs only for the debug command **`disp tp boot_on`** (U_SHELL, or ADJ op 0x902B over USB): its one caller is the `tp` handler 0x7E6B27C4 after strcmp(`boot_on`) (V). The image is the same in E-PM2 1.1–1.6, E-PL5 1.6 and E-PL6 1.4 (V, byte search) (14d §3.1). Factory touch calibration goes through ADJSLF (`PCODE_TP_CALIB`, `TPVercheck`). (strings)
 - **Accessory port / EVF**: `EVF_TYPE_VF2`/`EVF_TYPE_VF3` (with version reads `vf-2 Version:`/`vf-3 Version:`), `EV_EVF_CONNECTED`, the eye sensor (PER_EYE_SENSOR task over IIC; **but that task is an empty `retf`** (section 01), so no driver activity comes from it (D1 2026-11-09)), and `api_rec_Get_Acce_DeviceInformation`.
   **PENPAL** (PP-1) is a Bluetooth/iAP device (`OLYMPUS PENPAL`, `iap_get_acc_inf`), covered by the BT section.
   No macro-arm-light-specific strings were found. Note: `ACC_SPI` / `PRM_PER_ACC_X/Y/Z` is the **accelerometer** (level gauge), not the accessory port. (verified by strings)
@@ -194,7 +194,7 @@ The E-PM2 has no FireWire hardware. The 1394 slot exists only so the shared task
 
 ## 4. C3D (3D animation engine on CPU1)
 
-- **What it is (inferred, strong):** a 3D animation/rendering service.
+- **What it is (inferred, strong):** a 3D animation/rendering service. The feature is **the playback GPU slideshow**: the GUI start 0x7ED081AE calls `startSlideShowGpu` when Effect ≠ 1 and the slideshow is not 3D; the controller is `CapGSld_GpuSlideShow` (14a §3) (D2 2026-11-09).
   - The play side calls `api_play_Exec_C3d_Anime_Logo`, `Exec_C3d_Anime_Main`, `Skip/End/Abort_C3d_Anime`, and `Notify_C3d_Img_Load_Finish` with each photo's size, aspect and date (0x7E685AA3–0x7E685F4B).
   - The scene objects are named `P3D_Room`, `Gr_Room_A/B/C`, `P3D_Photo_%02d`, `P3D_Photo_Focus_%c`, `Gr_Photo_%c`, `TA_Camera_%02d`, `Act_Photo_Turn_%c`, `TA_Bar_In/Out`, `TA_Logo_In`, `P2D_Logo`, `TA_FadeIn/Out` (0x7F09E31F–0x7F0A30A9).
   - So this is a photo "room" slideshow/animation with a logo intro and title bars. `RES_MODE_C3D` is a resource type.
@@ -202,30 +202,31 @@ The E-PM2 has no FireWire hardware. The 1394 slot exists only so the shared task
   Queue names include `C3D_BRG_C0P_C1L`, `C3D_BRG_C1L_C0P`, `C3D_BRG_C0L_C1P`, `C3D_BRG_C1P_C0L` (P/L = physical/logical endpoints). A `c3d_dbg` shell loads `Pho%02d.bmp`.
 - **Dual core (verified part):** the fatal/NMI handler 0x7E463CD9 reads a CPU id at absolute address 0x8050 and prints `Genba Ha CPU0/CPU1` ("the failure is on CPU0/CPU1"). The object-name table has a CPU1 set (`BOOT_CPU1`, `CPUCONN_CPU1`, `MOV_ENC_VIDEO_CPU1`, `CPU1_MOV_AVCHD`, `IMG_CPU0_TO_CPU1`).
   So block 0 is one image that both cores run. C3D (and the movie encoder) run on CPU1 and are reached through the bridge tasks. (inferred from these)
-- **Engine code** = ~0x7EE294B5–0x7EE5B (inferred). 0x7EE21020–0x7EE294B4 is still the DMP GL library (§5); the `MCM_/MCA_/MCT_` module starts at 0x7EE294B5 (C2 2026-11-09):
+- **Engine code** = ~~~0x7EE294B5–0x7EE5B (inferred)~~ the 3D engine core **0x7EE294B5–0x7EE5B5BB** (verified layer edges), then its image decoders 0x7EE5B5BC–0x7EE5D00C (14a §2.2) (D2 2026-11-09). 0x7EE21020–0x7EE294B4 is still the DMP GL library (§5); the `MCM_/MCA_/MCT_` module starts at 0x7EE294B5 (C2 2026-11-09):
   - float-heavy: thousands of calls to the single-float helpers at 0x7E5018BC–0x7E501972, which use AM33-2 FPU ops. The full float-helper set is 0x7E500F62–0x7E501AAB (13a §2.2). Do not assume names by order: 0x7E5018BC is **fsub** and 0x7E5018C3 **fadd** (inferred, strong), 0x7E5018E8 is fmul (D1 2026-11-09);
-  - 89 functions call the C3D helper 0x7F0A3819;
-  - vtable-like pointers at 0x7F027C80;
+  - 89 functions call the C3D helper 0x7F0A3819; **corrected (D2 2026-11-09):** 0x7F0A3819 is the C3D port's free() (193 callers), and 0x7F0A3804 is malloc (14a §5);
+  - vtable-like pointers at 0x7F027C80; **corrected (D2 2026-11-09):** these are part of the format-loader table 0x7F027C4C–0x7F027CBF (MB, MT, BMP, MCM/MCA/MCT/MCE, GIF, PNG) (14a §2.2);
   - tags `MCA_/MCT_/MCE_` with `$Revision: #88 $`, and a `GIF89a` loader;
-  - it is driven from the C3D scene code (151 incoming calls into 0x7EE61020–0x7EE81020).
+  - it is driven from the C3D scene code (151 incoming calls into 0x7EE61020–0x7EE81020). **Not reproduced (D2 2026-11-09):** the overlay calls 25 distinct C3D targets (16 API entries and 9 object methods; 14a §2.4).
 - The firmware updater has a C3D type (`TYPE_FIRMUP_WRITE_C3D`), but **the E-PM2 container has no C3D block**. The C3D code is in block 0, and **block 2 is not CPU1 code** (see 6.1).
 
 ## 5. Libraries in 0x7EE21020–0x7F021020 (and nearby)
 
 | Range | What | Evidence |
 |---|---|---|
-| ~0x7EDE–0x7EE29 (**0x7EE02095–~0x7EE294B4**, not 0x7EE21020: the `{name, fn}` table 0x7F023C74–0x7F024283 has 194 `gl*` entries, 89 of them at or above 0x7EE21020, up to glPointSize 0x7EE29468 (C2 2026-11-09); 0x7EDE–0x7EE01 is GUI menu-page code, 13d §1 (D1 2026-11-09)) | **DMP GPU GL driver**: uniform table builder 0x7EE15060 (`gl_ModelViewMatrix`, `gl_TextureMatrix[0..2]`, `gl_PVLightAmbDMP`, `gl_SilhScaleDMP`, `gl_SubdLevelDMP`, …). Names at 0x7F01938E/0x7F026D08. Extension entry names `glBeginQueryDMP`, `glLineStippleDMP`, `glBlendColorDMP`, `glSetErrorFuncDMP` at 0x7F023ACB | **verified** strings + refs. The `*DMP` suffix is the Digital Media Professionals (PICA-family) extension style (inferred vendor) |
-| ~0x7EE294B5–0x7EE5B (C2 2026-11-09) | C3D 3D/animation engine (starts with the `MCM_/MCA_/MCT_` module; `$Revision: #88 $` 0x7F027CC4) | see 4 (inferred) |
-| 0x7EE5BB–0x7EE5F | **libpng 1.2.37** ("libpng version 1.2.37 - June 4, 2009", 0x7F02B404; all png_* error strings; read side only) | **verified** |
+| ~~~0x7EDE–0x7EE29~~ **0x7EE02095–0x7EE294B4** (D2 2026-11-09) (not 0x7EE21020: the `{name, fn}` table ~~0x7F023C74~~ 0x7F023B8C–0x7F024283 (223 slots: 29 `egl*`, then 194 `gl*` with `glDeleteQueriesDMP` twice; 14a §5 item 3 (D2 2026-11-09)) has 194 `gl*` entries, 89 of them at or above 0x7EE21020, up to glPointSize 0x7EE29468 (C2 2026-11-09); 0x7EDE–0x7EE01 is GUI menu-page code, 13d §1 (D1 2026-11-09)) | **DMP GPU GL driver**: uniform table builder 0x7EE15060 (`gl_ModelViewMatrix`, `gl_TextureMatrix[0..2]`, `gl_PVLightAmbDMP`, `gl_SilhScaleDMP`, `gl_SubdLevelDMP`, …). Names at 0x7F01938E/0x7F026D08. Extension entry names `glBeginQueryDMP`, `glLineStippleDMP`, `glBlendColorDMP`, `glSetErrorFuncDMP` at 0x7F023ACB | **verified** strings + refs. The `*DMP` suffix is the Digital Media Professionals (PICA-family) extension style (inferred vendor) |
+| ~~~0x7EE294B5–0x7EE5B (C2 2026-11-09)~~ **0x7EE294B5–0x7EE5B5BB** (D2 2026-11-09) | 3D engine core: MC* format loaders, GL render back end 0x7EE2FF5E–0x7EE32698 (the only engine code that calls GL), 28-type object runtime, maths (`$Revision: #88 $` 0x7F027CC4) (14a §1) | verified layer edges (14a) |
+| 0x7EE5B5BC–0x7EE5D00C (D2 2026-11-09) | Engine image decoders: BMP, GIF89a, PNG glue (14a §1) | verified (magic checkers, loader table) |
+| ~~0x7EE5BB–0x7EE5F~~ **0x7EE5D00D–0x7EE5F5F2** (D2 2026-11-09) | **libpng 1.2.37** ("libpng version 1.2.37 - June 4, 2009", 0x7F02B404; all png_* error strings; read side only) | **verified** |
 | 0x7EE5F5F3–0x7EE619C6 (C2 2026-11-09) | **zlib 1.2.3 inflate** ("inflate 1.2.3 Copyright 1995-2005 Mark Adler", 0x7F02E999). Inflate 0x7EE5FE61, CRC-32 0x7EE5F5F3 with table 0x7F02BE7C, code-length order 0x7F02E702, dist base 0x7F02EA44. Called from libpng (0x7EE5DA3F, 0x7EE5EE73). The last zlib function is `zmemcpy` 0x7EE619AC–0x7EE619BE (callers inflate 0x7EE5FD73/0x7EE5FE61), then the stubs 0x7EE619BF/0x7EE619C4; no zlib or libpng function calls 0x7EE619C7 or later (C2 2026-11-09) | **verified** |
-| 0x7EE619C7–0x7EE63004 (C2 2026-11-09) | C3D-facing API (called by the scene code 0x7F09E31F, 0x7F09DFD4). It starts with the 44-byte object init 0x7EE619C7 (caller chain 0x7EE61A59 → 0x7EE61A4F → 0x7F0A13F9 → 0x7F09DFD4), not zlib (C2 2026-11-09). Its last function 0x7EE62F80 runs to 0x7EE63004, and it and 16 other API functions are called from 0x7EE63000–0x7EE8F4F3, so the API and that code are one C3D library (A5 2026-11-09) | refs |
+| ~~0x7EE619C7–0x7EE63004 (C2 2026-11-09)~~ **0x7EE619C7–0x7EE8F4F3: the C3D framework, one module** (D2 2026-11-09) (overlay-called API 0x7EE619C7–0x7EE61E54; class code from 0x7EE62C10; class registry and ~55 classes; 14a §1, §2.4) | C3D-facing API (called by the scene code 0x7F09E31F, 0x7F09DFD4). It starts with the 44-byte object init 0x7EE619C7 (caller chain 0x7EE61A59 → 0x7EE61A4F → 0x7F0A13F9 → 0x7F09DFD4), not zlib (C2 2026-11-09). Its last function 0x7EE62F80 runs to 0x7EE63004, and it and 16 other API functions are called from 0x7EE63000–0x7EE8F4F3, so the API and that code are one C3D library (A5 2026-11-09) | refs |
 | 0x7EEA–0x7EEE (**0x7EE8F4F4–0x7EECE318**, where block-0 code ends; rodata follows. 0x7EE63000–0x7EE8F4F3 before it is C3D-side code; 13b §1 (D1 2026-11-09)) | **AV middleware ("AVPI")**: `CAvpiAsoAudioSource.cpp`, `Video Source Plug-in`, `MP4 Mux Plug-in`, `MP4 Demux Plug-in`, box writers `ftyp/moov/mvhd/trak/…/avc1/avcC/stts/stsc/stsz/stco/stss`, `sowt` PCM, `AvScaTask: AVSCA_*`. Called from the movie code (`AVMIDDLE CALL`, `[QT] MovmidApi_cmd_rec_init/start/end`) | strings + calls |
 | **0x7EEE1020–0x7F021020** | **rodata, not code**: strings of the CA/GUI C++ layer (`ShootingCommon`, `[S-AppShot ]:`, `AppVer: 2010Apr06 CheckIn`), vtables, the GL name pools, libpng/zlib tables. Entropy 3.4–4.5 bits/byte. The "calls" decoded there go to addresses like 0xAE6D05EC, so the ~1,500 DB "functions" are false positives | **verified** |
 
 Also:
 - **JPEG:** no zig-zag, quant or IDCT tables exist anywhere in block 0. Only the standard DHT tables (DC/AC luma Huffman bits/values) appear, twice, at 0x7E74A6E8 and 0x7E74A89D. Function 0x7E5576C2 reads them, presumably to write JPEG headers. So JPEG coding is done by the image ASIC; the CPU only builds headers. (verified absence; role inferred)
 - **No crypto tables**: no AES, SHA or MD5 constants. The iPod authentication (`cp_ValidateCertData`) is probably done by the Apple CP chip.
-- The BASIC-like interpreter (BAS_MAIN, `expr_222`, `do_for2`) at 0x7F021020 belongs to another section.
+- The BASIC-like interpreter (BAS_MAIN, `expr_222`, `do_for2`) is in overlay A at ~0x7F05C000 (`expr_222` user 0x7F05CDD6), not at 0x7F021020; see section 01 (coordinator 2026-11-09).
 
 ## 6. Non-main blocks
 
@@ -285,5 +286,5 @@ These are the "Frame" art-effect borders at each still and movie size. (inferred
 6. The C3D/CPU1 split: does CPU1 boot from the same block-0 image at another entry (BOOT_CPU1)? Which tasks run on CPU1?
 7. Block 2: the true width/height of the noise field, and how the Grainy Film pass samples it (offset/tiling).
 8. The H8 MCU part number (vector layout 34–37), and the SIO command set of the BC protocol.
-9. The DMP GPU: which core, and whether the GUI (`gl_*` in 0x7EDE) also renders through it or only C3D does.
+9. The DMP GPU: which core, and whether the GUI (`gl_*` in 0x7EDE) also renders through it or only C3D does. Answered in part: the GUI never calls GL; the only callers are the engine's GL back end 0x7EE2FF5E–0x7EE32698 and the overlay port and scene functions (14a §5 item 4) (D2 2026-11-09).
 10. The HDMI transmitter model (ADV75xx?) and which CEC opcodes are handled beyond the remote keys and power-off.

@@ -46,9 +46,12 @@ Round D1 deep dive. Scope: the driver code in 0x7E421020–0x7E521020, plus the 
 - Data in this range: PER_IN records, the busmes tables 0x7E46DDC4/0x7E46DDF0, the console port table 0x7E46DEC8, and the ROM driver tables 0x7E4C5534–0x7E4C8A88 (V).
 - Driver code above the C runtime:
   - CPUCONN 0x7E505A22;
-  - UI/keys 0x7E508F82–0x7E50D6F0;
+  - UI/keys ~~0x7E508F82~~ 0x7E508DA7–0x7E50D6F0: it starts with the beep-request layer 0x7E508DA7–0x7E508EAE (callers UI_OUT), then the `ui` shell `beep` 0x7E508EDA and `help` 0x7E508F14 (table 0x7E734DEC) (14b §1) (D2 2026-11-09);
+  - before it, the `sc` system-common library 0x7E506CB0–0x7E508DA6 (soft timers, scheap pools, string and RTC helpers; 14b §2) (D2 2026-11-09);
   - jog dial 0x7E50DAAF–0x7E50DC97 (0x9A600000);
-  - MEC timing unit 0x7E50F7F2–0x7E5107D9 (0x9A300000) and the `mec` shell 0x7E510A60.
+  - MEC timing unit 0x7E50F7F2–0x7E5107D9 (0x9A300000) and the `mec` shell 0x7E510A60;
+  - the MEC command layer 0x7E517791–0x7E518BBA (MAG_COM/MOT_COM): init 0x7E517791, ref-counted open/close 0x7E51783A/0x7E51785A, submit 0x7E51787B(a0 req) with codes MOT 0–9/16, MAG 10–15, PWR 17/18 (names from 0x7E51256F) (14b §6) (D2 2026-11-09).
+- **Entry points named in 14b §6 (D2 2026-11-09):** EMS1/EMS2 set-up, ISRs 0x7E45FB1F/0x7E4608F9 and result decoders 0x7E460DB8/0x7E460FC2/0x7E46118C; IOE SIO-ch3 callbacks write-done 0x7E464177 / read-done 0x7E4641A5 (config 0x7E463DB8); DCF file-type scanner 0x7E5AF95D; exFAT formatter 0x7E5B9DD7 (FAT writer 0x7E5BA1FE).
 
 **Drivers elsewhere** (V for the register users; the module name is I where noted):
 - lens controller 0x7E5324B3–0x7E5335BC (0x9A400000);

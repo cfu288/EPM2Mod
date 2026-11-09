@@ -11,16 +11,19 @@ Round D1 deep dive. E-PM2 v1.6, block 0, runtime = 0x7E421020 + offset.
 
 | Component | Code | Rodata / data | Basis |
 |---|---|---|---|
-| **OKAO core + PT** (facial parts) | **0x7E72CFA1–0x7E731584**. After the `ret` at 0x7E731582 come 3 bytes of 0xFF, then the libc `_ctype` table at 0x7E731588 (bytes 0x10/0x30/0xA0/0xC0/0x8C/0x89/0x81). Not ~0x7E732000. | Models and tables 0x7E85CEFC–~0x7E86DCxx (immediates from this code; end inferred). RAM: pool descriptors 0x602AE508 (W) and 0x602AE518 (B) | verified |
-| **OKAO SS "Smart Skin"** (beauty) | **0x7EBA7BC1–0x7EBABF8D**. It starts right after the last OXF code: the destructor 0x7EBA7B98 (stores vtable 0x7EBCDB0C, calls 0x7EBA7BB5, then the base destructor 0x7EBA7B13) and its 12-byte helper **0x7EBA7BB5–0x7EBA7BC0** (`add 16,a0`; if the word at this+16 is non-zero, store 0; `retf`; only caller 0x7EBA7B98). It ends at the `ret` at 0x7EBABF8B, followed by the strings `CIC_MUTEX`/`CIC_EN…` | LUTs 0x7EC92318–0x7ECAFF3C | verified bounds. Name: see §2.2 (A4 2026-11-09) |
+| **OKAO core + PT** (facial parts) | **0x7E72CFA1–0x7E731584**. After the `ret` at 0x7E731582 come 3 bytes of 0xFF, then the libc `_ctype` table at 0x7E731588 (bytes 0x10/0x30/0xA0/0xC0/0x8C/0x89/0x81). Not ~0x7E732000. | Models and tables 0x7E85CEFC–~~~0x7E86DCxx~~ **0x7E86DD5F** (the end of the atan LUT 0x7E86DC5F, reader 0x7E7310FE; 0xFF to 0x7E86DD7F; then the ORF CMIO blob 0x7E86DD80–0x7E8808BF, which is not OKAO) (14d §3.6, V) (D2 2026-11-09). RAM: pool descriptors 0x602AE508 (W) and 0x602AE518 (B) | verified |
+| **OKAO SS "Smart Skin"** (beauty) | **0x7EBA7BC1–0x7EBABF8D**. It starts right after the last OXF code: the destructor 0x7EBA7B98 (stores vtable 0x7EBCDB0C, calls 0x7EBA7BB5, then the base destructor 0x7EBA7B13) and its 12-byte helper **0x7EBA7BB5–0x7EBA7BC0** (`add 16,a0`; if the word at this+16 is non-zero, store 0; `retf`; only caller 0x7EBA7B98). It ends at the `ret` at 0x7EBABF8B, followed by the strings `CIC_MUTEX`/`CIC_EN…` | LUTs 0x7EC92318–~~0x7ECAFF3C~~ 0x7ECB083B (cosine table, 255·x and max(1, a·b/255) tables, ease curves; 14d §3.5) (D2 2026-11-09) | verified bounds. Name: see §2.2 (A4 2026-11-09) |
 | **Red-eye library** (overlay A) | **0x7F0645C1–0x7F0691C5**. It includes the maths helpers 0x7F068F66–0x7F0691C5. The DB marks the page 0x7F069000 as data, but 0x7F069020/0x7F0690A0/0x7F06910C/0x7F069171 are code with callers. After the `ret` at 0x7F0691C3 come `ff ff` and the BASIC keyword table (`list run new bye next…`) at 0x7F0691C8 | 3-byte constants at 0x7F06AD94/97; eight direction-offset tables 0x7F06ACD4–0x7F06AD93 (loads of 0x7F06ACD4/F4, AD14/24/34/44/54/74); a u16 quarter-sine table 0x7F06AD9C–0x7F06ADC1 (19 values 0…256, loaded 7 times at 0x7F068FB6–0x7F069093 by the angle helpers 0x7F068F9C/0x7F069020) (A5 2026-11-09) | verified |
 | **DPS in overlay A** | It ends at 0x7F0645C0. The last DPS function is 0x7F064584, which calls the string helpers 0x7F087BD1/0x7F087BF9/0x7F087C03 in overlay B | — | verified |
-| **AVPI AV middleware** | **0x7EE8F4F4–0x7EECE318**. Everything from 0x7EE63000 to 0x7EE8F4F3 has callers only in the C3D API (functions 0x7EE61A0A–0x7EE62F80) and the overlay-B C3D bridges (0x7F09E31F–0x7F0A30A9). 0x7EE63000 is a page number, not a function boundary: it falls inside 0x7EE62F80 (to 0x7EE63004), and 0x7EE62F80 and 16 other "API" functions are themselves called from inside 0x7EE63000–0x7EE8F4F3, so the C3D API and the code after it are one library (A5 2026-11-09). The first AVPI function, 0x7EE8F4F4, calls the kernel. After the `ret` at 0x7EECE316 come OSD-debug strings (`OSD DBG get`, `osddraw…`), so rodata starts at about 0x7EECE319 | Plug-in names, vtables and codec tables 0x7F02F600–~0x7F033xxx. Plug-in registry 0x7E8EFA18 (data image). Codec tables: code loads 0x7F031DEC (first at 0x7EEC5BD4)–0x7F033AC0; no code loads 0x7F0327DA directly, so "0x7F0327DA–" is inferred (item 12) (A5 2026-11-09) | verified (caller scan, bytes). Ranges inside AVPI: §2.4 |
+| **AVPI AV middleware** | **0x7EE8F4F4–0x7EECE318**. Everything from 0x7EE63000 to 0x7EE8F4F3 has callers only in the C3D API (functions 0x7EE61A0A–0x7EE62F80) and the overlay-B C3D bridges (0x7F09E31F–0x7F0A30A9). 0x7EE63000 is a page number, not a function boundary: it falls inside 0x7EE62F80 (to 0x7EE63004), and 0x7EE62F80 and 16 other "API" functions are themselves called from inside 0x7EE63000–0x7EE8F4F3, so the C3D API and the code after it are one library (A5 2026-11-09). That library is the C3D framework 0x7EE619C7–0x7EE8F4F3 (class registry and ~55 classes); its outside callers are only overlay-B functions (14a §1, §2.4) (D2 2026-11-09). The first AVPI function, 0x7EE8F4F4, calls the kernel. After the `ret` at 0x7EECE316 come OSD-debug strings (`OSD DBG get`, `osddraw…`), so rodata starts at about 0x7EECE319 | Plug-in names, vtables and codec tables ~~0x7F02F600~~ 0x7F02F684–~0x7F033xxx (14a §1: the first words point to AVPI OSAL 0x7EE8FFC8…) (D2 2026-11-09). Plug-in registry 0x7E8EFA18 (data image). Codec tables: code loads 0x7F031DEC (first at 0x7EEC5BD4)–0x7F033AC0; no code loads 0x7F0327DA directly, so "0x7F0327DA–" is inferred (item 12) (A5 2026-11-09) | verified (caller scan, bytes). Ranges inside AVPI: §2.4 |
 
 **What 0x7F021020–0x7F034000 holds** (verified strings):
-- the GL name pools (`gl_SilhScaleDMP` 0x7F022DCF, `glScalef` 0x7F023644);
-- libpng (0x7F02B404) and zlib (0x7F02E947–0x7F02EB24) strings;
-- then AVPI from 0x7F02F600.
+- 0x7F021020–0x7F0229AF is not graphics: the tail of an unreferenced 1,061-row `{u32 id, u32 0/3, u32 0}` table that starts at 0x7F01F7F4 (14a §1) (D2 2026-11-09);
+- the GL rodata 0x7F0229D0–~0x7F027BFF, with the name pools (`gl_SilhScaleDMP` 0x7F022DCF, `glScalef` 0x7F023644) and the `{name, fn}` table 0x7F023B8C–0x7F024283 (D2 2026-11-09);
+- the 3D-engine rodata 0x7F027C00–0x7F02B24A (format-loader table 0x7F027C4C, type table 0x7F02AA14) (D2 2026-11-09);
+- libpng (0x7F02B404) and zlib (0x7F02E947–0x7F02EB24) strings, to 0x7F02EB67;
+- the C3D framework rodata 0x7F02EB68–0x7F02F683 (D2 2026-11-09);
+- then AVPI from ~~0x7F02F600~~ 0x7F02F684 (D2 2026-11-09).
 
 So it is not "AVPI only", and it is not BASIC.
 
@@ -66,8 +69,8 @@ So it is not "AVPI only", and it is not BASIC.
 | 0x7E72E547 / 0x7E72E5DC / 0x7E72E65B / 0x7E72FE5B / 0x7E72FFAA | Byte feature maps, clamped to ±127 |
 | 0x7E72E8E3 / 0x7E72E9B4 / 0x7E72EF58 / 0x7E730A4A | Pose-model search over 940-element descriptors (940 = 47 × 20) |
 | **F024** 0x7E730BB9 / 0x7E730C34 | Pick one of 6 pose dictionaries: five 6-entry pointer tables at 0x7E86D994… |
-| 0x7E731532 | Masked SSD between two signed-byte vectors; mask bits from a byte array, 0x80 shifted right |
-| 0x7E731288 / 0x7E731394 | Byte multiply-accumulate (projections) |
+| 0x7E731532 | Masked SSD between two signed-byte vectors; mask bits from a byte array, 0x80 shifted right. It ends at 0x7E731584; the DB size 2,766 is wrong (14d §5) (D2 2026-11-09) |
+| ~~0x7E731288~~ 0x7E73121F / 0x7E731394 | Byte multiply-accumulate (projections). 0x7E731288 is not a function: it lies inside 0x7E73121F (the `jmp 0x7E731356` at 0x7E731262 crosses it), and its only DB caller is a false decode in the lens float tables (14d §5) (D2 2026-11-09) |
 | 0x7E72F79C → 0x7E72F5EC / 0x7E72F6C5 | Two refinement passes (loop bounds 6 and 7) |
 | 0x7E72F7B5 / 0x7E72F9FB | Direction estimate: clamp ±17157 (= π/3·2¹⁴) and the 999 sentinel |
 | **F025** 0x7E730FE5 → 0x7E730CBD | Mirrors the **47 landmarks** for the other side, then refits |
@@ -139,7 +142,7 @@ So it is not "AVPI only", and it is not BASIC.
 | 0x7EECC670–0x7EECE318 | Task 0x101E and the **DFS glue** | 0x7EECE2B9/C7/D1/FE/30E call the movie module's `[MOOV] DFS_Open/Close/Read/Seek/GetPos` |
 
 **Plug-in registry** (verified bytes):
-- 13 records of 272 bytes at 0x7E8EFA18 + 0x110·k: {+0 id, +4 factory, +12 category (1 = sink, 2 = source, 4 = transform), +16 `"staticlink.lib"`}.
+- 13 records of 272 bytes at 0x7E8EFA18 + 0x110·k (in the `.data` init image; the code uses the RAM copy **0x602BF558**, e.g. `add 0x602BF558,d0` at 0x7EE99822; 14d §3.8) (D2 2026-11-09): {+0 id, +4 factory, +12 category (1 = sink, 2 = source, 4 = transform), +16 `"staticlink.lib"`}.
 - The library name suggests a framework built for DLL plug-ins, linked statically here (inferred).
 
 | ID | Category | Plug-in | Factory → vtable |
@@ -261,6 +264,6 @@ So it is not "AVPI only", and it is not BASIC.
 1. **Overlay A load.** Red-eye needs overlay A in RAM. Usr2 bit 0 is requested by the vtable method 0x7EBA13BE (vtable slot 0x7EC90B34), and that method has no static caller. Which component calls it before red-eye fix? If none does, cmd 5 would run unloaded code.
 2. **SS details:** what p1/p2 mean (REC passes 120/0), image format 2 (assumed YCbCr 4:2:2), and the exact filter in 0x7EBA8F7F.
 3. **PT details:** the meaning of the 12 points (indices 3–6 are stored as eye data), the 10200 argument of 0x7E72DA7F, and the pose table 0x7E812FCC.
-4. **AVPI framework classes** in 0x7EE90235–0x7EE9C331 are not individually mapped (pins, buffers, graph). Also open: how SCA builds a graph per session type 1–7, and how the registry in the data image (0x7E8EFA18) is reached (no direct immediate found; probably through the RAM copy near 0x602BF4xx).
+4. **AVPI framework classes** in 0x7EE90235–0x7EE9C331 are not individually mapped (pins, buffers, graph). Also open: how SCA builds a graph per session type 1–7, and how the registry in the data image (0x7E8EFA18) is reached (no direct immediate found; probably through the RAM copy near 0x602BF4xx). Answered: through RAM 0x602BF558 (14d §3.8) (D2 2026-11-09).
 5. **AVCHD.** It does not call the AVSCA API (no caller in MOV_AVCHD). Its `USR_ScaCallback` 0x7E6D25BE has no immediate reference. Which library does AVCHD use?
 6. **Task bodies:** the roles of tasks 0x101D (0x7EE9AFE7) and 0x101E (0x7EECC6E3), and the codec MMIO map at 0x994xxxxx.

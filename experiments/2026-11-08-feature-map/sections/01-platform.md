@@ -200,7 +200,7 @@ Handlers in overlays (`bas`, `usb`, `tpc`, `c3d`, `md3d_*`, `spc`) are only vali
 | HPROC_PROC (0x16, 7E4628E2) | "handler proc" deferred handler queue (test hooks PER_HANDLER_PROC_TEST_*). **[I]** |
 | UI_IN (0x4E, 7E508FE8, pri 7) | Event flag 0x7E43EBFC. Bit 0x01 → key matrix scan 0x7E50A15C plus jog dial 0x7E50965C. Bit 0x02, every 10th tick → I/O-expander keys 0x7E50C26B and ADC dial 0x7E50B4C7, plus "edev" keys 0x7E50BAA6. Key sources: power, gio, adc, poll, ext, edev (0x7E50AB0C). Events go to `0x7E509CA3` (APPEVENT trigger, 101 callers). **[V]** |
 | UI_OUT (0x4F, 7E50D858), UI_SCREEN (0x50, 7E50DD29), LED_SCREEN (0x19, 7E50D798) | UI output and LED tasks. The shell command `ui led` (7E50D6F0) prints the led number and status. **[I]** |
-| SC_TTIMER (0x3E, 7E507115) | Soft timers `ttmr_dd1…5`/`ttmr_ed1…5`, together with the scheap allocator (small/middle/large heaps). **[I]** |
+| SC_TTIMER (0x3E, 7E507115) | Soft timers `ttmr_dd1…5`/`ttmr_ed1…5`. **[V] (D2 2026-11-09):** the loop 0x7E507115 waits 25 ticks per pass and calls the active slots 1–31 (masks 0x604F3658/0x604F365C); register 0x7E506FF6, unregister 0x7E50708F. The scheap allocator is a separate part of the `sc` library 0x7E506CB0–0x7E508DA6: six fixed-block pools (table 0x7E7348E4), and SCHEAPDBG (0x1003, 0x7E5079DD) is its guard checker (14b §2) (D2 2026-11-09) |
 | CPUCONN0/1 (0x8F / 0x1010, 7E505A22) | Inter-CPU service proxy (see §1). **[I]** |
 | USRTEST_A–D (0x90–0x93) | OS self-tests ("Hello World!!!", queue and flag tests). exinf = 1. Usr0–4 do not start them. **[V]** for that, not searched elsewhere. |
 

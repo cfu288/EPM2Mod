@@ -269,7 +269,7 @@ Examples: 738 Shooting Menu 1, 494 Shooting Menu 2, 739 Playback Menu, 527 Custo
 | `prmdbg` shell (read/write any tag, psave/pload/erase banks) | §1.4 | verified strings and dispatch |
 | `GUI Debug` shell: `DEBUGLEVEL/DBGLVL 0-3, hist, showev, ca on/off, gpi on/off, rec on/off, ev <EventID hex>, TOUCH, CONV, INFO, SHOWEC` | 0x7EDC3D85 | verified strings |
 | `app Get_CameraInfo/Set_CameraInfo/Get_CameraUserInfo <info>`, `getmodeinfo`, `modedial`, `iauto`, `evtset/evexec` | 0x7E677990 | verified |
-| GUI debug menu `SS_DEBUGMENU` (`gdbDebugMenu.usRightMark/usItem/usPrg`, `doCmdSsDebugMenuColor_Setting/Result EvtKeyPowerOn`) | 0x7ED48BBA, 0x7EDA0968 | strings verified; entry key combination not found |
+| GUI debug menu `SS_DEBUGMENU` (`gdbDebugMenu.usRightMark/usItem/usPrg`, `doCmdSsDebugMenuColor_Setting/Result EvtKeyPowerOn`) | 0x7ED48BBA, 0x7EDA0968 | strings verified; ~~entry key combination not found~~ superseded: entry through SS_MENU_MAIN HIDE_MODE (13d §4.3), plus a second OK-long/MENU-long/OK sequence (14e §4.4) (D2 2026-11-09) |
 | Self-adjust menu `SS_SELFADJ` (`startSelfAdjustMenuSubAppStateMisc` 0x7ECE067B, `SelfAdjust::getMenuItem…turnOnTFT`, `api_adj_Check_Execute_Self_Adjust`) | | verified strings |
 | Version-check menu (`CAM_MISC_VERCHK_MENU`, `startVersionCheckMenuSubAppStateMisc` 0x7ECE0653, `[GUI App Version]:OkOn called , F/W Version up start`) | 0x7EDA9D03 (loads the F/W string at 0x7EDAA63F), 0x7EDFD86F (audit 2026-11-09) | verified strings. The Firmware item can start a firmware update. |
 | Life test (`[GUI App]:Life Test Start`, `registerCode`, `eraseCode`, `LifeTest::getLifeTestMode`) | 0x7EFD1FB4 | verified strings |

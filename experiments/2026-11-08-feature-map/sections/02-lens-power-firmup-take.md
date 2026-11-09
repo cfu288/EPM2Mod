@@ -13,11 +13,11 @@ Scope: block 0 runtime 0x7E521020–0x7E621020, plus the code these tasks call e
 | Lens | 0x7E51BF67–0x7E538C1D | LENS_MAIN 0x7E51BF67, LENS_ASKDATA 0x7E51F77D, LENS_FIRM_UP 0x7E52FD56, LENS_FLASH 0x7E53086F, LENS_FOCUS_LIMIT 0x7E532218, ZOOM 0x7E538D9B | Server tasks on Oimf queues; big `lens` debug shell names the protocol |
 | Battery / power | 0x7E539254–0x7E53A981 | BCHK_MAIN 0x7E53A1D0, BCHK_BATT 0x7E53A3CC, PWR_STANDBY 0x7E53A4A4 | Damage reporting at 0x7E53A76C |
 | Body stabilizer ("BC") | 0x7E53BAAD–0x7E542B4E | BC_MAIN 0x7E53D96D | **Not battery**: BC = stabilizer controller (strings `stab.*`, `bc_stab`) |
-| Shooting control | 0x7E58204D–0x7E59A3EC | TAKE_MAIN 0x7E58204D, TAKE_EXPOSE 0x7E5829E8, TAKE_FOCUS 0x7E5881D9, TAKE_FUNC 0x7E595527, TAKE_FUNC_CP 0x7E5996F8 | Command tables decoded |
+| Shooting control | 0x7E58204D–0x7E59A3EC; the TAKE module starts at its init 0x7E581FB0 (only caller Usr0 0x7E503DD4; 14b §1) (D2 2026-11-09) | TAKE_MAIN 0x7E58204D, TAKE_EXPOSE 0x7E5829E8, TAKE_FOCUS 0x7E5881D9, TAKE_FUNC 0x7E595527, TAKE_FUNC_CP 0x7E5996F8 | Command tables decoded |
 | Movie AF | 0x7E5ED006–0x7E611F25 | FCS_MOVIE 0x7E610A65 | `fcs_lens_mfts_*` |
 | Strobe | 0x7E5D8E94–0x7E5E2419 | STB_SEQ 0x7E5D8E94, STB_EXTERNAL 0x7E5DCA31, STB_CHARGE 0x7E5DFF5E, STB_ASSIST_FUNC 0x7E5E1E94 | |
 | Files / DCF / Eye-Fi | 0x7E5ABE5B–0x7E5C8B40 | DCFPROC_SUB 0x7E5B34CE, EYEFI 0x7E5C1981, FILECLBK 0x7E5C1B4E, FILEFGND 0x7E5C4E90 | |
-| No strings | 0x7E55F9B6, 0x7E57F914 | IMG_PRECON, WB_MOV | IMG_PRECON = pixel-defect (Pixel Mapping) correction from the PIXELDEFECT prm lists, part of the IMG library (13a §3.2) (D1 2026-11-09); overstated: cmd 4 (0x7E580A54) also computes channel gains, disputed until the D2 deep dive (C2 2026-11-09). WB_MOV not mapped |
+| No strings | 0x7E55F9B6, 0x7E57F914 | IMG_PRECON, WB_MOV | IMG_PRECON = pixel-defect (Pixel Mapping) correction from the PIXELDEFECT prm lists, part of the IMG library (13a §3.2) (D1 2026-11-09); overstated: cmd 4 (0x7E580A54) also computes channel gains, disputed until the D2 deep dive (C2 2026-11-09). **Resolved (D2 2026-11-09):** cmd 0 is pixel-defect correction; cmds 1–4 are WB/colour calibration (0x7E55FE1E/0x7E55FF91/0x7E55FFA3 call the WB module; cmd 4 0x7E580A54 reads prm 0xAA92/0xAAA2/0xAAB2 = `PRM_CAM_SPECTRUM_STL_R/G/B` through table 0x7E78F170; 14b §3). ~~WB_MOV not mapped~~ WB_MOV 0x7E57F914 is the task of the unnamed WB (white balance / colour) module 0x7E579C34–0x7E581FAF (14b §3) (D2 2026-11-09) |
 
 Helpers used below (all **verified** by their own strings or code): 0x7E4263E5 = debug print(a0=str); 0x7E50652F = debug print str + hex value; 0x7E4492B9 = `OlyQeWr` (queue write); 0x7E449218 = `OlyQeRd`; 0x7E4490AF = `OlyEvWt`; 0x7E449030 = `OlyEvSt`; 0x7E449541 = `OlyTaSt` (start task); 0x7E449621 = `OlyTaSE` (exit task); 0x7E449605 = `OlyTaSS` (sleep); 0x7E4262C5 = get time; 0x7E500E40 = `strncmp(a0,a1,d0)`; 0x7E50689F = Oimf message send (d0 = target id, d1 = command; strings `Oimf>>qwrite`); 0x7E44F197 = flash write (`write_flash_*_error` strings), args a0 = dest, a1 = src, d0 = size, d1 = mode.
 
@@ -219,6 +219,6 @@ The USB flow (inferred from order): `[TPCFirmup]FirmwareCheck` sends type 3 (che
 4. Lens firmup command semantics (cmds 0/3/4/5) and whether LENS_FIRM_UP compares `g_firmup_version` with the lens (downgrade guard on the lens side?).
 5. `udf00 255` in the LED period formula; real blink rates.
 6. Code at 0x470010DE/0x4700118A (PWR_STANDBY) lives outside block 0: which block/RAM?
-7. IMG_PRECON (0x7E55F9B6) and WB_MOV (0x7E57F914) have no strings in this range; their roles need code reading. IMG_PRECON is answered: pixel-defect correction (13a §3.2) (D1 2026-11-09). Reopened in part: cmd 4 does channel-gain work (13a §3.2) (C2 2026-11-09).
+7. IMG_PRECON (0x7E55F9B6) and WB_MOV (0x7E57F914) have no strings in this range; their roles need code reading. IMG_PRECON is answered: pixel-defect correction (13a §3.2) (D1 2026-11-09). Reopened in part: cmd 4 does channel-gain work (13a §3.2) (C2 2026-11-09). Answered: cmds 1–4 are WB/colour calibration, and WB_MOV is the task of the WB module 0x7E579C34–0x7E581FAF (14b §3) (D2 2026-11-09).
 8. FIRMUP_LED (0x7E880CDD): is it ever started or signalled (event id 0x7E43EC22)?
 9. Meaning of the 69 damage codes at 0x7E744084.
