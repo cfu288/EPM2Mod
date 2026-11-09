@@ -88,3 +88,7 @@ English-string counts not present in the E-PM2: E-PL5 0 (block 1 identical), E-P
 - **13b (face/AV): the overlay-A library is red-eye correction. Confirmed:** `play_face_redeye_adjust` 0x7E94318E passes command 5 (`mov 5,d1`) to the sender 0x7E50689F. The library ends where the BASIC keyword table starts at 0x7F0691C8 (`list run new bye next return goto gosub …`). This corrects the C1 note "face-scoring library".
 - **13c (C++ framework): the OMReactive vtable. Confirmed:** slot 15 of 0x7EC91FE8 is 0x7EBA6D64 = `mov (104,a0),a0; retf`, i.e. getCurrentEvent returns this+104. Section 13c and 13b agree that the OXF runtime ends at ~0x7EBA7BB5 and that 0x7EBA7BC1– is an OKAO library (Smart Skin per 13b).
 - **Correction pass F1 rejected 13a §5 #4. Confirmed:** the image job library writes image-engine registers directly: `mov d3,(0x99400008)` at 0x7E54DABB, `mov d0,(0x99400000)` at 0x7E557514. Section 09b's "image-engine driver" wording stands.
+- **C2 batch 4: the GL library runs past 0x7EE21020. Confirmed:**
+  - The `{name, fn}` table at 0x7F023C74 has 194 `gl*` entries. 89 of them point above 0x7EE21020 (the reviewer said 91), and the highest is glPointSize at 0x7EE29468.
+  - `$Revision: #88 $` (0x7F027CC4) is referenced by 0x7EE295EE, in the module that follows.
+  - So the GL library ends at ~0x7EE294B4, not 0x7EE21020. Fix pending in the regions table and in sections 08 and 13d.
