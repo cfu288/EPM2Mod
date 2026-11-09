@@ -17,18 +17,27 @@ first_fn	last_fn	source_file	fns_naming_file	placement	name_string
 7e635f4b	7e6369ca	cam_expcal.c	0	inferred-14b	-
 7e636a04	7e63790d	cam_frame.c	1	direct	7e7ae71f
 7e63a4bb	7e63a4bb	cam_frame_sync.c	1	direct	7e7aeb55
-7e63be39	7e640186	cam_imgdev.c	26	direct	7e7aee88
-7e640200	7e640200	cam_lens.c	0	inferred-14b	-
+7e63be39	7e63d0dd	cam_imgdev.c	26	direct (D3 2026-11-09)	7e7aee88
+7e63d1c1	7e640186	imgdev driver/sequences [unnamed]	0	inferred-15b (D3 2026-11-09)	-
+7e640200	7e640844	cam_lens.c	0	inferred-14b (D3 2026-11-09)	-
 7e640858	7e640f3e	cam_list.c	0	inferred-14b	-
 7e640f53	7e641ba1	cam_mec_ctrl.c	0	inferred-14b	-
 7e641bb8	7e642301	cam_mem.c	0	inferred-14b	-
 7e642325	7e6438e9	cam_mirror.c	0	inferred-14b	-
 7e64f2a2	7e64f2a2	cam_sem.c	1	direct	7e7ba661
-7e6521c9	7e6521c9	cam_set.c	1	direct	7e7ba963
+7e64f744	7e650467	cam_serial.c	0	inferred-15b (D3 2026-11-09)	-
+7e65046f	7e652ae2	cam_set.c	1	direct (D3 2026-11-09)	7e7ba963
+7e652af3	7e6557c1	cam_sg.c	0	inferred-15b (D3 2026-11-09)	-
 7e6557ce	7e6557ce	cam_shutter.c	0	inferred-14b	-
+7e6561da	7e65663a	cam_siodrv.c	0	inferred-15b (D3 2026-11-09)	-
 7e656eeb	7e65d5e7	cam_still_func.c	7	direct	7e7be2b6
-7e65dc34	7e6619c5	cam_still_live_bulb.c	5	direct	7e7bf704
+7e65dc34	7e661cff	cam_still_live_bulb.c	5	direct (D3 2026-11-09)	7e7bf704
+7e661d84	7e662265	cam_strobe.c	0	inferred-15b (D3 2026-11-09)	-
 7e66296b	7e66296b	cam_timer.c	1	direct	7e7bf8b9
+7e6629a8	7e662ba7	cam_watchdog_timer.c	0	inferred-15b (D3 2026-11-09)	-
+7e662c27	7e666c4a	SDET [unnamed]	0	inferred-15b (D3 2026-11-09)	-
+7e666c5b	7e674de8	mdet [unnamed]	0	inferred-15b (D3 2026-11-09)	-
+7e674df5	7e675b1e	res [unnamed]	0	inferred-15b (D3 2026-11-09)	-
 7e67df4e	7e67df4e	api_eventque.c	1	direct	7e7c88a8
 7e67e783	7e67e783	api_exec.c	1	direct	7e7c8a39
 7e6c3955	7e6ca669	mov.c	6	direct	7e7fd372
@@ -133,12 +142,12 @@ first_fn	last_fn	source_file	fns_naming_file	placement	name_string
 7eae9cf2	7eaea343	CmpEra_ErasePicComponent.cpp	2	direct	7ec68254
 7eb015ff	7eb02843	CmpPCal_PlayCalendarComponent.cpp	2	direct	7ec6a8bc
 7eb05d26	7eb06375	CmpPCol_PlayCollageComponent.cpp	2	direct	7ec6b550
-7eb0af9a	7eb155c7	Cmp_PlayComponentBase.cpp	56	direct	7ec6c8c3
+7eb0a5e7	7eb16b23	Cmp_PlayComponentBase.cpp	56	direct (D3 2026-11-09)	7ec6c8c3
 7eb16ff4	7eb18833	CmpPct_PlayContinuousComponent.cpp	2	direct	7ec6fadb
 7eb1af51	7eb1b5a2	CmpPCw_PlayCwComponent.cpp	2	direct	7ec70360
 7eb1e186	7eb1e7d7	Cmp_PlayEditComponentBase.cpp	2	direct	7ec70c50
 7eb2037c	7eb2584e	CmpPEvc_PlayEvcollectionComponent.cpp	2	direct	7ec739a8
-7eb29279	7eb2b6c8	CmpPEvV_PlayEventViewComponent.cpp	2	direct	7ec74890
+7eb2887c	7eb2b6c8	CmpPEvV_PlayEventViewComponent.cpp	2	direct (D3 2026-11-09)	7ec74890
 7eb2bb81	7eb2e7ff	Cmp_PlayIndexComponentBase.cpp	2	direct	7ec7528a
 7eb2ecd0	7eb30258	CmpPli_PlayIndexComponent.cpp	2	direct	7ec75c05
 7eb33b24	7eb38d5d	CmpPLgh_PlayLightBoxComponent.cpp	2	direct	7ec77061

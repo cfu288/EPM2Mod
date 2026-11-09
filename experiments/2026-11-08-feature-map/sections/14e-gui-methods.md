@@ -261,7 +261,7 @@ All of these return at once if w = NULL.
   - **I:** the Tv/Av fields of the rec-view (live-view) exposure display. Which flag means "highlight" or "adjustable" is open.
 
 ### 4.3 RAW-edit menu page (C2 F065)
-- **Page ids:** the menu-page registry 0x7EFE190C has **page 620 → factory 0x7EDF77BD and page 621 → 0x7EDF77BD** (rows at 0x7EFE2114, V). So 620/621 are **page ids**, not menu items (corrects C2). The current page id is RAM 0x602BCFD8 (read by 0x7EDCD7CA).
+- **Page ids:** the menu-page registry ~~0x7EFE190C~~ 0x7EFE180C (312 entries keyed by list id; 13d §5, 15a §4) (D3 2026-11-09) has **page 620 → factory 0x7EDF77BD and page 621 → 0x7EDF77BD** (rows at 0x7EFE2114, V). So 620/621 are **page ids**, not menu items (corrects C2). Note (D3 2026-11-09): the registry keys are list ids (openPage maps page ids to list ids first, 13d §5), so 620/621 here are list keys; the page ids that reach them were not checked (D3 2026-11-09). The current page id is RAM 0x602BCFD8 (read by 0x7EDCD7CA).
 - **Vtable 0x7F0032B8** (dtor slot 1 stores it). Slots 3–33 are shared menu-page base slots (0x7EDCCCxx–0x7EDCDxxx); own slots are 0, 2, 31, 34–46.
 - **Slot 31 (F065)** calls `OlyApiEditRaw` vt+8 (API 0x031B06) for page 620 and vt+12 (0x031B0A) for page 621. **I:** these are the two RAW Data Edit modes of 06 CmpERaw ("current settings" / "custom"), but the order is not known.
 - Slot 38 0x7EDF79A4 passes the constants 913 and 197 (V). Read as string ids, they are "Exit" and "Set" (I: an Exit/Set dialog).

@@ -36,7 +36,9 @@ Round D1 deep dive. Scope: the driver code in 0x7E421020–0x7E521020, plus the 
 | 0x7E463124–0x7E46336C | **SIO I²C-mode helpers** (init/open/start/write/read; 0x7E463185 has 14 callers: accelerometer 0x7E45A83D/0x7E45A91B, IOE 0x7E464050, the HDMI/EVF transports 0x7E6BA39B–0x7E6BA986, touch 0x7E6BD6C2/0x7E6BD775, BT 0x7E8FC496/0x7E8FC540; 15d §5) (D3 2026-11-09) |
 | 0x7E4639F4–0x7E463CD9 | PER_IN, the IRQ-attach wrappers, and the NMI handler 0x7E463CD9 |
 | 0x7E463E70–0x7E46504A | I/O expander (IOE, IOEC) over SIO ch3 |
+| 0x7E465081–0x7E465582 | **Soft-timer API**: `tmr_start` 0x7E4650A2 (124 call sites), `tmr_stop` 0x7E4650DD (39), two timer lists by class (15d §5) (D3 2026-11-09) |
 | 0x7E465583–0x7E465C77 | Soft timers MINTIMER, `per timer`, PER_PCONT |
+| 0x7E465D10–0x7E466886 | **PER_PCONT client side**: ref-counted control on/off (0x7E465D10 ← 0x7E538C1D, 0x7E541A62, cam 0x7E63E737/0x7E64259E), PWM duty 0x7E466435/0x7E466448, `pcntdbg` (15d §5; V edges, roles I) (D3 2026-11-09) |
 | 0x7E466887–0x7E467117 | PWM, 0x9A500000 |
 | 0x7E467130–0x7E467ABE | PER_ROTATE, RTC |
 | 0x7E467D99–0x7E469D75 | **SIO** driver, including the client API after the `sio` shell 0x7E469BD1: init entry 0x7E469C16 (← Usr0 0x7E503DD4; calls 0x7E467D99), 0x7E469C1E, 0x7E469C27 and 0x7E469CDF (called by lens 0x7E53392C, LCD 0x7E6B1066, EVF 0x7E6B33D1, audio 0x7E94F128 and others) (A4 2026-11-09) |
