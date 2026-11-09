@@ -28,6 +28,7 @@ A region that fails a round gets a deep dive, then a **new** blind sample. The s
 | A5 | Claim audit, D1 sections after the A4 fixes | 34 claims, seed 20261113 | 17 correct, 17 minor, **0 wrong**. Most minors are range ends or counts; 5 of 6 re-sampled A4-corrected lines still had a detail wrong (`audit/check-13b-1..3.md`) |
 | A6 | Claim audit, D2 sections 14a–14e | 35 claims, seed 20261114 | 21 correct, 12 minor, **2 wrong, both in 14c**: 14c-134 (teardown 0x7EA17103 belongs to the class after CapMed_MediaInfo), 14c-145 (the Live Bulb TAKE step: message 19 → 0x7E5A2A27 → request 268, not the event table). 14a, 14b, 14d, 14e: 0 wrong (`audit/check-14-1..3.md`). Fix, then resample 14c |
 | F1 | Corrections pass after D1 | 52 items | 11 section-11 fixes + 41 D1 fixes applied, 1 rejected (13a no-registers claim); log `audit/fixes-D1.md` |
+| C3 | Coverage, whole block 0, after D2 | 80 new functions, seed 3109 | **FAIL.** 20 explained (25 %), 54 partly, 1 unexplained, **4 contradicted**, 1 not-code. Explained+partly 92.5 %. Contradictions are all region labels: 14b's cam_lens.c start (imgdev runs to ~0x7E640200); the 03/14b "SDET algorithm library" 0x7E666EB9–0x7E675000 is mainly the mdet motion-detection library used by TAKE AF (checked: F015's outside callers are 0x7E59BBD0/0x7E59BCD9); 13d's "self-adjust UI" range is mostly GuiTouch. Weakest: function-level roles (GUI pages, HCI, play-component notifications, camera-core command tables). `coverage/round3-review1..4.md` |
 | C2 | Coverage, whole block 0, after D1 | 80 new functions, seed 2109 | **FAIL (better).** 23 explained (29 %), 49 partly, 4 unexplained, **2 contradicted**, 2 not-code. Explained+partly 90 % (criterion met); explained < 50 % and contradicted > 0 (not met). Contradictions: zlib/C3D-API ranges overlap in 08 (zlib ends at zmemcpy 0x7EE619AC); 13c Dev*→Ctg boundary is ~0x7EB93423, not ~0x7EB93A80. Also found: the GL library ends ~0x7EE294B4, not 0x7EE21020 (checked: 194-entry name table 0x7F023C74); a string-scanner bug ('~' from a 0x7E pointer byte, fixed in fwmap, +900 string refs); a touch-panel firmware image at 0x7E7F0F78. `coverage/round2-review1..4.md` |
 | C1 | Coverage, whole block 0 | 80 functions, seed 1109 | **FAIL.** 10 explained (12.5 %), 51 partly, 17 unexplained, 1 contradicted, 1 not-code. Explained+partly 76 %. Gaps: string-less libraries, C++ framework patterns, GUI toolkit, mcon records, drivers; region-table errors. `coverage/round1-review1..4.md` |
 
@@ -43,6 +44,27 @@ A region that fails a round gets a deep dive, then a **new** blind sample. The s
 | 0x7ECA–0x7EE2 GUI | — | A1 ok | | pending C1 |
 | 0x7EE2–0x7EEE libraries / C3D | — | not sampled | | pending C1 |
 | 0x7F05–0x7F0B BASIC / ADJ / USB / SPC | — | A1 ok | | pending C1 |
+
+## Coverage by region, rounds C2 + C3 (159 functions, after D1)
+
+| Region | n | Explained | Partly | Unexpl. | Contra. | Not-code | E % | E+P % |
+|---|---|---|---|---|---|---|---|---|
+| 0x7E42–0x7E52 platform, drivers, libs | 7 | 1 | 5 | 1 | 0 | 0 | 14 | 86 |
+| 0x7E52–0x7E62 lens, firmup, IMG, WB, TAKE | 15 | 5 | 9 | 1 | 0 | 0 | 33 | 93 |
+| 0x7E62–0x7E73 camera core, movie, rec, art, face | 24 | 8 | 11 | 2 | 3 | 0 | 33 | 79 |
+| 0x7E73–0x7E8F rodata, .data | 3 | 1 | 0 | 0 | 0 | 2 | — | — |
+| 0x7E8F–0x7E96 playback, audio, BT | 6 | 3 | 3 | 0 | 0 | 0 | 50 | 100 |
+| 0x7E96–0x7EBA C++ app layer | 48 | 16 | 30 | 1 | 1 | 0 | 33 | 96 |
+| 0x7ECC–0x7EE0 GUI | 29 | 5 | 23 | 0 | 1 | 0 | 17 | 97 |
+| 0x7EE0–0x7EE8 3D / GL / C3D | 12 | 1 | 10 | 0 | 1 | 0 | 8 | 92 |
+| 0x7EE8–0x7EEC AVPI | 7 | 1 | 6 | 0 | 0 | 0 | 14 | 100 |
+| 0x7F05–0x7F0F overlays A/B | 8 | 2 | 6 | 0 | 0 | 0 | 25 | 100 |
+
+**Reading.**
+- **Placement:** breadth (E+P ≥ 80 %) holds in every region except the camera core (79 %, contradictions).
+- **Explained:** "explained" (a function-level role) stays near 25–33 % after two deep-dive rounds. The map places code correctly but does not give each function's role.
+- **Contradictions:** they are now all region-label errors, not wrong behaviour claims.
+- **Sample size:** per-region samples are small (7–48), so per-region rates are rough.
 
 ## Round C1 findings driving round D1 (deep dives)
 
