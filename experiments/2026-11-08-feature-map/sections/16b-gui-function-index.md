@@ -1,9 +1,9 @@
-# 16b. GUI and CA_MAIN function index 0x7ECCB800–0x7EE02094 (E-PM2 v1.6, rounds D4–D5)
+# 16b. GUI and CA_MAIN function index 0x7ECCB800–0x7EE02094 (E-PM2 v1.6, rounds D4–D6)
 
 Scope: one row per function for the GUI, the GUI toolkit and the camera app (CA_MAIN / appCaller) code before it. It builds on 13d (toolkit, Ss engine, registries), 14e (slots, DC, shapes) and 15a (pages, panels, touch). The index is `16b-gui-function-index.tsv`.
 
 - **Labels:** **V** = read in code, bytes or a decoded table; **I** = inferred (position, callers, name order).
-- **Scratch:** `$S/d5/gui/` (D4 copy plus D5 changes). Build order: `core.py` → `api.py` (OlyApi vtables; names from `apiname.py`) → `vt.py`, `cls.py`, `fact.py` → `ca.py`, `ca2.py` → `tables.py` → `drawobj.py` (draw-object types) → `idx.py` (rules; effects `eff.py`, names `known.py`, D5 structures `d5rules.py`, small-code describer `micro.py`) → `mktsv.py OUT`. Metric: `classify.py TSV`.
+- **Scratch:** `$S/d6/gui/` (D5 copy plus the D6 precision changes, §6; D5 state in `$S/d5/gui/`). Build order: `core.py` → `api.py` (OlyApi vtables; names from `apiname.py`) → `vt.py`, `cls.py`, `fact.py` → `ca.py`, `ca2.py` → `tables.py` → `drawobj.py` (draw-object types) → `idx.py` (rules; effects `eff.py`, names `known.py`, D5 structures `d5rules.py`, small-code describer `micro.py`; D6: path enumerator `emu.py`, Ss results `ssemu.py`, CA ctx stores `cactx.py`) → `mktsv.py OUT`. Metric: `classify.py TSV`. Row checks: `check*/` (briefs, samples, results).
 
 ## 1. Area and boundaries (V unless marked)
 
@@ -106,6 +106,8 @@ Scope: one row per function for the GUI, the GUI toolkit and the camera app (CA_
 4. **07 §5 data model:** add getInstance 0x7ECEF5DC, ctor, slot layout, get/set bodies, listener bitmaps and the GM 0x1900 notify (§2.3).
 5. **13d §2.2 / 14e:** WinMain slot 197 is the draw-object factory, not an unnamed slot (§2.2).
 6. **16b D4 §1 "draw-object family (19 classes, ctors 0x7ED1F4F4–0x7ED221E1)":** 18 classes derive from 0x7EF10EA4; type 0x2000 (ctor 0x7ED22306) has its own 56-slot vtable.
+7. **15a page-class spans (D6):** 51 page-class rows end before their last method; 81 functions follow them (§6.1 item 4). Page 422 runs to 0x7EDD7C31 (15a gives 0x7EDD7A57; C7 F066); the live-guide controller (getInstance 0x7EDD7C32, RAM 0x602BD5E4) starts there.
+8. **16b D5 CA rows "→ same state":** of the 489 CA handlers, 45 set the next state themselves on every path, 36 on some code path and 266 never; 142 could not be fully enumerated and carry a hedge (§6.1 item 1); e.g. Pc 0x6004 CBK_DEVLINK_REQ_FIRMUP → 0x6000 with SUB_EVENT_START_FIRMUP (C7 F054).
 
 ## 5. Open questions
 1. 283 Ss handlers return a value the rules do not resolve (unchanged).
@@ -114,8 +116,99 @@ Scope: one row per function for the GUI, the GUI toolkit and the camera app (CA_
 4. CA state names: no per-state name table; GUI codes 0x84/0x85 in Misc rows (unchanged).
 5. The display-variant values 0/1/2 of RAM 0x602B61F4 (I: output device).
 
+## 6. D6 precision cycle (2026-11-09)
+
+Goal: precision, not coverage. Every rule (`basis`, first code) with more than 50 rows was sampled at random and each row was read in the disassembly and the table bytes by a checker that saw only the row (`check/`, `check2/`, `check3/`, `check4/`). Error = any false claim in the row. THIN = true but context only (not an error).
+
+### 6.1 Named rule errors, fixed
+1. **CA next state.** The rows read only the table's static next field. D6 runs each CA handler through a path enumerator (`emu.py`) with a symbolic ctx in a1 and sentinels at ctx+92 (next state), +100 (next-state slot the runner uses when ctx+104 = 1), +76 (sub-event request) and +28 (GUI code), and reads their final values on every path. Callees that receive ctx are entered. Results: "→ next state 0x6000 (set by the handler; the table says same state)" when every path sets it; "same state (a code path in the handler sets 0x5108; path feasibility not checked)" when some do; when the enumeration does not finish, a hedge ("table next: same state (the handler was not fully analysed; it may change ctx+92)" or "the handler code … contains stores ctx+92 = …; whether they run on these events is not checked"). Example: 0x7ECE10CB → next state 0x6000, sub-event 0x09000000 SUB_EVENT_START_FIRMUP, GUI code 0x85; 0x7ECE0E37/0x7ECE0E3C → 0x6000 and 0x0900000F. The static scan alone missed stores in 5 of 280 "same state" handlers (e.g. 0x7ECE35F8 through 0x7ECDCFB0), so it is used only as a hedge.
+2. **Tail call read as a return.** `micro.py` reports "returns d0 of X" only if a caller reads d0; it names call targets by their slot role and constant argument ("calls 0x7ED6F7D9 = getChild(i) with d0 = 136" for 0x7ED719EB).
+3. **Text cut at a fixed length.** All cuts now go through `cut()` (word boundary, never inside a number, marked "…"; the TSV cap is 420 characters). 0x7EDDBCA2 now reads "RAM 0x602BDA2C".
+4. **Class spans that end early.** A 15a page-class span is extended over the following functions while each has evidence: an own vtable method, a caller that passes the class getInstance result in a0 (same basic block, callee keeps a0), all callers already in the class, or a read of the class singleton. 81 functions moved into 51 page classes; page 422 now runs to 0x7EDD7C32 (the live-guide helpers start there). Two contradictions now override a range: all callers lie in one other panel/page class (31 rows, e.g. 0x7ED4A845 is panel 53 code, not panel 94), or callers pass another singleton's getInstance result (6 rows, e.g. 0x7ED01DDD is a CCommon getter of +292); a function called only by another getInstance is the ctor of the object it allocates (0x7ED01DF2).
+5. **Ss destination built in a callee.** The Ss action now comes from path enumeration of the handler: the callees that write the (SS, state) outputs through pointers, Ss-range callees, tail calls, switches with a constant selector and (when the budget allows) every GUI callee are entered; RAM stores are tracked. 0x7EDA4C16 → "switch to SS_MENU_LV state 9 ANIMATION" (0x0409, via 0x7EDD7C9D case 0x7EDD7CD7); 0x7EDB4B11 → 0x0104 BLACK_SCREEN; 0x7EDA2E42 → 0x0104. Of 1,360 handlers, 1,081 resolve completely, 139 partly ("… / other paths not resolved"); the rest keep the D5 fact text or a hedge ("possible results (static scan; paths not checked)"). The enumeration also corrected D5 result sets that included dead branches (0x7EDA2FBD: only 0x0104; 0x7EDA2DD3: 23 or 0x0104).
+6. **Dispatcher rows.** A switch with a constant selector is entered, so only its taken case adds effects ("0x7EDD7C9D takes case 0x7EDD7CD7 (jump table)"). The switch's own row says "switch through its jump table 0x7EFE9068 (25 entries, M distinct targets)" and "its code calls (all cases together): …" instead of a behaviour sentence; jump-table cases are no longer listed as "merged vtable methods" (123 of the 132 ctor-less tables are jump tables).
+
+### 6.2 Other rules fixed after a wrong sample row
+| Rule | Defect found | Fix |
+|---|---|---|
+| returns (all rules) | constants written to the return register on other paths (0x7ED02833 "returns 1/4", 4 is a divisor); leftovers that no caller reads (0x7ECF6779, 0x7ED9E93D, layout functions) | values from path enumeration; reported only if a caller reads d0 (callers that return d0 unchanged pass the test to their callers; a following call does not count as a read); for functions reached only through pointers only constants loaded into d0 just before `ret` |
+| ss-table | handler entries inside a merged function copied the containing function's row | the entry is described on its own |
+| shape | "short wrapper" for an endless task loop (0x7ECE7DDD); "A then B" for exclusive branches | needs a return and no backward `bra`; calls after a conditional branch → "short function; calls (conditionally) …" |
+| hsw | "merged unreachable stub(s)" were other case blocks; key-0 rows claimed a jump | reachability text checks table/pointer targets; key-0 rows now say "target word of the empty (key 0) slots …; not checked", label I; bias also read from `add −N,dX` |
+| str | "named X" from a callee or enum in the message (0x7ED0BA20 "guiUtility::getReserveEventStatusForSync()", "CPlaySingleFrame::NEXT_REC"); "logs" for compared strings | a name must open the message or be the whole [tag], be used by one function only, not be ALL-CAPS; "references strings" instead of "logs" |
+| synth | "reads" for command calls (PlaySelect::start); "from"/"then" implied data flow | API calls count as reads only for get/is/can/has/check methods; sentences list setters, reads and outputs without order |
+| vt | "(own slot)" when the base vtable was not linked; container slot 104 "child-list accessor" (0x7ECF319B compares and sets a 16-B field) | "(own slot)" only with a known base chain; slot 104 name removed |
+| ctor/class names | "class userGuiBTSelectWizard::init" from a log string before the vtable | strings with "::" or shared by several vtables are not class names |
+| pmf | "static initialiser" for a ctor that stores a pointer-to-member in the object (0x7ED8C1DA) | "stored into the object by ctor …" |
+| openpage | getInstance result paired across switch cases | basic-block pairing (see 6.1 item 4) |
+| struct/known | 0x7ECD654A "returns 1" (0 or 1); 0x7ECD3583 query offsets; 0x7EDCCC9E "greyed test" (it is the enabled test) | texts corrected |
+| ca-body | the bracket used only 2 table rows (dropped state 0x5C02) | all rows |
+| ss | action list cut at 6 values (0x7EDA5073 lost 0x0406) | up to 10, then "+N more results" |
+| Ss/caller effects | callee effects listed for branches the handler's constants exclude (0x7ED83821 getPairingResult) | effects come from the enumerated paths; callees not entered are listed as "0xT (not analysed) may call …" |
+
+### 6.3 Rule precision (fresh random samples; R1–R3 = successive rounds, each after the fixes of the round before; R4 = re-sample of the rules fixed after R3)
+| Rule (basis) | Rows | V / I | R1 checked/wrong | R2 | R3 | R4 | Last sample: precision | THIN in R3 |
+|---|---|---|---|---|---|---|---|---|
+| vt | 2901 | 2901 / 0 | 10/1 | 10/0 | 10/0 | – | 10/10 = 100 % | 1 |
+| ca-table | 2336 | 2336 / 0 | 10/0 | 10/0 | 10/1 | 10/0 | 10/10 = 100 % | 0 |
+| synth | 1707 | 536 / 1171 | 10/2 | 10/2 | 10/0 | – | 10/10 = 100 % | 1 |
+| ss-table | 1484 | 1484 / 0 | 10/2 | 10/0 | 10/0 | – | 10/10 = 100 % | 0 |
+| ss | 1158 | 1155 / 3 | 10/4 | 10/0 | 10/0 | 10/0 | 10/10 = 100 % | 0 |
+| shape | 1013 | 1013 / 0 | 10/2 | 10/0 | 10/1 | 10/0 | 10/10 = 100 % | 2 |
+| caller | 794 | 0 / 794 | 10/0 | 10/0 | 10/0 | – | 10/10 = 100 % | 10 |
+| str | 589 | 589 / 0 | 10/1 | 10/1 | 10/0 | – | 10/10 = 100 % | 1 |
+| pentry | 512 | 512 / 0 | 10/0 | 10/1 | 10/0 | – | 10/10 = 100 % | 3 |
+| ca | 489 | 489 / 0 | 10/0 | 10/0 | 10/1 | 10/0 | 10/10 = 100 % | 0 |
+| ctor | 430 | 430 / 0 | 10/0 | 10/1 | 10/0 | – | 10/10 = 100 % | 0 |
+| ss-entry | 284 | 279 / 5 | 10/0 | 10/0 | 10/0 | – | 10/10 = 100 % | 0 |
+| code | 271 | 199 / 72 | 10/0 | 10/4 | 10/1 | 10/0 | 10/10 = 100 % | 0 |
+| range | 223 | 0 / 223 | 10/1 | 10/0 | 10/0 | – | 10/10 = 100 % | 8 |
+| openpage | 179 | 179 / 0 | 10/0 | 10/4 | 10/0 | – | 10/10 = 100 % | 0 |
+| pmf | 161 | 161 / 0 | 10/1 | 10/1 | 10/0 | – | 10/10 = 100 % | 5 |
+| api | 127 | 127 / 0 | 10/0 | 10/1 | 10/0 | – | 10/10 = 100 % | 0 |
+| layout | 115 | 115 / 0 | 10/2 | 10/0 | 10/0 | – | 10/10 = 100 % | 0 |
+| ctrl-range | 104 | 0 / 104 | 10/3 | 10/0 | 10/0 | – | 10/10 = 100 % | 9 |
+| struct | 90 | 83 / 7 | 10/1 | 10/1 | 10/0 | – | 10/10 = 100 % | 0 |
+| ca-body | 78 | 78 / 0 | 10/0 | 10/0 | 10/2 | 10/0 | 10/10 = 100 % | 0 |
+| touch | 64 | 64 / 0 | 10/0 | 10/0 | 10/0 | – | 10/10 = 100 % | 0 |
+| hsw | 56 | 41 / 15 | 10/5 | 10/2 | 10/2 | 10/1 | 9/10 = 90 % | 0 |
+| **all** | | | 230/25 | 230/18 | 230/8 | 70/1 | | |
+
+- 23 rule groups have more than 50 rows (the Ss and CA table-decode rows are counted as two groups). 760 sampled rows in four rounds, 52 wrong; every wrong row led to a fix (§6.1, §6.2) or a demotion (§6.4) before the next round. R1 checked the D6 build after the six named fixes; R4 re-sampled only the rules fixed after R3.
+- The checkers were blind (row text only) and decoded tables, names and literals from the block-0 bytes themselves. One R1 verdict was a checker error (0x7ED7FF55 "returns e.g. 33/59": the copied halfwords at 0x7EF9CC2A/0x7EF9CC32 are 33 and 59); it is counted as wrong anyway, because the value was a leftover no caller reads.
+- THIN (true, context only) is common in the I rules: caller 10/10, ctrl-range 9/10, range 8/10 in R3. These rules give position, not roles.
+
+### 6.4 Demoted rules
+- **hsw key-0 rows** (15 rows) → I, reworded "target word of the empty (key 0) slots …; whether the switch jumps there or returns on an empty slot is not checked" (R3: two key-0 targets are never reached by the jump).
+- **"fwmap merged code after an unconditional exit … (no branch, table or pointer … found)"** clause (11 rows) → those rows are I. The R4 error (0x7ED09CC7: the switch user jumps to the "merged" blocks) is fixed (branch targets from all functions are now checked), but the clause was not re-sampled.
+- **CA next state when path enumeration does not finish** (142 handlers): only hedges ("table next: … (the handler was not fully analysed …)", "… contains stores ctx+92 = …; whether they run on these events is not checked"); stores reached only on some paths say "a code path … can set …; path feasibility not checked".
+- **Ss result sets from the static scan** (36 rows): "possible results (static scan; paths not checked): …".
+- **Return values:** cut to values a caller reads (1,892 rows with "returns" in D5 → about 1,290 in D6).
+- **Callee effects not on enumerated paths:** "0xT (not analysed) may call …".
+- Rules already labelled I (caller, range, ctrl-range, synth on I bases) stay I; their sampled rows were true but mostly thin.
+
+### 6.5 Final check
+- **40 fresh random rows of the final TSV** (seed 271828, none sampled before; `check4/final40.tsv`), checked blind against code and bytes: **36 OK, 4 THIN, 0 WRONG; 0 wrong among the V rows.** One of the 40 rows (0x7EDFBD79) changed text after the check: it lost a true clause (a later fix limits the "called only by getInstance" override to callers in another class).
+- Earlier final checks of intermediate builds: R2 build 2 wrong in 40 (leftover "returns"; fixed by the recursive d0-use test), R3 build 1 wrong in 40 (Ss result list cut at 6 values; fixed).
+
+### 6.6 Shares (classify.py, 11,586 function rows; D5 → D6)
+| Class | D5 | D6 |
+|---|---|---|
+| specific | 7,038 (60.7 %) | 7,024 (60.6 %) |
+| behavioural | 1,693 (14.6 %) | 1,707 (14.7 %) |
+| exact code | 280 (2.4 %) | 271 (2.3 %) |
+| partial | 960 (8.3 %) | 995 (8.6 %) |
+| context only | 1,615 (13.9 %) | 1,589 (13.7 %) |
+
+- V/I: 9,205/2,381 → 9,180/2,406. Rows changed: 5,449 of 11,586 function rows and 2,214 of 3,820 table-decode rows.
+- The shares hardly move: D6 removed false text (return values, merged-stub claims, "reads" for commands) about as often as it added resolved destinations. Ss rows with a resolved destination: 837 → 1,017 (878 complete, 139 partial; rows, not handlers).
+
 ## Known rule errors (open)
-- **Behavioural rule (10):** the sentence lists inputs and sinks, not their order or conditions; on big functions it is a summary, not a role.
+- **Path feasibility.** The enumerator forks on every unknown condition, so a value from an infeasible path can appear in a result set or a "code path can set …" clause (the CA wording says so). Checked samples found no false Ss result set after the R3 fixes, but the over-approximation is structural.
+- **Unanalysed handlers.** 37 Ss handlers exceed the budget and 103 have no constant result; 142 of 489 CA handlers keep the static hedge. Their rows give facts or hedges, not destinations.
+- **Callee effects not path-checked.** "0xT (not analysed) may call …" lists the callee's own calls on all its branches.
+- **Behavioural rule (10):** lists setters, reads and outputs; on big functions it is a summary, not a role.
 - **Draw-object slot roles** for types without the `asr 15` signature come from slot position only (I).
-- **Partial-to-context drift:** rows longer than 340 characters lose their trailing `does:` part in the TSV.
-- Fixed in D5 and removed from this list: the `hsw` rule (§3 rule 4), the OlyApi name-order rule (§2.8), "returns N" for stored constants, the "merged 1 unreachable stub" undercount, and Ss rows without callee effects (rule 1). Context-only "private method"/"helper of" rows for panels and pages are reduced (panels 12 → 7 %) but remain where no effect is visible.
+- **Slot-role dictionaries** (ROOT/CONT/WIDG/SCREEN/PGB/LISTP in `idx.py`) were hand-made in D4; one wrong entry (CONT 104) was found and removed in D6. Entries are not all re-verified.
+- **Rows longer than 420 characters** end in "…" (cut at a word boundary).
+- Fixed in D6 and removed from this list: the static next-state rule, tail-call returns, fixed-length cuts, early page-class span ends, Ss destinations built in callees, dispatcher unions, and the rule errors of §6.2.
