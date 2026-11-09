@@ -18,7 +18,7 @@ Round D2 deep dive for the string-less blocks that coverage round C2 (review 1: 
 |---|---|---|
 | 0x7E506BEF–0x7E506CAD | firmware-package helpers (word sum, header getters, section parser, maker check; callers 0x7E543DDE, PTP overlay 0x7F09xxxx). Section 02 covers them | V |
 | **0x7E506CB0–0x7E508DA6** | **`sc` system-common library**: `sc` shell, SC_TTIMER soft timers, `scheap` fixed-block heaps + guard checker, utility/string library, RTC/calendar library | V (strings `sc …`, `ttmr_*`, `scheap_*`; call graph) |
-| 0x7E508DA7–0x7E508F81 | UI side: beep request layer 0x7E508DA7–0x7E508EAE (callers UI_OUT 0x7E50D7CD/0x7E50D88B/0x7E50D93A), `ui` shell `beep` 0x7E508EDA and `help` 0x7E508F14 (table 0x7E734DEC: led 0x7E50D6F0, beep, key 0x7E50AD9C, jog 0x7E50996C, remo 0x7E50917F, help) | V |
+| 0x7E508DA7–0x7E508F81 | UI side: beep request layer 0x7E508DA7–0x7E508ED9 (last function 0x7E508EAE; callers: the UI_OUT init 0x7E50D7CD ← Usr0 0x7E503DD4, and 0x7E50D88B/0x7E50D93A ← UI_OUT task 0x7E50D858) (A6 2026-11-09), `ui` shell `beep` 0x7E508EDA and `help` 0x7E508F14 (table 0x7E734DEC: led 0x7E50D6F0, beep, key 0x7E50AD9C, jog 0x7E50996C, remo 0x7E50917F, help) | V |
 | 0x7E579AB7–0x7E579C33 | still `buff`: 7 pointer-only methods of a pool object (128-id bitmap at +52), vtable 0x7E78EEBC–0x7E78EEE0 | V |
 | **0x7E579C34–0x7E581FAF** | **WB (white balance / colour) module**, no file name; holds the **WB_MOV task 0x7E57F914** and IMG_PRECON's cmd 1–4 back-ends | V (task table; call graph) |
 | 0x7E581FB0 → | TAKE: 0x7E581FB0 is the TAKE module init (only caller Usr0 0x7E503DD4; inits 0x7E58287B, 0x7E587D08, 0x7E59A23C, 0x7E5A0863 …). TAKE_MAIN 0x7E58204D follows | V |
@@ -29,7 +29,7 @@ Round D2 deep dive for the string-less blocks that coverage round C2 (review 1: 
 | **0x7E640858–0x7E640F52** | **cam_list.c**: list/queue library (id 0x28) | V code; name I |
 | **0x7E640F53–0x7E641BB7** | **cam_mec_ctrl.c**: mechanical-control sequences | V code; name I |
 | **0x7E641BB8–0x7E642324** | **cam_mem.c**: camera heap and named request pools (id 0x16) | V code; name I |
-| 0x7E642325–0x7E6437F1+ | cam_mirror.c (`MI_*`; id 0x1E) | V |
+| 0x7E642325–0x7E643932 | cam_mirror.c (`MI_*`; id 0x1E; last function 0x7E6438E9 `mirror_dummy_post_isen_err`; 0x7E643933 ← 0x7E6463F6 is not placed) | V code; name I (A6 2026-11-09) |
 
 ## 2. The `sc` library (0x7E506CB0–0x7E508DA6)
 
@@ -141,14 +141,14 @@ So IMG_PRECON is **pixel-defect correction (cmd 0) plus WB/colour preparation (c
 
 ## 5. Camera mechanics (0x7E640858–0x7E642324) and what "mirror" means
 
-- **cam_list.c 0x7E640858–0x7E640F52 (V):** list library. Create 0x7E640858 (← cam.c init 0x7E628161, frame-sync 0x7E63A0EE); push/pop/peek 0x7E640961, 0x7E6409B7, 0x7E640A0D, 0x7E640A51, 0x7E640A79, 0x7E640B0B … (← cam.c packet lists, frame sync); error helper 0x7E640F3E (id 0x28).
+- **cam_list.c 0x7E640858–0x7E640F52 (V code; name I (A6 2026-11-09)):** list library. Create 0x7E640858 (← cam.c init 0x7E628161, frame-sync 0x7E63A0EE); push/pop/peek 0x7E640961, 0x7E6409B7, 0x7E640A0D, 0x7E640A51, 0x7E640A79, 0x7E640B0B … (← cam.c packet lists, frame sync); error helper 0x7E640F3E (id 0x28).
 - **cam_mec_ctrl.c 0x7E640F53–0x7E641BB7 (V):**
   - 0x7E640F63 / 0x7E640FB9: fixed-point 2^x tables 0x7E7B0590–0x7E7B11B8 (APEX → linear);
   - 0x7E640FFB: mode-clock scaling (sensor-mode record +32, /1000). These three are used by cam_expcal;
   - 0x7E641044 / 0x7E641048: `return 0` stubs (← cam.c);
   - **0x7E64104C dispatches CamCommand codes** 15 COM_SETUP, 16 COM_SETDOWN, 13 COM_READY_ON, 0x90/0x91 COM_MEC_POWERON/OFF, 0x92/0x93 COM_MEC_SETUP/SETDOWN_HIGH_SPEED to seven arm functions 0x7E6410AE–0x7E6411EC. Each arms event object 2 (0x7E635701/0x7E635781/0x7E63589A) with one **sequence**.
 - **Sequence pattern (0x7E641221, 0x7E6412CA, 0x7E641394, 0x7E641473, 0x7E6414F0, 0x7E64156D, 0x7E641654):** `movm [a2],(sp); add -12,sp; mov a0,a2; mov 2,d0; call 0x7E635865`. Each step re-arms event 2 with the next mask and **itself** as callback, then posts one 12-byte request {cmd, param, done} (table 0x7E7B15B8–0x7E7B1670). The request goes to MI via 0x7E641A9A (open MI 0x7E642398, dispatch 0x7E642459, close 0x7E6423F1) or to the shutter (SH) via 0x7E641B30 (0x7E655834 / 0x7E6558AD / 0x7E655869). The done handlers 0x7E64173B–0x7E641A88 (56–61 B, 0 callers) set the event bit (0x7E63589A, 0x7E635B84).
-- **cam_mem.c 0x7E641BB8–0x7E642324 (V):**
+- **cam_mem.c 0x7E641BB8–0x7E642324 (V code; name I (A6 2026-11-09)):**
   - heap init 0x7E641BB8 (← cam.c init): 230 × 128 B at 0x6055578C and 12 × 512 B at 0x6055CA9C (free lists 0x605553C4 / 0x6055575C);
   - **alloc 0x7E641C2E(d0 size) → a0** (≤ 128 small, ≤ 512 large, else error 0x0A162001…; 203 sites); **free 0x7E641D60(a0)** (188 sites); usage stats 0x605553B2–BE; dumps 0x7E641E4C/0x7E641F0F/0x7E641F48 (`Used Block`, ← cam shell 0x7E6321B8);
   - named request pools: register by name 0x7E642035 (max 8; ← MI 0x7E642325, SH 0x7E6557CE, STL 0x7E656D91, LB 0x7E65DAC7), take n blocks 0x7E642097 (18 sites, e.g. MI init takes 11 × 32 B), release 0x7E6421C2.
@@ -168,13 +168,13 @@ So IMG_PRECON is **pixel-defect correction (cmd 0) plus WB/colour preparation (c
   - MEC_POWERON/OFF: MOT ON/OFF;
   - MEC_SETUP_HS: MOT ON → code 6 → MOT OFF;
   - MEC_SETDOWN_HS: MOT ON → N_READY → MOT OFF.
-- **Reading (I):** a mirrorless body keeps its focal-plane shutter open for live view. The motor must drive it to "open-ready" for live view and close/charge it before a capture. The DSLR code's mirror motor did the same charge job. So the still and live-bulb `MIRROR_DOWN*` phases on this body are the shutter charge/close steps before exposure, and MI open (0x7E642398) powers the MEC timing unit (0x7E51783A → 0x7E50F8F3) for them. The `mirror_dummy_post_pi/pinext/bound_err` functions 0x7E6436F1–0x7E6437F1 are only error loggers for photo-interrupter/bound posts.
+- **Reading (I):** a mirrorless body keeps its focal-plane shutter open for live view. The motor must drive it to "open-ready" for live view and close/charge it before a capture. The DSLR code's mirror motor did the same charge job. So the still and live-bulb `MIRROR_DOWN*` phases on this body are the shutter charge/close steps before exposure, and MI open (0x7E642398) powers the MEC timing unit (0x7E51783A → 0x7E50F8F3) for them. The five `mirror_dummy_post_pi/pinext/bound/brake/isen_err` functions 0x7E6436F1–0x7E6438E9 (0 callers; mirror code ends at 0x7E643932) are error loggers for the photo-interrupter, bound, brake and isen posts; the isen one also calls the MI_RES function 0x7E642FAE (A6 2026-11-09).
 
 ## 6. Driver and service roles named only by unit (review 1, item 2)
 
 | Unit | Entry points and role |
 |---|---|
-| **MEC command layer** (MAG_COM / MOT_COM), 0x7E517791–0x7E518BBA (V) | Init 0x7E517791 creates the locks `ANY_USE`/`MAG_COM`/`MOT_COM` (0x7E516C32). Open/close 0x7E51783A/0x7E51785A are ref-counted: the first open → MEC timing unit 0x7E50F8F3, the last close → 0x7E50F96F. **Submit 0x7E51787B(a0 req)**: code = u16 +0, class = byte +9 (0 MOT, 2 PWR, else MAG); jump table 0x7E7379C0; a bad code → 0x1500A001. Names from the printer 0x7E51256F: **MOT** 0 ON, 1 OFF, 2 OPENRDY, 3 OPENCHG, 4 CLOSCHG, 5 INTIAL, 7 F_READY, 8 F_OPCHG, 9 N_READY, 16 ABORT; **MAG** 10 ON, 11 OFF, 12 SET, 13 START (NML/DRK, TV, TIME), 14 STOP, 15 MG3_CHG; **PWR** 17 ON, 18 OFF. Handlers 0x7E517952 … 0x7E518ABE in that order. Each builds a driver request with "done" and "event" callbacks (e.g. MAG START 0x7E518664 → 0x7E518684, callbacks **0x7E5186EA = F006** and 0x7E518731). The done callback releases the lock by name (0x7E516D50) and calls the client's +16. `Shutter Client [0x%02x]` 0x7E518BBA ← `mec` monitor 0x7E510C3A. The `mec` shell has `mec shutter set [expose_time us]`, `mec still [num] [time]`, `mec lsnc …` (0x7E510943). Reading (I): MAG = curtain-hold magnets, MOT = charge motor |
+| **MEC command layer** (MAG_COM / MOT_COM), 0x7E517791–0x7E518C61 at least (0x7E518BBA is a 20-B function start; 0x7E518BCE and 0x7E518BF2 after it use the layer state 0x604F63A0) (A6 2026-11-09) (V) | Init 0x7E517791 creates the locks `ANY_USE`/`MAG_COM`/`MOT_COM` (0x7E516C32). Open/close 0x7E51783A/0x7E51785A are ref-counted: the first open → MEC timing unit 0x7E50F8F3, the last close → 0x7E50F96F. **Submit 0x7E51787B(a0 req)**: dispatches on the code alone (u16 +0, 0–18); the class (0 MOT, 0x200 PWR, else MAG) is `(word +8) & 0xFF00`, read only by the printer (A6 2026-11-09); jump table 0x7E7379C0; a bad code → 0x1500A001. Names from the printer 0x7E51256F: **MOT** 0 ON, 1 OFF, 2 OPENRDY, 3 OPENCHG, 4 CLOSCHG, 5 INTIAL, 7 F_READY, 8 F_OPCHG, 9 N_READY, 16 ABORT; **MAG** 10 ON, 11 OFF, 12 SET, 13 START (NML/DRK, TV, TIME), 14 STOP, 15 MG3_CHG; **PWR** 17 ON, 18 OFF. Handlers (through 8-byte call stubs 0x7E51789C–0x7E517930): 0 0x7E517952, 1 0x7E5179FA, 2 0x7E517A9D, 3 0x7E517B95, 4 0x7E517C8D, 5 0x7E517D7F, 6 0x7E518271, 7 0x7E517E81, 8 0x7E518123, 9 0x7E517FCF, 10 0x7E5183EB, 11 0x7E5184ED, 12 0x7E51856B, 13 0x7E518664, 14 0x7E518769, 15 0x7E5187DF, 16 0x7E5183C5, 17 0x7E518A6E, 18 0x7E518ABE; in address order codes 7, 9, 8, 6, 16 are out of sequence, and the unnamed MOT code 6 has its own handler (A6 2026-11-09). Each builds a driver request with "done" and "event" callbacks (e.g. MAG START 0x7E518664 → 0x7E518684, callbacks **0x7E5186EA = F006** and 0x7E518731). The done callback releases the lock by name (0x7E516D50) and calls the client's +16. `Shutter Client [0x%02x]` 0x7E518BBA ← `mec` monitor 0x7E510C3A. The `mec` shell has `mec shutter set [expose_time us]`, `mec still [num] [time]`, `mec lsnc …` (0x7E510943). Reading (I): MAG = curtain-hold magnets, MOT = charge motor |
 | **EMS1/EMS2** (`per_ems`), 0x7E45F2D8–0x7E46134D (V edges) | 0x7E45F2D8 init (IRQs, ← Usr0). EMS1: 0x7E45F2EA/0x7E45F309/0x7E45F333(+0x7E45F406 register program)/0x7E45F9F3 ← TAKE 0x7E59E203…0x7E59E2B3 (AF side); ISR 0x7E45FB1F → 0x7E45FCDE; result getters 0x7E45FDFA/0x7E45FE53/0x7E45FEB5 ← SDET algorithm block 0x7E66C9A8/0x7E66DA1D. EMS2: set-up 0x7E460030…0x7E46012D (+0x7E4601A4 register program), start 0x7E460810, ISR 0x7E4608F9 → 0x7E4609E6; **result decoders 0x7E460DB8, 0x7E460FC2 (F002), 0x7E46118C** ← `mdet` code 0x7E670FB8, 0x7E671208…0x7E671E92 (192-byte records, 17-bit fields, signed 9/13-bit pairs = vectors, I). Shell 0x7E46134D |
 | **IOE serial callbacks** (V, review F003) | SIO ch3 config 0x7E463DB8 (← 0x7E464526, 0x7E46480D): 400 kHz, write-done **0x7E464177**, read-done **0x7E4641A5**. Request ring 0x604168B0 (8 × 32 B, head 0x60416DF9). Advance 0x7E464138 starts the next GIOSEQ (0x7E464050) or releases ch3 (0x7E4699F9(3)) |
 | **External-strobe serial wait** (V, review F013) | 0x7E5DE91F(step): waits on the caller's flag with a 10 s timeout. At state ≤ 1 and step 6 it waits on flag 0x7E43EBD2 bits 1\|2. On timeout it logs 0x23000222. 14 sites (detect 0x7E5DD358, video light 0x7E5DDAD8, mode events, firmup 0x7E5DF13A…). `sio time out` handler 0x7E5DE8AE precedes it |
@@ -229,7 +229,7 @@ So F017 0x7E664A8F chooses **MACRO (23)** if the distance field is ≤ 325, else
   - `7e640858 7e640f3e cam_list.c`;
   - `7e640f53 7e641ba1 cam_mec_ctrl.c`;
   - `7e641bb8 7e642301 cam_mem.c`;
-  - `7e642325 7e6437f1 cam_mirror.c`;
+  - `7e642325 7e6438e9 cam_mirror.c` (A6 2026-11-09);
   - `7e6557ce cam_shutter.c`;
   - `7e629854 cam_aedrv.c`, `7e62a962 cam_afdrv.c`, `7e62b4dd cam_aperture.c`, `7e62f6eb cam_debug.c` (all inferred by the same rule);
   - unnamed modules `sc` (7e506cb0–7e508da6) and `wb` (7e579c34–7e581faf).

@@ -47,7 +47,7 @@ Scope: the GUI code 0x7ECCB800–0x7EE02094, method by method. This section buil
 | 57/58 (+228/+232) | OnTimer(id) / OnUser | V |
 | 61/62 (+244/+248) | set/get the pool bytes | V |
 | 63 (+252) | **selectLayout(i = 0..3)**: copies rect i of the 4 × 8-byte table at +64 into x/y/w/h | V |
-| 64–68 | bit 0x2000 (+256/+260), bit 0x1000 (+264/+268); +272 clears both | V |
+| 64–68 | bit 0x2000 (+256/+260), bit 0x1000 (+264/+268); +272 (0x7ECEF036) clears both (vt+264(0), vt+256(0)) and then zeroes the +40 plane-mask dword (`clr d0; mov d0,(40,a2)`) (A6 2026-11-09) | V |
 | 75–78 | Bits of the plane mask +40: (1 << (k−1)) and (0x10000 << (k−1)) | V; the "plane" name is I |
 | 79/80 | layer u16 +30 | V |
 | 101 (+404) | hit test: gets a rect through its own OnMessage(0x1301), then tests the point | V for the structure |
@@ -85,7 +85,7 @@ DrawSelf is +568; "base" = the slot is not overridden.
 | 0x8002 | 260, 175 | 0x7ED1CC1E (272 instructions: resource lookup 0x7ECFF3E9, slanted fill 0x7ED31C79) | +512 0x7ED1D3C8, +188, +200, +228, +384, +404, focus +108 0x7ED1D326 | four 16-byte blocks +128/+144/+160/+176, u16 +192/+194, a 24-byte style +196 (C1 F063), bytes +220..+225 | I: a multi-state graphic control (4 state blocks) |
 | 0x8003 | 300, 164 | 0x7ED2952F (418 instructions) | +512 0x7ED29AB3; no pointer or key override | count +131, index +132, values +140, items +172 (13d) | item list / selector (13d) |
 | 0x8004 | 156, 149 | 0x7ED27095 | +512 0x7ED272CD | u16 +128, +130 (set and redraw), struct +132 | I: image by resource id |
-| **0x8005** | 204, 195 | 0x7ED2DF2F (324 instructions) | **key press +208 0x7ED2E94C** (468 instructions, UTF-16 helpers), +216, focus +108 0x7ED2F562 (reselects the image) | **images +160 normal / +164 focused / +168 disabled**, picked by 0x7ED2E363. u16 +128/+130/+184/+186/+188/+190, 8-byte +136, dwords +176/+180, caption +172 (slot 188), **status bits 0x10000–0x1000000** (slots 161–178), text layout slots 185/186 | **Captioned image button / text field.** Bit 16 (focus) selects the image; vt+88 = 0 (disabled) selects +168. Bit **0x1000000**: DrawSelf draws the caption as `*` × length, a **password mask** (V, 0x7ED2E070). Bit **0x10000**: when the widget is not focused, DrawSelf rebuilds the caption with 0x7ED2F453, which uses the UTF-16 digits `0123456789` at 0x7EF146DC (I: a numeric display mode). C2 F058 is slot 163, the 0x10000 setter |
+| **0x8005** | 204, 195 | 0x7ED2DF2F (446 instructions) (A6 2026-11-09) | **key press +208 0x7ED2E94C** (508 instructions, 1,125 B to `ret` 0x7ED2EDAE; fwmap splits it into 0x7ED2E94C (5 B) + 0x7ED2E951 (A6 2026-11-09); UTF-16 helpers), +216, focus +108 0x7ED2F562 (reselects the image) | **images +160 normal / +164 focused / +168 disabled**, picked by 0x7ED2E363. u16 +128/+130/+186/+188, bytes +184/+190, 24-byte +136, dwords +176/+180, caption buffer +192 (UTF-16; max length +172, default 32; length +200; slot 188 returns both), second buffer +196 (A6 2026-11-09), **status bits 0x10000–0x1000000** (slots 161–178), text layout slots 185/186 | **Captioned image button / text field.** Bit 16 (focus) selects the image; vt+88 = 0 (disabled) selects +168. Bit **0x1000000**: DrawSelf draws the caption as `*` × length, a **password mask** (V, 0x7ED2E070). Bit **0x10000**: when the widget is not focused, DrawSelf rebuilds the caption with 0x7ED2F453, which uses the UTF-16 digits `0123456789` at 0x7EF146DC (I: a numeric display mode). C2 F058 is slot 163, the 0x10000 setter |
 | 0x8006 | 384, 183 | 0x7ED27A11 | setRect +44 0x7ED28765, +108, +152, +172, +188, +200, +208, +252 | 40 own slots | embeds a part (vt 0x7EF1459C) and a 0x800E; one of the 6 classes with a real notify map (§5, shape E) |
 | 0x8007 | 184, ≥165 | 0x7ED1EBEA | +108, +188, +200, +512 | not bounded (the next vtable has no root signature) | — |
 | 0x8008 | 180, 167 | 0x7ED2A775 (slanted shapes 0x7ED31AE5) | +108, +188, +200, +512 0x7ED2AE09 | u16 fields +128…+176 | I: a gauge or bar with slanted ends |
@@ -99,8 +99,8 @@ DrawSelf is +568; "base" = the slot is not overridden.
 | 0x0104 | 88, 123 | (root family) | many: see §2.5 | the attached panel +72, +76, bits 0x10000–0x80000 | **panel holder** (§2.5) |
 
 - **Every** factory type (all 140) has its own +412 body (V), and the classes checked also have their own +408 (§5, shape E).
-- C-parts: OnDraw (slot 40) calls exactly one renderer each (V): C001 → FillRect 0x7ECFB5F9 (I: a filled rect); C002 → 0x7ED319B4; C003 → 0x7ED34FE9 (slanted fill); C004 → 0x7ED35160 (tests bit 1 of part+64); C005 → 0x7ED3534D.
-- D-parts: D001/D002 draw lines (0x7ECFE523/0x7ECFE796); D003 draws with 0x7ED303F9 (slanted fill).
+- C-parts: OnDraw (slot 40) calls exactly one renderer each (V): C001 → FillRect 0x7ECFB5F9 (I: a filled rect); C002 → 0x7ED319B4; C003 → 0x7ED34FE9 (I: slanted fill, via 0x7ED31C9B (A6 2026-11-09)); C004 → 0x7ED35160 (called with a0 = DC, a1 = part+88; tests mask 0x1 (bit 0) of the u16 at DC+64 (A6 2026-11-09)); C005 → 0x7ED3534D.
+- D-parts: D001/D002 draw lines (0x7ECFE523/0x7ECFE796); D003 draws with 0x7ED303F9 (I: slanted fill, via 0x7ED31C9B (A6 2026-11-09)).
 
 ### 2.4 Container 0x0100 (vtable 0x7EEF5AE0, 142 slots)
 Fields (V): +92 child-list object (vtable 0x7EEF5834; core at list+4, cursor at list+16; first 0x7ECF2BE2, next 0x7ECF2BFD, clear 0x7ECF2B88); +112/+116 pointer targets (cleared on delete); +120 current child; +124 key-target list (+468 add / +472 remove); +128 animation timer list (+476/+480); +752 (+492/+496); +756 flag (+484 test-and-clear, +488 set); +759 byte.
@@ -127,7 +127,7 @@ Methods (V):
 - **Fields:** +72 is the attached panel (set by 0x7ECF6082, get 0x7ECF6098). Slots 92–98 and 100 forward the pre-filters and point events to it.
 - **OnSetFocus +220 (0x7ECF67C9)** makes the attached panel the app window's key target (`appWin->vt+580(a1 = +72)`). Then it calls its focus setter **0x7ECF6A50/0x7ECF6A55 (C2 F056)** with 1. That setter changes bit 16 and, **only if bit 0x10000 is set**, computes the frame rect (0x7ECF67F9) and invalidates it.
 - So for 0x0104, **bit 0x10000 = "draw a focus frame"** (I).
-- Bits 0x20000/0x40000 have the same setter shape; 0x80000 has no invalidate. Container +464 tests parent type 260 = 0x104 (V).
+- Bits 0x20000/0x40000 have the same setter shape as the 0x10000 setter (slots 104/106/108 = 0x7ECF5F6D/0x7ECF5FB8/0x7ECF6003: test, set if changed, then invalidate(1,0) with no further condition; not the shape of the focus setter 0x7ECF6A50) (A6 2026-11-09); 0x80000 (slot 110, 0x7ECF69E4) has no invalidate. Container +464 tests parent type 260 = 0x104 (V).
 - **App window vt+580/+584 = set/get the current key target** (V for both uses; this corrects C2 F056, which says "clears").
 
 ### 2.6 What the status bits mean (summary)
@@ -136,7 +136,7 @@ Methods (V):
 | 1, 2 | visible, enabled | V (13d) |
 | 0x10 | **focus**, propagated to all ancestors | V |
 | 0x20 | skip DrawSelf in OnDraw | V code; I name |
-| 0x1000, 0x2000 | root flags; +272 clears both | V; role open |
+| 0x1000, 0x2000 | root flags; +272 clears both and zeroes the +40 plane mask (A6 2026-11-09) | V; role open |
 | 0x10000+ | **class-specific**. 0x0104: focus-frame enable (I). 0x8005: numeric caption when not focused (I). 0x1000000 on 0x8005: password mask (V) | §2.3, §2.5 |
 
 ### 2.7 Helper layer 0x7EDC17FB–0x7EDC1B36 (V; call sites from calls.tsv)

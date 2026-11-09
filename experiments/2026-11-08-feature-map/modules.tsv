@@ -22,7 +22,7 @@ first_fn	last_fn	source_file	fns_naming_file	placement	name_string
 7e640858	7e640f3e	cam_list.c	0	inferred-14b	-
 7e640f53	7e641ba1	cam_mec_ctrl.c	0	inferred-14b	-
 7e641bb8	7e642301	cam_mem.c	0	inferred-14b	-
-7e642325	7e6437f1	cam_mirror.c	0	inferred-14b	-
+7e642325	7e6438e9	cam_mirror.c	0	inferred-14b	-
 7e64f2a2	7e64f2a2	cam_sem.c	1	direct	7e7ba661
 7e6521c9	7e6521c9	cam_set.c	1	direct	7e7ba963
 7e6557ce	7e6557ce	cam_shutter.c	0	inferred-14b	-
