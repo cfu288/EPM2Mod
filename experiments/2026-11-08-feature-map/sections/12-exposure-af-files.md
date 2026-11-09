@@ -15,7 +15,7 @@ This section goes below the module-level map of sections 02 §4–6, 03 §7–8 
 - **Two different exposure engines** (verified):
   - **Still exposure** is computed by `exp_cal_still`, entry 0x7E693D00. It is called from TAKE_EXPOSE.
   - **Live view and movie exposure** is computed by the EXP_MOVIE task (section 03 §7b).
-  - Both live in the `exp` module (0x7E68F0DD–~~0x7E6A9400~~ ~0x7E6A93E4; the first `[HDMI-DRV]` function is 0x7E6A93E5 (C3 2026-11-09)) and share its Q8 helpers.
+  - Both live in the `exp` module (~~0x7E68F0DD–0x7E6A9400~~ ~~0x7E68F0DD–~0x7E6A93E4~~ 0x7E68F07C–0x7E6A935C; the HDMI driver starts at 0x7E6A935D (only caller 0x7E6AC4DF), and the first `[HDMI-DRV]` string user is 0x7E6A93E5 (C3 2026-11-09) (D3 2026-11-09)) and share its Q8 helpers.
 - **How the still exposure is computed** (inferred from the structure below):
   1. The shooting mode is reduced to a canonical exposure program.
   2. A per-program 42-byte record of APEX corner values is fetched.

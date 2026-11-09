@@ -23,16 +23,17 @@ Round D1 deep dive. Scope: the driver code in 0x7E421020–0x7E521020, plus the 
 | 0x7E44EE0E–0x7E44EFEA | Inter-CPU reboot IRQ and the NMI flash-guard IRQ |
 | 0x7E45824B–0x7E45A80B | Accelerometer `per_acc`/`acc_spi` (SIO ch3) |
 | 0x7E45AAD4–0x7E45B67E | ADC `per_adc`, 0x98C00000 |
-| 0x7E45B67F–0x7E45CE11 | Not placed (no strings). It holds 0x7E45BB10, an asynchronous request/start with a callback at request +32 (21 callers: the ADC-key code 0x7E50B356 (stores callback 0x7E50B724 at +32) and 0x7E50B1B4…0x7E50B877, ADCONV 0x7E45CE5B, 0x7E458A47 in the accelerometer range, 0x7E45E27F/0x7E45E2B5/0x7E45E556 in the `cpudma` range, and functions of this gap such as 0x7E45B783) (C3 2026-11-09) |
+| ~~0x7E45B67F~~ 0x7E45B6BE–0x7E45CE11 | ~~Not placed (no strings).~~ **The ADCONV (ADC) driver** (D3 2026-11-09; 15b §5.6, 15d §5): init 0x7E45B6BE (← the PER_IN init 0x7E4639F4); submit `adc_request(a0 req)` **0x7E45BB10** looks up the channel u8 req+0 in the 9 × 16-B table 0x7E4C4908 (0x7E45C5A2) and dispatches on that record's mode byte (1, 2, 3, 7, 8, 9 → 0x7E45BB8C, 0x7E45BF47, 0x7E45BFBD, 0x7E45BCA8, 0x7E45BD81, 0x7E45BE60); an unknown channel logs 0x19001401 and completes at once; completion 0x7E45CCA1 (calls req+32 if set). 0x7E45B67E–0x7E45B6BD (`open|close`) is still the `per_adc` shell (D3 2026-11-09). Earlier text: it holds 0x7E45BB10, an asynchronous request/start with a callback at request +32 (21 callers: the ADC-key code 0x7E50B356 (stores callback 0x7E50B724 at +32) and 0x7E50B1B4…0x7E50B877, ADCONV 0x7E45CE5B, 0x7E458A47 in the accelerometer range, 0x7E45E27F/0x7E45E2B5/0x7E45E556 in the `cpudma` range, and functions of this gap such as 0x7E45B783) (C3 2026-11-09) (D3 2026-11-09) |
 | 0x7E45CE12–0x7E45CE5B | ADCONV, 0x99800000 (only the debug dump reads it) |
 | 0x7E45D120–0x7E45D9C7 | Bus-error IRQ (0x98000000). System controller 0x98E00000 (backup registers, power-on factor, RTC registers, standby; last 0x98E user 0x7E45D87B). `per backup` 0x7E45D8C2 (ends 0x7E45D9C7). The next two functions, 0x7E45D9C8 and 0x7E45D9F1, are GIO helpers (0x9A100104/108/110) (A4 2026-11-09) |
-| 0x7E45DBB5–0x7E45E1xx | CCD temperature task |
+| 0x7E45DBB5–~~0x7E45E1xx~~ 0x7E45E205 | CCD temperature task (its internals 0x7E45DCD3–0x7E45E205 included; last function 0x7E45E1B0 ends at 0x7E45E205; 15d §5) (D3 2026-11-09) |
 | 0x7E45E206–0x7E45E834 | `cpudma` (no MMIO immediates found) |
 | 0x7E45EA73–0x7E45EEA5 | DBGS debug support / NMI address watch, 0x99700000 |
 | 0x7E45F02D–0x7E45F28A | `per` help. A 4-channel unit (IRQ 23–26) with registers at 0x9A1000F4–0x9A100100 |
 | 0x7E45F2D8–0x7E46134D | EMS1 0x99E00000 and EMS2 0x99F00000 (`per_ems`) |
 | 0x7E46151E–0x7E4628E2 | GIO (GPIO and pad control) 0x9A100000, external interrupts |
 | 0x7E4628E2–0x7E4630E9 | HPROC deferred handler |
+| 0x7E463124–0x7E46336C | **SIO I²C-mode helpers** (init/open/start/write/read; 0x7E463185 has 14 callers: accelerometer 0x7E45A83D/0x7E45A91B, IOE 0x7E464050, the HDMI/EVF transports 0x7E6BA39B–0x7E6BA986, touch 0x7E6BD6C2/0x7E6BD775, BT 0x7E8FC496/0x7E8FC540; 15d §5) (D3 2026-11-09) |
 | 0x7E4639F4–0x7E463CD9 | PER_IN, the IRQ-attach wrappers, and the NMI handler 0x7E463CD9 |
 | 0x7E463E70–0x7E46504A | I/O expander (IOE, IOEC) over SIO ch3 |
 | 0x7E465583–0x7E465C77 | Soft timers MINTIMER, `per timer`, PER_PCONT |
@@ -41,7 +42,9 @@ Round D1 deep dive. Scope: the driver code in 0x7E421020–0x7E521020, plus the 
 | 0x7E467D99–0x7E469D75 | **SIO** driver, including the client API after the `sio` shell 0x7E469BD1: init entry 0x7E469C16 (← Usr0 0x7E503DD4; calls 0x7E467D99), 0x7E469C1E, 0x7E469C27 and 0x7E469CDF (called by lens 0x7E53392C, LCD 0x7E6B1066, EVF 0x7E6B33D1, audio 0x7E94F128 and others) (A4 2026-11-09) |
 | 0x7E469F91–0x7E46A395 | PER_SLOPE |
 | 0x7E46A6FA–0x7E46B123 | SYSCLK clock/reset generator, 0x98800000 |
+| 0x7E46B3E3–0x7E46B74C | **Hardware-timer client API** (init 0x7E46B3E3 ← Usr0; open/start/stop/abort; free-run read 0x7E46B519, 36 callers incl. VideoTimer, MEC and lens; 15d §5) (D3 2026-11-09) |
 | 0x7E46B74D–0x7E46BA92 | Hardware timers, 0x98900000 |
+| 0x7E46BC44–0x7E46C0DA | **USF unit** (0x7E46BC44 writes 1 to GIO 0x9A100008/124/12C; `usf` shell 0x7E46BEAF–0x7E46C004, `Debugging the USF unit`; callers TAKE 0x7E5959B3 and ADJ; I: dust-reduction filter; 15d §5) (D3 2026-11-09) |
 | 0x7E46C0DB–0x7E46C308 | `usf`, `water`, `wdt`, PER_WDT |
 
 - Data in this range: PER_IN records, the busmes tables 0x7E46DDC4/0x7E46DDF0, the console port table 0x7E46DEC8, and the ROM driver tables 0x7E4C5534–0x7E4C8A88 (V).
@@ -197,8 +200,8 @@ Round D1 deep dive. Scope: the driver code in 0x7E421020–0x7E521020, plus the 
 |---|---|---|---|
 | 0 | 0x98200000 | 77, 78 | — (opened only) |
 | 1 | 0x98300000 | 79, 80 | **console port 1**, EVF driver 0x7E6B361A (`[Display] Evf Driver`), Bluetooth/PENPAL 0x7E91369B (`bt_sio`) |
-| 2 | 0x98500000 (+0x80–0x94) | 81, 82, 83 | audio codec 0x7E94EFB4 and HDMI 0x7E6BA554 (switched by `SIOIIC_SEL > audio/HDMI` through GIO 0x9A100824/864), touch panel 0x7E6BDCD5, display VSC 0x7E6B5917, 0x7E8FC39A |
-| 3 | 0x98600000 (+0x80–0x94) | 84, 85, 86 | **I/O expander** 0x7E463ED7/0x7E464138, accelerometer 0x7E45A76E, HDMI 0x7E6BA578, touch 0x7E6BC6E5 |
+| 2 | 0x98500000 (+0x80–0x94) | 81, 82, 83 | audio codec 0x7E94EFB4 and HDMI 0x7E6BA554 (the HDMI-port transmitter, main map 0x72, and its CEC map 0x78 through 0x7E6B9B19/0x7E6B9B2A; 15d §3.3–3.4) (D3 2026-11-09) (switched by `SIOIIC_SEL > audio/HDMI` through GIO 0x9A100824/864), touch panel 0x7E6BDCD5, display VSC 0x7E6B5917, 0x7E8FC39A |
+| 3 | 0x98600000 (+0x80–0x94) | 84, 85, 86 | **I/O expander** 0x7E463ED7/0x7E464138, accelerometer 0x7E45A76E, ~~HDMI 0x7E6BA578, touch 0x7E6BC6E5~~ a **second** device-0x72 transmitter (bus wait 0x7E6BA578, bus select 0x7E6BAF45(1); `outevf_tmds_measurement` setters; I: the accessory-port EVF TMDS link) and a device 0x98/0x88 (wait 0x7E6BA59C, 0x7E6BAF45(2), writer 0x7E6BCC09). 0x7E6BC6E5 (`V_DROP_FLG`, ← 0x7E6BC698) drives both of these; it is not touch code (15d §3.4) (D3 2026-11-09) |
 | 4 | 0x98400000 | 89, 90 | lens 0x7E533978, **BC stabiliser MCU** 0x7E53F156, LCD panel 0x7E6B1126 |
 | 5 | 0x98700000 | 87, 88 | **console port 0** (S_SHELL) |
 
