@@ -1,0 +1,290 @@
+[
+ {
+  "id": "01-11",
+  "section": "01-platform.md",
+  "line": 11,
+  "text": "- There are two debug shells. S_SHELL is a system monitor (prompt `:-) `) on a memory-mapped serial port. U_SHELL (prompt `USR> `) has 54 command families in a {name, handler} table. A `:` line in S_SHELL sends the input on to U_SHELL. The same U_SHELL dispatcher is also reachable over USB through the factory-adjustment PTP operation 0x902B. **[V]**"
+ },
+ {
+  "id": "01-31",
+  "section": "01-platform.md",
+  "line": 31,
+  "text": "- `ID\u2192var` table at 0x7E43E948 (u16 per object name). The boot code reads task IDs from here: entries 0\u201324 are 0x8085\u20260x80E0, and entry 25+ holds 1, 2, 3\u2026. **[V]**"
+ },
+ {
+  "id": "01-47",
+  "section": "01-platform.md",
+  "line": 47,
+  "text": "| 0x1001 | 7E42691F | 1 | dyn | **CPU1 boot task** (attr TA_ACT) **[V]** |"
+ },
+ {
+  "id": "01-104",
+  "section": "01-platform.md",
+  "line": 104,
+  "text": "- The log goes through `0x7E503A6E`. The `usr fast` command (0x7E502111/0x7E5023E1) prints it (\"UsrFastAppDebug!\"). **[V]**"
+ },
+ {
+  "id": "01-186",
+  "section": "01-platform.md",
+  "line": 186,
+  "text": "- Upload: `rcu_serv_upload` \u2192 `bas_rcu_load` 0x7F05DF43. That function mounts the media and reads up to 16 KiB from `RCUOLYMP` / `R0240001.RCU` (8.3 names) into 0xBC620000. Then `0x7F05DDF0` rewrites the symbols, and `flash_mem` 0x7F05E041 calls `0x7E675700(mode 4, \u2026)`, the resource/flash writer. **[V]** For the call chain, **[I]** that mode 4 is a script area."
+ },
+ {
+  "id": "01-196",
+  "section": "01-platform.md",
+  "line": 196,
+  "text": "| PER_CCD_TEMP_MAIN (0x2D, 7E45DBB5) | Every 10 s (`dly 10000`) runs a state/event table (0x7E4C4FF8). Result 1 triggers a measurement (`0x7E45DC2C(3)`). Thresholds: lock / warn / attn1. **[V]** for the loop, **[I]** for the threshold meaning. |"
+ },
+ {
+  "id": "02-30",
+  "section": "02-lens-power-firmup-take.md",
+  "line": 30,
+  "text": "- The user start task 0x7E503DD4 (strings `Usr0`, `[usr]firmup`, `USTART1`) calls 0x7E5436D1 at 0x7E5045F4 and keeps the result in d2. At 0x7E504A59: if d2 == 1 it prints `[usr]firmup` and starts task FIRMUP_CLI (id at 0x7E43E9A0). Otherwise it calls 0x7E54374C, 0x7E5437AC and starts USTART1 (normal boot). **verified**"
+ },
+ {
+  "id": "02-33",
+  "section": "02-lens-power-firmup-take.md",
+  "line": 33,
+  "text": "- Which physical power-on cause (key combination) those factor values mean is **not decoded**. 0x602A9B54 is cleared by 0x7E505694 when 0x7E509CA3(4) == 0 and byte 0x604154E9 != 9. **verified (code); meaning inferred: a key held at power-on.**"
+ },
+ {
+  "id": "02-110",
+  "section": "02-lens-power-firmup-take.md",
+  "line": 110,
+  "text": "- **0x7E5448FB** (per section, modes 0 and 2): if header byte 21 == 1 \u2192 `[firmup]DeSecramble` \u2192 0x7E54343F. Then checksum 0x7E54337D with type 1. **verified**"
+ },
+ {
+  "id": "02-154",
+  "section": "02-lens-power-firmup-take.md",
+  "line": 154,
+  "text": "- **LENS_FIRM_UP** 0x7E52FD56: reads queue 0x7E43ED20, runs 0x7E52FDC3 \u2192 0x7E52FE8C, replies. 0x7E52FE8C stores the header pointer at 0x604F9390 and packet count `(size>>7) + (size & 127)` at 0x604F9394 (128-byte packets; the formula is literal). It picks lens protocol type 1 or 2 (0x604F943E, from 0x7E51FDB4) and runs step callbacks 0x7E52FFB3 / 0x7E530020 / 0x7E53008E / 0x7E530103 sending lens commands 0/3/4/5 (or 0x1000/0x1003/0x1004/0x1005 for type 2). Each step retries up to 3 times, then fails with 0x6608/0x6601/0x6604/0x6605. **verified** structure; command meanings **inferred**. Globals named by 0x7E53053F: `g_lens_firmup_send_num/ng/compare`, `g_firmup_id/hw_version/version/extension/serial_num[12]/recv_data[128]/err_status/connected_info/total_send`. A `compare` and `version` field exist, so the lens side may check versions (**inferred**, not traced)."
+ },
+ {
+  "id": "02-162",
+  "section": "02-lens-power-firmup-take.md",
+  "line": 162,
+  "text": "- **Tasks** (all **verified** as queue servers: read Oimf queue \u2192 handler \u2192 reply): LENS_MAIN 0x7E51BF67 (queue 0x7E43ED1E, handler 0x7E51BFBA), LENS_ASKDATA 0x7E51F77D (0x7E43ED1C \u2192 0x7E51F7C5), LENS_FLASH 0x7E53086F (0x7E43ED22; cmd 1 \u2192 0x7E5308E0, 2 \u2192 0x7E530DEF, 3 \u2192 0x7E531540), LENS_FOCUS_LIMIT 0x7E532218 (0x7E43ED24 \u2192 0x7E532240; also called from TakeFcs `limit:` 0x7E592D75), ZOOM 0x7E538D9B (waits event bit 2, then queue 0x7E43EDDE \u2192 0x7E538E60 if 0x7E5224F4() else 0x7E538D76)."
+ },
+ {
+  "id": "02-171",
+  "section": "02-lens-power-firmup-take.md",
+  "line": 171,
+  "text": "- **BCHK_MAIN** 0x7E53A1D0: reads queue 0x7E43ECD0 with a **1000 ms timeout**; on timeout, if polling is enabled (0x7E53A37F) \u2192 0x7E53A472 (periodic check). Commands: 3/4/5 \u2192 0x7E53A2E9 (check with a mode byte), 6/7 \u2192 enable/disable polling (0x7E53A376(1/0)), 8 \u2192 0x7E53A485. **verified**. Debug shell 0x7E539672 (`vbat`, `vac`, `tmp`, `pbhtmp`, `src` 1=AC 2=BAT, `level`, events `inter_start_rec`, `before-rec`, `before-fat`, \u2026). Event names `EBCHKBATT`, `EBCHKAD`, `EBCHKTIMER` at 0x7E53A049. **inferred**."
+ },
+ {
+  "id": "03-81",
+  "section": "03-camera-core-rec-art.md",
+  "line": 81,
+  "text": "| cam_damage.c | 0x7E62EA55, 0x7E62EAF3 | \u00a75 (verified) |"
+ },
+ {
+  "id": "03-82",
+  "section": "03-camera-core-rec-art.md",
+  "line": 82,
+  "text": "| `cam` debug shell | 0x7E62EB8E, table 0x7E7AC414 | \u00a76 (verified) |"
+ },
+ {
+  "id": "03-92",
+  "section": "03-camera-core-rec-art.md",
+  "line": 92,
+  "text": "| cam_still_func.c | 0x7E656B1D\u20130x7E656F6F | \u00a74 (verified tables) |"
+ },
+ {
+  "id": "03-98",
+  "section": "03-camera-core-rec-art.md",
+  "line": 98,
+  "text": "- **Still-func command filter (verified, 0x7E656D64):** it takes only cmd 7 (COM_SET) and cmd 80 (COM_MOVIE_EXPOSE). Anything else gives \"STL_FUNC_COM NOT SUPPORT\". **Live bulb (verified, 0x7E65DA2B)** takes only COM_SET."
+ },
+ {
+  "id": "03-103",
+  "section": "03-camera-core-rec-art.md",
+  "line": 103,
+  "text": "- `cam still` test help (0x7E62F370, verified strings): Mode 7 = Zengaso. Depth 8/9/10/12/14/16 bit. Option1 bits: dark, pack up, pack down, antishock. Option2 bits: continue, fpn, bulb_manual, bulb_auto, abort_ready, abort_take. Matching sequences: \"Still Normal\" 0x7E62F6EB, \"Still Continue\" 0x7E62FC0C, \"High (speed)\" 0x7E630201, \"Bulb\" 0x7E6307C0, \"LB\" 0x7E630C25 (LB turns AWB off: \"AWB OFF!!!!!\")."
+ },
+ {
+  "id": "03-281",
+  "section": "03-camera-core-rec-art.md",
+  "line": 281,
+  "text": "- **Verified:** the frame effect decodes JPEG frame resources (`art_frame_*` 0x7E721294\u2026, `ART_FRAME_MOVIE_SD/HD/FHD`)."
+ },
+ {
+  "id": "04-71",
+  "section": "04-movie.md",
+  "line": 71,
+  "text": "- **Display.** `api_movie_CalculateQualityTime_Record_Movie` 0x7E681D87 returns (40) \u00d7 600 / fps(30,ctx). `api_movie_Get_Time_Record_Movie` 0x7E681DC7 returns elapsed (552,ctx). `0x7E6EDF9D` adds 600 to (552) each second and posts `RECMOVIE_UPDATE` 0x04070100. **Verified.**"
+ },
+ {
+  "id": "04-105",
+  "section": "04-movie.md",
+  "line": 105,
+  "text": "| MOVART_TASK | 0x7E6CBEBC | img_exec + `mov_kdg_exec` (movie effects). **Verified** |"
+ },
+ {
+  "id": "04-133",
+  "section": "04-movie.md",
+  "line": 133,
+  "text": "- QT user data (0x7E6D5F55) writes an `OLYM` atom with `prms` (ArtFilterMode, ExposureMode, PictureMode, Scene, WB shift, iAuto). A `thmb` thumbnail and a `scrn` screennail come from 0x7E6D6438 (JPEG encode of a frame). **Verified** 4CC constants and strings."
+ },
+ {
+  "id": "04-139",
+  "section": "04-movie.md",
+  "line": 139,
+  "text": "- States: idle/aud_wait/first_frame 0x7E6EF3D6, record_normal 0x7E6EF5E7, userstop (+ `_for_edit`) 0x7E6EF7F7, finish_1 0x7E6EF958, errorstop/fullstop. **Verified** strings and state pointers."
+ },
+ {
+  "id": "04-152",
+  "section": "04-movie.md",
+  "line": 152,
+  "text": "- `mov_image_process` 0x7E6C6853 prints \"Effect OFF\", \"toyphoto ON for 1st\", \"filter ON for 1st\" and \"simple & Frame ON for 1st\". These are the art *effects* (Pin Hole/Toy, filter, Frame) applied to the first frame. **Verified** strings."
+ },
+ {
+  "id": "04-224",
+  "section": "04-movie.md",
+  "line": 224,
+  "text": "- **Task names vs content.** The entry named MOV_PLAY_AVF (0x7E6E324B) prints `[MOV_PLAY_AVCHD_FILE]`, and MOV_PLAY_AVI (0x7E6E38AC) prints `[MOV_PLAY_AVCHD_IMG]`. These names still hold in the corrected tasks.tsv, so they look like internal abbreviations: AVF = AVCHD file reader, AVI = AVCHD image/decode. That reading is **inferred**; the strings are **verified**."
+ },
+ {
+  "id": "05-13",
+  "section": "05-playback-audio-bt.md",
+  "line": 13,
+  "text": "| 0x7E8F904F\u20130x7E8F926E | SERV_MAIN: a service that broadcasts state notices | verified |"
+ },
+ {
+  "id": "05-17",
+  "section": "05-playback-audio-bt.md",
+  "line": 17,
+  "text": "| 0x7E91D000\u20130x7E937FFF | iAnywhere-style \"Blue SDK\" stack (`OLYMPUS BlueSDK a4`), RFCOMM, tasks BTSTK/BTTIM/BTEVU/BTAPL | inferred stack identity; task entries verified |"
+ },
+ {
+  "id": "05-153",
+  "section": "05-playback-audio-bt.md",
+  "line": 153,
+  "text": "| AUD_BRIDGE | 0x7E94D880 | 9 | Reads packets from queue 0x7E43E966 (via 0x7E95FF4C) into the buffer at 0xA07542D8, then runs `aud_bridge_recv_packet_analysis` 0x7E94D8A8 \u2192 `aud_bridge_exec_message` 0x7E94D968 or `aud_bridge_post_message` 0x7E94DACD (verified). Inferred: the packet entry point for other tasks (`res_qname` = reply queue). |"
+ },
+ {
+  "id": "05-156",
+  "section": "05-playback-audio-bt.md",
+  "line": 156,
+  "text": "| AUD_COPY_DATA | 0x7E94E4D8 | 9 | Waits on flags 0x33. Bits 0x30 \u2192 `aud_copy_data_main_play_copy` 0x7E94EBF3; bits 0x03 \u2192 `_rec_copy` 0x7E94E729. Copies PCM between the file buffer and the DMA ring (verified). |"
+ },
+ {
+  "id": "05-158",
+  "section": "05-playback-audio-bt.md",
+  "line": 158,
+  "text": "| AUD_LATE_RISER | 0x7E9502CE | 11 | Debug test: reads setting **10442** index 0/1/2 (action, wait_time, work_info), sleeps, then plays `HOGE.WAV`, records, or changes the volume (verified). Inferred: a \"start late after boot\" test hook; no effect on normal use. |"
+ },
+ {
+  "id": "05-228",
+  "section": "05-playback-audio-bt.md",
+  "line": 228,
+  "text": "- `bt_config_set` 0x7E9126CC calls 27 functions (0x7E904B2E\u20130x7E911EFD). Each one stores bytes into the TX buffer at 0x605CD215 and sends it with 0x7E912E84. The first is `01 4C FC 8B 58 75 08 00 \u2026` = **HCI vendor 0xFC4C Write_RAM** at 0x00087558. The last (0x7E912680) is `01 4E FC 04 FF FF FF FF` = **0xFC4E Launch_RAM**. This is the **Broadcom patch-RAM** format, so the PENPAL controller is a Broadcom chip and the camera stores its patch (inferred vendor; the opcodes are verified)."
+ },
+ {
+  "id": "06-57",
+  "section": "06-app-components.md",
+  "line": 57,
+  "text": "| `Cmp_PlayComponentBase` | base constructor **0x7EB0A5E7**; 58-slot vtable **0x7EC6F70C** (slots 52\u201357: `sound_state`, `playsound_set_volume`) | **verified**: 10 derived constructors call it (next row) |"
+ },
+ {
+  "id": "06-92",
+  "section": "06-app-components.md",
+  "line": 92,
+  "text": "| Interval shooting and time-lapse movie | Inside SequencePartsBase: `rcvStartIntervalShootingIn_active` 0x7EA98808, `setIntervalShootingNextTime` 0x7EA98F94, `rcvCreateTimeLapseMovieIn_active` 0x7EA991DD, `startIntervalShooting_First` 0x7EA99881. Guard `isStartIntervalShootingEnable` 0x7E969C11. API entry `OlyHfwOpeShoot::startIntervalShooting` 0x7E98849B. | **Verified:** the guard reads mode **482** through 0x7E6FCC91 (its log calls this `MODE_INTERVAL_SHOOTING_ONOFF`), plus take-status flags 18 and 9 and bit 14 of the interval state. 0x7E98849B calls the guard and then constructs event id 12047 (vtable 0x7EBDE7B0, constructor 0x7E971CB7). **Inferred:** the camera sleeps between shots (`CBS_START_INTERVAL_SHOOTING_SLEEP`, `API_SHUTDOWN_REASON_INTERVAL_SHOOTING = 0x07`, `API_WUI_INTERVAL_SHOOTING` wake reason). The movie is built by `api_play_Create_TimeLapseMovie` (0x7E686E96). Menu-side code is at 0x7ECD1BC1\u20130x7ECDA5C6. | Complete code. Whether the E-PM2 menu exposes it is **unknown** (open question). |"
+ },
+ {
+  "id": "06-96",
+  "section": "06-app-components.md",
+  "line": 96,
+  "text": "| 3D photo | `CmpSts_3dImageController.cpp` 0x7EA6E566 (events `Start3dCombine`, `Start3dOverlap`, `StartMpoRecording`); 3D path in `CmpShc_ShootingSequenceBase.cpp` 0x7EA6A6CF | Two takes, then combine, then MPO. **Verified:** `start3dCombine` 0x7EA4D845 calls `api_rec_dummy_Execute_3D_Still` (0x7E68C72F). That stub logs and then calls 0x7E880EFF(0xF00F0000, 1), probably to raise a done event. `Record_3D_Still`, `Make_YC_3D_Still` and `RecView_3d_Comb` are also stubs. The real `api_rec_Start_Take_3d` (0x7E68B98A, caller 0x7EA4D25F) exists. | The combine step is stubbed, so it is probably dormant (**inferred**). Separate: `start3DLensShooting` (3D-lens path, API M69). |"
+ },
+ {
+  "id": "06-133",
+  "section": "06-app-components.md",
+  "line": 133,
+  "text": "| CmpPPnr_PlayPanoramaComponent | 0x7EB3ECB8; `CapPPnr_PlayPanorama` 0x7EA653AB; 5 Notify*Observer classes | Scrolls a stitched wide image. **Verified:** `CapImg_ImagePlayer` 0x7E9FE7AB calls `api_play_dummy_Alloc_Panorama_PlayHandle`. | dormant (**inferred**) |"
+ },
+ {
+  "id": "06-138",
+  "section": "06-app-components.md",
+  "line": 138,
+  "text": "| CmpEBea_EditBeautyComponent | 0x7EABC982 | Beauty fix: face detect, compare, clear skin preview (`BEAUTY_CLEAR_SKIN / SHINY_EYE / DRAMATIC_EYE`). **Verified** stubs: `api_play_dummy_Alloc_Clear_Skin_Preview_Handle` (caller 0x7EA0A574) and `Get_Beauty_Edit_Eye_Point` (caller 0x7EA01A5F). | e-Portrait edit visible; eye options probably dormant (**inferred**) |"
+ },
+ {
+  "id": "06-159",
+  "section": "06-app-components.md",
+  "line": 159,
+  "text": "- Example call chain (**verified**): `chls_oldb_Get_DB_Existence` (0x7EA245F0) calls `0x7E67F822(23)`, then the stub 0x7E682EC3(d0, 1), and returns the stub result as a u16."
+ },
+ {
+  "id": "07-222",
+  "section": "07-gui-menus-settings.md",
+  "line": 222,
+  "text": "- Info 482 \u2192 prm tag 0xDE11, MODE class, u8, default 0. **(verified)**"
+ },
+ {
+  "id": "07-260",
+  "section": "07-gui-menus-settings.md",
+  "line": 260,
+  "text": "- **GUI substates:** SS_COMMON, SS_REC, SS_MENU_MAIN, SS_MENU_LV, SS_MENU_PLAY, SS_PLAY_SINGLE, SS_PLAY_MOVIE_SLIDE, SS_PLAY_INDEX, **SS_SELFADJ, SS_DEBUGMENU**, SS_USB, SS_DPS, SS_BTSEND, SS_BTRECEIVE (name table near 0x7EFDD233). **(verified strings)**"
+ },
+ {
+  "id": "07-268",
+  "section": "07-gui-menus-settings.md",
+  "line": 268,
+  "text": "| `GUI Debug` shell: `DEBUGLEVEL/DBGLVL 0-3, hist, showev, ca on/off, gpi on/off, rec on/off, ev <EventID hex>, TOUCH, CONV, INFO, SHOWEC` | 0x7EDC3D85 | verified strings |"
+ },
+ {
+  "id": "07-271",
+  "section": "07-gui-menus-settings.md",
+  "line": 271,
+  "text": "| Self-adjust menu `SS_SELFADJ` (`startSelfAdjustMenuSubAppStateMisc` 0x7ECE067B, `SelfAdjust::getMenuItem\u2026turnOnTFT`, `api_adj_Check_Execute_Self_Adjust`) | | verified strings |"
+ },
+ {
+  "id": "07-272",
+  "section": "07-gui-menus-settings.md",
+  "line": 272,
+  "text": "| Version-check menu (`CAM_MISC_VERCHK_MENU`, `startVersionCheckMenuSubAppStateMisc` 0x7ECE0653, `[GUI App Version]:OkOn called , F/W Version up start`) | 0x7EDA6D93, 0x7EDFD86F | verified strings. The Firmware item can start a firmware update. |"
+ },
+ {
+  "id": "07-275",
+  "section": "07-gui-menus-settings.md",
+  "line": 275,
+  "text": "| Pixel Mapping: normal Custom Menu J item (CmpCst_Function 0x7EAA8FF9\u2026, api_rec_Calculate/Save_Pixelmaping) | | verified strings |"
+ },
+ {
+  "id": "08-17",
+  "section": "08-connectivity-libs-blocks.md",
+  "line": 17,
+  "text": "3. **Firmware update over USB** uses ops 0x9117 and 0x9119\u20130x9125. FirmwareCheck posts the received image to the **FIRMUP_SRV** task queue. (verified)"
+ },
+ {
+  "id": "08-47",
+  "section": "08-connectivity-libs-blocks.md",
+  "line": 47,
+  "text": "| TPC | 0x7F088F64 | \"Transfer to PC\" controller: `TPC_ON connection=0x`, `tpc_control:unknown com`, globals gConnectMode/gConnectState | verified (below) |"
+ },
+ {
+  "id": "08-52",
+  "section": "08-connectivity-libs-blocks.md",
+  "line": 52,
+  "text": "| SAICAS | 0x7F0870D7 | script-file transport for DPS and X3C: `handle_SAICAS_OP_COM_OPEN_SESSION/WRITE_INFO/READ/DELETE\u2026`, file names `HREQUEST.DPS` etc. | **verified**: SAICAS reads queue 0x7E43EE0A, which both the PictBridge and the X3C SendObject handlers write |"
+ },
+ {
+  "id": "08-59",
+  "section": "08-connectivity-libs-blocks.md",
+  "line": 59,
+  "text": "- LANGID 0x0409, a device-qualifier descriptor, and at 0x7F0D7C61 the 53-byte USB 2.0 `TEST_PACKET` pattern (00\u2026AA\u2026EE\u2026FE FF\u2026 7F BF DF\u2026). (verified)"
+ },
+ {
+  "id": "08-203",
+  "section": "08-connectivity-libs-blocks.md",
+  "line": 203,
+  "text": "- **Dual core (verified part):** the fatal/NMI handler 0x7E463CD9 reads a CPU id at absolute address 0x8050 and prints `Genba Ha CPU0/CPU1` (\"the failure is on CPU0/CPU1\"). The object-name table has a CPU1 set (`BOOT_CPU1`, `CPUCONN_CPU1`, `MOV_ENC_VIDEO_CPU1`, `CPU1_MOV_AVCHD`, `IMG_CPU0_TO_CPU1`)."
+ },
+ {
+  "id": "08-241",
+  "section": "08-connectivity-libs-blocks.md",
+  "line": 241,
+  "text": "- **User (verified):** `art_filter_06_rough_monochrome.c` pass 2 (0x7E722B38) calls the resource loader 0x7E674F44 with type **10**. The jump table at 0x7E7C10A4 sends case 10 to 0x7E675538. That reader takes an 8-byte entry `{size, addr}` from the artfill directory (0x6059CCE8) and reads a window of it. \"Rough monochrome\" is the internal name of **Grainy Film**."
+ }
+]
