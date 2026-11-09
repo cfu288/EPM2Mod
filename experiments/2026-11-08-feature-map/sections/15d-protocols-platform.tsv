@@ -1,0 +1,616 @@
+addr_or_id	kind	role	evidence	V/I
+0x7E915A1B	bt-layer	BT stack init: ME_Init 0x7E924004, 0x7E9151FD, 0x7E915C8F, OBEX init 0x7E92DD6A, 0x7E92EC6C, SPP/transport init 0x7E936E05; caller 0x7E92F0FE	callees (disasm)	V
+0x7E915AAE	bt-evm	EVM cancel timer: remove from timer list 0x7DAE6218, recompute next expiry 0x7E915B07	disasm	V
+0x7E915B69	bt-evm	EVM start timer(timer a0, ms d0): +20 = now (0x7E92F33D), +16 = timeout, insert into list 0x7DAE6218	disasm	V
+0x7E915BBF	bt-evm	EVM timer expiry loop: calls timer +12 callback when now - start >= timeout	disasm	V
+0x7E915C4A	bt-evm	BTSTK work step: lock, timers 0x7E915BBF, HCI process 0x7E91917E, unlock (caller BTSTK task 0x7E92F5F7)	callees	V
+0x7E915D0C..0x7E917A3F	bt-layer	profile layer (OBEX clients/servers for OPP/BIP): called by BT_CTRL 0x7E8F92AB..0x7E8FC0CB, calls OBEX core 0x7E92C029..0x7E92E37A; 0x7E916D3B (15-case switch, table 0x7EBB13C8) and 0x7E917270 are callbacks (0 static callers)	call graph	V edges / I role
+0x7E917AFE..0x7E91962B	bt-layer	HCI layer (RAM 0x7DAC5xxx): init 0x7E917AFE, command send 0x7E917F02 (from 0x7E925704), event/ACL RX to ME 0x7E924D10 from 0x7E917D1E/0x7E9180E4/0x7E918121/0x7E91820A/0x7E9189C4/0x7E918BE8, HCI process 0x7E91917E (from BTSTK step), Number_Of_Completed/flow helpers 0x7E91833C..0x7E919504	call graph; RAM page	V edges / I names
+0x7E91962C..0x7E91D29E	bt-olympus	Olympus iAP over SPP (BT_Open 0x7E91962C, cp_* , BTIAP task 0x7E91A0C2, IDPS 0x7E91C69D, iAP response 0x7E91CD59); getters 0x7E91D279/0x7E91D289 belong to it	strings	V
+0x7E91D29F..0x7E923747	bt-layer	L2CAP (RAM 0x7DAE4xxx): PSM registration 0x7E91D29F (I), ERTM state handlers 0x7E91E215/0x7E91E75F/0x7E91EC0E (coverage C3 F027), F-bit latch 0x7E9207AC, signalling length check 0x7E9234DC (codes 1..11, table 0x7EBB1F08), callback 0x7E923474	constants 672 (MTU), codes 1..11; RFCOMM and SDP call it	V edges / I names
+0x7E923748	bt-debug	stack debug Report(fmt, ...) under the stack lock -> formatter 0x7E923769 -> debug print 0x7E4263E5 (56 callers)	disasm	V
+0x7E923928..0x7E924003	bt-test	Olympus Blue SDK test client (`OLYMPUS BlueSDK a4`, `OLYMPUS_TST_OBJ`, callbacks), BTAPL task 0x7E923FD2; demo-shell entries 0x7E923C93..0x7E923FFB	strings	V
+0x7E924004	me-core	ME_Init: list heads 0x7DAC4A00..0x7DAC4A2C, 0x7DAC50A8..	disasm	V
+0x7E924004..0x7E92BF5D	bt-layer	ME (management entity) + SEC (security), RAM 0x7DAC4xxx/0x7DAC5xxx: op scheduler 0x7E92412E, HCI event dispatcher 0x7E924E3A, command sender 0x7E925704, command builders (TSV rows), init 0x7E925727, link records 0x7E9275C6..0x7E9276AC, SEC 0x7E92A181..0x7E92BF5D (`SecReportAuthenticateResult`)	call graph; RAM page	V
+0x7E925A49..0x7E926692	bt-api	synchronous BT API wrappers (RAM 0x605D6xxx): BT init 0x7E925A49, deinit 0x7E925E9C, wait 0x7E926118 (OlyEvWt) / signal 0x7E926146 (OlyEvSt), BT_SetSecurity 0x7E925B4F/0x7E926620; callers BT_CTRL, BTAPI, test client	strings; callees	V edges / I role
+0x7E9266BE	me-core	accessibility state machine: Write_Scan_Enable 0x7E92688E, scan activity 0x7E9268A4, IAC LAP 0x7E926922	callees	V
+0x7E9275C6	link-rec	find link record by BD_ADDR (+84, memcmp 6 via 0x7E92F477); loop bound 1	disasm	V
+0x7E927600	link-rec	allocate link record: zero 320 B, +150 = 0xCC18 (DM1/DH1/DM3/DH3/DM5/DH5), list heads +108/+128/+232/+244, +224 = 0x7DAC4E00 + i*678	disasm	V
+0x7E927679	link-rec	free link record (+146 = 0)	disasm	V
+0x7E927681	link-rec	find link record by HCI handle (+144)	disasm	V
+0x7E9276AC	link-rec	MeCallLinkHandlers: call each handler (+8) on list +108 with event 0x7DAC4A30 (`---- MeCallLinkHandlers:ERR ----`)	string; disasm	V
+0x7DAC4C68	data	link-record table: ONE record of 320 B (loops end at cmp 1); +0 op node, +8 op type, +84 BD_ADDR, +108 handler list, +144 handle, +146 state, +150 packet types, +188..+194 mode/connect parameters, +224 -> 678-B record	loops in 0x7E9275C6/0x7E927600/0x7E927681	V
+0x7DAC4B40	data	ME curOp (the running op; for link ops it is the link record)	0x7E92412E stores it; builders read it	V
+0x7DAC4C48/0x7DAC4C4C/0x7DAC56CC	data	pending HCI command: completion callback / expected event (14 or 15) / opcode	builders; dispatcher default path	V
+0x7E92C029..0x7E92E37A	bt-layer	OBEX core (RAM 0x7DAF2xxx): client ops 0x7E92C029..0x7E92C62F (Connect 0x80, Disconnect 0x81, Put 0x82, Abort 0xFF, Body 0x48/0x49); server 0x7E92D432..0x7E92DC08 (0x80/0x81/0x85 SetPath/0xFF, Target 0x46, Who 0x4A, ConnID 0xCB, responses 0x90/0xA0/0xC0/0xC4); packet pool init 0x7E92DD6A (64 x 724 B)	constants	V constants / I roles
+0x7E92E37B/0x7E92E390	bt-obex	OBEX API lock / unlock (stack lock + counter 0x7DAE7A04); 33 callers in BT_CTRL	disasm	V
+0x7E92E37B..0x7E92EC6B	bt-layer	OBEX transport over RFCOMM (RAM 0x7DAE7xxx): server transport init 0x7E92E5D6 (SDP ProtocolDescriptorList template 0x7EBB4CE4, ops table 0x7EBB4CD4)	coverage C3 F029	V
+0x7E92EC6C..0x7E92F0FD	bt-api	OPP/BIP application glue (RAM 0x605D648C, 504 B); callers BT_CTRL 0x7E8FB30D..0x7E8FBEF7	call graph	V edges / I role
+0x7E92F0FE..0x7E92F66F	bt-os	OS layer: tasks/init 0x7E92F0FE/0x7E92F22E, time 0x7E92F33D, BTTIM task 0x7E92F345, mutex lock 0x7E92F449 / unlock 0x7E92F45C (sem id 0x7E43EADC), memcpy 0x7E92F46D, memcmp 0x7E92F477, memset 0x7E92F493, wake BTSTK 0x7E92F4D5 (flag 0x7E43EC48), stack lock 0x7E92F4EC / unlock 0x7E92F57A (101/115 callers), BTSTK task 0x7E92F5F7	disasm	V
+0x7E92F68D..0x7E92FCBC	bt-layer	radio manager / HCI transport (RAM 0x7DAD1xxx, 0x605D68xx): transport init 0x7E92F68D -> HCI init 0x7E917AFE; tracks HCI_Reset 0x0C03 and vendor 0xFC18 (baud) completions	constants 3075, 64536	V constants / I role
+0x7E92FCBD..0x7E933AED	bt-layer	RFCOMM (RAM 0x7DAE5xxx): frame types UIH 0xEF, SABM 0x3F, DISC 0x53, UA 0x73, DM 0x1F (P bit set); state handlers 0x7E93101B..0x7E9315FD (`Unexpected SABM ...`), mux open 0x7E931921 (`MUX is not initialized`), service channel alloc 0x7E93166C, session records 0x7DAE5C88 + i*1344	constants; strings	V
+0x7E933AEE..0x7E933C46	bt-layer	HCI receive-buffer pools (lists 0x7DAC5ACC/0x7DAC5AD4): init 0x7E933AEE (from HCI init), return buffer 0x7E933C06 (from HCI RX)	disasm	V code / I name
+0x7E933C47..0x7E936A46	bt-layer	SDP client + server (big-endian: 26 BE16 reads, 17 BE16 writes; calls L2CAP 21 times): L2CAP callback 0x7E933E4B (events 1..10, table 0x7EBB5280), SDP_AddRecord 0x7E934A5E (record {+8 n attrs, +12 attrs, +16 CoD service bits 0x100000}), remove 0x7E934AFA	call graph; constants	V edges / I names
+0x7E936A47..0x7E937BE1	bt-layer	SPP serial-port layer (RAM 0x605D6xxx) used by iAP: open 0x7E937022 (<- BT_Open), close 0x7E937153, 0x7E936EAB/0x7E936FD8/0x7E9371B3/0x7E937216/0x7E937287; BTEVU task 0x7E9375B4; event switch 0x7E9374EA (all 29 cases default)	callers in iAP	V edges / I names
+0x7E937BE2	bt-util	read BE16	disasm	V
+0x7E937BF0	bt-util	read BE32	disasm	V
+0x7E937C0F	bt-util	read LE16	disasm	V
+0x7E937C3C	bt-util	write LE16	disasm	V
+0x7E937C62	bt-util	write BE16	disasm	V
+0x7E937C6E	bt-util	write BE32	disasm	V
+0x7E937C88	bt-util	InsertTailList	disasm	V
+0x7E937C98	bt-util	InsertHeadList	disasm	V
+0x7E937CA7	bt-util	RemoveHeadList	disasm	V
+0x7E937CB4	bt-util	RemoveEntryList	disasm	V
+0x7E937CC6	bt-util	IsNodeOnList	disasm	V
+hcievt:0x01	hci-event	HCI event 0x01 Inquiry_Complete -> handler 0x7E924B8E	jump table 0x7EBB3C1C slot 0 -> stub 0x7E924E78 (dispatcher 0x7E924E3A)	V
+hcievt:0x02	hci-event	HCI event 0x02 Inquiry_Result -> handler 0x7E924A75	jump table 0x7EBB3C1C slot 1 -> stub 0x7E924E6A (dispatcher 0x7E924E3A)	V
+hcievt:0x03	hci-event	HCI event 0x03 Connection_Complete -> handler 0x7E9277D6	jump table 0x7EBB3C1C slot 2 -> stub 0x7E924E8E (dispatcher 0x7E924E3A)	V
+hcievt:0x04	hci-event	HCI event 0x04 Connection_Request -> handler 0x7E9276E7	jump table 0x7EBB3C1C slot 3 -> stub 0x7E924E83 (dispatcher 0x7E924E3A)	V
+hcievt:0x05	hci-event	HCI event 0x05 Disconnection_Complete -> handler 0x7E927872	jump table 0x7EBB3C1C slot 4 -> stub 0x7E924E99 (dispatcher 0x7E924E3A)	V
+hcievt:0x06	hci-event	HCI event 0x06 Authentication_Complete -> handler 0x7E92AF5A	jump table 0x7EBB3C1C slot 5 -> stub 0x7E924EC6 (dispatcher 0x7E924E3A)	V
+hcievt:0x07	hci-event	HCI event 0x07 Remote_Name_Request_Complete -> handler 0x7E927C31	jump table 0x7EBB3C1C slot 6 -> stub 0x7E924F3A (dispatcher 0x7E924E3A)	V
+hcievt:0x08	hci-event	HCI event 0x08 Encryption_Change -> handler 0x7E92B0E9	jump table 0x7EBB3C1C slot 7 -> stub 0x7E924EE7 (dispatcher 0x7E924E3A)	V
+hcievt:0x09	hci-event	HCI event 0x09 Change_Connection_Link_Key_Complete: default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 8 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x0A	hci-event	HCI event 0x0A Master_Link_Key_Complete: default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 9 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x0B	hci-event	HCI event 0x0B Read_Remote_Supported_Features_Complete -> handler 0x7E927E99	jump table 0x7EBB3C1C slot 10 -> stub 0x7E924F5B (dispatcher 0x7E924E3A)	V
+hcievt:0x0C	hci-event	HCI event 0x0C Read_Remote_Version_Information_Complete: default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 11 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x0D	hci-event	HCI event 0x0D QoS_Setup_Complete: default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 12 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x0E	hci-event	HCI event 0x0E Command_Complete: default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 13 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x0F	hci-event	HCI event 0x0F Command_Status: default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 14 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x10	hci-event	HCI event 0x10 Hardware_Error: default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 15 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x11	hci-event	HCI event 0x11 Flush_Occurred: default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 16 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x12	hci-event	HCI event 0x12 Role_Change -> handler 0x7E927D11	jump table 0x7EBB3C1C slot 17 -> stub 0x7E924F45 (dispatcher 0x7E924E3A)	V
+hcievt:0x13	hci-event	HCI event 0x13 Number_Of_Completed_Packets: default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 18 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x14	hci-event	HCI event 0x14 Mode_Change -> handler 0x7E927C96	jump table 0x7EBB3C1C slot 19 -> stub 0x7E924F50 (dispatcher 0x7E924E3A)	V
+hcievt:0x15	hci-event	HCI event 0x15 Return_Link_Keys -> handler 0x7E92AF81	jump table 0x7EBB3C1C slot 20 -> stub 0x7E924ED1 (dispatcher 0x7E924E3A)	V
+hcievt:0x16	hci-event	HCI event 0x16 PIN_Code_Request -> handler 0x7E92ABB2	jump table 0x7EBB3C1C slot 21 -> stub 0x7E924EA4 (dispatcher 0x7E924E3A)	V
+hcievt:0x17	hci-event	HCI event 0x17 Link_Key_Request -> handler 0x7E92AB23	jump table 0x7EBB3C1C slot 22 -> stub 0x7E924EB0 (dispatcher 0x7E924E3A)	V
+hcievt:0x18	hci-event	HCI event 0x18 Link_Key_Notification -> handler 0x7E92AFF8	jump table 0x7EBB3C1C slot 23 -> stub 0x7E924EDC (dispatcher 0x7E924E3A)	V
+hcievt:0x19	hci-event	HCI event 0x19 Loopback_Command: default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 24 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x1A	hci-event	HCI event 0x1A Data_Buffer_Overflow: default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 25 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x1B	hci-event	HCI event 0x1B Max_Slots_Change: ignored (returns 1)	jump table 0x7EBB3C1C slot 26 -> stub 0x7E924F9A (dispatcher 0x7E924E3A)	V
+hcievt:0x1C	hci-event	HCI event 0x1C Read_Clock_Offset_Complete: default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 27 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x1D	hci-event	HCI event 0x1D Connection_Packet_Type_Changed -> handler 0x7E927D3B	jump table 0x7EBB3C1C slot 28 -> stub 0x7E924FA8 (dispatcher 0x7E924E3A)	V
+hcievt:0x1E	hci-event	HCI event 0x1E QoS_Violation: default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 29 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x1F	hci-event	HCI event 0x1F Page_Scan_Mode_Change: default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 30 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x20	hci-event	HCI event 0x20 Page_Scan_Repetition_Mode_Change -> handler 0x7E924B9E	jump table 0x7EBB3C1C slot 31 -> stub 0x7E924F9D (dispatcher 0x7E924E3A)	V
+hcievt:0x21	hci-event	HCI event 0x21 Flow_Specification_Complete: default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 32 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x22	hci-event	HCI event 0x22 Inquiry_Result_with_RSSI -> handler 0x7E924A75	jump table 0x7EBB3C1C slot 33 -> stub 0x7E924E63 (dispatcher 0x7E924E3A)	V
+hcievt:0x23	hci-event	HCI event 0x23 Read_Remote_Extended_Features_Complete -> handler 0x7E927F6B	jump table 0x7EBB3C1C slot 34 -> stub 0x7E924F66 (dispatcher 0x7E924E3A)	V
+hcievt:0x24	hci-event	HCI event 0x24 (0x24): default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 35 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x25	hci-event	HCI event 0x25 (0x25): default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 36 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x26	hci-event	HCI event 0x26 (0x26): default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 37 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x27	hci-event	HCI event 0x27 (0x27): default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 38 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x28	hci-event	HCI event 0x28 (0x28): default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 39 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x29	hci-event	HCI event 0x29 (0x29): default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 40 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x2A	hci-event	HCI event 0x2A (0x2A): default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 41 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x2B	hci-event	HCI event 0x2B (0x2B): default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 42 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x2C	hci-event	HCI event 0x2C Synchronous_Connection_Complete: default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 43 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x2D	hci-event	HCI event 0x2D Synchronous_Connection_Changed: default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 44 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x2E	hci-event	HCI event 0x2E Sniff_Subrating -> handler 0x7E92809F	jump table 0x7EBB3C1C slot 45 -> stub 0x7E924F87 (dispatcher 0x7E924E3A)	V
+hcievt:0x2F	hci-event	HCI event 0x2F Extended_Inquiry_Result -> handler 0x7E924A75	jump table 0x7EBB3C1C slot 46 -> stub 0x7E924E5E (dispatcher 0x7E924E3A)	V
+hcievt:0x30	hci-event	HCI event 0x30 Encryption_Key_Refresh_Complete -> handler 0x7E92B0E9	jump table 0x7EBB3C1C slot 47 -> stub 0x7E924EEB (dispatcher 0x7E924E3A)	V
+hcievt:0x31	hci-event	HCI event 0x31 IO_Capability_Request -> handler 0x7E92B11D	jump table 0x7EBB3C1C slot 48 -> stub 0x7E924EF8 (dispatcher 0x7E924E3A)	V
+hcievt:0x32	hci-event	HCI event 0x32 IO_Capability_Response -> handler 0x7E92B156	jump table 0x7EBB3C1C slot 49 -> stub 0x7E924F03 (dispatcher 0x7E924E3A)	V
+hcievt:0x33	hci-event	HCI event 0x33 User_Confirmation_Request -> handler 0x7E92AEAB	jump table 0x7EBB3C1C slot 50 -> stub 0x7E924F19 (dispatcher 0x7E924E3A)	V
+hcievt:0x34	hci-event	HCI event 0x34 User_Passkey_Request -> handler 0x7E92AD89	jump table 0x7EBB3C1C slot 51 -> stub 0x7E924F0E (dispatcher 0x7E924E3A)	V
+hcievt:0x35	hci-event	HCI event 0x35 Remote_OOB_Data_Request -> handler 0x7E92AE3C	jump table 0x7EBB3C1C slot 52 -> stub 0x7E924F24 (dispatcher 0x7E924E3A)	V
+hcievt:0x36	hci-event	HCI event 0x36 Simple_Pairing_Complete -> handler 0x7E92AF08	jump table 0x7EBB3C1C slot 53 -> stub 0x7E924EBB (dispatcher 0x7E924E3A)	V
+hcievt:0x37	hci-event	HCI event 0x37 (reserved 0x37): default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 54 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x38	hci-event	HCI event 0x38 Link_Supervision_Timeout_Changed -> handler 0x7E928056	jump table 0x7EBB3C1C slot 55 -> stub 0x7E924F7C (dispatcher 0x7E924E3A)	V
+hcievt:0x39	hci-event	HCI event 0x39 Enhanced_Flush_Complete: default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 56 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x3A	hci-event	HCI event 0x3A (reserved 0x3A): default path (pending-command match for 0x0E/0x0F; else waiting-op lookup 0x7E92518F; 0x0D/0x21 -> 0x7E927D86)	jump table 0x7EBB3C1C slot 57 -> stub 0x7E924FB3 (dispatcher 0x7E924E3A)	V
+hcievt:0x3B	hci-event	HCI event 0x3B User_Passkey_Notification -> handler 0x7E92ADD6	jump table 0x7EBB3C1C slot 58 -> stub 0x7E924F2F (dispatcher 0x7E924E3A)	V
+hcievt:0x3C	hci-event	HCI event 0x3C Keypress_Notification -> handler 0x7E92ADFE	jump table 0x7EBB3C1C slot 59 -> stub 0x7E924F92 (dispatcher 0x7E924E3A)	V
+hcievt:0x3D	hci-event	HCI event 0x3D Remote_Host_Supported_Features_Notification -> handler 0x7E92801A	jump table 0x7EBB3C1C slot 60 -> stub 0x7E924F71 (dispatcher 0x7E924E3A)	V
+0x7E924432	hci-cmd-builder	HCI Inquiry_Cancel (0x0402), 0 param bytes; waits Command_Complete; completion cb 0x7E9248CC	mov 1026,d0 / mov 0,d1 before call 0x7E925704 at 0x7E92445C	V
+0x7E924473	hci-cmd-builder	HCI Write_Inquiry_Mode (0x0C45), 1 param bytes; waits Command_Complete; completion cb 0x7E9248CC	mov 3141,d0 / mov 1,d1 before call 0x7E925704 at 0x7E9244AA	V
+0x7E9244E8	hci-cmd-builder	HCI Write_Inquiry_Transmit_Power_Level (0x0C59), 1 param bytes; waits Command_Complete; completion cb 0x7E9248CC	mov 3161,d0 / mov 1,d1 before call 0x7E925704 at 0x7E92451F	V
+0x7E924554	hci-cmd-builder	HCI Write_Extended_Inquiry_Response (0x0C52), 241 param bytes; waits Command_Complete; completion cb 0x7E9248CC	mov 3154,d0 / mov 241,d1 before call 0x7E925704 at 0x7E9245B5	V
+0x7E9245D7	hci-cmd-builder	HCI Write_Class_of_Device (0x0C24), 3 param bytes; waits Command_Complete; completion cb 0x7E9248CC	mov 3108,d0 / mov 3,d1 before call 0x7E925704 at 0x7E924625	V
+0x7E924657	hci-cmd-builder	HCI Write_Local_Name (0x0C13), 248 param bytes; waits Command_Complete; completion cb 0x7E9248CC	mov 3091,d0 / mov 248,d1 before call 0x7E925704 at 0x7E9246CC	V
+0x7E924723	hci-cmd-builder	HCI Write_Default_Link_Policy_Settings (0x080F), 2 param bytes; waits Command_Complete; completion cb 0x7E9248CC	mov 2063,d0 / mov 2,d1 before call 0x7E925704 at 0x7E924761	V
+0x7E92477A	hci-cmd-builder	HCI Write_AFH_Channel_Assessment_Mode (0x0C49), 1 param bytes; waits Command_Complete; completion cb 0x7E9248CC	mov 3145,d0 / mov 1,d1 before call 0x7E925704 at 0x7E9247E6	V
+0x7E9247FC	hci-cmd-builder	generic HCI command pass-through: opcode = op+32, length = op+34 (ME op type 26)	sender call 0x7E924861 with regs from (0x7DAC4B40)+32/+34	V
+0x7E924883	hci-cmd-builder	HCI Inquiry (0x0401), 5 param bytes	mov 1025,d0 / mov 5,d1 before call 0x7E925704 at 0x7E9248C4	V
+0x7E924BD8	hci-cmd-builder	HCI Write_Default_Erroneous_Data_Reporting (0x0C5B), 1 param bytes; waits Command_Complete; completion cb 0x7E9248CC	mov 3163,d0 / mov 1,d1 before call 0x7E925704 at 0x7E924C0F	V
+0x7E92688E	hci-cmd-builder	HCI Write_Scan_Enable (0x0C1A), 1 param bytes	mov 3098,d0 / mov 1,d1 before call 0x7E925704 at 0x7E92689C	V
+0x7E926DDB	hci-cmd-builder	HCI Sniff_Subrating (0x0811), 8 param bytes; waits Command_Complete; completion cb 0x7E9248CC	mov 2065,d0 / mov 8,d1 before call 0x7E925704 at 0x7E926E52	V
+0x7E926F48	hci-cmd-builder	HCI Write_Link_Policy_Settings (0x080D), 4 param bytes; waits Command_Complete; completion cb 0x7E9248CC	mov 2061,d0 / mov 4,d1 before call 0x7E925704 at 0x7E926F92	V
+0x7E926FA6	hci-cmd-builder	HCI Create_Connection_Cancel (0x0408), 6 param bytes; waits Command_Complete; completion cb 0x7E9248CC	mov 1032,d0 / mov 6,d1 before call 0x7E925704 at 0x7E926FE9	V
+0x7E927010	hci-cmd-builder	HCI Remote_Name_Request_Cancel (0x041A), 6 param bytes; waits Command_Complete; completion cb 0x7E9248CC	mov 1050,d0 / mov 6,d1 before call 0x7E925704 at 0x7E927049	V
+0x7E927058	hci-cmd-builder	HCI Change_Connection_Packet_Type (0x040F), 4 param bytes; waits Command_Status; completion cb 0x7E924941	mov 1039,d0 / mov 4,d1 before call 0x7E925704 at 0x7E9270B1	V
+0x7E9270DA	hci-cmd-builder	HCI Read_Remote_Supported_Features (0x041B), 2 param bytes; waits Command_Status; completion cb 0x7E924941	mov 1051,d0 / mov 2,d1 before call 0x7E925704 at 0x7E927122	V
+0x7E92715A	hci-cmd-builder	HCI Read_Remote_Extended_Features (0x041C), 3 param bytes; waits Command_Status; completion cb 0x7E924941	mov 1052,d0 / mov 3,d1 before call 0x7E925704 at 0x7E9271AA	V
+0x7E9271E8	hci-cmd-builder	HCI Create_Connection (0x0405), 13 param bytes; waits Command_Status; completion cb 0x7E924941	mov 1029,d0 / mov 13,d1 before call 0x7E925704 at 0x7E92726C	V
+0x7E927274	hci-cmd-builder	HCI Accept_Connection_Request (0x0409), 7 param bytes; waits Command_Status; completion cb 0x7E924941	mov 1033,d0 / mov 7,d1 before call 0x7E925704 at 0x7E9272B6	V
+0x7E9272BE	hci-cmd-builder	HCI Reject_Connection_Request (0x040A), 7 param bytes; waits Command_Status; completion cb 0x7E924941	mov 1034,d0 / mov 7,d1 before call 0x7E925704 at 0x7E9272EE	V
+0x7E9272F6	hci-cmd-builder	HCI Disconnect (0x0406), 3 param bytes; waits Command_Status; completion cb 0x7E924941	mov 1030,d0 / mov 3,d1 before call 0x7E925704 at 0x7E92733C	V
+0x7E927344	hci-cmd-builder	HCI Remote_Name_Request (0x0419), 10 param bytes; waits Command_Status; completion cb 0x7E924941	mov 1049,d0 / mov 10,d1 before call 0x7E925704 at 0x7E92739E	V
+0x7E9273A6	hci-cmd-builder	HCI Hold_Mode (0x0801), 6 param bytes; waits Command_Status; completion cb 0x7E924941	mov 2049,d0 / mov 6,d1 before call 0x7E925704 at 0x7E927404	V
+0x7E92740C	hci-cmd-builder	HCI Sniff_Mode (0x0803), 10 param bytes; waits Command_Status; completion cb 0x7E924941	mov 2051,d0 / mov 10,d1 before call 0x7E925704 at 0x7E927498	V
+0x7E9274A0	hci-cmd-builder	HCI Exit_Sniff_Mode (0x0804), 2 param bytes; waits Command_Status; completion cb 0x7E924941	mov 2052,d0 / mov 2,d1 before call 0x7E925704 at 0x7E9274D0	V
+0x7E9274D8	hci-cmd-builder	HCI Park_State (0x0805), 6 param bytes; waits Command_Status; completion cb 0x7E924941	mov 2053,d0 / mov 6,d1 before call 0x7E925704 at 0x7E927536	V
+0x7E92753E	hci-cmd-builder	HCI Exit_Park_State (0x0806), 2 param bytes; waits Command_Status; completion cb 0x7E924941	mov 2054,d0 / mov 2,d1 before call 0x7E925704 at 0x7E92756E	V
+0x7E927576	hci-cmd-builder	HCI Switch_Role (0x080B), 7 param bytes; waits Command_Status; completion cb 0x7E924941	mov 2059,d0 / mov 7,d1 before call 0x7E925704 at 0x7E9275BE	V
+0x7E92817D	hci-cmd-builder	HCI Role_Discovery (0x0809), 2 param bytes; waits Command_Complete; completion cb 0x7E928124	mov 2057,d0 / mov 2,d1 before call 0x7E925704 at 0x7E9281C5	V
+0x7E92A571	hci-cmd-builder	HCI Write_Simple_Pairing_Debug_Mode (0x1804), 1 param bytes; waits Command_Complete; completion cb 0x7E9248CC	mov 6148,d0 / mov 1,d1 before call 0x7E925704 at 0x7E92A59E	V
+0x7E92A5FB	hci-cmd-builder	HCI Authentication_Requested (0x0411), 2 param bytes; waits Command_Status; completion cb 0x7E924941	mov 1041,d0 / mov 2,d1 before call 0x7E925704 at 0x7E92A62E	V
+0x7E92A884	hci-cmd-builder	HCI Set_Connection_Encryption (0x0413), 3 param bytes; waits Command_Status; completion cb 0x7E924941	mov 1043,d0 / mov 3,d1 before call 0x7E925704 at 0x7E92A8C6	V
+0x7E92A8CE	hci-cmd-builder	HCI Write_Authentication_Enable (0x0C20), 1 param bytes; waits Command_Complete; completion cb 0x7E92BA2E	mov 3104,d0 / mov 1,d1 before call 0x7E925704 at 0x7E92A8FF	V
+0x7E92A921	hci-cmd-builder	HCI IO_Capability_Request_Reply (0x042B), 9 param bytes	mov 1067,d0 / mov 9,d1 before call 0x7E925704 at 0x7E92A976	V
+0x7E92A97E	hci-cmd-builder	HCI IO_Capability_Request_Negative_Reply (0x0434), 7 param bytes	mov 1076,d0 / mov 7,d1 before call 0x7E925704 at 0x7E92A994	V
+0x7E92AA22	hci-cmd-builder	HCI Read_Local_OOB_Data (0x0C57), 0 param bytes; waits Command_Complete; completion cb 0x7E92B9B1	mov 3159,d0 / mov 0,d1 before call 0x7E925704 at 0x7E92AA3A	V
+0x7E92AA42	hci-cmd-builder	HCI Remote_OOB_Data_Request_Reply (0x0430), 38 param bytes; waits Command_Complete; completion cb 0x7E92BA2E	mov 1072,d0 / mov 38,d1 before call 0x7E925704 at 0x7E92AA98	V
+0x7E92AAA0	hci-cmd-builder	HCI Write_Encryption_Mode (0x0C22), 1 param bytes; waits Command_Complete; completion cb 0x7E92BA2E	mov 3106,d0 / mov 1,d1 before call 0x7E925704 at 0x7E92AAE0	V
+0x7E92AAE8	hci-cmd-builder	HCI Refresh_Encryption_Key (0x0C53), 2 param bytes; waits Command_Status; completion cb 0x7E924941	mov 3155,d0 / mov 2,d1 before call 0x7E925704 at 0x7E92AB1B	V
+0x7E92B979	hci-cmd-builder	HCI Remote_OOB_Data_Request_Negative_Reply (0x0433), 6 param bytes; waits Command_Complete; completion cb 0x7E92BA2E	mov 1075,d0 / mov 6,d1 before call 0x7E925704 at 0x7E92B9A9	V
+0x7E92A636	hci-cmd-builder	HCI Link_Key_Request_Reply (0x040B, 22 B) or Negative_Reply (0x040C, 6 B)	both opcodes loaded at 0x7E92A72E/0x7E92A73F	V
+0x7E92A77F	hci-cmd-builder	HCI PIN_Code_Request_Reply 0x040D / Neg 0x040E, User_Passkey_Reply 0x042E / Neg 0x042F, User_Confirmation_Reply 0x042C / Neg 0x042D	opcode loads 0x7E92A80E..0x7E92A86D	V
+0x7E9268A4	hci-cmd-builder	HCI Write_Page_Scan_Activity 0x0C1C or Write_Inquiry_Scan_Activity 0x0C1E (opcode in d0; interval/window, defaults 0x0800/0x0012); skipped when unchanged	cmp 3100,a3; defaults mov 2048 / mov 18	V
+0x7E926922	hci-cmd-builder	HCI Write_Current_IAC_LAP 0x0C3A: GIAC 0x9E8B33 and LIAC 0x9E8B00	bytes 33 8B 9E written to 0x7DAC4B50..55	V
+0x7E925727	hci-cmd-builder	HCI init sequence state machine (step counter 0x7DAC4C67, jump table 0x7EBB4504): Write_Page_Timeout 0x2000 -> Read_Page_Timeout -> Set_Event_Mask -> Read_Local_Version -> Read_Local_Features -> Read_BD_ADDR -> Read_Inquiry_Mode -> [feature bit 53] Read_Default_Erroneous_Data_Reporting -> Read_Inquiry_Response_TX_Power -> [feature bit 51 SSP] Write_Simple_Pairing_Mode(1); completion cb 0x7E9258F2	opcodes 3096/3095/3073/4097/4099/4105/3140/3162/3160/3158; feature test 0x7E92A144(51/53)	V
+0x7E925704	me-core	HCI command sender(opcode d0, param length d1): stores opcode at 0x7DAC56CC, sets busy 0x7DAC571D=1, sends packet 0x7DAC4B44 (params from 0x7DAC4B4F) via HCI layer 0x7E917F02	disasm	V
+0x7E924E3A	me-core	ME HCI-event dispatcher(event code d0, params a0): codes 1..61 via jump table 0x7EBB3C1C (index code-1); default path matches pending command (callback 0x7DAC4C48, expected event 0x7DAC4C4C, opcode 0x7DAC56CC)	disasm; caller 0x7E924D10 <- HCI layer 0x7E917D1E..0x7E918BE8	V
+0x7E92412E	me-core	ME operation scheduler: pops next op from queue 0x7DAC4A08 into curOp 0x7DAC4B40 and dispatches op type (op+8, 1..65) via jump table 0x7EBB3B18 to a start function stored at 0x7DAC4C50	disasm	V
+meop:1	me-op-type	ME op type 1 -> 0x7E9243ED -> Inquiry 0x7E924883	jump table 0x7EBB3B18 slot 0; start fn stored to 0x7DAC4C50	V
+meop:5	me-op-type	ME op type 5 -> Create_Connection 0x7E9271E8	jump table 0x7EBB3B18 slot 4; start fn stored to 0x7DAC4C50	V
+meop:6	me-op-type	ME op type 6 -> Accept_Connection 0x7E927274	jump table 0x7EBB3B18 slot 5; start fn stored to 0x7DAC4C50	V
+meop:7	me-op-type	ME op type 7 -> Reject_Connection 0x7E9272BE (via 0x7E926BFF)	jump table 0x7EBB3B18 slot 6; start fn stored to 0x7DAC4C50	V
+meop:8	me-op-type	ME op type 8 -> Disconnect 0x7E9272F6	jump table 0x7EBB3B18 slot 7; start fn stored to 0x7DAC4C50	V
+meop:9	me-op-type	ME op type 9 -> Authentication_Requested 0x7E92A5FB	jump table 0x7EBB3B18 slot 8; start fn stored to 0x7DAC4C50	V
+meop:10	me-op-type	ME op type 10 -> Link key reply 0x7E92A636	jump table 0x7EBB3B18 slot 9; start fn stored to 0x7DAC4C50	V
+meop:11	me-op-type	ME op type 11 -> PIN/passkey/confirm replies 0x7E92A77F	jump table 0x7EBB3B18 slot 10; start fn stored to 0x7DAC4C50	V
+meop:12	me-op-type	ME op type 12 -> 0x7E92A3CB (security, not resolved)	jump table 0x7EBB3B18 slot 11; start fn stored to 0x7DAC4C50	V
+meop:13	me-op-type	ME op type 13 -> Set_Connection_Encryption 0x7E92A884	jump table 0x7EBB3B18 slot 12; start fn stored to 0x7DAC4C50	V
+meop:14	me-op-type	ME op type 14 -> 0x7E92A454 -> Write_Authentication_Enable 0x7E92A8CE (I)	jump table 0x7EBB3B18 slot 13; start fn stored to 0x7DAC4C50	V
+meop:15	me-op-type	ME op type 15 -> accessibility 0x7E9266B9 -> scan-mode machine 0x7E9266BE	jump table 0x7EBB3B18 slot 14; start fn stored to 0x7DAC4C50	V
+meop:16	me-op-type	ME op type 16 -> Inquiry_Cancel 0x7E924432	jump table 0x7EBB3B18 slot 15; start fn stored to 0x7DAC4C50	V
+meop:17	me-op-type	ME op type 17 -> Remote_Name_Request 0x7E927344	jump table 0x7EBB3B18 slot 16; start fn stored to 0x7DAC4C50	V
+meop:18	me-op-type	ME op type 18 -> Write_Local_Name 0x7E924657	jump table 0x7EBB3B18 slot 17; start fn stored to 0x7DAC4C50	V
+meop:19	me-op-type	ME op type 19 -> Hold 0x7E9273A6	jump table 0x7EBB3B18 slot 18; start fn stored to 0x7DAC4C50	V
+meop:20	me-op-type	ME op type 20 -> Sniff 0x7E92740C	jump table 0x7EBB3B18 slot 19; start fn stored to 0x7DAC4C50	V
+meop:21	me-op-type	ME op type 21 -> Exit_Sniff 0x7E9274A0	jump table 0x7EBB3B18 slot 20; start fn stored to 0x7DAC4C50	V
+meop:22	me-op-type	ME op type 22 -> Park 0x7E9274D8	jump table 0x7EBB3B18 slot 21; start fn stored to 0x7DAC4C50	V
+meop:23	me-op-type	ME op type 23 -> Exit_Park 0x7E92753E	jump table 0x7EBB3B18 slot 22; start fn stored to 0x7DAC4C50	V
+meop:24	me-op-type	ME op type 24 -> Switch_Role 0x7E927576	jump table 0x7EBB3B18 slot 23; start fn stored to 0x7DAC4C50	V
+meop:25	me-op-type	ME op type 25 -> Write_CoD 0x7E9245D7	jump table 0x7EBB3B18 slot 24; start fn stored to 0x7DAC4C50	V
+meop:26	me-op-type	ME op type 26 -> generic command 0x7E9247FC	jump table 0x7EBB3B18 slot 25; start fn stored to 0x7DAC4C50	V
+meop:31	me-op-type	ME op type 31 -> 0x7E926BFF (Reject_Connection)	jump table 0x7EBB3B18 slot 30; start fn stored to 0x7DAC4C50	V
+meop:33	me-op-type	ME op type 33 -> Write_Link_Policy 0x7E926F43/0x7E926F48	jump table 0x7EBB3B18 slot 32; start fn stored to 0x7DAC4C50	V
+meop:35	me-op-type	ME op type 35 -> Write_Default_Link_Policy 0x7E924723	jump table 0x7EBB3B18 slot 34; start fn stored to 0x7DAC4C50	V
+meop:37	me-op-type	ME op type 37 -> Create_Connection_Cancel 0x7E926FA1	jump table 0x7EBB3B18 slot 36; start fn stored to 0x7DAC4C50	V
+meop:38	me-op-type	ME op type 38 -> Remote_Name_Cancel 0x7E92700B	jump table 0x7EBB3B18 slot 37; start fn stored to 0x7DAC4C50	V
+meop:39	me-op-type	ME op type 39 -> Write_AFH_Assessment_Mode 0x7E924777	jump table 0x7EBB3B18 slot 38; start fn stored to 0x7DAC4C50	V
+meop:40	me-op-type	ME op type 40 -> Role_Discovery 0x7E92817D	jump table 0x7EBB3B18 slot 39; start fn stored to 0x7DAC4C50	V
+meop:41	me-op-type	ME op type 41 -> special: no start fn (value 4)	jump table 0x7EBB3B18 slot 40; start fn stored to 0x7DAC4C50	V
+meop:42	me-op-type	ME op type 42 -> Change_Packet_Type 0x7E927058	jump table 0x7EBB3B18 slot 41; start fn stored to 0x7DAC4C50	V
+meop:45	me-op-type	ME op type 45 -> IO capability reply path 0x7E92A51B	jump table 0x7EBB3B18 slot 44; start fn stored to 0x7DAC4C50	V
+meop:48	me-op-type	ME op type 48 -> Remote_OOB_Reply 0x7E92A5AD	jump table 0x7EBB3B18 slot 47; start fn stored to 0x7DAC4C50	V
+meop:49	me-op-type	ME op type 49 -> Remote_OOB_Neg_Reply 0x7E92B952	jump table 0x7EBB3B18 slot 48; start fn stored to 0x7DAC4C50	V
+meop:50	me-op-type	ME op type 50 -> Read_Local_OOB 0x7E92A542	jump table 0x7EBB3B18 slot 49; start fn stored to 0x7DAC4C50	V
+meop:51	me-op-type	ME op type 51 -> Read_Remote_Features 0x7E9270DA	jump table 0x7EBB3B18 slot 50; start fn stored to 0x7DAC4C50	V
+meop:52	me-op-type	ME op type 52 -> Read_Remote_Ext_Features 0x7E92715A	jump table 0x7EBB3B18 slot 51; start fn stored to 0x7DAC4C50	V
+meop:53	me-op-type	ME op type 53 -> Refresh_Encryption_Key 0x7E92A5D4	jump table 0x7EBB3B18 slot 52; start fn stored to 0x7DAC4C50	V
+meop:54	me-op-type	ME op type 54 -> Sniff_Subrating 0x7E926DD6	jump table 0x7EBB3B18 slot 53; start fn stored to 0x7DAC4C50	V
+meop:55	me-op-type	ME op type 55 -> Write_Inquiry_Mode 0x7E924470	jump table 0x7EBB3B18 slot 54; start fn stored to 0x7DAC4C50	V
+meop:56	me-op-type	ME op type 56 -> Write_EIR 0x7E924554	jump table 0x7EBB3B18 slot 55; start fn stored to 0x7DAC4C50	V
+meop:57	me-op-type	ME op type 57 -> Write_Default_Erroneous_Data_Reporting 0x7E924BD5	jump table 0x7EBB3B18 slot 56; start fn stored to 0x7DAC4C50	V
+meop:64	me-op-type	ME op type 64 -> Write_Inquiry_TX_Power 0x7E9244E5	jump table 0x7EBB3B18 slot 63; start fn stored to 0x7DAC4C50	V
+meop:65	me-op-type	ME op type 65 -> Write_SSP_Debug_Mode 0x7E92A56E	jump table 0x7EBB3B18 slot 64; start fn stored to 0x7DAC4C50	V
+meop:2-4,27-30,32,34,36,43,44,46,47,58-63	me-op-type	ME op types with no start function (default 0x7E92433B)	jump table 0x7EBB3B18	V
+0x7E6A9323	hdmi-drv	HDMI-DRV entry stub called by 0x7E6A90B7 (EXP side); first function of the HDMI-DRV module (bound inferred)	caller 0x7E6A90B7 <- 0x7E68BD97/0x7E69B31E	I
+0x7E6A93E5	hdmi-drv	EDID buffer allocate + read request (`[hdmi]get heap error`); callers HPD handler 0x7E6AC28C, EDID-state poll 0x7E6AC56F	string; callers	V
+0x7E6A951A	hdmi-reg	HDMI/DVI mode select: write field main 0x72 reg 0xAF	field write 0x7E6AC903(0x72,0xAF)	V reg / I meaning
+0x7E6A977B	edid	EDID block-map extension (tag 0xF0) parser (`Problem parsing block map`)	string; caller segment parser 0x7E6AC127	V
+0x7E6A9821	edid	EDID bit-field decoder (calls getbits 0x7E6AC006); helper of base/CEA parsers	callers 0x7E6AA7CB, 0x7E6AB32D	I
+0x7E6A99B6	edid	EDID detailed-timing / video-descriptor decoder (3,605 B; soft-float calls 0x7E50198D/0x7E50160E/0x7E5010DE/0x7E50106D)	callers 0x7E6AA7CB, 0x7E6AB32D	I
+0x7E6AA7CB	edid	EDID CEA-861 extension block parser: checksum, data-block collection with tags 1..4 (audio, video, vendor, speaker); error `invalid tag in cea data block`	strings; cmp 1/2/3/4 on tag field	V
+0x7E6AB32D	edid	EDID base block 0 parser: memcmp(block, 00 FF FF FF FF FF FF 00, 8) at 0x7E7E1B0D, checksum, then ~30 getbits field extractions	memcmp 0x7E500D15 with header bytes (checked)	V
+0x7E6AB93D..0x7E6ABFE3	edid	parsed-EDID result records: zero/initialise sub-records (0x7E6AB93D, 0x7E6AB989, 0x7E6AB99F, 0x7E6ABA39, 0x7E6ABACF, 0x7E6ABB69) and small getters/setters	called only by state reset 0x7E6AC02B or the parsers; no callees	V structure / I meaning
+0x7E6AC006	edid	getbits(byte d0, lo d1? , hi a0): extract bit field (213 callers, all EDID parsers)	disasm: builds mask by loop, shifts	V
+0x7E6AC02B	hdmi-drv	HDMI-DRV state reset: clears globals 0x602AC7DC..F0, 0x605AB3CC..; stores the result-record pointers in 0x605AB3DC..0x605AB620	disasm	V
+0x7E6AC127	edid	EDID segment parser: per 128-byte block: block 0 -> 0x7E6AB32D, block map -> 0x7E6A977B, CEA (tag 2) -> 0x7E6AA7CB; `Block Map in Wrong Location`, `no valid blocks`	strings; callees	V
+0x7E6AC28C	hdmi-int	transmitter interrupt / HPD handler: reads 0x96 status, 0x42 HPD/monitor-sense, 0xC8 EDID state, 0xA1; rewrites 0x94/0xA1	register reads/writes on dev 0x72	V regs / I meaning
+0x7E6AC4AF	hdmi-int	HPD state check: reads 0x42 and 0xA1, then 0x7E6AC56F / 0x7E6AC5AB	regs	V
+0x7E6AC4DF	edid	EDID segment request: write 0xC4 (EDID segment) and 0xC9 (EDID re-read), then video/packet setup 0x7E6AD266/0x7E6AD6D0/0x7E6AD201/0x7E6AD2AC	regs	V regs / I meaning
+0x7E6AC56F	edid	EDID controller state poll: read 0xC8, then 0x7E6A93E5 / 0x7E6AC4DF	regs	V
+0x7E6AC5AB	hdmi-int	hot-plug (dis)connect handler: reads 0x42, clears 0x96, sets interrupt enables 0x94/0x95, power 0x41, 0xA1, 0xC9; calls state reset 0x7E6AC02B	regs	V regs / I meaning
+0x7E6AC803	hdmi-pwr	power-up step: read 0x42, write 0x41 (power down bit) and 0xC9	regs	V
+0x7E6AC8AA	hdmi-int	interrupt clear/enable: write 0x96, 0x94	regs	V
+0x7E6AC8E6	hdmi-reg	HAL read field(dev d0, reg d1, mask a0, shift a1) via read pointer 0x605ABE70 (29 callers)	disasm	V
+0x7E6AC903	hdmi-reg	HAL write field(dev d0, reg d1, mask a0, shift a1, value (sp+4)): read-modify-write via 0x605ABE70 / write pointer 0x605ABE6C (168 callers)	disasm	V
+0x7E6AC943	hdmi-reg	HAL read multi-byte field (up to 4 bytes)	disasm	V
+0x7E6AC9F4	hdmi-pwr	transmitter power-down: 0x41 bit 0x40 = 1, 0xE6, 0xA1 bit 0x40, disable/clear interrupts 0x94/0x96	field writes (0x72,0x41,mask 0x40,shift 6,1)	V regs / I meaning
+0x7E6ACADC	hdmi-video	colour-space selection (`Problem selecting colorspace`): output format 0x16, AVI Y field 0x55, CSC 0x18	string; regs	V
+0x7E6ACED5	hdmi-video	aspect ratio: 0x17 and AVI 0x56; calls 0x7E6ACADC and 0x7E6A951A	regs	V regs / I meaning
+0x7E6ACF45	hdmi-video	input format: 0x15 input id, 0x16, 0xD0 sync/DDR, 0xD6	regs	V regs / I meaning
+0x7E6ACFC2	hdmi-audio	audio setup: 0x15 (sample rate), 0x0C/0x0D (I2S enable/width), 0x73/0x76 (audio InfoFrame CC / speaker map)	regs	V regs / I meaning
+0x7E6AD16B	hdmi-audio	audio source select: 0x0A, 0x0B, 0x0C	regs	V regs / I meaning
+0x7E6AD201	hdmi-video	TMDS/output gate: 0xD5, 0xD6, 0xA1	regs	V regs / I meaning
+0x7E6AD266	hdmi-pkt	packet update: 0x4A (update latch), 0x40 (packet enable), 0x4B (AV mute)	regs	V regs / I meaning
+0x7E6AD2AC	hdmi-pkt	same registers as 0x7E6AD266 (the opposite AV-mute state, I)	regs	V
+0x7E6AD2F2	hdmi-pkt	AVI InfoFrame: 0x4A latch, 0x55..0x61 data bytes, 0x44 enable	regs	V regs / I meaning
+0x7E6AD4B1	hdmi-pkt	Audio InfoFrame: 0x4A, 0x73/0x75/0x77, 0x44 enable	regs	V regs / I meaning
+0x7E6AD53F	hdmi-reg	write dev 0x70 reg 0xDF and main 0x40 (second map, role not known)	regs	V regs
+0x7E6AD69A	hdmi-reg	as 0x7E6AD53F (dev 0x70 reg 0xDF, 0x40)	regs	V regs
+0x7E6AD6D0	hdmi-pwr	power-up fixed-register init: 0x98, 0x9C, 0x9D, 0xA2, 0xA3, 0xDE, 0xE4, 0xE5, 0xE6, 0xEB, 0xBA, 0x0C, 0x41, 0x56 (ADI "must write" set)	regs	V regs / I meaning
+0x7E6AD80C..0x7E6AEA69	cec	ADI CEC library (string `ADI_CEC` 0x7E6AE2FF): CEC map at I2C 0x78 via 0x7E6B9B19 (write) / 0x7E6B9B2A (read); main-map CEC interrupt regs 0x95/0x97 and CEC power 0xE2	register calls in 0x7E6ADE80..0x7E6AE603	V regs / I meaning
+0x7E6ADE80	cec	CEC init: read main 0xE2/0xE1 (CEC map address), CEC map 0x50, 0x4B, 0x4E, 0x51, 0x6E, 0x70, 0x71	regs	V
+0x7E6ADFE3	cec	CEC interrupt enable: 0xE2, 0x95	regs	V
+0x7E6AE033	cec	CEC TX status read (map 0x12)	regs	V reg / I meaning
+0x7E6AE064	cec	CEC logical-address set: 0x95, map 0x4B	regs	V reg / I meaning
+0x7E6AE0CE	cec	CEC TX frame write: map 0x10.., 0x11	regs	V reg / I meaning
+0x7E6AE117	cec	CEC TX start: clear 0x97, map 0x11	regs	V reg / I meaning
+0x7E6AE15D	cec	CEC interrupt status clear 0x97	regs	V
+0x7E6AE19D	cec	CEC map 0x12/0x14 write (retry/TX control, I)	regs	V
+0x7E6AE1DD	cec	CEC map 0x4C read-modify (I: RX buffer control)	regs	V
+0x7E6AE603	cec	CEC RX setup: map 0x26, 0x4A	regs	V
+0x7E6B9B19	cec	CEC/I2C write wrapper(dev d0, reg d1, buf a0, len a1) -> 0x7E6BA39B	disasm	V
+0x7E6B9B2A	cec	CEC/I2C read wrapper -> 0x7E6BA448	disasm	V
+0x7E6B9B3B	cec	CEC read/write poll (`CEC_RW`): reads main 0xE2 then the CEC library	string; regs	V
+0x7E6BA39B	i2c	HDMI I2C over SIO ch2, read: semaphore 0x7E43EACA, mux 0x7E6BA554 (SIO ch2 owner wait), bus select 0x7E6BAF45(0), flag 0x7E43EC14	disasm	V
+0x7E6BA448	i2c	HDMI I2C over SIO ch2, write	disasm	V
+0x7E6BA698	i2c	I2C over SIO ch3, read (bus select 0x7E6BAF45(1)); users: EVF/TMDS transmitter code 0x7E6BB06E..0x7E6BCD96	disasm	V
+0x7E6BA743	i2c	I2C over SIO ch3, write	disasm	V
+0x7E6BA7E0	i2c	read field on the ch3 transmitter (dev 0x72)	disasm	V
+0x7E6BA7F9	i2c	write field on the ch3 transmitter (150 callers: outevf_tmds code)	disasm	V
+0x7E6BA832	i2c	read multi-byte field on the ch3 transmitter	disasm	V
+0x7E6BA8E2/0x7E6BA986/0x7E6BAA1E	i2c	third I2C path (SIO ch3, bus select 2) read/write/write-field; device 0x98 (0x7E6BCC09 writes regs 0x12, 0x22..0x29, 0x34, 0x4D..0x59) and 0x88	disasm	V regs / I device
+0x7E6BAF45	i2c	bus select(n): calls 0x7E461469(224, n!=0)	disasm	V
+0x7E6BB4AB	evf-tmds	ch3 transmitter fixed-register init (same set as 0x7E6AD6D0)	regs	V
+0x7E6BBB37/0x7E6BBD13/0x7E6BC1F1/0x7E6BC6E5	evf-tmds	ch3 transmitter mode set (0xA1, 0x40, 0x4B, 0x41, 0x15, 0x16, 0xD0, 0xD6, 0x18, 0x55, 0xBA, 0x17, 0xAF, 0xD5); `outevf_tmds_measurement`, `V_DROP_FLG`	strings; regs	V regs / I role
+0x7E6BBF79/0x7E6BC4ED/0x7E6BCAC6	evf-tmds	ch3 transmitter status read: 0x35..0x3A, 0xD7..0xDA (I: measured input timing)	regs	V regs / I meaning
+0x7E6B749A	disp-isr	display-controller ISR: calls the 0x14 control writers 0x7E6B77FF/0x7E6B7815/0x7E6B7872/0x7E6B789A, status read 0x7E6B78A5 (0x0C, 0x14) and frame update 0x7E6B78E6 (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B75C2	disp-init	controller init: 0x0C, 0x10, 0x14, 0x30, 0x34, 0x88, 0x260; then bank inits 0x7E6B8DBC, 0x7E6B91BA, 0x7E6B9333, 0x7E6B9553 (caller VSC 0x7E6B5B39) (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B76E2	disp-reg	write 0x004, 0x204, 0x214, 0x224, 0x240 (caller 0x7E6B5F04) (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B770D	disp-reg	control 0x14 and 0x260 update (callers DISPLAY 0x7E6AF703, 0x7E6B00A3, update-wait 0x7E6B744B) (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B77FF..0x7E6B789A	disp-reg	control register 0x14 bit writers (5 small functions) (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B78A5	disp-reg	read 0x0C / 0x14 (status) for the ISR (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B78BF	disp-reg	update latch: OR mask (0x20 if 0x602ADAA8 = 16 else 0x60) into 0x04 (d0 != 0) or 0x08 (d0 = 0) (coverage C3 F022) (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B78E6	disp-frame	per-frame update from the ISR: copies shadow 0x0A4..0x0E0 (stride 0x0C) to layer registers 0x038..0x04C, loads 0x300..0x37C (32 words), 0x30, 0x14, 0x260 (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B7B30	disp-reg	read 0x1B8 (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B7B87	disp-reg	write 0x190 (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B7BA0/0x7E6B7BB9/0x7E6B8B59	disp-gamma	gamma control 0x204 (write/read) and 0x208; caller `[display gamma]` 0x7E6B721B (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B7C3B/0x7E6B7C8C	disp-colour	0x288..0x290 / 0x294 from the debug `exec` command 0x7E6B2440 (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B7CA7/0x7E6B8441/0x7E6B8D28	disp-geom	read 0x194..0x19C (window/size, I) for VSC 0x7E6B5B39/0x7E6B63FA (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B8321	disp-geom	write 0x058, 0x070 (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B85EF	disp-reg	write 0x0EC..0x0F4 (callers 0x7E6B4D96, 0x7E6B4EBD) (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B87E9/0x7E6B8856	disp-reg	write 0x214/0x218, 0x224 (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B886E	disp-adj	write 0x030, 0x1BC; callers `[DISP]ADJ CONT TFT` 0x7E6AF4CF, `adj_ext_port_tmds_exe` 0x7E6AF69B (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B89BD/0x7E6B89DB	disp-reg	write 0x020 (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B8A0A	disp-reg	write 0x244 (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B8A52	disp-reg	write 0x014 (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B8AD1	disp-reg	write 0x254..0x25C (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B8B62	disp-reg	write 0x018..0x020 (callers 0x7E6B5F76, 0x7E6B61E1) (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B8C8F	disp-colour	write 0x288..0x294; caller `COLOR MODE` 0x7E6B56E7 (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B8CB4	disp-colour	write 13 words 0x1C8..0x1F8 (colour matrix + offsets, I); caller `COLOR MODE` 0x7E6B56E7 (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B8D59/0x7E6B8D6C	disp-layer	read 0x038 / 0x03C and the second bank 0x9A901C38 / 0x9A901C3C (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B8D7F/0x7E6B8D97	disp-layer	write 0x038, 0x040 (caller `[DisplayFrame]` 0x7E6B6F1A) (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B8DBC	disp-init	bank init 0x0F8..0x294 (25 registers) (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B91BA	disp-init	bank init 0x054..0x1A0 (17 registers) (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B9333	disp-init	bank init 0x060..0x1B4 (16 registers) (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B9553	disp-init	bank init 0x004, 0x018..0x020, 0x228..0x240 (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7E6B990E	disp-reg	read 0x030 (registers are offsets from 0x9A900000)	absolute 0x9A90xxxx operands in disassembly	V regs / I meaning
+0x7F05C000-0x7F05DBCC	dps-range	BASIC interpreter (BAS_MAIN entry 0x7F05C000)	strings expr_222/do_for2/term; task entry	V
+0x7F05DBCD-0x7F05E58F	dps-range	RCU script server (rcu_*, ucr. magic)	strings rcu_*; Usr3 calls 0x7F05E551	V
+0x7F05E590-0x7F05E8D3	dps-range	playback calendar helpers (no strings) called only by api_calendar_* 0x7E6762DC-0x7E67636E	calls.tsv	V
+0x7F05E8D4	dps-fn	shell command md3d_hi_dbg	strings md3d_hi_dbg/help	V
+0x7F05E951	dps-fn	shell command md3d_dmp_dbg	strings md3d_dmp_dbg/help	V
+0x7F05E9CE-0x7F0645C0	dps-range	DPS (PictBridge) engine in overlay A	first fn called by DPS_MAIN; DPS rodata from 0x7F069F28	V
+0x7F05E9CE-0x7F060BFE	dps-range	DPS session/protocol layer	call graph	V
+0x7F060BFF-0x7F061CEC	dps-range	DPS XML encoder (envelope, builders, writer primitives)	call graph	V
+0x7F061CED-0x7F062B88	dps-range	DPS argument checks (validators)	call graph	V
+0x7F062B89-0x7F0645C0	dps-range	DPS XML decoder (parsers, tokenizer)	call graph	V
+0x7F05E61A	dps-fn	calendar body of api_calendar_Set_Calendar_Range	only callee of the api_calendar wrapper	V
+0x7F05E68D	dps-fn	calendar body of api_calendar_Search_Calendar_File_List	only callee of the api_calendar wrapper	V
+0x7F05E79E	dps-fn	calendar body of api_calendar_Get_Calendar_Last_OutRange part 1	only callee of the api_calendar wrapper	V
+0x7F05E7DF	dps-fn	calendar body of api_calendar_Get_Calendar_Last_OutRange part 2	only callee of the api_calendar wrapper	V
+0x7F05E820	dps-fn	calendar body of api_calendar_Get_Calendar_OutRange part 1	only callee of the api_calendar wrapper	V
+0x7F05E861	dps-fn	calendar body of api_calendar_Get_Calendar_OutRange part 2	only callee of the api_calendar wrapper	V
+0x7F05E8A2	dps-fn	calendar body of api_calendar_Get_Calendar_Cursor_To_Picno	only callee of the api_calendar wrapper	V
+0x7F05E590	dps-fn	calendar date helper (calls 0x7E5083E6), used by Set_Calendar_Range	calls.tsv	I
+0x7F05E9CE	dps-fn	dps_dispatch(msg): class 0x1 app request→0x7F06029C, 0x2 transport event→0x7F05ED4B, 0x3 abort→0x7F05ED37; frees msg	disasm	V
+0x7F05ED37	dps-fn	abort message 0x30000000 → session abort 0x7F05EC83(-2)	disasm	V
+0x7F05ED4B	dps-fn	transport events 0x20000000..3 (timeout check, file received, B notify, error)	disasm	V
+0x7F05EDBB	dps-fn	event 0x20000000: timeout/state check, stop timer, notify app	disasm	I
+0x7F05EE65	dps-fn	event 0x20000001: printer file received: read HREQUEST/HRSPONSE, decode 0x7F088D22, error map 0x7F088D2C, dispatch 0x7F05EFE0	disasm	V
+0x7F05EFE0	dps-fn	split by direction 0x602C1330: printer request→0x7F05F035, printer response→0x7F05F156	disasm	V
+0x7F05F035	dps-fn	printer-request handler, jump table 0x7F069F50[op-1]: 8 notifyJobStatus, 9 notifyDeviceStatus, 10 getFileID, else result 0x10020000	disasm + table	V
+0x7F069F50	dps-table	16-entry jump table of 0x7F05F035 (op 1..16)	bytes	V
+0x7F05F156	dps-fn	printer-response handler, jump table 0x7F069F90[op-0x101]: 0x101 cfgPS, 0x102 capability, 0x103 job, 0x104 device, 0x105-0x107 ack	disasm + table	V
+0x7F069F90	dps-table	jump table of 0x7F05F156 (ops 0x101..0x110)	bytes	V
+0x7F05F250	dps-fn	write camera reply DRSPONSE.DPS (encode via 0x7F088D18)	string + calls	V
+0x7F05F2B3	dps-fn	getCapability response merge (1031 B); re-posts getCapability for next item via 0x7F05F77D	calls	I
+0x7F05F77D	dps-fn	post message 0x10000004 (getCapability) to DPS queue	imm + call 0x7F08823B	I
+0x7F05F7B4	dps-fn	getFileID request: look up fileID via B 0x7F087F9D	calls	I
+0x7F05F7E5	dps-fn	map pending state 0x10000003..0x1000000F to expected reply (jump table 0x7F069FD0)	disasm	I
+0x7F05F840	dps-fn	pick host file HREQUEST.DPS/HRSPONSE.DPS and read it (B 0x7F087F3C)	strings	V
+0x7F05F880	dps-fn	copy job status record for the app (malloc+memcpy)	calls	I
+0x7F05F8F2	dps-fn	copy device status record for the app	calls	I
+0x7F05F929	dps-fn	copy configurePrintService result for the app	calls	I
+0x7F05FA4A	dps-fn	copy capability record for the app (918 B)	calls	I
+0x7F05FEE3	dps-fn	error-result handling for a received reply	calls	I
+0x7F05EA6B	dps-fn	store device-status record (0x602C1308), freeing the old one	disasm	V
+0x7F05EA90	dps-fn	store job-status record (0x602C130C)	disasm	V
+0x7F05EAB5	dps-fn	store configurePrintService result (0x602C1314); match printer dpsVersions with ours (0x7F069F20)	disasm	V
+0x7F069F20	dps-table	supported DPS versions {100,110} = 1.0/1.1	bytes; strings 1.0/1.1	I
+0x7F05EBE8	dps-fn	store capability record (0x602C1310)	disasm	V
+0x7F05EA1C	dps-fn	return pointer to version table 0x7F069F20	disasm	V
+0x7F05EC52	dps-fn	start DPS reply timer (B 0x7F088217 → sc timer)	calls	V
+0x7F05EC62	dps-fn	stop DPS reply timer (B 0x7F088209)	calls	V
+0x7F05EC83	dps-fn	session abort/error: reset state 0x10000000, notify app (B 0x7F0886C7/0x7F0886AD)	calls	V
+0x7F05ECD8	dps-fn	read printer response HRSPONSE (B 0x7F087E3B)	calls	I
+0x7F05ED1A	dps-fn	session-open test (0x602C1314 present)	disasm	I
+0x7F05EA2A-0x7F05EA60	dps-fns	getters of session records 0x602C1318/08/0C/14/10	disasm	V
+0x7F060222-0x7F060291	dps-fns	get/set session globals 0x602C1330 (direction), 0x602C1334, 0x602C1328 (capability mask), 0x602C1338 (state), 0x602C133C	disasm	V
+0x7F0601C7	dps-fn	free DPS record by op (jump table 0x7F06A010 → per-op freers 0x7F05FF54-0x7F0601A7); 31 callers incl. 6 in B	disasm	V
+0x7F06029C	dps-fn	app-request handler (jump table 0x7F06A0F8, msg 0x10000001..0x1000000E), only in state 0x10000000	disasm	V
+0x7F06A0F8	dps-table	jump table of 0x7F06029C (14 entries)	bytes	V
+0x7F0603B7	dps-fn	msg 0x10000001: discovery, write DDISCVRY.DPS	string + calls	V
+0x7F0604A5	dps-fn	msg 0x10000002: check HRSPONSE (open session)	calls	I
+0x7F06051B	dps-fn	msg 0x10000003: send configurePrintService (op 1, 236-B record)	disasm	V
+0x7F06099E	dps-fn	fill configurePrintService record: dpsVersions %d.%d%d, vendor/product/serial from B	disasm	V
+0x7F060594	dps-fn	msg 0x10000004: send getCapability (op 2), item tested against mask 0x602C1328	disasm	V
+0x7F060637	dps-fn	msg 0x10000005: send getDeviceStatus (op 4)	disasm	V
+0x7F0606A7	dps-fn	msg 0x10000006: send getJobStatus (op 3)	disasm	V
+0x7F060746	dps-fn	msg 0x10000007: send startJob (op 5)	disasm	V
+0x7F060AB9	dps-fn	startJob file path build (calls 0x7F060B3B)	calls	I
+0x7F060B3B	dps-fn	build DPS file URL pictbridge:/ storageserver/ localhost/	strings	V
+0x7F0607F2	dps-fn	msg 0x10000008: send abortJob (op 6)	disasm	V
+0x7F06088D	dps-fn	msg 0x10000009: send continueJob (op 7)	disasm	V
+0x7F060936	dps-fn	msg 0x1000000E: DDISCVRY.DPS (end/disconnect)	string	I
+0x7F060BA9	dps-fn	write an encoded DPS file (DREQUEST/DRSPONSE) through B transport	calls	V
+0x7F060BFF	dps-fn	dps_encode(rec, ?, d0 size, d1 buf): validate, envelope, builder; only via B trampoline 0x7F088D18	disasm	V
+0x7F060C5A	dps-fn	XML envelope: header, <dps xmlns>, builder 0x7F06A130[op&0xFEFF], </dps>	disasm	V
+0x7F060C9E	dps-fn	write <?xml version="1.0"?>CRLF	strings	V
+0x7F060CE2	dps-fn	write <dps xmlns="http://www.cipa.jp/dps/schema/">	strings	V
+0x7F06A130	dps-table	builder table, 17 slots indexed by op 0..16 (slot 0 and 11-15 NULL)	bytes	V
+0x7F060D17	dps-fn	builder op 1: configurePrintService input	table 0x7F06A130 slot; disasm	V
+0x7F060F0F	dps-fn	builder op 2: getCapability input (11 children, paperSize attr)	table 0x7F06A130 slot; disasm	V
+0x7F06103D	dps-fn	builder op 3: getJobStatus input (empty)	table 0x7F06A130 slot; disasm	V
+0x7F061083	dps-fn	builder op 4: getDeviceStatus input (empty)	table 0x7F06A130 slot; disasm	V
+0x7F0610C9	dps-fn	builder op 5: startJob input (jobConfig + printInfo)	table 0x7F06A130 slot; disasm	V
+0x7F061666	dps-fn	builder op 6: abortJob input (abortStyle %08X)	table 0x7F06A130 slot; disasm	V
+0x7F06170E	dps-fn	builder op 7: continueJob input (empty)	table 0x7F06A130 slot; disasm	V
+0x7F061754	dps-fn	builder op 8: notifyJobStatus output (result %08X)	table 0x7F06A130 slot; disasm	V
+0x7F0617D4	dps-fn	builder op 9: notifyDeviceStatus output (result)	table 0x7F06A130 slot; disasm	V
+0x7F061854	dps-fn	builder op 10: getFileID output (result + fileID %08X)	table 0x7F06A130 slot; disasm	V
+0x7F061934	dps-fn	builder op 16: result-only output	table slot 16	V
+0x7F061493	dps-fn	startJob builder helper	calls	I
+0x7F0614BA	dps-fn	startJob: croppingArea %04X x4	strings	V
+0x7F06153C	dps-fn	startJob printInfo fields with %03d (copies/date)	strings	I
+0x7F061614	dps-fn	startJob printInfo string field	calls	I
+0x7F061A36	dps-fn	write element (a0 name, d0 depth, d1 form 0 open / 1 close / 2 empty / 3 open no CRLF)	disasm	V
+0x7F061B3D	dps-fn	append string to output buffer (cursor 0xA06DD350, len 0xA06DD354, limit 0xA06DD34C)	disasm	V
+0x7F061996	dps-fn	write <	string table	V
+0x7F0619AF	dps-fn	write </	string table	V
+0x7F0619C8	dps-fn	write > CRLF	string table	V
+0x7F0619E5	dps-fn	write /> CRLF	string table	V
+0x7F061A02	dps-fn	write <?xml	string table	V
+0x7F061A1F	dps-fn	write </dps>	string table	V
+0x7F061ACA	dps-fn	write tab (indent)	string table	V
+0x7F061AED	dps-fn	write " name="	string table	V
+0x7F061B15	dps-fn	write quoted value	string table	V
+0x7F061A9D	dps-fn	write formatted value via 0x7F061B88	calls	V
+0x7F061B88	dps-fn	value formatter %08X/%04X/%03d, else "unknown format!"	strings	V
+0x7F062A9C	dps-fn	dps_validate(rec): version/op range (-300), output result check, hash 0x7F06A678 dispatch	disasm	V
+0x7F06A678	dps-table	16-bucket open-addressed hash {id, handler} keyed id&15; ids 1,0x101,0x102,2,0x104,0x103,5,8,9,6,0x10A,0xA	bytes + disasm	V
+0x7F061F89	dps-fn	result-code check: 0x1000-0x1003 high half; minor 0-4 only with 0x1002	disasm	V
+0x7F061CED	dps-fn	range test (value, lo, hi, step); 13 callers	disasm	I
+0x7F061FEA	dps-fn	string check: max length and char range or "."	disasm	V
+0x7F062036	dps-fn	check op 1 input strings (vendorName etc.)	calls	I
+0x7F062111	dps-fn	check configurePrintService fields (ops 1, 0x101)	hash table	V
+0x7F062552	dps-fn	check getCapability input (op 2), table 0x7F06A5F0 via 0x7F06259C	hash table	V
+0x7F06243B	dps-fn	check getCapability output (0x102): per-child jump table 0x7F06A64C	hash table + disasm	V
+0x7F0621AD	dps-fn	capability value in allowed ranges (tables 0x7F06A328 / 0x7F06A3C8)	disasm	V
+0x7F06A328	dps-table	{count, ptr} per capability child -> {min,max} code ranges 0x5000xxxx.. (quality, paperSize, fileType, datePrint, fileNamePrint, imageOptimize, fixedSize, cropping, paperType, layout)	bytes	I
+0x7F0626E1	dps-fn	check startJob input (op 5): jobConfig values, printInfo (path 0x7F061ED3)	hash table	V
+0x7F061ED3	dps-fn	printInfo file path check (../DCIM/, char classes 0x7F06A598)	strings	V
+0x7F06287E	dps-fn	check abortJob input (op 6) abortStyle	hash table	V
+0x7F0629D3	dps-fn	check job status (ops 8, 0x103)	hash table	V
+0x7F06289F	dps-fn	check device status (ops 9, 0x104): codes 0x70xx-0x76xx (0x7F06A4F0, 0x7F06A560, 0x7F06A440, 0x7F06A490)	hash table + bytes	V
+0x7F062A5E	dps-fn	getFileID check: op 10 needs non-empty path; 0x10A needs fileID unless result != OK; else -198	disasm	V
+0x7F062B89	dps-fn	dps_decode(buf, out, len): parse 0x7F062BEB then validate; only via B trampoline 0x7F088D22	disasm	V
+0x7F062BEB	dps-fn	parse document: <?xml?>, <dps xmlns>, body, </dps>	calls	V
+0x7F062C2A	dps-fn	parse <?xml version="1.0"?>	strings	V
+0x7F062C74	dps-fn	parse <dps xmlns=...>	strings	V
+0x7F062CAF	dps-fn	parse <input>/<output>, <result>, op name (0x7F06A7DC), call parser 0x7F06AB58[op]; errors -197/-200/-300/-400	disasm	V
+0x7F062E4B	dps-fn	parse <result> value into rec+4	calls	I
+0x7F06AB58	dps-table	parser table, 17 slots indexed by op 0..16 (0 and 11-15 NULL)	bytes	V
+0x7F062EAA	dps-fn	parser op 1: configurePrintService output	table 0x7F06AB58 slot	V
+0x7F0634BE	dps-fn	parser op 2: <capability> (11 children 0x7F06A920)	table 0x7F06AB58 slot	V
+0x7F0637E5	dps-fn	parser op 3: job status (ops 3 and 8)	table 0x7F06AB58 slot	V
+0x7F063B47	dps-fn	parser op 4: device status (ops 4 and 9)	table 0x7F06AB58 slot	V
+0x7F063C9E	dps-fn	parser op 5: startJob output (empty)	table 0x7F06AB58 slot	V
+0x7F063CED	dps-fn	parser op 6: abortJob output (empty)	table 0x7F06AB58 slot	V
+0x7F063D3C	dps-fn	parser op 7: continueJob output (empty)	table 0x7F06AB58 slot	V
+0x7F063D8B	dps-fn	parser op 10: getFileID input (basePathID, filePath)	table 0x7F06AB58 slot	V
+0x7F063F14	dps-fn	parser op 16: result-only record	table 0x7F06AB58 slot	V
+0x7F0632B8	dps-fn	parse dpsVersions list (1.0 1.1)	calls	I
+0x7F0633BB	dps-fn	parse vendorSpecificVersion list	calls	I
+0x7F063676	dps-fn	parse capability value list (hex codes, paperSize attr)	calls	V
+0x7F063AA2	dps-fn	job status sub-parser (progress nnn/nnn)	calls	I
+0x7F0644D6	dps-fn	match literal token at cursor 0xA06DD350	disasm	V
+0x7F06402A	dps-fn	skip spaces/CR/LF/tab	string table	V
+0x7F0643FF	dps-fn	skip whitespace and <!-- --> comments	string table	V
+0x7F064509	dps-fn	set/advance parser cursor and error flag (0xA06DD350/354)	disasm	I
+0x7F064535	dps-fn	match <	string table	V
+0x7F06454E	dps-fn	match </	string table	V
+0x7F064567	dps-fn	match </dps>	string table	V
+0x7F063F3D	dps-fn	match >	string table	V
+0x7F063F54	dps-fn	match </name>	string table	V
+0x7F063FA5	dps-fn	end of element: > or />	calls	V
+0x7F064131	dps-fn	empty element />	string table	V
+0x7F0641B8	dps-fn	match </ + name	string table	V
+0x7F063FE0	dps-fn	element text value	calls	I
+0x7F0641F3	dps-fn	parse hex number (digit loops 0x7F0642CC, 0x7F064333)	calls	I
+0x7F064255	dps-fn	copy text value	calls	I
+0x7F064281	dps-fn	copy text value into malloc buffer	calls	I
+0x7F064365	dps-fn	attribute name= 	string table	V
+0x7F06438D	dps-fn	attribute quote	string table	V
+0x7F0643B5	dps-fn	quoted attribute value	string table	V
+0x7F064584	dps-fn	bounded compare at cursor (B 0x7F087C03)	calls	V
+0x7F06A708	dps-table	{input, output}	bytes	V
+0x7F06A7DC	dps-table	op names, index 0 NULL, 1 configurePrintService .. 15 getThumb, 16 result	bytes	V
+0x7F06A878	dps-table	configurePrintService children (6)	bytes	V
+0x7F06A89C	dps-table	-> "capability"	bytes	V
+0x7F06A920	dps-table	capability children (11): qualities .. charRepertoires	bytes	V
+0x7F06A97C	dps-table	job status children (5): prtPID filePath copyID progress imagesPrinted	bytes	V
+0x7F06A9F8	dps-table	device status children (7): dpsPrintServiceStatus .. newJobOK	bytes	V
+0x7F06AA28	dps-table	{jobConfig, printInfo}	bytes	V
+0x7F06AA98	dps-table	jobConfig children (10): quality .. layout	bytes	V
+0x7F06AB00	dps-table	printInfo children (8): croppingArea fileID fileName date copies prtPID filePath copyID	bytes	V
+0x7F06AB2C	dps-table	-> abortStyle	bytes	V
+0x7F06AB4C	dps-table	getFileID children: basePathID filePath fileID	bytes	V
+0x7F087807	dps-task	DPS_MAIN (overlay B): flag 0x7E43EB62 mask 7, queues 0x7E43ECD8/0x7E43ECE0/0x7E43ECDC -> 0x7F05E9CE	disasm	V
+0x7F0878AC	dps-fn	DPS init (S_DPS_MEMORY pool)	strings	I
+0x7F0879CD	dps-fn	DPS pool malloc (<1024 B: 5 size classes 0x602C1374+, else 0x7F087A50)	disasm	V
+0x7F087B28	dps-fn	DPS pool free (semaphore 0x7E43EAA4)	disasm	V
+0x7F087BC7	dps-fn	strcpy thunk (→ 0x7E500DE9)	disasm; 13a libc names	V
+0x7F087BD1	dps-fn	strlen thunk (→ 0x7E500E01)	disasm; 13a libc names	V
+0x7F087BDB	dps-fn	strcmp thunk (→ 0x7E500DCA)	disasm; 13a libc names	V
+0x7F087BE5	dps-fn	memset thunk (→ 0x7E500D73)	disasm; 13a libc names	V
+0x7F087BEF	dps-fn	memcpy thunk (→ 0x7E500D33)	disasm; 13a libc names	V
+0x7F087BF9	dps-fn	memcmp thunk (→ 0x7E500D15)	disasm; 13a libc names	V
+0x7F087C03	dps-fn	bounded compare loop	disasm	I
+0x7F087D99	dps-fn	write DPS file DDISCVRY/DREQUEST/DRSPONSE	strings	V
+0x7F087E3B	dps-fn	check/read HRSPONSE.DPS	strings	V
+0x7F087F3C	dps-fn	read host file into malloc buffer	calls	I
+0x7F08815C-0x7F08818F	dps-fns	4 vendor/product string getters (strcpy)	calls	I
+0x7F088209	dps-fn	stop reply timer (sc 0x7E50708F)	calls	I
+0x7F088217	dps-fn	start reply timer (sc 0x7E506FF6)	calls	I
+0x7F08823B	dps-fn	queue/free DPS message (11 callers)	calls	I
+0x7F0886AD/0x7F0886BE/0x7F0886C7/0x7F0886E4	dps-fns	notify app (→ 0x7F088A56 → app-event poster 0x7E880F0C)	calls	V
+0x7F088D18	dps-fn	trampoline to dps_encode 0x7F060BFF	bytes	V
+0x7F088D22	dps-fn	trampoline to dps_decode 0x7F062B89	bytes	V
+0x7F088D2C	dps-fn	map internal error -400..0 to DPS result code (hash 0x7F0D5C5C)	disasm	V
+0x7E505005	dps-fn	Usr2: btst 1 → overlay A (0xF000 B, 0x80EFB000→0xBF05C000, seg 4, USTART3); btst 2 → overlay B (0x6B800 B, 0x80F1F000→0xBF080000, seg 5, USTART4); 0x1000000 → ADJSLF; done flags 0x602A9B48	disasm	V
+0x7EC90B30	dps-vtable	overlay-loader object: slot0 mask 0xFFFFFF, slot1 A, slot2 B, slot3 ADJSLF (0x7EBA139E/BE/DA/F6); ctor 0x7EBA1370	bytes + disasm	V
+0x7E67EC80	dps-fn	request Usr2 mask 0xFFFFFF (A+B) before strobe/lens firmware update	disasm	V
+0x7E421C93-0x7E425F43	gap-run	Flash translation library BML/STL (API, block layer, thunks, low-level part)	called by traced wrappers 0x7E451829-0x7E451D85 and fmem 0x7E44F509	V edges; split I
+0x7E421D53	function	STL close	<- STL_CLOSE wrapper 0x7E451949, fmem	V edge; name I
+0x7E421DBA	function	STL format	<- STL_FORMAT wrapper 0x7E451873	V edge; name I
+0x7E421E79	function	STL open	<- STL_OPEN wrapper 0x7E4518D4	V edge; name I
+0x7E421EC8	function	STL read (vol, src, buf, u16 size)	<- STL_READ wrapper 0x7E451D85; -> STL core 0x7E4546D4	V
+0x7E421F23	function	STL write	<- STL_WRITE wrapper 0x7E451CDB; -> 0x7E4546ED	V edge; name I
+0x7E421FB6	function	BML erase	<- ERASE wrapper 0x7E4519C5	V edge; name I
+0x7E4220D1	function	BML write	<- WRITE wrapper 0x7E451B69	V edge; name I
+0x7E42249E	function	BML read	<- READ wrapper 0x7E4217E6	V edge; name I
+0x7E4247BD-0x7E42482B	family	8-12 byte thunks into the low-level flash part 0x7E424833-0x7E425F43	call edges	V
+0x7E4300D7-0x7E438BF1	gap-run	uITRON 4.0 kernel internals (7 runs, 204 fns); see kernel rows	E_CTX=-25 checks; OSDB 'uITRON Error Code' 0x7E44D439	V mechanics; names I
+0x7E4300D7	kernel	acre_dtq	<- BMQ_ACRDTQ shim 0x7EBA582D	I
+0x7E43018D	kernel	acre_flg	<- BEF_ACRFLG, BTM_ACRFLG, HLS_CRE	I
+0x7E430201	kernel	acre_* (object type not identified; memory pool candidate)	<- api_firmup_Execute 0x7E67ECB7	I
+0x7E4302C2	kernel	acre_* (mailbox, I)	<- HLS_CRQ1 0x7E967D8F	I
+0x7E4303A9	kernel	acre_* (memory pool, I)	<- HLS_CRQ1 0x7E967D8F	I
+0x7E430472	kernel	acre_mtx	<- BMT_ACRMTX	I
+0x7E430506	kernel	acre_sem	<- HLS_CRS, BSE_ACRTSK	I
+0x7E4305A0	kernel	acre_tsk	<- acre_Task1 0x7E449696	I
+0x7E4307CD	kernel	task service used by OlyTaSE (505 B, 29 callers)	call edges	V edge; role open
+0x7E4309C6	kernel	clr_flg	<- OlyEvClCpu 0x7E449175	I
+0x7E430A81-0x7E430DDA	family	per-object-type control-block init helpers (shared by acre_* and static creation)	each called by one acre_* and one 0x7E432D30-0x7E4332A7 entry	V
+0x7E430E1C	kernel	del_flg	<- OlyEvDl, BEF_DELFLG	I
+0x7E430F3E	kernel	delete message buffer / queue	<- OlyQeDl	I
+0x7E43108E	kernel	del_sem	<- OlySmDl, BSE_DELSEM	I
+0x7E43130D	kernel	del_tsk (-> 0x7E4311B0)	<- OlyTaDl	I
+0x7E431316	kernel	dis_dsp (sets ctx byte 2)	code: E_CTX if in ISR or CPU locked; movbu 1,(2,ctx)	V
+0x7E4313FE	kernel	ena_dsp	pair of 0x7E431316 (ttmr, PwrS callers)	I
+0x7E431376	kernel	dly_tsk	<- OlyTaSS 0x7E449605	I
+0x7E43152D	kernel	ext_tsk-like task end	<- OlyTaSE, BTAPL 0x7E923FD2	I
+0x7E431666	kernel	chg_pri	<- BTH_CHGPRI	I
+0x7E43175D	kernel	get_tid (task context)	code: *a0 = (cur TCB)+16	V
+0x7E4317A1	kernel	get_tim (64-bit system time)	code copies 8 bytes from ctx+36	V mechanics; name I
+0x7E4317F2	kernel	iact_tsk (I)	<- HLS_IST, HLS_ACT	I
+0x7E4318E4	kernel	iget_tid (ISR context)	code: E_CTX unless in ISR	V
+0x7E431BBC	kernel	psnd/ipsnd_dtq	<- DTQ_P, DTQ_I (movie)	I
+0x7E431D20	kernel	iset_flg	<- OlyEvSt 0x7E449083; 13f	I
+0x7E431E1F	kernel	isig_sem	<- OlySmSi 0x7E4494E9; 13f	I
+0x7E432055	kernel	iwup_tsk	<- HLS_IWT, HLS_WKT	I
+0x7E432147	kernel	loc_cpu	code: E_CTX in ISR; PSW mask 0x7E432926; ctx byte1=1	V
+0x7E432863	kernel	kernel enter (85 callers)	call edges	V edge; role I
+0x7E4328DA	kernel	kernel exit + dispatch (138 callers)	call edges	V edge; role I
+0x7E432926	kernel	PSW save and mask interrupts to per-CPU level (+344)	code	V
+0x7E43294F	kernel	PSW restore	code	V
+0x7E432A3F	kernel	static object creation walker -> per-type 0x7E432D30-0x7E4332A7	call edges	V edge; role I
+0x7E434B00	kernel	dtq receive (prcv/trcv)	<- DTQ_R	I
+0x7E434C5C	kernel	rcv_mbx	<- img_l0 0x7E575C72 (13a)	I
+0x7E434D43	kernel	ref_dtq	<- OSDB dtq row 0x7E44CA45	V edge; name I
+0x7E434E26	kernel	ref_flg	<- OSDB flag row 0x7E44C72F	V edge; name I
+0x7E434EF2	kernel	ref_mbf	<- OSDB mbf row 0x7E44D031	V edge; name I
+0x7E434FF7	kernel	ref_mtx	<- OSDB mutex row 0x7E44CCAB	V edge; name I
+0x7E4350CB	kernel	ref_sem	<- OSDB sem row 0x7E44C476	V edge; name I
+0x7E435197	kernel	ref_tsk	<- OSDB task row 0x7E44C0AB	V edge; name I
+0x7E4355A9-0x7E435C86	family	free-id search, one per acre_* (8 copies)	each has exactly one acre_* caller	V
+0x7E435FF4	kernel	scheduler / dispatch request (27 callers)	call edges	I
+0x7E43610E	kernel	set_flg	<- OlyEvStCpu, BEF_SETFLG	I
+0x7E436212	kernel	sig_sem	<- OlySmSiCpu	I
+0x7E436343	kernel	snd_dtq	<- BMQ_SNDDTQ, DTQ_W	I
+0x7E436467	kernel	snd_mbx	<- img_l0 (13a), HLS_WRQ1	I
+0x7E436577	kernel	sns_ctx (in-ISR byte; 144 callers)	code	V
+0x7E436593	kernel	sns_dsp (ctx byte 2)	code	V
+0x7E436F83	kernel	ter_tsk	<- OlyTaSp, BTH_TERTSK	I
+0x7E437192	kernel	trcv_dtq	<- DTQ_TR	I
+0x7E43735A	kernel	message-buffer receive (OlyQeRd)	<- OlyQeRdCpu, NIKOLQ reader 0x7E44EA5C	I
+0x7E4374EF	kernel	tslp_tsk	<- HLS_SLT, BTAPI main task	I
+0x7E4375AA	kernel	message-buffer send (OlyQeWr)	<- OlyQeWrCpu, S_SHELL	I
+0x7E437777	kernel	twai_flg	<- OlyEvWtCpu, BEF_WAIFLG	I
+0x7E437909	kernel	twai_sem	<- OlySmWtCpu, BSE_TWISEM	I
+0x7E437A5B	kernel	unl_cpu	code: clears ctx byte 1	V
+0x7E437ABB	kernel	wai_flg	<- BEF_WAIFLG, CPUCONN	I
+0x7E437BF1	kernel	wai_sem	<- Oimf>>wsem	I
+0x7E437CD5	kernel	wup_tsk	<- OlyTaWu, HLS_WKT	I
+0x7E437EF4	kernel	del_dtq	<- BMQ_DELDTQ	I
+0x7E4382B9	kernel	del_mtx	<- BMT_DELMTX	I
+0x7E438477	kernel	frsm_tsk	<- BTH_FRSTSK	I
+0x7E438546	kernel	iloc_cpu	code: E_CTX unless in ISR	V
+0x7E4385A6	kernel	iunl_cpu	pair of 0x7E438546	I
+0x7E438606	kernel	loc_mtx	<- BMT_LOCMTX	I
+0x7E43895F	kernel	sus_tsk	<- BTH_SUSTSK, BFA_SUSTSK	I
+0x7E438BF2	kernel	unl_mtx	<- BMT_UNLMTX	I
+0x7E44B6B0-0x7E44D6EE	gap-run	static-ctor walker (14d) + OSDB object dumpers for S_SHELL	strings 'id Name CPU CLASS', '[OSDB]Error:'	V
+0x7E44D439	function	uITRON error-code legend printer	string '- uITRON Error Code -', 'E_SYS -5'	V
+0x7E45038D-0x7E450C4A	gap-run	SYSFMEM operation bodies (BML read/write/erase with read-back, adword, mode errors, bank check)	strings read_status, adread_gomennasai, unknown mode	V
+0x7E45140B-0x7E4520F2	gap-run	SYSFMEM 2nd poster, prm fmem help/status, traced BML/STL wrappers	strings \nSTL_READ\n etc.	V
+0x7E452343-0x7E455F92	gap-run	STL core (sector map); entries 0x7E4546CA/D4/ED, write path 0x7E4551C1, recovery 0x7E455A6D	callers only in the flash library	V edges; role I
+0x7E455F93-0x7E45824A	gap-run	prm settings store (explained in section 07 §1)	07 §1	V
+0x7E45B6BE-0x7E45CE11	gap-run	ADC conversion request scheduler	23 callers of 0x7E45BB10	V
+0x7E45BB10	function	adc_request(a0 req): switch req byte 0 = 1/2/3/7/8/9 -> 0x7E45BB8C/BF47/BFBD/BCA8/BD81/BE60; else log + fail	disassembly	V
+0x7E45CCA1	function	ADC request completion: event set (OlyEvSt/OlyEvStCpu by context) or copy result	callees 0x7E436577, 0x7E449030, 0x7E449083, 0x7E5081FA	V
+0x7E45DCD3-0x7E45E205	bound	CCD temperature task code ends 0x7E45E205 (13f gives 0x7E45E1xx)	cpudma starts 0x7E45E206	V
+0x7E463124-0x7E463334	gap-run	SIO I2C-mode client helpers: init/open/start/write/read	callees SIO 0x7E467EED/0x7E46822D/0x7E468324/0x7E4686E8	V edges
+0x7E463376	function	4-command request dispatcher (byte 0 = 0..3); cmd 0 calls strobe helpers 0x7E5E2152/0x7E5E2258	<- cam 0x7E626C76, EXP_MOVIE 0x7E6A1021..	V dispatch; role I (weak)
+0x7E465081-0x7E465582	gap-run	soft-timer API front end	124 + 39 callers	V
+0x7E4650A2	function	soft-timer start(d0 class): 0/0x80 -> 0x7E46515E, 1/2/0x81/0x82 -> 0x7E46538A	disassembly	V
+0x7E4650DD	function	soft-timer stop(d0 class): -> 0x7E4652CB / 0x7E465511	disassembly	V
+0x7E465D10-0x7E466886	gap-run	PER_PCONT client side: request, control ref counts, PWM duty helpers, pcntdbg	strings per_pcnt_get_control_no, pcntdbg	V edges; role I
+0x7E46B24E-0x7E46B3D0	gap-run	BT UART transport adapter (open, getc/write/flush thunks)	<- bt_get_data 0x7E912F55, 0x7E912E84	V
+0x7E46B3E3-0x7E46B74C	gap-run	hardware-timer client API (open/start/stop/abort, counter read 0x7E46B519, 8 channel stubs -> 0x7E46B70E)	<- VideoTimer, MEC timer, lens	V
+0x7E46BC44-0x7E46C0DA	gap-run	USF unit driver + usf shell (GIO 0x9A100124/0x9A10012C)	<- TAKE 0x7E5959B3/0x7E595AD0/0x7E59FB62, ADJ 0x7F082FCE	V; USF = dust filter I
+0x7E46C458-0x7E47EFFF	not-code	segment-0 rodata (false DB functions 0x7E46C458, 0x7E473000-0x7E47ED42)	bytes are strings/tables; 14d	V
+0x7E5025C3-0x7E503A6D	gap-run	USR_FAST_APP step handlers (fast start)	strings PowerAC, LensSet!!, OUT-EVF!, TakePicStart!!	V
+0x7E505A93-0x7E505F2F	gap-run	CPUCONN remote kernel calls (needs_remote 0x7E505A93, builders, send-wait 0x7E505D91, server 0x7E505C8A)	<- every Oly*Cpu wrapper	V
+0x7E50DD02-0x7E50F7F1	gap-run	UI_SCREEN task 0x7E50DD29 (OSD planes via api_tft_*) + UI_OUT back half	task table; callees api_tft_Alloc/Free_Handle_Plane_OSD	V edges; role I
+0x7E510CA9-0x7E5121D3	gap-run	mec shell sub-commands and phase-trace printers	strings start ch1, MEC_SHUTTER_CONTROL_PRM Output	V
+0x7E51256F-0x7E513399	gap-run	MEC request/phase decoders, mec_ev debug dump, mec_ev.c event core	strings REQ/, PST/, EV_SEM, mec_ev.c	V
+0x7E5138E5-0x7E514433	gap-run	MEC low layer under LCOM (trace tags Lcbr/Lrep/LINI/LOP/LST)	strings	V strings; role I
+0x7E51470B	function	mec_alloc(size<=128): 128-byte block from free list 0x604F48CC, used/max counters	disassembly; 143 callers	V
+0x7E51483B	function	MEC request state update / free (119 callers)	C3 F006	V edge; role I
+0x7E516DD7-0x7E517790	gap-run	MEC lock-by-name objects + ADC-sensed inputs (-> adc_request)	strings OBJ =, PS:	V edges
+0x7E518C62-0x7E518E57	gap-run	MEC adjustment interface (called only by ADJ overlay)	<- 0x7F0825E8/0x7F082E5E; OBJ_NAME_E_MEC_ADJUST	V
+0x7E518E91-0x7E51BA08	gap-run	MEC sequence steps: alloc block, set callback by mov imm32, call driver vector (0x604F64xx)	pattern seen at 0x7E519085, 0x7E51A322	V pattern; I per step
+0x7E51BA09-0x7E51BF66	gap-run	mec_timer.c: soft start 0x7E51BAC5, stop 0x7E51BB59, HW start 0x7E51BE0E, abort 0x7E51BE55	modules.tsv anchor 0x7E51BE62	V
+0x7E51BF67-0x7E520006	gap-run	lens module (LENS_MAIN, LENS_ASKDATA), explained in section 02	02	V
+SYSFMEM 0x000/0x002	sysfmem-mode	BML_NormalWrite / BML_AdwordWrite -> 0x7E44F197	class (mode & 0xFF00) = 0	V
+SYSFMEM 0x101/0x103	sysfmem-mode	BML_NormalRead -> 0x7E44F11B -> 0x7E45038D	cmp 257/259	V
+SYSFMEM 0x102	sysfmem-mode	BML_AdwordRead -> 0x7E45045A / 0x7E450500	cmp 258	V
+SYSFMEM 0x104-0x106	sysfmem-mode	undocumented read variants 0x7E4503BF / 0x7E450401 (ret stub) / 0x7E450404	cmp 260-262	V
+SYSFMEM 0x200	sysfmem-mode	BML_Erase -> 0x7E44F3D0	cmp 512	V
+SYSFMEM 0x300	sysfmem-mode	STL_Write -> 0x7E450A41 -> 0x7E451CDB	cmp 768	V
+SYSFMEM 0x400	sysfmem-mode	STL_Read -> 0x7E4505A6 -> 0x7E451D85	cmp 1024	V
+SYSFMEM 0x500	sysfmem-mode	STL_Delete -> 0x7E450A71 -> 0x7E451AE0 (trace STL_ERASE)	cmp 1280	V
+SYSFMEM 0x601	sysfmem-mode	STL_Init -> 0x7E450AA1 -> 0x7E4216FB	cmp 1537	V
+SYSFMEM 0x602	sysfmem-mode	STL_Format -> 0x7E450AAC -> 0x7E451873	cmp 1538	V
+SYSFMEM 0x603	sysfmem-mode	STL_Open -> 0x7E450AC0 -> 0x7E4518D4	cmp 1539	V
+SYSFMEM 0x604	sysfmem-mode	STL_Close -> 0x7E450AD3 -> 0x7E451949	cmp 1540	V

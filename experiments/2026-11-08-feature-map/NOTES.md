@@ -118,3 +118,7 @@ English-string counts not present in the E-PM2: E-PL5 0 (block 1 identical), E-P
 - **Tool: fwmap rule D (2026-11-09).** functions.tsv has a new `suspect` column (9th): rule D from 14d §5, implemented in `suspects()`.
   - **Measured:** 598 of the 601 false starts in 14d-false-functions.tsv are flagged. In the code ranges 14d studied, 36 of 71,435 starts are flagged: about 27 are data inside code ranges (the 31 that 14d found plus page-start entries), and about 9 are likely real code, e.g. 0x7EE72E82 (565 B, a recursive function reached by pointer).
   - **Use:** treat the flag as a hint. Nothing is removed from the DB; 881 functions are flagged in all.
+- **15d (protocols/platform): three claims. Confirmed:**
+  - The HCI sender 0x7E925704 has 48 callers.
+  - All 61 words of the HCI event table 0x7EBB3C1C point into the BT code.
+  - The EDID base-block parser 0x7E6AB32D copies the 8-byte constant at 0x7E7E1B0D (`00 FF FF FF FF FF FF 00`, the EDID header), compares it through 0x7E500D15 (memcmp), and prints the checksum error.
