@@ -237,7 +237,7 @@ Actions end `mov N,d0 ; ret` or build `asl 8 ; or` for an SS change; the shared 
   - Guard 0x7EDA3095: `[GUI] Abort custom print!` through IOlyApiCustomPrint (0x7E9C0BA2) vt+112. It always returns 1.
   - Action 0x7EDA301D: vt+116 → PostEventToCA(20, 0) → returns 0x0104 = SS_COMMON `ID_ST_BLACK_SCREEN`.
   - EVT_END_EASY_PRINT 0x9633 has a parallel set (0x7EDA3DAE…) using the EasyPrint interface.
-- **DPS states:** 1 = start (0xA306/0xA307 → 2 or 26); 2–4 and 9–21 = selection/setting screens (entry functions at a 15-byte stride from 0x7EDA09EC, each draws screen n through 0x7EDCED5A); 17 = image selection (all arrow, zoom and long-press keys); 23/24 = printing (EVT_PRINT_END 0xA303 → 1.4). DPS GUI helpers 0x7EDCE9B9–0x7EDD07F9.
+- **DPS states:** 1 = start (0xA306/0xA307 → 2 or 26); 2–4 and 9–21 = selection/setting screens (entry functions at a 15-byte stride from 0x7EDA09EC, each draws screen n through 0x7EDCED5A); 17 = image selection (~~all arrow,~~ the only state with the arrow OFF and long-press keys and EXPANSION (zoom) keys; arrow ON handlers also exist in states 4, 6, 7 and 9–21: UP/DOWN in 4 and 10–18, LEFT in 6, 7, 9 and 11–21, RIGHT in 9, 11–13, 16, 17, 19, 20; e.g. state 20 LEFT 0x7EDA19EC moves the print-image cursor through `moveCurrent(3)`) (C3 2026-11-09); 23/24 = printing (EVT_PRINT_END 0xA303 → 1.4). DPS GUI helpers 0x7EDCE9B9–~~0x7EDD07F9~~ ≥0x7EDD08D2 (0x7EDD07F9 is the start of moveCurrent, 218 B) (C3 2026-11-09).
 - **USB states.** USB_MENU, USB_WARNING, MEDIA_SETUP, USB_PRINT_READY (entry 0x7EDC0FE9), USB_PRINT_SEL (entry 0x7EDC0ED1, `USB Print Key Right -> Easy Print`; left/right/OK choose Easy or Custom print), BUSY.
 
 ## 5. Custom Menu A–J item lists (verified bytes; fork result checked in bytes for 4 rows)

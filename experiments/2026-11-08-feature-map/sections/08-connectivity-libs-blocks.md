@@ -50,7 +50,7 @@ scratchpad (`conn/ptptab.py`, `conn/adjtab.py`, `conn/sigscan.py`, `conn/libprof
 | PTPCOM | 0x7F08E88C | PTP transaction engine (`[TPC_COM] Phase Miss Match`, payload/sequence checks, XML-ish debug dump `<command>/<response>/<data>`) | verified dispatcher |
 | PTPASYNC | 0x7F08E6FE | PTP async events (`tpc_ptp_com_SendEvent`) | strings |
 | SAICAS | 0x7F0870D7 | script-file transport for DPS and X3C: `handle_SAICAS_OP_COM_OPEN_SESSION/WRITE_INFO/READ/DELETE…`, file names `HREQUEST.DPS` etc. | **verified**: SAICAS reads queue 0x7E43EE0A, which both the PictBridge and the X3C SendObject handlers write |
-| DPS_MAIN | 0x7F087807 | PictBridge application (`DREQUEST.DPS`, `dpsw_set_date_info`) with a DPS XML library at 0x7F061020–0x7F068F9C (`http://www.cipa.jp/dps/schema/`, `paperSize`, `pictbridge`) | strings |
+| DPS_MAIN | 0x7F087807 | PictBridge application (`DREQUEST.DPS`, `dpsw_set_date_info`) with a DPS XML library ~~at 0x7F061020–0x7F068F9C~~ in overlay A, ending at 0x7F0645C0; 0x7F0645C1–0x7F0691C5 is the red-eye library (13b §1) (C3 2026-11-09) (`http://www.cipa.jp/dps/schema/`, `paperSize`, `pictbridge`) | strings |
 | ADJ, ADJSLF | 0x7F080000, 0x7F087004 | factory adjustment over PTP (`adj_p15740_p.c`) and self-adjustment/calibration | verified dispatch, see 1.3 |
 
 USB descriptors at 0x7F0D7AF8 (**verified bytes**):
@@ -192,7 +192,7 @@ The E-PM2 has no FireWire hardware. The 1394 slot exists only so the shared task
   The GUI wrapper is `FlashAir::setWifiSSID/getOneTimePassword/connect`.
 - **`dB_Gain_Sv` is not SPC.** It sits in the ADJSLF calibration code that follows from 0x7F0A7E41: sensor gain/ISO, gyro gain/drift, IS-stage stroke, spectral (`SpectraChart.CSV`, `ADJ_BPF_*`) and dark/defect calibration. Results are logged to files such as `BCDT9710.JPG`, `CSAT9101.JPG`, `wb_lv001.csv`. (strings)
 
-## 4. C3D (3D animation engine on CPU1)
+## 4. C3D (3D animation engine; ~~on CPU1~~ tasks on both cores, see "Dual core" below (C3 2026-11-09))
 
 - **What it is (inferred, strong):** a 3D animation/rendering service. The feature is **the playback GPU slideshow**: the GUI start 0x7ED081AE calls `startSlideShowGpu` when Effect ≠ 1 and the slideshow is not 3D; the controller is `CapGSld_GpuSlideShow` (14a §3) (D2 2026-11-09).
   - The play side calls `api_play_Exec_C3d_Anime_Logo`, `Exec_C3d_Anime_Main`, `Skip/End/Abort_C3d_Anime`, and `Notify_C3d_Img_Load_Finish` with each photo's size, aspect and date (0x7E685AA3–0x7E685F4B).
@@ -201,7 +201,7 @@ The E-PM2 has no FireWire hardware. The 1394 slot exists only so the shared task
 - **Tasks:** C3D 0x7F0A3E60, C3D_UPDATE 0x7F0A406C (reads its queue, forwards message 18 to queue 0x7E43EDF8, calls a hook at 0xA06E12D0), C3D_EXE_BRIDGE 0x7F09ECDC, C3D_BRIDGE_CPU0P_TO_CPU1 0x7F09CE52 and C3D_BRIDGE_CPU1L_TO_CPU0 0x7F09CF7B (from the corrected task table).
   Queue names include `C3D_BRG_C0P_C1L`, `C3D_BRG_C1L_C0P`, `C3D_BRG_C0L_C1P`, `C3D_BRG_C1P_C0L` (P/L = physical/logical endpoints). A `c3d_dbg` shell loads `Pho%02d.bmp`.
 - **Dual core (verified part):** the fatal/NMI handler 0x7E463CD9 reads a CPU id at absolute address 0x8050 and prints `Genba Ha CPU0/CPU1` ("the failure is on CPU0/CPU1"). The object-name table has a CPU1 set (`BOOT_CPU1`, `CPUCONN_CPU1`, `MOV_ENC_VIDEO_CPU1`, `CPU1_MOV_AVCHD`, `IMG_CPU0_TO_CPU1`).
-  So block 0 is one image that both cores run. C3D (and the movie encoder) run on CPU1 and are reached through the bridge tasks. (inferred from these)
+  So block 0 is one image that both cores run. ~~C3D (and the movie encoder) run on CPU1 and are reached through the bridge tasks. (inferred from these)~~ **Corrected (C3 2026-11-09):** the task tables (tasks.tsv, `fwmap.py tasks`) put the C3D task 0x0071 (0x7F0A3E60), C3D_UPDATE, C3D_EXE_BRIDGE and C3D_BRIDGE_CPU0P_TO_CPU1 / CPU1L_TO_CPU0 on **CPU0**; only C3D_EXE 0x1002 (0x7F09DFD4) and the bridges C3D_BRG_C0L_C1P / C3D_BRG_C1P_C0L are on CPU1. The CPU0 C3D task replies into queue `C3D_BRG_CPU0P` (0x7F0A3F5A → OlyQeWr, var 0x7E43EE2C). Which core renders is open (C3 2026-11-09).
 - **Engine code** = ~~~0x7EE294B5–0x7EE5B (inferred)~~ the 3D engine core **0x7EE294B5–0x7EE5B5BB** (verified layer edges), then its image decoders 0x7EE5B5BC–0x7EE5D00C (14a §2.2) (D2 2026-11-09). 0x7EE21020–0x7EE294B4 is still the DMP GL library (§5); the `MCM_/MCA_/MCT_` module starts at 0x7EE294B5 (C2 2026-11-09):
   - float-heavy: thousands of calls to the single-float helpers at 0x7E5018BC–0x7E501972, which use AM33-2 FPU ops. The full float-helper set is 0x7E500F62–0x7E501AAB (13a §2.2). Do not assume names by order: 0x7E5018BC is **fsub** and 0x7E5018C3 **fadd** (inferred, strong), 0x7E5018E8 is fmul (D1 2026-11-09);
   - 89 functions call the C3D helper 0x7F0A3819; **corrected (D2 2026-11-09):** 0x7F0A3819 is the C3D port's free() (193 callers), and 0x7F0A3804 is malloc (14a §5);

@@ -17,7 +17,7 @@ first_fn	last_fn	source_file	fns_naming_file	placement	name_string
 7e635f4b	7e6369ca	cam_expcal.c	0	inferred-14b	-
 7e636a04	7e63790d	cam_frame.c	1	direct	7e7ae71f
 7e63a4bb	7e63a4bb	cam_frame_sync.c	1	direct	7e7aeb55
-7e63be39	7e63d0dd	cam_imgdev.c	26	direct	7e7aee88
+7e63be39	7e640186	cam_imgdev.c	26	direct	7e7aee88
 7e640200	7e640200	cam_lens.c	0	inferred-14b	-
 7e640858	7e640f3e	cam_list.c	0	inferred-14b	-
 7e640f53	7e641ba1	cam_mec_ctrl.c	0	inferred-14b	-
@@ -62,7 +62,7 @@ first_fn	last_fn	source_file	fns_naming_file	placement	name_string
 7e729149	7e729149	art_filter_com.c	1	direct	7e85b941
 7e72b6b6	7e72b6b6	art_nr.c	1	direct	7e85c6cb
 7e72bca5	7e72c85b	art_stl2ycc.c	8	direct	7e85ca7d
-7e93be70	7e93c39b	play_apical.c	3	direct	7ebb66d7
+7e93bc2f	7e93c68a	play_apical.c	3	direct	7ebb66d7
 7e93c80d	7e93c80d	play_beauty.c	1	direct	7ebb6a77
 7e93d770	7e93e0dc	play_cube.c	4	direct	7ebb706a
 7e93fdbf	7e93ffbe	play_dig_wide.c	2	direct	7ebb87d3
@@ -138,10 +138,10 @@ first_fn	last_fn	source_file	fns_naming_file	placement	name_string
 7eb1af51	7eb1b5a2	CmpPCw_PlayCwComponent.cpp	2	direct	7ec70360
 7eb1e186	7eb1e7d7	Cmp_PlayEditComponentBase.cpp	2	direct	7ec70c50
 7eb2037c	7eb2584e	CmpPEvc_PlayEvcollectionComponent.cpp	2	direct	7ec739a8
-7eb29279	7eb298ca	CmpPEvV_PlayEventViewComponent.cpp	2	direct	7ec74890
-7eb2cc08	7eb2d259	Cmp_PlayIndexComponentBase.cpp	2	direct	7ec7528a
+7eb29279	7eb2b6c8	CmpPEvV_PlayEventViewComponent.cpp	2	direct	7ec74890
+7eb2bb81	7eb2e7ff	Cmp_PlayIndexComponentBase.cpp	2	direct	7ec7528a
 7eb2ecd0	7eb30258	CmpPli_PlayIndexComponent.cpp	2	direct	7ec75c05
-7eb33b24	7eb353ea	CmpPLgh_PlayLightBoxComponent.cpp	2	direct	7ec77061
+7eb33b24	7eb38d5d	CmpPLgh_PlayLightBoxComponent.cpp	2	direct	7ec77061
 7eb3a4c2	7eb3ac0f	CmpPMov_PlayMovieComponent.cpp	2	direct	7ec78761
 7eb3e308	7eb3e308	CmpPPnr_NotifyPanoramaIdleEndErrorObserver.cpp	1	direct	7ec79520
 7eb3e38f	7eb3e38f	CmpPPnr_NotifyPanoramaIdleEndSuccessObserver.cpp	1	direct	7ec7957c

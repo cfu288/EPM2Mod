@@ -70,7 +70,7 @@ Sub-ranges inside the engine core (verified from callees and strings; the ends a
 | 0x7EE050AB–0x7EE0867F | 34 internal functions, between lighting and EGL |
 | 0x7EE08680–0x7EE09129 | EGL |
 | 0x7EE0E2B2–0x7EE0F366 | 29 functions; `glX*` names; F066 (the 284-byte library object, 0x602BE978) follows at 0x7EE0F3D2 |
-| 0x7EE10B33–0x7EE19609 | Shader/uniform back end (70 functions) |
+| 0x7EE10B33–0x7EE19609 | ~~Shader/uniform back end~~ Back end (70 functions; the shader/uniform role is inferred and does not fit all of it): it also holds the GL state-block creator 0x7EE133B3 (160 B via the allocator hook 0x606A33E8, stored at RAM 0x606A33E4; ← init 0x7EE0EDA7), whose sub-initialisers reach the texture-internal (0x7EE22793) and buffer (0x7EE2843C) areas (C3 2026-11-09) |
 | 0x7EE1B436–0x7EE1E8DF | 17 large float-heavy functions |
 | 0x7EE2245D–0x7EE24292 | 7 texture-internal functions |
 
@@ -264,7 +264,7 @@ Other uses:
    - `fc a? 94 e9 2b 60` = `mov (0x602BE994),aN`, the current context;
    - a call to 0x7EE097DA with d0 = 0x500–0x505 (raise a GL error);
    - a 0-caller function that is a table entry, or a body that starts 5 bytes after one. Look the address up in the TSV (`entry` or `body` column).
-   - Internal functions without either sign are back end (0x7EE10B33–0x7EE19609 uniforms and shaders).
+   - Internal functions without either sign are back end (0x7EE10B33–0x7EE19609 ~~uniforms and shaders~~: shared GL state set-up plus, inferred, uniforms and shaders; §2.1) (C3 2026-11-09).
 3. **Engine core:**
    - `call 0x7EE47412` (release) or `mov T,d0; call 0x7EE4736E` (alloc of type T);
    - the type-table index `f9 00 1c … fc d1 14 aa 02 7f` (`udf00 28,d0; add 0x7F02AA14,a1`);

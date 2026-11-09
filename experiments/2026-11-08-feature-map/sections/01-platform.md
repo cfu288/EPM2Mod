@@ -209,7 +209,7 @@ Other drivers in the range have shell hooks only: RTC, IOE/IOEC (I/O expander ov
 ## 6. Flash memory (SYSFMEM, [flashmem])
 
 - **SYSFMEM** (ID 0x45, entry 0x7E4520F3) serves read and write requests posted by `0x7E451306` (strings `FMEMGID/FMEMWS1/FMEMSS1x`). It calls the BML/STL layer (`0x7E45232A` → `0x7E4217E6` read, erase/write `…gomennasai` errors). **[V]**
-- Modes (help text): 000 BML_NormalWrite, 002 AdwordWrite, 101 NormalRead, 102 AdwordRead, 200 Erase, 300 STL_Write, 400 STL_Read, 500 STL_Delete, 601–604 STL Init/Format/Open/Close. The code passes 0x101/0x103. **[I]** whether these map one-to-one.
+- Modes (help text): 000 BML_NormalWrite, 002 AdwordWrite, 101 NormalRead, 102 AdwordRead, 200 Erase, 300 STL_Write, 400 STL_Read, 500 STL_Delete, 601–604 STL Init/Format/Open/Close. The code passes 0x101/0x103. ~~**[I]** whether these map one-to-one.~~ **The help-text modes are hexadecimal [V for STL_Read] (C3 2026-11-09):** SYSFMEM 0x7E4520F3 calls 0x7E4505A6, which calls the `STL_READ` wrapper 0x7E451D85 only for mode **0x400** (`cmp 1024`; else `data_read_error. unknown mode!!`). 0x101 = NormalRead fits the same reading; 0x103 (Usr2 overlay loads) is not in the help list, so whether every mode is listed is still open **[I]** (C3 2026-11-09).
 - Mode-bank and param-bank checks keep two copies with checksums: `Mode_Bank0 chksum OK/NG`, `Bank0 > Bank1` (0x7E450C4B, 0x7E450E86). **[V]**
 - `flash addr` prints the **major ROM map** (constants in 0x7E44FEA8…). **[V]**
 

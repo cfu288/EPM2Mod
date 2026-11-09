@@ -23,6 +23,7 @@ Round D1 deep dive. Scope: the driver code in 0x7E421020–0x7E521020, plus the 
 | 0x7E44EE0E–0x7E44EFEA | Inter-CPU reboot IRQ and the NMI flash-guard IRQ |
 | 0x7E45824B–0x7E45A80B | Accelerometer `per_acc`/`acc_spi` (SIO ch3) |
 | 0x7E45AAD4–0x7E45B67E | ADC `per_adc`, 0x98C00000 |
+| 0x7E45B67F–0x7E45CE11 | Not placed (no strings). It holds 0x7E45BB10, an asynchronous request/start with a callback at request +32 (21 callers: the ADC-key code 0x7E50B356 (stores callback 0x7E50B724 at +32) and 0x7E50B1B4…0x7E50B877, ADCONV 0x7E45CE5B, 0x7E458A47 in the accelerometer range, 0x7E45E27F/0x7E45E2B5/0x7E45E556 in the `cpudma` range, and functions of this gap such as 0x7E45B783) (C3 2026-11-09) |
 | 0x7E45CE12–0x7E45CE5B | ADCONV, 0x99800000 (only the debug dump reads it) |
 | 0x7E45D120–0x7E45D9C7 | Bus-error IRQ (0x98000000). System controller 0x98E00000 (backup registers, power-on factor, RTC registers, standby; last 0x98E user 0x7E45D87B). `per backup` 0x7E45D8C2 (ends 0x7E45D9C7). The next two functions, 0x7E45D9C8 and 0x7E45D9F1, are GIO helpers (0x9A100104/108/110) (A4 2026-11-09) |
 | 0x7E45DBB5–0x7E45E1xx | CCD temperature task |

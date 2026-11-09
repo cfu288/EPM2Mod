@@ -20,7 +20,7 @@
 
 **1.1 True file starts (V).** modules.tsv `first_fn` is the first function that *names* the file. A class file really starts at its `getInstance` (singleton classes) or at its ctor (classes embedded as members). Rows that start earlier than modules.tsv says:
 
-| File (modules.tsv first_fn) | True start | | File (first_fn) | True start |
+| File (modules.tsv first_fn before D2; D2 has since moved these rows to the true start (C3 2026-11-09)) | True start | | File (first_fn before D2) | True start |
 |---|---|---|---|---|
 | CmpSts_MfAssist (0x7EB7DEB9) | ctor **0x7EB7D14B** (member of the shooting facade 0x7EB7A703, no getInstance) | | CmpEAsp (0x7EAB9261) | getInstance 0x7EAB8802 |
 | CapDpc_DisplayControl (0x7E9EE86C) | getInstance 0x7E9EE544 | | CmpEBea (0x7EABC982) | getInstance 0x7EABC724 |
@@ -82,7 +82,7 @@ Every Cap class follows one pattern (verified on CapBoo, CapFls, CapTak, CapPls,
 | 3 | 8 (0x7EA7E198 → 0x7EA7CFCD) | send **4761** (full-boot request) to CapBoo. CapBoo 0x7EA3C9AD → state 10 0x7EA3C947: device slot 0 = Usr2(0xFFFFFF), notify +224 at once; device → 4741 → CapBoo state 12 (notify +224 again). Shooting components send **4762** instead (0x7EA8241C, 0x7EB7B412): CapBoo state 8 0x7EA3C8C0 → device slot 1 = Usr2(1) → 4742 → state 7 (notify +228) |
 | 4 | 8, on **12063** (0x7EA7E1AA) | clear +272, own vt+184 hook, `startCapabilityCollection` 0x7EA7D7AD: GEN evTraStart (0x7E96B13C) to each capability in collection +240 and each sub-transition in +256 (`****startCapabilityCollection contain NULL pointer`) |
 | 5 | 7 (0x7EA7E089) | count replies: `startTransition... %d/%d` (0x7EA7D00E: +272 vs +244 + +260); post 12067 when all are in; **5,000 ms timeout** (+516) |
-| 6 | 7 on 12067 or timeout (0x7EA7E0CA) | 0x7EA7D270 check, 0x7EA7D6EB → state 10 (0x7EA7CEC7): GEN **11562** to self |
+| 6 | 7 on 12067 or timeout (0x7EA7E0CA) | 0x7EA7D270 check, 0x7EA7D6EB → state 10 (0x7EA7CEC7): GEN **11562** to self. The same handler also takes **3346** (init OK): exit, 0x7EA7D5FE, then re-enter state 7 (0x7EA7E081 → entry 0x7EA7E089), which restarts the reply count and the 5,000 ms timeout (V; also in the per-component copies, e.g. CmpPRec 0x7EB4C4FB) (C3 2026-11-09) |
 | 7 | parent handler 0x7EA7E00F | 11562 → state 4 (running, 0x7EA7E30F); 11563 → error path 0x7EA7DB63 → 3 |
 | 8 | 4 Running (handler 0x7EA7E334) | 12069 → **26798** to +484; 12068 → **26797** to +484; 11769 evTraStop → stop path (0x7EA7E323: vt+196 hook, state 6 counts stop replies +308 vs +280 + +296, 12067 when done); also 13363/13365 (base ids of 7 and 40 derived events), 11566, 11761, 12962 |
 

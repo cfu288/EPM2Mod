@@ -177,6 +177,7 @@ All of these return at once if w = NULL.
 
 **Pixel format** = 3 channel masks and a byte at +661:
 - **setPixelFormat 0x7ECFE8FD**(d0 → +661, d1 = R mask, a1 = G mask, stack = B mask) stores the masks at +628/+632/+636.
+- **getPixelFormat 0x7ED36FC3**(dc, &bpp, &R, &G, &B) is a DC accessor **outside** this range, in the widget drawing parts: if dc ≠ NULL it copies +661 and the three masks out. Callers 0x7ED243EA (panel-base virtual) and 0x7ED2347A, which also call setPixelFormat (I: save/restore around drawing). So 0x7ECFE7B8–0x7ECFEF32 does not hold every DC method (C3 2026-11-09).
 - **F057 0x7ECFE95E** (mask → (highest set bit + 1) − 8) gives the shifts +662..+664. Example: R5G6B5 gives R shift +8, G +3, B −3.
 - It then re-converts every colour.
 - Attaching a surface (0x7ECFED61) accepts a bitmap descriptor with **bpp 8, 16 or 24** (+6) and takes the masks from the surface record (+146 flag, +148/+152/+156).
