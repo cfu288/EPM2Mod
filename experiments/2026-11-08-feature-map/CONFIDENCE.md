@@ -2,22 +2,31 @@
 
 **Goal:** high confidence in how each part of the firmware works, checked by adversarial review.
 
-## Status (2026-11-09, after rounds A11 and C6; work paused for user review)
+## Status (2026-11-09, after cycle 3: criteria met on the latest fresh samples)
 
-| Criterion | Result | Met? |
+| Criterion | Latest result | Met? |
 |---|---|---|
-| Breadth: ≥ 80 % explained or partly in a fresh blind sample | C6 96 %, C5 100 % | yes |
-| ≥ 50 % explained (function-level role) | C6 **47.5 %** (C5 32.5 %, C2–C4 25–30 %); the 16a–16d per-function indexes moved it | just short |
-| 0 contradicted in a fresh blind sample | C5 0; C6 **2**, both rule-made index rows, fixed | no in C6 (fixed after) |
-| 0 wrong in the latest claim audit of each section | 0 wrong in the latest audit of 01–08, 09a, 10d, 10e, 11, 12, 13a–f, 14a–e, 15a–d; 09b had 1 wrong in A11 (fixed: Sparkle's engine cases) | all but 09b |
+| Breadth: ≥ 80 % explained or partly in a fresh blind sample | C9 96 % | yes |
+| ≥ 50 % explained (function-level role) | C9 **50 %** (40/80) | yes, at the line |
+| 0 contradicted in a fresh blind sample | C9 **0** | yes |
+| 0 wrong in the latest claim audit of each section | every section's latest audit is clean: 01–08 (A1), 09a/09b (A11/A12), 10d/10e (A11), 11–12 (A10), 13a–f (A5), 14a–e (A6/A7), 15a–d (A8/A10) | yes |
+| 0 wrong among verified index rows in a random audit | A14: 0 wrong of 50 (A13: 0 of 50) | yes |
 | Boundary lint | 11 hard hits, all spans inside a function or data runs | yes |
 
-**Explained share per round:** C1 12.5 %, C2 29 %, C3 25 %, C4 30 %, C5 32.5 %, C6 47.5 %. With n = 80 per round, each figure is ± ~10 points (95 %).
+**Explained share per round:** C1 12.5 %, C2 29 %, C3 25 %, C4 30 %, C5 32.5 %, C6 47.5 %, C7 42.5 %, C8 46 %, C9 50 %.
+**Contradictions:** 1, 2, 4, 3, 0, 2, 8, 1, 0.
 
-**Where the remaining gap is:**
-- The app layer is explained almost everywhere (C6 batch 3: 15/15 app functions).
-- The GUI methods, platform drivers and storage internals, and the 3D/C3D/AVPI range (no 16x index) are the weak parts.
-- The generated indexes have known rule errors, listed at the end of each 16x section.
+**How sure:**
+- **Uncertainty:** with n = 80 the explained share is ± ~11 points (95 %), so C9's 50 % is consistent with a true value of roughly 39–61 %.
+- **Index error rate:** zero wrong among 100 audited index rows (A13 + A14) puts the error rate of a random index row below ~3 % (95 %).
+- **Thin rows:** many rows are still thin, true but context only: 23 of 50 in A14.
+
+**Remaining weak areas:**
+- 3D engine type modules and AVPI plug-in internals, where 16e's position- and call-graph-based rows are context only;
+- the USB device core in overlay B;
+- GUI panel private methods;
+- framework templates (OMQueue) inside app class ranges;
+- the 18-function gap 0x7E965FD1–0x7E966A16 between the 16d and 16a ranges.
 
 ## What "high confidence" means here
 
@@ -50,6 +59,8 @@ A region that fails a round gets a deep dive, then a **new** blind sample. The s
 | A10 | Claim audit: first audit of 09/10, resample of 11/12/15b/15c | 62 claims, seed 20261118 | 34 correct, 23 minor, **5 wrong**: 09a-78 (info 111 *is* written with constant ids, via mcon), 09b-161 (40 `cmp 108` sites, not 2), 10d-109 (the edit-mode jump table does not map every mode), 10e-87 (status reads are ADJ op 0x9005, not 0x902A), 15b-60 (two of the "MEC submit or timer" handlers are stubs). **11, 12, 15c: 0 wrong.** New finding (checked by coordinator): after the getShippingInfo(4) gate, 0x7EDFD69B posts PostEventToCA(11, 11), the VER_MENU → VerCheck trigger that 10f/13d called unknown (`audit/check-A10-1..4.md`) |
 | A11 | Re-audit of 09a, 09b, 10d, 10e, 15b after A10 fixes | 30 claims, seed 20261119; completeness claims checked by full scan | 23 correct, 6 minor, **1 wrong**: 09b-148 ("the image-engine code does not branch on 118" is false: three jump tables at 0x7E78C254/C514/C8E4 give art codes 118 and 122 their own cases with their own parameter tables), which weakens 09b's "Crystal configures nothing different". **09a, 10d, 10e, 15b: 0 wrong** (`audit/check-A11.md`) |
 | F1 | Corrections pass after D1 | 52 items | 11 section-11 fixes + 41 D1 fixes applied, 1 rejected (13a no-registers claim); log `audit/fixes-D1.md` |
+| C9 | Coverage after cycle 3 (context → role, precision gate kept) | 80 functions never used in C1–C8, seed 9109 | **40 explained (50 %)**, 37 partly, 1 unexplained, **0 contradicted**, 2 not-code (one already listed; one a USB dispatcher mis-split). Explained+partly 96 %. Index rows: 1 wrong, already hedged I (EMS2 for EMS1). Text errors found next to the batch: 14a accept vs write step, 15c display-effect End, 05 ecor/IKEY, 15d per-CPU block, the mdet EMS label; all fixed. `coverage/round9-review1..4.md` |
+| A14 | Audit of 50 random index rows after cycle 3 | 10 per index, seed 20261123 | 24 correct, 23 thin, 3 minor, **0 wrong**. `audit/check-A14-rows-1..2.md` |
 | C8 | Coverage after cycle 2 (precision pass on 16a–16e) | 80 functions never used in C1–C7, seed 8109 | **37 explained (46 %)**, 42 partly, 0 unexplained, **1 contradicted** (a row already hedged I: a 16b "merged vtable methods" note that mistook a function's own switch cases for methods), 0 not-code. Explained+partly 99 %. Index rows: 0 wrong among V rows; the gap is context-only rows (AVPI, 3D engine, movie internals, BT pairing, helpers). `coverage/round8-review1..4.md` |
 | A13 | Audit of 50 random index rows after cycle 2 | 10 per index, seed 20261122 | 25 correct, 22 thin, 3 minor, **0 wrong**; all minors from range-based naming. `audit/check-A13-rows-1..2.md` |
 | C7 | Coverage after cycle 1 (D5: 16a–16d regenerated, 16e added) | 80 functions never used in C1–C6, seed 7109 | 34 explained (42.5 %), 36 partly, 0 unexplained, **8 contradicted**, 2 not-code. Explained+partly 87.5 %. **All 8 contradictions are rule-made index rows:** the `sdk api` table read as {handler, cmd, name} at 0x7EBF8188 instead of {cmd, name, handler} at 0x7EBF8180 (634 rows off by one; fixed), CA handlers that write next-state +92 shown as "same state" (56 rows), the lens t3 hook filed as shell code, `iap_cmd_prc` named from a callee's error string, class-by-range (OlyHfwOpeBGrCtl), AVPI plug-in group by position (57 rows), a 15a page span ending early. **Lesson:** more specific generated rows raise both the explained share and the contradiction count. `coverage/round7-review1..4.md` |
