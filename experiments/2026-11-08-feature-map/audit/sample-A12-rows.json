@@ -1,0 +1,302 @@
+[
+ {
+  "index": "16a-app-function-index",
+  "addr": "0x7EA3DCBD",
+  "role": "CapFls_Flash getInstance (singleton RAM 0x602B3020, returns iface +520)",
+  "row": "0x7EA3DCBD\t59\tCapFls_Flash getInstance (singleton RAM 0x602B3020, returns iface +520)\tgetInstance\tV"
+ },
+ {
+  "index": "16a-app-function-index",
+  "addr": "0x7EA9E53A",
+  "role": "CmpCst_Communication forwarder -> 0x7EA9E542 [target role: CmpCst_Communication state 10 entry (+404/+172): \"disconnect\"]",
+  "row": "0x7EA9E53A\t8\tCmpCst_Communication forwarder -> 0x7EA9E542 [target role: CmpCst_Communication state 10 entry (+404/+172): \"disconnect\"]\tforwarder+tgt\tV"
+ },
+ {
+  "index": "16a-app-function-index",
+  "addr": "0x7EAEFD9E",
+  "role": "observer update() (slot 0 of 0x7EC696E4): builds 7080 and GENs it to target +20 [Com_ observer member]",
+  "row": "0x7EAEFD9E\t75\tobserver update() (slot 0 of 0x7EC696E4): builds 7080 and GENs it to target +20 [Com_ observer member]\tobs-update\tV"
+ },
+ {
+  "index": "16a-app-function-index",
+  "addr": "0x7E9CDE02",
+  "role": "code in OlyApi interface classes range, class not proven (callers only in sdk debug shell): schedule timeout (delay in register); vcalls +?->vt+48; called by 0x7E9BBE5B (sdk api handler q09 scStrncmp)",
+  "row": "0x7E9CDE02\t24\tcode in OlyApi interface classes range, class not proven (callers only in sdk debug shell): schedule timeout (delay in register); vcalls +?->vt+48; called by 0x7E9BBE5B (sdk api handler q09 scStrncmp)\tg:vcall+callers\tI"
+ },
+ {
+  "index": "16a-app-function-index",
+  "addr": "0x7EAE6368",
+  "role": "CmpETri_EditTrimmingComponent state 57 entry (+1124/+212): builds 12067 evTraCmp_NextState; GEN to self; \"CmpETri_EditTrimmingComponent::single_mode_start#\"",
+  "row": "0x7EAE6368\t147\tCmpETri_EditTrimmingComponent state 57 entry (+1124/+212): builds 12067 evTraCmp_NextState; GEN to self; \"CmpETri_EditTrimmingComponent::single_mode_start#\"\tstate-entry\tV"
+ },
+ {
+  "index": "16a-app-function-index",
+  "addr": "0x7E9C15AC",
+  "role": "OlyApi CustomPrint::trimmingMode (API id 0x050313); vt word 0x7EC0EA38",
+  "row": "0x7E9C15AC\t147\tOlyApi CustomPrint::trimmingMode (API id 0x050313); vt word 0x7EC0EA38\tolyapi-method\tV"
+ },
+ {
+  "index": "16a-app-function-index",
+  "addr": "0x7E96A475",
+  "role": "code in TraShareTakeStatus range, class not proven (callers only in CmpSqp_SequencePartsBase): getter of RAM global 0x602B0D9C",
+  "row": "0x7E96A475\t9\tcode in TraShareTakeStatus range, class not proven (callers only in CmpSqp_SequencePartsBase): getter of RAM global 0x602B0D9C\tgetter-setter\tV"
+ },
+ {
+  "index": "16a-app-function-index",
+  "addr": "0x7EA427D3",
+  "role": "CapMod_ModeInformation forwarder -> 0x7EA427DB [target role: CapMod_ModeInformation state 8 entry (+252/+212): state trace; \"ended\"]",
+  "row": "0x7EA427D3\t8\tCapMod_ModeInformation forwarder -> 0x7EA427DB [target role: CapMod_ModeInformation state 8 entry (+252/+212): state trace; \"ended\"]\tforwarder+tgt\tV"
+ },
+ {
+  "index": "16a-app-function-index",
+  "addr": "0x7EA3610D",
+  "role": "CapTak_Take forwarder [vt slot 32 of CapTak_Take] -> 0x7EA361F0 [target role: CapTak_Take forwarder -> 0x7EA361F8 [target role: CapTak_Take state 3 entry (+208/+212): state trace]]",
+  "row": "0x7EA3610D\t11\tCapTak_Take forwarder [vt slot 32 of CapTak_Take] -> 0x7EA361F0 [target role: CapTak_Take forwarder -> 0x7EA361F8 [target role: CapTak_Take state 3 entry (+208/+212): state trace]]\tforwarder+tgt\tV"
+ },
+ {
+  "index": "16a-app-function-index",
+  "addr": "0x7EB0493B",
+  "role": "CmpPCal_PlayCalendarComponent state 39 handler: 12067 evTraCmp_NextState -> state 49; else parent 0x7EB021F2",
+  "row": "0x7EB0493B\t63\tCmpPCal_PlayCalendarComponent state 39 handler: 12067 evTraCmp_NextState -> state 49; else parent 0x7EB021F2\thandler\tV"
+ },
+ {
+  "index": "16b-gui-function-index",
+  "addr": "0x7ED68791",
+  "role": "panel 13 (type 0x600D) vt slot 91 (+364) = post-create init; does: setVisible, DM get block 3, DM get block ?, DM get block 2, DM get block 37, DM get block 31, DM get block 34",
+  "row": "0x7ED68791\t1473\tpanel 13 (type 0x600D) vt slot 91 (+364) = post-create init; does: setVisible, DM get block 3, DM get block ?, DM get block 2, DM get block 37, DM get block 31, DM get block 34\tvt,args\tV"
+ },
+ {
+  "index": "16b-gui-function-index",
+  "addr": "0x7ED0652F",
+  "role": "post GM 0x9A40 , read-modify-write of DM block 80, read-modify-write of DM block 81 \u2026 (inputs: PlayLightBox::getEnlargeInfo, PlayLightBox::getNumber, PlayCommon::getStillInfo); logs 'getEnlargeInfo result=%d', 'getNumber() base=%d, current=%d'; method of CPlayLightBox (singleton RAM 0x602B605C); does: applyLongPressProfile, DM get block \u2026",
+  "row": "0x7ED0652F\t448\tpost GM 0x9A40 , read-modify-write of DM block 80, read-modify-write of DM block 81 \u2026 (inputs: PlayLightBox::getEnlargeInfo, PlayLightBox::getNumber, PlayCommon::getStillInfo); logs 'getEnlargeInfo result=%d', 'getNumber() base=%d, current=%d'; method of CPlayLightBox (singleton RAM 0x602B605C); does: applyLongPressProfile, DM get block \u2026\tsynth,str,args\tV"
+ },
+ {
+  "index": "16b-gui-function-index",
+  "addr": "0x7ED04177",
+  "role": "reads PlayCommon::getSelectPicNumber; logs 'OlyApiPlayCommon::getInterface()->getSel'; method of CPlayIndex (singleton RAM 0x602B6054, 3,300 B); does: PlayCommon::getSelectPicNumber",
+  "row": "0x7ED04177\t64\treads PlayCommon::getSelectPicNumber; logs 'OlyApiPlayCommon::getInterface()->getSel'; method of CPlayIndex (singleton RAM 0x602B6054, 3,300 B); does: PlayCommon::getSelectPicNumber\tsynth,str,args\tV"
+ },
+ {
+  "index": "16b-gui-function-index",
+  "addr": "0x7EDDBCA2",
+  "role": "getter of field +12 (movhu); in 15a class row \"return-to (SS, state)\" singleton: getInstance 0x7EDDBC06 (RAM 0x602BD",
+  "row": "0x7EDDBCA2\t6\tgetter of field +12 (movhu); in 15a class row \"return-to (SS, state)\" singleton: getInstance 0x7EDDBC06 (RAM 0x602BD\tshape\tV"
+ },
+ {
+  "index": "16b-gui-function-index",
+  "addr": "0x7ED719EB",
+  "role": "code: calls 0x7ED6F7D9; stores 0 (u8) to [(2018 + a0)+3]; calls 0x7ED6587F; returns result of 0x7ED6587F; short wrapper \u2192 0x7ED6F7D9 then 0x7ED6587F; in panel 29 (type 0x601C) code; via 0x7ED6587F: setVisible, setU16Prop8013",
+  "row": "0x7ED719EB\t35\tcode: calls 0x7ED6F7D9; stores 0 (u8) to [(2018 + a0)+3]; calls 0x7ED6587F; returns result of 0x7ED6587F; short wrapper \u2192 0x7ED6F7D9 then 0x7ED6587F; in panel 29 (type 0x601C) code; via 0x7ED6587F: setVisible, setU16Prop8013\tcode,shape,callee\tV"
+ },
+ {
+  "index": "16b-gui-function-index",
+  "addr": "0x7ED7EB2D",
+  "role": "private method (in unnumbered panel class type 0x6061 code); called by 0x7ED7EA53 (unnumbered panel class type 0x6061 vt slot 91 [+364] = post-create init), 0x7ED7EAFA; via 0x7ED7EBA2: setVisible; via 0x7ED7EC12: setVisible",
+  "row": "0x7ED7EB2D\t117\tprivate method (in unnumbered panel class type 0x6061 code); called by 0x7ED7EA53 (unnumbered panel class type 0x6061 vt slot 91 [+364] = post-create init), 0x7ED7EAFA; via 0x7ED7EBA2: setVisible; via 0x7ED7EC12: setVisible\trange,callee\tI"
+ },
+ {
+  "index": "16b-gui-function-index",
+  "addr": "0x7ED69718",
+  "role": "updates child widgets (visibility, 0x8013 value); private method (in panel 13 (type 0x600D) code); called by 0x7ED68791, 0x7ED68D52; does: setVisible, setU16Prop8013",
+  "row": "0x7ED69718\t465\tupdates child widgets (visibility, 0x8013 value); private method (in panel 13 (type 0x600D) code); called by 0x7ED68791, 0x7ED68D52; does: setVisible, setU16Prop8013\tsynth,range,args\tI"
+ },
+ {
+  "index": "16b-gui-function-index",
+  "addr": "0x7ED62F4C",
+  "role": "updates child widgets (visibility, position); private method (in panel 10 (type 0x600A) code); called by 0x7ED626F3; does: setVisible, moveTo",
+  "row": "0x7ED62F4C\t409\tupdates child widgets (visibility, position); private method (in panel 10 (type 0x600A) code); called by 0x7ED626F3; does: setVisible, moveTo\tsynth,range,args\tI"
+ },
+ {
+  "index": "16b-gui-function-index",
+  "addr": "0x7EDDF19D",
+  "role": "GuiTouch action handler: touch action 8 of panel 10 (type 0x600a)",
+  "row": "0x7EDDF19D\t32\tGuiTouch action handler: touch action 8 of panel 10 (type 0x600a)\ttouch\tV"
+ },
+ {
+  "index": "16b-gui-function-index",
+  "addr": "CA ShootingLvMagnify[0x5A05]/0x0100000F",
+  "role": "CA ShootingLvMagnify state 0x5A05 on 0x0100000F OLY_RELEASE_LEFT_KEY \u2192 handler 0x7ECDC0D6 (releaseKeyZoomScroll); same state",
+  "row": "CA ShootingLvMagnify[0x5A05]/0x0100000F\t-\tCA ShootingLvMagnify state 0x5A05 on 0x0100000F OLY_RELEASE_LEFT_KEY \u2192 handler 0x7ECDC0D6 (releaseKeyZoomScroll); same state\tca-table\tV"
+ },
+ {
+  "index": "16c-platform-function-index",
+  "addr": "0x7E507325",
+  "role": "scheap large alloc (16 KB block) wrapper (14-B: mov pool,a0/a1; call core); wrapper: calls 0x7E507395 (scheap alloc core (pool by pointer, lock 0x7E436593)) with a0=fn 0x7E507450 (logs \u201cscheap_large_alloc\u201d)",
+  "row": "0x7E507325\t14\tsc library (shell, SC_TTIMER, scheap, utils, RTC/calendar)\tscheap large alloc (16 KB block) wrapper (14-B: mov pool,a0/a1; call core); wrapper: calls 0x7E507395 (scheap alloc core (pool by pointer, lock 0x7E436593)) with a0=fn 0x7E507450 (logs \u201cscheap_large_alloc\u201d)\tcurated: 14b \u00a72 + shape: thunk (one call)\tV"
+ },
+ {
+  "index": "16c-platform-function-index",
+  "addr": "0x7E53BBB3",
+  "role": "service calls: scheap small alloc; scheap small free; helper of 0x7E53BAF0 (only caller), under 0x7E53D96D (BC_MAIN task: 16-B Oimf messages, code msg+8 (0-34) via jump)",
+  "row": "0x7E53BBB3\t225\tBC body-stabiliser controller > BC command layer (classes 0-3)\tservice calls: scheap small alloc; scheap small free; helper of 0x7E53BAF0 (only caller), under 0x7E53D96D (BC_MAIN task: 16-B Oimf messages, code msg+8 (0-34) via jump)\tcallee signatures + call graph\tV"
+ },
+ {
+  "index": "16c-platform-function-index",
+  "addr": "0x7E5ADE37",
+  "role": "FAT request: set parent-dir location (+76..) from root entry record n (0 DCIM, 1 MISC, 2 PARAMDT) of drive via 0x7E5B4527/0x7E5B453E; n>2 -> zeros",
+  "row": "0x7E5ADE37\t86\tDCF (folder/file numbering, scan)\tFAT request: set parent-dir location (+76..) from root entry record n (0 DCIM, 1 MISC, 2 PARAMDT) of drive via 0x7E5B4527/0x7E5B453E; n>2 -> zeros\tD5 read (dcf): calls 0x7E5B6463, 0x7E5B4527, 0x7E5B453E\tV"
+ },
+ {
+  "index": "16c-platform-function-index",
+  "addr": "0x7E464ADB",
+  "role": "empty function (`retf`, does nothing); helper of 0x7E4649E8 (IOE class register init part 1 (devid) (only caller)",
+  "row": "0x7E464ADB\t3\tI/O expander IOE/IOEC (SIO ch3)\tempty function (`retf`, does nothing); helper of 0x7E4649E8 (IOE class register init part 1 (devid) (only caller)\tshape: lone return + call graph\tV"
+ },
+ {
+  "index": "16c-platform-function-index",
+  "addr": "0x7E5C8D48",
+  "role": "DCF path parse (a0 '/DCIM/100OLYMP/PA010001.JPG', len >= 25): folder number from +8, file number from +17; returns 0 or 0xFFFF (dcf_get_index_from_path helper); helper of 0x7E5AFB62 (dcf_get_index_from_path) (only caller)",
+  "row": "0x7E5C8D48\t60\tEYEFI requests, AVCHD paths, EYEFI/FILECLBK tasks, file shells, FILEFGND, dcfnum\tDCF path parse (a0 '/DCIM/100OLYMP/PA010001.JPG', len >= 25): folder number from +8, file number from +17; returns 0 or 0xFFFF (dcf_get_index_from_path helper); helper of 0x7E5AFB62 (dcf_get_index_from_path) (only caller)\tD5 read (eyefi): strlen >= 25, 0x7E5C8CD3, 0x7E5C8C4B + call graph\tV"
+ },
+ {
+  "index": "16c-platform-function-index",
+  "addr": "0x7E465286",
+  "role": "shared helper, 2 callers (soft-timer API (tmr_start/tmr_stop) 2)",
+  "row": "0x7E465286\t69\tsoft-timer API (tmr_start/tmr_stop)\tshared helper, 2 callers (soft-timer API (tmr_start/tmr_stop) 2)\tcall graph\tV"
+ },
+ {
+  "index": "16c-platform-function-index",
+  "addr": "0x7E579E7F",
+  "role": "WB gain/colour getter for development; one of the row 0x7E579E7F / 0x7E579F3F / 0x7E57A028 / 0x7E57A0DC: gain and colour getters for development; service calls: prm data pointer(0xAA4A)",
+  "row": "0x7E579E7F\t192\tWB white-balance/colour module\tWB gain/colour getter for development; one of the row 0x7E579E7F / 0x7E579F3F / 0x7E57A028 / 0x7E57A0DC: gain and colour getters for development; service calls: prm data pointer(0xAA4A)\tcurated: 14b \u00a73 + section 14b + callee signatures\tV"
+ },
+ {
+  "index": "16c-platform-function-index",
+  "addr": "0x7E514236",
+  "role": "callback (no direct caller): address loaded at 0x7E5141CE in 0x7E5141B0, next call 0x7E512CE6; service calls: mec update/free",
+  "row": "0x7E514236\t49\tMEC LCOM low layer\tcallback (no direct caller): address loaded at 0x7E5141CE in 0x7E5141B0, next call 0x7E512CE6; service calls: mec update/free\tmov imm32 of the entry (callback rule) + callee signatures\tV"
+ },
+ {
+  "index": "16c-platform-function-index",
+  "addr": "0x7E46A6FA",
+  "role": "clk_gate(id 0-48 / 255, on): ref-counted SYSCLK gate 0x988000D0/D4 on, DC/E0 off; MMIO user: SYSCLK regs 0x988000D0, 0x988000D4, 0x988000DC, 0x988000E0; calls kernel services CPU lock, CPU unlock",
+  "row": "0x7E46A6FA\t337\tSYSCLK clock/reset (0x98800000)\tclk_gate(id 0-48 / 255, on): ref-counted SYSCLK gate 0x988000D0/D4 on, DC/E0 off; MMIO user: SYSCLK regs 0x988000D0, 0x988000D4, 0x988000DC, 0x988000E0; calls kernel services CPU lock, CPU unlock\tcurated: 13f \u00a72.5 + MMIO constants 0x98000000-0x9AFFFFFF (13f \u00a72.1) + kernel wrappers (callees)\tV"
+ },
+ {
+  "index": "16c-platform-function-index",
+  "addr": "0x7E535C4B",
+  "role": "uses strings \u201cLPe/\u201d | \u201cLRe/\u201d | \u201clsP/\u201d; service calls: printf; shared helper, 10 callers (lens module (tasks, command layer, shell, firmup, controller) 10)",
+  "row": "0x7E535C4B\t291\tlens module (tasks, command layer, shell, firmup, controller) > lens sync / sequence layer (error sub 0x0100)\tuses strings \u201cLPe/\u201d | \u201cLRe/\u201d | \u201clsP/\u201d; service calls: printf; shared helper, 10 callers (lens module (tasks, command layer, shell, firmup, controller) 10)\town strings + callee signatures + call graph\tV"
+ },
+ {
+  "index": "16d-core-play-overlay-index",
+  "addr": "0x7E958BEE",
+  "role": "`aud_dev_wm8946_output_path_spkout_l_control` (logs its own name); strings \u00abaux1 =\u00bb",
+  "row": "0x7E958BEE\t394\t`aud_dev_wm8946_output_path_spkout_l_control` (logs its own name); strings \u00abaux1 =\u00bb\town string (bare)\tV\tS\tAudio: bridge, control, WM8946 codec driver, DSP, FSC DMA, sequences, WAV/AC3 tools, AUD_*"
+ },
+ {
+  "index": "16d-core-play-overlay-index",
+  "addr": "0x7E67D03C",
+  "role": "under api layer init: calls api_* module inits 0x7E675D99 (direct caller)",
+  "row": "0x7E67D03C\t40\tunder api layer init: calls api_* module inits 0x7E675D99 (direct caller)\tfeatures+call graph\tV\tC\tC camera API api_*.c (api_exec_start queue table)"
+ },
+ {
+  "index": "16d-core-play-overlay-index",
+  "addr": "0x7E6C30BA",
+  "role": "helper called by 0x7E6C30A9",
+  "row": "0x7E6C30BA\t84\thelper called by 0x7E6C30A9\tcall graph (unnamed callers)\tV\tC\ttouch panel (TOUCHPANEL 0x7E6BCF84, TP bootloader) and disp_sync"
+ },
+ {
+  "index": "16d-core-play-overlay-index",
+  "addr": "0x7E62542E",
+  "role": "uses strings \u00ab[cr]\u00bb; under `SC_RT` 0x7E5F8BE4 (2 levels up)",
+  "row": "0x7E62542E\t52\tuses strings \u00ab[cr]\u00bb; under `SC_RT` 0x7E5F8BE4 (2 levels up)\town strings (gist)\tV\tC\tfcs/AF code tail (FCS_MOVIE/contrast AF helpers; setters 0x7E627E8D/96)"
+ },
+ {
+  "index": "16d-core-play-overlay-index",
+  "addr": "0x7E6B6123",
+  "role": "work of case 16 of the switch in 0x7E6AEAD2 (the case arm calls it; table 0x7E7E20A0)",
+  "row": "0x7E6B6123\t133\twork of case 16 of the switch in 0x7E6AEAD2 (the case arm calls it; table 0x7E7E20A0)\tjump/hash table (jt.py)\tV\tS\tDISPLAY task and display services"
+ },
+ {
+  "index": "16d-core-play-overlay-index",
+  "addr": "0x7E71D010",
+  "role": "wrapper: calls `debug print(a0 = str)` 0x7E4263E5 with a0=0x7E85564C",
+  "row": "0x7E71D010\t16\twrapper: calls `debug print(a0 = str)` 0x7E4263E5 with a0=0x7E85564C\tshape:wrapper\tV\tS\tart filters and effects art_*.c (ART task 0x7E729E25)"
+ },
+ {
+  "index": "16d-core-play-overlay-index",
+  "addr": "0x7F08DAE9",
+  "role": "work of case 18 of the switch in 0x7F08D380 (the case arm calls it; table 0x7F0D510C); calls `put LE16` 0x7E507F72, `memcpy (fast)` 0x7E5081FA, case 18 of 0x7F08D49B 0x7F08DE97",
+  "row": "0x7F08DAE9\t76\twork of case 18 of the switch in 0x7F08D380 (the case arm calls it; table 0x7F0D510C); calls `put LE16` 0x7E507F72, `memcpy (fast)` 0x7E5081FA, case 18 of 0x7F08D49B 0x7F08DE97\tjump/hash table (jt.py)\tV\tS\toverlay B: TPC_LANG and TPC services (TPC DPST, TPC_OLPTPAPI) (I, position)"
+ },
+ {
+  "index": "16d-core-play-overlay-index",
+  "addr": "0x7E93CC3E",
+  "role": "calls `scheap alloc` 0x7E5072ED, `scheap free` 0x7E5072FB, `play_exif_search_tag` 0x7E941224; under `play_save_remain_num` 0x7E94AD8F (direct caller), `play_cube_resize_judge` 0x7E93D5D1 (2 levels up)",
+  "row": "0x7E93CC3E\t293\tcalls `scheap alloc` 0x7E5072ED, `scheap free` 0x7E5072FB, `play_exif_search_tag` 0x7E941224; under `play_save_remain_num` 0x7E94AD8F (direct caller), `play_cube_resize_judge` 0x7E93D5D1 (2 levels up)\tfeatures+call graph\tV\tC\tplayback engine play_*.c / playbuff.c (PLAY_MAIN/IMAGE/LOAD/SOUND)"
+ },
+ {
+  "index": "16d-core-play-overlay-index",
+  "addr": "0x7E6EE9BC",
+  "role": "section text: \u201c`0x7E6EE9BC` (called from the QT/AVCHD encode loop 0x7E6EDB8D) does four things\u201d",
+  "row": "0x7E6EE9BC\t222\tsection text: \u201c`0x7E6EE9BC` (called from the QT/AVCHD encode loop 0x7E6EDB8D) does four things\u201d\tsec 04 line 61\tI\tS\tmovie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)"
+ },
+ {
+  "index": "16d-core-play-overlay-index",
+  "addr": "0x7E632CA8",
+  "role": "empty stub: returns at once (no work)",
+  "row": "0x7E632CA8\t3\tempty stub: returns at once (no work)\tshape:ret-only\tV\tS\tcam_*.c files cam_aedrv \u2026 cam_frame_sync (03 \u00a73, 14b)"
+ },
+ {
+  "index": "16e-graphics-avpi-index",
+  "addr": "0x7EE624CE",
+  "role": "getter: returns (a0 +0); shared helper, 4 callers: 0x7EE75D3C (C3D root-level ctor: +12 name, +36 id, +40 = -1, +44 ctx), 0x7EE84E0C (own ctor level of C3D class id 24)",
+  "row": "0x7EE624CE\t5\tC3D framework > context/registry/stream\tgetter: returns (a0 +0); shared helper, 4 callers: 0x7EE75D3C (C3D root-level ctor: +12 name, +36 id, +40 = -1, +44 ctx), 0x7EE84E0C (own ctor level of C3D class id 24)\tshape + call graph\tV\tS"
+ },
+ {
+  "index": "16e-graphics-avpi-index",
+  "addr": "0x7EE5ACA6",
+  "role": "sin(x), angle in turns; float computation: 15 soft-float ops (fsub\u00d73, fmul\u00d73, f2i\u00d72, i2f\u00d72)",
+  "row": "0x7EE5ACA6\t253\t3D engine core > maths helpers (extent I)\tsin(x), angle in turns; float computation: 15 soft-float ops (fsub\u00d73, fmul\u00d73, f2i\u00d72, i2f\u00d72)\tcurated: 14a 2.2 + soft-float callees (13a)\tV\tS"
+ },
+ {
+  "index": "16e-graphics-avpi-index",
+  "addr": "0x7EE9E0FC",
+  "role": "AVPI result codes 0xAA000103, 0xAA000104; helper of 0x7EE9DB19; under 0x7EE9E4B7 (vtable slot 2 of AVPI class vt 0x7F02FD10 type 0x0C02) (2 levels up)",
+  "row": "0x7EE9E0FC\t92\tAVPI > plug-ins\tAVPI result codes 0xAA000103, 0xAA000104; helper of 0x7EE9DB19; under 0x7EE9E4B7 (vtable slot 2 of AVPI class vt 0x7F02FD10 type 0x0C02) (2 levels up)\terror constants + call graph\tV\tP"
+ },
+ {
+  "index": "16e-graphics-avpi-index",
+  "addr": "0x7EE4FB26",
+  "role": "helper of 0x7EE6A286; calls 0x7EE31766 (GL back end: fog state), 0x7EE31E10 (GL back end: matrix load), 0x7EE4CCA0 (field init: u16 +504 = 0, u8 +512 = 0)",
+  "row": "0x7EE4FB26\t1058\t3D engine core > type modules\thelper of 0x7EE6A286; calls 0x7EE31766 (GL back end: fog state), 0x7EE31E10 (GL back end: matrix load), 0x7EE4CCA0 (field init: u16 +504 = 0, u8 +512 = 0)\tcall graph\tV\tP"
+ },
+ {
+  "index": "16e-graphics-avpi-index",
+  "addr": "0x7EE4245C",
+  "role": "float computation: 6 soft-float ops (fcmp\u00d75, fmul\u00d71); helper of 0x7EE4253C; calls 0x7EE54E83 (set a 4x4 float matrix to identity and its flag bytes +64..+66 = 1)",
+  "row": "0x7EE4245C\t224\t3D engine core > type modules\tfloat computation: 6 soft-float ops (fcmp\u00d75, fmul\u00d71); helper of 0x7EE4253C; calls 0x7EE54E83 (set a 4x4 float matrix to identity and its flag bytes +64..+66 = 1)\tsoft-float callees (13a) + call graph\tV\tP"
+ },
+ {
+  "index": "16e-graphics-avpi-index",
+  "addr": "0x7EE68013",
+  "role": "setter: u8 +32 = d0, u8 +33 = d0 (NULL-checked; range check against 0, 1); helper of 0x7EE67A5F; under 0x7EE81ECF (vtable slot +56 of C3D class id 50) (2 levels up)",
+  "row": "0x7EE68013\t28\tC3D framework > class code\tsetter: u8 +32 = d0, u8 +33 = d0 (NULL-checked; range check against 0, 1); helper of 0x7EE67A5F; under 0x7EE81ECF (vtable slot +56 of C3D class id 50) (2 levels up)\tshape + call graph\tV\tS"
+ },
+ {
+  "index": "16e-graphics-avpi-index",
+  "addr": "0x7EE9E72A",
+  "role": "shared helper, 2 callers",
+  "row": "0x7EE9E72A\t26\tAVPI > plug-ins\tshared helper, 2 callers\tcall graph\tV\tC"
+ },
+ {
+  "index": "16e-graphics-avpi-index",
+  "addr": "0x7EEB6A8D",
+  "role": "vtable slot 3 (+12) of AVPI class vt 0x7F0311DC (Audio Decode Plug-in group, by position); virtual-call stub: calls slot +12 of the vtable of the object",
+  "row": "0x7EEB6A8D\t43\tAVPI > plug-ins\tvtable slot 3 (+12) of AVPI class vt 0x7F0311DC (Audio Decode Plug-in group, by position); virtual-call stub: calls slot +12 of the vtable of the object\tAVPI vtable 0x7F0311DC word 0x7F0311E8 + shape\tV\tS"
+ },
+ {
+  "index": "16e-graphics-avpi-index",
+  "addr": "0x7EE9E785",
+  "role": "ctor (stores the vtable) of AVPI class vt 0x7F02FD38 (Audio Encode Plug-in group, by position); AVPI result codes 0xCA000003; uses memcpy",
+  "row": "0x7EE9E785\t103\tAVPI > plug-ins\tctor (stores the vtable) of AVPI class vt 0x7F02FD38 (Audio Encode Plug-in group, by position); AVPI result codes 0xCA000003; uses memcpy\tAVPI vtable 0x7F02FD38 loaded by code + error constants + runtime callees (13a, 14a)\tV\tS"
+ },
+ {
+  "index": "16e-graphics-avpi-index",
+  "addr": "0x7EE77579",
+  "role": "wrapper: calls 0x7EE8EDDD; shared helper, 2 callers",
+  "row": "0x7EE77579\t19\tC3D framework > class code\twrapper: calls 0x7EE8EDDD; shared helper, 2 callers\tshape + call graph\tV\tP"
+ }
+]
