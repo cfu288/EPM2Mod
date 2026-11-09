@@ -1,6 +1,19 @@
 #!/bin/sh
-# Enforce Conventional Commits on the subject line. Enable: git config core.hooksPath .githooks
-subject=$(head -n1 "$1")
+# Commit-message checks. Enable: git config core.hooksPath .githooks
+# 1. Remove AI attribution lines (Claude co-author trailers, session links, "Generated with" footers).
+# 2. Enforce Conventional Commits on the subject line.
+msg="$1"
+tmp="$msg.tmp.$$"
+grep -v -i -E '^[[:space:]]*(co-authored-by:.*(claude|anthropic)|claude-session:|.*generated with \[?claude)' "$msg" > "$tmp" || true
+# drop trailing blank lines left behind
+awk '{ lines[NR] = $0 } END { n = NR; while (n > 0 && lines[n] ~ /^[[:space:]]*$/) n--; for (i = 1; i <= n; i++) print lines[i] }' "$tmp" > "$msg"
+rm -f "$tmp"
+if grep -q -i -E 'co-authored-by:.*(claude|anthropic)|claude-session:' "$msg"; then
+  echo "commit-msg: AI attribution lines are not allowed" >&2
+  exit 1
+fi
+
+subject=$(head -n1 "$msg")
 pattern='^(feat|fix|docs|test|refactor|chore|build|ci|perf|style|revert|exp)(\([a-z0-9._/-]+\))?!?: .+'
 case "$subject" in Merge\ *|fixup!\ *|squash!\ *) exit 0 ;; esac
 if ! printf '%s' "$subject" | grep -Eq "$pattern"; then
