@@ -76,6 +76,26 @@ python3 tools/fwmap.py str 'firmup'
 python3 tools/fwmap.py tasks
 ```
 
+### Other bodies (local only, git-ignored)
+
+`out/` holds the inputs for the cross-body work:
+- `out/firmware/`: seven stock firmware files as `.BIN.lzma`, with `MANIFEST.sha256`. They are E-PL5 1.6, E-P5 1.8, E-PL6 1.4, E-M10 1.4, E-PL7 1.4, E-M5 II 4.1 and PEN-F 3.1, from the `ep5-fw-reverse` archive; all hashes verified, and the E-PL5 also against xdel.ru.
+- `out/lang/`: each body's English UI strings, plus diffs against the E-PM2.
+
+Keep these compressed and out of `build/`. **Never put a decompressed `OLY_E_100…` (E-PL5) file on the camera's card.**
+
+To rebuild a body's function database (about one minute each; bases from `scripts/art_findbase.py`):
+
+```bash
+O=experiments/2026-11-08-feature-map/out
+python3 -c "import lzma,sys; open(sys.argv[2],'wb').write(lzma.open(sys.argv[1]).read())" \
+  $O/firmware/OLY_E_108_1800_0000_0000.BIN.lzma $O/bin/OLY_E_108_1800_0000_0000.BIN
+python3 tools/fwmap.py --fw $O/bin/OLY_E_108_1800_0000_0000.BIN --base 0x7E101020 \
+  --out $O/map-108_1800 build
+```
+
+Bases: E-PL5 and E-PL6 0x7E421020, E-P5 0x7E101020, E-M10 0x7D991020, E-PL7 0x7D971020, E-M5 II and PEN-F 0x60021020. Create `$O/bin` first.
+
 Several sections name helper scripts (for example `lang.py`, `menutab3.py`, `ptptab.py`) that the investigators wrote in the session's temporary scratch folder. **They are not in this repo.**
 
 ## Open questions
