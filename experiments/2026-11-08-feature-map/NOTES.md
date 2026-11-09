@@ -84,3 +84,4 @@ English-string counts not present in the E-PM2: E-PL5 0 (block 1 identical), E-P
   - `memset` 0x7E500D73 (1,367 call sites) is a byte-store loop over [a0, a0+d1) with value d0.
   - `sprintf` 0x7E4FFDE3 has 1,664 call sites.
 - **13e (mcon/sequencers): the TAKE command tables are keyed by cmd + 1. Confirmed:** `inc d1` at 0x7E582A48 / 0x7E588321, then index (d1 & 31)·8 and compare key == d1. Table keys start 0x1, 0x2, 0x101, 0x102, …. Section 02 §4 now carries the correction.
+- **13d (GUI toolkit): 0x7EE02095–0x7EE21020 is a GL library for C3D, not GUI. Confirmed:** all 89 external callers are in the C3D region 0x7EE21020–0x7EE41020 or the C3D tasks 0x7F09–0x7F0A, and none are in GUI code. `GM_*` message names: 56 strings match `^GM_[A-Z_]+$` against the claimed 61 (detail to recheck).
