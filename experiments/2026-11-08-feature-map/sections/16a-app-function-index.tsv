@@ -4119,647 +4119,647 @@ addr	size	role	basis	V/I
 0x7E9A0FC3	1505	sdk debug shell method: [via 0x7E96E55C: "0x%08X"]; [via 0x7E99D026: "%1s\n"]; [via 0x7E96E625: "0x%08X"]; [via 0x7E96E5A6: "0x%08X"]; [via 0x7E99D05E: "%1s, %d\n"]; [via 0x7E9A0CF7: (via 0x7E99D05E: "%1s, %d\n"); (via 0x7E99D026: "%1s\n"); "kind"]	g:str	I
 0x7E9A15A4	55	sdk debug shell method: leaf: writes this+0,+2,+4,+6,+8,+10 +2 more; called by 0x7E9AF378 (sdk api handler O17 startSlide) +1	g:leaf+callers	I
 0x7E9A15DB	322	sdk debug shell method: calls 0x7E9A15A4 (sdk debug shell method: leaf: writes this+0,+2,+4,+6,+8,+10 +2 more; c); called by 0x7E9A407F (sdk api handler C02 paint) +36	g:callers	I
-0x7E9A171D	53	sdk api handler A02 shutDown	sdk-api	V
-0x7E9A1752	260	sdk api handler A03 startSleep	sdk-api	V
-0x7E9A1856	47	sdk api handler A04 retractLens	sdk-api	V
-0x7E9A1885	74	sdk api handler A05 changeOutLine	sdk-api	V
-0x7E9A18CF	171	sdk api handler A06 getDisplayDeviceState	sdk-api	V
-0x7E9A197A	393	sdk api handler A07 getWakeUpIssue	sdk-api	V
-0x7E9A1B03	202	sdk api handler A08 getSleepWakeupIssue	sdk-api	V
-0x7E9A1BCD	406	sdk api handler A09 startSaveLcd	sdk-api	V
-0x7E9A1D63	143	sdk api handler A10 endSaveLcd	sdk-api	V
-0x7E9A1DF2	47	sdk api handler A11 ctrlLcdBacklight	sdk-api	V
-0x7E9A1E21	149	sdk api handler A12 getUsbState	sdk-api	V
-0x7E9A1EB6	70	sdk api handler A13 getCompositeState	sdk-api	V
-0x7E9A1EFC	70	sdk api handler A14 getHdmiState	sdk-api	V
-0x7E9A1F42	70	sdk api handler A15 getEvfState	sdk-api	V
-0x7E9A1F88	218	sdk api handler A16 getPenpalState	sdk-api	V
-0x7E9A2062	70	sdk api handler A17 isCecConnect	sdk-api	V
-0x7E9A20A8	47	sdk api handler A18 getDisplaySupport3D	sdk-api	V
-0x7E9A20D7	47	sdk api handler A19 getFlashInfo	sdk-api	V
-0x7E9A2106	217	sdk api handler A20 getKeyState	sdk-api	V
-0x7E9A21DF	74	sdk api handler A21 getModeDialState	sdk-api	V
-0x7E9A2229	202	sdk api handler A22 getJogDialState	sdk-api	V
-0x7E9A22F3	303	sdk api handler A23 isMirrorSetup	sdk-api	V
-0x7E9A2422	106	sdk api handler A24 getEyeFiStatus	sdk-api	V
-0x7E9A248C	130	sdk api handler A25 startHighlightShadow	sdk-api	V
-0x7E9A250E	307	sdk api handler A26 endHighlightShadow	sdk-api	V
-0x7E9A2641	47	sdk api handler A27 getTemperatureState	sdk-api	V
-0x7E9A2670	94	sdk api handler A28 setDispSync	sdk-api	V
-0x7E9A26CE	152	sdk api handler A29 getISStatus	sdk-api	V
-0x7E9A2766	82	sdk api handler A30 setModeDialState	sdk-api	V
-0x7E9A27B8	116	sdk api handler A31 getDispSync	sdk-api	V
-0x7E9A282C	47	sdk api handler A32 cancelDispSync	sdk-api	V
-0x7E9A285B	47	sdk api handler A34 getEyeSensorState	sdk-api	V
-0x7E9A288A	48	sdk api handler A35 ctrlAutoThrough	sdk-api	V
-0x7E9A28BA	119	sdk api handler A36 ctrlEyeSensor	sdk-api	V
-0x7E9A2931	119	sdk api handler A37 getHlsStateS0036	sdk-api	V
-0x7E9A29A8	120	sdk api handler A38 setHlsStateS0036	sdk-api	V
-0x7E9A2A20	142	sdk api handler A39 getMonitorRotateStatus	sdk-api	V
-0x7E9A2AAE	279	sdk api handler A40 getHlsStateS004243	sdk-api	V
-0x7E9A2BC5	120	sdk api handler A41 setHlsStateS004243	sdk-api	V
-0x7E9A2C3D	120	sdk api handler B01 setSetting	sdk-api	V
-0x7E9A2CB5	224	sdk api handler B02 getSetting	sdk-api	V
-0x7E9A2D95	140	sdk api handler B03 setSettingDetail	sdk-api	V
-0x7E9A2E21	151	sdk api handler B04 getSettingDetail	sdk-api	V
-0x7E9A2EB8	141	sdk api handler B05 getSettingUser	sdk-api	V
-0x7E9A2F45	180	sdk api handler B06 getSettingDetailUser	sdk-api	V
-0x7E9A2FF9	135	sdk api handler B07 isEnabled	sdk-api	V
-0x7E9A3080	123	sdk api handler B08 getSettingCount	sdk-api	V
-0x7E9A30FB	118	sdk api handler B09 getSettingValue	sdk-api	V
-0x7E9A3171	140	sdk api handler B10 getSettingIndex	sdk-api	V
-0x7E9A31FD	140	sdk api handler B11 canSettingValue	sdk-api	V
-0x7E9A3289	145	sdk api handler B12 resetSetting	sdk-api	V
-0x7E9A331A	138	sdk api handler B13 resetFactorySetting	sdk-api	V
-0x7E9A33A4	39	sdk api handler B14 loadLanguageHeader	sdk-api	V
-0x7E9A33CB	293	sdk api handler B15 loadLanguageData	sdk-api	V
-0x7E9A34F0	275	sdk api handler B16 registerCallback	sdk-api	V
-0x7E9A3603	56	sdk api handler B17 notifyCurrentLanguage	sdk-api	V
-0x7E9A363B	559	sdk api handler B18 notifySupportLanguage	sdk-api	V
-0x7E9A386A	433	sdk api handler B19 saveCustom	sdk-api	V
-0x7E9A3A1B	143	sdk api handler B20 clearCustom	sdk-api	V
-0x7E9A3AAA	143	sdk api handler B21 loadCustom	sdk-api	V
-0x7E9A3B39	233	sdk api handler B22 getCustomState	sdk-api	V
-0x7E9A3C22	143	sdk api handler B23 changeMode	sdk-api	V
-0x7E9A3CB1	377	sdk api handler B24 isMFsetting	sdk-api	V
-0x7E9A3E2A	60	sdk api handler B25 startMFsetting	sdk-api	V
-0x7E9A3E66	60	sdk api handler B26 endMFsetting	sdk-api	V
-0x7E9A3EA2	179	sdk api handler B27 getExposeMode	sdk-api	V
-0x7E9A3F55	257	sdk api handler B28 resetIntervalShooting	sdk-api	V
-0x7E9A4056	41	sdk api handler C01 draw	sdk-api	V
-0x7E9A407F	406	sdk api handler C02 paint	sdk-api	V
-0x7E9A4215	161	sdk api handler C03 setMenuArea	sdk-api	V
-0x7E9A42B6	888	sdk api handler C04 setImageAreas	sdk-api	V
-0x7E9A462E	230	sdk api handler C05 getDrawState	sdk-api	V
-0x7E9A4714	316	sdk api handler D01 play	sdk-api	V
-0x7E9A4850	208	sdk api handler D02 stop	sdk-api	V
-0x7E9A4920	49	sdk api handler D03 setVolume	sdk-api	V
-0x7E9A4951	123	sdk api handler D04 startImportSound	sdk-api	V
-0x7E9A49CC	56	sdk api handler D05 getSoundName	sdk-api	V
-0x7E9A4A04	144	sdk api handler D06 getImportSoundCount	sdk-api	V
-0x7E9A4A94	61	sdk api handler D07 getImportSoundName	sdk-api	V
-0x7E9A4AD1	144	sdk api handler D08 registImportSound	sdk-api	V
-0x7E9A4B61	129	sdk api handler D09 endImportSound	sdk-api	V
-0x7E9A4BE2	49	sdk api handler D10 playImportSound	sdk-api	V
-0x7E9A4C13	209	sdk api handler D11 stopImportSound	sdk-api	V
-0x7E9A4CE4	49	sdk api handler E01 getCurrentDateTime	sdk-api	V
-0x7E9A4D15	116	sdk api handler E02 getDateCount	sdk-api	V
-0x7E9A4D89	157	sdk api handler E03 setDateTime	sdk-api	V
-0x7E9A4E26	273	sdk api handler E04 canPopup	sdk-api	V
-0x7E9A4F37	43	sdk api handler E05 getDefaultDateTime	sdk-api	V
-0x7E9A4F62	220	sdk api handler E06 getTimeValueToSerial	sdk-api	V
-0x7E9A503E	386	sdk api handler E07 getSerialToTimeValue	sdk-api	V
-0x7E9A51C0	312	sdk api handler F01 getExistMedia	sdk-api	V
-0x7E9A52F8	96	sdk api handler F02 getCurrentMedia	sdk-api	V
-0x7E9A5358	97	sdk api handler F03 getMediaStateInfo	sdk-api	V
-0x7E9A53B9	139	sdk api handler F04 mountMedia	sdk-api	V
-0x7E9A5444	4	sdk api handler F05 unmountMedia 	sdk-api	V
-0x7E9A5448	4	sdk api handler F06 isMediaAccess	sdk-api	V
-0x7E9A544C	159	sdk api handler F07 formatMedia	sdk-api	V
-0x7E9A54EB	166	sdk api handler F08 canFormat	sdk-api	V
-0x7E9A5591	153	sdk api handler F09 canCopy	sdk-api	V
-0x7E9A562A	186	sdk api handler F10 eraseALL	sdk-api	V
-0x7E9A56E4	195	sdk api handler F11 getMediaConsumeRate	sdk-api	V
-0x7E9A57A7	191	sdk api handler F12 getImageCount	sdk-api	V
-0x7E9A5866	454	sdk api handler F13 getAvailableShootCount	sdk-api	V
-0x7E9A5A2C	231	sdk api handler F14 unlockProtectAll	sdk-api	V
-0x7E9A5B13	195	sdk api handler F15 transferImageAll	sdk-api	V
-0x7E9A5BD6	306	sdk api handler F16 cancelTransferImageAll	sdk-api	V
-0x7E9A5D08	49	sdk api handler F17 changeMedia	sdk-api	V
-0x7E9A5D39	157	sdk api handler F18 getAVCHDstate	sdk-api	V
-0x7E9A5DD6	49	sdk api handler F19 getMountState	sdk-api	V
-0x7E9A5E07	235	sdk api handler F20 isMediaWriting	sdk-api	V
-0x7E9A5EF2	159	sdk api handler G01 execute	sdk-api	V
-0x7E9A5F91	178	sdk api handler G02 canPixelMapping	sdk-api	V
-0x7E9A6043	45	sdk api handler H01 canExecute	sdk-api	V
-0x7E9A6070	125	sdk api handler I01 startMonitor	sdk-api	V
-0x7E9A60ED	179	sdk api handler I02 getBatteryState	sdk-api	V
-0x7E9A61A0	112	sdk api handler J01 startLevel	sdk-api	V
-0x7E9A6210	179	sdk api handler J02 endLevel	sdk-api	V
-0x7E9A62C3	50	sdk api handler J03 getSlope	sdk-api	V
-0x7E9A62F5	5	sdk api handler J04 reset	sdk-api	V
+0x7E9A171D	53	sdk api handler A01 initializeApi (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A1752	260	sdk api handler A02 shutDown (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A1856	47	sdk api handler A03 startSleep (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A1885	74	sdk api handler A04 retractLens (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A18CF	171	sdk api handler A05 changeOutLine (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A197A	393	sdk api handler A06 getDisplayDeviceState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A1B03	202	sdk api handler A07 getWakeUpIssue (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A1BCD	406	sdk api handler A08 getSleepWakeupIssue (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A1D63	143	sdk api handler A09 startSaveLcd (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A1DF2	47	sdk api handler A10 endSaveLcd (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A1E21	149	sdk api handler A11 ctrlLcdBacklight (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A1EB6	70	sdk api handler A12 getUsbState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A1EFC	70	sdk api handler A13 getCompositeState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A1F42	70	sdk api handler A14 getHdmiState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A1F88	218	sdk api handler A15 getEvfState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A2062	70	sdk api handler A16 getPenpalState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A20A8	47	sdk api handler A17 isCecConnect (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A20D7	47	sdk api handler A18 getDisplaySupport3D (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A2106	217	sdk api handler A19 getFlashInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A21DF	74	sdk api handler A20 getKeyState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A2229	202	sdk api handler A21 getModeDialState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A22F3	303	sdk api handler A22 getJogDialState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A2422	106	sdk api handler A23 isMirrorSetup (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A248C	130	sdk api handler A24 getEyeFiStatus (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A250E	307	sdk api handler A25 startHighlightShadow (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A2641	47	sdk api handler A26 endHighlightShadow (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A2670	94	sdk api handler A27 getTemperatureState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A26CE	152	sdk api handler A28 setDispSync (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A2766	82	sdk api handler A29 getISStatus (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A27B8	116	sdk api handler A30 setModeDialState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A282C	47	sdk api handler A31 getDispSync (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A285B	47	sdk api handler A32 cancelDispSync (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A288A	48	sdk api handler A34 getEyeSensorState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A28BA	119	sdk api handler A35 ctrlAutoThrough (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A2931	119	sdk api handler A36 ctrlEyeSensor (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A29A8	120	sdk api handler A37 getHlsStateS0036 (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A2A20	142	sdk api handler A38 setHlsStateS0036 (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A2AAE	279	sdk api handler A39 getMonitorRotateStatus (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A2BC5	120	sdk api handler A40 getHlsStateS004243 (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A2C3D	120	sdk api handler A41 setHlsStateS004243 (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A2CB5	224	sdk api handler B01 setSetting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A2D95	140	sdk api handler B02 getSetting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A2E21	151	sdk api handler B03 setSettingDetail (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A2EB8	141	sdk api handler B04 getSettingDetail (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A2F45	180	sdk api handler B05 getSettingUser (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A2FF9	135	sdk api handler B06 getSettingDetailUser (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A3080	123	sdk api handler B07 isEnabled (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A30FB	118	sdk api handler B08 getSettingCount (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A3171	140	sdk api handler B09 getSettingValue (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A31FD	140	sdk api handler B10 getSettingIndex (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A3289	145	sdk api handler B11 canSettingValue (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A331A	138	sdk api handler B12 resetSetting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A33A4	39	sdk api handler B13 resetFactorySetting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A33CB	293	sdk api handler B14 loadLanguageHeader (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A34F0	275	sdk api handler B15 loadLanguageData (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A3603	56	sdk api handler B16 registerCallback (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A363B	559	sdk api handler B17 notifyCurrentLanguage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A386A	433	sdk api handler B18 notifySupportLanguage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A3A1B	143	sdk api handler B19 saveCustom (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A3AAA	143	sdk api handler B20 clearCustom (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A3B39	233	sdk api handler B21 loadCustom (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A3C22	143	sdk api handler B22 getCustomState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A3CB1	377	sdk api handler B23 changeMode (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A3E2A	60	sdk api handler B24 isMFsetting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A3E66	60	sdk api handler B25 startMFsetting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A3EA2	179	sdk api handler B26 endMFsetting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A3F55	257	sdk api handler B27 getExposeMode (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A4056	41	sdk api handler B28 resetIntervalShooting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A407F	406	sdk api handler C01 draw (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A4215	161	sdk api handler C02 paint (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A42B6	888	sdk api handler C03 setMenuArea (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A462E	230	sdk api handler C04 setImageAreas (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A4714	316	sdk api handler C05 getDrawState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A4850	208	sdk api handler D01 play (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A4920	49	sdk api handler D02 stop (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A4951	123	sdk api handler D03 setVolume (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A49CC	56	sdk api handler D04 startImportSound (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A4A04	144	sdk api handler D05 getSoundName (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A4A94	61	sdk api handler D06 getImportSoundCount (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A4AD1	144	sdk api handler D07 getImportSoundName (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A4B61	129	sdk api handler D08 registImportSound (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A4BE2	49	sdk api handler D09 endImportSound (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A4C13	209	sdk api handler D10 playImportSound (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A4CE4	49	sdk api handler D11 stopImportSound (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A4D15	116	sdk api handler E01 getCurrentDateTime (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A4D89	157	sdk api handler E02 getDateCount (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A4E26	273	sdk api handler E03 setDateTime (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A4F37	43	sdk api handler E04 canPopup (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A4F62	220	sdk api handler E05 getDefaultDateTime (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A503E	386	sdk api handler E06 getTimeValueToSerial (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A51C0	312	sdk api handler E07 getSerialToTimeValue (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A52F8	96	sdk api handler F01 getExistMedia (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A5358	97	sdk api handler F02 getCurrentMedia (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A53B9	139	sdk api handler F03 getMediaStateInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A5444	4	sdk api handler F04 mountMedia (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A5448	4	sdk api handler F05 unmountMedia  (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A544C	159	sdk api handler F06 isMediaAccess (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A54EB	166	sdk api handler F07 formatMedia (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A5591	153	sdk api handler F08 canFormat (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A562A	186	sdk api handler F09 canCopy (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A56E4	195	sdk api handler F10 eraseALL (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A57A7	191	sdk api handler F11 getMediaConsumeRate (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A5866	454	sdk api handler F12 getImageCount (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A5A2C	231	sdk api handler F13 getAvailableShootCount (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A5B13	195	sdk api handler F14 unlockProtectAll (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A5BD6	306	sdk api handler F15 transferImageAll (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A5D08	49	sdk api handler F16 cancelTransferImageAll (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A5D39	157	sdk api handler F17 changeMedia (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A5DD6	49	sdk api handler F18 getAVCHDstate (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A5E07	235	sdk api handler F19 getMountState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A5EF2	159	sdk api handler F20 isMediaWriting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A5F91	178	sdk api handler G01 execute (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A6043	45	sdk api handler G02 canPixelMapping (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A6070	125	sdk api handler H01 canExecute (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A60ED	179	sdk api handler I01 startMonitor (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A61A0	112	sdk api handler I02 getBatteryState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A6210	179	sdk api handler J01 startLevel (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A62C3	50	sdk api handler J02 endLevel (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A62F5	5	sdk api handler J03 getSlope (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
 0x7E9A62FA	140	sdk debug shell method: [via 0x7E99D05E: "%1s, %d\n"]; [via 0x7E9A0A8B: (via 0x7E99D026: "%1s\n"); "API_SUCCESS"]; "vertical"; vcalls +?->vt+16; called by 0x7E9A0FC3 (sdk debug shell method: [via 0x7E96E55C: "0x%08X"]; [via 0x7E99D026: ")	g:str+vcall+callers	I
-0x7E9A6386	51	sdk api handler J05 calibration	sdk-api	V
-0x7E9A63B9	51	sdk api handler K01 setLongPressKey	sdk-api	V
-0x7E9A63EC	512	sdk api handler K03 unsetAllLongPressKey	sdk-api	V
-0x7E9A65EC	414	sdk api handler K07 setExclusion	sdk-api	V
-0x7E9A678A	51	sdk api handler K05 unsetLongPressKey	sdk-api	V
-0x7E9A67BD	447	sdk api handler K02 setRepeatKey	sdk-api	V
-0x7E9A697C	414	sdk api handler K06 unsetRepeatKey	sdk-api	V
-0x7E9A6B1A	51	sdk api handler K04 unsetAllRepeatKey	sdk-api	V
-0x7E9A6B4D	358	sdk api handler K08 cancelKeyEvent	sdk-api	V
-0x7E9A6CB3	1901	sdk api handler K09 resetKeyEvent	sdk-api	V
-0x7E9A7420	51	sdk api handler L01 startTouchPanel	sdk-api	V
-0x7E9A7453	183	sdk api handler L02 endTouchPanel	sdk-api	V
-0x7E9A750A	51	sdk api handler L03 ctrlTouchPanelEvent	sdk-api	V
-0x7E9A753D	311	sdk api handler L04 getTouchPanelState	sdk-api	V
-0x7E9A7674	51	sdk api handler L05 getTouchNumber	sdk-api	V
-0x7E9A76A7	46	sdk api handler M01 startShootingService	sdk-api	V
-0x7E9A76D5	435	sdk api handler M02 endShootingService	sdk-api	V
-0x7E9A7888	52	sdk api handler M03 canEndShootingService	sdk-api	V
-0x7E9A78BC	52	sdk api handler M04 setShootingType	sdk-api	V
-0x7E9A78F0	194	sdk api handler M05 setRecViewArea	sdk-api	V
-0x7E9A79B2	109	sdk api handler M78 getZoomFrameState	sdk-api	V
-0x7E9A7A1F	476	sdk api handler M06 ctrlRelease	sdk-api	V
-0x7E9A7BFB	696	sdk api handler M07 startHistogram	sdk-api	V
-0x7E9A7EB3	327	sdk api handler M08 stopHistogram	sdk-api	V
-0x7E9A7FFA	51	sdk api handler M09 getCondition	sdk-api	V
-0x7E9A802D	1165	sdk api handler M10 getFlashChargeStatus	sdk-api	V
-0x7E9A84BA	236	sdk api handler M11 getHistogramData	sdk-api	V
-0x7E9A85A6	591	sdk api handler M12 getRecViewInfo	sdk-api	V
-0x7E9A87F5	3465	sdk api handler M13 getAspectFrame	sdk-api	V
-0x7E9A957E	472	sdk api handler M14 getFocusPosition	sdk-api	V
-0x7E9A9756	409	sdk api handler M15 getRecViewHistogram	sdk-api	V
-0x7E9A98EF	468	sdk api handler M16 getProgress	sdk-api	V
-0x7E9A9AC3	55	sdk api handler M17 getAvailableShootCount	sdk-api	V
-0x7E9A9AFA	122	sdk api handler M18 startZoomFrame	sdk-api	V
-0x7E9A9B74	54	sdk api handler M19 endZoomFrame	sdk-api	V
-0x7E9A9BAA	54	sdk api handler M20 getZoomFrame	sdk-api	V
-0x7E9A9BE0	547	sdk api handler M21 moveZoomFrame	sdk-api	V
-0x7E9A9E03	333	sdk api handler M22 zoomThrough	sdk-api	V
-0x7E9A9F50	203	sdk api handler M23 scrollThrough	sdk-api	V
-0x7E9AA01B	240	sdk api handler M25 setMultiThroughMode	sdk-api	V
-0x7E9AA10B	163	sdk api handler M26 startMultiThrough	sdk-api	V
-0x7E9AA1AE	355	sdk api handler M27 getMultiThroughCursor	sdk-api	V
-0x7E9AA311	126	sdk api handler M28 apertureDown	sdk-api	V
-0x7E9AA38F	143	sdk api handler M29 changeDirection	sdk-api	V
-0x7E9AA41E	168	sdk api handler M30 getDirection	sdk-api	V
-0x7E9AA4C6	45	sdk api handler M31 endPanoramaShooting	sdk-api	V
-0x7E9AA4F3	53	sdk api handler M32 getPanoramaCount	sdk-api	V
-0x7E9AA528	55	sdk api handler M33 getPanoramaCountMax	sdk-api	V
-0x7E9AA55F	55	sdk api handler M35 getScene	sdk-api	V
-0x7E9AA596	455	sdk api handler M36 setAflState	sdk-api	V
-0x7E9AA75D	149	sdk api handler M37 getAflState	sdk-api	V
-0x7E9AA7F2	45	sdk api handler M38 setAelState	sdk-api	V
-0x7E9AA81F	149	sdk api handler M39 getAelState	sdk-api	V
-0x7E9AA8B4	45	sdk api handler M40 saveWBdetect	sdk-api	V
-0x7E9AA8E1	139	sdk api handler M41 sampleWBadjust	sdk-api	V
-0x7E9AA96C	464	sdk api handler M42 startMFAssist	sdk-api	V
-0x7E9AAB3C	53	sdk api handler M43 endMFAssist	sdk-api	V
-0x7E9AAB71	53	sdk api handler M44 startMultiExposure	sdk-api	V
-0x7E9AABA6	53	sdk api handler M45 endMultiExposure	sdk-api	V
-0x7E9AABDB	53	sdk api handler M46 overlay	sdk-api	V
-0x7E9AAC10	171	sdk api handler M47 saveMultiExposure	sdk-api	V
-0x7E9AACBB	54	sdk api handler M48 getMultiExposureCount	sdk-api	V
-0x7E9AACF1	76	sdk api handler M49 deleteMultiExposure	sdk-api	V
-0x7E9AAD3D	54	sdk api handler M50 getMovieTime	sdk-api	V
-0x7E9AAD73	213	sdk api handler M51 abortSelfTimer	sdk-api	V
-0x7E9AAE48	46	sdk api handler M52 get3DCount	sdk-api	V
-0x7E9AAE76	55	sdk api handler M53 save3DShooting	sdk-api	V
-0x7E9AAEAD	54	sdk api handler M54 delete3DShooting	sdk-api	V
-0x7E9AAEE3	54	sdk api handler M55 preSampleWBadjust	sdk-api	V
-0x7E9AAF19	4	sdk api handler M56 postSampleWBadjust	sdk-api	V
-0x7E9AAF1D	4	sdk api handler M57 getRecViewState	sdk-api	V
-0x7E9AAF21	97	sdk api handler M58 touchTargetAf	sdk-api	V
-0x7E9AAF82	239	sdk api handler M23 scrollThrough	sdk-api	V
-0x7E9AB071	333	sdk api handler M24 getEnlargeInfo; M59 getTouchAction	sdk-api	V
-0x7E9AB1BE	249	sdk api handler M60 notifyGesture	sdk-api	V
-0x7E9AB2B7	164	sdk api handler M61 getMovableArea	sdk-api	V
-0x7E9AB35B	319	sdk api handler M62 getFPNexposureStatus	sdk-api	V
-0x7E9AB49A	54	sdk api handler M63 setThroughType	sdk-api	V
-0x7E9AB4D0	164	sdk api handler M64 ctrlZoomExposure	sdk-api	V
-0x7E9AB574	125	sdk api handler M65 getSlideRecView	sdk-api	V
-0x7E9AB5F1	240	sdk api handler M66 getLiveBulbInfo	sdk-api	V
-0x7E9AB6E1	148	sdk api handler M67 updateLiveBulb	sdk-api	V
-0x7E9AB775	54	sdk api handler M68 ctrlMovieEffect	sdk-api	V
-0x7E9AB7AB	54	sdk api handler M71 getReleaseSetting	sdk-api	V
-0x7E9AB7E1	46	sdk api handler M72 cancelRecview	sdk-api	V
-0x7E9AB80F	54	sdk api handler M70 end3DLensShooting	sdk-api	V
-0x7E9AB845	228	sdk api handler M69 start3DLensShooting	sdk-api	V
-0x7E9AB929	54	sdk api handler M73 isLiveBulbShooting	sdk-api	V
-0x7E9AB95F	54	sdk api handler M75 getShootingState	sdk-api	V
-0x7E9AB995	54	sdk api handler M76 resetTouchScrollPosition	sdk-api	V
-0x7E9AB9CB	54	sdk api handler M77 getShootingType	sdk-api	V
-0x7E9ABA01	54	sdk api handler M79 getThroughZoomRate	sdk-api	V
-0x7E9ABA37	121	sdk api handler M80 startLiveGuide	sdk-api	V
+0x7E9A6386	51	sdk api handler J04 reset (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A63B9	51	sdk api handler J05 calibration (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A63EC	512	sdk api handler K02 setRepeatKey (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A65EC	414	sdk api handler K06 unsetRepeatKey (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A678A	51	sdk api handler K04 unsetAllRepeatKey (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A67BD	447	sdk api handler K01 setLongPressKey (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A697C	414	sdk api handler K05 unsetLongPressKey (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A6B1A	51	sdk api handler K03 unsetAllLongPressKey (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A6B4D	358	sdk api handler K07 setExclusion (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A6CB3	1901	sdk api handler K08 cancelKeyEvent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A7420	51	sdk api handler K09 resetKeyEvent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A7453	183	sdk api handler L01 startTouchPanel (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A750A	51	sdk api handler L02 endTouchPanel (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A753D	311	sdk api handler L03 ctrlTouchPanelEvent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A7674	51	sdk api handler L04 getTouchPanelState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A76A7	46	sdk api handler L05 getTouchNumber (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A76D5	435	sdk api handler M01 startShootingService (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A7888	52	sdk api handler M02 endShootingService (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A78BC	52	sdk api handler M03 canEndShootingService (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A78F0	194	sdk api handler M04 setShootingType (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A79B2	109	sdk api handler M77 getShootingType (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A7A1F	476	sdk api handler M05 setRecViewArea (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A7BFB	696	sdk api handler M06 ctrlRelease (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A7EB3	327	sdk api handler M07 startHistogram (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A7FFA	51	sdk api handler M08 stopHistogram (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A802D	1165	sdk api handler M09 getCondition (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A84BA	236	sdk api handler M10 getFlashChargeStatus (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A85A6	591	sdk api handler M11 getHistogramData (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A87F5	3465	sdk api handler M12 getRecViewInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A957E	472	sdk api handler M13 getAspectFrame (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A9756	409	sdk api handler M14 getFocusPosition (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A98EF	468	sdk api handler M15 getRecViewHistogram (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A9AC3	55	sdk api handler M16 getProgress (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A9AFA	122	sdk api handler M17 getAvailableShootCount (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A9B74	54	sdk api handler M18 startZoomFrame (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A9BAA	54	sdk api handler M19 endZoomFrame (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A9BE0	547	sdk api handler M20 getZoomFrame (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A9E03	333	sdk api handler M21 moveZoomFrame (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9A9F50	203	sdk api handler M22 zoomThrough (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AA01B	240	sdk api handler M24 getEnlargeInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AA10B	163	sdk api handler M25 setMultiThroughMode (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AA1AE	355	sdk api handler M26 startMultiThrough (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AA311	126	sdk api handler M27 getMultiThroughCursor (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AA38F	143	sdk api handler M28 apertureDown (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AA41E	168	sdk api handler M29 changeDirection (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AA4C6	45	sdk api handler M30 getDirection (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AA4F3	53	sdk api handler M31 endPanoramaShooting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AA528	55	sdk api handler M32 getPanoramaCount (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AA55F	55	sdk api handler M33 getPanoramaCountMax (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AA596	455	sdk api handler M35 getScene (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AA75D	149	sdk api handler M36 setAflState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AA7F2	45	sdk api handler M37 getAflState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AA81F	149	sdk api handler M38 setAelState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AA8B4	45	sdk api handler M39 getAelState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AA8E1	139	sdk api handler M40 saveWBdetect (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AA96C	464	sdk api handler M41 sampleWBadjust (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AAB3C	53	sdk api handler M42 startMFAssist (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AAB71	53	sdk api handler M43 endMFAssist (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AABA6	53	sdk api handler M44 startMultiExposure (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AABDB	53	sdk api handler M45 endMultiExposure (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AAC10	171	sdk api handler M46 overlay (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AACBB	54	sdk api handler M47 saveMultiExposure (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AACF1	76	sdk api handler M48 getMultiExposureCount (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AAD3D	54	sdk api handler M49 deleteMultiExposure (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AAD73	213	sdk api handler M50 getMovieTime (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AAE48	46	sdk api handler M51 abortSelfTimer (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AAE76	55	sdk api handler M52 get3DCount (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AAEAD	54	sdk api handler M53 save3DShooting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AAEE3	54	sdk api handler M54 delete3DShooting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AAF19	4	sdk api handler M55 preSampleWBadjust (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AAF1D	4	sdk api handler M56 postSampleWBadjust (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AAF21	97	sdk api handler M57 getRecViewState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AAF82	239	sdk api handler M58 touchTargetAf (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AB071	333	sdk api handler M23 scrollThrough / M23 scrollThrough (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AB1BE	249	sdk api handler M59 getTouchAction (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AB2B7	164	sdk api handler M60 notifyGesture (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AB35B	319	sdk api handler M61 getMovableArea (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AB49A	54	sdk api handler M62 getFPNexposureStatus (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AB4D0	164	sdk api handler M63 setThroughType (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AB574	125	sdk api handler M64 ctrlZoomExposure (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AB5F1	240	sdk api handler M65 getSlideRecView (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AB6E1	148	sdk api handler M66 getLiveBulbInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AB775	54	sdk api handler M67 updateLiveBulb (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AB7AB	54	sdk api handler M70 end3DLensShooting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AB7E1	46	sdk api handler M71 getReleaseSetting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AB80F	54	sdk api handler M69 start3DLensShooting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AB845	228	sdk api handler M68 ctrlMovieEffect (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AB929	54	sdk api handler M72 cancelRecview (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AB95F	54	sdk api handler M73 isLiveBulbShooting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AB995	54	sdk api handler M75 getShootingState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AB9CB	54	sdk api handler M76 resetTouchScrollPosition (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9ABA01	54	sdk api handler M78 getZoomFrameState (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9ABA37	121	sdk api handler M79 getThroughZoomRate (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
 0x7E9ABAB0	38	sdk debug shell method: called by 0x7E9ABB27 (sdk api handler M81 startLiveGuideLevel) +4	g:callers	I
 0x7E9ABAD6	81	sdk debug shell method: leaf: returns 0; called by 0x7E9ABDE7 (sdk api handler M84 endLiveGuideLevel)	g:leaf+callers	I
-0x7E9ABB27	235	sdk api handler M81 startLiveGuideLevel	sdk-api	V
-0x7E9ABC12	235	sdk api handler M82 getLiveGuideLevel	sdk-api	V
-0x7E9ABCFD	234	sdk api handler M83 changeLiveGuideLevel	sdk-api	V
-0x7E9ABDE7	469	sdk api handler M84 endLiveGuideLevel	sdk-api	V
-0x7E9ABFBC	235	sdk api handler M85 endLiveGuide	sdk-api	V
-0x7E9AC0A7	54	sdk api handler M86 startIntervalShooting	sdk-api	V
-0x7E9AC0DD	156	sdk api handler M87 oneShotTakingPicture	sdk-api	V
-0x7E9AC179	46	sdk api handler M88 endIntervalShooting	sdk-api	V
-0x7E9AC1A7	46	sdk api handler M89 ctrlMovieTelecon	sdk-api	V
-0x7E9AC1D5	177	sdk api handler M90 getMovieTeleconFrame	sdk-api	V
-0x7E9AC287	203	sdk api handler M91 moveMovieTeleconFrame	sdk-api	V
-0x7E9AC352	334	sdk api handler M92 isLiveGuide	sdk-api	V
-0x7E9AC4A0	54	sdk api handler M93 createTimeLapseMovie	sdk-api	V
-0x7E9AC4D6	46	sdk api handler M94 getTouchTrackingAfl	sdk-api	V
-0x7E9AC504	46	sdk api handler M95 changeZoomFrameRate	sdk-api	V
-0x7E9AC532	307	sdk api handler N01 startPlayService	sdk-api	V
-0x7E9AC665	59	sdk api handler N02 endPlayService	sdk-api	V
-0x7E9AC6A0	53	sdk api handler N03 getImageType	sdk-api	V
-0x7E9AC6D5	236	sdk api handler N04 getStillInfo	sdk-api	V
-0x7E9AC7C1	3009	sdk api handler N05 getMovieInfo	sdk-api	V
-0x7E9AD382	2185	sdk api handler N06 getNumber	sdk-api	V
-0x7E9ADC0B	109	sdk api handler N07 getHistogram	sdk-api	V
-0x7E9ADC78	1566	sdk api handler N08 selectCurrent	sdk-api	V
-0x7E9AE296	70	sdk api handler N09 getSelectPicNumber	sdk-api	V
-0x7E9AE2DC	45	sdk api handler N10 erase	sdk-api	V
-0x7E9AE309	53	sdk api handler N11 changeProtect	sdk-api	V
-0x7E9AE33E	45	sdk api handler N12 canProtect	sdk-api	V
-0x7E9AE36B	45	sdk api handler N13 changeProtectSelected	sdk-api	V
-0x7E9AE398	53	sdk api handler N14 isReservePrint	sdk-api	V
-0x7E9AE3CD	53	sdk api handler N15 isProtect	sdk-api	V
-0x7E9AE402	53	sdk api handler N16 isRecording	sdk-api	V
-0x7E9AE437	53	sdk api handler N17 transferImage	sdk-api	V
-0x7E9AE46C	299	sdk api handler N18 cancelSelectedAll	sdk-api	V
-0x7E9AE597	53	sdk api handler O01 startSingleFrame	sdk-api	V
-0x7E9AE5CC	258	sdk api handler O02 canMoveCurrent	sdk-api	V
-0x7E9AE70E	236	sdk api handler O03 moveCurrent	sdk-api	V
-0x7E9AE7FA	317	sdk api handler O04 updateImage	sdk-api	V
-0x7E9AE937	259	sdk api handler O05 zoomImage	sdk-api	V
-0x7E9AEA3A	245	sdk api handler O06 scrollImage	sdk-api	V
-0x7E9AEB2F	189	sdk api handler O07 isEnlarge	sdk-api	V
-0x7E9AEBEC	45	sdk api handler O08 getEnlargeInfo	sdk-api	V
-0x7E9AEC19	414	sdk api handler O09 getZoomFrame	sdk-api	V
-0x7E9AEDB7	483	sdk api handler O10 moveZoomFrame	sdk-api	V
-0x7E9AEF9A	189	sdk api handler O11 canRotate	sdk-api	V
-0x7E9AF057	53	sdk api handler O12 rotateImage	sdk-api	V
-0x7E9AF08C	286	sdk api handler O13 canPrint	sdk-api	V
-0x7E9AF1AA	53	sdk api handler O14 eraseCurrent	sdk-api	V
-0x7E9AF1DF	53	sdk api handler O15 getAspectFrame	sdk-api	V
-0x7E9AF214	356	sdk api handler O16 getFocusPosition	sdk-api	V
-0x7E9AF378	379	sdk api handler O17 startSlide	sdk-api	V
-0x7E9AF4F3	254	sdk api handler O18 endSlide	sdk-api	V
-0x7E9AF5F1	75	sdk api handler O19 startMoveCurrentContinuous	sdk-api	V
-0x7E9AF63C	281	sdk api handler O20 endMoveCurrentContinuous	sdk-api	V
-0x7E9AF755	77	sdk api handler O21 startFastZoom	sdk-api	V
-0x7E9AF7A2	161	sdk api handler O22 zoomImageFast	sdk-api	V
-0x7E9AF843	161	sdk api handler O23 endFastZoom	sdk-api	V
-0x7E9AF8E4	53	sdk api handler O24 startScrollFast	sdk-api	V
-0x7E9AF919	300	sdk api handler O25 endScrollFast	sdk-api	V
-0x7E9AFA45	53	sdk api handler O26 startScrollZoomFrame	sdk-api	V
-0x7E9AFA7A	55	sdk api handler O27 endScrollZoomFrame	sdk-api	V
-0x7E9AFAB1	53	sdk api handler O28 updateImageSync	sdk-api	V
-0x7E9AFAE6	220	sdk api handler P01 startIndex	sdk-api	V
-0x7E9AFBC2	446	sdk api handler P02 getPageInfo	sdk-api	V
-0x7E9AFD80	80	sdk api handler P03 getCurrentInfo	sdk-api	V
-0x7E9AFDD0	101	sdk api handler P04 changeIndexNumber	sdk-api	V
-0x7E9AFE35	436	sdk api handler P05 updateImage	sdk-api	V
-0x7E9AFFE9	53	sdk api handler P06 canMoveCurrent	sdk-api	V
-0x7E9B001E	294	sdk api handler P07 moveCurrent	sdk-api	V
-0x7E9B0144	227	sdk api handler P08 canRotate	sdk-api	V
-0x7E9B0227	45	sdk api handler P09 rotateImage	sdk-api	V
-0x7E9B0254	163	sdk api handler P10 startExpandAnimation	sdk-api	V
-0x7E9B02F7	53	sdk api handler P11 moveCurrentDirect	sdk-api	V
-0x7E9B032C	138	sdk api handler P12 canMovePage	sdk-api	V
-0x7E9B03B6	175	sdk api handler P13 movePage	sdk-api	V
-0x7E9B0465	173	sdk api handler P14 getIndexInfo	sdk-api	V
-0x7E9B0512	77	sdk api handler Q01 start	sdk-api	V
-0x7E9B055F	202	sdk api handler Q02 singleMode	sdk-api	V
-0x7E9B0629	286	sdk api handler Q03 indexMode	sdk-api	V
-0x7E9B0747	380	sdk api handler Q04 getPageInfo	sdk-api	V
-0x7E9B08C3	80	sdk api handler Q05 getCurrentInfo	sdk-api	V
-0x7E9B0913	46	sdk api handler Q06 canMoveCurrent	sdk-api	V
-0x7E9B0941	294	sdk api handler Q07 moveCurrent	sdk-api	V
-0x7E9B0A67	315	sdk api handler Q08 expandAnimation	sdk-api	V
-0x7E9B0BA2	53	sdk api handler Q0B getIndexInfo	sdk-api	V
-0x7E9B0BD7	143	sdk api handler R02 play	sdk-api	V
-0x7E9B0C66	53	sdk api handler R03 reversePlay	sdk-api	V
-0x7E9B0C9B	53	sdk api handler R04 fastForward	sdk-api	V
-0x7E9B0CD0	189	sdk api handler R05 rewind	sdk-api	V
-0x7E9B0D8D	189	sdk api handler R06 pause	sdk-api	V
-0x7E9B0E4A	53	sdk api handler R07 seek	sdk-api	V
-0x7E9B0E7F	189	sdk api handler R08 forwardFrame	sdk-api	V
-0x7E9B0F3C	53	sdk api handler R09 rewindFrame	sdk-api	V
-0x7E9B0F71	53	sdk api handler R10 stop	sdk-api	V
-0x7E9B0FA6	45	sdk api handler S01 start	sdk-api	V
-0x7E9B0FD3	61	sdk api handler S02 record	sdk-api	V
-0x7E9B1010	53	sdk api handler S03 canRecord	sdk-api	V
-0x7E9B1045	45	sdk api handler S04 erase	sdk-api	V
-0x7E9B1072	45	sdk api handler S05 stop	sdk-api	V
-0x7E9B109F	45	sdk api handler T01 start	sdk-api	V
-0x7E9B10CC	148	sdk api handler T02 hasReservation	sdk-api	V
-0x7E9B1160	45	sdk api handler T03 eraseReservation	sdk-api	V
-0x7E9B118D	41	sdk api handler T04 singleMode	sdk-api	V
-0x7E9B11B6	257	sdk api handler T05 canMoveCurrent	sdk-api	V
-0x7E9B12B7	206	sdk api handler T06 moveCurrent	sdk-api	V
-0x7E9B1385	240	sdk api handler T07 canChangePrintCount	sdk-api	V
-0x7E9B1475	45	sdk api handler T08 changePrintCount	sdk-api	V
-0x7E9B14A2	169	sdk api handler T09 hasPrintCount	sdk-api	V
-0x7E9B154B	45	sdk api handler T10 changeDatePrint	sdk-api	V
-0x7E9B1578	146	sdk api handler T11 getPrintCount	sdk-api	V
-0x7E9B160A	41	sdk api handler T12 reservePrint	sdk-api	V
-0x7E9B1633	53	sdk api handler T13 end	sdk-api	V
-0x7E9B1668	41	sdk api handler T14 updateImageSync	sdk-api	V
-0x7E9B1691	220	sdk api handler T15 canReserve	sdk-api	V
-0x7E9B176D	45	sdk api handler U01 start	sdk-api	V
-0x7E9B179A	52	sdk api handler U02 startSlideShow	sdk-api	V
-0x7E9B17CE	253	sdk api handler U03 moveCurrent	sdk-api	V
-0x7E9B18CB	142	sdk api handler U04 endSlideShow	sdk-api	V
-0x7E9B1959	45	sdk api handler U05 canSlideShowGPU	sdk-api	V
-0x7E9B1986	44	sdk api handler U06 startSlideShowGPU	sdk-api	V
-0x7E9B19B2	49	sdk api handler U07 skipPage	sdk-api	V
-0x7E9B19E3	45	sdk api handler U08 endSlideShowGPU	sdk-api	V
-0x7E9B1A10	46	sdk api handler V01 start	sdk-api	V
-0x7E9B1A3E	51	sdk api handler V02 startPlay	sdk-api	V
-0x7E9B1A71	137	sdk api handler V03 stopPlay	sdk-api	V
-0x7E9B1AFA	53	sdk api handler V04 setVolume	sdk-api	V
-0x7E9B1B2F	222	sdk api handler W01 start	sdk-api	V
-0x7E9B1C0D	263	sdk api handler W02 getDateRange	sdk-api	V
-0x7E9B1D14	198	sdk api handler W03 getCursorPosition	sdk-api	V
-0x7E9B1DDA	63	sdk api handler W04 getPresenceImage	sdk-api	V
-0x7E9B1E19	169	sdk api handler W05 moveCursor	sdk-api	V
-0x7E9B1EC2	282	sdk api handler W06 canMovePage	sdk-api	V
-0x7E9B1FDC	162	sdk api handler W07 movePage	sdk-api	V
-0x7E9B207E	169	sdk api handler W09 end	sdk-api	V
-0x7E9B2127	136	sdk api handler X01 start	sdk-api	V
-0x7E9B21AF	113	sdk api handler X02 setScrollTarget	sdk-api	V
-0x7E9B2220	168	sdk api handler X03 getEnlargeInfo	sdk-api	V
-0x7E9B22C8	1085	sdk api handler X04 setBase	sdk-api	V
-0x7E9B2705	45	sdk api handler X05 scrollImage	sdk-api	V
-0x7E9B2732	189	sdk api handler X06 canMoveCurrent	sdk-api	V
-0x7E9B27EF	261	sdk api handler X07 moveCurrent	sdk-api	V
-0x7E9B28F4	269	sdk api handler X08 zoomImage	sdk-api	V
-0x7E9B2A01	103	sdk api handler X10 isSameNumber	sdk-api	V
-0x7E9B2A68	151	sdk api handler X09 updateImage	sdk-api	V
-0x7E9B2AFF	53	sdk api handler X11 singleMode	sdk-api	V
-0x7E9B2B34	139	sdk api handler X12 singleModeUpdate	sdk-api	V
-0x7E9B2BBF	139	sdk api handler X13 eraseCurrent	sdk-api	V
-0x7E9B2C4A	53	sdk api handler X14 erase	sdk-api	V
-0x7E9B2C7F	53	sdk api handler X15 getNumber	sdk-api	V
-0x7E9B2CB4	95	sdk api handler Y01 start	sdk-api	V
-0x7E9B2D13	211	sdk api handler Y02 getPossibleSize	sdk-api	V
-0x7E9B2DE6	101	sdk api handler Y03 makePreview	sdk-api	V
-0x7E9B2E4B	258	sdk api handler Y04 save	sdk-api	V
-0x7E9B2F4D	189	sdk api handler Z01 start	sdk-api	V
-0x7E9B300A	51	sdk api handler Z02 canTrimming	sdk-api	V
-0x7E9B303D	76	sdk api handler Z03 trimmingMode	sdk-api	V
-0x7E9B3089	312	sdk api handler Z04 getTrimmingInfo	sdk-api	V
-0x7E9B31C1	313	sdk api handler Z05 changeSize	sdk-api	V
-0x7E9B32FA	163	sdk api handler Z06 changePosition	sdk-api	V
-0x7E9B339D	189	sdk api handler Z07 makePreview	sdk-api	V
-0x7E9B345A	316	sdk api handler Z08 save	sdk-api	V
-0x7E9B3596	53	sdk api handler a01 start	sdk-api	V
-0x7E9B35CB	51	sdk api handler a02 canAspect	sdk-api	V
-0x7E9B35FE	45	sdk api handler a03 aspectMode	sdk-api	V
-0x7E9B362B	339	sdk api handler a04 getAspectInfo	sdk-api	V
-0x7E9B377E	363	sdk api handler a05 changePosition	sdk-api	V
-0x7E9B38E9	189	sdk api handler a06 makePreview	sdk-api	V
-0x7E9B39A6	346	sdk api handler a07 save	sdk-api	V
-0x7E9B3B00	53	sdk api handler b01 start	sdk-api	V
-0x7E9B3B35	51	sdk api handler b02 canColor	sdk-api	V
-0x7E9B3B68	45	sdk api handler b03 makePreview	sdk-api	V
-0x7E9B3B95	447	sdk api handler b04 makeComparePreview	sdk-api	V
-0x7E9B3D54	320	sdk api handler b05 save	sdk-api	V
-0x7E9B3E94	45	sdk api handler c01 start	sdk-api	V
-0x7E9B3EC1	51	sdk api handler c02 canAdjust	sdk-api	V
-0x7E9B3EF4	45	sdk api handler c03 makePreview	sdk-api	V
-0x7E9B3F21	316	sdk api handler c04 save	sdk-api	V
-0x7E9B405D	53	sdk api handler d01 start	sdk-api	V
-0x7E9B4092	51	sdk api handler d02 canAdjust	sdk-api	V
-0x7E9B40C5	45	sdk api handler d03 makePreview	sdk-api	V
-0x7E9B40F2	316	sdk api handler d04 save	sdk-api	V
-0x7E9B422E	53	sdk api handler e01 start	sdk-api	V
-0x7E9B4263	196	sdk api handler e02 canAdjust	sdk-api	V
-0x7E9B4327	45	sdk api handler e03 ready	sdk-api	V
-0x7E9B4354	45	sdk api handler e04 executeAdjust	sdk-api	V
-0x7E9B4381	53	sdk api handler e05 save	sdk-api	V
-0x7E9B43B6	53	sdk api handler e06 startCompare	sdk-api	V
-0x7E9B43EB	44	sdk api handler f01 canRaw	sdk-api	V
-0x7E9B4417	53	sdk api handler f02 save	sdk-api	V
-0x7E9B444C	59	sdk api handler f03 startCurrentModeEdit	sdk-api	V
-0x7E9B4487	60	sdk api handler f04 previewCurrentModeEdit	sdk-api	V
-0x7E9B44C3	257	sdk api handler f05 saveCurrentModeEdit	sdk-api	V
-0x7E9B45C4	53	sdk api handler f06 endCurrentModeEdit	sdk-api	V
-0x7E9B45F9	146	sdk api handler f07 startCustomEdit	sdk-api	V
-0x7E9B468B	170	sdk api handler f08 previewCustomEdit	sdk-api	V
-0x7E9B4735	257	sdk api handler f09 saveCustomEdit	sdk-api	V
-0x7E9B4836	53	sdk api handler f10 endCustomEdit	sdk-api	V
-0x7E9B486B	146	sdk api handler g01 start	sdk-api	V
-0x7E9B48FD	51	sdk api handler g02 index	sdk-api	V
-0x7E9B4930	257	sdk api handler g03 getPageInfo	sdk-api	V
-0x7E9B4A31	85	sdk api handler g04 getCurrentInfo	sdk-api	V
-0x7E9B4A86	65	sdk api handler g05 canMoveCurrent	sdk-api	V
-0x7E9B4AC7	358	sdk api handler g06 moveCurrent	sdk-api	V
-0x7E9B4C2D	327	sdk api handler g07 selectCurrent	sdk-api	V
-0x7E9B4D74	106	sdk api handler g08 makeAdjustPreview	sdk-api	V
-0x7E9B4DDE	421	sdk api handler g09 adjustGain	sdk-api	V
-0x7E9B4F83	205	sdk api handler g10 makePreview	sdk-api	V
-0x7E9B5050	206	sdk api handler g11 save	sdk-api	V
-0x7E9B511E	53	sdk api handler g12 moveCurrentDirect	sdk-api	V
-0x7E9B5153	147	sdk api handler g13 canOverlay	sdk-api	V
-0x7E9B51E6	45	sdk api handler g14 getIndexInfo	sdk-api	V
-0x7E9B5213	77	sdk api handler h01 start	sdk-api	V
-0x7E9B5260	59	sdk api handler h02 index	sdk-api	V
-0x7E9B529B	275	sdk api handler h03 getPageInfo	sdk-api	V
-0x7E9B53AE	86	sdk api handler h04 getCurrentInfo	sdk-api	V
-0x7E9B5404	65	sdk api handler h05 canMoveCurrent	sdk-api	V
-0x7E9B5445	303	sdk api handler h06 moveCurrent	sdk-api	V
-0x7E9B5574	327	sdk api handler h07 selectCurrent	sdk-api	V
-0x7E9B56BB	53	sdk api handler h08 getIndexInfo	sdk-api	V
-0x7E9B56F0	77	sdk api handler R01 startMovieService; i01 readyExecuteSelfAdjust	sdk-api	V
-0x7E9B573D	141	sdk api handler i02 execute	sdk-api	V
-0x7E9B57CA	1184	sdk api handler i03 getMode	sdk-api	V
-0x7E9B5C6A	112	sdk api handler i04 getMenuItemNumber	sdk-api	V
-0x7E9B5CDA	45	sdk api handler i05 getMenuItem	sdk-api	V
-0x7E9B5D07	817	sdk api handler i06 getDefaultItem	sdk-api	V
-0x7E9B6038	688	sdk api handler i07 getSelectItemNumber	sdk-api	V
-0x7E9B62E8	683	sdk api handler i08 getSelectItem	sdk-api	V
-0x7E9B6593	1750	sdk api handler i09 getBeforeAction	sdk-api	V
-0x7E9B6C69	2214	sdk api handler i10 getString	sdk-api	V
-0x7E9B750F	735	sdk api handler i11 getLineInfo	sdk-api	V
-0x7E9B7800	697	sdk api handler i12 getErrorStatus	sdk-api	V
-0x7E9B7AB9	115	sdk api handler i13 turnOnTFT	sdk-api	V
-0x7E9B7B2C	45	sdk api handler i14 turnOffTFT	sdk-api	V
-0x7E9B7B59	45	sdk api handler j01 execute	sdk-api	V
-0x7E9B7B86	326	sdk api handler j02 getLifeTestMode	sdk-api	V
-0x7E9B7CCC	55	sdk api handler j03 getLifeTestCount	sdk-api	V
-0x7E9B7D03	95	sdk api handler j04 abortLifeTest	sdk-api	V
-0x7E9B7D62	41	sdk api handler k01 registerCode	sdk-api	V
-0x7E9B7D8B	52	sdk api handler k02 eraseCode	sdk-api	V
-0x7E9B7DBF	53	sdk api handler l01 getApiVersion	sdk-api	V
-0x7E9B7DF4	94	sdk api handler l02 getNumberOfSystemName	sdk-api	V
-0x7E9B7E52	46	sdk api handler l03 getSystemName	sdk-api	V
-0x7E9B7E80	308	sdk api handler l04 getShippingInfo	sdk-api	V
-0x7E9B7FB4	106	sdk api handler l05 getSystemVersion	sdk-api	V
-0x7E9B801E	128	sdk api handler l06 getMaintenanceData	sdk-api	V
-0x7E9B809E	130	sdk api handler l07 getSerialNumber	sdk-api	V
-0x7E9B8120	147	sdk api handler l08 getDamageInfo	sdk-api	V
-0x7E9B81B3	191	sdk api handler l09 clearDamageInfo	sdk-api	V
-0x7E9B8272	53	sdk api handler l10 updateFirmware	sdk-api	V
-0x7E9B82A7	191	sdk api handler l11 updateFirmwareCard	sdk-api	V
-0x7E9B8366	191	sdk api handler l12 canUpdateFirmwareCard	sdk-api	V
-0x7E9B8425	53	sdk api handler m01 start	sdk-api	V
-0x7E9B845A	170	sdk api handler m02 select	sdk-api	V
-0x7E9B8504	64	sdk api handler m03 canMoveCurrent	sdk-api	V
-0x7E9B8544	227	sdk api handler m04 moveCurrent	sdk-api	V
-0x7E9B8627	207	sdk api handler m05 getStillImageCount	sdk-api	V
-0x7E9B86F6	46	sdk api handler m06 print	sdk-api	V
-0x7E9B8724	53	sdk api handler m07 continuePrint	sdk-api	V
-0x7E9B8759	53	sdk api handler m08 abortPrint	sdk-api	V
-0x7E9B878E	53	sdk api handler m09 end	sdk-api	V
-0x7E9B87C3	404	sdk api handler n01 startCustomPrintService	sdk-api	V
-0x7E9B8957	41	sdk api handler m10 getFrameInfo	sdk-api	V
+0x7E9ABB27	235	sdk api handler M80 startLiveGuide (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9ABC12	235	sdk api handler M81 startLiveGuideLevel (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9ABCFD	234	sdk api handler M82 getLiveGuideLevel (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9ABDE7	469	sdk api handler M83 changeLiveGuideLevel (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9ABFBC	235	sdk api handler M84 endLiveGuideLevel (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AC0A7	54	sdk api handler M85 endLiveGuide (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AC0DD	156	sdk api handler M86 startIntervalShooting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AC179	46	sdk api handler M87 oneShotTakingPicture (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AC1A7	46	sdk api handler M88 endIntervalShooting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AC1D5	177	sdk api handler M89 ctrlMovieTelecon (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AC287	203	sdk api handler M90 getMovieTeleconFrame (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AC352	334	sdk api handler M91 moveMovieTeleconFrame (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AC4A0	54	sdk api handler M92 isLiveGuide (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AC4D6	46	sdk api handler M93 createTimeLapseMovie (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AC504	46	sdk api handler M94 getTouchTrackingAfl (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AC532	307	sdk api handler M95 changeZoomFrameRate (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AC665	59	sdk api handler N01 startPlayService (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AC6A0	53	sdk api handler N02 endPlayService (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AC6D5	236	sdk api handler N03 getImageType (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AC7C1	3009	sdk api handler N04 getStillInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AD382	2185	sdk api handler N05 getMovieInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9ADC0B	109	sdk api handler N06 getNumber (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9ADC78	1566	sdk api handler N07 getHistogram (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AE296	70	sdk api handler N08 selectCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AE2DC	45	sdk api handler N09 getSelectPicNumber (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AE309	53	sdk api handler N10 erase (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AE33E	45	sdk api handler N11 changeProtect (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AE36B	45	sdk api handler N12 canProtect (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AE398	53	sdk api handler N13 changeProtectSelected (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AE3CD	53	sdk api handler N14 isReservePrint (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AE402	53	sdk api handler N15 isProtect (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AE437	53	sdk api handler N16 isRecording (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AE46C	299	sdk api handler N17 transferImage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AE597	53	sdk api handler N18 cancelSelectedAll (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AE5CC	258	sdk api handler O01 startSingleFrame (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AE70E	236	sdk api handler O02 canMoveCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AE7FA	317	sdk api handler O03 moveCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AE937	259	sdk api handler O04 updateImage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AEA3A	245	sdk api handler O05 zoomImage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AEB2F	189	sdk api handler O06 scrollImage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AEBEC	45	sdk api handler O07 isEnlarge (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AEC19	414	sdk api handler O08 getEnlargeInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AEDB7	483	sdk api handler O09 getZoomFrame (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AEF9A	189	sdk api handler O10 moveZoomFrame (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AF057	53	sdk api handler O11 canRotate (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AF08C	286	sdk api handler O12 rotateImage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AF1AA	53	sdk api handler O13 canPrint (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AF1DF	53	sdk api handler O14 eraseCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AF214	356	sdk api handler O15 getAspectFrame (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AF378	379	sdk api handler O16 getFocusPosition (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AF4F3	254	sdk api handler O17 startSlide (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AF5F1	75	sdk api handler O18 endSlide (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AF63C	281	sdk api handler O19 startMoveCurrentContinuous (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AF755	77	sdk api handler O20 endMoveCurrentContinuous (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AF7A2	161	sdk api handler O21 startFastZoom (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AF843	161	sdk api handler O22 zoomImageFast (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AF8E4	53	sdk api handler O23 endFastZoom (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AF919	300	sdk api handler O24 startScrollFast (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AFA45	53	sdk api handler O25 endScrollFast (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AFA7A	55	sdk api handler O26 startScrollZoomFrame (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AFAB1	53	sdk api handler O27 endScrollZoomFrame (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AFAE6	220	sdk api handler O28 updateImageSync (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AFBC2	446	sdk api handler P01 startIndex (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AFD80	80	sdk api handler P02 getPageInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AFDD0	101	sdk api handler P03 getCurrentInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AFE35	436	sdk api handler P04 changeIndexNumber (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9AFFE9	53	sdk api handler P05 updateImage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B001E	294	sdk api handler P06 canMoveCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B0144	227	sdk api handler P07 moveCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B0227	45	sdk api handler P08 canRotate (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B0254	163	sdk api handler P09 rotateImage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B02F7	53	sdk api handler P10 startExpandAnimation (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B032C	138	sdk api handler P11 moveCurrentDirect (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B03B6	175	sdk api handler P12 canMovePage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B0465	173	sdk api handler P13 movePage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B0512	77	sdk api handler P14 getIndexInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B055F	202	sdk api handler Q01 start (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B0629	286	sdk api handler Q02 singleMode (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B0747	380	sdk api handler Q03 indexMode (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B08C3	80	sdk api handler Q04 getPageInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B0913	46	sdk api handler Q05 getCurrentInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B0941	294	sdk api handler Q06 canMoveCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B0A67	315	sdk api handler Q07 moveCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B0BA2	53	sdk api handler Q08 expandAnimation (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B0BD7	143	sdk api handler R01 startMovieService (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B0C66	53	sdk api handler R02 play (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B0C9B	53	sdk api handler R03 reversePlay (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B0CD0	189	sdk api handler R04 fastForward (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B0D8D	189	sdk api handler R05 rewind (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B0E4A	53	sdk api handler R06 pause (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B0E7F	189	sdk api handler R07 seek (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B0F3C	53	sdk api handler R08 forwardFrame (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B0F71	53	sdk api handler R09 rewindFrame (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B0FA6	45	sdk api handler R10 stop (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B0FD3	61	sdk api handler S01 start (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B1010	53	sdk api handler S02 record (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B1045	45	sdk api handler S03 canRecord (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B1072	45	sdk api handler S04 erase (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B109F	45	sdk api handler S05 stop (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B10CC	148	sdk api handler T01 start (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B1160	45	sdk api handler T02 hasReservation (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B118D	41	sdk api handler T03 eraseReservation (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B11B6	257	sdk api handler T04 singleMode (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B12B7	206	sdk api handler T05 canMoveCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B1385	240	sdk api handler T06 moveCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B1475	45	sdk api handler T07 canChangePrintCount (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B14A2	169	sdk api handler T08 changePrintCount (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B154B	45	sdk api handler T09 hasPrintCount (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B1578	146	sdk api handler T10 changeDatePrint (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B160A	41	sdk api handler T11 getPrintCount (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B1633	53	sdk api handler T12 reservePrint (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B1668	41	sdk api handler T13 end (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B1691	220	sdk api handler T14 updateImageSync (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B176D	45	sdk api handler T15 canReserve (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B179A	52	sdk api handler U01 start (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B17CE	253	sdk api handler U02 startSlideShow (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B18CB	142	sdk api handler U03 moveCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B1959	45	sdk api handler U04 endSlideShow (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B1986	44	sdk api handler U05 canSlideShowGPU (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B19B2	49	sdk api handler U06 startSlideShowGPU (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B19E3	45	sdk api handler U07 skipPage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B1A10	46	sdk api handler U08 endSlideShowGPU (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B1A3E	51	sdk api handler V01 start (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B1A71	137	sdk api handler V02 startPlay (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B1AFA	53	sdk api handler V03 stopPlay (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B1B2F	222	sdk api handler V04 setVolume (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B1C0D	263	sdk api handler W01 start (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B1D14	198	sdk api handler W02 getDateRange (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B1DDA	63	sdk api handler W03 getCursorPosition (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B1E19	169	sdk api handler W04 getPresenceImage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B1EC2	282	sdk api handler W05 moveCursor (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B1FDC	162	sdk api handler W06 canMovePage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B207E	169	sdk api handler W07 movePage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B2127	136	sdk api handler W09 end (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B21AF	113	sdk api handler X01 start (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B2220	168	sdk api handler X02 setScrollTarget (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B22C8	1085	sdk api handler X03 getEnlargeInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B2705	45	sdk api handler X04 setBase (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B2732	189	sdk api handler X05 scrollImage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B27EF	261	sdk api handler X06 canMoveCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B28F4	269	sdk api handler X07 moveCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B2A01	103	sdk api handler X09 updateImage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B2A68	151	sdk api handler X08 zoomImage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B2AFF	53	sdk api handler X10 isSameNumber (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B2B34	139	sdk api handler X11 singleMode (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B2BBF	139	sdk api handler X12 singleModeUpdate (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B2C4A	53	sdk api handler X13 eraseCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B2C7F	53	sdk api handler X14 erase (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B2CB4	95	sdk api handler X15 getNumber (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B2D13	211	sdk api handler Y01 start (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B2DE6	101	sdk api handler Y02 getPossibleSize (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B2E4B	258	sdk api handler Y03 makePreview (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B2F4D	189	sdk api handler Y04 save (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B300A	51	sdk api handler Z01 start (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B303D	76	sdk api handler Z02 canTrimming (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B3089	312	sdk api handler Z03 trimmingMode (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B31C1	313	sdk api handler Z04 getTrimmingInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B32FA	163	sdk api handler Z05 changeSize (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B339D	189	sdk api handler Z06 changePosition (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B345A	316	sdk api handler Z07 makePreview (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B3596	53	sdk api handler Z08 save (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B35CB	51	sdk api handler a01 start (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B35FE	45	sdk api handler a02 canAspect (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B362B	339	sdk api handler a03 aspectMode (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B377E	363	sdk api handler a04 getAspectInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B38E9	189	sdk api handler a05 changePosition (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B39A6	346	sdk api handler a06 makePreview (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B3B00	53	sdk api handler a07 save (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B3B35	51	sdk api handler b01 start (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B3B68	45	sdk api handler b02 canColor (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B3B95	447	sdk api handler b03 makePreview (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B3D54	320	sdk api handler b04 makeComparePreview (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B3E94	45	sdk api handler b05 save (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B3EC1	51	sdk api handler c01 start (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B3EF4	45	sdk api handler c02 canAdjust (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B3F21	316	sdk api handler c03 makePreview (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B405D	53	sdk api handler c04 save (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B4092	51	sdk api handler d01 start (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B40C5	45	sdk api handler d02 canAdjust (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B40F2	316	sdk api handler d03 makePreview (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B422E	53	sdk api handler d04 save (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B4263	196	sdk api handler e01 start (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B4327	45	sdk api handler e02 canAdjust (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B4354	45	sdk api handler e03 ready (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B4381	53	sdk api handler e04 executeAdjust (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B43B6	53	sdk api handler e05 save (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B43EB	44	sdk api handler e06 startCompare (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B4417	53	sdk api handler f01 canRaw (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B444C	59	sdk api handler f02 save (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B4487	60	sdk api handler f03 startCurrentModeEdit (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B44C3	257	sdk api handler f04 previewCurrentModeEdit (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B45C4	53	sdk api handler f05 saveCurrentModeEdit (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B45F9	146	sdk api handler f06 endCurrentModeEdit (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B468B	170	sdk api handler f07 startCustomEdit (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B4735	257	sdk api handler f08 previewCustomEdit (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B4836	53	sdk api handler f09 saveCustomEdit (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B486B	146	sdk api handler f10 endCustomEdit (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B48FD	51	sdk api handler g01 start (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B4930	257	sdk api handler g02 index (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B4A31	85	sdk api handler g03 getPageInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B4A86	65	sdk api handler g04 getCurrentInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B4AC7	358	sdk api handler g05 canMoveCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B4C2D	327	sdk api handler g06 moveCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B4D74	106	sdk api handler g07 selectCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B4DDE	421	sdk api handler g08 makeAdjustPreview (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B4F83	205	sdk api handler g09 adjustGain (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B5050	206	sdk api handler g10 makePreview (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B511E	53	sdk api handler g11 save (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B5153	147	sdk api handler g12 moveCurrentDirect (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B51E6	45	sdk api handler g13 canOverlay (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B5213	77	sdk api handler g14 getIndexInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B5260	59	sdk api handler h01 start (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B529B	275	sdk api handler h02 index (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B53AE	86	sdk api handler h03 getPageInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B5404	65	sdk api handler h04 getCurrentInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B5445	303	sdk api handler h05 canMoveCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B5574	327	sdk api handler h06 moveCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B56BB	53	sdk api handler h07 selectCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B56F0	77	sdk api handler Q0B getIndexInfo / h08 getIndexInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B573D	141	sdk api handler i01 readyExecuteSelfAdjust (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B57CA	1184	sdk api handler i02 execute (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B5C6A	112	sdk api handler i03 getMode (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B5CDA	45	sdk api handler i04 getMenuItemNumber (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B5D07	817	sdk api handler i05 getMenuItem (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B6038	688	sdk api handler i06 getDefaultItem (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B62E8	683	sdk api handler i07 getSelectItemNumber (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B6593	1750	sdk api handler i08 getSelectItem (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B6C69	2214	sdk api handler i09 getBeforeAction (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B750F	735	sdk api handler i10 getString (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B7800	697	sdk api handler i11 getLineInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B7AB9	115	sdk api handler i12 getErrorStatus (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B7B2C	45	sdk api handler i13 turnOnTFT (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B7B59	45	sdk api handler i14 turnOffTFT (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B7B86	326	sdk api handler j01 execute (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B7CCC	55	sdk api handler j02 getLifeTestMode (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B7D03	95	sdk api handler j03 getLifeTestCount (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B7D62	41	sdk api handler j04 abortLifeTest (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B7D8B	52	sdk api handler k01 registerCode (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B7DBF	53	sdk api handler k02 eraseCode (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B7DF4	94	sdk api handler l01 getApiVersion (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B7E52	46	sdk api handler l02 getNumberOfSystemName (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B7E80	308	sdk api handler l03 getSystemName (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B7FB4	106	sdk api handler l04 getShippingInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B801E	128	sdk api handler l05 getSystemVersion (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B809E	130	sdk api handler l06 getMaintenanceData (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B8120	147	sdk api handler l07 getSerialNumber (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B81B3	191	sdk api handler l08 getDamageInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B8272	53	sdk api handler l09 clearDamageInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B82A7	191	sdk api handler l10 updateFirmware (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B8366	191	sdk api handler l11 updateFirmwareCard (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B8425	53	sdk api handler l12 canUpdateFirmwareCard (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B845A	170	sdk api handler m01 start (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B8504	64	sdk api handler m02 select (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B8544	227	sdk api handler m03 canMoveCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B8627	207	sdk api handler m04 moveCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B86F6	46	sdk api handler m05 getStillImageCount (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B8724	53	sdk api handler m06 print (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B8759	53	sdk api handler m07 continuePrint (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B878E	53	sdk api handler m08 abortPrint (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B87C3	404	sdk api handler m10 getFrameInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B8957	41	sdk api handler m09 end (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
 0x7E9B8980	792	sdk debug shell method: [via 0x7E99D026: "%1s\n"]; [via 0x7E99D05E: "%1s, %d\n"]; "SIZE_DEFAULT:"; called by 0x7E9B8E20 (sdk api handler n05 changePaperSize) +3	g:str+callers	I
-0x7E9B8C98	57	sdk api handler n02 getSupportedPrintMode	sdk-api	V
-0x7E9B8CD1	135	sdk api handler n03 setPrintMode	sdk-api	V
-0x7E9B8D58	200	sdk api handler n04 getPaperSetting	sdk-api	V
-0x7E9B8E20	68	sdk api handler n05 changePaperSize	sdk-api	V
-0x7E9B8E64	203	sdk api handler n06 changeBorderSetting	sdk-api	V
-0x7E9B8F2F	203	sdk api handler n07 changeMultiCount	sdk-api	V
-0x7E9B8FFA	203	sdk api handler n08 setPaperSetting	sdk-api	V
-0x7E9B90C5	51	sdk api handler n09 singleMode	sdk-api	V
-0x7E9B90F8	222	sdk api handler n10 indexMode	sdk-api	V
-0x7E9B91D6	452	sdk api handler n11 detailMode	sdk-api	V
-0x7E9B939A	166	sdk api handler n12 canMoveCurrent	sdk-api	V
-0x7E9B9440	292	sdk api handler n13 moveCurrent	sdk-api	V
-0x7E9B9564	313	sdk api handler n14 getStillImageCount	sdk-api	V
-0x7E9B969D	44	sdk api handler n15 getPageInfo	sdk-api	V
-0x7E9B96C9	78	sdk api handler n16 startExpandAnimation	sdk-api	V
-0x7E9B9717	51	sdk api handler n17 canPrint	sdk-api	V
-0x7E9B974A	43	sdk api handler n18 changePrintCount	sdk-api	V
-0x7E9B9775	180	sdk api handler n19 changeDatePrint	sdk-api	V
-0x7E9B9829	43	sdk api handler n20 changeFileNamePrint	sdk-api	V
-0x7E9B9854	43	sdk api handler n21 setPrintSetting	sdk-api	V
-0x7E9B987F	51	sdk api handler n22 resetPrintSetting	sdk-api	V
-0x7E9B98B2	51	sdk api handler n23 getPrintCount	sdk-api	V
-0x7E9B98E5	250	sdk api handler n25 trimmingMode	sdk-api	V
-0x7E9B99DF	222	sdk api handler n26 getTrimmingInfo	sdk-api	V
-0x7E9B9ABD	311	sdk api handler n27 changeSize	sdk-api	V
-0x7E9B9BF4	148	sdk api handler n28 changePosition	sdk-api	V
-0x7E9B9C88	187	sdk api handler n29 setTrimming	sdk-api	V
-0x7E9B9D43	52	sdk api handler n30 makePreview	sdk-api	V
-0x7E9B9D77	65	sdk api handler n31 print	sdk-api	V
-0x7E9B9DB8	51	sdk api handler n32 continuePrint	sdk-api	V
-0x7E9B9DEB	51	sdk api handler n33 abortPrint	sdk-api	V
-0x7E9B9E1E	51	sdk api handler n34 endCustomPrintService	sdk-api	V
-0x7E9B9E51	39	sdk api handler o01 connect	sdk-api	V
-0x7E9B9E78	78	sdk api handler n24 canDetailSetting	sdk-api	V
-0x7E9B9EC6	193	sdk api handler o02 disconnect	sdk-api	V
-0x7E9B9F87	51	sdk api handler o03 getStatus	sdk-api	V
-0x7E9B9FBA	440	sdk api handler o04 isCommunication	sdk-api	V
-0x7E9BA172	74	sdk api handler p01 startCommunication	sdk-api	V
+0x7E9B8C98	57	sdk api handler n01 startCustomPrintService (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B8CD1	135	sdk api handler n02 getSupportedPrintMode (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B8D58	200	sdk api handler n03 setPrintMode (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B8E20	68	sdk api handler n04 getPaperSetting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B8E64	203	sdk api handler n05 changePaperSize (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B8F2F	203	sdk api handler n06 changeBorderSetting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B8FFA	203	sdk api handler n07 changeMultiCount (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B90C5	51	sdk api handler n08 setPaperSetting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B90F8	222	sdk api handler n09 singleMode (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B91D6	452	sdk api handler n10 indexMode (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B939A	166	sdk api handler n11 detailMode (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B9440	292	sdk api handler n12 canMoveCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B9564	313	sdk api handler n13 moveCurrent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B969D	44	sdk api handler n14 getStillImageCount (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B96C9	78	sdk api handler n15 getPageInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B9717	51	sdk api handler n16 startExpandAnimation (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B974A	43	sdk api handler n17 canPrint (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B9775	180	sdk api handler n18 changePrintCount (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B9829	43	sdk api handler n19 changeDatePrint (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B9854	43	sdk api handler n20 changeFileNamePrint (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B987F	51	sdk api handler n21 setPrintSetting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B98B2	51	sdk api handler n22 resetPrintSetting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B98E5	250	sdk api handler n24 canDetailSetting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B99DF	222	sdk api handler n25 trimmingMode (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B9ABD	311	sdk api handler n26 getTrimmingInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B9BF4	148	sdk api handler n27 changeSize (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B9C88	187	sdk api handler n28 changePosition (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B9D43	52	sdk api handler n29 setTrimming (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B9D77	65	sdk api handler n30 makePreview (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B9DB8	51	sdk api handler n31 print (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B9DEB	51	sdk api handler n32 continuePrint (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B9E1E	51	sdk api handler n33 abortPrint (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B9E51	39	sdk api handler n34 endCustomPrintService (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B9E78	78	sdk api handler n23 getPrintCount (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B9EC6	193	sdk api handler o01 connect (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B9F87	51	sdk api handler o02 disconnect (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9B9FBA	440	sdk api handler o03 getStatus (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BA172	74	sdk api handler o04 isCommunication (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
 0x7E9BA1BC	227	sdk debug shell method: [via 0x7E99D026: "%1s\n"]; [via 0x7E99D05E: "%1s, %d\n"]; "address %d:%d:%d:%d:%d:%d"; called by 0x7E9BAE25 (sdk api handler p24 getPairingDeviceCount) +4	g:str+callers	I
-0x7E9BA29F	57	sdk api handler p02 stopCommunication	sdk-api	V
-0x7E9BA2D8	58	sdk api handler p03 requestConnection	sdk-api	V
-0x7E9BA312	440	sdk api handler p04 cancelConnection	sdk-api	V
-0x7E9BA4CA	58	sdk api handler p05 searchDevice	sdk-api	V
-0x7E9BA504	157	sdk api handler p06 cancelSearchDevice	sdk-api	V
-0x7E9BA5A1	58	sdk api handler p07 sendImage	sdk-api	V
-0x7E9BA5DB	58	sdk api handler p08 cancelSendImage	sdk-api	V
-0x7E9BA615	58	sdk api handler p09 requestPairing	sdk-api	V
-0x7E9BA64F	421	sdk api handler p10 cancelPairing	sdk-api	V
-0x7E9BA7F4	58	sdk api handler p11 waitRequest	sdk-api	V
-0x7E9BA82E	58	sdk api handler p12 abortWaitRequest	sdk-api	V
-0x7E9BA868	58	sdk api handler p13 acceptPairing	sdk-api	V
-0x7E9BA8A2	323	sdk api handler p14 rejectPairing	sdk-api	V
-0x7E9BA9E5	58	sdk api handler p15 acceptConnection	sdk-api	V
-0x7E9BAA1F	58	sdk api handler p16 rejectConnection	sdk-api	V
-0x7E9BAA59	58	sdk api handler p17 receiveImage	sdk-api	V
-0x7E9BAA93	323	sdk api handler p18 cancelReceiveImage	sdk-api	V
-0x7E9BABD6	58	sdk api handler p19 removePairingDevice	sdk-api	V
-0x7E9BAC10	177	sdk api handler p20 sendPinCode	sdk-api	V
-0x7E9BACC1	236	sdk api handler p21 createSendImage	sdk-api	V
-0x7E9BADAD	51	sdk api handler p22 getSearchDeviceCount	sdk-api	V
-0x7E9BADE0	69	sdk api handler p23 getSearchDeviceList	sdk-api	V
-0x7E9BAE25	218	sdk api handler p24 getPairingDeviceCount	sdk-api	V
-0x7E9BAEFF	69	sdk api handler p25 getPairingDeviceList	sdk-api	V
-0x7E9BAF44	218	sdk api handler p26 getPairingResult	sdk-api	V
-0x7E9BB01E	69	sdk api handler p27 getCommingDeviceInfo	sdk-api	V
-0x7E9BB063	69	sdk api handler p28 recordReceiveImage	sdk-api	V
-0x7E9BB0A8	174	sdk api handler p29 getMyDeviceInfo	sdk-api	V
-0x7E9BB156	69	sdk api handler p30 setMyDeviceName	sdk-api	V
-0x7E9BB19B	296	sdk api handler p31 setPairingDeviceName	sdk-api	V
-0x7E9BB2C3	316	sdk api handler p32 showSendImage	sdk-api	V
-0x7E9BB3FF	349	sdk api handler p33 showReceiveImage	sdk-api	V
-0x7E9BB55C	350	sdk api handler p34 getAuthNumber	sdk-api	V
-0x7E9BB6BA	144	sdk api handler q01 scSetTimer	sdk-api	V
+0x7E9BA29F	57	sdk api handler p01 startCommunication (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BA2D8	58	sdk api handler p02 stopCommunication (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BA312	440	sdk api handler p03 requestConnection (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BA4CA	58	sdk api handler p04 cancelConnection (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BA504	157	sdk api handler p05 searchDevice (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BA5A1	58	sdk api handler p06 cancelSearchDevice (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BA5DB	58	sdk api handler p07 sendImage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BA615	58	sdk api handler p08 cancelSendImage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BA64F	421	sdk api handler p09 requestPairing (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BA7F4	58	sdk api handler p10 cancelPairing (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BA82E	58	sdk api handler p11 waitRequest (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BA868	58	sdk api handler p12 abortWaitRequest (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BA8A2	323	sdk api handler p13 acceptPairing (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BA9E5	58	sdk api handler p14 rejectPairing (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BAA1F	58	sdk api handler p15 acceptConnection (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BAA59	58	sdk api handler p16 rejectConnection (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BAA93	323	sdk api handler p17 receiveImage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BABD6	58	sdk api handler p18 cancelReceiveImage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BAC10	177	sdk api handler p19 removePairingDevice (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BACC1	236	sdk api handler p20 sendPinCode (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BADAD	51	sdk api handler p21 createSendImage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BADE0	69	sdk api handler p22 getSearchDeviceCount (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BAE25	218	sdk api handler p23 getSearchDeviceList (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BAEFF	69	sdk api handler p24 getPairingDeviceCount (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BAF44	218	sdk api handler p25 getPairingDeviceList (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BB01E	69	sdk api handler p26 getPairingResult (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BB063	69	sdk api handler p27 getCommingDeviceInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BB0A8	174	sdk api handler p28 recordReceiveImage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BB156	69	sdk api handler p29 getMyDeviceInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BB19B	296	sdk api handler p30 setMyDeviceName (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BB2C3	316	sdk api handler p31 setPairingDeviceName (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BB3FF	349	sdk api handler p32 showSendImage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BB55C	350	sdk api handler p33 showReceiveImage (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BB6BA	144	sdk api handler p34 getAuthNumber (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
 0x7E9BB74A	44	sdk debug shell method: [via 0x7E99D026: "%1s\n"]; "timer_cb, id=%d type=%d"	g:str	I
 0x7E9BB776	45	sdk debug shell method: [via 0x7E99D026: "%1s\n"]; "debug_cb, argc=%d argv[0]=%s"	g:str	I
-0x7E9BB7A3	312	sdk api handler q02 scStartTimer	sdk-api	V
-0x7E9BB8DB	143	sdk shell sub-command "starttimer" handler	sdk-cmd	V
-0x7E9BB96A	143	sdk shell sub-command "stoptimer" handler	sdk-cmd	V
-0x7E9BB9F9	143	sdk api handler q05 scStrncpy	sdk-api	V
-0x7E9BBA88	296	sdk api handler q06 scWcsncpy	sdk-api	V
-0x7E9BBBB0	335	sdk api handler q07 scStrncat	sdk-api	V
-0x7E9BBCFF	348	sdk api handler q08 scWcsncat	sdk-api	V
-0x7E9BBE5B	307	sdk api handler q09 scStrncmp	sdk-api	V
-0x7E9BBF8E	275	sdk api handler q10 scWcsncmp	sdk-api	V
-0x7E9BC0A1	275	sdk api handler q11 scStrlen	sdk-api	V
-0x7E9BC1B4	136	sdk api handler q12 scWcslen	sdk-api	V
-0x7E9BC23C	186	sdk api handler q13 scStrnupr	sdk-api	V
-0x7E9BC2F6	250	sdk api handler q14 scWcsnupr	sdk-api	V
-0x7E9BC3F0	254	sdk api handler q15 scWcstol	sdk-api	V
-0x7E9BC4EE	136	sdk api handler q16 scSprintf	sdk-api	V
-0x7E9BC576	287	sdk api handler q17 scWcsprintf	sdk-api	V
-0x7E9BC695	583	sdk api handler q18 scMalloc	sdk-api	V
-0x7E9BC8DC	175	sdk api handler q19 scFree	sdk-api	V
-0x7E9BC98B	113	sdk api handler q20 scMemcpy	sdk-api	V
-0x7E9BC9FC	270	sdk api handler q21 scMemset	sdk-api	V
-0x7E9BCB0A	221	sdk api handler q22 scSendDbgLog	sdk-api	V
-0x7E9BCBE7	209	sdk api handler q23 scSetDbgFunction	sdk-api	V
-0x7E9BCCB8	256	sdk api handler q24 scOsCreateTask	sdk-api	V
-0x7E9BCDB8	388	sdk api handler q25 scOsDeleteTask	sdk-api	V
-0x7E9BCF3C	143	sdk api handler q26 scOsStartTask	sdk-api	V
-0x7E9BCFCB	143	sdk api handler q27 scOsIStartTask	sdk-api	V
-0x7E9BD05A	143	sdk api handler q28 scOsStopTask	sdk-api	V
-0x7E9BD0E9	143	sdk api handler q29 scOsWakeupTask	sdk-api	V
-0x7E9BD178	143	sdk api handler q30 scOsIWakeupTask	sdk-api	V
-0x7E9BD207	143	sdk api handler q31 scOsSelfEndTask	sdk-api	V
-0x7E9BD296	34	sdk api handler q32 scOsSleepTask	sdk-api	V
-0x7E9BD2B8	143	sdk api handler q33 scOsSelfSleepTask	sdk-api	V
-0x7E9BD347	143	sdk api handler q34 scOsCreateEvent	sdk-api	V
-0x7E9BD3D6	297	sdk api handler q35 scOsDeleteEvent	sdk-api	V
-0x7E9BD4FF	143	sdk api handler q36 scOsSetEvent	sdk-api	V
-0x7E9BD58E	189	sdk api handler q37 scOsISetEvent	sdk-api	V
-0x7E9BD64B	189	sdk api handler q38 scOsWaitEvent	sdk-api	V
-0x7E9BD708	342	sdk api handler q39 scOsClearEvent	sdk-api	V
-0x7E9BD85E	189	sdk api handler q40 scOsCreateQueue	sdk-api	V
-0x7E9BD91B	392	sdk api handler q41 scOsDeleteQueue	sdk-api	V
-0x7E9BDAA3	143	sdk api handler q42 scOsWriteQueue	sdk-api	V
-0x7E9BDB32	241	sdk api handler q43 scOsReadQueue	sdk-api	V
-0x7E9BDC23	220	sdk api handler q44 scOsCreateSemaphore	sdk-api	V
-0x7E9BDCFF	392	sdk api handler q45 scOsDeleteSemaphore	sdk-api	V
-0x7E9BDE87	143	sdk api handler q46 scOsWaitSemaphore	sdk-api	V
-0x7E9BDF16	215	sdk api handler q47 scOsSignalSemaphore	sdk-api	V
-0x7E9BDFED	143	sdk api handler q48 scOsISignalSemaphore	sdk-api	V
-0x7E9BE07C	143	sdk api handler q49 scTimeMinit	sdk-api	V
-0x7E9BE10B	46	sdk api handler q50 scTimeMset	sdk-api	V
-0x7E9BE139	144	sdk api handler q51 scTimeMshow	sdk-api	V
-0x7E9BE1C9	46	sdk api handler q52 scTimeMwrite	sdk-api	V
-0x7E9BE1F7	46	sdk api handler q53 scUsrTimeMeasurementStart	sdk-api	V
-0x7E9BE225	144	sdk api handler q54 scProcLogStart	sdk-api	V
-0x7E9BE2B5	46	sdk api handler q55 scProcLogStop	sdk-api	V
-0x7E9BE2E3	46	sdk api handler r01 initOsdControl	sdk-api	V
-0x7E9BE311	34	sdk api handler r02 drawOsdStart	sdk-api	V
-0x7E9BE333	34	sdk api handler r03 drawOsdEnd	sdk-api	V
-0x7E9BE355	34	sdk api handler r04 setOsdOrder	sdk-api	V
-0x7E9BE377	246	sdk api handler r05 setFrameSize	sdk-api	V
-0x7E9BE46D	247	sdk api handler r06 drawDot	sdk-api	V
-0x7E9BE564	182	sdk api handler r07 drawLine	sdk-api	V
-0x7E9BE61A	182	sdk api handler r08 drawRect	sdk-api	V
-0x7E9BE6D0	182	sdk api handler r09 drawFont	sdk-api	V
-0x7E9BE786	182	sdk api handler r10 drawBitmap	sdk-api	V
-0x7E9BE83C	182	sdk api handler r11 copyFrame	sdk-api	V
-0x7E9BE8F2	187	sdk api handler r12 copyAreaBlock	sdk-api	V
-0x7E9BE9AD	182	sdk api handler r13 customDisplay	sdk-api	V
-0x7E9BEA63	182	sdk api handler r14 updateDisplay	sdk-api	V
-0x7E9BEB19	182	sdk api handler r15 updateImageLayer	sdk-api	V
-0x7E9BEBCF	188	sdk api handler r16 setColorPalette	sdk-api	V
-0x7E9BEC8B	193	sdk api handler r17 setTransparent	sdk-api	V
-0x7E9BED4C	172	sdk api handler r18 resetTransparent	sdk-api	V
-0x7E9BEDF8	167	sdk api handler r19 getVramInfo	sdk-api	V
-0x7E9BEE9F	472	sdk api handler r20 freeVramInfo	sdk-api	V
-0x7E9BF077	143	sdk api handler r21 setDispInfo	sdk-api	V
-0x7E9BF106	170	sdk api handler s01 LVControlBase	sdk-api	V
-0x7E9BF1B0	487	sdk api handler s02 LVControlDirect	sdk-api	V
-0x7E9BF397	437	sdk api handler s03 LVguidePlate	sdk-api	V
-0x7E9BF54C	503	sdk api handler t01 isFlashAir	sdk-api	V
-0x7E9BF743	55	sdk api handler t02 getSettingStatus	sdk-api	V
-0x7E9BF77A	88	sdk api handler t03 getWifiSetting	sdk-api	V
-0x7E9BF7D2	172	sdk api handler t04 getWifiStatus	sdk-api	V
-0x7E9BF87E	56	sdk api handler t05 setWifiSSID	sdk-api	V
-0x7E9BF8B6	79	sdk api handler t06 setWifiPassword	sdk-api	V
-0x7E9BF905	80	sdk api handler t07 getOneTimePassword	sdk-api	V
-0x7E9BF955	64	sdk api handler t08 setOneTimePassword	sdk-api	V
-0x7E9BF995	80	sdk api handler t09 connect	sdk-api	V
-0x7E9BF9E5	95	sdk api handler t10 disconnect	sdk-api	V
-0x7E9BFA44	58	OlyApi FlashAir::disconnect (API id 0x05060A); vt word 0x7EBF9F4C	olyapi-method	V
+0x7E9BB7A3	312	sdk api handler q01 scSetTimer (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BB8DB	143	sdk api handler q02 scStartTimer (table 0x7EBF8180; C7 2026-11-09) | sdk shell sub-command "starttimer" handler	sdk-cmd	V
+0x7E9BB96A	143	sdk api handler q03 scStopTimer (table 0x7EBF8180; C7 2026-11-09) | sdk shell sub-command "stoptimer" handler	sdk-cmd	V
+0x7E9BB9F9	143	sdk api handler q04 scKillTimer (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BBA88	296	sdk api handler q05 scStrncpy (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BBBB0	335	sdk api handler q06 scWcsncpy (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BBCFF	348	sdk api handler q07 scStrncat (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BBE5B	307	sdk api handler q08 scWcsncat (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BBF8E	275	sdk api handler q09 scStrncmp (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BC0A1	275	sdk api handler q10 scWcsncmp (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BC1B4	136	sdk api handler q11 scStrlen (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BC23C	186	sdk api handler q12 scWcslen (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BC2F6	250	sdk api handler q13 scStrnupr (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BC3F0	254	sdk api handler q14 scWcsnupr (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BC4EE	136	sdk api handler q15 scWcstol (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BC576	287	sdk api handler q16 scSprintf (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BC695	583	sdk api handler q17 scWcsprintf (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BC8DC	175	sdk api handler q18 scMalloc (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BC98B	113	sdk api handler q19 scFree (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BC9FC	270	sdk api handler q20 scMemcpy (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BCB0A	221	sdk api handler q21 scMemset (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BCBE7	209	sdk api handler q22 scSendDbgLog (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BCCB8	256	sdk api handler q23 scSetDbgFunction (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BCDB8	388	sdk api handler q24 scOsCreateTask (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BCF3C	143	sdk api handler q25 scOsDeleteTask (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BCFCB	143	sdk api handler q26 scOsStartTask (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BD05A	143	sdk api handler q27 scOsIStartTask (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BD0E9	143	sdk api handler q28 scOsStopTask (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BD178	143	sdk api handler q29 scOsWakeupTask (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BD207	143	sdk api handler q30 scOsIWakeupTask (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BD296	34	sdk api handler q31 scOsSelfEndTask (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BD2B8	143	sdk api handler q32 scOsSleepTask (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BD347	143	sdk api handler q33 scOsSelfSleepTask (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BD3D6	297	sdk api handler q34 scOsCreateEvent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BD4FF	143	sdk api handler q35 scOsDeleteEvent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BD58E	189	sdk api handler q36 scOsSetEvent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BD64B	189	sdk api handler q37 scOsISetEvent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BD708	342	sdk api handler q38 scOsWaitEvent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BD85E	189	sdk api handler q39 scOsClearEvent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BD91B	392	sdk api handler q40 scOsCreateQueue (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BDAA3	143	sdk api handler q41 scOsDeleteQueue (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BDB32	241	sdk api handler q42 scOsWriteQueue (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BDC23	220	sdk api handler q43 scOsReadQueue (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BDCFF	392	sdk api handler q44 scOsCreateSemaphore (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BDE87	143	sdk api handler q45 scOsDeleteSemaphore (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BDF16	215	sdk api handler q46 scOsWaitSemaphore (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BDFED	143	sdk api handler q47 scOsSignalSemaphore (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BE07C	143	sdk api handler q48 scOsISignalSemaphore (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BE10B	46	sdk api handler q49 scTimeMinit (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BE139	144	sdk api handler q50 scTimeMset (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BE1C9	46	sdk api handler q51 scTimeMshow (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BE1F7	46	sdk api handler q52 scTimeMwrite (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BE225	144	sdk api handler q53 scUsrTimeMeasurementStart (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BE2B5	46	sdk api handler q54 scProcLogStart (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BE2E3	46	sdk api handler q55 scProcLogStop (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BE311	34	sdk api handler r01 initOsdControl (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BE333	34	sdk api handler r02 drawOsdStart (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BE355	34	sdk api handler r03 drawOsdEnd (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BE377	246	sdk api handler r04 setOsdOrder (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BE46D	247	sdk api handler r05 setFrameSize (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BE564	182	sdk api handler r06 drawDot (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BE61A	182	sdk api handler r07 drawLine (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BE6D0	182	sdk api handler r08 drawRect (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BE786	182	sdk api handler r09 drawFont (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BE83C	182	sdk api handler r10 drawBitmap (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BE8F2	187	sdk api handler r11 copyFrame (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BE9AD	182	sdk api handler r12 copyAreaBlock (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BEA63	182	sdk api handler r13 customDisplay (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BEB19	182	sdk api handler r14 updateDisplay (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BEBCF	188	sdk api handler r15 updateImageLayer (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BEC8B	193	sdk api handler r16 setColorPalette (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BED4C	172	sdk api handler r17 setTransparent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BEDF8	167	sdk api handler r18 resetTransparent (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BEE9F	472	sdk api handler r19 getVramInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BF077	143	sdk api handler r20 freeVramInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BF106	170	sdk api handler r21 setDispInfo (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BF1B0	487	sdk api handler s01 LVControlBase (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BF397	437	sdk api handler s02 LVControlDirect (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BF54C	503	sdk api handler s03 LVguidePlate (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BF743	55	sdk api handler t01 isFlashAir (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BF77A	88	sdk api handler t02 getSettingStatus (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BF7D2	172	sdk api handler t03 getWifiSetting (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BF87E	56	sdk api handler t04 getWifiStatus (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BF8B6	79	sdk api handler t05 setWifiSSID (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BF905	80	sdk api handler t06 setWifiPassword (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BF955	64	sdk api handler t07 getOneTimePassword (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BF995	80	sdk api handler t08 setOneTimePassword (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BF9E5	95	sdk api handler t09 connect (table 0x7EBF8180 {cmd, name, handler}; C7 2026-11-09)	sdk-api	V
+0x7E9BFA44	58	sdk api handler t10 disconnect (table 0x7EBF8180; C7 2026-11-09) | OlyApi FlashAir::disconnect (API id 0x05060A); vt word 0x7EBF9F4C	olyapi-method	V
 0x7E9BFA7E	88	OlyApiBackGroundCtrl getInstance (lazy 4-B singleton, lock 0x7E99A33A)	olyapi-getter	V
 0x7E9BFAD6	15	OlyApi interface classes object ctor: stores vt 0x7EC0E900 at +0	object-ctor	V
 0x7E9BFAE5	115	OlyApi BackGroundCtrl::draw (API id 0x010301); vt word 0x7EC0E90C	olyapi-method	V

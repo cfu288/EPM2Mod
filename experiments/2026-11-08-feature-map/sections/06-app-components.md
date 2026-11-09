@@ -15,7 +15,7 @@ Helper scripts are in the scratch dir (`.../scratchpad/app/`: `vt.py` dumps vtab
   4. `Cmp_*` components.
   5. `Ctg_*` categories that select components.
   6. `OlyHfwOpe*` "operation" classes, which turn API calls into events.
-  7. `OlyApi*Controller`. A large debug shell, `sdk api`, can call this API surface directly (635 commands).
+  7. `OlyApi*Controller`. A large debug shell, `sdk api`, can call this API surface directly (~~635~~ 636 commands; C7 2026-11-09).
 - **Main dormant-code finding (verified bytes, inferred meaning):**
   - The **picture database backend is stubbed.** All 46 `api_oldb_*` entry points are `api_oldb_dummy_*`. Each one logs its name and returns 1.
   - So Photo Surfing, Event View, Event/Collection, Collage and the person/GPS queries have full UI and component code, but no database behind them. They look dormant on the E-PM2.
@@ -193,7 +193,7 @@ Helper scripts are in the scratch dir (`.../scratchpad/app/`: `vt.py` dumps vtab
 - The debug shell's `sdk` sub-command table is at **0x7EBF0FA0**: `{name*, fn*}` pairs.
 - Sub-commands: `help dbglvl debug dump dbgall dbgstate dbgfw shutdown shutdown_api sleep sleep_api sleep_off charge_sleep power_info canexec mediastatus showtimer ca api starttimer stoptimer dbgseq dbgfunc dbgeyefi dbgbm dbgosd dbgsys olyapi_get dbggrid`.
 - `sdk api` = 0x7E9A074B, with help text `sdk api [A-z]`.
-- It dispatches through a **635-entry table at 0x7EBF8188**. Each entry is `{handler, "A02", "shutDown"}`, 12 bytes (dumped with `cmdtbl.py`).
+- It dispatches through a ~~**635-entry table at 0x7EBF8188**. Each entry is `{handler, "A02", "shutDown"}`~~ **636-entry table at 0x7EBF8180**, each entry `{cmd, name, handler}`, 12 bytes: the dispatcher 0x7E9A074B loads 0x7EBF8180, compares the command string at +0, calls the handler at +8 and stops at 636. The first entry is {"A01", "initializeApi", 0x7E9A171D}. The old reading shifted every name by one entry. Checked by handler API ids: 560 of 566 match the entry name (C7 2026-11-09; coverage/round7-review2.md; 16a rows regenerated from the table).
 - Each handler prints `usage: sdk api %s …` and the enum names (`API_MEDIA_*`, `API_*_KEY`, `DIRECTION_*`, `OLY_TRUE/FALSE`), parses its arguments, and calls the `OlyApi*` layer (0x7E9C–0x7E9D).
 - fwmap merges many handlers into one big "function", 0x7E9A1F88 (16.5 KB, 446 strings), because the handler starts are reached only through this table.
 
