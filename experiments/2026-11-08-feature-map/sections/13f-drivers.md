@@ -1,6 +1,6 @@
 # 13f — Drivers: MMIO map, interrupts, serial buses, storage stack, power and clocks
 
-Round D1 deep dive. Scope: the driver code in 0x7E421020–0x7E521020, plus the drivers that sit in other modules (camera core, display, audio, files, USB, GPU).
+Round D1 deep dive. Scope: the driver code in 0x7E421020–~0x7E521020 (the regions-table window; 0x7E520E2D crosses its end (L1 2026-11-09)), plus the drivers that sit in other modules (camera core, display, audio, files, USB, GPU).
 - **Labels:** **V** = verified (read in the code or bytes). **I** = inferred (names, order, layout).
 - **Database:** `$S/map-test`. Scripts are in `$S/d1/drivers/`:
   - `scanio.py` collects every I/O-range constant from functions.txt into `io.tsv` (13,533 rows);
@@ -10,7 +10,7 @@ Round D1 deep dive. Scope: the driver code in 0x7E421020–0x7E521020, plus the 
 
 ## 1. Area and boundaries
 
-**Driver code in 0x7E421020–0x7E521020.** Each start is the first function that has the driver's register or string, so the boundaries are verified to within one function (V).
+**Driver code in 0x7E421020–~0x7E521020 (L1 2026-11-09).** Each start is the first function that has the driver's register or string, so the boundaries are verified to within one function (V).
 
 | Range | Contents |
 |---|---|
@@ -19,7 +19,7 @@ Round D1 deep dive. Scope: the driver code in 0x7E421020–0x7E521020, plus the 
 | 0x7E449823–0x7E44B11E | Bus arbiter and bus measurement (`arbit`, `busmes`, `dqsdelay`), 0x98A/0x98B |
 | 0x7E44AD97–0x7E44B0ED | Console UART init (0x7E44AD97 port 0, 0x7E44AE3D port 1) and getc/putc |
 | 0x7E44B39C–0x7E44B637 | CPU0 level dispatchers and `irq_register` / `irq_disable` / `irq_restore` |
-| 0x7E44D6EF–0x7E44D7FF | Kernel tick timers |
+| 0x7E44D6EF–~~0x7E44D7FF~~ 0x7E44D7D1 (0x7E44D7D2 is a printf-style formatter with 48 callers (L1 2026-11-09)) | Kernel tick timers |
 | 0x7E44EE0E–0x7E44EFEA | Inter-CPU reboot IRQ and the NMI flash-guard IRQ |
 | 0x7E45824B–0x7E45A80B | Accelerometer `per_acc`/`acc_spi` (SIO ch3) |
 | 0x7E45AAD4–0x7E45B67E | ADC `per_adc`, 0x98C00000 |
@@ -238,7 +238,7 @@ From the top down. Positions are verified string anchors; the layer roles are I 
 | FILECLBK task 0x7E5C1B4E | — | Dispatches on the high 16 bits of the command (V): 0 → 0x7E5C1BC6; 0x1 → 0x7E5C50DE; 0x2 → 0x7E5C51A8; 0x20 → 0x7E5C0A7B; 0x8/0x10 → DCF 0x7E5AFAA0. Then it replies (0x7E5C1C84) |
 | FILEFGND task 0x7E5C4E90 | — | A generic job runner (V). It waits on the **event flag** 0x7E43EB7E (OlyEvWt 0x7E4490AF; the posters set it through 0x7E5C8AEE → OlyEvSt/OlyEvStCpu) and drains a 32-entry ring of 12-byte `{fn, arg, u16 d0, u16 kind}` jobs at 0x60545454 (read index +0x180, write index +0x182): kind 0 `fn()`, 1 `fn(a0)`, 2 `fn(a0,d0)`. Jobs are posted by 0x7E5C4E2C (kind 1), 0x7E5C4E37 (kind 2) and the generic 0x7E5C4E42; the real jobs are SD and logsec completion callbacks (posters such as 0x7E5CBA48, 0x7E5CD4D4, 0x7E5CD5FF). The thunks 0x7E5C4EBC… are **not** FILEFGND jobs: they are called directly by the FILECLBK (task entry 0x7E5C1B4E) dispatcher 0x7E5C50DE (jump table 0x7E797238, cmds 0x10001–0x10013), and their parameter layouts differ (0x7E5C4EBC uses +8 = a1, +12 = u16 d0) (A4 2026-11-09) |
 | File wrapper / VFS | 0x7E5C920F–0x7E5CB8D2 (`filewrap_dump_all_file_list_item`, `.`/`..` listings) | Job targets 0x7E5C97C1, 0x7E5C9A5F, 0x7E5C9DCC, 0x7E5CA326… (V call targets) |
-| FAT | 0x7E5B6233 (`NO_FAT_CHAIN`, 26 callers) – ~0x7E5BDE10 (cluster-cache MRU, C1 F008); type detect 0x7E5B79F4/0x7E5B88F0 (`FAT12/16/32`, `NO NAME`); **exFAT** 0x7E5BA075; DOS date/time 0x7E5C0C76 | Shell `FileSystem Debug Command` 0x7E5C213E. The U_SHELL `file` entry 0x7E5C2139 is the stub just before it |
+| FAT | 0x7E5B6233 (`NO_FAT_CHAIN`, 26 callers) – ~0x7E5BDE10 (cluster-cache MRU, C1 F008); type detect 0x7E5B79F4/0x7E5B88F0 (`FAT12/16/32`, `NO NAME`); **exFAT** 0x7E5BA075; DOS date/time 0x7E5C0C76 | Shell `FileSystem Debug Command` 0x7E5C213E. ~~The U_SHELL `file` entry 0x7E5C2139 is the stub just before it~~ The U_SHELL `file` entry 0x7E5C2139 is the same function's indirect entry: `movm [d2,a2],(sp); add -12,sp` falls straight into 0x7E5C213E. The data words 0x7E732738/0x7E733348/0x7EBCC350 point to 0x7E5C2139; the direct callers 0x7F09D95D/0x7F09D9F4 use `call 0x7E5C213E,[d2,a2],20`, which builds the same frame (two-entry rule, 14e) (L1 2026-11-09) |
 | Logical-sector layer ("logsec") | 0x7E5CBAA1–0x7E5CBC15 | `LOGSEC_SEM`, ticket semaphores `E_LOGSEC_TCKT2/3` (serialises the card users) |
 | SD host driver | 0x7E5CBD83 (init: IRQ 93 → 0x7E5CC3A4, IRQ 95 → 0x7E5CC069) – 0x7E5CE932 (`==== sdphy ====`); register dump 0x7E5CC42F | Block 0x99000000, with a second register bank at +0x2000 (V). Pad set-up through GIO 0x9A101384–0x9A101464 (0x7E5CC87C/0x7E5CC8D6, V). Eye-Fi/FlashAir (iSDIO) commands are layered above (`isdio_read_register` 0x7F0A4AF4) |
 

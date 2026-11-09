@@ -1,4 +1,4 @@
-# 15b. Camera core and its drivers: function-level index (E-PM2 v1.6, 0x7E520000–0x7E731588)
+# 15b. Camera core and its drivers: function-level index (E-PM2 v1.6, ~0x7E520000–~~0x7E731588~~ 0x7E731584 (L1 2026-11-09))
 
 Round D3 deep dive for coverage round C3 (review 1: F003–F005, F009–F017, F020). It gives roles to function families and table slots, so that a reader can look up a random function in the camera core and find what it does.
 
@@ -14,8 +14,8 @@ Round D3 deep dive for coverage round C3 (review 1: F003–F005, F009–F017, F0
 |---|---|---|
 | 0x7E627E9F–… | cam.c … cam_mec_ctrl.c, cam_mem.c: unchanged (03 §3, 14b §1) | |
 | 0x7E63B885–0x7E63BAA5 | unplaced helpers after cam_frame_sync.c: 0x7E63B912/0x7E63B955 write a debug image file to the card (`xxxOLYMP`, `File Size`; ← the `cam` shell test sequences 0x7E62F6EB…) | none |
-| 0x7E63BAA6–0x7E63D0DD | cam_imgdev.c command layer: names 0x7E63BAA6, init 0x7E63BC40 (← cam_set init), filter 0x7E63BE39 | 0x17; 16-bit 0x8480/81/85/86 |
-| **0x7E63D0DE–0x7E63EC58** | imgdev driver: per-command sequencers, `IMGDEV_DRIVER` dump 0x7E63E4B2, queue engine 0x7E63E795–0x7E63E8ED, enqueue 0x7E63EB3F (cam_imgdev_driver.c, I) | 0x0A1720xx to 0x7E63E515; last 0x84xx at 0x7E63EB3F |
+| 0x7E63BAA6–~~0x7E63D0DD~~ 0x7E63D1C0 (it ends with the `cam_imgdev.c` dumper 0x7E63D0DD (L1 2026-11-09)) | cam_imgdev.c command layer: names 0x7E63BAA6, init 0x7E63BC40 (← cam_set init), filter 0x7E63BE39 | 0x17; 16-bit 0x8480/81/85/86 |
+| **~~0x7E63D0DE~~ 0x7E63D1C1–0x7E63EC58** (L1 2026-11-09) | imgdev driver: per-command sequencers, `IMGDEV_DRIVER` dump 0x7E63E4B2, queue engine 0x7E63E795–0x7E63E8ED, enqueue 0x7E63EB3F (cam_imgdev_driver.c, I) | 0x0A1720xx to 0x7E63E515; last 0x84xx at 0x7E63EB3F |
 | **0x7E63EC59–0x7E6401FF** | imgdev sequence programs, one per command step, using descriptors 0x7E7B03A8–0x7E7B04CC (cam_imgdev_sensor/serial.c, I) | no codes; callers only imgdev |
 | **0x7E640200–0x7E640857** | cam_lens.c (`CAMLNS`) | 0x25; 16-bit 0x9211/0x9213/0x9280 |
 | 0x7E642325–0x7E643932 | cam_mirror.c (MI_*) | 0x1E |
@@ -254,6 +254,8 @@ The scanner (`jt.py`) finds every `jmp (aN)` in 0x7E520000–0x7E731588 and read
 
 Tables per owner: HDMI/display/touch 40, movie 34, IMG 25, AF (FCS_MOVIE/IAF/contrast) 19, api 17, lens 16, files 14, art 13, strobe 10, TAKE 9, REC 9, Exif 9, EXP_MOVIE 9, mcon 6, cam.c 5, BC 5, WB 3, other camera-core files 1–2 each. Slot rows exist for the camera-core and EXP_MOVIE tables (cam_frame, imgdev, MI, cam_set, sg, shutter, still/LB filters) and for the named-module tables of §5. The pure name lookups (cam.c 0x7E627F1E/0x7E62803B, imgdev 0x7E63BAA6, still 0x7E656B1D/0x7E656C5E, LB 0x7E65DA4A) are named in section 03.
 
+**U_SHELL `face` subcommand table 0x7E8DE4EC (L1 2026-11-09, V).** It is in the `.data` image (RAM copy 0x602AE02C), so the jump-table scanner does not see it. 20 records `{handler, name}`: `start`, `stop`, `get`, `keep`, `reset`, `abort`, `prog`, `get_eye`, `dump`, `setting`, `log`, `pt`, `load`, `set_pos`, `get_pos`, `set_info`, `mdm`, `reg`, `tune_l`, `tune_g` (handlers 0x7E6F4EC2…0x7E6F5B7F, each logs `face_dbg_<name> in`; the TSV row gives all 20). The dispatcher 0x7E6F4D77 is the `face` entry of the 54-family U_SHELL table (word 0x7E7333B8): it compares argv[1] with each name (strcmp 0x7E500DCA) in a loop of 20 and calls the handler. Review C4 (round 4 review 2) listed 17 names; it left out `start`, `stop` and `pt`, and its F021 0x7E6F591D is the `reg` handler (`face reg X Y`), not `mdm` (0x7E6F5840, `face mdm X Y`).
+
 ## 7. Corrections
 
 - **14b §1 / §8, modules.tsv:** cam_lens.c is **0x7E640200–0x7E640857**, not "~0x7E63E5xx–0x7E640857". The imgdev code runs to **0x7E6401FF** (command layer, driver and sequence programs, §1).
@@ -269,22 +271,22 @@ Tables per owner: HDMI/display/touch 40, movie 34, IMG 25, AF (FCS_MOVIE/IAF/con
   - Row 0x7E6A1020–0x7E70B000 starts at **0x7E6A935D** with the HDMI driver; the display, touch and HDMI tasks follow, and `mov*.c` starts at 0x7E6C3955. Its label "Movie (`mov*.c`)" first is wrong for 0x7E6A1020–0x7E6C3954.
   - Inside the camera-core row, name mdet 0x7E666C5B–0x7E674DF4 and res 0x7E674DF5–0x7E675D98 (§4).
 - **03 overview / §7b:**
-  - "EXP_MOVIE … about 0x7E68F000–0x7E6A0000" → 0x7E68F07C–0x7E6A935C. Section 12's 0x7E6A9400 was right to within one HDMI function.
+  - "EXP_MOVIE … about ~~0x7E68F000–0x7E6A0000~~" (L1 2026-11-09) → 0x7E68F07C–0x7E6A935C. Section 12's 0x7E6A9400 was right to within one HDMI function.
   - The mdet/res corrections are in §4.
 - **03 §1 "Event factor bits":** the table names cam.c's AE/AF/MEC factor bits only. The still and live-bulb step-event bits (§2.5) are the modules' own and are not named by it.
 - **03 §4 still phases are one too high (V).** The name lookup 0x7E656B1D does `inc d0` before its hash lookup (key = phase + 1). The phase values are therefore 0 READY, 1 TAKE, 2 STOP, 3 ABORT, 4 TERMINATE, 5 CONTINUE_READY, 6 CONTINUE_PAUSE, 7 CONTINUE_RESTART, 8/9 PRE_ACTION_ON/OFF, 10 MIRROR_DOWN, 11 CAPTURE_ENABLE, 12 FORCE_CAPTURE, 13 APERTURE_ENABLE; 0x100–0x10C BULB_*; 0xFFFF PHASE_NONE. This agrees with cam.c's still item 0x7E62952E (phase 0 → STL/RDY; 1 or 11 → STL/TAK; 5 → STL/CRDY).
 - **02 table / §1.9 (from §5):**
-  - BC is 0x7E53AEA9–0x7E542B4E; 0x7E53A981–0x7E53AEA8 is the `dbg` debug-log module.
+  - BC is 0x7E53AEA9–~~0x7E542B4E~~ ~0x7E542BA5 (0x7E542B4E is inside `[BC FUP]VERIFY` 0x7E542AFE, which ends at 0x7E542BA5; where BC ends after it was not traced (L1 2026-11-09)); 0x7E53A981–0x7E53AEA8 is the `dbg` debug-log module.
   - The LENS_FIRM_UP chain starts with cmd 7. Each error code belongs to the command whose reply failed (§5.3). There is no 0x6603.
 - **C3 F003:** `Led-` is the askdata STILLEXP_STATUS request, not an LED command. **C3 F002 / 13f:** 0x7E45B6BE–0x7E45CE11 (0x7E45B67E is a `per_adc` shell subcommand) (coordinator 2026-11-09, from fixes-D3) is the ADCONV driver, and 0x7E45BB10 is its request submit.
 - **03 §7b / 14b §6 (from §4):**
-  - 0x7E667400–0x7E675000 is the mdet library and res, not SDET's algorithm library.
+  - ~~0x7E667400–0x7E675000~~ 0x7E666C5B–0x7E675D98 (mdet 0x7E666C5B–0x7E674DF4 and res 0x7E674DF5–0x7E675D98, §4 (L1 2026-11-09)) is the mdet library and res, not SDET's algorithm library.
   - `ST/CO/IA…BIN`/`MDETDATA` are mdet debug logs.
   - "SDET algorithm block 0x7E66C9A8/0x7E66DA1D" is mdet: EMS1 AF-area motion and the tracking core.
   - The loader 0x7E674F44 is `res_read`.
 - **Database note (fwmap):** pointer-entry prologues (`movm …; add -N,sp`, 3–5 B) before a directly-called function are listed as separate functions (MI: 0x7E642C51, 0x7E642C90 …; still/LB: many 4–5-B "functions"). They are the same function as the next DB entry.
 - **modules.tsv rows to add or change (not edited here):**
-  - `7e63d0de 7e6401ff imgdev driver/sequences`;
+  - `7e63d1c1 7e6401ff imgdev driver/sequences` (was 7e63d0de (L1 2026-11-09));
   - `7e640200 7e640844 cam_lens.c`;
   - `7e64f744 7e650467 cam_serial.c inferred`;
   - cam_set.c first_fn `7e65046f`, last `7e652ae2`;

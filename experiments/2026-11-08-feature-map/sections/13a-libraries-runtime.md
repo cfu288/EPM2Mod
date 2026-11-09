@@ -18,7 +18,7 @@ Round D1 deep dive for the string-less libraries that coverage round C1 flagged 
 | ~0x7E576D59–~~0x7E579A7F~~ 0x7E579C33 (D2 2026-11-09) | Buffer-pool manager `buff` (shell 0x7E5776A2, `buff_recfile.c` 0x7E5793F0, pool names PRIM/THUM/…/PLAY_WORK); it ends with 7 pool-object methods 0x7E579AB7–0x7E579C17 of vtable 0x7E78EEBC (14b §1) (D2 2026-11-09) | verified (strings, modules.tsv) |
 | 0x7E579C34 → | ~~TAKE / WB_MOV code~~ **WB (white balance / colour) module 0x7E579C34–0x7E581FAF** (no file name): WB_MOV task 0x7E57F914, WB gain API 0x7E580E54, and the IMG_PRECON cmd 1–4 back-ends (callers 0x7E57E8F8, 0x7E580E54…). TAKE starts at its init 0x7E581FB0 (14b §1, §3) (D2 2026-11-09) | verified (callers) |
 
-**Bounds correction:** C1 gave 0x7E4F8000 for the runtime start; 0x7E4F8000–0x7E4FDFFF is padding. C1 gave ~0x7E54D000–0x7E578000 for the image library; it starts at 0x7E544AA9 (IMG init, called from Usr0 0x7E503DD4) and its last own code is near 0x7E576D58. The `buff` manager after it is a separate module.
+**Bounds correction:** C1 gave 0x7E4F8000 for the runtime start; 0x7E4F8000–0x7E4FDFFF is padding. C1 gave ~~~0x7E54D000–0x7E578000~~ (L1 2026-11-09) for the image library; it starts at 0x7E544AA9 (IMG init, called from Usr0 0x7E503DD4) and its last own code is near 0x7E576D58. The `buff` manager after it is a separate module.
 
 **Note (inferred):** 0x7E4FE000 is also the start of the region that section 01 says boot copies from flash (0x7E4FE000–0x7E881000). The runtime is the first module in that image.
 
@@ -278,12 +278,12 @@ All verified unless marked:
 
 1. **firmware-map C1 block:**
    - The C runtime is **0x7E4FE000**–0x7E501C5A, not 0x7E4F8000.
-   - The image library is **0x7E544AA9–~0x7E576D58**, not ~0x7E54D000–0x7E578000. It contains IMG_PRECON, IMG_ART_P, IMG0_LOCAL and art CPU kernels.
+   - The image library is **0x7E544AA9–~0x7E576D58**, not ~~~0x7E54D000–0x7E578000~~ (L1 2026-11-09). It contains IMG_PRECON, IMG_ART_P, IMG0_LOCAL and art CPU kernels.
    - 0x7E576D59–~~0x7E579A7F~~ 0x7E579C33 is the separate `buff` manager (14b §1) (D2 2026-11-09).
 2. **Map regions table:** the row 0x7E4E0000–0x7E521020 does not mention the C runtime. The row 0x7E521020–0x7E621020 ("firmup … TAKE") misses the IMG library and the `buff` manager. 0x7E4C90CA–0x7E4FDFFF is padding.
 3. **Section 03 / 02 (IMG_PRECON):** the role is pixel-defect correction from the PIXELDEFECT prm lists (verified), not generic "pre-conditioning". **Overstated (C2 2026-11-09):** this holds for cmd 0; cmd 4 computes channel-gain (×128) values from 65-point prm tables (0x7E580A54/0x7E581385), so "only pixel-defect correction" is disputed until the D2 deep dive reports. **Resolved (D2 2026-11-09):** IMG_PRECON is pixel-defect correction (cmd 0) plus WB/colour preparation (cmds 1–4: 0x7E55FE1E/0x7E55FF91/0x7E55FFA3 call WB; cmd 4 = spectral WB-gain and colour-matrix calibration from `PRM_CAM_SPECTRUM_STL_R/G/B`) (14b §3).
 4. **Section 09b** calls 0x7E54xxxx–0x7E56xxxx the "image-engine driver". Most of it is parameter computation in RAM, but the IMG library also programs the image engine at 0x99400000–0x994058xx (functions such as 0x7E54DA7F and 0x7E5574F7) and writes the SYSCLK clock gates 0x988000D0/D4/DC/E0 (§3, §3.2). So "driver" is right for part of the range; 09b needs no change. (A4 2026-11-09)
-5. **Section 08** gives the float helpers as 0x7E5018BC–0x7E501972. The full set is 0x7E500F62–0x7E501AAB (§2.2; the last helper 0x7E501A2C ends with `retf` at 0x7E501AA9, and `tan` starts at 0x7E501AAC). The names "fadd = 0x7E5018BC" or similar must not be assumed: **0x7E5018BC is fsub and 0x7E5018C3 is fadd** (inferred, strong). (A4 2026-11-09)
+5. **Section 08** gives the float helpers as ~~0x7E5018BC–0x7E501972~~ (L1 2026-11-09). The full set is 0x7E500F62–0x7E501AAB (§2.2; the last helper 0x7E501A2C ends with `retf` at 0x7E501AA9, and `tan` starts at 0x7E501AAC). The names "fadd = 0x7E5018BC" or similar must not be assumed: **0x7E5018BC is fsub and 0x7E5018C3 is fadd** (inferred, strong). (A4 2026-11-09)
 6. **C1 F070** described 0x7E5018E8 as "the float helper": it is fmul (confirmed).
 
 ## 6. Open questions

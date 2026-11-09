@@ -1,10 +1,10 @@
-# 15a. GUI app 0x7ED40000–0x7EE02094: pages, panels, Ss screens, touch (E-PM2 v1.6, round D3)
+# 15a. GUI app ~~0x7ED40000~~ 0x7ED37DAA–0x7EE02094 (L1 2026-11-09): pages, panels, Ss screens, touch (E-PM2 v1.6, round D3)
 
 Scope: a function-level index of the GUI app code. This section answers coverage C3: round3-review3 weakest area 4 (F053 touch dispatcher, F054 layer insertion, F059 Ss screens) and round3-review4 weakest areas 1 and 2 (no per-page index, GuiTouch missing, F061–F068 and the CONTRADICTED F064). It builds on 13d (classes, panels, Ss engine) and 14e (methods).
 
 - **Labels:** **V** = verified (read in code or bytes); **I** = inferred.
 - **Addresses:** runtime addresses. "vt+N" = the virtual at byte offset N.
-- **Index:** `15a-gui-pages.tsv` (1,181 rows). Look up a random function there in this order: by address in the `region`, `class`, `page-class`, `panel` and `touch-action` rows, then by id in the `page N`, `SS_x.n`, `registry N` and `page-key N` rows.
+- **Index:** `15a-gui-pages.tsv` (~~1,181~~ 1,184 rows (L1 2026-11-09)). Look up a random function there in this order: by address in the `region`, `class`, `page-class`, `panel` and `touch-action` rows, then by id in the `page N`, `SS_x.n`, `registry N` and `page-key N` rows.
 - **Scratch:** `$S/d3/gui/`:
   - `pages.py` → `pages_raw.txt` (functor cases);
   - `idx.py` / `pcls.py` / `gaps.py` / `api.py` → `pcls.txt`, `order.pkl` (page classes);
@@ -16,7 +16,7 @@ Scope: a function-level index of the GUI app code. This section answers coverage
 
 ## 1. Area and boundaries (V unless marked)
 
-This table replaces 13d §1 rows "0x7EDC15B0–~0x7EDE0000" and "~0x7EDE0000–0x7EE01FF5" for the part from 0x7EDC7DBA.
+This table replaces 13d §1 rows "~~0x7EDC15B0–~0x7EDE0000~~" and "~~~0x7EDE0000–0x7EE01FF5~~" (L1 2026-11-09) for the part from 0x7EDC7DBA.
 
 | Range | Contents |
 |---|---|
@@ -31,10 +31,12 @@ This table replaces 13d §1 rows "0x7EDC15B0–~0x7EDE0000" and "~0x7EDE0000–0
 | 0x7EDCDB13–0x7EDCE9B8 | Helpers. Most callers are SS_MENU_LV handlers (I: LV-menu support) |
 | 0x7EDCE9B9–0x7EDD13D6 | DPS GUI helpers to 0x7EDD08D2 (the DPS screen drawer 0x7EDCED5A(n) is 5,113 B). Then the DPS and printer callbacks, `initGuiFwUp` 0x7EDD0C89 and `notifyCurrentLanguage` 0x7EDD109C |
 | 0x7EDD13D7–0x7EDDBBEB | Page classes for pages 524, 423–430, 422, 434 and 523. Two larger blocks in this range: the helpers 0x7EDD7A57–0x7EDDA607, which SS_MENU_LV handlers call (I: live guide), and the methods without strings of the 423–430 class (0x7EDD1E7D, 0x7EDD2D82, 0x7EDD41C9, 4–5 KB each) |
+| 0x7EDDBC06–0x7EDDBD4F | **"Return-to (SS, state)" singleton** (L1 2026-11-09): getInstance 0x7EDDBC06 (RAM 0x602BDA2C, 52 B, ctor 0x7EDDBC2E; 445 call sites in 167 functions), field set/get pairs 0x7EDDBC64–0x7EDDBD4F (+0 flag, +4 SS, +8 state, …), reset 0x7EDDBCA8. The SS_MENU_MAIN "exit" path and the page-326 key slot branch on it (13d §6.3) |
 | 0x7EDDBD50 | `getLanguageLoadResource` / `loadLanguageData` |
 | **0x7EDDBF31–0x7EDDD1E5** | **Self-adjust UI `userGuiSelfAdjust`.** This is the only code that uses the `[GUI-SelfAdjust]` strings. Its page object is page 523 (class 0x7EDDB051–0x7EDDBBEB) |
-| **0x7EDDD21D–0x7EDE161C** | **GuiTouch** (§2.4). It has three parts: the action handlers 0x7EDDD21D–0x7EDE0383, the gesture listener and dispatcher 0x7EDE03CF–0x7EDE0ACF, and the common actions and context accessors 0x7EDE0AD2–0x7EDE161C |
-| 0x7EDE161D–0x7EE02094 | Page classes (179 `page-class` rows) and their private code. The userMenuMainReset code is at 0x7EDECDC0–0x7EDED8D6, the userMenuTopMenu code at 0x7EDFDA2A, the RAW-edit private code at 0x7EDF4977–0x7EDF779B, `getListDescriptor` at 0x7EDFD9AF, and the setting wrappers at 0x7EE01D38/0x7EE01D4E |
+| **0x7EDDD21D–~~0x7EDE161C~~ 0x7EDE15ED** (L1 2026-11-09) | **GuiTouch** (§2.4). It has three parts: the action handlers 0x7EDDD21D–~~0x7EDE0383~~ 0x7EDE03CE (0x7EDE0384 is inside the last handler 0x7EDE033E (L1 2026-11-09)), the gesture listener and dispatcher 0x7EDE03CF–0x7EDE0ACF, and the common actions and context accessors 0x7EDE0AD2–~~0x7EDE161C~~ 0x7EDE15ED (L1 2026-11-09) |
+| **0x7EDE15EE–0x7EDE1DD8** (L1 2026-11-09) | **USB-connect screen** (not an openPage page): getInstance 0x7EDE15EE (RAM 0x602BDF48, 172 B), ctor 0x7EDE161D (page base 0x7EDCD621, vtable 0x7EFEF47C, own slots 0/2/3), show 0x7EDE1649 (panels 82/103), callback `userGuiUsbConnectCallBack` 0x7EDE1D0A. All 14 callers of the getInstance are SS_USB handlers 0x7EDC0D90–0x7EDC156F (page-class row in the TSV) |
+| ~~0x7EDE161D~~ 0x7EDE1DD9–0x7EE02094 (L1 2026-11-09) | Page classes (179 `page-class` rows; the TSV now has 180 with the USB-connect screen (L1 2026-11-09)) and their private code. The userMenuMainReset code is at 0x7EDECDC0–0x7EDED8D6, the userMenuTopMenu code at 0x7EDFDA2A, the RAW-edit private code at 0x7EDF4977–0x7EDF779B, `getListDescriptor` at 0x7EDFD9AF, and the setting wrappers at 0x7EE01D38/0x7EE01D4E |
 
 ## 2. Components
 
@@ -63,7 +65,7 @@ This table replaces 13d §1 rows "0x7EDC15B0–~0x7EDE0000" and "~0x7EDE0000–0
   | 0x7EDED9DD | userCommonWizard1NRightAligned | 0x7EFFE768 | 1,756 B | the play/edit wizards |
   | 0x7EDEE169 | userCommon1CNLWizard | 0x7EFFEA34 | 1,744 B | — |
   | 0x7EDFFB83 | — | 0x7F00F600 | — | — |
-  | 0x7EDCCA5D (direct) | main-menu tab page 0x7EDEB923 (pages 1–7) and 0x7EDE1649 | — | — | — |
+  | 0x7EDCCA5D (direct) | main-menu tab page 0x7EDEB923 (pages 1–7) ~~and 0x7EDE1649~~ (0x7EDE1649 is the show method of the USB-connect screen, whose ctor 0x7EDE161D calls the page base 0x7EDCD621 (L1 2026-11-09)) | — | — | — |
 
 - **Page-base slots** (vt 0x7EFE79FC):
 
@@ -93,7 +95,8 @@ This table replaces 13d §1 rows "0x7EDC15B0–~0x7EDE0000" and "~0x7EDE0000–0
   | 14 | OK long (14e) |
   | 17 / 18 / 21 / 24 | expansion / INDEX / DELETE / Fn2 |
   | 23 / 25 | 1 s / 10 ms wizard timers |
-  | 26 / 27 / 28 | END_DIRECT / POPUP / mode dial |
+  | 26 | END_DIRECT 0x9AB8 (SS_MENU_MAIN state 4 handler 0x7EDB0EDA) and END_ART_MENU 0x9AC3 (state 7 handler 0x7EDB00BE): both call the page key slot with d0 = 26. The ART BKT On/Off pages (key slot 0x7EDFE82D) store the selected row on code 26 (L1 2026-11-09) |
+  | 27 / 28 | POPUP / mode dial |
   | 11 / 12 | dials, with the count in d1 (I, C3 F066) |
   | 6 | INFO release or dial (I) |
 
@@ -205,7 +208,7 @@ The 16 unnumbered panel classes sit inside the ranges of their numbered neighbou
 
    - The LV-bar handlers keep their state at RAM 0x602BDCFC (item) and 0x602BDCFE (level).
    - **0x7EFED8F4 holds a copy of the panel-26 set, not of a longer table.** Its first 13 words (slot 0 + the 12 handlers) equal 0x7EFE4058 word for word, and the area tables and maps before it (0x7EFED634–0x7EFED8F3) equal panel 26's 0x7EFE3D98–0x7EFE4057 byte for byte. From the 14th word on, the bytes differ (0x7EFE408C starts other rect data; 0x7EFED928 is zeros). No reference to 0x7EFED8F4 was found (raw byte scan of block 0). Its area tables 0x7EFED634/0x7EFED6D4 are pointed to from `.data` 0x7E8EE180 (RAM 0x602BDCC0), not from the panel table (I: unused or second copy). (A8 2026-11-09)
-6. **checkSlideAreaPos 0x7EDE13B4** (35 callers, all in 0x7EDDD22C–0x7EDE033E) rejects a slide that leaves its area. The context accessors 0x7EDE1448–0x7EDE161C are 17–47-byte "get context 0x7EDE12CF (253 callers), then store" shapes.
+6. **checkSlideAreaPos 0x7EDE13B4** (35 callers, all in 0x7EDDD22C–0x7EDE033E) rejects a slide that leaves its area. The context accessors 0x7EDE1448–~~0x7EDE161C~~ 0x7EDE15ED (L1 2026-11-09) are 17–47-byte "get context 0x7EDE12CF (253 callers), then store" shapes.
 
 ### 2.5 BT wizard screens (V; corrects C3 F059's "page 262")
 `userGuiBTWizard::init(d0)` 0x7EDCABE2 takes a **wizard screen id 256–265**. This id space is separate from menu page ids.
@@ -257,7 +260,7 @@ The caller 0x7ED2533C is called by the app-window methods 0x7ED1A6EA (panel hold
    - vt+8 is enter/redraw and vt+12 is key;
    - own slots ≥ 32 belong to the list bases;
    - a non-vtable function in the range is a private helper of that page.
-3. **Address in 0x7EDDD21D–0x7EDE0383:** find the `touch-action` row.
+3. **Address in 0x7EDDD21D–~~0x7EDE0383~~ 0x7EDE03CE (L1 2026-11-09):** find the `touch-action` row.
    - Signature: `cf ..` prologue; it reads the GuiTouch context (0x7EDE12CF) and calls a context setter 0x7EDE14xx/15xx;
    - it often calls checkSlideAreaPos 0x7EDE13B4;
    - it ends with `mov 27|25,d0 ; mov d0,(a2) ; mov 1,d0`.
@@ -267,7 +270,7 @@ The caller 0x7ED2533C is called by the app-window methods 0x7ED1A6EA (panel hold
 ## 4. Corrections
 1. **13d §1:**
    - "the self-adjust UI 0x7EDD8–0x7EDDF" is wrong. Self-adjust is 0x7EDDBF31–0x7EDDD1E5, plus the page-523 class 0x7EDDB051–0x7EDDBBEB.
-   - **GuiTouch** is 0x7EDDD21D–0x7EDE161C (C3 F064).
+   - **GuiTouch** is 0x7EDDD21D–~~0x7EDE161C~~ 0x7EDE15ED (C3 F064; end (L1 2026-11-09), C4 F066: 0x7EDE15EE is the USB-connect screen getInstance).
    - The "menu pages from ~0x7EDE0000" row is wrong. Page classes run from 0x7EDC7EAA, interleaved with the components of §1.
 2. **13d §5:** the menu-page registry is **0x7EFE180C–0x7EFE21CB, 312 entries, 101 factories**, keyed by **list id**, not 0x7EFE190C / 280 / 90.
    - Page ids go through openPage's three hash tables, **0x7EFE5A14 / 0x7EFE5614 / 0x7EFE4E14**.

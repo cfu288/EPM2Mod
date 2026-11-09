@@ -20,7 +20,7 @@ Scope: the GUI code 0x7ECCB800–0x7EE02094, method by method. This section buil
 | **0x7ECFF983–** | **`CCommon` starts here, not at 0x7ED00000.** The ctor is 0x7ECFF983 (a 300-byte object). getInstance is 0x7ECFFAC6 (RAM 0x602B6038, **775 callers**). Then come `setDbWarningInfo` 0x7ECFFB4C, `doHdmiConnectChange` 0x7ED001E8 and `setOutputType` 0x7ED00250 | V strings and code |
 | 0x7ED98B95–0x7ED9EED6 | Live-view display elements: a static initialiser and 77 element methods (§4.2) | V |
 | 0x7EDC17FB–0x7EDC1B36 | Widget helper layer (§2.7). Next comes 0x7EDC1B37 (1,333 B, to 0x7EDC206B) | V |
-| 0x7EDCB0C5–0x7EDCB1E0 | Bluetooth callback dispatcher and its 3 matchers (§4.1) | V |
+| 0x7EDCB0C5–~~0x7EDCB1E0~~ 0x7EDCB1FB (matcher 2 = 0x7EDCB1C5, 55 B; matcher table 0x7EFE2FF8 (L1 2026-11-09)) | Bluetooth callback dispatcher and its 3 matchers (§4.1) | V |
 
 ## 2. Widget toolkit: classes and slots
 

@@ -1,6 +1,6 @@
 # 13c — C++ framework: Rhapsody OXF runtime, generated statechart code, events, Com_ layer
 
-**Scope:** block 0, the C++ application layer 0x7E966000–0x7EBAC000. This section explains the *framework glue* that coverage round C1 found unexplained (12 of 20 sampled app-layer functions). Section 06 has the per-feature detail. The event dictionary is in `13c-event-ids.tsv` (1,270 rows).
+**Scope:** block 0, the C++ application layer ~~0x7E966000–0x7EBAC000~~ 0x7E966A17–0x7EBA7BC0 (HIGHLEVEL_MAIN to the end of OXF; §1 also covers the neighbours 0x7E965FD1–0x7E966A16 and 0x7EBA7BC1–0x7EBABF8D) (L1 2026-11-09). This section explains the *framework glue* that coverage round C1 found unexplained (12 of 20 sampled app-layer functions). Section 06 has the per-feature detail. The event dictionary is in `13c-event-ids.tsv` (1,270 rows).
 **Labels:** **verified** = read in code or bytes; **inferred** = from strings, names, layout or a heuristic.
 **Scratch:** `.../scratchpad/d1/cpp-framework/` (`fw.py` loader, `evscan.py` event-vtable scan, `classify.py` shape classifier, `classdir2.py` class directory, `mktsv.py` TSV builder).
 
@@ -11,9 +11,9 @@
 | 0x7E965FD1–0x7E966A16 | **Not app layer:** user-shell support code (fn 0x7E965FD1 spans 0x7E966000 and builds ANSI `ESC[` sequences; printf-like 0x7E966355; callers are shell commands from 0x7E9641FB on) (A5 2026-11-09) | verified call edges; role inferred (A5 2026-11-09) |
 | 0x7E966A17–0x7E9698EB | HIGHLEVEL_MAIN code (from 0x7E966A17; entry 0x7E966A78), HLS OS wrapper, growable array, logger (section 06). The end is the last function before `clearIntervalShootingState` 0x7E9698EC (A5 2026-11-09) | verified (06); end moved from 0x7E96B000 by the `Tra*` string tags (A4 2026-11-09), then from ~0x7E96998A to 0x7E9698EB (A5 2026-11-09) |
 | 0x7E9698EC–~0x7E9EA380 | `Tra*` event package (the `TraShareTakeStatus.cpp` tag is used by 0x7E969F7B, 0x7E96A14E, 0x7E96A422, 0x7E96A52A, 0x7E96AF2A and 0x7E96B048; first function of the package **0x7E9698EC `clearIntervalShootingState`**, which takes the TraShareTakeStatus lock 0x7E969EE6/0x7E969EF4 and clears bits in 0x602B0CDC; the RAM block 0x602B0CB4–0x602B0D18 is used only from here up (A5 2026-11-09)) + `OlyHfwOpe*`/`OlyHfwLowApiWrap` operation classes + event classes they declare; `sdk api` shell and `OlyApi*` (06 §5); the `app_check_*` group 0x7E9E8CCD–0x7E9EA380 | verified (string tags + event scan); both ends approximate (A4 2026-11-09) |
-| ~0x7E9EA381–0x7EB80000 | `Cap*` capabilities, `CmpSts*`/`CmpSqp*` controllers, `Cmp*` components (one file per class, see §5). **Per-class ranges (D3 2026-11-09):** `15c-class-index.tsv` (start = min(getInstance, ctor)); boundary fixes from 15c §1: `Cmp_PlayComponentBase` 0x7EB0A5E7–0x7EB16FF3, CmpPEvV 0x7EB2887C–0x7EB2BB80, `Cmp_IndxBase` 0x7EB2BB81–0x7EB2ECCF, CmpPLgh 0x7EB33B24–0x7EB39215 (CmpPMov getInstance 0x7EB39216 follows), observers of other classes 0x7EB3D990–0x7EB3DEF6 (e.g. the 8 `Cmp_PlayComponentBase` member observers, ctors 0x7EB3DA46…0x7EB3DE8C ← 0x7EB0A5E7), and the event-method run 0x7EB79137–0x7EB7A6C7 between Shutdown and the shooting facade (D3 2026-11-09) | verified (class directory) (A4 2026-11-09) |
+| ~0x7E9EA381–~~0x7EB80000~~ 0x7EB7FC90 (L1 2026-11-09) | `Cap*` capabilities, `CmpSts*`/`CmpSqp*` controllers, `Cmp*` components (one file per class, see §5). **Per-class ranges (D3 2026-11-09):** `15c-class-index.tsv` (start = min(getInstance, ctor)); boundary fixes from 15c §1: `Cmp_PlayComponentBase` 0x7EB0A5E7–0x7EB16FF3, CmpPEvV 0x7EB2887C–0x7EB2BB80, `Cmp_IndxBase` 0x7EB2BB81–0x7EB2ECCF, CmpPLgh 0x7EB33B24–0x7EB39215 (CmpPMov getInstance 0x7EB39216 follows), observers of other classes 0x7EB3D990–0x7EB3DEF6 (e.g. the 8 `Cmp_PlayComponentBase` member observers, ctors 0x7EB3DA46…0x7EB3DE8C ← 0x7EB0A5E7), and the event-method run 0x7EB79137–0x7EB7A6C7 between Shutdown and the shooting facade (D3 2026-11-09) | verified (class directory) (A4 2026-11-09) |
 | 0x7EB7FC91–0x7EB84344 | `CmpSts_SingleStillShootingSequence_NEW` statechart (`rcv3dShootingFinishIn_END_WAIT` …). Its last function is 0x7EB83ECB (1,146 B, ends 0x7EB84344) (C2 2026-11-09) | verified (class directory, strings) |
-| 0x7EB84345–0x7EB8C265 | **Com_ framework** (from 0x7EB84345: the `Com_EvSenderManager` static module 0x7EB84345–~0x7EB85562, a 4,143-byte function called only by the `RECV APP_EVENT` handler 0x7E96DD58, its getters 0x7EB85374… and the overflow logger 0x7EB854E0 (`Com_EvSenderManager buffer overflow!`); globals 0x602B48A8–0x602B48E0) (A5 2026-11-09): Com_ reactive base, observers, request/response registry, CmpInit helpers, `Cab_CameraBase` mode machine, `Com_ActiveTransitionManagerBufferd`, events 7001–7020 and 11561–11566 | verified |
+| 0x7EB84345–~~0x7EB8C265~~ 0x7EB8C264 (L1 2026-11-09) | **Com_ framework** (from 0x7EB84345: the `Com_EvSenderManager` static module 0x7EB84345–~0x7EB85562, a 4,143-byte function called only by the `RECV APP_EVENT` handler 0x7E96DD58, its getters 0x7EB85374… and the overflow logger 0x7EB854E0 (`Com_EvSenderManager buffer overflow!`); globals 0x602B48A8–0x602B48E0) (A5 2026-11-09): Com_ reactive base, observers, request/response registry, CmpInit helpers, `Cab_CameraBase` mode machine, `Com_ActiveTransitionManagerBufferd`, events 7001–7020 and 11561–11566 | verified |
 | 0x7EB8C265–0x7EB93422 (end verified: 0x7EB93417 ends at 0x7EB93422; 14c §1 (D2 2026-11-09)) | `Dev*` device classes, part 1 (14 device units with ctor, vtable, accessor and API wrappers: 15c §5 (D3 2026-11-09)) (the last `Dev*` string user is `DevSor::stop()` 0x7EB93362; the small helpers up to 0x7EB93422 are called only from Dev code) (C2 2026-11-09): display device (`api_disp_*`, `allocDisplayHandle`), `DevAef_AEAFCtrl`, `DevCls` (clear-skin rec view), effects, LED, `DevMed_MediaControl`, `DevRec` | verified (`api_*` callees, strings) |
 | 0x7EB93423 (D2 2026-11-09)–0x7EBA0AA8 | Categories: first the function-mode category (getInstance 0x7EB93423, only caller `Cab_CameraBase::functionModeState` 0x7EB8AA26; ctor 0x7EB9345E; vtable 0x7EC8F144; sub-category 0x7EB937D3/0x7EB9380E/0x7EB938CB) (C2 2026-11-09), then the `Ctg_ComponentSwitcher` categories (5 vtables; ctors 0x7EB93A89, 0x7EB94576, 0x7EB96F97, 0x7EB9D909, 0x7EB9F1D1) | verified (class directory) |
 | 0x7EBA0AA9–0x7EBA48BB | `Dev*` device classes, part 2: **face device** (0x7EBA0CA3 `api_rec_Get_Rec_Face_Number`, 0x7EBA0CCA `…Face_Rect_Area`, 0x7EBA0F8B `api_play_Get_FaceDirection`) (A5 2026-11-09), anti-shake, image handle, HDMI/CEC, histogram, Exif, picture files, `DevBlu_Bluetooth`, **USB-communication device**, DPS-T, DPS, pixel mapping, picture-file creation with its six helpers 0x7EBA4868–0x7EBA48BB (callers only 0x7EBA4603/0x7EBA464F/0x7EBA4759) (§5.4) (A5 2026-11-09) | verified |
@@ -119,8 +119,8 @@
 
 **Where they are (verified):**
 - Vtables: 0x7EBC–0x7EBF 575; 0x7EC1–0x7EC4 561; 0x7EC8 129; 0x7EC9 8 (OXF).
-- Ctor functions: 0x7E96B000–0x7E9823AB 373; 0x7E9823AB–0x7E9EA000 62; Cap/Cmp 0x7E9EA000–0x7EB80000 559; Com_/Dev 21; OXF 4.
-- Each package's events are emitted as one run just **before** that package's classes. The large runs are 0x7E96B13C–0x7E96C670 (Tra), 0x7E96FA94–0x7E97232D, 0x7E972D4A–0x7E974614, 0x7E9EA6DA–0x7E9EB24E, 0x7EA1722E–0x7EA1831E, 0x7EA69022–0x7EA6A299, 0x7EA84211–0x7EA86666, 0x7EB79137–0x7EB7A6C8 and 0x7EB8BCCB–0x7EB8C265.
+- Ctor functions (counts per window; the windows are the older, page-rounded bounds (L1 2026-11-09)): 0x7E96B000–0x7E9823AB 373; 0x7E9823AB–0x7E9EA000 62; Cap/Cmp 0x7E9EA000–0x7EB80000 559; Com_/Dev 21; OXF 4.
+- Each package's events are emitted as one run just **before** that package's classes. The large runs are 0x7E96B13C–~~0x7E96C670~~ 0x7E96C66F (Tra; 0x7E96C670 is the vtable store of the HLS root +0 object, 15c-class-index (L1 2026-11-09)), 0x7E96FA94–0x7E97232D, 0x7E972D4A–0x7E974614, 0x7E9EA6DA–0x7E9EB24E, 0x7EA1722E–0x7EA1831E, 0x7EA69022–0x7EA6A299, 0x7EA84211–0x7EA86666, 0x7EB79137–0x7EB7A6C8 and 0x7EB8BCCB–0x7EB8C265.
 
 **Id allocation (verified pattern, inferred cause):** positive ids come in **84 contiguous blocks, and every block starts at a number ending in 1** (2201, 3141, 7001, 11561, 11761, 12061, 26741…). Each block is one Rhapsody package. So the block tells you the package even when there is no name.
 
@@ -216,7 +216,7 @@ The CmpSqp_* sequence parts (`Base`, `Eportrait`, `MultiExposure`, `Otwb`, `Pano
 | 0x7EBA43C4–0x7EBA45D7 | pixel mapping (`api_rec_Calculate/Save/Get_Pixelmaping*`; caller CapPxm 0x7EA60BD3) | verified |
 | 0x7EBA45D8–0x7EBA48BB | picture-file creation (`api_picfile_Check_Create_PictureFile`; caller 0x7EA52E23, CapFrp), including six field helpers 0x7EBA4868–0x7EBA48BB called only by 0x7EBA4603/0x7EBA464F/0x7EBA4759 (A5 2026-11-09) | verified |
 
-## 6. The Com_ framework (0x7EB84345–0x7EB8C265) (A5 2026-11-09)
+## 6. The Com_ framework (0x7EB84345–~~0x7EB8C265~~ 0x7EB8C264 (L1 2026-11-09)) (A5 2026-11-09)
 
 | Function | Callers | Role |
 |---|---|---|
@@ -231,7 +231,7 @@ The CmpSqp_* sequence parts (`Base`, `Eportrait`, `MultiExposure`, `Otwb`, `Pano
 | 0x7EB87AC9 (ctor), 0x7EB878A2, 0x7EB880AC, 0x7EB88A2B, 0x7EB89D57 | 13 / 1–2 each | the class with the init states (vtable 0x7EC8BF08; slot-33 word 0x7EC8BF8C → dispatcher 0x7EB87B44, F058). Cap init base 0x7E9EF709 derives from it. The state functions log `CmpInitErr` |
 | 0x7EB89520 … 0x7EB8AA26 | — | `Cab_CameraBase` (getName 0x7EB89694, dispatch 0x7EB89C05) with the top-level **mode machine**: `standbyState` 0x7EB8A332, `shootModeState` 0x7EB8A48C, PLAY 0x7EB8A757, `functionModeState` 0x7EB8AA26 (F059). States send 7002 and create categories (verified strings and calls; owner inferred from position) |
 | 0x7EB8AD37– | — | `Com_ActiveTransitionManagerBufferd` (vtable 0x7EC8C708; "bud timing evTraStart") |
-| 0x7EB8BCCB–0x7EB8C265 | — | Com_ events 7001–7020 and 11561–11566 |
+| 0x7EB8BCCB–~~0x7EB8C265~~ 0x7EB8C264 (L1 2026-11-09) | — | Com_ events 7001–7020 and 11561–11566 |
 
 ## 7. Corrections to section 06 and the map
 
@@ -239,7 +239,7 @@ The CmpSqp_* sequence parts (`Base`, `Eportrait`, `MultiExposure`, `Otwb`, `Pano
 2. **Event location:**
    - Vtables span **0x7EBC0000–0x7EC92200**, not "mostly 0x7EBCE000–0x7EBF0000" (only 45% are there).
    - Ctors sit in each package's module (559 of them in Cap/Cmp code), not "in TraShareTakeStatus".
-3. **"Event constructors 0x7E96B000–0x7E9823AB" is wrong as a range label.**
+3. **"Event constructors ~~0x7E96B000–0x7E9823AB~~" (L1 2026-11-09) is wrong as a range label.**
    - Of the 2,603 functions there, 1,388 are event methods (ctor/isTypeOf/dtor, 26 KB of 95 KB).
    - The rest is operation-class code: `OlyHfwLowApiWrap` 0x7E974E7F–0x7E975704, `OlyHfwOpeLevel` 0x7E9782AF–~~0x7E97858C~~ ≥0x7E9786CE (0x7E97858C is the start of `reset`; `Ope::startLevel` 0x7E9785D3, which calls `api_user_Start_Slope_Event` 0x7E68EC99, follows it and ends at 0x7E9786CE; the exact end is not checked) (C3 2026-11-09), `OlyHfwOpePlyCom` 0x7E97B27A–0x7E97C487, `OlyHfwOpePlyMov` 0x7E981663–0x7E981F92, plus reactive classes such as the one with 1-second timeouts at 0x7E977ADA–0x7E977D6F (class name unknown).
    - The event-code runs are listed in §4.
@@ -249,7 +249,7 @@ The CmpSqp_* sequence parts (`Base`, `Eportrait`, `MultiExposure`, `Otwb`, `Pano
 7. **"Base methods copied into each file"**: the cause is statechart inheritance (§3), not header inlining (inferred, strong).
 8. **"Cmp_ComponentManagerWithBoot 0x7EA7D072"** is the inherited getName that 26 component vtables share, so it does not mark a file.
 9. **The transition-manager row (06 §1)** also holds `Cab_CameraBase` and the standby/shoot/play/function mode machine (§6).
-10. **Region table:** the row "0x7EBA1020–0x7ECA0000 OXF runtime, DevBlu" should read as in §1. Section 05's "0x7EBA6B03–0x7EBE1020 = strings" was already contradicted by C1.
+10. **Region table:** the row "~~0x7EBA1020–0x7ECA0000~~ OXF runtime, DevBlu" (L1 2026-11-09) should read as in §1. Section 05's "0x7EBA6B03–0x7EBE1020 = strings" was already contradicted by C1.
 
 ## 8. Open questions
 

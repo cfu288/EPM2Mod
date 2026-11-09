@@ -16,7 +16,7 @@
 | 1.3 (Oct 9 2014) | AF precision with the 40-150 F2.8 PRO | **One real code change** (0x7E6232ED): a lens-ID and lens-protocol test picks a different AF parameter set. Plus version constants | **Yes** (code verified; the 40-150 link inferred) |
 | 1.4 (May 11 2015) | FlashAir W-03 smartphone connection | **Only 6 instructions change** in the whole block: iSDIO register-access requests pass 18 instead of 19. Plus version and date | **Yes** (verified as the only change; meaning of 18/19 inferred) |
 | 1.5 (Nov 4 2015) | Lens IS support (not Sync IS); Windows 10 | Large rebuild (≈570 code functions differ). New lens-IS classifier `is_type`. The lens-OIS path is now limited to one lens family. New lens-info pages 030/033. New `lens current` shell command. In the PTP overlay, the handler for property 0xD406 (0x7F08CC99) now discards the host string (audit 2026-11-09) | Lens IS **yes** (inferred mechanism). Windows 10: **best code-level candidate** = the 0xD406 change (verified code; the link is inferred) (audit 2026-11-09) |
-| 1.6 (Oct 23 2018) | AF with Panasonic H-ES200 / H-ES50200 | **AF position variables widened from 16 to 32 bits** across the AF code (0x7E5E3000–0x7E627000); "focus position" is inferred from the `fcs_*` names. A new saturating clamp at 39 sites: 38 clamp to [−32768, 32767], one (0x7E60A5EE) to [0, 32767]. AF structs grow. Code from 0x7E626937 to about 0x7E76EA1F shifts by +0x2AC; code from 0x7E8F1C68 on does not move (audit 2026-11-09) | **Yes** (code verified; the link to these lenses inferred) |
+| 1.6 (Oct 23 2018) | AF with Panasonic H-ES200 / H-ES50200 | **AF position variables widened from 16 to 32 bits** across the AF code (~0x7E5E3000–~0x7E627000, page-rounded (L1 2026-11-09)); "focus position" is inferred from the `fcs_*` names. A new saturating clamp at 39 sites: 38 clamp to [−32768, 32767], one (0x7E60A5EE) to [0, 32767]. AF structs grow. Code from 0x7E626937 to about 0x7E76EA1F shifts by +0x2AC; code from 0x7E8F1C68 on does not move (audit 2026-11-09) | **Yes** (code verified; the link to these lenses inferred) |
 
 ## 1. Method and counts
 
@@ -79,7 +79,7 @@ Comparing "clean tails" (pointer bytes stripped, absent as NUL-terminated text i
 
 - **So Evf3 = the VF-4 (verified by `OUT-EVF3!` together with `display_open_evf_vf4` being added in the same release).** This answers section 10e's open question. `EVF_TYPE_VF4` exists in **no** E-PM2 version (verified). The E-PM2 has only `EVF_TYPE_VF2/VF3`; the VF-4 is handled by the `…_vf4` functions instead.
 - **Touch-panel stability (release note):** **unresolved.**
-  - Peripheral code at 0x7E512000–0x7E51C000 (EV_SEM, MOT_COM/MAG_COM, TM_SEM, `TP_SEM` 0x7E51BDAC) was heavily restructured: about 50 changed, about 45 removed and about 35 added functions. That makes it a candidate (inferred).
+  - Peripheral code at ~0x7E512000–~0x7E51C000 (page-rounded (L1 2026-11-09)) (EV_SEM, MOT_COM/MAG_COM, TM_SEM, `TP_SEM` 0x7E51BDAC) was heavily restructured: about 50 changed, about 45 removed and about 35 added functions. That makes it a candidate (inferred).
   - The only touch-named change found, 0x7E51BDAC, is a boundary artifact.
   - `sdk api … ctrl touch.x touch.y` (0x7E9AC32E) grew by 35 instructions. Its role was not traced.
 - **Undocumented in 1.2 (verified unless marked):**
@@ -141,7 +141,7 @@ The whole 1.3→1.4 diff is 27 bytes: the version byte at 0x7E7BFB8D, two date s
 
 - **The prior claim (ep5-fw-reverse) is CONFIRMED for strings but CORRECTED for code.**
   - The only string change is indeed the removal of `**fcs_lens_mfts_move_lens_ofset_target()*`. But that string had **no code reference already in v1.5**: no 32-bit absolute reference anywhere in block 0 (verified). So its removal is dead-text cleanup, not the fix.
-  - The block-0 diff is **not** "≈ relocation". The pipeline counts 358 changed code functions: 295 in the AF code 0x7E5E3000–0x7E627000 and 63 outside it. Most of the 63 are data decoded as code or boundary splits. Outside the AF range the only real changes are the three version constants and one constant in 0x7E63A20F (v1.5; v1.6 0x7E63A4BB, `cam_frame_sync.c`: `mov 1146,d0` → `mov 1151,d0`) (verified) (audit 2026-11-09).
+  - The block-0 diff is **not** "≈ relocation". The pipeline counts 358 changed code functions: 295 in the AF code ~0x7E5E3000–~0x7E627000 (page-rounded (L1 2026-11-09)) and 63 outside it. Most of the 63 are data decoded as code or boundary splits. Outside the AF range the only real changes are the three version constants and one constant in 0x7E63A20F (v1.5; v1.6 0x7E63A4BB, `cam_frame_sync.c`: `mov 1146,d0` → `mov 1151,d0`) (verified) (audit 2026-11-09).
 - **What changed (verified):**
   1. **New clamp helper 0x7E626BD4** = `clamp(d0, lo=a0, hi=d1)`. It has 39 call sites in 16 AF functions. All 39 pass hi = 32767; 38 pass lo = −32768, and one (0x7E60A5EE in 0x7E60A3DE) passes lo = 0 (audit 2026-11-09). Example: `fcs_lens_mfts_move_lens` 0x7E60E5A9 → 0x7E60E648 now clamps the target to the s16 range before the `movhu` store into the lens-command buffer. v1.5 stored the int truncated.
   2. **16→32-bit widening.** In the AF range, `movhu` drops 10,257→9,734, `exth` drops 1,785→1,359 and word `mov` rises 44,771→45,391. Example: CAF helper 0x7E6261FA → 0x7E626497 reads a 32-bit field (+1804) where v1.5 read a u16 (+1792) and sign-extended it.
@@ -166,6 +166,7 @@ The whole 1.3→1.4 diff is 27 bytes: the version byte at 0x7E7BFB8D, two date s
 | 1.6 | `move_lens` / CAF helper / clamp | 0x7E60E5A9 / 0x7E6261FA / — | 0x7E60E648 / 0x7E626497 / 0x7E626BD4 |
 | 1.5 | PTP property 0xD406 handler (stubbed) (audit 2026-11-09) | 0x7F08CC99 (46 B) | 0x7F08CC99 (6 B) |
 | 1.6 | Removed dead string; start of +0x2AC shift | 0x7E7A80FB; 0x7E626937 | —; 0x7E626BE3… |
+| 1.6 | Overlay-B version constant 0x1501→0x1600 (three sites) (L1 2026-11-09) | same addresses in v1.5 | **`mov 0x1600,d0` at 0x7F0A8F06** in the ADJSLF CSV identity-record writer 0x7F0A8E8F (it prints the value with `%04X`); the getter 0x7F0A9C08 (`mov 0x1600,d0; retf`, 2 callers 0x7F0B3E9E/0x7F0B8D18); `mov 0x1600,d2` at 0x7F0926F8 in the digit formatter 0x7F0925F7. The v1.3 addresses in §4 (0x7F09261F, 0x7F0A8EB7, 0x7F0A9C30) are not the v1.6 ones |
 
 ## 9. Release-note items vs code
 
@@ -180,6 +181,6 @@ The whole 1.3→1.4 diff is 27 bytes: the version byte at 0x7E7BFB8D, two date s
 ## Open questions
 
 1. What does request field +24 (19 vs 18) mean in the card driver behind 0x7E5CBA12 (v1.3/v1.4 0x7E5CB393)? Is it a timeout, a function number or a retry count?
-2. Which function in the 1.2 peripheral rework (0x7E512000–0x7E51C000) is the playback touch fix?
+2. Which function in the 1.2 peripheral rework (~0x7E512000–~0x7E51C000 (L1 2026-11-09)) is the playback touch fix?
 3. What do the outputs of the 1.5 IS decision (byte +735, `is_type` 1 vs 2) select downstream: body IS, lens IS or both?
 4. The 1.1→1.2 and 1.4→1.5 rebuilds have about 1,400 and about 570 changed code functions; most are unattributed. A per-module pass with `region.py` would sort refactors from fixes.

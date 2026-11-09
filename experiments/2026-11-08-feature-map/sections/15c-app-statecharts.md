@@ -1,12 +1,12 @@
 # 15c — C++ app layer: class index, play-notification protocol, statecharts, Dev part 1
 
-**Scope:** block 0, the C++ app layer 0x7E966000–0x7EBA48BB (Tra / Ope / Cap / Cmp / Com / Ctg / Dev). The OXF runtime (0x7EBA48BC–) and OKAO (0x7EBA7BC1–0x7EBABF8D) are out of scope (13c). This section builds on 06, 13c and 14c. It answers the coverage round C3 gaps (round3-review2/3: F041–F050 and the "weakest areas").
+**Scope:** block 0, the C++ app layer ~~0x7E966000~~ 0x7E966A17–0x7EBA48BB (L1 2026-11-09) (Tra / Ope / Cap / Cmp / Com / Ctg / Dev). The OXF runtime (0x7EBA48BC–) and OKAO (0x7EBA7BC1–0x7EBABF8D) are out of scope (13c). This section builds on 06, 13c and 14c. It answers the coverage round C3 gaps (round3-review2/3: F041–F050 and the "weakest areas").
 **Labels:** **V** = verified (read in code or bytes); **I** = inferred (strings, names, layout, a rule).
 **Outputs:** `15c-class-index.tsv` (495 rows: 224 classes/devices + 271 observer classes), `15c-event-id-fixes.tsv` (1,242 owner corrections). **Scratch:** `.../scratchpad/d3/app/`: `cls.py`/`idx.py`/`names.py`/`mkidx.py` (index), `tests.py` (isTypeOf scan, 6,201 sites / 1,095 ids), `evown.py`/`mkfix.py` (owners), `sc.py` (statechart extractor), `ent.py` (state-entry finder), `subs.py` (EVFW subscriptions), `obs.py`.
 
 ## 1. Area and boundaries
 
-The full per-class ranges are in `15c-class-index.tsv` (columns start/end). Rule (V as an address rule): a class file starts at `min(getInstance, ctor)` and ends just before the next class start, minus a trailing run of event methods (ctor/isTypeOf/dtor). Ranges in the Tra/Ope area (0x7E966000–0x7E9EB317) are coarse: many Ope/OlyApi classes are not reactive and have no row (13d §6.2 covers OlyApi), so one row can cover several files (e.g. 0x7E99A20E–0x7E9CFDFA).
+The full per-class ranges are in `15c-class-index.tsv` (columns start/end). Rule (V as an address rule): a class file starts at `min(getInstance, ctor)` and ends just before the next class start, minus a trailing run of event methods (ctor/isTypeOf/dtor). Ranges in the Tra/Ope area (~~0x7E966000~~ 0x7E966A17–0x7E9EB317 (L1 2026-11-09)) are coarse (an L1 scan of all getInstance-shaped functions found four rows that also hold another singleton: OlyHfwOpeShoot, Tra request base, key timer, OlyHfwOpeSndCtl; their role column names them (L1 2026-11-09)): many Ope/OlyApi classes are not reactive and have no row (13d §6.2 covers OlyApi), so one row can cover several files (e.g. 0x7E99A20E–0x7E9CFDFA).
 
 Boundary fixes found in this round (V unless marked):
 
@@ -20,6 +20,9 @@ Boundary fixes found in this round (V unless marked):
 | 0x7EB79137–0x7EB7A6C7 | event-method run between Shutdown and the shooting facade: Shutdown-package events and the play-package blocks 7591–7611, 8041–8566 (their ctors 0x7EB79CF2–0x7EB7A148) |
 | 0x7EB84345–0x7EB85562 / 0x7EB85563– | Com_EvSenderManager (14c) / Com_ framework; `Com_ManagersSubTransition` ctor 0x7EB8573D, base dtor 0x7EB857A1, accept-test 0x7EB857CA (§4.8) |
 | 0x7EB8C265–0x7EB93422 | Dev part 1: 14 device units, §5 |
+| 0x7E967145–0x7E967753 / 0x7E967754–0x7E9698EB / 0x7E9698EC–0x7E96B13B / 0x7E96C670–0x7E96C981 | Split of the old class-index row "TraShareTakeStatus 0x7E967145–0x7E96C981" (L1 2026-11-09, review C4 F029): the HLS log-level object (RAM 0x602B0C78, ctor 0x7E967145, vtable 0x7EBCDBB4, getInstance 0x7E967175); the HLS root singleton (RAM 0x602B0C88, getInstance 0x7E967754, ctor 0x7E9679DF, 7 sub-objects); `TraShareTakeStatus` itself, a static module without `this` (0x602B0CB4–0x602B0E24, `.cpp` tag users 0x7E969F7B–0x7E96B048); the Tra event run 0x7E96B13C–0x7E96C66F; the root's +0 code-translation object (vtable 0x7EBD0C4C) |
+| ~~0x7EB89214–0x7EB8E2B3~~ 0x7EB89214–0x7EB8C264 | `Cab_CameraBase` facade row: it ends before Dev part 1 (0x7EB8C265). 0x7EB8CAAF is slot 10 of the display-device vtable 0x7EC8DEDC (L1 2026-11-09, review C4 C1) |
+| ~~0x7E974710–0x7E974DCB~~ 0x7E974710–0x7E974D10 | EyeFi/FlashAir mode-info row: 0x7E974D11 is the EVFW router getInstance (L1 2026-11-09) |
 
 modules.tsv `last_fn` gaps (I2 of review 3): many Cmp/Cap rows end early because last_fn is the last function that *names* the file. The D3 fix pass found that this does **not** hold for the three rows named in the review: their last_fn values were already right, and only the CmpPEvV first_fn and the Cmp_PlayComponentBase row changed (coordinator 2026-11-09, from fixes-D3). Use the class index instead. The three named in the review: **CmpPLgh 0x7EB33B24–0x7EB39215**, **CmpPEvV 0x7EB2887C–0x7EB2BB80**, **Cmp_PlayIndexComponentBase 0x7EB2BB81–0x7EB2ECCF** (V).
 

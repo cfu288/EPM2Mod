@@ -82,9 +82,9 @@ Method: the strict method of section 09 (code, reachability, cross-body, externa
   **No accessory or port flag.**
 - **Block-0 strings** (`strdiff.py`): only 11 readable strings differ. The E-PL5 adds the swivel strings (`Set_Disp_TFT_Swivel`, `api_user_Set_Touch_Panel_Swivel`), `key_matrix_dial`, `ErrMoniRot` and `Start_Through mode`.
 - **Tables:** the group-11 list, the edev ID records and the chip map are **byte-identical** in the E-PL5 (0x7E73579C, 0x7E7357D4, 0x7E4C6F80).
-- **Code** (`mdiff.py`, 0x7E508F00–0x7E50D700, constants normalised): the edev functions 0x7E50B8DE–0x7E50BD60 are identical. The differences are key-matrix/dial code, e.g. the E-PL5-only ADC range classifier 0x7E50BAC2.
+- **Code** (`mdiff.py`, ~0x7E508F00–~0x7E50D700, a page-rounded compare window (L1 2026-11-09), constants normalised): the edev functions 0x7E50B8DE–0x7E50BD60 are identical. The differences are key-matrix/dial code, e.g. the E-PL5-only ADC range classifier 0x7E50BAC2.
 - **Conclusion:** the firmware cannot tell an E-PL5 from an E-PM2 on this path. On the E-PM2, PENPAL stays off only because no ID 0x0103 ever answers the probe (**inferred**). The product knowledge that the E-PM2 has no accessory port fits this, but the firmware gives no evidence for it either way.
-- **ADJ:** the service op 0x902A (0x7F080B39–0x7F080BC2) reads 0x1706/0x1708/0x1709/0x170A/0x170C and prints `cube is disable` (factory test, verified reads).
+- **ADJ:** the service op 0x902A (case code 0x7F080B39–0x7F080BC2 inside the function 0x7F08056A (L1 2026-11-09)) reads 0x1706/0x1708/0x1709/0x170A/0x170C and prints `cube is disable` (factory test, verified reads).
 
 ### 1.4 Accessory-port menu (verified unless marked)
 

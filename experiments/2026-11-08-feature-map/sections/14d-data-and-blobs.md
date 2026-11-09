@@ -1,6 +1,6 @@
 # 14d. Block-0 data regions and embedded payloads (round D2)
 
-Scope: block 0 (runtime = 0x7E421020 + offset), data from the end of OKAO PT (0x7E731585) to the start of the GUI code (0x7ECCB800), except the code segment 0x7E8F5800–0x7EBABF8F. The brief's two regions are 0x7E730000–0x7E8F0000 and 0x7EBB0000–0x7ECA1020. I extended them to the next real code on each side. Read-only work: no firmware was changed and no extracted code was run. Only headers and table shapes were decoded.
+Scope: block 0 (runtime = 0x7E421020 + offset), data from the end of OKAO PT (0x7E731585) to the start of the GUI code (0x7ECCB800), except the code segment 0x7E8F5800–~~0x7EBABF8F~~ 0x7EBABF8D (its last `ret` ends there; 0x7EBABF8E–0x7EBABF8F are 0xFF) (L1 2026-11-09). The brief's two regions are 0x7E730000–0x7E8F0000 and 0x7EBB0000–0x7ECA1020. I extended them to the next real code on each side. Read-only work: no firmware was changed and no extracted code was run. Only headers and table shapes were decoded.
 
 **Labels:** **V** = verified (read in the code or bytes); **I** = inferred.
 
@@ -50,7 +50,7 @@ So these tables mark the end of each segment's rodata. **V**
 
 | Start–end | KB | What | Mix | Readers |
 |---|---|---|---|---|
-| 0x7E731588–0x7E7323FF | 3.6 | libc rodata: `_ctype` 0x7E731588, libm double coefficients, a jump table 0x7E731714 into libc 0x7E4FEB34–0x7E4FEC8F (printf format switch, I), powers-of-ten doubles 0x7E7319F0… | tab, hent 33 % | 15: 0x7E4FF9E6, 0x7E500BD5 |
+| 0x7E731588–0x7E7323FF | 3.6 | libc rodata: `_ctype` 0x7E731588, libm double coefficients, a jump table 0x7E731714 (40 words) whose case targets 0x7E4FEB34–0x7E4FEC8F lie inside the libc function 0x7E4FEA8D (printf format switch, I; (L1 2026-11-09)), powers-of-ten doubles 0x7E7319F0… | tab, hent 33 % | 15: 0x7E4FF9E6, 0x7E500BD5 |
 | 0x7E732400–0x7E7343FF | 8.0 | FLSH and Usr strings; **U_SHELL command table 0x7E7332B4** and the dbgall copy 0x7E7326A4 (01) | str 68 % | 78: 0x7E503DD4, 0x7E504AF9 |
 | 0x7E734400–0x7E7378FF | 13.2 | ttmr, UI key/jog-dial, PWM/LED and mec (motor) strings and tables | str 70 % | ≈170: 0x7E511C8F, 0x7E506D76 |
 | 0x7E737A60–0x7E73B48B | 14.5 | **Per-lens float32 tables.** The index at 0x7E73B258 has 19 × {u32 lens id, u32 n, ptr, ptr} (ids 0x15, 0x17, 2, 3, 7, 6, 5, 1, 0x18, 0x20, 0x22–0x24, 0x105–0x107…). 0x7E521BD4 matches the first word against a key built from bytes 0x604F67B0–B3 (the lens id, I) and copies the selected floats to RAM. Records 0x7E737AE0–0x7E73B257. The role (lens-specific correction) is I. | tab 100 % | 2: 0x7E521BD4, 0x7E51F669 |
@@ -75,7 +75,8 @@ So these tables mark the end of each segment's rodata. **V**
 | 0x7E7FD600–0x7E8104FF | 75.8 | Movie (mov_*, MOV_ART name table 0x7E7FE240, KDG, AVCHD, QT, AVI, MOVSUPPLY) | str 82 % | 521 |
 | 0x7E810500–0x7E813F21 | 14.5 | MOV_FILE and FACE strings | str 91 % | 102 |
 | **0x7E813F22–0x7E84EE67** | 235.8 | **mcon** (13e): value lists 0x7E814864, conflict table 0x7E825DA8, 505 × 20-byte records 0x7E84A0B8. The descriptors at 0x7E84A0D0 (stride 20, reader 0x7E7077D3) point to sparse, mostly-zero per-mode records 0x7E83FD00–0x7E8491FF. These are tables, not padding. | tab 76 %, zero 15 % | 60: 0x7E6FDCAE |
-| 0x7E84EE68–0x7E851DFF | 11.9 | Exif/MakerNote/ORF IFD templates 0x7E84EF20 and tag lists (12) | ptr/tab | 19: 0x7E7085D2, 0x7E7096DC, 0x7E708F24 |
+| 0x7E84EE68–0x7E84EF1F | 0.2 | ~~Exif/MakerNote/ORF IFD templates 0x7E84EF20 and tag lists (12)~~ **IMGDMA add-job builder table 0x7E84EE68–0x7E84EE73**: 3 code pointers {0x7E70795C, 0x7E7079EA, 0x7E707A1B} = IMGDMA_ADD_YC/BAYER/RGB for req+37 = 0/1/2, read by the dispatcher 0x7E707880 (13e). Then small value tables of 0x7E707Fxx–0x7E7081xx, the 8-entry jump table 0x7E84EEAC (cases 0x7E708270–0x7E708307) and the PrintIM header bytes (L1 2026-11-09) | ptr/tab | 0x7E70788F (`mov 0x7E84EE68,a1`), 0x7E707B4D, 0x7E707F5D, 0x7E7080A9 |
+| 0x7E84EF20–0x7E851DFF | 11.7 | Exif/MakerNote/ORF IFD templates 0x7E84EF20 and tag lists (12) | ptr/tab | 19: 0x7E7085D2, 0x7E7096DC, 0x7E708F24 |
 | 0x7E851E00–0x7E8554FF | 13.8 | rec_* tables (com jump table 0x7E851DC4) and strings | str 52 % | 193 |
 | 0x7E855500–0x7E85CEFB | 30.5 | art strings and tables (hash table 0x7E85C45C, help 0x7E854BB4). Build stamp `10/23 17:15` at 0x7E85CEF0; its only pointer is in `.data` at 0x7E8DE9C4, next to the OKAO pool descriptors (owner I) | str 79 % | 287 |
 | **0x7E85CEFC–0x7E86DD5F** | 67.6 | **OKAO PT models and tables** (13b). The last one is the atan LUT 0x7E86DC5F–0x7E86DD5F; then 0x7E86DD60–0x7E86DD7F is 0xFF. | tab 86 %, hent 11 % | 20: 0x7E72DA7F, 0x7E72F5EC |
@@ -294,10 +295,10 @@ The TSV adds 10 **false starts inside real code** whose only DB caller is a deco
 
 | Row | Correction |
 |---|---|
-| "0x7E730000–0x7E8E0000 Mostly read-only data … code 0x7E8808C0–0x7E880E84" | The OKAO PT code ends at 0x7E731584. The table should list: segment-1 rodata 0x7E731588–0x7E8808BF (link order, §2); a code block 0x7E8808C0–**0x7E880F43** (firmup result messages/LED **and the app-event poster 0x7E880EFF/0x7E880F0C**, 76 callers); the constructor table 0x7E880F44; 0xFF 0x7E880F5C–0x7E8D9FFF; **`.data` image 0x7E8DA000–0x7E8F3113 → RAM 0x602A9B40** (V) |
+| "~~0x7E730000–0x7E8E0000~~ (L1 2026-11-09) Mostly read-only data … code 0x7E8808C0–0x7E880E84" | The OKAO PT code ends at 0x7E731584. The table should list: segment-1 rodata 0x7E731588–0x7E8808BF (link order, §2); a code block 0x7E8808C0–**0x7E880F43** (firmup result messages/LED **and the app-event poster 0x7E880EFF/0x7E880F0C**, 76 callers); the constructor table 0x7E880F44; 0xFF 0x7E880F5C–0x7E8D9FFF; **`.data` image 0x7E8DA000–0x7E8F3113 → RAM 0x602A9B40** (V) |
 | "0x7E8E1020–0x7E8F5800 Data (method-name pointer tables, padding)" (05) | This is the second part of the `.data` init image, not stand-alone tables; 0xFF from 0x7E8F3114 (V) |
-| "0x7EBA1020–0x7ECA0000 … data from about 0x7EBAC000" | Rodata starts at **0x7EBABF90**. The tail 0x7EC92318–0x7ECB083B is the OKAO Smart Skin LUTs, not GUI data (V) |
-| "0x7ECA1020–~0x7ECC8000 is mostly data. ~0x7ECC8000–… GUI" (13d) | Smart Skin LUTs to 0x7ECB083B, constructor table 0x7ECB083C–0x7ECB0887, 0xFF to 0x7ECCB7FF; **GUI code starts at 0x7ECCB800** (V) |
+| "~~0x7EBA1020–0x7ECA0000~~ (L1 2026-11-09) … data from about 0x7EBAC000" | Rodata starts at **0x7EBABF90**. The tail 0x7EC92318–0x7ECB083B is the OKAO Smart Skin LUTs, not GUI data (V) |
+| "~~0x7ECA1020–~0x7ECC8000~~ (L1 2026-11-09) is mostly data. ~0x7ECC8000–… GUI" (13d) | Smart Skin LUTs to 0x7ECB083B, constructor table 0x7ECB083C–0x7ECB0887, 0xFF to 0x7ECCB7FF; **GUI code starts at 0x7ECCB800** (V) |
 | Map §1 "Overlays: part of block 0 is copied from flash at boot" | Add the `.data` image copy by the reset code (§1) and the constructor walker 0x7E44B6B0 with one table per segment (V) |
 
 **Section 13b:**
@@ -314,7 +315,7 @@ The TSV adds 10 **false starts inside real code** whose only DB caller is a deco
 
 **Section 03:**
 - The ORF path (0x7E71969F) also copies the static CMIO blob through 0x7E5586B9 (V).
-- The scope line "0x7E6E0000–0x7E730000 (rec_*, FACE_*, art_*)" should also name mcon 0x7E6FCA60–0x7E70787F, the Exif/MakerNote writer 0x7E707880–0x7E70B434 (12) and OKAO PT 0x7E72CFA1–0x7E731584.
+- The scope line "0x7E6E0000–0x7E730000 (rec_*, FACE_*, art_*)" should also name mcon 0x7E6FCA60–0x7E70787F, ~~the Exif/MakerNote writer 0x7E707880–0x7E70B434 (12)~~ the IMGDMA add-job builders 0x7E707880–0x7E707A9C (dispatcher + 3 builders through table 0x7E84EE68; callers `[MOV]imgdma_exec` 0x7E6DADB9, `REC MULTIEXP ADD EXEC` 0x7E7172B4, art 0x7E71C7BE), unnamed helpers 0x7E707A9D–0x7E708311, the Exif/MakerNote writer 0x7E708312–~~0x7E70B434~~ 0x7E70B3F7 (12; its last `ret` is at 0x7E70B3F5, and 0x7E70B3F8, called only by Usr0 0x7E503DD4, is a rec init) (L1 2026-11-09) and OKAO PT 0x7E72CFA1–0x7E731584.
 - The camera-core rodata is at 0x7E7AB000–0x7E7C10FF (§2).
 
 **Section 07:** I found no error in my regions. Additions:

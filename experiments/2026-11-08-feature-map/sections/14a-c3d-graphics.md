@@ -316,7 +316,7 @@ Other uses:
    - "0x7EE21020–0x7EE5B" → 0x7EE294B5–0x7EE5B5BB.
    - "89 functions call the C3D helper 0x7F0A3819" → 0x7F0A3819 is the C3D port's **free()** (193 callers); 0x7F0A3804 is malloc.
    - "vtable-like pointers at 0x7F027C80" → part of the **format-loader table 0x7F027C4C** (MB, MT, BMP, MCM/MCA/MCT/MCE, GIF, PNG).
-   - The "151 incoming calls into 0x7EE61020–0x7EE81020" could not be reproduced. The overlay calls 25 distinct C3D targets (16 API entries plus 9 object methods, §2.4).
+   - The "151 incoming calls into ~~0x7EE61020–0x7EE81020~~" (L1 2026-11-09) could not be reproduced. The overlay calls 25 distinct C3D targets (16 API entries plus 9 object methods, §2.4).
 7. **08 §5 table.** Replace the rows 0x7EE21020–0x7EE5B, 0x7EE5BB–0x7EE5F and 0x7EE61C–0x7EE63 with the rows of §1. The first row's "~0x7EDE–0x7EE21" → 0x7EE02095–0x7EE294B4.
 8. **13b §1, the AVPI row.** "Everything from 0x7EE63000 to 0x7EE8F4F3 has callers only in the C3D API (functions 0x7EE61A0A–0x7EE62F80) and the overlay-B C3D bridges (0x7F09E31F–0x7F0A30A9)" (full sentence; the outside callers are 49 C3D-API and 15 overlay-B functions) (A6 2026-11-09). This is true in substance, but that code is the C3D class system itself, from 0x7EE619C7. Its outside callers are only overlay-B functions (verified with `pages.py`).
 9. **08 §4 "What it is" and "Tasks".** These are correct, but the feature should be named: **the playback GPU slideshow** (§3), selected by Effect ≠ 1 when the slideshow is not 3D.

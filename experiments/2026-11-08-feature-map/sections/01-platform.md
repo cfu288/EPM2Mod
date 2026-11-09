@@ -139,7 +139,7 @@ So BAS_MAIN and ADJ code is not in RAM until the app asks for Usr2. **[V]** The 
 | take | 7E582602 (func/dbginfo/dbgmode/exec) | stbd | 7E5DB015 (strobe: init/coff/cpau/cres/cloop/cset) | **per** | 7E45F09B (table below) |
 | res | 7E675B1E (RES_MODE_* read) | app | 7E67811B (`app Get_CameraInfo` etc.) | usb | 7F09ABD1 (core, pipe0–4) |
 | **prm** | 7E456928 (below) | **flash** | 7E44F509 (below) | rec | 7E710EB9 (write/dbginfo/trace/dump) |
-| file | 7E5C2139 (stub) | sc | 7E506D76 (heapshow, heaplist …, timing show/start/stop/clear) | exp | 7E69B75D (info/movie/still/call/time/120fps) |
+| file | 7E5C2139 (prologue entry of the FileSystem shell 0x7E5C213E: `movm` then falls through; two-entry rule) (L1 2026-11-09) | sc | 7E506D76 (heapshow, heaplist …, timing show/start/stop/clear) | exp | 7E69B75D (info/movie/still/call/time/120fps) |
 | dbg | 7E53A9C8 (start/stop/flush/show) | **ui** | 7E508F82 (below) | mec | 7E510A60 (still, shutter set/on, lsnc…, set flagNo, prmout, test) |
 | fcs | 7E5E9A37 | cp | 7E508F11 | dbgall | 7E501F0D |
 | sdet | 7E6637F2 | mov | 7E6D15A0 ("mov debug commands") | movp | 7E6E3D18 |

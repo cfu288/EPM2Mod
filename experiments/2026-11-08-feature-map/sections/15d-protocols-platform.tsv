@@ -12,7 +12,7 @@ addr_or_id	kind	role	evidence	V/I
 0x7E923928..0x7E924003	bt-test	Olympus Blue SDK test client (`OLYMPUS BlueSDK a4`, `OLYMPUS_TST_OBJ`, callbacks), BTAPL task 0x7E923FD2; demo-shell entries 0x7E923C93..0x7E923FFB	strings	V
 0x7E924004	me-core	ME_Init: list heads 0x7DAC4A00..0x7DAC4A2C, 0x7DAC50A8..	disasm	V
 0x7E924004..0x7E92BF5D	bt-layer	ME (management entity) + SEC (security), RAM 0x7DAC4xxx/0x7DAC5xxx: op scheduler 0x7E92412E, HCI event dispatcher 0x7E924E3A, command sender 0x7E925704, command builders (TSV rows), init 0x7E925727, link records 0x7E9275C6..0x7E9276AC, SEC 0x7E92A181..0x7E92BF5D (`SecReportAuthenticateResult`)	call graph; RAM page	V
-0x7E925A49..0x7E926692	bt-api	synchronous BT API wrappers (RAM 0x605D6xxx): BT init 0x7E925A49, deinit 0x7E925E9C, wait 0x7E926118 (OlyEvWt) / signal 0x7E926146 (OlyEvSt), BT_SetSecurity 0x7E925B4F/0x7E926620; callers BT_CTRL, BTAPI, test client	strings; callees	V edges / I role
+0x7E925A49..0x7E9266BD	bt-api	(end was 0x7E926692 (L1 2026-11-09)) synchronous BT API wrappers (RAM 0x605D6xxx): BT init 0x7E925A49, deinit 0x7E925E9C, wait 0x7E926118 (OlyEvWt) / signal 0x7E926146 (OlyEvSt), BT_SetSecurity 0x7E925B4F/0x7E926620; callers BT_CTRL, BTAPI, test client	strings; callees	V edges / I role
 0x7E9266BE	me-core	accessibility state machine: Write_Scan_Enable 0x7E92688E, scan activity 0x7E9268A4, IAC LAP 0x7E926922	callees	V
 0x7E9275C6	link-rec	find link record by BD_ADDR (+84, memcmp 6 via 0x7E92F477); loop bound 1	disasm	V
 0x7E927600	link-rec	allocate link record: zero 320 B, +150 = 0xCC18 (DM1/DH1/DM3/DH3/DM5/DH5), list heads +108/+128/+232/+244, +224 = 0x7DAC4E00 + i*678	disasm	V

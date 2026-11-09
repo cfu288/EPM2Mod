@@ -134,7 +134,7 @@ The `exp` shell `com N` command (jump table 0x7E7E0078, in 0x7E69C056) sends a f
 
 ### 2.1 Overview
 
-- **TAKE_FOCUS** (0x7E5881D9) builds an `fcs_packet` and hands AF to the FCS code (0x7E5E2000–0x7E612000). The FCS code runs contrast-detect AF:
+- **TAKE_FOCUS** (0x7E5881D9) builds an `fcs_packet` and hands AF to the FCS code (~~0x7E5E2000–0x7E612000~~ ~0x7E5E2C00–0x7E627E9E: the first `FCS_PACKET` user is 0x7E5E2DE5 and the 4-letter FCS log tags start a little earlier; `fcs` string users run to the time-lag logger 0x7E627C84, and cam.c starts at 0x7E627E9F (L1 2026-11-09)). The FCS code runs contrast-detect AF:
   - **S-AF:** a full hill-climbing scan, a reverse, then a second fine scan with peak interpolation;
   - **C-AF and movie:** wobbling.
 - **The lens is driven through `fcs_lens_mfts_*`**, which sends packets in the Micro Four Thirds lens protocol (section 02 lens task).

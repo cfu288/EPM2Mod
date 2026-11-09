@@ -10,7 +10,7 @@ Earlier detail: 07 §2.1–2.2, 09a §1, 10a §1–3, 02 §4–5, 12 §1. This s
 |---|---|---|---|
 | mcon (mode controller) | **0x7E6FCA60–0x7E70787F** | strings 0x7E813F22–0x7E814856; tables 0x7E814864–0x7E84EE67 | V: 0x7E6FCA3C is the FACE_PT1 task loop (01 table); 0x7E707880 dispatches through table 0x7E84EE68 and is called only from movie/REC code (0x7E6DADB9, 0x7E7172B4, 0x7E71C7BE). PrintIM/Exif starts at 0x7E708312 |
 | TAKE_MAIN sequencer engine | 0x7E58204D–0x7E582601 (last `ret` at 0x7E5825FF; 0x7E582602 starts the `take` debug-command function) | state table 0x7E790860 (27 × 20 B), names 0x7E790758 | V (A4 2026-11-09) |
-| TAKE sequencer states/handlers | ~0x7E59A24C–0x7E5AB7FF (entries 0x7E59A332…0x7E5AB405; shared handlers 0x7E5A4192–0x7E5A46CE) | event tables 0x7E78F530–0x7E7906B8 | V (table pointers) |
+| TAKE sequencer states/handlers | ~0x7E59A24C–~~0x7E5AB7FF~~ ~0x7E5AB877 (`--takerdy--` 0x7E5AB7E3 crosses 0x7E5AB7FF; 0x7E5AB878 opens a device (L1 2026-11-09)) (entries 0x7E59A332…0x7E5AB405; shared handlers 0x7E5A4192–0x7E5A46CE) | event tables 0x7E78F530–0x7E7906B8 | V (table pointers) |
 | Strobe exposure (`stb_expose`) | ~0x7E5D036C–0x7E5D8E94 | strings 0x7E79B06A–0x7E79CD9F | V strings / I bounds |
 | Light-source selection (strobe assist) | 0x7E5E2258–0x7E5E22FF: availability 0x7E5E2258 and F011 0x7E5E22A6 (+ 0x7E5E1B11, 0x7E5DEBAD). The rest of the range, 0x7E5E2300–0x7E5E2418, holds the four light-exec callbacks (§2.4), not selection code | – | V (A4 2026-11-09) |
 
@@ -28,9 +28,9 @@ mcon internal layout (V by callers/strings; one row per block):
 | 0x7E6FF9CE–0x7E6FFDF7 | 20-entry change log 0x605B4CB8, first +48 hooks, hook batch runner 0x7E6FFD6A, change-notify callback |
 | 0x7E6FFDF8–0x7E700992 | override slots 0x605B4C1C, mode-preset apply 0x7E6FFE55, **mode-conflict engine** 0x7E7002FF |
 | 0x7E700993–0x7E701177 | mode load / camera_start / set / end, mymode, custom, standard/full reset |
-| 0x7E701178–0x7E704701 | +4/+8/+16 step callbacks and +24 hooks (interleaved with their helpers) |
-| 0x7E704702–0x7E706835 | helpers and +48 hooks (W-plane twins) |
-| 0x7E706836–0x7E706F79 | reset lists, bank save/restore (0x7E706B75 / 0x7E706BDB) |
+| 0x7E701178–~~0x7E704701~~ 0x7E704700 (L1 2026-11-09) | +4/+8/+16 step callbacks and +24 hooks (interleaved with their helpers) |
+| ~~0x7E704702–0x7E706835~~ 0x7E704701–0x7E706834 (0x7E704701 and 0x7E706835 are function starts with data-word pointers 0x7E8182D8/0x7E8182B4 (L1 2026-11-09)) | helpers and +48 hooks (W-plane twins) |
+| ~~0x7E706836–0x7E706F79~~ 0x7E706835–0x7E706FA2 (it ends with 0x7E706F79, 42 B, called by 0x7E6FE35B (L1 2026-11-09)) | reset lists, bank save/restore (0x7E706B75 / 0x7E706BDB) |
 | 0x7E706FA3–0x7E70787F | value-list engine and the two ROM→RAM hash tables |
 
 ## 2. Components
@@ -249,7 +249,7 @@ mcon internal layout (V by callers/strings; one row per block):
 4. **Section 10a:** the 60-byte records are per-setting operation records. The cited hooks (0x7E7039C4, 0x7E703986, 0x7E703540) are their **+24** post-write hooks (V).
 5. **09a §1.1:** add +2 = variant key, +16 = clamp flag and the type codes of §3.1. The "+17 type 6 = composite" reading is confirmed.
 6. **Coverage review 1, F011:** "always clears bit 8" means it clears the value 0x8 (`and -9`), the light-source bit that is never available (V).
-7. **Regions:** mcon is 0x7E6FCA60–0x7E70787F (not ~0x7E6FC000–0x7E708000). 0x7E6FC000–0x7E6FCA5F is face code (FACE_EXEC, FaceXX wrappers, FACE_PT0/1).
+7. **Regions:** mcon is 0x7E6FCA60–0x7E70787F (not ~~~0x7E6FC000–0x7E708000~~ (L1 2026-11-09)). ~0x7E6FC000–0x7E6FCA5F (the face code starts before 0x7E6FC000 (L1 2026-11-09)) is face code (FACE_EXEC, FaceXX wrappers, FACE_PT0/1).
 
 ## 5. Open questions
 1. The names of TAKE A events 0, 2, 5, 6, 9, b, c, e, f, 10, 11. A full sender scan of queue 0x7E43ED96 is needed: 0x7E50334B–0x7E50379D and the api_rec_Take_Ready* functions build the message at msg+8 through helper 0x7E67EA30.

@@ -23,7 +23,7 @@ Labels: **V** = read in code or bytes. **I** = inferred. Register *names* for th
 | 0x7E6B749A–0x7E6B990E | display-controller (0x9A900000) ISR and register writers | V absolute operands |
 | 0x7E6B9932–0x7E6BAFFF | HDMI task, CEC poll, I2C transports over SIO ch2/ch3 | V |
 | 0x7E6BB06E–0x7E6BCD96 | second transmitter on SIO ch3 (`outevf_tmds`) | V regs; I role |
-| 0x7F05E9CE–0x7F0645C0 | DPS engine in overlay A (not 0x7F061020–0x7F068F9C) | V |
+| 0x7F05E9CE–0x7F0645C0 | DPS engine in overlay A (not ~~0x7F061020–0x7F068F9C~~ (L1 2026-11-09)) | V |
 
 **The Bluetooth stack is not one block at 0x7E91D279.** The HCI layer that feeds the ME event dispatcher sits at 0x7E917AFE–0x7E9195A6 (A8 2026-11-09). The caller chain is 0x7E924E3A ← 0x7E924D10 ← 0x7E917D1E/0x7E9180E4/0x7E918121/0x7E91820A/0x7E9189C4/0x7E918BE8, and the command sender 0x7E925704 sends through 0x7E917F02 (V). The Olympus iAP code is linked between the HCI layer and L2CAP.
 
@@ -39,7 +39,7 @@ The bounds come from the RAM pages each function touches and from the inter-laye
 | 0x7E923748–0x7E923927 | debug `Report` | — | 0x7E923748 (56 callers) → formatter 0x7E923769 → debug print 0x7E4263E5 (V) |
 | 0x7E923928–0x7E924003 | Olympus test client | 0x602AEE80–0x602AEEA0, 0x605D37F0–0x605D37FC, 0x605D5FFC (A8 2026-11-09) | `OLYMPUS BlueSDK a4`, BTAPL task 0x7E923FD2, demo-shell entries 0x7E923C93–0x7E923FFB (V) |
 | 0x7E924004–0x7E925A48, 0x7E9266BE–0x7E92BF5D | **ME + SEC** (management entity, security) | 0x7DAC4xxx–0x7DAC5xxx | ME_Init 0x7E924004. Op scheduler 0x7E92412E. Event dispatcher 0x7E924E3A. Command sender 0x7E925704. HCI init 0x7E925727. Link records 0x7E9275C6–0x7E9276AC. SEC 0x7E92A181–0x7E92BF5D (`SecReportAuthenticateResult`) (V) |
-| 0x7E925A49–0x7E926692 | BT API wrappers (Olympus or SDK sample) | 0x605D6xxx | BT init 0x7E925A49; deinit 0x7E925E9C; wait 0x7E926118 (OlyEvWt); signal 0x7E926146 (OlyEvSt); `BT_SetSecurity` 0x7E925B4F/0x7E926620 (V edges; role I) |
+| 0x7E925A49–~~0x7E926692~~ 0x7E9266BD (`BT_SetSecurity` 0x7E926620 ends at 0x7E9266B8, then a 5-B stub 0x7E9266B9; ME + SEC resumes at 0x7E9266BE (L1 2026-11-09)) | BT API wrappers (Olympus or SDK sample) | 0x605D6xxx | BT init 0x7E925A49; deinit 0x7E925E9C; wait 0x7E926118 (OlyEvWt); signal 0x7E926146 (OlyEvSt); `BT_SetSecurity` 0x7E925B4F/0x7E926620 (V edges; role I) |
 | 0x7E92C029–0x7E92E37A | **OBEX core** | 0x7DAF2xxx | Client: opcodes 0x80/0x81/0x82/0xFF, body headers 0x48/0x49. Server 0x7E92D432–0x7E92DC08: 0x85 SetPath, headers 0x46/0x4A/0xCB, responses 0x90/0xA0/0xC0/0xC4. Packet pool 0x7E92DD6A: 64 × 724 B (V constants) |
 | 0x7E92E37B–0x7E92EC6B | OBEX transport over RFCOMM | 0x7DAE7xxx | API lock/unlock 0x7E92E37B/0x7E92E390 (33 callers in BT_CTRL). Server transport 0x7E92E5D6 (V) |
 | 0x7E92EC6C–0x7E92F0FD | OPP/BIP application glue | 0x605D648C | Called by BT_CTRL 0x7E8FB30D–0x7E8FBEF7 (V edges; role I) |
@@ -286,7 +286,7 @@ Region-level ranges of 20 KB or more do not count (0x7E421020–0x7E426FFF, 0x7E
 1. **05 row "~0x7E91D279–~0x7E937CDD Blue SDK".** The stack also has part 1 at 0x7E915A1B–0x7E9195A6 (init, EVM, profiles, the **HCI layer**); 0x7E9195A7 (133 B, called only from `cp_init()`) is already Olympus iAP code. That part sits inside 05's row "0x7E913984–0x7E91CFFF stack callbacks, iAP". Also, 0x7E91D279 is an iAP getter and 0x7E91D289 an iAP action (0x605C6028 = 19, then the dispatcher 0x7E91C673); L2CAP starts at 0x7E91D29F (V). (A8 2026-11-09)
 2. **Link "table" 0x7DAC4C68:** it holds **one** 320-byte record (the loops stop at `cmp 1`), so there is one ACL link (V).
 3. **C3 F028: "0x7E926E88 picks the mode".** 0x7E926E88 is the start function of ME op type 22 (Park): op table 0x7EBB3B18 slot 21 (V).
-4. **08 §1.1: "DPS XML library 0x7F061020–0x7F068F9C".** The DPS range is 0x7F05E9CE–0x7F0645C0, and the red-eye library follows (V). 0x7F05E590–0x7F05E8D3 is playback-calendar code (new).
+4. **08 §1.1: "DPS XML library ~~0x7F061020–0x7F068F9C~~" (L1 2026-11-09).** The DPS range is 0x7F05E9CE–0x7F0645C0, and the red-eye library follows (V). 0x7F05E590–0x7F05E8D3 is playback-calendar code (new).
 5. **C3 F075: "0x7F062A5E … record type 10 (string)".** The 10 is op id 10 (getFileID) (V). The builder table base is 0x7F06A130 with 17 slots, not "0x7F06A134, 10 entries"; slots 11–15 are NULL (V).
 6. **01 §6:** the SYSFMEM modes are hex (table above).
 7. **01, Usr2:** the claim that A and B load separately is correct. Add two facts (V):
