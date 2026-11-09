@@ -193,3 +193,11 @@ The most common weak pattern in samples 1–3 is a register-block initialiser in
 4. ADJSLF steps: the sequence dispatcher 0x7F0AAD2B (word 0x7E8F2124) runs steps that are selected through CSV block names. A decoder of those step lists would turn the 347 ADJSLF rows into named steps.
 5. Cross-body matching (E-PL5 1.6 has the same code family; later bodies keep more strings) could name the C rows. It is not done here: the index uses only E-PM2 data.
 6. The `play`, `disp` and `art` shells use another subcommand idiom. They are not decoded yet.
+
+## Known rule errors found by coverage round C6 (2026-11-09)
+
+- **Pool allocators labelled as callbacks:** the 16 rows 0x7E65C6A1–0x7E65C8FB (`STILL` pool) and 0x7E660C21–0x7E660E7B (`S_LB_M` pool) were copied from a 15b rule that turned "immediates before a call" into "step callback". They are start-up pool allocators with one direct caller. Fixed here and in 15b.
+- **glSetErrorFuncDMP:** 0x7F09E9EE was named `glSetErrorFuncDMP`; it is the C3D scene start that calls it. Fixed, along with the "under …" rows that inherited the name.
+- **The BASIC command table** is {name, token, fn}, starting at 0x7F069338 (F076 = `run`). Rows built from the earlier reading of this table may give the wrong command.
+- **Rows that are context only:** overlay-B rows are mostly strings, MMIO and ancestor names. The USB endpoint-1 OUT handler, the ADJSLF helpers (e.g. the `MNF99991.JPG` card-write check; `cam poweroff` via ADJ op 0x902B sub-op 15) and the C3D scene code can be named from 01/13f but are not yet.
+- **Not covered:** 0x7EE02095–0x7EECE318 (GL, 3D engine, C3D, AVPI) is outside every 16x index.

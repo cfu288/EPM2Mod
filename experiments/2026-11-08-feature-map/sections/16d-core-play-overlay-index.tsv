@@ -160,7 +160,7 @@ addr	size	role	basis	V/I	class	component
 0x7E6294E6	72	section text: “COM_SET sensor-mode item 0x7E6294E6: value 0–4”	sec 03 line 49	I	S	cam.c
 0x7E62952E	38	section text: “This agrees with cam.c's still item 0x7E62952E in §1 (phase 0 → STL/RDY; 1 or 11 → STL/TAK; 5 → STL/CRDY) (15b §7) (D3 2026-11-09)”	sec 03 line 107	I	S	cam.c
 0x7E629554	9	section text: “the only writer is 0x7E629554”	sec 03 line 43	I	S	cam.c
-0x7E62955D	430	section text: “`Status [%02d]` dump: state byte 0x6054C7E5, power count 0x6054C7E4, and the packet list at 0x6054C7F4 ("Set Execute / Cancel Request / Set Cancel"). The `cam dbginfo` shell command calls it (0x7E6321”; dispatcher: switch table(s) 7E7AC120	sec 03 line 21	I	S	cam.c
+0x7E62955D	430	"section text: “`Status [%02d]` dump: state byte 0x6054C7E5, power count 0x6054C7E4, and the packet list at 0x6054C7F4 (""Set Execute / Cancel Request / Set Cancel""). The `cam dbginfo` shell command calls it (0x7E6321”; dispatcher: switch table(s) 7E7AC120"	sec 03 line 21	I	S	cam.c
 0x7E62970B	3	task entry CAM_MAIN (cfg 0x000c, build/map/tasks.tsv)	tasks.tsv	V	S	cam.c
 0x7E62970E	63	logs the tag `CAM_CL` (a log tag, not necessarily the function name)	own string (bare)	V	S	cam.c
 0x7E62974D	66	callback/pointer: address loaded by `CAM_CL` 0x7E62970E (passed to `cam_sem post job (MI_RES/MI_CLS)` 0x7E64F10E); calls `OlyEvSt (set event flag)` 0x7E449083	code immediate (immref)	V	C	cam_*.c files cam_aedrv … cam_frame_sync (03 §3, 14b)
@@ -357,10 +357,10 @@ addr	size	role	basis	V/I	class	component
 0x7E62F364	12	callback/pointer: address loaded by 0x7E62F261 (stored to (40,a2)); wrapper: calls 0x7E632CAE	code immediate (immref)	V	C	cam_*.c files cam_aedrv … cam_frame_sync (03 §3, 14b)
 0x7E62F370	891	`cam still` shell subcommand handler (entry 2 of {name,fn} table 0x7E7AC414, used by 0x7E62EB8E, 0x7E62F0E3)	shell table (ptab2)	V	S	cam_*.c files cam_aedrv … cam_frame_sync (03 §3, 14b)
 0x7E62F6EB	1313	uses strings «Still MirrorDown EventWait», «Still Terminate EventWait», «Dummy Field Recording End»; allocates 64 B from the camera heap; sends a CamCommand packet; error codes 0x0A262001; calls `OlyTaSS (task sleep)` 0x7E449605, `debug print `%s %s` (variant)` 0x7E5064E8, `debug print str + hex value (variant)` 0x7E50658F; under `cam still` handler 0x7E62F370 (direct caller)	own strings (gist)	V	C	cam_debug.c
-0x7E62FC0C	1525	section text: “"Still Continue" 0x7E62FC0C”	sec 03 line 111	I	S	cam_*.c files cam_aedrv … cam_frame_sync (03 §3, 14b)
+0x7E62FC0C	1525	"section text: “""Still Continue"" 0x7E62FC0C”"	sec 03 line 111	I	S	cam_*.c files cam_aedrv … cam_frame_sync (03 §3, 14b)
 0x7E630201	1471	uses strings «High ContinueReady EventWait», «Abort Start ContinueReady», «High MirrorDown EventWait»; allocates 64 B from the camera heap; sends a CamCommand packet; error codes 0x0A262001; calls `OlyTaSS (task sleep)` 0x7E449605, `debug print `%s %s` (variant)` 0x7E5064E8, `CamCommand` 0x7E628303; under `cam still` handler 0x7E62F370 (direct caller)	own strings (gist)	V	C	cam_*.c files cam_aedrv … cam_frame_sync (03 §3, 14b)
 0x7E6307C0	1125	uses strings «Bulb MirrorDown EventWait», «Bulb Terminate EventWait», «Bulb MirrorDown Start»; allocates 64 B from the camera heap; sends a CamCommand packet; error codes 0x0A262001; calls `OlyTaSS (task sleep)` 0x7E449605, `debug print `%s %s` (variant)` 0x7E5064E8, `CamCommand` 0x7E628303; under `cam still` handler 0x7E62F370 (direct caller)	own strings (gist)	V	C	cam_*.c files cam_aedrv … cam_frame_sync (03 §3, 14b)
-0x7E630C25	1267	section text: “"LB" 0x7E630C25 (LB turns AWB off: "AWB OFF!!!!!")”	sec 03 line 111	I	S	cam_*.c files cam_aedrv … cam_frame_sync (03 §3, 14b)
+0x7E630C25	1267	"section text: “""LB"" 0x7E630C25 (LB turns AWB off: ""AWB OFF!!!!!"")”"	sec 03 line 111	I	S	cam_*.c files cam_aedrv … cam_frame_sync (03 §3, 14b)
 0x7E631118	29	callback/pointer: address loaded by 0x7E62F6EB (stored to (40,a3); stored to (40,a3)); calls `printf (debug)` 0x7E426442	code immediate (immref)	V	C	cam_*.c files cam_aedrv … cam_frame_sync (03 §3, 14b)
 0x7E631135	19	callback/pointer: address loaded by 0x7E62F6EB (stored to (40,a3)); wrapper: calls 0x7E426442 with a0=0x7E7ACD40; calls `printf (debug)` 0x7E426442	code immediate (immref)	V	C	cam_*.c files cam_aedrv … cam_frame_sync (03 §3, 14b)
 0x7E631148	29	callback/pointer: address loaded by 0x7E62F6EB (stored to (40,a0)); calls `printf (debug)` 0x7E426442	code immediate (immref)	V	C	cam_*.c files cam_aedrv … cam_frame_sync (03 §3, 14b)
@@ -456,7 +456,7 @@ addr	size	role	basis	V/I	class	component
 0x7E633CC5	155	uses strings «-[%s]-------------------», «cam_debug_monitor.c», «%08x»; calls case 8 of 0x7E62955D 0x7E62EBCA; under `cam dbginfo` handler 0x7E63213F (direct caller), `cam dbgmon` handler 0x7E6322C9 (direct caller)	own strings (gist)	V	C	cam_debug_monitor.c
 0x7E633D60	9	setter: stores u16 arg into global *(0x6054C904)	shape:setter	V	S	cam_*.c files cam_aedrv … cam_frame_sync (03 §3, 14b)
 0x7E633D69	9	getter: returns u16 global *(0x6054C904)	shape:getter	V	S	cam_*.c files cam_aedrv … cam_frame_sync (03 §3, 14b)
-0x7E633D72	10	section text: “The first report also logs "DMG* CODE=" through the debug monitor (0x7E633A1B) and calls 0x7E633D72”	sec 03 line 117	I	S	cam_*.c files cam_aedrv … cam_frame_sync (03 §3, 14b)
+0x7E633D72	10	"section text: “The first report also logs ""DMG* CODE="" through the debug monitor (0x7E633A1B) and calls 0x7E633D72”"	sec 03 line 117	I	S	cam_*.c files cam_aedrv … cam_frame_sync (03 §3, 14b)
 0x7E633D7C	181	under `cam dbgmon` handler 0x7E6322C9 (direct caller)	features+call graph	V	C	cam_*.c files cam_aedrv … cam_frame_sync (03 §3, 14b)
 0x7E633E31	192	reports camera damage; calls `CPU lock (interrupts off)` 0x7E44B36F, `CPU unlock` 0x7E44B390, `large-heap alloc` 0x7E507325; under `cam dbgmon` handler 0x7E6322C9 (direct caller)	features+call graph	V	P	cam_*.c files cam_aedrv … cam_frame_sync (03 §3, 14b)
 0x7E633EF1	62	under `CamCommand` 0x7E628303 (3 levels up), still step callback; on error reports damage wi… 0x7E656EEB (3 levels up)	features+call graph	V	C	cam_*.c files cam_aedrv … cam_frame_sync (03 §3, 14b)
@@ -513,7 +513,7 @@ addr	size	role	basis	V/I	class	component
 0x7E635865	53	calls `CPU lock (interrupts off)` 0x7E44B36F, `CPU unlock` 0x7E44B390; under still step callback; on error reports damage wi… 0x7E659157 (direct caller)	features+call graph	V	C	cam_*.c files cam_aedrv … cam_frame_sync (03 §3, 14b)
 0x7E63589A	279	cam_ev: OR event mask into object flags (read in code)	hand name (this section)	V	S	cam_*.c files cam_aedrv … cam_frame_sync (03 §3, 14b)
 0x7E6359B1	87	section text: “cam_set sequence | start sequence STEP on cam_ev object ID”	sec 15b line 136	I	S	cam_*.c files cam_aedrv … cam_frame_sync (03 §3, 14b)
-0x7E635A08	380	section text: “cam_ev.c | event objects ("req post num logic code"), inferred”	sec 03 line 84	I	S	cam_ev.c
+0x7E635A08	380	"section text: “cam_ev.c | event objects (""req post num logic code""), inferred”"	sec 03 line 84	I	S	cam_ev.c
 0x7E635B84	24	helper called by 0x7E64173B, 0x7E641774 and 12 more	call graph (unnamed callers)	V	C	cam_ev.c
 0x7E635B9C	34	under still step callback; on error reports damage wi… 0x7E659E7B (direct caller), still step callback; on error reports damage wi… 0x7E659EA2 (direct caller)	features+call graph	V	C	cam_ev.c
 0x7E635BBE	23	under still step callback: posts step-event bit(s) 0x… 0x7E658F0E (direct caller)	features+call graph	V	C	cam_ev.c
@@ -2161,7 +2161,7 @@ addr	size	role	basis	V/I	class	component
 0x7E6557A4	13	MMIO 0x99900520	features+call graph	V	P	cam_sg.c
 0x7E6557B1	16	MMIO 0x99900520; under frame command 73 -> start handler 0x7E63751B; i… 0x7E63751B (2 levels up)	features+call graph	V	P	cam_sg.c
 0x7E6557C1	13	MMIO 0x999000F8	features+call graph	V	P	cam_sg.c
-0x7E6557CE	102	section text: “Whether OPENRDY/OPENCHG mean "open for live view" / "close and charge" needs the shutter module 0x7E6557CE read in full”	sec 14b line 239	I	S	cam_shutter.c
+0x7E6557CE	102	"section text: “Whether OPENRDY/OPENCHG mean ""open for live view"" / ""close and charge"" needs the shutter module 0x7E6557CE read in full”"	sec 14b line 239	I	S	cam_shutter.c
 0x7E655834	53	section text: “the entry the shutter code 0x7E655834 also uses”	sec 03 line 71	I	S	camera core / api / EXP_MOVIE region
 0x7E655869	68	uses strings «SH_MEM»; under still step callback; on error reports damage wi… 0x7E65CBDD (direct caller), live bulb step callback; on error reports damag… 0x7E661161 (direct caller)	own strings (gist)	V	C	camera core / api / EXP_MOVIE region
 0x7E6558AD	140	section text: “cam_shutter.c | hash 0x7E7BBAAC (key = code − 4): 5, 6, 7, 11, 12, 145–149. Codes 5, 6/147 (shared 0x7E655939), 12, 146 and 149 → MEC submit 0x7E51787B of an SH request object; 7 (0x7E655971) and 11 (”; dispatcher: switch table(s) 7E7BBAAC	sec 15b line 60	I	S	camera core / api / EXP_MOVIE region
@@ -2654,14 +2654,14 @@ addr	size	role	basis	V/I	class	component
 0x7E65C52E	135	struct writer: stores 8 fields (+4, +32, +4, +32, +4) through a pointer	shape:fieldstore	V	S	cam_still_func.c
 0x7E65C5B5	132	still step callback; on error reports damage with line tag 16515	15b tsv callback	V	S	cam_still_func.c
 0x7E65C639	104	still step callback; on error reports damage with line tag 16568	15b tsv callback	V	S	cam_still_func.c
-0x7E65C6A1	86	still step callback; on error reports damage with line tag 16612	15b tsv callback	V	S	cam_still_func.c
-0x7E65C6F7	86	still step callback; on error reports damage with line tag 16656	15b tsv callback	V	S	cam_still_func.c
-0x7E65C74D	86	still step callback; on error reports damage with line tag 16700	15b tsv callback	V	S	cam_still_func.c
-0x7E65C7A3	86	still step callback; on error reports damage with line tag 16744	15b tsv callback	V	S	cam_still_func.c
-0x7E65C7F9	86	still step callback; on error reports damage with line tag 16788	15b tsv callback	V	S	cam_still_func.c
-0x7E65C84F	86	still step callback; on error reports damage with line tag 16832	15b tsv callback	V	S	cam_still_func.c
-0x7E65C8A5	86	still step callback; on error reports damage with line tag 16876	15b tsv callback	V	S	cam_still_func.c
-0x7E65C8FB	86	still step callback; on error reports damage with line tag 16920	15b tsv callback	V	S	cam_still_func.c
+0x7E65C6A1	86	start-up allocation from the camera pool `STILL`: one direct caller; takes blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table; not a step callback (C6 2026-11-09)	15b tsv callback	V	S	cam_still_func.c
+0x7E65C6F7	86	start-up allocation from the camera pool `STILL`: one direct caller; takes blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table; not a step callback (C6 2026-11-09)	15b tsv callback	V	S	cam_still_func.c
+0x7E65C74D	86	start-up allocation from the camera pool `STILL`: one direct caller; takes blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table; not a step callback (C6 2026-11-09)	15b tsv callback	V	S	cam_still_func.c
+0x7E65C7A3	86	start-up allocation from the camera pool `STILL`: one direct caller; takes blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table; not a step callback (C6 2026-11-09)	15b tsv callback	V	S	cam_still_func.c
+0x7E65C7F9	86	start-up allocation from the camera pool `STILL`: one direct caller; takes blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table; not a step callback (C6 2026-11-09)	15b tsv callback	V	S	cam_still_func.c
+0x7E65C84F	86	start-up allocation from the camera pool `STILL`: one direct caller; takes blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table; not a step callback (C6 2026-11-09)	15b tsv callback	V	S	cam_still_func.c
+0x7E65C8A5	86	start-up allocation from the camera pool `STILL`: one direct caller; takes blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table; not a step callback (C6 2026-11-09)	15b tsv callback	V	S	cam_still_func.c
+0x7E65C8FB	86	start-up allocation from the camera pool `STILL`: one direct caller; takes blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table; not a step callback (C6 2026-11-09)	15b tsv callback	V	S	cam_still_func.c
 0x7E65C951	93	still step callback; on error reports damage with line tag 16970	15b tsv callback	V	S	cam_still_func.c
 0x7E65C9AE	55	still step callback; on error reports damage with line tag 17004	15b tsv callback	V	S	cam_still_func.c
 0x7E65C9E5	55	still step callback; on error reports damage with line tag 17041	15b tsv callback	V	S	cam_still_func.c
@@ -2928,14 +2928,14 @@ addr	size	role	basis	V/I	class	component
 0x7E660AF5	102	struct writer: stores 6 fields (+4, +32, +4, +32, +4) through a pointer	shape:fieldstore	V	S	cam_still_live_bulb.c
 0x7E660B5B	94	live bulb step callback; on error reports damage with line tag 8461	15b tsv callback	V	S	cam_still_live_bulb.c
 0x7E660BB9	104	live bulb step callback; on error reports damage with line tag 8514	15b tsv callback	V	S	cam_still_live_bulb.c
-0x7E660C21	86	live bulb step callback; on error reports damage with line tag 8558	15b tsv callback	V	S	cam_still_live_bulb.c
-0x7E660C77	86	live bulb step callback; on error reports damage with line tag 8602	15b tsv callback	V	S	cam_still_live_bulb.c
-0x7E660CCD	86	live bulb step callback; on error reports damage with line tag 8646	15b tsv callback	V	S	cam_still_live_bulb.c
-0x7E660D23	86	live bulb step callback; on error reports damage with line tag 8690	15b tsv callback	V	S	cam_still_live_bulb.c
-0x7E660D79	86	live bulb step callback; on error reports damage with line tag 8734	15b tsv callback	V	S	cam_still_live_bulb.c
-0x7E660DCF	86	live bulb step callback; on error reports damage with line tag 8778	15b tsv callback	V	S	cam_still_live_bulb.c
-0x7E660E25	86	live bulb step callback; on error reports damage with line tag 8822	15b tsv callback	V	S	cam_still_live_bulb.c
-0x7E660E7B	86	live bulb step callback; on error reports damage with line tag 8866	15b tsv callback	V	S	cam_still_live_bulb.c
+0x7E660C21	86	start-up allocation from the camera pool `S_LB_M`: one direct caller; takes 40-byte blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table (e.g. 0x7E660D79 → 0x6056EDAC); not a step callback (C6 2026-11-09)	15b tsv callback	V	S	cam_still_live_bulb.c
+0x7E660C77	86	start-up allocation from the camera pool `S_LB_M`: one direct caller; takes 40-byte blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table (e.g. 0x7E660D79 → 0x6056EDAC); not a step callback (C6 2026-11-09)	15b tsv callback	V	S	cam_still_live_bulb.c
+0x7E660CCD	86	start-up allocation from the camera pool `S_LB_M`: one direct caller; takes 40-byte blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table (e.g. 0x7E660D79 → 0x6056EDAC); not a step callback (C6 2026-11-09)	15b tsv callback	V	S	cam_still_live_bulb.c
+0x7E660D23	86	start-up allocation from the camera pool `S_LB_M`: one direct caller; takes 40-byte blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table (e.g. 0x7E660D79 → 0x6056EDAC); not a step callback (C6 2026-11-09)	15b tsv callback	V	S	cam_still_live_bulb.c
+0x7E660D79	86	start-up allocation from the camera pool `S_LB_M`: one direct caller; takes 40-byte blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table (e.g. 0x7E660D79 → 0x6056EDAC); not a step callback (C6 2026-11-09)	15b tsv callback	V	S	cam_still_live_bulb.c
+0x7E660DCF	86	start-up allocation from the camera pool `S_LB_M`: one direct caller; takes 40-byte blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table (e.g. 0x7E660D79 → 0x6056EDAC); not a step callback (C6 2026-11-09)	15b tsv callback	V	S	cam_still_live_bulb.c
+0x7E660E25	86	start-up allocation from the camera pool `S_LB_M`: one direct caller; takes 40-byte blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table (e.g. 0x7E660D79 → 0x6056EDAC); not a step callback (C6 2026-11-09)	15b tsv callback	V	S	cam_still_live_bulb.c
+0x7E660E7B	86	start-up allocation from the camera pool `S_LB_M`: one direct caller; takes 40-byte blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table (e.g. 0x7E660D79 → 0x6056EDAC); not a step callback (C6 2026-11-09)	15b tsv callback	V	S	cam_still_live_bulb.c
 0x7E660ED1	93	live bulb step callback; on error reports damage with line tag 8916	15b tsv callback	V	S	cam_still_live_bulb.c
 0x7E660F2E	55	live bulb step callback; on error reports damage with line tag 8950	15b tsv callback	V	S	cam_still_live_bulb.c
 0x7E660F65	55	live bulb step callback; on error reports damage with line tag 8987	15b tsv callback	V	S	cam_still_live_bulb.c
@@ -4420,7 +4420,7 @@ addr	size	role	basis	V/I	class	component
 0x7E694412	98	section text: “Three different helpers.** 0x7E694412: 0x9B00 → user value (0x7E69561E, or 0x7E6A30B0 when byte +40 = 4)”	sec 12 line 35	I	S	EXP_MOVIE `exp` module (live-view/movie AE)
 0x7E694474	97	section text: “+16] via 0x7E6A8EA4. 0x7E694474: 0x6400 → +20 (default 3328)”	sec 12 line 35	I	S	EXP_MOVIE `exp` module (live-view/movie AE)
 0x7E6944D5	107	section text: “skipped when prm 0xC222 = 2. 0x7E6944D5: 0x9B00 → user value (or 0x7E6A3174 when byte +40 = 5)”	sec 12 line 35	I	S	EXP_MOVIE `exp` module (live-view/movie AE)
-0x7E694540	95	section text: “Compensation-style bias | clamp(a − b + sel, −768, +768) = ±3.0 EV, then added to the target. `sel` is one of 3 BV inputs, chosen by a byte ∈ {0, 1, 2} (0x7E6A89AD) | verified arithmetic; "exposure co”	sec 12 line 38	I	S	EXP_MOVIE `exp` module (live-view/movie AE)
+0x7E694540	95	"section text: “Compensation-style bias | clamp(a − b + sel, −768, +768) = ±3.0 EV, then added to the target. `sel` is one of 3 BV inputs, chosen by a byte ∈ {0, 1, 2} (0x7E6A89AD) | verified arithmetic; ""exposure co”"	sec 12 line 38	I	S	EXP_MOVIE `exp` module (live-view/movie AE)
 0x7E69459F	29	helper called by 0x7E694540 (section text: “Compensation-style bias | cla…)	call graph (unnamed callers)	V	C	EXP_MOVIE `exp` module (live-view/movie AE)
 0x7E6945BC	51	helper called by 0x7E69459F	call graph (unnamed callers)	V	C	EXP_MOVIE `exp` module (live-view/movie AE)
 0x7E6945EF	92	section text: “Exposure-mode switch | Program code 6 or 58 → 0x7E69464B (manual path). Any other code → 0x7E6947C1 (auto path). Then 0x7E694F5D, 0x7E6951A6, 0x7E695591. Mode byte 90 → 0x7E69474D | verified”	sec 12 line 36	I	S	EXP_MOVIE `exp` module (live-view/movie AE)
@@ -5278,7 +5278,7 @@ addr	size	role	basis	V/I	class	component
 0x7E6A8905	149	calls `OlyTaSS (task sleep)` 0x7E449605; under EXP_MOVIE exp module: value 1280 -> 0x7E6A6FCE 0x7E6A6FCE (direct caller)	features+call graph	V	C	EXP_MOVIE `exp` module (live-view/movie AE)
 0x7E6A899A	9	setter: stores u16 arg into global *(0x605AB39C)	shape:setter	V	S	EXP_MOVIE `exp` module (live-view/movie AE)
 0x7E6A89A3	10	helper called by 0x7E69474D; RAM 0x605AB39C	call graph (unnamed callers)	V	C	EXP_MOVIE `exp` module (live-view/movie AE)
-0x7E6A89AD	55	section text: “Compensation-style bias | 0x7E694540 | verified arithmetic; "exposure compensation" inferred (the ±3 EV range matches `MT_EXP_BIAS_MINUS_3_0…PLUS_3_0`)”	sec 12 line 38	I	S	EXP_MOVIE `exp` module (live-view/movie AE)
+0x7E6A89AD	55	"section text: “Compensation-style bias | 0x7E694540 | verified arithmetic; ""exposure compensation"" inferred (the ±3 EV range matches `MT_EXP_BIAS_MINUS_3_0…PLUS_3_0`)”"	sec 12 line 38	I	S	EXP_MOVIE `exp` module (live-view/movie AE)
 0x7E6A89E4	10	setter: stores constant 0 into global *(0x605AB3A2)	shape:setconst	V	S	EXP_MOVIE `exp` module (live-view/movie AE)
 0x7E6A89EE	46	starts a soft timer; calls `CPU lock (interrupts off)` 0x7E44B36F, `CPU unlock` 0x7E44B390, `tmr_start` 0x7E4650A2	features+call graph	V	C	EXP_MOVIE `exp` module (live-view/movie AE)
 0x7E6A8A1C	71	calls `CPU lock (interrupts off)` 0x7E44B36F, `CPU unlock` 0x7E44B390, `OlyEvWt (wait event flag)` 0x7E4490AF	features+call graph	V	C	EXP_MOVIE `exp` module (live-view/movie AE)
@@ -5404,7 +5404,7 @@ addr	size	role	basis	V/I	class	component
 0x7E6AD53F	255	write dev 0x70 reg 0xDF and main 0x40 (second map, role not known)	15d tsv hdmi-reg	V regs	S	ADI HDMI transmitter driver [HDMI-DRV] (EDID, video, audio, InfoFrames, power)
 0x7E6AD63E	92	block-copy loop from table 0x7E7E1E05; calls write dev 0x70 reg 0xDF and main 0x40 (second m… 0x7E6AD53F; under `api_disp_Disp_Change_OutputDimensions_Exec` 0x7E679DBD (3 levels up)	features+call graph	V	P	ADI HDMI transmitter driver [HDMI-DRV] (EDID, video, audio, InfoFrames, power)
 0x7E6AD69A	54	as 0x7E6AD53F (dev 0x70 reg 0xDF, 0x40)	15d tsv hdmi-reg	V regs	S	ADI HDMI transmitter driver [HDMI-DRV] (EDID, video, audio, InfoFrames, power)
-0x7E6AD6D0	316	power-up fixed-register init: 0x98, 0x9C, 0x9D, 0xA2, 0xA3, 0xDE, 0xE4, 0xE5, 0xE6, 0xEB, 0xBA, 0x0C, 0x41, 0x56 (ADI "must write" set)	15d tsv hdmi-pwr	V regs / I meaning	S	ADI HDMI transmitter driver [HDMI-DRV] (EDID, video, audio, InfoFrames, power)
+0x7E6AD6D0	316	"power-up fixed-register init: 0x98, 0x9C, 0x9D, 0xA2, 0xA3, 0xDE, 0xE4, 0xE5, 0xE6, 0xEB, 0xBA, 0x0C, 0x41, 0x56 (ADI ""must write"" set)"	15d tsv hdmi-pwr	V regs / I meaning	S	ADI HDMI transmitter driver [HDMI-DRV] (EDID, video, audio, InfoFrames, power)
 0x7E6AD80C	9	setter: stores u32 arg into global *(0x605ABE84)	shape:setter	V	S	ADI CEC library (ADI_CEC)
 0x7E6AD815	9	getter: returns u32 global *(0x605ABE84)	shape:getter	V	S	ADI CEC library (ADI_CEC)
 0x7E6AD81E	44	calls `ADI_CEC` 0x7E6AE2FF; under CEC read/write poll (`CEC_RW`): reads main 0xE2… 0x7E6B9B3B (2 levels up), `HDMI task` 0x7E6BAF18 (3 levels up)	features+call graph	V	C	ADI CEC library (ADI_CEC)
@@ -5996,7 +5996,7 @@ addr	size	role	basis	V/I	class	component
 0x7E6BD892	36	calls `tp_drv_adjust_mode_search` 0x7E6BDDEB; under `TOUCHPANEL task` 0x7E6BCF84 (2 levels up)	features+call graph	V	C	touch panel (TOUCHPANEL 0x7E6BCF84, TP bootloader) and disp_sync
 0x7E6BD8B6	331	`(family not traced) boot_on` shell subcommand handler (string compare in 0x7E6B27C4, strcmp chain)	shell decode (shells.py)	V	S	touch panel (TOUCHPANEL 0x7E6BCF84, TP bootloader) and disp_sync
 0x7E6BDA01	67	under `TOUCHPANEL task` 0x7E6BCF84 (direct caller)	features+call graph	V	C	touch panel (TOUCHPANEL 0x7E6BCF84, TP bootloader) and disp_sync
-0x7E6BDA44	131	uses strings «TP to HLS --> "ERROR GESTURE"», «TP to HLS --> "LONG PRESS"», «TP to HLS --> "LIFT OFF"»; calls `debug print(a0 = str)` 0x7E4263E5	own strings (gist)	V	C	touch panel (TOUCHPANEL 0x7E6BCF84, TP bootloader) and disp_sync
+0x7E6BDA44	131	"uses strings «TP to HLS --> ""ERROR GESTURE""», «TP to HLS --> ""LONG PRESS""», «TP to HLS --> ""LIFT OFF""»; calls `debug print(a0 = str)` 0x7E4263E5"	own strings (gist)	V	C	touch panel (TOUCHPANEL 0x7E6BCF84, TP bootloader) and disp_sync
 0x7E6BDAC7	82	uses strings «x =», «y =», «count =»; calls `debug print str + hex value` 0x7E50652F, `debug print(a0 = str)` 0x7E4263E5	own strings (gist)	V	C	touch panel (TOUCHPANEL 0x7E6BCF84, TP bootloader) and disp_sync
 0x7E6BDB19	63	under `TOUCHPANEL task` 0x7E6BCF84 (direct caller)	features+call graph	V	C	touch panel (TOUCHPANEL 0x7E6BCF84, TP bootloader) and disp_sync
 0x7E6BDB58	58	under `TOUCHPANEL task` 0x7E6BCF84 (direct caller)	features+call graph	V	C	touch panel (TOUCHPANEL 0x7E6BCF84, TP bootloader) and disp_sync
@@ -6131,7 +6131,7 @@ addr	size	role	basis	V/I	class	component
 0x7E6C6723	98	callback/pointer: address loaded by `mov_image_process` 0x7E6C6853 (passed to `tmr_start` 0x7E4650A2)	code immediate (immref)	V	C	mov.c
 0x7E6C6785	117	callback/pointer: address loaded by 0x7E6C6E46 (passed to `tmr_start` 0x7E4650A2)	code immediate (immref)	V	C	mov.c
 0x7E6C67FA	89	callback/pointer: address loaded by 0x7E6CB1F9 (passed to `tmr_start` 0x7E4650A2)	code immediate (immref)	V	C	mov.c
-0x7E6C6853	1523	`mov_image_process` — `mov_image_process` 0x7E6C6853 prints "Effect OFF"	section name	V	S	mov.c
+0x7E6C6853	1523	"`mov_image_process` — `mov_image_process` 0x7E6C6853 prints ""Effect OFF"""	section name	V	S	mov.c
 0x7E6C6E46	991	uses strings «[mov]mov_image_process skip for m_NotMemUpdateFlg», «[mov]mov_image_process Record TIMEOUT!!», «[mov]mov_image_process transition skip»; starts a soft timer; block-copy loop; block-copy loop; calls `get time` 0x7E4262C5, `CPU lock (interrupts off)` 0x7E44B36F, `CPU unlock` 0x7E44B390	own strings (gist)	V	C	mov.c
 0x7E6C7225	665	uses strings «null:», «mov.c»; calls `debug print str + hex value` 0x7E50652F, `memcpy (fast)` 0x7E5081FA, `MOV_Q_W` 0x7E6DD86E; under `mov_image_process` 0x7E6C6853 (2 levels up)	own strings (gist)	V	C	mov.c
 0x7E6C74BE	408	reads prm 0xA07A; calls `MOV_IMG` 0x7E6DAE68; under `mov_image_process` 0x7E6C6853 (2 levels up)	features+call graph	V	P	mov.c
@@ -6290,8 +6290,8 @@ addr	size	role	basis	V/I	class	component
 0x7E6CE411	100	calls `get LE32` 0x7E507F7D, `get BE32` 0x7E507FC9	features+call graph	V	C	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
 0x7E6CE475	3	empty stub: returns at once (no work)	shape:ret-only	V	S	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
 0x7E6CE478	3	`movp davchdi` shell subcommand handler (string compare in 0x7E6E3D18, strcmp chain)	shell decode (shells.py)	V	S	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
-0x7E6CE47B	49	section text: “"task terminate" is printed in 0x7E6CE47B”	sec 04 line 103	I	S	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
-0x7E6CE4AC	107	section text: “The loop reads its DTQ (0x7E6DDB14) and calls the handler 0x7E6CE517, which routes AVCHD_RECORD_*/MEDIA_WRITE/FILE_OPEN/CLOSE and PLAY_* between app, MOV_AVCHD and file. "task terminate" is printed in”	sec 04 line 103	I	S	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
+0x7E6CE47B	49	"section text: “""task terminate"" is printed in 0x7E6CE47B”"	sec 04 line 103	I	S	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
+0x7E6CE4AC	107	"section text: “The loop reads its DTQ (0x7E6DDB14) and calls the handler 0x7E6CE517, which routes AVCHD_RECORD_*/MEDIA_WRITE/FILE_OPEN/CLOSE and PLAY_* between app, MOV_AVCHD and file. ""task terminate"" is printed in”"	sec 04 line 103	I	S	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
 0x7E6CE517	2321	logs the tag `PLAY_INIT` (a log tag, not necessarily the function name); strings «[MOV_BRIDGE] Command Receive AVCHD_RECORD_START», «[MOV_BRIDGE] Command Receive AVCHD_RECORD_INIT»; dispatcher: switch table(s) 7E7FFC08	own string (bare)	V	S	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
 0x7E6CEE28	155	uses strings «[MOV_BRIDGE] WriteQueue Over!!!», «[MOV_BRIDGE] queue_write error:»; calls `mov debug log variant (mask *(0xA07511E0))` 0x7E6D1406, `mov debug log + hex (mask *(0xA07511E0))` 0x7E6D144F; under `PLAY_INIT` 0x7E6CE517 (direct caller)	own strings (gist)	V	C	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
 0x7E6CEEC3	154	uses strings «[MOV_BRIDGE] WriteQueue Over!!!», «[MOV_BRIDGE] queue_write error:»; calls `mov debug log variant (mask *(0xA07511E0))` 0x7E6D1406, `mov debug log + hex (mask *(0xA07511E0))` 0x7E6D144F; under `PLAY_INIT` 0x7E6CE517 (direct caller)	own strings (gist)	V	C	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
@@ -6456,7 +6456,7 @@ addr	size	role	basis	V/I	class	component
 0x7E6D5531	3	case 3/6/12/24/48/96 of the switch in `queue_command` 0x7E6D4F1C (table 0x7E803E88); empty stub: returns at once (no work)	jump/hash table (jt.py)	V	S	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
 0x7E6D5534	3	`movp davchd` shell subcommand handler (string compare in 0x7E6E3D18, strcmp chain)	shell decode (shells.py)	V	S	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
 0x7E6D5537	19	initialiser/setter: writes 2 globals 0xA075151C, 0xA0751530	shape:multistore	V	S	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
-0x7E6D554A	158	section text: “— | "[QT] ENCODE Abort Packet". **Verified** string”	sec 04 line 102	I	S	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
+0x7E6D554A	158	"section text: “— | ""[QT] ENCODE Abort Packet"". **Verified** string”"	sec 04 line 102	I	S	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
 0x7E6D55E8	20	wrapper: calls 0x7E6D80B3	shape:wrapper	V	C	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
 0x7E6D55FC	12	wrapper: calls 0x7E6D8554	shape:wrapper	V	C	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
 0x7E6D5608	48	calls `MOV_E_S` 0x7E6DD909; under `queue_command` 0x7E6D4F1C (direct caller)	features+call graph	V	C	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
@@ -7104,7 +7104,7 @@ addr	size	role	basis	V/I	class	component
 0x7E6EF958	79	callback/pointer: address loaded by 0x7E6EF322, 0x7E6EF7F7 (stored to (0x605b21d0); stored to (a2)); calls `mov debug log (mask *(0xA07511E0))` 0x7E6D13BD	code immediate (immref)	V	C	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
 0x7E6EF9A7	22	callback/pointer: address loaded by 0x7E6EF958 (stored to (a2)); wrapper: calls 0x7E6D13BD with d0=16, a0=0x7E80F9D5; calls `mov debug log (mask *(0xA07511E0))` 0x7E6D13BD	code immediate (immref)	V	C	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
 0x7E6EF9BD	188	`movrec_fiish_2` (logs its own name); strings «[rec]mov_rec_state_record_finish_2»; callback/pointer: address loaded by 0x7E6EF322 (stored to (0x605b21d0))	own string (brk)	V	S	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
-0x7E6EFA79	32	`errorstop` — When the frame count 0x605B2004 ≥ max_sample it returns 0x3800. `record_normal` 0x7E6EF5E7 then posts TIME_LIMIT 0x04070026 through 0x7E6F0399. "Video buff FULL; callback/pointer: address loaded by `record_normal` 0x7E6EF5E7, `errorstop` 0x7E6EFA79 (stored to (a0); stored to (a2))	section name	V	S	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
+0x7E6EFA79	32	"`errorstop` — When the frame count 0x605B2004 ≥ max_sample it returns 0x3800. `record_normal` 0x7E6EF5E7 then posts TIME_LIMIT 0x04070026 through 0x7E6F0399. ""Video buff FULL; callback/pointer: address loaded by `record_normal` 0x7E6EF5E7, `errorstop` 0x7E6EFA79 (stored to (a0); stored to (a2))"	section name	V	S	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
 0x7E6EFA99	28	`fullstop` — 0xFF06 moves it to `fullstop` 0x7E6EFA99; callback/pointer: address loaded by 0x7E6EF3ED, `record_normal` 0x7E6EF5E7 (stored to (a3); stored to (a0))	section name	V	S	movie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)
 0x7E6EFAB5	1364	section text: “0x7E544CE5 | aligned-buffer `img_exec` wrapper; retries on results 11632/11633 | V”	sec 13a line 168	I	S	mov_rec_MJPEG.c
 0x7E6F0009	817	`mov_rec` (logs its own name)	own string (brk)	V	S	mov_rec_MJPEG.c
@@ -7436,8 +7436,8 @@ addr	size	role	basis	V/I	class	component
 0x7E6FB79D	42	calls `CPU lock (interrupts off)` 0x7E44B36F, `CPU unlock` 0x7E44B390; under `FACE_MAIN task` 0x7E6F45B8 (3 levels up)	features+call graph	V	C	FACE_* face detection tasks and wrappers
 0x7E6FB7C7	68	error codes 0x2F000C0B; calls `error recorder` 0x7E426D4B; under `FACE_MAIN task` 0x7E6F45B8 (3 levels up)	features+call graph	V	P	FACE_* face detection tasks and wrappers
 0x7E6FB80B	43	error codes 0x2F000C0B; calls `error recorder` 0x7E426D4B; under `FACE_MAIN task` 0x7E6F45B8 (3 levels up)	features+call graph	V	P	FACE_* face detection tasks and wrappers
-0x7E6FB836	137	section text: “0x7EBA7BC1–0x7EBABF8D | verified call edges; "OKAO" by role (13b) (A4 2026-11-09)”	sec 13c line 21	I	S	FACE_* face detection tasks and wrappers
-0x7E6FB8BF	66	section text: “0x7EBA7BC1–0x7EBABF8D | verified call edges; "OKAO" by role (13b) (A4 2026-11-09)”	sec 13c line 21	I	S	FACE_* face detection tasks and wrappers
+0x7E6FB836	137	"section text: “0x7EBA7BC1–0x7EBABF8D | verified call edges; ""OKAO"" by role (13b) (A4 2026-11-09)”"	sec 13c line 21	I	S	FACE_* face detection tasks and wrappers
+0x7E6FB8BF	66	"section text: “0x7EBA7BC1–0x7EBABF8D | verified call edges; ""OKAO"" by role (13b) (A4 2026-11-09)”"	sec 13c line 21	I	S	FACE_* face detection tasks and wrappers
 0x7E6FB901	295	hardware loop (setlb); under `FACE_MAIN task` 0x7E6F45B8 (3 levels up)	features+call graph	V	C	FACE_* face detection tasks and wrappers
 0x7E6FBA28	128	under `FACE_MAIN task` 0x7E6F45B8 (3 levels up)	features+call graph	V	C	FACE_* face detection tasks and wrappers
 0x7E6FBAA8	68	under `FACE_MAIN task` 0x7E6F45B8 (3 levels up)	features+call graph	V	C	FACE_* face detection tasks and wrappers
@@ -7495,7 +7495,7 @@ addr	size	role	basis	V/I	class	component
 0x7E6FCA97	8	wrapper: calls 0x7E6FE635 (in small record callbacks (§3.2: +52 write…)	shape:wrapper	V	C	exported mcon_if_* API veneers (8–27 B each)
 0x7E6FCA9F	9	section text: “0x7E6FE8B2 / 0x7E6FE765 | step to the next / previous value. Uses op slot +4 / +8 when present (note: 0x7E6FE8B2 tests +8 but calls +4). Default: walk the list (0x7E706FDE / 0x7E706FA3), skip values f”	sec 13e line 55	I	S	exported mcon_if_* API veneers (8–27 B each)
 0x7E6FCAA8	9	section text: “0x7E6FE8B2 / 0x7E6FE765 | step to the next / previous value. Uses op slot +4 / +8 when present (note: 0x7E6FE8B2 tests +8 but calls +4). Default: walk the list (0x7E706FDE / 0x7E706FA3), skip values f”	sec 13e line 55	I	S	exported mcon_if_* API veneers (8–27 B each)
-0x7E6FCAB1	9	section text: “0x7E6FEA00 | locked check, then op slot +12 (empty in all 250 records) or step-next (I: "cycle")”	sec 13e line 56	I	S	exported mcon_if_* API veneers (8–27 B each)
+0x7E6FCAB1	9	"section text: “0x7E6FEA00 | locked check, then op slot +12 (empty in all 250 records) or step-next (I: ""cycle"")”"	sec 13e line 56	I	S	exported mcon_if_* API veneers (8–27 B each)
 0x7E6FCABA	9	section text: “**0x7E6FEA5F** | get GUI value. kind = 0x7E7073E3(id): 0 = no list → raw; 2 = simple list; 1 = composite (0x7E6FED4C reads all member ids). If op-record slot +20 exists, its result picks the list vari”	sec 13e line 52	I	S	exported mcon_if_* API veneers (8–27 B each)
 0x7E6FCAC3	9	section text: “**0x7E6FEAE0** | set GUI value: gui→raw (0x7E7070B4, or 0x7E707397 with the +20 variant), then full write 0x7E6FF3ED”	sec 13e line 53	I	S	exported mcon_if_* API veneers (8–27 B each)
 0x7E6FCACC	10	section text: “0x7E6FF741, 0x7E6FEE8E, 0x7E6FEE02, 0x7E6FEF7F | list count / item by index / value→index / index of a raw value (override slots 0x605B4C1C are checked first, 0x7E6FFFF5)”	sec 13e line 58	I	S	exported mcon_if_* API veneers (8–27 B each)
@@ -7622,7 +7622,7 @@ addr	size	role	basis	V/I	class	component
 0x7E6FE73C	41	slot 13 of fn-pointer table 0x7E816B80 (10 entries, stride 4)	data pointer table (ptab2)	V	C	small record callbacks (§3.2: +52 writers, +20/+44 selectors, +40 index)
 0x7E6FE765	333	section text: “0x7E6FCAA8 / 0x7E6FCA9F | step to the next / previous value. Uses op slot +4 / +8 when present (note: 0x7E6FE8B2 tests +8 but calls +4). Default: walk the list (0x7E706FDE / 0x7E706FA3), skip values f”	sec 13e line 55	I	S	get / set / step engine (§2.1)
 0x7E6FE8B2	334	section text: “0x7E6FE8B2 tests +8 but calls +4”	sec 13e line 55	I	S	get / set / step engine (§2.1)
-0x7E6FEA00	55	section text: “0x7E6FCAB1 | locked check, then op slot +12 (empty in all 250 records) or step-next (I: "cycle")”	sec 13e line 56	I	S	get / set / step engine (§2.1)
+0x7E6FEA00	55	"section text: “0x7E6FCAB1 | locked check, then op slot +12 (empty in all 250 records) or step-next (I: ""cycle"")”"	sec 13e line 56	I	S	get / set / step engine (§2.1)
 0x7E6FEA37	24	section text: “else 0x7E6FEA37 (Set_CameraUserInfo then Set_CameraInfo)”	sec 13e line 62	I	S	get / set / step engine (§2.1)
 0x7E6FEA4F	11	wrapper: calls `Get_CameraInfo` 0x7E67F822	shape:wrapper	V	S	get / set / step engine (§2.1)
 0x7E6FEA5A	5	slot 2 of fn-pointer table 0x7E826D2C (14 entries, stride 4), table used by 0x7E703FDA, 0x7E704B75; pointer-entry prologue of 0x7E6FEA5F (movm + add -N,sp, falls into it; same function reached through a pointer)	data pointer table (ptab2)	V	C	get / set / step engine (§2.1)
@@ -8283,8 +8283,8 @@ addr	size	role	basis	V/I	class	component
 0x7E70FC18	162	uses strings «REC BEAUTY pre face Exif»; calls `rec debug log` 0x7E710C83; under `REC_MODE_STILL_CSKIN_PRE` 0x7E70ED0D (direct caller)	own strings (gist)	V	C	still recording rec_*.c (REC_MAIN 0x7E70B435)
 0x7E70FCBA	711	`rec_beauty_set_ctrl` — `rec_beauty_set_ctrl` 0x7E70FCBA	section name	V	S	still recording rec_*.c (REC_MAIN 0x7E70B435)
 0x7E70FF81	124	`rec_beauty_make_playpic` (logs its own name)	own string (bare)	V	S	still recording rec_*.c (REC_MAIN 0x7E70B435)
-0x7E70FFFD	218	`REC_BRACKET_ENTRY` — `REC_BRACKET_ENTRY` 0x7E70FFFD (prints "bkt start") and `bracket_update` 0x7E7100D7	section name	V	S	still recording rec_*.c (REC_MAIN 0x7E70B435)
-0x7E7100D7	276	`bracket_update` — `REC_BRACKET_ENTRY` 0x7E70FFFD (prints "bkt start") and `bracket_update` 0x7E7100D7	section name	V	S	still recording rec_*.c (REC_MAIN 0x7E70B435)
+0x7E70FFFD	218	"`REC_BRACKET_ENTRY` — `REC_BRACKET_ENTRY` 0x7E70FFFD (prints ""bkt start"") and `bracket_update` 0x7E7100D7"	section name	V	S	still recording rec_*.c (REC_MAIN 0x7E70B435)
+0x7E7100D7	276	"`bracket_update` — `REC_BRACKET_ENTRY` 0x7E70FFFD (prints ""bkt start"") and `bracket_update` 0x7E7100D7"	section name	V	S	still recording rec_*.c (REC_MAIN 0x7E70B435)
 0x7E7101EB	30	uses strings «REC IMAGE bkt finish»; under `REC_IMAGE task` 0x7E712955 (direct caller)	own strings (gist)	V	C	still recording rec_*.c (REC_MAIN 0x7E70B435)
 0x7E710209	299	section text: “string `REC BRACKET UPDATE RAWJEPG-EXIF` 0x7E710209”	sec 03 line 214	I	S	still recording rec_*.c (REC_MAIN 0x7E70B435)
 0x7E710334	160	under `bracket_update` 0x7E7100D7 (direct caller)	features+call graph	V	C	still recording rec_*.c (REC_MAIN 0x7E70B435)
@@ -8872,7 +8872,7 @@ addr	size	role	basis	V/I	class	component
 0x7E72E377	66	under `Create_HNDL_ERR` 0x7E6FBCB0 (2 levels up)	features+call graph	V	C	Omron OKAO PT library (no strings)
 0x7E72E3B9	35	calls `memset(a0, d0 c, d1 n)` 0x7E500D73; under `Create_HNDL_ERR` 0x7E6FBCB0 (3 levels up)	features+call graph	V	C	Omron OKAO PT library (no strings)
 0x7E72E3DC	18	under `Create_HNDL_ERR` 0x7E6FBCB0 (3 levels up)	features+call graph	V	C	Omron OKAO PT library (no strings)
-0x7E72E3EE	236	section text: “3. **The review said** "alloc/free 0x7E72D0BA/0x7E72D169 are also used by art-filter code 0x7E72E3EE”	sec 13b line 241	I	S	Omron OKAO PT library (no strings)
+0x7E72E3EE	236	"section text: “3. **The review said** ""alloc/free 0x7E72D0BA/0x7E72D169 are also used by art-filter code 0x7E72E3EE”"	sec 13b line 241	I	S	Omron OKAO PT library (no strings)
 0x7E72E4DA	86	section text: “Allocate / free the work buffers: 376, 1008, 26,244 (= 162²) and 46,664 bytes (0x7E72E71A)”	sec 13b line 65	I	S	Omron OKAO PT library (no strings)
 0x7E72E530	4	under `Create_HNDL_ERR` 0x7E6FBCB0 (3 levels up)	features+call graph	V	C	Omron OKAO PT library (no strings)
 0x7E72E534	6	under `Create_HNDL_ERR` 0x7E6FBCB0 (3 levels up)	features+call graph	V	C	Omron OKAO PT library (no strings)
@@ -8928,10 +8928,10 @@ addr	size	role	basis	V/I	class	component
 0x7E7311E9	54	hardware loop (setlb)	features+call graph	V	C	Omron OKAO PT library (no strings)
 0x7E73121F	105	section text: “it lies inside 0x7E73121F (the `jmp 0x7E731356` at 0x7E731262 crosses it)”	sec 13b line 73	I	S	Omron OKAO PT library (no strings)
 0x7E731394	320	section text: “Byte multiply-accumulate (projections). 0x7E731288 is not a function: it lies inside 0x7E73121F (the `jmp 0x7E731356` at 0x7E731262 crosses it), and its only DB caller is a false decode in the lens fl”	sec 13b line 73	I	S	Omron OKAO PT library (no strings)
-0x7E7314D4	27	helper called by 0x7E72E3EE (section text: “3. **The review said** "alloc…)	call graph (unnamed callers)	V	C	Omron OKAO PT library (no strings)
+0x7E7314D4	27	"helper called by 0x7E72E3EE (section text: “3. **The review said** ""alloc…)"	call graph (unnamed callers)	V	C	Omron OKAO PT library (no strings)
 0x7E7314EF	7	helper called by 0x7E72E8E3 (section text: “Pose-model search over 940-el…), 0x7E72E9B4 (section text: “Pose-model search over 940-el…) and 2 more	call graph (unnamed callers)	V	C	Omron OKAO PT library (no strings)
 0x7E7314F6	15	wrapper: calls 0x7E73100D	shape:wrapper	V	C	Omron OKAO PT library (no strings)
-0x7E731505	30	helper called by 0x7E72E3EE (section text: “3. **The review said** "alloc…), 0x7E72F5EC (section text: “Two refinement passes (loop b…) and 1 more	call graph (unnamed callers)	V	C	Omron OKAO PT library (no strings)
+0x7E731505	30	"helper called by 0x7E72E3EE (section text: “3. **The review said** ""alloc…), 0x7E72F5EC (section text: “Two refinement passes (loop b…) and 1 more"	call graph (unnamed callers)	V	C	Omron OKAO PT library (no strings)
 0x7E731523	15	wrapper: calls 0x7E73100D	shape:wrapper	V	C	Omron OKAO PT library (no strings)
 0x7E731532	2766	section text: “Masked SSD between two signed-byte vectors; mask bits from a byte array, 0x80 shifted right. It ends at 0x7E731584; the DB size 2,766 is wrong (14d §5) (D2 2026-11-09)”	sec 13b line 72	I	S	Omron OKAO PT library (no strings)
 0x7E8F5800	63	calls `irq_attach` 0x7E463C8E, `CIC_MUTEX` 0x7E8F58B8, `CIC_END` 0x7E8F58DE; under `USRSTART_FIRST task` 0x7E504AF9 (direct caller)	features+call graph	V	C	CIC driver (CIC_MUTEX, CIC_END). It is used by play_cic_decode_raw 0x7E93D10F (CicCtrl->ul
@@ -9205,7 +9205,7 @@ addr	size	role	basis	V/I	class	component
 0x7E901863	700	dispatcher: switch table(s) 7EBAFFD8; callback/pointer: address loaded by `BT_SrvInitialize` 0x7E901EAC (passed to 0x7E8FB0D4); block-copy loop from table 0x7EBAFFD8; block-copy loop from table 0x7EBAFFD8; calls case 49 of 0x7E901863 0x7E8FB247, `debug print(a0 = str)` 0x7E4263E5, `memcpy(a0 dst, a1 src, d0 n)` 0x7E500D33	jump/hash table owner (jt.py)	V	C	BT_CTRL (btc): connection control, OPP/BIP, pairing DB
 0x7E901B1F	525	callback/pointer: address loaded by `opp_push` 0x7E901EF1 (passed to 0x7E8FBFCE; passed to 0x7E8FBFCE); block-copy loop; block-copy loop; calls `debug print(a0 = str)` 0x7E4263E5, `memcpy(a0 dst, a1 src, d0 n)` 0x7E500D33	code immediate (immref)	V	C	BT_CTRL (btc): connection control, OPP/BIP, pairing DB
 0x7E901D2C	384	callback/pointer: address loaded by `opp_push` 0x7E901EF1 (passed to 0x7E8FBFCE); calls stack debug Report(fmt, ...) under the stack lo… 0x7E923748, `BT OS memcpy thunk` 0x7E92F46D, `debug print(a0 = str)` 0x7E4263E5	code immediate (immref)	V	C	BT_CTRL (btc): connection control, OPP/BIP, pairing DB
-0x7E901EAC	69	`BT_SrvInitialize` (logs its own name); strings «<imaging-capabilities version="1.0"><image-formats»	own string (io)	V	S	BT_CTRL (btc): connection control, OPP/BIP, pairing DB
+0x7E901EAC	69	"`BT_SrvInitialize` (logs its own name); strings «<imaging-capabilities version=""1.0""><image-formats»"	own string (io)	V	S	BT_CTRL (btc): connection control, OPP/BIP, pairing DB
 0x7E901EF1	1143	`opp_push` (logs its own name); strings «send data length is zero or data address is null», «thum_len %d length %d, buff_adr %x, name %s»	own string (io)	V	S	BT_CTRL (btc): connection control, OPP/BIP, pairing DB
 0x7E902368	21	`BT_CliAbort` (logs its own name)	own string (bare)	V	S	BT_CTRL (btc): connection control, OPP/BIP, pairing DB
 0x7E90237D	8	wrapper: calls `BT_SrvInitialize` 0x7E901EAC	shape:wrapper	V	S	BT_CTRL (btc): connection control, OPP/BIP, pairing DB
@@ -9214,7 +9214,7 @@ addr	size	role	basis	V/I	class	component
 0x7E902445	28	`bt_ctrl_opp_srv_end` (logs its own name)	own string (bare)	V	S	BT_CTRL (btc): connection control, OPP/BIP, pairing DB
 0x7E902461	256	uses strings «len = %d», «size=», «@@@@@»; block-copy loop from table 0x7EBAF7D3; calls `debug print str + hex value` 0x7E50652F, `debug print(a0 = str)` 0x7E4263E5, `sprintf` 0x7E4FFDE3	own strings (gist)	V	C	BT_CTRL (btc): connection control, OPP/BIP, pairing DB
 0x7E902561	188	section text: “vObject check 0x7E902561 (rejects vMessage and vCard)”	sec 05 line 246	I	S	BT_CTRL (btc): connection control, OPP/BIP, pairing DB
-0x7E90261D	3238	section text: “`Initiator put image` 0x7E8FB9F5. The capability XML (`<imaging-capabilities … encoding="JPEG" …>`) is built by 0x7E90261D and parsed for the remote's pixel sizes (0x7E9032C3, `can't pasrse pixel widt”	sec 05 line 247	I	S	BT_CTRL (btc): connection control, OPP/BIP, pairing DB
+0x7E90261D	3238	"section text: “`Initiator put image` 0x7E8FB9F5. The capability XML (`<imaging-capabilities … encoding=""JPEG"" …>`) is built by 0x7E90261D and parsed for the remote's pixel sizes (0x7E9032C3, `can't pasrse pixel widt”"	sec 05 line 247	I	S	BT_CTRL (btc): connection control, OPP/BIP, pairing DB
 0x7E9032C3	277	uses strings «can't pasrse pixel height», «can't pasrse pixel width», «pixel»; block-copy loop from table 0x7EBAFF53; block-copy loop from table 0x7EBAFF63; calls `debug print(a0 = str)` 0x7E4263E5, `atoi` 0x7E500832, `memcpy(a0 dst, a1 src, d0 n)` 0x7E500D33	own strings (gist)	V	C	BT_CTRL (btc): connection control, OPP/BIP, pairing DB
 0x7E9033D8	278	uses strings «can't pasrse pixel height», «can't pasrse pixel width», «@@@@@»; block-copy loop from table 0x7EBAFFB0; block-copy loop from table 0x7EBAFFC0; calls `debug print(a0 = str)` 0x7E4263E5, `atoi` 0x7E500832, `memcpy(a0 dst, a1 src, d0 n)` 0x7E500D33	own strings (gist)	V	C	BT_CTRL (btc): connection control, OPP/BIP, pairing DB
 0x7E9034EE	46	calls `OlyEvWt (wait event flag)` 0x7E4490AF; under `ME_GETNAME_TIMEOUT` 0x7E8FF204 (direct caller)	features+call graph	V	C	BT_CTRL (btc): connection control, OPP/BIP, pairing DB
@@ -9318,7 +9318,7 @@ addr	size	role	basis	V/I	class	component
 0x7E91468A	166	callback/pointer: address loaded by `BT_WaitEvent` 0x7E8FF617 (stored to (0x605c5df8)); block-copy loop from table 0x7EBB0BFF; calls `memcpy(a0 dst, a1 src, d0 n)` 0x7E500D33	code immediate (immref)	V	C	BTAPI glue (CB_BtEvtHandle, link-key store)
 0x7E914730	28	hardware loop (setlb); under `bt_ctrl_stack_init` 0x7E9011A7 (2 levels up)	features+call graph	V	C	BTAPI glue (CB_BtEvtHandle, link-key store)
 0x7E91474C	275	`BT_SrvCleanup` (logs its own name); strings «BTAPI: #### Main_Task(%d) Exit . . .»	own string (bare)	V	S	BTAPI glue (CB_BtEvtHandle, link-key store)
-0x7E91485F	220	uses strings «prof="%s" size=%6d/%6d(0x%08x/0x%08x)», «#### name NG!! NG!! NG!!(%d/%d) ####», «#### type NG!! NG!! NG!!(%d/%d) ####»; calls stack debug Report(fmt, ...) under the stack lo… 0x7E923748, `strlen` 0x7E500E01	own strings (gist)	V	C	BTAPI glue (CB_BtEvtHandle, link-key store)
+0x7E91485F	220	"uses strings «prof=""%s"" size=%6d/%6d(0x%08x/0x%08x)», «#### name NG!! NG!! NG!!(%d/%d) ####», «#### type NG!! NG!! NG!!(%d/%d) ####»; calls stack debug Report(fmt, ...) under the stack lo… 0x7E923748, `strlen` 0x7E500E01"	own strings (gist)	V	C	BTAPI glue (CB_BtEvtHandle, link-key store)
 0x7E91493B	541	dispatcher: switch table(s) 7EBB1048; callback/pointer: address loaded by 0x7E923AE4 (passed to 0x7E8FB0D4); block-copy loop; calls case 49 of 0x7E901863 0x7E8FB247, stack debug Report(fmt, ...) under the stack lo… 0x7E923748, `BT OS memset thunk` 0x7E92F493	jump/hash table owner (jt.py)	V	C	BTAPI glue (CB_BtEvtHandle, link-key store)
 0x7E914B58	51	under `BT_SrvCleanup` 0x7E91474C (direct caller)	features+call graph	V	C	BTAPI glue (CB_BtEvtHandle, link-key store)
 0x7E914B8B	31	wrapper: calls 0x7E437CD5 with d0=*0x602aec20 (in )	shape:wrapper	V	C	BTAPI glue (CB_BtEvtHandle, link-key store)
@@ -9803,7 +9803,7 @@ addr	size	role	basis	V/I	class	component
 0x7E926D9B	59	callback/pointer: address loaded by 0x7E92412E; calls HCI Exit_Sniff_Mode (0x0804), 2 param bytes; wa… 0x7E9274A0	code immediate (immref)	V	C	Blue SDK ME + SEC
 0x7E926DD6	5	section text: “ME op type 54 -> Sniff_Subrating 0x7E926DD6”; callback/pointer: address loaded by 0x7E92412E	sec 15dtsv line 196	I	S	Blue SDK ME + SEC
 0x7E926DDB	173	HCI Sniff_Subrating (0x0811), 8 param bytes; waits Command_Complete; completion cb 0x7E9248CC; case 54 of the switch in 0x7E927B19 (table 0x7EBB46E8)	15d tsv hci-cmd-builder	V	S	Blue SDK ME + SEC
-0x7E926E88	59	section text: “"0x7E926E88 picks the mode".** 0x7E926E88 is the start function of ME op type 22 (Park): op table 0x7EBB3B18 slot 21 (V)”; callback/pointer: address loaded by 0x7E92412E	sec 15d line 288	I	S	Blue SDK ME + SEC
+0x7E926E88	59	"section text: “""0x7E926E88 picks the mode"".** 0x7E926E88 is the start function of ME op type 22 (Park): op table 0x7EBB3B18 slot 21 (V)”; callback/pointer: address loaded by 0x7E92412E"	sec 15d line 288	I	S	Blue SDK ME + SEC
 0x7E926EC3	59	callback/pointer: address loaded by 0x7E92412E; calls HCI Exit_Park_State (0x0806), 2 param bytes; wa… 0x7E92753E	code immediate (immref)	V	C	Blue SDK ME + SEC
 0x7E926EFE	69	callback/pointer: address loaded by 0x7E92412E (stored to (0x7dac4c50)); calls HCI Switch_Role (0x080B), 7 param bytes; waits … 0x7E927576	code immediate (immref)	V	C	Blue SDK ME + SEC
 0x7E926F43	5	section text: “ME op type 33 -> Write_Link_Policy 0x7E926F43/0x7E926F48”; callback/pointer: address loaded by 0x7E92412E	sec 15dtsv line 181	I	S	Blue SDK ME + SEC
@@ -10314,7 +10314,7 @@ addr	size	role	basis	V/I	class	component
 0x7E936E05	166	section text: “SPP/transport init 0x7E936E05”	sec 15dtsv line 2	I	S	SPP (serial port)
 0x7E936EAB	301	hardware loop (setlb); under `cp_init` 0x7E91A2CF (2 levels up)	features+call graph	V	C	SPP (serial port)
 0x7E936FD8	74	calls `OlySmWtCpu (wait semaphore)` 0x7E449409; under `BT_Remove` 0x7E9196A2 (direct caller)	features+call graph	V	C	SPP (serial port)
-0x7E937022	305	section text: “BT_Open → 0x7E937022 (V edge; "SPP" I)”	sec 15d line 59	I	S	SPP (serial port)
+0x7E937022	305	"section text: “BT_Open → 0x7E937022 (V edge; ""SPP"" I)”"	sec 15d line 59	I	S	SPP (serial port)
 0x7E937153	96	under `BT_Close` 0x7E919676 (direct caller)	features+call graph	V	C	SPP (serial port)
 0x7E9371B3	99	under `cp_RcvCommand` 0x7E919CEB (2 levels up)	features+call graph	V	C	SPP (serial port)
 0x7E937216	113	under `cp_RcvError` 0x7E919D8E (2 levels up), `BTIAP_TSKID task` 0x7E91A0C2 (3 levels up)	features+call graph	V	C	SPP (serial port)
@@ -10542,7 +10542,7 @@ addr	size	role	basis	V/I	class	component
 0x7E93BC15	13	indexed table getter: returns an entry of table 0x605D6F04 by index d0	shape:tableget	V	S	playback engine play_*.c / playbuff.c (PLAY_MAIN/IMAGE/LOAD/SOUND)
 0x7E93BC22	13	indexed table getter: returns an entry of table 0x605D6F04 by index d0	shape:tableget	V	S	playback engine play_*.c / playbuff.c (PLAY_MAIN/IMAGE/LOAD/SOUND)
 0x7E93BC2F	155	`play_apical_check_edit_enable` (logs its own name)	own string (io)	V	S	play_apical.c
-0x7E93BCCA	110	`play_apical_edit_main` — `play_apical_edit_main` 0x7E93BCCA (separate "wide" and "normal" paths, `make_lum`, face detection); case 16 of the switch in `play_edit_main` 0x7E940D7C (table 0x7EBB8D88)	section name	V	S	play_apical.c
+0x7E93BCCA	110	"`play_apical_edit_main` — `play_apical_edit_main` 0x7E93BCCA (separate ""wide"" and ""normal"" paths, `make_lum`, face detection); case 16 of the switch in `play_edit_main` 0x7E940D7C (table 0x7EBB8D88)"	section name	V	S	play_apical.c
 0x7E93BD38	126	`play_apical_edit_pic` (logs its own name)	own string (io)	V	S	play_apical.c
 0x7E93BDB6	186	`play_apical_edit` (logs its own name)	own string (io)	V	S	play_apical.c
 0x7E93BE70	307	`play_apical_edit_face_recognition` (logs its own name)	own string (io)	V	S	play_apical.c
@@ -11625,8 +11625,8 @@ addr	size	role	basis	V/I	class	component
 0x7F060BA9	86	write an encoded DPS file (DREQUEST/DRSPONSE) through B transport	15d tsv dps-fn	V	S	DPS engine in overlay A)
 0x7F060BFF	91	dps_encode(rec, ?, d0 size, d1 buf): validate, envelope, builder; only via B trampoline 0x7F088D18	15d tsv dps-fn	V	S	DPS engine in overlay A)
 0x7F060C5A	68	XML envelope: header, <dps xmlns>, builder 0x7F06A130[op&0xFEFF], </dps>	15d tsv dps-fn	V	S	DPS engine in overlay A)
-0x7F060C9E	68	write <?xml version="1.0"?>CRLF	15d tsv dps-fn	V	S	DPS engine in overlay A)
-0x7F060CE2	53	write <dps xmlns="http://www.cipa.jp/dps/schema/">	15d tsv dps-fn	V	S	DPS engine in overlay A)
+0x7F060C9E	68	"write <?xml version=""1.0""?>CRLF"	15d tsv dps-fn	V	S	DPS engine in overlay A)
+0x7F060CE2	53	"write <dps xmlns=""http://www.cipa.jp/dps/schema/"">"	15d tsv dps-fn	V	S	DPS engine in overlay A)
 0x7F060D17	504	builder op 1: configurePrintService input	15d tsv dps-fn	V	S	DPS engine in overlay A)
 0x7F060F0F	302	builder op 2: getCapability input (11 children, paperSize attr)	15d tsv dps-fn	V	S	DPS engine in overlay A)
 0x7F06103D	70	builder op 3: getJobStatus input (empty)	15d tsv dps-fn	V	S	DPS engine in overlay A)
@@ -11651,10 +11651,10 @@ addr	size	role	basis	V/I	class	component
 0x7F061A36	103	write element (a0 name, d0 depth, d1 form 0 open / 1 close / 2 empty / 3 open no CRLF)	15d tsv dps-fn	V	S	DPS engine in overlay A)
 0x7F061A9D	45	write formatted value via 0x7F061B88	15d tsv dps-fn	V	S	DPS engine in overlay A)
 0x7F061ACA	35	write tab (indent)	15d tsv dps-fn	V	S	DPS engine in overlay A)
-0x7F061AED	40	write " name="	15d tsv dps-fn	V	S	DPS engine in overlay A)
+0x7F061AED	40	"write "" name="""	15d tsv dps-fn	V	S	DPS engine in overlay A)
 0x7F061B15	40	write quoted value	15d tsv dps-fn	V	S	DPS engine in overlay A)
 0x7F061B3D	75	append string to output buffer (cursor 0xA06DD350, len 0xA06DD354, limit 0xA06DD34C)	15d tsv dps-fn	V	S	DPS engine in overlay A)
-0x7F061B88	357	value formatter %08X/%04X/%03d, else "unknown format!"	15d tsv dps-fn	V	S	DPS engine in overlay A)
+0x7F061B88	357	"value formatter %08X/%04X/%03d, else ""unknown format!"""	15d tsv dps-fn	V	S	DPS engine in overlay A)
 0x7F061CED	91	range test (value, lo, hi, step); 13 call sites in 6 callers	15d tsv dps-fn	I	S	DPS engine in overlay A)
 0x7F061D48	56	hardware loop (setlb); under check getCapability output (0x102): per-child j… 0x7F06243B (direct caller)	features+call graph	V	C	DPS engine in overlay A)
 0x7F061D80	143	case 1/6 of the switch in 0x7F06243B (table 0x7F06A64C); hardware loop (setlb)	jump/hash table (jt.py)	V	S	DPS engine in overlay A)
@@ -11663,7 +11663,7 @@ addr	size	role	basis	V/I	class	component
 0x7F061E9A	57	under check job status (ops 8, 0x103) 0x7F0629D3 (direct caller)	features+call graph	V	C	DPS engine in overlay A)
 0x7F061ED3	182	printInfo file path check (../DCIM/, char classes 0x7F06A598)	15d tsv dps-fn	V	S	DPS engine in overlay A)
 0x7F061F89	97	result-code check: 0x1000-0x1003 high half; minor 0-4 only with 0x1002	15d tsv dps-fn	V	S	DPS engine in overlay A)
-0x7F061FEA	76	string check: max length and char range or "."	15d tsv dps-fn	V	S	DPS engine in overlay A)
+0x7F061FEA	76	"string check: max length and char range or ""."""	15d tsv dps-fn	V	S	DPS engine in overlay A)
 0x7F062036	219	check op 1 input strings (vendorName etc.)	15d tsv dps-fn	I	S	DPS engine in overlay A)
 0x7F062111	156	check configurePrintService fields (ops 1, 0x101); case 0x101 of the switch in 0x7F062A9C (table 0x7F06A678)	15d tsv dps-fn	V	S	DPS engine in overlay A)
 0x7F0621AD	145	capability value in allowed ranges (tables 0x7F06A328 / 0x7F06A3C8)	15d tsv dps-fn	V	S	DPS engine in overlay A)
@@ -11684,7 +11684,7 @@ addr	size	role	basis	V/I	class	component
 0x7F062A9C	237	dps_validate(rec): version/op range (-300), output result check, hash 0x7F06A678 dispatch; dispatcher: switch table(s) 7F06A678	15d tsv dps-fn	V	S	DPS engine in overlay A)
 0x7F062B89	98	dps_decode(buf, out, len): parse 0x7F062BEB then validate; only via B trampoline 0x7F088D22	15d tsv dps-fn	V	S	DPS engine in overlay A)
 0x7F062BEB	63	parse document: <?xml?>, <dps xmlns>, body, </dps>	15d tsv dps-fn	V	S	DPS engine in overlay A)
-0x7F062C2A	74	parse <?xml version="1.0"?>	15d tsv dps-fn	V	S	DPS engine in overlay A)
+0x7F062C2A	74	"parse <?xml version=""1.0""?>"	15d tsv dps-fn	V	S	DPS engine in overlay A)
 0x7F062C74	59	parse <dps xmlns=...>	15d tsv dps-fn	V	S	DPS engine in overlay A)
 0x7F062CAF	412	parse <input>/<output>, <result>, op name (0x7F06A7DC), call parser 0x7F06AB58[op]; errors -197/-200/-300/-400	15d tsv dps-fn	V	S	DPS engine in overlay A)
 0x7F062E4B	95	parse <result> value into rec+4	15d tsv dps-fn	I	S	DPS engine in overlay A)
@@ -11744,12 +11744,12 @@ addr	size	role	basis	V/I	class	component
 0x7F067718	432	hardware loop (setlb); calls `memset(a0, d0 c, d1 n)` 0x7E500D73	features+call graph	V	C	overlay A: red-eye correction library (FACE cmd 5)
 0x7F0678C8	1139	section text: “and 0x7F0678C8 with 8 directions 45°…360°”	sec 13b line 112	I	S	overlay A: red-eye correction library (FACE cmd 5)
 0x7F067D3B	1207	section text: “pupil refinement 0x7F067D3B (→ 0x7F066BDF, 0x7F067013, 0x7F067562, 0x7F067718, and 0x7F0678C8 with 8 directions 45°…360°)”	sec 13b line 112	I	S	overlay A: red-eye correction library (FACE cmd 5)
-0x7F0681F2	279	helper called by 0x7F0687C4 (section text: “"0x7F0687C4 writes the art co…)	call graph (unnamed callers)	V	C	overlay A: red-eye correction library (FACE cmd 5)
+0x7F0681F2	279	"helper called by 0x7F0687C4 (section text: “""0x7F0687C4 writes the art co…)"	call graph (unnamed callers)	V	C	overlay A: red-eye correction library (FACE cmd 5)
 0x7F068309	155	section text: “Pixel recolouring that keeps luma (luma weights, 65280, 4096) and colour-space helpers. Inferred: they desaturate and darken the red pupil”	sec 13b line 116	I	S	overlay A: red-eye correction library (FACE cmd 5)
 0x7F0683A4	364	section text: “Pixel recolouring that keeps luma (luma weights, 65280, 4096) and colour-space helpers. Inferred: they desaturate and darken the red pupil”	sec 13b line 116	I	S	overlay A: red-eye correction library (FACE cmd 5)
 0x7F068510	245	section text: “Pixel recolouring that keeps luma (luma weights, 65280, 4096) and colour-space helpers. Inferred: they desaturate and darken the red pupil”	sec 13b line 116	I	S	overlay A: red-eye correction library (FACE cmd 5)
 0x7F068605	447	section text: “Pixel recolouring that keeps luma (luma weights, 65280, 4096) and colour-space helpers. Inferred: they desaturate and darken the red pupil”	sec 13b line 116	I	S	overlay A: red-eye correction library (FACE cmd 5)
-0x7F0687C4	1954	section text: “"0x7F0687C4 writes the art composite descriptor +284"”	sec 13b line 243	I	S	overlay A: red-eye correction library (FACE cmd 5)
+0x7F0687C4	1954	"section text: “""0x7F0687C4 writes the art composite descriptor +284""”"	sec 13b line 243	I	S	overlay A: red-eye correction library (FACE cmd 5)
 0x7F068F66	54	section text: “isqrt, angle normalise (90/180/270/360), sin/cos/atan helpers”	sec 13b line 117	I	S	overlay A: red-eye correction library (FACE cmd 5)
 0x7F068F9C	100	section text: “loaded 7 times at 0x7F068FB6–0x7F069093 by the angle helpers 0x7F068F9C/0x7F069020”	sec 13b line 16	I	S	overlay A: red-eye correction library (FACE cmd 5)
 0x7F080000	373	task entry ADJ (cfg 0x0003, build/map/tasks.tsv); logs the tag `ADJ_SQR` (a log tag, not necessarily the function name); strings «ADJ_WaiF», «ADJ_POST»	tasks.tsv	V	S	overlay B: ADJ factory adjustment over PTP (op handler 0x7F080284)
@@ -13049,10 +13049,10 @@ addr	size	role	basis	V/I	class	component
 0x7F09CCBC	42	calls `OlyTaSS (task sleep)` 0x7E449605	features+call graph	V	C	overlay B: PC_XXX usb_dc4 vendor requests (I, position)
 0x7F09CCE6	13	helper called by 0x7F09CC56	call graph (unnamed callers)	V	C	overlay B: PC_XXX usb_dc4 vendor requests (I, position)
 0x7F09CCF3	42	calls `usb info` handler 0x7F09908E; under `PC_USB task` 0x7F098DE5 (3 levels up)	features+call graph	V	C	overlay B: PC_XXX usb_dc4 vendor requests (I, position)
-0x7F09CD1D	56	uses strings «"UAM_ON_TIMER START"»; starts a soft timer; calls `debug print(a0 = str)` 0x7E4263E5, `tmr_start` 0x7E4650A2	own strings (gist)	V	C	overlay B: PC_XXX usb_dc4 vendor requests (I, position)
+0x7F09CD1D	56	"uses strings «""UAM_ON_TIMER START""»; starts a soft timer; calls `debug print(a0 = str)` 0x7E4263E5, `tmr_start` 0x7E4650A2"	own strings (gist)	V	C	overlay B: PC_XXX usb_dc4 vendor requests (I, position)
 0x7F09CD55	46	callback/pointer: address loaded by 0x7F09CD1D (passed to `tmr_start` 0x7E4650A2); calls `printf (debug)` 0x7E426442	code immediate (immref)	V	C	overlay B: PC_XXX usb_dc4 vendor requests (I, position)
 0x7F09CD83	20	callback/pointer: address loaded by 0x7F09CD55 (passed to 0x7E462AD6); wrapper: calls 0x7E880EFF with d0=0x40D00B4; calls `app-event poster` 0x7E880EFF	code immediate (immref)	V	C	overlay B: PC_XXX usb_dc4 vendor requests (I, position)
-0x7F09CD97	51	uses strings «"UAM_ON_TIMER STOP"»; calls `debug print(a0 = str)` 0x7E4263E5, `tmr_stop` 0x7E4650DD	own strings (gist)	V	C	overlay B: PC_XXX usb_dc4 vendor requests (I, position)
+0x7F09CD97	51	"uses strings «""UAM_ON_TIMER STOP""»; calls `debug print(a0 = str)` 0x7E4263E5, `tmr_stop` 0x7E4650DD"	own strings (gist)	V	C	overlay B: PC_XXX usb_dc4 vendor requests (I, position)
 0x7F09CDCA	27	task entry PC_USBPNP (cfg 0x002c, build/map/tasks.tsv)	tasks.tsv	V	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F09CDE5	16	under `PC_USBPNP task` 0x7F09CDCA (direct caller)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F09CDF5	4	returns 0 (stub)	shape:ret0	V	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
@@ -13071,7 +13071,7 @@ addr	size	role	basis	V/I	class	component
 0x7F09D24D	159	dispatcher: switch table(s) 7F0D8008; receives from a queue; error codes 0x36002001; calls `error recorder` 0x7E426D4B, `OlyQue receive` 0x7E449218	jump/hash table owner (jt.py)	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F09D2EC	78	writes a message to a queue; calls `OlyQeWrCpu (write queue)` 0x7E4492B9	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F09D33A	45	error codes 0x36002003; calls `error recorder` 0x7E426D4B	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F09D367	95	hardware loop (setlb); calls `memset (word fill when aligned)` 0x7E5082B6; under `glSetErrorFuncDMP` 0x7F09E9EE (direct caller)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F09D367	95	hardware loop (setlb); calls `memset (word fill when aligned)` 0x7E5082B6; under the C3D scene start 0x7F09E9EE 0x7F09E9EE (direct caller)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F09D3C6	120	error codes 0x36003001; calls `error recorder` 0x7E426D4B	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F09D43E	5	pointer-entry prologue of 0x7F09D443 (movm + add -N,sp, falls into it; same function reached through a pointer)	shape:prologue	V	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F09D443	26	under `Gr_Room_A` 0x7F0A1BAF (2 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
@@ -13103,7 +13103,7 @@ addr	size	role	basis	V/I	class	component
 0x7F09E8C2	153	error codes 0x36004006; calls `error recorder` 0x7E426D4B	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F09E95B	44	helper called by 0x7F09DFD4 (section text: “~~0x7EE619C7–0x7EE63004 (C2 2…)	call graph (unnamed callers)	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F09E987	103	helper called by 0x7F09DFD4 (section text: “~~0x7EE619C7–0x7EE63004 (C2 2…)	call graph (unnamed callers)	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F09E9EE	140	`glSetErrorFuncDMP` — the overlay calls it from 0x7F09E9EE	section name	V	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F09E9EE	140	C3D scene start: calls glSetErrorFuncDMP (14a); not glSetErrorFuncDMP itself (C6 2026-11-09)	section name	V	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F09EA7A	50	helper called by 0x7F09DFD4 (section text: “~~0x7EE619C7–0x7EE63004 (C2 2…); RAM 0xA06E1044, 0xA06E1048	call graph (unnamed callers)	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F09EAAC	405	error codes 0x36004001; calls `error recorder` 0x7E426D4B	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F09EC41	155	logs the tag `C3D_EXE_BRIDGE` (a log tag, not necessarily the function name)	own string (bare)	V	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
@@ -13121,34 +13121,34 @@ addr	size	role	basis	V/I	class	component
 0x7F09F606	36	case 16 of the switch in 0x7F09ECDC (table 0x7F0D83DC); error codes 0x3600500A; calls `error recorder` 0x7E426D4B	jump/hash table (jt.py)	V	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F09F62A	9	case 0 of the switch in 0x7F09D0B0 (table 0x7F0D7FAC); setter: stores u32 arg into global *(0xA06E1264)	jump/hash table (jt.py)	V	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F09F633	9	getter: returns u32 global *(0xA06E1264)	shape:getter	V	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F09F63C	168	error codes 0x36006001; calls `memset (word fill when aligned)` 0x7E5082B6, `error recorder` 0x7E426D4B; under `glSetErrorFuncDMP` 0x7F09E9EE (3 levels up)	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F09F63C	168	error codes 0x36006001; calls `memset (word fill when aligned)` 0x7E5082B6, `error recorder` 0x7E426D4B; under the C3D scene start 0x7F09E9EE 0x7F09E9EE (3 levels up)	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F09F6E4	47	calls `get time` 0x7E4262C5; under `Gr_Room_A` 0x7F0A1BAF (direct caller), `Gr_Photo_A` 0x7F0A2222 (direct caller)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F09F713	141	hardware loop (setlb); under `glSetErrorFuncDMP` 0x7F09E9EE (2 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F09F713	141	hardware loop (setlb); under the C3D scene start 0x7F09E9EE 0x7F09E9EE (2 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F09F7A0	36	helper called by 0x7F09EAAC	call graph (unnamed callers)	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F09F7C4	31	helper called by 0x7F09EAAC	call graph (unnamed callers)	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F09F7E3	329	helper called by 0x7F09E31F (section text: “called by the scene code 0x7F…); RAM 0xA06E1264, 0xA075477D	call graph (unnamed callers)	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F09F92C	238	under `glSetErrorFuncDMP` 0x7F09E9EE (2 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F09FA1A	46	calls `Gr_Room_A` 0x7F0A1BAF, `Gr_Photo_A` 0x7F0A2222; under `glSetErrorFuncDMP` 0x7F09E9EE (2 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F09F92C	238	under the C3D scene start 0x7F09E9EE 0x7F09E9EE (2 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F09FA1A	46	calls `Gr_Room_A` 0x7F0A1BAF, `Gr_Photo_A` 0x7F0A2222; under the C3D scene start 0x7F09E9EE 0x7F09E9EE (2 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F09FA48	316	helper called by 0x7F09E31F (section text: “called by the scene code 0x7F…), 0x7F09EAAC; RAM 0xA06E1264	call graph (unnamed callers)	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F09FB84	36	hardware loop (setlb); under `glSetErrorFuncDMP` 0x7F09E9EE (2 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F09FBA8	429	uses strings «P2D_Logo»; error codes 0x36006001, 0x36006003, 0x36006004; calls `error recorder` 0x7E426D4B; under `glSetErrorFuncDMP` 0x7F09E9EE (2 levels up)	own strings (gist)	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F09FB84	36	hardware loop (setlb); under the C3D scene start 0x7F09E9EE 0x7F09E9EE (2 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F09FBA8	429	uses strings «P2D_Logo»; error codes 0x36006001, 0x36006003, 0x36006004; calls `error recorder` 0x7E426D4B; under the C3D scene start 0x7F09E9EE 0x7F09E9EE (2 levels up)	own strings (gist)	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F09FD55	756	`TA_Logo_In` (logs its own name); strings «TA_Logo_Out_W», «TA_Bar_Out_%c»	own string (bare)	V	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A0049	26	helper called by 0x7F09EA7A, 0x7F09EAAC	call graph (unnamed callers)	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A0063	9	setter: stores u8 arg into global *(0xA075477D)	shape:setter	V	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A006C	9	getter: returns u8 global *(0xA075477D)	shape:getter	V	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A0075	9	case 2/3 of the switch in 0x7F09D0B0 (table 0x7F0D7FAC); getter: returns u8 global *(0xA075477C)	jump/hash table (jt.py)	V	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F0A007E	45	calls `free-run timer read` 0x7E46B519; under `glSetErrorFuncDMP` 0x7F09E9EE (2 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F0A007E	45	calls `free-run timer read` 0x7E46B519; under the C3D scene start 0x7F09E9EE 0x7F09E9EE (2 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A00AB	22	under `TA_Logo_In` 0x7F09FD55 (direct caller), `Gr_Room_A` 0x7F0A1BAF (direct caller)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A00C1	131	calls `get time` 0x7E4262C5; under `TA_Logo_In` 0x7F09FD55 (direct caller)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A0144	20	wrapper: calls 0x7F0A0158 with d0=0xB6154A00, d1=0x52614C0	shape:wrapper	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F0A0158	131	error codes 0x3600600F; calls `error recorder` 0x7E426D4B; under `glSetErrorFuncDMP` 0x7F09E9EE (2 levels up)	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F0A01DB	326	hardware loop (setlb); under `glSetErrorFuncDMP` 0x7F09E9EE (2 levels up), `Gr_Room_A` 0x7F0A1BAF (3 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F0A0158	131	error codes 0x3600600F; calls `error recorder` 0x7E426D4B; under the C3D scene start 0x7F09E9EE 0x7F09E9EE (2 levels up)	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F0A01DB	326	hardware loop (setlb); under the C3D scene start 0x7F09E9EE 0x7F09E9EE (2 levels up), `Gr_Room_A` 0x7F0A1BAF (3 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A0321	552	error codes 0x3600600F; hardware loop (setlb); calls `error recorder` 0x7E426D4B; under `Gr_Room_A` 0x7F0A1BAF (3 levels up), `Gr_Photo_A` 0x7F0A2222 (3 levels up)	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A0549	194	error codes 0x3600600F; hardware loop (setlb); calls `error recorder` 0x7E426D4B	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A060B	52	under `TA_Logo_In` 0x7F09FD55 (direct caller), `Gr_Room_A` 0x7F0A1BAF (direct caller)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F0A063F	33	hardware loop (setlb); under `glSetErrorFuncDMP` 0x7F09E9EE (2 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F0A063F	33	hardware loop (setlb); under the C3D scene start 0x7F09E9EE 0x7F09E9EE (2 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A0660	294	under `Gr_Room_A` 0x7F0A1BAF (direct caller), `Gr_Photo_A` 0x7F0A2222 (direct caller)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F0A0786	136	error codes 0x36006001; calls `error recorder` 0x7E426D4B; under `glSetErrorFuncDMP` 0x7F09E9EE (2 levels up)	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F0A0786	136	error codes 0x36006001; calls `error recorder` 0x7E426D4B; under the C3D scene start 0x7F09E9EE 0x7F09E9EE (2 levels up)	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A080E	77	under `Gr_Room_A` 0x7F0A1BAF (2 levels up), `Gr_Photo_A` 0x7F0A2222 (2 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A085B	208	block-copy loop	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A092B	186	uses strings «%04d/%02d/%02d», «%02d/%02d/%04d»	own strings (gist)	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
@@ -13157,7 +13157,7 @@ addr	size	role	basis	V/I	class	component
 0x7F0A0CEA	1531	hardware loop (setlb)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A12E5	276	helper called by 0x7F09E31F (section text: “called by the scene code 0x7F…); RAM 0xA06E1264, 0xA075477D	call graph (unnamed callers)	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A13F9	661	section text: “caller chain 0x7EE61A59 → 0x7EE61A4F → 0x7F0A13F9 → 0x7F09DFD4”	sec 08 line 223	I	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F0A168E	1313	uses strings «TA_Camera_%02d», «P3D_Photo_%02d», «TA_FadeOut»; error codes 0x36006001, 0x3600600C, 0x36006015; block-copy loop from table 0xA0754660; block-copy loop from table 0xA0754660; calls `memset (word fill when aligned)` 0x7E5082B6, `error recorder` 0x7E426D4B; under `glSetErrorFuncDMP` 0x7F09E9EE (3 levels up)	own strings (gist)	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F0A168E	1313	uses strings «TA_Camera_%02d», «P3D_Photo_%02d», «TA_FadeOut»; error codes 0x36006001, 0x3600600C, 0x36006015; block-copy loop from table 0xA0754660; block-copy loop from table 0xA0754660; calls `memset (word fill when aligned)` 0x7E5082B6, `error recorder` 0x7E426D4B; under the C3D scene start 0x7F09E9EE 0x7F09E9EE (3 levels up)	own strings (gist)	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A1BAF	1651	`Gr_Room_A` (logs its own name); strings «Act_Photo_Start_%02d», «Act_Camera_%c_%02d»	own string (bare)	V	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A2222	896	`Gr_Photo_A` (logs its own name); strings «Gr_Photo_%c», «TA_FadeOut»	own string (bare)	V	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A25A2	153	hardware loop (setlb); under `Gr_Room_A` 0x7F0A1BAF (direct caller), `Gr_Photo_A` 0x7F0A2222 (direct caller)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
@@ -13178,22 +13178,22 @@ addr	size	role	basis	V/I	class	component
 0x7F0A3074	53	under `Gr_Room_A` 0x7F0A1BAF (3 levels up), `Gr_Photo_A` 0x7F0A2222 (3 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A30A9	259	uses strings «P3D_Photo_%02d»; error codes 0x36006008; block-copy loop from table 0x7F0D872D; calls `error recorder` 0x7E426D4B	own strings (gist)	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A31AC	11	struct writer: stores 2 fields (+4, +8) through a pointer	shape:fieldstore	V	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F0A31B7	48	error codes 0x3600600F; calls `error recorder` 0x7E426D4B; under `glSetErrorFuncDMP` 0x7F09E9EE (3 levels up)	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F0A31E7	46	error codes 0x3600600F; calls `error recorder` 0x7E426D4B; under `glSetErrorFuncDMP` 0x7F09E9EE (3 levels up)	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F0A3215	46	error codes 0x3600600F; calls `error recorder` 0x7E426D4B; under `glSetErrorFuncDMP` 0x7F09E9EE (3 levels up)	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F0A31B7	48	error codes 0x3600600F; calls `error recorder` 0x7E426D4B; under the C3D scene start 0x7F09E9EE 0x7F09E9EE (3 levels up)	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F0A31E7	46	error codes 0x3600600F; calls `error recorder` 0x7E426D4B; under the C3D scene start 0x7F09E9EE 0x7F09E9EE (3 levels up)	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F0A3215	46	error codes 0x3600600F; calls `error recorder` 0x7E426D4B; under the C3D scene start 0x7F09E9EE 0x7F09E9EE (3 levels up)	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A3243	41	helper called by 0x7F0A0321, 0x7F0A0549	call graph (unnamed callers)	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A326C	24	struct writer: stores 3 fields (+4, +4, +4) through a pointer	shape:fieldstore	V	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F0A3284	22	under `glSetErrorFuncDMP` 0x7F09E9EE (3 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F0A3284	22	under the C3D scene start 0x7F09E9EE 0x7F09E9EE (3 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A329A	54	error codes 0x3600600F; calls `error recorder` 0x7E426D4B	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F0A32D0	42	under `glSetErrorFuncDMP` 0x7F09E9EE (3 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F0A32FA	42	under `glSetErrorFuncDMP` 0x7F09E9EE (3 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F0A3324	43	error codes 0x3600600F; calls `error recorder` 0x7E426D4B; under `glSetErrorFuncDMP` 0x7F09E9EE (3 levels up)	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F0A32D0	42	under the C3D scene start 0x7F09E9EE 0x7F09E9EE (3 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F0A32FA	42	under the C3D scene start 0x7F09E9EE 0x7F09E9EE (3 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F0A3324	43	error codes 0x3600600F; calls `error recorder` 0x7E426D4B; under the C3D scene start 0x7F09E9EE 0x7F09E9EE (3 levels up)	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A334F	15	wrapper: calls 0x7F0A31E7 with a0=0xA06E1298	shape:wrapper	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F0A335E	64	error codes 0x3600600F; calls `error recorder` 0x7E426D4B; under `glSetErrorFuncDMP` 0x7F09E9EE (3 levels up)	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F0A335E	64	error codes 0x3600600F; calls `error recorder` 0x7E426D4B; under the C3D scene start 0x7F09E9EE 0x7F09E9EE (3 levels up)	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A339E	15	wrapper: calls 0x7F0A31E7 with a0=0xA06E12A4	shape:wrapper	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A33AD	10	callback/pointer: address loaded by 0x7F0A335E (passed to 0x7F0A31AC)	code immediate (immref)	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A33B7	10	callback/pointer: address loaded by 0x7F0A0158 (passed to 0x7F0A31AC)	code immediate (immref)	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F0A33C1	21	under `glSetErrorFuncDMP` 0x7F09E9EE (2 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F0A33C1	21	under the C3D scene start 0x7F09E9EE 0x7F09E9EE (2 levels up)	features+call graph	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A33D6	3	orphan: no direct callers and no code or data pointer found (dead code, or reached through a computed pointer)	call graph (no callers)	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A33D9	10	section text: “allocator wrappers 0x7F0A33D9/0x7F0A33E8/0x7F0A3436”	sec 14a line 293	I	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A33E3	5	pointer-entry prologue of 0x7F0A33E8 (movm + add -N,sp, falls into it; same function reached through a pointer)	shape:prologue	V	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
@@ -13208,7 +13208,7 @@ addr	size	role	basis	V/I	class	component
 0x7F0A3793	10	wrapper: calls 0x7E45DA9D (in )	shape:wrapper	V	C	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A379D	12	wrapper: calls `CPU lock (interrupts off)` 0x7E44B36F with d0=1	shape:wrapper	V	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A37A9	10	wrapper: calls `CPU unlock` 0x7E44B390	shape:wrapper	V	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
-0x7F0A37B3	81	receives from a queue; calls `OlyQue receive` 0x7E449218; under `glSetErrorFuncDMP` 0x7F09E9EE (direct caller), `Gr_Room_A` 0x7F0A1BAF (direct caller)	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
+0x7F0A37B3	81	receives from a queue; calls `OlyQue receive` 0x7E449218; under the C3D scene start 0x7F09E9EE 0x7F09E9EE (direct caller), `Gr_Room_A` 0x7F0A1BAF (direct caller)	features+call graph	V	P	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A3804	10	section text: “and 0x7F0A3804 is malloc (14a §5)”	sec 08 line 208	I	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A380E	11	section text: “realloc 0x7F0A380E (copies min(old, new))”	sec 14a line 295	I	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
 0x7F0A3819	11	section text: “corrected (D2 2026-11-09):** 0x7F0A3819 is the C3D port's free() (193 callers)”	sec 08 line 208	I	S	overlay B: PC_USBPNP, then unplaced code to C3D (I, position)
@@ -13244,7 +13244,7 @@ addr	size	role	basis	V/I	class	component
 0x7F0A41A9	8	wrapper: calls 0x7F0A4217	shape:wrapper	V	C	overlay B: C3D / C3D_UPDATE bridges, TXC, SPC helpers (I, position)
 0x7F0A41B1	8	wrapper: calls 0x7F0A4240	shape:wrapper	V	C	overlay B: C3D / C3D_UPDATE bridges, TXC, SPC helpers (I, position)
 0x7F0A41B9	94	section text: “0x9AB00000 | GPU (DMP GL / C3D) | 112–114 | attach 0x7F0A3723”	sec 13f line 122	I	S	overlay B: C3D / C3D_UPDATE bridges, TXC, SPC helpers (I, position)
-0x7F0A4217	41	MMIO 0x9AB00000, 0x9AB00010; under `glSetErrorFuncDMP` 0x7F09E9EE (3 levels up)	features+call graph	V	P	overlay B: C3D / C3D_UPDATE bridges, TXC, SPC helpers (I, position)
+0x7F0A4217	41	MMIO 0x9AB00000, 0x9AB00010; under the C3D scene start 0x7F09E9EE 0x7F09E9EE (3 levels up)	features+call graph	V	P	overlay B: C3D / C3D_UPDATE bridges, TXC, SPC helpers (I, position)
 0x7F0A4240	89	MMIO 0x9AB00000, 0x9AB00010, 0x9AB00040	features+call graph	V	P	overlay B: C3D / C3D_UPDATE bridges, TXC, SPC helpers (I, position)
 0x7F0A4299	8	wrapper: calls 0x7F0A41A1	shape:wrapper	V	C	overlay B: C3D / C3D_UPDATE bridges, TXC, SPC helpers (I, position)
 0x7F0A42A1	8	wrapper: calls 0x7F0A41A9	shape:wrapper	V	C	overlay B: C3D / C3D_UPDATE bridges, TXC, SPC helpers (I, position)
@@ -13389,7 +13389,7 @@ addr	size	role	basis	V/I	class	component
 0x7F0A8A91	59	calls `strcat` 0x7E500D84; under `PRM_BC_DISABLE` 0x7F0B0F1D (direct caller), `UnitCodeCam` 0x7F0B8D18 (direct caller)	features+call graph	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
 0x7F0A8ACC	65	calls `strcat` 0x7E500D84; under `R_src_white_test` 0x7F0C6059 (direct caller), `UnitCodeCam` 0x7F0B8D18 (2 levels up)	features+call graph	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
 0x7F0A8B0D	284	uses strings «MNF99991.JPG», «parge:»; calls `strlen` 0x7E500E01; under `ADJSLF sequence dispatcher` 0x7F0AAD2B (2 levels up), `UnitCodeCam` 0x7F0B8D18 (3 levels up)	own strings (gist)	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
-0x7F0A8C29	263	uses strings «"%s","%s",%06u,%08u,%u,%s,"%s"\r»; calls `strcat` 0x7E500D84, `strlen` 0x7E500E01; under `UnitCodeCam` 0x7F0B8D18 (2 levels up), `R_src_white_test` 0x7F0C6059 (2 levels up)	own strings (gist)	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
+0x7F0A8C29	263	"uses strings «""%s"",""%s"",%06u,%08u,%u,%s,""%s""\r»; calls `strcat` 0x7E500D84, `strlen` 0x7E500E01; under `UnitCodeCam` 0x7F0B8D18 (2 levels up), `R_src_white_test` 0x7F0C6059 (2 levels up)"	own strings (gist)	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
 0x7F0A8D30	92	uses strings «MNF99991.JPG»; under `UnitCodeCam` 0x7F0B8D18 (2 levels up)	own strings (gist)	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
 0x7F0A8D8C	10	wrapper: calls 0x7F0A8C29	shape:wrapper	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
 0x7F0A8D96	10	wrapper: calls 0x7F0A8DA0	shape:wrapper	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
@@ -13534,7 +13534,7 @@ addr	size	role	basis	V/I	class	component
 0x7F0B0700	815	uses strings «UnitCodeBody»; soft-float maths (6 calls); calls `UnitCodeCam` 0x7F0A8912, `atoi` 0x7E500832	own strings (gist)	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
 0x7F0B0A2F	258	calls `? CFLASH/STAB_FLASH` handler 0x7F0A9631	features+call graph	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
 0x7F0B0B31	98	helper called by 0x7F0AAA70	call graph (unnamed callers)	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
-0x7F0B0B93	906	uses strings «"%09d",%.1f,%.1f,%.2f», «"%s","%s","%s",», «%d,%d,%.2f,»; soft-float maths (17 calls); calls `memset(a0, d0 c, d1 n)` 0x7E500D73	own strings (gist)	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
+0x7F0B0B93	906	"uses strings «""%09d"",%.1f,%.1f,%.2f», «""%s"",""%s"",""%s"",», «%d,%d,%.2f,»; soft-float maths (17 calls); calls `memset(a0, d0 c, d1 n)` 0x7E500D73"	own strings (gist)	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
 0x7F0B0F1D	143	logs the tag `PRM_BC_DISABLE` (a log tag, not necessarily the function name); strings «BC_UNIT:OFF»	own string (bare)	V	S	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
 0x7F0B0FAC	47	calls `PRM_BC_DISABLE` 0x7F0B0F1D; under `R_src_white_test` 0x7F0C6059 (direct caller)	features+call graph	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
 0x7F0B0FDB	22	calls `PRM_BC_DISABLE` 0x7F0B0F1D	features+call graph	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
@@ -13593,7 +13593,7 @@ addr	size	role	basis	V/I	class	component
 0x7F0B916D	2659	block-copy loop from table 0x7F0DE219; soft-float maths (127 calls)	features+call graph	V	P	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
 0x7F0B9BD0	105	helper called by 0x7F0BF118; RAM 0xA06E1738	call graph (unnamed callers)	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
 0x7F0B9C39	55	helper called by 0x7F0B9BD0, 0x7F0BBD39 and 3 more; RAM 0xA06E1738, 0xA06E1740	call graph (unnamed callers)	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
-0x7F0B9C70	1353	uses strings «%4d, 0x%08X, 0=%7.2f, 1=%7.2f, "offset"\r», «%4d, 0x%08X, 2=%7.2f, 3=%7.2f\r», «%4d, 0x%08X, 4=%7.2f, 5=%7.2f\r»; soft-float maths (34 calls)	own strings (gist)	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
+0x7F0B9C70	1353	"uses strings «%4d, 0x%08X, 0=%7.2f, 1=%7.2f, ""offset""\r», «%4d, 0x%08X, 2=%7.2f, 3=%7.2f\r», «%4d, 0x%08X, 4=%7.2f, 5=%7.2f\r»; soft-float maths (34 calls)"	own strings (gist)	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
 0x7F0BA1B9	393	helper called by 0x7F0BA342; RAM 0xA06E1740	call graph (unnamed callers)	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
 0x7F0BA342	6647	uses strings «0x%04X,%11.6f, %11.6f,%11.6f,%11.6f,%11.6f\r», «G_F56_SvStd,%f,Lev,%f, Tv,%f\rTv_std,%f\r», «, (overflow),%8.6f,%8.3f,%8.3f\r»; soft-float maths (122 calls); hardware loop (setlb); calls `memset(a0, d0 c, d1 n)` 0x7E500D73	own strings (gist)	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
 0x7F0BBD39	3068	uses strings «, (overflow),%8.6f,%8.3f,%8.3f\r», «, (stop),%8.6f,%8.3f,%8.3f\r», «%2d,%8.6f,%8.3f,%8.3f\r»; soft-float maths (60 calls); hardware loop (setlb)	own strings (gist)	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
@@ -13643,7 +13643,7 @@ addr	size	role	basis	V/I	class	component
 0x7F0C814F	202	hardware loop (setlb); calls `strlen` 0x7E500E01	features+call graph	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
 0x7F0C8219	339	helper called by 0x7F0C836C; RAM 0xA06E1754	call graph (unnamed callers)	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
 0x7F0C836C	779	uses strings «STAB_FLASH», «CFLASH», «FLASH»; block-copy loop from table 0x7F0EB13A; calls `? CFLASH/STAB_FLASH` handler 0x7F0A9631, `memset(a0, d0 c, d1 n)` 0x7E500D73, `strcmp` 0x7E500DCA	own strings (gist)	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
-0x7F0C8677	1414	uses strings «"%s","0x%04X","», «","%d"\r":"\r», «"%s","MC"\r»; calls `memset(a0, d0 c, d1 n)` 0x7E500D73, `strcat` 0x7E500D84, `strcpy` 0x7E500DE9	own strings (gist)	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
+0x7F0C8677	1414	"uses strings «""%s"",""0x%04X"",""», «"",""%d""\r"":""\r», «""%s"",""MC""\r»; calls `memset(a0, d0 c, d1 n)` 0x7E500D73, `strcat` 0x7E500D84, `strcpy` 0x7E500DE9"	own strings (gist)	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
 0x7F0C8BFD	5	returns constant -1 (0xFFFFFFFF)	shape:retconst	V	S	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
 0x7F0C8C02	550	uses strings «DSCPRM%02d\%c%c%cPRMDT.CSV», «DSCPRM%02d\%c%c%cBAKUP.CSV», «DSCPRM%02d»; calls `debug print(a0 = str)` 0x7E4263E5, `memset(a0, d0 c, d1 n)` 0x7E500D73, `strcmp` 0x7E500DCA	own strings (gist)	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers
 0x7F0C8E28	241	uses strings «DSCPRM%02d\%c%c%cBAKUP.CSV», «DSCPRM%02d»; calls `debug print(a0 = str)` 0x7E4263E5	own strings (gist)	V	C	overlay B: ADJSLF self-adjustment steps and CSV/test helpers

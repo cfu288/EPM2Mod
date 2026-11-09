@@ -1734,14 +1734,14 @@ ADCONV callers	list	UI ADC keys/dial 0x7E50B1B4, 0x7E50B356, 0x7E50B512, 0x7E50B
 0x7E65AEA7	callback	still step callback; on error reports damage with line tag 14458	immediates before the calls (cbx.py)	V
 0x7E65C5B5	callback	still step callback; on error reports damage with line tag 16515	immediates before the calls (cbx.py)	V
 0x7E65C639	callback	still step callback; on error reports damage with line tag 16568	immediates before the calls (cbx.py)	V
-0x7E65C6A1	callback	still step callback; on error reports damage with line tag 16612	immediates before the calls (cbx.py)	V
-0x7E65C6F7	callback	still step callback; on error reports damage with line tag 16656	immediates before the calls (cbx.py)	V
-0x7E65C74D	callback	still step callback; on error reports damage with line tag 16700	immediates before the calls (cbx.py)	V
-0x7E65C7A3	callback	still step callback; on error reports damage with line tag 16744	immediates before the calls (cbx.py)	V
-0x7E65C7F9	callback	still step callback; on error reports damage with line tag 16788	immediates before the calls (cbx.py)	V
-0x7E65C84F	callback	still step callback; on error reports damage with line tag 16832	immediates before the calls (cbx.py)	V
-0x7E65C8A5	callback	still step callback; on error reports damage with line tag 16876	immediates before the calls (cbx.py)	V
-0x7E65C8FB	callback	still step callback; on error reports damage with line tag 16920	immediates before the calls (cbx.py)	V
+0x7E65C6A1	callback	start-up allocation from the camera pool `STILL`: one direct caller; takes blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table; not a step callback (C6 2026-11-09)	immediates before the calls (cbx.py)	V
+0x7E65C6F7	callback	start-up allocation from the camera pool `STILL`: one direct caller; takes blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table; not a step callback (C6 2026-11-09)	immediates before the calls (cbx.py)	V
+0x7E65C74D	callback	start-up allocation from the camera pool `STILL`: one direct caller; takes blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table; not a step callback (C6 2026-11-09)	immediates before the calls (cbx.py)	V
+0x7E65C7A3	callback	start-up allocation from the camera pool `STILL`: one direct caller; takes blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table; not a step callback (C6 2026-11-09)	immediates before the calls (cbx.py)	V
+0x7E65C7F9	callback	start-up allocation from the camera pool `STILL`: one direct caller; takes blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table; not a step callback (C6 2026-11-09)	immediates before the calls (cbx.py)	V
+0x7E65C84F	callback	start-up allocation from the camera pool `STILL`: one direct caller; takes blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table; not a step callback (C6 2026-11-09)	immediates before the calls (cbx.py)	V
+0x7E65C8A5	callback	start-up allocation from the camera pool `STILL`: one direct caller; takes blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table; not a step callback (C6 2026-11-09)	immediates before the calls (cbx.py)	V
+0x7E65C8FB	callback	start-up allocation from the camera pool `STILL`: one direct caller; takes blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table; not a step callback (C6 2026-11-09)	immediates before the calls (cbx.py)	V
 0x7E65C951	callback	still step callback; on error reports damage with line tag 16970	immediates before the calls (cbx.py)	V
 0x7E65C9AE	callback	still step callback; on error reports damage with line tag 17004	immediates before the calls (cbx.py)	V
 0x7E65C9E5	callback	still step callback; on error reports damage with line tag 17041	immediates before the calls (cbx.py)	V
@@ -1878,14 +1878,14 @@ ADCONV callers	list	UI ADC keys/dial 0x7E50B1B4, 0x7E50B356, 0x7E50B512, 0x7E50B
 0x7E6602C1	callback	live bulb step callback: posts step-event bit(s) 0x1 via 0x7E6617F4	immediates before the calls (cbx.py)	V
 0x7E660B5B	callback	live bulb step callback; on error reports damage with line tag 8461	immediates before the calls (cbx.py)	V
 0x7E660BB9	callback	live bulb step callback; on error reports damage with line tag 8514	immediates before the calls (cbx.py)	V
-0x7E660C21	callback	live bulb step callback; on error reports damage with line tag 8558	immediates before the calls (cbx.py)	V
-0x7E660C77	callback	live bulb step callback; on error reports damage with line tag 8602	immediates before the calls (cbx.py)	V
-0x7E660CCD	callback	live bulb step callback; on error reports damage with line tag 8646	immediates before the calls (cbx.py)	V
-0x7E660D23	callback	live bulb step callback; on error reports damage with line tag 8690	immediates before the calls (cbx.py)	V
-0x7E660D79	callback	live bulb step callback; on error reports damage with line tag 8734	immediates before the calls (cbx.py)	V
-0x7E660DCF	callback	live bulb step callback; on error reports damage with line tag 8778	immediates before the calls (cbx.py)	V
-0x7E660E25	callback	live bulb step callback; on error reports damage with line tag 8822	immediates before the calls (cbx.py)	V
-0x7E660E7B	callback	live bulb step callback; on error reports damage with line tag 8866	immediates before the calls (cbx.py)	V
+0x7E660C21	callback	start-up allocation from the camera pool `S_LB_M`: one direct caller; takes 40-byte blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table (e.g. 0x7E660D79 → 0x6056EDAC); not a step callback (C6 2026-11-09)	immediates before the calls (cbx.py)	V
+0x7E660C77	callback	start-up allocation from the camera pool `S_LB_M`: one direct caller; takes 40-byte blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table (e.g. 0x7E660D79 → 0x6056EDAC); not a step callback (C6 2026-11-09)	immediates before the calls (cbx.py)	V
+0x7E660CCD	callback	start-up allocation from the camera pool `S_LB_M`: one direct caller; takes 40-byte blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table (e.g. 0x7E660D79 → 0x6056EDAC); not a step callback (C6 2026-11-09)	immediates before the calls (cbx.py)	V
+0x7E660D23	callback	start-up allocation from the camera pool `S_LB_M`: one direct caller; takes 40-byte blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table (e.g. 0x7E660D79 → 0x6056EDAC); not a step callback (C6 2026-11-09)	immediates before the calls (cbx.py)	V
+0x7E660D79	callback	start-up allocation from the camera pool `S_LB_M`: one direct caller; takes 40-byte blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table (e.g. 0x7E660D79 → 0x6056EDAC); not a step callback (C6 2026-11-09)	immediates before the calls (cbx.py)	V
+0x7E660DCF	callback	start-up allocation from the camera pool `S_LB_M`: one direct caller; takes 40-byte blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table (e.g. 0x7E660D79 → 0x6056EDAC); not a step callback (C6 2026-11-09)	immediates before the calls (cbx.py)	V
+0x7E660E25	callback	start-up allocation from the camera pool `S_LB_M`: one direct caller; takes 40-byte blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table (e.g. 0x7E660D79 → 0x6056EDAC); not a step callback (C6 2026-11-09)	immediates before the calls (cbx.py)	V
+0x7E660E7B	callback	start-up allocation from the camera pool `S_LB_M`: one direct caller; takes 40-byte blocks via 0x7E642097, zeroes them (memset 0x7E5082B6) and stores them in a RAM table (e.g. 0x7E660D79 → 0x6056EDAC); not a step callback (C6 2026-11-09)	immediates before the calls (cbx.py)	V
 0x7E660ED1	callback	live bulb step callback; on error reports damage with line tag 8916	immediates before the calls (cbx.py)	V
 0x7E660F2E	callback	live bulb step callback; on error reports damage with line tag 8950	immediates before the calls (cbx.py)	V
 0x7E660F65	callback	live bulb step callback; on error reports damage with line tag 8987	immediates before the calls (cbx.py)	V

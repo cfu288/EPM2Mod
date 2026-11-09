@@ -130,3 +130,12 @@ By area (T1 / T2 / T3 %): Tra/Ope/OlyApi/sdk 7,002 rows 74 / 18 / 8; Cap 8,647 r
 2. The class name of the print facade 0x7E991647 (CustomPrint + EasyPrint) and of the 30+ unnamed "Ope/app class @…" rows of 15c.
 3. OMReactive slots 3, 10, 26, 31, 34 are still unnamed (slot 17 is now placed, §7 item 5).
 4. `handler` rows whose branches enter states through large helpers have no target state; a deeper entry search (with a size limit per level) would fill them.
+
+## Known rule errors found by coverage round C6 (2026-11-09)
+
+Rows fixed in the TSV: 0x7EA1D604, 0x7EA18D55, 0x7E9E4C43 and 0x7E966CCE. The rules behind them are not yet rerun, so expect more rows of the same kinds:
+- **Getter-setter rule:** it reads `clr d0; call X` as "returns 0". It is a call with argument 0.
+- **Class from address range:** a function without strings inside a class range is given that class. Ope ranges hold code of other classes (TouchPanel code inside OlyHfwOpeSndCtl).
+- **"Transition action" rule:** it labels small getters whose only use is inside handlers.
+- **Missing state numbers:** handlers reached through forwarders or region dispatchers, and entries that start with pushNullConfig, often lack their state number.
+- **Missing side effects:** shape-labelled rows leave out side effects, such as observer notifies and history-field writes.

@@ -162,3 +162,11 @@ Scope: one row per function for the GUI, the GUI toolkit and the camera app (CA_
 3. About 600 own vtable slots (widgets, screen, draw-object family, page own slots) have no role beyond their effects. The draw-object family 0x7EF10EA4 and the image table 0x7EFB13BC (round-4 weakest 1) need a slot dictionary.
 4. CA state names: only sub-app and event names exist (no per-state name table was found). The meaning of "GUI code" values 0x84/0x85 in Misc rows (no GUI event in 0x7EEF3434) is open.
 5. The GE/GPI layer, the renderers and the pools are still 47–64 % weak (no strings; callers only).
+
+## Known rule errors found by coverage round C6 (2026-11-09)
+
+Rows fixed in the TSV: 0x7EE01FF5, 0x7ED16C72 and 0x7ECEF6A6.
+- **The `hsw` hash-switch rule:** it labelled a whole function (own prologue, called through `calls (a0)`) as a case block. Its table 0x7F01170C is a linear {key, fn} table. Treat other `hsw` rows marked V as unconfirmed until rerun.
+- **The OlyApi "slot vt+N = (N/4+1)-th name" order rule:** it fails for CustomPrint (vt+60 is canPrint, vt+84 is getPrintCount). Read the API id inside the slot target instead. The MediaCtrl vt+44 doubt (transferImageAll vs cancelTransferImageAll) has the same cause.
+- **Rows that are context only:** "private method" and "helper of X" rows for panel and page code give context, not a role.
+- **Undescribed structures:** the GUI draw-object family (factory 0x7ED1AFF9, types 0x2000–0x2012; e.g. 0x200C is an animated blur effect) and the GUI trace ring buffer (120 × 16 B) have no descriptions.
