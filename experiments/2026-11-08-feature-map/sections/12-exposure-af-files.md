@@ -32,11 +32,11 @@ This section goes below the module-level map of sections 02 §4–6, 03 §7–8 
 | `exp_cal_still` | 0x7E693D00 | Calls the sub-steps below, then copies its inputs and results into the debug capture (0x7E69E86F → the buffer pointed to by 0x605A7370; `exp still on/info`) | verified |
 | Mode canonicalisation | 0x7E69433B, table 0x7E7DBC94 | Maps mode byte 12–183 to a program code (below). A byte at +40 equal to 4 or 5 forces A or S | verified |
 | Per-mode record lookup | 0x7E6942CE, table 0x7E7DB508 | 45 records of 42 bytes, key u16 at +40. A missing key gives error 0x0E000050 through 0x7E426D4B | verified |
-| Corner resolver | 0x7E6940C6 / 0x7E694181 / 0x7E6941DA → 0x7E694412 | Sentinels (verified): 0x9B00 → user value (0x7E69561E, or 0x7E6A30B0 when byte +40 = 4); 0x6400 → max (field +16); 0x9C00 → min (field +14). Every result is clamped to [min, max] by 0x7E6A8EA4. 0x7E6941DA also has cases for the art codes 69–181 | verified |
+| Corner resolvers (audit 2026-11-09: corrected) | 0x7E6940C6 → 0x7E694412; 0x7E694181 → 0x7E694474; 0x7E6941DA → 0x7E6944D5 | **Three different helpers.** 0x7E694412: 0x9B00 → user value (0x7E69561E, or 0x7E6A30B0 when byte +40 = 4); 0x6400 → max (+16); 0x9C00 → min (+14); clamp to [+14, +16] via 0x7E6A8EA4. 0x7E694474: 0x6400 → +20 (default 3328), 0x6300 → +22 (default 1536); fixed clamp [1536, 3328], skipped when prm 0xC222 = 2. 0x7E6944D5: 0x9B00 → user value (or 0x7E6A3174 when byte +40 = 5), 0x6400 → +16, 0x6300 → second argument; fixed clamp [−1536, 3072]. 0x7E6941DA also has a sparse case list {3, 4, 69–74, 85, 86, 91, 96, 145, 163, 181} | verified |
 | Exposure-mode switch | 0x7E6945EF | Program code 6 or 58 → 0x7E69464B (manual path). Any other code → 0x7E6947C1 (auto path). Then 0x7E694F5D, 0x7E6951A6, 0x7E695591. Mode byte 90 → 0x7E69474D | verified |
 | Program line | 0x7E6947C1 | 0x7E6948AE builds 8 s16 breakpoints as sums and differences of the corner fields (+6…+26). A loop finds the first breakpoint that is below the scene BV. Segments 1–7 go to 0x7E694A24, 0x7E694B02, 0x7E694B7F, 0x7E694C68, 0x7E694D34, 0x7E694DDE, 0x7E694E56; segments 0 and 8 are the end clamps | verified structure; Av/Tv/Sv roles inferred |
 | Compensation-style bias | 0x7E694540 | clamp(a − b + sel, −768, +768) = ±3.0 EV, then added to the target. `sel` is one of 3 BV inputs, chosen by a byte ∈ {0, 1, 2} (0x7E6A89AD) | verified arithmetic; "exposure compensation" inferred (the ±3 EV range matches `MT_EXP_BIAS_MINUS_3_0…PLUS_3_0`) |
-| APEX → Exif rational | 0x7E69B184 (Tv), 0x7E69B1D9 (Av), 0x7E69B31E (bias) | Called by the Exif filler. Each has three variants for step 256 / 128 / other. Small lookup tables at 0x7E7E1xxx | verified calls; tables not decoded |
+| APEX → Exif rational | 0x7E69B184 (Tv), 0x7E69B1D9 (Av), 0x7E69B31E (bias) | Called by the Exif filler; step 256 / 128 / other select a table. Tables: Tv 0x7E7E0DFE / 0x7E7E117C / 0x7E7E1372, Av 0x7E7E1558 / 0x7E7E15AA / 0x7E7E15E2, bias 0x7E7E192D / 0x7E7E194B / 0x7E7E195F (shutter rationals, F-number × 10, bias in tenths). Tv at the upper limit goes to 0x7E6A8F11; Av can fall back to a computed value (0x7E69B223) (audit 2026-11-09) | verified |
 
 **Mode numbering** (verified from two independent consumers: the exp remap table and the Exif filler 0x7E7096DC):
 - 3 = P, 4 = A, 5 = S, 6 = M, 7 = iAuto.
@@ -75,7 +75,7 @@ Each record holds 19 Q8 values plus a u16 flag. Sentinels: **max** = 0x6400, **m
 
 ### 1.4 Metering and the 18×18 grid
 
-- **The still result holds every metering candidate.** The capture block +60 is printed by 0x7E69EDF3 (`exp_cal_still[bv]`). It holds `bv_cntr, bv_arnd, bv_ave, bv_ave2, bv_esp, bv_spot`, then `face_num, gyako` (backlight), `mode` and `bv_std` at +200/+201/+202 (verified field offsets).
+- **The still result holds every metering candidate.** The block printed by 0x7E69EDF3 (`exp_cal_still[bv]`; capture block +60) holds the six BVs at +0…+10 (spot, esp, ave, ave2, cntr, arnd), then face_num (u8 +200), mode (u8 +201) and bv_std (u16 +202). `gyako` (逆光, backlight — translation, inferred) is a byte from capture block +336, passed in d0 (audit 2026-11-09; verified offsets).
   - So centre, surround, average, ESP and spot BVs are all computed, and `mode` picks the BV used (`bv_std`) (inferred).
   - **Not mapped:** the selection switch for the five user metering modes (ESP / centre-weighted / spot / spot-highlight / spot-shadow). The highlight and shadow variants are probably the spot BV plus a fixed offset, but this was not found in code.
 - **The 18×18 grid** (`*** [EXP] BV_18x18 ***` 0x7E693B6C) feeds three things:
@@ -184,7 +184,7 @@ The result goes to byte +38 of the TAKE_FOCUS globals (pointer at 0x60515FA8). T
   - The eye-AF dump at 0x7E5E7935 prints `is_eye_af, f_size, main_eye, r_size/r_cx/r_cy, l_size/l_cx/l_cy` (verified strings). So the AF target can be the left or right eye.
   - The rule for choosing the eye was not traced.
 - **AF areas:**
-  - The spot dump 0x7E5E6063 prints `area_no`, the spot, still and AF centres, `bayer_af_w/h`, and `single_area[i].hs/vs/hw/vw` (verified).
+  - 0x7E5E6063 is the 1,455-byte **spot AF-area setup**: it picks area sizes (72/34/93/96/144, 100) by lens type and mode and fills the area structs. Only when debug mask 0x2000 is set (0x7E627500 tests 0x6054C7A4) does it print `area_no`, the spot/still/AF centres, `bayer_af_w/h`, `single_area[i].hs/vs/hw/vw`, still_img_w/h and offset_hs/vs (audit 2026-11-09; verified).
   - **Not verified:** a 35-point (7×5) layout. No 35-entry area table was found. The MakerNote AFAreas field is u32 × 64.
 - **AF illuminator:**
   - It is driven by the strobe assist task: STB_ASSIST_FUNC 0x7E5E1E94 → `stb_illuminator` 0x7E5E0FA4 → 0x7E5E1106 (abort / err / flush) (verified).
@@ -210,7 +210,7 @@ The result goes to byte +38 of the TAKE_FOCUS globals (pointer at 0x60515FA8). T
   - 0x7E708F24: the version strings and ASCII fields;
   - **0x7E7096DC** (6,319 bytes): most of the MakerNote values (with prm reads through 0x7E457C75);
   - `rec_art_set_exif_data` 0x7E70DC24 (section 09): ArtFilter.
-- **How an IFD is written:** each one comes from a pointer list of 12-byte tag templates `{u16 tag, u16 type, u32 byte_length, u32 struct_offset}`. The templates are at 0x7E84EF20–0x7E850438 and the lists at 0x7E850434–0x7E851510. The generic writer 0x7E708AAB copies from struct+offset. Tags 256–37500 that hold offsets get special cases (verified).
+- **How an IFD is written:** each one comes from a pointer list of 12-byte tag templates `{u16 tag, u16 type, u32 byte_length, u32 struct_offset}`. The templates are at 0x7E84EF20–0x7E8503FB (445 × 12 bytes) and the lists at 0x7E8503FC–0x7E851663; the last list (FocusInfo, 85 entries) starts at 0x7E851510 (audit 2026-11-09). The generic writer 0x7E708AAB copies from struct+offset. Tags 256–37500 that hold offsets get special cases (verified).
 
 ### 3.2 File types (u16 at struct+16384, verified)
 
@@ -246,7 +246,7 @@ The result goes to byte +38 of the TAKE_FOCUS globals (pointer at 0x60515FA8). T
 
 ### 3.4 ORF container and the CIC codec
 
-- **ORF IFD0 values** (0x7E71969F, verified constants):
+- **ORF values** (0x7E71969F, verified constants). Most are IFD0; CFAPattern is Exif tag 0xA302 (struct+2407) and ValidBits is ImageProcessing 0x0611 (struct+4360) (audit 2026-11-09). "12-bit in 16-bit containers" is inferred from ValidBits 12 and BitsPerSample 16:
   - ImageWidth 4640, ImageLength 3472, BitsPerSample 16, **Compression 1**, PhotometricInterpretation 1, SamplesPerPixel 1, PlanarConfiguration 1.
   - StripOffsets is computed: a size read from prm 0xCF94[55], plus a 512-aligned length from 0x7E55871C(), plus 101,376.
   - CFAPattern `02 00 02 00 | 00 01 01 02` = 2×2, **R G / G B**.
@@ -257,7 +257,7 @@ The result goes to byte +38 of the TAKE_FOCUS globals (pointer at 0x60515FA8). T
   - **Then 14 parameters** are copied from struct+4378…+4404, which are **ImageProcessing tags 0x0640–0x0653** in order: SepBitNum, ThPred, ImaginVal, Equation, RestCut, ThDiff, ThRunSm, KparaSm, ThKparaSm, KparaRo, ThKparaRo, KparaMax, MaxPrefix, RstLength (field names from the dump strings).
   - **Reading (inferred):** CIC is a hardware RAW codec. It has interrupt statistics (" CIC %-4d" 0x7E449905) and a mutex. It does predictive coding with adaptive Golomb-style k parameters for smooth and rough areas, and a restart interval every `RowsPerStrip` lines. That matches the public description of Olympus compressed ORF (external).
   - **The encode side** in REC was not found by name. It is probably the same hardware block, driven from the REC_IMAGE pipeline (inferred).
-- **Sensor capture packing:** the cam debug at 0x7E62F370 offers "12 = 12bit" and "pack up / pack down" (verified strings). This is the in-memory format, not the file format.
+- **Sensor capture packing:** the cam debug at 0x7E62F370 offers "12 = 12bit" and "pack up / pack down" (verified strings). This is probably the in-memory format, not the file format (inferred; audit 2026-11-09).
 
 ### 3.5 DCF names
 

@@ -22,6 +22,7 @@ A region that fails a round gets a deep dive, then a **new** blind sample. The s
 | Round | Test | Sample | Result |
 |---|---|---|---|
 | A1 | Claim audit, sections 01–08 | 48 claims, seed 20261109 | 26 correct, 21 minor, **0 wrong**, 1 uncheckable (`audit/REPORT.md`); fixed in `audit/fixes.md` |
+| A2 | Claim audit, section 12 | 12 claims, seed 20261110 | 6 correct, 5 minor, **1 wrong** (12-35: three corner-resolver helpers merged into one); all fixed |
 | C1 | Coverage, whole block 0 | 80 functions, seed 1109 | *running* |
 
 ## Region status
