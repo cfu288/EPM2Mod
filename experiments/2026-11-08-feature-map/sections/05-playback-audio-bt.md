@@ -21,7 +21,7 @@ Labels: **verified** = read in the code or bytes; **inferred** = from strings, n
 | 0x7E93BA6C–0x7E94D2FF | Playback engine `play_*.c`, `playbuff.c` (PLAY_MAIN/IMAGE/LOAD/SOUND) | verified |
 | 0x7E94D8A8–0x7E961C5A | Audio: bridge, control, WM8946 codec driver, DSP, FSC DMA, sequences, WAV/AC3 tools, AUD_* tasks | verified |
 | 0x7E961C5B–0x7E966000 | `fsc_drv` (audio DMA), then the user shell (`User Shell Help Command`, memory dump/fill/verify) | inferred, not examined |
-| 0x7EBA1020–0x7EBA6B03 | C++ device class `DevBlu_Bluetooth` (vtable 0x7EC91628), OS shims `BSE_*`/`BMQ_*`/`BEF_*`/`BTM_*`/`BMT_*`, state-machine runtime (`OMREactive`). Bounds per 13c §1: `Dev*` classes 0x7EBA0AA9–0x7EBA4867, OXF runtime 0x7EBA4868–0x7EBA7BB5 (D1 2026-11-09) | verified (vtable); class role inferred |
+| 0x7EBA1020–0x7EBA6B03 | C++ device class `DevBlu_Bluetooth` (vtable 0x7EC91628), OS shims `BSE_*`/`BMQ_*`/`BEF_*`/`BTM_*`/`BMT_*`, state-machine runtime (`OMREactive`). Bounds per 13c §1: `Dev*` classes 0x7EBA0AA9–0x7EBA48BB, OXF runtime 0x7EBA48BC–0x7EBA7BC0 (D1 2026-11-09) (A5 2026-11-09) | verified (vtable); class role inferred |
 | 0x7EBA6B03–0x7EBE1020 | Strings and rodata for all of the above (e.g. `play_apical.c` at 0x7EBB66D7). **Corrected:** 0x7EBA6B03–0x7EBA7BB5 is still OXF code and 0x7EBA7BC1–0x7EBABF8D is OKAO Smart Skin code; the data starts at about 0x7EBAC000 (13b §1, 13c §1) (D1 2026-11-09) | verified |
 
 **Key result.** In this firmware, **"cube" is the code name of the Bluetooth/PENPAL feature** (verified).

@@ -11,7 +11,7 @@ Scope: how the C++ GUI in 0x7ECA–0x7EE0 is built. The topics are the widget fr
 
 | Range | Contents | Basis |
 |---|---|---|
-| 0x7ECA1020–0x7ECCB7FF | Mostly data: ramp/LUT tables (0x7ECA1020–0x7ECB1000, from 0x7ECA6000…), then `de 00 00` (a `retf`) at 0x7ECB1000 and **108,541 bytes of 0xFF erased fill** (0x7ECB1003–0x7ECCB7FF), which is padding, not a table. The DB's "function" 0x7ECAD443 (15 KB, calls only itself) is probably data | verified bytes; the role of the ramp data is inferred (A4 2026-11-09) |
+| 0x7ECA1020–0x7ECCB7FF | Mostly data: ramp/LUT tables up to ~0x7ECB083B (the ramps start before 0x7ECA1020, from at least 0x7EC9F000; 13b gives the OKAO Smart Skin LUTs as 0x7EC92318–0x7ECAFF3C, which covers most of them) (A5 2026-11-09); then **19 ascending code pointers 0x7ECB083C–0x7ECB0887** to 0-caller functions that construct globals (e.g. 0x7E969F02 → mutex 0x605E1638; inferred: the C++ static-constructor table) (A5 2026-11-09); then 0xFF fill 0x7ECB0888–0x7ECB0FFF; then `de 00 00` (a `retf`) at 0x7ECB1000 and **108,541 bytes of 0xFF erased fill** (0x7ECB1003–0x7ECCB7FF), which is padding, not a table. The DB's "function" 0x7ECAD443 (15 KB; it calls itself, 0x7ECAD43E and two targets outside the image) is probably data (A5 2026-11-09) | verified bytes; the role of the ramp data is inferred (A4 2026-11-09) |
 | 0x7ECCB800–0x7ECE4000 | CA_MAIN "camera app" (code restarts at 0x7ECCB800): OSD_CONTROL/OSDDRAW (0x7ECCBA45…), `*SubAppMdl*` modules, `*SubAppState*` states (ShootingFuncDirect, ModeDirect, Misc) | verified strings (A4 2026-11-09) |
 | 0x7ECE4000–0x7ECEC798 | GUI↔CA bridge `GuiCallerImp::sendEvent` (0x7ECE6E27); "Genifa" GE event layer (message build 0x7ECE7597, post 0x7ECE75C3, task GPI_TIM_TASK); GPI display layer (`GPISetPalette`, `cw_updateDisplay`, `GPISetOsdOrder`), including 0x7ECEBE26 (962 B) and 0x7ECEC1E8 (1,457 B), which call the GPI functions 0x7ECEA7ED…0x7ECEAD0A | verified strings and code (A4 2026-11-09) |
 | 0x7ECEC799–0x7ECEE1D5 | GUI memory pools (from 0x7ECEC799; alloc 0x7ECEC905, free 0x7ECEC9CB, pool lookup 0x7ECEC854, 20-byte header); UTF-16 helpers (`wcscpy` 0x7ECED793, `wcslen` 0x7ECED7BB, compare 0x7ECED75C); CTouchPnl (0x7ECEDE30). The GUI data-model get/set 0x7ECEF64F/0x7ECEF667 (section 07) sits just after the root class | verified code (A4 2026-11-09) |
@@ -20,12 +20,12 @@ Scope: how the C++ GUI in 0x7ECA–0x7EE0 is built. The topics are the widget fr
 | **0x7ED17000–0x7ED37DAA** | **Object factory** 0x7ED17DB8, panel creation by number 0x7ED19D3F, top window (WinMain class) 0x7ED1B48C…, the widget classes 0x80xx/0xC0xx/0xD0xx and their drawing parts (0x7ED2F000–0x7ED37DAA) | verified |
 | **0x7ED37DAA–~0x7ED82025** | **114 panel classes** (`GCPnl_*`, type ids 0x6000–0x6071), one per screen layout | verified |
 | ~0x7ED82200–0x7ED82820 | Statechart engine: default handlers 0x7ED82276, init 0x7ED82282, dispatch 0x7ED822FE, evmap 0x7ED8243C; WinMain 0x7ED8249F (`WinMain called` / `messageloop start`, "Start Gui Task") | verified |
-| 0x7ED82820–0x7ED86DA0 | `Ss*` handlers of SS_BTRECEIVE, SS_BTSEND, SS_COMMON (§4) | verified |
-| 0x7ED86DA0–0x7EDA0410 | Live-view controller `IGui_Controler` (0x7ED87077, 0x7ED87397); Actuator/Viewer objects of the registry 0x7EFC5408 (`Func_Scp_Actuator`, `Input_String_Actuator`, `Rec_View_Viewer`) | verified strings |
+| 0x7ED82820–0x7ED86DA5 | `Ss*` handlers of SS_BTRECEIVE, SS_BTSEND, SS_COMMON (§4). The last handler 0x7ED86DA0 (`mov 516,d0; retf`) ends at 0x7ED86DA5; the DB merges it into 0x7ED86D73 (A5 2026-11-09) | verified |
+| 0x7ED86DA6–0x7EDA0410 (A5 2026-11-09) | Live-view controller `IGui_Controler` (0x7ED87077, 0x7ED87397); Actuator/Viewer objects of the registry 0x7EFC5408 (`Func_Scp_Actuator`, `Input_String_Actuator`, `Rec_View_Viewer`) | verified strings |
 | 0x7EDA0410–0x7EDC15B0 | `Ss*` handlers of DEBUGMENU, DPS, MENU_LV, MENU_MAIN, SS12, PLAY_INDEX, PLAY_MOVIE_SLIDE, PLAY_SINGLE, REC, SELFADJ, SPC, USB, in that order (`doCmd_<Ss>_<St>_<Evt>`; FuncMenu strings at 0x7EDA4…) | verified (fork ranges) |
 | 0x7EDC15B0–~0x7EDE0000 | Actuator objects (0x7EDC15E0…), guiUtility (ShowPanelEx 0x7EDC5D2D, PostEventToCA 0x7EDC5C47, self-post 0x7EDC5BF5), guiEventFilter, widget helpers 0x7EDC17FB–, BT wizard, DPS GUI helpers 0x7EDCE9B9–0x7EDD07F9, the self-adjust UI 0x7EDD8–0x7EDDF | verified strings |
 | ~0x7EDE0000–0x7EE01FF5 | Menu pages: the generic list pages, the Custom Menu panel (0x7EDE9AA6…, §5), the `userMenu*` special pages, and the setting wrappers 0x7EE01D38 / 0x7EE01D4E | verified |
-| **0x7EE02095–0x7EE21020** | **Not GUI.** This is a DMP ("Digital Media Professionals, Inc." 0x7EE0877E) OpenGL-ES-style 3D library: `gl_ModelViewMatrix`, and shader-object tags `DVOJ`/`DVPE`. Its only callers are C3D (0x7EE2–0x7EE3) and the overlay C3D bridges (0x7F09/0x7F0A); no call comes from 0x7ECA–0x7EE01 | verified call edges; that it is the GPU driver of C3D is inferred |
+| **0x7EE02095–~0x7EE294B4** (C2 2026-11-09) | **Not GUI.** This is a DMP ("Digital Media Professionals, Inc." 0x7EE0877E) OpenGL-ES-style 3D library: `gl_ModelViewMatrix`, and shader-object tags `DVOJ`/`DVPE`. Its only callers are C3D (0x7EE2–0x7EE3) and the overlay C3D bridges (0x7F09/0x7F0A); no call comes from 0x7ECA–0x7EE01. **It runs to ~0x7EE294B4, not 0x7EE21020** (C2 2026-11-09): the `{name, fn}` table 0x7F023C74–0x7F024283 (194 `gl*` entries) has 89 entries at or above 0x7EE21020, up to glPointSize 0x7EE29468; the last GL function 0x7EE2946D ends at 0x7EE294B4, and an `MCM_/MCA_/MCT_` module starts at 0x7EE294B5. The outside callers are in 0x7EE2F000–0x7EE32xxx (after the library) and 0x7F09E/0x7F0A3 (C2 2026-11-09) | verified call edges; that it is the GPU driver of C3D is inferred |
 
 Rodata: the GUI tables and vtables run from 0x7EEF5000 to ~0x7F01xxxx. **A class's strings come just before its vtable** (verified for the 11 named panels, §3).
 
@@ -61,7 +61,7 @@ Every object stores its **vtable at +0** and a **u16 type id at +4**.
 | 0xC000 / 0xC001–C005 | drawable part, family C | 0x7ECF563A | 0x7EEF6110 | root |
 | 0xD000 / 0xD001–D003 | drawable part, family D | 0x7ECF5451 | 0x7EEF5F54 | root |
 
-- The two parent types the panel builders test are **257/258** (screen / sub-screen). For those parents the builders scale each child rect by 4.12 fixed-point factors at 0x602B6204/6206 and add offsets at 0x602B6208/620A (verified, 0x7ED37E90…). **Inferred:** this rescales layouts for HDMI/EVF output.
+- The two parent types the panel builders test are **257/258** (screen / sub-screen). For those parents the builders scale only the **origin** (x1, y1) of each child rect by 4.12 fixed-point factors at 0x602B6204/6206 and add offsets at 0x602B6208/620A; width and height are kept (x2 = x1′ + w − 1, y2 = y1′ + h − 1; two multiplies per builder, all 61 builders) (verified, e.g. 0x7ED37EA5–0x7ED37EE7 inside fn 0x7ED37E2D) (A5 2026-11-09). **Inferred:** this relocates child positions (for HDMI/EVF output); it is not a full rescale (A5 2026-11-09).
 - **Geometry (verified):** a rect is `{s16 x1, y1, x2, y2}`, inclusive (x2 = x1 + w − 1 in the builders). Point set 0x7ECFF349; rect from coordinates (normalised) 0x7ECFF899; copy 0x7ECFF422; equal 0x7ECFF431; offset rect/point 0x7ECFF561/0x7ECFF266; overlap test 0x7ECFF6A6 (133 callers).
 - **Pools (verified):** GUI pool alloc/free 0x7ECFF1D8/0x7ECFF1E4 (→ 0x7ECEC905/0x7ECEC9CB) take two pool bytes. Root-family objects keep them at +28/+29 (slot +244 sets, +248 reads), but of the 205 call sites only about 24 load +28/+29 directly and about 13 use slot-248 results; the rest pass constants ((1,0) ×57, (5,0) ×21, (8,0) ×10) or bytes +17/+18 of another structure (×36). (A4 2026-11-09)
 
@@ -122,7 +122,7 @@ There are 140 type ids: 1, 0x104, 0x105, 0x6000–0x6071, 0x8001–0x8008, 0x800
   - 0x7ECFF3E9 (69 callers) indexes RAM tables by the current layer byte 0x602B6034;
   - 0x7ECFF3C3 indexes ROM records of 884 bytes at 0x7EFB1034 (sub-records of 52 bytes).
 - **Roles not identified:** of 0x8001/04/05/07/08/0A/0E/0F/12/13 and the C/D parts. Text, image and frame parts are likely (inferred).
-- **Helper layer 0x7EDC17FB–0x7EDC2000 (verified; "set only if changed"):** 0x7EDC1851 `setVisible(w, b)` (2,641 call sites, the most called GUI function; vt+80 then vt+76); 0x7EDC1875 `setListIndex(w, i)` (453; range-checked); 0x7EDC189F set list item resource; 0x7EDC1B15 set list item value; 0x7EDC18C8 / 0x7EDC1972 move/resize (vt+52 get rect, +44 set rect, +168 invalidate); 0x7EDC181B text by string id + show. C1 F065 0x7ED61C13 is a panel-level "show item n−2 or hide" helper built on these.
+- **Helper layer 0x7EDC17FB–~0x7EDC1B36 (verified; most helpers "set only if changed"):** 0x7EDC17FB is a static initializer (stores −1/0x7EDC178A at 0x602BC588), not a helper (A5 2026-11-09); 0x7EDC1851 `setVisible(w, b)` (2,641 call sites, the most called GUI function; vt+80 then vt+76); 0x7EDC1875 `setListIndex(w, i)` (453; range-checked); 0x7EDC189F set list item resource (no "only if changed" check) (A5 2026-11-09); 0x7EDC1B15 set list item value; 0x7EDC18C8 move/resize (vt+52 get rect, +44 set rect, +168 invalidate); 0x7EDC1972 the same but gets the rect through vt+48 (A5 2026-11-09); 0x7EDC181B set text by string id (0x7ED2CE0C), or hide when the id is 0 (A5 2026-11-09). 0x7EDC2000 is inside the 1,333-byte fn 0x7EDC1B37 (to 0x7EDC206B) (A5 2026-11-09). C1 F065 0x7ED61C13 is a panel-level "show item n−2 or hide" helper built on these.
 
 ## 3. Panels (`GCPnl_*`) and panel numbers (verified)
 - **Create by number.** `CreatePanel(this = manager, d0 = no 0..159)` is 0x7ED19D3F.
@@ -153,7 +153,7 @@ There are 140 type ids: 1, 0x104, 0x105, 0x6000–0x6071, 0x8001–0x8008, 0x800
 
 - Panel 81 is shown by the Custom Menu page (§5). GCPnl_Custom_Btn and GCPnl_Menu are the two ~3.9 KB menu-list panels (inferred).
 - The debug-menu draw routine 0x7ED48BBA (sections 07, 10f) is in panel 0x6066's code.
-- Panel **signature (verified, majority form):** 93 of the 115 callers of 0x7ED23C27 use `call 0x7ED23C27 ; mov a0,a2 ; mov VT,d0 ; mov d0,(a2) ; …zero the child array at +792… ; [call 0x7ED01DFD ; call 0x7ED01F7C/0x7ED01FBA]`. Variants: 17 store the vtable through (a0), zero +792 and return with no tail calls (e.g. 0x7ED7A79F); 4 zero from +796 (e.g. 0x7ED40F26); 0x7ED230C2 only does `mov d0,(792,a0)`. (A4 2026-11-09)
+- Panel **signature (verified, majority form):** 93 of the 115 callers of 0x7ED23C27 use `call 0x7ED23C27 ; mov a0,a2 ; mov VT,d0 ; mov d0,(a2) ; …zero the child array at +792… ; [call 0x7ED01DFD ; call 0x7ED01F7C/0x7ED01FBA]`. Variants: 16 store the vtable through (a0), zero +792 and return with no tail calls (e.g. 0x7ED7A79F); 0x7ED7E533 uses (a2), zeroes +792 and calls 0x7EDC65C5 with no 0x7ED01DFD; 4 use other child-array offsets: +796 (0x7ED40F26), +808 (0x7ED5313E), +824 (0x7ED488AA), +888 (0x7ED410EB) (A5 2026-11-09); 0x7ED230C2 only does `mov d0,(792,a0)`. (A4 2026-11-09)
 - Panel virtuals log `[GUI App   ] GCPnl_X::CheckRecView/CheckIndexBtn/CheckImageArea/CheckAllArea() called`. These are the touch hit tests.
 
 ## 4. Generated state handlers (Ss*)
@@ -187,7 +187,7 @@ Actions end `mov N,d0 ; ret` or build `asl 8 ; or` for an SS change; the shared 
 ### 4.2 Super-states (verified; code ranges are the handler code)
 | SS | Name | Descriptor | States/events/handlers | Handler code |
 |---|---|---|---|---|
-| 1 | SS_COMMON | 0x7EFC4038 | 9/37/41 | 0x7ED8612D–0x7ED86DA0 |
+| 1 | SS_COMMON | 0x7EFC4038 | 9/37/41 | 0x7ED8612D–0x7ED86DA5 (A5 2026-11-09) |
 | 2 | SS_REC | 0x7EFD8A78 | 4/26/20 | 0x7EDBE595–0x7EDBEE11 |
 | 3 | SS_MENU_MAIN | 0x7EFD40C4 | 12/71/211 | 0x7EDA8BB6–0x7EDB3239 |
 | 4 | SS_MENU_LV | 0x7EFD30F8 | 10/45/181 | 0x7EDA46B7–0x7EDA8BA0 |
@@ -324,7 +324,7 @@ Actions end `mov N,d0 ; ret` or build `asl 8 ; or` for an SS change; the shared 
 - API class 03.0A is EditImageOverlay (link order); the GUI uses no EditCalendar interface (agrees with 10d).
 
 ## 7. Corrections
-1. **Region table:** 0x7EE02095–0x7EE21020 is a DMP GL/shader library used by C3D, not GUI. 0x7ECA1020–0x7ECCB7FF is data and padding (108,541 bytes of 0xFF from 0x7ECB1003); CA_MAIN code starts at 0x7ECCB800. (A4 2026-11-09)
+1. **Region table:** 0x7EE02095–~0x7EE294B4 (not 0x7EE21020; C2 2026-11-09) is a DMP GL/shader library used by C3D, not GUI. 0x7ECA1020–0x7ECCB7FF is data and padding (108,541 bytes of 0xFF from 0x7ECB1003); CA_MAIN code starts at 0x7ECCB800. (A4 2026-11-09)
 2. **Section 07 §3.2:** the sub-item table is 0x7EFEF4FC–0x7EFF044B (196 × 20 bytes, label at +16), and 0x7EFEFE04 is not a second table. 0x7EDCBE97/0x7EDC7DBA create menu pages; panels are created by 0x7ED19D3F (0..159).
 3. **Section 10d §6:** the Custom Menu table starts at 0x7EFF7E80. 0x7EFF8250 is page H, and group 8 is page I. The "mic level" row is labelled Recording Volume.
 4. **C1 review:** the registry is at 0x7EFC5408, and 0x7EFC5470 is its entry for id 13. F069 is an Actuator/Viewer object (id 17). The 0x7ED17DB8 callers are the panel child-builders and CreatePanel, not "widget" constructors.

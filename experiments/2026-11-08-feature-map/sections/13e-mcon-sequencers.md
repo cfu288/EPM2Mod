@@ -21,7 +21,7 @@ mcon internal layout (V by callers/strings; one row per block):
 | 0x7E6FCA60–0x7E6FCD3C | exported `mcon_if_*` API veneers (8–27 B each) |
 | 0x7E6FCD3D–0x7E6FD10A | busy-guarded wrappers (camera_start/set/end, mymode, custom, resets) |
 | 0x7E6FD10B–0x7E6FE250 | `mcon` debug shell 0x7E6FDCAE, help 0x7E6FDB25, dumps (modeinfo, enumlist, modeconftbl, `MODE0DT%1dDAT` log 0x7E6FDA31) |
-| 0x7E6FE251–0x7E6FE43F | language-list init (`Warning Language error`, `AllocMemory error LanguageInfo`) (I role) |
+| 0x7E6FE251–0x7E6FE444 | **0x7E6FE251 = mcon module init** (only caller Usr0 0x7E503DD4; it calls 15 functions across the module, e.g. 0x7E706905, 0x7E70097E, 0x7E6FF6C2, 0x7E7002E4) (C2 2026-11-09). Language-list code 0x7E6FE2C6–~0x7E6FE3FA (`Warning Language error` 0x7E6FE2C6, `AllocMemory error LanguageInfo` 0x7E6FE32F and their helpers) (I role); then small back-ends 0x7E6FE3FB–0x7E6FE444 called from the `mcon_if_*` veneers (C2 2026-11-09) |
 | 0x7E6FE445–0x7E6FE764 | small record callbacks (§3.2: +52 writers, +20/+44 selectors, +40 index) |
 | 0x7E6FE765–0x7E6FF5F0 | get / set / step engine (§2.1) |
 | 0x7E6FF5F1–0x7E6FF9CD | composite records, dependency propagation, post-write notify |
@@ -133,11 +133,11 @@ mcon internal layout (V by callers/strings; one row per block):
 
 | Group | States (id) | Verified behaviour |
 |---|---|---|
-| idle | Idle 0, Damage 1 | Idle: A0/A2 → RdyStart. Damage: all A events rejected (0x7E59A3AD) |
+| idle | Idle 0, Damage 1 | Idle: A0/A2 → RdyStart. Damage: 8 of its 14 A events (A0, 2, 6, 7, 8, 9, b, c) go to the reject handler 0x7E59A3AD; A5, Ae, Af, A10, A11, A13 go to the ignore handler 0x7E582546 (A5 2026-11-09) |
 | release-ready (half press, I) | RdyStart 2 → RdyFcsRdy1 3 → RdyFcsRdy2 4 → RdyFcsRdy3 5 | Rdy1 sends FUNC 0x35. Rdy2 sends FCS 0x403 `release_idle_ready`; its B-e handler goes to 5, or to 7 when byte 0x60517D48 ≠ 0 (0x7E5AAB0F). Rdy3 sends EXP 0x500 and FCS 0x400 `release_idle_start` |
-| wait for 2nd trigger (I: S2) | RdyTrig2Wait 6, RdyFastTrig2Wait 7 | A8/Ab → RdyFcsTake; A7/A2 → RdyAbort. In state 7, A6 → 6 |
+| wait for 2nd trigger (I: S2) | RdyTrig2Wait 6, RdyFastTrig2Wait 7 | A8/Ab → RdyFcsTake; A7 → RdyAbort. In state 6, A2 → RdyAbort too. In state 7, A2 maps to 0x7E5AADBC, which returns 0xFFFF and sets no state (A5 2026-11-09), and A6 → 6 |
 | take / abort | RdyFcsTake 8, RdyFcsAbort 9, RdyAbort 10, RdyEnd 11 | 8: B9 → EXP 0x600 `release_take_start`. 9: B6 → FUNC 0x35 + EXP 0x401 `release_ready_end` (F007 0x7E5AB1BB). 10: B6 → EXP 0x501 `release_idle_end` |
-| still capture | Standby 12 → StlRdy1 13 → StlRdy2 14 → StlTake 15 / StlLiveTake 16 → StlEnd1 17 / StlEnd2 18 | Standby: A7/A9 → RdyAbort with EXP 0x601+0x701 and FCS 0x501+0xE01 (`release_take_end`, `release_end`). StlRdy2 entry calls 0x7E5A4BA3 → strobe calc F010. StlTake: FCS 0x800 `mf_start`, B20 → 0x801 `mf_end`. StlEnd2: EXP/FCS release_take_end + release_end, FUNC 0x30/0x35. B35–B37 → Damage |
+| still capture | Standby 12 → StlRdy1 13 → StlRdy2 14 → StlTake 15 / StlLiveTake 16 → StlEnd1 17 / StlEnd2 18 | Standby (handler 0x7E5A190C for both): A9 sends EXP 0x601 + FCS 0x501 (`release_take_end`), replies (0x7E582595) and goes to **RdyTrig2Wait 6**; A7 sends EXP 0x701 + FCS 0xE01 (`release_end`) and goes to RdyAbort 10 (A5 2026-11-09). StlRdy2 entry calls 0x7E5A4BA3 → strobe calc F010. StlTake: FCS 0x800 `mf_start`, B20 → 0x801 `mf_end`. StlEnd2: EXP/FCS release_take_end + release_end, FUNC 0x30/0x35. B35–B37 → Damage |
 | sequential with AF | ContAfAe 19, ContAf 20, ContAfStop 21, ContWait 22 | 19: B10 → FCS 0x600 `take_continue_start`. 20/21: A7/Ae/A11 → StlEnd1 with EXP 0x801 + FCS 0x601 `take_continue_end` |
 | high-speed sequential | HsContTake 23, HsContWait 24, HsContRdy 25, HsContEnd 26 | HsContRdy entry also calls 0x7E5A4BA3 (strobe). A7/Ae/A11 in 24 → HsContEnd |
 

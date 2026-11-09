@@ -8,21 +8,22 @@
 
 | Range | Contents | Basis |
 |---|---|---|
-| 0x7E966000–~0x7E96998A | HIGHLEVEL_MAIN entry, HLS OS wrapper, growable array, logger (section 06) | verified (06); end moved from 0x7E96B000 by the `Tra*` string tags (A4 2026-11-09) |
-| ~0x7E96998B–~0x7E9EA380 | `Tra*` event package (the `TraShareTakeStatus.cpp` tag is used by 0x7E969F7B, 0x7E96A14E, 0x7E96A422, 0x7E96A52A, 0x7E96AF2A and 0x7E96B048; first function of the package about 0x7E96998B `getIntervalShootingState`) + `OlyHfwOpe*`/`OlyHfwLowApiWrap` operation classes + event classes they declare; `sdk api` shell and `OlyApi*` (06 §5); the `app_check_*` group 0x7E9E8CCD–0x7E9EA380 | verified (string tags + event scan); both ends approximate (A4 2026-11-09) |
+| 0x7E965FD1–0x7E966A16 | **Not app layer:** user-shell support code (fn 0x7E965FD1 spans 0x7E966000 and builds ANSI `ESC[` sequences; printf-like 0x7E966355; callers are shell commands from 0x7E9641FB on) (A5 2026-11-09) | verified call edges; role inferred (A5 2026-11-09) |
+| 0x7E966A17–0x7E9698EB | HIGHLEVEL_MAIN code (from 0x7E966A17; entry 0x7E966A78), HLS OS wrapper, growable array, logger (section 06). The end is the last function before `clearIntervalShootingState` 0x7E9698EC (A5 2026-11-09) | verified (06); end moved from 0x7E96B000 by the `Tra*` string tags (A4 2026-11-09), then from ~0x7E96998A to 0x7E9698EB (A5 2026-11-09) |
+| 0x7E9698EC–~0x7E9EA380 | `Tra*` event package (the `TraShareTakeStatus.cpp` tag is used by 0x7E969F7B, 0x7E96A14E, 0x7E96A422, 0x7E96A52A, 0x7E96AF2A and 0x7E96B048; first function of the package **0x7E9698EC `clearIntervalShootingState`**, which takes the TraShareTakeStatus lock 0x7E969EE6/0x7E969EF4 and clears bits in 0x602B0CDC; the RAM block 0x602B0CB4–0x602B0D18 is used only from here up (A5 2026-11-09)) + `OlyHfwOpe*`/`OlyHfwLowApiWrap` operation classes + event classes they declare; `sdk api` shell and `OlyApi*` (06 §5); the `app_check_*` group 0x7E9E8CCD–0x7E9EA380 | verified (string tags + event scan); both ends approximate (A4 2026-11-09) |
 | ~0x7E9EA381–0x7EB80000 | `Cap*` capabilities, `CmpSts*`/`CmpSqp*` controllers, `Cmp*` components (one file per class, see §5) | verified (class directory) (A4 2026-11-09) |
-| 0x7EB7FC91–~0x7EB854FF | `CmpSts_SingleStillShootingSequence_NEW` statechart (`rcv3dShootingFinishIn_END_WAIT` …) | verified (class directory, strings) |
-| ~0x7EB85500–0x7EB8C265 | **Com_ framework**: Com_ reactive base, observers, request/response registry, CmpInit helpers, `Cab_CameraBase` mode machine, `Com_ActiveTransitionManagerBufferd`, events 7001–7020 and 11561–11566 | verified |
-| 0x7EB8C265–~0x7EB93A80 | `Dev*` device classes, part 1: display device (`api_disp_*`, `allocDisplayHandle`), `DevAef_AEAFCtrl`, `DevCls` (clear-skin rec view), effects, LED, `DevMed_MediaControl`, `DevRec` | verified (`api_*` callees, strings) |
-| ~0x7EB93A80–0x7EBA0AA8 | `Ctg_ComponentSwitcher` categories (5 vtables; ctors 0x7EB93A89, 0x7EB94576, 0x7EB96F97, 0x7EB9D909, 0x7EB9F1D1) | verified (class directory) |
-| 0x7EBA0AA9–0x7EBA4867 | `Dev*` device classes, part 2: anti-shake, image handle, HDMI/CEC, histogram, Exif, picture files, `DevBlu_Bluetooth`, **USB-communication device**, DPS-T, DPS, pixel mapping, picture-file creation (§5.4) | verified |
-| **0x7EBA4868–0x7EBA7BC0** | **Rhapsody OXF runtime** (§2). Its last function is the 12-byte helper **0x7EBA7BB5–0x7EBA7BC0** (`add 16,a0`; zero the word at this+16 if it is non-zero; `retf`), called only by the class destructor 0x7EBA7B98 (own vtable 0x7EBCDB0C, then base destructor 0x7EBA7B13 with vtable 0x7EC922DC): it fills the clean-up step of the class-dtor shape in §3 (that role is inferred). The base/derived class pair (vtable slots point into 0x7EBA79D8–0x7EBA7B98) has no name string | verified (A4 2026-11-09) |
-| 0x7EBA7BC1–0x7EBABF8D | **Not OXF: OKAO Smart Skin** (13b §2.2; data from ~0x7EBAC000). A string-less library called only from the FACE task code (0x7E6FB836, 0x7E6FB8BF, 0x7E6FBBCD, 0x7E6FBC17). It calls 0x7E72D0BA–0x7E72D95E (OKAO area) and the soft-float helpers 0x7E5010xx. Error codes 0x0CA000xx. | verified call edges; "OKAO" by role (13b) (A4 2026-11-09) |
+| 0x7EB7FC91–0x7EB84344 | `CmpSts_SingleStillShootingSequence_NEW` statechart (`rcv3dShootingFinishIn_END_WAIT` …). Its last function is 0x7EB83ECB (1,146 B, ends 0x7EB84344) (C2 2026-11-09) | verified (class directory, strings) |
+| 0x7EB84345–0x7EB8C265 | **Com_ framework** (from 0x7EB84345: the `Com_EvSenderManager` static module 0x7EB84345–~0x7EB85562, a 4,143-byte function called only by the `RECV APP_EVENT` handler 0x7E96DD58, its getters 0x7EB85374… and the overflow logger 0x7EB854E0 (`Com_EvSenderManager buffer overflow!`); globals 0x602B48A8–0x602B48E0) (A5 2026-11-09): Com_ reactive base, observers, request/response registry, CmpInit helpers, `Cab_CameraBase` mode machine, `Com_ActiveTransitionManagerBufferd`, events 7001–7020 and 11561–11566 | verified |
+| 0x7EB8C265–~0x7EB93422 | `Dev*` device classes, part 1 (the last `Dev*` string user is `DevSor::stop()` 0x7EB93362; the small helpers up to 0x7EB93422 are called only from Dev code) (C2 2026-11-09): display device (`api_disp_*`, `allocDisplayHandle`), `DevAef_AEAFCtrl`, `DevCls` (clear-skin rec view), effects, LED, `DevMed_MediaControl`, `DevRec` | verified (`api_*` callees, strings) |
+| ~0x7EB93423–0x7EBA0AA8 | Categories: first the function-mode category (getInstance 0x7EB93423, only caller `Cab_CameraBase::functionModeState` 0x7EB8AA26; ctor 0x7EB9345E; vtable 0x7EC8F144; sub-category 0x7EB937D3/0x7EB9380E/0x7EB938CB) (C2 2026-11-09), then the `Ctg_ComponentSwitcher` categories (5 vtables; ctors 0x7EB93A89, 0x7EB94576, 0x7EB96F97, 0x7EB9D909, 0x7EB9F1D1) | verified (class directory) |
+| 0x7EBA0AA9–0x7EBA48BB | `Dev*` device classes, part 2: **face device** (0x7EBA0CA3 `api_rec_Get_Rec_Face_Number`, 0x7EBA0CCA `…Face_Rect_Area`, 0x7EBA0F8B `api_play_Get_FaceDirection`) (A5 2026-11-09), anti-shake, image handle, HDMI/CEC, histogram, Exif, picture files, `DevBlu_Bluetooth`, **USB-communication device**, DPS-T, DPS, pixel mapping, picture-file creation with its six helpers 0x7EBA4868–0x7EBA48BB (callers only 0x7EBA4603/0x7EBA464F/0x7EBA4759) (§5.4) (A5 2026-11-09) | verified |
+| **0x7EBA48BC–0x7EBA7BC0** | **Rhapsody OXF runtime** (§2); it starts with the OMEvent ctor 0x7EBA48BC (A5 2026-11-09). Its last function is the 12-byte helper **0x7EBA7BB5–0x7EBA7BC0** (`add 16,a0`; zero the word at this+16 if it is non-zero; `retf`), called only by the class destructor 0x7EBA7B98 (own vtable 0x7EBCDB0C, then base destructor 0x7EBA7B13 with vtable 0x7EC922DC): it fills the clean-up step of the class-dtor shape in §3 (that role is inferred). The base/derived class pair (vtable slots point into 0x7EBA79D8–0x7EBA7B98) has no name string | verified (A4 2026-11-09) |
+| 0x7EBA7BC1–0x7EBABF8D | **Not OXF: OKAO Smart Skin** (13b §2.2; data from ~0x7EBAC000). A string-less library called only from the FACE task code (0x7E6FB836, 0x7E6FB8BF, 0x7E6FBBCD, 0x7E6FBC17). It calls 0x7E72D0BA–0x7E72D95E (OKAO area) and the runtime helpers 0x7E4FE9D7 (sqrt), 0x7E500D33 (memcpy), 0x7E500D73 (memset) and soft-double 0x7E500F62–0x7E5019E4 (A5 2026-11-09). **0x0CA00080 is a handle magic, not an error code** (stored in word 0 by 0x7E72D932, checked by 0x7E72D94C, cleared by 0x7E72D95E; 13b §2.2); the return codes are small signed values (mapper 0x7EBA7BC1: 0, −1, −3, −4, 3, −8) (A5 2026-11-09). | verified call edges; "OKAO" by role (13b) (A4 2026-11-09) |
 | 0x7EBAC000– | data | verified (no code xrefs) |
 
 **Rodata (verified):** OXF vtables and the RCS markers `//! $Id$` are at 0x7EC919C0–0x7EC922A0. `$Id: ntos.cpp 1.83 2006/02/20 13:52:46 vova Exp $` is at 0x7EC91BBC; this is the Rhapsody OS-adapter file. Event vtables are in 0x7EBCxxxx–0x7EC92xxx (§4).
 
-## 2. The OXF runtime (0x7EBA4868–0x7EBA7BC0) (A4 2026-11-09)
+## 2. The OXF runtime (0x7EBA48BC–0x7EBA7BC0) (A4 2026-11-09) (A5 2026-11-09)
 
 | Part | Addresses | Notes |
 |---|---|---|
@@ -137,7 +138,7 @@
 | **12067** | `evTraCmp_NextState`: generic "step done, go on". 858 creating functions (ComponentManager `startTransition… %d/%d`, every play component), 1,174 tests | creation and test counts verified; name inferred (string in creator 0x7EAC9680) |
 | 11761 / 11769 | `evTraStart` / `evTraStop` for capabilities and controllers (240 / 242 tests) | inferred (strings, creators `initialize3dController` / `requestStop`) |
 | 11565 / 11562 / 11563 | init request / **init OK** / **init error** ("CmpInitErr") | code shape verified (§4.3); names inferred |
-| 11772 | sent to the requester when a request is registered (0x7EB86C21) | verified call; "ack" inferred |
+| 11772 | built by 0x7EB86C21 and sent to `requester->vtbl[1]`. Two callers: register+ack 0x7EB868BC, and lookup-and-ack 0x7EB868A6, which only looks up an existing entry (0x7EB867EB) with no registration; a third sender is 0x7E96E40A (vtable word 0x7EBD1384). So it is a general acknowledge-to-requester event, not registration-only (A5 2026-11-09) | verified call; "ack" inferred |
 | 7009 / 7008 | `evTraCom_OperationSuccess` / `evTraCom_OperationError` | inferred (0x7EA4E032) |
 | 26742–26861 | `evTraResSht*` (43 of them named in the TSV) | inferred |
 
@@ -200,19 +201,19 @@ The CmpSqp_* sequence parts (`Base`, `Eportrait`, `MultiExposure`, `Otwb`, `Pano
 - API events: 13781–13821 (CustomPrint) and 13881–13905 (`evTraResPrt*`, EasyPrint) in the Ope layer.
 - Before it: **CmpFnc_FunctionComponent** 0x7EAEC905–0x7EAEEAEE (picture-DB control: "CmpFunction OLDBControl receive Create/Abort request", 0x7EAED5CE–0x7EAEE00D; getInstance called from Ctg 0x7EB938CB). After it: CmpPCal at 0x7EB015FF.
 
-**5.4 Device classes at 0x7EBA0AA9–0x7EBA4867 (verified API callees and callers; class names inferred):**
+**5.4 Device classes at 0x7EBA0AA9–0x7EBA48BB (verified API callees and callers; class names inferred) (A5 2026-11-09):**
 
 | Range | Device | Evidence |
 |---|---|---|
-| 0x7EBA0AA9–0x7EBA28E0 | anti-shake, image handle, HDMI 3D/EDID/CEC, histogram (dummy display calls), Exif/picture size, picture-file search/erase/count | `api_rec_Control_Anti_Shake`, `api_tft_*CEC*`, `api_histogram_*`, `api_picfile_*` |
+| 0x7EBA0AA9–0x7EBA28E0 | face information (0x7EBA0CA3/0x7EBA0CCA/0x7EBA0F8B → `api_rec_Get_Rec_Face_Number`/`…Face_Rect_Area`/`api_play_Get_FaceDirection`, the first ~1.7 KB) (A5 2026-11-09), anti-shake, image handle, HDMI 3D/EDID/CEC, histogram (dummy display calls), Exif/picture size, picture-file search/erase/count | `api_rec_Control_Anti_Shake`, `api_tft_*CEC*`, `api_histogram_*`, `api_picfile_*` |
 | 0x7EBA28E1–0x7EBA330F | `DevBlu_Bluetooth` (vtable 0x7EC91628, ctor 0x7EBA2987, factory 0x7EBA290C called by the CapBlu ctor) + sub-object vtable 0x7EC916C8 | 39 `DevBlu_Bluetooth::*` strings |
 | **0x7EBA3310–0x7EBA36F6** | **USB-communication device**. Accessors 0x7EBA3310/333C/3368/3394 (called by CapPbr 0x7EA58AF3 and CapCom 0x7EA51A8C) lead to ctor **0x7EBA33C0**. The ctor builds 4 mode sub-objects with 9-slot vtables: **DPS 0x7EC916F4, MTP 0x7EC91718, Storage 0x7EC9173C, generic 0x7EC91760**, and 8 observer lists at +48…+188. Slot 2 = `api_comm_End_Communication_<mode>`, slot 6 = `api_comm_Start_Communication_<mode>` (F060 0x7EBA35C2 = DPS start), slots 3/5/7 = `api_media_Initial_Strage` / `Mount_USB_Strage` | verified |
 | 0x7EBA36F7–0x7EBA414D | DPS-T device (vtable 0x7EC91784; 16 small methods, then `api_dpst_Dpst_*` Req/Send for DPOF, print, reserve) | verified |
 | 0x7EBA414E–0x7EBA43C3 | DPS device (vtable 0x7EC917E8; 25 `api_dps_*` wrappers: capability, job start/abort/continue, status) | verified |
 | 0x7EBA43C4–0x7EBA45D7 | pixel mapping (`api_rec_Calculate/Save/Get_Pixelmaping*`; caller CapPxm 0x7EA60BD3) | verified |
-| 0x7EBA45D8–0x7EBA4867 | picture-file creation (`api_picfile_Check_Create_PictureFile`; caller 0x7EA52E23, CapFrp) | verified |
+| 0x7EBA45D8–0x7EBA48BB | picture-file creation (`api_picfile_Check_Create_PictureFile`; caller 0x7EA52E23, CapFrp), including six field helpers 0x7EBA4868–0x7EBA48BB called only by 0x7EBA4603/0x7EBA464F/0x7EBA4759 (A5 2026-11-09) | verified |
 
-## 6. The Com_ framework (~0x7EB85500–0x7EB8C265)
+## 6. The Com_ framework (0x7EB84345–0x7EB8C265) (A5 2026-11-09)
 
 | Function | Callers | Role |
 |---|---|---|
@@ -220,7 +221,7 @@ The CmpSqp_* sequence parts (`Base`, `Eportrait`, `MultiExposure`, `Otwb`, `Pano
 | 0x7EB8717D (slot 6) | vtable ×114 | takeEvent override: if slot 37 gives a delegate ≠ this, forward the event to it; else use OMReactive takeEvent |
 | **0x7EB871B1** | 1,297 | gen to self = OMReactive gen 0x7EBA66D4; it logs `*****Q OVER?!*****` if the queue refuses |
 | **0x7EB86DA1** / **0x7EB86DF0** / **0x7EB86ED0** | 313 / 386 / 606 | observer list ctor / addObserver (`#ERR# addObserver = NULL!`, duplicate warning) / notify-all. Notify iterates the list; for each observer it calls `vtbl[2]()` (filter), then `vtbl[0]()` (update) |
-| 0x7EB85D67 / 0x7EB85D75 / 0x7EB85DAB | 272 / 271 / 356 | 24-byte observer member ctor (base 0x7E96E4DA) / dtor / setTarget(+20). The update callbacks of these observers have the 75-byte "observer callback" shape (§3) |
+| 0x7EB85D67 / 0x7EB85D75 / 0x7EB85DAB | 272 / 271 / 356 | 24-byte observer member ctor (base 0x7E96E4DA) / dtor / setTarget(+20). The update callbacks of these observers usually have the 75-byte "observer callback" shape (§3). **Exception (C2 2026-11-09):** relay observers, e.g. `CapBlu_BluetoothEv2Observer` (ctor 0x7EA5119D, vtable 0x7EC412F4): its 35-byte update 0x7EA511D1 logs and calls notify-all 0x7EB86ED0 on this+24, and builds no event |
 | 0x7EB867EB family | — | **request/response registry keyed by u16 event id**: register 0x7EB86ABF (384; 8-byte {id, requester}) and register+ack 0x7EB868BC (364; sends 11772); answer 0x7EB8693F (36) / answer-and-remove 0x7EB86A2A (109) / 0x7EB868D2 (206; deletes the response if no requester); remove 0x7EB86A8E (236); `ERR:unsubscribeForceDestroy` 0x7EB86B29. Delivery 0x7EB86D73 = `requester->vtbl[1](ev, params)` | verified shape; "request/response" inferred |
 | 0x7EB855C7 / 0x7EB85972 | 3 / 1 | `resend event %d`; `handleNotConsumed EvID=%d` (re-queues an unconsumed event) |
 | **0x7EB87341** / 0x7EB872DF | 429 / 70 | state trace `*** on state %2d [%s] ***`. It reads a global trace level (0x7E9672EA) and returns early when that level is above this+124. The name comes from getName (slot 36). Called from state-entry functions |

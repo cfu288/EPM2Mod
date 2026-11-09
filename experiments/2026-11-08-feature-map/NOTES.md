@@ -92,3 +92,4 @@ English-string counts not present in the E-PM2: E-PL5 0 (block 1 identical), E-P
   - The `{name, fn}` table at 0x7F023C74 has 194 `gl*` entries. 89 of them point above 0x7EE21020 (the reviewer said 91), and the highest is glPointSize at 0x7EE29468.
   - `$Revision: #88 $` (0x7F027CC4) is referenced by 0x7EE295EE, in the module that follows.
   - So the GL library ends at ~0x7EE294B4, not 0x7EE21020. Fix pending in the regions table and in sections 08 and 13d.
+- **Fix pass A5+C2: the touch-panel image end. Confirmed** by arithmetic: 0x7E7F0F78 + 470 × 85 − 1 = 0x7E7FAB85, as the editor says (the review's 0x7E7FAB34 was wrong).

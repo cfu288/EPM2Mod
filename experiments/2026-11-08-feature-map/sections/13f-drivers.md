@@ -78,7 +78,7 @@ Round D1 deep dive. Scope: the driver code in 0x7E421020–0x7E521020, plus the 
 | Block | Name / function | Evidence | IRQs | Driver functions |
 |---|---|---|---|---|
 | 0x98000000 | Address-decoder bus error ("ADDEC") | `[SYS WANA] ADDEC ERROR Hassei!` (Japanese "occurred") plus an address/RW/data dump in handler 0x7E45D164 (V) | 0 | init 0x7E45D120 |
-| 0x98100000, 0x98100400 | Two identical small units. Regs +0, +8, +10, +44, +48. **Not identified** | Toggled bit 0x10 in the SRAM standby code. Also used by 0x7E95EFC8 (no strings; it sits just before the `aud_tool_ac3_*` functions, so the audio label is a neighbourhood guess (I); only caller 0x7E94E1FE), by its twin **0x7E95F008** (+0x444/+0x448 of the 0x98100400 unit; callers 0x7E6D80B3, 0x7E6D8900, 0x7E6E0857, 0x7E6E08F1, movie/CPU1 image-engine code) and by 0x7EEC6822 (V) | – | – (A4 2026-11-09) |
+| 0x98100000, 0x98100400 | Two identical small units. Regs +0, +8, +10, +44, +48. **Not identified** | Toggled bit 0x10 in the SRAM standby code. Also used by 0x7E95EFC8 (no strings; it sits just before the `aud_tool_ac3_*` functions, so the audio label is a neighbourhood guess (I); only caller 0x7E94E1FE), by its twin **0x7E95F008** (0x98100444/0x98100448 = +0x44/+0x48 of the 0x98100400 unit, mirroring 0x7E95EFC8's +0x44/+0x48 on the 0x98100000 unit (A5 2026-11-09); callers 0x7E6D80B3, 0x7E6D8900, 0x7E6E0857, 0x7E6E08F1, movie/CPU1 image-engine code) and by 0x7EEC6822 (V) | – | – (A4 2026-11-09) |
 | 0x98200000, 0x98300000, 0x98400000, 0x98500000, 0x98600000, 0x98700000 | **SIO / UART channels**, logical ch 0, 1, 4, 2, 3, 5 (see 2.3) | ROM table 0x7E4C7F48 (V) | 77–90 | 0x7E467D99–0x7E469D75 (A4 2026-11-09) |
 | 0x98800000 | **SYSCLK** clock/reset generator | `[SYSCLK]mntr` strings. Gate set 0xD0/0xD4, gate clear 0xDC/0xE0 (V) | – | 0x7E46A6FA–0x7E46B123 |
 | 0x98900000 | **Timers**, 10 channels | Table 0x7E4C89D4 (V) | 69–76 | 0x7E46B74D–0x7E46BA92 |
@@ -94,7 +94,7 @@ Round D1 deep dive. Scope: the driver code in 0x7E421020–0x7E521020, plus the 
 | 0x99600000 | Face detector (agent FD) | Used only by 0x7E6F8077–0x7E6F81F0 in the FACE task area (V) | 110 | 0x7E6FC745 (the caller passes the handler) |
 | 0x99700000 | DBGS debug support (NMI address watch) | `SHOW DBGS SETTING`, `[ADDRESS SETTING]` (V) | – | 0x7E45EA87–0x7E45ED2A |
 | 0x99800000 | ADCONV | `[ADC_REG]0x99800000`, ANCTR/IRQMSK/IRQCLR (V) | – | 0x7E45CE5B |
-| 0x99900000 | Camera-core unit: 3 buffer channels, 197 registers. **Identity open** (the candidates are agents SSG, PRO or FSC) | 92 accesses, all in 0x7E653AB1–0x7E65663A. Followed by the `SH_RES`/`SH_MEM` objects (V) | 4, 5, 6, 7 | init 0x7E653AB1, ISRs 0x7E655548/C6/644, 0x7E65628B |
+| 0x99900000 | Camera-core unit: 3 buffer channels, 197 registers. **Identity open** (the candidates are agents SSG, PRO or FSC) | 328 instructions with an operand in 0x99900000–0x99900600 (54 `mov imm32` + 274 absolute) in 74 functions, all in 0x7E653AB1–0x7E65663A (A5 2026-11-09). The `SH_RES`/`SH_MEM` users 0x7E6557CE–0x7E655D4B lie **inside** that range, and register users continue after them up to 0x7E65663A (A5 2026-11-09). IRQ 7's ISR 0x7E65628B is registered by 0x7E6561DA (A5 2026-11-09) (V) | 4, 5, 6, 7 | init 0x7E653AB1, ISRs 0x7E655548/C6/644, 0x7E65628B |
 | 0x99A00000 | Camera-core unit (before `cam_sem.c`) | 0x7E64DBDB–0x7E64EF47 (V) | 11 | ISR 0x7E64EF47 |
 | 0x99B00000 | AE statistics (agent AE) | `AE_SEM` (V) | 8, 9 | ISR 0x7E629EDF |
 | 0x99C00000 | AF evaluation (agent AF) | `CAMAFD`, `AFDRV` (V) | 12 | ISR 0x7E62A9D3 |
