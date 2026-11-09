@@ -1,0 +1,218 @@
+[
+ {
+  "id": "15a-42",
+  "section": "15a-gui-pages.md",
+  "line": 42,
+  "text": "- **`openPage(id)` 0x7EDCBE97.** Callers do not call it directly. They allocate a 4-byte functor, store the vtable 0x7EFD51D0 (byte signature `fc cc d0 51 fd 7e`) and call vt[0] with the page id (22 sites)."
+ },
+ {
+  "id": "15a-54",
+  "section": "15a-gui-pages.md",
+  "line": 54,
+  "text": "- The grand-base is 0x7EDCCA5D (vt 0x7EFE6214, 30 slots). The **page base** is 0x7EDCD621 (vt 0x7EFE79FC, 32 slots, 96 callers)."
+ },
+ {
+  "id": "15a-59",
+  "section": "15a-gui-pages.md",
+  "line": 59,
+  "text": "| 0x7EDC7EAA | **userCommonSecondWizard**: the generic list page. +168 = list id, +172 = list descriptor | 0x7EFE221C | 1,748 B | factory 0x7EDC7ECB serves 110 list ids; 29 derived classes |"
+ },
+ {
+  "id": "15a-63",
+  "section": "15a-gui-pages.md",
+  "line": 63,
+  "text": "| 0x7EDED9DD | userCommonWizard1NRightAligned | 0x7EFFE768 | 1,756 B | the play/edit wizards |"
+ },
+ {
+  "id": "15a-100",
+  "section": "15a-gui-pages.md",
+  "line": 100,
+  "text": "- **`getListDescriptor(N)` 0x7EDFD9AF.** It searches 312 \u00d7 `{u16 list id, u32 desc}` at **0x7F00D710**."
+ },
+ {
+  "id": "15a-123",
+  "section": "15a-gui-pages.md",
+  "line": 123,
+  "text": "| Page dtor | `f8 fe fc dd \u2192 0x7EDCD664 ; 90 00 ; df 00 04` | \u2014 |"
+ },
+ {
+  "id": "15a-133",
+  "section": "15a-gui-pages.md",
+  "line": 133,
+  "text": "| 511 / 513 | 0x7EDE437F / 0x7EDE4632 (168 B each) | PENPAL album copy P2S / S2P. Panel 4; MediaCtrl vt+44 with (2,4) / (4,2). The sibling pages 515, 519, 521 and 493 are also 168-B MediaCtrl pages |"
+ },
+ {
+  "id": "15a-134",
+  "section": "15a-gui-pages.md",
+  "line": 134,
+  "text": "| 466 | 0x7EDFB664, vt 0x7F004DC0 | `userMenuRec2_CompScale`. Panel 64; moveCurrent 0x7EDFB968 |"
+ },
+ {
+  "id": "15a-146",
+  "section": "15a-gui-pages.md",
+  "line": 146,
+  "text": "- key slot 0x7EDFD86F: key 10 with d1 = 0 sets the flag +168, and any other d1 clears it; OK returns 3 only if the flag is set **and** `IOlyApiMaintenance` vt+40 = 1;"
+ },
+ {
+  "id": "15b-54",
+  "section": "15b-camera-core-index.md",
+  "line": 54,
+  "text": "| cam.c | `CamCommand` 0x7E628303 | 0x7E7AC020 (3\u2013147; 03 \u00a71) |"
+ },
+ {
+  "id": "15b-55",
+  "section": "15b-camera-core-index.md",
+  "line": 55,
+  "text": "| cam_frame.c | 0x7E636AAB | jump 0x7E7AE744 (frame commands 1\u201385, 33 handled) |"
+ },
+ {
+  "id": "15b-91",
+  "section": "15b-camera-core-index.md",
+  "line": 91,
+  "text": "- **Run set list** 0x7E65156C(d0 list type, a1 done): list of FrameType d0 (0x7E65210C), kept in the 20-slot table 0x6055EEF8, executed by 0x7E6513CF, finished by 0x7E651B0E or by FC 7."
+ },
+ {
+  "id": "15b-174",
+  "section": "15b-camera-core-index.md",
+  "line": 174,
+  "text": "- 0 INT_LANG 0x7E67510C; 1 EXT_LANG (returns NULL); 2 SOUND 0x7E67534F; 3 PIC 0x7E6753CC;"
+ },
+ {
+  "id": "15b-220",
+  "section": "15b-camera-core-index.md",
+  "line": 220,
+  "text": "| 0x7E530103 | 4 | 5 | 0x6605 |"
+ },
+ {
+  "id": "15b-222",
+  "section": "15b-camera-core-index.md",
+  "line": 222,
+  "text": "| 0x7E53023E | 6 | next packet \u2192 4; last \u2192 1 | 0x6607 |"
+ },
+ {
+  "id": "15b-235",
+  "section": "15b-camera-core-index.md",
+  "line": 235,
+  "text": "- **Descriptor 0x6054AABC (V):** +0 timeout handler 0x7E5DE8AE, +4 tx buffer, +8 u16 command, +10 tx length, +12 rx length, +14 sync byte 0x55, +15 command echo. Send 0x7E5DC0F7, wait 0x7E5DE91F."
+ },
+ {
+  "id": "15b-243",
+  "section": "15b-camera-core-index.md",
+  "line": 243,
+  "text": "- **Request (52 B, V):** +0 channel, +1 type (0xF1 special), +4 1500, +8 5, +12 result buffer, +32 async callback, +40 sync marker. **Completion 0x7E45CCA1 (V):** calls +32 if set; otherwise copies the request to 0x6041538C and sets event flag 0x7E43EBB2."
+ },
+ {
+  "id": "15b-275",
+  "section": "15b-camera-core-index.md",
+  "line": 275,
+  "text": "- **03 \u00a74 still phases are one too high (V).** The name lookup 0x7E656B1D does `inc d0` before its hash lookup (key = phase + 1). The phase values are therefore 0 READY, 1 TAKE, 2 STOP, 3 ABORT, 4 TERMINATE, 5 CONTINUE_READY, 6 CONTINUE_PAUSE, 7 CONTINUE_RESTART, 8/9 PRE_ACTION_ON/OFF, 10 MIRROR_DOWN, 11 CAPTURE_ENABLE, 12 FORCE_CAPTURE, 13 APERTURE_ENABLE; 0x100\u20130x10C BULB_*; 0xFFFF PHASE_NONE. This agrees with cam.c's still item 0x7E62952E (phase 0 \u2192 STL/RDY; 1 or 11 \u2192 STL/TAK; 5 \u2192 STL/CRDY)."
+ },
+ {
+  "id": "15c-48",
+  "section": "15c-app-statecharts.md",
+  "line": 48,
+  "text": "| +680 | 0x7EB3DC53 / 0x7EC79354 | 0x7EB3DC6E | 7604 |"
+ },
+ {
+  "id": "15c-49",
+  "section": "15c-app-statecharts.md",
+  "line": 49,
+  "text": "| +704 | 0x7EB3DCB9 / 0x7EC79370 | 0x7EB3DCDA (118 B: reads a progress value first, \u00a73.2) | 7605 |"
+ },
+ {
+  "id": "15c-73",
+  "section": "15c-app-statecharts.md",
+  "line": 73,
+  "text": "| **7609** | **`evTraCmpPly_NotifySelectExecuteEnd`** (V: CmpEAsp `save_start_enter` 0x7EABA04C tests only 7609 and logs it) | 0x7EB0F0D2, CmpPLgh 0x7EB33E6E, CmpPSel 0x7EB4FA8E | consumed by the work state that waits for the redraw (138 test sites), e.g. erase state 37 (F045) |"
+ },
+ {
+  "id": "15c-93",
+  "section": "15c-app-statecharts.md",
+  "line": 93,
+  "text": "| 8 (0x7EA7E198) | 12063 \u2192 7 | GEN 4761 boot request to +472 |"
+ },
+ {
+  "id": "15c-106",
+  "section": "15c-app-statecharts.md",
+  "line": 106,
+  "text": "| 1 \u2192 39 `play_service_end` 0x7EB1669D \u00b7 2 \u2192 31 `get_image_type` 0x7EB16263 \u00b7 3 \u2192 23 `get_still_info` 0x7EB15FF7 \u00b7 4 \u2192 29 `get_move_info` 0x7EB161EC \u00b7 5 \u2192 27 `get_number` 0x7EB16175 \u00b7 6 \u2192 33 `get_image_count` 0x7EB162DA \u00b7 7 \u2192 35 `get_histogram` 0x7EB16351 |"
+ },
+ {
+  "id": "15c-121",
+  "section": "15c-app-statecharts.md",
+  "line": 121,
+  "text": "| 1 (0x7EB785F8) | GEN 11565 to self | 11565 \u2192 3 (inline in the dispatcher) |"
+ },
+ {
+  "id": "15c-122",
+  "section": "15c-app-statecharts.md",
+  "line": 122,
+  "text": "| 3 Idle (0x7EB78E44) | \u2014 | 11761 \u2192 8 |"
+ },
+ {
+  "id": "15c-162",
+  "section": "15c-app-statecharts.md",
+  "line": 162,
+  "text": "| CmpSts_MultiThrough 0x7EB7EC0B | 0x7EB7ED19 | 11980, 11979, 11978 (startMultiThrough), 12004, 12005 |"
+ },
+ {
+  "id": "15c-166",
+  "section": "15c-app-statecharts.md",
+  "line": 166,
+  "text": "| the other 8 (3D, EPortrait, RecView, Record, Outline 0x7EA7E6EB, the getName-less subclasses 0x7EA6CF32 / 0x7EA77CBA, Com_ActiveTransitionManagerBufferd 0x7EB8AD37) | 0x7EB85924 (empty) or a stub | none |"
+ },
+ {
+  "id": "15d-40",
+  "section": "15d-protocols-platform.md",
+  "line": 40,
+  "text": "| 0x7E923928\u20130x7E924003 | Olympus test client | 0x602AE, 0x605D0\u20135 | `OLYMPUS BlueSDK a4`, BTAPL task 0x7E923FD2, demo-shell entries 0x7E923C93\u20130x7E923FFB (V) |"
+ },
+ {
+  "id": "15d-73",
+  "section": "15d-protocols-platform.md",
+  "line": 73,
+  "text": "- **Link control** 0x0401\u20130x0434 (Inquiry, Create Connection, Disconnect, accept/reject, link-key/PIN/passkey/confirm/OOB replies, authentication, encryption, remote name and features);"
+ },
+ {
+  "id": "15d-93",
+  "section": "15d-protocols-platform.md",
+  "line": 93,
+  "text": "- **Link records at 0x7DAC4C68, stride 320.** All 3 loops (0x7E9275C6 find by BD_ADDR, 0x7E927600 allocate, 0x7E927681 find by handle) stop at `cmp 1`. So **there is exactly one record**: the stack supports one ACL link (V). The record starts with the op node, so for link commands curOp is the record. Fields:"
+ },
+ {
+  "id": "15d-102",
+  "section": "15d-protocols-platform.md",
+  "line": 102,
+  "text": "| +146 | in-use / state (0 = free) | allocator, free 0x7E927679 |"
+ },
+ {
+  "id": "15d-199",
+  "section": "15d-protocols-platform.md",
+  "line": 199,
+  "text": "- Range helper 0x7F061CED (13 callers)."
+ },
+ {
+  "id": "15d-228",
+  "section": "15d-protocols-platform.md",
+  "line": 228,
+  "text": "- **Section 01 is right that A and B are separate Usr2 requests.** Usr2 0x7E505005 tests `btst 1` \u2192 overlay A (0xF000 B from 0x80EFB000 to 0xBF05C000, segment-4 constructors, USTART3), `btst 2` \u2192 overlay B (0x6B800 B from 0x80F1F000 to 0xBF080000, segment 5, USTART4) and `and 0x1000000` \u2192 ADJSLF; done flags in 0x602A9B48."
+ },
+ {
+  "id": "15d-244",
+  "section": "15d-protocols-platform.md",
+  "line": 244,
+  "text": "| 0x7E45038D\u20130x7E450C4A | **SYSFMEM operation bodies** (BML read variants and retry, write/erase with read-back, STL thunks 0x7E450AA1\u20130x7E450AD3, boot-bank check 0x7E450C4B) | SYSFMEM 0x7E4520F3; `flash` shell | V |"
+ },
+ {
+  "id": "15d-245",
+  "section": "15d-protocols-platform.md",
+  "line": 245,
+  "text": "| 0x7E45140B\u20130x7E4520F2 | second request poster 0x7E45140B, `prm fmem` 0x7E451515/0x7E4515F5, **traced BML/STL wrappers** 0x7E451873\u20130x7E451D85 (STL_READ = C3 F001) | fupsrv 0x7E54398B, ADJ | V |"
+ },
+ {
+  "id": "15d-286",
+  "section": "15d-protocols-platform.md",
+  "line": 286,
+  "text": "1. **05 row \"~0x7E91D279\u2013~0x7E937CDD Blue SDK\".** The stack also has part 1 at 0x7E915A1B\u20130x7E91962B (init, EVM, profiles, the **HCI layer**). That part sits inside 05's row \"0x7E913984\u20130x7E91CFFF stack callbacks, iAP\". Also, 0x7E91D279/0x7E91D289 are iAP getters; L2CAP starts at 0x7E91D29F (V)."
+ }
+]
