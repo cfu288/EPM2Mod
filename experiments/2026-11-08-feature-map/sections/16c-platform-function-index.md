@@ -1,16 +1,16 @@
-# 16c. Platform, drivers and libraries 0x7E421020–0x7E6211E0: generated function index (E-PM2 v1.6, rounds D4–D5)
+# 16c. Platform, drivers and libraries 0x7E421020–0x7E6211E0: generated function index (E-PM2 v1.6, rounds D4–D6)
 
 Scope: block 0 from the reset entry 0x7E421020 to the end of the fcs function 0x7E620C6F (0x7E6211E0). This covers boot, the kernel, the drivers, the C runtime and the `sc` library, UI input, MEC, lens, power, BC, firmup, the IMG library, `buff`, WB, TAKE, the file system, strobe and AF.
 
-- **Labels:** **V** = read in the code or the bytes. **I** = inferred from names, order, layout or call position.
+- **Labels:** **V** = read in the code or the bytes, by a rule with 0 errors in its D6 precision sample. **I** = inferred, or made by a rule that failed its precision sample; I rows start with “probably”, and names quoted from I rows inside other rows also start with “probably”.
 - **Index:** `16c-platform-function-index.tsv`, one row for each of the **8,783** database functions in the range (build/map functions.tsv; the 7 `data_page` and 22 `suspect` rows are left out). Columns: `addr`, `size`, `component` (component `>` family), `role`, `basis`, `V/I`. The format is unchanged from D4.
-- **Scripts** in `$S/d5/plat/` (copied from `$S/d4/plat/`; run with `python3 -I`):
+- **Scripts** in `$S/d6/plat/` (D6; copied from `$S/d5/plat/`; run with `python3 -I`). D6 adds `subroots.py` (sub-group roots), `cur_d6fix.py` (D6 corrections, loaded first), `work/mksample.py` / `work/final_sample.py` (precision samples) and `check/` (samples, the checker brief and the verdicts `res_*.tsv`). Older list:
   - `mkidx.py` builds the TSV; `stats.py` gives the levels; `diffidx.py` compares two TSVs; `sample.py` draws the check samples; `q.py ADDR…` is a quick reader;
   - `leaf.py` is the new leaf-summary rule (D5);
   - `cur_<topic>.py` hold the D5 function reads (CUR roles, RAM names, NOTES with the details): `dcf`, `fat`, `dpof` (DPOF + VFS + logsec), `eyefi` (FILECLBK, file shells, EYEFI), `af1`, `af2`, `drv` (BBM/STL, accelerometer, ADC, IOE), `stb`, `prm` (prm, SYSFMEM, USR_FAST_APP), `ui`, `mine`;
   - `lib.py`, `feat.py`, `anchors.py`, `comps.py`, `curated.py` as in D4.
 
-## 1. Area and boundaries (changes in D5)
+## 1. Area and boundaries (changes in D5 and D6)
 
 The component ranges are in `comps.py`. Each runs to the start of the next one. D5 changes (V: the callers and the code of the edge functions):
 
@@ -24,6 +24,19 @@ The component ranges are in `comps.py`. Each runs to the start of the next one. 
 | 0x7E5BE156 | **DPOF starts here** (counts, print lists, AUTPRINT.MRK writer/reader), not at 0x7E5BE823 | fat and dpof agree on 15 rows |
 | 0x7E5CEB41 | strobe exposure starts here: 0x7E5CEB41–0x7E5CEC4A (flash target and amount calculation, caller 0x7E5D0F5C) were in "SD host driver" | stb reads |
 
+**D6 component changes** (C7 review F003 and the D6 precision checks; V from callers and the D5 reads of the edge functions):
+
+| New start | Component | Basis |
+|---|---|---|
+| 0x7E4613DD | PER_EYE_SENSOR empty task and a constant stub (were EMS1/EMS2) | code |
+| 0x7E4613E5 | **pin-op dispatch layer**: 7 units, pin = unit << 24 \| n; 14 op tables of 7 pointers at 0x7E4C584C + 28·op; init 0x7E4613E5 calls op 0 of all units; dispatchers 0x7E4613FD (op 2), 418 (3), 433 (4), 44E (5), 469 (6), 484 (7), 4A0 (9), 4BB (11), 4D6 (12), 4F1 (13); ops 1, 8, 10 have no dispatcher. Unit 0 = GIO 0x9A100000 (op 4 configure from a record, 5 read input bit 4, 6 write output d1 & 1, 7 irq_attach), unit 3 = pin bank 0x98B00780–0x98B007A4 (op 0 0x7E462252 sets ROM defaults), units 1/2/4/5/6 = `retf`/constant stubs. The DB merged many stubs into 0x7E461FE9, 0x7E46204D, 0x7E462160, 0x7E462252 (real end +138), 0x7E462321, 0x7E461AD1; their rows list the entries | C7 F003, D6 read |
+| 0x7E45E820 | cpudma (0x7E45E206–0x7E45E81D are CCD-temperature ADC code, table 0x7E4C4DF0 of the ccd_temp dispatcher 0x7E45DC2C) | D6 check |
+| 0x7E50C992 | UI LED / UI_OUT (LED engine 0x7E50C998–0x7E50D654 was under UI input) | D5 ui reads |
+| 0x7E5C0A05 | EYEFI requests … (0x7E5C0960/0x7E5C09C4 are DPOF text writers) | D5 dpof reads |
+| 0x7E5C8F22 | file wrapper / VFS (VFS init, file-object pool, dir cache) | D5 eyefi reads |
+| 0x7E5CBA12 | logsec (request execute/dispatch 0x7E5CBA12/0x7E5CBA48) | D6 check |
+| 0x7E5CBCB6 | SD host driver (SD host stack init, R1 status decode) | D5 eyefi reads |
+
 All other ranges are as in D4 (regions table, 01, 13a, 13f, 14b, 15b §1, 15d §5).
 
 ## 2. How the index is built (rules, in priority order)
@@ -32,23 +45,26 @@ All other ranges are as in D4 (regions table, 01, 13a, 13f, 14b, 15b §1, 15d §
 
 | # | Rule | Source / signature | Rows (primary) |
 |---|---|---|---|
-| 0 | **D5 read** (new) | `cur_*.py`: roles read in the code by topic; they replace the curated and section facts of the same row, and their first clause is the short name used for callers | 2,029 (1,773 V, 256 I) |
+| 0 | **D5 read** | `cur_*.py`: roles read in the code by topic; they replace the curated and section facts of the same row, and their first clause is the short name used for callers. **D6:** topics af1, af2, dcf, fat, eyefi and ui are demoted to I (see §2a) | 2,029 (D6: 1,195 V, 834 I) |
+| 0a | **pin-op layer** (D6) | tables 0x7E4C584C + 28·op (14 ops × 7 units), dispatchers 0x7E4613E5–0x7E4614F1; also names the pin-op entries that the DB merged into one row | 31 |
 | 1 | curated | roles from the sections and D4 reads | 586 |
 | 2 | task | CPU0/CPU1 task tables | 6 |
 | 3 | TAKE tables | 0x7E790860 states, A/B event tables, TakeExp/TakeFcs hashes, next state | 186 |
-| 4 | section anchors | table rows and `` `name` 0xADDR `` in the sections; **the 16x indexes are no longer sources** (D5) | 266 |
-| 5 | data-word table scan | aligned words in rodata/.data equal to a function start; slot = (word − table base) / stride (**D5 fix**) | 510 |
-| 6 | linear jump table | `mov TAB,aN; mov (dX,aN),aN; jmp (aN)`; first call after each case label | 156 |
-| 7 | IRQ | `mov irq,d0; mov lvl,d1; mov H,a0; call 0x7E463C8E/9E` | 22 |
+| 4 | section anchors | table rows and `` `name` 0xADDR `` in the sections; **the 16x indexes are no longer sources** (D5). **D6: always I** | 266 |
+| 5 | data-word table scan | aligned words in rodata/.data equal to a function start. **D6:** only named tables (curated `TABLES`) give a slot; other words are reported as “pointed to by the data word at W”; no entry count, no “used by”; uITRON task-record entry fields and the pin tables are skipped | 510 |
+| 6 | linear jump table | `mov TAB,aN; mov (dX,aN),aN; jmp (aN)`; reported as “first call after case label X” (D6 wording; other cases can reach the same call). **D6:** `mov N,dY; sub dY,dX` bases are decoded | 156 |
+| 7 | IRQ | `mov irq,d0; mov lvl,d1; mov H,a0; call 0x7E463C8E/9E`. **D6:** `clr d1` = level 0; a register loaded from memory or another register is “not decoded” (was “None”, or an older constant) | 22 |
 | 8 | shape | lone return, constant/global/field getters and setters, per-channel stub, thunk (**D5:** absolute stores before the call are reported as "sets …, then calls"; a thunk that stores through `(off,aN)` is no longer a thunk), two-entry pointer prologue | 1,038 |
 | 9 | **leaf summary** (new) | straight-line function without a call (a `setlb`/`Lcc` loop is allowed; ≤ 24 insns): symbolic run of mov/add/shift/and/or/mul; prints the stores and the return value with RAM names, e.g. `leaf: u32[u32[a0+8]+220+d0*4] = d1`. In a loop it prints the first-pass values and the count when it is visible | 216 (+459 as 2nd fact) |
-| 10 | own strings | `[tag]name`, `name(`, `name:` count as a name | 577 |
+| 10 | own strings | `[tag]name`, `name(`, `name: message` count as a name. **D6:** field labels (`name   :`, `name: %d`) and functions that print more than 2 such labels (dumpers) give no name | 577 |
 | 11 | error codes | `mov CODE,d0` before 0x7E426D4B / 0x7E579DBF | 283 |
 | 12 | MMIO | operands 0x98000000–0x9AFFFFFF | 118 |
-| 13 | callback | entry loaded by `mov imm32`, with the store offset and the next call | 629 |
+| 13 | address taken (was “callback”) | entry loaded by `mov imm32`, with the store (D6: “+N of aK”, `(aK)` = +0, none when the register is overwritten first) and the next call. **D6 wording:** “address taken (no direct caller)”: a table seed or a task entry reads the same, so no use is claimed | 629 |
 | 14 | callee signatures | 60 services with constant arguments (prm tags with names, CamCommand, TAKE, lens pool, timers, ADC, Oimf …) | 499 |
 | 15 | kernel services | Oly* wrappers and the 15d kernel rows | 90 |
 | 16 | call graph | single caller / shared helper with named callers, ancestor, callees, RAM state | 1,572 |
+
+**Sub-group labels (component `>` family), D6 rule.** The families in `curated.SUBS` were address ranges. In D6 a function gets the family label only when it is linked to the family roots (`subroots.py`: direct calls, `mov imm32` loads, table slots, prologue fall-through) **and** every function that refers to it is itself a member or a root. Shared helpers lose the label. Ranges without roots (IMG art kernels, IMG value-mapping switches, IMG rec/movie helpers, IMG float helpers, TakeExp backlight/face) give no label. Labels fell from 2,879 rows to 1,081. The `lens` debug shell family now holds only the dispatcher 0x7E524C76 tree (0x7E523E5E–…); the lens timed-transmit hook 0x7E52463F (0x7E51C129 → 0x7E524169 → hook 0x604F9070), 0x7E524169, the lens controller 0x7E524284/0x7E52431E and their helpers are no longer in it. The AF family is renamed “FCS_MOVIE task call tree (…, S-AF run 0x7E5EDD24 called by the frame step 0x7E6110C3)”.
 
 **Byte signatures for new functions (V):**
 - **FS work-buffer heap** (not a request pair): `call 0x7E5C8497` (alloc d0 = size ≤ 128 → 128-B slot list, ≤ 512 → 512-B list; 16-KB arena *(0x6054754C)) … `call 0x7E5C856E` (free; errors 0x1000C401/03/04/05). A function between them fills a request and calls one of the executors below.
@@ -62,6 +78,44 @@ All other ranges are as in D4 (regions table, 01, 13a, 13f, 14b, 15b §1, 15d §
 - **FCS OS layer** 0x7E611E24–0x7E6121EF: flag set/wait, queue, Oimf, sleep; 0x7E6120C7 before each wait logs 0x0F8010C0 when the task ran > 3000 µs.
 - **IOE request** (32 B): type 0x00/0x40 set register pointer, 0x02/0x42 read N, 0x11/0x51 write one register, 0x13/0x53 write N, 0x20 read and test a mask, 0x31 set/clear output bits, 0x80 raw read.
 - **ADC request** (52 B): +0 channel, +1 type (1 single, 0x81 repeat, 0xF1 stop), +4 period, +8 sample count, +12 result buffer, +16 trigger, +32 callback, +36 start hook, +44 average flag.
+
+## 2a. Rule precision (D6)
+
+Method: for every rule (basis value, or group of similar values) with more than 50 rows, a random sample of its facts (seed 6101: 10 per rule, 12 for rules with > 1,000 rows) was checked against the disassembly and the table bytes by blind checkers (`$S/d6/plat/check/CHECK_BRIEF.md`; verdicts `check/res_*.tsv`). A fact counts as wrong when any concrete detail is false (address, offset, slot, count, order, role). Rules with a wrong fact were fixed and re-sampled (seeds 6202, 6303) or demoted. Rows = facts made by the rule in the final build (a row can hold up to three facts).
+
+| Rule (basis) | Rows | Checked | Wrong | Precision | Action |
+|---|---|---|---|---|---|
+| call graph (helper of / shared helper / under / RAM state) | 5,524 | 12 | 0 | 12/12 | V |
+| callee signatures (service calls) | 2,009 | 12 | 0 | 12/12 | V |
+| own strings | 1,325 | 12 | 0 | 12/12 | V; **fixed** after the final check (a dumper was named from one of its 29 field labels) |
+| callback (`mov imm32`) | 1,104 | 12 + 10 | 2 + 0 | 10/12 → 10/10 | **fixed**: store offset of `(aN)` stores and of a register overwritten before the store; store is now “+N of aK”; after the final check (a table seed called a callback) reworded to “address taken” |
+| shape: thunk | 693 | 10 | 0 | 10/10 | V |
+| shape: getters, setters, stubs, prologue entries | 637 | 10 | 0 | 10/10 | V |
+| leaf summary | 675 | 10 | 0 | 10/10 | V |
+| kernel wrappers | 638 | 10 | 0 | 10/10 | V |
+| curated (sections, D4 reads) | 584 | 10 | 0 | 10/10 | V (plus the multi-row texts re-read, below); 0x7E53E2CD was named `sc_get_stabtype` from a printed label (final check), now its dump role |
+| data-word table scan | 537 | 10 + 10 + 10 | 5 + 3 + 0 | 5/10 → 7/10 → 10/10 | **fixed twice**: entry counts and “used by” removed (counts were DB starts only; an equal immediate can be another table’s end bound); task-record entry fields skipped; the run start is not always the table base (12-B records), so unnamed tables report only “pointed to by the data word at W” |
+| error codes | 462 | 10 | 0 | 10/10 | V |
+| section anchors | 359 | 10 | 3 | 7/10 | **demoted to I** (a wrong table address from 13a, a “HUGE constant” that is 0.0, a 13a text copied to 3 rows) |
+| MMIO constants | 238 | 10 | 0 | 10/10 | V |
+| TAKE tables | 189 | 10 | 0 | 10/10 | V |
+| linear jump table | 185 | 10 + 10 + 10 | 1 + 2 + 1 | → fact reworded | **fixed**: `sub` bases; then reworded to the certain fact “first call after entry k of jump table T (switch in D)”: the entry index and first call were right in all 30 checks, the case value and “handler” were not |
+| task table | 65 | 10 | 0 | 10/10 | V |
+| IRQ attach sites | 53 | 10 + 10 + 10 | 3 + 1 + 0 | → 10/10 | **fixed**: `clr d1` = level 0; a level, IRQ or handler loaded from memory or a register is “not decoded” (was None, or an older constant: a handler table was named as the handler) |
+| D5 read: dcf | 339 | 10 | 2 | 8/10 | **demoted to I** |
+| D5 read: af2 | 224 | 10 | 4 | 6/10 | **demoted to I** |
+| D5 read: fat | 221 | 10 | 1 | 9/10 | **demoted to I** |
+| D5 read: eyefi | 208 | 10 | 1 | 9/10 | **demoted to I** |
+| D5 read: af1 | 176 | 10 | 3 | 7/10 | **demoted to I** |
+| D5 read: ui | 141 | 10 | 1 | 9/10 | **demoted to I** |
+| D5 read: stb, dpof, drv, prm | 179, 173, 167, 160 | 10 each | 0 | 10/10 each | V (as read) |
+| component range | 8,783 | 11 + 10 | 1 + 2 | 10/11, 8/10 | boundaries fixed (§1); a range rule, so it stays a known limit (§7) |
+| sub-group label (family) | 1,081 | 12 + 10 | 1 + 0 | 11/12 → 10/10 | **rebuilt** as a linked-family rule (§2); one root removed (0x7E53053F) |
+| pin-op layer (D6), D5 mine, D6 fixes | 31, 27, 19 | – | – | < 50 rows | V where read |
+
+All wrong facts found by the samples were corrected in `cur_d6fix.py` (19 rows; those in demoted topics stay I). Every I row and every I fact inside a V row now starts with “probably”; names quoted from I rows in other rows (e.g. “helper of 0x7E5B108F (probably DCF mount …)”) are hedged the same way.
+
+**Curated texts applied to more than one row** (D6 re-read): scheap wrappers 0x7E5072ED…0x7E507387 (12 rows: `mov fn,a0` + call 0x7E507395 / `mov fn,a1` + call 0x7E5073B8; a0/a1 are function pointers; the cores run the fn with task dispatch disabled through sns_dsp/dis_dsp/ena_dsp, there is no pool pointer and no lock); “WB gain/colour getter” ×4 (0x7E579E7F is the 3×3 colour matrix: prm tag from table 0x7E78F028/0x7E78F05C × ROM matrix 0xAA6A/0xAA4A via 0x7E57F0DF into obj+18, +14 = +16 = 4095, no WB gain; the other 3 are I); “colour-matrix computation (26 entries)” ×2 → I; “PWM duty helper” ×2 → the Oimf facts; “WB state getter” ×2, “external flash state record read” ×2 → the copies they make; IMG job builder ×3 (0x7E545590 runs a caller-given job, it fills no descriptor); 13a anchor texts “one of the row A / B / C” → I. The shared labels used in many caller rows were corrected: `FAT request` → `FAT text-file line reader` (0x7E5BDF36, 19 rows), `APPEVENT/status trigger` → `key status read by id`, `FAT NO_FAT_CHAIN check` → `FS low executor`; and three curated rows that D5 had corrected only in its notes (0x7E5C816A FS command-log id → name; 0x7E5C8AEE event-flag set wrapper; 0x7E50C26B → I). Checked and kept: EMS2 decoders, console UART inits, system-controller/EMS/IMG/CPUCONN ISRs, SIO hooks, EYEFI requests, FILEFGND posts, IMG_PRECON cmds, u16 min.
 
 ## 3. Tables and structures decoded in D5 (V unless marked)
 
@@ -78,27 +132,32 @@ All other ranges are as in D4 (regions table, 01, 13a, 13f, 14b, 15b §1, 15d §
 
 ## 4. Coverage (rows with a role / all rows)
 
-**8,783 / 8,783 rows have a role (0 blank).** Levels from `stats.py` (A = own specific role: rules 0–13 or a string name; B = partial: callee signatures, kernel services, unnamed strings, or a call-graph role that names a caller or ancestor; C = context only: call graph without a named caller). The same classifier is used before and after:
+**8,783 / 8,783 rows have a role (0 blank).** Levels from `stats.py` (D6 classifier: A = own specific role, rules 0–13 or a string name, **marked V**; B = partial: callee signatures, kernel services, unnamed strings, a call-graph role that names a caller or ancestor, **or any I row**; C = context only: call graph without a named caller). The D6 classifier counts I rows as B, so the D5 column is recomputed with it:
 
-| Level | D4 TSV | D5 TSV |
+| Level | D5 TSV (D6 classifier) | D6 TSV |
 |---|---|---|
-| A specific | 4,209 (47.9 %) | **6,246 (71.1 %)** |
-| B partial | 3,859 (43.9 %) | 2,200 (25.0 %) |
-| C context only | 715 (8.1 %) | 337 (3.8 %) |
+| A specific (V) | 5,872 (66.9 %) | **4,560 (51.9 %)** |
+| B partial (incl. I rows) | 2,574 (29.3 %) | 3,882 (44.2 %) |
+| C context only | 337 (3.8 %) | 341 (3.9 %) |
 
-- Of the 6,246 A rows, 2,029 come from D5 reads (256 of them I: mainly the C-AF/IAF engine bodies in af1/af2, labelled from strings and callees) and 216 from the leaf summary (a mechanical, but true, description).
-- Level-A share per component, D4 → D5: DCF 21 → 100 %, FAT 23 → 100 %, DPOF 11 → 100 %, file wrapper/VFS 27 → 100 %, EYEFI/FILECLBK/shells 38 → 100 %, AF 25 → 100 %, BBM/STL 31 → 100 %, ADCONV 22 → 100 %, accelerometer 21 → 100 %, IOE 60 → 100 %, strobe exposure 41 → 100 %, strobe module 51 → 100 %, prm 17 → 100 %, USR_FAST_APP 9 → 100 %, UI input 44 → 100 %, UI LED/OUT 41 → 100 %. Lowest now: MEC request decoders 33 %, S_SHELL dumpers 35 %, kernel internals 36 %, SD host driver 42 %, WB 45 %, TakeFcs 48 %, IMG 50 %, lens 52 %.
-- V/I: 8,409 rows V, 374 I.
-- **Diff against the D4 TSV:** 3,260 rows changed role (2,249 changed primary rule); level moves B → A 1,687, C → A 352, C → B 26, A → B 2 (thunks that store through a pointer). 10 changed rows were checked against the code (0x7E5B05F6, 0x7E5AE5F1, 0x7E5B936B, 0x7E608F69, 0x7E558021, 0x7E509609, 0x7E508FD6, 0x7E5C8891, 0x7E5C5439, 0x7E456200): all true; 0x7E608F69 and 0x7E610129 are I as marked.
+- V/I: D5 8,409 V / 374 I → **D6 7,134 V / 1,649 I**. The drop in A is the demotion of six D5 read topics (1,276 rows V → I) and of the section anchors; the rows keep their text, hedged with “probably”.
+- **Rows changed against the D5 TSV: 5,254** (role text 4,158; main component 98; sub-group label dropped 1,798; V → I 1,276).
+- Lowest level-A shares now: DCF 5 %, uITRON kernel 6 %, C runtime 6 % (section anchors, now I), FAT 7 %, AF 22 % (D5 dcf/fat/af reads, now I).
 
 ## 5. Measured accuracy
 
-A row counts as an **error** when its role states something false (vague but true rows are not errors; see the levels).
-- **Sample 1** (`sample.py` seed 5150, build before the rule fixes): **2 / 30 = 6.7 %.**
-  - 0x7E548A62 was "slot 0 and slot 6 of table 0x7E747314"; it is slot 1 and slot 8 (the word at 0x7E747314 is 0x7E548941). Cause: the slot number was the position in the run of function words, which skips words that are not function starts. **Rule fixed** (slot = (word − base) / stride); 158 rows changed text.
-  - 0x7E46C246 had "calls 0x7E46C20C with d0=1, d0=10"; d0 = 1 is stored to 0x6041A464 first, only d0 = 10 is the argument. **Rule fixed** (absolute stores are reported, overwritten registers dropped, stores through `(off,aN)` end the thunk shape).
-- **Sample 2** (seed 9090, final build, 30 fresh rows): **0 / 30.** D5 rows checked in the code: 0x7E50F6AB, 0x7E454305, 0x7E5AEE53, 0x7E5F3F6E, 0x7E502DD6, 0x7E5BFE19; mechanical rows: 0x7E528FDF and 0x7E461C81 (table bytes), 0x7E511171 (`close` in 0x7E73616C), 0x7E55F0E3, 0x7E512F7C, 0x7E50578B. Levels in the sample: 22 A, 5 B, 3 C.
-- **Combined after the fixes: 0 / 30 (< 5 %).** Cross-check: the fat and dpof reads overlap on 15 rows (0x7E5BE156–0x7E5BE7A1) and agree on all of them; the fat and eyefi reads give the same FAT/FILE op names.
+A row counts as an **error** when any un-hedged fact in it is false (vague but true facts are not errors).
+- **D5:** sample 1 2/30 (rule fixes), sample 2 0/30. The D6 rule samples (§2a) show that these 30-row samples were too small: 28 of 301 facts were wrong in the first D6 rule sample (most in D5 reads, section anchors, table slots, IRQ and callback rows).
+- **D6 full-row checks** (blind checkers, whole row incl. component; `check/final*.tsv`, verdicts `check/res_fin*.tsv`, `res_f3*.tsv`):
+
+| Round | Build | Rows (V / I) | Wrong V | Wrong I (hedged) | Causes, all fixed afterwards |
+|---|---|---|---|---|---|
+| seed 7313 | after rule fixes | 40 (35 / 5) | 1 | 1 | unnamed table “used by” was another table's end bound; a hedged D5 ui row |
+| seed 8424 | + table/case/IRQ rewording | 24 checked (24 / 0) | 3 | – | a curated name and an own-string name taken from printed field labels; a table seed called a callback |
+| **seed 9535** | **final build** | **40 (34 / 6)** | **1** | 0 | the quoted ancestor name of 0x7E432A3F came from a 15d role-I kernel row without a hedge (the call path itself exists); 15d role-I names are now quoted as “probably …” |
+
+- **Final error rate among V rows: 1 / 34 = 2.9 %** on the final-build sample (0 / 6 I rows wrong); over the three rounds 5 / 93 V rows (5.4 %), every cause fixed by a rule change (§7). The target 0 was not reached in a fresh sample of the shipped build; the last fix (hedged 15d names, 230 rows) was not re-sampled.
+- Rule-level precision after the fixes: every rule that still asserts V had 0 wrong facts in its last ≥ 10-fact sample (§2a).
 
 ## 6. Corrections to older sections and to the D4 index
 
@@ -116,24 +175,37 @@ A row counts as an **error** when its role states something false (vague but tru
 12. **USR_FAST_APP:** bit 0x20 is TakeFunc (0x7E502391/0x7E502467), not 2ndEnd; the lens reply wait in 0x7E502C7B never runs (0x7E5027D7 always returns 1).
 13. **buff (C6 F008):** 0x7E579B45 = pool method 0, get the buffer address of id n (returns 0 taken / 2 free / 4 bad id); 3 slots of vtable 0x7E78EEBC are base-class code.
 14. Section 13f/D4 "lock pair 0x7E4215A2/0x7E4215B6" and "SIO open counter" corrections stand as in D4.
+15. **D6:** 0x7E579E7F is a 3×3 colour-matrix computation, not a WB gain getter (14b §3); 0x7E507395/0x7E5073B8 run a function pointer with task dispatch disabled (14b §2 “alloc core, pool by pointer, lock 0x7E436593” is wrong); 0x7E545590 runs a caller-given IMG job (13a §3.2 “job builder, 320-B descriptor” fits only 0x7E545276/0x7E5453CA); 13a: the sin polynomial table is 0x7E7316CC (not 0x7E7371CC) and 0x7E4FFD20 returns 0.0 (not a HUGE constant); 0x7E5C816A is the FS command-log id → name function and 0x7E5C8AEE a generic event-flag set wrapper (02 §6, 13f §2.4); 0x7E53E2CD is the `bc_main` debug-info dump, not `sc_get_stabtype`; 13f: 0x98B00780–0x98B007A4 is the unit-3 pin bank of the pin-op layer (13f lists 0x98B00000 only as SDRAM controller/arbiter/bus monitor); cpudma starts at 0x7E45E820 (0x7E45E206… is CCD-temperature ADC code).
 
 ## 7. Known rule errors and limits
 
-Fixed in D5 (rules, with the TSV regenerated): (a) FS heap pair named as request alloc/submit; (b) prm get/set2 names; (c) data-word slot numbering; (d) thunk rule reading stores as arguments; (e) section anchors citing the 16x indexes themselves; (f) curated short names (e.g. `key-matrix scan`) winning over newer reads in caller references.
+Fixed in D5: (a) FS heap pair named as request alloc/submit; (b) prm get/set2 names; (c) data-word slot numbering; (d) thunk rule reading stores as arguments; (e) section anchors citing the 16x indexes; (f) curated short names winning over newer reads.
+
+Fixed in D6 (TSV regenerated; details in §2/§2a):
+- **(g) sub-group labels by address range** (e.g. the `lens` debug shell range held the lens timed-transmit hook 0x7E52463F and the lens controller 0x7E524284/0x7E52431E): replaced by the linked-family rule; 1,798 labels dropped.
+- **(h) pin-op layer** 0x7E4613E5–0x7E4614F1 filed under EMS1/EMS2, with table-slot rows giving wrong slots and entry counts: own component and decode (§1); the DB-merged stub rows list their entries.
+- **(i) curated texts copied to several rows**: scheap wrappers/cores, WB getters (0x7E579E7F = colour matrix), colour-matrix pair, PWM helpers, strobe record copies, IMG job builders, shared labels (`FAT request`, `APPEVENT trigger`, `FAT NO_FAT_CHAIN check`); curated rows corrected only in D5 notes (0x7E5C816A, 0x7E5C8AEE, 0x7E50C26B).
+- **(j) data-word table scan**: entry counts (DB starts only), “used by” (end-bound immediates), task-record entry fields read as 1-entry tables, run start taken as the base of 12-B record tables.
+- **(k) linear jump tables**: `sub` bases not decoded, so case values were off by the base (0x20019 reported as 0x18); now the entry index is reported.
+- **(l) IRQ rule**: `clr d1` reported as level None; a handler table read through `mov (d0,a0),a0` reported as the handler.
+- **(m) callback rule**: wrong store offset (`(aN)` stores, overwritten registers); table seeds called callbacks → “address taken”.
+- **(n) own-string names from field labels** (`face_area_count   :`, `sc_get_stabtype: %d`).
+- **(p) 15d role-I kernel names** (e.g. 0x7E432A3F “static object creation walker”) were quoted un-hedged in caller/ancestor references; now “probably …”.
+- **(o) hand example** 0x7E5C8D48: the path has the 2-char drive prefix (`C:/DCIM/100OLYMP/PA010001.JPG`).
+- Demoted: section anchors and D5 topics af1, af2, dcf, fat, eyefi, ui (I, “probably”).
 
 Still open:
-- **Callback rule (13):** any function whose address is loaded by `mov imm32` is called a callback. Most are, but a task entry or a table seed reads the same; the "next call" names the consumer, not the event.
-- **Curated rows not re-read in D5** (586 primary) can still hold old errors; D5 found more than 20 of them in the platform range (§6).
-- **I rows:** 256 D5 rows are I, mostly the large C-AF/IAF engine bodies (0x7E5F41B1, 0x7E604068, 0x7E605F6C, 0x7E607180, 0x7E612316, 0x7E614C8F, 0x7E616F61, 0x7E618502) and float helpers.
+- **Component ranges**: 2 of 21 sampled components were wrong (both fixed, §1); other boundaries were not all re-checked, and the large components (AF, DCF, FAT, lens, IMG) contain helpers shared with neighbours.
+- **I rows (1,649)**: the demoted D5 topics hold mostly true text (they scored 6–9 of 10), but no row there is guaranteed; re-read before quoting.
 - **Leaf summary** shows first-pass values inside loops and does not track stack arguments beyond `stack(+off)`.
-- **Context-only rows:** 2,537 rows are B/C, mainly in IMG, lens, TAKE, BC and the kernel (not targeted in this cycle).
+- **F019** (coverage/round7-review1.md, 0x7E704E01) is a 16d row, outside this index: its condition should read “15000 := 0 when 556 changed, or when 556 ≠ 4 and AE BKT (480) is off” (480 is not compared before/after). Not edited here.
 
 ## 8. How to classify a new function in this range
 
 1. Look it up in the TSV (component, role, rule).
 2. For an extra start inside a row, use that row and the signatures in §2.
 3. A function that allocates from 0x7E5C8497, fills +4 and calls 0x7E5B6233/0x7E5BB51A/0x7E5CBA12 issues the FS op named in §2 for that class/op.
-4. A callback row with a `next call` is a completion or event callback for that service (lens submit 0x7E51F98E → req+4; MEC 0x7E512AE0/0x7E512A57; CamCommand 0x7E628303 → +40/+44; SC_TTIMER 0x7E506FF6 / tmr_start 0x7E4650A2 → timer).
+4. An “address taken” row with a `next call` is often a completion or event callback for that service (but table seeds and task entries look the same) (lens submit 0x7E51F98E → req+4; MEC 0x7E512AE0/0x7E512A57; CamCommand 0x7E628303 → +40/+44; SC_TTIMER 0x7E506FF6 / tmr_start 0x7E4650A2 → timer).
 
 ## 9. Open questions
 
