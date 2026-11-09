@@ -73,8 +73,8 @@ for t in order:
   - The buffer is sized from table[req+96], but the kernel always writes 4×128×96×2 = 98,304 bytes.
   - For 16:9 (idx3) the buffer is 73,728 bytes, and for 1:1 it is also 73,728. That is an overflow, unless
     art_buff_alloc rounds the size up.
-- **Verified:** `art_chk_type` 0x7E71C0E1 accepts 151/153 only when req+2==3 (block 0x7E71C1BA). They are
-  rejected for req+2==1, 2, 4 and 5.
+- **Verified:** `art_chk_type_rec` 0x7E71C0E1 (trace id 7; its caller `art_chk_type` 0x7E71C075 is id 6) accepts 151/153 only when req+2==3 (block 0x7E71C1BA). (A10 2026-11-09)
+  This helper rejects them (returns 1) for req+2==1, 2, 4 and 5. That is not final: when it returns 1, `art_IsSupportType` 0x7E71BC93 runs `art_chk_effect` 0x7E71C4DC and returns its result. (A10 2026-11-09)
 
 ## 2. Pastel Art (menu 120, codes 181/182) = shipped **Watercolor I/II**
 
@@ -151,14 +151,14 @@ out = imgdma_merge(A, B, w=256, mask=0xFF00)   // inferred: per-byte select/mix,
   and no extra base look is applied in code. Any base look would have to come from request tone fields
   (req+92..167) that the camera side fills. `rec_art_set_artmode` has not been traced.
 - **Open:** whether code 118 together with effect flag 0 runs the module twice.
-- **Verified:** `art_chk_type` accepts 118 for req+2 = 1 and 3, but not 2.
+- **Verified:** `art_chk_type_rec` (0x7E71C0E1) accepts 118 for req+2 = 1 and 3, but not 2. (A10 2026-11-09)
 
 ## 4. Pin Hole III (code 108) vs I/II (73/106)
 
 - **Verified:** 73, 106 and 108 all go to case 0x7E72A615 → `art_effect_20_pinhole` 0x7E720332.
-- **Verified:** no art code tells them apart. Every compare treats {73,106,108} as one group: `art_chk_type`
+- **Verified:** no art code tells them apart. Every compare treats {73,106,108} as one group: `art_chk_type_rec` (A10 2026-11-09)
   0x7E71C132…, and `art_set_func_effect` 0x7E72A743, which drops the pinhole effect for these codes.
-- **Verified:** the only other `cmp 108` sites are a numeric threshold at 0x7E551E93 and printf `%l` at 0x7F0A3479.
+- **Corrected:** `cmp 108` is common. The linear sweep finds 93 `cmp 108,Dn/An` sites (about 40 in code; the A10 audit counts 40 in the function disassembly). Besides the threshold at 0x7E551E93 and printf `%l` at 0x7F0A3479, several are REC/art code that tests the picture-mode **menu id** 108 (Gentle Sepia), not art code 108: 0x7E70E5BD (`rec_art_set_ctrl_nr`), 0x7E7160C3, 0x7E70C674 (`rec_3d_lens_set_ctrl`), 0x7E71822D (`REC NR stl2nr`) and the ART BKT builders (0x7EA764C5, 0x7EA9540C). Others are unrelated (0x7E6E3E85, a shell parser). None tells art code 108 apart from 73/106, so the Pin Hole III conclusion stands. (A10 2026-11-09)
 - **Pinhole module (verified):**
   - The gain map is made by **CPU kernel 3** (`art_cpu_exec(3, 0x20000)` in pass 2 0x7E720441) on the MAIN TASK.
   - The map size comes from table 0x7E550BB4, indexed by req+96 (modes 1/2/3/8/9) or by constants 1/3 (modes 4/5/7).

@@ -36,7 +36,7 @@ Detail is in 10a–10f. Coordinator spot checks are in `../NOTES.md`.
 | e-Portrait | Active | **Active** (shooting and playback edit). "Beauty Fix" variants: **stub/absent**, never shipped | |
 | Smile detection | "stubbed" | **CORRECTED → Absent** (orphan name string) | |
 | SCN list | 12 iAuto types (inf) | **23 fixed SCN entries, all selectable.** 8 SCENE_PROGRAM entries (Party, Self Portrait, Cooking, 3× Underwater, Animal, Snow) are never offered on any of the 8 bodies | |
-| Art effects | Active (inf) | **Active (verified).** One effect at a time from a per-filter list | Values at 0x7EFE8664 |
+| Art effects | Active (inf) | **Active (verified selection).** One effect at a time from a per-filter list. The step from the setting to the `art_effect_*` module is inferred (10b §6) | Values at **0x7EFE866C** (12-byte records; 0x7EFE8664 is inside the last "Filter Type" row 0x7EFE8660) (A10 2026-11-09) |
 
 ### Movie (10c)
 
@@ -89,7 +89,7 @@ Detail is in 10a–10f. Coordinator spot checks are in `../NOTES.md`.
 | BASIC overlay "loaded on demand" | on demand | **CORRECTED (inferred strong)**: loaded in normal use (the same step starts the movie tasks) | |
 | ADJSLF / self-adjust menu | trigger unknown | **Gated by the factory flag** PRM_MODE_SHIPS_ENABLE (prm 0x0DB1) = 0 plus wake reason SELF_ADJUST. Dormant on a shipped camera (inferred) | |
 | SS_DEBUGMENU | entry unknown | **Contents found** (Life Test, BASIC script register/erase, Color setting). **Entry found but gated** (13d §4.3 (D1 2026-11-09)): key sequence in HIDE_MODE, behind getShippingInfo(4); retail pass unknown | |
-| Version-check menu | "hidden" | **CORRECTED (inferred)**: probably the normal Setup › Firmware screen | |
+| Version-check menu | "hidden" | **CORRECTED (10f §4.3)**: not the Firmware screen (that item starts CAM_MISC_FIRMUP). The CA VERCHK sub-app is requested by the same hidden gate that opens HIDE_MODE (PostEventToCA(11, 11) at 0x7EDFD69E, after getShippingInfo(4) = 1) | (A10 2026-11-09) |
 | USRTEST_A–D | dormant | **Dormant (confirmed)**: nothing starts them | |
 
 ## What changed overall

@@ -91,7 +91,7 @@ modules.tsv `last_fn` gaps (I2 of review 3): many Cmp/Cap rows end early because
 
 | State (entry) | Events → next | Entry action |
 |---|---|---|
-| 3 Idle (0x7EA7E266) | 11761 → 9 | — |
+| 3 Idle (0x7EA7E266) | 11761 → 9 (vt+188 is called first); handler 0x7EA7E27A also takes 11769 (→ 0x7EA7D5F0 = 0x7EB86ED0(this+188)) and 11770 (→ vt+20), both with no state change | — (A10 2026-11-09) |
 | 9 (0x7EA7E1F1) | 3346 → 8 | GEN 11761 evTraStart to CapBoo iface (+472) |
 | 8 (0x7EA7E198) | 12063 → 7 | GEN 4761 boot request to +472 |
 | 7 (0x7EA7E089) | 12067 or timeout −2 (+516) → 10; **3346 → 7** (re-enter, new 5 s timeout) | `startTransition... %d/%d`, timeout 5,000 ms |
@@ -124,7 +124,7 @@ Relations (setters called from 0x7EB780F7): +352 CapThr facade, +344 CapPow, +34
 | 1 (0x7EB785F8) | GEN 11565 to self; then 0x7EB783AF (189 B: virtual calls on the relations +352, +344, +348, +336, +332, +324, +340; the counterpart of 0x7EB782C1, which the state-2 entry 0x7EB7864A calls; I: relation unsubscribe) | 11565 → 3 (inline in the dispatcher) (A8 2026-11-09) |
 | 3 Idle (0x7EB78E44; the name "Idle" is I, by analogy with the CM chart: the entry logs only `*** on state %2d [%s] ***`) | — | 11761 → 8; 11769 and 11770 (0x7EBA6569) are taken without a state change (A8 2026-11-09) |
 | 8 (0x7EB78A3D) | GEN 11769 evTraStop to +328 CapFls | **3344 → 11** (F047 0x7EB78A88 is the state-8 handler; review F047 said "case 12") |
-| 11 (0x7EB78C84) | if CapIod (+332) vt+12 says active: GEN **5761** to it; else self 12067 | 12067 → 9 |
+| 11 (0x7EB78C84) | if CapIod (+332) vt+12 says active: GEN **5761** to it; else (also when +332 is NULL) self 12067 | 12067 → 9 (A10 2026-11-09) |
 | 9 (0x7EB78AC9) | self 12067 | 12067 → 6 |
 | 6 (0x7EB787ED) | GEN 11769 to +340 CapMod (`Mode My Shutdown`) | 3344 → 12 |
 | 12 (0x7EB78D61) | GEN **3951** to +324 CapBlc; self 12067 | 12067 → 10 |
@@ -138,7 +138,7 @@ I: shutdown stops the strobe, powers down I/O (5761), stops the mode manager, th
 
 The outer states are the CM chart. **Running (4) = AND-state 0x7EAF1506 with three regions plus the running handler 0x7EAF1566:**
 - **Main region +1296** (dispatcher 0x7EAF265D, jump table, states 11–168, 131 cases). **13 = `PictBridgeComponent:idle`** (entry 0x7EAFBBA4). Its handler 0x7EAFBF48 maps CustomPrint requests to work states: 13784→30, 13809→31, 13806→32, 13810→33 (enters sub-state 35), 13808→36, 13807→37, 13819→38, 13820→55, 13795→58, 13799→62, 13797→65, 13802→66, 13801→67, 13789→71, 13815→71, 13783→84, 13792→136, 13814→137, 13805→138, 13816→139, 13793→140, 13821→141, 13811→142, 13803→143, 13796→144, 13813→154, 13804→157, 13812→158, 13798→161, 13788→166. Play requests: 12261→14, 12264→15, 12267→16, 12262→17, 12274→19. The top-level state number goes to +1292; composite states keep their own sub-state words +1300…+1376 (162's sub-state 166 is at +1376), and composite 18 uses +540 (sub-state 19). Composites 59/63/162/18 resolve to 62/65/166/19 above; 144, 154, 71 and 67 enter sub-states 149 (+1364), 155 (+1372), 78 (+1328) and 68 (+1324). **F042's "state 35 at +1300" is a sub-state of composite 33, not of 34:** 0x7EAF2EF7 → 0x7EAF2F06 sets +1292 = 33, then enters 35 (0x7EAF2FE7, writes +1300 and +1296). Its sibling 34 (entry 0x7EAF2F90, reached from 0x7EAF315D) writes the same +1300 (and +1296) and GENs 7094 (0x7EB79829) to self. (A9 2026-11-09)
-- **Region +1280** (0x7EAF1E59): 23 (entry 0x7EAF1E7F GENs **3615** to +1256 = CapPbr) ⇄ 24 on 7079/13791 (`CmpPictBridge Abort Success`).
+- **Region +1280** (0x7EAF1E59): 23 (entry 0x7EAF1E7F GENs **3615** to +1256 = CapPbr) → 24 on **7093** (replies through 0x7EB86A8E and logs `CmpPictBridge Abort Success`) or on **7079** (registers through 0x7EB868D2 and logs `CmpPbr0 err %d` with 2059); 24 → 23 on 13791. (A10 2026-11-09)
 - **Region +1288** (0x7EAF2092): 26/27 → 28 on −1; 28 = `backgroundctrl_idle start in Pictbridge`; 12281 internal.
 - **Events:** 7071–7109 (`CmpPbr` package, 80 creators and 111 tests, all in CmpPbr) are its internal step events. 13781–13821 come from `OlyHfwOpeCustomPrint`. 3611–3623 are its requests to CapPbr (3613 is built only in CmpPbr; CapPbr tests it).
 
@@ -155,7 +155,7 @@ The outer states are the CM chart. **Running (4) = AND-state 0x7EAF1506 with thr
 
 - The base init 0x7EB859ED calls vt+184, caches the EVFW router at +140, then calls **slot 42 (vt+168)**. The slot-42 override fills the array at +144 with prototype events. The base slot is the empty `retf` 0x7EB85924. Exception: `Com_ActiveTransitionManagerBufferd` has a stub slot 42 but fills +144 at run time from its state entries (table below). (A8 2026-11-09)
 - **0x7EB857CA = "accepts this request?"**: it works only while the helper's state (+168) is 4. It loops over +144 and tests `ev->isTypeOf(proto->getId())`. Callers: CM 0x7EA7D0AE, `Cmp_ShootingComponentBase` 0x7EA7A1AA, still-shooting 0x7EA80393, Com_ 0x7EB87590, Cab 0x7EB896CA, Ctg 0x7EB9478B/0x7EB95E3B.
-- So an owner routes an `evTraReq*` request to the sub-transition whose list holds that id. F049 0x7EB85867 clears the list.
+- So an owner routes an `evTraReq*` request to the sub-transition whose list holds that id. F049 0x7EB85867 clears the list: it deletes each prototype object, frees the array and allocates a new 20-slot (80 B) array with count 0. (A10 2026-11-09)
 
 | Subclass (ctor) | Slot 42 | Accepted ids |
 |---|---|---|
@@ -167,7 +167,7 @@ The outer states are the CM chart. **Running (4) = AND-state 0x7EAF1506 with thr
 | CmpCst_Function 0x7EA9F812 | 0x7EAA01DE (2,109 B) | 67 ids: 13481–13543, 12964/12965/12971/12972/12976/12982/12983, 7009, 12077, 11975 |
 | CmpCst_MediaMount 0x7EAAA4AF | 0x7EAAA56F | 12981, 12980, 12970, 12967, 12977, 12978, 12984 |
 | the other 7 (3D 0x7EA6D23C, EPortrait 0x7EA6EC03, RecView 0x7EA75054, Record 0x7EA7822A, Outline 0x7EA7E66B, the getName-less subclasses 0x7EA6CF32 / 0x7EA77CBA) | 0x7EB85924 (empty `retf`); Outline has its own `retf` stub 0x7EA7E6EB | none (A8 2026-11-09) |
-| Com_ActiveTransitionManagerBufferd 0x7EB8AD37 (vt 0x7EC8C708) | stub `retf` 0x7EB8AE46 | **13361** while the helper is in state 4: the entries of states 7 (0x7EB8B66F, region +316) and 8 (0x7EB8B8EA, region +312) push the static prototype 0x605EF18C (a copy of 13361, built by 0x7EB85D2A from ctor 0x7E96C3D3) onto +144 through 0x7E966C01; the exit code 0x7EB8B458 removes it through 0x7E966CCE. Cab_CameraBase uses it: initRelations 0x7EB893EA sets Cab +276 = facade+128 (the Bufferd member built by 0x7EB8924F), and 0x7EB896CA calls 0x7EB857CA on (+276) (A8 2026-11-09) |
+| Com_ActiveTransitionManagerBufferd 0x7EB8AD37 (vt 0x7EC8C708) | stub `retf` 0x7EB8AE46 | **13361** while the helper is in state 4: the entries of states 7 (0x7EB8B66F, region +316) and 8 (0x7EB8B8EA, region +312) push the static prototype 0x605EF18C (a copy of 13361, built by 0x7EB85D2A from ctor 0x7E96C3D3) onto +144 through 0x7E966C01. It is removed through 0x7E966CCE by three paths: the exit of region +316, 0x7EB8B458, only when +316 = 7 (the state-7 copy); 0x7EB8B86A, the exit of state 8's sub-region +324 (7 callers, unconditional), for the state-8 copy; and the state-7 handler 0x7EB8B69E itself on 7014 and on 13361. Cab_CameraBase uses it: initRelations 0x7EB893EA sets Cab +276 = facade+128 (the Bufferd member built by 0x7EB8924F), and 0x7EB896CA calls 0x7EB857CA on (+276) (A8 2026-11-09) (A10 2026-11-09) |
 
 Request names come from the `OlyHfwOpeShoot::*` sender strings (I).
 

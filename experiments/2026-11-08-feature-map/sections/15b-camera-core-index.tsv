@@ -18,7 +18,7 @@ addr_or_id	kind	role	evidence	V/I
 0x7E65165A-0x7E65181E	family	cam_set frame-command done callbacks, 18 functions: 16 x 27-B pointer-only stubs free the frame request (0x7E641D60) and OR flag mask 0x2, 0x4 or 0x8 into the cam_ev object's flag word (ids 32-40, 54-56; 0x7E63589A, `or` at 0x7E635C75); 0x7E65179E (11 B) only releases a list (0x7E652171; used by COM_SET 0x7E650721); 0x7E6517FA (36 B) frees the request and calls the owner's done at +20 (used by code 100, 0x7E650C85)	code; disasm 0x7E65165A-0x7E651838	V (A9 2026-11-09)
 0x7E650CFE-0x7E65137A	family	cam_set sequences (13 functions, 85-236 B): event-driven state machines on one cam_ev object each (ids 32-41, 54-56); each step re-arms itself (0x7E6356C3/0x7E6359B1) and issues the next frame command or set list	code (fcmds.py)	V
 0x7E652AF3-0x7E6557CD	range	cam_sg.c (I: alphabetical after cam_set.c, E-PL7 `sg ... cam_sg.c / cam_sgdrv.c`; FunctionList names sg_*): module byte 0x00 (0x0A00xxxx); init 0x7E652AF3 (<- cam_set init); 0x7E653AB1 attaches IRQs 4, 5, 6 -> ISRs 0x7E655548/0x7E6555C6/0x7E655644; command filter 0x7E652CEB (hash 0x7E7BB5D4: 5, 6, 7, 9, 18, 19, 129-133) called from frame handlers 0x7E637CA4...; setters 0x7E652BEA/0x7E652C6D (<- set list)	codes; call graph	V code, I name
-0x7E6557CE-0x7E6561D9	range	cam_shutter.c (SH_RES/SH_MEM; module 0x1A): open 0x7E655834/close 0x7E655869, command filter 0x7E6558AD (hash 0x7E7BBAAC: 5, 6, 7, 11, 12, 145-149 -> MEC submit 0x7E51787B of SH request objects), SH_RES post/release pairs 0x7E655A84-0x7E655C1F, MEC shutter-client callbacks 0x7E655FC4-0x7E656177 (-> 0x7E518BF2)	strings; calls	V
+0x7E6557CE-0x7E6561D9	range	cam_shutter.c (SH_RES/SH_MEM; module 0x1A): open 0x7E655834/close 0x7E655869, command filter 0x7E6558AD (hash 0x7E7BBAAC, key = code - 4: 5, 6, 7, 11, 12, 145-149; most -> MEC submit 0x7E51787B of SH request objects; 7 and 11 also arm cam timer 0x7E6623CB twice; 145 = no-op 0x7E655A2E; 148 = only sets byte +1 of *(0x6056EB44)), SH_RES post/release pairs 0x7E655A84-0x7E655C1F, MEC shutter-client callbacks 0x7E655FC4-0x7E656177 (-> 0x7E518BF2)	strings; calls	V (A10 2026-11-09)
 0x7E6561DA-0x7E65663A	range	cam_siodrv.c (I name): sensor driver of MMIO block 0x99900000 (enable word 0x99900014 bits 27-29 = channels 0-2, status 0x99900004); init 0x7E6561DA clears callbacks 0x6056EB4C-54 and attaches IRQ 7 level 2 -> ISR 0x7E65628B, which calls the callback of each pending enabled bit; helpers 0x7E656203-0x7E65663A used only by cam_serial	code	V
 0x7E656643-0x7E656B1C	range	still glue (cam_still.c? I): init 0x7E656643 (MI, still, LB inits), COM_ON 0x7E656664, COM_OFF 0x7E6566C1, COM_SET router 0x7E6566D9 -> still 0x7E656EEB / LB 0x7E65DC34 / mec_ctrl 0x7E64104C	callers	V code, I name
 0x7E7BD480	table	still state x event table: 25 status rows x 12 event columns x {handler, u16 next status}, row = status (0x6056EB58) * 96, column * 8; default handler 0x7E657928; entry 300 = 0x7E65D271	code at 0x7E65D6E6-0x7E65D735	V
@@ -214,28 +214,28 @@ addr_or_id	kind	role	evidence	V/I
 0x7E670B3C	ems2	mdet_ems2 job builder (job 0x6059710C + 188*i)	8 callers = the start functions	V
 0x7E670D5D	ems2-start	mdet_ems2 job start: set callback, EMS2 0x7E46012D + 0x7E460810	pattern	V
 0x7E670E56	ems2	mdet_ems2 job-layer helper (member by range and call graph)	graph.py internal callers	I
-0x7E670FB8	ems2-cb	mdet_ems2 completion callback: decode EMS2 results (0x7E460DB8/0x7E460FC2/0x7E46118C), chain next start	movm entry, loaded by preceding start	V
+0x7E670FB8	ems2-cb	mdet_ems2 completion callback: decode EMS2 results (0x7E460FC2), chain next start	movm entry, loaded by preceding start	V (A10 2026-11-09)
 0x7E671132	ems2-start	mdet_ems2 job start: set callback, EMS2 0x7E46012D + 0x7E460810	pattern	V
-0x7E671208	ems2-cb	mdet_ems2 completion callback: decode EMS2 results (0x7E460DB8/0x7E460FC2/0x7E46118C), chain next start	movm entry, loaded by preceding start	V
+0x7E671208	ems2-cb	mdet_ems2 completion callback: decode EMS2 results (0x7E460DB8), chain next start	movm entry, loaded by preceding start	V (A10 2026-11-09)
 0x7E67123A	ems2-start	mdet_ems2 job start: set callback, EMS2 0x7E46012D + 0x7E460810	pattern	V
-0x7E67132B	ems2-cb	mdet_ems2 completion callback: decode EMS2 results (0x7E460DB8/0x7E460FC2/0x7E46118C), chain next start	movm entry, loaded by preceding start	V
+0x7E67132B	ems2-cb	mdet_ems2 completion callback: decode EMS2 results (0x7E460DB8), chain next start	movm entry, loaded by preceding start	V (A10 2026-11-09)
 0x7E671364	ems2-start	mdet_ems2 job start: set callback, EMS2 0x7E46012D + 0x7E460810	pattern	V
 0x7E6714D9	ems2	mdet_ems2 job-layer helper (member by range and call graph)	graph.py internal callers	I
-0x7E671506	ems2-cb	mdet_ems2 completion callback: decode EMS2 results (0x7E460DB8/0x7E460FC2/0x7E46118C), chain next start	movm entry, loaded by preceding start	V
+0x7E671506	ems2-cb	mdet_ems2 completion callback: decode EMS2 results (0x7E460DB8), chain next start	movm entry, loaded by preceding start	V (A10 2026-11-09)
 0x7E671552	ems2-start	mdet_ems2 job start: set callback, EMS2 0x7E46012D + 0x7E460810	pattern	V
-0x7E671683	ems2-cb	mdet_ems2 completion callback: decode EMS2 results (0x7E460DB8/0x7E460FC2/0x7E46118C), chain next start	movm entry, loaded by preceding start	V
+0x7E671683	ems2-cb	mdet_ems2 completion callback: decode EMS2 results (0x7E460DB8), chain next start	movm entry, loaded by preceding start	V (A10 2026-11-09)
 0x7E671895	ems2	mdet_ems2 job-layer helper (member by range and call graph)	graph.py internal callers	I
 0x7E6719CA	ems2	mdet_ems2 job-layer helper (member by range and call graph)	graph.py internal callers	I
 0x7E671A81	ems2	mdet_ems2 job-layer helper (member by range and call graph)	graph.py internal callers	I
 0x7E671B19	ems2	mdet_ems2 job-layer helper (member by range and call graph)	graph.py internal callers	I
 0x7E671BEE	ems2	mdet_ems2 job-layer helper (member by range and call graph)	graph.py internal callers	I
 0x7E671CC3	ems2-start	mdet_ems2 job start: set callback, EMS2 0x7E46012D + 0x7E460810	pattern	V
-0x7E671E92	ems2-cb	mdet_ems2 completion callback, chain end: decode EMS2 results (0x7E460DB8/0x7E46118C), then 0x7E672308 -> analysis 0x7E672896 -> user callback *(0x605970F0) (= 0x7E6686D0 from tracking open); no next start	movm entry, loaded by start 0x7E671CC3	V (A9 2026-11-09)
+0x7E671E92	ems2-cb	mdet_ems2 completion callback, chain end: decode EMS2 results (0x7E460DB8/0x7E46118C), then 0x7E672308 -> analysis 0x7E672896 (only if byte 0x60598D0C = 0 and byte 0x605970E4 != 0) -> user callback *(0x605970F0) (= 0x7E6686D0 from tracking open; always called); no next start	movm entry, loaded by start 0x7E671CC3	V (A9 2026-11-09) (A10 2026-11-09)
 0x7E6721E5	ems2	mdet_ems2 job-layer helper (member by range and call graph)	graph.py internal callers	I
-0x7E672308	ems2	EMS2 result unpack -> 0x7E672896, then calls user callback *(0x605970F0); not a start	caller 0x7E671E92	V (A9 2026-11-09)
+0x7E672308	ems2	EMS2 result unpack -> 0x7E672896 only if byte 0x60598D0C = 0 and byte 0x605970E4 != 0 (sets 0x60598D0C = 1 when it was 0), then always calls user callback *(0x605970F0); not a start	caller 0x7E671E92	V (A9 2026-11-09) (A10 2026-11-09)
 0x7E67249F	ems2	post from tracking -> 0x7E67253F	caller 0x7E66891E	V
 0x7E67253F	ems2-start	mdet_ems2 job start: set callback, EMS2 0x7E46012D + 0x7E460810	pattern	V
-0x7E6725C6	ems2-cb	mdet_ems2 completion callback, chain end: decode EMS2 results (0x7E460DB8), analysis 0x7E672896, then user callback *(0x605970F4) (= 0x7E6689F3); no next start	movm entry, loaded by start 0x7E67253F	V (A9 2026-11-09)
+0x7E6725C6	ems2-cb	mdet_ems2 completion callback, chain end: decode EMS2 results (0x7E460DB8), analysis 0x7E672896 only if byte 0x605970E4 != 0, then always user callback *(0x605970F4) (= 0x7E6689F3); no next start	movm entry, loaded by start 0x7E67253F	V (A9 2026-11-09) (A10 2026-11-09)
 0x7E6727BC	log	debug logger: ems2 5164 B/record (kind 1)	strings datsz...	V
 0x7E67283D	ems2-start	mdet_ems2 job start: set callback, EMS2 0x7E46012D + 0x7E460810	pattern	V
 0x7E67287A	cb	mdet_ems2 callback of the last start 0x7E67283D, chain end: 28 B, no movm, no decoder; calls 0x7E460109 and 0x7E4600DC, then user callback *(0x605970F8) (= 0x7E66C1AF, stop)	loaded at 0x7E672851	V (A9 2026-11-09)
@@ -1004,8 +1004,8 @@ ADCONV callers	list	UI ADC keys/dial 0x7E50B1B4, 0x7E50B356, 0x7E50B512, 0x7E50B
 0x7E7BB094	hashtable	cam_set.c (module 0x11): 32-slot {u32 key, label} hash in 7E650607 (key = value-4; linear probing); 26 keys	jmp (aN) at 0x7E650647; table bytes	V
 0x7E7BB094{key 1}	slot	cam_set request code 5 -> start ev-object 33 sequence 0x7E650DB3: set-list type 16, FC41, FC3; = COM_OFF path (cam.c COM_OFF job 0x7E6287E2 sends 0x8005)	table word + case label at 0x7E65069D	V
 0x7E7BB094{key 2}	slot	cam_set request code 6 -> start ev-object 32 sequence 0x7E650CFE (F013): FC40, set-list type 10, FC6; = COM_ON path (COM_ON job 0x7E62862B sends 0x8006)	table word + case label at 0x7E650696	V
-0x7E7BB094{key 3}	slot	cam_set request code 7 -> COM_SET: builds set lists of types 57, 58, 59, 62, 63 (0x7E65156C) (COM_EXECUTE_REQUEST 0x7E628E12 sends 0x8007)	table word + case label at 0x7E650649	V
-0x7E7BB094{key 4}	slot	cam_set request code 8 -> COM_GET: copies the current setting block (18 + 9 words) from 0x7E649822 to the caller (COM_GET 0x7E6288E5 sends 8)	table word + case label at 0x7E65068F	V
+0x7E7BB094{key 3}	slot	cam_set request code 7 -> COM_SET: builds set lists of types 57, 58, 59, 62, 63 (0x7E65156C), and runs types 61, 64 or a packet u16 through 0x7E651520 -> executor 0x7E6513CF (COM_EXECUTE_REQUEST 0x7E628E12 sends 0x8007)	table word + case label at 0x7E650649	V (A10 2026-11-09)
+0x7E7BB094{key 4}	slot	cam_set request code 8 -> COM_GET: copies the current setting block (18 + 9 words; sources reached through the getter 0x7E649822 = *(*0x6055E2BC), destinations = pointers at *(pkt+8) +0/+4) to the caller (COM_GET 0x7E6288E5 sends 8)	table word + case label at 0x7E65068F	V (A10 2026-11-09)
 0x7E7BB094{key 13}	slot	cam_set request code 17 -> start ev-object 41 sequence 0x7E650E6B; = COM_ABORT path (0x7E628ACD sends 0x8011)	table word + case label at 0x7E650651	V
 0x7E7BB094{key 14}	slot	cam_set request code 18 -> start ev-object 34 sequence 0x7E650EDC: FC1, set-list type 34	table word + case label at 0x7E650659	V
 0x7E7BB094{key 15}	slot	cam_set request code 19 -> start ev-object 35 sequence 0x7E650F62: set-list type 35, FC57	table word + case label at 0x7E650661	V

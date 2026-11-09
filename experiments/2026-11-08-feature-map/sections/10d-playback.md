@@ -21,7 +21,7 @@
 | Slideshow | inferred | CONFIRMED | Active. Menu rows Start/BGM/Effect/Slide/Slide Interval/Movie Interval (verified); the component reads the settings (verified) | all |
 | Playback transitions (EFFECT task) | Active | CONFIRMED (inferred link to info 97) | Active: slideshow Effect info 97 has 4 values, read by the slideshow component | all |
 | Opening screen (registered picture kind 5) | inferred | **CORRECTED → Stub (registration)** | `api_play_dummy_Regist_Play_Rom` has no code; `OpeningScreen` has no API interface. The PLAY_IMAGE 0x85 worker is complete but unreachable (inferred) | — |
-| Audio DSP | Active (inf for use) | **CORRECTED (split)** | **Wind cut is user-switched:** Custom Menu "Wind Noise Reduction" (info 434 → prm 0x7871) selects windcut or plain HPF (verified). ReTune, 5-band EQ, notches, DF1 and 3D use **fixed ROM-class settings**. The notch pattern follows movie quality. DRC uses 2 CPRAM values | — |
+| Audio DSP | Active (inf for use) | **CORRECTED (split)** | **Wind cut is user-switched:** Custom Menu "Wind Noise Reduction" (info 434 → prm 0x7871) selects windcut or plain HPF (verified). ReTune, 5-band EQ, notches, DF1 and 3D use **fixed ROM-class settings**. The notch pattern follows movie quality. DRC uses 2 CPRAM values. Caveat: the 3D tag 30034 and the windcut tag 56004 do have prm sets (2 and 4 sites in 07-settings.tsv; e.g. 0x7E94D577 sets 30034); the A10 audit traces them to a save/restore driven from ADJ (… ← 0x7F082681), so a user still cannot set them | — (A10 2026-11-09) |
 
 ## 1. Picture-database play modes (Photo Surfing, Event View, Collection, Collage)
 
@@ -106,7 +106,7 @@ Basis for "Active": the GUI calls the component's `OlyApi*` interface (singleton
 - 0x89–0x8C `play_cube_*` serve Bluetooth/PENPAL only, so they are Dormant (§05: no accessory port).
 - 0x85 regist: see §5.
 - 0x84 pocket and 0x8F SNS flag: not traced.
-- `api_picfile_Check_Create_PictureFile` 0x7E683DB6 maps API modes 1..33 to these internal modes (jump table 0x7E7CF458; for example → 132, 129, 8, 10, 11, 14, 133, 16, 131, 7, 12, 1, 2). The size check therefore knows every mode, including 0x85 (verified).
+- **Corrected:** `api_picfile_Check_Create_PictureFile` 0x7E683DB6 maps API modes 1..33 through the jump table 0x7E7CF458 (all 33 words decoded): 1→1, 2→2, 3→0x81, 5→7, 6→0x85, 9→8, 10→0x0A, 11→0x0B, 12→0x0E, 14→0x0C, 15/16→0x84, 17→0x10, 18→0x10 (it also clears the flag at (8,sp)), 19→0x83, 21–25→0x88, 26→0x87, 30→0x89, 31→0x8A, 33→0x82. Mode 20 is computed by 0x7E93FDBB. Modes 4, 7, 8, 13, 27, 28, 29 and 32 fall to the error default 0x7E683E69 (d2 = 1, (8,sp) = 2). So the size check does **not** know every mode: 10 of the 23 modes in 0x7EBB8D88 are never produced as constants (0x80, 0x86, 0x8B, 0x8C, 0x8F, 0x90, 0x91, 0x92, 0x93, 0x94; mode 20 is the only possible source), and it produces 0x0A, 0x0B, 0x0E, 0x82 and 0x83, which are not in that table. Only 0x85 (API mode 6) is known as claimed (verified). (A10 2026-11-09)
 
 ## 3. 3D (MPO) playback
 - **Code (verified):**

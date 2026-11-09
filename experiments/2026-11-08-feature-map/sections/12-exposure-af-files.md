@@ -75,7 +75,7 @@ Each record holds 19 Q8 values plus a u16 flag. Sentinels: **max** = 0x6400, **m
 
 ### 1.4 Metering and the 18×18 grid
 
-- **The still result holds every metering candidate.** The block printed by 0x7E69EDF3 (`exp_cal_still[bv]`; capture block +60) holds the six BVs at +0…+10 (spot, esp, ave, ave2, cntr, arnd), then face_num (u8 +200), mode (u8 +201) and bv_std (u16 +202). `gyako` (逆光, backlight — translation, inferred) is a byte from capture block +336, passed in d0 (audit 2026-11-09; verified offsets).
+- **The still result holds every metering candidate.** The block printed by 0x7E69EDF3 (`exp_cal_still[bv]`; capture block +60) holds the six BVs at +0…+10 (spot, esp, ave, ave2, cntr, arnd), then face_num (u8 +200), mode (u8 +201) and bv_std (s16 +202: `movhu` then `exth`, like the six BVs). `gyako` (逆光, backlight — translation, inferred) is a byte from capture block +336, passed in d0 (audit 2026-11-09; verified offsets). (A10 2026-11-09)
   - So centre, surround, average, ESP and spot BVs are all computed, and `mode` picks the BV used (`bv_std`) (inferred).
   - **Not mapped:** the selection switch for the five user metering modes (ESP / centre-weighted / spot / spot-highlight / spot-shadow). The highlight and shadow variants are probably the spot BV plus a fixed offset, but this was not found in code.
 - **The 18×18 grid** (`*** [EXP] BV_18x18 ***` 0x7E693B6C) feeds three things:
@@ -210,7 +210,7 @@ The result goes to byte +38 of the TAKE_FOCUS globals (pointer at 0x60515FA8). T
   - 0x7E708F24: the version strings and ASCII fields;
   - **0x7E7096DC** (6,319 bytes): most of the MakerNote values (with prm reads through 0x7E457C75);
   - `rec_art_set_exif_data` 0x7E70DC24 (section 09): ArtFilter.
-- **How an IFD is written:** each one comes from a pointer list of 12-byte tag templates `{u16 tag, u16 type, u32 byte_length, u32 struct_offset}`. The templates are at 0x7E84EF20–0x7E8503FB (445 × 12 bytes) and the lists at 0x7E8503FC–0x7E851663; the last list (FocusInfo, 85 entries) starts at 0x7E851510 (audit 2026-11-09). The generic writer 0x7E708AAB copies from struct+offset. Tags 256–37500 that hold offsets get special cases (verified).
+- **How an IFD is written:** each one comes from a pointer list of 12-byte tag templates `{u16 tag, u16 type, u32 byte_length, u32 struct_offset}`. The templates are at 0x7E84EF20–0x7E8503FB (445 × 12 bytes) and the lists at 0x7E8503FC–0x7E851663; the last list (FocusInfo, 85 entries) starts at 0x7E851510 (audit 2026-11-09). The generic writer 0x7E708AAB copies from struct+offset. **Templates with byte_length 0** take a special path (verified: when (+4) = 0 and the tag is in 256…37500, it looks the tag up in the 16-bucket table 0x7E851688, key = tag − 255). There are 9 such tags: 256, 257, 273, 279 (StripByteCounts, a size, not an offset), 513, 1590, 4355, 4356 and 37500. Offset tags such as 34665 ExifIFD, 40965 Interop and the type-13 MakerNote sub-IFD pointers 0x2010–0x2050 have byte_length 4 and take the generic copy. (A10 2026-11-09)
 
 ### 3.2 File types (u16 at struct+16384, verified)
 

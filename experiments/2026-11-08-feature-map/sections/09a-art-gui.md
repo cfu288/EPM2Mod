@@ -9,7 +9,7 @@ Labels: **verified** = I read it in the code or the bytes. **inferred** = from n
 ### 1.1 Where the conversion happens (verified)
 - Get_CameraInfo `0x7E67F822` → `0x7E67F82B` and Set_CameraInfo `0x7E67F882` → `0x7E67F899` do **no** value conversion. They only map info id → (tag, index) and call prm get/set. Set_CameraInfo does no range check: its only test is a lock byte at RAM 0x605A5B50 (`0x7E680266`).
 - The conversion is in the **mode controller** ("mcon", ~~0x7E6FC000–0x7E708000~~ 0x7E6FCA60–0x7E70787F, 13e §1 (D1 2026-11-09)), which the GUI reaches through getSetting: 0x7E9CA19C → 0x7E9E76BE → 0x7E6FCABA → **`0x7E6FEA5F`**.
-- mcon has a value-list table of 505 records of 20 bytes at **0x7E84A0B8**, found by a 128-bucket hash at RAM 0x605B9750 (`0x7E70782A`). The record layout (verified from the users 0x7E707147, 0x7E7071EF, 0x7E7070B4 and 0x7E70708D) is: `+0 u16 info`, `+2 u16 variant key` (128 = default), `+4 ptr raw[]`, `+8 ptr gui[] (u32)`, `+12 u16 total bytes`, `+14 u16 element size`, `+16 u8 clamp` (1 = stop at the ends, 0 = wrap), `+17 u8 type` (1 = u8, 2 = s8, 3 = s16 nearest match, 4 = s16 exact, 5 = u16, 6 = composite) (13e §3.1) (D1 2026-11-09).
+- mcon has a value-list table of 505 records of 20 bytes at **0x7E84A0B8**, found by a 128-bucket hash at RAM 0x605B9750 (`0x7E70782A`). The record layout (verified; the users 0x7E707147, 0x7E7071EF, 0x7E7070B4 and 0x7E70708D read +4, +8, +12, +14 and +17 (6 vs not 6); +2 is read by 0x7E707854, the +16 clamp is used by the u8 step 0x7E7074B5, and the type codes come from the dispatcher 0x7E70761C (cases 1–6, `extb` for type 2)) is: `+0 u16 info`, `+2 u16 variant key` (128 = default), `+4 ptr raw[]`, `+8 ptr gui[] (u32)`, `+12 u16 total bytes`, `+14 u16 element size`, `+16 u8 clamp` (1 = stop at the ends, 0 = wrap), `+17 u8 type` (1 = u8, 2 = s8, 3 = s16 nearest match, 4 = s16 exact, 5 = u16, 6 = composite) (13e §3.1) (D1 2026-11-09). (A10 2026-11-09)
 - Type 6 is a **composite**: each raw element is 64 bytes (16 u32). It holds the values of several info ids, and the id list comes from the table at **0x7E8182FC** (68 records of 34 bytes `{u16 info, u16 ids[..], 2000 = end}`, `0x7E6FF5D3`).
 - **Read path:** `0x7E6FED4C` zeroes a 64-byte buffer and fills it with Get_CameraInfo of each listed id. `0x7E707147` then compares it with memcmp (`0x7E508294`) against each raw element, and `0x7E70708D` returns `gui[index]`.
 - **Write path:** `0x7E6FEB74` → `0x7E7070B4` → `0x7E7071EF` finds the GUI value in `gui[]` and takes `raw[index]`. Then `0x7E6FF4C7` → `0x7E6FF788` calls Set_CameraInfo for each listed id.
@@ -68,14 +68,14 @@ raw[] is at 0x7E844CC0 (19 × 64 bytes) and gui[] is at 0x7E83F70C. Info 553 is 
 - **If 0x9481 holds 110–118** (consequences verified from the code above; end result inferred):
   - The GUI shows **Watercolor** (read fallback).
   - The rec-view colorTone is NONE, with an assert log.
-  - The Exif value has no art entry (coordinator's 0x7E70DC24 result).
+  - The Exif value has no art entry for 111–118 (coordinator's 0x7E70DC24 result). For **110** the writer has a real case, 0x7E70DE4B, which stores **15** (ExifTool: Pale & Light Color II); the E-P5 writer does the same (0x7E3ECFAA). (A10 2026-11-09)
   - `mov_art` 0x7E6CBFD3 maps 110–118 to the codes 145/75/84/69/117/118/119/151/153.
-  - The still path's acceptance (`art_IsSupportType` 0x7E71BC93, `art_chk_type` 0x7E71C0E1) was not re-traced here.
+  - The still path's acceptance (`art_IsSupportType` 0x7E71BC93, `art_chk_type` 0x7E71C075 → `art_chk_type_rec` 0x7E71C0E1) was not re-traced here. (A10 2026-11-09)
   - The next GUI change of picture mode overwrites the value.
 - **Not traced (open):**
   - Myset recall (`OlyHfwUserSettingManager::loadCustomSetting` 0x7E9E77E6). If it restores raw bank bytes, it would preserve an injected value, but it cannot create one (inferred).
   - PTP/remote property writes. The Set_CameraInfo callers at 0x7F08xxxx belong to `adj_p15740_p.c` (factory-adjustment PTP); I did not check which ids they write.
-- There are no constant-id writes of 111 or 0x9481: 0 prm sets, 0 Set_CameraInfo and 0 GUI setSetting with a constant id (07-settings.tsv, verified earlier). All writes are table-driven, through mcon.
+- **Corrected:** constant-id writes of info 111 exist, but every one goes through mcon. There are 0 direct prm sets of 0x9481 and 0 `Set_CameraInfo` 0x7E67F882 calls with 111 (07-settings.tsv). But the GUI setSetting 0x7EE01D4E (`setSetting Mode=%d Val=%d`) is called with id 111 at 0x7EDE26EC (value from the table 0x7EFF63EC) and at 0x7EE00E6F/0x7EE00E75 (values 8 and 1, one shared call 0x7EE00E79); the Set_CameraInfo wrapper 0x7E6FCC72 (it calls the mcon setter 0x7E6FEAE0) is called with 111 at 0x7EA807AC, 0x7EA817F6 and 0x7EA81823 (value 1 at the last two); and the mcon setter 0x7E6FEAE0 itself at 0x7E704036 (value 1, the §1.3 reset hook). The gui_set column of 07-settings.tsv (0) misses these. All of them use the mcon GUI→raw conversion, so the conclusion stands: the GUI cannot store 110–118. (A10 2026-11-09)
 
 ## Q3. E-PL5 v1.6 and E-P5 v1.8
 

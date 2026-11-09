@@ -135,3 +135,7 @@ English-string counts not present in the E-PM2: E-PL5 0 (block 1 identical), E-P
 - **A9/C5 fix pass: the CA misc table and the firmware chain. Confirmed:**
   - Rows at 0x7EED946C/7C/8C are {0x06000009, 1, 0x2006, 0x7ECE0653}, {0x0600000A, 1, 0x2007, 0x7ECE067B} and {0x0600000B, 0x85, 0x2008, 0x7ECE06C0 startFirmupSubAppStateMisc}.
   - The shooting row 0x7EEE0BF4 is {0x0400000B, 1, 1, startShooting 0x7ECDCB10}.
+- **A10 fix pass: the VERCHK path. Confirmed:**
+  - 0x7EDFD68D–0x7EDFD69E posts GUI 0x9628, then calls PostEventToCA(11, 11), inside the getShippingInfo(4) = 1 branch.
+  - CA state 0x2006 has the row {0x09000006, 0x75, 1, 0} at 0x7EED998C. Its second word 0x75 is the GUI code that GuiCallerImp maps to 0x9628.
+  - So VERCHK is the CA half of the hidden debug-menu (HIDE_MODE) entry, not a screen of its own.

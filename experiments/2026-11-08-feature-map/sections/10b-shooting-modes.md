@@ -18,7 +18,7 @@ Re-check of six shooting-mode features using the method of section 09. Labels: *
 **How a SCN mode is chosen (verified):**
 - The SCN select screen draws 4 items per page from the ROM table **0x7EFE9240**: 23 × 14-byte records `{u16 code, u16 label, u16 icon, u16 icon, u16 description, …}` (draw fn 0x7EDDA6CA).
 - On confirm, **0x7EDDA91D** checks `cursor < 23`, reads `code = *(u16*)(0x7EFE9240 + 14·cursor)` and calls setSetting(**info 280**, code) through 0x7EE01D4E.
-- Info 280 = prm 0x2881 (u8, MODE, default 9 = Portrait). Its mcon record at 0x7E84AEA4 is type 1 with 23 bytes at **0x7E84976D** (verified). The bytes match the screen table in the same order.
+- Info 280 = prm 0x2881 (u8, MODE, default 9 = Portrait). Its mcon record at 0x7E84AEA0 (0x7E84AEA4 is its raw[] pointer field) is type 1 with 23 bytes at **0x7E84976D** (verified). The bytes match the screen table in the same order. (A10 2026-11-09)
 - The draw loop has no per-entry skip and no model or lens test. So all 23 entries are shown and selectable (verified for 0x7EDDA6CA; the mcon reset hooks for info 280 were not traced).
 - A second label table of the same shape is at 0x7EFEA388 (`{idx 2..24, code, icon, icon, label×3}`). It has the same 23 codes.
 
@@ -145,7 +145,7 @@ Re-check of six shooting-mode features using the method of section 09. Labels: *
 
 ## 6. Art effects ("Add Effects", strings 763–768)
 
-- **Value ↔ label (verified bytes 0x7EFE8664):** 0 Off (1371), 1 Soft Focus (764), 2 Pin-Hole (765), **4 White Edge (766), 3 Frame (767)**, 5 Star Light (768). The menu order is Off, Soft, Pin-Hole, White Edge, Frame, Star.
+- **Value ↔ label (verified bytes 0x7EFE866C, 12-byte records {u16 value, u16 label, …}; the GUI loads 0x7EFE866C at 0x7EDD57C3, 0x7EDD5D77 and 0x7EDD6FF1) (A10 2026-11-09):** 0 Off (1371), 1 Soft Focus (764), 2 Pin-Hole (765), **4 White Edge (766), 3 Frame (767)**, 5 Star Light (768). The menu order is Off, Soft, Pin-Hole, White Edge, Frame, Star.
 - **One list per filter:**
   - Tag 0x44D1 (12 × u8, MODE) holds infos 371–381 and 471.
   - `0x7E702A71` switches on the GUI picture-mode value (jump table 0x7E826C5C) and reads the matching info.

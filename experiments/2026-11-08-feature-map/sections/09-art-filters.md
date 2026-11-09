@@ -46,7 +46,7 @@ Watercolor is a complete 11-pass module: a RAW re-develop with noise reduction, 
 
 | Menu id | Code | Module | Exif in E-PM2 | Exif in E-PL7 / E-M5 II / PEN-F | Identity |
 |---|---|---|---|---|---|
-| 110 | 145 | (same as Pale&Light II) | case, no value written | default | Pale&Light Color II alias ("Tender Light") — inferred |
+| 110 | 145 | (same as Pale&Light II) | **15** = Pale & Light Color II (writer case 0x7E70DE4B: `mov 15,d0; movhu d0,(a3)`; the E-P5 writer 0x7E3ECFAA also stores 15) | default | Pale&Light Color II alias ("Tender Light") — inferred (A10 2026-11-09) |
 | 111 | 75 | none | none (default) | **12 = Fish Eye** | Magic Filter "Fish Eye" |
 | 112 | 84 | none | none | none | "Drawing" — inferred from order (ExifTool 13) |
 | 113 | 69 | soft focus | none | none | "Soft Focus 2" — inferred (ExifTool 22) |

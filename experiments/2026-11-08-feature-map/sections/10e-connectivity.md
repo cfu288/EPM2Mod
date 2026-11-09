@@ -31,7 +31,7 @@ Method: the strict method of section 09 (code, reachability, cross-body, externa
 ### 1.1 The gate (verified)
 
 - **`cube_enabled` 0x7E91367A:** `d0 = 0x7E509CA3(0x1709)`; it returns 1 only when the result is 0. It has 22 callers. The E-PL5 has the same bytes at the same address; only the call target differs (0x7E509CC6).
-- **What 0x1709 is (verified):** the status-name table at **0x7E8DA174–0x7E8DA330** holds records `{u32 id, char *name}`, e.g. (4, "O  k"), (0x100, "Trg1"). Part of it:
+- **What 0x1709 is (verified):** the status-name table at **0x7E8DA174–0x7E8DA333** (8-byte records; zero terminator at 0x7E8DA334) holds records `{u32 id, char *name}`, e.g. (4, "O  k"), (0x100, "Trg1"). The last 8 records (from 0x7E8DA2F4) are a mode-name list (" P " 1, "iAT" 0x31, "ART" 0x33, "SCN" 0x2A, "MOV" 0xA, " M " 4, " S " 3, " A " 2), so some ids occur twice (4 = "O  k" and " M "). (A10 2026-11-09) Part of it:
 
 | id | name | id | name |
 |---|---|---|---|
@@ -84,7 +84,7 @@ Method: the strict method of section 09 (code, reachability, cross-body, externa
 - **Tables:** the group-11 list, the edev ID records and the chip map are **byte-identical** in the E-PL5 (0x7E73579C, 0x7E7357D4, 0x7E4C6F80).
 - **Code** (`mdiff.py`, ~0x7E508F00–~0x7E50D700, a page-rounded compare window (L1 2026-11-09), constants normalised): the edev functions 0x7E50B8DE–0x7E50BD60 are identical. The differences are key-matrix/dial code, e.g. the E-PL5-only ADC range classifier 0x7E50BAC2.
 - **Conclusion:** the firmware cannot tell an E-PL5 from an E-PM2 on this path. On the E-PM2, PENPAL stays off only because no ID 0x0103 ever answers the probe (**inferred**). The product knowledge that the E-PM2 has no accessory port fits this, but the firmware gives no evidence for it either way.
-- **ADJ:** the service op 0x902A (case code 0x7F080B39–0x7F080BC2 inside the function 0x7F08056A (L1 2026-11-09)) reads 0x1706/0x1708/0x1709/0x170A/0x170C and prints `cube is disable` (factory test, verified reads).
+- **ADJ (corrected):** the status reads are in op **0x9005**, not 0x902A. The ADJ dispatcher 0x7F080284 (op table 0x7F0D2850, key = op − 0x1001: 0x8004 → 0x7F08034A) calls 0x7F080519 → 0x7F08056A, a linear status-packet builder that reads all of 0x1706–0x170C (the seven reads start at 0x7F080B39 and end at 0x7F080BC5). `cube is disable` comes from op **0x902A** (key 0x8029 → 0x7F0803BD → 0x7F082C09), whose sub-op 0x7F083BDD calls the cube routine 0x7E8FED1A, which prints it (factory test, verified). (A10 2026-11-09)
 
 ### 1.4 Accessory-port menu (verified unless marked)
 
@@ -124,7 +124,7 @@ The E-M10 and E-PL7 also lack an accessory port (product knowledge) but still ca
   - info 290 = prm 0x5001 (mcon #348, 3 values).
 - **Eye-Fi menu item:** "Eye-Fi" (str 290/479) is in neither menu table, so it is built in code. **Update:** it is a Custom Menu J row in the table 0x7EFF7E80: label 1447 "Eye-Fi", info 404, help 479 (13d §5; verified bytes) (D1 2026-11-09). Whether it shows only when a card is detected was **not traced (UNRESOLVED)**.
 - **FlashAir:**
-  - "Connection to Smartphone" (1719/1720) is a Playback-menu row at **0x7EFFE1DC**, kind 0x100 (verified).
+  - "Connection to Smartphone" (1719/1720) is a row at **0x7EFFE1DC**, kind 0x100 (row bytes verified). That it is in the Playback tab is inferred from item order (it follows Edit, Print Order and Reset Protect; 07 §3.1). (A10 2026-11-09)
   - The app side has `FlashAir::isFlashAir/getWifiSetting/connect…` (names 0x7EBDB0A6…) and `OlyHfwOpeFlashAir::*` 0x7E9D5577…; the camera side is SPC_MAIN 0x7F0A7AF7 with `chk_flashair`.
   - Whether the row is hidden or greyed without a FlashAir card was not traced.
 - **E-P5 (verified strings):** it keeps EYEFI, SPC_MAIN/SPC_CTRL and BT_CTRL. It adds `WIFI_MNGR`, `WIFI_REMOCON_THROUGH/PROXY/CGI/DATA`, `WIFI_RELEASE_PUSH`, `HTTPD_MAIN` + `HTTPD_SUB1–5` and `WIFI_LINK_KIND_AUTO/PRIVATE/ONETIME/OTHER`, plus block-1 strings 2007 "Wi-Fi Settings" and "FlashAir is running. Can not use the built-in Wi-Fi." (coordinator diff).
@@ -192,7 +192,7 @@ The E-M10 and E-PL7 also lack an accessory port (product knowledge) but still ca
 
 | Path | Files | How it is reached | Status |
 |---|---|---|---|
-| Card update mode (FIRMUP_CLI) | All 9 entries: S, A, M, V, D, T, E/G/H/W/E100, DATE/PICTURE1JPG, N | Boot only. 0x7E544A6F needs a power-on factor of 12 / 0x01000002 / 0x01000001 **and** 0x602A9B54 = 0. 0x7E505694 clears that byte when status 4 reads 0 and 0x7E45D893() ≠ 9. Status 4 is **"O  k"** in the name table (verified), so this is probably the OK key held at power-on (**inferred**). The power-on factor values are not decoded | Hidden / service |
+| Card update mode (FIRMUP_CLI) | All 9 entries: S, A, M, V, D, T, E/G/H/W/E100, DATE/PICTURE1JPG, N | Boot only. 0x7E544A6F needs `table[factor]` to be 12, 0x01000002 or 0x01000001 (table 0x7E73522C read by 0x7E50B1A7; factor = u16 at 0x604154E6, read by 0x7E45D407) **and** 0x602A9B54 = 0. 0x7E505694 clears that byte when status 4 reads 0 and 0x7E45D893() ≠ 9; it is the only writer of 0x602A9B54 and can only clear it. The initial value is not traced, so the role of the key is open. Status 4 is "O  k" in the status part of the name table (verified; the trailing mode-name list of the same array also has id 4 = " M "), so this is probably the OK key held at power-on (**inferred**). The table values partly decode through the name table: 12 = "Powr" (indices 1 and 10); 0x01000002 (index 8) and 0x01000001 (indices 0 and 9) have no name | Hidden / service (A10 2026-11-09) |
 | Setup > Firmware (menu) | `L???????BIN` (lens), `F???????BIN` (flash) from the card (section 02 §1.7) | `update_firmware()` 0x7EAB3195 | Active (not re-traced here) |
 | USB (TPCFirmup) | Body package via ops 0x9119, 0x911C, 0x9120–0x9125 (audit 2026-11-09) → FIRMUP_SRV; `api_firmup_Execute_FirmwareUpdate` 0x7E67EBDF | Op sets A/D: Storage (type 0) and generic PTP (5) | Active (inf: Olympus updater) |
 

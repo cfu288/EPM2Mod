@@ -56,7 +56,7 @@ Scope: interval shooting / time-lapse movie, the six bracketing modes (including
 - **The panel layer is present and identical in E-PM2 and E-PL6.** The GUI panel tree is made of 40-byte records `{id, -15, type, 1, 1, children*}`; 222 records in each body; the parsed records match. Two panels matter here:
   - Panel 628 has the children (636, 637).
   - **Panel 637** has the children (638, info 483), (639, 484), (640, 485) and (641, 486). Its record is at 0x7EFFDB74 and its child list at 0x7EFFA3C4.
-  - Panel 637 is in the panel factory hash 0x7EFE5814 and opens the generic sub-item panel 0x7EDE1E3D (verified).
+  - Panel 637 is in the panel factory's 256-slot {id, handler} hash 0x7EFE5A14 (entry 0x7EFE5E04 = {637, 0x7EDCBF28}; 0x7EFE5814 is only slot 64 of the factory's second, 128-slot hash at 0x7EFE5614), and its case calls the generic sub-item panel 0x7EDE1E3D (verified). (A10 2026-11-09)
   - **No panel lists 628 as a child** in either body. On the E-PL6 the only way in is the extra top-menu row. On the E-PM2 nothing opens 628 or 637 (verified for the panel tree and the top table).
 - **Constant writes of 482 all store 0** (verified). These are:
   - the 7 GUI `setSetting(482, 0)` calls listed in section 07;
@@ -115,7 +115,7 @@ Scope: interval shooting / time-lapse movie, the six bracketing modes (including
 ### 2.3 HDR merging (verified by string and API search)
 - The E-PM2 has **no** HDR merge code: no `HDR_COMBINE`, no `*_HDR` API names, and no "composite into a high contrast image" text. HDR BKT only shoots a series of exposures.
 - The E-P5 has the API names `api_rec_dummy_Record_Media_HDR` and `..._Get_HDR_Combine_Progress` and the guard text `… Interval or HDR_COMBINE`. It also has the texts 2221/2222 ("4 picture are taken… Composited automatically").
-- The E-M10, E-PL7, E-M5 II and PEN-F have a top-menu **HDR** item (verified rows at 0x7E5B1CA6 for the E-M10 and 0x7E5DAACE for the E-PL7) and `MODE_HDR1_HDR2_JUDGE_NG`.
+- The E-M10, E-PL7, E-M5 II and PEN-F have a top-menu **HDR** item (verified 12-byte rows {ptr, id 472, 0, 4, label} that start at 0x7E5B1C9C for the E-M10 and 0x7E5DAAC4 for the E-PL7). `MODE_HDR1_HDR2_JUDGE_NG` is only in the E-M10; the E-PL7, E-M5 II and PEN-F have `CHECK_IS_NOT_HDR1_HDR2` instead (string search of each block 0). (A10 2026-11-09)
 
 ## 3. Live Bulb / Live Time (verified)
 - **Settings.** Info 437 (Live BULB, prm 0xD732, default 0) and info 438 (Live TIME, prm 0xD752, default 1). Both mcon lists are u16 [0, 1, 2, 4, 8, 16, 30, 60, 120].
@@ -141,7 +141,7 @@ Scope: interval shooting / time-lapse movie, the six bracketing modes (including
   - The drive-mode list is mcon composite 2074 = {549, 555, 625, info 0, 87, 568, 166}, 12 entries.
   - Six of them have info **166 = 1**, the anti-shock flag (GUI 25, 16, 17, 23, 13, 12). That 166 is the anti-shock flag is inferred: it is set on exactly the entries that would carry the "Anti-Shock" drive labels.
   - Camera core: `cam still` option bit 3 antishock and "Setting AntiShock Ready" (0x7E62F370). Active.
-- **Custom self-timer (verified).** Panel 629 holds Frame 473 (1–10), Timer 475 (1–30 s) and Interval 474 (5, 10, 20, 30; units inferred as 0.1 s). It is used by the drive-list entries with info 0 = 5 (GUI 24, 25). `KIND_CUSTOM_INTERVAL` is at 0x7EA981DB. Active.
+- **Custom self-timer (verified).** Panel 629 holds Frame 473 (1–10), Timer 475 (1–30 s) and Interval 474 (5, 10, 20, 30; units inferred as 0.1 s). It is used by the drive-list entries with info 0 = 5 (GUI 24, 25). The string `KIND_CUSTOM_INTERVAL` is at 0x7EC52F5A; `startSelfTimer` 0x7EA981DB logs it or `KIND_NORMAL`. Active. (A10 2026-11-09)
 - **"COMPOSITE" in `MODE_EXPOSE_COMPOSITE` (0x7E7FE1A4) is the Fragmented art filter**, not Live Composite. It sits in the art "expose mode" name list with FISH_EYE, DRAWING and the others (section 09).
 - **Live Composite: Absent.** The only traces are the orphan strings `api_rec_dummy_Start/End/Get_Count_TakeComposite` (0x7E7D592C…), which nothing references (xref: none), and there is no UI text.
   - The E-M10 has the same orphan strings, yet it shipped the feature ("Composite Settings" 2332, "BULB/TIME/COMP"). So these strings say nothing about whether a body has the feature (verified for both bodies).
