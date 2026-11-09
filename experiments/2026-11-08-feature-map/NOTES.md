@@ -122,3 +122,6 @@ English-string counts not present in the E-PM2: E-PL5 0 (block 1 identical), E-P
   - The HCI sender 0x7E925704 has 48 callers.
   - All 61 words of the HCI event table 0x7EBB3C1C point into the BT code.
   - The EDID base-block parser 0x7E6AB32D copies the 8-byte constant at 0x7E7E1B0D (`00 FF FF FF FF FF FF 00`, the EDID header), compares it through 0x7E500D15 (memcmp), and prints the checksum error.
+- **15b vs the C3 fix pass: the exp/HDMI boundary. Settled:**
+  - 0x7E6A935D is called only from 0x7E6AC4DF and calls 0x7E6AC02B, both HDMI-driver code. So the HDMI driver starts at 0x7E6A935D (15b), before the first `[HDMI-DRV]` string user 0x7E6A93E5 (C3 fix pass).
+  - The exp module ends at 0x7E6A935C. Section 12/03 rows tagged C3 that say ~0x7E6A93E4 are 136 bytes too late (fix pending).
