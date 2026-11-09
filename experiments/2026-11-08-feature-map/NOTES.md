@@ -83,3 +83,4 @@ English-string counts not present in the E-PM2: E-PL5 0 (block 1 identical), E-P
   - 0x7E4C90CA–0x7E4FDFFF is 216,886 bytes of 0xFF.
   - `memset` 0x7E500D73 (1,367 call sites) is a byte-store loop over [a0, a0+d1) with value d0.
   - `sprintf` 0x7E4FFDE3 has 1,664 call sites.
+- **13e (mcon/sequencers): the TAKE command tables are keyed by cmd + 1. Confirmed:** `inc d1` at 0x7E582A48 / 0x7E588321, then index (d1 & 31)·8 and compare key == d1. Table keys start 0x1, 0x2, 0x101, 0x102, …. Section 02 §4 now carries the correction.

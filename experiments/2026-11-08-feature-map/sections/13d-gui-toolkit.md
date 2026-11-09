@@ -1,0 +1,362 @@
+# 13d. GUI toolkit, panels, state handlers, Custom Menu tables (E-PM2 v1.6, round D1)
+
+Scope: how the C++ GUI in 0x7ECA–0x7EE0 is built. The topics are the widget framework, the panel classes, the object registries, the generated `Ss*` state handlers, the Custom Menu tables and the OlyApi interfaces.
+
+- **Labels:** **verified** = read in code or bytes; **inferred** = from names, order or layout.
+- **Addresses:** runtime addresses.
+- **Earlier detail:** settings and menus are in section 07, light box / 3D / BGM in 10d, and the debug menu in 10f.
+- **Scratch:** scripts and dumps are in `$S/d1/gui-toolkit/`: `cases.txt` (factory), `vt.txt` (classes), `panelno.txt`, `panels.txt`, `olyapi.txt`, `custmenu/`, `ss/`.
+
+## 1. Area and boundaries
+
+| Range | Contents | Basis |
+|---|---|---|
+| 0x7ECA1020–~0x7ECC8000 | Mostly data: ramp/LUT tables (0x7ECA6000…) and a 108 KB block at 0x7ECB1000. The DB's "function" 0x7ECAD443 (15 KB) is probably data | verified bytes; the role of the data is inferred |
+| ~0x7ECC8000–0x7ECE4000 | CA_MAIN "camera app": OSD_CONTROL/OSDDRAW (0x7ECCBA45…), `*SubAppMdl*` modules, `*SubAppState*` states (ShootingFuncDirect, ModeDirect, Misc) | verified strings |
+| 0x7ECE4000–0x7ECEC000 | GUI↔CA bridge `GuiCallerImp::sendEvent` (0x7ECE6E27); "Genifa" GE event layer (message build 0x7ECE7597, post 0x7ECE75C3, task GPI_TIM_TASK); GPI display layer (`GPISetPalette`, `cw_updateDisplay`, `GPISetOsdOrder`) | verified strings and code |
+| 0x7ECEC000–0x7ECEE1D5 | GUI memory pools (alloc 0x7ECEC905, free 0x7ECEC9CB); UTF-16 helpers (`wcscpy` 0x7ECED793, `wcslen` 0x7ECED7BB, compare 0x7ECED75C); CTouchPnl (0x7ECEDE30); GUI data model (get 0x7ECEF64F / set 0x7ECEF667) | verified code |
+| **0x7ECEE1D5–0x7ED00000** | **Widget framework core:** the root object, container, screen and widget base classes, and the drawing engine | verified (§2) |
+| 0x7ED00000–0x7ED17000 | GUI-side controller classes `CCommon`, `CGuiDrawCtrl`, `CPlayIndex`, `CPlaySingleFrame`, `CRec`, `CPlayZoom`. They wrap the OlyApi interfaces (`OlyApiPlay*`, `OlyApiShooting` strings) | verified strings |
+| **0x7ED17000–0x7ED37DAA** | **Object factory** 0x7ED17DB8, panel creation by number 0x7ED19D3F, top window (WinMain class) 0x7ED1B48C…, the widget classes 0x80xx/0xC0xx/0xD0xx and their drawing parts (0x7ED2F000–0x7ED37DAA) | verified |
+| **0x7ED37DAA–~0x7ED82025** | **114 panel classes** (`GCPnl_*`, type ids 0x6000–0x6071), one per screen layout | verified |
+| ~0x7ED82200–0x7ED82820 | Statechart engine: default handlers 0x7ED82276, init 0x7ED82282, dispatch 0x7ED822FE, evmap 0x7ED8243C; WinMain 0x7ED8249F (`WinMain called` / `messageloop start`, "Start Gui Task") | verified |
+| 0x7ED82820–0x7ED86DA0 | `Ss*` handlers of SS_BTRECEIVE, SS_BTSEND, SS_COMMON (§4) | verified |
+| 0x7ED86DA0–0x7EDA0410 | Live-view controller `IGui_Controler` (0x7ED87077, 0x7ED87397); Actuator/Viewer objects of the registry 0x7EFC5408 (`Func_Scp_Actuator`, `Input_String_Actuator`, `Rec_View_Viewer`) | verified strings |
+| 0x7EDA0410–0x7EDC15B0 | `Ss*` handlers of DEBUGMENU, DPS, MENU_LV, MENU_MAIN, SS12, PLAY_INDEX, PLAY_MOVIE_SLIDE, PLAY_SINGLE, REC, SELFADJ, SPC, USB, in that order (`doCmd_<Ss>_<St>_<Evt>`; FuncMenu strings at 0x7EDA4…) | verified (fork ranges) |
+| 0x7EDC15B0–~0x7EDE0000 | Actuator objects (0x7EDC15E0…), guiUtility (ShowPanelEx 0x7EDC5D2D, PostEventToCA 0x7EDC5C47, self-post 0x7EDC5BF5), guiEventFilter, widget helpers 0x7EDC17FB–, BT wizard, DPS GUI helpers 0x7EDCE9B9–0x7EDD07F9, the self-adjust UI 0x7EDD8–0x7EDDF | verified strings |
+| ~0x7EDE0000–0x7EE01FF5 | Menu pages: the generic list pages, the Custom Menu panel (0x7EDE9AA6…, §5), the `userMenu*` special pages, and the setting wrappers 0x7EE01D38 / 0x7EE01D4E | verified |
+| **0x7EE02095–0x7EE21020** | **Not GUI.** This is a DMP ("Digital Media Professionals, Inc." 0x7EE0877E) OpenGL-ES-style 3D library: `gl_ModelViewMatrix`, and shader-object tags `DVOJ`/`DVPE`. Its only callers are C3D (0x7EE2–0x7EE3) and the overlay C3D bridges (0x7F09/0x7F0A); no call comes from 0x7ECA–0x7EE01 | verified call edges; that it is the GPU driver of C3D is inferred |
+
+Rodata: the GUI tables and vtables run from 0x7EEF5000 to ~0x7F01xxxx. **A class's strings come just before its vtable** (verified for the 11 named panels, §3).
+
+## 2. Widget framework (a Win32-like toolkit)
+
+### 2.1 Message model (verified)
+- **Message names.** The table at **0x7EFDFDA8** holds `{u32 id, char* name}` pairs and ends at 0x7EFDFF78. It names the `GM_*` messages:
+  - 0x1000 CREATE, 0x1001 DELETE, 0x1002 PAINT, 0x1003 ONDRAW, 0x1006 USER, 0x1007/8 SET/KILLFOCUS;
+  - 0x100B–0x1010 SET/GETVISIBLE, ENABLE, CONSUMABLE; 0x1011 ADDREFRESHRECT; 0x1014 GETCLIENTRECT;
+  - 0x1100 SHOWPANEL, 0x1101 SETSTATUS, 0x1102–0x1105 ADD/DELETECHILD…, 0x1106 CREATEINSTANCE, 0x1107 CREATECHILDREN, 0x1109 ATTACHPANEL, 0x110A DRAWBACKGROUND;
+  - 0x1800–0x1813 CB_ON* callbacks (PRESS, RELEASE, CLICK, KEYPRESS, TIMER, SELECTCHANGE, SCROLLFINISH, NEXTFRAME, CHANGEPAGE …);
+  - 0x1900–0x1902 DB_* (data-model update).
+- **Message object.** 0x7ECE7597 (373 callers) builds a 32-byte message: `d0 = id`, −2, `a0 = target`, `d1 = param`, `a1 = data`. 0x7ECE75C3 (251 callers) posts it to the GE queue. That function drops GM_PAINT while the flag 0x605F569C = 1.
+- **The app is "WinMain"-style.** 0x7ED8249F logs `WinMain called` and then `WinMain messageloop start`.
+- **ShowPanelEx is a message.** ShowPanelEx 0x7EDC5D2D posts GM_SHOWPANEL (`mov 4352,d0` at 0x7EDC5DE8).
+
+### 2.2 Class hierarchy and type ids (verified from constructors)
+Every object stores its **vtable at +0** and a **u16 type id at +4**.
+
+| Type id | Class (role) | Ctor | Vtable | Base |
+|---|---|---|---|---|
+| 0x0001 | root object (68 B) | 0x7ECEE1D5 | 0x7EEF5328 (104 slots) | — |
+| 0x0100 | container / window | 0x7ECF3083 | 0x7EEF5AE0 | root |
+| 0x0101 | top-level screen ("desktop") | 0x7ECEFED5 | 0x7EEF5520 | root |
+| 0x0101 | **application window**, created in WinMain. Its ctor chain is 0x7ED24DD0 → 0x7ECEFED5 and 0x7ED230C2. Slot +148 = ChangePanel 0x7ED1B4FF. **Inferred:** it is the object at RAM 0x602B6200 (getter 0x7ED17DA1, 565 callers), which CreatePanel uses as parent | 0x7ED1B48C | 0x7EF1017C | screen |
+| 0x0102 | sub-screen | 0x7ECF2CBA | 0x7EEF5880 | container |
+| 0x0103 / 0x0105 | 0x0105 is a 784 B factory class derived from 0x0103 | 0x7ED171FF / 0x7ED16F18 | 0x7EF04570 / 0x7EF04328 | sub-screen |
+| 0x0104 | 88 B object | 0x7ECF5ECF | 0x7EEF6338 | root |
+| — | panel base (no own type) | 0x7ED23C27 (115 callers) | 0x7EF11778 | container |
+| 0x6000–0x6071 | `GCPnl_*` panels (§3) | 0x7ED37DAA… | 0x7EF1544C–0x7EFA0278 | panel base |
+| 0x8000 | widget base | 0x7ECF4C68 | 0x7EEF5D18 (143 slots) | root |
+| 0x8001–0x8013 | 15 widget classes (§2.4); 0x8009 is an abstract base | | 0x7EF104A8–0x7EF14A00 | widget base |
+| 0xC000 / 0xC001–C005 | drawable part, family C | 0x7ECF563A | 0x7EEF6110 | root |
+| 0xD000 / 0xD001–D003 | drawable part, family D | 0x7ECF5451 | 0x7EEF5F54 | root |
+
+- The two parent types the panel builders test are **257/258** (screen / sub-screen). For those parents the builders scale each child rect by 4.12 fixed-point factors at 0x602B6204/6206 and add offsets at 0x602B6208/620A (verified, 0x7ED37E90…). **Inferred:** this rescales layouts for HDMI/EVF output.
+- **Geometry (verified):** a rect is `{s16 x1, y1, x2, y2}`, inclusive (x2 = x1 + w − 1 in the builders). Point set 0x7ECFF349; rect from coordinates (normalised) 0x7ECFF899; copy 0x7ECFF422; equal 0x7ECFF431; offset rect/point 0x7ECFF561/0x7ECFF266; overlap test 0x7ECFF6A6 (133 callers).
+- **Pools (verified):** GUI pool alloc/free 0x7ECFF1D8/0x7ECFF1E4, selected by the bytes at object +28/+29 (slot +244 sets, +248 reads).
+
+### 2.3 Root vtable 0x7EEF5328: slot map (verified unless marked)
+Object fields: +4 type, +6 id, +8/+10 x/y, +12/+14 w/h, +16 status bits, +20 parent, +24 handler/owner, +28/+29 pool, +30 layer, +40 mask, +44, +48 (8 B).
+
+| Slots (+offset) | Role |
+|---|---|
+| 0 (+0) | returns a constant (class info) |
+| 1–4 (+4…+16) | get type (+4), id (+6), x (+8), y (+10) |
+| 5–10 | position and size getters (+8…+14), as a point via 0x7ECFF349 |
+| 14–16 | rect getters (via 0x7ECFF899) |
+| 19/20 (+76/+80) | setVisible / isVisible (status bit 1) |
+| 21/22 (+84/+88) | setEnable / isEnable (bit 2) |
+| 23–28 (+92…+112) | bits 4, 8, 16. The bit-8 and bit-16 setters invalidate. **Inferred:** CONSUMABLE / focus-like |
+| 29/30 (+116/+120) | setStatusBits(mask, on) / testStatus(mask) on +16 |
+| 31/32 (+124/+128) | setParent / getParent (+20; getParent 0x7ECEEA74 has 86 callers) |
+| 33/34 (+132/+136) | set/get +24 (handler) |
+| 39 (+156) | OnPaint: asks the manager (vt+680), then calls **+160 = OnDraw** |
+| 42 (+168) | invalidate(rect a1, d0) |
+| 61/62 (+244/+248) | set/get pool bytes |
+| 64–67 (+256…+268) | status bits 0x2000 and 0x1000 |
+| 102 (+408) | **OnMessage(d0 = id, d1, a1)**. Hashes the id (`id & 31`) into the 32 × `{id, case}` table at 0x7EEF5228. Cases: 0x100/0x101/0x102 (point events → +172 / +384→+184 / +388→+196), 0x200/0x201 (→ +372→+208 / +376→+212), 1, 2, 0x1002 PAINT (→ +392→+156), 0x1006 USER, 0x1103, 0x1300–0x1302, 0x1901/0x1902. **Inferred:** 0x100–0x102 are touch press/release/move and 0x200/0x201 are key press/release |
+| 103 (+412) | returns −1 for message 6399 |
+
+**Signature of a toolkit method (verified pattern):**
+- Getters are 2–3 instructions: `movhu (N,a0),d0 ; [exth d0] ; retf`.
+- Setters compare first: `call vt+get ; cmp ; beq out ; call vt+116 (set bit) ; mov 0,a1 ; mov 1,d0 ; call vt+168 (invalidate)`.
+- **DB caveat:** many 2–6-byte getters sit right after another method and are vtable targets. fwmap merges them into the previous function, for example the slot-18 target 0x7ECEE75A inside 0x7ECEE72F.
+
+### 2.4 Factory and widget classes (verified)
+**Factory `Create(d0 = type, d1 = parent, a1 = resource)` 0x7ED17DB8 (8 KB, 132 callers) → a0 = object or NULL.**
+1. It asks the parent for its pool bytes (vt+248).
+2. It looks the type up in the 256-entry hash table **0x7EF0F3B0** (`{u32 id, u32 case}`, index `id & 0xFF`, linear probe).
+3. The case runs `mov SIZE,d0 ; call 0x7ECEEF9A` (operator new from the GUI pool), then the class ctor, then `0x7ECEEF80` (store pool), then the class's create/import routine with a1. For example, panels use 0x7ECF31EB and C parts use 0x7ECF575F.
+
+There are 140 type ids: 1, 0x104, 0x105, 0x6000–0x6071, 0x8001–0x8008, 0x800A, 0x800E–0x8013, 0xC001–C005 and 0xD001–D003.
+
+| Type | Size | Ctor → vtable | What is known |
+|---|---|---|---|
+| 0x8001 | 128 | 0x7ED1C4C1 → 0x7EF104A8 | overrides 15 base slots (+0, +148…+232, +408, +412); its OnDraw 0x7ED1C533 is a 13-byte wrapper of the base |
+| 0x8002 | 260 | 0x7ED1C5ED → 0x7EF106E4 (175 slots) | slot 161 = C1 F063: setter of a 24-byte style/property at +196 that redraws on change; its getter tail is 0x7ED1CA54 |
+| 0x8003 | 300 | 0x7ED290AD → 0x7EF12830 | **item list / selector:** +131 count, +132 current index, +140 u16 item values, +172 item pointers. Methods: count 0x7ED29244, index get/set 0x7ED29AAC / 0x7ED29A6F, item value get/set 0x7ED29F00 / 0x7ED29ECA, set item 0x7ED29CCB |
+| 0x8004 | 156 | 0x7ED26E84 → 0x7EF12034 | — |
+| 0x8005 | 204 | 0x7ED2D7BD → 0x7EF146F4 | base of 0x8011 |
+| 0x8006 | 384 | 0x7ED27484 → 0x7EF122CC | embeds a part (ctor 0x7ED2D740, vt 0x7EF1459C) and a 0x800E |
+| 0x8007 / 0x8008 / 0x800A | 184 / 180 / 176 | 0x7ED1E868 / 0x7ED2A3C8 / 0x7ED29F1E | — |
+| 0x800E | 180 | 0x7ED2B700 → 0x7EF133E8 | derived from 0x8009 (ctor 0x7ED2B12A, vt 0x7EF13184), which the factory never creates |
+| 0x800F | 228 | 0x7ED2538F → 0x7EF11D1C | — |
+| 0x8010 | 176 | 0x7ED2CD1A → 0x7EF14308 | **text label:** +130 string id (set 0x7ED2CE0C), +132 text style (set 0x7ED2CE6A), +156/+160 UTF-16 buffer and length. setText(wchar*) is 0x7ED2D510 (257 callers); C1 F064 is its buffer setter (vt word 0x7EF1456C) |
+| 0x8011 | 216 | 0x7ED2F97A → 0x7EF14A00 | derived from 0x8005 |
+| 0x8012 / 0x8013 | 188 / 152 | 0x7ED1DB7B / 0x7ED28829 | 0x8013: u16 property +128 (set 0x7ED28CDD → re-layout → redraw) |
+| 0xC001–C005 | 88–104 | 0x7ED2CB68, 0x7ED2C7D2, 0x7ED2C880, 0x7ED2C9D4, 0x7ED2CC18 | **these draw.** Their OnDraw (+160) calls renderers 0x7ECFB5F9, 0x7ED319B4, 0x7ED34FE9, 0x7ED35160, 0x7ED3534D |
+| 0xD001–D003 | 80–92 | 0x7ED2C31C, 0x7ED2C605, 0x7ED2AFD8 | draw through 0x7ECFE523/0x7ECFE796 or 0x7ED303F9 |
+
+- 14 of the 15 0x80xx widgets keep the empty base OnDraw 0x7ECF4DA2 (verified). **Inferred:** they are controls that own C/D drawable parts, and the pixels come from the parts.
+- **Drawing engine (verified call graph):** 0x7ECF5000–0x7ECFF000 and 0x7ED2F000–0x7ED37DAA. It calls nothing outside the toolkit except memcpy 0x7E500D33, memset 0x7E500D73 and the UTF-16 helpers. Resource lookups:
+  - 0x7ECFF3E9 (69 callers) indexes RAM tables by the current layer byte 0x602B6034;
+  - 0x7ECFF3C3 indexes ROM records of 884 bytes at 0x7EFB1034 (sub-records of 52 bytes).
+- **Roles not identified:** of 0x8001/04/05/07/08/0A/0E/0F/12/13 and the C/D parts. Text, image and frame parts are likely (inferred).
+- **Helper layer 0x7EDC17FB–0x7EDC2000 (verified; "set only if changed"):**
+  - 0x7EDC1851 `setVisible(w, b)`: 2,641 call sites, the most called GUI function; vt+80 then vt+76.
+  - 0x7EDC1875 `setListIndex(w, i)`: 453 sites; range check against the count.
+  - 0x7EDC189F `setListItemResource`.
+  - 0x7EDC18C8 / 0x7EDC1972 move / resize, using vt+52 get rect, +44 set rect, +168 invalidate.
+  - 0x7EDC1B15 `setListItemValue`.
+  - 0x7EDC181B text by string id + show.
+  - C1 F065 0x7ED61C13 is the panel-level "show item n−2 or hide" helper built on these.
+
+## 3. Panels (`GCPnl_*`) and panel numbers (verified)
+- **Create by number.** `CreatePanel(this = manager, d0 = no 0..159)` is 0x7ED19D3F.
+  1. It switches through the jump table 0x7EF0FBB0 (160 words).
+  2. Each case calls the factory with type 0x6000+k and the resource record **0x7EF0DF10 + 0x2C·k**.
+  3. It takes one of two panel slots (bytes at this+1374; pool id 6 + slot), so an old and a new panel can coexist.
+
+  It is reached from the manager's vt slot +148 (0x7ED1B4FF, word 0x7EF10210). ShowPanelEx's GM_SHOWPANEL message leads there (inferred link).
+- **Number → class.** 98 numbers map to a class and 62 are empty (`panelno.txt`). 16 classes have no number; they are created directly by type.
+- **Resource record (44 bytes, verified):** `{u16 type, u16 k+1, u32 rects → 0x7EF0D7F0 + 16·k, u16 7, …, u16 layer (1/2/3), 0xFFFE, …, 100, 100}`. The rect pair is two `{x, y, w, h}` rects, e.g. 800×600 or 720×480. **Inferred:** the two rects are for two outputs.
+- **Children.** Each panel's child-builder (a vtable slot, e.g. 0x7ED37E2D) loops over a per-class RAM table of resource pointers (e.g. 0x602B6218 / 0x602B7758). It calls the factory with type = the first u16 of each record. The compact property data is in ROM 0x7EF047B8–0x7EF0CDF0, indexed by `{key, ptr}` pairs at 0x7EF0CDF0, where key 0x60xx starts a panel (layout verified; field meaning not decoded).
+- **Code and rodata order (verified).**
+  - Code of class k = [ctor_k, ctor_k+1).
+  - Rodata of class k = (vt_k−1, vt_k]: the strings come first, then the vtable.
+  - Ctor and vtable addresses rise together.
+  - **Inferred:** the 11 class names found are in alphabetical order, so the link order is alphabetical.
+
+**Named panels (verified class-name strings in their rodata or code):**
+
+| Name | Type | No. | Ctor | Name | Type | No. | Ctor |
+|---|---|---|---|---|---|---|---|
+| GCPnl_Art_Bkt_Rec | 0x6032 | 66 | 0x7ED3E485 | GCPnl_Index | 0x6025 | 53 | 0x7ED4AC23 |
+| GCPnl_Calender | 0x6026 | 54 | 0x7ED3F53E | GCPnl_Menu | 0x6034 | 80 | 0x7ED53D35 |
+| GCPnl_CompScale | 0x6030 | 64 | 0x7ED418F5 | GCPnl_Move | 0x602C | 60 | 0x7ED56907 |
+| GCPnl_Custom_Btn | 0x6035 | 81 | 0x7ED42679 | GCPnl_Play | 0x6022 | 50 | 0x7ED5A7AB |
+| debug menu (`gdbDebugMenu`) | 0x6066 | 150 | 0x7ED488AA | GCPnl_Play_Overall | 0x6023 | 51 | 0x7ED5D55A |
+| GCPnl_Zoom | 0x6027 | 55 | 0x7ED7932E | | | | |
+
+- Panel 81 is shown by the Custom Menu page (§5). GCPnl_Custom_Btn and GCPnl_Menu are the two ~3.9 KB menu-list panels (inferred).
+- The debug-menu draw routine 0x7ED48BBA (sections 07, 10f) is in panel 0x6066's code.
+- Panel **signature (verified):** the ctor is `call 0x7ED23C27 ; mov VT,d0 ; mov d0,(a2) ; …zero the child array at +792… ; [call 0x7ED01DFD ; call 0x7ED01F7C/0x7ED01FBA]`.
+- Panel virtuals log `[GUI App   ] GCPnl_X::CheckRecView/CheckIndexBtn/CheckImageArea/CheckAllArea() called`. These are the touch hit tests.
+
+## 4. Generated state handlers (Ss*)
+Source: a fork that decoded all 17 descriptors (`ss/handlers.tsv`, 3,137 (SS, state, event) rows). I re-checked the descriptor table, the SS10 counts and the debug-menu entry bytes myself.
+
+### 4.1 Engine (verified)
+- **Context.** RAM 0x6069FAC8: +0 current SS, +1 current state (both 1-based), +2 SS count 17, +4 the descriptor table, +16 dispatch 0x7ED822F9. Getter 0x7ED8226D.
+- **Init.** 0x7ED82282 starts at SS 1 state 2 (POWER_ON); WinMain calls it.
+- **WinMain loop.**
+  - Messages ≥ 0x8000 are statechart events: event filter 0x7EDC4DBC → dispatch 0x7ED822FE(ctx, d0 = event, d1 = param, a1 = data) → state-change hook 0x7EDC4205.
+  - Messages < 0x8000 are GM_* messages, which go to the window (vt+588).
+- **Descriptor table.** 0x7EFB8BCC holds 17 pointers (index ss−1). Each 32-byte descriptor is `{u8 nstates; u16 nevents; u16 nhandlers; u16 nevents; u8 matrix[nevents][nstates] @+8; handler fn[] @+12; {u32 event, u32 row}[] @+16; entry fn[nstates] @+20; exit fn[nstates] @+24}`.
+  - Handler indexes 0–2 are default `clr d0; retf` stubs.
+  - Example: SS10 at 0x7EFD1F94 = 4 states, 10 events, 22 handlers, verified bytes `04 00 0a 00 16 00 0a 00`.
+- **Dispatch.** row = evmap(event) (linear search, 0x7ED8243C); idx = matrix[row·nstates + state−1]; r = handler(a0 = ctx, d0, d1, a1).
+- **Return convention.** 0 = consumed, stay. 1–255 = go to that state in the same SS. `(ss<<8)|state` = switch super-state. The engine runs exit[old] then entry[new].
+- **`0x7EDC5C47(code, param)` is PostEventToCA,** a request to the camera app. It is **not** a GUI state change (corrects 10f). The GUI posts events to itself with 0x7EDC5BF5 (218 sites).
+- **Name tables (debug only).**
+  - SS names: 0x7EFDD2D8 `{ss, name, state-name table}`.
+  - Event names: 0x7EFDEF78–0x7EFDFA20, 339 `{id, name}`.
+  - Event-id groups: 0x90xx keys/dials, 0x91 touch, 0x92 HDMI-CEC, 0x96xx CA→GUI requests (`EVT_REQ_*`, `EVT_START/END_*_PRINT`), 0x97 rec display, 0x9Axx GUI-internal, 0xA0xx debug/self-adjust, 0xA1/A2 BT, 0xA3 print.
+
+**Signature of a generated handler (verified bytes):**
+1. Prologue `cf f0` (movm [d2,d3,a2,a3]) and `f8 fe fc`.
+2. `mov d1,d3 ; mov a1,a3 ; mov d0,d2 ; mov a0,a2`.
+3. `call guard ; exthu d0 ; cmp 1,d0 ; beq … ; cmp 2,d0 ; beq …`.
+4. Each branch calls an action with (a0, d0, d1, a1), then `exthu d0 ; ret [d2,d3,a2,a3],20`.
+
+Actions end `mov N,d0 ; ret` or build `asl 8 ; or` for an SS change; the shared "stay" action is 0x7EDA2654 `clr d0; retf` (113 callers). Entry/exit functions take the same arguments; their result is ignored. Many handlers log `doCmd_<Ss>_<St>_<Evt>`. **Tool note:** 213 handler entry points are not function starts in map-test (`ss/handler_starts.txt`).
+
+### 4.2 Super-states (verified; code ranges are the handler code)
+| SS | Name | Descriptor | States/events/handlers | Handler code |
+|---|---|---|---|---|
+| 1 | SS_COMMON | 0x7EFC4038 | 9/37/41 | 0x7ED8612D–0x7ED86DA0 |
+| 2 | SS_REC | 0x7EFD8A78 | 4/26/20 | 0x7EDBE595–0x7EDBEE11 |
+| 3 | SS_MENU_MAIN | 0x7EFD40C4 | 12/71/211 | 0x7EDA8BB6–0x7EDB3239 |
+| 4 | SS_MENU_LV | 0x7EFD30F8 | 10/45/181 | 0x7EDA46B7–0x7EDA8BA0 |
+| 5 | SS_MENU_PLAY | 0x7EFD5230 | 2/2/3 (empty placeholder) | — |
+| 6 | SS_PLAY_SINGLE | 0x7EFD7BAC | 40/78/200 | 0x7EDB6DC4–0x7EDBE531 |
+| 7 | SS_PLAY_MOVIE_SLIDE | 0x7EFD6808 | 30/69/126 | 0x7EDB4B9E–0x7EDB6DB0 |
+| 8 | SS_PLAY_INDEX | 0x7EFD598C | 13/64/75 | 0x7EDB345D–0x7EDB4B45 |
+| 9 | SS_SELFADJ | 0x7EFD8E70 | 9/26/60 | 0x7EDBEE1C–0x7EDC0097 |
+| 10 | SS_DEBUGMENU | 0x7EFD1F94 | 4/10/22 | 0x7EDA0410–0x7EDA098D |
+| 11 | SS_USB | 0x7EFD9B98 | 6/23/37 | 0x7EDC0D90–0x7EDC15B0 |
+| 12 / 13 | unnamed stubs | 0x7EFD5278 / 0x7EFC1884 | 2/2/3, 1/26/3 | 12 has only an entry 0x7EDB3448 (`USB_Connect_Print`) |
+| 14 | SS_DPS | 0x7EFD28D0 | 26/33/202 | 0x7EDA09C0–0x7EDA4694 |
+| 15 / 16 | SS_BTSEND / SS_BTRECEIVE | 0x7EFC3C78 / 0x7EFC1E6C | 35/24/111, 19/36/89 | 0x7ED8459B–0x7ED860E7 / 0x7ED82820–0x7ED8453D |
+| 17 | SS_SPC (FlashAir pairing) | 0x7EFD91D4 | 15/18/27 | 0x7EDC00BD–0x7EDC0D7B |
+
+- Handler code is ordered alphabetically by SS name (inferred from the ranges). Other GUI code sits in 0x7ED87–0x7ED9F.
+- **Entries from SS_COMMON (verified return constants):**
+  - 0x962A START_SELF_ADJUST → 9.1;
+  - 0x9630 START_USB_SELECT → 11.1; START_MEDIA_SETUP → 11.1/11.3;
+  - 0x9632/0x9634 START_EASY/CUSTOM_PRINT → 14.1;
+  - START_LV_CONTROL → 4.1; LV_GUIDE → 4.9; ART_SELECT → 3.7; SCN_SELECT → 3.8; DIRECT_SELECT → 2.1;
+  - START_SLIDE_SHOW → 7.11; START_MENU → 0x300|state;
+  - START_PLAY → the chooser 0x7ED05440.
+
+### 4.3 Which event opens which screen
+- **Light box (verified code; menu label inferred).**
+  - In SS_PLAY_SINGLE display states, INFO-key release (0x7EDBACD3) returns `CPlaySingleFrame::getJumpState` 0x7ED09135.
+  - getJumpState reads info 27 (prm 0x8301) and the ▶Info enables, info 253–257 (prm 0x9171[0..4]).
+  - It returns state 15 `ID_ST_DISP_LIGHTBOX_PREPARE` when the mode is 11 and info 257 = 1. The **entry** function of that state is 0x7EDB8C08.
+  - So the light box is one stop of the INFO display cycle, enabled by ▶Info "@A021@" (sub-item group 191).
+- **3D Show (verified code; the API meanings are inferred).**
+  - 0x7EDB61FE is the **entry** of SS7 state 16 `ID_ST_3D_IMG_SEL_MENU`. It builds the "Sel. Image: All / 3D Show" panel.
+  - The play-start chooser 0x7ED05440 picks 7.16 when CameraCommon vt+104 ≠ 0 (inferred: 3D output available) and MediaCtrl reports 3D/MPO images.
+- **BGM Import (verified structure).** No Ss row handles it. It is a userMenu item: vtable 0x7F00095C, slot 0x7EDF26B2 loads string 1782 and calls ShowPanelEx(111). Its callback 0x7EDF2BA1 logs `OlyApiSoundCtrl::registImportSound()`. It runs inside SS_MENU_MAIN (Slideshow > BGM, inferred).
+- **SS_DEBUGMENU (verified; resolves 10f's open question).**
+  1. A Setup dialog method 0x7EDFD665 checks the key code 4 and then `IOlyApiMaintenance` (0x7E99E423) vt+12, logged as getShippingInfo(4).
+     - Only if the result is 1 does it post EVT_REQ_START_VERSION_CHECK 0x9628.
+     - **Inferred:** the dialog is Monitor Adjust (it toggles info 432 and logs `showMonitorMenu`), and selector 4 is API_SHIPPING_INFO_MENU_BUTTON.
+  2. SS_MENU_MAIN state 4 maps 0x9628 to state 6 `ID_ST_HIDE_MODE` (handler 0x7EDAB90A).
+  3. In HIDE_MODE a counter at RAM 0x602BC480 steps on **Up → Down → Left → Right → shutter half-press → shutter full-press** (0→1→2→3→7→8; e.g. 0x7EDAB980 is the Down step).
+  4. **OK with counter 8 returns 0x0A01 = SS 10 state 1.** Bytes 0x7EDABA14–0x7EDABA54 checked: `cmp 8,d0 ; mov 10,d2 ; mov 1,d3 ; … asl 8,d2 ; or d3,d2`.
+  5. Whether a retail body passes the getShippingInfo(4) gate is **not known**.
+  6. External, corroboration only: the widely cited Olympus hidden-menu sequence (Monitor adjust, Up, Down, Left, Right, shutter) matches.
+  7. **Second sequence.** A second counter 0x602BC482 (OK-long / MENU-long) reaching 10 makes the same OK call 0x7EDED19A(4,0), which is in `userMenuMainReset`, and then settings slot +40. **Inferred:** a hidden reset.
+- **Inside the debug menu.**
+  - State 1 = item list; its OK goes to the action dispatcher 0x7EDA05EC (10f).
+  - State 2 = life test running; states 3/4 = Color setting/result.
+  - EVT_DEBUG_MENU 0xA000 is posted only by the LifeTest callback 0x7EDCB035 ("test ended → back to the menu"). It is not an entry.
+
+### 4.4 DPS (SS 14) and USB (SS 11) (verified; DPS state roles inferred)
+- **C1 F066 0x7EDA3AB5** = SS_DPS state 20, event EVT_END_CUSTOM_PRINT 0x9635. Its 24 siblings are the same generated handler for the other states.
+  - Guard 0x7EDA3095: `[GUI] Abort custom print!` through IOlyApiCustomPrint (0x7E9C0BA2) vt+112. It always returns 1.
+  - Action 0x7EDA301D: vt+116 → PostEventToCA(20, 0) → returns 0x0104 = SS_COMMON `ID_ST_BLACK_SCREEN`.
+  - EVT_END_EASY_PRINT 0x9633 has a parallel set (0x7EDA3DAE…) using the EasyPrint interface.
+- **DPS states.**
+  - 1 = start (0xA306/0xA307 → 2 or 26).
+  - 2–4 and 9–21 = selection and setting screens. Their entry functions sit at a 15-byte stride from 0x7EDA09EC, and each draws screen n through 0x7EDCED5A.
+  - 17 = image selection (every arrow, zoom and long-press key).
+  - 23/24 = printing (EVT_PRINT_END 0xA303 → 1.4).
+- **USB states.** USB_MENU, USB_WARNING, MEDIA_SETUP, USB_PRINT_READY (entry 0x7EDC0FE9), USB_PRINT_SEL (entry 0x7EDC0ED1, `USB Print Key Right -> Easy Print`; left/right/OK choose Easy or Custom print), BUSY.
+
+## 5. Custom Menu A–J item lists (verified bytes; fork result checked in bytes for 4 rows)
+- **Row table.** 0x7EFF7E80–0x7EFF835F holds 78 rows of 16 bytes: `{u16 page 0..9 = A..J, u16 label, u16 info, 0, u16 idx, u16 help, u16 x, u16 flag}`. info 2000 = submenu, 2047 = action (Pixel Mapping); the help string goes to GUI data block 45. Section 10d's 0x7EFF8250 is page **H**'s first row (Quick Erase), not the table start.
+- **Code.**
+
+| Role | Address |
+|---|---|
+| Page object singleton (1,264 B, RAM 0x602BE3A4, vt 0x7EFF8A20) | 0x7EDE9AA6 |
+| Key handler (up/down walk all 78 rows, wrap at 77, skip hidden rows) | 0x7EDE9C38 |
+| Draw (7 rows per screen) | 0x7EDE9F56 |
+
+  It shows panel 81. The page is the current row's page, so the cursor crosses pages.
+- **Status array:** RAM 0x606A3118[78], 0 normal / 1 greyed / 2 hidden, filled from `{item_id, check_info}` × 78 at 0x7EFF8E4C. Hidden comes from 0x7EDCD103 (runtime hide lists at RAM 0x602BCE98, **not resolved statically**); greyed from 0x7EDCCC9E → ModeCheck slot 0.
+- **Items.** Format: label(string id) info. "sub" = submenu.
+  - **A AF/MF:** AF Mode(51) sub; Full-time AF(539) 98; AEL/AFL(44) 68; Reset Lens(224) 81; BULB/TIME Focusing(1462) 169; Focus Ring(139) 38; MF Assist(172) 285; Set Home(47) 238; AF Illuminat.(50) 62; Face Priority(130) 241.
+  - **B Button/Dial:** Button Function(96) sub; Dial Function(99) sub; Dial Direction(98) sub; Lock(100) 386.
+  - **C Release/Drive:** Rls Priority S(222) 79; Rls Priority C(221) 80; L fps(1161) 430; H fps(1321) 431; +IS Off(1472) 441; Lens I.S. Priority(1766) 494.
+  - **D Disp/Sound/PC:** HDMI(1662) sub; Video Out(273) 1010; Control Settings(80) sub; Info Settings(149) sub; Displayed Grid(797) 155; Picture Mode Settings(204) sub; Histogram Settings(144) sub; Mode Guide(174) 311; Live View Boost(184) 36; Frame Rate(1367) 272; Art LV Mode(59) 387; Flicker reduction(1750) 464; LV Close Up Mode(1476) 344; Backlit LCD(72) 161; Sleep(261) 32; beep(75) 18; USB Mode(272) 82.
+  - **E Exp/Metering/ISO:** EV Step(125) 64; Noise Reduct.(189) 35; Noise Filter(188) 143; ISO(153) 6; ISO Step(158) 141; ISO-Auto Set(155) sub; ISO-Auto(154) 239; Metering(169) 1; AEL Metering(45) 103; BULB/TIME Timer(1464) 173; Live BULB(1466) 437; Live TIME(1468) 438; Anti-Shock(57) 167.
+  - **F Flash Custom:** X-Sync.(137) 114; Slow Limit(136) 174; flash+EV(164) 113.
+  - **G Quality/Color/WB:** Record-mode Set(214) sub; Pixel Count(206) sub; Shading Comp.(254) 61; WB(281) 9; All WB(56) sub; Keep Warm Color(542) 429; flash+WB(543) 318; Color Space(88) 60.
+  - **H Record/Erase:** Quick Erase(215) 142; RAW+JPEG Erase(216) 139; File Name(133) 21; Edit Filename(116) sub; Priority Set(210) 83; dpi Settings(109) 178 (the parallel list has 179); Copyright Settings(93) sub.
+  - **I Movie:** Movie Mode(94) 162; Movie mic(180) 102; Movie Effect(1492) 444; Wind Noise Reduction(1087) 434; Recording Volume(1373) 435.
+  - **J Utility:** Pixel Mapping(207) action; Exposure Shift(129) sub; Battery Warning Level(73) 278; Touch Screen Settings(544) 427; Eye-Fi(1447) 404.
+- **Caution:** like the sub-item table, this may be a superset. The runtime hide lists can remove rows, e.g. Frame Rate, Flicker reduction or Lens I.S. Priority (inferred).
+- **Sub-item table.** It is 0x7EFEF4FC–0x7EFF044B, 196 records of 20 bytes: `{group, title, info, 0, kind, 0, 7, 1, label, 0}`.
+  - The label is at +16 of the same record. Section 07 read the table 16 bytes out of phase.
+  - The "second table at 0x7EFEFE04" is the same table continued.
+  - For submenus, group = the parent row's item id. Examples: G152 WB presets; G191 ▶Info = Image Only / Overall / @A021@ / Highlight&Shadow; G42 Menu Display = info 283/394.
+- **Menu-page registry.** The table 0x7EFE190C–0x7EFE21CB holds 280 `{u16 page, 0, create}` entries with 90 factories. The generic list page is 0x7EDC7ECB (vt 0x7EFE221C). The lookup is 0x7EDC7DBA, which caches 50 pages.
+  - So 0x7EDCBE97 → 0x7EDC7DBA (section 07) creates **menu pages**, not panels.
+- **`userMenu*` classes** (0x7EDE7835–0x7EE00F8D) are special pages: WbRev, MainReset, PlayWiz_*, Play_CompScale/ImageCompose/DPOF…, Rec2_WBBKT, TopMenu. They do not build the A–J lists.
+- **Accessory-port menu.** 12-byte rows at 0x7EFF6870: PENPAL Share/Album, EVF Adjust (info 58).
+
+## 6. Object registries and GUI↔app interfaces
+
+### 6.1 Actuator/Viewer registry 0x7EFC5408 (verified)
+- **Table:** 31 entries `{u32 id 0..30, create(owner)}` (C1 said 0x7EFC5470, which is entry 13).
+- **Lookup:** 0x7ED8BBDF(d0 = id, a0 = owner) is a linear search. id 31 = none.
+- **Callers:** `IGui_Controler` 0x7ED87077 (`internal_control_id / actuator_id / viewer_id` logs) and 0x7ED87397, which pick an Actuator and a Viewer per control. The lookup is also called by 0x7ED996F6 (id 18) and by C1's F069 0x7EDC15FF (id 19 child).
+- **Objects:** allocated with operator new 0x7EBA62DB; sizes 4–1,608 bytes.
+
+| Ids | Object, from nearby strings (inferred) |
+|---|---|
+| 0, 1, 4 | live-view superimpose |
+| 6, 8–10, 17 | USB print / Warning_Viewer area |
+| 11, 28, 29 | Func_Scp_Actuator (Super Control Panel) |
+| 12, 13, 26, 27 | Input_String_Actuator (SPC text entry) |
+| 23–25 | Rec_View_Viewer area; section 10f's "debug-menu factories" (params 3/4/5) |
+
+### 6.2 OlyApi interfaces (verified getters; names from class strings and link order)
+- **Getter pattern (signature):** `mov (0x602B24xx),a0 ; cmp 0,a0 ; bne ; mov 2,d0 ; call 0x7E99A33A (lock) ; call 0x7E96E86E ; … mov 4,d0 ; call 0x7EBA62DB ; call ctor ; …`.
+- **Object:** a 4-byte object whose ctor stores its vtable.
+- **API id:** each method passes a constant `0xGGCCMM`, where GG.CC is the class and MM the method.
+- **Order:** the 39 getters 0x7E9BFA7E–0x7E9CDEBE (RAM 0x602B2478–0x602B2510) are in alphabetical class order. That order and 20 `OlyApiX::` strings fix the names.
+- **GUI column:** call sites in 0x7ECA–0x7EE2.
+
+| Getter | Class | API class | GUI | Getter | Class | API class | GUI |
+|---|---|---|---|---|---|---|---|
+| 7E9BFA7E | BackGroundCtrl | 01.03 | 10 | 7E9C524D | PixelMapping | 01.08 | 2 |
+| 7E9BFDA3 | Bluetooth | 05.04 | 81 | 7E9C5389 | PlayCalendar | 03.1E | 19 |
+| 7E9C0BA2 | CustomPrint | 05.03 | 66 | 7E9C5850 | PlayCommon | 03.01 | 148 |
+| 7E9C1A8D | DateCtrl | 01.07 | 9 | 7E9C5FF8 | PlayIndex | 03.03 | 20 |
+| 7E9C1F38 | DeviceLink | 05.01 | 5 | 7E9C667F | PlayLightBox | 03.1D | 46 |
+| 7E9C2147 | EasyPrint | 05.02 | 21 | 7E9C6D18 | PlayMovie | 03.05 | 18 |
+| 7E9C25B8 | EditAspect | 03.1A | 12 | 7E9C71C5 | PlayRecord | 03.06 | 10 |
+| 7E9C290C | EditBeautyAdjust | 03.0D | 6 | 7E9C7424 | PlaySelect | 03.1C | 57 |
+| 7E9C2BDB | EditColor | 03.09 | 28 | 7E9C794C | PlaySingleFrame | 03.02 | 124 |
+| 7E9C2E87 | EditImageOverlay | 03.0A | 17 | 7E9C8579 | PlaySlideShow | 03.0F | 17 |
+| 7E9C34D1 | EditRaw | 03.1B | 43 | 7E9C8947 | PlaySound | 03.17 | 50 |
+| 7E9C396C | EditRedEyeAdjust | 03.0B | 8 | 7E9C8BD4 | Relocate | 04.03 | 1 |
+| 7E9C3B7D | EditResize | 03.07 | 4 | 7E9C8D07 | ReservePrint | 03.10 | 40 |
+| 7E9C3D89 | EditShadowAdjust | 03.0C | 8 | 7E9C93F1 | SelectOverlay | 03.1F | 9 |
+| 7E9C3F9A | EditTrimming | 03.08 | 11 | 7E9C97C0 | SelfAdjust | 04.01 | 20 |
+| 7E9C4351 | (3 methods; OSDEffect?) | 01.12 | 4 | 7E9C9E9A | SettingController | 01.02 | 706 |
+| 7E9C458C | FlashAir | 05.06 | 19 | 7E9CADB5 | Shooting | 02.01 | 98 |
+| 7E9C4970 | KeyCtrl | 01.0E | 4 | 7E9CD7B0 | SoundCtrl | 01.05 | 39 |
+| 7E9C4DC8 | LevelCtrl | 01.0F | 7 | 7E9CDEBE | TouchPanel | 05.05 | 3 |
+| 7E9C503D | LifeTest | 04.02 | 2 | | | | |
+
+- **Second getter series (verified, same pattern; RAM 0x602B239C–0x602B23BC):** CameraCommon 0x7E99D2DD (01.01, 209 GUI sites), Maintenance 0x7E99E423 (04.04, 15), MediaCtrl 0x7E99E95E (01.0C, 145), ModeCheck 0x7E99F203 (01.09, 49), PowerSupplyControl 0x7E99FF14 (01.0A, 10). So 10d's "39 interfaces" is the first series only. Other names in the API name table (SystemCommon, OSDControl, ShootingMovie, …) have no getter of this shape (not searched further).
+- **Component mapping:** each interface reaches the C++ component through its `OlyHfwOpe*` class (10d §2 table: the Play/Edit ids 0x201xx and their requester getters).
+- API class 03.0A is EditImageOverlay (link order); the GUI uses no EditCalendar interface (agrees with 10d).
+
+## 7. Corrections
+1. **Region table:** 0x7EE02095–0x7EE21020 is a DMP GL/shader library used by C3D, not GUI. 0x7ECA1020–~0x7ECC8000 is mostly data.
+2. **Section 07 §3.2:** the sub-item table is 0x7EFEF4FC–0x7EFF044B (196 × 20 bytes, label at +16), and 0x7EFEFE04 is not a second table. 0x7EDCBE97/0x7EDC7DBA create menu pages; panels are created by 0x7ED19D3F (0..159).
+3. **Section 10d §6:** the Custom Menu table starts at 0x7EFF7E80. 0x7EFF8250 is page H, and group 8 is page I. The "mic level" row is labelled Recording Volume.
+4. **C1 review:** the registry is at 0x7EFC5408, and 0x7EFC5470 is its entry for id 13. F069 is an Actuator/Viewer object (id 17). The 0x7ED17DB8 callers are the panel child-builders and CreatePanel, not "widget" constructors.
+5. **Section 10d:** 39 OlyApi getters is the first series only; at least 5 more exist at 0x7E99D2DD–0x7E99FF14.
+6. **C1 F066:** it is SS_DPS state 20 / EVT_END_CUSTOM_PRINT. Return 260 = 0x0104 = go to SS_COMMON BLACK_SCREEN. 0/1/23 are "stay", "state 1" and "state 23".
+7. **Section 10f §4.1:**
+   - The SS_DEBUGMENU entry is found (§4.3).
+   - 0x7EDC5C47 is PostEventToCA, so "(9,7) for item 598" and "(3,0) exit" are CA requests.
+   - 0x000A0004/0x000A0016 are descriptor counts. 0x7EFD1EA4 is the event map and 0x7EFD1EF4 the handler array.
+8. **Section 10d:** 0x7EDB8C08 (light box) and 0x7EDB61FE (3D Show) are state **entry** functions, not handler-table rows.
+9. **Section 07 §5:** there are 17 SS ids; 12 and 13 are stubs, 17 = SPC and 5 is empty.
+
+## 8. Open questions
+1. Roles of most 0x80xx widgets and of the C/D parts. A pass over the panel resource data (0x7EF047B8–0x7EF0CDF0) would give each child's type, rect and string id.
+2. Names of 103 of the 114 panel classes. The alphabetical order bounds them between the 11 anchors.
+3. The Custom Menu hide lists (RAM 0x602BCE98): which rows the E-PM2 hides at run time.
+4. API class 01.12 (3 methods): is it OSDEffect?
+5. Does getShippingInfo(4) return 1 on a retail E-PM2? This decides whether the debug menu is reachable. Also: which physical key is code 4 in the Monitor Adjust dialog, and what the second (OK-long/MENU-long) sequence resets.
+6. What 0x7ED009D6 / 0x7ED00A1D test (they gate the play-start chooser and the light box). There are no state-name tables for DPS, SELFADJ, DEBUGMENU or SPC.

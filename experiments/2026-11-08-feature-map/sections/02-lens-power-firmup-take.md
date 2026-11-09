@@ -175,6 +175,8 @@ The USB flow (inferred from order): `[TPCFirmup]FirmwareCheck` sends type 3 (che
 
 ## 4. Shooting control (TAKE_*)
 
+> **Correction (13e, checked by coordinator, 2026-11-09).** The TakeExp/TakeFcs tables (0x7E791478 / 0x7E7928B0) are 32-slot hash tables keyed by **cmd + 1**: the dispatchers do `inc d1` before the lookup (0x7E582A48, 0x7E588321). **Every command number in this section is one too high.** For example, 0x1xx keys are commands 0x100/0x101 (lock_start/lock_end), and F007's 0x401 is `release_ready_end`. Use the corrected list in `13e-mcon-sequencers.md` §4.
+
 - **TAKE_EXPOSE** 0x7E5829E8 and **TAKE_FOCUS** 0x7E5881D9 dispatch commands through {cmd, handler} tables at **0x7E791478** and **0x7E7928B0** (8-byte rows, 0 = default). Each handler prints its name. **verified**:
 
 | Cmd | TakeExp | TakeFcs |
