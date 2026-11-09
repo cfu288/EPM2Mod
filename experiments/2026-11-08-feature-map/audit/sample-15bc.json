@@ -1,0 +1,122 @@
+[
+ {
+  "id": "15b-58",
+  "section": "15b-camera-core-index.md",
+  "line": 58,
+  "text": "| cam_set.c | 0x7E650607 | hash 0x7E7BB094 (\u00a72.2) |"
+ },
+ {
+  "id": "15b-82",
+  "section": "15b-camera-core-index.md",
+  "line": 82,
+  "text": "| 93\u201397 | 0x7E650BCB \u2026 0x7E650BFF (13 B each) | FC72, 73, 74, 75, 76 (95 = COM_MOVIE_ENABLE) |"
+ },
+ {
+  "id": "15b-93",
+  "section": "15b-camera-core-index.md",
+  "line": 93,
+  "text": "- **Callback stubs:** per-module completions 0x7E651839\u20130x7E6519A2 (10 \u00d7 ~40 B: decrement the list count +42, call one module's finish, then 0x7E651B0E); list-done 0x7E6515C0\u20130x7E651644 (7 \u00d7 22 B: release the list, set bit 2/4 of the sequence object); frame-done 0x7E65165A\u20130x7E65181E (21 \u00d7 27 B, pointer-only: free the request, set bit 2/4/8 of objects 32\u201340, 54\u201356)."
+ },
+ {
+  "id": "15b-125",
+  "section": "15b-camera-core-index.md",
+  "line": 125,
+  "text": "- The bits are the module's own step events. The still/LB monitor prints phase names (0x7E656B1D), not the cam.c factor names, so the cam factor table (03 \u00a71) does not name them (V)."
+ },
+ {
+  "id": "15b-136",
+  "section": "15b-camera-core-index.md",
+  "line": 136,
+  "text": "| cam_set sequence | `mov a0,a2; mov ID,d0; clr d1; mov 1,a0; call 0x7E635665; \u2026; mov STEP,a0; call 0x7E6359B1; mov ID,d0; mov 1,d1; call 0x7E63589A` (55 B) | start sequence STEP on cam_ev object ID |"
+ },
+ {
+  "id": "15b-160",
+  "section": "15b-camera-core-index.md",
+  "line": 160,
+  "text": "| EMS1 AF-area motion | 0x7E66C501\u20130x7E66CE89 | start 0x7E66C501 (\u2190 TAKE `ems_start`); per-frame 0x7E66C72B \u2192 0x7E66C9A8 (EMS1 results 0x7E45FDFA/FE53/FEB5); offset getter 0x7E66CE6E (\u2190 FCS_MOVIE 0x7E5E85A0) |"
+ },
+ {
+  "id": "15b-169",
+  "section": "15b-camera-core-index.md",
+  "line": 169,
+  "text": "- *ems2 callback* (0x7E670FB8, 0x7E671208, 0x7E67132B, 0x7E671506, 0x7E671683, 0x7E671E92, 0x7E6725C6, 0x7E67287A): `movm`, 0 callers, a result decoder 0x7E460DB8/0x7E460FC2/0x7E46118C, then a direct call to the next start."
+ },
+ {
+  "id": "15b-170",
+  "section": "15b-camera-core-index.md",
+  "line": 170,
+  "text": "- *debug logger* (0x7E66827C, 0x7E66C6C3, 0x7E66D60D, 0x7E6727BC): prints `datsz:` and calls 0x7E66723C."
+ },
+ {
+  "id": "15b-216",
+  "section": "15b-camera-core-index.md",
+  "line": 216,
+  "text": "| 0x7E52FE8C | \u2014 (start; fw_kind from 0x7E530524: P\u21922, Q\u21924, S\u21921) | 7 | 0x6610 (protocol type unknown) |"
+ },
+ {
+  "id": "15b-244",
+  "section": "15b-camera-core-index.md",
+  "line": 244,
+  "text": "- **Channels (V):** 4 and 13 = battery/power, 15 = ccd_temp, 34 = per_acc accelerometer (its I\u00b2C check `ACC:I2C NG?`), 38 = MEC layer 0x7E5175C9. Channels 21, 22, 39 and 41 have no user found. ADC-key callers 0x7E50B1B4\u20260x7E50B877 set callback F002 0x7E50B724."
+ },
+ {
+  "id": "15c-16",
+  "section": "15c-app-statecharts.md",
+  "line": 16,
+  "text": "| 0x7EB2887C\u20130x7EB2BB80 | `CmpPEvV_PlayEventViewComponent` (getInstance 0x7EB2887C; `rcv Request` dispatcher 0x7EB2B6C8 is inside) |"
+ },
+ {
+  "id": "15c-22",
+  "section": "15c-app-statecharts.md",
+  "line": 22,
+  "text": "| 0x7EB8C265\u20130x7EB93422 | Dev part 1: 14 device units, \u00a75 |"
+ },
+ {
+  "id": "15c-51",
+  "section": "15c-app-statecharts.md",
+  "line": 51,
+  "text": "| +680 | 0x7EB3DC53 / 0x7EC79354 | 0x7EB3DC6E | 7604 |"
+ },
+ {
+  "id": "15c-57",
+  "section": "15c-app-statecharts.md",
+  "line": 57,
+  "text": "2. **Subscription.** `app_select_display_execute` 0x7EB0B054 (`Cmp_PlayComponentBase.cpp`, 81 callers) registers the members with the EVFW router (14c \u00a72.4). +680 is registered with **11775** for a request handle; +656 is subscribed (11776) to APP_EVENT code 0x02020002 and +732 to 0x03010005. +584 is subscribed to 0x04020181 in 0x7EB0ED3C. +756/+780/+804 sit on CapDpv (+828) notification lists: 0x7EB12BD9 (9 callers, the unsubscribe step) removes them via CapDpv iface slots 31/32/33 (vt+124/+128/+132), then calls CM unsubscribe 0x7EA7DB1E."
+ },
+ {
+  "id": "15c-96",
+  "section": "15c-app-statecharts.md",
+  "line": 96,
+  "text": "| 8 (0x7EA7E198) | 12063 \u2192 7 | GEN 4761 boot request to +472 |"
+ },
+ {
+  "id": "15c-132",
+  "section": "15c-app-statecharts.md",
+  "line": 132,
+  "text": "| 4 (0x7EB78EEA) | \u2014 | 11769 \u2192 1; CM-type ids 13363\u201313365, 11566, 11761, 12962 |"
+ },
+ {
+  "id": "15c-140",
+  "section": "15c-app-statecharts.md",
+  "line": 140,
+  "text": "- **Main region +1296** (dispatcher 0x7EAF265D, jump table, states 11\u2013168, 131 cases). **13 = `PictBridgeComponent:idle`** (entry 0x7EAFBBA4). Its handler 0x7EAFBF48 maps CustomPrint requests to work states: 13784\u219230, 13809\u219231, 13806\u219232, 13808\u219236, 13807\u219237, 13819\u219238, 13795\u219258, 13799\u219262, 13797\u219265, 13802\u219266, 13783\u219284, 13792\u2192136, 13814\u2192137, 13805\u2192138, 13816\u2192139, 13793\u2192140, 13821\u2192141, 13811\u2192142, 13803\u2192143, 13804\u2192157, 13812\u2192158, 13788\u2192166. Play requests: 12261\u219214, 12264\u219215, 12267\u219216, 12262\u219217, 12274\u219219. Composite states keep their own sub-state words +1300\u2026+1364. F042's \"state 35 at +1300\" is inside composite 34 (entry 0x7EAF2F90 GENs 7094 to self)."
+ },
+ {
+  "id": "15c-164",
+  "section": "15c-app-statecharts.md",
+  "line": 164,
+  "text": "| CmpSts_MfAssist 0x7EB7D14B | 0x7EB7D494 (F048) | 11989, 11988, 12014 `evTraReqShtMfScrollThrough`, 12015 `evTraReqShtMfZoomThrough` |"
+ },
+ {
+  "id": "15c-166",
+  "section": "15c-app-statecharts.md",
+  "line": 166,
+  "text": "| CmpCst_Communication 0x7EA9D405 | 0x7EA9D87B | 13161, 13162, 13164\u201313168 |"
+ },
+ {
+  "id": "15c-221",
+  "section": "15c-app-statecharts.md",
+  "line": 221,
+  "text": "7. **13c \u00a75 \"CmpSqp_* vtables have a different layout\":** the sequence parts are classes with getInstance + ctor (0x7EA86666 3D, 0x7EA87609 Base, 0x7EA99DB7 Eportrait, 0x7EA9A4E5 MultiExposure, 0x7EA9CA79 Otwb, 0x7EA9CE2F Panorama, 0x7EA9D108 PictBkt). They are plain C++ classes: the base ctor 0x7EA87609 stores vtable 0x7EC550D8 and calls no base ctor and no setActiveContext (V)."
+ }
+]
