@@ -11,10 +11,10 @@ Scope: how the C++ GUI in 0x7ECA–0x7EE0 is built. The topics are the widget fr
 
 | Range | Contents | Basis |
 |---|---|---|
-| 0x7ECA1020–~0x7ECC8000 | Mostly data: ramp/LUT tables (0x7ECA6000…) and a 108 KB block at 0x7ECB1000. The DB's "function" 0x7ECAD443 (15 KB) is probably data | verified bytes; the role of the data is inferred |
-| ~0x7ECC8000–0x7ECE4000 | CA_MAIN "camera app": OSD_CONTROL/OSDDRAW (0x7ECCBA45…), `*SubAppMdl*` modules, `*SubAppState*` states (ShootingFuncDirect, ModeDirect, Misc) | verified strings |
-| 0x7ECE4000–0x7ECEC000 | GUI↔CA bridge `GuiCallerImp::sendEvent` (0x7ECE6E27); "Genifa" GE event layer (message build 0x7ECE7597, post 0x7ECE75C3, task GPI_TIM_TASK); GPI display layer (`GPISetPalette`, `cw_updateDisplay`, `GPISetOsdOrder`) | verified strings and code |
-| 0x7ECEC000–0x7ECEE1D5 | GUI memory pools (alloc 0x7ECEC905, free 0x7ECEC9CB); UTF-16 helpers (`wcscpy` 0x7ECED793, `wcslen` 0x7ECED7BB, compare 0x7ECED75C); CTouchPnl (0x7ECEDE30). The GUI data-model get/set 0x7ECEF64F/0x7ECEF667 (section 07) sits just after the root class | verified code |
+| 0x7ECA1020–0x7ECCB7FF | Mostly data: ramp/LUT tables (0x7ECA1020–0x7ECB1000, from 0x7ECA6000…), then `de 00 00` (a `retf`) at 0x7ECB1000 and **108,541 bytes of 0xFF erased fill** (0x7ECB1003–0x7ECCB7FF), which is padding, not a table. The DB's "function" 0x7ECAD443 (15 KB, calls only itself) is probably data | verified bytes; the role of the ramp data is inferred (A4 2026-11-09) |
+| 0x7ECCB800–0x7ECE4000 | CA_MAIN "camera app" (code restarts at 0x7ECCB800): OSD_CONTROL/OSDDRAW (0x7ECCBA45…), `*SubAppMdl*` modules, `*SubAppState*` states (ShootingFuncDirect, ModeDirect, Misc) | verified strings (A4 2026-11-09) |
+| 0x7ECE4000–0x7ECEC798 | GUI↔CA bridge `GuiCallerImp::sendEvent` (0x7ECE6E27); "Genifa" GE event layer (message build 0x7ECE7597, post 0x7ECE75C3, task GPI_TIM_TASK); GPI display layer (`GPISetPalette`, `cw_updateDisplay`, `GPISetOsdOrder`), including 0x7ECEBE26 (962 B) and 0x7ECEC1E8 (1,457 B), which call the GPI functions 0x7ECEA7ED…0x7ECEAD0A | verified strings and code (A4 2026-11-09) |
+| 0x7ECEC799–0x7ECEE1D5 | GUI memory pools (from 0x7ECEC799; alloc 0x7ECEC905, free 0x7ECEC9CB, pool lookup 0x7ECEC854, 20-byte header); UTF-16 helpers (`wcscpy` 0x7ECED793, `wcslen` 0x7ECED7BB, compare 0x7ECED75C); CTouchPnl (0x7ECEDE30). The GUI data-model get/set 0x7ECEF64F/0x7ECEF667 (section 07) sits just after the root class | verified code (A4 2026-11-09) |
 | **0x7ECEE1D5–0x7ED00000** | **Widget framework core:** the root object, container, screen and widget base classes, and the drawing engine | verified (§2) |
 | 0x7ED00000–0x7ED17000 | GUI-side controller classes `CCommon`, `CGuiDrawCtrl`, `CPlayIndex`, `CPlaySingleFrame`, `CRec`, `CPlayZoom`. They wrap the OlyApi interfaces (`OlyApiPlay*`, `OlyApiShooting` strings) | verified strings |
 | **0x7ED17000–0x7ED37DAA** | **Object factory** 0x7ED17DB8, panel creation by number 0x7ED19D3F, top window (WinMain class) 0x7ED1B48C…, the widget classes 0x80xx/0xC0xx/0xD0xx and their drawing parts (0x7ED2F000–0x7ED37DAA) | verified |
@@ -63,7 +63,7 @@ Every object stores its **vtable at +0** and a **u16 type id at +4**.
 
 - The two parent types the panel builders test are **257/258** (screen / sub-screen). For those parents the builders scale each child rect by 4.12 fixed-point factors at 0x602B6204/6206 and add offsets at 0x602B6208/620A (verified, 0x7ED37E90…). **Inferred:** this rescales layouts for HDMI/EVF output.
 - **Geometry (verified):** a rect is `{s16 x1, y1, x2, y2}`, inclusive (x2 = x1 + w − 1 in the builders). Point set 0x7ECFF349; rect from coordinates (normalised) 0x7ECFF899; copy 0x7ECFF422; equal 0x7ECFF431; offset rect/point 0x7ECFF561/0x7ECFF266; overlap test 0x7ECFF6A6 (133 callers).
-- **Pools (verified):** GUI pool alloc/free 0x7ECFF1D8/0x7ECFF1E4, selected by the bytes at object +28/+29 (slot +244 sets, +248 reads).
+- **Pools (verified):** GUI pool alloc/free 0x7ECFF1D8/0x7ECFF1E4 (→ 0x7ECEC905/0x7ECEC9CB) take two pool bytes. Root-family objects keep them at +28/+29 (slot +244 sets, +248 reads), but of the 205 call sites only about 24 load +28/+29 directly and about 13 use slot-248 results; the rest pass constants ((1,0) ×57, (5,0) ×21, (8,0) ×10) or bytes +17/+18 of another structure (×36). (A4 2026-11-09)
 
 ### 2.3 Root vtable 0x7EEF5328: slot map (verified unless marked)
 Object fields: +4 type, +6 id, +8/+10 x/y, +12/+14 w/h, +16 status bits, +20 parent, +24 handler/owner, +28/+29 pool, +30 layer, +40 mask, +44, +48 (8 B).
@@ -118,7 +118,7 @@ There are 140 type ids: 1, 0x104, 0x105, 0x6000–0x6071, 0x8001–0x8008, 0x800
 | 0xD001–D003 | 80–92 | 0x7ED2C31C, 0x7ED2C605, 0x7ED2AFD8 | draw through 0x7ECFE523/0x7ECFE796 or 0x7ED303F9 |
 
 - 14 of the 15 0x80xx widgets keep the empty base OnDraw 0x7ECF4DA2 (verified). **Inferred:** they are controls that own C/D drawable parts, and the pixels come from the parts.
-- **Drawing engine (verified call graph):** 0x7ECF5000–0x7ECFF000 and 0x7ED2F000–0x7ED37DAA. It calls nothing outside the toolkit except memcpy 0x7E500D33, memset 0x7E500D73 and the UTF-16 helpers. Resource lookups:
+- **Drawing engine (verified call graph):** about 0x7ECF5000–0x7ECFF000 and 0x7ED2F000–0x7ED37DAA (both are round bounds: 0x7ECFEF32 crosses 0x7ECFF000 and 0x7ED2EF75 crosses 0x7ED2F000). Outside the GUI it calls memcpy 0x7E500D33 and memset 0x7E500D73, and one rotation routine, **0x7ED3231E** (angles 900/1800/2700/3600, constants π and 1800.0), calls 11 C-runtime float routines: fabs 0x7E4FE251, tan 0x7E501AAC, and the soft-float helpers 0x7E500F62, 0x7E501390, 0x7E50160E, 0x7E5017EC, 0x7E501860, 0x7E5018CF, 0x7E5018D6, 0x7E5018E8, 0x7E501986 (13a §2.2). Resource lookups (outside these ranges) (A4 2026-11-09):
   - 0x7ECFF3E9 (69 callers) indexes RAM tables by the current layer byte 0x602B6034;
   - 0x7ECFF3C3 indexes ROM records of 884 bytes at 0x7EFB1034 (sub-records of 52 bytes).
 - **Roles not identified:** of 0x8001/04/05/07/08/0A/0E/0F/12/13 and the C/D parts. Text, image and frame parts are likely (inferred).
@@ -132,7 +132,7 @@ There are 140 type ids: 1, 0x104, 0x105, 0x6000–0x6071, 0x8001–0x8008, 0x800
 
   It is reached from the manager's vt slot +148 (0x7ED1B4FF, word 0x7EF10210). ShowPanelEx's GM_SHOWPANEL message leads there (inferred link).
 - **Number → class.** 98 numbers map to a class and 62 are empty (`panelno.txt`). 16 classes have no number; they are created directly by type.
-- **Resource record (44 bytes, verified):** `{u16 type, u16 k+1, u32 rects → 0x7EF0D7F0 + 16·k, u16 7, …, u16 layer (1/2/3), 0xFFFE, …, 100, 100}`. The rect pair is two `{x, y, w, h}` rects, e.g. 800×600 or 720×480. **Inferred:** the two rects are for two outputs.
+- **Resource record (44 bytes, verified):** `{u16 type, u16 k+1, u32 rects → 0x7EF0D7F0 + 16·k, u16 7, …, u16 layer (1/2/3), 0xFFFE, …, 100, 100}`. Field +20 is 0xFFFE in 98 records and 0xFFFF in 16. Records exist for k = 0…113 only (indices 114–159 are not records). The rect pair is two `{x, y, w, h}` rects (720×480 ×65, 800×600 ×37, 640×480 ×7, …), and in all 114 records the two rects are identical, so nothing in the data supports the inferred "two outputs" reading. (A4 2026-11-09)
 - **Children.** Each panel's child-builder (a vtable slot, e.g. 0x7ED37E2D) loops over a per-class RAM table of resource pointers (e.g. 0x602B6218 / 0x602B7758). It calls the factory with type = the first u16 of each record. The compact property data is in ROM 0x7EF047B8–0x7EF0CDF0, indexed by `{key, ptr}` pairs at 0x7EF0CDF0, where key 0x60xx starts a panel (layout verified; field meaning not decoded).
 - **Code and rodata order (verified).**
   - Code of class k = [ctor_k, ctor_k+1).
@@ -153,7 +153,7 @@ There are 140 type ids: 1, 0x104, 0x105, 0x6000–0x6071, 0x8001–0x8008, 0x800
 
 - Panel 81 is shown by the Custom Menu page (§5). GCPnl_Custom_Btn and GCPnl_Menu are the two ~3.9 KB menu-list panels (inferred).
 - The debug-menu draw routine 0x7ED48BBA (sections 07, 10f) is in panel 0x6066's code.
-- Panel **signature (verified):** the ctor is `call 0x7ED23C27 ; mov VT,d0 ; mov d0,(a2) ; …zero the child array at +792… ; [call 0x7ED01DFD ; call 0x7ED01F7C/0x7ED01FBA]`.
+- Panel **signature (verified, majority form):** 93 of the 115 callers of 0x7ED23C27 use `call 0x7ED23C27 ; mov a0,a2 ; mov VT,d0 ; mov d0,(a2) ; …zero the child array at +792… ; [call 0x7ED01DFD ; call 0x7ED01F7C/0x7ED01FBA]`. Variants: 17 store the vtable through (a0), zero +792 and return with no tail calls (e.g. 0x7ED7A79F); 4 zero from +796 (e.g. 0x7ED40F26); 0x7ED230C2 only does `mov d0,(792,a0)`. (A4 2026-11-09)
 - Panel virtuals log `[GUI App   ] GCPnl_X::CheckRecView/CheckIndexBtn/CheckImageArea/CheckAllArea() called`. These are the touch hit tests.
 
 ## 4. Generated state handlers (Ss*)
@@ -215,16 +215,21 @@ Actions end `mov N,d0 ; ret` or build `asl 8 ; or` for an SS change; the shared 
 - **3D Show (verified code; the API meanings are inferred).**
   - 0x7EDB61FE is the **entry** of SS7 state 16 `ID_ST_3D_IMG_SEL_MENU`. It builds the "Sel. Image: All / 3D Show" panel.
   - The play-start chooser 0x7ED05440 picks 7.16 when CameraCommon vt+104 ≠ 0 (inferred: 3D output available) and MediaCtrl reports 3D/MPO images.
-- **BGM Import (verified structure).** No Ss row handles it. It is a userMenu item: vtable 0x7F00095C, slot 0x7EDF26B2 loads string 1782 and calls ShowPanelEx(111). Its callback 0x7EDF2BA1 logs `OlyApiSoundCtrl::registImportSound()`. It runs inside SS_MENU_MAIN (Slideshow > BGM, inferred).
+- **BGM Import (verified structure).** No Ss row handles it. A menu item with vtable 0x7F00095C (32 code slots; "userMenu item" is inferred: no class string, base slots shared with `userMenu*` classes): slot 2 = 0x7EDF26B2 loads string 1782 and calls ShowPanelEx(111). 0x7EDF2BA1, which logs `OlyApiSoundCtrl::registImportSound()`, is slot 40 of a **different** 45-slot class (vtable 0x7F0010B4, ctor 0x7EDF2A08, created by 0x7EDF2A25, factory id 0x20D at 0x7EFE20B8); that the item reaches it is inferred. It runs inside SS_MENU_MAIN (Slideshow > BGM, inferred). (A4 2026-11-09)
 - **SS_DEBUGMENU (verified; resolves 10f's open question).**
   1. A Setup dialog method 0x7EDFD665 checks the key code 4 and then `IOlyApiMaintenance` (0x7E99E423) vt+12, logged as getShippingInfo(4).
      - Only if the result is 1 does it post EVT_REQ_START_VERSION_CHECK 0x9628.
      - **Inferred:** the dialog is Monitor Adjust (it toggles info 432 and logs `showMonitorMenu`), and selector 4 is API_SHIPPING_INFO_MENU_BUTTON.
-  2. SS_MENU_MAIN state 4 maps 0x9628 to state 6 `ID_ST_HIDE_MODE` (handler 0x7EDAB90A).
+  2. SS_MENU_MAIN state 4 `ID_ST_WIZARD_MENU_ENTRY` (the Setup-menu page state) maps 0x9628 to state 6 `ID_ST_HIDE_MODE` (handler 0x7EDAB90A = `mov 6,d0; retf`). No other SS state has a non-default handler for 0x9628 (SS_COMMON has a row, with default handlers only), and EVT_REQ_END_VERSION_CHECK 0x9629 has no row (descriptor scan). (A4 2026-11-09)
   3. In HIDE_MODE a counter at RAM 0x602BC480 steps on **Up → Down → Left → Right → shutter half-press → shutter full-press** (0→1→2→3→7→8; e.g. 0x7EDAB980 is the Down step).
   4. **OK with counter 8 returns 0x0A01 = SS 10 state 1.** Bytes 0x7EDABA14–0x7EDABA54 checked: `cmp 8,d0 ; mov 10,d2 ; mov 1,d3 ; … asl 8,d2 ; or d3,d2`.
   5. Whether a retail body passes the getShippingInfo(4) gate is **not known**. External corroboration only: the widely cited Olympus hidden-menu sequence (Monitor adjust, Up, Down, Left, Right, shutter) matches.
   6. **Second sequence.** A second counter 0x602BC482 (OK-long / MENU-long) reaching 10 makes the same OK call 0x7EDED19A(4,0), which is in `userMenuMainReset`, and then settings slot +40. **Inferred:** a hidden reset.
+- **0x9628 and the "version-check menu" of 10f §4.3 are two different paths (verified unless marked).** (A4 2026-11-09)
+  - The only immediate 0x9628 in block 0 is the GUI self-post at 0x7EDFD68D (step 1). The CA could also deliver it: GuiCallerImp::sendEvent 0x7ECE6E27 turns CA code k (1..167) into a GUI event through the table 0x7EEF3434 (`{k, event}`), where k = 0x75 → 0x9628. No CA_MAIN code (0x7ECCB800–0x7ECE4000) loads 0x75 as an immediate, so no CA sender was found. (A4 2026-11-09)
+  - The 10f path is the CA sub-app CAM_MISC_VERCHK_MENU (`startVersionCheckMenuSubAppStateMisc` 0x7ECE0653, event 0x0600000A). CA `startShooting` 0x7ECDCB10 reads rcv_info.info from the **second** word of the CA event (a1+4) and maps info 11 → VERCHK (12) and info 12 → CAM_MISC_FIRMUP (13). (A4 2026-11-09)
+  - The Firmware OK path, `doCmd_SsMenuMain_StWizardMenu_EvtKeyOKOn` 0x7EDA9D03, calls PostEventToCA(11, 12) for item 43 and logs `F/W Version up start`. PostEventToCA sends {code, param}. The sender 0x7ECE3A9E maps code 11 to the CA event 0x0400000B `GUI_START_SHOOTING_SERVICE` (table 0x7EEEBB28) and keeps param 12 as the second word. So item 43 carries info **12 = CAM_MISC_FIRMUP** (firmware update), not VERCHK. The step from the 0x0400000B handler (0x7ECDCF0D → 0x7ECD27A7) to startShooting was not traced (inferred). No PostEventToCA call passes the constants (11, 11), so the trigger of VERCHK is not known. (A4 2026-11-09)
+  - So EVT_REQ_START_VERSION_CHECK 0x9628 is the debug-menu entry event (HIDE_MODE), and it is not the Firmware screen. The shared name suggests that the CA VERCHK sub-app is the intended sender of k = 0x75 (inferred). (A4 2026-11-09)
 - **Inside the debug menu:** state 1 = item list (OK → action dispatcher 0x7EDA05EC, 10f); 2 = life test running; 3/4 = Color setting/result. Exits return 3.6 (HIDE_MODE). EVT_DEBUG_MENU 0xA000 is posted only by the LifeTest callback 0x7EDCB035 ("test ended → back to the menu"); it is not an entry.
 
 ### 4.4 DPS (SS 14) and USB (SS 11) (verified; DPS state roles inferred)
@@ -319,7 +324,7 @@ Actions end `mov N,d0 ; ret` or build `asl 8 ; or` for an SS change; the shared 
 - API class 03.0A is EditImageOverlay (link order); the GUI uses no EditCalendar interface (agrees with 10d).
 
 ## 7. Corrections
-1. **Region table:** 0x7EE02095–0x7EE21020 is a DMP GL/shader library used by C3D, not GUI. 0x7ECA1020–~0x7ECC8000 is mostly data.
+1. **Region table:** 0x7EE02095–0x7EE21020 is a DMP GL/shader library used by C3D, not GUI. 0x7ECA1020–0x7ECCB7FF is data and padding (108,541 bytes of 0xFF from 0x7ECB1003); CA_MAIN code starts at 0x7ECCB800. (A4 2026-11-09)
 2. **Section 07 §3.2:** the sub-item table is 0x7EFEF4FC–0x7EFF044B (196 × 20 bytes, label at +16), and 0x7EFEFE04 is not a second table. 0x7EDCBE97/0x7EDC7DBA create menu pages; panels are created by 0x7ED19D3F (0..159).
 3. **Section 10d §6:** the Custom Menu table starts at 0x7EFF7E80. 0x7EFF8250 is page H, and group 8 is page I. The "mic level" row is labelled Recording Volume.
 4. **C1 review:** the registry is at 0x7EFC5408, and 0x7EFC5470 is its entry for id 13. F069 is an Actuator/Viewer object (id 17). The 0x7ED17DB8 callers are the panel child-builders and CreatePanel, not "widget" constructors.
@@ -331,6 +336,7 @@ Actions end `mov N,d0 ; ret` or build `asl 8 ; or` for an SS change; the shared 
    - 0x000A0004/0x000A0016 are descriptor counts. 0x7EFD1EA4 is the event map and 0x7EFD1EF4 the handler array.
 8. **Section 10d:** 0x7EDB8C08 (light box) and 0x7EDB61FE (3D Show) are state **entry** functions, not handler-table rows.
 9. **Section 07 §5:** there are 17 SS ids; 12 and 13 are stubs, 17 = SPC and 5 is empty.
+10. **Section 10f §4.3:** the Firmware item (43) posts PostEventToCA(11, 12) = GUI_START_SHOOTING_SERVICE with info 12, which `startShooting` maps to CAM_MISC_FIRMUP, not to VERCHK (link to startShooting inferred). EVT_REQ_START_VERSION_CHECK 0x9628 is a different, GUI-side event that leads to HIDE_MODE (§4.3). (A4 2026-11-09)
 
 ## 8. Open questions
 1. Roles of most 0x80xx widgets and of the C/D parts. A pass over the panel resource data (0x7EF047B8–0x7EF0CDF0) would give each child's type, rect and string id.

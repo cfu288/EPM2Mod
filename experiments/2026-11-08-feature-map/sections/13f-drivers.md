@@ -24,7 +24,7 @@ Round D1 deep dive. Scope: the driver code in 0x7E421020–0x7E521020, plus the 
 | 0x7E45824B–0x7E45A80B | Accelerometer `per_acc`/`acc_spi` (SIO ch3) |
 | 0x7E45AAD4–0x7E45B67E | ADC `per_adc`, 0x98C00000 |
 | 0x7E45CE12–0x7E45CE5B | ADCONV, 0x99800000 (only the debug dump reads it) |
-| 0x7E45D120–0x7E45D9F1 | Bus-error IRQ (0x98000000). System controller 0x98E00000 (backup registers, power-on factor, RTC registers, standby). `per backup` 0x7E45D8C2 |
+| 0x7E45D120–0x7E45D9C7 | Bus-error IRQ (0x98000000). System controller 0x98E00000 (backup registers, power-on factor, RTC registers, standby; last 0x98E user 0x7E45D87B). `per backup` 0x7E45D8C2 (ends 0x7E45D9C7). The next two functions, 0x7E45D9C8 and 0x7E45D9F1, are GIO helpers (0x9A100104/108/110) (A4 2026-11-09) |
 | 0x7E45DBB5–0x7E45E1xx | CCD temperature task |
 | 0x7E45E206–0x7E45E834 | `cpudma` (no MMIO immediates found) |
 | 0x7E45EA73–0x7E45EEA5 | DBGS debug support / NMI address watch, 0x99700000 |
@@ -37,7 +37,7 @@ Round D1 deep dive. Scope: the driver code in 0x7E421020–0x7E521020, plus the 
 | 0x7E465583–0x7E465C77 | Soft timers MINTIMER, `per timer`, PER_PCONT |
 | 0x7E466887–0x7E467117 | PWM, 0x9A500000 |
 | 0x7E467130–0x7E467ABE | PER_ROTATE, RTC |
-| 0x7E467D99–0x7E469BD1 | **SIO** driver |
+| 0x7E467D99–0x7E469D75 | **SIO** driver, including the client API after the `sio` shell 0x7E469BD1: init entry 0x7E469C16 (← Usr0 0x7E503DD4; calls 0x7E467D99), 0x7E469C1E, 0x7E469C27 and 0x7E469CDF (called by lens 0x7E53392C, LCD 0x7E6B1066, EVF 0x7E6B33D1, audio 0x7E94F128 and others) (A4 2026-11-09) |
 | 0x7E469F91–0x7E46A395 | PER_SLOPE |
 | 0x7E46A6FA–0x7E46B123 | SYSCLK clock/reset generator, 0x98800000 |
 | 0x7E46B74D–0x7E46BA92 | Hardware timers, 0x98900000 |
@@ -78,14 +78,14 @@ Round D1 deep dive. Scope: the driver code in 0x7E421020–0x7E521020, plus the 
 | Block | Name / function | Evidence | IRQs | Driver functions |
 |---|---|---|---|---|
 | 0x98000000 | Address-decoder bus error ("ADDEC") | `[SYS WANA] ADDEC ERROR Hassei!` (Japanese "occurred") plus an address/RW/data dump in handler 0x7E45D164 (V) | 0 | init 0x7E45D120 |
-| 0x98100000, 0x98100400 | Two identical small units. Regs +0, +8, +10, +44, +48. **Not identified** | Toggled bit 0x10 in the SRAM standby code. Also used by 0x7E95EFC8 (`aud_tool_ac3`) and 0x7EEC6822 (V) | – | – |
-| 0x98200000, 0x98300000, 0x98400000, 0x98500000, 0x98600000, 0x98700000 | **SIO / UART channels**, logical ch 0, 1, 4, 2, 3, 5 (see 2.3) | ROM table 0x7E4C7F48 (V) | 77–90 | 0x7E467D99–0x7E469BD1 |
+| 0x98100000, 0x98100400 | Two identical small units. Regs +0, +8, +10, +44, +48. **Not identified** | Toggled bit 0x10 in the SRAM standby code. Also used by 0x7E95EFC8 (no strings; it sits just before the `aud_tool_ac3_*` functions, so the audio label is a neighbourhood guess (I); only caller 0x7E94E1FE), by its twin **0x7E95F008** (+0x444/+0x448 of the 0x98100400 unit; callers 0x7E6D80B3, 0x7E6D8900, 0x7E6E0857, 0x7E6E08F1, movie/CPU1 image-engine code) and by 0x7EEC6822 (V) | – | – (A4 2026-11-09) |
+| 0x98200000, 0x98300000, 0x98400000, 0x98500000, 0x98600000, 0x98700000 | **SIO / UART channels**, logical ch 0, 1, 4, 2, 3, 5 (see 2.3) | ROM table 0x7E4C7F48 (V) | 77–90 | 0x7E467D99–0x7E469D75 (A4 2026-11-09) |
 | 0x98800000 | **SYSCLK** clock/reset generator | `[SYSCLK]mntr` strings. Gate set 0xD0/0xD4, gate clear 0xDC/0xE0 (V) | – | 0x7E46A6FA–0x7E46B123 |
 | 0x98900000 | **Timers**, 10 channels | Table 0x7E4C89D4 (V) | 69–76 | 0x7E46B74D–0x7E46BA92 |
 | 0x98A00000, 0x98B00000 | SDRAM controller, arbiter and bus monitor | `Arbitration Config Reg`, `LLF_PRIORITY*`, `DQS Delay` (V) | – | 0x7E449823–0x7E44B11E |
 | 0x98C00000 | ADC (`per_adc`) | Strings (V) | 117 | 0x7E45AB01–0x7E45B49D |
 | 0x98D00000 | Early boot setup (address/mask writes). Purpose unknown | 0x7E421B99 writes 0x98D000F0–0x10C (V) | – | 0x7E421AFB, 0x7E421B99 |
-| 0x98E00000 | **System controller**, always-on domain | See 2.6 (V) | 120, 121 | 0x7E45D1F3–0x7E45D9F1, 0x7E425F44 |
+| 0x98E00000 | **System controller**; "always-on domain" is inferred from the backup, RTC, power-on factor and watchdog registers | See 2.6 (registers V; names I) | 120, 121 | 0x7E45D1F3–0x7E45D9C7, 0x7E425F44 (A4 2026-11-09) |
 | 0x98F00000 | **USB device** core and DMA | `USB_CSR_REG`, `EP0_FIFO`, `usb_dma_in_set` (V) | 91, 92 | 0x7F098C43, 0x7F09AE11–0x7F09CB95 |
 | 0x99000000 | **SD card host** (agent SD) | `SDERR cmd`, `CBSY`, register dump `IRQ02_STATUS … MIC_CONFIG0` (V) | 93, 95 | 0x7E5CBD83–0x7E5CC42F |
 | 0x99100000 | Display helper (swivel debug) | 0x7E6B31CC only (V) | – | – |
@@ -227,7 +227,7 @@ From the top down. Positions are verified string anchors; the layer roles are I 
 |---|---|---|
 | App/DCF API (`dcf*`, `fileif_*`) | DCF 0x7E5AD055–~0x7E5B5xxx (`DCF_SEM_SM`, `DCFPROC_*`, `%c:\DCIM\%s\%s`); DPOF 0x7E5BEEAE–0x7E5C0903 (`AUTPRINTMRK`); AVCHD paths 0x7E5C1164 | The `fileif_*` names occur only in the `filedbg` test strings 0x7E5C60F8–0x7E5C64AA |
 | FILECLBK task 0x7E5C1B4E | — | Dispatches on the high 16 bits of the command (V): 0 → 0x7E5C1BC6; 0x1 → 0x7E5C50DE; 0x2 → 0x7E5C51A8; 0x20 → 0x7E5C0A7B; 0x8/0x10 → DCF 0x7E5AFAA0. Then it replies (0x7E5C1C84) |
-| FILEFGND task 0x7E5C4E90 | — | A generic job runner (V). It waits on queue (0x7E43EB7E) and drains a 32-entry ring of 12-byte `{fn, arg, u16 d0, u16 kind}` jobs at 0x60545454: kind 0 `fn()`, 1 `fn(a0)`, 2 `fn(a0,d0)`. Jobs are posted by 0x7E5C4E2C/37/42. Job thunks 0x7E5C4EBC… unpack `{ret, a0, d0, d1, a1}` and call the file-wrapper layer |
+| FILEFGND task 0x7E5C4E90 | — | A generic job runner (V). It waits on the **event flag** 0x7E43EB7E (OlyEvWt 0x7E4490AF; the posters set it through 0x7E5C8AEE → OlyEvSt/OlyEvStCpu) and drains a 32-entry ring of 12-byte `{fn, arg, u16 d0, u16 kind}` jobs at 0x60545454 (read index +0x180, write index +0x182): kind 0 `fn()`, 1 `fn(a0)`, 2 `fn(a0,d0)`. Jobs are posted by 0x7E5C4E2C (kind 1), 0x7E5C4E37 (kind 2) and the generic 0x7E5C4E42; the real jobs are SD and logsec completion callbacks (posters such as 0x7E5CBA48, 0x7E5CD4D4, 0x7E5CD5FF). The thunks 0x7E5C4EBC… are **not** FILEFGND jobs: they are called directly by the FILECLBK (task entry 0x7E5C1B4E) dispatcher 0x7E5C50DE (jump table 0x7E797238, cmds 0x10001–0x10013), and their parameter layouts differ (0x7E5C4EBC uses +8 = a1, +12 = u16 d0) (A4 2026-11-09) |
 | File wrapper / VFS | 0x7E5C920F–0x7E5CB8D2 (`filewrap_dump_all_file_list_item`, `.`/`..` listings) | Job targets 0x7E5C97C1, 0x7E5C9A5F, 0x7E5C9DCC, 0x7E5CA326… (V call targets) |
 | FAT | 0x7E5B6233 (`NO_FAT_CHAIN`, 26 callers) – ~0x7E5BDE10 (cluster-cache MRU, C1 F008); type detect 0x7E5B79F4/0x7E5B88F0 (`FAT12/16/32`, `NO NAME`); **exFAT** 0x7E5BA075; DOS date/time 0x7E5C0C76 | Shell `FileSystem Debug Command` 0x7E5C213E. The U_SHELL `file` entry 0x7E5C2139 is the stub just before it |
 | Logical-sector layer ("logsec") | 0x7E5CBAA1–0x7E5CBC15 | `LOGSEC_SEM`, ticket semaphores `E_LOGSEC_TCKT2/3` (serialises the card users) |
@@ -294,7 +294,7 @@ From the top down. Positions are verified string anchors; the layer roles are I 
 3. **C1 F015 (0x99900000 = shutter timing, I):** this reading is weakened. The mechanical timing unit used by the `mec` code is **0x9A300000** (2 channels, IRQ 2). 0x99900000 is a camera-core unit with 3 buffer channels (IRQs 4–7) whose name is still open.
 4. **Section 08 says the eye sensor is "PER_EYE_SENSOR task over IIC".** The task is an empty `retf` (V, section 01), so no driver activity comes from it.
 5. **Firmware map, "Codec WM8946 shares a serial bus with the HDMI chip":** confirmed, and more: SIO ch2 also carries the touch panel and the display VSC, with a GIO mux (V).
-6. **Firmware map, region 0x7E421020–0x7E4A0000:** the drivers proper are 0x7E45824B–0x7E46C308. The kernel is 0x7E426xxx–0x7E44Axxx. The ROM driver tables are 0x7E4C5534–0x7E4C8A88 (V).
+6. **Firmware map, region 0x7E421020–0x7E4A0000:** the drivers proper are 0x7E45824B–0x7E46C308. Below them: reset and boot code 0x7E421020–~0x7E426FFF (reset code to 0x7E4262xx, timers, CPU1 boot 0x7E42691F, CPU1 level dispatchers 0x7E426974–0x7E426B25, debug print 0x7E426D4B), then 0xFF fill with one small data block (0x7E42F020–0x7E42F688), and the kernel 0x7E430000–0x7E44Axxx (as in §1; the earlier "0x7E426xxx" start is withdrawn). The ROM driver tables are 0x7E4C5534–0x7E4C8A88 (V). (A4 2026-11-09)
 
 ## 5. Open questions
 

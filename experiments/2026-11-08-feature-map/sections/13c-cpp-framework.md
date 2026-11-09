@@ -8,21 +8,21 @@
 
 | Range | Contents | Basis |
 |---|---|---|
-| 0x7E966000–0x7E96B000 | HIGHLEVEL_MAIN entry, HLS OS wrapper, growable array, logger (section 06) | verified (06) |
-| 0x7E96B000–0x7E9EA000 | `Tra*` event package + `OlyHfwOpe*`/`OlyHfwLowApiWrap` operation classes + event classes they declare; `sdk api` shell and `OlyApi*` (06 §5) | verified (string tags + event scan) |
-| 0x7E9EA000–0x7EB80000 | `Cap*` capabilities, `CmpSts*`/`CmpSqp*` controllers, `Cmp*` components (one file per class, see §5) | verified (class directory) |
+| 0x7E966000–~0x7E96998A | HIGHLEVEL_MAIN entry, HLS OS wrapper, growable array, logger (section 06) | verified (06); end moved from 0x7E96B000 by the `Tra*` string tags (A4 2026-11-09) |
+| ~0x7E96998B–~0x7E9EA380 | `Tra*` event package (the `TraShareTakeStatus.cpp` tag is used by 0x7E969F7B, 0x7E96A14E, 0x7E96A422, 0x7E96A52A, 0x7E96AF2A and 0x7E96B048; first function of the package about 0x7E96998B `getIntervalShootingState`) + `OlyHfwOpe*`/`OlyHfwLowApiWrap` operation classes + event classes they declare; `sdk api` shell and `OlyApi*` (06 §5); the `app_check_*` group 0x7E9E8CCD–0x7E9EA380 | verified (string tags + event scan); both ends approximate (A4 2026-11-09) |
+| ~0x7E9EA381–0x7EB80000 | `Cap*` capabilities, `CmpSts*`/`CmpSqp*` controllers, `Cmp*` components (one file per class, see §5) | verified (class directory) (A4 2026-11-09) |
 | 0x7EB7FC91–~0x7EB854FF | `CmpSts_SingleStillShootingSequence_NEW` statechart (`rcv3dShootingFinishIn_END_WAIT` …) | verified (class directory, strings) |
 | ~0x7EB85500–0x7EB8C265 | **Com_ framework**: Com_ reactive base, observers, request/response registry, CmpInit helpers, `Cab_CameraBase` mode machine, `Com_ActiveTransitionManagerBufferd`, events 7001–7020 and 11561–11566 | verified |
 | 0x7EB8C265–~0x7EB93A80 | `Dev*` device classes, part 1: display device (`api_disp_*`, `allocDisplayHandle`), `DevAef_AEAFCtrl`, `DevCls` (clear-skin rec view), effects, LED, `DevMed_MediaControl`, `DevRec` | verified (`api_*` callees, strings) |
 | ~0x7EB93A80–0x7EBA0AA8 | `Ctg_ComponentSwitcher` categories (5 vtables; ctors 0x7EB93A89, 0x7EB94576, 0x7EB96F97, 0x7EB9D909, 0x7EB9F1D1) | verified (class directory) |
 | 0x7EBA0AA9–0x7EBA4867 | `Dev*` device classes, part 2: anti-shake, image handle, HDMI/CEC, histogram, Exif, picture files, `DevBlu_Bluetooth`, **USB-communication device**, DPS-T, DPS, pixel mapping, picture-file creation (§5.4) | verified |
-| **0x7EBA4868–0x7EBA7BB5** | **Rhapsody OXF runtime** (§2) | verified |
-| 0x7EBA7BC1–0x7EBAC000 | **Not OXF.** A string-less library called only from the FACE task code (0x7E6FB836, 0x7E6FB8BF, 0x7E6FBBCD, 0x7E6FBC17). It calls 0x7E72D0BA–0x7E72D95E (OKAO area) and the soft-float helpers 0x7E5010xx. Error codes 0x0CA000xx. | verified call edges; "OKAO extension" inferred |
+| **0x7EBA4868–0x7EBA7BC0** | **Rhapsody OXF runtime** (§2). Its last function is the 12-byte helper **0x7EBA7BB5–0x7EBA7BC0** (`add 16,a0`; zero the word at this+16 if it is non-zero; `retf`), called only by the class destructor 0x7EBA7B98 (own vtable 0x7EBCDB0C, then base destructor 0x7EBA7B13 with vtable 0x7EC922DC): it fills the clean-up step of the class-dtor shape in §3 (that role is inferred). The base/derived class pair (vtable slots point into 0x7EBA79D8–0x7EBA7B98) has no name string | verified (A4 2026-11-09) |
+| 0x7EBA7BC1–0x7EBABF8D | **Not OXF: OKAO Smart Skin** (13b §2.2; data from ~0x7EBAC000). A string-less library called only from the FACE task code (0x7E6FB836, 0x7E6FB8BF, 0x7E6FBBCD, 0x7E6FBC17). It calls 0x7E72D0BA–0x7E72D95E (OKAO area) and the soft-float helpers 0x7E5010xx. Error codes 0x0CA000xx. | verified call edges; "OKAO" by role (13b) (A4 2026-11-09) |
 | 0x7EBAC000– | data | verified (no code xrefs) |
 
 **Rodata (verified):** OXF vtables and the RCS markers `//! $Id$` are at 0x7EC919C0–0x7EC922A0. `$Id: ntos.cpp 1.83 2006/02/20 13:52:46 vova Exp $` is at 0x7EC91BBC; this is the Rhapsody OS-adapter file. Event vtables are in 0x7EBCxxxx–0x7EC92xxx (§4).
 
-## 2. The OXF runtime (0x7EBA4868–0x7EBA7BB5)
+## 2. The OXF runtime (0x7EBA4868–0x7EBA7BC0) (A4 2026-11-09)
 
 | Part | Addresses | Notes |
 |---|---|---|
@@ -240,7 +240,7 @@ The CmpSqp_* sequence parts (`Base`, `Eportrait`, `MultiExposure`, `Otwb`, `Pano
    - The rest is operation-class code: `OlyHfwLowApiWrap` 0x7E974E7F–0x7E975704, `OlyHfwOpeLevel` 0x7E9782AF–0x7E97858C, `OlyHfwOpePlyCom` 0x7E97B27A–0x7E97C487, `OlyHfwOpePlyMov` 0x7E981663–0x7E981F92, plus reactive classes such as the one with 1-second timeouts at 0x7E977ADA–0x7E977D6F (class name unknown).
    - The event-code runs are listed in §4.
 4. **The OXF reactive base vtable is 0x7EC91FE8**, not 0x7EC6C320. 0x7EC6C320 is a derived component vtable (slot 0 = 0x7EB08A15). Slot 15 = getCurrentEvent; slot 6 = takeEvent; slots 32/33 = rootState_entDef/dispatchEvent.
-5. **OXF ends at ~0x7EBA7BB5.** 0x7EBA7BC1–0x7EBAC000 is a face-library extension (§1), not OXF. The device classes start at 0x7EBA0AA9 (Ctg ends there), not 0x7EBA1020.
+5. **OXF ends at 0x7EBA7BC0** (the destructor helper 0x7EBA7BB5 is OXF, §1). 0x7EBA7BC1–0x7EBABF8D is OKAO Smart Skin (13b), not OXF. The device classes start at 0x7EBA0AA9 (Ctg ends there), not 0x7EBA1020. (A4 2026-11-09)
 6. **chls_oldb "unnamed source file" (06 §4)** is the class **CapPDB_PlayOLDB** (getName 0x7EA26E13, ctor 0x7EA2384A).
 7. **"Base methods copied into each file"**: the cause is statechart inheritance (§3), not header inlining (inferred, strong).
 8. **"Cmp_ComponentManagerWithBoot 0x7EA7D072"** is the inherited getName that 26 component vtables share, so it does not mark a file.

@@ -9,10 +9,10 @@ Earlier detail: 07 §2.1–2.2, 09a §1, 10a §1–3, 02 §4–5, 12 §1. This s
 | Component | Code | Data (ROM) | Basis |
 |---|---|---|---|
 | mcon (mode controller) | **0x7E6FCA60–0x7E70787F** | strings 0x7E813F22–0x7E814856; tables 0x7E814864–0x7E84EE67 | V: 0x7E6FCA3C is the FACE_PT1 task loop (01 table); 0x7E707880 dispatches through table 0x7E84EE68 and is called only from movie/REC code (0x7E6DADB9, 0x7E7172B4, 0x7E71C7BE). PrintIM/Exif starts at 0x7E708312 |
-| TAKE_MAIN sequencer engine | 0x7E58204D–0x7E582602 | state table 0x7E790860 (27 × 20 B), names 0x7E790758 | V |
+| TAKE_MAIN sequencer engine | 0x7E58204D–0x7E582601 (last `ret` at 0x7E5825FF; 0x7E582602 starts the `take` debug-command function) | state table 0x7E790860 (27 × 20 B), names 0x7E790758 | V (A4 2026-11-09) |
 | TAKE sequencer states/handlers | ~0x7E59A24C–0x7E5AB7FF (entries 0x7E59A332…0x7E5AB405; shared handlers 0x7E5A4192–0x7E5A46CE) | event tables 0x7E78F530–0x7E7906B8 | V (table pointers) |
 | Strobe exposure (`stb_expose`) | ~0x7E5D036C–0x7E5D8E94 | strings 0x7E79B06A–0x7E79CD9F | V strings / I bounds |
-| Light-source selection (strobe assist) | 0x7E5E2258–0x7E5E2418 (+ 0x7E5E1B11, 0x7E5DEBAD) | – | V |
+| Light-source selection (strobe assist) | 0x7E5E2258–0x7E5E22FF: availability 0x7E5E2258 and F011 0x7E5E22A6 (+ 0x7E5E1B11, 0x7E5DEBAD). The rest of the range, 0x7E5E2300–0x7E5E2418, holds the four light-exec callbacks (§2.4), not selection code | – | V (A4 2026-11-09) |
 
 mcon internal layout (V by callers/strings; one row per block):
 
@@ -153,11 +153,11 @@ mcon internal layout (V by callers/strings; one row per block):
 ### 2.4 Strobe exposure (F010) and light-source selection (F011)
 - **Light-source mask** bits 1/2/4/8. What the code checks (V): bit 1 needs the internal/clip-on flash to be usable, bit 2 needs an external flash on the hot shoe, bit 4 is always available, and bit 8 is never available. What the bits mean (I): 4 = wireless RC or a non-TTL external unit; 8 = a built-in pop-up flash, which the E-PM2 does not have.
   - **0x7E5E2258(src)** answers availability:
-    - src 1 → 0x7E5E1B11() == 0 (internal OK; 0x7E5E1B11 returns an inhibit code, e.g. 0x2C50 when switch 0x1215 ≠ 1);
+    - src 1 → 0x7E5E1B11() == 0 (internal OK). 0x7E5E1B11 returns an inhibit code: 0 at once when 0x7E5E1CAF() = 1 and 0x7E457C75(0x2981) = 1; otherwise 0x2C50 when 0x7E509CA3(0x1215) **== 1** (`mov 11344,d0; cmp 1,d1; beq exit`), else 0; (A4 2026-11-09)
     - src 2 → 0x7E5DEBAD() == 1 (external state 0x6054AC64 = 2 and 0x6054AA7C = 0);
     - src 0 → either; src 4 → 1; src 8 → 0.
   - **F011 0x7E5E22A6(req)** maps req (0 → 15; 1/2/4/8/16 kept; else &15), clears 0x8, clears 0x1 if internal is inhibited, clears 0x2 if no external flash, then calls 0x7E5E1D38(mask, req).
-  - The four functions after it (0x7E5E2300, 0x7E5E2346, 0x7E5E2387, 0x7E5E23F5) are callbacks of `strobe_light_exec` 0x7E5E2419 (V `movm` prologues).
+  - The four functions after it are light-exec callbacks (V `movm` prologues): 0x7E5E2300, 0x7E5E2346 and 0x7E5E2387 are loaded by `strobe_light_exec` 0x7E5E2419 (at 0x7E5E24E6, 0x7E5E2597, 0x7E5E2573/25E6/2661); 0x7E5E23F5 is loaded only inside 0x7E5E2387 (at 0x7E5E23AB). (A4 2026-11-09)
 - **Flash selection 0x7E5D1659** (`check_select`; inputs onoff, ae_chg, mode_stb_expose, general, rc_mode, after_movie) (V):
   - It clears and sets the status words 0x6054A3DE (internal), 0x6054A3E0 (external), 0x6054A3E2 and 0x6054A3E4.
   - It reads the external flash state with 0x7E5E2152 / 0x7E5E20E8 (records 0x6054A82C / 0x6054A850).
@@ -233,14 +233,14 @@ mcon internal layout (V by callers/strings; one row per block):
 
 ## 4. Corrections
 
-1. **Section 05 §5:** "SERV_S1 … called through 0x7E68CCBD from the REC (0x7E701D27)" is **wrong** (V).
+1. **Section 05 §5:** "SERV_S1 … called through 0x7E68CCBD from the REC (0x7E701D27)" has the wrong module label: 0x7E701D27 is mcon code, not REC. The call edge itself is real: 0x7E701D27 calls 0x7E68CCBD at 0x7E701D50 (d0 = 0x03010007, d1 = 1), and 0x7E68CCBD = `call 0x7E8F91DD` (SERV_S1) (V). (A4 2026-11-09)
    - 0x7E701D27 is mcon code. Its only caller is F021 0x7E7000BA. F021's only caller is camera_end 0x7E700CF9, which is reached from veneer 0x7E6FCD9F (shell `camera_end` and the HFW vtable method 0x7EB927AE).
    - It sends SERV notice 0x03010007 when a change-notify callback is registered, after api_rec_Charge_Strobe(0) and api_rec_Control_Strobe(0).
    - The other mcon caller of 0x7E68CCBD is 0x7E701E42 (external-strobe state, through 0x7E701D68). Coverage review 2 also named the `modedump`/`modeback` commands and loadCustom; only the `camera_end` command and the method next to loadCustom reach it.
 2. **Section 02 §4 command tables (V): the "cmd" column is the hash key, and the key is cmd + 1.**
    - 0x7E791478 (TakeExp) and 0x7E7928B0 (TakeFcs) are 32-slot open-addressing hash tables `{u32 key, ptr handler}`. Key 0 is an empty slot → default handler (0x7E582DFC logs 0x25000701).
    - The dispatchers do `inc d1` before the lookup (0x7E582A48, 0x7E588321).
-   - Real TakeExp commands: mode_end 1, lock_start 0x100, lock_end 0x101, preview 0x200–0x202, panorama 0x300/0x301, release_ready_start/end 0x400/0x401, release_idle_start/end/ready 0x500/0x501/0x503, release_take_start/end 0x600/0x601, release_end 0x701, take_continue 0x800/0x801, lv 0x900–0x902, iaf 0xA00/0xA01/0xA04, movie 0xB00/0xB01.
+   - Real TakeExp commands: mode_start 0 (key 1 → 0x7E582A71, `[TakeExp]mode_start`), mode_end 1, lock_start 0x100, lock_end 0x101, preview 0x200–0x202, panorama 0x300/0x301, release_ready_start/end 0x400/0x401, release_idle_start/end/ready 0x500/0x501/0x503, release_take_start/end 0x600/0x601, release_end 0x701, take_continue 0x800/0x801, lv 0x900–0x902, iaf 0xA00/0xA01/0xA04, movie 0xB00/0xB01. (A4 2026-11-09)
    - Real TakeFcs commands: mode 0–2, lock_start 0x100, lock_end 0x101, lock_start_end 0x102, panorama 0x200/0x201, release_ready 0x300/0x301, release_idle_start/end/ready 0x400/0x401/0x403, release_take 0x500/0x501, take_continue 0x600/0x601, lv 0x700–0x702, mf 0x800/0x801, iaf_restart 0x900, iaf_pause 0x901, movie 0xA00–0xA03, release_end 0xE01.
    - So **F007's EXP 0x401 is `release_ready_end`**, not `release_ready_start`. The senders confirm it: they send matching pairs (EXP 0x500 + FCS 0x400 = both `release_idle_start`).
 3. **Section 07 §2.1:**

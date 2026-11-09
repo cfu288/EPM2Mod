@@ -12,7 +12,7 @@ Round D1 deep dive. E-PM2 v1.6, block 0, runtime = 0x7E421020 + offset.
 | Component | Code | Rodata / data | Basis |
 |---|---|---|---|
 | **OKAO core + PT** (facial parts) | **0x7E72CFA1–0x7E731584**. After the `ret` at 0x7E731582 come 3 bytes of 0xFF, then the libc `_ctype` table at 0x7E731588 (bytes 0x10/0x30/0xA0/0xC0/0x8C/0x89/0x81). Not ~0x7E732000. | Models and tables 0x7E85CEFC–~0x7E86DCxx (immediates from this code; end inferred). RAM: pool descriptors 0x602AE508 (W) and 0x602AE518 (B) | verified |
-| **OKAO SS "Smart Skin"** (beauty) | **0x7EBA7BC1–0x7EBABF8D**. It starts right after an OXF-style destructor at 0x7EBA7B98 and ends at the `ret` at 0x7EBABF8B, followed by the strings `CIC_MUTEX`/`CIC_EN…` | LUTs 0x7EC92318–0x7ECAFF3C | verified bounds. Name: see §2.2 |
+| **OKAO SS "Smart Skin"** (beauty) | **0x7EBA7BC1–0x7EBABF8D**. It starts right after the last OXF code: the destructor 0x7EBA7B98 (stores vtable 0x7EBCDB0C, calls 0x7EBA7BB5, then the base destructor 0x7EBA7B13) and its 12-byte helper **0x7EBA7BB5–0x7EBA7BC0** (`add 16,a0`; if the word at this+16 is non-zero, store 0; `retf`; only caller 0x7EBA7B98). It ends at the `ret` at 0x7EBABF8B, followed by the strings `CIC_MUTEX`/`CIC_EN…` | LUTs 0x7EC92318–0x7ECAFF3C | verified bounds. Name: see §2.2 (A4 2026-11-09) |
 | **Red-eye library** (overlay A) | **0x7F0645C1–0x7F0691C5**. It includes the maths helpers 0x7F068F66–0x7F0691C5. The DB marks the page 0x7F069000 as data, but 0x7F069020/0x7F0690A0/0x7F06910C/0x7F069171 are code with callers. After the `ret` at 0x7F0691C3 come `ff ff` and the BASIC keyword table (`list run new bye next…`) at 0x7F0691C8 | 3-byte constants at 0x7F06AD94/97 | verified |
 | **DPS in overlay A** | It ends at 0x7F0645C0. The last DPS function is 0x7F064584, which calls the string helpers 0x7F087BD1/0x7F087BF9/0x7F087C03 in overlay B | — | verified |
 | **AVPI AV middleware** | **0x7EE8F4F4–0x7EECE318**. Everything from 0x7EE63000 to 0x7EE8F4F3 has callers only in the C3D API (0x7EE61A–0x7EE62F) and the overlay-B C3D bridges. The first AVPI function, 0x7EE8F4F4, calls the kernel. After the `ret` at 0x7EECE316 come OSD-debug strings (`OSD DBG get`, `osddraw…`), so rodata starts at about 0x7EECE319 | Plug-in names, vtables and codec tables 0x7F02F600–~0x7F033xxx. Plug-in registry 0x7E8EFA18 (data image). Codec tables 0x7F0327DA–0x7F033xxx | verified (caller scan, bytes). Ranges inside AVPI: §2.4 |
@@ -38,8 +38,8 @@ So it is not "AVPI only", and it is not BASIC.
 
 | Address | Role | Notes |
 |---|---|---|
-| 0x7E72CFA1 / 0x7E72CFBE | `OKAO_SetWMemoryArea` / `OKAO_SetBMemoryArea`(ptr, size) | They init pool 0x602AE508 / 0x602AE518 through 0x7E72CFED/0x7E72D003 → 0x7E72D01D. Return −3 for NULL/0 and −1 if too small (verified) |
-| 0x7E72CFDB / 0x7E72CFE4 | `OKAO_FreeWMemoryArea` / `OKAO_FreeBMemoryArea` | Name verified: 0x7E6FBCB0 prints these strings when they fail. They clear the 16-byte pool descriptors |
+| 0x7E72CFA1 / 0x7E72CFBE | `OKAO_SetWMemoryArea` / `OKAO_SetBMemoryArea`(ptr, size) | They init pool 0x602AE508 / 0x602AE518 through 0x7E72CFED/0x7E72D003 → 0x7E72D01D. Return −3 for NULL/0, and −1 if the pool is already initialised (descriptor word ≠ 0) or too small (< 4 units of 8 B) (verified) (A4 2026-11-09) |
+| 0x7E72CFDB / 0x7E72CFE4 | `OKAO_FreeWMemoryArea` / `OKAO_FreeBMemoryArea` | They clear the 16-byte pool descriptors (0x602AE508–514 / 0x602AE518–524) and **always return 0** (`call clear; clr d0`), so they cannot fail. The names come from the order of the failure strings in 0x7E6FBCB0 next to the call order (inferred from order, strong). Those prints are dead code, and the FreeB print re-tests the FreeW result in d2 (0x7E6FBE1F) (A4 2026-11-09) |
 | 0x7E72D0BA / 0x7E72D169 | W-pool malloc / free | First-fit allocator 0x7E72D0F2 with 8-byte units; free 0x7E72D199 coalesces. **Also used by SS and the red-eye library** |
 | 0x7E72D0D6 / 0x7E72D181 | B-pool malloc / free | Used for handles |
 | 0x7E72D932 / 0x7E72D94C / 0x7E72D95E | handle create (B-alloc, zero, store magic) / magic check / delete | The handle pattern (§3) |
@@ -187,9 +187,9 @@ So it is not "AVPI only", and it is not BASIC.
 | Address | Holds |
 |---|---|
 | 0x605B3FC0 / 0x605B3FC4 | PT handle / PT result |
-| 0x605B3FC8 | "contour" module (38 points); a stub, always NULL |
+| 0x605B3FC8 | "contour" module (38 points; the name is inferred); a stub, always NULL (A4 2026-11-09) |
 | 0x605B3FCC | SS handle |
-| 0x605B3FD0 / 0x605B3FD4 | module 2 / module 4; stubs |
+| 0x605B3FD0 / 0x605B3FD4 | module 2 / module 4 ("eye-retouch" is an inferred label); stubs (A4 2026-11-09) |
 | 0x605B3FD8 | abort flag |
 | 0x605B3FDC / 0x605B3FE0 / 0x605B3FE4 | progress of modules 1/2/4 |
 
@@ -200,12 +200,12 @@ So it is not "AVPI only", and it is not BASIC.
 4. Set the position from the face record: coordinates halved; the angle comes from table 0x7E812FCC.
 5. Detect on 640×480.
 6. 0x7E6FBE4E stores points 5, 6, 3 and 4 (+ face offset), the three direction values and the 999 sentinels at +32…+58 of the face record. Inferred: the eye corners for eye-AF.
-7. Delete everything and free the pools. On failure the `OKAO_*` strings are printed.
+7. Delete everything and free the pools. On failure the `OKAO_*` strings are printed; the two Free prints can never fire (both Free functions return 0). (A4 2026-11-09)
 
 **Command 11** (0x7E6F4739): e-Portrait / beauty processing (verified):
 - **Senders:** `REC_BEAUTY_CSKIN_EXEC` 0x7E70F134 and `play_face_beauty_revise` 0x7E9431DA. REC posts {reply 0x7E43ED78, cmd 11, &param} to FACE_EXEC through 0x7E7185D8, then polls progress (0x7E6FB5D2 → 0x7E6F49B4) and abort (0x7E6FB5EF → 0x7E6F49E8, which sets 0x605B3FD8 = 1).
 - **Parameter:** +0 module mask, +4/+8 W area (REC: 0xB35BA200, 32,487,552 B), +12 image, +16/+18 size, +28/+30 SS p1/p2. REC sets the mask to **1**: Smart Skin only.
-- **Mask & 6** creates PT plus the contour module. The contour create is a stub that returns NULL, so this path always returns 0x8707. **Eye-retouch modules 2 and 4 are therefore dead** (verified: the stubs are 0x7E6FB6E3 and 0x7E6FB71E).
+- **Mask & 6** creates PT plus the contour module. The contour create is a stub that returns NULL, so this path always returns 0x8707. **Modules 2 and 4 are therefore dead** (verified: the stubs are 0x7E6FB6E3 and 0x7E6FB71E). The labels "contour" and "eye-retouch" are inferred. (A4 2026-11-09)
 - **Mask 1:** for each face 0x7E6FBBCD calls SS AddFace; then 0x7E6FBC17 calls SetParams and Execute.
 
 **Command 5** = red-eye (§2.3). W = 30,720 bytes at 0xBDBB5000.
@@ -234,12 +234,12 @@ So it is not "AVPI only", and it is not BASIC.
 ## 4. Corrections to the map and earlier sections
 
 1. **OKAO end:** the code ends at 0x7E731584, not ~0x7E732000. 0x7E731585+ is rodata (`_ctype` first). Verified.
-2. **A second OKAO block:** 0x7EBA7BC1–0x7EBABF8D is OKAO **Smart Skin**, not OXF. The C1 note "OXF runs on to ~0x7EBA9xxx" is wrong: OXF ends at ~0x7EBA7BC0. Verified.
+2. **A second OKAO block:** 0x7EBA7BC1–0x7EBABF8D is OKAO **Smart Skin**, not OXF. The C1 note "OXF runs on to ~0x7EBA9xxx" is wrong: OXF ends at **0x7EBA7BC0**, the last byte of the destructor helper 0x7EBA7BB5 (§1). Verified. (A4 2026-11-09)
 3. **The review said** "alloc/free 0x7E72D0BA/0x7E72D169 are also used by art-filter code 0x7E72E3EE, 0x7E7314D4". **This is wrong.** Those two functions are PT internals, under 0x7E72E04C. The external users are SS and the red-eye library. Verified.
 4. **The overlay-A face library is red-eye correction**, with cmd 5 sent by `play_face_redeye_adjust`. It is not "face scoring". **F076's score is the blue ratio** (byte 0 = B). Overlay-A code ends at **0x7F0691C5**, not 0x7F069000. Verified.
 5. **§09b open question 1** ("0x7F0687C4 writes the art composite descriptor +284") is wrong. 0x7F0687C4 is the red-eye pixel correction, reached only from FACE cmd 5. Verified reachability; role inferred.
 6. **Smile:** confirmed absent. In addition, **the eye-retouch modules 2 and 4 of cmd 11 and the 38-point contour module are linked as stubs**. Verified.
-7. **§03 "PT uses OKAO":** confirmed and extended. FD itself is the hardware engine at 0x99600000, driven by 0x7E6F8062–0x7E6F82C7 (verified addresses). OKAO is used **only** for PT (live eyes), for Smart Skin (cmd 11) and, inferred, for red-eye (cmd 5). **FACE_MAIN cmds 5/11 are now named** (§03 open question 9).
+7. **§03 "PT uses OKAO":** confirmed and extended. FD itself is a hardware engine; the 0x99600000 registers are written by 0x7E6F8062–0x7E6F82C7 (verified addresses; that this unit is the FD engine is inferred). OKAO is used **only** for PT (live eyes), for Smart Skin (cmd 11) and, inferred, for red-eye (cmd 5). **FACE_MAIN cmds 5/11 are now named** (§03 open question 9). (A4 2026-11-09)
 8. **AVPI bounds:**
    - It starts at **0x7EE8F4F4**, not 0x7EE8F000. Before that, 0x7EE63000–0x7EE8F4F3 is C3D-side code.
    - It ends at **0x7EECE318**, which is also where block-0 .text ends; rodata follows.

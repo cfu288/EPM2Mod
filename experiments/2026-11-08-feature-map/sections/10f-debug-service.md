@@ -18,7 +18,7 @@
 | ADJSLF (self adjust) | "bit 24 starts it" | **CONFIRMED + gate found** | Hidden, gated by the factory flag PRM_MODE_SHIPS_ENABLE (prm 0x0DB1) = 0 and wake reason SELF_ADJUST. Dormant on a shipped camera (inferred: flag set at shipping) | E-P5 same gate (verified); others have the strings |
 | SS_DEBUGMENU | entry not found | **PARTLY RESOLVED** | Hidden. Contents found (Life Test, Relocate register/erase code, Color setting/result). **Entry found (13d §4.3) (D1 2026-11-09)**: a key sequence in SS_MENU_MAIN HIDE_MODE, gated by getShippingInfo(4); whether a retail body passes the gate is unknown | all 7 (strings) |
 | SS_SELFADJ / self-adjust menu | entry not found | **RESOLVED** | Reached only through the ADJSLF gate above | all 7 |
-| Version-check menu (CAM_MISC_VERCHK_MENU) | "hidden menu" | **CORRECTED (inferred)** | Probably the normal Setup › Firmware screen, not hidden (see §4.3) | all 7 |
+| Version-check menu (CAM_MISC_VERCHK_MENU) | "hidden menu" | **NOT the Firmware screen; trigger open** | The Firmware item starts CAM_MISC_FIRMUP, not VERCHK (verified mapping; one CA step inferred). The GUI event of the same name, EVT_REQ_START_VERSION_CHECK 0x9628, opens HIDE_MODE, the hidden debug-menu entry. No trigger of the CA VERCHK sub-app was found. Probably hidden (inferred) (see §4.3) | all 7 (A4 2026-11-09) |
 | Life test | strings only | **CONFIRMED, entry = debug menu** | Hidden-debug-only | all 7 |
 | prmdbg / `app Set_CameraInfo` / `sdk api` / `mov` / `lens` / `cam` | debug shells | **CONFIRMED** (only via U_SHELL) | Hidden-debug-only | all 7 |
 | USRTEST_A–D | "Usr0–4 do not start them" | **CONFIRMED, wider search** | Dormant: no code loads their task-id slots | all 7 (strings) |
@@ -133,9 +133,11 @@ So **ADJ vendor ops, including the remote shell, work only on connection types 0
 - Two menu-OK paths (0x7EDA9F47, 0x7EDAAAC5) call `0x7EDC5C47(9,7)` for menu item 598 when a condition holds ((0x602BC48C)==1 and `0x7ED009D6()`==4). What item 598 is was not identified. (0x7EDC5C47 is PostEventToCA, so (9,7) is a CA request, not "go to SS 9 state 7" (D1 2026-11-09).)
 
 ### 4.3 Version-check menu
-- **Verified:** `startShooting` 0x7ECDCB10 maps rcv_info.info **11 → param 12 (VERCHK)** and 12 → param 13 (CAM_MISC_FIRMUP).
-- **Verified:** the main-menu OK handler 0x7EDA9D03 calls `0x7EDC5C47(11,12)` for item **43**, then logs `[GUI App Version]:OkOn called , F/W Version up start` ("version up" = firmware update).
-- **Inferred:** item 43 is Setup › **Firmware** (string 134, help 492 "View product's firmware version."), the only firmware item in the top table (record 35, kind 0x100). If so, the "version-check menu" is the **normal Firmware screen**, and its firmware-update branch is the card lens/flash updater. The prior label "hidden" is **corrected** to "probably Active". The link from item 43 to VERCHK was not traced end to end.
+- **Verified:** `startShooting` 0x7ECDCB10 reads rcv_info.info from the **second** word of the CA event (a3 = a1+4) and maps info **11 → param 12 (VERCHK)** and 12 → param 13 (CAM_MISC_FIRMUP). (A4 2026-11-09)
+- **Verified:** the main-menu OK handler 0x7EDA9D03 (`doCmd_SsMenuMain_StWizardMenu_EvtKeyOKOn`, SS_MENU_MAIN state 4 WIZARD_MENU_ENTRY) calls PostEventToCA `0x7EDC5C47(11,12)` for item **43**, then logs `[GUI App Version]:OkOn called , F/W Version up start` ("version up" = firmware update). PostEventToCA sends {code 11, param 12}. Its sender 0x7ECE3A9E maps code 11 to the CA event **0x0400000B `GUI_START_SHOOTING_SERVICE`** (table 0x7EEEBB28) and passes param 12 as the second word. So the info is **12 → CAM_MISC_FIRMUP**, the firmware update, not VERCHK. The earlier reading took code 11 as the info. The CA step from the 0x0400000B handler (0x7ECDCF0D → 0x7ECD27A7) to startShooting was not traced (inferred). (A4 2026-11-09)
+- **Inferred:** item 43 is Setup › **Firmware** (string 134, help 492 "View product's firmware version."), the only firmware item in the top table (record 35, kind 0x100). Its OK path is the firmware-update branch (CAM_MISC_FIRMUP: the card lens/flash updater), so the Firmware screen is **not** the VERCHK menu. The earlier "probably the normal Firmware screen" reading is withdrawn. (A4 2026-11-09)
+- **VERCHK trigger (verified absence, as far as checked):** VERCHK needs info 11, and no PostEventToCA call passes the constants (11, 11) (one site, 0x7EDAD0D3, passes a setting value). What starts `startVersionCheckMenuSubAppStateMisc` 0x7ECE0653 is not known. (A4 2026-11-09)
+- **The GUI event of the same name is a different path (verified; 13d §4.3).** EVT_REQ_START_VERSION_CHECK 0x9628 is posted only by the GUI itself at 0x7EDFD68D, after the getShippingInfo(4) gate, and only SS_MENU_MAIN state 4 handles it: it goes to state 6 `ID_ST_HIDE_MODE`, the debug-menu entry (§4.1). The CA could deliver it too: GuiCallerImp::sendEvent 0x7ECE6E27 maps CA code 0x75 to 0x9628 (table 0x7EEF3434), but no CA sender of 0x75 was found. **Inferred:** by name, the CA VERCHK sub-app and the hidden HIDE_MODE screen belong together, so the "version-check menu" is most likely hidden. (A4 2026-11-09)
 
 ### 4.4 Shipping info
 - `Maintenance::getShippingInfo` (`API_SHIPPING_INFO_{DEST_AREA, FLAG, DPS, TIME_ADJUST, MENU_BUTTON}`) is logged by the GUI at 0x7EDFD665. Its use as a menu gate was not traced. (Traced in 13d §4.3: selector 4, inferred API_SHIPPING_INFO_MENU_BUTTON, gates the debug-menu entry (D1 2026-11-09).)
@@ -163,7 +165,7 @@ So **ADJ vendor ops, including the remote shell, work only on connection types 0
 | Pixel Mapping (207; help 476) | `PixelMapping::execute` (SDK class G) → `CmpCst_Function` 0x7EAA8FF9… → `api_rec_Calculate/Save_Pixelmaping` 0x7E688CFF/0x7E688D6C | Active (verified chain from strings; menu record is in Custom Menu J code, not traced here) | all 8 |
 | Level Adjust (160; 478) | PER_SLOPE `readall adj for digitallevel` | Active (inf) | all 8 |
 | Touch Calibration (1343) | touch-panel task | Active (inf) | all 8 |
-| Firmware (134; 492) | top-table record 35 → possibly the VERCHK screen (§4.3) | Active | all 8 |
+| Firmware (134; 492) | top-table record 35; OK → PostEventToCA(11, 12) → CAM_MISC_FIRMUP (firmware update), not VERCHK (§4.3) | Active | all 8 (A4 2026-11-09) |
 | Reset/Myset (225), EVF Adjust (126) | normal tables | Active | all 8 |
 
 ## Open questions
@@ -172,6 +174,6 @@ So **ADJ vendor ops, including the remote shell, work only on connection types 0
 2. **Wake reason 9.** Find which power-on factor (0x604154E6, decoded at 0x7E45D280) becomes API_WUI_SELF_ADJUST. Check also that retail cameras have prm 0x0DB1 = 1 (a camera-side read only).
 3. **Storage mode and PTP.** Find how PTP ops reach TPC in connection type 0 (mass storage). Find what selects type 5 and type 6.
 4. **Edev ID 0x023E** (console re-route) and 0x0204/0x0205: which accessory or jig they are, and which connector carries UART port 0.
-5. **Item 43 / item 598.** Confirm item 43 = Firmware with the panel-id map, and identify item 598.
+5. **Item 43 / item 598.** Confirm item 43 = Firmware with the panel-id map, and identify item 598. Also: what starts CAM_MISC_VERCHK_MENU (info 11), and does any CA code send GUI code 0x75 (→ 0x9628)? (A4 2026-11-09)
 6. **0x902B in E-PL7 and later.** Compare the sub-op 15 code with the E-PM2 code to confirm the shell bridge was removed.
 7. **The BootManager call.** Find the call site that invokes slot 0 (Usr2 0xFFFFFF) of the 0x7EC90B30 object, to turn "overlays load at boot" from inferred to verified.

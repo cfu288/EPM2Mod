@@ -8,7 +8,17 @@ You are testing how well a firmware map explains the real code. Assume the map i
 - /path/to/epm2-tools/docs/firmware-map.md — the regions table and the feature inventory;
 - experiments/2026-11-08-feature-map/modules.tsv — source files in link order with code ranges;
 - experiments/2026-11-08-feature-map/tasks.tsv;
-- experiments/2026-11-08-feature-map/sections/*.md — detail by subsystem.
+- experiments/2026-11-08-feature-map/sections/*.md — detail by subsystem. Since round C1 the map also has:
+  - 11 (version history);
+  - 12 (exposure/AF/file writers);
+  - 13a C runtime + image job library;
+  - 13b OKAO/red-eye/AVPI;
+  - 13c C++ framework: OXF runtime, statechart templates with byte signatures, event classes, Com_ framework; plus 13c-event-ids.tsv;
+  - 13d GUI toolkit, panels, Ss state handlers, Custom Menus;
+  - 13e mode controller and TAKE sequencer;
+  - 13f drivers and the MMIO/IRQ map.
+
+  Use the byte/instruction signatures in 13c and 13d to classify framework and GUI glue.
 
 **Tools** (run from /path/to/epm2-tools):
 - `python3 tools/fwmap.py fn ADDR [--dis] | str REGEX | range LO HI | xref ADDR`
