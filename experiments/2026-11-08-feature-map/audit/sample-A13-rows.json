@@ -1,0 +1,252 @@
+[
+ {
+  "index": "16a-app-function-index",
+  "addr": "0x7EA6C622",
+  "row": "0x7EA6C622\t3\tvirtual entry (prologue only) of the next body 0x7EA6C625 [vt slot 0 of vt 0x7EC4810C] = code in Cap_PlaySlide (slideshow) + CmpShc_ShootingSequenceBase range, class not proven (callers only in OXF runtime / CmpSts_RecordController): forwarder (this+12) -> 0x7E966BD6 [target role: EyeFi/FlashAir mode info iface/member dtor (slot 0 of vt \tprologue+body\tV"
+ },
+ {
+  "index": "16a-app-function-index",
+  "addr": "0x7EB2796E",
+  "row": "0x7EB2796E\t63\tCmpPEvc_PlayEvcollectionComponent parent of state 37 handler: 12067 evTraCmp_NextState -> state 49; else parent 0x7EB2511F\thandler\tV"
+ },
+ {
+  "index": "16a-app-function-index",
+  "addr": "0x7E97A359",
+  "row": "0x7E97A359\t5\tvirtual entry (prologue only) of the next body 0x7E97A35E [vt slot 1 of vt 0x7EBE3940] = code in Ope/app class (base Ope request base (level 3)) @7E979D72 range, class not proven (callers only in Ope facade / Ope media-access counter): [via 0x7E974A85: \"get UNKNOWN MEDIA ACCESS STATE!\"]; called by 0x7E9798AA (code in Ope facade range, cl\tprologue+body\tV"
+ },
+ {
+  "index": "16a-app-function-index",
+  "addr": "0x7E9A03F3",
+  "row": "0x7E9A03F3\t28\tsdk debug shell (range) method: calls 0x7E9A053F (forwarder -> 0x7E975CD3); [via 0x7E9E5737: (via 0x7E9E5A46: pointer-collection remove())]; vt slot 5 of sdk debug shell (range)\tg:vtword\tI"
+ },
+ {
+  "index": "16a-app-function-index",
+  "addr": "0x7EB2A250",
+  "row": "0x7EB2A250\t8\tCmpPEvV_PlayEventViewComponent forwarder -> 0x7EB2A258 [target role: CmpPEvV_PlayEventViewComponent state 17 entry (+884/+212): calls 0x7EB0EC7E (forwarder (d0=0, d1=5636) -> 0x7E5082B6); c]\tforwarder+tgt\tV"
+ },
+ {
+  "index": "16a-app-function-index",
+  "addr": "0x7E97119E",
+  "row": "0x7E97119E\t22\tevent 11981 isTypeOf\tev-isTypeOf\tV"
+ },
+ {
+  "index": "16a-app-function-index",
+  "addr": "0x7EA3C09F",
+  "row": "0x7EA3C09F\t6\tCapBlc_BlurringCorrection setter (+4,this) = arg\tgetter-setter\tV"
+ },
+ {
+  "index": "16a-app-function-index",
+  "addr": "0x7EB6C7BA",
+  "row": "0x7EB6C7BA\t23\tCmpPSou_PlaySoundComponent method: calls 0x7EB6C7D1 (CmpPSou_PlaySoundComponent sets field +208 = 1 [vt...); calls 0x7EA7CE74; calls 0x7EB6C842 (forwarder -> 0x7EB6C84A); called by 0x7EB6CCDD (CmpPSou_PlaySoundComponent method: [via 0x7EB6CC31: popNullConfig]; [v...)\tg:callers\tI"
+ },
+ {
+  "index": "16a-app-function-index",
+  "addr": "0x7EBA3698",
+  "row": "0x7EBA3698\t15\tDev USB communication (range) probably an object ctor: stores vt 0x7EC91760 at +0 after base ctor 0x7EBA34BB (Dev USB communication zeroes fields +4,+8 of this )\tobject-ctor\tI"
+ },
+ {
+  "index": "16a-app-function-index",
+  "addr": "0x7EB9FCC6",
+  "row": "0x7EB9FCC6\t18\tCtg category method: calls 0x7EBA0247 (forwarder -> 0x7EBA024F); vcalls this->vt+208; called by 0x7EB9F826 (Ctg category transition step: exit (0x7EB9F81E); notify list +148 then...)\tg:vcall+callers\tI"
+ },
+ {
+  "index": "16b-gui-function-index",
+  "addr": "0x7ED24D23",
+  "row": "0x7ED24D23\t173\tpanel base vt slot 63 (+252) = selectLayout(0..3), shared by 115 more vtable(s); returns e.g. 1\tvt\tV"
+ },
+ {
+  "index": "16b-gui-function-index",
+  "addr": "0x7EDEB068",
+  "row": "0x7EDEB068\t36\tpage class (pages 329) vt slot 3 (+12) = key(d0 = page key, d1)\tvt\tV"
+ },
+ {
+  "index": "16b-gui-function-index",
+  "addr": "0x7ED71155",
+  "row": "0x7ED71155\t58\tprivate method (in panel 29 (type 0x601C) code); called by 0x7ED70C5E (calls widget setters [position, visibility, list index])\trange\tI"
+ },
+ {
+  "index": "16b-gui-function-index",
+  "addr": "0x7ED497B1",
+  "row": "0x7ED497B1\t232\tpanel 108 (type 0x6050) vt slot 100 (+400) = OnDBUpdate (GM 0x1901/0x1902); does: DM get block 0, DM get block 4, DM get block 5, DM get block 77, DM get block 6\tvt,args\tV"
+ },
+ {
+  "index": "16b-gui-function-index",
+  "addr": "0x7ED810C3",
+  "row": "0x7ED810C3\t119\tcalls widget setters (visibility); private method (in panel 9 (type 0x6009) code); called by 0x7ED805E9, 0x7ED808DD +1; does: setVisible\tsynth,range,args\tI"
+ },
+ {
+  "index": "16b-gui-function-index",
+  "addr": "0x7EDBD20E",
+  "row": "0x7EDBD20E\t54\tSs handler \u2192 stay; on: SS_PLAY_SINGLE 30 ZOOM_PREV_NEXT on 0x9008 KEY_LEFT_ON; calls (itself or in callees): PlaySingleFrame::moveCurrent\tss\tV"
+ },
+ {
+  "index": "16b-gui-function-index",
+  "addr": "0x7ED33DA8",
+  "row": "0x7ED33DA8\t1786\thelper with 3 callers, e.g. 0x7ED31C9B (slanted-edge polygon fill)\tcaller\tI"
+ },
+ {
+  "index": "16b-gui-function-index",
+  "addr": "0x7EDFF150",
+  "row": "0x7EDFF150\t33\tmenu-page getter/creator for page(s) 8 (openPage functor case); list-page factory for list id(s) 8 (registry 0x7EFE180C); creator: new 1744 B, ctor 0x7EDFF12F (page class (pages 8)); in page class (pages 8) code\topenpage,listreg,shape\tV"
+ },
+ {
+  "index": "16b-gui-function-index",
+  "addr": "0x7EE014AC",
+  "row": "0x7EE014AC\t33\tmenu-page getter/creator for page(s) 552-556 (openPage functor case); list-page factory for list id(s) 552-556 (registry 0x7EFE180C); creator: new 1748 B, ctor 0x7EE0148B (page class (pages 552,553,554,555\u2026)); in page class (pages 552,553,554,555\u2026) code\topenpage,listreg,shape\tV"
+ },
+ {
+  "index": "16b-gui-function-index",
+  "addr": "0x7EDB791A",
+  "row": "0x7EDB791A\t800\tSs handler \u2192 returns a state computed in the handler (calls play controller , 0x7ED09135, 0x7ED01A03); on: SS_PLAY_SINGLE 31 IMAGE_PREV_NEXT on 0x9A01 GUI_END_PLAY_SINGLE_DISPLAY; calls (itself or in Ss callees): getSetting(27), PlayCommon::getImageType, PlayCommon::getStillInfo, PlaySingleFrame::getAspectFrame, PlayCommon::getNumber, PlaySingleFrame::updateImageSync; via 0x7ED09135: getSetting(27), getSetting(253) \u2026\tss\tV"
+ },
+ {
+  "index": "16c-platform-function-index",
+  "addr": "0x7E5CA752",
+  "row": "0x7E5CA752\t99\tfile wrapper / VFS\trename(a0 old path, a1 new path): splits the new name, path walk on the old path with op mask 1 -> 0x7E5B604F writes the new 8.3 name; 0 / -1\tD5 read (dpof): read: 88ef, temp FILE on stack, mask 1\tV"
+ },
+ {
+  "index": "16c-platform-function-index",
+  "addr": "0x7E550927",
+  "row": "0x7E550927\t6\tIMG image-job library > IMG constant/table getters\tconstant getter: returns 211; leaf: returns d0 = 211; helper of 0x7E57A140 (only caller), under 0x7E55FFA3 (IMG_PRECON cmd 3 (WB))\tshape: mov imm; retf + leaf summary (straight-line, no call) + call graph\tV"
+ },
+ {
+  "index": "16c-platform-function-index",
+  "addr": "0x7E5853A1",
+  "row": "0x7E5853A1\t341\ttake shell / TAKE_EXPOSE (TakeExp)\tlogs error 0x25000702 (TAKE) via the recorder 0x7E426D4B; service calls: prm getval(0x8551, 0x8D21); EXP command(0x701, 0x501, 0x700, 0x505); helper of 0x7E5829E8 (TAKE_EXPOSE task: TakeExp hash table 0x7E791478 (key = cmd+1) (only caller)\terror codes (0xMM00SSNN) + callee signatures + call graph\tV"
+ },
+ {
+  "index": "16c-platform-function-index",
+  "addr": "0x7E50F101",
+  "row": "0x7E50F101\t29\tUI LED / UI_OUT / UI_SCREEN / jog dial\tleaf: in a loop x18 (first-pass values): u8[0x604F3F7C] = 1; u8[0x604F3F7D] = 1; helper of 0x7E50D7CD (only caller), under 0x7E503DD4 (Usr0 startup task: starts ~60 tasks in a fixed order (OlyTaS)\tleaf summary (straight-line, no call) + call graph\tV"
+ },
+ {
+  "index": "16c-platform-function-index",
+  "addr": "0x7E5A5EF5",
+  "row": "0x7E5A5EF5\t334\tTAKE sequencer states and handlers\thelper of 0x7E5A605B (only caller), under 0x7E5A2A6F (TAKE_MAIN handler for StlLiveTake B-event 0x1B)\tcall graph\tV"
+ },
+ {
+  "index": "16c-platform-function-index",
+  "addr": "0x7E601ECF",
+  "row": "0x7E601ECF\t108\tAF (contrast AF / FCS_MOVIE / fcs shell)\tprobably C-AF re-init: work+6=0x1000, 0x7E623591, 0x6054C15C=0x2706, 0x6054C15E=1, lens sync 0x7E60FEFF(4,0), resets 0x7E5F9ABA/0x7E5F9A52/0x7E623A75/0x7E5FAEED/0x7E5FB2EB/0x7E5FEEC2, wob+1300=0\tD5 read (af2): code\tI"
+ },
+ {
+  "index": "16c-platform-function-index",
+  "addr": "0x7E59F4A8",
+  "row": "0x7E59F4A8\t66\tTAKE sequencer states and handlers\tshared helper, 3 callers (TAKE sequencer states and handlers 3)\tcall graph\tV"
+ },
+ {
+  "index": "16c-platform-function-index",
+  "addr": "0x7E5BA1FE",
+  "row": "0x7E5BA1FE\t281\tFAT file system (incl. exFAT format)\texFAT FAT writer (once per FAT copy); helper of 0x7E5B9DD7 (exFAT format sequence) (only caller)\tcurated: 14b \u00a76 + call graph\tV"
+ },
+ {
+  "index": "16c-platform-function-index",
+  "addr": "0x7E533D12",
+  "row": "0x7E533D12\t37\tlens module (tasks, command layer, shell, firmup, controller) > lens memory pool\thelper of 0x7E533B5B (only caller), under 0x7E533AD2 (lens pool allocator core (errors 0x14009001 / 0x14009004))\tcall graph\tV"
+ },
+ {
+  "index": "16c-platform-function-index",
+  "addr": "0x7E54D4C5",
+  "row": "0x7E54D4C5\t10\tIMG image-job library\twrapper: calls 0x7E5064E8 (debug print %s %s (2)); shared helper, 2 callers (IMG image-job library 2); e.g. 0x7E56DA08 (YC2 Recview RGB gamma (checks R=G=B))\tshape: thunk (one call) + call graph\tV"
+ },
+ {
+  "index": "16d-core-play-overlay-index",
+  "addr": "0x7E91D925",
+  "row": "0x7E91D925\t17\tprobably: returns 1 if the link's tx packet list (+232) is non-empty\tD5 BT decode (bt/hand_bt.tsv): code\tI (D6: demoted; V)\tS\tL2CAP"
+ },
+ {
+  "index": "16d-core-play-overlay-index",
+  "addr": "0x7E68029F",
+  "row": "0x7E68029F\t42\tunder case 0x60000 of 0x7E67F3E6 0x7E67F49F (direct caller)\tfeatures+call graph\tV\tC\tC camera API api_*.c (api_exec_start queue table)"
+ },
+ {
+  "index": "16d-core-play-overlay-index",
+  "addr": "0x7E7071EF",
+  "row": "0x7E7071EF\t50\tprobably: index of GUI value d0 in the gui[] array of record a0; 0 when not found or no gui[]\tD5 mcon/Apical decode (mcon/hand_mcon.tsv): code\tI (D6: demoted; V)\tS\tvalue-list engine and the two ROM\u2192RAM hash tables"
+ },
+ {
+  "index": "16d-core-play-overlay-index",
+  "addr": "0x7E67DD54",
+  "row": "0x7E67DD54\t118\tunder `setExclusion` 0x7E9D6160 (direct caller), `api_event_Check_EntryCustomEvent` 0x7E67DDCA (2 levels up)\tfeatures+call graph\tV\tC\tC camera API api_*.c (api_exec_start queue table)"
+ },
+ {
+  "index": "16d-core-play-overlay-index",
+  "addr": "0x7F0933B0",
+  "row": "0x7F0933B0\t25\tunder `tpc_control` 0x7F089208 (2 levels up)\tfeatures+call graph\tV\tC\toverlay B: PTPCOM transaction engine, ptp_register 0x7F08E975, PTP/MTP op handlers (I, position)"
+ },
+ {
+  "index": "16d-core-play-overlay-index",
+  "addr": "0x7E92A8CE",
+  "row": "0x7E92A8CE\t57\tprobably: HCI Write_Authentication_Enable (0x0C20), 1 param bytes; waits Command_Complete; completion cb 0x7E92BA2E\t15d tsv hci-cmd-builder\tI (D6: demoted; V)\tS\tBlue SDK ME + SEC"
+ },
+ {
+  "index": "16d-core-play-overlay-index",
+  "addr": "0x7E6DCF29",
+  "row": "0x7E6DCF29\t32\tunder `MOV_TASK task` 0x7E6C33B5 (3 levels up)\tfeatures+call graph\tV\tC\tmovie mov*.c (MOV_* tasks, recorders, AVI/MOV writers, movie playback)"
+ },
+ {
+  "index": "16d-core-play-overlay-index",
+  "addr": "0x7E690F4B",
+  "row": "0x7E690F4B\t188\tprobably: face-table selector: mode 1 (clip) returns tables 0x605A6684/0x605A66AA and converts the clip offset (face_clip_x/y, \u00f74608\u00d7640, \u00f73456\u00d7480); else tables 0x605A6638/0x605A665E, offset 0; stores the HS grid params in AE work +780..+786\tD5 exp decode (exp/hand_exp.tsv): code + strings\tI (D6: demoted; V)\tS\tEXP_MOVIE `exp` module (live-view/movie AE)"
+ },
+ {
+  "index": "16d-core-play-overlay-index",
+  "addr": "0x7E94FB41",
+  "row": "0x7E94FB41\t52\tprobably a `aud ld_clear` shell subcommand handler (it is called after a string compare with \u00abld_clear\u00bb in 0x7E94F73A; the full command path is not traced); entry \u00ab[PLAY]clear memory data(top address = M_SOUNDWORKBASE)\u00bb of {fn,name} table 0x7EBBEC80\tshell decode (shells.py)\tI\tS\tAudio: bridge, control, WM8946 codec driver, DSP, FSC DMA, sequences, WAV/AC3 tools, AUD_*"
+ },
+ {
+  "index": "16d-core-play-overlay-index",
+  "addr": "0x7E63DAD9",
+  "row": "0x7E63DAD9\t19\tfunction passed to the imgdev queue engine 0x7E63E8ED (I: completion callback); registered by 0x7E63DAA3; callback/pointer: address loaded as an immediate by 0x7E63DAA3\tcallback by consumer (D5: code immediate passed to a known API)\tI\tS\timgdev driver: per-command sequencers, IMGDEV_DRIVER dump 0x7E63E4B2, queue engine 0x7E63E"
+ },
+ {
+  "index": "16e-graphics-avpi-index",
+  "addr": "0x7EE36B89",
+  "row": "0x7EE36B89\t301\t3D engine core > MB/MT format loaders\tMT animation-loader sub-parser: up to 3 key arrays (u16 count, alloc, fill, ascending-time check); helper of 0x7EE35EE6 (format loader for MT files)\tcurated: review r5 F074 + call graph\tV\tS"
+ },
+ {
+  "index": "16e-graphics-avpi-index",
+  "addr": "0x7EE83BAC",
+  "row": "0x7EE83BAC\t18\tC3D framework > class code > in the code block of class id 51 (by position, I)\twrapper of 0x7EE83AF0 (calls vtable slots of the argument a1: +0 \u00d71, +12 \u00d71; 2 of its 2 indir); helper of 0x7EE83901 (vtable slot +8 = read of C3D class id 51; override chain: root/ancesto); calls 0x7EE83AF0 (calls vtable slots of the argument a1: +0 \u00d71, +12 \u00d71; 2 of its 2 indir)\tshape + callee role + call graph\tV\tS"
+ },
+ {
+  "index": "16e-graphics-avpi-index",
+  "addr": "0x7EEC3A8B",
+  "row": "0x7EEC3A8B\t484\tAVPI > SCA session control\tvtable slot 29 (+116) of AVPI class vt 0x7F031B54; helper of 0x7EEC3D55 (vtable slot 32 of AVPI class vt 0x7F031B54); calls 0x7EEC40A3 (vtable slot 45 of AVPI class vt 0x7F031B54)\tAVPI vtable 0x7F031B54 word 0x7F031BC8 + call graph\tV\tS"
+ },
+ {
+  "index": "16e-graphics-avpi-index",
+  "addr": "0x7EE74066",
+  "row": "0x7EE74066\t53\tC3D framework > class code\traises C3D error 2 (null argument); helper of 0x7EE73A66; under 0x7EE72CE6 (vtable slot +12 = copy of C3D class id 57; override chain: root/ancest) (2 levels up)\terror-raise call with constant code + call graph\tV\tP"
+ },
+ {
+  "index": "16e-graphics-avpi-index",
+  "addr": "0x7EE8541F",
+  "row": "0x7EE8541F\t37\tC3D framework > class code > in the code block of class id 49 (by position, I)\thelper of 0x7EE8556F (fini of C3D class id 49); calls 0x7EE7F27B (I: C3D string fini wrapper -> 0x7EE7F057)\tcall graph\tV\tP"
+ },
+ {
+  "index": "16e-graphics-avpi-index",
+  "addr": "0x7EE54E83",
+  "row": "0x7EE54E83\t87\t3D engine core > maths helpers (extent I)\tset a 4x4 float matrix to identity (1.0f on the diagonal) and its flag bytes +64..+66 = 1 (32 callers); shared helper, 32 callers\tcurated: D5 read + call graph\tV\tS"
+ },
+ {
+  "index": "16e-graphics-avpi-index",
+  "addr": "0x7EE534DD",
+  "row": "0x7EE534DD\t76\t3D engine core > type modules\tshared helper, 2 callers\tcall graph\tV\tC"
+ },
+ {
+  "index": "16e-graphics-avpi-index",
+  "addr": "0x7EE944C6",
+  "row": "0x7EE944C6\t6\tAVPI > framework classes\tvtable slot 1 (+4) = GetTypeId \u2192 0x0B04 of AVPI class vt 0x7F02FB20 type 0x0B04; returns the constant 0xB04\tAVPI vtable 0x7F02FB20 word 0x7F02FB24 + shape\tV\tS"
+ },
+ {
+  "index": "16e-graphics-avpi-index",
+  "addr": "0x7EE6DEAF",
+  "row": "0x7EE6DEAF\t39\tC3D framework > class code > in the code block of class id 43 (by position, I)\town vtable fill of C3D class id 43 (60-B instance, vt16); helper of 0x7EE6DF4D (vtinit of C3D class id 43: chain 0x7EE75DA2 \u2192 0x7EE6EADF \u2192 0x7EE6DEAF)\tC3D ctor/vtinit chains + call graph\tV\tS"
+ },
+ {
+  "index": "16e-graphics-avpi-index",
+  "addr": "0x7EEC46D8",
+  "row": "0x7EEC46D8\t210\tAVPI > SCA session control\tAVPI result codes 0x80000001, 0x80000003, 0x80000008; helper of 0x7EEC3F73 (vtable slot 25 of AVPI class vt 0x7F031B54)\terror constants + call graph\tV\tP"
+ }
+]
