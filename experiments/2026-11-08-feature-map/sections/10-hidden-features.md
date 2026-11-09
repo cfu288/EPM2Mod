@@ -53,8 +53,8 @@ Detail is in 10a–10f. Coordinator spot checks are in `../NOTES.md`.
 
 | Feature | First pass | Now | Evidence (key) |
 |---|---|---|---|
-| Bluetooth/PENPAL | Dormant; gate = I/O pin 0x1709 | **Hardware-gated, complete.** 0x1709 is the "Cube" bit of the external-device byte, set only when an accessory with ID 0x0103 answers | |
-| "E-PM2 has no accessory port" | product knowledge | **UNRESOLVED from firmware.** The E-PL5 (which has the port) carries byte-identical menu and accessory tables | Top menu table (370 B) and accessory ID tables (148 B) found byte-identical in the E-PL5 (checked by hand) |
+| Bluetooth/PENPAL | Dormant; gate = I/O pin 0x1709 | **Hardware-gated, complete: active with a PENPAL attached** (the E-PM2 has the port). 0x1709 is the "Cube" bit of the external-device byte, set only when an accessory with ID 0x0103 answers | |
+| "E-PM2 has no accessory port" | product knowledge | **WRONG (corrected 2026-11-09).** The firmware could not decide it, since the E-PL5 tables are identical, but Olympus's v1.2 release notes add VF-4 EVF support, so the port exists | Top menu table (370 B) and accessory ID tables (148 B) found byte-identical in the E-PL5 (checked by hand) |
 | Accessory-port menu | Dormant | **CORRECTED → hidden by a setting default** (info 394 = 0), as on the E-PL5 | |
 | EVF / mic / accessory strobe | Dormant | **Hardware-gated**: one accessory-ID scan decides all of them | |
 | Eye-Fi, FlashAir SPC | Active (inf) | **Code complete.** SPC is a Playback-menu row; show/hide rules not traced | |
@@ -127,7 +127,7 @@ About 20 earlier claims were wrong or incomplete. They fall into three kinds:
 | USRTEST tasks | Nothing starts them |
 
 **What the firmware cannot settle:**
-- **Whether the E-PM2 has an accessory port.** The E-PL5 carries identical tables, so only the hardware can tell.
+- ~~Whether the E-PM2 has an accessory port.~~ Answered later: yes (v1.2 release notes add VF-4 support).
 - **Whether HDR BKT appears on the camera.**
 - **How SS_DEBUGMENU is entered.**
 

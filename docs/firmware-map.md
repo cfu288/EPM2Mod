@@ -142,8 +142,8 @@ A map of what the main firmware contains and where. This is for learning only: n
 | Touch panel (and its own firmware update) | Active | TOUCHPANEL 0x7E6BCF84 | | 08 |
 | Eye-Fi | Active (inf) | EYEFI task, card control files | | 02, 08 |
 | FlashAir "SmartPhone Connection" (SPC) | Active (inf) | SPC_MAIN 0x7F0A7AF7 | Edits `\SD_WLAN\CONFIG` | 07, 08 |
-| Bluetooth via PENPAL ("cube") | **Hardware-gated** | BT_CTRL 0x7E8FF96E, gate 0x7E91367A | Gate = "Cube" bit of the external-device byte, set only when accessory ID 0x0103 answers. Whether the E-PM2 has the port cannot be told from firmware (E-PL5 tables identical) | 05, 10e |
-| EVF, SEMA-1, accessory-port menu | Hardware-gated; menu hidden by setting default | Accessory-ID scan 0x7E464850; info 394 = 0 hides the menu | Same as E-PL5 | 10e |
+| Bluetooth via PENPAL ("cube") | **Active with the accessory attached** | BT_CTRL 0x7E8FF96E, gate 0x7E91367A | Gate = the "Cube" bit of the external-device byte, set when accessory ID 0x0103 answers on the accessory port. The E-PM2 **has** an accessory port: Olympus's v1.2 release notes add VF-4 EVF support. The earlier "no accessory port" was a product-knowledge error | 05, 10e, 11 |
+| EVF (VF-2/VF-3/VF-4), SEMA-1, accessory-port menu | **Active with the accessory attached**; menu hidden by setting default | Accessory-ID scan 0x7E464850; info 394 = 0 hides the menu | VF-4 support was added in v1.2 (official release notes) | 10e, 11 |
 | IEEE 1394 | Stub | PC_I1394, PC_1394PNP | Drain their queue and exit | 08 |
 
 ### Platform, debug and service
@@ -180,7 +180,7 @@ A map of what the main firmware contains and where. This is for learning only: n
 
 - **Task table.** First read one field off, and the last rows were renamed from their strings. Section 01 found the real `{id, …, entry, …}` layout from the boot code's labels. Checked in the bytes: the only TA_ACT row is the boot task.
 - **Function database.** Pointer and integer tables in 0x7EEE–0x7F02 gave about 1,300 false functions. Offset-aligned pages hid the BASIC overlay. Both fixed: data pages now include tables, and pages are aligned to runtime addresses.
-- **PENPAL.** The first brief assumed the E-PM2 supports PENPAL. It has no accessory port, so that code is dormant.
+- **PENPAL / accessory port.** The first brief said the E-PM2 supports PENPAL; a correction then said it has no accessory port, so the code was dormant. **That correction was itself wrong:** Olympus's v1.2 release notes add VF-4 EVF support, which needs the accessory port. The PENPAL/EVF code is active when the accessory is attached.
 - **Movie limit units.** "Inferred" in the first analysis; now settled as 512-byte sectors (section 04).
 
 ## 6. Main open questions

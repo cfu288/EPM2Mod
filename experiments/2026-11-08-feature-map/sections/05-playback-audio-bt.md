@@ -1,3 +1,5 @@
+> **Coordinator note (2026-11-09):** this section calls the Bluetooth code "probably dormant on the E-PM2" because the brief said the body has no accessory port. That was wrong: the E-PM2 has one (v1.2 release notes add VF-4 support). The BT stack is active when a PENPAL is attached.
+
 # 05 — Playback engine, audio, Bluetooth (PENPAL), OBEX, effects
 
 Scope: block 0, runtime 0x7E8E1020–0x7E966000, plus the string/rodata area 0x7EBA1020–0x7EBE1020.

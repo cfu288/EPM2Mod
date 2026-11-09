@@ -1,3 +1,5 @@
+> **Coordinator note (2026-11-09):** the open question "does the E-PM2 have an accessory port" is answered: **yes**. Olympus's v1.2 release notes add VF-4 EVF support. See section 11.
+
 # 10e — Connectivity re-check: accessory port, PENPAL, EVF, Eye-Fi/FlashAir, USB modes, 1394, CEC, firmware files
 
 Method: the strict method of section 09 (code, reachability, cross-body, external only as support, audit of prior claims).
