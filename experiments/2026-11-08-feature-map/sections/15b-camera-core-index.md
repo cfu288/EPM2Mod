@@ -267,7 +267,7 @@ Tables per owner: HDMI/display/touch 40, movie 34, IMG 25, AF (FCS_MOVIE/IAF/con
   - cam_shutter.c is 0x7E6557CE–0x7E6561D9.
   - cam_timer.c is 0x7E66226E–0x7E6629A7.
 - **Regions table:**
-  - Row ~~0x7E621020–0x7E6A1020~~ → 0x7E6211E1–**0x7E6A935C** (the row start is the first camera-core function 0x7E6211E1, as the regions table now has it): the exp module (EXP_MOVIE) runs to 0x7E6A935C. (D4 2026-11-09)
+  - Row ~~0x7E621020–0x7E6A1020~~ → 0x7E6211E1–**0x7E6A935C** (the row starts at 0x7E6211E1; ~~it is the first camera-core function~~ 0x7E6211E1–0x7E627E9E is AF/FCS code, and cam.c starts at 0x7E627E9F; 16c §1, cycle 3 2026-11-09): the exp module (EXP_MOVIE) runs to 0x7E6A935C. (D4 2026-11-09)
   - Row ~~0x7E6A1020–0x7E70B000~~ (now 0x7E6A935D–0x7E70B3F7 in the regions table) starts at **0x7E6A935D** with the HDMI driver; the display, touch and HDMI tasks follow, and `mov*.c` starts at 0x7E6C3955. Its label "Movie (`mov*.c`)" first was wrong for the part before 0x7E6C3955. (D4 2026-11-09)
   - Inside the camera-core row, name mdet 0x7E666C5B–0x7E674DF4 and res 0x7E674DF5–0x7E675D98 (§4).
 - **03 overview / §7b:**
