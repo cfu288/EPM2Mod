@@ -2,6 +2,20 @@
 
 **Goal:** high confidence in how each part of the firmware works, checked by adversarial review.
 
+## Status (2026-11-09, after round A10)
+
+| Criterion | Result | Met? |
+|---|---|---|
+| Breadth: ≥ 80 % explained or partly in a fresh blind sample | C5: **100 %** (80/80) | yes |
+| No contradictions in a fresh blind sample | C5: **0** (C2–C4 had 2–4, all range labels; fixed by the L1 boundary lint) | yes |
+| ≥ 50 % explained (function-level role) | C5: **32.5 %**; flat at 25–33 % since C2 | **no** |
+| 0 wrong in the latest claim audit of each section | 01–08 (A1), 11 and 12 (A10), 13a–f (A5), 14a/b/d/e (A6), 14c (A7), 15a/15d (A8), 15c (A10): **0 wrong**. 09a/09b, 10d/10e and 15b had wrong claims in A10; fixed but **not yet resampled** | mostly |
+| Boundary lint (`scripts/boundary_lint.py`) | 1,323 ranges; **15 hard hits**, each explained in `audit/fixes-L1-b.md` §3 or as a span or data run | yes |
+
+**What still fails, and why.**
+- **The explained share:** a random function gets a specific role from the map about a third of the time. The map places all of them correctly, and the shape catalogues and indexes (13c/14c/15a–15d) explain the generated and framework code. What remains is ~74,500 functions of feature logic, driver internals and GUI methods with no strings, one role at a time.
+- **Error-prone claims:** the claims most often wrong in audits are "all/only/none/every" statements in the dense indexes (15b, 09, 10).
+
 ## What "high confidence" means here
 
 A region of block 0 counts as understood when all of the following hold:
