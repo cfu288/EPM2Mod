@@ -1,0 +1,179 @@
+# 14c — C++ app layer: protocols between components, capabilities, devices and threads
+
+**Scope:** block 0, the C++ app layer 0x7E966000–0x7EBA0AA8 (Tra / Ope / Cap / Cmp / Com / Ctg / Dev), building on sections 06 (features) and 13c (framework shapes). This section explains *how the classes talk to each other*: interfaces, observers, the boot protocol, the shutter path to TAKE, the event-forward router and its threads. It answers the coverage-round C2 gaps (round2-review2/3).
+**Labels:** **V** = verified (read in code or bytes); **I** = inferred (strings, names, layout, heuristic counts).
+**Event names:** new ids are in `14c-event-ids-extra.tsv` (29 rows). The role names there are mine, not Olympus names, unless they start with `evTra`.
+**Scratch:** `.../scratchpad/d2/app/`: `fw.py`/`q.py` loaders on build/map; `gi.py` (getInstance → class map, `gi.txt`); `rel.py` (component field → capability); `slots.py` (slot use counts); `shapes.py` (shape counts); `lb.txt` (Live Bulb table); `mkextra.py` (TSV).
+
+## 1. Area and boundaries (corrections C2-6)
+
+| Range | Contents | Basis |
+|---|---|---|
+| 0x7E966000–0x7E9698EB | HIGHLEVEL_MAIN, HLS OS wrapper (callers of kernel 0x7E44xxxx, e.g. 0x7E96985A), logger, growable array | V |
+| **0x7E9698EC**–~0x7E9EA380 | `Tra*` package: first function **0x7E9698EC** `clearIntervalShootingState` (clears bits of 0x602B0CDC; callers in CmpSqp). Not ~0x7E96998B (13c). Then Ope/Api classes, `sdk api`, `app_check_*` | V start |
+| ~0x7E9EA381–0x7EB7FC90 | Cap*, CmpSts*, CmpSqp*, Cmp* (one file per class; true file starts in §1.1) | V |
+| 0x7EB7FC91–**0x7EB84344** | `CmpSts_SingleStillShootingSequence_NEW` chart; its last function 0x7EB83ECB ends with `ret` at 0x7EB84342 (not ~0x7EB854FF) | V |
+| **0x7EB84345–0x7EB85562** | **Com_EvSenderManager (static module, no `this`)**: sender 0x7EB84345 (4,143 B; maps APP_EVENT codes to 41 event classes 16070…27522; only caller HLS_EVENT 0x7E96DD58), "set wait code" 0x7EB85398/0x7EB8543C (callers CapThr 0x7EA1D60D/0x7EA1D68E), `Com_EvSenderManager buffer overflow!` 0x7EB854E0. All use globals 0x602B48A8–0x602B48E0 | V |
+| 0x7EB85563–0x7EB8C265 | Com_ framework (event buffer ctor 0x7EB85563, `buffering event` 0x7EB85594, `resend event` 0x7EB855C7, Com_ManagersSubTransition 0x7EB8573D …) | V |
+| 0x7EB8C265–**0x7EB93385** | `Dev*` device classes part 1; the last Dev string user is `DevSor::stop()` 0x7EB93362, then 7 six-byte setters 0x7EB93386–0x7EB933AA and small DevSor helpers to 0x7EB93422 | V |
+| **0x7EB93423**–0x7EBA0AA8 | Ctg categories: starts with the function-mode category getInstance 0x7EB93423 (852-B singleton 0x602B49C4, only caller `Cab_CameraBase::functionModeState`), not ~0x7EB93A80 (13c §1). Category getInstances 0x7EB93423, 0x7EB937D3, 0x7EB967DA, 0x7EB96B3C, 0x7EB9C640, 0x7EB9D6E3 (singletons 0x602B49C4–0x602B49D8) | V |
+
+**1.1 True file starts (V).** modules.tsv `first_fn` is the first function that *names* the file. A class file really starts at its `getInstance` (singleton classes) or at its ctor (classes embedded as members). Rows that start earlier than modules.tsv says:
+
+| File (modules.tsv first_fn) | True start | | File (first_fn) | True start |
+|---|---|---|---|---|
+| CmpSts_MfAssist (0x7EB7DEB9) | ctor **0x7EB7D14B** (member of the shooting facade 0x7EB7A703, no getInstance) | | CmpEAsp (0x7EAB9261) | getInstance 0x7EAB8802 |
+| CapDpc_DisplayControl (0x7E9EE86C) | getInstance 0x7E9EE544 | | CmpEBea (0x7EABC982) | getInstance 0x7EABC724 |
+| CapThr_ThroughImage (0x7EA1852F) | ctor 0x7EA1831E | | CmpPCal (0x7EB021F2) | getInstance 0x7EB015FF |
+| CapTak_Take (0x7EA362F8) | getInstance 0x7EA32D19 | | CmpPct (0x7EB181C1) | getInstance 0x7EB16FF4 |
+| CapRev_RecView (0x7EA46813) | ctor 0x7EA46704 | | CmpPEvc (0x7EB2511F) | getInstance 0x7EB2037C |
+| CmpSts_3dImageController (0x7EA6E566) | ctor 0x7EA6D23C | | CmpPli (0x7EB2FBB2) | getInstance 0x7EB2ECD0 |
+| CmpSts_EPortraitShootingEditer (0x7EA70126) | ctor 0x7EA6EC03 | | CmpPLgh (0x7EB34D9B) | getInstance 0x7EB33B24 |
+| CmpSts_LiveViewZoomController (0x7EA71AF9) | ctor 0x7EA70D5B | | CmpPPho (0x7EB47A3B) | getInstance 0x7EB423AF |
+| CmpSts_RecViewController (0x7EA75B1B) | ctor 0x7EA75054 | | CmpPRec (0x7EB4C862) | getInstance 0x7EB4B882 |
+| CmpCst_Function (0x7EAA7E9E) | ctor 0x7EA9F812 | | CmpPSel (0x7EB517F9) | getInstance 0x7EB4F77F |
+| Cmp_ComponentManagerWithBoot (06: 0x7EA7CB15) | ctor 0x7EA7C89C – observers end 0x7EA7E66A | | CmpPls (0x7EB5E9AA) | getInstance 0x7EB58D49 |
+
+The shooting facade 0x7EB7A6C8/0x7EB7A703 (singleton 0x602B48A4, 6,188 B) embeds LiveViewZoomController (+112), MfAssist (ctor 0x7EB7D14B), MultiThrough (0x7EB7EC0B) and SingleStillShootingSequence_NEW (0x7EB7FC91) (V: ctor calls). `gi.py` labels 0x7EB7A6C8 "LiveViewZoomController" because that is the first known ctor it calls; the real class is CmpSht_ShootingComponent_NEW (I).
+
+## 2. Components and protocols
+
+### 2.1 Capability = facade + reactive + interface (V)
+
+Every Cap class follows one pattern (verified on CapBoo, CapFls, CapTak, CapPls, CapImg, CapDpc):
+- **getInstance** (58–59 B): `mov (RAM),d0; …; new(N); facade ctor; store; register; return 0x… adjust` — the last call is a 7-byte `add K,a0; retf`, so callers get an **interface sub-object at facade+K**, not the reactive.
+- **Facade ctor**: OMReactive base 0x7EBA6375, own vtable, observer lists (0x7EB86DA1), the embedded reactive Cap class (e.g. CapFls at facade+112, CapBoo at +156), member observers, the interface (its ctor stores the interface vtable and clears +4…), then **initRelations** (§3).
+- **Interface vtable slots (V on CapBoo 0x7EC3BAE8 and CapFls 0x7EC3C0C0):** 0 = add observer to the *init-OK* list (via 0x7EB88DF1), 2 = add to the *init-error* list (0x7EB88DFF), 4/6 = remove them, 7 = `gen(ev)` to the reactive (0x7EB871B1), 9… = `addObserver` to the class's notification lists (`mov (N,a0),a0; call 0x7EB86DF0`), then the matching `removeObserver` (0x7EB86FB4), then forwarders `mov (4|52,a0),a0; call <method>` to real methods.
+
+**Singleton directory (V, `gi.txt`, 140 getInstances).** RAM slots follow link order. Interface offsets used in the protocols below:
+
+| getInstance | RAM | Class | iface | | getInstance | RAM | Class | iface |
+|---|---|---|---|---|---|---|---|---|
+| 0x7E9EB318 | 0x602B2878 | CapBuf_BufferManager | +376 | | 0x7EA3C136 | 0x602B3014 | CapBoo_BootManager | +456 |
+| 0x7E9EE544 | 0x602B2880 | CapDpc_DisplayControl | +440 | | 0x7EA3DCBD | 0x602B3020 | CapFls_Flash (strobe) | +520 |
+| 0x7E9EFAC8 | 0x602B2884 | CapImg_ImagePlayer (Cap_ImagePlayerFactory) | +2736 | | 0x7EA4080B | 0x602B302C | CapIod_IODevice | +504 |
+| 0x7EA0E1B8 | 0x602B2E14 | CapDpv_DisplayView | +6124 | | 0x7EA615EC | 0x602B3244 | sound control (§2.7) | +388 |
+| 0x7EA104DE | 0x602B2E44 | CapMed_MediaInfo (I: file tag inside) | +352 | | 0x7EA37F85 | 0x602B3008 | CapThr_ThroughImageFacade | +968 |
+| 0x7EA27EBF | 0x602B2F94 | CapPls_PlayState | +392 | | 0x7EA32D19 | 0x602B3004 | CapTak_Take | +1700 |
+| 0x7EA2372A | 0x602B2F64 | CapPDB_PlayOLDB | +720 | | 0x7EA55350 | 0x602B321C | CapGSld_GpuSlideShow | +1380 |
+| 0x7EA30750 | 0x602B3000 | unnamed (I: CapPlt_PlayTrimming, by position and users) | +488 | | 0x7E974D11 | 0x602B1FE8 | **EVFW router** (§2.4) | — |
+
+### 2.2 Boot / mode-change protocol, end to end (C2-1)
+
+**Actors (V):** every component derives from `Cmp_ComponentManagerWithBoot` (CM, ctor 0x7EA7C89C). CM initRelations 0x7EA7DBFB stores CapBoo iface at +472, CapIod at +480, CapFls at +476 and sets the target of its 6 member observers. The subscribe step 0x7EA7CD32 (caller 0x7EA7A008) adds them to the capabilities; 0x7EA7D617 removes them.
+
+| CM member | Observer class / update() | Event made | Registered on | Notified by |
+|---|---|---|---|---|
+| +328 | Com_ 0x7EB85DC3 / 0x7EB85DDF | **3346** init OK | CapBoo & CapFls iface slot 0 | Cap init chart, state 2 on 11562 (13c §4.3) |
+| +424 | Com_ 0x7EB86084 / 0x7EB860A0 | **3344** init error | slot 2 of both | init chart on 11563 |
+| +376 | 0x7EA7E595 / 0x7EA7E5B5 | **12063** boot step done | CapBoo slots 9/10 (lists BootManager+224/+228) | BootManager states 7/10/12 |
+| +352 | 0x7EA7E52A / 0x7EA7E54A | **12069** strobe state | CapFls slots 9–13 (Fls+356/+376/+380/+384/+388) | §2.3 |
+| +448 | 0x7EA7E600 / 0x7EA7E620 | **12068** flash mode re-applied | CapFls slot 14 (Fls+396) | §2.3 |
+| +400 | Com_ 0x7EB85E8F | (not traced) | CapFls slot 1 (I: the slot word points into a function) | — |
+
+**Boot device (V):** vtable 0x7EC90B30, singleton 0x602B49E8 (getInstance 0x7EBA12CE; the "object with vtable 0x7EC90B30" of section 10f). Slot 0 = `Usr2(0xFFFFFF)` (0x7E68CD13 → 0x7E505005, load all overlays) then notify list +8; slot 1 = `Usr2(1)` (overlay A + USTART3) → list +16; slot 2 = `Usr2(2)` → +12; slot 3 = `Usr2(0x1000000)` (ADJSLF) → +20; slots 4–7 add observers to those lists. CapBoo's facade observers +408 (update 0x7EA3CA49 → **4741**) and +432 (0x7EA3CAAE → **4742**) sit on lists +8 and +16.
+
+**CM statechart** (`rootState_active` +212; states verified from the dispatcher 0x7EA7DE6E and entries):
+
+| Step | State (entry) | What happens (V) |
+|---|---|---|
+| 1 | 3 Idle (0x7EA7E266) | on **11761** evTraStart: call own vt+188 hook → state 2 → 9 |
+| 2 | 9 (0x7EA7E1F1 → 0x7EA7CE86) | GEN evTraStart to CapBoo iface (+472 vt+28); wait for **3346** (0x7EA7E203) → 8 |
+| 3 | 8 (0x7EA7E198 → 0x7EA7CFCD) | send **4761** (full-boot request) to CapBoo. CapBoo 0x7EA3C9AD → state 10 0x7EA3C947: device slot 0 = Usr2(0xFFFFFF), notify +224 at once; device → 4741 → CapBoo state 12 (notify +224 again). Shooting components send **4762** instead (0x7EA8241C, 0x7EB7B412): CapBoo state 8 0x7EA3C8C0 → device slot 1 = Usr2(1) → 4742 → state 7 (notify +228) |
+| 4 | 8, on **12063** (0x7EA7E1AA) | clear +272, own vt+184 hook, `startCapabilityCollection` 0x7EA7D7AD: GEN evTraStart (0x7E96B13C) to each capability in collection +240 and each sub-transition in +256 (`****startCapabilityCollection contain NULL pointer`) |
+| 5 | 7 (0x7EA7E089) | count replies: `startTransition... %d/%d` (0x7EA7D00E: +272 vs +244 + +260); post 12067 when all are in; **5,000 ms timeout** (+516) |
+| 6 | 7 on 12067 or timeout (0x7EA7E0CA) | 0x7EA7D270 check, 0x7EA7D6EB → state 10 (0x7EA7CEC7): GEN **11562** to self |
+| 7 | parent handler 0x7EA7E00F | 11562 → state 4 (running, 0x7EA7E30F); 11563 → error path 0x7EA7DB63 → 3 |
+| 8 | 4 Running (handler 0x7EA7E334) | 12069 → **26798** to +484; 12068 → **26797** to +484; 11769 evTraStop → stop path (0x7EA7E323: vt+196 hook, state 6 counts stop replies +308 vs +280 + +296, 12067 when done); also 13363/13365 (base ids of 7 and 40 derived events), 11566, 11761, 12962 |
+
++484 (getter 0x7EA7DD09) is the API-side reply object; 26797/26798 are each tested only in the API callback dispatcher **0x7E995C0B** (OlyHfwOpeShootRsbCommon) (V). The play components that also create 4761 (0x7EAAB9C4, 0x7EAAE945) run the same boot request from their own charts (I). `Cmp_PictBridgeComponent` has its own 12063 observer (0x7EAEF4CA, vtable word 0x7EC6944C) (V).
+
+### 2.3 Strobe notifications 12068 / 12069 (V)
+
+CapFls_Flash (strobe capability; strings `_flashState`, `checkChargeState()`, `strobeMode == MODE_OFF`) notifies: Fls+376/+380 from 0x7EA3E36B (external strobe attached = `api_rec_Get_External_Strobe_State` 1 → +376, else +380); Fls+384/+388 from charge paths 0x7EA3E3E9/0x7EA3E4B4/0x7EA3E938 (after `api_rec_Charge_Strobe`; info 544 = 1 → +388, 0 → +384; then `api_rec_Calculate_Expose`); Fls+356 from 0x7EA3E90B; Fls+396 from 0x7EA3E6F1, which reads info 16 through `Get_CameraInfo_Simple` 0x7E6FCC91, sets globals 0x605E176C/0x605E1768 around two mcon calls (log `mcon == false -> true` / `true -> false`), then notifies. CM relays them as 12069 / 12068 and answers with 26798 / 26797. **On the API side 26798 ends in an empty method** (0x7E9748ED = `retf`): the strobe-status callback is compiled out. 26797 calls 0x7E975D4B and then API callback (35, 35) through 0x7E96E954 (the CBS name table 0x7EBD3928 gives 35 = `CBS_FINISH_CALENDAR`, which does not fit, so the id space differs; unresolved).
+
+### 2.4 Event-forward router, APP_EVENTs and the three extra threads (C2-1, event 11779)
+
+- **Threads (V, thread-name strings; answers 13c open question 3):** `HLS_CALLBACK` 0x7E96CA56, `HLS_EVENT` 0x7E96DB78 (singleton 0x602B0EE4), `HLS_USER` 0x7E9E762F (OlyHfwUserSettingManager). All three are OMThread (0x7EBA708D) active objects.
+- **APP_EVENT path (V):** tasks and drivers post `(code, value)` through 0x7E880EFF (118 callers, e.g. the 3D stub's 0xF00F0000). HLS_EVENT 0x7E96DD58 (`RECV APP_EVENT [%08X][%08X]`) takes each one and first offers it to **Com_EvSenderManager** 0x7EB84345 (code → event class, sent to the registered receiver or buffered). If that does not consume it, 0x7E96DE42 forwards it to EVFW subscribers (`EVFW TO`), else keeps it in a backup list (`NOT FOUND EVFW BACKUP`, `EVFW FROM BACKUP`).
+- **EVFW router (V):** singleton 0x602B1FE8 (getInstance 0x7E974D11, 482 callers; ctor 0x7E999809, two collections at +4/+20), delivery method 0x7E999883. It handles **11775** register forward, **11776/11777** subscribe (code / range: find or create a 44-byte topic 0x7E9E5384 and add the observer), **11779/11780** unsubscribe (remove the observer; drop the topic when empty), **2201** run an API callback on HLS_CALLBACK, **2205/2206** add/remove a listener (+20), **11794/11795/11800/11801/11802/11803** subscribe/unsubscribe at HLS_USER (all settings, or setting group 0..21), **11805** a record in the HLS_EVENT trace ring. Errors return 0xF0000016.
+- **Correction to review F036:** event 11779 is **unsubscribe**, not publish. CapGSld 0x7EA56A6B unsubscribes its observers +1180/+1156/+1204 from topics **0x04170003/0x04170002/0x04170001**; `gpu_slide_play` 0x7EA56935 subscribes (11776, ctor 0x7E96B3E4) to 0x04170003 with +1180 (V).
+- **Codes 0x0417000x (I, strong):** APP_EVENT codes of the C3D slideshow. The overlay C3D scene code also posts 0x04170001–4 (0x7F09E12F, 0x7F09E19E, 0x7F09E7E7 next to `P3D_Photo_*` strings, 0x7F0A2805) through 0x7F09E235 (`{11, code, arg}` message). App-side use: 3 = play/started (subscribed in `gpu_slide_play`), 2 = page end (`ReceiveEvent PAGE_END` 0x7EA56C84), 4 = end (`gpu_slide_end` 0x7EA56E19), 1 = load request (0x7EA56A1E/0x7EA56B15; `Request Load#` 0x7EA561E4) (I from string neighbours).
+
+### 2.5 From shutter to TAKE, black-out and write (C2-2)
+
+| Step | Where | Evidence |
+|---|---|---|
+| 1 | Key → GUI → OlyApiShooting → `OlyHfwOpeShoot::*` → `evTraReqSht*` request (13361 family) → shooting facade 0x602B48A4 → selected sequence part (`changeSequence` 0x7EA6B124 picks singleton 1..7: Base 0x7EA8A09E, 2 0x7EA9CA9E, 3 0x7EA9D128, 4 0x7EA9CE4F, Eportrait 0x7EA99DDC, 6 0x7EA86682, MultiExposure 0x7EA9A516) | I for the GUI half; V for changeSequence |
+| 2 | changeSequence copies 30 pointers into the part: part field N ← ShootingSequenceBase field N+680 (e.g. +364 ← +1044 = **CapDpc_DisplayControl**, +376 ← CapFls, +388 ← +1068, +412 ← CapPls), and **+432 ← +1112 = CapTak_Take interface** | V |
+| 3 | `setTakePictureSubstate(n)` 0x7EA8F9C8 (0 none, 1 QUICK = full press with no half-press stop (I), 2 QUICK_RELEASE) drives the take-ready requests (review F042) | V (F042) |
+| 4 | `TAKERDY_NORMAL_send` 0x7EA94AF9 → CapTak slot **75** (+300) 0x7EA33ECA: `api_rec_Take_Ready_Ext(kind 0x5000 if sequence flag 0x10000004 is set, else 0x0FFF; sub 1..5)`, stops a running movie effect first, and hands the returned request handle (+692) to 0x7E9E8A3A (role not traced); `TAKERDY_FAST_send` 0x7EA94C22 → slot **73** (+292) = kind 0x3000 "Fast"; `TAKERDY_ABORTPROC_send` 0x7EA94BE8 → slot **72** (+288) 0x7EA33DC7 = kind 0 "End"; if the API returns a handle it sends 11805 to the EVFW router (argument 1) or 11775 to the object at +1324 (otherwise). ABORTPROC first runs TAKERDY_NORMAL when its second argument is 1 | V |
+| 5 | `api_rec_Take_Ready_Ext` 0x7E68BA11 → TAKE_MAIN queue 0x7E43ED96 (03 §, 13e). Kind → message code / log: 0 → 7 `End com`; 16 → 9 `Trig2_Abort`; 0x3CFF → 8 `Start mode/button` (0x0CFF takes a separate branch, not traced); 0x1000 → 3 `Force`; 0x2000 → 4 `Force_PM`; 0x3000 → 5 `Fast`; 0x4000 → 10 `Trig2_Watch`; other kinds (0x0EFF, 0x5EFF, 0x0DFF, 0x5DFF, 0x5000, 0x6000) → a start request with mode 2/6/1/5/4/6 | V constants; meanings from log strings (I) |
+| 6 | The exposure: CapTak `takePicture` 0x7EA34AB9 (`### DevTak_Take:;takePicture`) → `api_rec_Take_Picture` 0x7E687CBC (only caller); the TAKE_* sequencers of 13e run it | V call; sequencing per 13e |
+| 7 | Black-out ON: 0x7EA97FF5 (`BLACK:ON`, trace 0x04000001, PaintBlack flag **0x602B0D20 = 1** via 0x7E96ADC8) → part+364 = CapDpc iface slot **26** (+104) → 0x7E9EE967 → display device (+256) vt+172 = `startPaintBlack` **0x7EB8D5AD**. BLACK:OFF siblings: 0x7EA8FBBA → slot 24 (+96) → device vt+156 = `setPaintBlackFlag` 0x7EB8D45A; 0x7EA900E6 → slot 14 (+56) → device vt+80 = `endPaintBlack` 0x7EB8CDC1. Display-device vtables 0x7EC8DEDC / 0x7EC8E57C (base/derived) | V |
+| 8 | While 0x602B0D20 is set, the GUI draw guard 0x7E96A9B8 (`draw guard. PaintBlack`) skips drawing and `ope::getShootingState` reports it (F043) | V (F043) |
+| 9 | Write: RecordController (0x7EA7822A–0x7EA79762, `recordingNormal/Abort`, `recordMedia`) → REC tasks; result to the API as 26759 `evTraResShtEndShooting` (13c) | I |
+
+### 2.6 Play/Edit component fields (C2-3)
+
+Each `Cmp_*Architecture createActiveRelations` (e.g. EditAspect 0x7EAB8896) fetches singletons and stores them with 7-byte setters (0x7EB147E5…0x7EB14832). `rel.py` resolves +860 = CapPls_PlayState in all 34 architecture functions and +832 = CapImg_ImagePlayer in 30 (the parser misses the other fields of Collage, Evcollection, Photosurf and PlayMovie) (V):
+
+| Field | Capability | Most-used slots (uses in 0x7EAA–0x7EB8) and role |
+|---|---|---|
+| **+860** | **CapPls_PlayState** iface (vtable 0x7EC3760C) | slot 80 (161) = word 0x605E53E0 + 0x605E5404 (current position, I); 45 (81) = fill the 200-entry table at 0x605E71EC with 0xFFFF (clear selection, I); 115 (42) = count at 0x605E7554 (`can_protect` tests > 0, V); 111 (40) = u16 0x605E71E8 (image-overlay select count, string context); 113 (35) = 0x605E7578 + 0x605E5404 (target/relevant picture, `move_relevant`/`move_target` strings); 77 (10) = copy the 60-byte current-index record from 0x605E5380 (F048); 183 = set u16 0x605E758A. All are accessors of one play-info RAM block, about **0x605E5380–0x605E758C** (range from the fields seen, I) |
+| **+832** | **CapImg_ImagePlayer** iface (vtable 0x7EC29CFC) | slot 112 (53) = `app_disp_background(background_no)` 0x7E9F6E7A (the `+832 vtbl+448(37/38/54)` calls set the background screen); 141 (11) 0x7E9F7F9C; 133 (10) 0x7E9F75E4 (allocates); 108 (9); 39 = Exif tag read; 162/163 = face / focus position info |
+| +828 | CapDpv_DisplayView | display layers |
+| +836 | CapMed_MediaInfo (I) | media slot status (F032) |
+| +856 | CapPDB_PlayOLDB | picture DB (stubbed backend, 06 §4) |
+| +868 | unnamed 0x7EA30750 (I: CapPlt_PlayTrimming) | only in EditAspect, EditTrimming, PlaySingle |
+
+### 2.7 Classes the map lacked (C2-4)
+
+- **Playback sound control (unnamed, V)** 0x7EA615EC–0x7EA624CA: getInstance 0x7EA615EC (0x602B3244, iface +388; getName not overridden, so no class name), ctor 0x7EA61627. Users: PlayCom and PlaySlideShow architectures (0x7EB08A33, 0x7EB663F0) and 0x7EA677E7, 0x7EB0F521, 0x7EB12942. Methods: `app_control_sound_set/init_wav_file_info` (record at this+260), `judge_set_sound_volume`, `mode_volume_change_check`, `set_mode_sound_volume[_core]`, `set_sound_volume`, `wav_hdl_alloc/get/info_get/all_clear/load_check` (`api_picfile_Get_SoundObject`), `start_still_load_sound` 0x7EA61D3D (`api_play_Load_Play_Sound`, abort, EVFW 11805 wait). 0x7EA61C56 starts a sound through **`api_sound_dummy_Start_Sound`** (a stub). 0x7EA62077–0x7EA623FF is its copy of the Cap init chart (11565/11562, `CmpInitErr`). Role: loads and plays the WAV attached to a still (voice memo) (I).
+- **CapBuf_BufferManager** 0x7E9EB318–0x7E9EE543: `initializeBuffer` 0x7E9EB41D (gets CapTak), handle alloc 0x7E9EC76D (in-use list append F030), `BM_F_*`/`BM_NULL_*` per-kind allocators 0x7E9EB7BC–0x7E9EC5C0, `HandleList_Start` dump 0x7E9EBF14, `TraceDump_Start` 0x7E9ED35E, conversions `ATH/ATHM/THA/THF` 0x7E9EDB66–0x7E9EDC5F. 0x7E9EBA3D is the trace logger: it prints `BM_Alloc/Alloc_Multi/Free/Free_Pic/Num(%02d)` only when kind bit 1/2/4/8/16 is set in 0x602B287C (the `sdk dbgbm` mask, I) (V).
+- **CapMed_MediaInfo** 0x7EA104DE–0x7EA10D3D: per-slot status update 0x7EA10735 (F032), category map 0x7EA1082F, init chart 0x7EA10A66, `pMediaInfo(NULL)` iface guard 0x7EA10C4F, teardown 0x7EA17103 (F033) (V).
+- **CapThr_ThroughImageFacade** 0x7EA37F85–0x7EA39105: getInstance (26 callers, 980-B singleton), ctor 0x7EA37FC0 (builds CapThr_ThroughImage at +300), initRelations 0x7EA3819B (F034), live-view take control 0x7EA383CF (`api_rec_Continuous_Expose`, `Control_Focus`, `End_Take_Control`), `isActive()` 0x7EA385C1, `Trigger Force stop` 0x7EA388B8 (V).
+- **CapGSld_GpuSlideShow** 0x7EA55350–0x7EA57112: date info 0x7EA5569E, next picture 0x7EA55794/0x7EA56041, slide mode 0x7EA5584B (`api_media_Exist_FA_CipathFlie`), `makeGPUImage` 0x7EA559BB/0x7EA55AF0, random list 0x7EA55BE8, `updatePage` 0x7EA55DDB, aspect 0x7EA55F87, C3D image load 0x7EA561E4 (`api_play_Get_C3d_Draw_Img_Info`, `Notify_C3d_Img_Load_Finish`), states `gpu_slide_play/skip/play_idle/idle/end` 0x7EA56935–0x7EA56E19 (`api_play_Exec_C3d_Anime_Logo`, `Skip/End/Abort_C3d_Anime`) (V strings and calls).
+- **CmpSts_RecViewController** 0x7EA75054–~0x7EA7822A: states prepare 0x7EA75B1B → standby 0x7EA75DF3 → view 0x7EA75EA6 (+ slide wait); Start/Stop RecV 0x7EA75189/0x7EA755C6/0x7EA7560C; `CB EndRecView` 0x7EA7563D–0x7EA757AC; brightness for rec view (`api_tft_Set_Save_Brightness_Mode`, `api_disp_Disp_Set_Brightness_Ext`); transition actions 0x7EA76833–0x7EA76B4B; View-timeout choice F039 0x7EA77185 (§3); `evTraStop recieved! RecViewController is not standby` 0x7EA77085 (V strings).
+- **CmpSts_RecordController** 0x7EA7822A–0x7EA79762 (`start/end/running/requestStop/recordingNormal/recordingAbort/recording`), then **Cmp_ShootingComponentBase** ~0x7EA79Exx–0x7EA7C89B: `AE guard`/`BOOT guard` 0x7EA79EF6, boot step F040, `startShooting` 0x7EA7A5DD, movie effect 0x7EA7A7A0 and tele-converter 0x7EA7AA26, touch AF 0x7EA7AE3E/0x7EA7AE58, AE/AF lock family 0x7EA7AEE8–0x7EA7C047 (`TakeReadyEnd Restart`), `end SubTransition` 0x7EA7C2A4, `transitStartThroughOnStanby() MultiExposure` 0x7EA7C3AC (V strings).
+- **CmpSts_MfAssist** 0x7EB7D14B–~0x7EB7EBxx: answers 11989 `evTraReqShtStartMfAssist` / 11988 `evTraReqShtEndMfAssist` (senders `OlyHfwOpeShoot::startMfAssist` 0x7E9889EB / `endMfAssist` 0x7E9830E0); notification handlers (`NotifyLeftKey`, `NotifySubDial`…) 0x7EB7E77A; states MfAssistOn/Off (V).
+
+### 2.8 GUI member-function-pointer tables and the Live Bulb path (C2-7)
+
+- **Mechanism (V):** 22 GUI static initialisers in the C++ ctor table **0x7F033AC4–0x7F033B7B** (46 entries) fill RAM tables of 8-byte pointer-to-member records `{−1, method}`; for 21 of them exactly one other function loads the table base (the dispatcher). Example: 0x7ED98B95 fills **77** records at **0x602BC070–0x602BC2D7**; the dispatcher 0x7ED99847 (vtable word 0x7EFD101C) clears its output fields and calls all 77 in order (`cmp 77,d2` loop), then writes data-model values (0x7ECEF667). Other tables (init → base, n, dispatcher): 0x7ED86DA6 → 0x602BB094 (22, 0x7ED87077, `IGui_Controler`); 0x7ED8ECE2 → 0x602BB7CC (18); 0x7ED8F435 → 0x602BB8DC (59); 0x7ED912E5 → 0x602BBAB4 (42); 0x7ED9319E → 0x602BBCA0 (60); 0x7ED94F0D → 0x602BBE80 (43); 0x7ED9D151 → 0x602BC2D8 (46, 0x7ED9D844); 0x7EDC2829 → 0x602BC5A4 (3, `Warning_Viewer::Update`); 13 smaller ones (1–7 records). fwmap shows 0 callers for all these methods because the only reference is the `mov imm32` inside the initialiser.
+- **Live Bulb (V):** record 49 at **0x602BC278** (not 0x602BA478 as F060 says) = 0x7ED9C8FB, which calls `Shooting::getLiveBulbInfo`. That API (OlyHfwOpeShoot 0x7E984DDE) returns minute/second from `api_rec_Get_Bulb_Exp_Time` (TAKE 0x7E5A624F) and `nowcount` = `api_rec_Get_Bulb_Lv_Count` (u16 0x605178BE), `maxcount` = info 696 (prm 0xD721).
+- **Update chain (V):** GUI table 0x7EEDE0C0… (16-byte records `{code, 1, 1, handler}`) binds `updateLiveBulb` 0x7ECDF300 to codes 0x01000002 and 0x0200001A → API object slot 66 (+264; I: OlyApiShooting, its vtable word 0x7EC0F59C is next to F028's 0x7EC0F610) → 0x7E9CC9EC → OlyHfwOpeShoot 0x7E98A2B5 → event **12039** → SequencePartsBase 0x7EA8E955: if Live Bulb is running and `info 696 − CapTak slot 42 ≥ 1`, `TAKEPIC_BULB_LV_UPDATE_send` 0x7EA985D7 → CapTak slot 105 (+420) → `api_rec_Update_Bulb_Lv` 0x7E68C46D → TAKE_MAIN message **19** → TAKE event table 0x7E790060 (records `{event, handler}`, end 0xFFFF): event 0x38 → 0x7E5A2C01 increments 0x605178BE and sends 0x0408003A; events 0x1B/0x1C → start 0x7E5A2A6F (copies 4 request words to 0x605178C0–CC); 0x1D → 0x7E5A2B4C (stores a pointer at 0x605178D0, used by the end step 0x7E5A2C31). The result goes back as `evTraResShtUpdateLiveBulb` (0x7EA941E5) / `CBS_UPDATE_LIVEBULB` (254).
+- **Update interval: still not found.** The camera core does not time the updates: each refresh is *pulled* by the GUI through `updateLiveBulb`. So the interval must be in whatever raises GUI code 0x01000002 / 0x0200001A for that record. 0x01000002 is also a GUI app-state value (set by 0x7ECDCE0C via 0x7ECD4DE3, read via 0x7ECD4E00), so the record may fire on a state tick (I).
+
+## 3. Shape catalogue additions (13c §3) (C2-5)
+
+| Shape (count, heuristic) | Signature | Role / example |
+|---|---|---|
+| **initRelations** (73 in 0x7E966000–0x7EBA4868; ≥4 calls, ≥60% of them to setters or setTarget) | runs of `mov N,aX; add aY,aX; mov aX,a1; call SETTER` where SETTER is a 6/7-byte `mov a1,(N,a0); retf` (bytes `fa 34 NN NN de 00 00` or `f8 34 NN de 00 00`; 943 such setters) and `call 0x7EB85DAB/0x7EB85DB1` (observer setTarget, bytes `dd <rel32> 00 00`); no branches | Rhapsody `initRelations()`: wires sibling parts and sets observer targets. F034 0x7EA3819B, CM 0x7EA7DBFB, CapFls 0x7EA3DEDE, changeSequence tail 0x7EA6B124 |
+| **createActiveRelations** (34) | log `…Architecture createActiveRelations`, 4–6 getInstance calls stored to `(N,sp)`, then the same setter run | component wiring to its capabilities (§2.6) |
+| **Container teardown** (7 strict matches) | iterator 0x7E966B4E (begin) / 0x7E966B7D (next) / 0x7E966B8E / 0x7E966BD6; per element: vt slot-0 deleter if present, else operator delete 0x7EBA62EB/0x7EBA62F3; null the slot; reset the iterator vtable 0x7EBCDABC | dtor helpers: F033 0x7EA17103, 0x7EB855C7 (`resend event`), 0x7E9ECC9F |
+| **Guarded choice** (1 stand-alone; most choices are inline in handlers) | `mov a0,a2; clr d2;` then ≥2 blocks `call GUARD; cmp 1,d0 (a0 01); bne next (c9 xx); mov a2,a0; call EXIT; mov a2,a0; call ACTION; mov a2,a0; call ENTER; bra end`; end `mov 1,d2; mov d2,d0; ret` — bytes start `92 08 cd/dd …` | Rhapsody condition connector after a trigger, e.g. F039 0x7EA77185 (View timeout → Standby / Prepare / View); the guards (0x7EA761F9…) are small bool functions |
+| **Relaying observer** (16 functions match in 0x7E966000–0x7EBC0000; ≤60 B; they include non-observer device methods) | `movm; …; [log 0x7E9670E9]; mov (N,a2),a0 (f8 22 NN); call 0x7EB86ED0` — no `new`, no event ctor, no 0x7EBA4C8D | turns a notification into a notify of a second list. CapBlu_BluetoothEv2Observer::update 0x7EA511D1 (35 B, bytes `cf 20 f8 fe f8 92 fc cc <str32> 42 04 00 dd <rel32> 0c f8 22 18 dd <rel32> 13 00 b0 …`), CapBlu 0x7EA510FF/0x7EA51168, boot-device slots 0x7EBA139E–0x7EBA13F6 (call Usr2 first) |
+| **Interface thunk** (hundreds) | `add -4,sp; mov (4|8|52,a0),a0; call METHOD; ret [],4` or `…; call 0x7EB86DF0/0x7EB86FB4` | Cap interface slots (§2.1) |
+| **Member-pointer table init** (22) | repeated `mov -1,d2 … mov FN,d0; mov d0,(4,a0); mov RAM,a1; mov (a0),d1; mov (4,a0),d0; mov d1,(a1); mov d0,(4,a1)`; called only from the ctor table 0x7F033AC4 | §2.8 |
+
+**Correction to 13c §6:** observers built on 0x7EB85D67 are *not* all 75-byte event-makers. 149 have the 75-byte GEN shape (13c count); others only relay to a second list (row above, e.g. CapBlu_BluetoothEv2Observer). The boot-device methods that notify their lists call Usr2 first.
+
+## 4. Corrections
+
+1. **Boundaries** (§1): Tra starts **0x7E9698EC**; the SingleStillShootingSequence_NEW chart ends **0x7EB84344**; **0x7EB84345–0x7EB85562 = Com_EvSenderManager** (static); Dev* part 1 ends **0x7EB93422** and Ctg starts at **0x7EB93423** (13c §1 said ~0x7EB93A80; this also removes the 13c §5.3 self-contradiction about 0x7EB938CB). File starts of 22 modules.tsv rows move earlier (§1.1); MfAssist starts at its ctor **0x7EB7D14B**.
+2. **Event 11779 = EVFW unsubscribe**, not a send of codes (review F036). 11776 = subscribe.
+3. **Live Bulb table slot** is 0x602BC278 (F060 wrote 0x602BA478).
+4. 13c open question 3 answered: the three extra OMThreads are HLS_CALLBACK, HLS_EVENT and HLS_USER (§2.4).
+5. Section 06 "Capabilities wrap devices" is right but incomplete: callers never hold the Cap reactive; they hold an interface at facade+K (§2.1).
+6. 13c §3 "CmpSts controllers use Com_ManagersSubTransition (15)": the class is a general sub-transition helper (review C2); its observer classes 0x7EB85DC3/0x7EB86084 are the producers of 3346/3344.
+
+## 5. Open questions
+
+1. Live Bulb update interval: who raises GUI code 0x01000002 / 0x0200001A for record 0x7EEDE110/0x7EEDE140, and with what period (§2.8)?
+2. Names of the 41 event ids that Com_EvSenderManager 0x7EB84345 makes from APP_EVENT codes (16070…27522); a code → id table would name many unnamed ids.
+3. The API callback id space of 0x7E96E954 (26797 → 35) and why 26798's handler is empty on the E-PM2 (stubbed strobe-status callback; compare E-PL5).
+4. CapFls lists +356 and +400 (0x7E68E9F4(0x02020000), `(216) ≥ 90`): what conditions they report; CM observer +400 (0x7EB85E8F) was not traced.
+5. BootManager notifies list +224 twice in the full-boot path (state 10 entry and state 12); confirm that CM ignores the second 12063 in state 7.
+6. Exact meaning of the PlayState fields 0x605E53E0/0x605E5404/0x605E7578 (current vs. base index) needs a writer trace.
+7. Overlay message type 11 (0x7F09E235 → 0x7F0A37B3): confirm it becomes the APP_EVENT that HLS_EVENT receives.

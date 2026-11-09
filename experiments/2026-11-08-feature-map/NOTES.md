@@ -111,3 +111,10 @@ English-string counts not present in the E-PM2: E-PL5 0 (block 1 identical), E-P
 - **14d (data and blobs): two claims. Confirmed:**
   - The reset code loads 0x7E8DA000 (0x7E4212B8), 0x7E8F3114 and RAM 0x602A9B40, so 0x7E8DA000–0x7E8F3113 is the `.data` init image (ROM = RAM + 0x1E6304C0).
   - 0x7E86DD80 starts with `CMIO 01 00 09 DC`.
+- **14c (app protocols): three claims. Confirmed:**
+  - `HLS_CALLBACK`/`HLS_EVENT`/`HLS_USER` are loaded by 0x7E96CA56/0x7E96DB78/0x7E9E762F (the three extra OMThreads).
+  - `TAKERDY_NORMAL/ABORTPROC/FAST_send` are at 0x7EA94AF9/0x7EA94BE8/0x7EA94C22.
+  - The APP_EVENT poster 0x7E880EFF has 118 callers.
+- **Tool: fwmap rule D (2026-11-09).** functions.tsv has a new `suspect` column (9th): rule D from 14d §5, implemented in `suspects()`.
+  - **Measured:** 598 of the 601 false starts in 14d-false-functions.tsv are flagged. In the code ranges 14d studied, 36 of 71,435 starts are flagged: about 27 are data inside code ranges (the 31 that 14d found plus page-start entries), and about 9 are likely real code, e.g. 0x7EE72E82 (565 B, a recursive function reached by pointer).
+  - **Use:** treat the flag as a hint. Nothing is removed from the DB; 881 functions are flagged in all.

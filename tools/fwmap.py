@@ -204,7 +204,44 @@ def stage_elf(path, base, size, starts):
     return dis
 
 
-def stage_index(dis, base, size, strings, data_pages):
+UDF_OK = ("udf00", "udf01", "udfu01")
+
+
+def anomalous(op, arg):
+    """An instruction that real code in this image does not contain (see section 14d, rule D)."""
+    if op in ("break", "unknown") or op.startswith("."):
+        return True
+    if op.startswith("udf") and op not in UDF_OK:
+        return True
+    return op in ("movm", "call", "ret", "retf") and re.search(r"\b(exreg\d?|exother|other)\b", arg.split("]")[0]) is not None
+
+
+def suspects(funcs, calls, data, base, call_only):
+    """Rule D: starts that are probably data decoded as code. Seed with functions that contain an
+    anomalous instruction, or call-only starts with no caller; flag call-only starts whose callers
+    are all flagged; un-flag anything an unflagged function calls. A start right after a return is
+    never flagged by propagation."""
+    callers = collections.defaultdict(set)
+    for c, _, t in calls:
+        if c != t and t in funcs:
+            callers[t].add(c)
+    flag = {k for k, f in funcs.items() if f["bad"]}
+    flag |= {k for k in call_only if k in funcs and not callers[k] and not after_return(data, base, k)}
+    changed = True
+    while changed:
+        changed = False
+        for k in call_only:
+            if k in funcs and k not in flag and callers[k] and callers[k] <= flag and not after_return(data, base, k):
+                flag.add(k)
+                changed = True
+        for k in list(flag):
+            if any(c not in flag for c in callers[k]):
+                flag.discard(k)
+                changed = True
+    return flag
+
+
+def stage_index(dis, base, size, strings, data_pages, data=None, call_only=()):
     soffs = sorted(strings)
     funcs, cur = {}, None
     calls, refs = [], []
@@ -215,13 +252,14 @@ def stage_index(dis, base, size, strings, data_pages):
             m = SYM.match(line)
             if m:
                 cur = int(m.group(1), 16)
-                funcs[cur] = {"n": 0, "data": cur // PAGE in data_pages, "pos": here}
+                funcs[cur] = {"n": 0, "data": cur // PAGE in data_pages, "pos": here, "bad": 0}
                 continue
             m = INSN.match(line)
             if not m or cur is None:
                 continue
             a, op, arg = int(m.group(1), 16), m.group(2), m.group(3)
             funcs[cur]["n"] += 1
+            funcs[cur]["bad"] += anomalous(op, arg)
             if funcs[cur]["data"] or a // PAGE in data_pages:
                 continue
             t = call_target(op, arg)
@@ -244,12 +282,13 @@ def stage_index(dis, base, size, strings, data_pages):
     nout = collections.Counter(c for c, _, _ in calls)
     nref = collections.Counter(c for c, _, _ in refs)
     keys = sorted(funcs)
+    sus = suspects(funcs, calls, data, base, set(call_only)) if data is not None else set()
     with open(os.path.join(OUT, "functions.tsv"), "w") as f:
-        f.write("addr\toffset\tsize\tinsns\tcallers\tcallees\tstrrefs\tdata_page\n")
+        f.write("addr\toffset\tsize\tinsns\tcallers\tcallees\tstrrefs\tdata_page\tsuspect\n")
         for i, k in enumerate(keys):
             end = keys[i + 1] if i + 1 < len(keys) else base + size
             f.write(f"{k:08x}\t{k - base:06x}\t{end - k}\t{funcs[k]['n']}\t{ncall[k]}\t{nout[k]}\t{nref[k]}\t"
-                    f"{int(funcs[k]['data'])}\n")
+                    f"{int(funcs[k]['data'])}\t{int(k in sus)}\n")
     with open(os.path.join(OUT, "fnidx.tsv"), "w") as f:
         f.writelines(f"{k:08x}\t{funcs[k]['pos']}\n" for k in keys)
     return len(keys), len(calls), len(refs)
@@ -295,7 +334,8 @@ def cmd_build(a):
     print(f"function starts {len(starts)} (call {len(call_starts)}, ptr {len(ptr_starts)}, "
           f"ptr-only {len(ptr_starts - call_starts)})")
     dis = stage_elf(path, base, len(data), starts)
-    n, c, r = stage_index(dis, base, len(data), strings, data_pages)
+    call_only = call_starts - ptr_starts - imm_starts - tsk_starts
+    n, c, r = stage_index(dis, base, len(data), strings, data_pages, data, call_only)
     stage_ptrs(data, base, strings, starts, code_pages)
     print(f"functions {n}, call edges {c}, string refs {r} -> {OUT}")
 
