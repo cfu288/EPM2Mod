@@ -96,3 +96,9 @@ English-string counts not present in the E-PM2: E-PL5 0 (block 1 identical), E-P
 - **14e (GUI methods): two claims. Confirmed:**
   - 0x7ECFFAC6 has 775 callers, and its neighbour 0x7ECFFB4C carries `CCommon::setDbWarningInfo`. So CCommon starts before 0x7ED00000.
   - 0x7ED3231E is called only from the fill routine 0x7ED31C9B (3 sites), which fits "angle → slope for a slanted-edge fill", not a rotation.
+- **14b (unlabelled platform/camera): three claims. Confirmed:**
+  - The MEC request printer 0x7E51256F loads `OPENRDY` and `OPENCHG`.
+  - `dbgscnmode`-style scene names (`NIGHT_SHOT_MACRO`, `SPOT_LIGHT`, `UNDERWATER_SNAP`) are printed by 0x7E6637F2.
+  - `PRM_CAM_SPECTRUM_%s_R` exists (0x7F0DEBA8).
+
+  So the "mirror = DSLR stub" reading in 03 is withdrawn: it drives MOT_* shutter-charge requests (14b §6).
