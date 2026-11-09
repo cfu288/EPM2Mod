@@ -171,7 +171,7 @@ Columns: address | size | sites/fns | name | notes. Every name is identified by 
 | 0x7E5451CB–0x7E545275, 0x7E55EB2D–0x7E55EB65 | 0x7E5451CB…0x7E545269 = the five IMG ISRs (IRQ 105/106/107/108: a status helper 0x7E54D815 / 0x7E54D903 / 0x7E54D97C / 0x7E54DA0F, then IMG_END set; IRQ 102: 0x7E54DA7F); 0x7E55EB2D = IMG_END "create" (calls the no-op 0x7E449000), 0x7E55EB40 = wait (OlyEvWt 0x7E4490AF), 0x7E55EB5B = set (OlyEvSt 0x7E449083) | IRQ table (ISRs); internal | V (A4 2026-11-09) |
 | 0x7E545276, 0x7E5453CA, 0x7E545590 | job builders: fill a 320-byte descriptor (0x20000000 flag, sizes, 2048, 100…) → **0x7E54D5E4** | internal | V |
 | **0x7E54D5E4** | **job preparation**: work area (0x7E5503E8: one of 5 RAM areas 0x6050xxxx/0x6072xxxx by CPU, flags and op), then the **three op-type dispatches**: | | V |
-| | (a) 0x7E5704ED → table **0x7E78D028** (31 builders 0x7E57302D–0x7E574EE7); | | V |
+| | (a) 0x7E5704ED → table **0x7E78D028** (~~31 builders 0x7E57302D–0x7E574EE7~~ **34 entries**, ops 0–33, indexed by desc byte +194: ops 0–30 = the 31 builders 0x7E57302D…0x7E574EE7, op 31 → 0x7E570740 (`mov 11586,d0; retf`, a stub after 0x7E5705F2), op 32 → 0x7E573B7E, op 33 → 0x7E574C0D). A separate **41-entry step table 0x7E78D0B0** (0x7E5723A6…0x7E57301C, then zeros) follows it; 0x7E5705F2 (31 builder callers) calls it per step byte (`cmp 41` at 0x7E5706B7) (D4 2026-11-09); | | V |
 | | (b) 0x7E560ACF → table **0x7E789604** (34 entries, ops 0–33: op-type parameter-block handlers; the colour/tone role is inferred); | | V (dispatch); role I (A4 2026-11-09) |
 | | (c) 0x7E550434 → table **0x7E74A3C8** (34 entries: geometry, 0x7E55044D default); | | V |
 | | then 0x7E54880E | | V |
@@ -289,7 +289,7 @@ All verified unless marked:
 ## 6. Open questions
 
 1. The exact semantics of opcodes `f6 2x/3x/4x/5x/6x`, `fb e0 80 00` and `f9 4x`: which unit executes them, and how does it round?
-2. The names of IMG op types 0–33 beyond 21 (copy) and 30 (fill), and what each of the 31 builders in table 0x7E78D028 programs.
+2. The names of IMG op types 0–33 beyond 21 (copy) and 30 (fill), and what each of the ~~31 builders~~ 34 entries in table 0x7E78D028 (and the 41 steps of 0x7E78D0B0) programs (D4 2026-11-09).
 3. Which unit each block-setter mask bit (0x10, 0x2000, …) controls; where the RAM parameter blocks (job+572/+2592/+3904) are handed to hardware.
 4. Which settings fill the tone-curve bytes ctx+3939…3972, and how the picture-mode contrast/gradation map onto them.
 5. The meaning of the three Exif records (magic 0x4F494D43, 0xDC09000n) built by 0x7E55866A.

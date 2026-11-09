@@ -54,7 +54,7 @@ raw[] is at 0x7E844CC0 (19 × 64 bytes) and gui[] is at 0x7E83F70C. Info 553 is 
 |---|---|---|
 | Picture Mode menu, plus Live Control / SCP for info 111 | the ROM mcon list of info 111 (19 entries). mcon API: count `0x7E6FCB15`→`0x7E6FF741`, item by index `0x7E6FCAD6`→`0x7E6FEE8E`→`0x7E70726D`, value→index `0x7E6FCACC`→`0x7E6FEE02` | 7 picture modes, then 12 art filters, in the §1.2 order. Labels from the u16 table 0x7EF1F4D6, in display order (i-Enhance, Vivid, Natural, Muted, Portrait, Monotone, Custom, Pop Art … Watercolor), read by `0x7ED3E6C5` with index 1..19 |
 | ART shooting mode (the E-PM2 has no mode dial; the mode is chosen on a screen) | **info 281** = tag 0x2891 (u8, MODE). mcon type-1 list at 0x7E849784 (record 0x7E84AEB4, 13 bytes) | internal codes `70, 69, 71, 72, 74, 73, 86, 85, 91, 96, 163, 181, 3`: Pop Art, Soft Focus, Pale&Light, Light Tone, Grainy, Pin Hole, Diorama, Cross Process, Gentle Sepia, Dramatic Tone, Key Line, Watercolor, then **3 = ART BKT**. Verified: `0x7EA951E0` tests info 281 == 3 together with infos 109/279 and logs `FUNC ARTD_ARTBKT ON` |
-| ART BKT | info 414–423 → 100–109, 424 → 119, 469 → 120 (coordinator-verified builder 0x7EA7633A / 0x7EA9528D). Each info is a 0/1 flag (mcon records 0x7E84C278…0x7E84C354, raw [0, 1]) | the same 12 filters |
+| ART BKT | info 414–423 → 100–109, 424 → 119, 469 → 120 (coordinator-verified builder 0x7EA7633A / 0x7EA9528D). Each info is a 0/1 flag (mcon records 0x7E84C278…0x7E84C354, raw [0, 1]) | ~~the same 12 filters~~ One list of up to 20 entries: entry 0 = the current info-111 value, then the flagged art filters (414–423 → 100–109, 424 → 119, 469 → 120), then the flagged **picture modes 407–413 → 7, 1, 2, 3, 4, 5, 6**, all stored with the same array and counter (0x7EA7633A: `mov 469` at 0x7EA7654A, then `mov 407` at 0x7EA76572 … 413; 0x7EA9528D has the same order) (A11 2026-11-09) |
 
 - **What decides inclusion: fixed ROM lists (verified).**
   - No count variable, model check or debug flag selects the entries. The 12 art values are compiled into the mcon raw/GUI arrays (info 111, 509, 510), into the info-281 list, and into the ART BKT info ids.
@@ -65,11 +65,11 @@ raw[] is at 0x7E844CC0 (19 × 64 bytes) and gui[] is at 0x7E83F70C. Info 553 is 
 ### Can a hidden filter (110–118) become selectable?
 - **GUI / mcon:** no (verified, §1.2 write fallback). The GUI cannot produce these values.
 - **`app Set_CameraInfo <info> <value>` shell** (`0x7E677990`; at 0x7E6780AC it passes both parsed arguments straight to Set_CameraInfo): **yes, it can store any u8 in 0x9481** (verified code path; no range check in Set_CameraInfo). `prmdbg setval` (07 §1.4) can also write the tag. Whether a retail camera exposes these shells (UART) is unknown.
-- **If 0x9481 holds 110–118** (consequences verified from the code above; end result inferred):
+- **If 0x9481 holds 110–118** (~~consequences verified from the code above~~ the consequences below are verified from the code above except where a bullet says "not re-traced"; the end result is inferred) (A11 2026-11-09):
   - The GUI shows **Watercolor** (read fallback).
   - The rec-view colorTone is NONE, with an assert log.
   - The Exif value has no art entry for 111–118 (coordinator's 0x7E70DC24 result). For **110** the writer has a real case, 0x7E70DE4B, which stores **15** (ExifTool: Pale & Light Color II); the E-P5 writer does the same (0x7E3ECFAA). (A10 2026-11-09)
-  - `mov_art` 0x7E6CBFD3 maps 110–118 to the codes 145/75/84/69/117/118/119/151/153.
+  - `mov_art` 0x7E6CBFD3 has **two** 100..120 jump tables. ~~maps 110–118 to the codes 145/75/84/69/117/118/119/151/153.~~ Table 0x7E7FF05C maps 110–118 to the codes 145/75/84/69/117/118/119/151/153. Table 0x7E7FF008 maps them to 146/125/124/78/121/122/123/152/154 (the movie-side codes, 10c). The second table is taken when bit 0 of the first argument (d0) is set, or when the d0 value read before the switch is non-zero (record word +32 on the d1 = 0 path; the return of 0x7E6CFCDE on the d1 = 1/2 paths) (A11 2026-11-09)
   - The still path's acceptance (`art_IsSupportType` 0x7E71BC93, `art_chk_type` 0x7E71C075 → `art_chk_type_rec` 0x7E71C0E1) was not re-traced here. (A10 2026-11-09)
   - The next GUI change of picture mode overwrites the value.
 - **Not traced (open):**

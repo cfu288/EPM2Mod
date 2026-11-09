@@ -41,7 +41,7 @@ Round D1 deep dive. Scope: the driver code in 0x7E421020–~0x7E521020 (the regi
 | 0x7E465D10–0x7E466886 | **PER_PCONT client side**: ref-counted control on/off (0x7E465D10 ← 0x7E538C1D, 0x7E541A62, cam 0x7E63E737/0x7E64259E), PWM duty 0x7E466435/0x7E466448, `pcntdbg` (15d §5; V edges, roles I) (D3 2026-11-09) |
 | 0x7E466887–0x7E467117 | PWM, 0x9A500000 |
 | 0x7E467130–0x7E467ABE | PER_ROTATE, RTC |
-| 0x7E467D99–0x7E469D75 | **SIO** driver, including the client API after the `sio` shell 0x7E469BD1: init entry 0x7E469C16 (← Usr0 0x7E503DD4; calls 0x7E467D99), 0x7E469C1E, 0x7E469C27 and 0x7E469CDF (called by lens 0x7E53392C, LCD 0x7E6B1066, EVF 0x7E6B33D1, audio 0x7E94F128 and others) (A4 2026-11-09) |
+| 0x7E467D99–0x7E469D75 | **SIO** driver, including the client API after the `sio` shell 0x7E469BD1: init entry 0x7E469C16 (← Usr0 0x7E503DD4; calls 0x7E467D99), 0x7E469C1E, 0x7E469C27 (client open) and 0x7E469CDF (client transfer start; §2.3) (D4 2026-11-09) (called by lens 0x7E53392C, LCD 0x7E6B1066, EVF 0x7E6B33D1, audio 0x7E94F128 and others) (A4 2026-11-09) |
 | 0x7E469F91–0x7E46A395 | PER_SLOPE |
 | 0x7E46A6FA–0x7E46B123 | SYSCLK clock/reset generator, 0x98800000 |
 | 0x7E46B3E3–0x7E46B74C | **Hardware-timer client API** (init 0x7E46B3E3 ← Usr0; open/start/stop/abort; free-run read 0x7E46B519, 36 callers incl. VideoTimer, MEC and lens; 15d §5) (D3 2026-11-09) |
@@ -49,7 +49,7 @@ Round D1 deep dive. Scope: the driver code in 0x7E421020–~0x7E521020 (the regi
 | 0x7E46BC44–0x7E46C0DA | **USF unit** (0x7E46BC44 writes 1 to GIO 0x9A100008/124/12C; `usf` shell 0x7E46BEAF–0x7E46C004, `Debugging the USF unit`; callers TAKE 0x7E5959B3 and ADJ; I: dust-reduction filter; 15d §5) (D3 2026-11-09) |
 | 0x7E46C0DB–0x7E46C308 | `usf`, `water`, `wdt`, PER_WDT |
 
-- Data in this range: PER_IN records, the busmes tables 0x7E46DDC4/0x7E46DDF0, the console port table 0x7E46DEC8, and the ROM driver tables 0x7E4C5534–0x7E4C8A88 (V).
+- Data in this range: PER_IN records, the busmes tables 0x7E46DDC4/0x7E46DDF0, the console port table 0x7E46DEC8, and the ROM driver tables 0x7E4C5534–0x7E4C8A88 (V). After the tables come the `usf` shell strings (from 0x7E4C8A88: `help`, `init`, `exec`, `Usage: usf [command] <count>`) and then **code, not table data: FLSH flash helpers from 0x7E4C8E40** (0x7E4C8E40 sets and 0x7E4C8E49 gets the u16 flag 0x600011E0; 0x7E4C8E40 is called by CPU0 init 0x7E421115 and the flash writers 0x7E44F197/0x7E44F3D0; 0x7E4C8E52 `ARIENAI` has the only caller BML erase 0x7E4519C5). The code bytes continue past 0x7E4C9000, which the function list treats as the start of a data block, to the 0xFF padding at 0x7E4C90CA (V callers; the end is read from the bytes) (D4 2026-11-09).
 - Driver code above the C runtime:
   - CPUCONN 0x7E505A22;
   - UI/keys ~~0x7E508F82~~ 0x7E508DA7–0x7E50D6F0: it starts with the beep-request layer 0x7E508DA7–0x7E508EAE (callers UI_OUT), then the `ui` shell `beep` 0x7E508EDA and `help` 0x7E508F14 (table 0x7E734DEC) (14b §1) (D2 2026-11-09);
@@ -212,7 +212,9 @@ Round D1 deep dive. Scope: the driver code in 0x7E421020–~0x7E521020 (the regi
   - **Bus ownership** `sio_request(ch, fn a0, arg a1)` 0x7E469961 (19 callers). If the channel is idle it marks it busy and calls `fn(arg)` at once (returns 0). Otherwise it queues one of 2 slots (returns 2) or refuses (returns 1).
   - `sio_release(ch)` 0x7E4699F9 (21 callers) masks the channel IRQs (0x7E468B97) and runs the next queued `fn`. The state lives at RAM 0x60419F00 + ch·20.
   - The client callback does the transfer. `<<SIO SEM STATUS>>` 0x7E469A9A prints FLAG/Q_READ/Q_WRITE/FUNC/OPEN/CLOSE.
-  - Open/close counters: 0x7E469C27 / 0x7E469CDF.
+  - ~~Open/close counters: 0x7E469C27 / 0x7E469CDF.~~ (D4 2026-11-09)
+  - **SIO client open(a0 config record)** 0x7E469C27 (7 callers: lens 0x7E5338ED, BC 0x7E53F16E, LCD/EVF/display 0x7E6B1197/0x7E6B33D1/0x7E6B5988, audio 0x7E94F128/0x7E94F318). Per direction flag (byte +5 bit 0 / bit 1) it calls 0x7E468B97, which stores the client hook 0x7E469D76 (dir 1) or 0x7E469D93 (dir 2) in the per-channel tables 0x6041762C / 0x60417644; it then builds the channel configuration on the stack and calls open/configure 0x7E467EED (V). (D4 2026-11-09)
+  - **SIO client transfer start(a0 request)** 0x7E469CDF (8 callers). It clears the channel state 0x6041A0DC + 8·ch and 0x6041A10C + 8·ch, stores the request's callback (+20) and the request there (read back by the hooks 0x7E469D76/0x7E469D93, which call it), and starts the transfer: request byte +1 bit 1 → 0x7E4686E8, bit 0 → the write dispatcher 0x7E468324. It counts nothing (V). (D4 2026-11-09)
   - **UART (console) mode**:
     - 0x7E46967C attaches IRQs 79/80 (ch1) and 87/88 (ch5) from tables 0x7E4C81D0/0x7E4C82A8.
     - Each port has a 5,152-byte block at 0x6041A6BC: a 1,024-byte TX ring and a 4,096-byte RX ring.
@@ -234,7 +236,7 @@ From the top down. Positions are verified string anchors; the layer roles are I 
 
 | Layer | Where | Notes |
 |---|---|---|
-| App/DCF API (`dcf*`, `fileif_*`) | DCF 0x7E5AD055–~0x7E5B5xxx (`DCF_SEM_SM`, `DCFPROC_*`, `%c:\DCIM\%s\%s`); DPOF 0x7E5BEEAE–0x7E5C0903 (`AUTPRINTMRK`); AVCHD paths 0x7E5C1164 | The `fileif_*` names occur only in the `filedbg` test strings 0x7E5C60F8–0x7E5C64AA |
+| App/DCF API (`dcf*`, `fileif_*`) | DCF 0x7E5AD055–~0x7E5B5xxx (`DCF_SEM_SM`, `DCFPROC_*`, `%c:\DCIM\%s\%s`); DPOF ~~0x7E5BEEAE~~ 0x7E5BE823–0x7E5C0903 (`AUTPRINTMRK` at 0x7E5BEEAE; 0x7E5BE823 calls the dpofnode functions 0x7E5BF396/0x7E5BF403/0x7E5BF415, and 0x7E5BEB99 (← 0x7E5BEAE9) feeds the DPOF request builder 0x7E5BF77E; the start is I, since 0x7E5BE295 before it also calls 0x7E5BF396) (D4 2026-11-09); AVCHD paths 0x7E5C1164 | The `fileif_*` names occur only in the `filedbg` test strings 0x7E5C60F8–0x7E5C64AA |
 | FILECLBK task 0x7E5C1B4E | — | Dispatches on the high 16 bits of the command (V): 0 → 0x7E5C1BC6; 0x1 → 0x7E5C50DE; 0x2 → 0x7E5C51A8; 0x20 → 0x7E5C0A7B; 0x8/0x10 → DCF 0x7E5AFAA0. Then it replies (0x7E5C1C84) |
 | FILEFGND task 0x7E5C4E90 | — | A generic job runner (V). It waits on the **event flag** 0x7E43EB7E (OlyEvWt 0x7E4490AF; the posters set it through 0x7E5C8AEE → OlyEvSt/OlyEvStCpu) and drains a 32-entry ring of 12-byte `{fn, arg, u16 d0, u16 kind}` jobs at 0x60545454 (read index +0x180, write index +0x182): kind 0 `fn()`, 1 `fn(a0)`, 2 `fn(a0,d0)`. Jobs are posted by 0x7E5C4E2C (kind 1), 0x7E5C4E37 (kind 2) and the generic 0x7E5C4E42; the real jobs are SD and logsec completion callbacks (posters such as 0x7E5CBA48, 0x7E5CD4D4, 0x7E5CD5FF). The thunks 0x7E5C4EBC… are **not** FILEFGND jobs: they are called directly by the FILECLBK (task entry 0x7E5C1B4E) dispatcher 0x7E5C50DE (jump table 0x7E797238, cmds 0x10001–0x10013), and their parameter layouts differ (0x7E5C4EBC uses +8 = a1, +12 = u16 d0) (A4 2026-11-09) |
 | File wrapper / VFS | 0x7E5C920F–0x7E5CB8D2 (`filewrap_dump_all_file_list_item`, `.`/`..` listings) | Job targets 0x7E5C97C1, 0x7E5C9A5F, 0x7E5C9DCC, 0x7E5CA326… (V call targets) |
@@ -303,7 +305,7 @@ From the top down. Positions are verified string anchors; the layer roles are I 
 3. **C1 F015 (0x99900000 = shutter timing, I):** this reading is weakened. The mechanical timing unit used by the `mec` code is **0x9A300000** (2 channels, IRQ 2). 0x99900000 is a camera-core unit with 3 buffer channels (IRQs 4–7) whose name is still open.
 4. **Section 08 says the eye sensor is "PER_EYE_SENSOR task over IIC".** The task is an empty `retf` (V, section 01), so no driver activity comes from it.
 5. **Firmware map, "Codec WM8946 shares a serial bus with the HDMI chip":** confirmed, and more: SIO ch2 also carries the touch panel and the display VSC, with a GIO mux (V).
-6. **Firmware map, region 0x7E421020–0x7E4A0000:** the drivers proper are 0x7E45824B–0x7E46C308. Below them: reset and boot code 0x7E421020–~0x7E426FFF (reset code to 0x7E4262xx, timers, CPU1 boot 0x7E42691F, CPU1 level dispatchers 0x7E426974–0x7E426B25, debug print 0x7E426D4B), then 0xFF fill with one small data block (0x7E42F020–0x7E42F688), and the kernel 0x7E430000–0x7E44Axxx (as in §1; the earlier "0x7E426xxx" start is withdrawn). The ROM driver tables are 0x7E4C5534–0x7E4C8A88 (V). (A4 2026-11-09)
+6. **Firmware map, region 0x7E421020–0x7E4A0000:** the drivers proper are 0x7E45824B–0x7E46C308. Below them: reset and boot code 0x7E421020–~0x7E426FFF (reset code to 0x7E4262xx, timers, CPU1 boot 0x7E42691F, CPU1 level dispatchers 0x7E426974–0x7E426B25, debug print 0x7E426D4B), then 0xFF fill with one small data block (0x7E42F020–0x7E42F688), and the kernel 0x7E430000–0x7E44Axxx (as in §1; the earlier "0x7E426xxx" start is withdrawn). The ROM driver tables are 0x7E4C5534–0x7E4C8A88 (V). (A4 2026-11-09) The FLSH helper code from 0x7E4C8E40 (to the padding at 0x7E4C90CA) is code, not driver-table data (§1 note) (D4 2026-11-09)
 
 ## 5. Open questions
 

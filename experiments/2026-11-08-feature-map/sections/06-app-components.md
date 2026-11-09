@@ -187,6 +187,8 @@ Helper scripts are in the scratch dir (`.../scratchpad/app/`: `vt.py` dumps vtab
 
 **Range (L1 2026-11-09, verified table words):** the lowest `sdk` sub-command handler is 0x7E99A7CF (table 0x7EBF0FA0); helpers such as `Adapter Info` 0x7E99A6A8 (← 0x7E99A940) come before it, so the shell code starts a little earlier. The `sdk api` handlers of the 635-entry table run from 0x7E9A171D to 0x7E9BF9E5; the word after the table (0x7EBF9F4C) points to 0x7E9BFA44, which ends at 0x7E9BFA7D, and the OlyApi getters start at 0x7E9BFA7E.
 
+**Correction (D4 2026-11-09, verified function starts and API-id constants; 16a §1):** the `sdk` shell is two pieces, 0x7E99A6A8–0x7E99D2B2 and 0x7E9A0254–0x7E9BFA7D. Between them, 0x7E99D2B3–0x7E9A0253 is not shell code but the **second OlyApi getter series and its methods** (singleton getter 0x7E99D2B3 → RAM 0x602B2398, CameraCommon getter 0x7E99D2DD … SystemCommon `scOsCreateQueue` 0x7E99FAA7). The first OlyApi series runs 0x7E9BFA7E–0x7E9CE116 (last method `TouchPanel::startTouchPanel` 0x7E9CE0B2, 101 B); 0x7E9CE117 onward is Ope code. Every OlyApi method name is in the table at RAM 0x602B1F10 (`.data` image 0x7E8E23D0); 0x7E96E5F0 (1,217 callers) maps an id 0xGGCCMM to its name through that table (`mov 0x602B1F10,a0`; indices `(id>>16)&0xFF`, `(id>>8)&0xFF`, `id&0xFF`) (D4 2026-11-09).
+
 **Shell structure (verified):**
 - The debug shell's `sdk` sub-command table is at **0x7EBF0FA0**: `{name*, fn*}` pairs.
 - Sub-commands: `help dbglvl debug dump dbgall dbgstate dbgfw shutdown shutdown_api sleep sleep_api sleep_off charge_sleep power_info canexec mediastatus showtimer ca api starttimer stoptimer dbgseq dbgfunc dbgeyefi dbgbm dbgosd dbgsys olyapi_get dbggrid`.

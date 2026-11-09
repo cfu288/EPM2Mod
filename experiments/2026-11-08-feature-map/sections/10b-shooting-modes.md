@@ -57,7 +57,7 @@ Re-check of six shooting-mode features using the method of section 09. Labels: *
   - External: these names match Olympus compact scene modes (Cuisine, Self Portrait, Pet, Snow, Underwater Wide1/2/Macro). Read: a compact-heritage superset (inferred).
 
 **SDET (iAuto):**
-- The 12 names in `dbgscnmode` are PORTRAIT 9, SCENERY 11, SCENERY_PORTRAIT 17, NIGHT_SHOT 12, NIGHT_SHOT_PORTRAIT 18, NIGHT_SHOT_MACRO 156, EVENING_SUN 21, SPORTS 8, MACRO 23, SPOT_LIGHT 157, UNDERWATER_SNAP 50, PROGRAM 3 (verified immediates at bytes 0x7E663939–0x7E6639E8 inside the function 0x7E6637F2 (L1 2026-11-09)).
+- The 12 names in `dbgscnmode` are PORTRAIT 9, SCENERY 11, SCENERY_PORTRAIT 17, NIGHT_SHOT 12, NIGHT_SHOT_PORTRAIT 18, NIGHT_SHOT_MACRO 156, EVENING_SUN 21, SPORTS 8, MACRO 23, SPOT_LIGHT 157, UNDERWATER_SNAP 50, PROGRAM 3 (verified immediates at bytes 0x7E663939–0x7E6639E8, a byte span inside one function, 0x7E6637F2 (L1 2026-11-09) (D4 2026-11-09)).
 - The prior "12 types" is the right count, but one of them is PROGRAM (no scene), and `gyakkou`/`aozora`/… are flags, not types.
 - Orphan strings `OneShot Detect …` add LOW_LIGHT.
 - Debug override: `app iauto <val>` (0x7E6776E9).

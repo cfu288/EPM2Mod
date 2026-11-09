@@ -121,7 +121,7 @@ Sensor modes (verified table 0x7E7ABDA0, key = mode+1): 0 HS, 1 HSSC, 2 MSSC, 3 
 
 ## 6. Debug shell and debug monitor
 
-- **`cam` shell (verified, table 0x7E7AC414, scanned by 0x7E62EB8E/0x7E62F0E3):** poweron, poweroff, still, movie, exp (`cam exp [Tv] [Sv] [Av] [PacketID]`, APEX-style hex), area, tg, test, dbglog, dbgcsv, dbginfo, mem, time_m, readyon, dbgmon, dblcap, dramcap, awb, expcal (`Expcal Still/Movie`: Tv sweeps for calibration).
+- **`cam` shell (verified, table 0x7E7AC414, scanned by 0x7E62EB8E/0x7E62F0E3; the entry 0x7E62EB8E passes a0 = 0x7E7AC414 and d0 = 19 records to the interpreter 0x7E62F0E3, which prints `==> UNKNOWN COMMAND` when no name matches (D4 2026-11-09)):** poweron, poweroff, still, movie, exp (`cam exp [Tv] [Sv] [Av] [PacketID]`, APEX-style hex), area, tg, test, dbglog, dbgcsv, dbginfo, mem, time_m, readyon, dbgmon, dblcap, dramcap, awb, expcal (`Expcal Still/Movie`: Tv sweeps for calibration).
 - **cam_debug_monitor.c (verified):** a log of camera events. Record printers in table 0x7E8DCA38 ({enable, fn} × 13): CAM I/P/E 0x7E632EEB/0x7E632FD8/0x7E63307E, STL I/P/E 0x7E633162/0x7E633271/0x7E633372, BLB I/P/E 0x7E63347E/0x7E633593/0x7E633684, FRM INF 0x7E6337A5, IMG I/P 0x7E6338E1/0x7E6339B7, GENERAL 0x7E633A89. "CAM I" decodes word +8 as {cmd name low16, sensor-mode high16} and word +12 as a set-mask (MODE|EXP|CAP|AWB|STL). `cam dbgmon on/off [1=Top,2=Stl,3=LiveBulb,4=ImgDev,5=General]`, `lv [0,1]`, `sw [0=Local,1=Heap]`. **Inferred:** I = input command, P = post (completion), E = event factor.
 
 ## 7. Camera API layer (api_*.c) and api_exec / api_eventque

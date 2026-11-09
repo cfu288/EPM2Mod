@@ -21,7 +21,7 @@ Labels: **verified** = read in the code or bytes; **inferred** = from strings, n
 | 0x7E938594–0x7E93BA6B | OBEX_ACP and OBEX tasks | verified |
 | 0x7E93BA6C–~~0x7E94D2FF~~ 0x7E94D279 (the last `playbuff_*` function, `playbuff_get_mode` 0x7E94D261, ends there. 0x7E94D27A–0x7E94D8A7 is audio-side (inferred): 0x7E94D27A is called only by the audio wrapper 0x7E95C47A, and the task entries 0x7E94D72F (CPU1 task 0x9009) and AUD_BRIDGE 0x7E94D880 follow) (L1 2026-11-09) | Playback engine `play_*.c`, `playbuff.c` (PLAY_MAIN/IMAGE/LOAD/SOUND) | verified |
 | 0x7E94D8A8–0x7E961C5A | Audio: bridge, control, WM8946 codec driver, DSP, FSC DMA, sequences, WAV/AC3 tools, AUD_* tasks | verified |
-| 0x7E961C5B–~~0x7E966000~~ 0x7E965FD0 (L1 2026-11-09) | `fsc_drv` (audio DMA), then the user shell (`User Shell Help Command` 0x7E96429B, memory dump/fill/verify); its support code 0x7E965FD1–0x7E966A16 continues in 06's row | inferred, not examined |
+| 0x7E961C5B–~~0x7E966000~~ 0x7E965FD0 (L1 2026-11-09) | `fsc_drv` (audio DMA) 0x7E961C5B–0x7E962FE8 (its last function is `fsc_drv_iocontrol` 0x7E962F41, 168 B), then the user shell from 0x7E962FE9, the U_SHELL `shell` family entry (handler word 0x7E7332B8 and 0x7E7326A8; the command reader 0x7E9630D4 is inside the shell) (D4 2026-11-09) (`User Shell Help Command` 0x7E96429B, memory dump/fill/verify); its support code 0x7E965FD1–0x7E966A16 continues in 06's row | inferred, not examined |
 | ~~0x7EBA1020–0x7EBA6B03~~ 0x7EBA0AA9–0x7EBA7BC0 (`Dev*` part 2 and OXF, the bounds below) (L1 2026-11-09) | C++ device class `DevBlu_Bluetooth` (vtable 0x7EC91628), OS shims `BSE_*`/`BMQ_*`/`BEF_*`/`BTM_*`/`BMT_*`, state-machine runtime (`OMREactive`). Bounds per 13c §1: `Dev*` classes 0x7EBA0AA9–0x7EBA48BB, OXF runtime 0x7EBA48BC–0x7EBA7BC0 (D1 2026-11-09) (A5 2026-11-09) | verified (vtable); class role inferred |
 | ~~0x7EBA6B03–0x7EBE1020~~ 0x7EBABF90–0x7EBE1020 (L1 2026-11-09) | Strings and rodata for all of the above (e.g. `play_apical.c` at 0x7EBB66D7). **Corrected:** 0x7EBA6B03–0x7EBA7BB5 is still OXF code and 0x7EBA7BC1–0x7EBABF8D (between the two rows) is OKAO Smart Skin code; the data starts at ~~about 0x7EBAC000~~ 0x7EBABF90, after the Smart Skin `ret` at 0x7EBABF8B and two 0xFF bytes (L1 2026-11-09) (13b §1, 13c §1) (D1 2026-11-09) | verified |
 
@@ -283,7 +283,8 @@ So SERV is a small **publish/subscribe service for camera state changes**. Which
 - 0x7E8F6B37 chooses the output frame size for the display device and TV setting 49953: 720×480, 800×600, 1024×768, 640×480, 640×436, 640×524, 720×576, 1280×720, 1920×1080 (table also at 0x7E80E2AC).
 - **EFFECT_EXE** 0x7E8F6A60 waits on flag 0x7E43EC62 and runs one frame step for each bit: 0x8, 0x10, 0x20, 0x40, 0x80, 0x100, 0x200 (the 0x100 and 0x200 bits have two variants each, chosen by flags at 0x605C22D8). 0x80000000 = finish.
 - Effect types (from the EXP setters `set_effect_*`): **index_zoom, slideshow_fade, 3d_overlap, osd_slide, tp_slide, tp_scroll**, plus common parameters. The debug shell `effect` (0x7E8F5EF1) has `slide`, `overlap`, `index`, `tpsl/tpslc` (touch-panel slide, continue) and `tpsc/tpscc` (touch-panel scroll, continue).
-  "TP SCROLL" is the touch-panel scroll of playback images. Which bit runs which effect is not mapped.
+  "TP SCROLL" is the touch-panel scroll of playback images. ~~Which bit runs which effect is not mapped.~~ (D4 2026-11-09)
+- **Bit map (D4 2026-11-09, V; the effect names per type are not mapped):** cmd 1 (0x7E8F6E64) reads the type byte 0x602AE54E and calls one start stub per type; each stub sets one EFFECT_EXE flag bit through 0x7E449030, and EFFECT_EXE calls one frame step per bit: type 11 → 0x7E8F7923 → bit 0x8 → 0x7E8F793D; type 10 → 0x7E8F7BBE → 0x10 → 0x7E8F7BD8; type 27 → 0x7E8F768B → 0x20 → 0x7E8F76A5; type 6 → 0x7E8F795F → 0x40 → 0x7E8F7979; type 28 → 0x7E8F7C11 (also sets mask 32 of 0x605C22D8) → 0x80 → 0x7E8F7C33; type 29 → 0x7E8F80A5 (mask 1) → 0x100 → 0x7E8F80C7, or 0x7E8F88F2 when mask 2 is set; type 30 → 0x7E8F8340 (masks 4 and 16) → 0x200 → 0x7E8F8369, or 0x7E8F8A89 when mask 8 is set. (D4 2026-11-09)
 
 ---
 
@@ -297,4 +298,4 @@ So SERV is a small **publish/subscribe service for camera state changes**. Which
 6. The meaning of the DSP setting IDs (29858–30354, 13393/13409, 56004): factory-adjusted or fixed? And the meaning of movie quality 3/6 for `ims_active_pattern`.
 7. PLAY_SOUND sub-commands 1, 2, 4 (voice memo vs. BGM vs. preview), and what PLAY_MAIN cmd 3 (0x7E6DDE3E) does in the MOV code.
 8. The 0x7E8E3E3C–0x7E8F57FF block: what the data is (it may include the 0xFF-padded BT or CIC tables). Answered: it is the `.data` init image (to 0x7E8F3113; code uses the RAM copy at address − 0x1E6304C0), then 0xFF (14d §3.8) (D2 2026-11-09).
-9. The mapping of EFFECT_EXE bits to the six effect types.
+9. ~~The mapping of EFFECT_EXE bits to the six effect types.~~ Answered except for the names: type → bit → step is in §6 (D4 2026-11-09).

@@ -138,7 +138,7 @@ So BAS_MAIN and ADJ code is not in RAM until the app asks for Usr2. **[V]** The 
 | cmd | handler | cmd | handler | cmd | handler |
 |---|---|---|---|---|---|
 | shell | 7E962FE9 | echo | 7E503BC6 | help | 7E503BFF |
-| lens | 7E524C76 (reset/aperture/focus/askdata/confdata/ctrl…) | aud | 7E94F735 (stub) | cam | 7E62EB8E |
+| lens | 7E524C76 (reset/aperture/focus/askdata/confdata/ctrl…) | aud | 7E94F735 (~~stub~~ a 5-byte prologue that runs into 0x7E94F73A: a table shell over 27 × 12-B records at 0x7EBBEC7C (`read_reg`, `write_reg`, `reset`, `poweron`, `rec`, `play`, `set_vol` … `test`); argc < 2 or no match → 0x7E950275 (D4 2026-11-09)) | cam | 7E62EB8E |
 | bas | 7F05DC8B (→ QBASIC) | pwr | 7E539672 (vbat, pbhtmp, get_src/set_src 1=AC 2=BAT) | bc | 7E53BE63 (siotx/siorx/setprm/getprm/debug_mode/mask) |
 | take | 7E582602 (func/dbginfo/dbgmode/exec) | stbd | 7E5DB015 (strobe: init/coff/cpau/cres/cloop/cset) | **per** | 7E45F09B (table below) |
 | res | 7E675B1E (RES_MODE_* read) | app | 7E67811B (`app Get_CameraInfo` etc.) | usb | 7F09ABD1 (core, pipe0–4) |
@@ -211,7 +211,7 @@ Handlers in overlays (`bas`, `usb`, `tpc`, `c3d`, `md3d_*`, `spc`) are only vali
 Other drivers in the range have shell hooks only: RTC, IOE/IOEC (I/O expander over SIO), PWM, ADCONV, GIO, USF unit, water detection (`WATERDET`, a waterproof-housing leftover **[I]**), NMI/address-watch `dbgsup`, and the SDRAM arbiter/bus monitor.
 
 **Roles of the unnamed runs in 0x7E421020–0x7E520000 (D3 2026-11-09; 15d §5 has the full list and the TSV rows; anchors re-checked with `fwmap fn`):**
-- **BML/STL flash library 0x7E421C93–0x7E425F43**: STL read 0x7E421EC8 (← the traced wrapper 0x7E451D85 and `fmem` 0x7E44F509), write 0x7E421F23; BML erase/write/read; lock pair 0x7E4215A2/0x7E4215B6. The **STL core** (sector map) is 0x7E452343–0x7E455F92 (entries 0x7E4546CA/0x7E4546D4/0x7E4546ED) **[V edges; split I]** (D3 2026-11-09).
+- **BML/STL flash library 0x7E421C93–0x7E425F43**: STL read 0x7E421EC8 (← the traced wrapper 0x7E451D85 and `fmem` 0x7E44F509), write 0x7E421F23; BML erase/write/read; ~~lock pair 0x7E4215A2/0x7E4215B6~~ not a lock pair: 0x7E4215B6 (`mov (0x600011DC),d0; retf`) is the getter of a BML/STL mode flag whose setter is 0x7E4215AD (only caller CPU0 init 0x7E421115); when the flag is 0, the 13 STL/BML API functions (e.g. STL close 0x7E421D53 with d0 = 0x50004) call 0x7E4215A2 (`mov 0x7E401400,a1; calls (a1)`), which forwards the request to code at 0x7E401400, below block 0 (V; I: a loader/boot-ROM flash service) (D4 2026-11-09). The **STL core** (sector map) is 0x7E452343–0x7E455F92 (entries 0x7E4546CA/0x7E4546D4/0x7E4546ED) **[V edges; split I]** (D3 2026-11-09).
 - **uITRON 4.0 kernel internals** 0x7E4300D7–0x7E438BF1 (7 runs: object create/delete, task, flag/sem/dtq/mbx/mtx, `ref_*`, CPU lock, dispatch, scheduler 0x7E435FF4) **[V mechanics; names I]**; OSDB object dumpers for S_SHELL up to 0x7E44D6EE (error legend 0x7E44D439 `uITRON Error Code`) **[V]** (D3 2026-11-09).
 - **prm settings store** 0x7E455F93–0x7E45824A (`getval` 0x7E457C75, 2,168 call sites; section 07 §1) **[V]** (D3 2026-11-09).
 - **Soft-timer API** 0x7E465081–0x7E465582: `tmr_start` 0x7E4650A2 (124 sites), `tmr_stop` 0x7E4650DD (39) **[V]**; **PER_PCONT client side** 0x7E465D10–0x7E466886 (PWM duty 0x7E466435/0x7E466448) **[V edges; I]** (D3 2026-11-09).

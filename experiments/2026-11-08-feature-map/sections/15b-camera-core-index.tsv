@@ -545,7 +545,7 @@ lens tag Mr1/	tag	trace tag of 0x7E53774C	strrefs	V (string); role I
 0x7E530103	step	LENS_FIRM_UP after cmd 4: send cmd 5 / 0x1005; failure -> 0x6605	step fn stores the next step at req+4 and submits with 0x7E51F98E; retry count 0x604F9396	V
 0x7E530171	step	LENS_FIRM_UP after cmd 5: compare 128 B read-back 0x604F93BC with the packet (0x7E5303E1); match -> cmd 6 / 0x1006; mismatch -> resend cmd 4 (count 0x604F9398; 4th consecutive mismatch -> 0x6609); 4th consecutive transport failure -> 0x6606	step fn stores the next step at req+4 and submits with 0x7E51F98E; retry count 0x604F9396 (A8)	V
 0x7E53023E	step	LENS_FIRM_UP after cmd 6: packet index +1 (+16 low, +18 high, 256 per high step); more packets -> cmd 4; else cmd 1 / 0x1001; failure -> 0x6607	step fn stores the next step at req+4 and submits with 0x7E51F98E; retry count 0x604F9396	V
-0x7E53030A	step	LENS_FIRM_UP after cmd 1: done; failure -> 0x6602	step fn stores the next step at req+4 and submits with 0x7E51F98E; retry count 0x604F9396	V
+0x7E53030A	step	LENS_FIRM_UP after cmd 1: success -> status 0 in 0x604F943C, then 0x7E53043E (as Abort) submits a closing request (+8 = 0, done 0x7E53046A); failure -> 0x6602 (A11 2026-11-09)	step fn stores the next step at req+4 and submits with 0x7E51F98E; retry count 0x604F9396	V
 0x7E53043E	step	LENS_FIRM_UP abort: send cmd 0 with done 0x7E53046A (reports 0x604F943C to the client, frees)	step fn stores the next step at req+4 and submits with 0x7E51F98E; retry count 0x604F9396	V
 0x6601	error	LENS_FIRM_UP error (0x604F943C): cmd 0 failed	immediates in the step functions	V
 0x6602	error	LENS_FIRM_UP error (0x604F943C): cmd 1 (finish) failed	immediates in the step functions	V

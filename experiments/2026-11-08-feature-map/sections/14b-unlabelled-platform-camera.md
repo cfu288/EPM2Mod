@@ -22,6 +22,8 @@ Round D2 deep dive for the string-less blocks that coverage round C2 (review 1: 
 | 0x7E579AB7–0x7E579C33 | still `buff`: 7 pointer-only methods of a pool object (128-id bitmap at +52), vtable 0x7E78EEBC–0x7E78EEE0 | V |
 | **0x7E579C34–0x7E581FAF** | **WB (white balance / colour) module**, no file name; holds the **WB_MOV task 0x7E57F914** and IMG_PRECON's cmd 1–4 back-ends | V (task table; call graph) |
 | 0x7E581FB0 → | TAKE: 0x7E581FB0 is the TAKE module init (only caller Usr0 0x7E503DD4; inits 0x7E58287B, 0x7E587D08, 0x7E59A23C, 0x7E5A0863 …). TAKE_MAIN 0x7E58204D follows | V |
+| 0x7E5AB878–0x7E5ABE5A | **Eye-Fi device/request layer** (REQM/REQC/RSPC device files, `Request timed out...`), between the TAKE sequencer (ends 0x7E5AB877) and Eye-Fi card control 0x7E5ABE5B; callers 0x7E5ABE5B and 0x7E5AC0B8…0x7E5AC67F (D4 2026-11-09) | V (strings, callers) |
+| 0x7E5E2988 → | **AF/FCS init** 0x7E5E2988 (only caller Usr0 0x7E503DD4; calls 0x7E610887 `FCS MOVIE INIT END`, 0x7E611D3A, 0x7E626BE3). One more Usr0 module init, like the TAKE init 0x7E581FB0 above. 0x7E5E28D8–0x7E5E297F before it are strobe helpers (callers mostly strobe 0x7E5D9640… and TAKE 0x7E5A1A27…, plus a few others such as 0x7E539EA4 and 0x7E695302); 0x7E5E29CE (`fMS/`, `fME/`) follows (D4 2026-11-09) | V |
 | 0x7E635A08–0x7E635F4A | cam_ev.c (unchanged) | V |
 | **0x7E635F4B–0x7E636A03** | **cam_expcal.c**: exposure → sensor-timing calculator ("sensor-mode parameter builder", F015) | V code; name I (§0) |
 | **0x7E636A04–…** | **cam_frame.c starts here**, not at the 0x7E63790D anchor | V (error id 0x12 starts at 0x7E636A04; rodata rule) |

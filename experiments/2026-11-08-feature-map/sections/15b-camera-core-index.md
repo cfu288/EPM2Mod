@@ -220,7 +220,7 @@ The **command order (V)** is **7 → 0 → 3 → [4 → 5 → compare → 6] × 
 | 0x7E530103 | 4 | 5 | 0x6605 |
 | 0x7E530171 | 5 | match → 6; mismatch → 4 again | 0x6606 transport; 0x6609 on the 4th consecutive mismatch (count 0x604F9398 > 3) (A8 2026-11-09) |
 | 0x7E53023E | 6 | next packet → 4; last → 1 | 0x6607 |
-| 0x7E53030A | 1 | — (done) | 0x6602 |
+| 0x7E53030A | 1 | ~~— (done)~~ on success: status 0 → 0x604F943C, then 0x7E53043E (the same routine as Abort), which submits one closing request (+8 = 0, done 0x7E53046A) (A11 2026-11-09) | 0x6602 |
 
 - Abort 0x7E53043E sends cmd 0 and reports 0x604F943C. Class-7 bytes: cmd n → 0x70 + n (type 1) or 0x60 + n (type 2). The reply handler 0x7E52F025 copies the 128-B read-back of 0x65/0x75 to 0x604F93BC. For 0x67/0x77 it parses id, hw version, version, extension and serial[12] into 0x604F939C (V). So the roles are: cmd 7 = identify, 4 = write a 128-B packet, 5 = read back, 6 = next/commit, 1 = finish (I; the 4/5 roles are firm).
 - 0x7E5307C7 skips the compare for lens ids 0x21001–0x21004 with u16 0x1000 (V; reason I). No 0x6603 code exists.
@@ -267,8 +267,8 @@ Tables per owner: HDMI/display/touch 40, movie 34, IMG 25, AF (FCS_MOVIE/IAF/con
   - cam_shutter.c is 0x7E6557CE–0x7E6561D9.
   - cam_timer.c is 0x7E66226E–0x7E6629A7.
 - **Regions table:**
-  - Row 0x7E621020–0x7E6A1020 → 0x7E621020–**0x7E6A935C**: the exp module (EXP_MOVIE) runs to 0x7E6A935C.
-  - Row 0x7E6A1020–0x7E70B000 starts at **0x7E6A935D** with the HDMI driver; the display, touch and HDMI tasks follow, and `mov*.c` starts at 0x7E6C3955. Its label "Movie (`mov*.c`)" first is wrong for 0x7E6A1020–0x7E6C3954.
+  - Row ~~0x7E621020–0x7E6A1020~~ → 0x7E6211E1–**0x7E6A935C** (the row start is the first camera-core function 0x7E6211E1, as the regions table now has it): the exp module (EXP_MOVIE) runs to 0x7E6A935C. (D4 2026-11-09)
+  - Row ~~0x7E6A1020–0x7E70B000~~ (now 0x7E6A935D–0x7E70B3F7 in the regions table) starts at **0x7E6A935D** with the HDMI driver; the display, touch and HDMI tasks follow, and `mov*.c` starts at 0x7E6C3955. Its label "Movie (`mov*.c`)" first was wrong for the part before 0x7E6C3955. (D4 2026-11-09)
   - Inside the camera-core row, name mdet 0x7E666C5B–0x7E674DF4 and res 0x7E674DF5–0x7E675D98 (§4).
 - **03 overview / §7b:**
   - "EXP_MOVIE … about ~~0x7E68F000–0x7E6A0000~~" (L1 2026-11-09) → 0x7E68F07C–0x7E6A935C. Section 12's 0x7E6A9400 was right to within one HDMI function.

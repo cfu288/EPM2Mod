@@ -182,7 +182,7 @@ The E-PM2 has no FireWire hardware. The 1394 slot exists only so the shared task
 
 ## 3. Eye-Fi and FlashAir
 
-- **Eye-Fi** (EYEFI task 0x7E5C1981, code ~0x7E5AB–0x7E5C7): it makes the `EyeFi` directory on the card, reads `EYEFI_CARD_TOKEN_MAC_ADDRESS`, and uses `eyefi_get_status`, `eyefi_enable_operation` and `eyefi_get_file_status(_array)`.
+- **Eye-Fi** (EYEFI task 0x7E5C1981, code ~~~0x7E5AB–0x7E5C7~~ from the device/request layer 0x7E5AB878 to ~0x7E5C7xxx (D4 2026-11-09)): it makes the `EyeFi` directory on the card, reads `EYEFI_CARD_TOKEN_MAC_ADDRESS`, and uses `eyefi_get_status`, `eyefi_enable_operation` and `eyefi_get_file_status(_array)`.
   These are Eye-Fi's control-file protocol over normal FAT I/O. The GUI side is `api_media_*_Eyefi_*` and `EV_EYEFI_STATUS`. (strings)
 - **FlashAir = the "SPC" module** (SPC_MAIN 0x7F0A7AF7, SPC_TIMER 0x7F0A7BF7, code 0x7F0A4A–0x7F0A7C):
   - the iSDIO register/command layer (`isdio_read_register`, `isdio_write_command` with com_id/seq_id/res_status, `num_of_res_sts_queue_supp`, `establish_info`, `vendor_info`);

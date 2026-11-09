@@ -50,6 +50,8 @@ Scope: the GUI code 0x7ECCB800–0x7EE02094, method by method. This section buil
 | 64–68 | bit 0x2000 (+256/+260), bit 0x1000 (+264/+268); +272 (0x7ECEF036) clears both (vt+264(0), vt+256(0)) and then zeroes the +40 plane-mask dword (`clr d0; mov d0,(40,a2)`) (A6 2026-11-09) | V |
 | 75–78 | Bits of the plane mask +40: (1 << (k−1)) and (0x10000 << (k−1)) | V; the "plane" name is I |
 | 79/80 | layer u16 +30 | V |
+| 54, 57/58, 60, 81–83, 99, 100 (D4 2026-11-09) | message targets of OnMessage (case table 0x7EEF5228): msg 2 → **+216 (slot 54)**; msg 1 → +228 (57), then **+396 (99)**; 0x1006 GM_USER → +232 (58); 0x1103 GM_DELETECHILD → **+240 (60)**; 0x1300/0x1301/0x1302 → **+324/+328/+332 (81–83)**; 0x1901/0x1902 GM_DB_* → **+400 (100)**, OnDBUpdate (name I) (D4 2026-11-09) | V (cases 0x7ECEE377…0x7ECEE3ED: each loads its own vt offset first) (D4 2026-11-09) |
+| panel 91 / 129 (+364/+516) (D4 2026-11-09) | **Panel classes (base vt 0x7EF11778):** slot 91 = post-create init: it binds the resource table through 0x7ED16C72(panel resource no.), calls 0x7EDC62BD and fetches children through slot 129 (e.g. 0x7ED37F27, 0x7ED79406); 97 of the 98 numbered panel vtables override it (16b counts 114 of 116 with the unnumbered ones). Slot 129 = getChild(i): `cmp N,d1; bcc → NULL; add 792,a0; mov (d0,a0),a0` (bounds-checked +792 array; the base returns NULL, 0x7ECF466A) (D4 2026-11-09) | V (D4 2026-11-09) |
 | 101 (+404) | hit test: gets a rect through its own OnMessage(0x1301), then tests the point | V for the structure |
 | 102 (+408) | OnMessage (13d §2.3) | V |
 | 103 (+412) | **OnNotify(d0 = code, d1 = child id, a1, stack)**: the per-class notification map (§5, shape E) | V |
@@ -157,6 +159,12 @@ All of these return at once if w = NULL.
 | 0x7EDC1AB4 | 8 | **setLabelAlign(w, axis 0/1, 0/1/2)**: writes byte +12 or +13 of the 0x8010 style, then 0x7ED2CE6A |
 | 0x7EDC1B15 | 230 | setListItemValue(w, i, v): set only if changed |
 
+**Other GUI helpers (D4 2026-11-09, 16b §4.3 item 7; V):**
+- 0x7ECE631E: CA trace print (447 caller functions). Module word in a0, text in a1; it prints through 0x7ECE64B3 only when the gate 0x7ECE6408 returns non-zero (D4 2026-11-09).
+- 0x7EDC3BCC: GUI printf (493 caller functions); the format is the first stack argument ((272,sp) after its `add -260,sp`). It prints when RAM 0x602BC60C ≥ 2 (`cmp 2,d0; blt`); its twin 0x7EDC3A50 prints at ≥ 1 (D4 2026-11-09).
+- 0x7ED16C72(d0 = panel type − 0x6000, a0 = panel): per-panel resource initialiser (99 caller functions, the panels' slot 91). It indexes the 8-B `{u32 type, u32 init fn}` table **0x7EF03C08** (`add 0x7EF03C08,a2` after `asl 3`; e.g. index 75 = type 0x604B), calls the init fn if it is non-NULL, then 0x7ED17A93 and 0x7ED17AD4. 16b names the table 0x7EF04808; the code adds 0x7EF03C08, and no code refers to 0x7EF04808 (D4 2026-11-09).
+- 0x7ED8BC18: `{u32 key, u32 value}` table search (126 caller functions): d0 = key, a1 = table, d1 = count; on a match it stores the u16 value to the pointer at (12,sp) (D4 2026-11-09).
+
 ### 2.8 Panel child builders: origin-only relocation (V; corrects 13d §2.2 "scales each child rect")
 - There are 61 builders, from 0x7ED37E2D to 0x7ED82096. Each is the panel vtable slot 106 (+424 = GM_CREATECHILDREN). The container base returns 1 there.
 - **Loop**, for each resource pointer in the class's RAM table (e.g. 0x602B6214+4k, k = 1..11 in 0x7ED37E2D):
@@ -262,9 +270,9 @@ All of these return at once if w = NULL.
 
 ### 4.3 RAW-edit menu page (C2 F065)
 - **Page ids:** the menu-page registry ~~0x7EFE190C~~ 0x7EFE180C (312 entries keyed by list id; 13d §5, 15a §4) (D3 2026-11-09) has **page 620 → factory 0x7EDF77BD and page 621 → 0x7EDF77BD** (rows at 0x7EFE2114, V). So 620/621 are **page ids**, not menu items (corrects C2). Note (D3 2026-11-09): the registry keys are list ids (openPage maps page ids to list ids first, 13d §5), so 620/621 here are list keys; the page ids that reach them were not checked (D3 2026-11-09). The current page id is RAM 0x602BCFD8 (read by 0x7EDCD7CA).
-- **Vtable 0x7F0032B8** (dtor slot 1 stores it). Slots 3–33 are shared menu-page base slots (0x7EDCCCxx–0x7EDCDxxx); own slots are 0, 2, 31, 34–46.
-- **Slot 31 (F065)** calls `OlyApiEditRaw` vt+8 (API 0x031B06) for page 620 and vt+12 (0x031B0A) for page 621. **I:** these are the two RAW Data Edit modes of 06 CmpERaw ("current settings" / "custom"), but the order is not known.
-- Slot 38 0x7EDF79A4 passes the constants 913 and 197 (V). Read as string ids, they are "Exit" and "Set" (I: an Exit/Set dialog).
+- ~~**Vtable 0x7F0032B8** (dtor slot 1 stores it). Slots 3–33 are shared menu-page base slots (0x7EDCCCxx–0x7EDCDxxx); own slots are 0, 2, 31, 34–46.~~ **Vtable 0x7F0032C0** (the page ctor 0x7EDF779C calls base `userCommonWizard1NRightAligned` 0x7EDED9DD, then stores 0x7F0032C0). Slot 0 = dtor 0x7EDF77AE. Slot numbers below are those of 0x7F0032C0, i.e. 2 less than in the earlier 0x7F0032B8 reading: slots 1–31 are shared menu-page base slots (0x7EDCCCxx–0x7EDCDxxx), own slots are 0, 29 and 32–44. **0x7F0032B8 is a separate 2-slot object** (ctor 0x7EDF6295, base ctor 0x7ED8BBA6; slot 1 0x7EDF63EB is its dtor, which stores 0x7F0032B8; slot 0 0x7EDF6447 writes DM blocks 37/29/30 through 0x7ECEF667) (D4 2026-11-09).
+- **Slot ~~31~~ 29 (0x7EDF795E; F065)** (D4 2026-11-09) calls `OlyApiEditRaw` vt+8 (API 0x031B06) for page 620 and vt+12 (0x031B0A) for page 621. **I:** these are the two RAW Data Edit modes of 06 CmpERaw ("current settings" / "custom"), but the order is not known.
+- Slot ~~38~~ 36 (D4 2026-11-09) 0x7EDF79A4 passes the constants 913 and 197 (V). Read as string ids, they are "Exit" and "Set" (I: an Exit/Set dialog).
 
 ### 4.4 HIDE_MODE (SS_MENU_MAIN state 6) and the debug-menu sequences (V unless marked; C2 F062)
 **Entry function 0x7EDABA6F:**

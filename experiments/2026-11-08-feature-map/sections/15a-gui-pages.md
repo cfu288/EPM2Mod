@@ -115,7 +115,7 @@ This table replaces 13d §1 rows "~~0x7EDC15B0–~0x7EDE0000~~" and "~~~0x7EDE00
   - Singleton pages write their own record. Page 43 puts 134 "Firmware" first in block 76.
 
 ### 2.2 Page index (TSV `page N`, `page-class` rows)
-504 page ids resolve: 191 to singleton/object getters and 313 to list ids. They resolve to 180 classes (179 class code ranges). Each `page-class` row gives the code range [lo, end of the last own method], ctor, vtable, slot count, base, own slots, panels shown (ShowPanelEx immediates in its own code), OlyApi interfaces called and the first string.
+504 page ids resolve: 191 to singleton/object getters and 313 to list ids. They resolve to 180 classes (179 class code ranges). Each `page-class` row gives the code range ~~[lo, end of the last own method]~~ [lo, end), where `end` is **exclusive**: in 179 of the 180 rows it is the start of the next class (its ctor; e.g. 0x7EDC8AD0 is the next class's ctor, not part of the pages-639 class 0x7EDC8692) (D4 2026-11-09), ctor, vtable, slot count, base, own slots, panels shown (ShowPanelEx immediates in its own code), OlyApi interfaces called and the first string.
 
 **Byte signatures (V).**
 
@@ -168,7 +168,7 @@ Each numbered panel's ctor range comes from the CreatePanel case table (13d §3)
 | 147 / 148 | HIDE_MODE pages and Custom Menu |
 | 150–159 | debug menu and self-adjust |
 
-The 16 unnumbered panel classes sit inside the ranges of their numbered neighbours.
+~~The 16 unnumbered panel classes sit inside the ranges of their numbered neighbours.~~ The 16 unnumbered panel classes all follow GCPnl_Zoom (panel 55, 0x7ED7932E–0x7ED7A79E). Their ctors (type: ctor) are 0x605B: 0x7ED7A79F, 0x605D: 0x7ED7B07A, 0x6062: 0x7ED7B250, 0x6008: 0x7ED7B4B3, 0x6060: 0x7ED7B8CC, 0x605E: 0x7ED7BBEB, 0x605C: 0x7ED7BE74, 0x6003: 0x7ED7C0C5, 0x6007: 0x7ED7C5B7, 0x601E: 0x7ED7C93E, 0x6033: 0x7ED7E21A, 0x6070: 0x7ED7E533, 0x605F: 0x7ED7E77B, 0x6061: 0x7ED7E98D, 0x6001: 0x7ED7ED04 and 0x6071: 0x7ED7F445; the last class ends at 0x7ED7F6D4. Each is created by type through the factory table 0x7EF0F3B0 (V: each factory entry calls its ctor) (D4 2026-11-09).
 
 ### 2.4 GuiTouch (V; corrects 13d §1 and C3 F064)
 1. **Binding.** ShowPanelEx 0x7EDC5D2D calls 0x7EDCBA98(panel no.), which looks the panel up in **0x7EFE42EC** (16 × `{u16 panel, u16 type, make, RAM descriptor}`). The 16 touch panels are 10, 11, 12, 13, 14, 17, 18, 19, 23, 24, 25, 26, 27, 29, 30 and 66; 17 and 18 share one descriptor. On a match:
