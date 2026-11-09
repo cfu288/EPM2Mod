@@ -23,7 +23,7 @@
   - `fwmap.py tasks` prints both tables.
   - Correction history: first read at 0x17D9C, then at 0x17CBC with a `cfg_id − 2` rule. Both were one field off; section 01 found the real layout.
 - **Task configuration (CPU1):** block-0 offset 0x1C490, same layout, 30 tasks. Bit 12 of the id marks CPU1, and `OlyTaSt` forwards such ids to the other core. Names come from the boot code's labels (section 01): DBG_MESS1, MOV_AVCHD/MOV_AVCHDI/MOV_ENCODE, ART_SUB, C3D_EXE, CPUCONN1, an 11-task worker pool (entry 0x7EE8FBB1), and the CPU1 boot task 0x1001.
-- **Default interrupt vector table:** block-0 offset 0x4CDD0; every entry points to 0x7E44ACB0.
+- ~~Default interrupt vector table at block-0 offset 0x4CDD0~~ **Corrected (13f, checked by coordinator):** the 26 words at 0x7E46DDF0 all point to 0x7E44ACB0, which prints `start:throug` for the `busmes through` debug command (called from the shell at 0x7E44A9A7). They are a debug-command table, not interrupt vectors. The real interrupt path: vector registers 0x8000–0x801C → stubs 0x7E430020–0x7E430070 → common entry 0x7E432648; `irq_attach` 0x7E463C8E (57 call sites) → `irq_register` 0x7E44B57F.
 - **OS wrappers:** `OlyTa*` (task), `OlyEv*` (event flag), `OlyQe*` (queue), `OlySm*` (semaphore). The OS is uITRON.
 - **Settings getter:** `0x7E457C75(id, a0=0, d1=index)`, with 2,168 call sites. Example: the movie routine reads id 26225 (format) and id 33105/index 7.
 

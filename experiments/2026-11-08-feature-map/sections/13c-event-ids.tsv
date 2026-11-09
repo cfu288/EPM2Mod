@@ -331,107 +331,107 @@ id	vtable	ctor	isTypeOf	parent_id	owner (package of ctor)	id_block	n_create_fns	
 7018	7ec8cdd8	7eb8c0df	7eb8c0f9		Com_ framework / transition manager	7001-7020 evTraCom_*	1	1				
 7019	7ec8ce20	7eb8c107	7eb8c121		Com_ framework / transition manager	7001-7020 evTraCom_*	1	10				
 7020	7ec8ce68	7eb8c12f	7eb8c149		Com_ framework / transition manager	7001-7020 evTraCom_*	1	5				
-7071	7ec88b0c	7eb79491	7eb794ab		CmpSts_MfAssist (next class)	7071-7109	15	15				
-7072	7ec88b54	7eb794b9	7eb794d3		CmpSts_MfAssist (next class)	7071-7109	2	7				
-7073	7ec88b9c	7eb794e1	7eb794fb		CmpSts_MfAssist (next class)	7071-7109	1	14				
-7074	7ec88be4	7eb79509	7eb79523		CmpSts_MfAssist (next class)	7071-7109	1	2				
-7075	7ec88c2c	7eb79531	7eb7954b		CmpSts_MfAssist (next class)	7071-7109	1	2				
-7076	7ec88c74	7eb79559	7eb79573		CmpSts_MfAssist (next class)	7071-7109	1	1				
-7077	7ec88cbc	7eb79581	7eb7959b		CmpSts_MfAssist (next class)	7071-7109	1	2				
-7078	7ec88d04	7eb795a9	7eb795c3		CmpSts_MfAssist (next class)	7071-7109	1	1				
-7079	7ec88d4c	7eb795d1	7eb795eb		CmpSts_MfAssist (next class)	7071-7109	1	5				
-7080	7ec88d94	7eb795f9	7eb79613		CmpSts_MfAssist (next class)	7071-7109	1	0				
-7081	7ec88ddc	7eb79621	7eb7963b		CmpSts_MfAssist (next class)	7071-7109	1	1				
-7082	7ec88e24	7eb79649	7eb79663		CmpSts_MfAssist (next class)	7071-7109	1	1				
-7083	7ec88e6c	7eb79671	7eb7968b		CmpSts_MfAssist (next class)	7071-7109	2	1				
-7084	7ec88eb4	7eb79699	7eb796b3		CmpSts_MfAssist (next class)	7071-7109	1	7				
-7085	7ec88efc	7eb796c1	7eb796db		CmpSts_MfAssist (next class)	7071-7109	1	2				
-7086	7ec88f44	7eb796e9	7eb79703		CmpSts_MfAssist (next class)	7071-7109	5	5				
-7087	7ec88f8c	7eb79711	7eb7972b		CmpSts_MfAssist (next class)	7071-7109	1	1				
-7088	7ec88fd4	7eb79739	7eb79753		CmpSts_MfAssist (next class)	7071-7109	2	1				
-7089	7ec8901c	7eb79761	7eb7977b		CmpSts_MfAssist (next class)	7071-7109	1	2				
-7090	7ec89064	7eb79789	7eb797a3		CmpSts_MfAssist (next class)	7071-7109	3	5				
-7091	7ec890ac	7eb797b1	7eb797cb		CmpSts_MfAssist (next class)	7071-7109	3	2				
-7092	7ec890f4	7eb797d9	7eb797f3		CmpSts_MfAssist (next class)	7071-7109	1	4				
-7093	7ec8913c	7eb79801	7eb7981b		CmpSts_MfAssist (next class)	7071-7109	1	1				
-7094	7ec89184	7eb79829	7eb79843		CmpSts_MfAssist (next class)	7071-7109	3	5				
-7095	7ec891cc	7eb79851	7eb7986b		CmpSts_MfAssist (next class)	7071-7109	2	2				
-7096	7ec89214	7eb79879	7eb79893		CmpSts_MfAssist (next class)	7071-7109	1	2				
-7097	7ec8925c	7eb798a1	7eb798bb		CmpSts_MfAssist (next class)	7071-7109	1	1				
-7098	7ec892a4	7eb798c9	7eb798e3		CmpSts_MfAssist (next class)	7071-7109	1	1				
-7099	7ec892ec	7eb798f1	7eb7990b		CmpSts_MfAssist (next class)	7071-7109	2	4				
-7100	7ec89334	7eb79919	7eb79933		CmpSts_MfAssist (next class)	7071-7109	1	0				
-7101	7ec8937c	7eb79941	7eb7995b		CmpSts_MfAssist (next class)	7071-7109	1	1				
-7102	7ec893c4	7eb79969	7eb79983		CmpSts_MfAssist (next class)	7071-7109	1	1				
-7103	7ec8940c	7eb79991	7eb799ab		CmpSts_MfAssist (next class)	7071-7109	2	4				
-7104	7ec89454	7eb799b9	7eb799d3		CmpSts_MfAssist (next class)	7071-7109	1	1				
-7105	7ec8949c	7eb799e1	7eb799fb		CmpSts_MfAssist (next class)	7071-7109	1	1				
-7106	7ec894e4	7eb79a09	7eb79a23		CmpSts_MfAssist (next class)	7071-7109	1	3				
-7107	7ec8952c	7eb79a31	7eb79a4b		CmpSts_MfAssist (next class)	7071-7109	1	1				
-7108	7ec89574	7eb79a59	7eb79a73		CmpSts_MfAssist (next class)	7071-7109	1	1				
-7109	7ec895bc	7eb79a81	7eb79a9b		CmpSts_MfAssist (next class)	7071-7109	1	1				
-7411	7ec4c844	7ea84211	7ea8422b		CmpCst_Communication (next class)	7411-7415	1	3				
-7412	7ec4c88c	7ea84239	7ea84253		CmpCst_Communication (next class)	7411-7415	1	1				
-7413	7ec4c8d4	7ea84261	7ea8427b		CmpCst_Communication (next class)	7411-7415	1	1				
-7414	7ec4c91c	7ea84289	7ea842a3		CmpCst_Communication (next class)	7411-7415	1	2				
-7415	7ec4c964	7ea842b1	7ea842cb		CmpCst_Communication (next class)	7411-7415	1	2				
-7591	7ec89610	-	7eb79cf2		CmpSts_MfAssist (next class)	7591-7611	0	8				
-7592	7ec89658	-	7eb79d00		CmpSts_MfAssist (next class)	7591-7611	0	4				
-7593	7ec896a0	7eb79d0e	7eb79d28		CmpSts_MfAssist (next class)	7591-7611	2	2				
-7594	7ec896e8	-	7eb79d36		CmpSts_MfAssist (next class)	7591-7611	0	2				
-7595	7ec89730	-	7eb79d44		CmpSts_MfAssist (next class)	7591-7611	0	2				
-7596	7ec89778	-	7eb79d52		CmpSts_MfAssist (next class)	7591-7611	0	2				
-7597	7ec897c0	7eb79d60	7eb79d7a		CmpSts_MfAssist (next class)	7591-7611	1	38				
-7598	7ec89808	7eb79d88	7eb79da2		CmpSts_MfAssist (next class)	7591-7611	1	38				
-7599	7ec89850	7eb79db0	7eb79dca		CmpSts_MfAssist (next class)	7591-7611	1	38				
-7600	7ec89898	7eb79dd8	7eb79df2		CmpSts_MfAssist (next class)	7591-7611	1	38				
-7601	7ec898e0	7eb79e00	7eb79e1a		CmpSts_MfAssist (next class)	7591-7611	1	1				
-7602	7ec89928	7eb79e28	7eb79e42		CmpSts_MfAssist (next class)	7591-7611	1	1				
-7603	7ec89970	7eb79e50	7eb79e6a		CmpSts_MfAssist (next class)	7591-7611	1	1				
-7604	7ec899b8	7eb79e78	7eb79e92		CmpSts_MfAssist (next class)	7591-7611	1	38				
-7605	7ec89a00	7eb79ea0	7eb79ebe		CmpSts_MfAssist (next class)	7591-7611	1	38				
-7606	7ec89a48	7eb79ecc	7eb79ee6		CmpSts_MfAssist (next class)	7591-7611	2	38				
-7607	7ec89a90	7eb79ef4	7eb79f0e		CmpSts_MfAssist (next class)	7591-7611	1	38				
-7608	7ec89ad8	7eb79f1c	7eb79f36		CmpSts_MfAssist (next class)	7591-7611	38	40				
-7609	7ec89b20	7eb79f44	7eb79f5e		CmpSts_MfAssist (next class)	7591-7611	3	138			Cmp_PlaySingleComponentBase::after_app_display_select_execute_end	CmpEAsp_EditAspectComponent::save_start_enter;CmpEImg_EditImageOverlayComponent::save_start
-7610	7ec89b68	7eb79f6c	7eb79f86		CmpSts_MfAssist (next class)	7591-7611	40	40				
-7611	7ec89bb0	7eb79f94	7eb79fae		CmpSts_MfAssist (next class)	7591-7611	1	38				
-7881	7ec888c0	7eb792f3	7eb7930d		CmpSts_MfAssist (next class)	7881-7888	1	1				
-7882	7ec88908	7eb7931b	7eb79335		CmpSts_MfAssist (next class)	7881-7888	2	1				
-7883	7ec88950	7eb79343	7eb7935d		CmpSts_MfAssist (next class)	7881-7888	1	1				
-7884	7ec88998	7eb7936b	7eb79385		CmpSts_MfAssist (next class)	7881-7888	1	1				
-7885	7ec889e0	-	7eb79393		CmpSts_MfAssist (next class)	7881-7888	0	1				
-7886	7ec88a28	7eb793a1	7eb793bb		CmpSts_MfAssist (next class)	7881-7888	1	1				
-7887	7ec88a70	7eb793c9	7eb793e3		CmpSts_MfAssist (next class)	7881-7888	1	1				
-7888	7ec88ab8	7eb793f1	7eb7940b		CmpSts_MfAssist (next class)	7881-7888	1	1				
-8041	7ec89f04	7eb7a321	7eb7a33b		CmpSts_MfAssist (next class)	8041-8048 evTraCmpPls_*	1	1				
-8042	7ec89f4c	7eb7a349	7eb7a363		CmpSts_MfAssist (next class)	8041-8048 evTraCmpPls_*	1	1			CmpPls_PlayNotifyBodyRotateObserver::update	
-8043	7ec89f94	7eb7a371	7eb7a38b		CmpSts_MfAssist (next class)	8041-8048 evTraCmpPls_*	4	1				
-8044	7ec89fdc	7eb7a399	7eb7a3b3		CmpSts_MfAssist (next class)	8041-8048 evTraCmpPls_*	4	1				
-8045	7ec8a024	7eb7a3c1	7eb7a3db		CmpSts_MfAssist (next class)	8041-8048 evTraCmpPls_*	1	1	evTraCmpPls_NotifyMoveCurrentContinuous	string in a function that uses only this id (inferred)		
-8046	7ec8a06c	7eb7a3e9	7eb7a403		CmpSts_MfAssist (next class)	8041-8048 evTraCmpPls_*	1	5				
-8047	7ec8a0b4	7eb7a411	7eb7a42b		CmpSts_MfAssist (next class)	8041-8048 evTraCmpPls_*	1	1	evTraCmpPls_NotifyStartMoveCurrent	string in a function that uses only this id (inferred)		
-8048	7ec8a0fc	7eb7a439	7eb7a453		CmpSts_MfAssist (next class)	8041-8048 evTraCmpPls_*	1	1				
-8081	7ec89c04	7eb7a0f7	7eb7a111		CmpSts_MfAssist (next class)	8081-8081	1	1			CmpPli_PlayNotifyBodyRotateObserver::update	
-8221	7ec88668	7eb79137	7eb79151		CmpSts_MfAssist (next class)	8221-8221	1	1				
-8261	7ec89e68	7eb7a2af	7eb7a2c9		CmpSts_MfAssist (next class)	8261-8262	1	2				
-8262	7ec89eb0	7eb7a2d7	7eb7a2f5		CmpSts_MfAssist (next class)	8261-8262	1	1				
-8281	7ec8a30c	7eb7a623	7eb7a63d		CmpSts_MfAssist (next class)	8281-8283 evTraCmpRPri_*	2	2				
-8282	7ec8a354	7eb7a64b	7eb7a665		CmpSts_MfAssist (next class)	8281-8283 evTraCmpRPri_*	1	1	evTraCmpRPri_NotifyStartMoveCurrent	string in a function that uses only this id (inferred)		
-8283	7ec8a39c	7eb7a673	7eb7a68d		CmpSts_MfAssist (next class)	8281-8283 evTraCmpRPri_*	1	1	evTraCmpRPri_NotifyMoveCurrentContinuous	string in a function that uses only this id (inferred)		
-8521	7ec89c58	7eb7a12e	7eb7a148		CmpSts_MfAssist (next class)	8521-8521	1	1				
-8541	7ec8a150	7eb7a4d9	7eb7a4f3		CmpSts_MfAssist (next class)	8541-8546	1	1				
-8542	7ec8a198	7eb7a501	7eb7a51b		CmpSts_MfAssist (next class)	8541-8546	1	1				
-8543	7ec8a1e0	7eb7a529	7eb7a543		CmpSts_MfAssist (next class)	8541-8546	1	1				
-8544	7ec8a228	7eb7a551	7eb7a56b		CmpSts_MfAssist (next class)	8541-8546	1	1				
-8545	7ec8a270	7eb7a579	7eb7a593		CmpSts_MfAssist (next class)	8541-8546	1	1				
-8546	7ec8a2b8	7eb7a5a1	7eb7a5bb		CmpSts_MfAssist (next class)	8541-8546	2	2				
-8561	7ec89cac	7eb7a165	7eb7a17f		CmpSts_MfAssist (next class)	8561-8566	1	1				
-8562	7ec89cf4	7eb7a18d	7eb7a1a7		CmpSts_MfAssist (next class)	8561-8566	1	1				
-8563	7ec89d3c	7eb7a1b5	7eb7a1cf		CmpSts_MfAssist (next class)	8561-8566	1	1				
-8564	7ec89d84	7eb7a1dd	7eb7a1f7		CmpSts_MfAssist (next class)	8561-8566	1	1				
-8565	7ec89dcc	7eb7a205	7eb7a21f		CmpSts_MfAssist (next class)	8561-8566	1	1				
-8566	7ec89e14	7eb7a22d	7eb7a247		CmpSts_MfAssist (next class)	8561-8566	2	2				
+7071	7ec88b0c	7eb79491	7eb794ab		CmpSht_ShootingComponent_NEW (next class)	7071-7109	15	15				
+7072	7ec88b54	7eb794b9	7eb794d3		CmpSht_ShootingComponent_NEW (next class)	7071-7109	2	7				
+7073	7ec88b9c	7eb794e1	7eb794fb		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	14				
+7074	7ec88be4	7eb79509	7eb79523		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	2				
+7075	7ec88c2c	7eb79531	7eb7954b		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	2				
+7076	7ec88c74	7eb79559	7eb79573		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	1				
+7077	7ec88cbc	7eb79581	7eb7959b		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	2				
+7078	7ec88d04	7eb795a9	7eb795c3		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	1				
+7079	7ec88d4c	7eb795d1	7eb795eb		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	5				
+7080	7ec88d94	7eb795f9	7eb79613		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	0				
+7081	7ec88ddc	7eb79621	7eb7963b		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	1				
+7082	7ec88e24	7eb79649	7eb79663		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	1				
+7083	7ec88e6c	7eb79671	7eb7968b		CmpSht_ShootingComponent_NEW (next class)	7071-7109	2	1				
+7084	7ec88eb4	7eb79699	7eb796b3		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	7				
+7085	7ec88efc	7eb796c1	7eb796db		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	2				
+7086	7ec88f44	7eb796e9	7eb79703		CmpSht_ShootingComponent_NEW (next class)	7071-7109	5	5				
+7087	7ec88f8c	7eb79711	7eb7972b		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	1				
+7088	7ec88fd4	7eb79739	7eb79753		CmpSht_ShootingComponent_NEW (next class)	7071-7109	2	1				
+7089	7ec8901c	7eb79761	7eb7977b		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	2				
+7090	7ec89064	7eb79789	7eb797a3		CmpSht_ShootingComponent_NEW (next class)	7071-7109	3	5				
+7091	7ec890ac	7eb797b1	7eb797cb		CmpSht_ShootingComponent_NEW (next class)	7071-7109	3	2				
+7092	7ec890f4	7eb797d9	7eb797f3		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	4				
+7093	7ec8913c	7eb79801	7eb7981b		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	1				
+7094	7ec89184	7eb79829	7eb79843		CmpSht_ShootingComponent_NEW (next class)	7071-7109	3	5				
+7095	7ec891cc	7eb79851	7eb7986b		CmpSht_ShootingComponent_NEW (next class)	7071-7109	2	2				
+7096	7ec89214	7eb79879	7eb79893		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	2				
+7097	7ec8925c	7eb798a1	7eb798bb		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	1				
+7098	7ec892a4	7eb798c9	7eb798e3		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	1				
+7099	7ec892ec	7eb798f1	7eb7990b		CmpSht_ShootingComponent_NEW (next class)	7071-7109	2	4				
+7100	7ec89334	7eb79919	7eb79933		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	0				
+7101	7ec8937c	7eb79941	7eb7995b		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	1				
+7102	7ec893c4	7eb79969	7eb79983		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	1				
+7103	7ec8940c	7eb79991	7eb799ab		CmpSht_ShootingComponent_NEW (next class)	7071-7109	2	4				
+7104	7ec89454	7eb799b9	7eb799d3		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	1				
+7105	7ec8949c	7eb799e1	7eb799fb		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	1				
+7106	7ec894e4	7eb79a09	7eb79a23		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	3				
+7107	7ec8952c	7eb79a31	7eb79a4b		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	1				
+7108	7ec89574	7eb79a59	7eb79a73		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	1				
+7109	7ec895bc	7eb79a81	7eb79a9b		CmpSht_ShootingComponent_NEW (next class)	7071-7109	1	1				
+7411	7ec4c844	7ea84211	7ea8422b		CmpSqp_SequencePartsBase (next class)	7411-7415	1	3				
+7412	7ec4c88c	7ea84239	7ea84253		CmpSqp_SequencePartsBase (next class)	7411-7415	1	1				
+7413	7ec4c8d4	7ea84261	7ea8427b		CmpSqp_SequencePartsBase (next class)	7411-7415	1	1				
+7414	7ec4c91c	7ea84289	7ea842a3		CmpSqp_SequencePartsBase (next class)	7411-7415	1	2				
+7415	7ec4c964	7ea842b1	7ea842cb		CmpSqp_SequencePartsBase (next class)	7411-7415	1	2				
+7591	7ec89610	-	7eb79cf2		CmpSht_ShootingComponent_NEW (next class)	7591-7611	0	8				
+7592	7ec89658	-	7eb79d00		CmpSht_ShootingComponent_NEW (next class)	7591-7611	0	4				
+7593	7ec896a0	7eb79d0e	7eb79d28		CmpSht_ShootingComponent_NEW (next class)	7591-7611	2	2				
+7594	7ec896e8	-	7eb79d36		CmpSht_ShootingComponent_NEW (next class)	7591-7611	0	2				
+7595	7ec89730	-	7eb79d44		CmpSht_ShootingComponent_NEW (next class)	7591-7611	0	2				
+7596	7ec89778	-	7eb79d52		CmpSht_ShootingComponent_NEW (next class)	7591-7611	0	2				
+7597	7ec897c0	7eb79d60	7eb79d7a		CmpSht_ShootingComponent_NEW (next class)	7591-7611	1	38				
+7598	7ec89808	7eb79d88	7eb79da2		CmpSht_ShootingComponent_NEW (next class)	7591-7611	1	38				
+7599	7ec89850	7eb79db0	7eb79dca		CmpSht_ShootingComponent_NEW (next class)	7591-7611	1	38				
+7600	7ec89898	7eb79dd8	7eb79df2		CmpSht_ShootingComponent_NEW (next class)	7591-7611	1	38				
+7601	7ec898e0	7eb79e00	7eb79e1a		CmpSht_ShootingComponent_NEW (next class)	7591-7611	1	1				
+7602	7ec89928	7eb79e28	7eb79e42		CmpSht_ShootingComponent_NEW (next class)	7591-7611	1	1				
+7603	7ec89970	7eb79e50	7eb79e6a		CmpSht_ShootingComponent_NEW (next class)	7591-7611	1	1				
+7604	7ec899b8	7eb79e78	7eb79e92		CmpSht_ShootingComponent_NEW (next class)	7591-7611	1	38				
+7605	7ec89a00	7eb79ea0	7eb79ebe		CmpSht_ShootingComponent_NEW (next class)	7591-7611	1	38				
+7606	7ec89a48	7eb79ecc	7eb79ee6		CmpSht_ShootingComponent_NEW (next class)	7591-7611	2	38				
+7607	7ec89a90	7eb79ef4	7eb79f0e		CmpSht_ShootingComponent_NEW (next class)	7591-7611	1	38				
+7608	7ec89ad8	7eb79f1c	7eb79f36		CmpSht_ShootingComponent_NEW (next class)	7591-7611	38	40				
+7609	7ec89b20	7eb79f44	7eb79f5e		CmpSht_ShootingComponent_NEW (next class)	7591-7611	3	138			Cmp_PlaySingleComponentBase::after_app_display_select_execute_end	CmpEAsp_EditAspectComponent::save_start_enter;CmpEImg_EditImageOverlayComponent::save_start
+7610	7ec89b68	7eb79f6c	7eb79f86		CmpSht_ShootingComponent_NEW (next class)	7591-7611	40	40				
+7611	7ec89bb0	7eb79f94	7eb79fae		CmpSht_ShootingComponent_NEW (next class)	7591-7611	1	38				
+7881	7ec888c0	7eb792f3	7eb7930d		CmpSht_ShootingComponent_NEW (next class)	7881-7888	1	1				
+7882	7ec88908	7eb7931b	7eb79335		CmpSht_ShootingComponent_NEW (next class)	7881-7888	2	1				
+7883	7ec88950	7eb79343	7eb7935d		CmpSht_ShootingComponent_NEW (next class)	7881-7888	1	1				
+7884	7ec88998	7eb7936b	7eb79385		CmpSht_ShootingComponent_NEW (next class)	7881-7888	1	1				
+7885	7ec889e0	-	7eb79393		CmpSht_ShootingComponent_NEW (next class)	7881-7888	0	1				
+7886	7ec88a28	7eb793a1	7eb793bb		CmpSht_ShootingComponent_NEW (next class)	7881-7888	1	1				
+7887	7ec88a70	7eb793c9	7eb793e3		CmpSht_ShootingComponent_NEW (next class)	7881-7888	1	1				
+7888	7ec88ab8	7eb793f1	7eb7940b		CmpSht_ShootingComponent_NEW (next class)	7881-7888	1	1				
+8041	7ec89f04	7eb7a321	7eb7a33b		CmpSht_ShootingComponent_NEW (next class)	8041-8048 evTraCmpPls_*	1	1				
+8042	7ec89f4c	7eb7a349	7eb7a363		CmpSht_ShootingComponent_NEW (next class)	8041-8048 evTraCmpPls_*	1	1			CmpPls_PlayNotifyBodyRotateObserver::update	
+8043	7ec89f94	7eb7a371	7eb7a38b		CmpSht_ShootingComponent_NEW (next class)	8041-8048 evTraCmpPls_*	4	1				
+8044	7ec89fdc	7eb7a399	7eb7a3b3		CmpSht_ShootingComponent_NEW (next class)	8041-8048 evTraCmpPls_*	4	1				
+8045	7ec8a024	7eb7a3c1	7eb7a3db		CmpSht_ShootingComponent_NEW (next class)	8041-8048 evTraCmpPls_*	1	1	evTraCmpPls_NotifyMoveCurrentContinuous	string in a function that uses only this id (inferred)		
+8046	7ec8a06c	7eb7a3e9	7eb7a403		CmpSht_ShootingComponent_NEW (next class)	8041-8048 evTraCmpPls_*	1	5				
+8047	7ec8a0b4	7eb7a411	7eb7a42b		CmpSht_ShootingComponent_NEW (next class)	8041-8048 evTraCmpPls_*	1	1	evTraCmpPls_NotifyStartMoveCurrent	string in a function that uses only this id (inferred)		
+8048	7ec8a0fc	7eb7a439	7eb7a453		CmpSht_ShootingComponent_NEW (next class)	8041-8048 evTraCmpPls_*	1	1				
+8081	7ec89c04	7eb7a0f7	7eb7a111		CmpSht_ShootingComponent_NEW (next class)	8081-8081	1	1			CmpPli_PlayNotifyBodyRotateObserver::update	
+8221	7ec88668	7eb79137	7eb79151		CmpSht_ShootingComponent_NEW (next class)	8221-8221	1	1				
+8261	7ec89e68	7eb7a2af	7eb7a2c9		CmpSht_ShootingComponent_NEW (next class)	8261-8262	1	2				
+8262	7ec89eb0	7eb7a2d7	7eb7a2f5		CmpSht_ShootingComponent_NEW (next class)	8261-8262	1	1				
+8281	7ec8a30c	7eb7a623	7eb7a63d		CmpSht_ShootingComponent_NEW (next class)	8281-8283 evTraCmpRPri_*	2	2				
+8282	7ec8a354	7eb7a64b	7eb7a665		CmpSht_ShootingComponent_NEW (next class)	8281-8283 evTraCmpRPri_*	1	1	evTraCmpRPri_NotifyStartMoveCurrent	string in a function that uses only this id (inferred)		
+8283	7ec8a39c	7eb7a673	7eb7a68d		CmpSht_ShootingComponent_NEW (next class)	8281-8283 evTraCmpRPri_*	1	1	evTraCmpRPri_NotifyMoveCurrentContinuous	string in a function that uses only this id (inferred)		
+8521	7ec89c58	7eb7a12e	7eb7a148		CmpSht_ShootingComponent_NEW (next class)	8521-8521	1	1				
+8541	7ec8a150	7eb7a4d9	7eb7a4f3		CmpSht_ShootingComponent_NEW (next class)	8541-8546	1	1				
+8542	7ec8a198	7eb7a501	7eb7a51b		CmpSht_ShootingComponent_NEW (next class)	8541-8546	1	1				
+8543	7ec8a1e0	7eb7a529	7eb7a543		CmpSht_ShootingComponent_NEW (next class)	8541-8546	1	1				
+8544	7ec8a228	7eb7a551	7eb7a56b		CmpSht_ShootingComponent_NEW (next class)	8541-8546	1	1				
+8545	7ec8a270	7eb7a579	7eb7a593		CmpSht_ShootingComponent_NEW (next class)	8541-8546	1	1				
+8546	7ec8a2b8	7eb7a5a1	7eb7a5bb		CmpSht_ShootingComponent_NEW (next class)	8541-8546	2	2				
+8561	7ec89cac	7eb7a165	7eb7a17f		CmpSht_ShootingComponent_NEW (next class)	8561-8566	1	1				
+8562	7ec89cf4	7eb7a18d	7eb7a1a7		CmpSht_ShootingComponent_NEW (next class)	8561-8566	1	1				
+8563	7ec89d3c	7eb7a1b5	7eb7a1cf		CmpSht_ShootingComponent_NEW (next class)	8561-8566	1	1				
+8564	7ec89d84	7eb7a1dd	7eb7a1f7		CmpSht_ShootingComponent_NEW (next class)	8561-8566	1	1				
+8565	7ec89dcc	7eb7a205	7eb7a21f		CmpSht_ShootingComponent_NEW (next class)	8561-8566	1	1				
+8566	7ec89e14	7eb7a22d	7eb7a247		CmpSht_ShootingComponent_NEW (next class)	8561-8566	2	2				
 11561	7ec8c7f0	-	7eb8bccb		Com_ framework / transition manager	11561-11566	0	0				
 11562	7ec8c838	7eb8bcd9	7eb8bcf3		Com_ framework / transition manager	11561-11566	73	129	component init OK	code-verified shape: CmpInit helper state 2 (e.g. 0x7E9ECE8C, 0x7EB87C55) notifies its +148 observers and continues on 11562		
 11563	7ec8c880	-	7eb8bd01		Com_ framework / transition manager	11561-11566	0	129	component init error	code-verified shape: same helpers log "CmpInitErr" and notify their +168 observers on 11563; no constructor found (vtable only)		
@@ -912,110 +912,110 @@ id	vtable	ctor	isTypeOf	parent_id	owner (package of ctor)	id_block	n_create_fns	
 13904	7ebef75c	7e991c54	7e991c71	13881	OlyHfwOpeCustomPrint (Ope layer)	13881-13905	2	2				
 13905	7ebef7a4	7e991c87	7e991cae	13881	OlyHfwOpeCustomPrint (Ope layer)	13881-13905	1	1				
 14381	7ebf5474	7e9a0254	7e9a0272		OlyHfwPower (Ope layer)	14381-14381	10	0				
-16061	7ec4dc84	7ea85143	7ea8515d		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	4				
-16062	7ec4dccc	7ea8516b	7ea85185		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	4				
-16063	7ec4dd14	7ea85193	7ea851ad		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	2				
-16064	7ec4dd5c	7ea851bb	7ea851d5		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16065	7ec4dda4	7ea851e3	7ea851fd		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	2				
-16066	7ec4ddec	7ea8520b	7ea85232		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	2	1				
-16067	7ec4de34	7ea85240	7ea8525a		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	2			RecordController::send_seq_RecordDone	
-16068	7ec4de7c	7ea85268	7ea85282		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16069	7ec4dec4	7ea85290	7ea852ae		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16070	7ec4df0c	7ea852bc	7ea852d6		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	7				
-16071	7ec4df54	7ea852e4	7ea852fe		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	4	5			MULTI::entryTAKE_PICTURE_CONT	
-16072	7ec4df9c	7ea8530c	7ea85326		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	8				
-16073	7ec4dfe4	7ea85334	7ea8534e		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16074	7ec4e02c	7ea8535c	7ea85376		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	3	6				
-16075	7ec4e074	7ea85384	7ea8539e		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	3	5				
-16076	7ec4e0bc	7ea853ac	7ea853ce		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16077	7ec4e104	7ea853dc	7ea853f6		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	2				
-16078	7ec4e14c	7ea85404	7ea8541e		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	3	2				
-16079	7ec4e194	-	7ea8542c		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	0	0				
-16080	7ec4e1dc	7ea8543a	7ea85454		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	4	2			CmpShc_ShootingSequenceBase::stopRecView;RecordController::sendRecViewStop	
-16081	7ec4e224	-	7ea85462		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	0	0				
-16082	7ec4e26c	-	7ea85470		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	0	0				
-16083	7ec4e2b4	-	7ea8547e		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	0	0				
-16084	7ec4e2fc	-	7ea8548c		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	0	1				
-16085	7ec4e344	7ea8549a	7ea854b4		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16086	7ec4e38c	7ea854c2	7ea854dc		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	0				
-16087	7ec4e3d4	7ea854ea	7ea85504		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	0				
-16088	7ec4e41c	-	7ea85512		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	0	0				
-16089	7ec4e464	7ea85520	7ea8553a		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	0				
-16090	7ec4e4ac	7ea85548	7ea85562		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	0				
-16091	7ec4e4f4	7ea85570	7ea8558a		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	3				
-16092	7ec4e53c	7ea85598	7ea855b2		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	3				
-16093	7ec4e584	7ea855c0	7ea855da		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	0				
-16094	7ec4e5cc	7ea855e8	7ea85602		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	0				
-16095	7ec4e614	7ea85610	7ea8562a		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	2	1			RecordController::recordMedia;RecordController::recordMediaPictBkt	
-16096	7ec4e65c	-	7ea85638		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	0	0				
-16097	7ec4e6a4	7ea85646	7ea85660		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	2	1			RecordController::EvRecRecordMediaError;RecordController::MEDIA_ERROR	
-16098	7ec4e6ec	-	7ea8566e		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	0	2				
-16099	7ec4e734	-	7ea8567c		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	0	2				
-16100	7ec4e77c	7ea8568a	7ea856a8		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	2	0				
-16101	7ec4e7c4	7ea856b6	7ea856d0		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	2	0				
-16102	7ec4e80c	-	7ea856de		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	0	0				
-16103	7ec4e854	-	7ea856ec		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	0	0				
-16104	7ec4e89c	-	7ea856fa		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	0	0				
-16105	7ec4e8e4	7ea85708	7ea85722		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	6	9	evTraCmpSts_Trig2Key	string in a function that uses only this id (inferred)		
-16106	7ec4e92c	7ea85730	7ea8574a		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	0				
-16107	7ec4e974	7ea85758	7ea85772		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	7	2				
-16108	7ec4e9bc	7ea85780	7ea8579a		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	16	10				
-16109	7ec4ea04	7ea857a8	7ea857c2		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	6	5				
-16110	7ec4ea4c	7ea857d0	7ea857ea		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	4	3				
-16111	7ec4ea94	7ea857f8	7ea85812		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	2				
-16112	7ec4eadc	7ea85820	7ea8583a		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16113	7ec4eb24	7ea85848	7ea85862		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	2	3				
-16114	7ec4eb6c	7ea85870	7ea8588a		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16115	7ec4ebb4	7ea85898	7ea858b2		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16116	7ec4ebfc	7ea858c0	7ea858da		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16117	7ec4ec44	7ea858e8	7ea85902		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16118	7ec4ec8c	7ea85910	7ea8592a		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16119	7ec4ecd4	7ea85938	7ea85952		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16120	7ec4ed1c	7ea85960	7ea8597a		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16121	7ec4ed64	-	7ea85988		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	0	0				
-16122	7ec4edac	-	7ea85996		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	0	0				
-16123	7ec4edf4	7ea859a4	7ea859be		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16124	7ec4ee3c	7ea859cc	7ea859e6		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	2				
-16125	7ec4ee84	7ea859f4	7ea85a0e		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	2				
-16126	7ec4eecc	-	7ea85a1c		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	0	0				
-16127	7ec4ef14	7ea85a2a	7ea85a44		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	0				
-16128	7ec4ef5c	7ea85a52	7ea85a6c		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	0				
-16129	7ec4efa4	7ea85a7a	7ea85aa0		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16130	7ec4efec	7ea85aae	7ea85ad4		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16131	7ec4f034	7ea85ae2	7ea85afc		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	2				
-16132	7ec4f07c	7ea85b0a	7ea85b24		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16133	7ec4f0c4	7ea85b32	7ea85b54		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1	evTraCmpSts_BeautyStart	string in a function that uses only this id (inferred)		
-16134	7ec4f10c	7ea85b62	7ea85b7c		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16135	7ec4f154	7ea85b8a	7ea85ba4		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16136	7ec4f19c	7ea85bb2	7ea85bcc		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	2	1	evTraCmpSts_ErrorTimerStart	string in a function that uses only this id (inferred)		
-16137	7ec4f1e4	7ea85bda	7ea85bf4		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	2	1				
-16138	7ec4f22c	7ea85c02	7ea85c1c		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16139	7ec4f274	7ea85c2a	7ea85c44		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16140	7ec4f2bc	7ea85c52	7ea85c6c		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16141	7ec4f304	7ea85c7a	7ea85c94		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16142	7ec4f34c	7ea85ca2	7ea85cbc		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16143	7ec4f394	7ea85cca	7ea85ce8		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	2	2				
-16144	7ec4f3dc	7ea85cf6	7ea85d14		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	2	4				
-16145	7ec4f424	7ea85d22	7ea85d3c		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	2	3				
-16146	7ec4f46c	7ea85d4a	7ea85d64		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16147	7ec4f4b4	7ea85d72	7ea85d8c		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16148	7ec4f4fc	7ea85d9a	7ea85db8		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	2				
-16149	7ec4f544	7ea85dc6	7ea85de0		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16150	7ec4f58c	7ea85dee	7ea85e08		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16151	7ec4f5d4	7ea85e16	7ea85e30		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16152	7ec4f61c	7ea85e3e	7ea85e5c		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16153	7ec4f664	7ea85e6a	7ea85e84		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16154	7ec4f6ac	7ea85e92	7ea85eac		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16155	7ec4f6f4	7ea85eba	7ea85ed4		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16156	7ec4f73c	7ea85ee2	7ea85efc		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16157	7ec4f784	7ea85f0a	7ea85f24		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1	evTraCmpSts_Stop3dOverlap	string in a function that uses only this id (inferred)		
-16158	7ec4f7cc	7ea85f32	7ea85f4c		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	3	1				
-16159	7ec4f814	7ea85f5a	7ea85f74		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	3	1				
-16160	7ec4f85c	7ea85f82	7ea85f9c		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16161	7ec4f8a4	7ea85faa	7ea85fc4		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16162	7ec4f8ec	7ea85fd2	7ea85ff0		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1			RecordController::send_seq_FullRecviewCreateDone	
-16163	7ec4f934	7ea85ffe	7ea86018		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
-16164	7ec4f97c	7ea86026	7ea86040		CmpCst_Communication (next class)	16061-16164 evTraCmpSts_*	1	1				
+16061	7ec4dc84	7ea85143	7ea8515d		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	4				
+16062	7ec4dccc	7ea8516b	7ea85185		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	4				
+16063	7ec4dd14	7ea85193	7ea851ad		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	2				
+16064	7ec4dd5c	7ea851bb	7ea851d5		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16065	7ec4dda4	7ea851e3	7ea851fd		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	2				
+16066	7ec4ddec	7ea8520b	7ea85232		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	2	1				
+16067	7ec4de34	7ea85240	7ea8525a		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	2			RecordController::send_seq_RecordDone	
+16068	7ec4de7c	7ea85268	7ea85282		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16069	7ec4dec4	7ea85290	7ea852ae		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16070	7ec4df0c	7ea852bc	7ea852d6		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	7				
+16071	7ec4df54	7ea852e4	7ea852fe		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	4	5			MULTI::entryTAKE_PICTURE_CONT	
+16072	7ec4df9c	7ea8530c	7ea85326		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	8				
+16073	7ec4dfe4	7ea85334	7ea8534e		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16074	7ec4e02c	7ea8535c	7ea85376		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	3	6				
+16075	7ec4e074	7ea85384	7ea8539e		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	3	5				
+16076	7ec4e0bc	7ea853ac	7ea853ce		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16077	7ec4e104	7ea853dc	7ea853f6		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	2				
+16078	7ec4e14c	7ea85404	7ea8541e		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	3	2				
+16079	7ec4e194	-	7ea8542c		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	0	0				
+16080	7ec4e1dc	7ea8543a	7ea85454		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	4	2			CmpShc_ShootingSequenceBase::stopRecView;RecordController::sendRecViewStop	
+16081	7ec4e224	-	7ea85462		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	0	0				
+16082	7ec4e26c	-	7ea85470		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	0	0				
+16083	7ec4e2b4	-	7ea8547e		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	0	0				
+16084	7ec4e2fc	-	7ea8548c		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	0	1				
+16085	7ec4e344	7ea8549a	7ea854b4		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16086	7ec4e38c	7ea854c2	7ea854dc		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	0				
+16087	7ec4e3d4	7ea854ea	7ea85504		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	0				
+16088	7ec4e41c	-	7ea85512		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	0	0				
+16089	7ec4e464	7ea85520	7ea8553a		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	0				
+16090	7ec4e4ac	7ea85548	7ea85562		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	0				
+16091	7ec4e4f4	7ea85570	7ea8558a		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	3				
+16092	7ec4e53c	7ea85598	7ea855b2		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	3				
+16093	7ec4e584	7ea855c0	7ea855da		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	0				
+16094	7ec4e5cc	7ea855e8	7ea85602		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	0				
+16095	7ec4e614	7ea85610	7ea8562a		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	2	1			RecordController::recordMedia;RecordController::recordMediaPictBkt	
+16096	7ec4e65c	-	7ea85638		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	0	0				
+16097	7ec4e6a4	7ea85646	7ea85660		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	2	1			RecordController::EvRecRecordMediaError;RecordController::MEDIA_ERROR	
+16098	7ec4e6ec	-	7ea8566e		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	0	2				
+16099	7ec4e734	-	7ea8567c		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	0	2				
+16100	7ec4e77c	7ea8568a	7ea856a8		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	2	0				
+16101	7ec4e7c4	7ea856b6	7ea856d0		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	2	0				
+16102	7ec4e80c	-	7ea856de		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	0	0				
+16103	7ec4e854	-	7ea856ec		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	0	0				
+16104	7ec4e89c	-	7ea856fa		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	0	0				
+16105	7ec4e8e4	7ea85708	7ea85722		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	6	9	evTraCmpSts_Trig2Key	string in a function that uses only this id (inferred)		
+16106	7ec4e92c	7ea85730	7ea8574a		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	0				
+16107	7ec4e974	7ea85758	7ea85772		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	7	2				
+16108	7ec4e9bc	7ea85780	7ea8579a		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	16	10				
+16109	7ec4ea04	7ea857a8	7ea857c2		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	6	5				
+16110	7ec4ea4c	7ea857d0	7ea857ea		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	4	3				
+16111	7ec4ea94	7ea857f8	7ea85812		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	2				
+16112	7ec4eadc	7ea85820	7ea8583a		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16113	7ec4eb24	7ea85848	7ea85862		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	2	3				
+16114	7ec4eb6c	7ea85870	7ea8588a		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16115	7ec4ebb4	7ea85898	7ea858b2		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16116	7ec4ebfc	7ea858c0	7ea858da		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16117	7ec4ec44	7ea858e8	7ea85902		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16118	7ec4ec8c	7ea85910	7ea8592a		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16119	7ec4ecd4	7ea85938	7ea85952		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16120	7ec4ed1c	7ea85960	7ea8597a		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16121	7ec4ed64	-	7ea85988		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	0	0				
+16122	7ec4edac	-	7ea85996		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	0	0				
+16123	7ec4edf4	7ea859a4	7ea859be		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16124	7ec4ee3c	7ea859cc	7ea859e6		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	2				
+16125	7ec4ee84	7ea859f4	7ea85a0e		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	2				
+16126	7ec4eecc	-	7ea85a1c		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	0	0				
+16127	7ec4ef14	7ea85a2a	7ea85a44		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	0				
+16128	7ec4ef5c	7ea85a52	7ea85a6c		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	0				
+16129	7ec4efa4	7ea85a7a	7ea85aa0		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16130	7ec4efec	7ea85aae	7ea85ad4		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16131	7ec4f034	7ea85ae2	7ea85afc		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	2				
+16132	7ec4f07c	7ea85b0a	7ea85b24		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16133	7ec4f0c4	7ea85b32	7ea85b54		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1	evTraCmpSts_BeautyStart	string in a function that uses only this id (inferred)		
+16134	7ec4f10c	7ea85b62	7ea85b7c		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16135	7ec4f154	7ea85b8a	7ea85ba4		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16136	7ec4f19c	7ea85bb2	7ea85bcc		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	2	1	evTraCmpSts_ErrorTimerStart	string in a function that uses only this id (inferred)		
+16137	7ec4f1e4	7ea85bda	7ea85bf4		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	2	1				
+16138	7ec4f22c	7ea85c02	7ea85c1c		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16139	7ec4f274	7ea85c2a	7ea85c44		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16140	7ec4f2bc	7ea85c52	7ea85c6c		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16141	7ec4f304	7ea85c7a	7ea85c94		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16142	7ec4f34c	7ea85ca2	7ea85cbc		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16143	7ec4f394	7ea85cca	7ea85ce8		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	2	2				
+16144	7ec4f3dc	7ea85cf6	7ea85d14		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	2	4				
+16145	7ec4f424	7ea85d22	7ea85d3c		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	2	3				
+16146	7ec4f46c	7ea85d4a	7ea85d64		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16147	7ec4f4b4	7ea85d72	7ea85d8c		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16148	7ec4f4fc	7ea85d9a	7ea85db8		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	2				
+16149	7ec4f544	7ea85dc6	7ea85de0		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16150	7ec4f58c	7ea85dee	7ea85e08		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16151	7ec4f5d4	7ea85e16	7ea85e30		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16152	7ec4f61c	7ea85e3e	7ea85e5c		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16153	7ec4f664	7ea85e6a	7ea85e84		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16154	7ec4f6ac	7ea85e92	7ea85eac		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16155	7ec4f6f4	7ea85eba	7ea85ed4		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16156	7ec4f73c	7ea85ee2	7ea85efc		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16157	7ec4f784	7ea85f0a	7ea85f24		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1	evTraCmpSts_Stop3dOverlap	string in a function that uses only this id (inferred)		
+16158	7ec4f7cc	7ea85f32	7ea85f4c		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	3	1				
+16159	7ec4f814	7ea85f5a	7ea85f74		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	3	1				
+16160	7ec4f85c	7ea85f82	7ea85f9c		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16161	7ec4f8a4	7ea85faa	7ea85fc4		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16162	7ec4f8ec	7ea85fd2	7ea85ff0		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1			RecordController::send_seq_FullRecviewCreateDone	
+16163	7ec4f934	7ea85ffe	7ea86018		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
+16164	7ec4f97c	7ea86026	7ea86040		CmpSqp_SequencePartsBase (next class)	16061-16164 evTraCmpSts_*	1	1				
 16331	7ec2b394	7ea1722e	7ea17248		CapThr_ThroughImage (next class)	16331-16352	1	1				
 16332	7ec2b3dc	7ea17256	7ea17270		CapThr_ThroughImage (next class)	16331-16352	1	1				
 16333	7ec2b424	7ea1727e	7ea17298		CapThr_ThroughImage (next class)	16331-16352	1	1				
@@ -1046,9 +1046,9 @@ id	vtable	ctor	isTypeOf	parent_id	owner (package of ctor)	id_block	n_create_fns	
 24414	7ec40dd0	7ea4eaea	7ea4eb04		CapBlu_Bluetooth (next class)	24411-24416	1	1				
 24415	7ec40e18	7ea4eb12	7ea4eb2c		CapBlu_Bluetooth (next class)	24411-24416	2	2				
 24416	7ec40e60	7ea4eb3a	7ea4eb54		CapBlu_Bluetooth (next class)	24411-24416	1	3				
-25001	7ec887e8	7eb7924a	7eb79264		CmpSts_MfAssist (next class)	25001-25003	5	5			CmpERaw_EditRawComponent::preview_current_start;CmpERaw_EditRawComponent::preview_custom_start	
-25002	7ec88830	7eb79272	7eb79290		CmpSts_MfAssist (next class)	25001-25003	1	2				
-25003	7ec88878	7eb7929e	7eb792b8		CmpSts_MfAssist (next class)	25001-25003	1	2				
+25001	7ec887e8	7eb7924a	7eb79264		CmpSht_ShootingComponent_NEW (next class)	25001-25003	5	5			CmpERaw_EditRawComponent::preview_current_start;CmpERaw_EditRawComponent::preview_custom_start	
+25002	7ec88830	7eb79272	7eb79290		CmpSht_ShootingComponent_NEW (next class)	25001-25003	1	2				
+25003	7ec88878	7eb7929e	7eb792b8		CmpSht_ShootingComponent_NEW (next class)	25001-25003	1	2				
 25241	7ec3e6cc	-	7ea466a8		CapRev_RecView (next class)	25241-25242	0	0				
 25242	7ec3e714	7ea466b6	7ea466d8		CapRev_RecView (next class)	25241-25242	1	1				
 25991	7ec40f38	7ea4ec2a	7ea4ec44		CapBlu_Bluetooth (next class)	25991-25991	1	1				
@@ -1173,10 +1173,10 @@ id	vtable	ctor	isTypeOf	parent_id	owner (package of ctor)	id_block	n_create_fns	
 26859	7ebe0c58	7e973e78	7e973e8d	26741	OlyHfwOpeCamCom (Ope layer)	26741-26861 evTraResSht*	1	1	evTraResShtStartIntervalShootingSleep	string in a function that uses only this id (inferred)		
 26860	7ebe0ca0	7e973ea3	7e973ebc	26741	OlyHfwOpeCamCom (Ope layer)	26741-26861 evTraResSht*	1	1	evTraResShtEndCreateMovie	string in a function that uses only this id (inferred)		
 26861	7ebe0ce8	7e973ed2	7e973ee7	26741	OlyHfwOpeCamCom (Ope layer)	26741-26861 evTraResSht*	1	1	evTraResShtRequestEndIntervalShooting	string in a function that uses only this id (inferred)		
-27101	7ec886bc	7eb7916e	7eb79188		CmpSts_MfAssist (next class)	27101-27104 evTraCmpEImg_*	2	2				
-27102	7ec88704	7eb79196	7eb791b0		CmpSts_MfAssist (next class)	27101-27104 evTraCmpEImg_*	6	6				
-27103	7ec8874c	7eb791be	7eb791d8		CmpSts_MfAssist (next class)	27101-27104 evTraCmpEImg_*	1	1	evTraCmpEImg_NotifyAdjustGainContinuous	string in a function that uses only this id (inferred)		
-27104	7ec88794	7eb791e6	7eb79200		CmpSts_MfAssist (next class)	27101-27104 evTraCmpEImg_*	1	1	evTraCmpEImg_NotifyStartAdjustGain	string in a function that uses only this id (inferred)	CmpEImg_EditImageOverlayComponent::init_adjust_gain	
+27101	7ec886bc	7eb7916e	7eb79188		CmpSht_ShootingComponent_NEW (next class)	27101-27104 evTraCmpEImg_*	2	2				
+27102	7ec88704	7eb79196	7eb791b0		CmpSht_ShootingComponent_NEW (next class)	27101-27104 evTraCmpEImg_*	6	6				
+27103	7ec8874c	7eb791be	7eb791d8		CmpSht_ShootingComponent_NEW (next class)	27101-27104 evTraCmpEImg_*	1	1	evTraCmpEImg_NotifyAdjustGainContinuous	string in a function that uses only this id (inferred)		
+27104	7ec88794	7eb791e6	7eb79200		CmpSht_ShootingComponent_NEW (next class)	27101-27104 evTraCmpEImg_*	1	1	evTraCmpEImg_NotifyStartAdjustGain	string in a function that uses only this id (inferred)	CmpEImg_EditImageOverlayComponent::init_adjust_gain	
 27161	7ec42ac0	7ea57e31	7ea57e4b		CapPbr_PictBridgeCommunicate (next class)	27161-27176	3	2				
 27162	7ec42b08	7ea57e59	7ea57e77		CapPbr_PictBridgeCommunicate (next class)	27161-27176	1	1				
 27163	7ec42b50	7ea57e85	7ea57e9f		CapPbr_PictBridgeCommunicate (next class)	27161-27176	1	1				
@@ -1204,70 +1204,70 @@ id	vtable	ctor	isTypeOf	parent_id	owner (package of ctor)	id_block	n_create_fns	
 27431	7ec437b0	7ea5873d	7ea58757		CapPbr_PictBridgeCommunicate (next class)	27431-27433	1	1				
 27432	7ec437f8	7ea58765	7ea58783		CapPbr_PictBridgeCommunicate (next class)	27431-27433	1	1				
 27433	7ec43840	7ea58791	7ea587ab		CapPbr_PictBridgeCommunicate (next class)	27431-27433	1	1				
-27461	7ec4c9ac	7ea84324	7ea8433e		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	2				
-27462	7ec4c9f4	7ea8434c	7ea84366		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	2				
-27463	7ec4ca3c	7ea84374	7ea8438e		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	2				
-27464	7ec4ca84	7ea8439c	7ea843b6		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	2				
-27465	7ec4cacc	7ea843c4	7ea843de		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27466	7ec4cb14	7ea843ec	7ea84406		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	2	2				
-27467	7ec4cb5c	7ea84414	7ea8442e		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27468	7ec4cba4	7ea8443c	7ea84456		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27469	7ec4cbec	7ea84464	7ea8447e		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27470	7ec4cc34	7ea8448c	7ea844a6		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27471	7ec4cc7c	7ea844b4	7ea844ce		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27472	7ec4ccc4	7ea844dc	7ea844f6		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27473	7ec4cd0c	7ea84504	7ea8451e		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27474	7ec4cd54	7ea8452c	7ea84546		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27475	7ec4cd9c	7ea84554	7ea8456e		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27476	7ec4cde4	7ea8457c	7ea84596		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27477	7ec4ce2c	7ea845a4	7ea845be		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27478	7ec4ce74	7ea845cc	7ea845e6		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27479	7ec4cebc	7ea845f4	7ea8460e		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27480	7ec4cf04	-	7ea8461c		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	0	1				
-27481	7ec4cf4c	7ea8462a	7ea84644		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	2	1	evTraCmpShc_ErrorEvent	string in a function that uses only this id (inferred)		
-27482	7ec4cf94	7ea84652	7ea8466c		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27483	7ec4cfdc	7ea8467a	7ea84694		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27484	7ec4d024	7ea846a2	7ea846bc		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	10	1				
-27485	7ec4d06c	7ea846ca	7ea846e4		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1			RecordController::send_seq_CamStRecordError	
-27486	7ec4d0b4	7ea846f2	7ea8470c		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	2	1				
-27487	7ec4d0fc	7ea8471a	7ea84734		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1			CmpSqp_SequencePartsMultiExposure::startMesCombine	
-27488	7ec4d144	7ea84742	7ea8475c		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1			CmpSqp_SequencePartsMultiExposure::startMultiExposure	
-27489	7ec4d18c	7ea8476a	7ea84784		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	3	1	evTraCmpMov_READYtoEND	string in a function that uses only this id (inferred)		
-27490	7ec4d1d4	7ea84792	7ea847ac		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	3	1	evTraCmpMov_READYFINISFtoEND	string in a function that uses only this id (inferred)		
-27491	7ec4d21c	-	7ea847ba		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	0	0				
-27492	7ec4d264	7ea847c8	7ea847e2		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27493	7ec4d2ac	7ea847f0	7ea8480a		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27494	7ec4d2f4	7ea84818	7ea84832		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	3	4	evTraCmpSts_ZoomOff	string in a function that uses only this id (inferred)		
-27495	7ec4d33c	7ea84840	7ea8485a		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	6	1				
-27496	7ec4d384	7ea84868	7ea84882		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	2	1				
-27497	7ec4d3cc	7ea84890	7ea848aa		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	2				
-27498	7ec4d414	7ea848b8	7ea848d2		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	2				
-27499	7ec4d45c	7ea848e0	7ea848fa		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	2				
-27500	7ec4d4a4	7ea84908	7ea84922		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27501	7ec4d4ec	7ea84930	7ea8494a		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27502	7ec4d534	7ea84958	7ea84972		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	4	1				
-27503	7ec4d57c	7ea84980	7ea8499a		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27504	7ec4d5c4	7ea849a8	7ea849c2		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	2	1				
-27505	7ec4d60c	7ea849d0	7ea849ea		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	2	1				
-27506	7ec4d654	7ea849f8	7ea84a12		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27507	7ec4d69c	7ea84a20	7ea84a3a		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27508	7ec4d6e4	-	7ea84a48		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	0	0				
-27509	7ec4d72c	7ea84a56	7ea84a70		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	2	1				
-27510	7ec4d774	7ea84a7e	7ea84a9c		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	2				
-27511	7ec4d7bc	7ea84aaa	7ea84ac4		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	2	1				
-27512	7ec4d804	7ea84ad2	7ea84aec		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27513	7ec4d84c	7ea84afa	7ea84b14		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27514	7ec4d894	7ea84b22	7ea84b3c		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27515	7ec4d8dc	7ea84b4a	7ea84b64		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27516	7ec4d924	7ea84b72	7ea84b8c		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27517	7ec4d96c	7ea84b9a	7ea84bb4		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27518	7ec4d9b4	7ea84bc2	7ea84bdc		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27519	7ec4d9fc	7ea84bea	7ea84c04		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27520	7ec4da44	7ea84c12	7ea84c2c		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27521	7ec4da8c	7ea84c3a	7ea84c54		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27522	7ec4dad4	7ea84c62	7ea84c7c		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	1				
-27523	7ec4db1c	7ea84c8a	7ea84ca4		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	2	1				
-27524	7ec4db64	7ea84cb2	7ea84ccc		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	2	1				
-27525	7ec4dbac	7ea84cda	7ea84cf8		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	2	1				
-27526	7ec4dbf4	7ea84d06	7ea84d20		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	2				
-27527	7ec4dc3c	7ea84d2e	7ea84d48		CmpCst_Communication (next class)	27461-27527 evTraCmpMov_*	1	2				
+27461	7ec4c9ac	7ea84324	7ea8433e		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	2				
+27462	7ec4c9f4	7ea8434c	7ea84366		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	2				
+27463	7ec4ca3c	7ea84374	7ea8438e		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	2				
+27464	7ec4ca84	7ea8439c	7ea843b6		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	2				
+27465	7ec4cacc	7ea843c4	7ea843de		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27466	7ec4cb14	7ea843ec	7ea84406		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	2	2				
+27467	7ec4cb5c	7ea84414	7ea8442e		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27468	7ec4cba4	7ea8443c	7ea84456		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27469	7ec4cbec	7ea84464	7ea8447e		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27470	7ec4cc34	7ea8448c	7ea844a6		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27471	7ec4cc7c	7ea844b4	7ea844ce		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27472	7ec4ccc4	7ea844dc	7ea844f6		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27473	7ec4cd0c	7ea84504	7ea8451e		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27474	7ec4cd54	7ea8452c	7ea84546		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27475	7ec4cd9c	7ea84554	7ea8456e		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27476	7ec4cde4	7ea8457c	7ea84596		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27477	7ec4ce2c	7ea845a4	7ea845be		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27478	7ec4ce74	7ea845cc	7ea845e6		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27479	7ec4cebc	7ea845f4	7ea8460e		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27480	7ec4cf04	-	7ea8461c		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	0	1				
+27481	7ec4cf4c	7ea8462a	7ea84644		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	2	1	evTraCmpShc_ErrorEvent	string in a function that uses only this id (inferred)		
+27482	7ec4cf94	7ea84652	7ea8466c		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27483	7ec4cfdc	7ea8467a	7ea84694		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27484	7ec4d024	7ea846a2	7ea846bc		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	10	1				
+27485	7ec4d06c	7ea846ca	7ea846e4		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1			RecordController::send_seq_CamStRecordError	
+27486	7ec4d0b4	7ea846f2	7ea8470c		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	2	1				
+27487	7ec4d0fc	7ea8471a	7ea84734		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1			CmpSqp_SequencePartsMultiExposure::startMesCombine	
+27488	7ec4d144	7ea84742	7ea8475c		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1			CmpSqp_SequencePartsMultiExposure::startMultiExposure	
+27489	7ec4d18c	7ea8476a	7ea84784		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	3	1	evTraCmpMov_READYtoEND	string in a function that uses only this id (inferred)		
+27490	7ec4d1d4	7ea84792	7ea847ac		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	3	1	evTraCmpMov_READYFINISFtoEND	string in a function that uses only this id (inferred)		
+27491	7ec4d21c	-	7ea847ba		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	0	0				
+27492	7ec4d264	7ea847c8	7ea847e2		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27493	7ec4d2ac	7ea847f0	7ea8480a		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27494	7ec4d2f4	7ea84818	7ea84832		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	3	4	evTraCmpSts_ZoomOff	string in a function that uses only this id (inferred)		
+27495	7ec4d33c	7ea84840	7ea8485a		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	6	1				
+27496	7ec4d384	7ea84868	7ea84882		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	2	1				
+27497	7ec4d3cc	7ea84890	7ea848aa		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	2				
+27498	7ec4d414	7ea848b8	7ea848d2		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	2				
+27499	7ec4d45c	7ea848e0	7ea848fa		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	2				
+27500	7ec4d4a4	7ea84908	7ea84922		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27501	7ec4d4ec	7ea84930	7ea8494a		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27502	7ec4d534	7ea84958	7ea84972		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	4	1				
+27503	7ec4d57c	7ea84980	7ea8499a		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27504	7ec4d5c4	7ea849a8	7ea849c2		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	2	1				
+27505	7ec4d60c	7ea849d0	7ea849ea		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	2	1				
+27506	7ec4d654	7ea849f8	7ea84a12		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27507	7ec4d69c	7ea84a20	7ea84a3a		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27508	7ec4d6e4	-	7ea84a48		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	0	0				
+27509	7ec4d72c	7ea84a56	7ea84a70		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	2	1				
+27510	7ec4d774	7ea84a7e	7ea84a9c		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	2				
+27511	7ec4d7bc	7ea84aaa	7ea84ac4		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	2	1				
+27512	7ec4d804	7ea84ad2	7ea84aec		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27513	7ec4d84c	7ea84afa	7ea84b14		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27514	7ec4d894	7ea84b22	7ea84b3c		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27515	7ec4d8dc	7ea84b4a	7ea84b64		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27516	7ec4d924	7ea84b72	7ea84b8c		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27517	7ec4d96c	7ea84b9a	7ea84bb4		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27518	7ec4d9b4	7ea84bc2	7ea84bdc		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27519	7ec4d9fc	7ea84bea	7ea84c04		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27520	7ec4da44	7ea84c12	7ea84c2c		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27521	7ec4da8c	7ea84c3a	7ea84c54		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27522	7ec4dad4	7ea84c62	7ea84c7c		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	1				
+27523	7ec4db1c	7ea84c8a	7ea84ca4		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	2	1				
+27524	7ec4db64	7ea84cb2	7ea84ccc		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	2	1				
+27525	7ec4dbac	7ea84cda	7ea84cf8		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	2	1				
+27526	7ec4dbf4	7ea84d06	7ea84d20		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	2				
+27527	7ec4dc3c	7ea84d2e	7ea84d48		CmpSqp_SequencePartsBase (next class)	27461-27527 evTraCmpMov_*	1	2				
