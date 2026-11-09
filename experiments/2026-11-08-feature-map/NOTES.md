@@ -108,3 +108,6 @@ English-string counts not present in the E-PM2: E-PL5 0 (block 1 identical), E-P
   - `PlaySlideShow::canSlideShowGPU` / `startSlideShowGPU` exist.
 
   So C3D = the GPU slideshow.
+- **14d (data and blobs): two claims. Confirmed:**
+  - The reset code loads 0x7E8DA000 (0x7E4212B8), 0x7E8F3114 and RAM 0x602A9B40, so 0x7E8DA000–0x7E8F3113 is the `.data` init image (ROM = RAM + 0x1E6304C0).
+  - 0x7E86DD80 starts with `CMIO 01 00 09 DC`.
