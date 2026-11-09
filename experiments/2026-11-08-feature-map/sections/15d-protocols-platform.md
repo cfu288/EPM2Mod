@@ -17,7 +17,7 @@ Labels: **V** = read in code or bytes. **I** = inferred. Register *names* for th
 | 0x7E915A1B–0x7E9195A6 | Blue SDK part 1: stack init 0x7E915A1B, event manager/timers 0x7E915AAE–0x7E915C68, profile layer 0x7E915D0C–0x7E917A3F, **HCI layer 0x7E917AFE–0x7E9195A6** | V call edges, RAM pages; names I (A8 2026-11-09) |
 | 0x7E9195A7–0x7E91D29E | Olympus iAP: iAP/SPP set-up 0x7E9195A7 (only caller `cp_init()` 0x7E91A2CF; Olympus RAM 0x602AEDB4/B8, uITRON calls, registers 0x7E9196D9/0x7E919CEB with SPP), BT_Open 0x7E91962C, cp_*, BTIAP, IDPS; the getter 0x7E91D279 and the action 0x7E91D289 (sets 0x605C6028 = 19, runs the iAP dispatcher 0x7E91C673) belong to it | V strings, callers (A8 2026-11-09) |
 | 0x7E91D29F–0x7E937CDD | Blue SDK part 2: L2CAP → debug Report → Olympus test client → ME/SEC → BT API wrappers → OBEX → OS layer → radio manager → RFCOMM → RX buffers → SDP → SPP → utilities | V bounds (layer edges below) |
-| 0x7E6A9323–0x7E6AD7FF | ADI HDMI transmitter driver `[HDMI-DRV]` (EDID, video, audio, InfoFrames, power) | V register calls; I lower bound |
+| ~~0x7E6A9323~~ 0x7E6A935D–0x7E6AD7FF | ADI HDMI transmitter driver `[HDMI-DRV]` (EDID, video, audio, InfoFrames, power) | V register calls; lower bound V: 0x7E6A935D is called only from HDMI code 0x7E6AC4DF, while 0x7E6A9323 is called from the exp helper 0x7E6A90B7 (coordinator 2026-11-09, from fixes-D3) |
 | 0x7E6AD80C–0x7E6AEA69 | ADI CEC library (`ADI_CEC`) | V register calls; bounds I |
 | 0x7E6AEA6A–0x7E6B74xx | DISPLAY task and display services (section 08) | V strings |
 | 0x7E6B749A–0x7E6B990E | display-controller (0x9A900000) ISR and register writers | V absolute operands |
@@ -137,7 +137,7 @@ ADV7511-family names fit every register used (I): 0x41 power-down; 0x42 HPD/moni
 
 ### 3.3 CEC (V register calls; meaning I)
 
-- The ADI CEC library 0x7E6AD80C–0x7E6AEA69 (`ADI_CEC` 0x7E6AE2FF) accesses the CEC map 0x78 through 0x7E6B9B19 (write) and 0x7E6B9B2A (read). Those call the SIO ch2 I2C pair 0x7E6BA39B/0x7E6BA448.
+- The ADI CEC library 0x7E6AD80C–0x7E6AEA69 (`ADI_CEC` 0x7E6AE2FF) accesses the CEC map 0x78 through 0x7E6B9B19 (read, calls 0x7E6BA39B) and 0x7E6B9B2A (write, calls 0x7E6BA448) (coordinator 2026-11-09, from fixes-D3). Those call the SIO ch2 I2C pair 0x7E6BA39B/0x7E6BA448.
 - Init 0x7E6ADE80 reads 0xE2/0xE1, then CEC map 0x4B/0x4E/0x50/0x51/0x6E/0x70/0x71.
 - Main-map CEC interrupts: 0x95 (enable), 0x97 (status).
 - CEC map registers: TX frame 0x10/0x11 (0x7E6AE0CE, 0x7E6AE117), TX status 0x12 (0x7E6AE033), logical address 0x4B (0x7E6AE064), RX enable 0x26/0x4A (0x7E6AE603).
@@ -245,7 +245,7 @@ Region-level ranges of 20 KB or more do not count (0x7E421020–0x7E426FFF, 0x7E
 | 0x7E45140B–0x7E4520F2 | second request poster 0x7E45140B, `prm fmem` 0x7E451515/0x7E4515F5, **traced BML/STL wrappers** 0x7E451873–0x7E451D85 (STL_READ = C3 F001) | fupsrv 0x7E54398B, ADJ | V |
 | 0x7E452343–0x7E455F92 | **STL core** (sector map): entries 0x7E4546CA/0x7E4546D4/0x7E4546ED, write path 0x7E4551C1, recovery 0x7E455A6D | STL API only | V edges; role I |
 | 0x7E455F93–0x7E45824A | prm settings store (getval 0x7E457C75, 2,168 callers) | section 07 §1 | V |
-| **0x7E45B6BE–0x7E45CE11** | **ADC request scheduler**: `adc_request(a0)` **0x7E45BB10** (23 callers) switches on req byte 0 (1 → 0x7E45BB8C, 2 → 0x7E45BF47, 3 → 0x7E45BFBD, 7 → 0x7E45BCA8, 8 → 0x7E45BD81, 9 → 0x7E45BE60); completion 0x7E45CCA1; ISR bodies 0x7E45C820–0x7E45CA72; PER_IN init 0x7E45B6BE | UI keys 0x7E50B1B4–0x7E50B877, accelerometer, MEC 0x7E5175C9, PWR | V dispatch; what each type samples I |
+| **0x7E45B6BE–0x7E45CE11** | **ADC request scheduler**: `adc_request(a0)` **0x7E45BB10** (23 callers) looks up req byte 0 (the channel) in table 0x7E4C4908 and switches on that record's mode byte (coordinator 2026-11-09, from fixes-D3) (1 → 0x7E45BB8C, 2 → 0x7E45BF47, 3 → 0x7E45BFBD, 7 → 0x7E45BCA8, 8 → 0x7E45BD81, 9 → 0x7E45BE60); completion 0x7E45CCA1; ISR bodies 0x7E45C820–0x7E45CA72; PER_IN init 0x7E45B6BE | UI keys 0x7E50B1B4–0x7E50B877, accelerometer, MEC 0x7E5175C9, PWR | V dispatch; what each type samples I |
 | 0x7E45DCD3–0x7E45E205 | CCD-temperature task internals (13f's range ends at 0x7E45E205) | | V |
 | 0x7E463124–0x7E463334 | **SIO I²C-mode helpers**: init/open/start/write/read | accelerometer, IOE, HDMI 0x7E6BA39B, touch, BT | V |
 | 0x7E463376–0x7E4639F3 | 4-command dispatcher 0x7E463376 (cmd 0 calls strobe helpers 0x7E5E2152/0x7E5E2258) | camera core 0x7E626C76, EXP_MOVIE | V; role I (weak) |

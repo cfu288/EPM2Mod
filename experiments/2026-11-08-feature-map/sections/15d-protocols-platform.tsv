@@ -200,7 +200,7 @@ meop:57	me-op-type	ME op type 57 -> Write_Default_Erroneous_Data_Reporting 0x7E9
 meop:64	me-op-type	ME op type 64 -> Write_Inquiry_TX_Power 0x7E9244E5	jump table 0x7EBB3B18 slot 63; start fn stored to 0x7DAC4C50	V
 meop:65	me-op-type	ME op type 65 -> Write_SSP_Debug_Mode 0x7E92A56E	jump table 0x7EBB3B18 slot 64; start fn stored to 0x7DAC4C50	V
 meop:2-4,27-30,32,34,36,43,44,46,47,58-63	me-op-type	ME op types with no start function (default 0x7E92433B)	jump table 0x7EBB3B18	V
-0x7E6A9323	hdmi-drv	HDMI-DRV entry stub called by 0x7E6A90B7 (EXP side); first function of the HDMI-DRV module (bound inferred)	caller 0x7E6A90B7 <- 0x7E68BD97/0x7E69B31E	I
+0x7E6A9323	exp	stub called by the exp helper 0x7E6A90B7: exp side, not HDMI-DRV; the HDMI driver starts at 0x7E6A935D (coordinator 2026-11-09, from fixes-D3)	caller 0x7E6A90B7 <- 0x7E68BD97/0x7E69B31E	I
 0x7E6A93E5	hdmi-drv	EDID buffer allocate + read request (`[hdmi]get heap error`); callers HPD handler 0x7E6AC28C, EDID-state poll 0x7E6AC56F	string; callers	V
 0x7E6A951A	hdmi-reg	HDMI/DVI mode select: write field main 0x72 reg 0xAF	field write 0x7E6AC903(0x72,0xAF)	V reg / I meaning
 0x7E6A977B	edid	EDID block-map extension (tag 0xF0) parser (`Problem parsing block map`)	string; caller segment parser 0x7E6AC127	V

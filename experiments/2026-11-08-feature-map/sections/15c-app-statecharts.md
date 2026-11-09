@@ -21,7 +21,7 @@ Boundary fixes found in this round (V unless marked):
 | 0x7EB84345–0x7EB85562 / 0x7EB85563– | Com_EvSenderManager (14c) / Com_ framework; `Com_ManagersSubTransition` ctor 0x7EB8573D, base dtor 0x7EB857A1, accept-test 0x7EB857CA (§4.8) |
 | 0x7EB8C265–0x7EB93422 | Dev part 1: 14 device units, §5 |
 
-modules.tsv `last_fn` gaps (I2 of review 3): every Cmp/Cap row ends early because last_fn is the last function that *names* the file. Use the class index instead. The three named in the review: **CmpPLgh 0x7EB33B24–0x7EB39215**, **CmpPEvV 0x7EB2887C–0x7EB2BB80**, **Cmp_PlayIndexComponentBase 0x7EB2BB81–0x7EB2ECCF** (V).
+modules.tsv `last_fn` gaps (I2 of review 3): many Cmp/Cap rows end early because last_fn is the last function that *names* the file. The D3 fix pass found that this does **not** hold for the three rows named in the review: their last_fn values were already right, and only the CmpPEvV first_fn and the Cmp_PlayComponentBase row changed (coordinator 2026-11-09, from fixes-D3). Use the class index instead. The three named in the review: **CmpPLgh 0x7EB33B24–0x7EB39215**, **CmpPEvV 0x7EB2887C–0x7EB2BB80**, **Cmp_PlayIndexComponentBase 0x7EB2BB81–0x7EB2ECCF** (V).
 
 ## 2. Class index (`15c-class-index.tsv`)
 

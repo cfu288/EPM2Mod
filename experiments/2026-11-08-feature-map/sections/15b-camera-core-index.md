@@ -238,7 +238,7 @@ The **command order (V)** is **7 → 0 → 3 → [4 → 5 → compare → 6] × 
   pre-check 0x7E5DC4A1 (`stb_external_com_exec`, 0x7E79F9AC), executor 0x7E5DCC5C (`EXT mode_set`, 0x7E79FAAC; 0x1000 → strobe firmware update 0x7E5DF13A, which FIRMUP_SRV's cmd 0x1000 reaches), post-update 0x7E5DC602 (0x7E79FA2C).
 
 ### 5.6 ADCONV request 0x7E45BB10
-- The "gap" 0x7E45B67E–0x7E45CE11 is the **ADCONV driver** itself, between the `per_adc` shell and the ADCONV debug shell 0x7E45CE12 (V).
+- The "gap" 0x7E45B6BE–0x7E45CE11 (0x7E45B67E is a `per_adc` shell subcommand) (coordinator 2026-11-09, from fixes-D3) is the **ADCONV driver** itself, between the `per_adc` shell and the ADCONV debug shell 0x7E45CE12 (V).
 - **Submit 0x7E45BB10(a0 req) (V).** It looks up channel u8 req+0 in the table 0x7E4C4908 (9 × 16 B: channel, mode, mask) and dispatches on the mode (1, 2, 3, 7, 8, 9 → six engines). Unknown channel → log 0x19001401.
 - **Request (52 B, V):** +0 channel, +1 type (0xF1 special), +4 and +8 per-request u32 parameters (+4/+8 = 1500/5 in 0x7E45E38D and 0x7E5394B5, 1500/4 in 0x7F080BEC, 750/5 in MEC 0x7E5175C9, 750/2 in ADC-key 0x7E50B1B4, 750/1 in 0x7E4589DC; +4 = 750 in the ADCONV shell 0x7E45CE5B), +12 result buffer, +32 async callback, +40 sync marker. **Completion 0x7E45CCA1 (V):** calls +32 if set; otherwise, only if +40 ≠ 0, copies the request to 0x6041538C and sets event flag 0x7E43EBB2. A request with neither is dropped without a signal. (A8 2026-11-09)
 - **Channels (V):** 4 and 13 = battery/power, 15 = ccd_temp, 34 = per_acc accelerometer (its I²C check `ACC:I2C NG?`), 38 = MEC layer 0x7E5175C9. Channels 21, 22, 39 and 41 have no user found. ADC-key callers 0x7E50B1B4…0x7E50B877 set callback F002 0x7E50B724.
@@ -276,7 +276,7 @@ Tables per owner: HDMI/display/touch 40, movie 34, IMG 25, AF (FCS_MOVIE/IAF/con
 - **02 table / §1.9 (from §5):**
   - BC is 0x7E53AEA9–0x7E542B4E; 0x7E53A981–0x7E53AEA8 is the `dbg` debug-log module.
   - The LENS_FIRM_UP chain starts with cmd 7. Each error code belongs to the command whose reply failed (§5.3). There is no 0x6603.
-- **C3 F003:** `Led-` is the askdata STILLEXP_STATUS request, not an LED command. **C3 F002 / 13f:** 0x7E45B67E–0x7E45CE11 is the ADCONV driver, and 0x7E45BB10 is its request submit.
+- **C3 F003:** `Led-` is the askdata STILLEXP_STATUS request, not an LED command. **C3 F002 / 13f:** 0x7E45B6BE–0x7E45CE11 (0x7E45B67E is a `per_adc` shell subcommand) (coordinator 2026-11-09, from fixes-D3) is the ADCONV driver, and 0x7E45BB10 is its request submit.
 - **03 §7b / 14b §6 (from §4):**
   - 0x7E667400–0x7E675000 is the mdet library and res, not SDET's algorithm library.
   - `ST/CO/IA…BIN`/`MDETDATA` are mdet debug logs.

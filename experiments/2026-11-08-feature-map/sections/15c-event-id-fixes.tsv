@@ -267,7 +267,7 @@ id	old_owner	new_owner	name_if_known	evidence
 5651	CapThr_ThroughImage (next class)	CapMed_MediaManager		snd CapMed_MediaManager x1; hnd CapMed_MediaManager x1; basis handlers
 5652	CapThr_ThroughImage (next class)	CapMed_MediaManager		snd CapMed_MediaManager x1; hnd CapMed_MediaManager x1; basis handlers
 5653	CapThr_ThroughImage (next class)	CapMed_MediaManager		snd CapMed_MediaManager x2; hnd CapMed_MediaManager x1; basis handlers
-5761	CapRev_RecView (next class)	CapIod_IODevice	IODevice request from Shutdown state 11 (I)	snd Cmp_OutlineController x1, Cmp_OutlineController (2nd) x1, CmpSqp_SequencePartsBase x1; hnd CapIod_IODevice x2; basis handlers
+5761	CapRev_RecView (next class)	CapIod_IODevice	IODevice request from Shutdown state 11 (I)	snd Shutdown (0x7EB78C84 calls the 5761 ctor 0x7EA4644E), Cmp_OutlineController x1, Cmp_OutlineController (2nd) x1, CmpSqp_SequencePartsBase x1 (coordinator 2026-11-09, from fixes-D3); hnd CapIod_IODevice x2; basis handlers
 5801	CapThr_ThroughImage (next class)	CapDpc_DisplayControl		snd CapDpc_DisplayControl x1; hnd CapDpc_DisplayControl x2; basis handlers
 5821	CapThr_ThroughImage (next class)	CapDpc_DisplayControl		snd -; hnd CapDpc_DisplayControl x1; basis handlers
 5822	CapThr_ThroughImage (next class)	CapDpc_DisplayControl		snd -; hnd CapDpc_DisplayControl x1; basis handlers
