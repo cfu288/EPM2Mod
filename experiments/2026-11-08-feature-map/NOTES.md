@@ -93,3 +93,6 @@ English-string counts not present in the E-PM2: E-PL5 0 (block 1 identical), E-P
   - `$Revision: #88 $` (0x7F027CC4) is referenced by 0x7EE295EE, in the module that follows.
   - So the GL library ends at ~0x7EE294B4, not 0x7EE21020. Fix pending in the regions table and in sections 08 and 13d.
 - **Fix pass A5+C2: the touch-panel image end. Confirmed** by arithmetic: 0x7E7F0F78 + 470 × 85 − 1 = 0x7E7FAB85, as the editor says (the review's 0x7E7FAB34 was wrong).
+- **14e (GUI methods): two claims. Confirmed:**
+  - 0x7ECFFAC6 has 775 callers, and its neighbour 0x7ECFFB4C carries `CCommon::setDbWarningInfo`. So CCommon starts before 0x7ED00000.
+  - 0x7ED3231E is called only from the fill routine 0x7ED31C9B (3 sites), which fits "angle → slope for a slanted-edge fill", not a rotation.
