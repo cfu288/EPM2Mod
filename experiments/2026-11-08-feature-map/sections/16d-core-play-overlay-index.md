@@ -1,20 +1,21 @@
 # 16d. Camera core, playback/audio/Bluetooth and overlays A/B: generated per-function index
 
-Round D5, cycle 1 (2026-11-09; builds on D4). Scope: block 0 of E-PM2 v1.6, three ranges:
+Round D6, cycle 2 (2026-11-09; builds on D5). **This round is about precision, not coverage:** every rule with more than 50 rows was sampled against the code, wrong rules were fixed or demoted, and the share of specific rows went down where a rule could not be trusted. Scope: block 0 of E-PM2 v1.6, three ranges:
 - camera core, movie, rec, face: 0x7E6211E1–0x7E731584 (8,935 functions);
 - playback, audio, Bluetooth: 0x7E8F5800–0x7E965FD0 (2,486 functions);
 - overlays A and B, code parts: 0x7F05C000–0x7F0F0000 (2,273 functions).
 
 The 65 functions with `data_page` = 1 or `suspect` = 1 are skipped. CapImg and OlyHfwLowApiWrap are outside these ranges (16a rows); only the Apical code is here.
 
-- **Labels:** (V) = read in code or bytes; (I) = inferred.
+- **Labels:** (V) = read in code or bytes; (I) = inferred. **In the TSV, a row marked I starts with "probably"**: it comes from a demoted rule (§4.2) and is a hedged reading, not a checked fact.
 - **Index file:** `16d-core-play-overlay-index.tsv`, **one row per function, 13,694 rows**. Columns: `addr`, `size`, `role`, `basis` (rule or table), `V/I`, `class` (S = specific role, P = specific facts only, C = context only), `component` (smallest named range, §1).
-- **Scratch:** `$S/d5/core/` (copied from `$S/d4/core/`). Run with `python3 -I`, in this order:
-  1. `db.py`, `ment.py`, `ranges.py`, `strnames.py`, `ptab2.py`, `immref.py`, `shells.py` (as in D4; re-run `ment.py` after any section edit);
-  2. `cb/cbfix.py OLD15b NEW15b`: re-derives the 15b "callback" rows (rule C1, §3) and writes the fixed 15b TSV;
+- **Scratch:** `$S/d6/core/` (copied from `$S/d5/core/`; paths point to d6). Run with `python3 -I`, in this order:
+  1. `db.py`, `ment.py`, `ranges.py`, `strnames.py`, `ptab2.py`, `immref.py`, `shells.py` (as in D5; D6 changed `strnames.py`, so re-run it);
+  2. D6 does not run `cb/cbfix.py` (the 15b TSV is not edited in D6);
   3. `cat roles_head.py roles_main.py > roles2.py; python3 -I roles2.py` → `index.tsv`;
-  4. `measure.py [seed ch|all n]`: class shares before/after, changed rows, random samples.
-- **Hand and decode inputs:** `comps_hand.tsv`, `hand.tsv`, `handnames.tsv` (D4); new in D5: `hand_d5.tsv` (BASIC, USB, C3D, ADJSLF API, `disp`/`art`/`play` shells), and three decode files whose every row was read in code: `exp/hand_exp.tsv` (872 rows), `bt/hand_bt.tsv` (284), `mcon/hand_mcon.tsv` (698). Their tables and signatures are in `exp|bt|mcon/notes.md`.
+  4. `measure.py` (class shares against the D5 TSV `pub_d5.tsv`), `final_stats.py` (rows, V/I and class per rule group, `rgrp.py`), `prec.py` (checks and errors per rule group and round).
+- **Samples and verdicts:** `v6/batch{A,B,C,D}N.tsv` (rows as sampled) and `v6/res*.tsv` (verdicts, one line per row, with the instruction addresses). Instructions to the readers: `v6/VERIFY.md`.
+- **Hand and decode inputs:** `comps_hand.tsv`, `hand.tsv`, `handnames.tsv` (D4); `hand_d5.tsv` (D5, with 9 D6 rows marked "D6"), and the decode files `exp/hand_exp.tsv` (872 rows), `bt/hand_bt.tsv` (284), `mcon/hand_mcon.tsv` (698). Their tables and signatures are in `exp|bt|mcon/notes.md`.
 
 ## 1. Area and boundaries
 
@@ -33,7 +34,7 @@ D4 boundaries stand (camera core 15b §1; HDMI/CEC, Blue SDK, overlay A 15d; mco
 | 0x7E92BA80 | OBEX client API starts here, so Blue SDK SEC ends at 0x7E92BA7F (not 0x7E92BF5D) | V: call edges |
 | ~0x7E9362F5 | SPP starts here (calls RFCOMM register/open); SDP ends 0x7E9362F4 (not 0x7E936A47) | I |
 
-## 2. Components and decoded tables (new in D5)
+## 2. Components and decoded tables (D5; D6 additions in §2.6)
 
 The D4 tables still hold: the EFFECT/EFFECT_EXE bit map, the U_SHELL family table 0x7E7332B4 and its copy 0x7E7326A4, the three shell idioms and the level-gated loggers.
 
@@ -46,7 +47,7 @@ The D4 tables still hold: the EFFECT/EFFECT_EXE bit map, the U_SHELL family tabl
 - **State machines:**
   - still: table 0x7E7BD480, 96 B per status, 8-B cells {handler, u16 next status}. 0x7E65D6E6 runs the cell for event column d0; 0x7E65D71E moves to the next status (0 or ≥ 25 → damage 15492).
   - live bulb: table 0x7E7BF220, 88 B per status, status 0x6056ED14; runner 0x7E661AAB, next status 0x7E661AE3.
-- **Step events:** posters 0x7E65D41A / 0x7E6617F4 (d0 = bit, names AE_START … EXPOSE_INTERVAL); matchers 0x7E65D497 / 0x7E661851 call the per-step functions of the matching phase request.
+- **Step events:** posters 0x7E65D41A / 0x7E6617F4 (d0 = bit; cam.c's factor table 0x7E7ABF20 does not name these bits (03 §1 scope note), so D6 rows give only the bit value); matchers 0x7E65D497 / 0x7E661851 call the per-step functions of the matching phase request.
 - **Senders** (one-callee wrappers, many callers): to cam_set 0x7E65D1FD, MI 0x7E65D248, shutter 0x7E65D276, aperture 0x7E65D338, lens 0x7E65D3B2; delayed step 0x7E65D3E6 (d1 ≠ 0 → cam_timer 0x7E66260A, else call a1). On failure each one stores the module error (0x7E65D756/0x7E661B1B) and reports damage with a source-line tag (0x7E65D9A6/0x7E661CFF).
 
 **2.2 BASIC (overlay A; V).**
@@ -63,9 +64,9 @@ The D4 tables still hold: the EFFECT/EFFECT_EXE bit map, the U_SHELL family tabl
 
 **2.4 ADJSLF engine API (overlay B; V).**
 - **Context:** *(0xA06E1720) (0x7F0A8682); status word ctx+0 (0x7F0A8873 get, 0x7F0A885B set).
-- **Test records:** start 0x7F0A89F0 (d0 = test id, 283 sites) → result line ctx+8404 (0x7F0A8ACC/0x7F0A8A91) → finish 0x7F0A8C29 (CSV `"%s","%s",%06u,%08u,%u,%s,"%s"`); pass 0x7F0A8D8C, fail 0x7F0A8D96(error d0).
+- **Test records:** start 0x7F0A89F0 (d0 = test id, 284 call sites) → result line ctx+8404 (0x7F0A8ACC/0x7F0A8A91) → finish 0x7F0A8C29 (CSV `"%s","%s",%06u,%08u,%u,%s,"%s"`); pass 0x7F0A8D8C, fail 0x7F0A8D96(error d0).
 - **Parameter reader:** next CSV token as int 0x7F0AA025 (983 sites) or double 0x7F0AA056 (570).
-- **ADJ operations:** `MDO` 0x7F0A99A4 = op 0x902B (sub-op 15 = U_SHELL command string: `cam poweroff` 0x7F0B90F7, `cam poweron` 0x7F0B90CD); `MDN`/`MDI` 0x7F0A9867/0x7F0A98E9 = op 0x9029; `SetPrePro` 0x7F0A9AA3 = op 0x900D; `GetCalibData` 0x7F0A9563 = op 0x9006 (wrapper 0x7F0A961B); SetCalibData wrapper 0x7F0A9626; request builder 0x7F0A934B.
+- **ADJ operations:** `MDO` 0x7F0A99A4 = op 0x902B (sub-op 15 = U_SHELL command string: `cam poweroff` 0x7F0B90F7, `cam poweron` 0x7F0B90CD); `MDN` 0x7F0A9867 = op 0x9029, `MDI` 0x7F0A98E9 = op 0x902A (`mov 36906,d0` at 0x7F0A9955; 0x9029 is only in MDI's null-buffer log; D6); `SetPrePro` 0x7F0A9AA3 = op 0x900D; `GetCalibData` 0x7F0A9563 = op 0x9006 (wrapper 0x7F0A961B); SetCalibData wrapper 0x7F0A9626; request builder 0x7F0A934B.
 - **Card-write check** 0x7F0A8D30 (`MNF99991.JPG`); vsprintf copy 0x7F0CAA0F.
 
 **2.5 Other decodes (V).**
@@ -80,81 +81,138 @@ The D4 tables still hold: the EFFECT/EFFECT_EXE bit map, the U_SHELL family tabl
 - **mcon** (`mcon/notes.md`): 0x7E6FEA5F is the GUI-value get of info d0, not a record lookup; accessor table 0x7E826D2C (get/set/write × 2 planes; slot 11 = W-plane GUI set entry); op records 0x7E814864 (250 × 60 B, 230 callbacks named by slot and info id); twin-copy pair table 0x7E818C68 (keyed by the value of info 9).
 - **Apical:** REC, MOV and PLAY fill the same 53-byte request and run IMG job type 11 (THM2LUM); IMG 0x7E574FBC computes an 8-knot tone curve. "Dynamic range/tone" is I.
 
+**2.6 New in D6 (V).**
+- **iAP link callback and command processor** (round7-review2 F021):
+  - 0x7E8FF8A0 is `link_callback(flg)`, the callback that 0x7E900560 passes to `cp_init` 0x7E91A2CF (`mov 0x7E8FF8A0,a0; mov 1,d0; call` at 0x7E9007EE). flg = 0 sets up the iAP context 0x605C5EB0 (+906 = 1, command id 56) and calls `iap_cmd_prc`; flg ≠ 0 can post a 16-byte message to queue id 0x7E43EDF4.
+  - `iap_cmd_prc` is **0x7E91C673** (the caller prints « iap_cmd_prc error:» after `call 0x7E91C673` at 0x7E8FF914). It switches on ctx byte +906: 1 → 0x7E91C69D, 2 → 0x7E91C9D7, 3 → 0x7E91CB38.
+  - 0x7E900560 (3,079 B, switch table 0x7EBAF374, values 1–18) has no name now. Its strings «bt_ctrl_inquiry err», «bt_ctrl_inquiry_cancel error:», «SEC_SetPin error:» … report its callees.
+- **ADJSLF spectral tables** (round7-review4 F080; bytes read):
+  - 0x7F0DED34–0x7F0E104F: 321 rows of 28 B {u32 wavelength 380…700 nm, 3 doubles} (row 0 = {380, 46.97, 33.46, 40.54}).
+  - 0x7F0E1050–0x7F0E7EA7: 321 rows × 11 doubles (88 B).
+  - The loader 0x7F0C6FEC (only caller `R_src_white_test` 0x7F0C6059) copies table 1 column by column to three 321-double arrays at a0+31108/+33836/+36564, then copies table 2 (loop `add 88`, `cmp 321`). The meaning of the 3 and 11 columns is not decoded (I: spectral reference data for the `WL_Peak_*ref_BPF%d` white-source test).
+  - The GUI exposure-step table 0x7EFE9622 (6-B rows) is outside this index's ranges.
+- **Overrides of source rows** (`hand_d5.tsv`, D6 verifier): 0x7E666C98 copies the 20-byte EMS2 state 0x6056F170 *out* to the caller buffer (15b says "clear"); 0x7E65FC9B stores the error first and then posts event 8 (15b had the order reversed); 0x7E92C429 fills an *outgoing* OBEX Body/End-of-Body packet (bt decode had the direction reversed); 0x7E9338F4 is an RFCOMM credit advance, not a modem-status setter.
+
 ## 3. The rules (priority order)
 
-A function gets the role of the highest-priority rule that fires; up to two lower rules are appended after `;`. Rows = rows whose primary basis is that rule (final index).
+A function gets the role of the highest-priority rule that fires; up to two lower rules are appended after `;`. Rows = rows whose primary basis is that rule (D6 index). **D6** marks the changes of this round; §4 has the measured precision of each rule.
 
 | # | Rule (basis value) | Source or signature | Rows | V/I |
 |---|---|---|---|---|
-| 0 | `hand`, `hand (D5, read in code)` | `hand.tsv`, `hand_d5.tsv` (D5 adds 7 rows from the verifier's reading) | 148 | V (I parts marked) |
-| 0 | `D5 exp/BT/mcon decode` | `exp|bt|mcon/hand_*.tsv`: tables decoded and each function read | 1,854 | per row (V 1,720, I 134) |
-| 1 | `15b/15d tsv …` | single-address rows; slot and cell rows give their handler. **D5:** the 15b `callback` rows are re-derived by C1; a row keyed by a list of functions (15d `0x7F0886AD/BE/C7/E4`) no longer gives "slot" roles to the addresses in its text | 1,064 | as in the TSV |
-| 1 | `tasks.tsv`, `hand name` | task entries; logger, heap and lock names | 131 | V |
-| 2 | `shell …`, `U_SHELL table` | §2 and D4 §2. **D5:** a "handler" with ≥ 2 callers outside the shell is a shared callee of that branch (priority 7, class C; 15 rows; e.g. `isdio_read_register` 0x7F0A4AF4 is not `spc read_enc`) | 196 + 15 | V |
-| 3 | `section name` | backticked identifier next to the address. **D5:** when the sections give one name to several addresses, only the address with the most mentions keeps it (fixes glSetErrorFuncDMP 0x7F09E9EE, UnitCodeCam 0x7F0A8912, glGetError 0x7F09E2FF, art_SendRequest 0x7E70E687) | 231 | V |
-| 3 | `own string (io/brk/bare/call)` | the function's own name string. **D5:** `…_ERR/_NG/_OK/_END/_START/_IDLE` tags are never names (priority drops to 8, no label); bare all-capital names are labelled "`X` (log tag)"; a bare string whose next call is not a print function is an argument (object name, compare key): "passes the string «X» to F", class P (92 rows, e.g. `CIC_MUTEX` 0x7E8F58B8) | 1,487 | V |
-| 3 | `ADJSLF constants (D5)` | d0 constants at the calls 0x7F0A89F0 (test ids), 0x7F0A8D96 (fail codes), 0x7F0A961B/0x7F0A9626 (calib tags, prm names), 0x7F0A99A4 (MDO sub-ops), 0x7F0A9867/0x7F0A98E9; S when it records tests | 85 | V |
-| 4 | `callback by consumer (D5)` | a code immediate passed in a known register to a known API: cam_set frame/set-list done (a1 of 0x7E651483/0x7E65156C), imgdev/sg request (a0 of 0x7E638F34/0x7E6390A6), hook list 0x7E6533F7, tmr_start, sio_request, cam_ev arm/set-up, cam_timer 0x7E66260A, cam_sem job (a1 of 0x7E64F10E), PTP op handler (a0 of ptp_register; op = d0 at the call) | 231 | V |
-| 4 | `sec NN line L` | section phrase holding the address. **D5:** phrases with `~~`, "first/last function 0x…", "starts at 0x…", the address after "called (directly) by / passed by / stored by / loaded by", the middle of a `A → X → B` chain, an `A / B` pair, or a table cell naming several functions are dropped; `|` inside a backtick span no longer ends a phrase | 459 | I |
-| 5 | `jump/hash table` | case → handler (jt.py). **D5:** (a) a target with ≥ 2 callers outside the switch is a shared callee ("shared function … that case K … calls first", priority 7, class C; 40 rows; e.g. the cam debug printf 0x7E62EBCA); (b) a table without a bound check is cut at the next table base (stacked tables 0x7E7F0988/09C0/09F8 gave false cases 17/31) | 392 + 40 | V |
-| 6 | `data pointer table` | ptab2 runs. **D5:** the BASIC run at 0x7F069340 is skipped (read as {name, token, fn} at 0x7F069338 instead) | 414 | V |
-| 7 | `jump/hash table owner`, `code immediate` | as D4 | 712 | V |
-| 8 | `shape:*` | byte shapes (D4 table). **D5 wrapper fix:** the last write to each argument register wins (0x7F08459E stored 8221 to memory and called with d0 = 0; the old row said d0 = 8221); stores before the call are reported | 1,178 | V |
-| 9 | `own strings (gist)` | up to 3 own strings | 789 | V |
-| 10 | `features+call graph` | facts + nearest labelled ancestor. **D5:** a block copy whose source is a short printable C string is written "copies the string «…»" (it was "block-copy loop from table"); new call templates: imgdev command N with its COM_ name, sg command N, ADJSLF test N, "reads the mcon GUI value of info N" | 3,610 | V |
-| 11 | `call graph (unnamed callers)`, `(no callers)` | as D4 | 655 | V |
+| 0 | `hand`, `hand (D5, read in code)` | `hand.tsv`, `hand_d5.tsv`. **D6:** `hand_d5.tsv` rows are demoted to I ("probably: …") except the 9 rows re-read in D6 (V/I contains "D6") | 23 + 132 | V; hand_d5 I (9 V) |
+| 0 | `D5 exp/BT/mcon decode` | `exp|bt|mcon/hand_*.tsv`. **D6:** demoted to I ("probably: …"); 6 rows corrected (§2.6, §5) | 872 + 284 + 698 | I (2 BT rows re-read in D6: V) |
+| 1 | `15b/15d tsv …` | single-address rows of the 15b/15d TSVs. **D6:** demoted to I ("probably: …"). The step-event names of cam.c's factor table are removed from the still/live-bulb rows (`posts step event 0x10000`, not `0x10000 PRO_EMS`); slot and I rows are no longer ancestor labels | 732 + 328 | I |
+| 1 | `tasks.tsv`, `hand name` | task entries; logger, heap and lock names. **D6:** the names of task IDs above 0x84 and of ID 1 are shifted in the name table (01 §1), so those entries are "uITRON task entry (cfg N); the label «X» is probably shifted" (I) and are not ancestor labels (`BOOT_CPU0` 0x7E53A4A4 is the standby task) | 73 + 58 | V (shifted IDs I) |
+| 2 | `shell decode` | strcmp chains (shells.py). **D6:** demoted to I and reworded: "probably a `fam … sub` shell subcommand handler (it is called after a string compare with «sub» in F; the full command path is not traced)". Nested shells now show the known path (`obex dmy snd`) or `…` | 159 | I |
+| 2 | `shell … (shared callee)`, `U_SHELL table`, `shell table (ptab2)` | as D5 | 18 + 22 + 15 | V |
+| 3 | `section name` | backticked identifier next to the address. **D6:** not a name when it is a plain word (`Seikou`), a shell command (`cam`), an all-capital tag (`V_DROP_FLG`, `REC_MAKE_IMAGE`), one of the function's own strings passed to a non-print call (`mov_dsi` → 0x7E44AD02), or an identifier that appears only in the strings of another function (04 gives `sound_chunk_int` to the helper 0x7E6F3E9B; the string is in 0x7E6F3EA4). The quoted section text is no longer appended | 157 | V |
+| 3 | `own string (io/brk/call)` | the function's own name string. **D6:** (a) "N error/err/NG/failed/ret/result/status" names a **callee** and is never a name (0x7E8FF8A0 is not `iap_cmd_prc`; 0x7E900560 is not `bt_ctrl_inquiry_cancel`); (b) `[TAG]` in capitals is a trace tag (`[SC_RT]`); (c) `[x] text` is a module tag or a name with a field (`[adj_slf] DispErrInfo`, `[init_memory] top:`), not a name; (d) a function with several different identifier strings gets no name unless the others are parts of it (`api_rec_X` / `X`) or it dominates (≥ 3 uses and 3× each other) | 427 + 73 + 9 | V |
+| 3 | `own string (bare)` | a bare identifier string. **D6:** rules (d) above; no bare name when the function also has a `[x] text` string | 810 | V |
+| 3 | `ADJSLF constants (D5)` | d0 constants at the ADJSLF API calls. **D6:** MDN = op 0x9029, MDI = op 0x902A (was one "MDN/MDI 0x9029" entry); any other write to d0 kills the constant (0x7F0B7002 recorded test "0"; 0x7F0C2B6B recorded the fail code 3002 as a test) | 83 | V |
+| 4 | `callback by consumer (D5)` | code immediate passed in a known register to a known API. **D6:** the cam_sem post-job text no longer says "queued on MI_RES/MI_CLS" (the queue object is a0: CAMLNS, FDRV …) | 233 | V (28 I) |
+| 4 | `sec NN line L` | section phrase holding the address. **D6:** worded "probably as a section says (not checked here): “…”" | 489 | I |
+| 5 | `jump/hash table` | case → handler. **D6:** (a) the switch value is read from the code: `add -k`, `sub k`, `mov k,dX; sub dX,dN`, `mov -k,dX; add dN,dX`, `inc`, register copies; the bound compares cut the table (§4.3); (b) hash keys compared after an adjustment (`mov -1,d0; add a2,d0` in 0x7E939461) get the real value; (c) the first call of a case arm follows a leading `bra` (0x7E63D3FC branches to the 0x7E63D407 arm; jt.py read the next arm); (d) more than 6 cases are written `…/… (N cases)` | 398 + 42 | V |
+| 6 | `data pointer table` | ptab2 runs. **D6:** cut to the certain fact "its address is stored in the data word W". The run start, its length and its "user" were wrong in 8 of 11 checks (runs that start mid-table, {key, fn} hash pairs, users that only compare against the end) | 418 | V |
+| 7 | `jump/hash table owner`, `code immediate` | **D6:** owner rows say "contains a jump through switch table(s) T" (a switch is not always a dispatcher: 0x7F08E1F9 decodes hex digits); code-immediate rows say "address loaded as an immediate by F" without the "passed to/stored to" detail (it named the wrong call for 0x7E6AF4B9) | 104 + 625 | V |
+| 8 | `shape:*` | byte shapes. **D6:** a struct writer names the base register of each store (`(a0)+0, (a0)+2, (a1)+0 …`; it said "through a pointer" for three pointers) | 1,192 | V |
+| 9 | `own strings (gist)` | up to 3 own strings | 970 | V |
+| 10 | `features+call graph` | facts + nearest labelled ancestor. **D6:** prm pointer/count getters (0x7E457C52/62) give "gets the storage pointer/count of prm N", not "reads prm N" | 3,438 | V |
+| 11 | `call graph (unnamed callers)`, `(no callers)` | as D4 | 789 + 20 | V |
 
-**Rule C1 (15b callback rows, `cb/cbfix.py`; also written into `15b-camera-core-index.tsv`).** The D3 `cbx.py` rule called every function that calls the step poster or the damage reporter a "step callback". The fix:
-- **Callback:** only a function whose address is loaded as a code immediate or held in a data word (pointer reference) and that has no direct caller. Kind `callback`; the role says where the pointer goes (passed to cam_ev object set-up 0x7E635701, the delayed-step helper, stored at +20/+24/… of a request).
-- **Not a callback:** a function with direct callers and no pointer reference becomes kind `action` ("sequence function, not a callback (called directly by …)"), with its effect read from the code (step bit, cam_ev object id, sub-module open/close, request sender, delayed step).
-- **Hand roles:** the module API and the state-machine functions (§2.1) get hand roles (kind `function`).
-- **Pool allocators:** the 16 allocators get kind `init`.
-- **Result:** of 340 rows, 221 are callbacks, 81 actions, 22 functions and 16 init; 324 rows changed text.
+**Ancestor and callee labels ("under X", "calls X", "registered by X"; D6).** A label is used only when it is a name: hand names, library names, task names (not the shifted IDs), section names that pass rule 3, own-string names that pass rule 3, and V rows of the decode files and TSVs that are not slot rows. Not used: log tags (`LENS_MAIN`, `PRE_ACTION_ON`, `CAM_CL`), names from callee error strings (`BT_SrvInitialize`, `bt_sio_sem_get`), I rows (`CEC RX setup`), 15b slot-row text, and string names of functions longer than 1,500 B (`WOB_lens_wait` is one state message of the 4.7 KB 0x7E5F9AED; `g_g_fcs_expse_tv` is a variable that 0x7E5EA6BD prints). Long labels are cut at a word boundary (a cut "infos 6…" read as "info 6"). 0x7E5F8BE4 is labelled "C-AF scan-route decision (16c)", not `SC_RT`.
 
-**Class P (D5):** a C row that also contains a specific fact after `;` (issues/posts/sends/registers/reads prm/records ADJSLF test …) is now P.
+**Rule C1 (15b callback rows, D5).** The D5 rule (`cb/cbfix.py`) is unchanged: a callback is a function whose address is a code immediate or a data word and that has no direct caller; functions with direct callers are "sequence function, not a callback". In D6 the 15b rows are demoted to I with the other 15b rows, and their step-event names are removed.
 
-## 4. Coverage and measured accuracy
+**Class P:** a C row that also contains a specific fact after `;` (issues/posts/sends/registers/reads prm/records ADJSLF test …) is P.
 
-**Coverage: 13,694 / 13,694 rows have a role** (no blanks; 60 orphans are described as such).
+## 4. Measured precision and coverage (D6)
 
-| Range | Rows | S: D4 → D5 | P: D4 → D5 | C: D4 → D5 |
-|---|---|---|---|---|
-| camera core / movie / rec / face | 8,935 | 3,641 (41 %) → 4,778 (53 %) | 916 (10 %) → 1,034 (12 %) | 4,378 (49 %) → 3,123 (35 %) |
-| playback / audio / BT | 2,486 | 1,052 (42 %) → 1,265 (51 %) | 63 (3 %) → 103 (4 %) | 1,371 (55 %) → 1,118 (45 %) |
-| overlays A + B | 2,273 | 866 (38 %) → 950 (42 %) | 160 (7 %) → 253 (11 %) | 1,247 (55 %) → 1,070 (47 %) |
-| **all** | **13,694** | **5,559 (41 %) → 6,993 (51 %)** | **1,139 (8 %) → 1,390 (10 %)** | **6,996 (51 %) → 5,311 (39 %)** |
+### 4.1 Method
 
-- **S share of the flagged components, D4 → D5:** EXP_MOVIE 20 → 78 %; mcon mode controller 15 → 100 %; RFCOMM 4 → 72 %; L2CAP 7 → 46 %; SDP 4 → 51 %; OBEX core 4 → 21 %; OBEX_ACP/tasks 40 → 65 %; BASIC 13 → 49 %; ADJSLF 8 → 31 %.
-- **Weakest now:** cam_param/pfp/port/prepro/rap.c 3 % S (56 % S+P); PC_USB driver 12 %; fcs/AF tail 13 %; ADJ helpers 15 %; touch panel 22 %; cam_*.c aedrv…frame_sync 25 %; the 252 EXP_MOVIE functions without a decode row (loop bodies 0x7E6A2BB7–0x7E6A8905).
+- **Readers:** independent agents with the code tools and `v6/VERIFY.md`. Each row gets CORRECT, CONTEXT (true but says nothing about the function), MINOR (one false detail: a number, offset, case value, callee or ancestor name, condition) or WRONG (false role or name). **Errors = MINOR + WRONG.** The reader names the false clause, so each error is traced to the rule that wrote that clause.
+- **Rounds:** A = the D5 TSV (40-row baseline + 10 rows per rule; 230 rows); B = after the A fixes (10 per rule, 20 for `features`; 190 rows); C = after the B fixes (10 per fixed rule + 40 fresh rows; 100 rows); D = after the C fixes (10 for the two rules fixed in C + 40 fresh rows; 60 rows). 580 rows in all, no row checked twice.
+- **Baseline (round A, 40 random rows of the D5 TSV):** 20 CORRECT, 16 CONTEXT, 4 MINOR, 0 WRONG: **4 / 40 = 10 % errors**, all in V rows (jt slot as case value ×2, the trace tag `LENS_MAIN`, the I label "CEC RX setup" as an ancestor name).
 
-**Diff against the D4 TSV:** 5,484 rows changed text. Most of these are rewordings: the jt rows now read "work of case K … (the case arm calls it)", and the ancestor labels changed.
-- Class moves: C→S 1,603; P→S 206; C→P 112; S→C 249; S→P 127; P→C 1.
-- The S→C/P moves are deliberate demotions:
-  - shared callees that the D4 jt and shell rules called case or subcommand handlers (55 rows);
-  - section phrases that describe a chain, a pair or a shared table cell (about 260 rows);
-  - 92 bare strings that are arguments, not own names;
-  - the 15b direct-call "callbacks".
+### 4.2 Precision per rule
 
-**Changed-row checks (V, read in code):**
-- Seed 55, 10 rows: 2 misleading (0x7E65AF26, 0x7E65AEF8: "called directly by", taken from the new 15b wording). Fixed by the caller-phrase filter.
-- Seed 77, 10 rows: 1 wrong (0x7E93189D said "answers DM"; it sends UA 0x73 to a SABM). Fixed in `bt/hand_bt.tsv`.
+"A" counts the D5 rows; "B–D" counts the rows of the D6 builds. A rule keeps V only if its checks after its last measured fix have 0 errors in ≥ 10 rows.
 
-**Fresh random samples, each 30 rows, judged by an independent reader against the code** (`sample_d5_fresh{1..4}.tsv`, verdicts in `verify*/results.tsv`). After each sample, every error was traced to its rule, the rule was fixed and the index was rebuilt. So each sample measures the rules as they stood before that sample's fixes.
-
-| Sample (seed) | Correct | Misleading | Wrong | Truly specific (reader) | Rules fixed after it |
+| Rule group (basis) | Rows | A: errors / checked | B–D: errors / checked | Errors found (rule that wrote the false clause) | D6 result |
 |---|---|---|---|---|---|
-| 1 (5151) | 26 | 3 | 1 | 4–8 | jt shared callee; `|` inside backticks; 15d list-keyed rows; chain middle |
-| 2 (6262) | 25 | 1 | 4 | 11 | wrapper last-write; stacked jt tables; `A / B` and shared cells; bare-string argument; shell shared callee |
-| 3 (7373) | 27 | 0 | 3 | 11 | fieldstore at +0; timer wrap value 0x7E46B519 (was "free-run timer read"); DPS host-file test (15d source error) |
-| 4 (8484) | 27 | 1 | 2 | 12 | "block copy" excludes in-place arithmetic; mcon 0x7E6FFB28/2D text; DPS 0x7F06029C states (15d source error) |
+| features+call graph | 3,438 | 3 / 10 | 0 / 36 | A: ancestor labels (log tag, I label, `Seikou`) | **V** |
+| own strings (gist) | 970 | 3 / 13 | 2 / 25 | A: ancestor labels and a jt slot; B: labels `BOOT_CPU0` (shifted task ID), `WOB_lens_wait`; fixed before C; C–D 0 / 15 | **V** |
+| call graph (unnamed/no callers) | 809 | 0 / 12 | 0 / 7 | — | **V** |
+| own string (bare) | 810 | 0 / 13 | 0 / 4 | — (made stricter by rule 3d) | **V** |
+| code immediate | 625 | 2 / 14 | 1 / 17 | A: wrong "passed to" call, callee-error label; C: callee label `sound_chunk_int` (section name on the wrong address; fixed after C, D 0 / 1) | **V** (last fix not re-sampled) |
+| shape:* (not wrapper) | 604 | 0 / 12 | 0 / 3 | (D: struct-writer wording in a jt row; fixed after D) | **V** (last fix not re-sampled) |
+| shape:wrapper | 588 | 0 / 12 | 0 / 2 | — | **V** |
+| own string (io/brk/call) | 509 | 0 / 1 | 2 / 38 | C: bracket module tags `[adj_slf]`, `[init_memory]`; fixed before D; D 0 / 13 | **V** |
+| jump/hash table (case) | 440 | 0 / 1 (8 more jt clauses wrong in other rows) | 3 / 23 | A: slot given as case value (8 clauses); B: case list cut at 6; D: two extra clauses (struct-writer and prm wording; fixed after D) | **V** (last fix not re-sampled) |
+| data pointer table | 418 | 8 / 11 | 0 / 10 | A: run start, entry count, table user | **V** (reworded to the data word) |
+| jt owner | 104 | 2 / 10 | 1 / 21 | A: jt case values; B: "dispatcher" on a hex decoder; C–D 0 / 11 | **V** (reworded) |
+| section name | 157 | 1 / 9 | 1 / 30 | A: section quote appended; B: `mov_dsi` tag; C–D 0 / 20 | **V** |
+| callback by consumer | 233 | 4 / 11 | 0 / 10 | A: "queued on MI_RES/MI_CLS", `V_DROP_FLG` label | **V** |
+| ADJSLF constants | 83 | 4 / 10 | 0 / 11 | A: MDI op, test id 0, fail code as test id | **V** |
+| hand.tsv, hand names, tasks, U_SHELL | 177 | 2 / 10 (hand group) | 3 / 23 (hand group) | C: two truncated addresses «0x605C...» in `handnames.tsv` (fixed; no other truncated entry); task names of shifted IDs | V (I for shifted task IDs) |
+| `hand_d5.tsv` | 132 | (in hand group) | (in hand group) | A: "283 call sites" (284); B: «or unknown» in the `play` usage row | **demoted to I** (9 D6 rows V) |
+| section text | 489 | 2 / 11 | 2 / 13 | quoted section claims that are false for this function (13b's retracted "+284"; "27-entry" table has 29; "each called once") | I (worded "probably as a section says") |
+| shell decode | 159 | 6 / 11 | 1 / 10 | A: wrong command paths (`mov time print`, `obex dmy snd`, `c3d test Q 0`, shared `usb pipeN`) | **demoted to I** |
+| 15b TSV | 732 | 2 / 12 | 4 / 12 | "clear" for a copy-out, reversed order, step-event names from the wrong table (×3), slot 54 for slot 55 | **demoted to I** |
+| 15d TSV | 328 | 2 / 11 | 2 / 12 | "CEC interrupt enable" for a disable, call order; jt case values | **demoted to I** |
+| exp decode | 872 | 1 / 13 | 6 / 15 | "bit 2" for mask 0x02, error code 0x0E000503 for 0x0E000703, offset +12 for +16, returns the state vs a flag, a range start, "clears" vs "sets 32767" | **demoted to I** |
+| mcon decode | 698 | 2 / 12 | 5 / 16 | missing source infos, store order, "drive" for "distance", a cut label | **demoted to I** |
+| BT decode | 284 | 3 / 10 | 2 / 11 | reversed packet direction, `oacp` for `acp`, "mux closing" for the responder state, `RFCOMM_SetModemStatus` for a credit advance | **demoted to I** (2 re-read rows V) |
 
-**Measured error rate: 15 / 120 = 12.5 % before the fixes (wrong 10, misleading 5). The last two samples gave 3 / 30 = 10 % each.** This is above the 5 % target. Two things are behind it:
-- the reader in D5 also checks callee names and argument values, which the D4 self-check (2.2 %) did not;
-- most errors come from D4-era generic rules (wrapper, jt, section text, fieldstore, copy loop) and from two 15d source rows.
+**Demoted rows (I, "probably: …"): 3,715** — decode files 1,852, 15b/15d 1,060, `hand_d5` 123, shifted task IDs 4, section text 489, shell 159, callback-by-consumer rows already I in D5 28.
 
-All 15 sampled errors are fixed. No sample was drawn after the last fixes, so **no post-fix rate is claimed**. Of the errors, only one came from a decode file (mcon 0x7E6FFB28); none came from rule C1.
+### 4.3 Named rule errors fixed in D6
+
+- **Jump-table case values.** jt.py read only `add -k` before the index. With `mov k,dX; sub dX,dN` or `mov -k,dX; add dN,dX` it gave the slot as the case. 0x7E6AEAD2 covers values 1..27 at value − 1 (0x7E6B6123 is case 17, not 16); 0x7F08D380 / 0x7F08D49B subtract 0x5001 (0x7F08DAE9 is case 0x5013, not 18). 79 linear tables changed base or length (e.g. 0x7E7FF05C starts at 100, 0x7E81004C at 76, 0x7F069F90 at 257, 0x7F06A0F8 at 0x10000001; 0x7E7FDD9C has 9 entries, not 167), and 10 hash tables changed their key offset (0x7E939461: key 127 is value 128 = OBEX CONNECT; 0x7E7FF300 keys + 77; 0x7EBAF3BC keys + 0x04020010).
+- **Names from a callee's error string.** 0x7E8FF8A0 is `link_callback`; `iap_cmd_prc` is 0x7E91C673 (§2.6). The same rule removed `bt_ctrl_inquiry_cancel` from the 3 KB switch 0x7E900560, `BT_SrvInitialize` from 0x7E901EAC and `bt_sio_sem_get` from 0x7E912CF8.
+- **Trace tags as ancestor names.** `SC_RT` (0x7E62542E row), `LENS_MAIN`, `PRE_ACTION_ON`, `V_DROP_FLG`, `CAM_CL`, `REC_MAKE_IMAGE` and other capital tags are no longer labels. All "under X" labels were listed and sorted by source (989 distinct labels): slot rows, I rows, shifted task names, long-function string names and capital section names were removed.
+- **Names on large switch functions.** Rule 3d: a function with several different identifier strings gets no name (114 functions; e.g. the 5.5 KB `bt` shell 0x7E9035A8 was `sio_read_start`, the 1.6 KB 0x7E6E59CB was `AVSCA_SetVideoParam`).
+
+### 4.4 Final check (fresh rows)
+
+Two fresh random samples of 40 rows, drawn after rounds B and C fixes, rows never checked before:
+
+| Sample | V rows: errors / rows | I rows: errors / rows | Errors in V rows (fixed after the sample) |
+|---|---|---|---|
+| round C (seed FINAL-D6) | 2 / 31 | 3 / 9 | `[adj_slf]` bracket tag as a name (WRONG); callee label `sound_chunk_int` at the wrong address |
+| round D (seed FINAL2-D6) | 2 / 29 | 2 / 11 | "6 fields through a pointer" (three pointers); "reads prm 0xC202" (the code writes it through the prm pointer getter) |
+| **both** | **4 / 60 = 6.7 %** | **5 / 20 = 25 %** | |
+
+**The target (0 wrong among V rows) is not met.** All 4 V-row errors were minor or wrong details in a clause, each traced to a rule and fixed after its sample (bracket tags, string-owner check for section names, struct-writer wording, prm pointer wording). No sample was drawn after these last fixes, so **no post-fix rate is claimed**. The I rows ("probably") carry the demoted rules; their measured detail-error rate is 25 % in the fresh samples and 3–40 % per source in §4.2.
+
+### 4.5 Coverage
+
+**13,694 / 13,694 rows have a role.** Shares by class, D5 → D6:
+
+| Range | Rows | S: D5 → D6 | of which V / I in D6 | P: D5 → D6 | C: D5 → D6 |
+|---|---|---|---|---|---|
+| camera core / movie / rec / face | 8,935 | 4,778 (53 %) → 4,684 (52 %) | 1,931 (22 %) / 2,753 (31 %) | 1,034 (12 %) → 1,049 (12 %) | 3,123 (35 %) → 3,202 (36 %) |
+| playback / audio / BT | 2,486 | 1,265 (51 %) → 1,197 (48 %) | 609 (24 %) / 588 (24 %) | 103 (4 %) → 126 (5 %) | 1,118 (45 %) → 1,163 (47 %) |
+| overlays A + B | 2,273 | 950 (42 %) → 887 (39 %) | 534 (23 %) / 353 (16 %) | 253 (11 %) → 252 (11 %) | 1,070 (47 %) → 1,134 (50 %) |
+| **all** | **13,694** | **6,993 (51 %) → 6,768 (49 %)** | **3,074 (22 %) / 3,694 (27 %)** | **1,390 (10 %) → 1,427 (10 %)** | **5,311 (39 %) → 5,499 (40 %)** |
+
+- **Final shares:** specific 49 % (V 22 %, hedged I 27 %), partial (P) 10 %, context only (C) 40 %. Of the 13,694 rows, 9,979 are V and 3,715 are I.
+- **Diff against the D5 TSV:** 8,629 rows changed text. Most changes are ancestor labels, the data-word rewording (418 rows), the "probably" prefix (3,715 rows) and corrected case values. Class moves: S→C 169, S→P 55, P→C 24, C→S 5, P→S 3.
+- **D5 history (kept for reference):** D5 measured 15 / 120 errors (12.5 %) on four 30-row samples before its own fixes; the last two gave 3 / 30 each.
 
 ## 5. Corrections to earlier sections
+
+**New in D6 (V, from the D6 readers; the other sections are not edited here):**
+- **05 / 15d / 16d D5:** 0x7E8FF8A0 is `link_callback(flg)`, and `iap_cmd_prc` is 0x7E91C673 (§2.6). 0x7E900560 is not `bt_ctrl_inquiry_cancel`.
+- **15b TSV:** 0x7E666C98 copies the EMS2 state *out* (memcpy 0x7E500D33), it does not clear it. 0x7E65FC9B stores the error before it posts event 8. The still/live-bulb rows name step-event bits with cam.c's factor table (`AE_FPN`, `PRO_EMS`, `MEC_APERTURE_START` …), which 03 §1 says does not name them. Slot rows taken from 0x7E7AF27C miss the leading `bra` of some arms (0x7E7AF27C[54] goes to the 0x7E63D5CB arm; only slot 55 = value 58 calls 0x7E63D4F8).
+- **15d TSV:** 0x7E6ADFE3 is a CEC interrupt *disable* (AND 0xC3 on reg 0x95, reg 0xE2 = 1), not an enable. 0x7E6AC4AF calls 0x7E6AC56F *before* it reads 0x42/0xA1.
+- **16d D5 §2.4 (fixed here):** MDI 0x7F0A98E9 sends op 0x902A; 0x7F0A89F0 has 284 call sites.
+- **16d D5 §2.1 (fixed here):** the step-event posters take bit values; the AE_START … EXPOSE_INTERVAL names belong to cam.c's factor table only.
+- **04 line 229:** `sound_chunk_int` is 0x7E6F3EA4 (it logs «[SOUND] sound_chunk_int»), not the 9-byte helper 0x7E6F3E9B.
+- **tasks.tsv / 01 §1:** 0x7E53A4A4 is the standby task (`[pwr_standby]`), not BOOT_CPU0; do not use the name-table labels of IDs above 0x84 as names.
+- **bt decode:** RFCOMM mux state 3 is the responder state that waits for SABM after the L2CAP connect is accepted, not "mux closing". The `acp` U_SHELL command (module tag OACP) is not `oacp`.
+- **exp/mcon decode (fixed here):** 0x7E69D35F tests mask 0x02 (bit 1); 0x7E70277F reads the pair selected by info 25 (66/565, 67/566, 68/567); 0x7E706756 copies 437 or 438 into 436.
+
+**From D5:**
 
 - **15b TSV (edited here):** the 340 `callback` rows are re-derived (rule C1). 119 of them have direct callers and no pointer reference, so they are not callbacks. They are module init/open/close/filter, state-machine runners, open/close chain steps, request senders and step-event completions (§2.1).
 - **15b §5.7 / 12 §1.6:** the EXP codes 0x504 AF_END, 0x50D ONCE_PRE, 0x50E ONCE_RE_CALC and 0x90A/0x90B PRE_ONCE_CONTINUE(_AF) have names. 0x502/0x50A/0x50D/0x50E/0x702/0x801/0x1402 go to 0x7E68F2C1, not 0x7E6904C1. EXP_MOVIE_POST 0x7E43ECEC is the reply queue; the command queue is 0x7E43ECEA (V).
@@ -175,26 +233,18 @@ All 15 sampled errors are fixed. No sample was drawn after the last fixes, so **
 4. The effect names of EFFECT types 6, 10, 11, 27–30; which of 29/30 is slide and which is scroll.
 5. The OBEX core PUT/GET handler names and many RFCOMM user-event names are I (`bt/notes.md`).
 6. 0x7EE02095–0x7EECE318 (GL, 3D engine, C3D framework, AVPI) is still outside every 16x index.
+7. **(D6)** The demoted sources (exp/BT/mcon decode files, 15b/15d TSV rows, `hand_d5.tsv`) return to V only when each row is re-read, or when a new sample of ≥ 10 rows per source has 0 errors. The D6 readers' evidence columns (`v6/res*.tsv`) hold corrected roles for about 60 rows that are still C or I (e.g. 0x7F08E1F9 hex-digit decoder, 0x7F0A370D strlen, 0x7E6E4E41 the `mov meminfo` printer, 0x7F08D2CA nibble → ASCII).
+
 
 ## Known rule errors
 
-Fixed in D5 (removed from this list):
-- the 15b callback rule (C1);
-- the BASIC table reading;
-- section names given to callees or arguments (glSetErrorFuncDMP, UnitCodeCam);
-- trace tags (FCS_END) used as ancestor names;
-- overlay-B context-only rows for the USB ISR, the ADJSLF helpers and the C3D scene;
-- "block-copy from table" on strings and on in-place loops;
-- jt/shell "handlers" that are shared callees;
-- stacked jump tables;
-- wrapper arguments overwritten before the call;
-- fieldstore missing +0 stores;
-- section-phrase cuts at `|` and two-function phrases.
+Fixed in D6 (removed from this list): jt slot used as the case value (linear and hash switches) and the leading-`bra` case arms; names from callee error strings; trace and log tags as names or ancestor labels; names on functions with several identifier strings (switches, shells); shifted task names; section names that are tags, plain words, arguments or another function's string; pointer-table run starts, lengths and users; "passed to" details of code immediates; cam_sem "MI_RES/MI_CLS"; ADJSLF MDI op and lost d0 constants; step-event names on still/live-bulb rows; "dispatcher" on any switch; struct-writer and prm-pointer wording; cut labels.
 
-Still open (measured rate 10 % on the last two fresh samples):
-- **Wrapper/shape rows describe the body but not the purpose.** Examples: "returns 900", "sets a byte". They are correct but are not roles.
-- **`15d tsv dps-fn` rows** carry two known source errors (fixed by hand rows here). The 15d text has not been re-checked as a whole.
-- **Bare all-capital labels** (`MOV_IMDF`, `EXP_DATA`) are kept with "(log tag)". Some may be trace tags inside another function.
-- **"Under X" context** uses the nearest labelled ancestor within 3 levels. That is a location, not a role.
-- **`sec NN line L` (rule 4, I)** still takes the phrase around the address. Phrases with one address but several subjects can still mislead.
-- **Decode files (exp/bt/mcon)** were checked on samples only. Their 134 I rows are inferences from call edges and constants.
+Still open:
+- **Fixes made after the last sample are not measured:** bracket tags, the string-owner check for section names, struct-writer wording, prm-pointer wording and cut labels (§4.4). The last two fresh samples gave 4 errors in 60 V rows (6.7 %), all fixed after.
+- **Demoted rules ("probably", I; 3,715 rows):** decode files, 15b/15d TSV rows, `hand_d5.tsv`, section text and shell paths. They hold real readings, but 3–40 % of their checked rows had one wrong detail (offset, error code, condition order, direction, command path). Use them as leads, not facts.
+- **"Under X" context** is a location (nearest labelled ancestor within 3 levels), not a role. Labels are now names only, but an ancestor's own row may still be I.
+- **Case lists** show the cases whose arm calls the function first. A function that a case reaches later, or through shared code, is not listed; the "(N cases)" form cuts lists over 6.
+- **Wrapper/shape rows describe the body, not the purpose** ("returns 900", "6 stores (a0)+0 …"). They are true but are not roles.
+- **Context-only rows are 40 %.** The readers found a role in many of them (hex-digit decoder 0x7F08E1F9, NULL-safe strlen 0x7F0A370D, iSDIO command writer 0x7F0A4C3A, OBEX packet builder 0x7E92C429); those roles need code reading, not rules.
+- **The function map splits some case arms into separate functions** (0x7E913DD6, 0x7F08A18B, 0x7F08A1E7 are arms of their switch, not functions); their rows describe the arm.
