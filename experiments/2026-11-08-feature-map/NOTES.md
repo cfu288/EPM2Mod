@@ -139,3 +139,7 @@ English-string counts not present in the E-PM2: E-PL5 0 (block 1 identical), E-P
   - 0x7EDFD68D–0x7EDFD69E posts GUI 0x9628, then calls PostEventToCA(11, 11), inside the getShippingInfo(4) = 1 branch.
   - CA state 0x2006 has the row {0x09000006, 0x75, 1, 0} at 0x7EED998C. Its second word 0x75 is the GUI code that GuiCallerImp maps to 0x9628.
   - So VERCHK is the CA half of the hidden debug-menu (HIDE_MODE) entry, not a screen of its own.
+- **16a (app function index): the OlyApi method-name table. Consistent:**
+  - RAM 0x602B1F10 = `.data` image 0x7E8E23D0 (+0x1E6304C0). Its words are RAM pointers (0x602B1E14 …) into the same `.data` image.
+  - `CameraCommon::ctrlLcdBacklight` (0x7EBD5592) is referenced as data from 0x7E8E1450, inside that image.
+  - Not traced end to end by the coordinator.
