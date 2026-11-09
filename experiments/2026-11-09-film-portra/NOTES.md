@@ -1,6 +1,8 @@
 # Film look (Portra 400) for the E-PM2: plan and findings
 
-Started 2026-11-09. Status: **planning done; shoot 1 not yet taken.** Nothing built or flashed.
+Started 2026-11-09. Status: **shoot 1 taken and analysed (results §10). Test bench valid (RAW Data
+Edit output is pixel-identical to the camera JPEG). Per-channel curves exist only in the art-filter
+path. Curve table addresses not yet identified.** Nothing built or flashed.
 
 ## 1. Question
 
@@ -15,7 +17,7 @@ and is it better than the best recipe the menus already allow?
 | Target | **spektrafilm** Portra 400 → Kodak Portra Endura print, scanned (`spektrafilm-lut build --film kodak_portra_400 --print kodak_portra_endura --input vlog --output srgb --resolution 33`, as gr3-film-mods §13) | User choice. A real roll + lab scan was considered and dropped. Note: this is a *darkroom print* rendering (enlarger balanced to neutral), not a Frontier/Noritsu lab-scan look. |
 | Exposure anchor | 0 EV: camera middle gray = film middle gray (GRKit `exposure: 0.0`) | Default, not yet confirmed by the user. +1 EV ("overexposed Portra") is a common alternative and changes the look a lot (gr3 §13: Standard vs target 5.7 at 0 EV, 12.2 at +1 EV). |
 | White balance | Camera WB normalizes first; grays must stay neutral | Matches the print's neutral balance and per-frame lab balancing. Default, not yet confirmed. |
-| Slot | Replace **Portrait** first; **Cross Process** if per-channel curves exist only in the art path | Decide after step 1e (§6). New menu entries are out of reach (selector table, report). |
+| Slot | **Open, recommendation: Cross Process.** Shoot 1 (§10) shows per-channel curves only in the art-filter path (Cross Process, Pale&Light); normal modes, Portrait included, have one luminance curve plus saturation. | Portrait would give a custom tone curve + saturation only ("Portra-ish"). Cross Process gives R/G/B curves and hue shifts (as gr3 used on the GR III), at the cost of art-filter behaviour (RAW-only becomes RAW+JPEG; art filters lock Colour Space to sRGB). New menu entries are out of reach (selector table, report). |
 | Camera control | **Manual** shooting; no USB/ADJ scripting for now | Saves ~15–30 min of ~2–3 h; revisit only for live RAM edits, many looks, or > 6 rounds. |
 
 ## 3. Approach
@@ -58,22 +60,21 @@ stock Portrait. If free tables barely beat the menu recipe, stop there.
 
 | Set | Gives | Decides |
 |---|---|---|
-| B1–B7 tone bracket | ~250 gray points (36-step gray row × 7 exposures) with exactly known relative input | Natural's curve; match it against the 148 firmware curves (§5) to find its table address; K (where middle gray lands) |
+| B1–B5 tone bracket (−2…+2 stops; handheld, by aperture and time) | ~180 gray points (36-step gray row × 5 exposures); the actual exposure of each patch is measured from the RAW | Natural's curve; match it against the 148 firmware curves (§5) to find its table address; K (where middle gray lands) |
 | M1–M5 modes | Curve + matrix per mode | What differs between modes: matrix, curve, or both |
 | G1–G3 gradation | Curve per Gradation | Whether Gradation switches tables (likely: repeating sets of ~30) |
 | N1–N4, P1–P4 | Contrast and Saturation effects | Whether those settings still work on top of a new look, and how to keep them working |
 | A1–A4 art filters | Gray rendering per channel | **Whether R/G/B curves can differ** (the main limit on fidelity) and which slot to use |
 | I1–I2 ISO | Curve at ISO 800 / 3200 | Whether curves vary with ISO (the ~30-curve sets may be per ISO) |
 | W1–W2 WB | Matrix under other WB | Whether Portrait's matrix stacks on the per-illuminant matrix from the WB module (14b), so whether the look holds under other light |
-| D1 | Repeat of B4 | Drift during the session |
-| R1 | RAW Data Edit of B4 | Whether one ORF can be the test input for every later round |
+| D1 | Repeat of B3 | Drift during the session |
+| R1 | RAW Data Edit of B3 | Whether one ORF can be the test input for every later round |
 | S1 | Real scene | Side-by-side check against T(ORF) later |
 
 Also from every ORF: ImageProcessing `UnknownBlock1` (0x0635, 5,764 B, starts `CMIO`). Its
 builder 0x7E55866A uses table-driven fillers, one of which (0x7E559BE5) also reads the engine
-coefficient blocks 0x7E764000–0x7E7885FF (14d). So it may hold the processing parameters of each
-shot. Plan: diff it across the M/G/N/P/A shots and search block 0 for the bytes that change.
-Not yet tested.
+coefficient blocks 0x7E764000–0x7E7885FF (14d). So it might have held each shot's processing
+parameters. **Tested 2026-11-09: it does not** (§10.3).
 
 ## 5. What is known (repo references)
 
@@ -104,11 +105,11 @@ Not yet tested.
 
 | Phase | Work | Gate |
 |---|---|---|
-| 0 | Shoot 1 ([SHOTS.md](SHOTS.md)) | Test bench valid (R1 ≈ B4 JPEG) |
-| 1 | a. match measured curves to the 148 tables; b. trace readers 0x7E56E837 / 0x7E56EB95 → mode-to-table index; c. trace writers of ctx+3939…3972 back to 0x7E70430B; d. find matrices in 0x7E764000–0x7E7885FF (3×3 fixed point, rows summing to a power of two), match to the Saturation shots; e. compare art filters with Natural for per-channel curves; f. `UnknownBlock1` diff | Written E-PM2 pipeline model: stages, where each mode's values live, what each can express |
-| 2 | One-flash location proof: an obvious change to one Portrait table | Observed change = predicted |
+| 0 | Shoot 1 ([SHOTS.md](SHOTS.md)) | **Done.** Test bench valid: R1 pixel-identical to its camera JPEG |
+| 1 | a. match measured curves to the stored tables (**done: shape measured; address ambiguous**, §10.4); b. trace readers 0x7E56E837 / 0x7E56EB95 → mode-to-table index (**next**); c. trace writers of ctx+3939…3972 back to 0x7E70430B (**next**); d. find the saturation / hue-dependent chroma stage (the camera matrix is per-illuminant only, §10.2); e. per-channel curves (**done: art path only**, §10.5); f. `UnknownBlock1` diff (**done: negative**, §10.3) | Written E-PM2 pipeline model: stages, where each mode's values live, what each can express |
+| 2 | One-flash location proof: an obvious change to one candidate table (e.g. 0x7E74E9BC vs its twin 0x7E74EDBC, §10.4), checked with RAW Data Edit of PB090221 | Observed change = predicted |
 | 3 | Camera model + fitter (port GRKit or gr3-film-mods); calibrate to shoot 1 until stock modes are predicted within ~ΔE 1 | Model accuracy; predicted ΔE free vs menu-only vs stock |
-| 4 | `patches/film-portra.json` (tables + "Portrait" → "Portra" label); flash; RAW Data Edit the B4 and S1 ORFs + 1 live shot; measure | Camera ≈ prediction; ΔE vs T |
+| 4 | `patches/film-portra.json` (tables + "Portrait" → "Portra" label); flash; RAW Data Edit the B3 and S1 ORFs + 1 live shot; measure | Camera ≈ prediction; ΔE vs T |
 | 5 | More looks (Muted → Gold/Ektar, Monotone → Tri-X) | — |
 
 Expected rounds for phase 2–4: about 4–6 flashes, each 1 flash + 2 RAW Data Edits + 1 shot
@@ -120,11 +121,12 @@ fixing unmodelled stages it reached camera vs model 0.55–0.80 and camera vs ta
 
 - Replaces a mode; adds none. JPEG only: the ORF is unchanged and Olympus software renders it as
   the original mode.
-- Fidelity depends on phase 1e. With matrix + per-channel curves + a post matrix, ~ΔE 2 is
-  realistic (gr3). With one luminance curve + saturation + one matrix, expect "Portra-ish"
-  (custom curve shape and hue-specific shifts, but no split toning).
-- Yellow-to-orange rotation (Portra) needs hue sectors; gr3 left it as residual until it found the
-  GR's MultiAxial stage. No hue-sector stage is known on the E-PM2 (no Color Creator / HSL strings).
+- Fidelity depends on the slot (§10.5). Cross Process: per-channel curves and some hue shift,
+  so ~ΔE 2–3 is plausible (gr3 reached 2.3 that way). Portrait: one luminance curve + saturation,
+  so expect "Portra-ish" (curve shape and saturation, no split toning).
+- Yellow-to-orange rotation (Portra) needs hue sectors. The E-PM2 has **some** hue-dependent chroma
+  processing (Vivid and i-Enhance boost different hues by different amounts, §10.6); whether it
+  can rotate hue, and where its tables are, is unknown. No Color Creator / HSL strings.
 - No grain or halation: the grain texture (block 2) is read only by Grainy Film.
 
 ## 8. References
@@ -151,10 +153,111 @@ fixing unmodelled stages it reached camera vs model 0.55–0.80 and camera vs ta
 
 ## 9. Tooling
 
-- `../../.venv`: `rawpy` 0.28.0 (LibRaw 0.22.2) and `numpy`. Run analysis with `.venv/bin/python -I`.
-- `exiftool`: **not installed** (needs sudo: `sudo apt install libimage-exiftool-perl`). Needed
-  for the EXIF settings check and `exiftool -u -b -ImageProcessing:UnknownBlock1 X.ORF`.
+- `../../.venv`: `rawpy` 0.28.0 (LibRaw 0.22.2), `numpy`, `scipy`, `opencv-python-headless`,
+  `pillow`. Run analysis with `../../.venv/bin/python -I`.
+- `exiftool` 12.76 (Ubuntu package, installed 2026-11-09).
 - `make_chart.py`: monitor chart PNGs + `out/chart_layout.json` (patch boxes). Stdlib only.
 - `profile_curves.py`: §5 curve profile. Stdlib only.
-- To write after shoot 1: `extract.py` (ORF + JPEG → patch pairs, EXIF check), `fit_stock.py`,
-  `fit_look.py`, `check.py`.
+- `extract.py`: shots → `out/patches.npz` (per shot × 252 patches: raw RGB, JPEG RGB, clip and
+  spread flags) + `out/settings.json`. Markers found separately in JPEG and raw; per-patch boxes
+  refined to the flattest spot with a robust cubic distortion field (§10.1).
+- `analyze_tone.py`: model `v = ColorMatrix·(WB⊙raw)`, outlier flag, and matching of the measured
+  gray response against every 256-entry curve in block 0 (`out/tone_report.txt`, `out/tone_*.png`).
+- `analyze_modes.py`: Natural's measured response F; every other shot vs F (gray per channel;
+  colour chroma/hue by sextant) (`out/modes_report.txt`, `out/gray_*.png`, `out/natural_F.npz`).
+- Still to write: `fit_stock.py`, `fit_look.py`, `check.py`.
+
+## 10. Shoot 1 results (2026-11-09)
+
+### 10.1 Extraction
+- All 36 chart shots (PB090185–0221) decode; markers found in every JPEG and raw. The displayed chart
+  was the 1920×1080 layout.
+- **The raw is not corrected for lens distortion; the JPEG is.** A four-corner homography put raw
+  boxes up to half a patch off on the right side of the chart (on the gap between two gray patches,
+  0185 column 26). Fixed by a per-patch flatness search plus a robust cubic offset field; after it
+  the gray row rises monotonically in every shot and the f/5.6 vs f/11 ratio is 3.9–4.0 in every
+  row. The last gray patch (pure white, right edge) reads ~8 % low in every shot, raw and JPEG: real
+  screen fall-off.
+- Black level is per file (255 at ISO 200, 253/254 at ISO 800, 251/252 at ISO 3200); the sensor
+  saturates at 4045. About 14 % of patch samples are flagged as raw outliers and left out.
+
+### 10.2 What the EXIF already says
+- `ColorMatrix` (camera RGB → sRGB, rows sum to 256) is **identical for every Picture Mode,
+  Contrast, Saturation, Gradation and art filter**; it changes only with WB (5300K:
+  `418 -140 -22 / -56 360 -48 / 14 -132 374`; CWB 3200K: `374 -92 -26 / -70 340 -14 / 22 -184 418`).
+  So modes do not differ in this matrix; their colour differences come later.
+- `WB_RBLevels` 528/460 (÷256) at 5300K = LibRaw's camera WB. ImageProcessing 0x1401–0x1406 follow
+  ISO/exposure (noise), not the look.
+
+### 10.3 Maker-note blocks: no shortcut
+- `UnknownBlock1` (5,764 B, `CMIO`): identical for every mode / Contrast / Gradation / Saturation /
+  art filter; changes only at ISO 800/3200. Sensor/noise parameters, not the look.
+- `UnknownBlock2` (76,608 B) is byte-identical to the firmware's static CMIO blob
+  0x7E86DD80–0x7E8808BF in every shot (confirms 14d's inference).
+- `UnknownBlock3` (49,152 B) and `UnknownBlock4` (4,608 B) change between identical base shots,
+  most with exposure: image statistics (metering/histogram), not settings tables.
+- So the ORF records which mode was used, not the mode's curve or matrix values.
+
+### 10.4 Natural's tone response and the stored curves
+- The model `v = ColorMatrix · (WB ⊙ raw)`, JPEG = F(v), collapses all three channels of all 11
+  Natural shots onto one curve (isotonic fit, residual 1.6 codes = the noise floor). So WB and
+  `ColorMatrix` are the camera's first stages and grays then go through one curve.
+- F: v 133 → 71, 251 → 115, 472 → 162, 887 → 210, 1669 → 234 (8-bit codes); middle gray
+  (code 118) at v ≈ 267; v = 4045 (saturation) → 249.
+- No stored 256-entry table fits with only an input scale (best 0x7E74E9BC, 2.95 codes). With
+  input offset and output gain/offset free, several reach the floor (1.73–1.93), so the chart
+  cannot identify the table. Most plausible: **0x7E74E9BC** (input offset 0.07, output gain 0.244
+  ≈ 1/4.1, i.e. the 10-bit table to 8-bit; 1.79 codes); its near-twin 0x7E74EDBC fits as well.
+  The tone builder 0x7E553271 makes 10-bit curves from spline knots at run time (13a §3.3), so the
+  real curve may not be stored at all. Identification needs the static trace (phase 1b/1c) or the
+  phase-2 flash test.
+- A fixed-scale test of the art filters' channel responses against stored curves is inconclusive.
+
+### 10.5 Tone and channels per setting (gray row vs F, codes; `out/modes_report.txt`)
+
+| Setting | Gray rendering vs Natural | Channels |
+|---|---|---|
+| Vivid, Muted, Monotone, i-Enhance | same curve (±2–4) | equal |
+| **Portrait** | **own brighter curve**: +3 shadows, +11 from midtones up | equal |
+| High Key / Low Key / Auto | own curves (High Key +16…+22 above midtones; Low Key −11 shadows, +7 highlights; Auto lifts shadows/mids +15…+23) | equal |
+| Contrast −2 / +2 (Natural) | flatter / steeper (+2 / −10 shadows, −5 / +19 highlights) | equal |
+| Contrast −2 / +2 (Portrait) | same kind of change on Portrait's curve | equal |
+| ISO 800 / 3200 | **same curve** (±1) | equal |
+| WB CWB 3200K / Auto | same curve | equal (B +4…+6 in mids at 3200K) |
+| Pop Art | own curve (shadows −5, highlights +11) | equal |
+| Light Tone | own curve (shadows/mids +17…+28, highlights −25) | equal |
+| **Pale&Light Color** | lifted | **channel-dependent** (B lifted ~10–40 codes more than R) |
+| **Cross Process** | | **channel-dependent**: R and B ~33 codes below G in shadows, ~53 in mids; highlights R +40, G/B +56 |
+
+So per-channel curves exist, but only in the art-filter path. Every normal Picture Mode moves
+R, G and B together.
+
+### 10.6 Colour per setting (chroma × and hue shift vs Natural, by hue sextant)
+Sextants (BT.601 angle of CbCr): blue-magenta, magenta-red, red-yellow, yellow-green, green-cyan,
+cyan-blue.
+
+| Setting | Chroma × (6 sextants) | Hue |
+|---|---|---|
+| Saturation −2 / +2 | 0.79–0.81 / 1.20–1.23, uniform | no shift |
+| Vivid | 1.19 1.20 1.13 1.15 1.09 1.22 | ±4° |
+| Muted | 1.00 0.95 0.94 1.01 1.01 0.92 | ±4° |
+| Portrait | 1.00–1.06 | ±2° |
+| i-Enhance | 1.08 1.14 **1.24 1.23** 1.04 1.00 | ±4° |
+| Gradation, Contrast, ISO, WB | 0.95–1.06 | ±3° |
+| Pop Art | 2.0–2.5 | −10…+5° |
+| Pale&Light | 0.53–0.58 (cyan-blue 0.95) | ±14° |
+| Light Tone | 0.87–0.93 | ±5° |
+| Cross Process | 1.23–1.44 | +10…+14° (magenta-red, red-yellow) |
+
+So the normal path has a **hue-dependent chroma gain** (Vivid and i-Enhance boost hue sectors
+differently), and Saturation is a uniform scale. No normal mode rotates hue by more than ~4°.
+
+### 10.7 What this means for Portra
+- **Portrait slot:** a custom luminance curve (Portrait already has its own) + saturation
+  (+ possibly hue-dependent saturation, once its tables are found). No warm shadows / split toning.
+- **Cross Process slot:** per-channel curves (warm shadows, cooler highlights) + hue shifts. Closest
+  to what gr3-film-mods did on the GR III (it took over Cross Process's three curves).
+- Next (no camera needed): phase 1b/1c static trace from the curve readers (0x7E56E837,
+  0x7E56EB95), the art-code compares in the colour handlers (0x7E560B85, codes 85/167 = Cross
+  Process), and the mode switch 0x7E70430B, to find where Portrait's curve, Cross Process's channel
+  curves and the chroma gains are stored. Then phase 2: one flash that changes one of them visibly.
