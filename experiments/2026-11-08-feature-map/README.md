@@ -53,7 +53,13 @@ A static study of the Olympus PEN E-PM2 main firmware, v1.6, to learn what it co
 | [`sections/08-connectivity-libs-blocks.md`](sections/08-connectivity-libs-blocks.md) | USB/PTP/MTP/PictBridge, HDMI, Eye-Fi/FlashAir, libraries, blocks 2/3, stabiliser MCU |
 | [`sections/09-art-filters.md`](sections/09-art-filters.md) | Art filters: the shipped 12, the hidden Magic Filters, and how they evolved across 8 bodies. Detail in `09a-art-gui.md` and `09b-art-algorithms.md` |
 | [`sections/10-hidden-features.md`](sections/10-hidden-features.md) | **Second pass:** every hidden/dormant/stub feature re-checked (code, menu value tables, 8 bodies). Detail in `10a`–`10f` (timed shooting, shooting modes, movie, playback, connectivity, debug/service) |
-| [`scripts/`](scripts/) | Scripts for the cross-body art comparison (base finder, Exif-table decoder, enum and name scans) |
+| [`sections/11-version-history.md`](sections/11-version-history.md) | What changed in each E-PM2 release, v1.1 to v1.6, from code diffs and the Olympus release notes |
+| [`sections/12-exposure-af-files.md`](sections/12-exposure-af-files.md) | Exposure and AF calculation, file writers |
+| [`sections/13a-libraries-runtime.md`](sections/13a-libraries-runtime.md) … [`13f-drivers.md`](sections/13f-drivers.md) | **Round D1 deep dives** into the code the first map could not explain: (a) C runtime and image job library, (b) OKAO face, red-eye and AVPI libraries, (c) the Rhapsody OXF C++ framework, with byte signatures and [`13c-event-ids.tsv`](sections/13c-event-ids.tsv), (d) the GUI toolkit and Custom Menus, (e) the mode controller and TAKE sequencer, (f) drivers and the MMIO/IRQ map |
+| [`CONFIDENCE.md`](CONFIDENCE.md) | Criteria for "understood" and the results of each claim audit (A*) and blind coverage round (C*) |
+| [`audit/`](audit/) | Claim samples, checker reports and the fix logs (`fixes*.md`) |
+| [`coverage/`](coverage/) | Blind coverage samples and reviews |
+| [`scripts/`](scripts/) | Cross-body art comparison scripts, plus `audit_sample.py` and `coverage_sample.py` for the adversarial reviews |
 | [`tasks.tsv`](tasks.tsv) | All 177 tasks (both CPUs): id, name, entry, priority, stack. Made by `fwmap.py tasks` |
 | [`modules.tsv`](modules.tsv) | The 152 source files in link order, with their code ranges |
 | [`regions.txt`](regions.txt) | Strings and tasks per 256 KiB region. Made from the **first** database, before the task-table and data-page fixes, so its task names are out of date. Use it as a rough guide only |
