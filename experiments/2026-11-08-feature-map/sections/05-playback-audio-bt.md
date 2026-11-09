@@ -130,7 +130,7 @@ The flash-resource back end is 0x7E675700. 0x7E52220B and 0x7E522287 in the firm
 So "import BGM" copies a card WAV into the camera's flash, and its name/info goes into setting 0xE001 (inferred meaning: `api_play_Regist_BGM_Sound`, `SoundCtrl::registImportSound`).
 
 **BGM file rules** (in `play_rom_chk_bgm`, verified): at most **14** entries; directories are skipped; file size ≤ **6,145,024** bytes; the header check 0x7E95BF44 → 0x7E960B7B → `aud_tool_wav_judge_OLYMPUS_authentication` 0x7E960C93 must return **2**.
-The legend string says `rinf(0:NG 1:OK(auh.NG) 2:OK(auh.OK)`. The check reads an EXIF `ecor` (maker) string and an `IKEY` chunk from the WAV, and compares them with `OLYMPUS IMAGING CORP.` / `OLYMPUS CORPORATION`.
+The legend string says `rinf(0:NG 1:OK(auh.NG) 2:OK(auh.OK)`. The check reads an EXIF `ecor` (maker) string and an `IKEY` chunk from the WAV. Only `ecor` is compared with `OLYMPUS IMAGING CORP.` / `OLYMPUS CORPORATION`; authentication returns 2 only when `ecor` matches one of them **and** `IKEY` equals `PRM_AUD_BGM_VOL` (C9/A14 2026-11-09).
 So **only Olympus-authenticated WAVs can be imported as BGM** (the comparison with 2 is verified; the meaning comes from the legend string).
 
 ### 1.5 Support modules (inferred from names, entry/exit strings read)

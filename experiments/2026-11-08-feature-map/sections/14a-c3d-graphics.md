@@ -215,7 +215,7 @@ Object methods called directly by the overlay:
 | +8 | read | 0x7EE75DF2 → 0x7EE75D1D: the inverse |
 | +12 | copy | 0x7EE75DAD: id, +40 and name; 53 callers |
 
-  The node-type classes add `accept(visitor)` 0x7EE75C9A → the walk 0x7EE758CD (it recurses over children 0x7EE75599/0x7EE755C9).
+  The node-type classes add ~~`accept(visitor)` 0x7EE75C9A → the walk 0x7EE758CD~~ a node-level **write step** 0x7EE75C9A (step 3 of the slot +4 write chain, after the root write 0x7EE75DE0; no vtable or data word holds it) that calls 0x7EE758CD, which writes the child count through the stream vt+8, then each child's class id and the child's own slot +4 through 0x7EE75E96 (it recurses over children 0x7EE75599/0x7EE755C9) (C9/A14 2026-11-09).
 - **Context heap** (verified): 0x7EE8F212 sets up an allocator pair. alloc **0x7EE8F248** calls `allocator->vt[0](size + 4)` and keeps a 4-byte tag; free **0x7EE8F269** calls `vt[2]`. Small helpers 0x7EE8F081–0x7EE8F4F3: memory copy 0x7EE8F3A9, string 0x7EE8F46C/0x7EE8F488, LUT user 0x7EE8F321.
 
 **Class tree.** The ctor chains are verified (each level returns a bool; the chain stops at the first 0). The family roles are inferred. Notation: id(ctor, instance size).
@@ -279,7 +279,7 @@ Other uses:
 | tiny accessor/stub | 21 % | `cmp 0,a0; beq; mov (N,a0),d0/a0; retf`, `clr d0; retf` |
 | thunk | 15 % | ≤ 20 B, one call |
 | other | 21 % | — |
-| override chain | 10 % | `cf 30 f8 fe fc 97 92` (or `cf 20 …`); its first call is a root method: 0x7EE75DD8 = size, 0x7EE75DE0 = write, 0x7EE75DF2 = read, 0x7EE75DAD = copy, 0x7EE75C9A = accept. Then a chain of `14 a0 01 c9` (`extbu d0; cmp 1,d0; bne`) for each ancestor level's same method. These functions have 0 callers in the DB, because vtinit stores them as code immediates |
+| override chain | 10 % | `cf 30 f8 fe fc 97 92` (or `cf 20 …`); its first call is a root method: 0x7EE75DD8 = size, 0x7EE75DE0 = write, 0x7EE75DF2 = read, 0x7EE75DAD = copy, 0x7EE75C9A = node write step (C9/A14 2026-11-09). Then a chain of `14 a0 01 c9` (`extbu d0; cmp 1,d0; bne`) for each ancestor level's same method. These functions have 0 callers in the DB, because vtinit stores them as code immediates |
 | leaf | 11 % | no calls |
 | release/fini | 7 % | 0x7EE8F269 / 0x7EE622F9 / 0x7EE7F27B |
 | serialize helper | 4 % | 0x7EE7F1CF / 0x7EE7F1FE / 0x7EE8EF9D |
