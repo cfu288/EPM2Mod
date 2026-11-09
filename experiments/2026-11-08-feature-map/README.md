@@ -82,6 +82,20 @@ python3 tools/fwmap.py str 'firmup'
 python3 tools/fwmap.py tasks
 ```
 
+### µITRON 4.0 specification (local only, git-ignored)
+
+The OS layer was checked against the ERTL µITRON 4.0 specification (section 01). To fetch it again:
+
+```sh
+O=experiments/2026-11-08-feature-map/out/specs
+mkdir -p $O
+for f in mitron-400e.pdf mitron-402j.pdf mitron-diff-402j.pdf; do
+  curl -sS -o $O/$f https://www.ertl.jp/ITRON/SPEC/FILE/$f
+done
+python3 -I experiments/2026-11-08-feature-map/scripts/pdf_text.py \
+  $O/mitron-400e.pdf > $O/mitron-400e.txt
+```
+
 ### Other bodies (local only, git-ignored)
 
 `out/` holds the inputs for the cross-body work:
