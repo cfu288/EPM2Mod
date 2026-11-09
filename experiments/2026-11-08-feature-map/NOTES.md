@@ -79,3 +79,7 @@ English-string counts not present in the E-PM2: E-PL5 0 (block 1 identical), E-P
 - **10d: Wind Noise Reduction is a user setting. Confirmed:** 0x7E95136C reads prm 30833 (0x7871); a non-zero value calls wind cut 0x7E951BDE, otherwise the other branch is taken.
 - **10f: the ADJ accept table. Confirmed:** 0x7F0D25A2 holds 22 {op, flag} pairs (0x1002/0x1003/0x1014–0x1017 and vendor ops 0x9005–0x902B, including 0x902B).
 - **CORRECTION (2026-11-09): the E-PM2 has an accessory port.** Olympus's official E-PM2 release notes (archived in ep5-fw-reverse `firmware/notes/release_notes/1010_i06.html`) list for **Ver.1.2 (Jun.12 2013): "Supported VF-4 electronic view finder."** The VF-4 attaches to the accessory port. The earlier note "the E-PM2 has no accessory port" came from product knowledge and was wrong. It made the PENPAL/EVF code look dormant; 10e had already found the detection code and tables identical to the E-PL5's. The PENPAL/EVF/SEMA-1 paths are therefore hardware-gated: active with the accessory attached.
+- **13a (C runtime / image library): spot checks confirmed.**
+  - 0x7E4C90CA–0x7E4FDFFF is 216,886 bytes of 0xFF.
+  - `memset` 0x7E500D73 (1,367 call sites) is a byte-store loop over [a0, a0+d1) with value d0.
+  - `sprintf` 0x7E4FFDE3 has 1,664 call sites.
