@@ -14,7 +14,7 @@ Scope: how the C++ GUI in 0x7ECA–0x7EE0 is built. The topics are the widget fr
 | 0x7ECA1020–~0x7ECC8000 | Mostly data: ramp/LUT tables (0x7ECA6000…) and a 108 KB block at 0x7ECB1000. The DB's "function" 0x7ECAD443 (15 KB) is probably data | verified bytes; the role of the data is inferred |
 | ~0x7ECC8000–0x7ECE4000 | CA_MAIN "camera app": OSD_CONTROL/OSDDRAW (0x7ECCBA45…), `*SubAppMdl*` modules, `*SubAppState*` states (ShootingFuncDirect, ModeDirect, Misc) | verified strings |
 | 0x7ECE4000–0x7ECEC000 | GUI↔CA bridge `GuiCallerImp::sendEvent` (0x7ECE6E27); "Genifa" GE event layer (message build 0x7ECE7597, post 0x7ECE75C3, task GPI_TIM_TASK); GPI display layer (`GPISetPalette`, `cw_updateDisplay`, `GPISetOsdOrder`) | verified strings and code |
-| 0x7ECEC000–0x7ECEE1D5 | GUI memory pools (alloc 0x7ECEC905, free 0x7ECEC9CB); UTF-16 helpers (`wcscpy` 0x7ECED793, `wcslen` 0x7ECED7BB, compare 0x7ECED75C); CTouchPnl (0x7ECEDE30); GUI data model (get 0x7ECEF64F / set 0x7ECEF667) | verified code |
+| 0x7ECEC000–0x7ECEE1D5 | GUI memory pools (alloc 0x7ECEC905, free 0x7ECEC9CB); UTF-16 helpers (`wcscpy` 0x7ECED793, `wcslen` 0x7ECED7BB, compare 0x7ECED75C); CTouchPnl (0x7ECEDE30). The GUI data-model get/set 0x7ECEF64F/0x7ECEF667 (section 07) sits just after the root class | verified code |
 | **0x7ECEE1D5–0x7ED00000** | **Widget framework core:** the root object, container, screen and widget base classes, and the drawing engine | verified (§2) |
 | 0x7ED00000–0x7ED17000 | GUI-side controller classes `CCommon`, `CGuiDrawCtrl`, `CPlayIndex`, `CPlaySingleFrame`, `CRec`, `CPlayZoom`. They wrap the OlyApi interfaces (`OlyApiPlay*`, `OlyApiShooting` strings) | verified strings |
 | **0x7ED17000–0x7ED37DAA** | **Object factory** 0x7ED17DB8, panel creation by number 0x7ED19D3F, top window (WinMain class) 0x7ED1B48C…, the widget classes 0x80xx/0xC0xx/0xD0xx and their drawing parts (0x7ED2F000–0x7ED37DAA) | verified |
@@ -122,14 +122,7 @@ There are 140 type ids: 1, 0x104, 0x105, 0x6000–0x6071, 0x8001–0x8008, 0x800
   - 0x7ECFF3E9 (69 callers) indexes RAM tables by the current layer byte 0x602B6034;
   - 0x7ECFF3C3 indexes ROM records of 884 bytes at 0x7EFB1034 (sub-records of 52 bytes).
 - **Roles not identified:** of 0x8001/04/05/07/08/0A/0E/0F/12/13 and the C/D parts. Text, image and frame parts are likely (inferred).
-- **Helper layer 0x7EDC17FB–0x7EDC2000 (verified; "set only if changed"):**
-  - 0x7EDC1851 `setVisible(w, b)`: 2,641 call sites, the most called GUI function; vt+80 then vt+76.
-  - 0x7EDC1875 `setListIndex(w, i)`: 453 sites; range check against the count.
-  - 0x7EDC189F `setListItemResource`.
-  - 0x7EDC18C8 / 0x7EDC1972 move / resize, using vt+52 get rect, +44 set rect, +168 invalidate.
-  - 0x7EDC1B15 `setListItemValue`.
-  - 0x7EDC181B text by string id + show.
-  - C1 F065 0x7ED61C13 is the panel-level "show item n−2 or hide" helper built on these.
+- **Helper layer 0x7EDC17FB–0x7EDC2000 (verified; "set only if changed"):** 0x7EDC1851 `setVisible(w, b)` (2,641 call sites, the most called GUI function; vt+80 then vt+76); 0x7EDC1875 `setListIndex(w, i)` (453; range-checked); 0x7EDC189F set list item resource; 0x7EDC1B15 set list item value; 0x7EDC18C8 / 0x7EDC1972 move/resize (vt+52 get rect, +44 set rect, +168 invalidate); 0x7EDC181B text by string id + show. C1 F065 0x7ED61C13 is a panel-level "show item n−2 or hide" helper built on these.
 
 ## 3. Panels (`GCPnl_*`) and panel numbers (verified)
 - **Create by number.** `CreatePanel(this = manager, d0 = no 0..159)` is 0x7ED19D3F.
@@ -211,13 +204,7 @@ Actions end `mov N,d0 ; ret` or build `asl 8 ; or` for an SS change; the shared 
 | 17 | SS_SPC (FlashAir pairing) | 0x7EFD91D4 | 15/18/27 | 0x7EDC00BD–0x7EDC0D7B |
 
 - Handler code is ordered alphabetically by SS name (inferred from the ranges). Other GUI code sits in 0x7ED87–0x7ED9F.
-- **Entries from SS_COMMON (verified return constants):**
-  - 0x962A START_SELF_ADJUST → 9.1;
-  - 0x9630 START_USB_SELECT → 11.1; START_MEDIA_SETUP → 11.1/11.3;
-  - 0x9632/0x9634 START_EASY/CUSTOM_PRINT → 14.1;
-  - START_LV_CONTROL → 4.1; LV_GUIDE → 4.9; ART_SELECT → 3.7; SCN_SELECT → 3.8; DIRECT_SELECT → 2.1;
-  - START_SLIDE_SHOW → 7.11; START_MENU → 0x300|state;
-  - START_PLAY → the chooser 0x7ED05440.
+- **Entries from SS_COMMON (verified return constants, as SS.state):** 0x962A START_SELF_ADJUST → 9.1; 0x9630 START_USB_SELECT → 11.1; START_MEDIA_SETUP → 11.1/11.3; 0x9632/0x9634 START_EASY/CUSTOM_PRINT → 14.1; START_LV_CONTROL → 4.1; LV_GUIDE → 4.9; ART_SELECT → 3.7; SCN_SELECT → 3.8; DIRECT_SELECT → 2.1; START_SLIDE_SHOW → 7.11; START_MENU → 0x300|state; START_PLAY → the chooser 0x7ED05440.
 
 ### 4.3 Which event opens which screen
 - **Light box (verified code; menu label inferred).**
@@ -236,24 +223,16 @@ Actions end `mov N,d0 ; ret` or build `asl 8 ; or` for an SS change; the shared 
   2. SS_MENU_MAIN state 4 maps 0x9628 to state 6 `ID_ST_HIDE_MODE` (handler 0x7EDAB90A).
   3. In HIDE_MODE a counter at RAM 0x602BC480 steps on **Up → Down → Left → Right → shutter half-press → shutter full-press** (0→1→2→3→7→8; e.g. 0x7EDAB980 is the Down step).
   4. **OK with counter 8 returns 0x0A01 = SS 10 state 1.** Bytes 0x7EDABA14–0x7EDABA54 checked: `cmp 8,d0 ; mov 10,d2 ; mov 1,d3 ; … asl 8,d2 ; or d3,d2`.
-  5. Whether a retail body passes the getShippingInfo(4) gate is **not known**.
-  6. External, corroboration only: the widely cited Olympus hidden-menu sequence (Monitor adjust, Up, Down, Left, Right, shutter) matches.
-  7. **Second sequence.** A second counter 0x602BC482 (OK-long / MENU-long) reaching 10 makes the same OK call 0x7EDED19A(4,0), which is in `userMenuMainReset`, and then settings slot +40. **Inferred:** a hidden reset.
-- **Inside the debug menu.**
-  - State 1 = item list; its OK goes to the action dispatcher 0x7EDA05EC (10f).
-  - State 2 = life test running; states 3/4 = Color setting/result.
-  - EVT_DEBUG_MENU 0xA000 is posted only by the LifeTest callback 0x7EDCB035 ("test ended → back to the menu"). It is not an entry.
+  5. Whether a retail body passes the getShippingInfo(4) gate is **not known**. External corroboration only: the widely cited Olympus hidden-menu sequence (Monitor adjust, Up, Down, Left, Right, shutter) matches.
+  6. **Second sequence.** A second counter 0x602BC482 (OK-long / MENU-long) reaching 10 makes the same OK call 0x7EDED19A(4,0), which is in `userMenuMainReset`, and then settings slot +40. **Inferred:** a hidden reset.
+- **Inside the debug menu:** state 1 = item list (OK → action dispatcher 0x7EDA05EC, 10f); 2 = life test running; 3/4 = Color setting/result. Exits return 3.6 (HIDE_MODE). EVT_DEBUG_MENU 0xA000 is posted only by the LifeTest callback 0x7EDCB035 ("test ended → back to the menu"); it is not an entry.
 
 ### 4.4 DPS (SS 14) and USB (SS 11) (verified; DPS state roles inferred)
 - **C1 F066 0x7EDA3AB5** = SS_DPS state 20, event EVT_END_CUSTOM_PRINT 0x9635. Its 24 siblings are the same generated handler for the other states.
   - Guard 0x7EDA3095: `[GUI] Abort custom print!` through IOlyApiCustomPrint (0x7E9C0BA2) vt+112. It always returns 1.
   - Action 0x7EDA301D: vt+116 → PostEventToCA(20, 0) → returns 0x0104 = SS_COMMON `ID_ST_BLACK_SCREEN`.
   - EVT_END_EASY_PRINT 0x9633 has a parallel set (0x7EDA3DAE…) using the EasyPrint interface.
-- **DPS states.**
-  - 1 = start (0xA306/0xA307 → 2 or 26).
-  - 2–4 and 9–21 = selection and setting screens. Their entry functions sit at a 15-byte stride from 0x7EDA09EC, and each draws screen n through 0x7EDCED5A.
-  - 17 = image selection (every arrow, zoom and long-press key).
-  - 23/24 = printing (EVT_PRINT_END 0xA303 → 1.4).
+- **DPS states:** 1 = start (0xA306/0xA307 → 2 or 26); 2–4 and 9–21 = selection/setting screens (entry functions at a 15-byte stride from 0x7EDA09EC, each draws screen n through 0x7EDCED5A); 17 = image selection (all arrow, zoom and long-press keys); 23/24 = printing (EVT_PRINT_END 0xA303 → 1.4). DPS GUI helpers 0x7EDCE9B9–0x7EDD07F9.
 - **USB states.** USB_MENU, USB_WARNING, MEDIA_SETUP, USB_PRINT_READY (entry 0x7EDC0FE9), USB_PRINT_SEL (entry 0x7EDC0ED1, `USB Print Key Right -> Easy Print`; left/right/OK choose Easy or Custom print), BUSY.
 
 ## 5. Custom Menu A–J item lists (verified bytes; fork result checked in bytes for 4 rows)

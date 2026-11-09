@@ -23,6 +23,7 @@ A region that fails a round gets a deep dive, then a **new** blind sample. The s
 |---|---|---|---|
 | A1 | Claim audit, sections 01–08 | 48 claims, seed 20261109 | 26 correct, 21 minor, **0 wrong**, 1 uncheckable (`audit/REPORT.md`); fixed in `audit/fixes.md` |
 | A2 | Claim audit, section 12 | 12 claims, seed 20261110 | 6 correct, 5 minor, **1 wrong** (12-35: three corner-resolver helpers merged into one); all fixed |
+| A3 | Claim audit, section 11 | 12 claims, seed 20261111 | 3 correct, 7 minor, **2 wrong**: (11-127) v1.5 stubbed the MTP property 0xD406 handler, the best Windows-10 candidate (checked by coordinator: v1.4 copies a host string to 0x602C1A98, v1.5 returns 0x2001 OK); (11-119) is_type gate inverted, and it is a mask test. Pending fix in the corrections pass |
 | C1 | Coverage, whole block 0 | 80 functions, seed 1109 | **FAIL.** 10 explained (12.5 %), 51 partly, 17 unexplained, 1 contradicted, 1 not-code. Explained+partly 76 %. Gaps: string-less libraries, C++ framework patterns, GUI toolkit, mcon records, drivers; region-table errors. `coverage/round1-review1..4.md` |
 
 ## Region status
