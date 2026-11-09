@@ -17,7 +17,7 @@ Scope: block 0 runtime 0x7E521020–0x7E621020, plus the code these tasks call e
 | Movie AF | 0x7E5ED006–0x7E611F25 | FCS_MOVIE 0x7E610A65 | `fcs_lens_mfts_*` |
 | Strobe | 0x7E5D8E94–0x7E5E2419 | STB_SEQ 0x7E5D8E94, STB_EXTERNAL 0x7E5DCA31, STB_CHARGE 0x7E5DFF5E, STB_ASSIST_FUNC 0x7E5E1E94 | |
 | Files / DCF / Eye-Fi | 0x7E5ABE5B–0x7E5C8B40 | DCFPROC_SUB 0x7E5B34CE, EYEFI 0x7E5C1981, FILECLBK 0x7E5C1B4E, FILEFGND 0x7E5C4E90 | |
-| No strings | 0x7E55F9B6, 0x7E57F914 | IMG_PRECON, WB_MOV | Not mapped (see open questions) |
+| No strings | 0x7E55F9B6, 0x7E57F914 | IMG_PRECON, WB_MOV | IMG_PRECON = pixel-defect (Pixel Mapping) correction from the PIXELDEFECT prm lists, part of the IMG library (13a §3.2) (D1 2026-11-09). WB_MOV not mapped |
 
 Helpers used below (all **verified** by their own strings or code): 0x7E4263E5 = debug print(a0=str); 0x7E50652F = debug print str + hex value; 0x7E4492B9 = `OlyQeWr` (queue write); 0x7E449218 = `OlyQeRd`; 0x7E4490AF = `OlyEvWt`; 0x7E449030 = `OlyEvSt`; 0x7E449541 = `OlyTaSt` (start task); 0x7E449621 = `OlyTaSE` (exit task); 0x7E449605 = `OlyTaSS` (sleep); 0x7E4262C5 = get time; 0x7E500E40 = `strncmp(a0,a1,d0)`; 0x7E50689F = Oimf message send (d0 = target id, d1 = command; strings `Oimf>>qwrite`); 0x7E44F197 = flash write (`write_flash_*_error` strings), args a0 = dest, a1 = src, d0 = size, d1 = mode.
 
@@ -177,9 +177,9 @@ The USB flow (inferred from order): `[TPCFirmup]FirmwareCheck` sends type 3 (che
 
 > **Correction (13e, checked by coordinator, 2026-11-09).** The TakeExp/TakeFcs tables (0x7E791478 / 0x7E7928B0) are 32-slot hash tables keyed by **cmd + 1**: the dispatchers do `inc d1` before the lookup (0x7E582A48, 0x7E588321). **Every command number in this section is one too high.** For example, 0x1xx keys are commands 0x100/0x101 (lock_start/lock_end), and F007's 0x401 is `release_ready_end`. Use the corrected list in `13e-mcon-sequencers.md` §4.
 
-- **TAKE_EXPOSE** 0x7E5829E8 and **TAKE_FOCUS** 0x7E5881D9 dispatch commands through {cmd, handler} tables at **0x7E791478** and **0x7E7928B0** (8-byte rows, 0 = default). Each handler prints its name. **verified**:
+- **TAKE_EXPOSE** 0x7E5829E8 and **TAKE_FOCUS** 0x7E5881D9 dispatch commands through 32-slot open-addressing hash tables `{u32 key, ptr handler}` at **0x7E791478** and **0x7E7928B0**; key = cmd + 1, key 0 = empty slot → default handler (0x7E582DFC) (D1 2026-11-09). Each handler prints its name. **verified**:
 
-| Cmd | TakeExp | TakeFcs |
+| Key (= cmd + 1) (D1 2026-11-09) | TakeExp | TakeFcs |
 |---|---|---|
 | 0x001/2/3 | mode_start / mode_end / – | mode_start / mode_end / mode_update |
 | 0x101/102/103 | lock_start / lock_end | lock_start / lock_end / lock_start_end |
@@ -219,6 +219,6 @@ The USB flow (inferred from order): `[TPCFirmup]FirmwareCheck` sends type 3 (che
 4. Lens firmup command semantics (cmds 0/3/4/5) and whether LENS_FIRM_UP compares `g_firmup_version` with the lens (downgrade guard on the lens side?).
 5. `udf00 255` in the LED period formula; real blink rates.
 6. Code at 0x470010DE/0x4700118A (PWR_STANDBY) lives outside block 0: which block/RAM?
-7. IMG_PRECON (0x7E55F9B6) and WB_MOV (0x7E57F914) have no strings in this range; their roles need code reading.
+7. IMG_PRECON (0x7E55F9B6) and WB_MOV (0x7E57F914) have no strings in this range; their roles need code reading. IMG_PRECON is answered: pixel-defect correction (13a §3.2) (D1 2026-11-09).
 8. FIRMUP_LED (0x7E880CDD): is it ever started or signalled (event id 0x7E43EC22)?
 9. Meaning of the 69 damage codes at 0x7E744084.

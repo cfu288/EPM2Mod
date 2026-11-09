@@ -129,7 +129,7 @@ The second-table entries come from 28-byte records at 0x7E43D4BC…; the IDs 0x9
 - The short record descriptor 0x605B1CC4 = {format, quality, fine} is filled by 0x7E6ED021. **Verified.**
 
 **H.264 files.**
-- `MovmidApi_cmd_rec_init/start/end/free` are at 0x7E6D80B3/0x7E6D8554/0x7E6D860B/0x7E6D8668. The QT callback `USR_ScaCallback` (0x7E6D886A) handles AVSCA_RSLT_* and AVSCA_ERR_*.
+- `MovmidApi_cmd_rec_init/start/end/free` are at 0x7E6D80B3/0x7E6D8554/0x7E6D860B/0x7E6D8668. The QT callback `USR_ScaCallback` (**0x7E6D8900**) handles AVSCA_RSLT_* and AVSCA_ERR_*; 0x7E6D886A is `MovmidApi_SetMakersInfoPrivateData` (AVSCA message 0x10C), not the callback (D1 2026-11-09).
 - QT user data (0x7E6D5F55) writes an `OLYM` atom with `prms` (ArtFilterMode, ExposureMode, PictureMode, Scene, WB shift, iAuto). A `thmb` thumbnail and a `scrn` screennail come from 0x7E6D6438 (JPEG encode of a frame). **Verified** 4CC constants and strings.
 - Path format `%c:\DCIM\%s\%s` (0x7E6D7370). **Verified.**
 

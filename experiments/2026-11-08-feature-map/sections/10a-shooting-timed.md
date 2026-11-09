@@ -35,7 +35,7 @@ Scope: interval shooting / time-lapse movie, the six bracketing modes (including
   - 483 = 1..99 (record 0x7E84C5FC).
   - 486 = [0, 1] (record 0x7E84C610).
   - 484 and 485 have no list. Their GUI panels 639 and 640 are of type 39, which is a time editor (the "time editor" meaning is inferred).
-- **mcon interlock rules** (60-byte records at 0x7E814864):
+- **mcon interlock rules** (60-byte records at 0x7E814864; these are the per-setting operation records, and the hooks below sit in their **+24** post-write slot, 13e §3.2 (D1 2026-11-09)):
   - Record 0x7E817618 (482) has hook 0x7E7039C4: when 482 = 1, multiple exposure (268) is cleared.
   - Record 0x7E8175DC (268) has hook 0x7E703986: when 268 ≠ 0, 482 is cleared through the mcon setter 0x7E6FEAE0.
   - So interval shooting and multiple exposure exclude each other.
@@ -95,7 +95,7 @@ Scope: interval shooting / time-lapse movie, the six bracketing modes (including
 - **FL BKT (140 + 608)** and **ISO BKT (216 + 646):** 3 frames at 1/3, 2/3 and 1 EV.
 - **ART BKT (406):** on/off, plus the 19 flags 407–424 and 469 (section 09).
 - **HDR BKT (476 + 478):** GUI 25–29 = 3, 5 or 7 frames at 2.0 EV, and 3 or 5 frames at 3.0 EV.
-- **HDR BKT interlock.** The mcon hook 0x7E703540 (record 0x7E818158) runs when 476 is set non-zero:
+- **HDR BKT interlock.** The mcon hook 0x7E703540 (record 0x7E818158, +24 post-write slot (D1 2026-11-09)) runs when 476 is set non-zero:
   - it clears AE (480), FL (140), 609, WB (90), 146, ISO (216) and ART (406) bracketing;
   - it copies the value to 477.
 - **Shot count.** SequenceParts `0x7EA94F7A` sets `_bracketMaxShootCount` from AE (480), FL (140) or HDR (476). The `HDR_BKT MEDIA_FULL` check is at 0x7EA92502.

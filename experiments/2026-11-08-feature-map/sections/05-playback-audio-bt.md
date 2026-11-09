@@ -21,8 +21,8 @@ Labels: **verified** = read in the code or bytes; **inferred** = from strings, n
 | 0x7E93BA6C–0x7E94D2FF | Playback engine `play_*.c`, `playbuff.c` (PLAY_MAIN/IMAGE/LOAD/SOUND) | verified |
 | 0x7E94D8A8–0x7E961C5A | Audio: bridge, control, WM8946 codec driver, DSP, FSC DMA, sequences, WAV/AC3 tools, AUD_* tasks | verified |
 | 0x7E961C5B–0x7E966000 | `fsc_drv` (audio DMA), then the user shell (`User Shell Help Command`, memory dump/fill/verify) | inferred, not examined |
-| 0x7EBA1020–0x7EBA6B03 | C++ device class `DevBlu_Bluetooth` (vtable 0x7EC91628), OS shims `BSE_*`/`BMQ_*`/`BEF_*`/`BTM_*`/`BMT_*`, state-machine runtime (`OMREactive`) | verified (vtable); class role inferred |
-| 0x7EBA6B03–0x7EBE1020 | Strings and rodata for all of the above (e.g. `play_apical.c` at 0x7EBB66D7) | verified |
+| 0x7EBA1020–0x7EBA6B03 | C++ device class `DevBlu_Bluetooth` (vtable 0x7EC91628), OS shims `BSE_*`/`BMQ_*`/`BEF_*`/`BTM_*`/`BMT_*`, state-machine runtime (`OMREactive`). Bounds per 13c §1: `Dev*` classes 0x7EBA0AA9–0x7EBA4867, OXF runtime 0x7EBA4868–0x7EBA7BB5 (D1 2026-11-09) | verified (vtable); class role inferred |
+| 0x7EBA6B03–0x7EBE1020 | Strings and rodata for all of the above (e.g. `play_apical.c` at 0x7EBB66D7). **Corrected:** 0x7EBA6B03–0x7EBA7BB5 is still OXF code and 0x7EBA7BC1–0x7EBABF8D is OKAO Smart Skin code; the data starts at about 0x7EBAC000 (13b §1, 13c §1) (D1 2026-11-09) | verified |
 
 **Key result.** In this firmware, **"cube" is the code name of the Bluetooth/PENPAL feature** (verified).
 The BT API refuses with `cube is disable\n` when the I/O-expander input 0x1709 is in its "active" state (see §3.0).
@@ -270,7 +270,7 @@ So **the camera with the PENPAL is an MFi iAP accessory over Bluetooth**, for an
 ## 5. SERV_MAIN (verified)
 Entry 0x7E8F904F. It waits on flag 0x7E43ECA8 for bits 0x01 or 0x10.
 - 0x10: control queue 0x7E43EE68 → `serv_stateinfo_ctrl` 0x7E8F912F. com 1 adds a queue ID to a subscriber list (at most 8, at 0x605C1CF8, count at 0x605C2318) (0x7E8F915E). com 2 removes one (0x7E8F9187). Sender `SERV_S2` 0x7E8F9226 is called from 0x7F0862F2 (PC/USB region).
-- 0x01: notice queue 0x7E43EE66 (8-byte notices) → 0x7E8F90EC (`SERV_OLW`) writes each notice to every subscriber queue (OlyQeWr 0x7E4492B9). Sender `SERV_S1` 0x7E8F91DD is called through 0x7E68CCBD from the REC (0x7E701D27), HIGHLEVEL (0x7E995C0B) and GUI (0x7EA1F7BF…) code.
+- 0x01: notice queue 0x7E43EE66 (8-byte notices) → 0x7E8F90EC (`SERV_OLW`) writes each notice to every subscriber queue (OlyQeWr 0x7E4492B9). Sender `SERV_S1` 0x7E8F91DD is called through 0x7E68CCBD from mcon code (not REC: 0x7E701D27, the strobe-off step of camera_end 0x7E700CF9 → F021 0x7E7000BA, which sends notice 0x03010007 after api_rec_Charge_Strobe(0)/Control_Strobe(0) when a change-notify callback is registered; and 0x7E701E42, external-strobe state) (D1 2026-11-09), HIGHLEVEL (0x7E995C0B) and GUI (0x7EA1F7BF…) code.
 
 So SERV is a small **publish/subscribe service for camera state changes**. Which states it carries is not decoded.
 

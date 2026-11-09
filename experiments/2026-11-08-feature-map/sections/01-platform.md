@@ -48,8 +48,8 @@ Helper scripts: `/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/pl
 | 0x1002 | 7F09DFD4 | 11 | | C3D_EXE |
 | 0x1003 | 7E5079DD | 16 | | SCHEAPDBG |
 | 0x1010 | 7E505A22 | 11 | | CPUCONN1 (same code as CPUCONN0) |
-| 0x1011–0x101B | 7EE8FBB1 ×11 | 5 | | worker pool, exinf 0…10 **[I]** |
-| 0x101C–0x101E | 7EEC202E, 7EE8FF18, 7EECC670 | 5 | | not identified |
+| 0x1011–0x101B | 7EE8FBB1 ×11 | 5 | | **AVPI threads**: 0x7EE8FBB1 is the AVPI thread trampoline (`rec->fn(rec->arg)`, records created by 0x7EE8FBC9), exinf 0…10 **[V]** (13b §2.4) (D1 2026-11-09) |
+| 0x101C–0x101E | 7EEC202E, 7EE8FF18, 7EECC670 | 5 | | 0x101C = **AvScaTask**; 0x101D and 0x101E = AVPI service tasks (0x101E inferred: codec-driver task) **[V entries]** (13b §2.4) (D1 2026-11-09) |
 
 How a task on the other CPU starts: `OlyTaSt` (0x7E449541) checks `id & 0x1000`. If the bit is set, it calls `0x7E44ED7D(0x10001, id)` instead of calling the kernel. That is a request to the other CPU. **[V]** I infer that CPUCONN carries this request out; its strings list proxied services (`tsnd_mbf`, `twai_flg`, `sig_sem` … at 0x7E5060E8). **[I]**
 
@@ -105,9 +105,9 @@ So BAS_MAIN and ADJ code is not in RAM until the app asks for Usr2. **[V]** The 
 
 ## 3. Debug shells
 
-**Console hardware.** `0x7E44B040` and `0x7E44B0DA` are getc/kbhit, and `0x7E44B051` is putc. They use pointer tables at 0x7E46DEC8 indexed by CPU. **[V]** I infer that this is a UART. **[I]**
-- CPU0 registers: 0x98700008 RX data, 0x9870000C RX status, 0x98700018 TX data, 0x9870001C TX status.
-- CPU1 registers: 0x98300008 / 0C / 18 / 1C.
+**Console hardware.** `0x7E44B040` and `0x7E44B0DA` are getc/kbhit, and `0x7E44B051` is putc. They use pointer tables at 0x7E46DEC8 indexed by CPU. **[V]** I infer that this is a UART. **[I]** **Corrected:** the index is a port number (byte 0x8FF00080), not the CPU (10f §1.2). The two ports are SIO logical ch5 (0x9870xxxx) and ch1 (0x9830xxxx), and ch1 is also the EVF and PENPAL/Bluetooth UART **[V]** (13f §2.3) (D1 2026-11-09).
+- Port 0 ("CPU0") registers: 0x98700008 RX data, 0x9870000C RX status, 0x98700018 TX data, 0x9870001C TX status.
+- Port 1 ("CPU1") registers: 0x98300008 / 0C / 18 / 1C.
 - putc also copies output into a 767-byte ring at 0xA0731…. **[V]**
 - Debug prints (`0x7E4263E5`, 2,623 callers) go through `OlyQeWr`. **[I]** that the DBG_OUT task drains them to the port.
 
@@ -260,7 +260,7 @@ Other drivers in the range have shell hooks only: RTC, IOE/IOEC (I/O expander ov
 2. What sets the USR_FAST_APP flag bits after 0x01/0x08, and when does the app call Usr2 (bits 0, 1, 24) during normal use?
 3. Meaning of flash src 0x4039D000 (boot read) compared with the 0x80xxxxxx fmem addresses, and the layout of the 0x40xxxxxx ROM map.
 4. The runtime API_IF_/APPEVENT_ name tables used by BASIC (RAM 0x602C…), and which API codes `api()` accepts (0x7E67F3E6).
-5. The CPU1 worker pool 0x1011–0x101B (entry 0x7EE8FBB1) and 0x101C–0x101E.
+5. ~~The CPU1 worker pool 0x1011–0x101B (entry 0x7EE8FBB1) and 0x101C–0x101E.~~ Answered: AVPI threads, AvScaTask and two AVPI service tasks (13b §2.4) (D1 2026-11-09).
 6. Exact sub-operation meanings for ADJ 0x9029/0x902A/0x902B, and whether TPC really routes PTP vendor ops to ADJ (`QTPCADJR`).
 7. Who sets the UI_IN flag (likely a cyclic timer), and the LED_SCREEN/UI_SCREEN internals.
 8. Where the `dbgall` command list comes from.

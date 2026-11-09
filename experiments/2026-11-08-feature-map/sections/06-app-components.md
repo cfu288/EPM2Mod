@@ -40,8 +40,8 @@ Helper scripts are in the scratch dir (`.../scratchpad/app/`: `vt.py` dumps vtab
 **Event classes (verified):**
 - Each event class has an 18-word vtable. Example: vtable 0x7EBDD058, built by constructor 0x7E970EE8. The constructor writes the event id as a u16 at `+4` (11964 here).
 - Slot 2 (0x7E970F1B) is `isTypeOf(id)`. It compares the id with 11964, then calls the parent class's check 0x7E96C3F1. This is a hand-made RTTI.
-- Slot 3 is `getId` = 0x7E966B30 (`movhu (4,a0),d0`). **930 data words point to 0x7E966B30**, so there are about 930 event classes.
-- Most event vtables are in 0x7EBCE000–0x7EBF0000. The event constructors are in 0x7E96B000–0x7E9823AB, in the TraShareTakeStatus part (`Tra` = transition framework, **inferred**).
+- Slot 3 is `getId` = 0x7E966B30 (`movhu (4,a0),d0`). ~~930 data words point to 0x7E966B30~~ **1,273 data words point to 0x7E966B30** (each followed by slot 4 = 0x7E966B37), so there are **1,273 event vtables with 1,268 distinct ids**; 250 of the classes are never constructed (13c §4) (D1 2026-11-09).
+- ~~Most event vtables are in 0x7EBCE000–0x7EBF0000.~~ The event vtables span **0x7EBC0000–0x7EC92200**; only 45% lie in 0x7EBCE000–0x7EBF0000. The constructors sit in each package's module (559 of them in Cap/Cmp code), not in TraShareTakeStatus. 0x7E96B000–0x7E9823AB is not an "event constructor" range: of its 2,603 functions, 1,388 are event methods; the rest is operation-class code (`OlyHfwLowApiWrap`, `OlyHfwOpeLevel`, `OlyHfwOpePlyCom`, `OlyHfwOpePlyMov` and reactive classes; 13c §4, §7) (D1 2026-11-09). (`Tra` = transition framework, **inferred**.)
 
 **OS wrapper "HLS" (verified strings + code):**
 - Functions 0x7E967A99–0x7E9690EE (`HLS_CRE/DLE/SEE/WAE` for events, `HLS_CRQ2/REQ1/WRQ1` for queues, `HLS_*S` for semaphores, `HLS_IST/SLT/WKT` for tasks).
@@ -52,19 +52,19 @@ Helper scripts are in the scratch dir (`.../scratchpad/app/`: `vt.py` dumps vtab
 
 | Layer | Where | Evidence |
 |---|---|---|
-| OXF reactive base: a 35-slot vtable whose methods are at 0x7EBA6449–0x7EBA6D64 | e.g. vtable 0x7EC6C320 | **verified** slot dump; `OMREactive` strings in slots 7–8 |
-| `Cmp_ComponentManager` (`Cmp_ComponentManagerWithBoot`, 0x7EA7D072) | slots 35–51 of the component vtables; code 0x7EA7CB15–0x7EA7DBAC | **verified** slot dump of 0x7EC6F70C |
+| OXF reactive base: a 35-slot vtable whose methods are at 0x7EBA6449–0x7EBA6D64 | ~~e.g. vtable 0x7EC6C320~~ The base vtable is **0x7EC91FE8**; 0x7EC6C320 is a derived component vtable (slot 0 = 0x7EB08A15). Slot 15 = getCurrentEvent, slot 6 = takeEvent, slots 32/33 = rootState_entDef/dispatchEvent (13c §7) (D1 2026-11-09) | **verified** slot dump; `OMREactive` strings in slots 7–8 |
+| `Cmp_ComponentManager` (`Cmp_ComponentManagerWithBoot`, 0x7EA7D072) | slots 35–51 of the component vtables; code 0x7EA7CB15–0x7EA7DBAC. 0x7EA7D072 is the inherited getName that 26 component vtables share, so it does not mark a file (13c §7) (D1 2026-11-09) | **verified** slot dump of 0x7EC6F70C |
 | `Cmp_PlayComponentBase` | base constructor **0x7EB0A5E7**; 58-slot vtable **0x7EC6F70C** (slots 52–57: `sound_state`, `playsound_set_volume`) | **verified**: 10 derived constructors call it (next row) |
 | Derived constructors (vtable they load) | 0x7EAAB4B8 (0x7EC59A00), 0x7EAAE3C3 (0x7EC5A360), 0x7EAB160C (0x7EC5B144), 0x7EB055F9 (0x7EC6C1C0), 0x7EB1A7E6 (0x7EC70B48), 0x7EB28B48 (0x7EC74F9C), 0x7EB3E58B (0x7EC7A16C), 0x7EB4264A (0x7EC7DDCC), 0x7EB54718 (0x7EC81A90), 0x7EB6C601 (0x7EC861B8) | **verified** call edges. Which file each belongs to is **inferred**: they sit near the module boundaries of Function, PlayCommon, BackgroundControl, Calendar, Continuous, Evcollection, Panorama (×2), Select and SlideShow. |
 | `Cmp_ShootingComponentBase` / `Cmp_StillShootingComponentBase` | 0x7EA7A486 / 0x7EA8001A | **inferred** (strings) |
 | Category (`Ctg_ComponentSwitcher` 0x7EB9473A, 5 vtable refs) | 0x7EB94000–0x7EBA0000 | **inferred** |
-| Transition manager (`Com_ActiveTransitionManagerBufferd`; strings `newCapabilityStart`, `previousCapabilityEnd`) | 0x7EB8A000–0x7EB8C000 | **inferred**: the components start and stop capabilities through "transitions" |
+| Transition manager (`Com_ActiveTransitionManagerBufferd`; strings `newCapabilityStart`, `previousCapabilityEnd`) | 0x7EB8A000–0x7EB8C000. The same area also holds `Cab_CameraBase` and the standby/shoot/play/function mode machine (Com_ framework ~0x7EB85500–0x7EB8C265, 13c §6) (D1 2026-11-09) | **inferred**: the components start and stop capabilities through "transitions" |
 
 **Caveat:** `vtref.py` counts vtable slots as consecutive code-range words, so packed vtables can make the count too high. Treat the 58/35/288 slot counts as upper bounds.
 
 **The base methods are copied into each file (verified strings, inferred cause):**
 - The strings `Cmp_PlayComponentBase::transfer_image_start`, `select_current_start`, `is_protect`, `erase_start`, `change_protect_start` and the `@@@@@ APP_MEDIA_COPY_*` messages are referenced again inside every Play/Edit module. Examples: 0x7EAAC284 (PlayCommon), 0x7EAB98B2 (EditAspect), 0x7EAEA343 (ErasePic).
-- So this base code is probably inlined from a header or macro into each component. Expect near-identical functions in every component.
+- So this base code is probably inlined from a header or macro into each component. Expect near-identical functions in every component. **Corrected cause (inferred, strong):** statechart inheritance; each generated class carries copies of its base chart's code (13c §3) (D1 2026-11-09).
 
 ## 2. Shooting features
 
@@ -153,7 +153,7 @@ Helper scripts are in the scratch dir (`.../scratchpad/app/`: `vt.py` dumps vtab
 ## 4. Picture database (chls / oldb)
 
 **Layers (verified):**
-- `chls_oldb_*` wrappers are at **0x7EA238A1–0x7EA26CBB**. This is an unnamed source file between `CapThr_ThroughBuffering.cpp` and `CapPlt_PlayTrimming.cpp`.
+- `chls_oldb_*` wrappers are at **0x7EA238A1–0x7EA26CBB**. This is ~~an unnamed source file~~ the class **CapPDB_PlayOLDB** (getName 0x7EA26E13, ctor 0x7EA2384A; 13c §7) (D1 2026-11-09), between `CapThr_ThroughBuffering.cpp` and `CapPlt_PlayTrimming.cpp`.
 - `chls_` appears to be the playback-library prefix: 277 `chls_oldb_` strings, plus `chls_editbeauty_`, `chls_photsurf_` and `chls_editimageoverlay_` (**inferred**). The UI strings that use it are mostly in 0x7E9F–0x7EA0 (ImagePlayer) and 0x7EA2/0x7EB2/0x7EB4.
 - **The backend is a stub (verified):** all 46 `api_oldb_*` names are `api_oldb_dummy_*` (string table 0x7E7CE460–0x7E7CEAE2, code 0x7E682EC3–0x7E683107). No `api_oldb_` name without `dummy` exists. 0x7E682EC3 and 0x7E682F3B both disassemble to `mov 15,d0; mov <name>,a0; call 0x7E678422; mov 1,d0; ret`, which logs the name and returns 1.
 - Example call chain (**verified**): `chls_oldb_Get_DB_Existence` (0x7EA245F0) calls `0x7E67F822(23)`, then the stub 0x7E682EC3(d0, 1), and returns the stub result as a u16.
@@ -235,7 +235,7 @@ Helper scripts are in the scratch dir (`.../scratchpad/app/`: `vt.py` dumps vtab
 1. Is interval shooting / time-lapse reachable on the E-PM2? Check who sets mode 482 (`MODE_INTERVAL_SHOOTING_ONOFF`) and whether the menu code at 0x7ECD1BC1–0x7ECDA5C6 has an E-PM2 menu entry.
 2. 3D photo: `Execute_3D_Still`, `Make_YC_3D_Still` and `Record_3D_Still` are stubs, while `api_rec_Start_Take_3d` is real. Does a 3D scene still save an MPO through another path, or is the mode dead? Check what 0x7E880EFF(0xF00F0000, 1) signals.
 3. Which `Cmp_*` file owns each of the 10 `Cmp_PlayComponentBase` subclasses? A constructor that sits between two files' first strings is ambiguous. One fix: check the first string of each constructor's callers.
-4. Map the event id space: about 930 event classes with u16 ids (e.g. 11964, 12047). Dumping `id → vtable → constructor → module` would give an event dictionary. Also confirm that −6 is OXF's end-thread id.
+4. Map the event id space: ~~about 930~~ 1,273 event classes with u16 ids (e.g. 11964, 12047). Done in 13c §4 and `13c-event-ids.tsv` (D1 2026-11-09). Dumping `id → vtable → constructor → module` would give an event dictionary. Also confirm that −6 is OXF's end-thread id.
 5. Light box (X group), Multi-through, PlayContinuous and the CW canvas: present in the code, but are any user-visible on the E-PM2?
 6. What does the stub's return value 1 mean to the `chls_oldb_*` callers ("absent" or "error")? Which UI path checks it before entering Photosurf?
 7. Is `Q` (9 commands) the EditCalendar or PlayEventView API? Is `k` (registerCode/eraseCode) a device-registration API?

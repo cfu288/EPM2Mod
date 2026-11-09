@@ -16,7 +16,7 @@
 | Overlay A (BASIC) loaded in normal use | "on demand" | **CORRECTED (inferred strong)** | Loaded in normal use: Usr2 bit 0 also starts the movie-recording tasks | all 7 (inferred) |
 | ADJ (factory PTP) | "16 vendor ops; on demand" | **CONFIRMED + gate traced** | Hidden. Code is in RAM whenever USB/PTP is up. 22 ops accepted | all 7: identical 22-op accept table |
 | ADJSLF (self adjust) | "bit 24 starts it" | **CONFIRMED + gate found** | Hidden, gated by the factory flag PRM_MODE_SHIPS_ENABLE (prm 0x0DB1) = 0 and wake reason SELF_ADJUST. Dormant on a shipped camera (inferred: flag set at shipping) | E-P5 same gate (verified); others have the strings |
-| SS_DEBUGMENU | entry not found | **PARTLY RESOLVED** | Hidden. Contents found (Life Test, Relocate register/erase code, Color setting/result). Entry still **UNRESOLVED** | all 7 (strings) |
+| SS_DEBUGMENU | entry not found | **PARTLY RESOLVED** | Hidden. Contents found (Life Test, Relocate register/erase code, Color setting/result). **Entry found (13d §4.3) (D1 2026-11-09)**: a key sequence in SS_MENU_MAIN HIDE_MODE, gated by getShippingInfo(4); whether a retail body passes the gate is unknown | all 7 (strings) |
 | SS_SELFADJ / self-adjust menu | entry not found | **RESOLVED** | Reached only through the ADJSLF gate above | all 7 |
 | Version-check menu (CAM_MISC_VERCHK_MENU) | "hidden menu" | **CORRECTED (inferred)** | Probably the normal Setup › Firmware screen, not hidden (see §4.3) | all 7 |
 | Life test | strings only | **CONFIRMED, entry = debug menu** | Hidden-debug-only | all 7 |
@@ -113,15 +113,16 @@ So **ADJ vendor ops, including the remote shell, work only on connection types 0
 ## 4. Hidden GUI menus
 
 ### 4.1 SS_DEBUGMENU (GUI super-state 10)
-- **State ids (verified):** the SS name table at 0x7EFDD2D8 gives 1 COMMON, 2 REC, 3 MENU_MAIN … 9 SELFADJ, **10 DEBUGMENU**, 11 USB, 14 DPS, 15/16 BT. The debug-menu module 0x7ED9F800–0x7EDA1400 registers with descriptor words 0x000A0004/0x000A0016 (0x7EFD1F94), with handler tables at 0x7EFD1EA4/0x7EFD1EF4.
+- **State ids (verified):** the SS name table at 0x7EFDD2D8 gives 1 COMMON, 2 REC, 3 MENU_MAIN … 9 SELFADJ, **10 DEBUGMENU**, 11 USB, 14 DPS, 15/16 BT. The debug-menu module 0x7ED9F800–0x7EDA1400 registers with descriptor words 0x000A0004/0x000A0016 (0x7EFD1F94), with handler tables at 0x7EFD1EA4/0x7EFD1EF4. **Corrected (13d §4.1) (D1 2026-11-09):** 0x000A0004/0x000A0016 are the descriptor counts (4 states, 10 events, 22 handlers, 10 events); 0x7EFD1EA4 is the event map and 0x7EFD1EF4 the handler array.
 - **What it offers (verified dispatch, labels inferred):** the action dispatcher `0x7EDA05EC` uses the selector `0x7EDA0637`, which reads GUI data (69, 6):
   - **values 245–247, 249–251 → Life Test** (`0x7EDA053B`, `[GUI App]:Life Test Start`, then a LifeTest SDK call). The AF/IS/strobe/shutter/CCD life-test loops are at 0x7E9D7F4F–0x7E9DAF97.
   - **0 → Relocate code register/erase** (BASIC script to/from flash, §2).
-  - **26 → Color setting/result** (`0x7EDA0968` area; on the power key it leaves through `0x7EDC5C47(3,0)`).
+  - **26 → Color setting/result** (`0x7EDA0968` area; on the power key it leaves through `0x7EDC5C47(3,0)`, which is a request to the camera app (PostEventToCA), not a GUI state change (D1 2026-11-09)).
   - The gdbDebugMenu draw routine is `0x7ED48BBA` (`usRightMark/usItem/usPrg`).
   - The menu draws no block-1 labels: no debug-menu text exists in any body's English table (all 7 `diff_*` files and the `.en.tsv` checked).
-- **Entry: UNRESOLVED.**
-  - `0x7EDC5C47(ss, state)` changes the GUI super-state (inferred from the debug-menu exit). Among its 317 call sites none passes the constant 10.
+- **Entry: found (13d §4.3, verified code) (D1 2026-11-09).** A Setup dialog method 0x7EDFD665 (inferred: Monitor Adjust) checks key code 4 and `IOlyApiMaintenance` getShippingInfo(4); only if it returns 1 does it post EVT_REQ_START_VERSION_CHECK 0x9628. SS_MENU_MAIN state 4 maps 0x9628 to state 6 `ID_ST_HIDE_MODE`. There a counter at RAM 0x602BC480 steps on Up → Down → Left → Right → shutter half-press → shutter full-press (0→1→2→3→7→8), and OK with counter 8 returns 0x0A01 = SS 10 state 1 (bytes 0x7EDABA14–0x7EDABA54). Whether a retail body passes the getShippingInfo(4) gate is **not known**.
+- *Superseded reading:*
+  - `0x7EDC5C47(ss, state)` changes the GUI super-state (inferred from the debug-menu exit). Among its 317 call sites none passes the constant 10. **Corrected:** 0x7EDC5C47 is `PostEventToCA` (string `[GUI App]: PostEventToCA`), a request to the camera app; SS changes are handler return values (13d §4.1) (D1 2026-11-09).
   - The descriptor's factories (0x7ED9FFAF/D1/F3) are reached only through pointers.
   - Not ruled out: a table-driven state change, a key-combination handler in SS_REC, or a boot path.
 
@@ -129,7 +130,7 @@ So **ADJ vendor ops, including the remote shell, work only on connection types 0
 - The misc sub-app table at 0x7EED9400 holds `{state, next, handler, event}` rows. Event **0x0600000B** → `startSelfAdjustMenuSubAppStateMisc` 0x7ECE067B (next 0x2007), and 0x0600000A → `startVersionCheckMenuSubAppStateMisc` 0x7ECE0653 (next 0x2006).
 - `setSubAppChgReqInfo` 0x7ECD6574 → `0x7ECD6728` maps boot param 11 (CAM_MISC_SELF_ADJUST) → 0x0600000B and param 12 (CAM_MISC_VERCHK_MENU) → 0x0600000A. The names come from `0x7ECD68D8`.
 - Param 11 is passed from `0x7ECE01DB` (the readyExecuteSelfAdjust path). So the self-adjust menu is reached only through the §3 gate.
-- Two menu-OK paths (0x7EDA9F47, 0x7EDAAAC5) call `0x7EDC5C47(9,7)` for menu item 598 when a condition holds ((0x602BC48C)==1 and `0x7ED009D6()`==4). What item 598 is was not identified.
+- Two menu-OK paths (0x7EDA9F47, 0x7EDAAAC5) call `0x7EDC5C47(9,7)` for menu item 598 when a condition holds ((0x602BC48C)==1 and `0x7ED009D6()`==4). What item 598 is was not identified. (0x7EDC5C47 is PostEventToCA, so (9,7) is a CA request, not "go to SS 9 state 7" (D1 2026-11-09).)
 
 ### 4.3 Version-check menu
 - **Verified:** `startShooting` 0x7ECDCB10 maps rcv_info.info **11 → param 12 (VERCHK)** and 12 → param 13 (CAM_MISC_FIRMUP).
@@ -137,7 +138,7 @@ So **ADJ vendor ops, including the remote shell, work only on connection types 0
 - **Inferred:** item 43 is Setup › **Firmware** (string 134, help 492 "View product's firmware version."), the only firmware item in the top table (record 35, kind 0x100). If so, the "version-check menu" is the **normal Firmware screen**, and its firmware-update branch is the card lens/flash updater. The prior label "hidden" is **corrected** to "probably Active". The link from item 43 to VERCHK was not traced end to end.
 
 ### 4.4 Shipping info
-- `Maintenance::getShippingInfo` (`API_SHIPPING_INFO_{DEST_AREA, FLAG, DPS, TIME_ADJUST, MENU_BUTTON}`) is logged by the GUI at 0x7EDFD665. Its use as a menu gate was not traced.
+- `Maintenance::getShippingInfo` (`API_SHIPPING_INFO_{DEST_AREA, FLAG, DPS, TIME_ADJUST, MENU_BUTTON}`) is logged by the GUI at 0x7EDFD665. Its use as a menu gate was not traced. (Traced in 13d §4.3: selector 4, inferred API_SHIPPING_INFO_MENU_BUTTON, gates the debug-menu entry (D1 2026-11-09).)
 - The one verified ship-flag gate is ADJSLF (§3).
 
 ## 5. prmdbg / `app Set_CameraInfo` / `sdk api` / `mov` / `lens` / `cam`
@@ -167,7 +168,7 @@ So **ADJ vendor ops, including the remote shell, work only on connection types 0
 
 ## Open questions
 
-1. **SS_DEBUGMENU entry.** Find the non-constant `0x7EDC5C47(10, …)` site or a key-sequence handler. Start from the SS_REC key handlers and the factories at 0x7ED9FFAF.
+1. ~~**SS_DEBUGMENU entry.** Find the non-constant `0x7EDC5C47(10, …)` site or a key-sequence handler. Start from the SS_REC key handlers and the factories at 0x7ED9FFAF.~~ Found (13d §4.3); still open: does a retail body pass getShippingInfo(4) (D1 2026-11-09)?
 2. **Wake reason 9.** Find which power-on factor (0x604154E6, decoded at 0x7E45D280) becomes API_WUI_SELF_ADJUST. Check also that retail cameras have prm 0x0DB1 = 1 (a camera-side read only).
 3. **Storage mode and PTP.** Find how PTP ops reach TPC in connection type 0 (mass storage). Find what selects type 5 and type 6.
 4. **Edev ID 0x023E** (console re-route) and 0x0204/0x0205: which accessory or jig they are, and which connector carries UART port 0.

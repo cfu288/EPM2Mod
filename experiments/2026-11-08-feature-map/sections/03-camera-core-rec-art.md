@@ -162,7 +162,7 @@ Sensor modes (verified table 0x7E7ABDA0, key = mode+1): 0 HS, 1 HSSC, 2 MSSC, 3 
 - **`exp` debug shell (verified strings, 0x7E69C056 and helpers):** info, mode, bvall, logclr, flick, data, ae_setting, capture_mode, ae_y, expose_setting, aeprm, shift, ftbl, clip, farea. Plus `exp still on/off/info`, `exp_cal_still[mode/set/still/bv]`, `exp log start/stop/put`, `exp zoom [0:x4,1:x5…]`, `exp 120fps`.
 - **Exposure modes P/A/S/M and metering selection** live in TAKE_EXPOSE (0x7E5829E8, `[TakeExp]…` strings, outside this range) and in the settings store. Not mapped here.
 - **SDET (verified entry 0x7E662DCB; content inferred):** iAuto scene detection. Its dump at 0x7E663B54 has state, scene, tone_rev, aozora (blue sky), highsat, near, up_portrait, led, y_data_state, yc422_addr. The debug command at 0x7E6637F2 (`dbgscnmode`) lists the scene types PORTRAIT, SCENERY, SCENERY_PORTRAIT, NIGHT_SHOT, NIGHT_SHOT_PORTRAIT, NIGHT_SHOT_MACRO, EVENING_SUN, SPORTS, MACRO, SPOT_LIGHT, UNDERWATER_SNAP, PROGRAM, and also gyakkou (backlight). It dumps data files `ST/CO/IA%02d%02d%02dBIN`, `MDETDATA` (0x7E6672F3). 0x7E667400–0x7E675000 has about 200 functions without strings. **Inferred:** the detection algorithm library.
-- **IMG_PRECON (verified, 0x7E55F9B6, outside range):** a message server with no strings. Command 0–4 goes to 0x7E55FAE8, 0x7E55FE1E, 0x7E55FF91, 0x7E55FFA3, 0x7E580A54(0/1). It replies with OlyQeWr if the message has a reply queue. The handlers read settings (0x7E457C75) and call into the TAKE region. The name suggests image pre-conditioning before capture (inferred).
+- **IMG_PRECON (verified, 0x7E55F9B6, outside range):** a message server with no strings. Command 0–4 goes to 0x7E55FAE8, 0x7E55FE1E, 0x7E55FF91, 0x7E55FFA3, 0x7E580A54(0/1). It replies with OlyQeWr if the message has a reply queue. The handlers read settings (0x7E457C75) and call into the TAKE region. **Role: pixel-defect (Pixel Mapping) correction**, not generic pre-conditioning: cmd 0 (0x7E55FAE8) runs the defect kernels 0x7E55ECD8 on the lists from prm 0x7044 `PRM_CCD_FIRST_PIXELDEFECT_ADDRESS`, 0x7052 `…_SIZE` and 0x7144 `…_ADDRESS2` (verified; 13a §3.2) (D1 2026-11-09).
 
 
 ## 8. Still recording pipeline (REC_*; rec_3d.c, rec_jpeg.c, rec_misc.c, rec_view.c)
@@ -322,9 +322,9 @@ Sensor modes (verified table 0x7E7ABDA0, key = mode+1): 0 HS, 1 HSSC, 2 MSSC, 3 
 
 **Inferred:**
 - FD is a hardware engine fed by DMA (control block `ulInAddr, ucDmaMode, ucDtMinSize, ucDtDir, ucThreshold` dumped at 0x7E6F97D3).
-- PT uses Omron OKAO (`OKAO_DeletePtResult`, `OKAO_FreeWMemoryArea` near 0x7E6FBCB0).
+- PT uses Omron OKAO (`OKAO_DeletePtResult`, `OKAO_FreeWMemoryArea` near 0x7E6FBCB0). **Confirmed and extended (13b §2):** FD itself is the hardware engine at 0x99600000, driven by 0x7E6F8062–0x7E6F82C7. OKAO is used only for PT (live eyes), for Smart Skin (FACE_MAIN cmd 11, e-Portrait/beauty) and, inferred, for red-eye (cmd 5) (D1 2026-11-09).
 - Per-face results are `center_x/y, size, angle, confidence, pose`. PT adds eye positions; "EYE AF ON/OFF" is at 0x7E6F9A26, so PT supports eye-priority AF.
-- `api_rec_dummy_Get_Smile_Face_Detect` exists only as a string, so smile detection is stubbed out.
+- `api_rec_dummy_Get_Smile_Face_Detect` exists only as a string, so smile detection is stubbed out. Confirmed absent; in addition, the eye-retouch modules 2 and 4 of cmd 11 and the 38-point contour module are linked as stubs (0x7E6FB6BA–0x7E6FB74D: `mov 0x8707,d0; retf` or `mov 0,a0; retf`) (verified; 13b §2.5) (D1 2026-11-09).
 
 ## Open questions
 
@@ -336,5 +336,5 @@ Sensor modes (verified table 0x7E7ABDA0, key = mode+1): 0 HS, 1 HSSC, 2 MSSC, 3 
 6. Live Bulb/Live Time: where is the update interval and display-refresh logic (0x7E65E000–0x7E661900, no strings)? Is Live Bulb reachable from the E-PM2 menus? This was not checked against the GUI.
 7. REC: what are take-handle fields +17132 (1/2/8/12) and +16386 (5 = RAW+JPEG?), and usModes 0x1002/3/4/7/8? What is REC_EXT's 640×480 Y image for?
 8. Art: what do the CPU kernels 0x7E5475FC/0x7E547A7A compute? What is request type 3 (two filters: ART BKT?)? Which menu ids 100–120 does the E-PM2 GUI expose (Pin Hole III, Crystal, Pastel, Mirror, Composite)?
-9. Face: what are FACE_MAIN cmds 5/11, FACE_POST/FACE_PT1 and DISP_FRAME states 0/1/2? Who sets the FD-done event (ISR?)?
+9. Face: ~~what are FACE_MAIN cmds 5/11~~ (answered: cmd 5 = playback red-eye correction, sent by `play_face_redeye_adjust` 0x7E94318E → overlay-A library 0x7F0645C1; cmd 11 = e-Portrait/beauty through OKAO Smart Skin; 13b §2.3/§2.5 (D1 2026-11-09)), FACE_POST/FACE_PT1 and DISP_FRAME states 0/1/2? Who sets the FD-done event (ISR?)?
 10. SDET: the algorithm block 0x7E667400–0x7E675000 (about 200 functions without strings), and how the SDET result reaches `api_rec_Get_I_Auto_Scene`.

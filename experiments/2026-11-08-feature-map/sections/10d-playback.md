@@ -49,7 +49,7 @@
 ### 1.3 Reachability on the E-PM2
 
 **Verified negatives:**
-- **API interfaces.** I listed every lazily built `OlyApi*` singleton getter in 0x7E9BF000–0x7E9CE000 (39 getters). Each one matches one `sdk api` letter group, and none is for PhotoSurfing, EventView, EventCollection, Collage, ContinuousShots, CopyPicture, PlayPanorama, EditCalendar, OpeningScreen, OLDBControl or GpsCtrl. These classes exist only as names in the debug name table at 0x7EBD5000.
+- **API interfaces.** I listed every lazily built `OlyApi*` singleton getter in 0x7E9BF000–0x7E9CE000 (39 getters; this is the first series only, at least 5 more exist at 0x7E99D2DD–0x7E99FF14, 13d §6.2 (D1 2026-11-09)). Each one matches one `sdk api` letter group, and none is for PhotoSurfing, EventView, EventCollection, Collage, ContinuousShots, CopyPicture, PlayPanorama, EditCalendar, OpeningScreen, OLDBControl or GpsCtrl. These classes exist only as names in the debug name table at 0x7EBD5000.
 - **Ope classes.** No `OlyHfwOpe*` class string exists for them. The 43 Ope class names are listed in the scratch output.
 - **Component-id constants.** In the Ope region 0x7E9CD000–0x7E9E2000, no immediate equals the ids of EVENT_VIEW, COLLAGE, EVCOLLECTION, PHOTOSURF, CONTINUOUS_SHOTS, PLAY_CW, COPY_PICTURE, PANORAMA, EDIT_CALENDAR or EDIT_ROTATE. The only hit is a `cmp` of EVENT_VIEW in a mode-flag routine at 0x7E9E5A97. All edit and play components that the GUI uses do have such getters (§2).
   - Caveat: ERASE_SELECT_PIC and EDIT_PROTECT have no getter either, so ids passed indirectly cannot be ruled out completely.
@@ -98,8 +98,8 @@ Basis for "Active": the GUI calls the component's `OlyApi*` interface (singleton
 **Light box (verified GUI code; how it is entered is inferred):**
 - The SsPlaySingle state ids at 0x7EFDC50C include `ID_ST_DISP_HIGHLIGHSHAD` = 14 and `ID_ST_DISP_LIGHTBOX_PREPARE` = 15, followed by LIGHTBOX, SCOLL, MOVE, ZOOM and SETBASE.
 - The handlers include `doCmd_SsPlaySingle_StDispLightBox_EvtStChgMainDial` 0x7ED0E05B and `…_EvtKeyFn2On` 0x7EDB9FC7.
-- The prepare handler 0x7EDB8C08 is reached from the GUI handler table at 0x7EFD7AA4. It checks the picture count through MediaCtrl, then calls `CPlayLightBox::start` 0x7ED05C54.
-- The light-box display sits next to the Highlight&Shadow display. This matches the "▶ Info" display list (Image Only / Overall / Highlight&Shadow / Light Box) that the PENs of this period offer (external). I did not decode which event of the handler table enters it.
+- The prepare handler 0x7EDB8C08 is reached from the GUI handler table at 0x7EFD7AA4. **Corrected:** 0x7EFD7AA4 is slot 14 of SS_PLAY_SINGLE's entry-function array (0x7EFD7A6C), so 0x7EDB8C08 is the **entry** function of state 15 `ID_ST_DISP_LIGHTBOX_PREPARE`, not a handler-table row. The INFO-key release in the display states returns that state through `CPlaySingleFrame::getJumpState` 0x7ED09135 (13d §4.3) (D1 2026-11-09). It checks the picture count through MediaCtrl, then calls `CPlayLightBox::start` 0x7ED05C54.
+- The light-box display sits next to the Highlight&Shadow display. This matches the "▶ Info" display list (Image Only / Overall / Highlight&Shadow / Light Box) that the PENs of this period offer (external). I did not decode which event of the handler table enters it. (Answered in 13d §4.3: one stop of the INFO display cycle, enabled by ▶Info "@A021@" (D1 2026-11-09).)
 
 **Edit modes (table 0x7EBB8D88, §05):**
 - 0x01/0x02/0x0C color, 0x07 trim, 0x08 redeye, 0x10 shadow, 0x80 rotate, 0x81 resize, 0x86/0x91 overlay, 0x87 aspect, 0x88 beauty, 0x90 save and 0x92–0x94 RAW back the Active components above (link inferred from the component/edit names).
@@ -118,7 +118,7 @@ Basis for "Active": the GUI calls the component's `OlyApi*` interface (singleton
   - `api_disp_Disp_Get_3D_Format_Size` 0x7E6798C5 maps 0/64/128 to 0/6/8, asks the display driver 0x7E6B49CB and tests bit 0 (`btst 1` = mask 0x01) (audit 2026-11-09).
   - 0/6/8 match the HDMI 1.4a 3D_Structure codes: frame packing, top-and-bottom, side-by-side half (external).
   - `CameraCommon::getDisplaySupport3D` is sdk A18.
-- **GUI (verified):** 0x7ED054FB builds a panel titled "Sel. Image" (572) with the items "All" (442) and "3D Show" (982). It is called from handler 0x7EDB61FE (table 0x7EFD6754).
+- **GUI (verified):** 0x7ED054FB builds a panel titled "Sel. Image" (572) with the items "All" (442) and "3D Show" (982). It is called from handler 0x7EDB61FE (table 0x7EFD6754). **Corrected:** 0x7EFD6754 is slot 15 of SS_PLAY_MOVIE_SLIDE's entry-function array (0x7EFD6718), so 0x7EDB61FE is the **entry** function of SS7 state 16 `ID_ST_3D_IMG_SEL_MENU`, not a handler-table row (13d §4.3) (D1 2026-11-09).
   - On the E-PM2 the Slide list (info 101) is only 0/2/3 (mcon, verified), so 3D is not in the normal Slide menu.
 - **Reading (inferred):**
   - On a 2D screen the camera shows the JPEG of the JPEG+MPO pair.
@@ -152,6 +152,7 @@ Basis for "Active": the GUI calls the component's `OlyApi*` interface (singleton
 - **Wind Noise Reduction is a user setting (verified):**
   - A 16-byte record table at 0x7EFF8250 holds `{group, label, info, 0, kind, help, …}`. Group 8 has Movie Effect (1492, info 444), **Wind Noise Reduction (1087, info 434, help 1491)** and the mic level (1373, info 435, help 1490).
   - The layout is inferred. These look like the Custom Menu item lists that §07 did not find.
+  - **Corrected (13d §5) (D1 2026-11-09):** the Custom Menu table starts at **0x7EFF7E80** (78 rows, page 0..9 = A..J); 0x7EFF8250 is page **H**'s first row (Quick Erase). Group 8 is page **I** (Movie). The "mic level" row (1373) is labelled **Recording Volume**.
   - Info 434 → prm **0x7871** (mcon values 0/2/6/10, verified).
   - In `cmd_set_dsp_param_on` (0x7E95136C), when the mode at 0x605D8744 is 1 and the argument at (536,sp) is 1, it reads 0x7871. Non-zero → windcut 0x7E951BDE with the value as argument; zero → plain LHPF 0x7E951ADF.
   - The meaning Off/Low/Standard/High is inferred from the 4 values and the external menu.
@@ -162,7 +163,7 @@ Basis for "Active": the GUI calls the component's `OlyApi*` interface (singleton
 - **Automatic choice:** the notch pattern follows movie quality (34145 → pattern 5 or 1, §05). So only wind cut and mic level are user choices.
 
 ## Open questions
-1. Decode the GUI handler tables (0x7EFD5E00…, 0x7EFD6754, 0x7EFD7AA4). That would name the key or event that enters light box, "3D Show" and BGM Import.
+1. Decode the GUI handler tables (0x7EFD5E00…, 0x7EFD6754, 0x7EFD7AA4). That would name the key or event that enters light box, "3D Show" and BGM Import. (Answered in 13d §4.3: 0x7EFD6754/0x7EFD7AA4 are entry-function arrays; light box = INFO display cycle; 3D Show = play-start chooser 0x7ED05440; BGM Import = a `userMenu` item, not an Ss row (D1 2026-11-09).)
 2. What edit modes 0x84 (`play_pocket`) and 0x8F (SNS flag) are, and whether any API mode reaches them.
 3. Whether E-P5 and later bodies still route light box and calendar the same way (only the component names were compared).
 4. 3D shooting: are `rec_3d_make_mpo`/`write_mpo` reached in SCN 3D on the E-PM2? This contradicts the §06 "dormant" reading.

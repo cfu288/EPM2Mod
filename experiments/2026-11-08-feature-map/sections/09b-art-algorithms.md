@@ -171,7 +171,7 @@ out = imgdma_merge(A, B, w=256, mask=0xFF00)   // inferred: per-byte select/mix,
 
 ## Open questions
 1. Composite desc+284 modes 5–8: rotation/flip or blend mode? Find the image-engine consumer of desc+284, which
-   only 0x7E548351 and 0x7F0687C4 write.
+   only 0x7E548351 ~~and 0x7F0687C4~~ write. 0x7F0687C4 is not an art writer: it is the red-eye pixel correction in overlay A, reached only from FACE cmd 5 (13b §4) (D1 2026-11-09).
 2. Does the composite mask buffer really overflow for 16:9 and 1:1? Check how art_buff_alloc 0x7E7293DE rounds sizes.
 3. Watercolor presets P+89 = 10–13: find the table that P+89 indexes in the image-engine driver. Decode the
    181/182 branches in fn 0x7E566C94.

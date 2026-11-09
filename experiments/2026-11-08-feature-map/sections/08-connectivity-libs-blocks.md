@@ -175,7 +175,7 @@ The E-PM2 has no FireWire hardware. The 1394 slot exists only so the shared task
 - **DISPLAY task** (0x7E6AEAD2): output routing `0:IDLE/1:TFT/2:NTSC/3:PAL/4:HDMI/5:EVF`, two OSD layers + image layer (`I43DM_*` modes), gamma, backlight duty (`[duty] OLED/EVF`), and panel SIO.
   Also `DISP_ADJ_EXT_PORT` / `adj_ext_port_tmds_exe`: the accessory-port EVF video appears to use a TMDS-type link with its own calibration (`outevf_tmds_measurement`). (inferred)
 - **TOUCHPANEL task** (0x7E6BCF84): gestures TOUCH/LPRESS/LIFT-OFF/TAP/SLIDE/DTAP are sent to "HLS". It has swivel parameters and a **touch-controller firmware bootloader** (`Initiate Bootload`, `Write Block`, `Please 12sec wait`). Factory touch calibration goes through ADJSLF (`PCODE_TP_CALIB`, `TPVercheck`). (strings)
-- **Accessory port / EVF**: `EVF_TYPE_VF2`/`EVF_TYPE_VF3` (with version reads `vf-2 Version:`/`vf-3 Version:`), `EV_EVF_CONNECTED`, the eye sensor (PER_EYE_SENSOR task over IIC), and `api_rec_Get_Acce_DeviceInformation`.
+- **Accessory port / EVF**: `EVF_TYPE_VF2`/`EVF_TYPE_VF3` (with version reads `vf-2 Version:`/`vf-3 Version:`), `EV_EVF_CONNECTED`, the eye sensor (PER_EYE_SENSOR task over IIC; **but that task is an empty `retf`** (section 01), so no driver activity comes from it (D1 2026-11-09)), and `api_rec_Get_Acce_DeviceInformation`.
   **PENPAL** (PP-1) is a Bluetooth/iAP device (`OLYMPUS PENPAL`, `iap_get_acc_inf`), covered by the BT section.
   No macro-arm-light-specific strings were found. Note: `ACC_SPI` / `PRM_PER_ACC_X/Y/Z` is the **accelerometer** (level gauge), not the accessory port. (verified by strings)
 
@@ -203,7 +203,7 @@ The E-PM2 has no FireWire hardware. The 1394 slot exists only so the shared task
 - **Dual core (verified part):** the fatal/NMI handler 0x7E463CD9 reads a CPU id at absolute address 0x8050 and prints `Genba Ha CPU0/CPU1` ("the failure is on CPU0/CPU1"). The object-name table has a CPU1 set (`BOOT_CPU1`, `CPUCONN_CPU1`, `MOV_ENC_VIDEO_CPU1`, `CPU1_MOV_AVCHD`, `IMG_CPU0_TO_CPU1`).
   So block 0 is one image that both cores run. C3D (and the movie encoder) run on CPU1 and are reached through the bridge tasks. (inferred from these)
 - **Engine code** = 0x7EE21020–0x7EE5B (inferred):
-  - float-heavy: thousands of calls to the single-float helpers at 0x7E5018BC–0x7E501972, which use AM33-2 FPU ops;
+  - float-heavy: thousands of calls to the single-float helpers at 0x7E5018BC–0x7E501972, which use AM33-2 FPU ops. The full float-helper set is 0x7E500F62–0x7E501AAB (13a §2.2). Do not assume names by order: 0x7E5018BC is **fsub** and 0x7E5018C3 **fadd** (inferred, strong), 0x7E5018E8 is fmul (D1 2026-11-09);
   - 89 functions call the C3D helper 0x7F0A3819;
   - vtable-like pointers at 0x7F027C80;
   - tags `MCA_/MCT_/MCE_` with `$Revision: #88 $`, and a `GIF89a` loader;
@@ -214,12 +214,12 @@ The E-PM2 has no FireWire hardware. The 1394 slot exists only so the shared task
 
 | Range | What | Evidence |
 |---|---|---|
-| ~0x7EDE–0x7EE21 | **DMP GPU GL driver**: uniform table builder 0x7EE15060 (`gl_ModelViewMatrix`, `gl_TextureMatrix[0..2]`, `gl_PVLightAmbDMP`, `gl_SilhScaleDMP`, `gl_SubdLevelDMP`, …). Names at 0x7F01938E/0x7F026D08. Extension entry names `glBeginQueryDMP`, `glLineStippleDMP`, `glBlendColorDMP`, `glSetErrorFuncDMP` at 0x7F023ACB | **verified** strings + refs. The `*DMP` suffix is the Digital Media Professionals (PICA-family) extension style (inferred vendor) |
+| ~0x7EDE–0x7EE21 (**0x7EE02095–0x7EE21020**; 0x7EDE–0x7EE01 is GUI menu-page code, 13d §1 (D1 2026-11-09)) | **DMP GPU GL driver**: uniform table builder 0x7EE15060 (`gl_ModelViewMatrix`, `gl_TextureMatrix[0..2]`, `gl_PVLightAmbDMP`, `gl_SilhScaleDMP`, `gl_SubdLevelDMP`, …). Names at 0x7F01938E/0x7F026D08. Extension entry names `glBeginQueryDMP`, `glLineStippleDMP`, `glBlendColorDMP`, `glSetErrorFuncDMP` at 0x7F023ACB | **verified** strings + refs. The `*DMP` suffix is the Digital Media Professionals (PICA-family) extension style (inferred vendor) |
 | 0x7EE21020–0x7EE5B | C3D 3D/animation engine | see 4 (inferred) |
 | 0x7EE5BB–0x7EE5F | **libpng 1.2.37** ("libpng version 1.2.37 - June 4, 2009", 0x7F02B404; all png_* error strings; read side only) | **verified** |
 | 0x7EE5F5F3–0x7EE61F | **zlib 1.2.3 inflate** ("inflate 1.2.3 Copyright 1995-2005 Mark Adler", 0x7F02E999). Inflate 0x7EE5FE61, CRC-32 0x7EE5F5F3 with table 0x7F02BE7C, code-length order 0x7F02E702, dist base 0x7F02EA44. Called from libpng (0x7EE5DA3F, 0x7EE5EE73) | **verified** |
 | 0x7EE61C–0x7EE63 | C3D-facing API (called by the scene code 0x7F09E31F, 0x7F09DFD4) | refs |
-| 0x7EEA–0x7EEE | **AV middleware ("AVPI")**: `CAvpiAsoAudioSource.cpp`, `Video Source Plug-in`, `MP4 Mux Plug-in`, `MP4 Demux Plug-in`, box writers `ftyp/moov/mvhd/trak/…/avc1/avcC/stts/stsc/stsz/stco/stss`, `sowt` PCM, `AvScaTask: AVSCA_*`. Called from the movie code (`AVMIDDLE CALL`, `[QT] MovmidApi_cmd_rec_init/start/end`) | strings + calls |
+| 0x7EEA–0x7EEE (**0x7EE8F4F4–0x7EECE318**, where block-0 code ends; rodata follows. 0x7EE63000–0x7EE8F4F3 before it is C3D-side code; 13b §1 (D1 2026-11-09)) | **AV middleware ("AVPI")**: `CAvpiAsoAudioSource.cpp`, `Video Source Plug-in`, `MP4 Mux Plug-in`, `MP4 Demux Plug-in`, box writers `ftyp/moov/mvhd/trak/…/avc1/avcC/stts/stsc/stsz/stco/stss`, `sowt` PCM, `AvScaTask: AVSCA_*`. Called from the movie code (`AVMIDDLE CALL`, `[QT] MovmidApi_cmd_rec_init/start/end`) | strings + calls |
 | **0x7EEE1020–0x7F021020** | **rodata, not code**: strings of the CA/GUI C++ layer (`ShootingCommon`, `[S-AppShot ]:`, `AppVer: 2010Apr06 CheckIn`), vtables, the GL name pools, libpng/zlib tables. Entropy 3.4–4.5 bits/byte. The "calls" decoded there go to addresses like 0xAE6D05EC, so the ~1,500 DB "functions" are false positives | **verified** |
 
 Also:

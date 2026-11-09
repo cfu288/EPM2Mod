@@ -88,7 +88,7 @@ Detail is in 10a–10f. Coordinator spot checks are in `../NOTES.md`.
 | BASIC + RCU scripts | card load, flash autoload | **Confirmed. Trigger:** the card load comes from the GUI debug menu or `sdk api`, not at boot. A script saved in flash with the `ucr.` header runs at every BAS_RCU_SRV start | |
 | BASIC overlay "loaded on demand" | on demand | **CORRECTED (inferred strong)**: loaded in normal use (the same step starts the movie tasks) | |
 | ADJSLF / self-adjust menu | trigger unknown | **Gated by the factory flag** PRM_MODE_SHIPS_ENABLE (prm 0x0DB1) = 0 plus wake reason SELF_ADJUST. Dormant on a shipped camera (inferred) | |
-| SS_DEBUGMENU | entry unknown | **Contents found** (Life Test, BASIC script register/erase, Color setting). **Entry still unresolved** | |
+| SS_DEBUGMENU | entry unknown | **Contents found** (Life Test, BASIC script register/erase, Color setting). **Entry found but gated** (13d §4.3 (D1 2026-11-09)): key sequence in HIDE_MODE, behind getShippingInfo(4); retail pass unknown | |
 | Version-check menu | "hidden" | **CORRECTED (inferred)**: probably the normal Setup › Firmware screen | |
 | USRTEST_A–D | dormant | **Dormant (confirmed)**: nothing starts them | |
 
@@ -129,12 +129,12 @@ About 20 earlier claims were wrong or incomplete. They fall into three kinds:
 **What the firmware cannot settle:**
 - ~~Whether the E-PM2 has an accessory port.~~ Answered later: yes (v1.2 release notes add VF-4 support).
 - **Whether HDR BKT appears on the camera.**
-- **How SS_DEBUGMENU is entered.**
+- ~~**How SS_DEBUGMENU is entered.**~~ Found (13d §4.3); what the firmware cannot settle is whether a retail body passes the getShippingInfo(4) gate (D1 2026-11-09).
 
 ## Open questions (cross-section)
 
 1. Is HDR BKT visible in Shooting Menu 2 › Bracketing on a real E-PM2? (A 5-second check on the camera.)
-2. How is SS_DEBUGMENU entered, and which power-on cause gives wake reason 9 (self-adjust)?
+2. ~~How is SS_DEBUGMENU entered~~ (found, 13d §4.3 (D1 2026-11-09)), and which power-on cause gives wake reason 9 (self-adjust)?
 3. What is the X3C PTP mode? (The opcode set is known; it has no requester.)
-4. Which key or event opens light box, 3D Show and BGM Import (GUI handler tables 0x7EFD5E00 / 0x7EFD6754 / 0x7EFD7AA4)?
-5. Custom Menu A–J item lists: the record table at 0x7EFF8250 (10d) is a candidate.
+4. Which key or event opens light box, 3D Show and BGM Import (GUI handler tables 0x7EFD5E00 / 0x7EFD6754 / 0x7EFD7AA4)? Answered in 13d §4.3; 0x7EFD6754/0x7EFD7AA4 are entry-function arrays (D1 2026-11-09).
+5. Custom Menu A–J item lists: the record table at 0x7EFF8250 (10d) is a candidate. Answered: the table starts at 0x7EFF7E80; 0x7EFF8250 is page H (13d §5) (D1 2026-11-09).

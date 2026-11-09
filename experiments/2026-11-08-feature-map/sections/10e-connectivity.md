@@ -91,7 +91,7 @@ Method: the strict method of section 09 (code, reachability, cross-body, externa
 - **Rows:** 0x7EFFE24A/54/5E, items 2122 PENPAL Share (268/481), 2123 PENPAL Album (270/589) and 2124 Electronic Viewfinder (269/482).
 - **Tab visibility:** 0x7EDEBF67 drops the tab unless info 394 ≠ 0. Info 394 = prm 0x61B1 (MODE, u8, **default 0**). It has a mode-controller (mcon) record (#400, 2 values).
 - **Reading 394:** the tab-navigation helpers 0x7EDECA27/0x7EDECBF8 and the predicate 0x7E9E91EF (vtable 0x7EC1C3E4) read it.
-- **Setting 394:** no constant-id setter was found. Setup > "Menu Display" (str 168; help 491 "Choose whether to display @A00E@ menu or @A000@ menu") is the likely toggle (**inferred**; that screen is built in code and was not traced).
+- **Setting 394:** no constant-id setter was found. Setup > "Menu Display" (str 168; help 491 "Choose whether to display @A00E@ menu or @A000@ menu") is the likely toggle (**inferred**; that screen is built in code and was not traced). **Update:** the sub-item table, read in phase (13d §5), has group 42 = Menu Display (168) with two items: info 283 ("@A00E@ Menu Display", 497) and **info 394 ("@A000@ Menu Display", 498)**. So the toggle is a table row, not built in code (verified bytes) (D1 2026-11-09).
 - **E-PL5:** the top table is byte-identical (E-PL5 0x7EFFEA28).
 - **So the E-PM2 does not hide this menu by model.** It is off by default as on the E-PL5. If a user turned it on, the PENPAL and EVF pages would open but find no device (**inferred**).
 
@@ -122,7 +122,7 @@ The E-M10 and E-PL7 also lack an accessory port (product knowledge) but still ca
   - `api_media_Get_Eyefi_Status` 0x7E680970, `Enable/Disable_Eyefi_Operation` 0x7E680A28/0x7E680A56, `Get_Eyefi_File_Status` 0x7E680A84;
   - an app-layer Eye-Fi manager: mode 0x7E9747B2, `EyeFi restrict:` 0x7E9748A4 with 23 callers that block uploads during operations (inf);
   - info 290 = prm 0x5001 (mcon #348, 3 values).
-- **Eye-Fi menu item:** "Eye-Fi" (str 290/479) is in neither menu table, so it is built in code. Whether it shows only when a card is detected was **not traced (UNRESOLVED)**.
+- **Eye-Fi menu item:** "Eye-Fi" (str 290/479) is in neither menu table, so it is built in code. **Update:** it is a Custom Menu J row in the table 0x7EFF7E80: label 1447 "Eye-Fi", info 404, help 479 (13d §5; verified bytes) (D1 2026-11-09). Whether it shows only when a card is detected was **not traced (UNRESOLVED)**.
 - **FlashAir:**
   - "Connection to Smartphone" (1719/1720) is a Playback-menu row at **0x7EFFE1DC**, kind 0x100 (verified).
   - The app side has `FlashAir::isFlashAir/getWifiSetting/connect…` (names 0x7EBDB0A6…) and `OlyHfwOpeFlashAir::*` 0x7E9D5577…; the camera side is SPC_MAIN 0x7F0A7AF7 with `chk_flashair`.
@@ -186,7 +186,7 @@ The E-M10 and E-PL7 also lack an accessory port (product knowledge) but still ca
 - `api_tft_Enable/Disable_CEC_Protocol` 0x7E68DEC4/0x7E68DEF7 each have one caller: the vtable method 0x7EBA1652 (`setCec(bool)`, vtable word 0x7EC90B9C).
 - The HDMI component 0x7EA4143F reads info 306 before logging `io cec: %d`. Info 306 = prm 0x6721 has mcon record #356 with values {0, 1}; that it is the "HDMI Control" (700) on/off is **inferred**.
 - TV-remote events `EV_PUSH_CEC_*` and `isCecConnect` (GUI 0x7ECE2177) are present.
-- **Active (inferred).** The menu row was not traced, because the Custom Menu D lists are built in code.
+- **Active (inferred).** The menu row was not traced, because the Custom Menu D lists are built in code. **Update:** the Custom Menu D lists are the ROM table 0x7EFF7E80 (13d §5), and D has the submenu HDMI (1662); its sub-item group 121 holds "HDMI Control" (700) = **info 306** (verified bytes). So the info 306 = HDMI Control link is now verified (D1 2026-11-09).
 
 ## 7. Firmware-update file types: what a user can reach
 

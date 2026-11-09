@@ -15,8 +15,8 @@
 | 1.2 (May 9 2013) | Touch-panel stability in playback; VF-4 support | **VF-4: verified.** A new accessory ID 0x0322 = "Evf3", a new I²C bus configuration, an init write, and the VF-4 display path. Large rebuild (≈1,400 code functions differ). Touch fix **not isolated** | VF-4 **yes**; touch **unresolved** |
 | 1.3 (Oct 9 2014) | AF precision with the 40-150 F2.8 PRO | **One real code change** (0x7E6232ED): a lens-ID and lens-protocol test picks a different AF parameter set. Plus version constants | **Yes** (code verified; the 40-150 link inferred) |
 | 1.4 (May 11 2015) | FlashAir W-03 smartphone connection | **Only 6 instructions change** in the whole block: iSDIO register-access requests pass 18 instead of 19. Plus version and date | **Yes** (verified as the only change; meaning of 18/19 inferred) |
-| 1.5 (Nov 4 2015) | Lens IS support (not Sync IS); Windows 10 | Large rebuild (≈570 code functions differ). New lens-IS classifier `is_type`. The lens-OIS path is now limited to one lens family. New lens-info pages 030/033. New `lens current` shell command | Lens IS **yes** (inferred mechanism). Windows 10 **not found** |
-| 1.6 (Oct 23 2018) | AF with Panasonic H-ES200 / H-ES50200 | **Focus-position variables widened from 16 to 32 bits** across the AF code (0x7E5E3000–0x7E627000). A new saturating clamp to [−32768, 32767] at 39 sites. AF structs grow. Code after 0x7E626937 shifts by +0x2AC | **Yes** (code verified; the link to these lenses inferred) |
+| 1.5 (Nov 4 2015) | Lens IS support (not Sync IS); Windows 10 | Large rebuild (≈570 code functions differ). New lens-IS classifier `is_type`. The lens-OIS path is now limited to one lens family. New lens-info pages 030/033. New `lens current` shell command. In the PTP overlay, the handler for property 0xD406 (0x7F08CC99) now discards the host string (audit 2026-11-09) | Lens IS **yes** (inferred mechanism). Windows 10: **best code-level candidate** = the 0xD406 change (verified code; the link is inferred) (audit 2026-11-09) |
+| 1.6 (Oct 23 2018) | AF with Panasonic H-ES200 / H-ES50200 | **AF position variables widened from 16 to 32 bits** across the AF code (0x7E5E3000–0x7E627000); "focus position" is inferred from the `fcs_*` names. A new saturating clamp at 39 sites: 38 clamp to [−32768, 32767], one (0x7E60A5EE) to [0, 32767]. AF structs grow. Code from 0x7E626937 to about 0x7E76EA1F shifts by +0x2AC; code from 0x7E8F1C68 on does not move (audit 2026-11-09) | **Yes** (code verified; the link to these lenses inferred) |
 
 ## 1. Method and counts
 
@@ -28,7 +28,7 @@
 
 **Two kinds of noise have to be removed by hand.**
 - **Data pages decoded as code** ("junk": raw out-of-range branch targets, `unknown` opcodes).
-- **Function-boundary artifacts.** A new call target or pointer splits or merges database functions. `region.py`/`cdiff.py` therefore diff whole code streams of each gap. Several "changed" playback functions in 1.3 (0x7EB6318E, 0x7EB638FC) turn out to be byte-identical code that was only split differently (verified).
+- **Function-boundary artifacts.** A new call target or pointer splits or merges database functions. `region.py`/`cdiff.py` therefore diff whole code streams of each gap. Several "changed" playback functions in 1.3 (0x7EB6318E, 0x7EB638FC) turn out to be the same code, only split differently: v1.2 0x7EB6318E + 0x7EB637F2 + 0x7EB63833 become one v1.3 function 0x7EB6318E, and v1.2 0x7EB638FC is split into 0x7EB638FC + 0x7EB63939. The code is not byte-identical: 7 call displacements change by +0x80 because their callees moved (verified) (audit 2026-11-09).
 
 | Pair | Unchanged (same address, same bytes) | Relocated only | Relocated, ref flagged¹ | Changed (all / real code²) | Added (all / code) | Removed (all / code) |
 |---|---|---|---|---|---|---|
@@ -44,7 +44,7 @@
 **Where the code moves (verified, from the pairs):**
 - **1.2→1.3:** +0x80 from 0x7E623521 to 0x7E8F1C48 (that is the size growth of 0x7E6232ED, 564→692 bytes). Identical elsewhere.
 - **1.3→1.4:** no shift at all.
-- **1.5→1.6:** +0x2AC from 0x7E626937 to 0x7E8F1C68. Identical before and after. This matches the ep5-fw-reverse "+0x2AC" note.
+- **1.5→1.6:** +0x2AC from 0x7E626937; the shifted code ends at about 0x7E76EA1F. The data after it moves by +0x2AC…+0x2B0, then by +0x288/+0x280 after the removed string at 0x7E7A80FB. From 0x7E8F1C68 on the delta is 0, except about 0x7EF2C000–0x7F030000, which moves by +4…+0x10. Identical before 0x7E626937. The +0x2AC matches the ep5-fw-reverse note (audit 2026-11-09).
 - **1.1→1.2 and 1.4→1.5:** dozens of different deltas (e.g. +0x24F at 0x7E51B7BA and +0xFE6 at 0x7E6C92B1 in 1.2; +0x606 at 0x7E53F270 and +0x67F at 0x7E5A6A83 in 1.5). These are full rebuilds.
 
 ## 2. String-set changes (verified)
@@ -53,7 +53,7 @@ Comparing "clean tails" (pointer bytes stripped, absent as NUL-terminated text i
 - **1.1→1.2, +about 80 strings.**
   - Accessory and EVF: `OUT-EVF3!`, `display_open_evf_vf4`, `\noutevf_vf4_setup`, `V_DROP_FLG`, `VDROP EvFlgWai Error.`, `[VSC]App<=>PerIOE ID UnMached.`, `[Display] Evf Driver open/close failed!`.
   - Accessory-key driver: `ui_key_set_edev_init_0`, `ui_edev_mode_chg`, `ui_key_edev_on__io_ctl`, `ui_key_edev_off_io_ctl`, `ui_key_edev_chk mode : `, `KEY_POLL_TYPE_IOE KEY CANSEL`, `per_gio_ioe_read :`.
-  - I²C debug: `ACC:I2C NG? LIFE:`, `rreset`, `rdump`, `Who am I?:`.
+  - I²C "ACC" device: `ACC:I2C NG? LIFE:` (runtime health check, §3), and `rreset`, `rdump`, `Who am I?:` (new subcommands of the existing ACC shell command; `ACC: Who am I?:` already exists in v1.1) (audit 2026-11-09).
   - GUI debug traces (`###### [LOWAPI]RecView…`, `calculateRecViewArea`, `pMainArea …`, `faceArea …`) and an `sdk dbggrid` command.
   - **Removed:** `ui_edev_sleep_chg`.
   - `Evf3`/`Ef3C` are new too (4-char names, see §3).
@@ -82,7 +82,10 @@ Comparing "clean tails" (pointer bytes stripped, absent as NUL-terminated text i
   - Peripheral code at 0x7E512000–0x7E51C000 (EV_SEM, MOT_COM/MAG_COM, TM_SEM, `TP_SEM` 0x7E51BDAC) was heavily restructured: about 50 changed, about 45 removed and about 35 added functions. That makes it a candidate (inferred).
   - The only touch-named change found, 0x7E51BDAC, is a boundary artifact.
   - `sdk api … ctrl touch.x touch.y` (0x7E9AC32E) grew by 35 instructions. Its role was not traced.
-- **Undocumented in 1.2 (verified strings, purpose inferred):** I²C "ACC" debug commands (0x7E458938, 0x7E458B28), GUI LOWAPI area traces and `sdk dbggrid`. The rest of the rebuild (C++ app about 400, GUI about 130, camera core about 170 changed) was not attributed.
+- **Undocumented in 1.2 (verified unless marked):**
+  - **0x7E458938 is a new runtime I²C health check, not a debug command.** It is a timer callback (0x7E458A2C stores its pointer in the descriptor at 0x60414928). It checks the "ACC" device through 0x7E46144E(174). On failure it decrements a life counter at 0x60414958 (reset to 10), prints `ACC:I2C NG? LIFE:`, and re-initialises the device through 0x7E4650A2; when the counter goes below 0 it marks the device dead (state 2 at 0x604148F4) (audit 2026-11-09).
+  - 0x7E458B28 is the ACC shell command. It already existed in v1.1 (0x7E458AAB, `otbl_all`); v1.2 only adds the subcommands `rreset`, `rdump` and `Who am I?:`. "ACC" = accelerometer is inferred from its x/y/z tables at 0/90/270° (audit 2026-11-09).
+  - GUI LOWAPI area traces and `sdk dbggrid` (strings verified, purpose inferred). The rest of the rebuild (C++ app about 400, GUI about 130, camera core about 170 changed) was not attributed.
 
 ## 4. v1.3 — 40-150 F2.8 PRO (verified code; attribution inferred)
 
@@ -109,22 +112,26 @@ The whole 1.3→1.4 diff is 27 bytes: the version byte at 0x7E7BFB8D, two date s
 | `isdio_write_command` 0x7F0A4C62 | 0x7F0A4C3A | 19→18 (3 sites) |
 | response/status reader 0x7F0A500F | 0x7F0A4FE7 | 19→18 (2 sites) |
 
-- **What the value is (partly inferred).** All six sites build a request for 0x7F0A4A20(d0=0, d1=13 read / 14 write, a1=iSDIO register address such as 0x603/0x440, stack = length, **stack+8 = 19/18**). 0x7F0A4A20 stores that value at request +24, then queues the request through 0x7E5CBA12 to the card driver (verified). What field +24 means to the SD driver was not traced.
+- **What the value is (partly inferred).** All six sites build a request for 0x7F0A4A48 (v1.3/v1.4; 0x7F0A4A20 in v1.5/v1.6) with d0=0, d1=13 read / 14 write (13 at 5 sites, 14 at 1, in the write command), a1=iSDIO register address such as 0x603/0x440, stack = length, **stack+8 = 19/18**. The builder stores that value at request +24, then queues the request through 0x7E5CB393 (v1.3/v1.4; 0x7E5CBA12 in v1.5/v1.6) to the card driver (verified) (audit 2026-11-09). What field +24 means to the SD driver was not traced.
 - **Conclusion.** The W-03 support is this one parameter change in the SPC/FlashAir overlay. The menu row and the SPC flow already existed in v1.3, because the GUI code is byte-identical (verified).
 
 ## 6. v1.5 — lens IS, Windows 10 (mixed)
 
 | Item | v1.4 | v1.5 | Basis |
 |---|---|---|---|
-| New `is_type` classifier | — | 0x7E523C09: returns 0 if the lens record's (+6632) bit 1 is clear; 1 if 0x7E52260A()=1 (lens-ID byte0 = 0, byte1 ≠ 0); 2 if 0x7E522622()=1 (byte0 = 2 or 3, byte1 ≠ 0); else 3 | verified code; "1 = Olympus, 2 = Panasonic/Leica" inferred from ExifTool make codes |
-| Lens-OIS state test | 0x7E522323: returned bit 1 of 0x604F7F64 | 0x7E5223DF: returns it **only if 0x7E522622() = 1** | verified |
-| IS decision that uses `is_type` | 0x7E5A6535 (no lens-type test) | 0x7E5A59EA: when 0x7E598A60()=1 and `is_type`=1, it applies a different condition (0x7E598A72) before writing byte +735 | verified code; "body/lens IS choice" inferred |
+| New `is_type` classifier | — | 0x7E523C09: returns 0 if 0x7E51FD09(0) returns NULL or the lens record's (+6632) bit 0 (mask 1) is clear; 1 if 0x7E52260A()=1 (lens-ID byte0 = 0 **and byte1 = 0**); 2 if 0x7E522622()=1 (byte0 = 2 or 3, **byte1 = 0**); else 3. The ID bytes at +564 are make-lo, make-hi, model, release, so byte1 = 0 means make < 256 (audit 2026-11-09) | verified code; "1 = Olympus, 2 = Panasonic/Leica" inferred from ExifTool make codes |
+| Panasonic-private-lens test (name inferred; earlier "Lens-OIS state test" had no support) (audit 2026-11-09) | 0x7E522323: returned bit 0 (mask 1) of 0x604F7F60 (record +6632; record base 0x604F6578 in v1.4) (audit 2026-11-09) | 0x7E5223DF: returns bit 0 of 0x604F7F64 **only if 0x7E522622() = 1**. The two callers that print (v1.5 0x7E528A8C/0x7E528B4D) use it to choose the `LENS_INFO_PANA_PRIVATE`(_STATE) page over the `OLY_PRIVATE` page; 4 other callers were not traced, and the `LENS OIS INFO` dump does not call it (audit 2026-11-09) | verified |
+| IS decision that uses `is_type` | 0x7E5A6535: decided inline (prm 39057 / +731 / 39297 / 39089 → 1/2/3, stored to +3860; no lens-type test) | New 0x7E5A59EA + 0x7E5A5A5A write a **new** byte +735 (the old +735 field moved to +736), and 0x7E5A6D0A copies it to +3860. When 0x7E598A60()=1, 0x7E598A72()=1 sets the value to 1 in both branches, except that with `is_type`=1 a non-zero value from 0x7E5A5A5A is kept. When 0x7E598A60()≠1, the value is cleared if prm 33681 = 1 and prm 26865 = 1 (audit 2026-11-09) | verified code; "body/lens IS choice" inferred |
 | Lens-info pages | list up to 025, `cmp 26` (0x7E526343) | adds 030 `LENS_INFO_ENABLE`, 033 `CURRENT_CONSUMPTION`; `cmp 34` (0x7E5266BC); `lens current` 0x7E524117/0x7E524134 | verified |
 | Lens command set (`LENS_ASKDATA_MODE_*` 0x00–0x62) | — | **identical list** | verified (debug strings only) |
 
 - **Answer to "new lens-communication commands?":** no new ASKDATA modes appear (verified). Two new lens-info pages appear (030, 033: enable flags and current draw; verified). Lens-IS cooperation is done mostly in body logic: the new type classifier, and the old OIS path gated by lens family (verified code, intent inferred).
 - **Not Sync IS:** consistent with no new IS-sync command (inferred).
-- **Windows 10:** **not found.** The overlay diff is small: one call in `SetDevicePropValue` (0x7F08B56E) and the version constants. No USB descriptor or MTP string changed (verified). Probably host-side or very minor (inferred).
+- **Windows 10: best code-level candidate found (link inferred) (audit 2026-11-09).**
+  - The one functional change in the overlays is in the PTP stack. `SetDevicePropValue` (0x7F08B56E) accepts only property **0xD406** (`cmp 54278,a3`; any other code gets 0x2002) and calls 0x7F08CC99 for it.
+  - In v1.4, 0x7F08CC99 (46 bytes) copies the host-supplied string (length byte × 2 bytes, bounded only by the 8-bit length) to RAM 0x602C1A98 with memcpy 0x7E5081FA, then returns 0x2001. In v1.5 it is `mov 0x2001,d0; retf`: it answers OK and stores nothing (verified). The 40-byte shrink shifts the later overlay code by −0x28; the call at 0x7F08B5DE differs only in its register-save operands.
+  - 0xD406 is the MTP "Session Initiator Version Info" property, which the Windows MTP driver sets when it connects (outside knowledge, inferred). So this change is the best candidate for the Windows 10 item; the link is inferred.
+  - Otherwise: overlay A does not change; overlay B has the three version constants 0x1400→0x1501; no USB descriptor or MTP string changed (verified).
 - **Undocumented in 1.5 (verified):**
   - BGM WAV authentication `aud_tool_wav_judge_OLYMPUS_authentication` (0x7E960C93) now accepts `OLYMPUS CORPORATION    ` as well as `OLYMPUS IMAGING CORP.  ` (a second compare). This follows Olympus's 2015 company-name change (inferred).
   - Lens current-consumption readout.
@@ -134,9 +141,9 @@ The whole 1.3→1.4 diff is 27 bytes: the version byte at 0x7E7BFB8D, two date s
 
 - **The prior claim (ep5-fw-reverse) is CONFIRMED for strings but CORRECTED for code.**
   - The only string change is indeed the removal of `**fcs_lens_mfts_move_lens_ofset_target()*`. But that string had **no code reference already in v1.5**: no 32-bit absolute reference anywhere in block 0 (verified). So its removal is dead-text cleanup, not the fix.
-  - The block-0 diff is **not** "≈ relocation". 358 code functions change, almost all in the AF code 0x7E5E3000–0x7E627000 (about 300) (verified).
+  - The block-0 diff is **not** "≈ relocation". The pipeline counts 358 changed code functions: 295 in the AF code 0x7E5E3000–0x7E627000 and 63 outside it. Most of the 63 are data decoded as code or boundary splits. Outside the AF range the only real changes are the three version constants and one constant in 0x7E63A20F (v1.5; v1.6 0x7E63A4BB, `cam_frame_sync.c`: `mov 1146,d0` → `mov 1151,d0`) (verified) (audit 2026-11-09).
 - **What changed (verified):**
-  1. **New clamp helper 0x7E626BD4** = `clamp(d0, lo=a0, hi=d1)`. It has 39 call sites in 16 AF functions, 38 of them with lo = −32768 and 21 with hi = 32767. Example: `fcs_lens_mfts_move_lens` 0x7E60E5A9 → 0x7E60E648 now clamps the target to the s16 range before the `movhu` store into the lens-command buffer. v1.5 stored the int truncated.
+  1. **New clamp helper 0x7E626BD4** = `clamp(d0, lo=a0, hi=d1)`. It has 39 call sites in 16 AF functions. All 39 pass hi = 32767; 38 pass lo = −32768, and one (0x7E60A5EE in 0x7E60A3DE) passes lo = 0 (audit 2026-11-09). Example: `fcs_lens_mfts_move_lens` 0x7E60E5A9 → 0x7E60E648 now clamps the target to the s16 range before the `movhu` store into the lens-command buffer. v1.5 stored the int truncated.
   2. **16→32-bit widening.** In the AF range, `movhu` drops 10,257→9,734, `exth` drops 1,785→1,359 and word `mov` rises 44,771→45,391. Example: CAF helper 0x7E6261FA → 0x7E626497 reads a 32-bit field (+1804) where v1.5 read a u16 (+1792) and sign-extended it.
   3. **Sentinels change** from `cmp 0x8000`/`cmp 0` to `cmp −32768`/`cmp 0x80000000` in about 30 functions (e.g. 0x7E5EC7BD→0x7E5EC799, 0x7E605F9F→0x7E605F6C).
   4. **AF structs grow:** field offsets +8 (564→572, 692→700), +12 (1084→1096, 1120→1132), +24 (37048→37072); one block grows by 1,052 (14956→16008).
@@ -154,23 +161,25 @@ The whole 1.3→1.4 diff is 27 bytes: the version byte at 0x7E7BFB8D, two date s
 | 1.3 | Lens-protocol getter it calls | — | 0x7E5222E2 |
 | 1.4 | iSDIO read / write / response (19→18) | 0x7F0A4B1C / 0x7F0A4C62 / 0x7F0A500F | same; v1.6 0x7F0A4AF4 / 0x7F0A4C3A / 0x7F0A4FE7 |
 | 1.4 | Version byte; date strings | 0x7E7BFB8D; 0x7E85BBB4, 0x7EBF4F1E | same |
-| 1.5 | `is_type` / OIS-state test / IS decision | — / 0x7E522323 / 0x7E5A6535 | 0x7E523C09 / 0x7E5223DF / 0x7E5A59EA |
+| 1.5 | `is_type` / Panasonic-private-lens test (audit 2026-11-09) / IS decision | — / 0x7E522323 / 0x7E5A6535 | 0x7E523C09 / 0x7E5223DF / 0x7E5A59EA + 0x7E5A5A5A |
 | 1.5 | Lens OIS dump / lens-info list / WAV auth | 0x7E523BED / 0x7E526343 / 0x7E960C93 | 0x7E523EA2 / 0x7E5266BC / 0x7E960C93 |
 | 1.6 | `move_lens` / CAF helper / clamp | 0x7E60E5A9 / 0x7E6261FA / — | 0x7E60E648 / 0x7E626497 / 0x7E626BD4 |
+| 1.5 | PTP property 0xD406 handler (stubbed) (audit 2026-11-09) | 0x7F08CC99 (46 B) | 0x7F08CC99 (6 B) |
 | 1.6 | Removed dead string; start of +0x2AC shift | 0x7E7A80FB; 0x7E626937 | —; 0x7E626BE3… |
 
 ## 9. Release-note items vs code
 
 - **Found in code:** VF-4 (1.2); 40-150 PRO AF (1.3, attribution inferred); W-03 (1.4); lens IS (1.5, mechanism inferred); H-ES200 AF (1.6, attribution inferred).
-- **Not found:** the 1.1 exposure fix (no v1.0 image); the 1.2 playback touch-panel fix (not isolated within the large peripheral rework); Windows 10 (1.5).
+- **Candidate only:** Windows 10 (1.5): the stubbed PTP property 0xD406 handler (code verified, link inferred) (audit 2026-11-09).
+- **Not found:** the 1.1 exposure fix (no v1.0 image); the 1.2 playback touch-panel fix (not isolated within the large peripheral rework).
 - **Undocumented changes:**
-  - 1.2: I²C "ACC" debug, GUI LOWAPI traces and `sdk dbggrid`, plus a full rebuild.
+  - 1.2: an I²C "ACC" health check with a life counter (runtime code) and new ACC shell subcommands (audit 2026-11-09), GUI LOWAPI traces and `sdk dbggrid`, plus a full rebuild.
   - 1.5: WAV-BGM maker string, lens current-consumption page and `lens current`, plus a full rebuild of lens, DCF and camera core.
   - 1.6: removal of a dead debug string.
 
 ## Open questions
 
-1. What does request field +24 (19 vs 18) mean in the card driver behind 0x7E5CBA12? Is it a timeout, a function number or a retry count?
+1. What does request field +24 (19 vs 18) mean in the card driver behind 0x7E5CBA12 (v1.3/v1.4 0x7E5CB393)? Is it a timeout, a function number or a retry count?
 2. Which function in the 1.2 peripheral rework (0x7E512000–0x7E51C000) is the playback touch fix?
 3. What do the outputs of the 1.5 IS decision (byte +735, `is_type` 1 vs 2) select downstream: body IS, lens IS or both?
 4. The 1.1→1.2 and 1.4→1.5 rebuilds have about 1,400 and about 570 changed code functions; most are unattributed. A per-module pass with `region.py` would sort refactors from fixes.

@@ -104,8 +104,8 @@ Get_CameraInfo `0x7E67F822` (1,763 static callers) does: id → tag → `0x7E680
 The names `MODE_*` come from debug strings, for example `isStartIntervalShootingEnable return false for MODE_INTERVAL_SHOOTING_ONOFF` beside info 482. Matches that agree with the menu tables (§3): 90 = MODE_BRACKET_WB (`userMenuRec2_WBBKT ModeId = MODE_BRACKET_WB`) and 110 = MODE_PLAYSLIDE_BGM (`Get_CameraInfo(MODE_PLAYSLIDE_BGM)`).
 
 The **mode controller** layer `0x7E6FEA5F` sits between the GUI and Get_CameraInfo. It uses two per-id hash tables:
-- 64 buckets at 0x605B52D8, from the ROM list at 0x7E814864. Entries carry a converter function at +20.
-- 128 buckets at 0x605B9750, from 505 ROM records of 20 bytes at **0x7E84A0B8** (`{u16 info, u16 flags, ptr, ptr, ...}`). The pointers lead to per-mode availability matrices. These are probably "mcon_if_check_selectable" / "Search_Mode_Conflict". **(inferred)**
+- 64 buckets at 0x605B52D8, from the ROM list at 0x7E814864. ~~Entries carry a converter function at +20.~~ The entries are the 250 per-setting **60-byte operation records**; slot +20 is the list-variant selector, not a converter; slot +24 is the post-write hook (13e §3.2) (D1 2026-11-09).
+- 128 buckets at 0x605B9750, from 505 ROM records of 20 bytes at **0x7E84A0B8** (`{u16 info, u16 flags, ptr, ptr, ...}`). ~~The pointers lead to per-mode availability matrices. These are probably "mcon_if_check_selectable" / "Search_Mode_Conflict". **(inferred)**~~ The pointers are the raw/GUI value arrays (13e §3.1). Availability is the separate 92-record conflict table **0x7E825DA8** ("Search_Mode_Conflict", 13e §2.2) (D1 2026-11-09).
 
 ### 2.2 GUI access path (verified)
 The GUI never calls prm or Get_CameraInfo directly (0 call sites in 0x7ECA1020–0x7EE21020). It does `obj = 0x7E9C9E9A()` (a singleton at 0x602B2504; vtable 0x7EC0F2E4 has 29 slots) and calls through the vtable:
@@ -188,7 +188,9 @@ Setup Menu (1020)                Date/Time @A04B@(253) · Language @A085@(1688, 
 ```
 `@Axxx@` is an inline icon escape in the string text (verified: present in all languages).
 
-### 3.2 Sub-item table, 0x7EFEF50C–0x7EFEFE04 (verified layout, 114 items)
+### 3.2 Sub-item table, 0x7EFEF4FC–0x7EFF044B (196 records; first read as 0x7EFEF50C–0x7EFEFE04, 114 items) (D1 2026-11-09)
+**Corrected (13d §5) (D1 2026-11-09):** the table is **0x7EFEF4FC–0x7EFF044B, 196 records of 20 bytes** `{group, title, info, 0, kind, 0, 7, 1, label, 0}`. The label is at +16 of the **same** record. The reading below starts 16 bytes late, so its rows are out of phase; its rule "the label sits 16 bytes after the group field" still pairs each label with the right item. The "second table at 0x7EFEFE04" is the same table continued.
+
 The rows are 20 bytes. Each row holds `{u16 group, u16 group_title_str, u16 info_id, 0, u16 kind(2), 0, 7, 1}`. The **item label is the first u16 of the next row**: the label sits 16 bytes after the group field.
 
 I checked this pairing in three ways:
@@ -212,9 +214,9 @@ Groups:
 - **Button Function (114):** 47, 48, 53, 51, 158, 56.
 - **Dial Function (110):** P 70, A 74, S 72, M 76.
 
-A second table follows at 0x7EFEFE04 with a different 20-byte layout, `{7,1,label,0,group,value,...}`. It looks like option-value lists. **(not decoded)**
+A second table follows at 0x7EFEFE04 with a different 20-byte layout, `{7,1,label,0,group,value,...}`. It looks like option-value lists. **(not decoded)** **Corrected:** it is the same sub-item table continued, read out of phase (13d §5) (D1 2026-11-09).
 
-I did **not** find the item lists for Custom Menu A–J (for example AF illuminator or anti-shock). They are probably built by the per-panel C++ classes (`userMenuCustomA_AFPos`, `userMenuCustomG_WbRev`, `userMenuRec2_WBBKT`, `userMenuPlay_*`, 17 class names). Panels are created by number through a switch over 1..651 (0x7EDCBE97 → 0x7EDC7DBA).
+I did **not** find the item lists for Custom Menu A–J (for example AF illuminator or anti-shock). They are probably built by the per-panel C++ classes (`userMenuCustomA_AFPos`, `userMenuCustomG_WbRev`, `userMenuRec2_WBBKT`, `userMenuPlay_*`, 17 class names). Panels are created by number through a switch over 1..651 (0x7EDCBE97 → 0x7EDC7DBA). **Corrected (13d §5) (D1 2026-11-09):** the A–J lists are the ROM row table 0x7EFF7E80 (78 rows); the `userMenu*` classes do not build them. 0x7EDCBE97 → 0x7EDC7DBA creates **menu pages**; panels are created by 0x7ED19D3F (0..159).
 
 **Caution:** the sub-item table is a **superset**. It has HDR BKT and Time Lapse, which the E-PM2 does not offer in its public menus. A record in this table does not prove that the item can be reached.
 
@@ -227,7 +229,7 @@ I did **not** find the item lists for Custom Menu A–J (for example AF illumina
 
 ### 3.4 Art filters (coordinator question 2)
 - The Picture Mode list (§3.2) and the ART BKT list both name exactly **12 art filters**: Pop Art, Soft Focus, Pale&Light Color, Light Tone, Grainy Film, Pin Hole, Diorama, Cross Process, Gentle Sepia, Dramatic Tone, Key Line, Watercolor. **(verified table)**
-- The English language table has no label for Crystal, Mirror, Vintage, Partial Color or Pastel (a search for those names finds nothing; I did not check the other 33 languages). Only the generic `ART1…ART12` (341–353, 1649–1704, 1961) exist. **(verified)** So those modules have no English menu text in this firmware, and the GUI cannot list them by name (inferred for the other languages).
+- The English language table has no label for Crystal, Mirror, Vintage, Partial Color or Pastel (a search for those names finds nothing; I did not check the other 33 languages). Only the generic `ART1…ART12` (341–353, 1649–1704, 1961) exist. **(verified)** So those modules have no English menu text in this firmware, and the GUI cannot list them by name (inferred for the other languages). **Exception (09 §2):** "Pastel" (`art_filter_21_pastel_art`, stored 120) is the shipped **Watercolor**, label 1717, so that module does have English text (D1 2026-11-09).
 - Variant I/II selection and the 21-id filter table from section 03 are not mapped to these entries here.
 - Model gate: block 1 is shared with E-PL5, and block 0 differs per model, so the gate is per build (which list is compiled in), not a runtime check. I saw no runtime model test in the GUI. I had no E-PL5 block 0 to compare. **(inferred)**
 
@@ -257,8 +259,8 @@ Examples: 738 Shooting Menu 1, 494 Shooting Menu 2, 739 Playback Menu, 527 Custo
 - **"SPC" means SmartPhone Connection, not Super Control Panel.** The `[GUI App SPC]` state machine (0x7EDC0019: `SsSpc_StSpcInitPass`, `StSpcStartPrivat`, `Input_String_Actuator::ok_on`) goes with the SPC_MAIN task (`spc_ctrl_write_ssid`, `chk_flashair`, iSDIO). So it is the Toshiba FlashAir Wi-Fi pairing UI. **(inferred, consistent strings)** The Super Control Panel is `Func_Scp_Actuator` (`updateScpSelectState`, `main_dial`). It reads info 111 and others. Live Control is string 806.
 - **FuncMenu** (0x7EDA622C): this dumps `sAppCallerData` capability flags such as dust_reduction, count_self_timer, record_movie, lv_magnify, operate_touch, bulb_shooting, operate_custom, mf_assist, movie_effect, finder_style, operate_mode_direct and display_wizard. **(verified strings)** The function decides which function and menu paths are allowed in the current state.
 - **GuiTouch:** touch coordinates and active-index logs (0x7EDE040E, 0x7EDE0983). Panel change through `guiUtility::ShowPanelEx` (0x7EDC5D2D, 193 callers) with the log `[GuiTouch] ... changePanel Fail`.
-- **GUI substates:** SS_COMMON, SS_REC, SS_MENU_MAIN, SS_MENU_LV, SS_MENU_PLAY, SS_PLAY_SINGLE, SS_PLAY_MOVIE_SLIDE, SS_PLAY_INDEX, **SS_SELFADJ, SS_DEBUGMENU**, SS_USB, SS_DPS, SS_BTSEND, SS_BTRECEIVE (name table near 0x7EFDD233). **(verified strings)**
-- **OSD:** OSDDRAW/OSDDBG (0x7ECCBA45 `osddraw_init`, 0x7ECCC5BD `exec_bitmap`, 0x7ECCE613 `exec_line`) is a low-level layer that draws dots, lines and bitmaps in the CA_MAIN region. **(verified strings)** The GUI itself also has GL-like code (`gl_ModelViewMatrix`, `glReadPixels`).
+- **GUI substates:** SS_COMMON, SS_REC, SS_MENU_MAIN, SS_MENU_LV, SS_MENU_PLAY, SS_PLAY_SINGLE, SS_PLAY_MOVIE_SLIDE, SS_PLAY_INDEX, **SS_SELFADJ, SS_DEBUGMENU**, SS_USB, SS_DPS, SS_BTSEND, SS_BTRECEIVE (name table near 0x7EFDD233). **(verified strings)** The descriptor table 0x7EFB8BCC has **17** SS ids: these 14 named ones (1–11, 14–16), the unnamed stubs 12 and 13, and 17 = SS_SPC; SS 5 (MENU_PLAY) is an empty placeholder (13d §4.2) (D1 2026-11-09).
+- **OSD:** OSDDRAW/OSDDBG (0x7ECCBA45 `osddraw_init`, 0x7ECCC5BD `exec_bitmap`, 0x7ECCE613 `exec_line`) is a low-level layer that draws dots, lines and bitmaps in the CA_MAIN region. **(verified strings)** The GUI itself also has GL-like code (`gl_ModelViewMatrix`, `glReadPixels`). **Corrected:** that code (0x7EE02095–0x7EE21020) is a DMP GL library used only by C3D, not GUI (13d §1) (D1 2026-11-09).
 - **Warnings:** `[GUI Warning]` and `Warning_Viewer` strings in 0x7EDB0847 and 0x7EDC25D4 respectively (audit 2026-11-09). I did not map them further.
 
 ## 6. Hidden, debug and service features
