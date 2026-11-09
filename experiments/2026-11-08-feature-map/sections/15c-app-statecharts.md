@@ -118,8 +118,8 @@ Relations (setters called from 0x7EB780F7): +352 CapThr facade, +344 CapPow, +34
 
 | State (entry) | Entry action | Events → next |
 |---|---|---|
-| 1 (0x7EB785F8) | GEN 11565 to self | 11565 → 3 (inline in the dispatcher) |
-| 3 Idle (0x7EB78E44) | — | 11761 → 8 |
+| 1 (0x7EB785F8) | GEN 11565 to self; then 0x7EB783AF (189 B: virtual calls on the relations +352, +344, +348, +336, +332, +324, +340; the counterpart of 0x7EB782C1, which the state-2 entry 0x7EB7864A calls; I: relation unsubscribe) | 11565 → 3 (inline in the dispatcher) (A8 2026-11-09) |
+| 3 Idle (0x7EB78E44; the name "Idle" is I, by analogy with the CM chart: the entry logs only `*** on state %2d [%s] ***`) | — | 11761 → 8; 11769 and 11770 (0x7EBA6569) are taken without a state change (A8 2026-11-09) |
 | 8 (0x7EB78A3D) | GEN 11769 evTraStop to +328 CapFls | **3344 → 11** (F047 0x7EB78A88 is the state-8 handler; review F047 said "case 12") |
 | 11 (0x7EB78C84) | if CapIod (+332) vt+12 says active: GEN **5761** to it; else self 12067 | 12067 → 9 |
 | 9 (0x7EB78AC9) | self 12067 | 12067 → 6 |
@@ -150,7 +150,7 @@ The outer states are the CM chart. **Running (4) = AND-state 0x7EAF1506 with thr
 
 ### 4.8 `Com_ManagersSubTransition` request list (+144) (V)
 
-- The base init 0x7EB859ED calls vt+184, caches the EVFW router at +140, then calls **slot 42 (vt+168)**. The slot-42 override fills the array at +144 with prototype events. The base slot is the empty `retf` 0x7EB85924.
+- The base init 0x7EB859ED calls vt+184, caches the EVFW router at +140, then calls **slot 42 (vt+168)**. The slot-42 override fills the array at +144 with prototype events. The base slot is the empty `retf` 0x7EB85924. Exception: `Com_ActiveTransitionManagerBufferd` has a stub slot 42 but fills +144 at run time from its state entries (table below). (A8 2026-11-09)
 - **0x7EB857CA = "accepts this request?"**: it works only while the helper's state (+168) is 4. It loops over +144 and tests `ev->isTypeOf(proto->getId())`. Callers: CM 0x7EA7D0AE, `Cmp_ShootingComponentBase` 0x7EA7A1AA, still-shooting 0x7EA80393, Com_ 0x7EB87590, Cab 0x7EB896CA, Ctg 0x7EB9478B/0x7EB95E3B.
 - So an owner routes an `evTraReq*` request to the sub-transition whose list holds that id. F049 0x7EB85867 clears the list.
 
@@ -163,7 +163,8 @@ The outer states are the CM chart. **Running (4) = AND-state 0x7EAF1506 with thr
 | CmpCst_Communication 0x7EA9D405 | 0x7EA9D87B | 13161, 13162, 13164–13168 |
 | CmpCst_Function 0x7EA9F812 | 0x7EAA01DE (2,109 B) | 67 ids: 13481–13543, 12964/12965/12971/12972/12976/12982/12983, 7009, 12077, 11975 |
 | CmpCst_MediaMount 0x7EAAA4AF | 0x7EAAA56F | 12981, 12980, 12970, 12967, 12977, 12978, 12984 |
-| the other 8 (3D, EPortrait, RecView, Record, Outline 0x7EA7E6EB, the getName-less subclasses 0x7EA6CF32 / 0x7EA77CBA, Com_ActiveTransitionManagerBufferd 0x7EB8AD37) | 0x7EB85924 (empty) or a stub | none |
+| the other 7 (3D 0x7EA6D23C, EPortrait 0x7EA6EC03, RecView 0x7EA75054, Record 0x7EA7822A, Outline 0x7EA7E66B, the getName-less subclasses 0x7EA6CF32 / 0x7EA77CBA) | 0x7EB85924 (empty `retf`); Outline has its own `retf` stub 0x7EA7E6EB | none (A8 2026-11-09) |
+| Com_ActiveTransitionManagerBufferd 0x7EB8AD37 (vt 0x7EC8C708) | stub `retf` 0x7EB8AE46 | **13361** while the helper is in state 4: the entries of states 7 (0x7EB8B66F, region +316) and 8 (0x7EB8B8EA, region +312) push the static prototype 0x605EF18C (a copy of 13361, built by 0x7EB85D2A from ctor 0x7E96C3D3) onto +144 through 0x7E966C01; the exit code 0x7EB8B458 removes it through 0x7E966CCE. Cab_CameraBase uses it: initRelations 0x7EB893EA sets Cab +276 = facade+128 (the Bufferd member built by 0x7EB8924F), and 0x7EB896CA calls 0x7EB857CA on (+276) (A8 2026-11-09) |
 
 Request names come from the `OlyHfwOpeShoot::*` sender strings (I).
 

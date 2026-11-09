@@ -14,8 +14,8 @@ Labels: **V** = read in code or bytes. **I** = inferred. Register *names* for th
 
 | Range | Component | Basis |
 |---|---|---|
-| 0x7E915A1B–0x7E91962B | Blue SDK part 1: stack init 0x7E915A1B, event manager/timers 0x7E915AAE–0x7E915C68, profile layer 0x7E915D0C–0x7E917A3F, **HCI layer 0x7E917AFE–0x7E91962B** | V call edges, RAM pages; names I |
-| 0x7E91962C–0x7E91D29E | Olympus iAP (BT_Open, cp_*, BTIAP, IDPS); getters 0x7E91D279/0x7E91D289 belong to it | V strings |
+| 0x7E915A1B–0x7E9195A6 | Blue SDK part 1: stack init 0x7E915A1B, event manager/timers 0x7E915AAE–0x7E915C68, profile layer 0x7E915D0C–0x7E917A3F, **HCI layer 0x7E917AFE–0x7E9195A6** | V call edges, RAM pages; names I (A8 2026-11-09) |
+| 0x7E9195A7–0x7E91D29E | Olympus iAP: iAP/SPP set-up 0x7E9195A7 (only caller `cp_init()` 0x7E91A2CF; Olympus RAM 0x602AEDB4/B8, uITRON calls, registers 0x7E9196D9/0x7E919CEB with SPP), BT_Open 0x7E91962C, cp_*, BTIAP, IDPS; the getter 0x7E91D279 and the action 0x7E91D289 (sets 0x605C6028 = 19, runs the iAP dispatcher 0x7E91C673) belong to it | V strings, callers (A8 2026-11-09) |
 | 0x7E91D29F–0x7E937CDD | Blue SDK part 2: L2CAP → debug Report → Olympus test client → ME/SEC → BT API wrappers → OBEX → OS layer → radio manager → RFCOMM → RX buffers → SDP → SPP → utilities | V bounds (layer edges below) |
 | 0x7E6A9323–0x7E6AD7FF | ADI HDMI transmitter driver `[HDMI-DRV]` (EDID, video, audio, InfoFrames, power) | V register calls; I lower bound |
 | 0x7E6AD80C–0x7E6AEA69 | ADI CEC library (`ADI_CEC`) | V register calls; bounds I |
@@ -25,7 +25,7 @@ Labels: **V** = read in code or bytes. **I** = inferred. Register *names* for th
 | 0x7E6BB06E–0x7E6BCD96 | second transmitter on SIO ch3 (`outevf_tmds`) | V regs; I role |
 | 0x7F05E9CE–0x7F0645C0 | DPS engine in overlay A (not 0x7F061020–0x7F068F9C) | V |
 
-**The Bluetooth stack is not one block at 0x7E91D279.** The HCI layer that feeds the ME event dispatcher sits at 0x7E917AFE–0x7E91962B. The caller chain is 0x7E924E3A ← 0x7E924D10 ← 0x7E917D1E/0x7E9180E4/0x7E918121/0x7E91820A/0x7E9189C4/0x7E918BE8, and the command sender 0x7E925704 sends through 0x7E917F02 (V). The Olympus iAP code is linked between the HCI layer and L2CAP.
+**The Bluetooth stack is not one block at 0x7E91D279.** The HCI layer that feeds the ME event dispatcher sits at 0x7E917AFE–0x7E9195A6 (A8 2026-11-09). The caller chain is 0x7E924E3A ← 0x7E924D10 ← 0x7E917D1E/0x7E9180E4/0x7E918121/0x7E91820A/0x7E9189C4/0x7E918BE8, and the command sender 0x7E925704 sends through 0x7E917F02 (V). The Olympus iAP code is linked between the HCI layer and L2CAP.
 
 ## 2. Blue SDK Bluetooth stack
 
@@ -37,7 +37,7 @@ The bounds come from the RAM pages each function touches and from the inter-laye
 |---|---|---|---|
 | 0x7E91D29F–0x7E923747 | **L2CAP** | 0x7DAE4xxx | PSM registration 0x7E91D29F (I). ERTM state handlers 0x7E91E215/0x7E91E75F/0x7E91EC0E (fwmap merged them; coverage C3). Signalling length check 0x7E9234DC: codes 1..11, table 0x7EBB1F08, code 8 = Echo (V). MTU constant 672 (V). RFCOMM calls it 19×, SDP 21× (V) |
 | 0x7E923748–0x7E923927 | debug `Report` | — | 0x7E923748 (56 callers) → formatter 0x7E923769 → debug print 0x7E4263E5 (V) |
-| 0x7E923928–0x7E924003 | Olympus test client | 0x602AE, 0x605D0–5 | `OLYMPUS BlueSDK a4`, BTAPL task 0x7E923FD2, demo-shell entries 0x7E923C93–0x7E923FFB (V) |
+| 0x7E923928–0x7E924003 | Olympus test client | 0x602AEE80–0x602AEEA0, 0x605D37F0–0x605D37FC, 0x605D5FFC (A8 2026-11-09) | `OLYMPUS BlueSDK a4`, BTAPL task 0x7E923FD2, demo-shell entries 0x7E923C93–0x7E923FFB (V) |
 | 0x7E924004–0x7E925A48, 0x7E9266BE–0x7E92BF5D | **ME + SEC** (management entity, security) | 0x7DAC4xxx–0x7DAC5xxx | ME_Init 0x7E924004. Op scheduler 0x7E92412E. Event dispatcher 0x7E924E3A. Command sender 0x7E925704. HCI init 0x7E925727. Link records 0x7E9275C6–0x7E9276AC. SEC 0x7E92A181–0x7E92BF5D (`SecReportAuthenticateResult`) (V) |
 | 0x7E925A49–0x7E926692 | BT API wrappers (Olympus or SDK sample) | 0x605D6xxx | BT init 0x7E925A49; deinit 0x7E925E9C; wait 0x7E926118 (OlyEvWt); signal 0x7E926146 (OlyEvSt); `BT_SetSecurity` 0x7E925B4F/0x7E926620 (V edges; role I) |
 | 0x7E92C029–0x7E92E37A | **OBEX core** | 0x7DAF2xxx | Client: opcodes 0x80/0x81/0x82/0xFF, body headers 0x48/0x49. Server 0x7E92D432–0x7E92DC08: 0x85 SetPath, headers 0x46/0x4A/0xCB, responses 0x90/0xA0/0xC0/0xC4. Packet pool 0x7E92DD6A: 64 × 724 B (V constants) |
@@ -108,7 +108,7 @@ The TSV has **47 builder rows** (opcode, length and callback, all V):
 
 ### 2.5 PENPAL on top
 
-The PENPAL profile is the Olympus code above the stack (section 05): BT_CTRL 0x7E8F926F–0x7E9035A7 (OPP push, BIP, pairing), BTAPI glue 0x7E913984–0x7E9158FD (`CB_BtEvtHandle`, link-key store), iAP/ACP 0x7E91962C–0x7E91D29E and OBEX_ACP 0x7E937CDE–0x7E93BA6B. It reaches the stack through OBEX (BIP/OPP servers registered with SDP_AddRecord 0x7E934A5E), SPP (iAP `jp.co.olympus.acp`) and the ME API (pairing, security).
+The PENPAL profile is the Olympus code above the stack (section 05): BT_CTRL 0x7E8F926F–0x7E9035A7 (OPP push, BIP, pairing), BTAPI glue 0x7E913984–0x7E9158FD (`CB_BtEvtHandle`, link-key store), iAP/ACP 0x7E9195A7–0x7E91D29E (A8 2026-11-09) and OBEX_ACP 0x7E937CDE–0x7E93BA6B. It reaches the stack through OBEX (BIP/OPP servers registered with SDP_AddRecord 0x7E934A5E), SPP (iAP `jp.co.olympus.acp`) and the ME API (pairing, security).
 
 The **Olympus test client 0x7E923928–0x7E924003** is a vendor sample. It is reachable only from the demo shell and BTAPL (05).
 
@@ -196,7 +196,7 @@ The other single-register writers are in the TSV.
 3. **Argument checks, 0x7F061CED–0x7F062B88.**
    - Validator 0x7F062A9C: version byte ≤ 1, op 1..16, and the result range 0x1000–0x1003 for outputs (0x7F061F89).
    - It uses a **16-bucket open-addressed hash table 0x7F06A678** ({id, check} pairs, bucket = id & 15) with 12 ids. Examples: 2 → 0x7F062552, 0x102 → 0x7F06243B, 5 → 0x7F0626E1 (startJob, `../DCIM/` paths), 9/0x104 → 0x7F06289F (device status), 10/0x10A → 0x7F062A5E.
-   - Range helper 0x7F061CED (13 callers).
+   - Range helper 0x7F061CED (13 call sites in 6 callers: 0x7F061F89, 0x7F062111, 0x7F0621AD, 0x7F062302, 0x7F06287E, 0x7F06289F). (A8 2026-11-09)
 4. **XML decoder, 0x7F062B89–0x7F0645C0.** It handles the envelope, `<input>`/`<output>`, `<result>` 0x7F062E4B, and the op-name lookup in 0x7F06A7DC. Then it calls **parser table 0x7F06AB58[op]**. The primitives are 0x7F0644D6 (match), 0x7F0643FF (skip whitespace and comments), 0x7F0641F3 (hex) and 0x7F064365 (attribute).
 
 ### 4.3 Operation index (op = name index in 0x7F06A7DC; V tables)
@@ -225,7 +225,7 @@ Bit 0x100 of the op marks an `<output>` (a response). Error codes: −100 null; 
 
 - **The dependency.** There are 297 call edges from A to 36 targets in B, and **all of them come from DPS code** (BASIC, RCU, calendar and red-eye make none). Targets: the DPS pool malloc 0x7F0879CD / free 0x7F087B28; libc thunks 0x7F087BC7 strcpy, 0x7F087BD1 strlen, 0x7F087BDB strcmp, 0x7F087BE5 memset, 0x7F087BEF memcpy, 0x7F087BF9 memcmp (→ the 0x7E500Dxx runtime); the file transport 0x7F087D99–0x7F087F9D (`DREQUEST`/`DRSPONSE`/`HREQUEST`); the reply timer 0x7F088209; app notification 0x7F0886AD–0x7F0886E4; the trampolines 0x7F088D18 → encoder 0x7F060BFF and 0x7F088D22 → decoder 0x7F062B89; the error map 0x7F088D2C.
 - **DPS_MAIN 0x7F087807 is in overlay B** (started by USTART4). It feeds A's dispatcher. So **PictBridge needs both overlays.**
-- **Section 01 is right that A and B are separate Usr2 requests.** Usr2 0x7E505005 tests `btst 1` → overlay A (0xF000 B from 0x80EFB000 to 0xBF05C000, segment-4 constructors, USTART3), `btst 2` → overlay B (0x6B800 B from 0x80F1F000 to 0xBF080000, segment 5, USTART4) and `and 0x1000000` → ADJSLF; done flags in 0x602A9B48.
+- **Section 01 is right that A and B are separate Usr2 requests.** Usr2 0x7E505005 tests `btst 1` → overlay A (0xF000 B from 0x80EFB000 to 0xBF05C000, 0x7E44B6B0(4), USTART3), `btst 2` → overlay B (0x6B800 B from 0x80F1F000 to 0xBF080000, 0x7E44B6B0(5), USTART4) and `and 0x1000000` → ADJSLF; done flags in 0x602A9B48. The constructor tables of segments 4 and 5 are empty (0x7E44B6B0 loads `mov 0,d2` for ids 4 and 5), so these calls run no constructors. (A8 2026-11-09)
 - **Why it matters.** The masks are independent, so **mask 2 alone loads B and starts DPS_MAIN without A** (V code). The callers seen pass 0xFFFFFF (A + B): firmware-update path 0x7E67EC80, self-adjust 0x7E675F05, vtable slot 0 0x7EBA139E. Masks 1, 2 and 0x1000000 alone come only from slots 1–3 of vtable 0x7EC90B30 (ctor 0x7EBA1370), not traced. **Calendar playback calls overlay A with no load check** (V), so A must already be resident (§7).
 
 ## 5. Platform gaps, 0x7E421020–0x7E520000
@@ -238,7 +238,7 @@ Region-level ranges of 20 KB or more do not count (0x7E421020–0x7E426FFF, 0x7E
 
 | Run | Role | Key entries / callers | V/I |
 |---|---|---|---|
-| 0x7E421C93–0x7E425F43 | **BML/STL flash library**: STL close 0x7E421D53, format 0x7E421DBA, open 0x7E421E79, **read 0x7E421EC8**, write 0x7E421F23; BML erase 0x7E421FB6, write 0x7E4220D1, read 0x7E42249E; block layer 0x7E423F09–0x7E42475D; thunks 0x7E4247BD–0x7E42482B; low-level part 0x7E424833–0x7E425F43 | lock pair 0x7E4215A2/0x7E4215B6; traced wrappers 0x7E451829–0x7E451D85; `fmem` 0x7E44F509 | V edges; split I |
+| 0x7E421C93–0x7E425F43 | **BML/STL flash library**: STL close 0x7E421D53, format 0x7E421DBA, open 0x7E421E79, **read 0x7E421EC8**, write 0x7E421F23; BML erase 0x7E421FB6, write 0x7E4220D1, read 0x7E42249E; block layer 0x7E423F09–0x7E42475D; thunks 0x7E4247BD–0x7E42482B; low-level part 0x7E424833–0x7E425F43 | lock pair 0x7E4215A2/0x7E4215B6; traced wrappers 0x7E451873–0x7E451D85 and fupsrv's untraced wrapper 0x7E451829; `fmem` 0x7E44F509 | V edges; split I (A8 2026-11-09) |
 | 0x7E4300D7–0x7E438BF1 (7 runs, 204 fns) | **uITRON 4.0 kernel internals**: acre/del, act/ter/dly/slp/wup, flag/sem/dtq/mbx/mtx, ref_*, loc/unl_cpu, dis/ena_dsp, sns_ctx 0x7E436577, kernel enter 0x7E432863 / exit 0x7E4328DA, scheduler 0x7E435FF4 (67 `kernel` TSV rows) | every task-context check returns E_CTX −25; per-CPU block (0x8FE00004)[(0x8050)] +28: in-ISR / CPU-locked / dispatch-disabled | V mechanics; names I (from caller shim names) |
 | 0x7E44B6B0–0x7E44D6EE | ctor walker (14d) + **OSDB object dumpers** for S_SHELL (task, sem, flag, dtq, mutex, mbf header/row printers; error legend 0x7E44D439) | S_SHELL 0x7E44DBF5 | V |
 | 0x7E45038D–0x7E450C4A | **SYSFMEM operation bodies** (BML read variants and retry, write/erase with read-back, STL thunks 0x7E450AA1–0x7E450AD3, boot-bank check 0x7E450C4B) | SYSFMEM 0x7E4520F3; `flash` shell | V |
@@ -283,7 +283,7 @@ Region-level ranges of 20 KB or more do not count (0x7E421020–0x7E426FFF, 0x7E
 
 ## 6. Corrections
 
-1. **05 row "~0x7E91D279–~0x7E937CDD Blue SDK".** The stack also has part 1 at 0x7E915A1B–0x7E91962B (init, EVM, profiles, the **HCI layer**). That part sits inside 05's row "0x7E913984–0x7E91CFFF stack callbacks, iAP". Also, 0x7E91D279/0x7E91D289 are iAP getters; L2CAP starts at 0x7E91D29F (V).
+1. **05 row "~0x7E91D279–~0x7E937CDD Blue SDK".** The stack also has part 1 at 0x7E915A1B–0x7E9195A6 (init, EVM, profiles, the **HCI layer**); 0x7E9195A7 (133 B, called only from `cp_init()`) is already Olympus iAP code. That part sits inside 05's row "0x7E913984–0x7E91CFFF stack callbacks, iAP". Also, 0x7E91D279 is an iAP getter and 0x7E91D289 an iAP action (0x605C6028 = 19, then the dispatcher 0x7E91C673); L2CAP starts at 0x7E91D29F (V). (A8 2026-11-09)
 2. **Link "table" 0x7DAC4C68:** it holds **one** 320-byte record (the loops stop at `cmp 1`), so there is one ACL link (V).
 3. **C3 F028: "0x7E926E88 picks the mode".** 0x7E926E88 is the start function of ME op type 22 (Park): op table 0x7EBB3B18 slot 21 (V).
 4. **08 §1.1: "DPS XML library 0x7F061020–0x7F068F9C".** The DPS range is 0x7F05E9CE–0x7F0645C0, and the red-eye library follows (V). 0x7F05E590–0x7F05E8D3 is playback-calendar code (new).
@@ -300,7 +300,7 @@ Region-level ranges of 20 KB or more do not count (0x7E421020–0x7E426FFF, 0x7E
 
 ## 7. Open questions
 
-1. Name the HCI-layer functions in 0x7E917AFE–0x7E91962B. In particular: where does it handle Number_Of_Completed_Packets (0x13 never reaches the ME table), and how does it route ACL data to L2CAP?
+1. Name the HCI-layer functions in 0x7E917AFE–0x7E9195A6 (A8 2026-11-09). In particular: where does it handle Number_Of_Completed_Packets (0x13 never reaches the ME table), and how does it route ACL data to L2CAP?
 2. The RFCOMM/SDP split near 0x7E933AEE–0x7E933C47 comes from RAM pages and endianness (I). Confirm it with the SDP PDU parser (PDU ids 2/4/6).
 3. The ME op types 12 (0x7E92A3CB) and 45 (0x7E92A99C) are not resolved to commands.
 4. The CEC opcode handling (which messages beyond the remote keys and standby) has not been decoded.

@@ -131,3 +131,4 @@ English-string counts not present in the E-PM2: E-PL5 0 (block 1 identical), E-P
 - **15c (app statecharts): two claims. Confirmed:**
   - `evTraCmpPly_NotifySelectDisplayExecuteEnd` and `…NotifySelectExecuteEnd` are named in receive traces (0x7EB109D3, 0x7EABA04x).
   - The original running handler 0x7EB14F8E is 1,500 B with 21 callers.
+- **Correction to my 15a note above:** the touch handler table is 13 words long (slot 0 + 12 handlers), and the area tables before it also match byte for byte (0x7EFED634–0x7EFED8F3 = 0x7EFE3D98–0x7EFE4057), per the A8 fix pass. So "identical copy" was right; my 16/80-word comparison ran past the table end.

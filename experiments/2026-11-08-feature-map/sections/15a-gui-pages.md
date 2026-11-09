@@ -56,7 +56,7 @@ This table replaces 13d §1 rows "0x7EDC15B0–~0x7EDE0000" and "~0x7EDE0000–0
 
   | Base ctor | Name | Vtable | Size | Users |
   |---|---|---|---|---|
-  | 0x7EDC7EAA | **userCommonSecondWizard**: the generic list page. +168 = list id, +172 = list descriptor | 0x7EFE221C | 1,748 B | factory 0x7EDC7ECB serves 110 list ids; 29 derived classes |
+  | 0x7EDC7EAA | **userCommonSecondWizard**: the generic list page. +168 = list id, +172 = list descriptor | 0x7EFE221C | 1,748 B | factory 0x7EDC7ECB: 111 registry ids (110 reachable from openPage; list 110 is not, because page 110 is the object page 0x7EDE1E3D); 28 derived classes (A8 2026-11-09) |
   | 0x7EDC8692 | userCommonTimeAdjust | 0x7EFE235C | 608 B | — |
   | 0x7EDC8AD0 | list base that logs `GetTableData() error` | 0x7EFE241C | 432 B | 26 lists, 16 derived classes |
   | 0x7EDC8F62 / 0x7EDC9231 / 0x7EDC9669 | other list bases | — | — | — |
@@ -97,7 +97,7 @@ This table replaces 13d §1 rows "0x7EDC15B0–~0x7EDE0000" and "~0x7EDE0000–0
   | 11 / 12 | dials, with the count in d1 (I, C3 F066) |
   | 6 | INFO release or dial (I) |
 
-- **`getListDescriptor(N)` 0x7EDFD9AF.** It searches 312 × `{u16 list id, u32 desc}` at **0x7F00D710**.
+- **`getListDescriptor(N)` 0x7EDFD9AF.** It searches 312 × `{u16 list id, u16 pad 0, u32 desc}` (8-byte entries) at **0x7F00D710**. (A8 2026-11-09)
   - Descriptor: `{u16 info id, u16 item count, u32, u32, u32 items}`. Each item has 28 bytes: `{u16 kind, u16 label, …, +12 info or 2000, +16 value, +20/+22/+24 guide string ids}` (V layout).
   - **The info id ties a list page to its setting (V).** Examples: list 167 → info 162, items P/A/S/M, Custom Menu label "@A00C@ Mode"; 101 → info 98, Full-time AF Off/On; 104 → 81, Reset Lens; 169 → 102, Movie mic. The TSV page rows give the info id and the matching Custom Menu label (I as a title).
 - **Data-model blocks seen here (V for the writes).**
@@ -130,7 +130,7 @@ This table replaces 13d §1 rows "0x7EDC15B0–~0x7EDE0000" and "~0x7EDE0000–0
 | 43 | 0x7EDFD804 → 0x7EDFD833, 0x7F0052AC (172 B) | **Firmware version** (see the notes below) |
 | 346–349 | 0x7EDEA9D7 → 0x7EDEAA06, 0x7EFFDDB8 | Edit › Aspect. Panel 58; key 0x7EDEAA4D |
 | 472, 473, 506, 508 | 0x7EDE893E → 0x7EDE896D, 0x7EFF7D80 (1,184 B) | Text page. Panel 106; dial translator 0x7EDE8A19 |
-| 511 / 513 | 0x7EDE437F / 0x7EDE4632 (168 B each) | PENPAL album copy P2S / S2P. Panel 4; MediaCtrl vt+44 with (2,4) / (4,2). The sibling pages 515, 519, 521 and 493 are also 168-B MediaCtrl pages |
+| 511 / 513 | 0x7EDE437F / 0x7EDE4632 (168 B each) | P2S / S2P all-image transfer: MediaCtrl vt+44 = `transferImageAll` (name id 0x10C12) with (2,4) / (4,2); panel 4. **I:** a PENPAL album ↔ card copy (C3 F065; which medium is 2 and which is 4 is not proven). The sibling pages 515, 519, 521 and 493 are also 168-B MediaCtrl pages (A8 2026-11-09) |
 | 466 | 0x7EDFB664, vt 0x7F004DC0 | `userMenuRec2_CompScale`. Panel 64; moveCurrent 0x7EDFB968 |
 | 261 | 0x7EDEFCB6 | `userMenuPlay_CompScale` |
 | 262 | 0x7EDF2164 | `userMenuPlay_ImageCompose`. **Not** BT wizard screen 262 (§2.5) |
@@ -143,7 +143,7 @@ This table replaces 13d §1 rows "0x7EDC15B0–~0x7EDE0000" and "~0x7EDE0000–0
 
 Notes on page 43 (Firmware):
 - slot 2 0x7EDFD858 → 0x7EDFD8E6 writes block 76 = {134 "Firmware", versions from Maintenance vt+16 with d0 = 1, 6, 10, 8};
-- key slot 0x7EDFD86F: key 10 with d1 = 0 sets the flag +168, and any other d1 clears it; OK returns 3 only if the flag is set **and** `IOlyApiMaintenance` vt+40 = 1;
+- key slot 0x7EDFD86F: key 10 with d1 = 0 sets the flag +168, and any other d1 clears it; OK returns 3 only if the flag is set **and** `IOlyApiMaintenance` vt+40 = 1. vt+40 is `Maintenance::canUpdateFirmwareCard` (name id 0x4040C); (A8 2026-11-09)
 - the C3 F061 handler (SS_MENU_MAIN.4, OK-off) then pops the nav stack.
 
 ### 2.3 Panels (TSV `panel` rows, V)
@@ -204,7 +204,7 @@ The 16 unnumbered panel classes sit inside the ranges of their numbered neighbou
    | 66 | 0x7EDDD3B2 | — |
 
    - The LV-bar handlers keep their state at RAM 0x602BDCFC (item) and 0x602BDCFE (level).
-   - **The table at 0x7EFED8F4 is an identical copy of 0x7EFE4058.** No reference to its address was found (raw byte scan). Its area maps 0x7EFED634… are pointed to from `.data` 0x7E8EE180 (RAM 0x602BDCC0), not from the panel table (I: unused or second copy).
+   - **0x7EFED8F4 holds a copy of the panel-26 set, not of a longer table.** Its first 13 words (slot 0 + the 12 handlers) equal 0x7EFE4058 word for word, and the area tables and maps before it (0x7EFED634–0x7EFED8F3) equal panel 26's 0x7EFE3D98–0x7EFE4057 byte for byte. From the 14th word on, the bytes differ (0x7EFE408C starts other rect data; 0x7EFED928 is zeros). No reference to 0x7EFED8F4 was found (raw byte scan of block 0). Its area tables 0x7EFED634/0x7EFED6D4 are pointed to from `.data` 0x7E8EE180 (RAM 0x602BDCC0), not from the panel table (I: unused or second copy). (A8 2026-11-09)
 6. **checkSlideAreaPos 0x7EDE13B4** (35 callers, all in 0x7EDDD22C–0x7EDE033E) rejects a slide that leaves its area. The context accessors 0x7EDE1448–0x7EDE161C are 17–47-byte "get context 0x7EDE12CF (253 callers), then store" shapes.
 
 ### 2.5 BT wizard screens (V; corrects C3 F059's "page 262")
@@ -274,7 +274,7 @@ The caller 0x7ED2533C is called by the app-window methods 0x7ED1A6EA (panel hold
    - C3 review 4's "hash table 0x7EFE1914" is wrong.
    - ids 547–551 map to lists 95–99.
 3. **C3 F059:** "page 262" is a **BT wizard screen id** (panel 113). Menu page 262 is `userMenuPlay_ImageCompose`.
-4. **C3 F064:** the live touch-action table is 0x7EFE4058, reached through the panel-26 descriptor. 0x7EFED8F4 is an identical copy with no pointer found.
+4. **C3 F064:** the live touch-action table is 0x7EFE4058, reached through the panel-26 descriptor. 0x7EFED8F4 holds a copy of the 13-word handler table (and of its area tables and maps); the words after those 13 differ, and no pointer to it was found. (A8 2026-11-09)
 5. **C3 F053:** CA code 23 is the touch result sent after every panel touch action (0x7ED1C489), as well as the result of the touch-mode dispatcher.
 6. **14e §4.3:** "registry 0x7EFE190C" should read 0x7EFE180C. The rows for 620/621 at 0x7EFE2114 are inside it.
 7. **13d §3 name list:** add the class names found here:

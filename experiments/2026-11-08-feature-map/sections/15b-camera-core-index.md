@@ -51,7 +51,7 @@ The modules share CamCommand's code numbers: 7 = COM_SET and 134 (0x86) = COM_CA
 
 | Module | Filter | Table (codes) |
 |---|---|---|
-| cam.c | `CamCommand` 0x7E628303 | 0x7E7AC020 (3–147; 03 §1) |
+| cam.c | `CamCommand` 0x7E628303 (the name is assigned, I: no firmware string has it) | 0x7E7AC020 (3–147; 03 §1) (A8 2026-11-09) |
 | cam_frame.c | 0x7E636AAB | jump 0x7E7AE744 (frame commands 1–85, 33 handled) |
 | cam_imgdev.c | 0x7E63BE39 | hash 0x7E7AF048: 1 SLEEP, 7 SET, 9 ACTIVE, 11 START, 12 STOP, 20 WAKEUP, 134 CANCEL_REQUEST, 144 RESET, 145–148 MOVIE_START/STOP/PAUSE/RESTART, 149–154 CLOCK_PAUSE/RESTART/CHANGE_PREPROCESS/HIGH/LOW/CHANGE_RESTART_WAIT, 155–159 LB_WAKEUP/SLEEP/PAUSE/STANDBY/RESET (names from 0x7E63BAA6) |
 | cam_mirror.c | 0x7E642459 | hash 0x7E7B18B8: 1, 2, 5, 6, 9, 10, 145–152 (roles 14b §5) |
@@ -88,10 +88,10 @@ The code names are not in the firmware (cam.c's name table stops at its own code
 **Machinery (V).**
 - **Sequence functions** 0x7E650CFE–0x7E65137A (13, 85–236 B): event-driven state machines on one cam_ev object each (ids 32–41, 54–56). Each step re-arms its object with itself as callback (0x7E6356C3/0x7E6359B1) and issues the next frame command or set list.
 - **Issue frame command** 0x7E651483(d0 FC, a0 owner, a1 done): a 20-byte request {u16 FC, owner ids, done at +12} to the frame dispatcher 0x7E636AAB. FC 7 = "apply set list": it first runs the distributor 0x7E651B7A.
-- **Run set list** 0x7E65156C(d0 list type, a1 done): list of FrameType d0 (0x7E65210C), kept in the 20-slot table 0x6055EEF8, executed by 0x7E6513CF, finished by 0x7E651B0E or by FC 7.
+- **Run set list** 0x7E65156C(d0 list type, a0 owner object, a1 done; d1 is passed through) (A8 2026-11-09): the builder 0x7E65210C keeps a0 at list +16 and copies its +8/+12/+24, a1 goes to +20 and d1 to +28; list of FrameType d0 (0x7E65210C), kept in the 20-slot table 0x6055EEF8, executed by 0x7E6513CF, finished by 0x7E651B0E or by FC 7.
 - **Distributor 0x7E651B7A** (1426 B) sends the list's FunctionList to the module setters (aperture 0x7E62B513, contrast 0x7E62CBF2, imgdev 0x7E63BE31, lens 0x7E64024C, sg 0x7E652BEA, strobe 0x7E661DA6, 0x7E62BC40, 0x7E64A34A, 0x7E64D5D3). The dump 0x7E6521C9 names the 44 FunctionList flags: `sync_setting_sg/rap/prepro/bright/contrast/aperture/strobe/lens`, `sg_img_setting_*`, `tg_expose_imgdev/strobe`, `sg_composition/vl_point/cycle/intr/tft_sync/ktc_setting`, `lvds_setting`, `rap_vkiz/pdc/psc/line_gain/ob/shading/linear_setting`, `capture/awb/ae/contrast/tg_setting`, `tg_capture`, `tg_gain`, `aperture/strobe/lens_setting` (V strings; which flag drives which setter is I).
 - **Callback stubs:** per-module completions 0x7E651839–0x7E6519A2 (10 × ~40 B: decrement the list count +42, call one module's finish, then 0x7E651B0E); list-done 0x7E6515C0–0x7E651644 (7 × 22 B: release the list, set bit 2/4 of the sequence object); frame-done 0x7E65165A–0x7E65181E (21 × 27 B, pointer-only: free the request, set bit 2/4/8 of objects 32–40, 54–56).
-- Set-list FrameTypes (10, 16, 34–37, 54, 57–59, 62, 63, 65) are a separate number space from frame commands: they are default slots of 0x7E7AE744 (V).
+- Set-list FrameTypes (10, 16, 34–37, 54, 57–59, 62, 63, 65) are a separate number space from frame commands. As frame-command codes, 11 of the 13 values are default slots of 0x7E7AE744; 54 → 0x7E636B40 and 57 → 0x7E636B63 are handled entries (V). (A8 2026-11-09)
 
 **Frame commands** handled by 0x7E636AAB (V): 1, 3–7, 17, 20, 40, 41, 50–57, 60, 70–77, 80–85. All start handlers follow 14b's pattern (120-byte request, done at +112). FC 7 (0x7E636BC5) is set-list apply. cam_set issues 1, 3, 6, 20, 40, 41, 50–52, 54, 56, 57, 60, 70–77, 81–85 (TSV rows give the issuing code). A frame object's work mask is run by 0x7E637C46 (pointer-only): for each set bit i of the mask it calls entry i of the 27-entry table **0x7E7AE898** (V). Entry 0 0x7E637CA4 sends the packet to sg 0x7E652CEB, then 0x7E64D73E and 0x7E64A423; the other entries are 17-B senders 0x7E637D2E… (what each bit means is I).
 
@@ -209,16 +209,16 @@ Slot rows are in the TSV (346 rows; kinds `slot`, `fn`, `step`, `error`, `cmd`, 
 - **LENS_FLASH (V):** cmd 1 → step chain 0x7E5309A0; cmd 2 → 0x7E530DEF, lens-ROM ops 0–11 (table 0x7E741BA8), each a class-9 request waiting on flag 0x7E43EB9C; cmd 3 → 0x7E531540/0x7E5315FD, a 34-state machine (table 0x7E741BD8, 34 entries; I: lens data cache).
 
 ### 5.3 LENS_FIRM_UP step chain (corrects 02 §1.9)
-The **command order (V)** is **7 → 0 → 3 → [4 → 5 → compare → 6] × packets → 1**. Type-2 lenses use 0x1000 + cmd. Each step function handles the reply of the previous command and sends the next. The step pointer is at req+4; retry count 0x604F9396, 3 tries.
+The **command order (V)** is **7 → 0 → 3 → [4 → 5 → compare → 6] × packets → 1**. Type-2 lenses use 0x1000 + cmd. Each step function handles the reply of the previous command and sends the next. The step pointer is at req+4; retry count 0x604F9396: a failed reply is resubmitted while the count is ≤ 3, and the error is reported on the 4th consecutive failure (3 retries). Each success clears the count. (A8 2026-11-09)
 
-| step fn | handles reply of | sends | error after 3 failures |
+| step fn | handles reply of | sends | error on the 4th consecutive failure (3 retries) (A8 2026-11-09) |
 |---|---|---|---|
 | 0x7E52FE8C | — (start; fw_kind from 0x7E530524: P→2, Q→4, S→1) | 7 | 0x6610 (protocol type unknown) |
 | 0x7E52FFB3 | 7 | 0 | 0x6608 |
 | 0x7E530020 | 0 | 3 | 0x6601 |
 | 0x7E53008E | 3 | 4 (packet 0) | 0x6604 |
 | 0x7E530103 | 4 | 5 | 0x6605 |
-| 0x7E530171 | 5 | match → 6; mismatch → 4 again | 0x6606 transport; 0x6609 three mismatches (count 0x604F9398) |
+| 0x7E530171 | 5 | match → 6; mismatch → 4 again | 0x6606 transport; 0x6609 on the 4th consecutive mismatch (count 0x604F9398 > 3) (A8 2026-11-09) |
 | 0x7E53023E | 6 | next packet → 4; last → 1 | 0x6607 |
 | 0x7E53030A | 1 | — (done) | 0x6602 |
 
@@ -232,7 +232,7 @@ The **command order (V)** is **7 → 0 → 3 → [4 → 5 → compare → 6] × 
 - **Callbacks (V):** **0x7E60B0E1** `FCS MOVIE LENS post` (`sLQ/`, shared by about 20 builders: result → *(req+0), set bit 1); **0x7E60B167** `sync post` (`sLR/`, for the sync request 0x7E60B3B8 `s10/`, sync start 0x7E535A21: result → *(req+4)); **0x7E60B572** `sync post_e` (for 0x7E60B5AF); **0x7E60A7CA** (`sL5/`, for the non-blocking request 0x7E60A921).
 
 ### 5.5 External flash (STB_EXTERNAL)
-- **Descriptor 0x6054AABC (V):** +0 timeout handler 0x7E5DE8AE, +4 tx buffer, +8 u16 command, +10 tx length, +12 rx length, +14 sync byte 0x55, +15 command echo. Send 0x7E5DC0F7, wait 0x7E5DE91F.
+- **Descriptor 0x6054AABC (V):** +0 completion callback, called with d0 = status after a tx-only completion, after rx completion and on error (0x7E5DE8AE in 22 of the 25 set-ups; it logs ` sio time out` only for a non-zero status; 0x7E5DC7FD / 0x7E5DC9F3 in the 0x06/0x0600 paths); +4 owner/context pointer (0 in the handshake set-ups; the caller's request in the 0x06/0x0600 paths 0x7E5DC71A, 0x7E5DC893, 0x7E5DC950, read back by their callbacks as `(4,desc)`); +8 u16 command; +10 u16 tx length; +12 u16 rx length; **+14 inline tx frame** (+14 = tx byte 0 = 0x55 for most frames, not the 1-byte cmd-0 frame; +15 = tx byte 1 = the command low byte for 0x81–0x84/0x7F/6, but a subcode 2/3/4 for command 0x0600); rx data at desc+214. Send 0x7E5DC0F7 (sends u16 +10 bytes from desc+14), wait 0x7E5DE91F. (A8 2026-11-09)
 - **Command bytes (V):** 0x00 firmup data stream (STB firmup steps 0x7E5DEC15…, PTP 0x7F08443D); 0x01, 0x7F, 0x81–0x88 detect/handshake sequence 0x7E5DD358 (0x81 rx 4, 0x82 rx 9, 0x86 rx 7 status, 0x87 tx 13); 0x05 video light; 0x06/0x07/0x0600 tx 4, rx 1; **0x89** tx 2, rx 2, checked by rx[1] = rx[0] + 0x89, sent only from event 0x402 of the video-light group (V; meaning unknown, I: a video-light level query).
 - **Event codes (V):** codes 0–4, 0x200/0x201, 0x300/0x301, 0x400–0x402, 0x800, 0x900, 0x1000. All three tables use **key = code + 1**:
   pre-check 0x7E5DC4A1 (`stb_external_com_exec`, 0x7E79F9AC), executor 0x7E5DCC5C (`EXT mode_set`, 0x7E79FAAC; 0x1000 → strobe firmware update 0x7E5DF13A, which FIRMUP_SRV's cmd 0x1000 reaches), post-update 0x7E5DC602 (0x7E79FA2C).
@@ -240,7 +240,7 @@ The **command order (V)** is **7 → 0 → 3 → [4 → 5 → compare → 6] × 
 ### 5.6 ADCONV request 0x7E45BB10
 - The "gap" 0x7E45B67E–0x7E45CE11 is the **ADCONV driver** itself, between the `per_adc` shell and the ADCONV debug shell 0x7E45CE12 (V).
 - **Submit 0x7E45BB10(a0 req) (V).** It looks up channel u8 req+0 in the table 0x7E4C4908 (9 × 16 B: channel, mode, mask) and dispatches on the mode (1, 2, 3, 7, 8, 9 → six engines). Unknown channel → log 0x19001401.
-- **Request (52 B, V):** +0 channel, +1 type (0xF1 special), +4 1500, +8 5, +12 result buffer, +32 async callback, +40 sync marker. **Completion 0x7E45CCA1 (V):** calls +32 if set; otherwise copies the request to 0x6041538C and sets event flag 0x7E43EBB2.
+- **Request (52 B, V):** +0 channel, +1 type (0xF1 special), +4 and +8 per-request u32 parameters (+4/+8 = 1500/5 in 0x7E45E38D and 0x7E5394B5, 1500/4 in 0x7F080BEC, 750/5 in MEC 0x7E5175C9, 750/2 in ADC-key 0x7E50B1B4, 750/1 in 0x7E4589DC; +4 = 750 in the ADCONV shell 0x7E45CE5B), +12 result buffer, +32 async callback, +40 sync marker. **Completion 0x7E45CCA1 (V):** calls +32 if set; otherwise, only if +40 ≠ 0, copies the request to 0x6041538C and sets event flag 0x7E43EBB2. A request with neither is dropped without a signal. (A8 2026-11-09)
 - **Channels (V):** 4 and 13 = battery/power, 15 = ccd_temp, 34 = per_acc accelerometer (its I²C check `ACC:I2C NG?`), 38 = MEC layer 0x7E5175C9. Channels 21, 22, 39 and 41 have no user found. ADC-key callers 0x7E50B1B4…0x7E50B877 set callback F002 0x7E50B724.
 
 ### 5.7 EXP_MOVIE (live-view AE) range and dispatch (V)

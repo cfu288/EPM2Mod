@@ -5,8 +5,8 @@ addr_or_id	kind	role	evidence	V/I
 0x7E915BBF	bt-evm	EVM timer expiry loop: calls timer +12 callback when now - start >= timeout	disasm	V
 0x7E915C4A	bt-evm	BTSTK work step: lock, timers 0x7E915BBF, HCI process 0x7E91917E, unlock (caller BTSTK task 0x7E92F5F7)	callees	V
 0x7E915D0C..0x7E917A3F	bt-layer	profile layer (OBEX clients/servers for OPP/BIP): called by BT_CTRL 0x7E8F92AB..0x7E8FC0CB, calls OBEX core 0x7E92C029..0x7E92E37A; 0x7E916D3B (15-case switch, table 0x7EBB13C8) and 0x7E917270 are callbacks (0 static callers)	call graph	V edges / I role
-0x7E917AFE..0x7E91962B	bt-layer	HCI layer (RAM 0x7DAC5xxx): init 0x7E917AFE, command send 0x7E917F02 (from 0x7E925704), event/ACL RX to ME 0x7E924D10 from 0x7E917D1E/0x7E9180E4/0x7E918121/0x7E91820A/0x7E9189C4/0x7E918BE8, HCI process 0x7E91917E (from BTSTK step), Number_Of_Completed/flow helpers 0x7E91833C..0x7E919504	call graph; RAM page	V edges / I names
-0x7E91962C..0x7E91D29E	bt-olympus	Olympus iAP over SPP (BT_Open 0x7E91962C, cp_* , BTIAP task 0x7E91A0C2, IDPS 0x7E91C69D, iAP response 0x7E91CD59); getters 0x7E91D279/0x7E91D289 belong to it	strings	V
+0x7E917AFE..0x7E9195A6	bt-layer	HCI layer (RAM 0x7DAC5xxx): init 0x7E917AFE, command send 0x7E917F02 (from 0x7E925704), event/ACL RX to ME 0x7E924D10 from 0x7E917D1E/0x7E9180E4/0x7E918121/0x7E91820A/0x7E9189C4/0x7E918BE8, HCI process 0x7E91917E (from BTSTK step), Number_Of_Completed/flow helpers 0x7E91833C..0x7E919504	call graph; RAM page (A8)	V edges / I names
+0x7E9195A7..0x7E91D29E	bt-olympus	Olympus iAP over SPP (BT_Open 0x7E91962C, cp_* , BTIAP task 0x7E91A0C2, IDPS 0x7E91C69D, iAP response 0x7E91CD59); iAP/SPP set-up 0x7E9195A7 (only caller cp_init 0x7E91A2CF); getter 0x7E91D279 and action 0x7E91D289 (0x605C6028 = 19, iAP dispatcher 0x7E91C673) belong to it	strings (A8)	V
 0x7E91D29F..0x7E923747	bt-layer	L2CAP (RAM 0x7DAE4xxx): PSM registration 0x7E91D29F (I), ERTM state handlers 0x7E91E215/0x7E91E75F/0x7E91EC0E (coverage C3 F027), F-bit latch 0x7E9207AC, signalling length check 0x7E9234DC (codes 1..11, table 0x7EBB1F08), callback 0x7E923474	constants 672 (MTU), codes 1..11; RFCOMM and SDP call it	V edges / I names
 0x7E923748	bt-debug	stack debug Report(fmt, ...) under the stack lock -> formatter 0x7E923769 -> debug print 0x7E4263E5 (56 callers)	disasm	V
 0x7E923928..0x7E924003	bt-test	Olympus Blue SDK test client (`OLYMPUS BlueSDK a4`, `OLYMPUS_TST_OBJ`, callbacks), BTAPL task 0x7E923FD2; demo-shell entries 0x7E923C93..0x7E923FFB	strings	V
@@ -398,7 +398,7 @@ meop:2-4,27-30,32,34,36,43,44,46,47,58-63	me-op-type	ME op types with no start f
 0x7F062A9C	dps-fn	dps_validate(rec): version/op range (-300), output result check, hash 0x7F06A678 dispatch	disasm	V
 0x7F06A678	dps-table	16-bucket open-addressed hash {id, handler} keyed id&15; ids 1,0x101,0x102,2,0x104,0x103,5,8,9,6,0x10A,0xA	bytes + disasm	V
 0x7F061F89	dps-fn	result-code check: 0x1000-0x1003 high half; minor 0-4 only with 0x1002	disasm	V
-0x7F061CED	dps-fn	range test (value, lo, hi, step); 13 callers	disasm	I
+0x7F061CED	dps-fn	range test (value, lo, hi, step); 13 call sites in 6 callers	disasm (A8)	I
 0x7F061FEA	dps-fn	string check: max length and char range or "."	disasm	V
 0x7F062036	dps-fn	check op 1 input strings (vendorName etc.)	calls	I
 0x7F062111	dps-fn	check configurePrintService fields (ops 1, 0x101)	hash table	V
@@ -486,10 +486,10 @@ meop:2-4,27-30,32,34,36,43,44,46,47,58-63	me-op-type	ME op types with no start f
 0x7F088D18	dps-fn	trampoline to dps_encode 0x7F060BFF	bytes	V
 0x7F088D22	dps-fn	trampoline to dps_decode 0x7F062B89	bytes	V
 0x7F088D2C	dps-fn	map internal error -400..0 to DPS result code (hash 0x7F0D5C5C)	disasm	V
-0x7E505005	dps-fn	Usr2: btst 1 → overlay A (0xF000 B, 0x80EFB000→0xBF05C000, seg 4, USTART3); btst 2 → overlay B (0x6B800 B, 0x80F1F000→0xBF080000, seg 5, USTART4); 0x1000000 → ADJSLF; done flags 0x602A9B48	disasm	V
+0x7E505005	dps-fn	Usr2: btst 1 → overlay A (0xF000 B, 0x80EFB000→0xBF05C000, seg 4, USTART3); btst 2 → overlay B (0x6B800 B, 0x80F1F000→0xBF080000, seg 5, USTART4); the seg-4/5 ctor tables are empty (0x7E44B6B0: 0 bytes), so no ctors run; 0x1000000 → ADJSLF; done flags 0x602A9B48	disasm (A8)	V
 0x7EC90B30	dps-vtable	overlay-loader object: slot0 mask 0xFFFFFF, slot1 A, slot2 B, slot3 ADJSLF (0x7EBA139E/BE/DA/F6); ctor 0x7EBA1370	bytes + disasm	V
 0x7E67EC80	dps-fn	request Usr2 mask 0xFFFFFF (A+B) before strobe/lens firmware update	disasm	V
-0x7E421C93-0x7E425F43	gap-run	Flash translation library BML/STL (API, block layer, thunks, low-level part)	called by traced wrappers 0x7E451829-0x7E451D85 and fmem 0x7E44F509	V edges; split I
+0x7E421C93-0x7E425F43	gap-run	Flash translation library BML/STL (API, block layer, thunks, low-level part)	called by traced wrappers 0x7E451873-0x7E451D85, fupsrv's untraced 0x7E451829 and fmem 0x7E44F509 (A8)	V edges; split I
 0x7E421D53	function	STL close	<- STL_CLOSE wrapper 0x7E451949, fmem	V edge; name I
 0x7E421DBA	function	STL format	<- STL_FORMAT wrapper 0x7E451873	V edge; name I
 0x7E421E79	function	STL open	<- STL_OPEN wrapper 0x7E4518D4	V edge; name I
