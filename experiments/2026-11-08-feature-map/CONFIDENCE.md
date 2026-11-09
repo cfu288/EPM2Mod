@@ -23,7 +23,7 @@ A region that fails a round gets a deep dive, then a **new** blind sample. The s
 |---|---|---|---|
 | A1 | Claim audit, sections 01–08 | 48 claims, seed 20261109 | 26 correct, 21 minor, **0 wrong**, 1 uncheckable (`audit/REPORT.md`); fixed in `audit/fixes.md` |
 | A2 | Claim audit, section 12 | 12 claims, seed 20261110 | 6 correct, 5 minor, **1 wrong** (12-35: three corner-resolver helpers merged into one); all fixed |
-| C1 | Coverage, whole block 0 | 80 functions, seed 1109 | *running* |
+| C1 | Coverage, whole block 0 | 80 functions, seed 1109 | **FAIL.** 10 explained (12.5 %), 51 partly, 17 unexplained, 1 contradicted, 1 not-code. Explained+partly 76 %. Gaps: string-less libraries, C++ framework patterns, GUI toolkit, mcon records, drivers; region-table errors. `coverage/round1-review1..4.md` |
 
 ## Region status
 
@@ -37,3 +37,12 @@ A region that fails a round gets a deep dive, then a **new** blind sample. The s
 | 0x7ECA–0x7EE2 GUI | — | A1 ok | | pending C1 |
 | 0x7EE2–0x7EEE libraries / C3D | — | not sampled | | pending C1 |
 | 0x7F05–0x7F0B BASIC / ADJ / USB / SPC | — | A1 ok | | pending C1 |
+
+## Round C1 findings driving round D1 (deep dives)
+
+- **Tool:** function starts were missed for code reached only via `mov imm32` (callbacks, IRQ handlers, state handlers) and for vtable getters next to each other. `fwmap.py` now adds "imm" starts and frame-after-return starts. A test build gives 74,554 functions (+8,385), with no existing start lost.
+- **Libraries without strings:** C runtime 0x7E4F8000–0x7E501C5B (incl. soft-float 0x7E5010EA–0x7E5019ED); Omron OKAO face library ~0x7E72CFA1–0x7E732000; a face-scoring library in overlay A 0x7F0645C1–0x7F069000 (called only from FACE_MAIN cmd 5; checked by coordinator); image/colour-curve library ~0x7E54D000–0x7E578000; AVPI AV middleware ~0x7EE8F000–0x7EEA0000 and strings/vtables at 0x7F021020–0x7F034000.
+- **C++ layer:** 1,273 event vtables (not ~930; checked by coordinator), most outside the range section 06 gives; the Com_ framework 0x7EB855C7–; the OXF runtime runs on to ~0x7EBA9xxx (`getCurrentEvent` 0x7EBA6D64, 12,693 callers; checked); classes missing from the map (CapPls_PlayState, CapBlu_Bluetooth, Cmp_PictBridgeComponent, a USB-communication device class); no event-id dictionary.
+- **GUI:** widget toolkit, GCPnl panels, object-type registry 0x7EFC5470, Ss* handler tables.
+- **mcon:** 60-byte per-setting operation records at 0x7E814864; region ~0x7E6FC000–0x7E708000.
+- **Drivers/state machines:** SIO, jog-dial hardware 0x9A600000, unit at 0x99900000, the FAT layer, IRQ handlers; TAKE release sequencer (state table 0x7E7908C0); strobe exposure calculation.

@@ -46,6 +46,14 @@ A map of what the main firmware contains and where. This is for learning only: n
 | 0x7F05C000–0x7F06B000 | BASIC interpreter and DPS (PictBridge) — on-demand overlay | 01, 08 |
 | 0x7F06B000–0x7F0AB000 | ADJ / ADJSLF factory adjustment, PTP/MTP/USB stack, TPC, C3D bridges, SPC (FlashAir) | 01, 08 |
 
+**Corrections to the table above from coverage round C1 (2026-11-09).** Being verified in round D1; see `experiments/2026-11-08-feature-map/CONFIDENCE.md`.
+- Face detection (FACE_* tasks 0x7E6F45B8–0x7E6FC9F4) and the mode controller "mcon" (~0x7E6FC000–0x7E708000) sit inside the "movie" row, not in 0x7E70B000–0x7E730000.
+- 0x7E72CFA1–~0x7E732000 is code: the Omron OKAO face library (no strings).
+- Libraries without strings: C runtime 0x7E4F8000–0x7E501C5B; image/colour-curve library ~0x7E54D000–0x7E578000; AVPI middleware ~0x7EE8F000–0x7EEA0000.
+- 0x7F021020–0x7F034000 holds AVPI strings and vtables, not BASIC.
+- In overlay A, DPS runs ~0x7F05F840–0x7F0645xx, and 0x7F0645C1–0x7F069000 is a face-scoring library called from FACE_MAIN.
+- The OXF runtime code runs on to ~0x7EBA9xxx.
+
 ## 2. Firmware package and blocks
 
 | Part | What it is | Basis |

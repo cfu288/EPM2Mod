@@ -14,10 +14,13 @@ Stages:
    - "call": targets of direct `call` instructions decoded in a linear objdump sweep
      (`call` on MN103 sets up the callee frame, so its target is a function entry);
    - "task": entries of the uITRON task tables;
+   - "imm": code addresses loaded by `mov imm32` (callbacks, IRQ handlers) that start with a prologue or
+     directly follow a return instruction;
    - "ptr": aligned data words that point into code at a function prologue. Functions reached
      only through pointers (vtables, callbacks, task entries) set up their own frame, so they start
      with `movm [regs],(sp)` (0xCF). One-instruction stubs (`retf`/`ret`) and `add -N,sp` entries
-     are accepted too, unless the word sits in a jump table (neighbouring words point nearby).
+     are accepted too, as are targets right after a return (small getters), unless the word sits in a jump
+     table (neighbouring words point nearby).
 2. Assemble an ELF where each start is a function symbol (.incbin slices), then objdump -d it.
    objdump restarts decoding at every symbol, so each function decodes from a true boundary.
 3. Index: functions.tsv, calls.tsv (caller->callee), strrefs.tsv (function -> string it loads),
@@ -118,6 +121,30 @@ PROLOGUE = (b"\xcf",)                       # movm [regs],(sp)
 WEAK_ENTRY = (b"\xde", b"\xdf", b"\xf8\xfe", b"\xfa\xfe")  # retf, ret, add -imm8/-imm16,sp
 
 
+def after_return(data, base, v):
+    """True if the bytes just before v end a function: ret/retf [regs],imm8 (DF/DE xx xx) or rets/rti (F0 FC/FD)."""
+    o = v - base
+    return o >= 3 and (data[o - 3] in (0xDE, 0xDF) or data[o - 2:o] in (b"\xf0\xfc", b"\xf0\xfd"))
+
+
+def stage_imm_starts(linear, data, base, code_pages, data_pages):
+    """Code addresses loaded as `mov imm32` (callbacks, IRQ handlers) that start with a prologue or follow a return."""
+    size, starts = len(data), set()
+    imm = re.compile(r"^(\d+),[ad]\d$")
+    with open(linear) as f:
+        for a, op, arg in iter_insns(f):
+            if op != "mov" or a // PAGE in data_pages:
+                continue
+            m = imm.match(arg)
+            if not m:
+                continue
+            v = int(m.group(1))
+            if base <= v < base + size and v // PAGE in code_pages and \
+                    (data[v - base:v - base + 1] in PROLOGUE or after_return(data, base, v)):
+                starts.add(v)
+    return starts
+
+
 def stage_ptr_starts(data, base, code_pages):
     size, starts = len(data), set()
     words = [int.from_bytes(data[o:o + 4], "little") for o in range(0, size - 3, 4)]
@@ -131,7 +158,9 @@ def stage_ptr_starts(data, base, code_pages):
         head = data[v - base:v - base + 2]
         if head.startswith(PROLOGUE):
             starts.add(v)
-        elif head.startswith(WEAK_ENTRY) and (base + i * 4) // PAGE not in code_pages:
+        elif head.startswith((b"\xf8\xfe", b"\xfa\xfe")) and after_return(data, base, v):
+            starts.add(v)  # frame setup right after a return: a function, even with near neighbours (vtables)
+        elif (head.startswith(WEAK_ENTRY) or after_return(data, base, v)) and (base + i * 4) // PAGE not in code_pages:
             near = [w for w in words[max(0, i - 1):i + 2] if w != v and codeptr(w) and abs(w - v) < 0x800]
             if not near:
                 starts.add(v)
@@ -250,12 +279,14 @@ def cmd_build(a):
     # (task entries, vtable methods) have no call targets of their own.
     code_pages = set(range(base // PAGE, (base + len(data) - 1) // PAGE + 1)) - data_pages
     ptr_starts = stage_ptr_starts(data, base, code_pages)
+    imm_starts = stage_imm_starts(linear, data, base, code_pages, data_pages)
     tsk_starts = task_starts(data, base) if FW == disasm.DEFAULT_FW else set()  # tables are v1.6 offsets
-    starts = sorted(call_starts | ptr_starts | tsk_starts | data_run_starts(base, data_pages))
+    starts = sorted(call_starts | ptr_starts | imm_starts | tsk_starts | data_run_starts(base, data_pages))
     with open(os.path.join(OUT, "starts.tsv"), "w") as f:
         f.write("addr\tsource\n")
         for t in starts:
-            src = "+".join(k for k, ss in (("call", call_starts), ("ptr", ptr_starts), ("task", tsk_starts))
+            src = "+".join(k for k, ss in (("call", call_starts), ("ptr", ptr_starts), ("imm", imm_starts),
+                                                ("task", tsk_starts))
                            if t in ss) or "data"
             f.write(f"{t:08x}\t{src}\n")
     print(f"function starts {len(starts)} (call {len(call_starts)}, ptr {len(ptr_starts)}, "
