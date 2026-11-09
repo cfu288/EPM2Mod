@@ -10,9 +10,9 @@
 | Section | Pool | Correct | Minor | Wrong | Uncheckable |
 |---|---|---|---|---|---|
 | 01 platform | 30 | 1 | 5 | 0 | 0 |
-| 02 lens/firmup/take | 23 | 5 | 1 | 0 | 0 |
+| 02 lens/firmup/take | 23 | 4 | 2 | 0 | 0 |
 | 03 camera core/art | 30 | 3 | 3 | 0 | 0 |
-| 04 movie | 51 | 2 | 4 | 0 | 0 |
+| 04 movie | 51 | 3 | 3 | 0 | 0 |
 | 05 playback/audio/BT | 20 | 2 | 4 | 0 | 0 |
 | 06 app components | 12 | 5 | 1 | 0 | 0 |
 | 07 GUI/settings | 15 | 4 | 1 | 0 | 1 |
@@ -37,3 +37,5 @@
 
 ## Fixes
 The minor errors are corrected in place in sections 01–08; each fix carries an "(audit 2026-11-09)" note. See the fix pass in `fixes.md`.
+
+**Count check (audit of the audit).** The fix pass reported totals of 25/22. A recount of the verdict tables in check-1..4 gives 5/7, 6/6, 7/5 and 8/3 + 1, so the totals above (26/21/0/1) are right. The batch-2 checker's summary listed only 11 of its 12 claims. Two per-section rows (02, 04) were wrong in the first version of this table and are now fixed.

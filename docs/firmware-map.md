@@ -137,7 +137,7 @@ A map of what the main firmware contains and where. This is for learning only: n
 | Feature | Status | Where | Notes | § |
 |---|---|---|---|---|
 | USB mass storage, PTP, MTP, PictBridge | Active | PC_* tasks; `ptp_register` 0x7F08E975, 4 opcode sets | No InitiateCapture: no standard tethering | 08 |
-| Firmware update over USB | Active | ops 0x9117, 0x9119–0x9125 → FIRMUP_SRV | | 02, 08 |
+| Firmware update over USB | Active | ops 0x9117, 0x9119, 0x911C, 0x9120–0x9125 (audit 2026-11-09) → FIRMUP_SRV | | 02, 08 |
 | HDMI with CEC remote | Active | HDMI task 0x7E6BAF18 | Analog Devices transmitter, EDID | 08 |
 | Touch panel (and its own firmware update) | Active | TOUCHPANEL 0x7E6BCF84 | | 08 |
 | Eye-Fi | Active (inf) | EYEFI task, card control files | | 02, 08 |

@@ -12,11 +12,11 @@ Labels: **verified** = read in the code or bytes; **inferred** = from strings, n
 | 0x7E8E1020–0x7E8F57FF | Data, not code: a table of C++ method-name pointers (e.g. 0x7E8E1584 → `OpeningScreen::regist`, 0x7E8E156C → `SoundCtrl::registImportSound`), more pointer tables, 0xFF padding (0x7E8F3298…). The "functions" the database finds here call wild targets (0x5C49DBCC…). | verified (bytes) |
 | 0x7E8F5800–0x7E8F5CE8 | CIC driver (`CIC_MUTEX`, `CIC_END`). It is used by `play_cic_decode_raw` 0x7E93D10F (`CicCtrl->ulCompAddr / ulRawAddr`). | inferred: RAW decompression codec |
 | 0x7E8F5CE9–0x7E8F904E | EFFECT / EFFECT_EXE: transitions in playback | verified |
-| 0x7E8F904F–0x7E8F926E | SERV_MAIN: a service that broadcasts state notices | verified |
+| 0x7E8F9031–0x7E8F926E | SERV_MAIN (init 0x7E8F9031, task entry 0x7E8F904F (audit 2026-11-09)): a service that broadcasts state notices | verified |
 | 0x7E8F926F–0x7E9035A7 | BT_CTRL ("btc"): connection control, OPP/BIP, pairing database, Apple CP access | verified |
 | 0x7E9035A8–0x7E91367A | BT debug shell (`demo`), Broadcom patch-RAM download, HCI vendor commands, UART transport | verified |
 | 0x7E913984–0x7E91CFFF | Stack callbacks, iAP (BTIAP task, `cp_*`, IDPS) | verified |
-| 0x7E91D000–0x7E937FFF | iAnywhere-style "Blue SDK" stack (`OLYMPUS BlueSDK a4`), RFCOMM, tasks BTSTK/BTTIM/BTEVU/BTAPL | inferred stack identity; task entries verified |
+| ~0x7E91D279–~0x7E937CDD | iAnywhere-style "Blue SDK" stack (`OLYMPUS BlueSDK a4`), RFCOMM, tasks BTSTK/BTTIM/BTEVU/BTAPL. Bounds approximate: Olympus iAP code 0x7E91CD59 is before it and Olympus OBEX-ACP glue starts at 0x7E937CDE; Olympus test code (0x7E923B0F, `OLYMPUS_TST_OBJ`) is inside (audit 2026-11-09) | inferred stack identity; task entries verified |
 | 0x7E938594–0x7E93BA6B | OBEX_ACP and OBEX tasks | verified |
 | 0x7E93BA6C–0x7E94D2FF | Playback engine `play_*.c`, `playbuff.c` (PLAY_MAIN/IMAGE/LOAD/SOUND) | verified |
 | 0x7E94D8A8–0x7E961C5A | Audio: bridge, control, WM8946 codec driver, DSP, FSC DMA, sequences, WAV/AC3 tools, AUD_* tasks | verified |
@@ -157,7 +157,7 @@ The register write `[reg]adr|dat` 0x7E95B361 has 200 callers. The serial bus is 
 | AUD_MAIN | 0x7E95BB4F | 9 | Initializes (0x7E95BAC1), reads packets from queue 0x7E43ECCC, dispatches on the packet's first byte (hash 0x7EBC2664, verified), replies when the packet is synchronous (type 1) |
 | AUD_COPY_DATA | 0x7E94E4D8 | 9 | Waits on flags 0x33. Bits 0x30 → `aud_copy_data_main_play_copy` 0x7E94EBF3; bits 0x03 → `_rec_copy` 0x7E94E729. Copies PCM between the file buffer and the DMA ring (verified). |
 | AUD_WATCH_DOG | 0x7E96188B | 11 | Every 500 ms (verified): if FSC status = 2 (playing) or 3 (recording) and `aud_dev_fsc_ctrl_check_intr_stop` reports more than 1 missed interval, it logs error 0x06106001/2 and forces a stop (0x7E961A1C play / 0x7E961A42 rec). It also runs repeat play/rec tests in debug mode. Debug modes: `0:WD OFF 1:WD ON 2:WD ON(2s video command stop)`. |
-| AUD_LATE_RISER | 0x7E9502CE | 11 | Debug test: reads setting **10442** index 0/1/2 (action, wait_time, work_info), sleeps, then plays `HOGE.WAV`, records, or changes the volume (verified). Inferred: a "start late after boot" test hook; no effect on normal use. |
+| AUD_LATE_RISER | 0x7E9502CE | 11 | Debug test: reads setting **10442** index 0/1/2 (action, wait_time, work_info), sleeps 10 s (more if wait_time × 1000 > 10000 ms), then plays `HOGE.WAV` at volume work_info (action 2; a value > 10 is logged and clamped to 10) or records at 48 kHz (action 3) (verified). There is no separate volume-change action (audit 2026-11-09). Inferred: a "start late after boot" test hook; no effect on normal use. |
 | PLAY_SOUND | see §1.4 | | |
 
 **AUD_MAIN command classes** (verified table): 0x02/0x03 → `aud_seq_qplay` 0x7E95E558 (power on/off). 0x24–0x26 → `aud_seq_io` 0x7E95D097 (volume, output device, video on/off). 0x41/0x45/0x46/0x49 → `aud_seq_play` 0x7E95D654 (init/start/stop/end). 0x82–0x86 → `aud_seq_rec` 0x7E95E676 (init/start/stop/wav_style/get_wav_info).
@@ -221,13 +221,13 @@ Each API function also has a second caller, the debug shell `demo` 0x7E9035A8 (`
 | BTSTK_TSKID | 0x7E92F5F7 | Stack loop: calls 0x7E915C4A, then waits on flag 0x7E43EC48 (10 s timeout) while the run flag 0x602AEEBD = 1 |
 | BTTIM_TSKID | 0x7E92F345 | Stack tick: counter at 0x7DAF2F5C, one-shot callback, health check 0x7E9014C6 every 100 ticks |
 | BTEVU_TSKID | 0x7E9375B4 | Waits on flag 0x7E43EC4A (mask 14, 1 s); runs HCI/transport events (0x7E913984) |
-| BTAPL_TSKID | 0x7E923FD2 | One shot: if bit 1 of 0x602AEE98 → 0x7E923B0F (a Blue SDK test client: `OLYMPUS BlueSDK a4`, BIP put of `OLYMPUS_TST_OBJ`); bit 2 → an empty stub. Inferred: a vendor sample/test application. |
+| BTAPL_TSKID | 0x7E923FD2 | One shot: if bit 0 (`btst 1` (audit 2026-11-09)) of 0x602AEE98 → 0x7E923B0F (a Blue SDK test client: `OLYMPUS BlueSDK a4`, BIP put of `OLYMPUS_TST_OBJ`); bit 1 (`btst 2` (audit 2026-11-09)) → an empty stub. Inferred: a vendor sample/test application. |
 | BTIAP_TSKID | 0x7E91A0C2 | iAP transfer: flag 0x7E43EC54, mask 0xFF; retry `DevDataTransfer`, `DevDataTransfer timeout!!!` |
 | OBEX / OBEX_ACP | 0x7E93ADFD / 0x7E938DF2 | §4 |
 
 ### 3.3 Controller bring-up (verified from HCI bytes)
 - `bt_dev_hci_reset` 0x7E9132B2 sends `01 03 0C 00` (HCI_Reset).
-- `bt_config_set` 0x7E9126CC calls 27 functions (0x7E904B2E–0x7E911EFD). Each one stores bytes into the TX buffer at 0x605CD215 and sends it with 0x7E912E84. The first is `01 4C FC 8B 58 75 08 00 …` = **HCI vendor 0xFC4C Write_RAM** at 0x00087558. The last (0x7E912680) is `01 4E FC 04 FF FF FF FF` = **0xFC4E Launch_RAM**. This is the **Broadcom patch-RAM** format, so the PENPAL controller is a Broadcom chip and the camera stores its patch (inferred vendor; the opcodes are verified).
+- `bt_config_set` 0x7E9126CC calls 28 command functions: 27 Write_RAM chunks (0x7E904B2E–0x7E911EFD) plus Launch_RAM 0x7E912680 (audit 2026-11-09). Each one stores bytes into the TX buffer at 0x605CD215 and sends it with 0x7E912E84. The first is `01 4C FC 8B 58 75 08 00 …` = **HCI vendor 0xFC4C Write_RAM** at 0x00087558. The last (0x7E912680) is `01 4E FC 04 FF FF FF FF` = **0xFC4E Launch_RAM**. This is the **Broadcom patch-RAM** format, so the PENPAL controller is a Broadcom chip and the camera stores its patch (inferred vendor; the opcodes are verified).
 - `bt_dev_wrt_addr` 0x7E913335: `01 01 FC 06 <6 bytes>` = Broadcom Write_BD_ADDR. The camera writes the BD address into the module (`send bd_addr to module` 0x7E8FE4B0).
 - `bt_dev_upd_baud` 0x7E91343D: `01 18 FC 06 00 00 <u32>` = Update_UART_Baud_Rate, with 3,000,000 (0x2DC6C0) or 1,500,000 (0x16E360); other branches test 1,000,000 and 230,400.
 - 0x7E8FEDBB checks that a BD address is `00:01:13:13:xx:xx` or `00:01:13:14:xx:xx` (`… isn't olympus bd address`; 00-01-13 is the Olympus OUI). It is called from the address validator 0x7E8FDF21.

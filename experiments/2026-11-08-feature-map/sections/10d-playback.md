@@ -115,7 +115,7 @@ Basis for "Active": the GUI calls the component's `OlyApi*` interface (singleton
   - The slideshow treats Slide value **7** as 3D (`APP_DISP_BG_3D_PLAY`, 0x7EA683F8; 0x7EB69367).
   - `Disp_Change_OutputDimensions_Exec … 3D` exists for single frame, one-move and slideshow (0x7EB50118, 0x7EB50481, 0x7EB66B14).
 - **HDMI 3D (verified code; meaning external):**
-  - `api_disp_Disp_Get_3D_Format_Size` 0x7E6798C5 maps 0/64/128 to 0/6/8, asks the display driver 0x7E6B49CB and tests bit 1.
+  - `api_disp_Disp_Get_3D_Format_Size` 0x7E6798C5 maps 0/64/128 to 0/6/8, asks the display driver 0x7E6B49CB and tests bit 0 (`btst 1` = mask 0x01) (audit 2026-11-09).
   - 0/6/8 match the HDMI 1.4a 3D_Structure codes: frame packing, top-and-bottom, side-by-side half (external).
   - `CameraCommon::getDisplaySupport3D` is sdk A18.
 - **GUI (verified):** 0x7ED054FB builds a panel titled "Sel. Image" (572) with the items "All" (442) and "3D Show" (982). It is called from handler 0x7EDB61FE (table 0x7EFD6754).

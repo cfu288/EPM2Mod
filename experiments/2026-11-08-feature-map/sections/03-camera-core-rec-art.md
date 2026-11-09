@@ -89,13 +89,13 @@ Sensor modes (verified table 0x7E7ABDA0, key = mode+1): 0 HS, 1 HSSC, 2 MSSC, 3 
 | cam_sem.c | 0x7E64F085–0x7E64F2A2 | §2 (verified) |
 | cam_set.c | 0x7E6521C9 | COM_SET list storage ("List Number", "list[%d] is used") |
 | shutter (SH_*) | 0x7E6557CE | shutter resource (inferred) |
-| cam_still_func.c | 0x7E656B1D–0x7E656F6F | §4 (verified tables) |
+| cam_still_func.c | 0x7E656B1D–~0x7E65DA2A (audit 2026-11-09) | §4 (verified tables) |
 | cam_still_live_bulb.c | 0x7E65DA2B–0x7E6619C5 | §4 |
 | cam_timer.c | 0x7E662535 TM_SEM, 0x7E66296B | timer object |
 
 ## 4. Still sequence and Live Bulb (cam_still_func.c, cam_still_live_bulb.c)
 
-- **Still-func command filter (verified, 0x7E656D64):** it takes only cmd 7 (COM_SET) and cmd 80 (COM_MOVIE_EXPOSE). Anything else gives "STL_FUNC_COM NOT SUPPORT". **Live bulb (verified, 0x7E65DA2B)** takes only COM_SET.
+- **Still-func command filter (verified, dispatcher 0x7E656EEB):** it takes only cmd 7 (COM_SET) and cmd 80 (COM_MOVIE_EXPOSE). Anything else is rejected with error 0x3C11. **Live bulb (verified, dispatcher 0x7E65DC34)** takes only COM_SET. 0x7E656D64 and 0x7E65DA2B are only command-name lookups for the debug monitor; "STL_FUNC_COM NOT SUPPORT" / "LBULB_COM NOT SUPPORT" is the name they print for any other value (audit 2026-11-09).
 - **Still phases (verified hash table 0x7E7BE488):** 1 READY, 2 TAKE, 3 STOP, 4 ABORT, 5 TERMINATE, 6 CONTINUE_READY, 7 CONTINUE_PAUSE, 8 CONTINUE_RESTART, 9/10 PRE_ACTION_ON/OFF, 11 MIRROR_DOWN, 12 CAPTURE_ENABLE, 13 FORCE_CAPTURE, 14 APERTURE_ENABLE. 0x101–0x10D are the same set with a BULB_ prefix (APERTURE_ENABLE has no bulb form). 0x10000 PHASE_NONE.
 - **Still status (verified, 0x7E656C5E, linear 0–25):** STS_ERROR, IDLE, MGON, READY, TAKE, TAKE_CHARGE, TAKE_DEADLINE, TAKE_CHARGE_DEADLINE, then 13 MIRROR_DOWN_* variants (CHARGE / MGON / MECEN / DEADLINE / READY combinations), CONTINUE_READY(+CHARGE/DEADLINE). **Live-bulb status (verified, 0x7E65DA4A, 0–10):** BULB_STS_ERROR, IDLE, MGON, READY, TAKE, TAKE_ENABLE, TAKE_END, MIRR_DWN, MIRR_DWN_TAKE_END, MIRR_DWN_TAKE_END_MGON.
 - **Status dumps (verified strings):** 0x7E656F6F (still) and 0x7E65DCAE (live bulb) print a table of phase request/post/remain/active. The rows are Ready, Take, Mirror Down, Continue Ready, Terminate, **FPN Origin/Light/Dark** × Ready/Take/MirrDown. **Inferred:** FPN = fixed-pattern-noise frames. The "Dark" take is the long-exposure noise-reduction dark frame, and the `cam still` option "bit1 : fpn" and "Recording FPN Dark" in the LB test agree.
@@ -278,7 +278,7 @@ Sensor modes (verified table 0x7E7ABDA0, key = mode+1): 0 HS, 1 HSSC, 2 MSSC, 3 
 | 4 | art_effect_50_white_edge | 0x7E721EA9 |
 
 - **Verified:** pinhole is dropped when the filter is already 73/106/108.
-- **Verified:** the frame effect decodes JPEG frame resources (`art_frame_*` 0x7E721294…, `ART_FRAME_MOVIE_SD/HD/FHD`).
+- **Verified:** the frame effect decodes JPEG frame resources (`art_frame_*` 0x7E7209BD–0x7E721619 (audit 2026-11-09), `ART_FRAME_MOVIE_SD/HD/FHD`).
 
 **Present in code but not in the E-PM2 menu (inferred; GUI not traced):**
 - Full CPU modules exist for Crystal (118), Mirror (151), Composite (153), Pastel I/II (181/182) and Pin Hole III (108).
@@ -307,7 +307,7 @@ Sensor modes (verified table 0x7E7ABDA0, key = mode+1): 0 HS, 1 HSSC, 2 MSSC, 3 
 2. Wait for FD done (FaceWEFd).
 3. Take FACE_DATA, store results, release it.
 4. Set the PT event, which wakes FACE_PT0.
-5. 0x7E6B3ACE sets bit 16 on DISP_FRAME's flag when DISP_FRAME is in state 1.
+5. 0x7E6B3ACE sets pattern 0x10 (bit 4; `mov 16,d1`) (audit 2026-11-09) on DISP_FRAME's flag when DISP_FRAME is in state 1.
 6. 0x7E6C35A7 calls into the movie code.
 
 **Senders (verified):**

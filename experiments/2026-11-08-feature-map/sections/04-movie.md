@@ -68,7 +68,7 @@ Then:
   - Prints `[AVCHD] APPEVENT RECMOVIE_TIME_LIMIT`.
   - Calls `0x7E880EFF(0x04070026, 0)`.
 - **The 4 GiB cap has no separate check in the H.264 path.** The term (filecap 8388608 − reserve)/(rate + overhead) is folded into (40). The library's own `AVSCA_INF_REC_FILESIZE` / `DIV_FILESIZE` / `BITRATE_OVER` callbacks are only logged in the QT callback (0x7E6D8C9C…0x7E6D8CB6: print, then return). **Verified.** The library's ulMaxRecTime (30 min / 120 min, units **inferred** ms) is a backstop above 1740 s.
-- **Display.** `api_movie_CalculateQualityTime_Record_Movie` 0x7E681D87 returns (40) × 600 / fps(30,ctx). `api_movie_Get_Time_Record_Movie` 0x7E681DC7 returns elapsed (552,ctx). `0x7E6EDF9D` adds 600 to (552) each second and posts `RECMOVIE_UPDATE` 0x04070100. **Verified.**
+- **Display.** `api_movie_CalculateQualityTime_Record_Movie` 0x7E681D87 returns (40) × 600 / fps(30,ctx). `api_movie_Get_Time_Record_Movie` 0x7E681DC7 returns elapsed (552,ctx). `0x7E6EDF9D`, only when byte 0x605B1FA2 == 1, adds 600 to (552) (or sets (552) = (96)/fps × 600 when mode byte (3) == 106) and posts `RECMOVIE_UPDATE` 0x04070100. **Verified.** "Each second" is **inferred** from the units (600 = 1 s); the function is an AVCHD callback (slot +52) (audit 2026-11-09).
 - **App side.** The four events 0x04070026/27/28/0x04070100 are also loaded as constants in 0x7EA42F9B. That function constructs a set of listeners, so it is probably the app subscriber (**inferred**). The step from the event to MOV_CMD_RECORD_END was not traced.
 
 Overheads (**verified** constants; meaning **inferred**):
@@ -136,7 +136,7 @@ The second-table entries come from 28-byte records at 0x7E43D4BC…; the IDs 0x9
 **MJPEG files.** The AVI is written by the firmware itself:
 - States: `mov_rec_write_start` 0x7E6F0E25, `build_header` 0x7E6F11E3, `00dc` chunk writes 0x7E6F0D88/0x7E6F0C38, `build_footer` 0x7E6F1ED2, `chainwrite` control 0x7E6F20D7.
 - Names: `make_file_name` 0x7E6F071B (`xxxOLYMP`), `last_file_delete` 0x7E6F1129.
-- States: idle/aud_wait/first_frame 0x7E6EF3D6, record_normal 0x7E6EF5E7, userstop (+ `_for_edit`) 0x7E6EF7F7, finish_1 0x7E6EF958, errorstop/fullstop. **Verified** strings and state pointers.
+- States (fnNext pointers): MJPEG idle 0x7E6EF3D3, aud_wait 0x7E6EF3ED, first_frame 0x7E6EF507, record_normal 0x7E6EF5E2, userstop 0x7E6EF7F2, userstop_for_edit 0x7E6EF89E, finish_1 0x7E6EF958, do_nothing 0x7E6EF9A7, finish_2 0x7E6EF9BD, errorstop 0x7E6EFA79, fullstop 0x7E6EFA99 (audit 2026-11-09). **Verified** strings and state pointers.
 
 **File split.** No code that splits files into several parts was found. When a limit is reached the recording stops (TIME_LIMIT event); it does not continue in a new file. **Verified for the paths read; absence elsewhere is inferred.**
 
@@ -149,7 +149,7 @@ The second-table entries come from 28-byte records at 0x7E43D4BC…; the IDs 0x9
   - dramatic tone buffer (0x7E6CC6EE)
   - line-YC buffers for `ligneclair` (= Key Line, **inferred**) and `pastelart` (0x7E6CD4B7/0x7E6CD6B8)
   - `mov_art_set_color_yc_param`, `set_line_yc_param`, `set_artpacket` (skip CLIP / SIMPLE_1ST)
-- `mov_image_process` 0x7E6C6853 prints "Effect OFF", "toyphoto ON for 1st", "filter ON for 1st" and "simple & Frame ON for 1st". These are the art *effects* (Pin Hole/Toy, filter, Frame) applied to the first frame. **Verified** strings.
+- `mov_image_process` 0x7E6C6853 prints "Effect OFF", "toyphoto ON for 1st", "filter ON for 1st" and "simple & Frame ON for 1st". **Verified** strings. "toyphoto" is chosen when the art code at 0xA07507CC is 73 or 82 (73 is a Pin Hole code in section 09; 82 is not identified); "filter" vs "simple & Frame" depends on the word 0x605B0394. **Inferred:** these are the art effects (Pin Hole/Toy, filter, Frame); "1st" more likely names a first pass (compare `SIMPLE_1ST` at 0x7E6CCBE1) than the first frame (audit 2026-11-09).
 - Art code 88 clears 0x605B1F80 in the QT path (0x7E6EDDE9). Art code 83 inflates the MJPEG frame budget (§1.3). **Verified**; meaning **inferred**.
 - `mov_apical.c` 0x7E6CB9B8: `[MOV_APICAL] THM2LUM img_exec`. A luminance map from the thumbnail, probably Apical iridix-style tone mapping (**inferred**).
 
@@ -194,7 +194,7 @@ All rows are **verified** from the strcmp chain in 0x7E6D15A0. Help text: 0x7E80
 | `dump <mode>` | 0x7E6D1E11→0x7E6D1E50 | 0 RAW, 1 current video buffer, 2 all video buffers, 3 AWB, 4 all three, 5/6 dump/file-write for movie (MJPEG YCC420), 7/8 the same over all buffers (not art), 9 HDMI buffers, 10 AVCHD record YUV |
 | `dbginfo` | 0x7E6D2747 | Module status / history |
 | `img <n>` | 0x7E6CA889 | Sets 0x602ADC71 (IMG_CTRL dump selector) |
-| `kdg <1/2/3>` | 0x7E6DD107 | Sets bit 1/2/4 of 0x602ADFB8 (KDG Param/Log/Img output) |
+| `kdg <1/2/3>` | 0x7E6DD107 | Sets mask 0x01/0x02/0x04 (bits 0/1/2; `bset 1/2/4` (audit 2026-11-09)) of 0x602ADFB8 (KDG Param/Log/Img output) |
 | `effect <n>` | 0x7E6D18EE | Parses a number only (no visible effect) |
 | `mf ...` | 0x7E6D1909 | Prints the "mov mf switch/zoom 100–400/area" help only |
 | `gdisp` / `sdisp <0/1>` | 0x7E6D1936 / 0x7E6D194D | Get/set DispThroughState |

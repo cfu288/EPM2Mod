@@ -194,7 +194,7 @@ The E-M10 and E-PL7 also lack an accessory port (product knowledge) but still ca
 |---|---|---|---|
 | Card update mode (FIRMUP_CLI) | All 9 entries: S, A, M, V, D, T, E/G/H/W/E100, DATE/PICTURE1JPG, N | Boot only. 0x7E544A6F needs a power-on factor of 12 / 0x01000002 / 0x01000001 **and** 0x602A9B54 = 0. 0x7E505694 clears that byte when status 4 reads 0 and 0x7E45D893() ≠ 9. Status 4 is **"O  k"** in the name table (verified), so this is probably the OK key held at power-on (**inferred**). The power-on factor values are not decoded | Hidden / service |
 | Setup > Firmware (menu) | `L???????BIN` (lens), `F???????BIN` (flash) from the card (section 02 §1.7) | `update_firmware()` 0x7EAB3195 | Active (not re-traced here) |
-| USB (TPCFirmup) | Body package via ops 0x9119–0x9125 → FIRMUP_SRV; `api_firmup_Execute_FirmwareUpdate` 0x7E67EBDF | Op sets A/D: Storage (type 0) and generic PTP (5) | Active (inf: Olympus updater) |
+| USB (TPCFirmup) | Body package via ops 0x9119, 0x911C, 0x9120–0x9125 (audit 2026-11-09) → FIRMUP_SRV; `api_firmup_Execute_FirmwareUpdate` 0x7E67EBDF | Op sets A/D: Storage (type 0) and generic PTP (5) | Active (inf: Olympus updater) |
 
 - Every card pattern also accepts the E-PL5 code `…100` (S100, M100, V100, D100, T100, E100), so the card path shares the E-PL5 files (verified pattern list, section 02).
 - N files are loaded but nothing is written.

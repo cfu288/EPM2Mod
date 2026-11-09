@@ -14,7 +14,7 @@ scratchpad (`conn/ptptab.py`, `conn/adjtab.py`, `conn/sigscan.py`, `conn/libprof
    plain PTP + firmware update, MTP, PictBridge, and "X3C". **No InitiateCapture (0x100E) in any table**, so there is no standard PTP tethering. (verified)
 2. **Vendor ops 0x9xxx that are not in the table go to the ADJ (factory-adjustment) task** through
    `ADJ_P15740_COM_VENDOR_OPERATION`. ADJ handles 16 vendor ops (0x9005–0x902B). One of them, 0x902B, ends in the `USR>` debug shell, so it is a remote shell over USB. (dispatch verified; shell inferred)
-3. **Firmware update over USB** uses ops 0x9117 and 0x9119–0x9125. FirmwareCheck posts the received image to the **FIRMUP_SRV** task queue. (verified)
+3. **Firmware update over USB** uses ops 0x9117, 0x9119, 0x911C and 0x9120–0x9125 (0x911A/0x911B/0x911D–0x911F are not registered) (audit 2026-11-09). FirmwareCheck posts the received image to the **FIRMUP_SRV** task queue. (verified)
 4. **IEEE 1394 tasks are stubs.** PC_I1394 and PC_1394PNP only drain their message queue and then exit. (verified)
 5. **Block 2 (kind 0x106) = "ARTFIL"**: a 2.25 MiB noise texture of 6-bit values. Only the Grainy Film
    (`art_filter_06_rough_monochrome`) art filter reads it. **Block 3 (kind 0x104) = "FRAME"/"arteffe"**: 8 JFIF
@@ -56,7 +56,7 @@ scratchpad (`conn/ptptab.py`, `conn/adjtab.py`, `conn/sigscan.py`, `conn/libprof
 USB descriptors at 0x7F0D7AF8 (**verified bytes**):
 - Device descriptor: USB 2.0, EP0 64 bytes, **VID/PID = 0 in the template**, strings 1/2/3, 1 configuration. VID/PID are patched at run time. The source was not found: the constant 0x07B4 is not in code.
 - Two config templates, both `class 08 / subclass 06 / proto 0x50` (mass storage, SCSI, bulk-only). The full-speed one has 2 × 64-byte bulk endpoints. The high-speed one has 2 × 512-byte bulk endpoints plus interrupt EP 0x83. The interrupt EP and the PTP class (06/01/01) are probably patched in for PTP/MTP mode. (inferred)
-- LANGID 0x0409, a device-qualifier descriptor, and at 0x7F0D7C61 the 53-byte USB 2.0 `TEST_PACKET` pattern (00…AA…EE…FE FF… 7F BF DF…). (verified)
+- LANGID 0x0409, a device-qualifier descriptor, and at 0x7F0D7C58 the 53-byte USB 2.0 `TEST_PACKET` pattern (00…AA…EE…FE FF… 7F BF DF…; the last byte is E7 where the spec has 7E). (verified (audit 2026-11-09))
 - GetDeviceInfo handler 0x7F0934AB uses the strings `OLYMPUS` and `1.00`. (strings referenced)
 
 ### 1.2 PTP opcode tables (verified)

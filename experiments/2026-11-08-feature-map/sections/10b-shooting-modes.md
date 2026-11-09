@@ -89,7 +89,7 @@ Re-check of six shooting-mode features using the method of section 09. Labels: *
 - **3D-lens path:**
   - GUI `checkConnect3DLens` 0x7ECD7899 starts `start3DLensShooting` only when `0x7ECD6117` (info 26 == 115) is true **and** a lens query returns 3. Otherwise it ends the 3D-lens mode.
   - TAKE 0x7E582893: when prm 0x85C1 (info 26) == 115 and the lens status `0x7E522647` (the backend of `api_rec_Get_Lens_Trouble_Status`) == 64, it loads stereo offsets.
-  - Bit 64 is set when the lens info is ≥ 0x102A and RAM flag 0x604F67AC bit 0x200000 is set. The lens debug `LENS_INFO_3D` 0x7E5288EB prints convergence_angle and baseline_length (verified strings), so this is a 3D-lens test (inferred, strong).
+  - Bit 0x40 (value 64, bit 6; `or 64` (audit 2026-11-09)) is set when the lens info is ≥ 0x102A and RAM flag 0x604F67AC bit 0x200000 is set. The lens debug `LENS_INFO_3D` 0x7E5288EB prints convergence_angle and baseline_length (verified strings), so this is a 3D-lens test (inferred, strong).
   - REC: handle +17132 == 12 → 0x7E70BD7F: `rec_3d_lens_art_exec` 0x7E70CF0B → `rec_3d_write_mpo` 0x7E70BF3C (→ `rec_3d_make_jpg` 0x7E70C1EB + `rec_3d_make_mpo` 0x7E70C23F, 390 B) → `rec_3d_free`. View: `rec_3d_lens_view`.
   - Every function is real (sizes 64–1054 bytes, no log-and-return).
   - **Verdict: complete, reachable only with a 3D lens fitted** (hardware-gated).
@@ -173,7 +173,7 @@ Re-check of six shooting-mode features using the method of section 09. Labels: *
 
 ## Open questions
 
-1. What the E-PM2 does in SCN 3D Photo without a 3D lens. Does it start the stubbed two-shot statechart and show string 981, or refuse earlier? Which RAM flag sets lens status bit 64 (0x604F67AC bit 0x200000), and from which lens-info field?
+1. What the E-PM2 does in SCN 3D Photo without a 3D lens. Does it start the stubbed two-shot statechart and show string 981, or refuse earlier? Which RAM flag sets lens status bit 0x40 (audit 2026-11-09) (0x604F67AC bit 0x200000), and from which lens-info field?
 2. The mapping from scene code (info 24/26) to the internal 0..45 field (+172 of the 0x7E96A4EB object) and to Exif. This would name the unused codes 3–61 and show what PARTY, COOKING, UNDERWATER_*, ANIMAL and SNOW would do. The mcon hash 0x7E826CAC (info 24 → handler) and the string `app_mode_expose_scene_to_expose` are the next leads.
 3. SCN code → shooting-component id (factory ids 6, 8, 16/17) in `CtgStl_StillImageShooting::getComponentInstance` 0x7EB9D939.
 4. Whether mcon reset hooks can change info 280 (no reset path for info 280 was looked for; only the screen code was read).

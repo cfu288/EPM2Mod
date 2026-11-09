@@ -259,7 +259,7 @@ Examples: 738 Shooting Menu 1, 494 Shooting Menu 2, 739 Playback Menu, 527 Custo
 - **GuiTouch:** touch coordinates and active-index logs (0x7EDE040E, 0x7EDE0983). Panel change through `guiUtility::ShowPanelEx` (0x7EDC5D2D, 193 callers) with the log `[GuiTouch] ... changePanel Fail`.
 - **GUI substates:** SS_COMMON, SS_REC, SS_MENU_MAIN, SS_MENU_LV, SS_MENU_PLAY, SS_PLAY_SINGLE, SS_PLAY_MOVIE_SLIDE, SS_PLAY_INDEX, **SS_SELFADJ, SS_DEBUGMENU**, SS_USB, SS_DPS, SS_BTSEND, SS_BTRECEIVE (name table near 0x7EFDD233). **(verified strings)**
 - **OSD:** OSDDRAW/OSDDBG (0x7ECCBA45 `osddraw_init`, 0x7ECCC5BD `exec_bitmap`, 0x7ECCE613 `exec_line`) is a low-level layer that draws dots, lines and bitmaps in the CA_MAIN region. **(verified strings)** The GUI itself also has GL-like code (`gl_ModelViewMatrix`, `glReadPixels`).
-- **Warnings:** `[GUI Warning]` and `Warning_Viewer` strings in 0x7EDA6D93 (shared with the Version screen). I did not map them further.
+- **Warnings:** `[GUI Warning]` and `Warning_Viewer` strings in 0x7EDB0847 and 0x7EDC25D4 respectively (audit 2026-11-09). I did not map them further.
 
 ## 6. Hidden, debug and service features
 | Feature | Evidence | Status |
@@ -269,10 +269,10 @@ Examples: 738 Shooting Menu 1, 494 Shooting Menu 2, 739 Playback Menu, 527 Custo
 | `app Get_CameraInfo/Set_CameraInfo/Get_CameraUserInfo <info>`, `getmodeinfo`, `modedial`, `iauto`, `evtset/evexec` | 0x7E677990 | verified |
 | GUI debug menu `SS_DEBUGMENU` (`gdbDebugMenu.usRightMark/usItem/usPrg`, `doCmdSsDebugMenuColor_Setting/Result EvtKeyPowerOn`) | 0x7ED48BBA, 0x7EDA0968 | strings verified; entry key combination not found |
 | Self-adjust menu `SS_SELFADJ` (`startSelfAdjustMenuSubAppStateMisc` 0x7ECE067B, `SelfAdjust::getMenuItem…turnOnTFT`, `api_adj_Check_Execute_Self_Adjust`) | | verified strings |
-| Version-check menu (`CAM_MISC_VERCHK_MENU`, `startVersionCheckMenuSubAppStateMisc` 0x7ECE0653, `[GUI App Version]:OkOn called , F/W Version up start`) | 0x7EDA6D93, 0x7EDFD86F | verified strings. The Firmware item can start a firmware update. |
+| Version-check menu (`CAM_MISC_VERCHK_MENU`, `startVersionCheckMenuSubAppStateMisc` 0x7ECE0653, `[GUI App Version]:OkOn called , F/W Version up start`) | 0x7EDA9D03 (loads the F/W string at 0x7EDAA63F), 0x7EDFD86F (audit 2026-11-09) | verified strings. The Firmware item can start a firmware update. |
 | Life test (`[GUI App]:Life Test Start`, `registerCode`, `eraseCode`, `LifeTest::getLifeTestMode`) | 0x7EFD1FB4 | verified strings |
 | Shipping info: `API_SHIPPING_INFO_{DEST_AREA, FLAG, DPS, TIME_ADJUST, MENU_BUTTON}` (Maintenance::getShippingInfo) → FLASH tags 0x0AA2/0x0DB1/0x0DA1 | 0x7EC0A321, 0x7EDFD665 | verified strings and names |
-| Pixel Mapping: normal Custom Menu J item (CmpCst_Function 0x7EAA8FF9…, api_rec_Calculate/Save_Pixelmaping) | | verified strings |
+| Pixel Mapping (CmpCst_Function 0x7EAA8FF9…, api_rec_Calculate/Save_Pixelmaping) | | verified strings. That it is a normal Custom Menu J item is **inferred** (the A–J item lists are not decoded) (audit 2026-11-09) |
 
 **Model identity:** the model name is ROM-constant prm tag 0x62F1 = `"E-PM2"`, with product code 0x6551 = `"S0043"`. The firmware has no "E-PL5" string; `PL5GAMMACSV` is a display gamma table name, not a model. Block 1 is shared with E-PL5. Block 0 is per model. I found no runtime E-PL5/E-PM2 switch in the GUI; the differences come from the build. **(verified absence of model strings; the gate conclusion is inferred)**
 

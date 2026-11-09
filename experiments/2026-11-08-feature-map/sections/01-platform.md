@@ -8,7 +8,7 @@ Helper scripts: `/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/pl
 
 - Two CPUs run uITRON. A task ID holds the CPU number in bits 12–14 and the index in bits 0–11. Bit 15 marks the tasks that have a static stack. **[V]** (kernel `0x7E4306A6` decodes `id & 0x7000 >> 12` and `id & 0xFFF`, then indexes the per-CPU control blocks at `0x8FF00004 + cpu*4`; the current CPU number is at `(0x8050)`.)
 - Boot runs as a chain. CPU0 task ID 1 is the only CPU0 task with attribute TA_ACT. It loads more code from flash, then runs `Usr0`. `Usr0` starts about 60 tasks in a fixed order. The USRSTART_* tasks start the rest. Some code overlays (BASIC, ADJ/PTP/USB) load from flash only when they are needed. **[V]**
-- There are two debug shells. S_SHELL is a system monitor (prompt `:-) `) on a memory-mapped serial port. U_SHELL (prompt `USR> `) has 54 command families in a {name, handler} table. A `:` line in S_SHELL sends the input on to U_SHELL. The same U_SHELL dispatcher is also reachable over USB through the factory-adjustment PTP operation 0x902B. **[V]**
+- There are two debug shells. S_SHELL is a system monitor (prompt `:-) `) on a memory-mapped serial port. U_SHELL (prompt `USR> `) has 54 command families in a {name, handler} table. A bare `:` line in S_SHELL toggles pass-through: while it is on, lines that do not start with `:` go to U_SHELL, and a `:cmd` line still runs in S_SHELL (audit 2026-11-09). The same U_SHELL dispatcher is also reachable over USB through the factory-adjustment PTP operation 0x902B. **[V]**
 - BASIC ("QBASIC") is a small line-number interpreter. It takes input from the `bas` shell command. Its `api(code,a,b)` function calls the application API executor. Scripts (".RCU", "RelocateCode") can be loaded from the card, rewritten (symbolic `API_IF_*`/`APPEVENT_*` names become hex codes) and stored in flash. They reload into the interpreter at boot. **[V]** for the code path, **[I]** for the purpose.
 - ADJ is a PTP (ISO 15740) responder for factory adjustment, with standard opcodes and vendor opcodes 0x9005–0x902B. ADJSLF is an in-camera "self adjust" client of the same operations, driven by files on the card. **[V]** for the tables, **[I]** for the purpose.
 
@@ -28,9 +28,9 @@ Helper scripts: `/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/pl
   - ID 0x808D, entry 0x7E575D41 (the "task-1 entry" in the brief) → `names[140]` = **IMG0_LOCAL**. Next to it is `0x7E575C72` with `img_l0` and `IMG_SYSTEM_ERR!!!`. **[V for the table, I for the purpose]**
   - ID 0x8E, entry 0x7E53A4A4 → `names[141]` = BOOT_CPU0. Its code prints `[pwr_standby]`, and its stack is in SRAM (0x47000800). It is probably the standby/resume task. **[I]**
   - ID 1, entry 0x7E44A043 → `names[0]` = "DBG_OUT" in the table. Its code is the boot task. **[V for the code]**
-- `ID→var` table at 0x7E43E948 (u16 per object name). The boot code reads task IDs from here: entries 0–24 are 0x8085…0x80E0, and entry 25+ holds 1, 2, 3…. **[V]**
+- `ID→var` table at 0x7E43E948 (u16 per object name). The boot code reads task IDs from here: entries 0–24 are 0x8085–0x808D, 0x8058, 0x80AE, 0x8001, 0x8007, 0x80C0–0x80C3, 0x80D9–0x80E0 (not one run) (audit 2026-11-09), and entry 25+ holds 1, 2, 3…. **[V]**
 
-**Second object table, CPU1** (the "0x1C448 table"). At 0x1C408–0x1C487 there is an array of pointers 0xA0767420 + k·0x28. **[I]** These may be control blocks. 7-word task records follow from **0x1C488**, in the same layout. The IDs have bit 12 set, so they are CPU1 tasks. **[V]**
+**Second object table, CPU1** (the "0x1C448 table"). At 0x1C408–0x1C487 there is an array of pointers 0xA0767420 + k·0x28. **[I]** These may be control blocks. 7-word task records follow from **0x1C490** (first id 0x9004) (audit 2026-11-09), in the same layout. The IDs have bit 12 set, so they are CPU1 tasks. **[V]**
 
 | ID | entry | pri | stack | name (from the boot check label) |
 |---|---|---|---|---|
@@ -101,7 +101,7 @@ So BAS_MAIN and ADJ code is not in RAM until the app asks for Usr2. **[V]** The 
 
 - `Usr0` first calls `0x7E5436D1`. That function reads the firmup reboot flag (3 = `REBOOT SYSTEM UPDATE`, 4 = `USER UPDATE`). If the result is 1, Usr0 sets bit 0x40 (end the fast path). Otherwise it sets 0x01 (lens setup). **[V]**
 - Strings such as `ErrLeBat`, `ErrThrAdj`, `ErrRelNoSD`, `TakePicStart!!`, `StrobeChg!!` and `FastEndCb` suggest this is a quick power-on-to-live-view-to-shoot path that runs before the full UI app. **[I]**
-- The log goes through `0x7E503A6E`. The `usr fast` command (0x7E502111/0x7E5023E1) prints it ("UsrFastAppDebug!"). **[V]**
+- The log goes through `0x7E503A6E`. The `usr fast log` command (audit 2026-11-09) (0x7E502111/0x7E5023E1) prints it ("UsrFastAppDebug!"). **[V]**
 
 ## 3. Debug shells
 
@@ -162,7 +162,7 @@ Handlers in overlays (`bas`, `usb`, `tpc`, `c3d`, `md3d_*`, `spc`) are only vali
 
 **`prm`** (settings store): getval/getstr `<TagID>`, setval/setstr, getval_def/getstr_def/set_def, getdevice, `clear <1:CSV,2:CPRAM,3:BKRAM,4:FLASH,6:EEROM,7:MODE>`, dump, `psave/pload <bit0 bkram,1 flash,2 eerom,3 mode,4 cflash>`, chkload, erase, `fmem <mode> <adrs> <KB>`. **[V]**
 
-**Remote use over USB.** ADJ PTP op 0x902B, sub-op 15 (`0x7F08433A`), takes a command string of up to 127 characters. It calls the same U_SHELL parser/dispatcher `0x7E503CB7`. If the "system" flag bit 2 is set it replies `not support nikomon`, so S_SHELL is not reachable this way. **[V]**
+**Remote use over USB.** ADJ PTP op 0x902B, sub-op 15 (`0x7F08433A`), takes a command string of up to 127 characters. It calls the same U_SHELL parser/dispatcher `0x7E503CB7`. If the "system" flag bit 1 (mask 0x02, `btst 2` (audit 2026-11-09)) is set it replies `not support nikomon`, so S_SHELL is not reachable this way. **[V]**
 
 ## 4. BASIC interpreter (BAS_MAIN, BAS_RCU_SRV)
 
@@ -183,7 +183,7 @@ Handlers in overlays (`bas`, `usb`, `tpc`, `c3d`, `md3d_*`, `spc`) are only vali
 - **RCU = "RelocateCode".**
   - App API wrappers: `api_rcu_Upload_RelocateCode` 0x7E687157, `…Delete…`, `…Get_ProcList(_Media)…`. They are reached from SDK/high-level stubs at 0x7E9C8C3B/0x7E9C8C9C (pointer table 0x7EC0F09C).
   - These wrappers send requests through `0x7F05E43B` to **BAS_RCU_SRV** (ID 7, entry 0x7F05E2FE), which handles commands 0–7.
-  - Upload: `rcu_serv_upload` → `bas_rcu_load` 0x7F05DF43. That function mounts the media and reads up to 16 KiB from `RCUOLYMP` / `R0240001.RCU` (8.3 names) into 0xBC620000. Then `0x7F05DDF0` rewrites the symbols, and `flash_mem` 0x7F05E041 calls `0x7E675700(mode 4, …)`, the resource/flash writer. **[V]** For the call chain, **[I]** that mode 4 is a script area.
+  - Upload: `rcu_serv_upload` → `bas_rcu_load` 0x7F05DF43. That function mounts the media and reads up to 16 KiB from `RCUOLYMP` / `R0240001.RCU` (8.3 names) into 0xBC61DF00 (audit 2026-11-09). Then `0x7F05DDF0` rewrites the symbols, and `flash_mem` 0x7F05E041 calls `0x7E675700(mode 4, …)`, the resource/flash writer. **[V]** For the call chain, **[I]** that mode 4 is a script area.
   - At start, BAS_RCU_SRV fetches the stored block (`0x7E674F44`) and checks the magic `ucr.`. If it is valid, `0x7F05DD81` feeds it into QBASIC. Stored scripts therefore auto-load. **[V]**
 
 ## 5. Peripherals (PER_*), UI input, LEDs
@@ -193,7 +193,7 @@ Handlers in overlays (`bas`, `usb`, `tpc`, `c3d`, `md3d_*`, `spc`) are only vali
 | PER_IN (0x2F, 7E463B0E) | Generic deferred-callback dispatcher. Waits on flag `E_PER_IN` and runs each registered 12-byte record `{…, u16 mask, fn}` (count 0x604163F8, array 0x604163FC) whose bit is set. Uses `udfu01 12,d2` to index the records, which supports udfu01 = multiply. **[V]** |
 | PER_PCONT (0x30, 7E465C77) | Waits on flag and queue `QPERPCONT`. Ring buffer and per-client callbacks (`pcntdbg`: control, wait_flg, tag, callback). **[V]** for the structure. Pulse counter used by MEC_PCNT (shutter) **[I]**. |
 | PER_WDT (0x31, 7E46C29B) | Kicks the watchdog through **SRAM code 0x47001560** when enabled (flag 0x6041A464), then waits on its queue with a 3000 ms timeout. Commands: 0 = off, 1 = on (10 s), 2 = change time. Shell: `per wdt off/on/time N`. **[V]** |
-| PER_CCD_TEMP_MAIN (0x2D, 7E45DBB5) | Every 10 s (`dly 10000`) runs a state/event table (0x7E4C4FF8). Result 1 triggers a measurement (`0x7E45DC2C(3)`). Thresholds: lock / warn / attn1. **[V]** for the loop, **[I]** for the threshold meaning. |
+| PER_CCD_TEMP_MAIN (0x2E (audit 2026-11-09), 7E45DBB5) | Every 10 s (`dly 10000`) runs a state/event table (0x7E4C4DF8 (audit 2026-11-09)). Result 1 triggers a measurement (`0x7E45DC2C(3)`). Thresholds: lock / warn / attn1. **[V]** for the loop, **[I]** for the threshold meaning. |
 | PER_ROTATE (0x6A, 7E4671F9) | Calls the accelerometer module (`per_acc`/`acc_spi` 0x7E45824B–0x7E45A76E: "Who am I?", offset/sensitivity tables) and math helpers. Outputs ROTATE_0/90/180/270. **[V]** for the calls, **[I]** for the purpose. |
 | PER_SLOPE (0x6B, 7E469FD2) | Same accelerometer calls. roll/pitch, orientation, `readall adj for digitallevel` (level gauge). **[V]**/**[I]** |
 | PER_EYE_SENSOR (0x78, 7E4613DD), PER_SCPU_POLLING (0x7B, 7E467D96) | **Empty tasks (`retf`)** in this firmware. **[V]** |
