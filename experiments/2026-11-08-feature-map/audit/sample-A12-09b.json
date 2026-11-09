@@ -1,0 +1,50 @@
+[
+ {
+  "id": "09b-57",
+  "section": "09b-art-algorithms.md",
+  "line": 57,
+  "text": "- **Verified:** op type 21 (desc+194) is the same image-engine job that `[movp]copy` 0x7E6E3161 uses. So it is a"
+ },
+ {
+  "id": "09b-61",
+  "section": "09b-art-algorithms.md",
+  "line": 61,
+  "text": "- **Masks (`make_mask` 0x7E548626 \u2192 0x7E54846F, verified).** Each mask is radially symmetric:"
+ },
+ {
+  "id": "09b-76",
+  "section": "09b-art-algorithms.md",
+  "line": 76,
+  "text": "- **Verified:** `art_chk_type_rec` 0x7E71C0E1 (trace id 7; its caller `art_chk_type` 0x7E71C075 is id 6) accepts 151/153 only when req+2==3 (block 0x7E71C1BA). (A10 2026-11-09)"
+ },
+ {
+  "id": "09b-141",
+  "section": "09b-art-algorithms.md",
+  "line": 141,
+  "text": "- **Verified:** the filter hash entry for 118 (table 0x7E85C45C, key 0x2E) \u2192 case 0x7E72A635 \u2192 0x7E71E705. This"
+ },
+ {
+  "id": "09b-145",
+  "section": "09b-art-algorithms.md",
+  "line": 145,
+  "text": "- **Verified:** the star module range 0x7E71E705\u20130x7E72032F contains no compare with 118. Its `(6,aX)` reads are"
+ },
+ {
+  "id": "09b-148",
+  "section": "09b-art-algorithms.md",
+  "line": 148,
+  "text": "- ~~**Verified:** I searched the image-engine driver (0x7E54xxxx\u20130x7E56xxxx) for compares on P+79. It branches on 96/97/165/166, 151/152 and 181\u2013184. It does **not** branch on 118.~~ (A11 2026-11-09)"
+ },
+ {
+  "id": "09b-149",
+  "section": "09b-art-algorithms.md",
+  "line": 149,
+  "text": "- **Verified (A11 2026-11-09):** the image-engine driver (0x7E540000\u20130x7E56FFFF) has no literal `cmp 118`, and none of the five P+79 hashes (0x7E78B29C, 0x7E74A568, 0x7E78CBA8, 0x7E78CCA8, 0x7E78CDA8) has key 118. But P+79 (P = desc+96) also feeds **three jump tables that give {118, 122} a case of their own** (122 = the movie-side Sparkle code, `mov_art` table 0x7E7FF008, 09a). Each case loads its own parameter pointer: (A11 2026-11-09)"
+ },
+ {
+  "id": "09b-157",
+  "section": "09b-art-algorithms.md",
+  "line": 157,
+  "text": "- **Verified:** `art_chk_type_rec` (0x7E71C0E1) accepts 118 for req+2 = 1 and 3, but not 2. (A10 2026-11-09)"
+ }
+]
