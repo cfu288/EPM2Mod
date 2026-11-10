@@ -28,6 +28,22 @@
 - framework templates (OMQueue) inside app class ranges;
 - the 18-function gap 0x7E965FD1–0x7E966A16 between the 16d and 16a ranges.
 
+## Paused 2026-11-10 (after cycle 3; cycle 4 interrupted)
+
+- **State:** cycle 3 is the last complete cycle, and its results above are current. The user allowed up to 5 cycles after C6 and 3 have run.
+- **Cycle 4 was interrupted** when the session ended. Its five index passes (16a–16e weak areas) never wrote to the repo.
+- **Saved locally:**
+  - the partial builder work;
+  - the builders that regenerate the committed 16a–16e TSVs (D4–D7);
+  - the hand-role tables and the cycle briefs.
+
+  All of these are in `out/index-builders/index-builders-d4-d8.tar.gz` (git-ignored; SHA256SUMS next to it).
+- **To resume:**
+  1. Unpack the archive.
+  2. Rerun the D7 builder of an index to reproduce its TSV (each 16x .md header gives the run order).
+  3. Then either redo the cycle-4 targets (the brief is `d8/BRIEF.md` in the archive, and the targets are the weak areas listed in the status table) or go straight to the confirmation round.
+- **Confirmation round:** C10 is already sampled (`coverage/round10.json`, 6 × 20 functions never used before; seed 10109) but has not been run.
+
 ## What "high confidence" means here
 
 A region of block 0 counts as understood when all of the following hold:
