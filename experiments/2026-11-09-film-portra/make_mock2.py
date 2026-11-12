@@ -29,7 +29,7 @@ import numpy as np
 import orfcodec
 from mocklib import fl, M5300
 
-DONOR = "shots/archive/PB090221.ORF" if os.path.exists("shots/archive/PB090221.ORF") else "shots/PB090221.ORF"
+DONOR = "shots/testraw/PB090221.ORF"
 H, W, P, X0, Y0, NC, NR = 3472, 4640, 48, 16, 8, 96, 72
 BLACK, UMAX, VG = 255, 3790.0, fl.V_GRAY
 WB = np.array([520 / 256, 1.0, 470 / 256]); MINV = np.linalg.inv(M5300)

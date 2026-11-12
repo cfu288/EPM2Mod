@@ -20,7 +20,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import orfcodec
 
-DONOR = "shots/PB090221.ORF"
+DONOR = "shots/testraw/PB090221.ORF"
 H, W, P, X0, Y0, NC, NR = 3472, 4640, 48, 16, 8, 96, 72
 BLACK, UMAX = 255, 3790.0
 WB = np.array([528 / 256, 1.0, 460 / 256])

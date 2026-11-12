@@ -1764,3 +1764,12 @@ dominates the look. Correction to §29.4: Vision3 250D's nearest installed look 
   tables placed in "free" loaded space (0x7ECB0888, 0x7F033B7C) still read back correctly (pixel-
   identical output), which argues against them being overwritten, but does not rule out the
   firmware using that space for something else at save time.
+
+## 42. Clean-up (2026-11-12)
+
+- `shots/` reduced to `testraw/`, `measured/`, `photos/` (see README). All other camera files this
+  document names (chart series PB0901xx, SpyderCheckr PB1102xx, real photos PA30/31xxxx, the
+  per-round folders) were deleted at the user's request; sections that analyse them cannot be
+  re-run. The cached patch readings `out/mock/read_*.npz` were kept.
+- Superseded patch specs moved to `patches/history/`; superseded firmware builds deleted.
+- `make_mock.py` / `make_mock2.py` now take the donor ORF from `shots/testraw/PB090221.ORF`.

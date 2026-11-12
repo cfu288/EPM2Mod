@@ -49,7 +49,7 @@ def unpack(p): return curves(p), p[3 * KN], np.concatenate([p[3 * KN + 1:3 * KN 
 
 # ---- data ----
 # The xp8 measurement this refit is anchored on: PB120002.JPG on the first test RAW. Uploads later reused that file
-# name, and the user moves older uploads into shots/archive*/; a copy is kept as shots/mock1/xp8_mock1.JPG (NOTES 37.4).
+# name, and the user moves older uploads into shots/archive*/; a copy is kept as shots/measured/xp8_mock1.JPG (NOTES 37.4).
 P8 = renormalise(A8) / 128.0; sat8 = SAT_PER_GAIN * GAIN8
 lin, w, kind = fl.samples(); us = (lin / 0.18 * fl.V_GRAY) @ MINV.T; tl_s = target(lin / 0.18 * fl.V_GRAY)
 HAVE_ANCHOR = os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), "out", "mock", "read_xp8_mock1.npz"))
@@ -101,7 +101,7 @@ def summary(tag, pm, ps, ph):
             f"GRKit set: gray {ds[kind == 0].mean():.2f} ColorChecker {ds[kind == 1].mean():.2f} random {ds[kind == 2].mean():.2f} | hold-out (model) {dh.mean():.2f}")
 
 if __name__ == "__main__":
-    assert HAVE_ANCHOR, "run read_mock.py shots/mock1/xp8_mock1.JPG first (the xp8 anchor measurement)"
+    assert HAVE_ANCHOR, "run read_mock.py shots/measured/xp8_mock1.JPG first (the xp8 anchor measurement)"
     lines = ["ΔE2000 vs the Portra target:"]
     pm, ps = predict(G8, sat8, S8, H8, P8)
     lines.append(summary("xp8 (mock = MEASURED)", pm, ps, R(uh, G8, sat8, S8, H8, P8)))

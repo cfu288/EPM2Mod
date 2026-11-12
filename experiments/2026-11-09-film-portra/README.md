@@ -18,9 +18,12 @@ Not in git: `shots/` (camera files), `out/` (fit results, target LUTs, readings)
 `out/` are needed to regenerate the patches; the patches themselves are committed. Target LUTs come
 from [spektrafilm](https://github.com/andreavolpato/spektrafilm) 0.3.4 (CC BY-SA 4.0).
 
-`shots/` layout: `testraw/` the synthetic RAWs; `mock1/`, `mock2/`, `stockfilters/`, `remap7/`,
-`remap2/`, `portracheck/`, `films1/`, `films1b/`, `films2/` one folder per measurement round, files
-named by look; `archive/` the photographed-chart series and real photos of the early stages (some
-scripts expect these directly under `shots/`).
+`shots/` layout (kept small on purpose; only what the current pipeline uses): `testraw/` the
+synthetic RAWs and the donor ORF whose header they borrow; `measured/` the camera's development of
+the test RAW for each current film (the last measurement and the one its fit was corrected
+against), plus stock Natural; `photos/` three ordinary photos taken with the seven-film build.
+The photographed-chart series, the per-round folders (`mock1/`, `mock2/`, `stockfilters/`,
+`remap7/`, …) and other files that NOTES and the earlier scripts name were deleted on 2026-11-12;
+their patch readings remain in `out/mock/read_*.npz` on the machine that made them.
 
 Run scripts from this folder with `../../.venv/bin/python -I <script>`.
