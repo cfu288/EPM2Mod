@@ -4,11 +4,14 @@ Goal: enable the dormant interval / time-lapse feature (info 482–486), using t
 
 - **Labels:** **V** = read in the bytes or run in the emulator; **I** = inferred.
 - **Addresses:** E-PM2 v1.6 runtime addresses (base 0x7E421020) unless the E-PL6 is named. The E-PL6 1.4 block 0 has the same base.
-- **Spec:** [patches/interval-timelapse.json](patches/interval-timelapse.json) (5 ops, 14 bytes, block 0 only).
+- **Specs (both block 0 only, neither built):**
+  - [patches/interval-timelapse.json](patches/interval-timelapse.json): **replace** Flash RC Mode (5 ops, 14 bytes; the fallback).
+  - [patches/interval-timelapse-insert.json](patches/interval-timelapse-insert.json): **insert** the row exactly as the E-PL6 does (43 ops, 626 bytes changed). See §10.
 
 ## Summary
 - **Missing on the E-PM2:** only menu wiring, in four places. The interval engine, the guards, panels 628/636/637/638–641, the panel factory entries and all 34 languages' strings are already there and match the E-PL6 (V).
-- **Approach:** the spec writes the E-PL6's Time Lapse row into the place of **Flash RC Mode** (Shooting Menu 2, last row). It does not insert a row. Flash RC Mode loses its menu row.
+- **Approach, replace spec:** the E-PL6's Time Lapse row goes into the place of **Flash RC Mode** (Shooting Menu 2, last row), and Flash RC Mode loses its menu row.
+- **Approach, insert spec:** a 37-row menu matching the E-PL6. In the emulator, every row's help, OK target and value matches the E-PL6 1.4 (V, §10).
 - **Not ported:** the E-PL6 holds the sleep and power-off timers while a sequence runs (0x7E998F12 and its new callers). That needs new code. For tests, set Sleep to Off.
 
 ## 1. The menu row
@@ -30,7 +33,7 @@ There are four structures. The E-PL6 changes all four; the E-PM2 has no slack in
 - **The other code is the same in both bodies (V).** All 300 / 53 / 265 instructions of 0x7EDEBF67 / 0x7EDEC745 / 0x7EDECE64, the page factory 0x7EDCBE97 and the 361 page/panel records (ids, types, flags) are the same after address normalisation. Only 0x7EDEC2C0 and the child lists of pages 3 and 25/26 differ.
 - **Inserting a row would cost more (V).** After an insert, every global row number above 10 moves. A constant-shift scan (`results/rowshift-constants.txt`) finds the E-PL6 renumbered `mov/cmp 31..35` in 0x7EDEC2C0 and `mov 33,d0` (→ 34) in 9 panel functions (0x7EDE35AC, 0x7EDE4FBD, 0x7EDFD3A8 …). An insert would also need (a) and (c) moved to free space, the 6 imm32 table loads repointed, and (b) rewritten.
 
-### 1.2 Decision: replace Flash RC Mode (V for the bytes, I for the value judgement)
+### 1.2 Replace spec: Flash RC Mode's slot (V for the bytes, I for the value judgement; the insert spec is §10)
 - **No room:** there is no slack after (a) or (c), and neither table has a size field (V).
 - **Row 11 is the right slot.** Flash RC Mode is row 11, so the new row lands exactly where the E-PL6 has Time Lapse. Rows 1–10 and 12–36 keep their numbers, so (b), the row constants and the cursor memory stay valid (V).
 - **The value list already fits.** Row 11's value list is Off/On, the same list the E-PL6 uses for its Time Lapse row (V).
@@ -118,14 +121,15 @@ The new cases are in `tools/emu/cases.py`. Each has an independent Python model 
 
 | Case | Entry | Rows | Stock model | Diff vs the spec |
 |---|---|---|---|---|
-| `menu_help` | 0x7EDEC745 (help id → DM 45, through the .data tab lists and the top table) | 42 (every tab bar and row) | 42/42 | **1 changed:** tab 1 row 4 (global row 11), help **403 → 1358**. 41 identical. Every changed row read a patched byte; 0 flagged |
-| `menu_child` | 0x7EDEC618 + 0x7EDCCA8C (the panel that OK opens) | 42 | 42/42 | **1 changed:** tab 1 row 4, panel **18 → 628**. 0 flagged |
-| `menu_value` | 0x7EDEC2C0 + 0x7EE01DDA (right-column value) | 16 (rows 3, 5, 6, 7, 10, 11, 13, 32 × value 0/1) | 16/16 | **2 changed:** row 11 reads **180 → 482**; it shows 1371 "Off" / 198 "On" as before. 0 flagged |
+| `menu_help` | 0x7EDEC745 (help id → DM 45, through the .data tab lists and the top table) | 43 (every tab bar and row slot; tab 1 has 6 slots so the E-PL6 fits) | 43/43 | **1 changed:** tab 1 row 4 (global row 11), help **403 → 1358**. 42 identical. Every changed row read a patched byte; 0 flagged |
+| `menu_child` | 0x7EDEC618 + 0x7EDCCA8C (the panel that OK opens) | 43 | 43/43 | **1 changed:** tab 1 row 4, panel **18 → 628**. 0 flagged |
+| `menu_value` | 0x7EDEC2C0 + 0x7EE01DDA (right-column value) | 74 (global rows 1–37 × value 0/1) | 74/74 | **2 changed:** row 11 reads **180 → 482**; it shows 1371 "Off" / 198 "On" as before. 0 flagged |
 | `ivl_guard` | 0x7E969C11 start guard, 0x7E969ACE movie guard | 192 (482 × 4 state inputs × 6 state words) | 192/192 | 0 changed. The guards read **only info 482**: 483–485 and the defaults do not affect them |
 
 - **Guard results:** both guards return 1 exactly when 482 = 1 and no blocking state is set (RecView/recording, multiple-exposure flag, state bits 1–3; for the movie guard, the time-lapse-movie state).
 - **Not emulated:** the full menu builder 0x7EDEBF67 (drawing and many callees), and the label read. The label comes from the same record, so it is checked by the byte parse in §1 only.
-- **IS row case:** row 8 (IS) was dropped from `menu_value`, because its .data value-list pointer is NULL and the formatter faulted reading address 0 (V; not a patch effect).
+- **Skipped rows:** `menu_value` skips the IS row (kind 0), because its .data value-list pointer is NULL and the formatter faulted reading address 0 (V; the same in both bodies). It also skips the date row (kind 0x106), whose case calls an object through a vtable.
+- **Both bodies:** the menu cases pick their addresses from the image (E-PM2 or E-PL6 profile) and follow relocated tables. Results: `results/emu-replace-*`, `results/emu-insert-*`, `results/compare-bodies*`.
 
 **What only the camera can test (I):**
 - the row draws and is selectable, and panel 628 / 637 open;
@@ -161,8 +165,84 @@ The new cases are in `tools/emu/cases.py`. Each has an independent Python model 
 - 10a §1.2 links ` IntervalShooting Count ZERO ` to the 483 default. That is **wrong**: 0x7ECD2DC2 reads **489** (frames done) (V).
 - 10a §1.3 says "the E-PL6 extra call … may be a fix". It is the power/sleep timer hold 0x7E998F12 (V code, I purpose).
 
+## 10. Insert spec: the E-PL6 wiring reproduced (V unless marked)
+**Is the free space loaded at run time? Yes.**
+- Block 0 is not loaded whole. Usr1 at 0x7E504D50 reads flash 0x80B6A800 into 0xBECCB800 (taken to be the uncached view of 0x7ECCB800: I) through SYSFMEM 0x7E451306. The size is `0x7F034000 − 0x7ECCB800` = 0x368800. Next it runs the segment-3 constructor walker 0x7E44B6B0(3).
+- For both Usr1 segments, flash = 0x802C0020 + block-0 offset. So block-0 bytes 0x7ECCB800–0x7F033FFF are what lands in RAM. The menu tables and the GUI code are in this range; 0x7F034000 and above are not loaded.
+- **Space used:** 0x7F033B7C–0x7F033FFF is 0xFF (1,156 B). It follows the constructor table 0x7F033AC8–0x7F033B7B, which the walker takes by count (`mov 180,d2`), not up to a terminator.
+- An any-alignment scan of block 0 finds no imm32 and no data word in that range (`results/refscan.txt`). The spec leaves 0x7F033B7C–0x7F033BFF untouched and uses 0x7F033C00–0x7F033E12.
+- **References to the old tables (same scan):**
+  - top table: exactly the 6 imm32 loads (all of the base; no offset into the table is used);
+  - page-3 list: only its page record's pointer 0x7EFFA4B0;
+  - two unaligned hits at 0x7EFA0A19 / 0x7EFA5EC1 are inside numeric tables (coincidence).
+
+| Part | E-PM2 edit (generated by `scripts/mkspec_insert.py` from the stock bytes; each asserted equal to the E-PL6) | E-PL6 1.4 counterpart |
+|---|---|---|
+| (a) top table | 37 rows + terminator at **0x7F033C00**, byte-identical to E-PL6 0x7EFFF864. 6 imm32 → 0x7F033C00 (0x7EDEC0A5, …0FA, …121, …7A6, 0x7EDECF42, 0x7EDED085). The old table stays, now unreferenced | its own table |
+| (b) .data tab layout (ROM 0x7E8EE8A2) | tab 1 = 7–12, tabs 2–5 +1, tab-1 count 5 → 6: equal to E-PL6 | 0x7E8EE8CA |
+| (c) page 3 list | {13, 14, 15, 16, (628, 482), 18} + terminator at **0x7F033D80**; record pointer 0x7EFFA4B0 → it | 0x7EFFA324 |
+| (d1) .data row value lists (RAM 0x602BE874, 40 entries) | Off/On inserted at row 11, rows 11–38 → 12–39. Non-zero rows {3, 5, 6, 7, 10, 11, 12, 14, 33, 34, 35} and every list's content equal the E-PL6 | RAM 0x602BE89C (41 entries) |
+| (d2) value switch 0x7EDEC2C0 | the constants for rows 13, 31, 32, 33 and 34 +1 (10 sites). The old row-11 case at 0x7EDEC335 becomes `jmp 0x7F033DE0`, a **51-byte cave** that maps row 11 → getSetting(482) and row 12 → getSetting(180), then returns to the formatter tail 0x7EDEC432 or the next case 0x7EDEC34A. The 16 bytes after the jmp are left, unreachable (the only branches into the block target its start) | the case inserted in line, 0x7EDED1CB–0x7EDED1F2 |
+| (d3) panel row arguments | 20 × `mov 33,d0` → 34: the formatter / reverse formatter calls in the 10 monitor-adjust panel functions (0x7EDE35AC … 0x7EDFD725) | 34 at all 20 |
+| (e) defaults | 483 = 10, 485 = 5 s, as the replace spec | — |
+
+**Row constants (`results/rowshift-constants.txt`, `scripts/rowsites.py`, `scripts/fmtsites.py`):**
+- **Mirrored (V):** every `k → k+1` the E-PL6 made in menu code (31 sites = (d2) + (d3)).
+- **Not mirrored, because they are not top-menu rows (V code, I meaning):**
+  - CA sub-app command ids (0x7ECDF738, 0x7ECE0004, 0x7ECE078C, 0x7ECE1AB1);
+  - dial events in SS_BTSEND / SS_DPS (0x7ED8479E, 0x7EDA21C3);
+  - an SS_SPC state (0x7EDC02B7);
+  - a page-141 list size (0x7EE00464);
+  - a pages 35–37 list size (0x7EDE3131/32DA, `cmp 10 → 11`).
+- **The Custom Menu group sizes in .data (RAM 0x602BE390) also differ:** B 4→5, C 6→7, D 17→18, J 5→6. These are the E-PL6's extra Custom Menu items (page 25/26 children 651, 659, 130, 173). They are not ported.
+- **.data check:** an aligned u16 diff of the whole .data image (`results/data-diff.txt`) finds only these `+1` runs: the Custom Menu sizes, plus 2 single words (0x8F5A, 0xA6D9) that look like pointer halves. The byte-packed tab layout and the pointer lists are covered above.
+- **Constants the E-PM2 needs but the E-PL6 did not change:** none found.
+  - All 14 formatter calls and all 12 reverse-formatter calls in the E-PM2 have constant row arguments 33 or 5, or a computed one (0x7EDEA29B uses another, id-indexed table). They map one-to-one to the E-PL6's 14 + 12 sites.
+  - The .data value lists are read only by the two formatters.
+  - The tab-layout bytes and the top table are read only by the 3 identical page functions.
+
+**Emulator (`results/compare-bodies.txt|json`, `results/compare-bodies-summary.txt`):** the three menu cases ran on four images: stock, replace, insert and the **E-PL6 1.4 block 0**.
+
+| Case | Rows | insert ≠ E-PL6 | replace ≠ E-PL6 | Model errors (all 4 images) |
+|---|---|---|---|---|
+| `menu_help` (help id per tab/row) | 43 | **0** | 26 (rows 12+ keep the E-PM2 numbering) | 0 |
+| `menu_child` (OK target) | 43 | **0** | 1 (no RC row) | 0 |
+| `menu_value` (setting + string per global row) | 74 | **0** | 52 | 0 |
+
+- **Flash RC Mode at its new place (insert):** tab 1 row 5, global row 12. Help 403, OK opens panel 18, value getSetting(**180**) → Off/On. This is the same as the E-PL6.
+- **Stock vs insert** (`results/emu-insert-*`): `menu_help` 27 changed and `menu_child` 2 changed, all toward the E-PL6 values; `menu_value` 54 changed; `ivl_guard` 0 changed.
+  - emurun flags 10 + 4 rows "reads patched bytes but unchanged". These are rows 1–10, read from the relocated copy, whose values match. That is expected for a relocation, not an error.
+  - The cave ran inside the case's allowed ranges.
+- **Not emulated:** the 20 panel constants (d3). They are checked only by bytes against the E-PL6's 20 sites.
+
+**The two specs compared:**
+
+| | Replace (`interval-timelapse.json`) | Insert (`interval-timelapse-insert.json`) |
+|---|---|---|
+| Ops / bytes changed | 5 / 14 | 43 / 626 |
+| Code changes | 1 immediate | 6 table pointers, 30 immediates, a 5-byte jmp and a 51-byte code cave |
+| Data changes | 1 row, 1 child entry, 2 defaults | new 37-row table and page list in padding, .data tab layout and value lists, 1 record pointer, 2 defaults |
+| Menu result | 36 rows; Time Lapse replaces Flash RC Mode | 37 rows, equal to the E-PL6 1.4 row for row (emulator) |
+| Flash RC Mode | no menu row | kept, row 12 |
+| Extra risks (I) | the lost RC row | code executing from the rodata padding (the GUI segment is one RAM copy; no NX is known on this CPU, but not proven); more sites to get wrong (the panel constants are not emulated); the saved menu cursor for tabs 2–5 may land one row off after flashing (DM state) |
+| Restore | stock v1.6 | stock v1.6 |
+
+**Extra camera checks for the insert spec:**
+- every tab draws, with its row count (Shooting Menu 2 = 6 rows);
+- Flash RC Mode toggles;
+- Setup ▸ Monitor adjust (`@A032@`) still shows and changes brightness / colour: this is the (d3) panels;
+- Language and Rec View show their values;
+- Custom Menu entries open the right pages.
+
 ## Files
-- `patches/interval-timelapse.json`: the spec.
+- `patches/interval-timelapse.json`: the replace spec.
+- `patches/interval-timelapse-insert.json`: the insert spec (ops carry a `_why` note; build.py ignores it).
+- `scripts/` (insert spec):
+  - `mkspec_insert.py`: builds the insert ops;
+  - `refscan.py`: reference scan;
+  - `rowsites.py`, `fmtsites.py`: row constants;
+  - `datadiff.py`: .data diff;
+  - `compare_bodies.py`: runs the menu cases on several images.
 - `scripts/`: helpers. Run them with `python3 -I`; they use the scratch block copies.
   - `extract.py`, `langs.py`: block and language extraction;
   - `dis.py`, `cmp.py`, `side.py`: disassembly and side-by-side;

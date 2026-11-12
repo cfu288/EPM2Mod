@@ -1,0 +1,2 @@
+patched bytes: 626 in 57 runs
+ivl_guard: 192 rows, 0 changed, 192 identical, 0 flagged

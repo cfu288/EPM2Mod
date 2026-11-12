@@ -811,12 +811,29 @@ CASES.update({c.name: c for c in (RateTable(), EncParamCheck(), EncRateFields())
 
 
 # ---- interval shooting / time-lapse menu row and guards (experiments/2026-11-13-intervalometer) ----------------
-DATA_ROM = 0x1E6304C0             # ROM image of .data = RAM + this (0x7E8DA000 -> 0x602A9B40, map section 01)
-TOP_TABLE = 0x7EFFE13C            # top-menu rows {u16 item, label, help, kind, param}, 1-based global row numbers
-TAB_ROWS, TAB_COUNT, TAB_HELP = 0x602BE3CE, 0x602BE446, 0x602BE44C   # .data: 6 x 20-byte row lists, 6 counts, tab helps
-CUR_TAB, CUR_ROW, HELP_TOGGLE = 0x602BE48C, 0x602BE490, 0x602BE4AC   # u16 current tab, current row (-1 = tab bar)
-TAB_PAGES = 0x7EFF8BAC            # page 1 child list {u32 page, u32 kind}: tab -> page 2..7
-PAGE_RECS = 0x7EFFA44C            # 40-byte page/panel records {id, -15, type, 1, 1|2, children*, ...}, id 0 ends
+# The menu cases run on the E-PM2 v1.6 (stock or patched) and on the E-PL6 1.4 block 0 (same base). body_of()
+# picks the profile from the image; the tables the code reads (top table, page lists) are found the way the code
+# finds them (the imm32 in the help writer, the page record's child pointer), so relocated tables are followed.
+DATA_ROM = 0x1E6304C0             # ROM image of .data = RAM + this, both bodies (0x7E8DA000 -> 0x602A9B40, map section 01)
+BODIES = {
+    "E-PM2": dict(help=(0x7EDEC745, 0x7EDEC7C3), dm=0x7ECEF667, top_site=0x7EDEC7A6,
+                  tab_rows=0x602BE3CE, tab_count=0x602BE446, tab_help=0x602BE44C,
+                  cur_tab=0x602BE48C, cur_row=0x602BE490, toggle=0x602BE4AC,
+                  child=(0x7EDEC618, 0x7EDEC663), lookup=(0x7EDCCA8C, 0x7EDCCABB), tab_pages=0x7EFF8BAC, page_recs=0x7EFFA44C,
+                  value=(0x7EDEC2C0, 0x7EDEC50E), fmt=(0x7EE01DDA, 0x7EE01E1E), get=0x7EE01D38, ptrs=0x602BE874),
+    "E-PL6": dict(help=(0x7EDED5F0, 0x7EDED66E), dm=0x7ECEFB2C, top_site=0x7EDED651,
+                  tab_rows=0x602BE3F6, tab_count=0x602BE46E, tab_help=0x602BE474,
+                  cur_tab=0x602BE4B4, cur_row=0x602BE4B8, toggle=0x602BE4D4,
+                  child=(0x7EDED4C3, 0x7EDED50E), lookup=(0x7EDCD889, 0x7EDCD8B8), tab_pages=0x7EFFA298, page_recs=0x7EFFBB74,
+                  value=(0x7EDED156, 0x7EDED3B9), fmt=(0x7EE02C6E, 0x7EE02CB2), get=0x7EE02BCC, ptrs=0x602BE89C),
+}
+CAVE = (0x7F033DE0, 0x7F033E13)   # interval-timelapse-insert.json: value-switch cave (rows 11 and 12)
+MEMSET = 0x7E500D73               # same address in both bodies
+
+
+def body_of(image):
+    rec = image[0x7EFFF8C8 - BASE:0x7EFFF8C8 - BASE + 10]
+    return "E-PL6" if rec == struct.pack("<5H", 0, 1357, 1358, 0x102, 1) else "E-PM2"
 
 
 def load_data(emu, ram, n):
@@ -825,52 +842,60 @@ def load_data(emu, ram, n):
     emu.write(ram, emu.image[o:o + n])
 
 
-def tab_rows(image, tab):
-    o = TAB_ROWS + DATA_ROM - BASE
-    n = image[TAB_COUNT + DATA_ROM - BASE + tab]
-    return list(image[o + 20 * tab:o + 20 * tab + n])
+def dget(image, ram, fmt):
+    return struct.unpack_from(fmt, image, ram + DATA_ROM - BASE)
 
 
-def top_row(image, row):
-    return struct.unpack_from("<5H", image, TOP_TABLE - BASE + 10 * (row - 1))
+def tab_rows(image, prof, tab):
+    n = dget(image, prof["tab_count"] + tab, "<B")[0]
+    return list(dget(image, prof["tab_rows"] + 20 * tab, f"<{n}B"))
 
 
-def page_child(image, page, idx):
-    """child panel id of entry idx of the page's 12-byte child list (pages 2..7)."""
-    a = PAGE_RECS
+def top_table(image, prof):
+    return struct.unpack_from("<I", image, prof["top_site"] - BASE)[0]
+
+
+def page_kids(image, prof, page):
+    a = prof["page_recs"]
     while True:
-        rid = struct.unpack_from("<I", image, a - BASE)[0]
+        rid, = struct.unpack_from("<I", image, a - BASE)
         if rid == 0:
             return None
         if rid == page:
-            kids = struct.unpack_from("<I", image, a - BASE + 20)[0]
-            return struct.unpack_from("<H", image, kids - BASE + 12 * idx)[0]
+            return struct.unpack_from("<I", image, a - BASE + 20)[0]
         a += 40
 
 
+MAXROWS = (6, 5, 6, 10, 3, 6)
+
+
 def menu_rows():
-    return [dict(tab=t, row=-1) for t in range(6)] + [dict(tab=t, row=r) for t, n in enumerate((6, 5, 6, 10, 3, 6))
-                                                      for r in range(n)]
+    """every tab bar and every row slot up to the larger body's count (E-PL6 tab 1 has 6 rows)"""
+    return [dict(tab=t, row=-1) for t in range(6)] + [dict(tab=t, row=r) for t, n in enumerate(MAXROWS)
+                                                      for r in range(n + (t == 1))]
 
 
 class MenuHelp(Case):
     name, entry = "menu_help", 0x7EDEC745
-    doc = ("main-menu help/DM writer: from the current tab (0x602BE48C) and row (0x602BE490), takes the help "
-           "string of the top-menu row (tab row list in .data -> 1-based global row -> TOP_TABLE+10*(row-1)+4) or the "
-           "tab's own help (row -1), and stores {toggle, 0, help} as DM block 45")
-    ranges = [(0x7EDEC745, 0x7EDEC7C3)]
-    S_MEMSET, S_DM = 0x7E500D73, 0x7ECEF667
-    stubs_doc = [(S_MEMSET, "memset(a0, d0, d1): done in Python"),
-                 (S_DM, "DM set (d0 block 45, d1 size 4, a0 buffer, a1 1): the buffer is captured")]
+    doc = ("main-menu help/DM writer (E-PM2 0x7EDEC745, E-PL6 0x7EDED5F0): from the current tab and row takes the help "
+           "string of the top-menu row (tab row list in .data -> 1-based global row -> table+10*(row-1)+4) or the tab's "
+           "own help (row -1), and stores {toggle, 0, help} as DM block 45. Rows past a body's tab count: absent")
+    ranges = [BODIES[b]["help"] for b in BODIES]
+    stubs_doc = [(MEMSET, "memset(a0, d0, d1): done in Python"),
+                 (0x7ECEF667, "DM set (d0 block 45, d1 size 4, a0 buffer, a1 1): the buffer is captured (E-PL6 0x7ECEFB2C)")]
 
     def rows(self):
         return menu_rows()
 
     def run(self, emu, row):
-        load_data(emu, TAB_ROWS, 0x90)
-        emu.write(CUR_TAB, struct.pack("<H", row["tab"]))
-        emu.write(CUR_ROW, struct.pack("<h", row["row"]))
-        emu.write(HELP_TOGGLE, b"\0\0")
+        prof = BODIES[body_of(emu.image)]
+        n = len(tab_rows(emu.image, prof, row["tab"]))
+        if row["row"] >= n:
+            return {"absent": True, "_r": {"pcs": set()}, "_reads": []}
+        load_data(emu, prof["tab_rows"], 0x90)
+        emu.write(prof["cur_tab"], struct.pack("<H", row["tab"]))
+        emu.write(prof["cur_row"], struct.pack("<h", row["row"]))
+        emu.write(prof["toggle"], b"\0\0")
         cap = {}
 
         def memset(e, r):
@@ -880,73 +905,89 @@ class MenuHelp(Case):
         def dm(e, r):
             cap["blk"], cap["buf"] = r["d0"], e.read(r["a0"], 4)
             return {"d0": 0}
-        r = emu.call(self.entry, stubs={self.S_MEMSET: memset, self.S_DM: dm})
-        g = tab_rows(emu.image, row["tab"])[row["row"]] if row["row"] >= 0 else 0
-        out = {"block": cap.get("blk"), "help": struct.unpack_from("<H", cap["buf"], 2)[0], "_r": r}
-        if g:
-            out["_reads"] = [(TOP_TABLE + 10 * (g - 1) + 4, 2)]
+        r = emu.call(prof["help"][0], stubs={MEMSET: memset, prof["dm"]: dm})
+        out = {"block": cap.get("blk"), "help": struct.unpack_from("<H", cap["buf"], 2)[0], "_r": r, "_reads": []}
+        if row["row"] >= 0:
+            g = tab_rows(emu.image, prof, row["tab"])[row["row"]]
             out["grow"] = g
-        else:
-            out["_reads"] = []
+            out["_reads"] = [(top_table(emu.image, prof) + 10 * (g - 1) + 4, 2)]
         return out
 
     def model(self, row, image):
+        prof = BODIES[body_of(image)]
+        rows = tab_rows(image, prof, row["tab"])
+        if row["row"] >= len(rows):
+            return {"absent": True}
         if row["row"] < 0:
-            return {"block": 45, "help": struct.unpack_from("<H", image, TAB_HELP + DATA_ROM - BASE + 2 * row["tab"])[0]}
-        g = tab_rows(image, row["tab"])[row["row"]]
-        return {"block": 45, "help": top_row(image, g)[2], "grow": g}
+            return {"block": 45, "help": dget(image, prof["tab_help"] + 2 * row["tab"], "<H")[0]}
+        g = rows[row["row"]]
+        return {"block": 45, "grow": g,
+                "help": struct.unpack_from("<H", image, top_table(image, prof) - BASE + 10 * (g - 1) + 4)[0]}
 
 
 class MenuChild(Case):
     name, entry = "menu_child", 0x7EDEC618
-    doc = ("main-menu current item: tab -> page (page-1 child list 0x7EFF8BAC), page record lookup 0x7EDCCA8C, "
-           "then the page's 12-byte child list [row] -> the panel that OK / right opens (0 for the tab bar)")
-    ranges = [(0x7EDEC618, 0x7EDEC663), (0x7EDCCA8C, 0x7EDCCABB)]
+    doc = ("main-menu current item (E-PM2 0x7EDEC618, E-PL6 0x7EDED4C3): tab -> page (page-1 child list), page record "
+           "lookup, then the page's 12-byte child list [row] -> the panel that OK / right opens (0 for the tab bar)")
+    ranges = [BODIES[b][k] for b in BODIES for k in ("child", "lookup")]
 
     def rows(self):
         return menu_rows()
 
     def run(self, emu, row):
-        emu.write(CUR_TAB, struct.pack("<H", row["tab"]))
-        emu.write(CUR_ROW, struct.pack("<h", row["row"]))
-        r = emu.call(self.entry)
-        out = {"panel": r["regs"]["d0"] & 0xFFFF, "_r": r}
+        prof = BODIES[body_of(emu.image)]
+        if row["row"] >= len(tab_rows(emu.image, prof, row["tab"])):
+            return {"absent": True, "_r": {"pcs": set()}, "_reads": []}
+        emu.write(prof["cur_tab"], struct.pack("<H", row["tab"]))
+        emu.write(prof["cur_row"], struct.pack("<h", row["row"]))
+        r = emu.call(prof["child"][0])
+        out = {"panel": r["regs"]["d0"] & 0xFFFF, "_r": r, "_reads": []}
         if row["row"] >= 0:
-            page = struct.unpack_from("<I", emu.image, TAB_PAGES - BASE + 8 * row["tab"])[0]
-            a = PAGE_RECS
-            while struct.unpack_from("<I", emu.image, a - BASE)[0] != page:
-                a += 40
-            kids = struct.unpack_from("<I", emu.image, a - BASE + 20)[0]
-            out["_reads"] = [(kids + 12 * row["row"], 2)]
-        else:
-            out["_reads"] = []
+            page = struct.unpack_from("<I", emu.image, prof["tab_pages"] - BASE + 8 * row["tab"])[0]
+            out["_reads"] = [(page_kids(emu.image, prof, page) + 12 * row["row"], 2)]
         return out
 
     def model(self, row, image):
+        prof = BODIES[body_of(image)]
+        if row["row"] >= len(tab_rows(image, prof, row["tab"])):
+            return {"absent": True}
         if row["row"] < 0:
             return {"panel": 0}
-        page = struct.unpack_from("<I", image, TAB_PAGES - BASE + 8 * row["tab"])[0]
-        return {"panel": page_child(image, page, row["row"])}
+        page = struct.unpack_from("<I", image, prof["tab_pages"] - BASE + 8 * row["tab"])[0]
+        return {"panel": struct.unpack_from("<H", image, page_kids(image, prof, page) - BASE + 12 * row["row"])[0]}
 
 
 class MenuValue(Case):
     name, entry = "menu_value", 0x7EDEC2C0
-    doc = ("main-menu right-column value of a global row (d0): reads the row's setting through getSetting 0x7EE01D38 "
-           "and maps it to a string id with 0x7EE01DDA (per-row {value, string} lists through the .data pointer table "
-           "0x602BE874); writes the string id to (a3 = d1)")
-    ranges = [(0x7EDEC2C0, 0x7EDEC50E), (0x7EE01DDA, 0x7EE01E1E)]
-    S_GET = 0x7EE01D38
-    PTRS = 0x602BE874
-    stubs_doc = [(S_GET, "getSetting(d0 id, a0 out): writes the row's value to *a0; the id is logged")]
-    ROWS = (3, 5, 6, 7, 10, 11, 13, 32)       # row 8 (IS) has a NULL value list in .data: the formatter reads address 0
-    IMM = {3: 0x7EDEC2D1, 5: 0x7EDEC2E5, 7: 0x7EDEC2FA, 8: 0x7EDEC30F, 10: 0x7EDEC324, 11: 0x7EDEC339,
-           6: 0x7EDEC34E, 13: 0x7EDEC362, 32: 0x7EDEC424}
+    doc = ("main-menu right-column value of global row d0 (E-PM2 0x7EDEC2C0, E-PL6 0x7EDED156): reads the row's setting "
+           "through getSetting and maps it to a string id with the row formatter (per-row {value, string} lists through "
+           "the .data pointer table); writes the string id to (a3 = d1). Rows 1-37; the date row (kind 0x106) and the IS row (kind 0, NULL list) are skipped")
+    ranges = [BODIES[b][k] for b in BODIES for k in ("value", "fmt")] + [CAVE]
+    stubs_doc = [(0x7EE01D38, "getSetting(d0 id, a0 out): writes the row's value to *a0; the id is logged (E-PL6 0x7EE02BCC)")]
+    # model: the info a row's value case reads = the top-table param, except these labels (V: switch disassembly)
+    INFO_BY_LABEL = {363: 34, 1357: 482, 175: (31, 265)}      # Digital Tele-converter, Time Lapse, monitor adjust
 
     def rows(self):
-        return [dict(grow=g, value=v) for g in self.ROWS for v in (0, 1)]
+        return [dict(grow=g, value=v) for g in range(1, 38) for v in (0, 1)]
+
+    def row_info(self, image, prof, g):
+        top = top_table(image, prof)
+        n = 0
+        while struct.unpack_from("<5H", image, top - BASE + 10 * n) != (0, 0, 0, 0, 0):
+            n += 1
+        if g > n:
+            return None, None
+        item, label, hlp, kind, param = struct.unpack_from("<5H", image, top - BASE + 10 * (g - 1))
+        return kind, (label, param)
 
     def run(self, emu, row):
-        load_data(emu, self.PTRS, 4 * 40)
+        prof = BODIES[body_of(emu.image)]
+        kind, lp = self.row_info(emu.image, prof, row["grow"])
+        if kind is None:
+            return {"absent": True, "_r": {"pcs": set()}}
+        if kind in (0x106, 0x000):
+            return {"skipped": "date row" if kind else "IS row: NULL value list, the formatter reads address 0", "_r": {"pcs": set()}}
+        load_data(emu, prof["ptrs"], 4 * 41)
         emu.write(DATA, b"\x01" + b"\0" * 63)
         ids = []
 
@@ -954,16 +995,23 @@ class MenuValue(Case):
             ids.append(r["d0"] & 0xFFFF)
             e.write(r["a0"], struct.pack("<I", row["value"]))
             return {"d0": 0}
-        r = emu.call(self.entry, {"d0": row["grow"], "a1": DATA, "d1": DATA + 0x20}, stubs={self.S_GET: get})
-        return {"setting": ids, "string": struct.unpack_from("<H", emu.read(DATA + 0x20, 2))[0], "_r": r,
-                "_reads": [(self.IMM[row["grow"]], 3)]}
+        r = emu.call(prof["value"][0], {"d0": row["grow"], "a1": DATA, "d1": DATA + 0x20}, stubs={prof["get"]: get})
+        return {"label": lp[0], "setting": ids, "string": struct.unpack_from("<H", emu.read(DATA + 0x20, 2))[0], "_r": r}
 
     def model(self, row, image):
-        a = self.IMM[row["grow"]]
-        o = a - BASE
-        assert image[o] in (0x2C, 0x80, 0xFA), hex(image[o])
-        info = image[o + 1] if image[o] == 0x80 else struct.unpack_from("<H", image, o + 1)[0]
-        p = struct.unpack_from("<I", image, self.PTRS + DATA_ROM - BASE + 4 * row["grow"])[0]
+        prof = BODIES[body_of(image)]
+        kind, lp = self.row_info(image, prof, row["grow"])
+        if kind is None:
+            return {"absent": True}
+        if kind in (0x106, 0x000):
+            return {"skipped": "date row" if kind else "IS row: NULL value list, the formatter reads address 0"}
+        label, param = lp
+        if kind not in (0x000, 0x001, 0x002, 0x101, 0x102, 0x107):
+            return {"label": label, "setting": [], "string": 0}
+        info = self.INFO_BY_LABEL.get(label, param)
+        if kind == 0x107:
+            return {"label": label, "setting": list(info), "string": 0}
+        p = dget(image, prof["ptrs"] + 4 * row["grow"], "<I")[0]
         s = 0
         while p:
             v, sid = struct.unpack_from("<2I", image, p - BASE)
@@ -973,12 +1021,12 @@ class MenuValue(Case):
                 s = sid & 0xFFFF
                 break
             p += 8
-        return {"setting": [info], "string": s}
+        return {"label": label, "setting": [info], "string": s}
 
 
 class IvlGuard(Case):
     name, entry = "ivl_guard", 0x7E969C11
-    doc = ("isStartIntervalShootingEnable (guard=start, 0x7E969C11) and isCreateTimeLapseMovieEnable (guard=movie, "
+    doc = ("E-PM2 isStartIntervalShootingEnable (guard=start, 0x7E969C11) and isCreateTimeLapseMovieEnable (guard=movie, "
            "0x7E969ACE): read info 482 and the shooting-state words; 1 = allowed")
     ENTRIES = {"start": 0x7E969C11, "movie": 0x7E969ACE}
     ranges = [(0x7E969ACE, 0x7E969B43), (0x7E969C11, 0x7E969C87), (0x7E96998B, 0x7E9699AA), (0x7E969A6A, 0x7E969A73)]

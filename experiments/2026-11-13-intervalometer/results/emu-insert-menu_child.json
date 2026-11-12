@@ -1,7 +1,7 @@
 {
  "case": "menu_child",
  "stock": "/path/to/epm2-tools/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin",
- "patched": "/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/ivl/emurun-pu_elh_t.block0.bin",
+ "patched": "/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/ivl/emurun-u2ba_y28.block0.bin",
  "rows": [
   {
    "row": {
@@ -183,7 +183,9 @@
     "panel": 13
    },
    "diff": {},
-   "flags": []
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
   },
   {
    "row": {
@@ -197,7 +199,9 @@
     "panel": 14
    },
    "diff": {},
-   "flags": []
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
   },
   {
    "row": {
@@ -211,7 +215,9 @@
     "panel": 15
    },
    "diff": {},
-   "flags": []
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
   },
   {
    "row": {
@@ -225,7 +231,9 @@
     "panel": 16
    },
    "diff": {},
-   "flags": []
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
   },
   {
    "row": {
@@ -242,6 +250,29 @@
     "panel": [
      18,
      628
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 1,
+    "row": 5
+   },
+   "stock": {
+    "absent": true
+   },
+   "patched": {
+    "panel": 18
+   },
+   "diff": {
+    "absent": [
+     true,
+     null
+    ],
+    "panel": [
+     null,
+     18
     ]
    },
    "flags": []

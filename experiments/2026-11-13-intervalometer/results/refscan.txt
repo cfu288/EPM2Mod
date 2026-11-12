@@ -1,0 +1,24 @@
+# stock E-PM2: refs to old top table, old page-3 list, the free space
+7edec0a5 off 9cb085 value 7effe13c pre fcdc aligned False
+7edec0cb off 9cb0ab value 7effe2ae pre fcdd aligned False
+7edec0fa off 9cb0da value 7effe13c pre fcc0 aligned False
+7edec121 off 9cb101 value 7effe13c pre fcc0 aligned False
+7edec7a6 off 9cb786 value 7effe13c pre fcc1 aligned False
+7edecf22 off 9cbf02 value 7effe2ae pre fcdc aligned False
+7edecf42 off 9cbf22 value 7effe13c pre fcdc aligned False
+7eded085 off 9cc065 value 7effe13c pre fcd1 aligned False
+7efa0a19 off b7f9f9 value 7eff8c28 pre ff68 aligned False
+7efa5ec1 off b84ea1 value 7eff8c28 pre ff68 aligned False
+7effa4b0 off bd9490 value 7eff8c38 pre 0000 aligned True
+# insert-patched: same ranges
+7edec0a5 off 9cb085 value 7f033c00 pre fcdc aligned False
+7edec0cb off 9cb0ab value 7effe2ae pre fcdd aligned False
+7edec0fa off 9cb0da value 7f033c00 pre fcc0 aligned False
+7edec121 off 9cb101 value 7f033c00 pre fcc0 aligned False
+7edec7a6 off 9cb786 value 7f033c00 pre fcc1 aligned False
+7edecf22 off 9cbf02 value 7effe2ae pre fcdc aligned False
+7edecf42 off 9cbf22 value 7f033c00 pre fcdc aligned False
+7eded085 off 9cc065 value 7f033c00 pre fcd1 aligned False
+7efa0a19 off b7f9f9 value 7eff8c28 pre ff68 aligned False
+7efa5ec1 off b84ea1 value 7eff8c28 pre ff68 aligned False
+7effa4b0 off bd9490 value 7f033d80 pre 0000 aligned True

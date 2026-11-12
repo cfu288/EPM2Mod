@@ -1,0 +1,79 @@
+patched bytes: 626 in 57 runs
+FAIL tab=0 row=0
+     reads patched bytes but unchanged
+FAIL tab=0 row=1
+     reads patched bytes but unchanged
+FAIL tab=0 row=2
+     reads patched bytes but unchanged
+FAIL tab=0 row=3
+     reads patched bytes but unchanged
+FAIL tab=0 row=4
+     reads patched bytes but unchanged
+FAIL tab=0 row=5
+     reads patched bytes but unchanged
+FAIL tab=1 row=0
+     reads patched bytes but unchanged
+FAIL tab=1 row=1
+     reads patched bytes but unchanged
+FAIL tab=1 row=2
+     reads patched bytes but unchanged
+FAIL tab=1 row=3
+     reads patched bytes but unchanged
+chg  tab=1 row=4
+     help: 403 -> 1358
+chg  tab=1 row=5
+     absent: true -> null
+     block: null -> 45
+     grow: null -> 12
+     help: null -> 403
+chg  tab=2 row=0
+     grow: 12 -> 13
+chg  tab=2 row=1
+     grow: 13 -> 14
+chg  tab=2 row=2
+     grow: 14 -> 15
+chg  tab=2 row=3
+     grow: 15 -> 16
+chg  tab=2 row=4
+     grow: 16 -> 17
+chg  tab=2 row=5
+     grow: 17 -> 18
+chg  tab=3 row=0
+     grow: 18 -> 19
+chg  tab=3 row=1
+     grow: 19 -> 20
+chg  tab=3 row=2
+     grow: 20 -> 21
+chg  tab=3 row=3
+     grow: 21 -> 22
+chg  tab=3 row=4
+     grow: 22 -> 23
+chg  tab=3 row=5
+     grow: 23 -> 24
+chg  tab=3 row=6
+     grow: 24 -> 25
+chg  tab=3 row=7
+     grow: 25 -> 26
+chg  tab=3 row=8
+     grow: 26 -> 27
+chg  tab=3 row=9
+     grow: 27 -> 28
+chg  tab=4 row=0
+     grow: 28 -> 29
+chg  tab=4 row=1
+     grow: 29 -> 30
+chg  tab=4 row=2
+     grow: 30 -> 31
+chg  tab=5 row=0
+     grow: 31 -> 32
+chg  tab=5 row=1
+     grow: 32 -> 33
+chg  tab=5 row=2
+     grow: 33 -> 34
+chg  tab=5 row=3
+     grow: 34 -> 35
+chg  tab=5 row=4
+     grow: 35 -> 36
+chg  tab=5 row=5
+     grow: 36 -> 37
+menu_help: 43 rows, 27 changed, 16 identical, 10 flagged

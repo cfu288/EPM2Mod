@@ -1,0 +1,86 @@
+== menu_help: 43 rows, 0 with model/run errors
+  diff {'tab': 1, 'row': 4} stock: {"block": 45, "grow": 11, "help": 403} | replace+insert+epl6: {"block": 45, "grow": 11, "help": 1358}
+  diff {'tab': 1, 'row': 5} stock+replace: {"absent": true} | insert+epl6: {"block": 45, "grow": 12, "help": 403}
+  diff {'tab': 2, 'row': 0} stock+replace: {"block": 45, "grow": 12, "help": 406} | insert+epl6: {"block": 45, "grow": 13, "help": 406}
+  diff {'tab': 2, 'row': 1} stock+replace: {"block": 45, "grow": 13, "help": 407} | insert+epl6: {"block": 45, "grow": 14, "help": 407}
+  diff {'tab': 2, 'row': 2} stock+replace: {"block": 45, "grow": 14, "help": 408} | insert+epl6: {"block": 45, "grow": 15, "help": 408}
+  diff {'tab': 2, 'row': 3} stock+replace: {"block": 45, "grow": 15, "help": 409} | insert+epl6: {"block": 45, "grow": 16, "help": 409}
+  diff {'tab': 2, 'row': 4} stock+replace: {"block": 45, "grow": 16, "help": 410} | insert+epl6: {"block": 45, "grow": 17, "help": 410}
+  diff {'tab': 2, 'row': 5} stock+replace: {"block": 45, "grow": 17, "help": 1720} | insert+epl6: {"block": 45, "grow": 18, "help": 1720}
+  diff {'tab': 3, 'row': 0} stock+replace: {"block": 45, "grow": 18, "help": 412} | insert+epl6: {"block": 45, "grow": 19, "help": 412}
+  diff {'tab': 3, 'row': 1} stock+replace: {"block": 45, "grow": 19, "help": 413} | insert+epl6: {"block": 45, "grow": 20, "help": 413}
+  diff {'tab': 3, 'row': 2} stock+replace: {"block": 45, "grow": 20, "help": 1318} | insert+epl6: {"block": 45, "grow": 21, "help": 1318}
+  diff {'tab': 3, 'row': 3} stock+replace: {"block": 45, "grow": 21, "help": 415} | insert+epl6: {"block": 45, "grow": 22, "help": 415}
+  diff {'tab': 3, 'row': 4} stock+replace: {"block": 45, "grow": 22, "help": 416} | insert+epl6: {"block": 45, "grow": 23, "help": 416}
+  diff {'tab': 3, 'row': 5} stock+replace: {"block": 45, "grow": 23, "help": 417} | insert+epl6: {"block": 45, "grow": 24, "help": 417}
+  diff {'tab': 3, 'row': 6} stock+replace: {"block": 45, "grow": 24, "help": 418} | insert+epl6: {"block": 45, "grow": 25, "help": 418}
+  diff {'tab': 3, 'row': 7} stock+replace: {"block": 45, "grow": 25, "help": 419} | insert+epl6: {"block": 45, "grow": 26, "help": 419}
+  diff {'tab': 3, 'row': 8} stock+replace: {"block": 45, "grow": 26, "help": 420} | insert+epl6: {"block": 45, "grow": 27, "help": 420}
+  diff {'tab': 3, 'row': 9} stock+replace: {"block": 45, "grow": 27, "help": 421} | insert+epl6: {"block": 45, "grow": 28, "help": 421}
+  diff {'tab': 4, 'row': 0} stock+replace: {"block": 45, "grow": 28, "help": 481} | insert+epl6: {"block": 45, "grow": 29, "help": 481}
+  diff {'tab': 4, 'row': 1} stock+replace: {"block": 45, "grow": 29, "help": 589} | insert+epl6: {"block": 45, "grow": 30, "help": 589}
+  diff {'tab': 4, 'row': 2} stock+replace: {"block": 45, "grow": 30, "help": 482} | insert+epl6: {"block": 45, "grow": 31, "help": 482}
+  diff {'tab': 5, 'row': 0} stock+replace: {"block": 45, "grow": 31, "help": 1024} | insert+epl6: {"block": 45, "grow": 32, "help": 1024}
+  diff {'tab': 5, 'row': 1} stock+replace: {"block": 45, "grow": 32, "help": 1117} | insert+epl6: {"block": 45, "grow": 33, "help": 1117}
+  diff {'tab': 5, 'row': 2} stock+replace: {"block": 45, "grow": 33, "help": 489} | insert+epl6: {"block": 45, "grow": 34, "help": 489}
+  diff {'tab': 5, 'row': 3} stock+replace: {"block": 45, "grow": 34, "help": 490} | insert+epl6: {"block": 45, "grow": 35, "help": 490}
+  diff {'tab': 5, 'row': 4} stock+replace: {"block": 45, "grow": 35, "help": 491} | insert+epl6: {"block": 45, "grow": 36, "help": 491}
+  diff {'tab': 5, 'row': 5} stock+replace: {"block": 45, "grow": 36, "help": 492} | insert+epl6: {"block": 45, "grow": 37, "help": 492}
+== menu_child: 43 rows, 0 with model/run errors
+  diff {'tab': 1, 'row': 4} stock: {"panel": 18} | replace+insert+epl6: {"panel": 628}
+  diff {'tab': 1, 'row': 5} stock+replace: {"absent": true} | insert+epl6: {"panel": 18}
+== menu_value: 74 rows, 0 with model/run errors
+  diff {'grow': 11, 'value': 0} stock: {"label": 526, "setting": [180], "string": 1371} | replace+insert+epl6: {"label": 1357, "setting": [482], "string": 1371}
+  diff {'grow': 11, 'value': 1} stock: {"label": 526, "setting": [180], "string": 198} | replace+insert+epl6: {"label": 1357, "setting": [482], "string": 198}
+  diff {'grow': 12, 'value': 0} stock+replace: {"label": 262, "setting": [], "string": 0} | insert+epl6: {"label": 526, "setting": [180], "string": 1371}
+  diff {'grow': 12, 'value': 1} stock+replace: {"label": 262, "setting": [], "string": 0} | insert+epl6: {"label": 526, "setting": [180], "string": 198}
+  diff {'grow': 13, 'value': 0} stock+replace: {"label": 226, "setting": [89], "string": 1371} | insert+epl6: {"label": 262, "setting": [], "string": 0}
+  diff {'grow': 13, 'value': 1} stock+replace: {"label": 226, "setting": [89], "string": 198} | insert+epl6: {"label": 262, "setting": [], "string": 0}
+  diff {'grow': 14, 'value': 0} stock+replace: {"label": 115, "setting": [], "string": 0} | insert+epl6: {"label": 226, "setting": [89], "string": 1371}
+  diff {'grow': 14, 'value': 1} stock+replace: {"label": 115, "setting": [], "string": 0} | insert+epl6: {"label": 226, "setting": [89], "string": 198}
+  diff {'grow': 15, 'value': 0} stock+replace: {"label": 1966, "setting": [], "string": 0} | insert+epl6: {"label": 115, "setting": [], "string": 0}
+  diff {'grow': 15, 'value': 1} stock+replace: {"label": 1966, "setting": [], "string": 0} | insert+epl6: {"label": 115, "setting": [], "string": 0}
+  diff {'grow': 16, 'value': 0} stock+replace: {"label": 212, "setting": [], "string": 0} | insert+epl6: {"label": 1966, "setting": [], "string": 0}
+  diff {'grow': 16, 'value': 1} stock+replace: {"label": 212, "setting": [], "string": 0} | insert+epl6: {"label": 1966, "setting": [], "string": 0}
+  diff {'grow': 17, 'value': 0} stock+replace: {"label": 1719, "setting": [], "string": 0} | insert+epl6: {"label": 212, "setting": [], "string": 0}
+  diff {'grow': 17, 'value': 1} stock+replace: {"label": 1719, "setting": [], "string": 0} | insert+epl6: {"label": 212, "setting": [], "string": 0}
+  diff {'grow': 18, 'value': 0} stock+replace: {"label": 48, "setting": [], "string": 0} | insert+epl6: {"label": 1719, "setting": [], "string": 0}
+  diff {'grow': 18, 'value': 1} stock+replace: {"label": 48, "setting": [], "string": 0} | insert+epl6: {"label": 1719, "setting": [], "string": 0}
+  diff {'grow': 19, 'value': 0} stock+replace: {"label": 79, "setting": [], "string": 0} | insert+epl6: {"label": 48, "setting": [], "string": 0}
+  diff {'grow': 19, 'value': 1} stock+replace: {"label": 79, "setting": [], "string": 0} | insert+epl6: {"label": 48, "setting": [], "string": 0}
+  diff {'grow': 20, 'value': 0} stock+replace: {"label": 1305, "setting": [], "string": 0} | insert+epl6: {"label": 79, "setting": [], "string": 0}
+  diff {'grow': 20, 'value': 1} stock+replace: {"label": 1305, "setting": [], "string": 0} | insert+epl6: {"label": 79, "setting": [], "string": 0}
+  diff {'grow': 21, 'value': 0} stock+replace: {"label": 108, "setting": [], "string": 0} | insert+epl6: {"label": 1305, "setting": [], "string": 0}
+  diff {'grow': 21, 'value': 1} stock+replace: {"label": 108, "setting": [], "string": 0} | insert+epl6: {"label": 1305, "setting": [], "string": 0}
+  diff {'grow': 22, 'value': 0} stock+replace: {"label": 127, "setting": [], "string": 0} | insert+epl6: {"label": 108, "setting": [], "string": 0}
+  diff {'grow': 22, 'value': 1} stock+replace: {"label": 127, "setting": [], "string": 0} | insert+epl6: {"label": 108, "setting": [], "string": 0}
+  diff {'grow': 23, 'value': 0} stock+replace: {"label": 135, "setting": [], "string": 0} | insert+epl6: {"label": 127, "setting": [], "string": 0}
+  diff {'grow': 23, 'value': 1} stock+replace: {"label": 135, "setting": [], "string": 0} | insert+epl6: {"label": 127, "setting": [], "string": 0}
+  diff {'grow': 24, 'value': 0} stock+replace: {"label": 146, "setting": [], "string": 0} | insert+epl6: {"label": 135, "setting": [], "string": 0}
+  diff {'grow': 24, 'value': 1} stock+replace: {"label": 146, "setting": [], "string": 0} | insert+epl6: {"label": 135, "setting": [], "string": 0}
+  diff {'grow': 25, 'value': 0} stock+replace: {"label": 217, "setting": [], "string": 0} | insert+epl6: {"label": 146, "setting": [], "string": 0}
+  diff {'grow': 25, 'value': 1} stock+replace: {"label": 217, "setting": [], "string": 0} | insert+epl6: {"label": 146, "setting": [], "string": 0}
+  diff {'grow': 26, 'value': 0} stock+replace: {"label": 179, "setting": [], "string": 0} | insert+epl6: {"label": 217, "setting": [], "string": 0}
+  diff {'grow': 26, 'value': 1} stock+replace: {"label": 179, "setting": [], "string": 0} | insert+epl6: {"label": 217, "setting": [], "string": 0}
+  diff {'grow': 27, 'value': 0} stock+replace: {"label": 81, "setting": [], "string": 0} | insert+epl6: {"label": 179, "setting": [], "string": 0}
+  diff {'grow': 27, 'value': 1} stock+replace: {"label": 81, "setting": [], "string": 0} | insert+epl6: {"label": 179, "setting": [], "string": 0}
+  diff {'grow': 28, 'value': 0} stock+replace: {"label": 268, "setting": [], "string": 0} | insert+epl6: {"label": 81, "setting": [], "string": 0}
+  diff {'grow': 28, 'value': 1} stock+replace: {"label": 268, "setting": [], "string": 0} | insert+epl6: {"label": 81, "setting": [], "string": 0}
+  diff {'grow': 29, 'value': 0} stock+replace: {"label": 270, "setting": [], "string": 0} | insert+epl6: {"label": 268, "setting": [], "string": 0}
+  diff {'grow': 29, 'value': 1} stock+replace: {"label": 270, "setting": [], "string": 0} | insert+epl6: {"label": 268, "setting": [], "string": 0}
+  diff {'grow': 30, 'value': 0} stock+replace: {"label": 269, "setting": [], "string": 0} | insert+epl6: {"label": 270, "setting": [], "string": 0}
+  diff {'grow': 30, 'value': 1} stock+replace: {"label": 269, "setting": [], "string": 0} | insert+epl6: {"label": 270, "setting": [], "string": 0}
+  diff {'grow': 31, 'value': 0} stock+replace: {"skipped": "date row"} | insert+epl6: {"label": 269, "setting": [], "string": 0}
+  diff {'grow': 31, 'value': 1} stock+replace: {"skipped": "date row"} | insert+epl6: {"label": 269, "setting": [], "string": 0}
+  diff {'grow': 32, 'value': 0} stock+replace: {"label": 1688, "setting": [1009], "string": 23} | insert+epl6: {"skipped": "date row"}
+  diff {'grow': 32, 'value': 1} stock+replace: {"label": 1688, "setting": [1009], "string": 14} | insert+epl6: {"skipped": "date row"}
+  diff {'grow': 33, 'value': 0} stock+replace: {"label": 175, "setting": [31, 265], "string": 0} | insert+epl6: {"label": 1688, "setting": [1009], "string": 23}
+  diff {'grow': 33, 'value': 1} stock+replace: {"label": 175, "setting": [31, 265], "string": 0} | insert+epl6: {"label": 1688, "setting": [1009], "string": 14}
+  diff {'grow': 34, 'value': 0} stock+replace: {"label": 218, "setting": [19], "string": 1371} | insert+epl6: {"label": 175, "setting": [31, 265], "string": 0}
+  diff {'grow': 34, 'value': 1} stock+replace: {"label": 218, "setting": [19], "string": 0} | insert+epl6: {"label": 175, "setting": [31, 265], "string": 0}
+  diff {'grow': 35, 'value': 0} stock+replace: {"label": 168, "setting": [], "string": 0} | insert+epl6: {"label": 218, "setting": [19], "string": 1371}
+  diff {'grow': 35, 'value': 1} stock+replace: {"label": 168, "setting": [], "string": 0} | insert+epl6: {"label": 218, "setting": [19], "string": 0}
+  diff {'grow': 36, 'value': 0} stock+replace: {"label": 134, "setting": [], "string": 0} | insert+epl6: {"label": 168, "setting": [], "string": 0}
+  diff {'grow': 36, 'value': 1} stock+replace: {"label": 134, "setting": [], "string": 0} | insert+epl6: {"label": 168, "setting": [], "string": 0}
+  diff {'grow': 37, 'value': 0} stock+replace: {"absent": true} | insert+epl6: {"label": 134, "setting": [], "string": 0}
+  diff {'grow': 37, 'value': 1} stock+replace: {"absent": true} | insert+epl6: {"label": 134, "setting": [], "string": 0}

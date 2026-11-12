@@ -1,4 +1,4 @@
 patched bytes: 14 in 7 runs
 chg  tab=1 row=4
      help: 403 -> 1358
-menu_help: 42 rows, 1 changed, 41 identical, 0 flagged
+menu_help: 43 rows, 1 changed, 42 identical, 0 flagged
