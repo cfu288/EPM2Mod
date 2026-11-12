@@ -391,6 +391,8 @@ class FilterType(Case):
              107: (85, 167), 108: (91,), 109: (96, 165), 110: (145,), 111: (75,), 112: (84,), 113: (69,), 114: (117,),
              115: (118,), 116: (119,), 117: (151,), 118: (153,), 119: (163, 169), 120: (181, 182)}
     ONE_TYPE = (101, 103, 106, 108, 110, 111, 112, 113, 114, 115, 116, 117, 118)        # the type is not looked at
+    STOCK_SHA = "361e4c7ae09f5575"                                # the function and its jump table in stock v1.6
+    _seen = [None, None]
 
     def stubs(self, row):
         nop = lambda emu, r: {}
@@ -404,8 +406,10 @@ class FilterType(Case):
         return {"code": r["regs"]["d0"] & 0xFFFF, "_r": r}
 
     def model(self, row, image):
-        if image[0x7E71BE39 - BASE:0x7E71BE3B - BASE] != b"\x8a\x4a":
-            return None                                   # patched image: compare by diff
+        if self._seen[0] is not image:                    # hash once per image: the whole function and its jump table
+            self._seen[:] = [image, hashlib.sha256(image[0x7E71BD94 - BASE:0x7E71BEC7 - BASE] + image[0x7E854A24 - BASE:0x7E854A24 - BASE + 84]).hexdigest()[:16]]
+        if self._seen[1] != self.STOCK_SHA:
+            return None                                   # patched mapping: compare by diff
         m, t = row["mode"], row["type"]
         if m not in self.STOCK:
             return {"code": 0xFFFF}
