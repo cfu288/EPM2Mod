@@ -31,7 +31,7 @@ SLOTS = {
     "Cross Process":    dict(tables=full((0x7E78B41C, 0x7E78B43C, 0x7E78B45C)), sat=0x7E7696B4, six=[0x7E7694FE, 0x7E76950A], matrix=0x7E768F46, m_expect=None, per_ch=8),
 }
 CHROMA = {"Pop Art": 0x7E74B8BA, "Soft Focus": 0x7E74BBCA, "Pale&Light Color": 0x7E74B91C, "Light Tone": 0x7E74B97E, "Pin Hole": 0x7E74BB68, "Diorama": 0x7E74BE16, "Cross Process": 0x7E74BAA4}   # 97-byte chroma-curve record of the slot's stills code (needs seven-fixes-1)
-WITH_CHROMA = ("3",)                       # tags whose build has seven-fixes-1 instead of slot3-chroma-linear: every slot's chroma record is written
+WITH_CHROMA = ("3", "4")                       # tags whose build has seven-fixes-1 instead of slot3-chroma-linear: every slot's chroma record is written
 # film per slot: (fit file, label). Labels are at most as long as the entry's stock name.
 LABELS = {"Pop Art": "Portra", "Soft Focus": "Ektachrome", "Pale&Light Color": "Pro 400H", "Light Tone": "Kodachrome", "Pin Hole": "Vis 250D", "Diorama": "Velvia", "Cross Process": "Superia 400"}
 _OLD3 = {"Pop Art": "film-portra-xp10", "Soft Focus": "film-ektachrome-lt3", "Pale&Light Color": "film-pro400h-pa2"}
@@ -39,6 +39,7 @@ FITS = {   # tag -> fit file per slot (out/fit_<name>.npz)
     "1": dict(_OLD3, **{"Light Tone": "cand-kodak_kodachrome_64_scanfilm", "Pin Hole": "cand-vision3250d_2383", "Diorama": "cand-fujifilm_velvia_100_scanfilm", "Cross Process": "cand-xtra400_crystalarchive"}),   # model-only first fits (NOTES 39)
     "2": dict(_OLD3, **{"Light Tone": "film-kodachrome64-2", "Pin Hole": "film-vision3250d-2", "Diorama": "film-velvia100-2", "Cross Process": "film-superia400-2"}),                                            # corrected against build 1 (NOTES 40)
     "3": {"Pop Art": "film-portra-c1", "Soft Focus": "film-ektachrome-c1", "Pale&Light Color": "film-pro400h-c1", "Light Tone": "film-kodachrome64-c1", "Pin Hole": "film-vision3250d-c1", "Diorama": "film-velvia100-c1", "Cross Process": "film-superia400-c1"},   # refit with chroma curves (NOTES 43)
+    "4": {"Pop Art": "film-portra-c2", "Soft Focus": "film-ektachrome-c2", "Pale&Light Color": "film-pro400h-c2", "Light Tone": "film-kodachrome64-c2", "Pin Hole": "film-vision3250d-c2", "Diorama": "film-velvia100-c2", "Cross Process": "film-superia400-c2"},   # corrected against build 3 (NOTES 44)
 }
 if tag not in FITS: sys.exit(f"unknown tag {tag!r}; add it to FITS")
 FILMS = {slot: (f"out/fit_{FITS[tag][slot]}.npz", LABELS[slot]) for slot in SLOTS}

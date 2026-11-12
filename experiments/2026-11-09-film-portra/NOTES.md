@@ -1850,3 +1850,50 @@ The matrices for other white-balance settings are not in the firmware as literal
 all four blocks for the 5300 K matrix in several encodings: no hit), so they cannot be simulated.
 Test on the camera: develop PB130001 with WB set to Tungsten and to Shade, in Natural and in two
 film entries; the EXIF ColorMatrix gives each setting's matrix.
+
+## 44. `seven-films-3` on the camera; correction round → `seven-films-4` (2026-11-12)
+
+- Upload saved as `shots/films3/` (20 files) and `shots/measured/F3_*.JPG`. All seven EXIF matrices
+  as predicted.
+- **Chroma-curve order: first stored curve = Cb.** Camera vs model (kinds 5, 7, 8, 9, unclipped) as
+  assumed / swapped: Portra 0.92 / 0.97, Ektachrome 1.05 / 1.10, Pro 400H 1.08 / 1.16, Kodachrome
+  1.04 / 1.08, Vision3 1.10 / 1.17, Velvia 0.96 / 1.03, Superia 1.07 / 1.19. Small margins (the
+  fitted Cb and Cr curves are alike) but the same sign in all seven.
+- Camera vs target, previous build → seven-films-3 (predicted in §43.4):
+
+| film | ColorChecker | skin | natural | hold-out | grays | near-neutral | gamut edge |
+|---|---|---|---|---|---|---|---|
+| Portra | 2.58 → 1.68 | 1.36 → 1.26 | 1.33 → 1.27 | 1.35 → 1.30 | 0.98 → 0.84 | 1.08 → 1.05 | 13.2 → 16.3 |
+| Ektachrome | 2.24 → 1.78 | 1.35 → 1.13 | 1.36 → 1.29 | 1.36 → 1.34 | 0.77 → 0.83 | 1.04 → 0.97 | → 16.7 |
+| Pro 400H | 2.33 → 1.61 | 1.14 → 1.37 | 1.19 → 1.16 | 1.22 → 1.19 | 0.61 → 0.75 | 0.92 → 0.92 | → 16.4 |
+| Kodachrome | 1.79 → 1.41 | 0.97 → 0.90 | 1.07 → 1.08 | 1.11 → 1.08 | 0.89 → 0.92 | 0.86 → 0.89 | → 17.8 |
+| Vision3 250D | 2.71 → 1.71 | 1.13 → 1.16 | 1.22 → 1.24 | 1.24 → 1.25 | 0.74 → 0.82 | 0.91 → 1.00 | → 16.4 |
+| Velvia | 2.50 → 1.89 | 1.68 → 1.65 | 1.52 → 1.48 | 1.52 → 1.53 | 0.79 → 0.93 | 1.06 → 1.09 | → 20.7 |
+| Superia | 2.66 → 2.13 | 1.56 → 1.70 | 1.39 → 1.37 | 1.39 → 1.41 | 0.74 → 0.81 | 1.10 → 1.02 | → 15.0 |
+
+  ColorChecker gains are real (0.4–1.0); the predicted gains on grays and natural colours mostly did
+  not appear (grays are at the rounding floor). Gamut-edge colours (not in the objective) got worse:
+  the curves compress strong chroma.
+- Fixes: Diorama after Grainy Film ×3 no restart, files pixel-identical; three shots straight after
+  power-on in the Portra entry saved with the film matrix (the load-order concern of §43.1 did not
+  show). Type II not testable from RAW Data Edit (its list has no types).
+- **White balance.** Shade (7500 K) matrix from Natural: 454 −172 −26 / −52 376 −68 / 10 −108 354.
+  Incandescent (3000 K), from inv(art)·product of two films: ≈ 360 −73 −32 / −82 335 3 / 31 −244
+  468 (the two estimates agree to 3 units; the same method reproduces the 7500 K matrix to 5 units).
+  **Auto WB uses the 5300 K matrix whatever the gains** (three shots, gains 370–422 / 554–688).
+  Model check at the presets: camera vs model 1.14 / 1.52 (7500 K, Portra / Velvia), 0.74 / 0.72
+  (3000 K). Simulated correctly balanced scene (same white-balanced sensor values, target computed
+  with the preset's matrix), model vs target, natural / skin / ColorChecker: Portra 0.84 / 1.20 /
+  1.46 (5300) → 0.83 / 1.20 / 1.49 (7500) → 0.88 / 1.21 / 1.67 (3000); Velvia 1.08 / 1.67 / 1.71 →
+  1.10 / 1.63 / 1.74 → 1.10 / 1.84 / 2.07. So the looks hold under the presets; no change needed.
+  (The developed test files themselves score 1.8–3.2 because a daylight image developed at 3000 K
+  is deliberately mis-balanced.)
+- Correction round: `fit_chroma.py` now accepts an anchor build that already has curves (the
+  measured values are taken back through them first; round trip ≤ 0.25 codes). Refits
+  `out/fit_film-*-c2.npz` against the F3 measurements; predicted weighted: Portra 1.012 → 0.850,
+  Ektachrome 1.020 → 0.803, Pro 400H 0.948 → 0.798 (skin 1.37 → 1.03), Kodachrome 0.980 → 0.760,
+  Vision3 1.023 → 0.773, Velvia 1.146 → 0.911, Superia 1.109 → 0.982. Most of the predicted gain is
+  on grays, which did not materialise last round; expect less.
+- `build/seven-films-4.BIN` (same patch list with seven-films-4), sha256
+  `06ba7e02e1f2f2b9ad35fc4a08f6b244a9fccb31ddd4d6277c9eeca1bfeff4b6`. Differs from seven-films-3
+  only inside the film data tables (checked byte by byte); blocks 1–3 equal. NOT flashed.

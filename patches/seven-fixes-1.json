@@ -1,7 +1,7 @@
 {
  "name": "seven-fixes-1",
  "description": "On top of remap7b-code: plain six-axis handler for art code 167 (Diorama entry no longer runs Cross Process's statistics code through an uninitialised pointer); each film slot's stills code uses its own chroma-curve record, movie codes use a linear one; Pop Art II, Pale&Light II and Cross Process II select the type I code. NOTES \u00a743.",
- "status": "built, NOT camera-tested",
+ "status": "camera-tested 2026-11-12 as part of build/seven-films-3.BIN (sha256 e38ece2331afcd7af98978690a64fce29273cad5ebde4f8a3b683993c8a1ea72); see docs/camera-log.md",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
  "ops": [

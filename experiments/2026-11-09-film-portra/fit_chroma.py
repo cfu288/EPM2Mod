@@ -18,13 +18,19 @@ a = ap.parse_args(argv[1:])
 Am = load(a.anchor[0]); za = np.load(a.anchor[1]); lut = str(za["lut"]); cube, size = fl.load_cube(lut)
 tgt = lambda v: lab(np.clip(fl.apply_cube(cube, size, fl.encode(np.maximum(v, 0) / fl.V_GRAY * 0.18, "vlog")), 0, 1) * 255)
 assert "weight" in Am, "needs a reading of the second-generation test image"
-assert "Cb" not in za.files, "the anchor build already had chroma curves: not supported (the measured values would have to be un-curved first)"
 J, k = Am["jpg"], Am["kind"]; KN = f.KN
 wa = np.where(Am["weight"] > 0, Am["weight"], np.where(k == 8, 20.0, np.where(k == 3, 4.0, np.where(k == 2, 20.0, 0.0))))
 sel = Am["ok"] & (wa > 0); u, Js, ks, ws = Am["u"][sel], J[sel], k[sel], wa[sel]; tl = tgt(Am["vs"][sel]); unc = (Js.min(1) > 2) & (Js.max(1) < 253)
-base = f.R(u, za["G"], float(za["sat"]), za["S"], za["H"], za["P"])
+base = f.R(u, za["G"], float(za["sat"]), za["S"], za["H"], za["P"])                 # the anchor build's model output BEFORE its chroma curves
+Q0 = np.tile(C.Q_LINEAR, 2); uncurve = lambda X: X
+if "Cb" in za.files:                         # the anchor build had curves: take the measured values back through them (they are monotonic), then work as before
+    _c = np.linspace(0, 255, 2041); _cb = C.ev_bytes(_c, za["Cb"][0], za["Cb"][1], za["Cb_slope17"]); _cr = C.ev_bytes(_c, za["Cr"][0], za["Cr"][1], za["Cr_slope17"])
+    def uncurve(X):
+        y, cb, cr = C.ycc(X); return C.rgb(y, np.interp(cb, _cb, _c), np.interp(cr, _cr, _c))
+    Q0 = np.concatenate([C.q_of(za["Cb"][1][:11].astype(float)), C.q_of(za["Cr"][1][:11].astype(float))])
+Jpre = uncurve(Js)
 def pre(G, sat, S, H, P):
-    m = f.R(u, G, sat, S, H, P); return np.where(unc[:, None], Js + m - base, m)
+    m = f.R(u, G, sat, S, H, P); return np.where(unc[:, None], Jpre + m - base, m)
 def unpack(p):
     H = p[3 * KN + 7:3 * KN + 13].copy(); H[0] = 0.0
     return f.curves(p), p[3 * KN], p[3 * KN + 1:3 * KN + 7], H, f.P_of(p[3 * KN + 13:3 * KN + 19])
@@ -41,7 +47,7 @@ lo = np.concatenate([np.zeros(3 * KN), [0.6], [-40] * 6, [-20] * 6, [-64] * 6]);
 sq = np.sqrt(np.concatenate([np.diff(C.XK[:5]), np.diff(C.XK[6:])]))                      # segment widths: slope limits 0.35 .. 1.6
 clo, chi = np.tile(sq * np.sqrt(0.35), 2), np.tile(sq * np.sqrt(1.6), 2)
 if a.no_chroma: clo = np.tile(C.Q_LINEAR, 2) - 1e-4; chi = np.tile(C.Q_LINEAR, 2) + 1e-4
-p0 = np.concatenate([f.knots_of(za["G"]), [float(za["sat"])], za["S"], za["H"], f.off(za["P"] * 128), np.tile(C.Q_LINEAR, 2)])
+p0 = np.concatenate([f.knots_of(za["G"]), [float(za["sat"])], za["S"], za["H"], f.off(za["P"] * 128), Q0])
 LO, HI = np.concatenate([lo, clo]), np.concatenate([hi, chi])
 r = least_squares(res, np.clip(p0, LO + 1e-6, HI - 1e-6), bounds=(LO, HI), x_scale="jac", max_nfev=300, loss="soft_l1", f_scale=a.robust)
 G, sat, S, H, P = unpack(r.x); S, H = np.round(S), np.round(H); A = f.find_A(P); Pq = f.renormalise(A) / 128.0
@@ -55,7 +61,7 @@ def line(tag, pm):
     return (f"  {tag}: GRKit-weighted {np.average(dd, weights=ws):.3f} | grays {g(6):.2f} ColorChecker {g(7):.2f} (p95 {np.percentile(dd[ks == 7], 95):.2f}) skin {g(8):.2f} "
             f"natural {g(5):.2f} (p95 {np.percentile(dd[ks == 5], 95):.2f}) near-neutral {g(3):.2f} dense grays {g(2):.2f}")
 ho = Am["ok"] & (k == 9) & (J.min(1) > 2) & (J.max(1) < 253); ht = tgt(Am["vs"][ho])
-hp = np.clip(C.apply(J[ho] + f.R(Am["u"][ho], G, sat, S, H, Pq) - f.R(Am["u"][ho], za["G"], float(za["sat"]), za["S"], za["H"], za["P"]), cbb, crb, stored=True), 0, 255)
+hp = np.clip(C.apply(uncurve(J[ho]) + f.R(Am["u"][ho], G, sat, S, H, Pq) - f.R(Am["u"][ho], za["G"], float(za["sat"]), za["S"], za["H"], za["P"]), cbb, crb, stored=True), 0, 255)
 ge = Am["ok"] & (k == 10)
 lines = [f"Target {os.path.basename(lut)}; anchor {a.anchor[0]} ({a.anchor[1]})", line("anchor build, MEASURED", Js), line("this fit, predicted      ", final),
          f"  hold-out naturals (not in the fit): measured {de(lab(J[ho]), ht).mean():.2f} -> predicted {de(lab(hp), ht).mean():.2f}",
