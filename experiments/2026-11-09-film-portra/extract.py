@@ -3,18 +3,20 @@
 For each ORF+JPG pair in shots/:
   1. find the chart's four white corner markers, separately in the JPEG and in the raw data
      (the camera corrects lens distortion in its JPEGs, so the two geometries differ);
-  2. map every patch of the chart (out/chart_layout.json) into the photo with a homography, then
-     move each sampling box to the flattest spot within a third of a patch (the raw is not
-     corrected for lens distortion, so the four-corner homography is off by up to half a patch
-     there), with the offsets smoothed over neighbouring patches;
+  2. map every patch of the chart (out/chart_layout.json) into the photo with a homography (the
+     raw is not corrected for lens distortion, so this is off by up to half a patch there); move
+     each box to the flattest spot nearby (a first guess, smoothed with a cubic offset field); then
+     find the dark gap lines between the patches, fit them as smooth curves, and centre every
+     sampling box between the four lines around its patch (grid_quads);
   3. take the median over the central part of each patch:
        raw: camera RGB minus each file's own black level (255 at ISO 200, 253/254 at higher ISO) from the Bayer planes (G = mean of the two greens),
             plus a clip flag (any raw sample at the sensor's saturation, 4045);
        jpg: 8-bit sRGB values as decoded by Pillow;
   4. read the shot settings with exiftool.
 
-Writes out/patches.npz, out/settings.json and out/overlay_<shot>.jpg (sampling regions drawn
-on a few shots, for checking by eye). Run with the project venv:
+Writes out/patches.npz, out/settings.json, out/gridlines.json (gap-line fit statistics per shot)
+and, for checking by eye, out/overlay_<shot>.jpg, out/overlay_raw_<shot>.png and full-resolution
+crops out/check_{raw,jpg}_<shot>.png with the sampling boxes drawn. Run with the project venv:
 
     ../../.venv/bin/python -I extract.py
 """
@@ -32,7 +34,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SHOTS = os.path.join(HERE, "shots")
 OUT = os.path.join(HERE, "out")
 SAT = 4045           # sensor saturation in raw units (the nominal white level is 4095)
-INNER_X, INNER_Y = 0.4, 0.5   # sample a 40 % x 50 % box of each patch (after refinement)
+INNER_X, INNER_Y = 0.45, 0.5  # sampled box = central 45 % x 50 % of the cell between the gap lines
+# (a patch fills ~87 % of its cell on screen; defocus blurs ~5 half-size raw px of a ~46 px cell)
 
 # Shot roles from the shoot-1 log in SHOTS.md (file number -> id).
 ROLES = {
@@ -170,6 +173,180 @@ def refine(score_img, quads, ncols=36):
 
 # ---------- image loading ----------
 
+def _profile(img, along, centre, half, vertical_lines):
+    """Brightness profile along a row (vertical_lines=True: positions x = along, row centre y =
+    centre(x)) or a column (x = centre(y), y = along), median over +-half across it."""
+    off = np.arange(-half, half + 1, dtype=np.float32)[None, :]
+    a = along.astype(np.float32)[:, None] + 0 * off
+    c = centre.astype(np.float32)[:, None] + off
+    mx, my = (a, c) if vertical_lines else (c, a)
+    vals = cv2.remap(img, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+    return np.median(vals, axis=1)
+
+
+def _valleys(prof, pitch, thr=0.05):
+    """All gap valleys: local minima with relative contrast > 5 %, at least half a pitch apart.
+    Returns [(sub-pixel index, relative contrast)]."""
+    w = max(int(0.5 * pitch), 2)
+    out = []
+    for i in range(1, len(prof) - 1):
+        if not (prof[i] < prof[i - 1] and prof[i] <= prof[i + 1]):
+            continue
+        left = prof[max(i - w, 0):i].max(initial=prof[i])
+        right = prof[i + 1:i + w + 1].max(initial=prof[i])
+        side = min(left, right)
+        rel = (side - prof[i]) / max(side, 1e-6)
+        if rel <= thr:
+            continue
+        a, b, c = prof[i - 1], prof[i], prof[i + 1]
+        den = a - 2 * b + c
+        frac = 0.5 * (a - c) / den if den > 0 else 0.0
+        out.append((i + float(np.clip(frac, -0.5, 0.5)), rel))
+    out.sort(key=lambda v: -v[1])                       # keep the deepest of any close pair
+    kept = []
+    for v in out:
+        if all(abs(v[0] - u[0]) >= 0.5 * pitch for u in kept):
+            kept.append(v)
+    return sorted(kept)
+
+
+def _track(valleys, preds, pitch, nlines):
+    """Assign valleys to line indices 1..nlines-1 by walking outward from the middle line.
+    preds[k] = first-guess position of line k. Returns {k: (pos, contrast)}."""
+    pos = np.array([v[0] for v in valleys]) if valleys else np.zeros(0)
+    found = {}
+
+    def nearest(x, tol):
+        if not len(pos):
+            return None
+        j = int(np.argmin(np.abs(pos - x)))
+        return j if abs(pos[j] - x) <= tol else None
+
+    mid = nlines // 2
+    anchor = None
+    for k in sorted(range(1, nlines), key=lambda k: abs(k - mid)):
+        j = nearest(preds[k], 0.35 * pitch)
+        if j is not None:
+            anchor = k; found[k] = valleys[j]; break
+    if anchor is None:
+        return found
+    for step in (1, -1):
+        x_prev, spacing, k = found[anchor][0], pitch, anchor + step
+        prev_found = True
+        while 1 <= k < nlines:
+            pred = x_prev + step * spacing
+            j = nearest(pred, 0.3 * pitch)
+            if j is not None:
+                if prev_found:
+                    spacing = 0.5 * spacing + 0.5 * abs(valleys[j][0] - x_prev)
+                found[k] = valleys[j]; x_prev = valleys[j][0]; prev_found = True
+            else:
+                x_prev = pred; prev_found = False
+            k += step
+    return found
+
+
+def _fit_lines(pts, deg_line=3, deg_along=2):
+    """Robust smooth model pos = f(line index, position along the line) from (idx, along, pos, w).
+    Returns the model, the median absolute residual and the inlier share (residual < 3 px)."""
+    p = np.array(pts, float)
+    k, t, x, w = p[:, 0], p[:, 1], p[:, 2], p[:, 3]
+    km, ks, tm, ts = k.mean(), k.std() + 1e-9, t.mean(), t.std() + 1e-9
+
+    def design(kk, tt):
+        u, v = (np.asarray(kk, float) - km) / ks, (np.asarray(tt, float) - tm) / ts
+        return np.stack([u ** i * v ** j for i in range(deg_line + 1) for j in range(deg_along + 1)], -1)
+
+    A = design(k, t)
+    ww = w.copy()
+    for _ in range(10):                                 # iteratively reweighted least squares
+        coef = np.linalg.lstsq(A * ww[:, None], x * ww, rcond=None)[0]
+        res = np.abs(A @ coef - x)
+        s = max(1.4826 * np.median(res), 0.3)
+        ww = w / np.maximum(1, res / (2.5 * s))
+    return (lambda kk, tt: design(kk, tt) @ coef), float(np.median(res)), float(np.mean(res < 3))
+
+
+def grid_quads(score_img, quads, ncols=36, inner_x=None, inner_y=None, retry=True):
+    """grid_quads_once; if the lines are not found, once more with heavier smoothing and a lower
+    contrast threshold (for very dark frames)."""
+    out, info = grid_quads_once(score_img, quads, ncols, inner_x, inner_y)
+    if info is None and retry:
+        out, info = grid_quads_once(score_img, quads, ncols, inner_x, inner_y, sigma=2.5, thr=0.02)
+        if info is not None:
+            info["retry"] = True
+    return out, info
+
+
+def grid_quads_once(score_img, quads, ncols=36, inner_x=None, inner_y=None, sigma=1.0, thr=0.05):
+    """Place every sampling box centred between the dark gap lines around its patch.
+
+    1. Horizontal gap lines (between rows): brightness profiles down every column, valleys
+       assigned to lines by tracking outward from the middle; smooth robust fit y = Y(j, x).
+    2. Vertical gap lines (between columns): one profile along the centre of each row, following
+       Y; all valleys found; assigned to line numbers by walking outward from the chart centre,
+       each next line predicted from the last one found plus the local spacing (a missing valley,
+       e.g. a near-black patch next to the dark gap, is skipped, not mis-assigned); smooth robust
+       fit x = X(k, y), which also carries the lens distortion and the outer edges.
+    3. Horizontal lines again, now down the true column centres.
+    4. Each box: the central inner_x x inner_y of the cell between its four lines. A cell whose
+       width or height is implausible keeps its input quad. (No check against the first guess:
+       that guess was itself up to 0.7 of a patch off in places, e.g. 0185 rows 2-4, cols 27-34.)"""
+    inner_x = INNER_X if inner_x is None else inner_x
+    inner_y = INNER_Y if inner_y is None else inner_y
+    C = np.array([q.mean(0) for q in quads]).reshape(-1, ncols, 2)   # first-guess centres [row, col]
+    nrows = C.shape[0]
+    px = np.median(np.linalg.norm(np.diff(C, axis=1), axis=2))
+    py = np.median(np.linalg.norm(np.diff(C, axis=0), axis=2))
+    img = cv2.GaussianBlur(score_img.astype(np.float32), (0, 0), sigma)
+
+    def horizontal(colx):
+        pts = []
+        for c in range(ncols):
+            ys = np.arange(C[0, c, 1] - py, C[-1, c, 1] + py, dtype=np.float32)
+            prof = _profile(img, ys, colx(c, ys), int(0.15 * px), vertical_lines=False)
+            vals = [(ys[0] + v[0], v[1]) for v in _valleys(prof, py, thr)]
+            preds = {j: (C[j - 1, c, 1] + C[j, c, 1]) / 2 for j in range(1, nrows)}
+            for j, (y, wgt) in _track(vals, preds, py, nrows).items():
+                pts.append((j, float(colx(c, np.array([y]))[0]), y, wgt))
+        return pts
+
+    hpts = horizontal(lambda c, ys: np.interp(ys, C[:, c, 1], C[:, c, 0]))
+    if len(hpts) < 0.5 * ncols * (nrows - 1):
+        return quads, None
+    Y, hmed, hin = _fit_lines(hpts)
+    vpts = []
+    for r in range(nrows):
+        xs = np.arange(C[r, 0, 0] - px, C[r, -1, 0] + px, dtype=np.float32)
+        ymid = (Y(np.full(len(xs), r), xs) + Y(np.full(len(xs), r + 1), xs)) / 2 if r not in (0, nrows - 1) \
+            else np.interp(xs, C[r, :, 0], C[r, :, 1])
+        prof = _profile(img, xs, ymid, int(0.2 * py), vertical_lines=True)
+        vals = [(xs[0] + v[0], v[1]) for v in _valleys(prof, px, thr)]
+        preds = {k: (C[r, k - 1, 0] + C[r, k, 0]) / 2 for k in range(1, ncols)}
+        for k, (x, wgt) in _track(vals, preds, px, ncols).items():
+            vpts.append((k, float(np.interp(x, xs, ymid)), x, wgt))
+    if len(vpts) < 0.5 * nrows * (ncols - 1):
+        return quads, None
+    X, vmed, vin = _fit_lines(vpts)
+    hpts = horizontal(lambda c, ys: (X(np.full(len(ys), c), ys) + X(np.full(len(ys), c + 1), ys)) / 2)
+    Y, hmed, hin = _fit_lines(hpts)
+    out, fallback = [], 0
+    for r in range(nrows):
+        for c in range(ncols):
+            cx, cy = C[r, c]
+            for _ in range(3):                         # intersect the four lines around the cell
+                xl, xr = X([c], [cy])[0], X([c + 1], [cy])[0]
+                yt, yb = Y([r], [cx])[0], Y([r + 1], [cx])[0]
+                cx, cy = (xl + xr) / 2, (yt + yb) / 2
+            ok = 0.8 * px < xr - xl < 1.2 * px and 0.8 * py < yb - yt < 1.2 * py
+            if not ok:
+                out.append(quads[r * ncols + c]); fallback += 1; continue
+            hw, hh = inner_x * (xr - xl) / 2, inner_y * (yb - yt) / 2
+            out.append(np.array([[cx - hw, cy - hh], [cx + hw, cy - hh], [cx + hw, cy + hh], [cx - hw, cy + hh]]))
+    return out, {"vpts": len(vpts), "hpts": len(hpts), "vmed": vmed, "hmed": hmed, "vin": vin, "hin": hin,
+                 "fallback": fallback}
+
+
 def load_jpeg(path):
     im = Image.open(path).convert("RGB")
     a = np.asarray(im)
@@ -249,6 +426,22 @@ def overlay_raw(rp, black, quads, out):
     cv2.imwrite(out, im)
 
 
+def check_crops(n, rp, black, qr, jp, qj, rows=(4, 7), cols=(14, 36)):
+    """Full-resolution crops (raw G plane and JPEG) of rows 4-6, columns 14-35 with the boxes."""
+    for tag, img, quads, scale in (("raw", rp[1] - black[1], qr, 1), ("jpg", sum(jp) / 3, qj, 1)):
+        sel = [quads[r * 36 + c] for r in range(*rows) for c in range(*cols)]
+        pts = np.concatenate(sel)
+        x0, y0 = np.floor(pts.min(0) - 60).astype(int)
+        x1, y1 = np.ceil(pts.max(0) + 60).astype(int)
+        x0, y0 = max(x0, 0), max(y0, 0)
+        crop = img[y0:y1, x0:x1].astype(np.float32)
+        crop = np.clip(crop / max(np.percentile(crop, 99), 1), 0, 1) ** (1 / 2.2)
+        im = cv2.cvtColor((crop * 255).astype(np.uint8), cv2.COLOR_GRAY2BGR)
+        for q in sel:
+            cv2.polylines(im, [np.round(q - [x0, y0]).astype(np.int32)], True, (255, 0, 255), 1)
+        cv2.imwrite(os.path.join(OUT, f"check_{tag}_{n}.png"), im)
+
+
 def main():
     layouts = json.load(open(os.path.join(OUT, "chart_layout.json")))
     layouts = {k: v for k, v in layouts.items() if k in ("1920x1080", "2560x1600")}  # 3840 = 1920 in fractions
@@ -265,6 +458,7 @@ def main():
     raw = np.zeros((len(names), npatch, 3)); rawclip = np.zeros((len(names), npatch), bool)
     rawspread = np.zeros((len(names), npatch)); jpg = np.zeros((len(names), npatch, 3))
     jpgspread = np.zeros((len(names), npatch)); npx = np.zeros((len(names), npatch, 2), int)
+    lines = {}
     for k, n in enumerate(names):
         jp, small, sc = load_jpeg(os.path.join(SHOTS, n + ".JPG"))
         Hj = homography(lay, small, sc)
@@ -274,6 +468,14 @@ def main():
             sys.exit(f"{n}: markers not found (jpg {Hj is not None}, raw {Hr is not None})")
         qj, offj = refine(sum(jp) / 3, inner_quads(lay, Hj))
         qr, offr = refine(sum(rp), inner_quads(lay, Hr))
+        qj, gj = grid_quads(sum(jp) / 3, qj)
+        qr, gr = grid_quads(sum(rp), qr)
+        none = {"vpts": 0, "hpts": 0, "vmed": np.nan, "hmed": np.nan, "vin": np.nan, "hin": np.nan, "fallback": 252}
+        if gj is None or gr is None:
+            print(f"{n}: WARNING gap lines not found in {'jpg' if gj is None else ''} {'raw' if gr is None else ''}; "
+                  f"keeping the flatness-search placement there")
+        gj, gr = gj or none, gr or none
+        lines[n] = {"jpg": gj, "raw": gr}
         for i in range(npatch):
             sj = sample(jp, qj[i])
             jpg[k, i] = [s[0] for s in sj]
@@ -286,10 +488,12 @@ def main():
             npx[k, i] = [sj[0][4], sr[0][4]]
         if n in ("PB090187", "PB090219", "PB090211"):
             overlay(os.path.join(SHOTS, n + ".JPG"), qj, os.path.join(OUT, f"overlay_{n}.jpg"))
-        if n in ("PB090187", "PB090185"):
+        if n in ("PB090187", "PB090185", "PB090198", "PB090211"):
             overlay_raw(rp, black, qr, os.path.join(OUT, f"overlay_raw_{n}.png"))
+            check_crops(n, rp, black, qr, jp, qj)
         print(f"{n} {ROLES.get(int(n[-3:]), '?'):16s} jpg spread med {np.median(jpgspread[k]):5.1f}  "
-              f"shift jpg max {np.abs(offj).max():4.0f} raw max {np.abs(offr).max():4.0f}  "
+              f"lines jpg {gj['vpts']}/{gj['hpts']} med {gj['vmed']:.1f}/{gj['hmed']:.1f}px in {gj['vin']:.2f}/{gj['hin']:.2f} fb {gj['fallback']}  "
+              f"raw {gr['vpts']}/{gr['hpts']} med {gr['vmed']:.1f}/{gr['hmed']:.1f}px in {gr['vin']:.2f}/{gr['hin']:.2f} fb {gr['fallback']}  "
               f"raw clipped patches {rawclip[k].sum():3d}  px/patch jpg {npx[k, :, 0].min()} raw {npx[k, :, 1].min()}")
 
     meta = [{k: p[k] for k in ("row", "col", "kind", "rgb")} for p in lay["patches"]]
@@ -298,6 +502,7 @@ def main():
                         rawspread=rawspread, jpg=jpg, jpgspread=jpgspread, npx=npx,
                         patch_meta=json.dumps(meta), layout=lay_name)
     json.dump(settings, open(os.path.join(OUT, "settings.json"), "w"), indent=1)
+    json.dump(lines, open(os.path.join(OUT, "gridlines.json"), "w"), indent=1, default=float)
     print("wrote out/patches.npz, out/settings.json")
 
 

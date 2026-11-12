@@ -1,0 +1,379 @@
+{
+ "slots": {
+  "palelight1": {
+   "codes": [
+    71,
+    80
+   ],
+   "tabs": [
+    "0x7f033b7c",
+    "0x7f033d7c",
+    "0x7e75e4f0"
+   ],
+   "sat": "0x7e7696a4",
+   "six": [
+    "0x7e76949e",
+    "0x7e7694aa"
+   ],
+   "matrix": "0x7ecb09c8",
+   "stub": "0x7ecb0888"
+  },
+  "softfocus": {
+   "codes": [
+    69,
+    78
+   ],
+   "tabs": [
+    "0x7e75e8f0",
+    "0x7e75ecf0",
+    "0x7e75f0f0"
+   ],
+   "sat": "0x7e76969c",
+   "six": [
+    "0x7e76946e",
+    "0x7e76947a"
+   ],
+   "matrix": "0x7ecb09da",
+   "stub": "0x7ecb0890"
+  },
+  "pinhole1": {
+   "codes": [
+    73,
+    82
+   ],
+   "tabs": [
+    "0x7e75faf0",
+    "0x7e75f8f0",
+    "0x7e7616f0"
+   ],
+   "sat": "0x7e7696ac",
+   "six": [
+    "0x7e7694ce",
+    "0x7e7694da"
+   ],
+   "matrix": "0x7ecb09ec",
+   "stub": "0x7ecb0898"
+  },
+  "diorama": {
+   "codes": [
+    86,
+    88
+   ],
+   "tabs": [
+    "0x7e75fcf0",
+    "0x7e75fef0",
+    "0x7e74efbc"
+   ],
+   "sat": "0x7e7696b0",
+   "six": [
+    "0x7e7694e6",
+    "0x7e7694f2"
+   ],
+   "matrix": "0x7ecb09fe",
+   "stub": "0x7ecb08a0"
+  },
+  "grainy": {
+   "codes": [
+    102,
+    103
+   ],
+   "tabs": [
+    "0x7e751fbc",
+    "0x7e7521bc",
+    "0x7e754fbc"
+   ],
+   "sat": "0x7e7696bc",
+   "six": [
+    "0x7e76952e",
+    "0x7e76953a"
+   ],
+   "matrix": "0x7ecb0a10",
+   "stub": "0x7ecb08a8"
+  },
+  "sepia": {
+   "codes": [
+    106
+   ],
+   "tabs": [
+    "0x7e7551bc",
+    "0x7e757fbc",
+    "0x7e7581bc"
+   ],
+   "sat": "0x7e7696c0",
+   "six": [
+    "0x7e769546",
+    "0x7e769552"
+   ],
+   "matrix": "0x7ecb0a22",
+   "stub": "0x7ecb08b0"
+  },
+  "dramatic": {
+   "codes": [
+    108
+   ],
+   "tabs": [
+    "0x7e74f3bc",
+    "0x7e7523bc",
+    "0x7e7525bc"
+   ],
+   "sat": "0x7e7696c4",
+   "six": [
+    "0x7e76955e",
+    "0x7e76956a"
+   ],
+   "matrix": "0x7ecb0a34",
+   "stub": "0x7ecb08b8"
+  },
+  "keyline": {
+   "codes": [
+    145,
+    146
+   ],
+   "tabs": [
+    "0x7e7553bc",
+    "0x7e7555bc",
+    "0x7e7583bc"
+   ],
+   "sat": "0x7e7696b8",
+   "six": [
+    "0x7e769516",
+    "0x7e769522"
+   ],
+   "matrix": "0x7ecb0a46",
+   "stub": "0x7ecb08c0"
+  },
+  "watercolor": {
+   "codes": [
+    167,
+    168
+   ],
+   "tabs": [
+    "0x7e7585bc",
+    "0x7e7503bc",
+    "0x7e7533bc"
+   ],
+   "sat": "0x7e7696ec",
+   "six": [
+    "0x7e769622",
+    "0x7e76962e"
+   ],
+   "matrix": "0x7ecb0a58",
+   "stub": "0x7ecb08c8"
+  }
+ },
+ "s1": {
+  "__bss_start": "0x7e880fd4",
+  "___ctors": "0x7e880fd4",
+  "___ctors_end": "0x7e880fd4",
+  "___dtors": "0x7e880fd4",
+  "___dtors_end": "0x7e880fd4",
+  "_edata": "0x7e880fd4",
+  "_end": "0x7e880fd4",
+  "gamma3": "0x7e880f5c",
+  "GTAIL": "0x7e56b852",
+  "m1": "0x7e880faa",
+  "m2": "0x7e880faf",
+  "m3": "0x7e880fb4",
+  "M_APPLY": "0x7e56c764",
+  "matrix3": "0x7e880f8d",
+  "M_NONE": "0x7e56c76b",
+  "M_T1": "0x7e56c6b8",
+  "M_T2": "0x7e56c6c3",
+  "PICK": "0x7e56b732",
+  "_stack": "0x80000",
+  "t3": "0x7e880fc2"
+ },
+ "s2": {
+  "__bss_start": "0x7ecb0e38",
+  "chainB": "0x7ecb096c",
+  "___ctors": "0x7ecb0e38",
+  "___ctors_end": "0x7ecb0e38",
+  "___dtors": "0x7ecb0e38",
+  "___dtors_end": "0x7ecb0e38",
+  "_edata": "0x7ecb0e38",
+  "_end": "0x7ecb0e38",
+  "endc": "0x7ecb09c8",
+  "gcommon": "0x7ecb08ce",
+  "g_diorama": "0x7ecb08a0",
+  "g_dramatic": "0x7ecb08b8",
+  "g_grainy": "0x7ecb08a8",
+  "g_keyline": "0x7ecb08c0",
+  "g_palelight1": "0x7ecb0888",
+  "g_pinhole1": "0x7ecb0898",
+  "g_sepia": "0x7ecb08b0",
+  "g_softfocus": "0x7ecb0890",
+  "GTAIL": "0x7e56b852",
+  "g_watercolor": "0x7ecb08c8",
+  "h0_0": "0x7ecb092f",
+  "h0_1": "0x7ecb0937",
+  "h0_2": "0x7ecb093f",
+  "h0_3": "0x7ecb0947",
+  "h0_4": "0x7ecb094f",
+  "h0_5": "0x7ecb0957",
+  "h0_6": "0x7ecb095f",
+  "h1_0": "0x7ecb0999",
+  "h1_1": "0x7ecb09a1",
+  "h1_2": "0x7ecb09a9",
+  "h1_3": "0x7ecb09b1",
+  "h1_4": "0x7ecb09b9",
+  "M_APPLY": "0x7e56c764",
+  "matrix12": "0x7ecb08f5",
+  "M_NONE": "0x7e56c76b",
+  "mt0": "0x7ecb0965",
+  "mt1": "0x7ecb09bf",
+  "PICK": "0x7e56b732",
+  "recs": "0x7ecb0ad8",
+  "_stack": "0x80000",
+  "T1": "0x7e768f46",
+  "T2": "0x7e768f58",
+  "T3": "0x7e880fc2",
+  "t_diorama": "0x7ecb09fe",
+  "t_dramatic": "0x7ecb0a34",
+  "t_grainy": "0x7ecb0a10",
+  "t_keyline": "0x7ecb0a46",
+  "t_palelight1": "0x7ecb09c8",
+  "t_pinhole1": "0x7ecb09ec",
+  "tri_diorama": "0x7ecb0a90",
+  "tri_dramatic": "0x7ecb0ab4",
+  "tri_grainy": "0x7ecb0a9c",
+  "tri_keyline": "0x7ecb0ac0",
+  "tri_palelight1": "0x7ecb0a6c",
+  "tri_pinhole1": "0x7ecb0a84",
+  "tri_sepia": "0x7ecb0aa8",
+  "tri_softfocus": "0x7ecb0a78",
+  "tri_watercolor": "0x7ecb0acc",
+  "t_sepia": "0x7ecb0a22",
+  "t_softfocus": "0x7ecb09da",
+  "t_watercolor": "0x7ecb0a58"
+ },
+ "hash": [
+  [
+   "0x20",
+   "0x7ecb08a8"
+  ],
+  [
+   "0x1",
+   "0x7ecb0888"
+  ],
+  [
+   "0x2",
+   "0x7e56b82a"
+  ],
+  [
+   "0x21",
+   "0x7ecb08a8"
+  ],
+  [
+   "0x61",
+   "0x7ecb08c8"
+  ],
+  [
+   "0x62",
+   "0x7ecb08c8"
+  ],
+  [
+   "0x63",
+   "0x7e56b85f"
+  ],
+  [
+   "0x64",
+   "0x7e56b85f"
+  ],
+  [
+   "0x8",
+   "0x7ecb0890"
+  ],
+  [
+   "0x9",
+   "0x7e880f5c"
+  ],
+  [
+   "0xa",
+   "0x7ecb0888"
+  ],
+  [
+   "0xb",
+   "0x7e56b82a"
+  ],
+  [
+   "0x3",
+   "0x7ecb0898"
+  ],
+  [
+   "0x4d",
+   "0x7e56b861"
+  ],
+  [
+   "0xc",
+   "0x7ecb0898"
+  ],
+  [
+   "0xf",
+   "0x7e56b7f8"
+  ],
+  [
+   "0x50",
+   "0x7e56b861"
+  ],
+  [
+   "0x11",
+   "0x7e56b7f8"
+  ],
+  [
+   "0x10",
+   "0x7ecb08a0"
+  ],
+  [
+   "0x12",
+   "0x7ecb08a0"
+  ],
+  [
+   "0x24",
+   "0x7ecb08b0"
+  ],
+  [
+   "0x26",
+   "0x7ecb08b8"
+  ],
+  [
+   "0x4b",
+   "0x7ecb08c0"
+  ],
+  [
+   "0x4c",
+   "0x7ecb08c0"
+  ],
+  [
+   "0x0",
+   "0x7e880f5c"
+  ],
+  [
+   "0x0",
+   "0x7e56b861"
+  ],
+  [
+   "0x0",
+   "0x7e56b861"
+  ],
+  [
+   "0x0",
+   "0x7e56b861"
+  ],
+  [
+   "0x0",
+   "0x7e56b861"
+  ],
+  [
+   "0x5d",
+   "0x7e56b85f"
+  ],
+  [
+   "0x5e",
+   "0x7e56b85f"
+  ],
+  [
+   "0xffffffff",
+   "0x7ecb0890"
+  ]
+ ]
+}

@@ -1,0 +1,124 @@
+{
+ "slots": {
+  "palelight1": {
+   "codes": [
+    71,
+    80
+   ],
+   "tabs": [
+    "0x7f033b7c",
+    "0x7f033d7c",
+    "0x7e75e8f0"
+   ],
+   "sat": "0x7e7696a4",
+   "six": [
+    "0x7e76949e",
+    "0x7e7694aa"
+   ],
+   "matrix": "0x7ecb0988"
+  },
+  "softfocus": {
+   "codes": [
+    102,
+    103
+   ],
+   "tabs": [
+    "0x7e75faf0",
+    "0x7e75f8f0",
+    "0x7e7616f0"
+   ],
+   "sat": "0x7e7696bc",
+   "six": [
+    "0x7e76952e",
+    "0x7e76953a"
+   ],
+   "matrix": "0x7ecb099a"
+  },
+  "pinhole": {
+   "codes": [
+    145,
+    146
+   ],
+   "tabs": [
+    "0x7e74efbc",
+    "0x7e751fbc",
+    "0x7e7521bc"
+   ],
+   "sat": "0x7e7696b8",
+   "six": [
+    "0x7e769516",
+    "0x7e769522"
+   ],
+   "matrix": "0x7ecb09ac"
+  },
+  "diorama": {
+   "codes": [
+    167,
+    168
+   ],
+   "tabs": [
+    "0x7e754fbc",
+    "0x7e7551bc",
+    "0x7e757fbc"
+   ],
+   "sat": "0x7e7696ec",
+   "six": [
+    "0x7e769622",
+    "0x7e76962e"
+   ],
+   "matrix": "0x7ecb09be"
+  }
+ },
+ "s2": {
+  "__bss_start": "0x7ecb0b80",
+  "chainB": "0x7ecb094c",
+  "___ctors": "0x7ecb0b80",
+  "___ctors_end": "0x7ecb0b80",
+  "___dtors": "0x7ecb0b80",
+  "___dtors_end": "0x7ecb0b80",
+  "_edata": "0x7ecb0b80",
+  "_end": "0x7ecb0b80",
+  "endc": "0x7ecb0988",
+  "ft_dio": "0x7ecb095f",
+  "FT_END": "0x7e71bea3",
+  "ft_soft": "0x7ecb0958",
+  "gcommon": "0x7ecb08a6",
+  "g_diorama": "0x7ecb08a0",
+  "g_palelight1": "0x7ecb0888",
+  "g_pinhole": "0x7ecb0898",
+  "g_softfocus": "0x7ecb0890",
+  "GTAIL": "0x7e56b852",
+  "h0_0": "0x7ecb090f",
+  "h0_1": "0x7ecb0917",
+  "h0_2": "0x7ecb091f",
+  "h0_3": "0x7ecb0927",
+  "h0_4": "0x7ecb092f",
+  "h0_5": "0x7ecb0937",
+  "h0_6": "0x7ecb093f",
+  "lva_dio": "0x7ecb096e",
+  "LVA_END": "0x7e6cc14e",
+  "lva_soft": "0x7ecb0967",
+  "lvb_dio": "0x7ecb097d",
+  "LVB_END": "0x7e6dbbc4",
+  "lvb_soft": "0x7ecb0976",
+  "M_APPLY": "0x7e56c764",
+  "matrix12": "0x7ecb08cd",
+  "M_NONE": "0x7e56c76b",
+  "mt0": "0x7ecb0945",
+  "mt1": "0x7ecb0951",
+  "PICK": "0x7e56b732",
+  "recs": "0x7ecb0a00",
+  "_stack": "0x80000",
+  "T1": "0x7e768f46",
+  "T2": "0x7e768f58",
+  "T3": "0x7e880fc2",
+  "t_diorama": "0x7ecb09be",
+  "t_palelight1": "0x7ecb0988",
+  "t_pinhole": "0x7ecb09ac",
+  "tri_diorama": "0x7ecb09f4",
+  "tri_palelight1": "0x7ecb09d0",
+  "tri_pinhole": "0x7ecb09e8",
+  "tri_softfocus": "0x7ecb09dc",
+  "t_softfocus": "0x7ecb099a"
+ }
+}
