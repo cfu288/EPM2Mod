@@ -5,6 +5,8 @@
 | [01-public-sources.md](01-public-sources.md) | Specs, reviews, community work, re-checked on the real pages or archive.org copies (2026-11-12); each fact marked confirmed / corrected / unverified |
 | [02-sd-and-encoder.md](02-sd-and-encoder.md) | Firmware: the SD host driver and the H.264 encoder set-up |
 | [03-sensor-pipeline-memory.md](03-sensor-pipeline-memory.md) | Firmware: sensor readout modes, the movie image path, DRAM |
+| [05-qp-floor.md](05-qp-floor.md) | The QP floor is set twice (first frame 0xA84A00, every later frame 0xA84E9C) into codec register 0x994043A8; the hardware picks QP |
+| [06-bitrate-and-limit.md](06-bitrate-and-limit.md) | Bitrate and time-limit specs: every derived field, the 4 GiB stop kept consistent, clip lengths per mode |
 | [04-mov-clip-analysis.md](04-mov-clip-analysis.md) | **A real clip: High@4.1, CAVLC, custom 4×4 matrices, QP pinned at 20 while using 41 % of the 20.48 Mb/s budget. The QP floor (0x7EEA5A1F) is the binding limit** |
 
 Labels: **V** read in our bytes; **I** inferred; **X** external source.
@@ -35,3 +37,24 @@ Labels: **V** read in our bytes; **I** inferred; **X** external source.
 3. **First test build, inside every existing check:** raise MOV 1080 Fine from 20 to 24 Mb/s in the table only. Gain: +20 %.
 4. **Beyond 24 Mb/s:** raise the 0x7EEA33CB constant together with the HRD fields, then a camera ladder at 28 → 36 → 50 Mb/s, checking for RECMOVIE_BUFFER_LIMIT stops. The encoder hardware is the unknown.
 5. **For image quality,** look at the ÷1.4 resize and the movie noise reduction (temporal reference, `kedge`) before bitrate.
+
+## Conclusion and status (2026-11-12, work paused: the user's focus moved to stills features)
+
+**What limits E-PM2 video**, in order of effect on quality:
+1. **The upscaled 1080 frame:** a 1646×1296 source stretched to 1920 (V).
+2. **The encoder's design:** CAVLC, no 8×8 transform, harsh 4×4 matrices. These are probably fixed in the hardware.
+3. **The QP floor of 20:** stock clips stop spending bits at 41 % of their budget.
+4. **The 20 Mb/s target and the 24 Mb/s parameter check.**
+5. **The 29-minute and 4 GiB caps:** the EU tariff and FAT32 / 32-bit MOV offsets.
+
+The SD card path is not a limit: it is UHS-I SDR50, against a stream of about 3 MB/s.
+
+**Patch specs prepared** (emulator-checked, **not built, not flashed**):
+
+| Spec | Change | Expected effect | Open risk |
+|---|---|---|---|
+| `patches/movie-qp-floor-16.json` | min QP 20 → 16 in both set-ups (2 bytes) | Static scenes about 12–14 Mb/s instead of 8.4; finer texture; clip length unchanged | Whether the hardware rate control still holds the target below QP 20 |
+| `patches/movie-bitrate-32.json` | MOV 32/24/20/16 Mb/s, the check 24 → 50 M, time-limit rates moved in step (9 ops) | More bits for busy scenes; 1080 Fine clips 17:04 (4 GiB) | Encoder throughput above 24 Mb/s; **in-camera playback may refuse clips above 20 Mb/s** (Video Decode check 0x7EEB93DA) |
+| `patches/movie-rec-limit.json` | 29-min cap → 7200 s, plus VGA's header reserve and ulMaxRecTime (3 ops) | 720 Normal 49:36, 720 Fine 39:22, 1080 Normal 30:52; 1080 Fine unchanged | Header-reserve link inferred; one 10 s test clip checks it |
+
+The three specs share no bytes and give the same image in any order. **Suggested first camera test**, if this work resumes: QP floor alone, then a static clip and a busy clip, analysed with `scripts/qp.py`.

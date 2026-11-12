@@ -74,6 +74,11 @@ The harness uses scratch RAM at 0x7D000000–0x7D2FFFFF: the trampoline, the ret
 | `strlen` | 0x7E508346 | 5 | none | matches the model (**V**) |
 | `rec_limit` | 0x7E6EDE08 | 48 (MOV q6/q3/q4/q7, AVCHD q5/q3/q4, format 1; rate hi/lo; free space 500 sectors, 1 GiB, 64 GiB) | 4, listed below | matches the model on stock and patched (**V**) |
 | `curve_select` | 0x7E56E837 | 229 (7 modes × contrast −3…+3, High/Low Key, the identity flag, art codes 8–184) | none (its only callee, 0x7E56E80F, runs natively) | the 52 modelled rows match; art codes 85/87 → 0x7E75F2F0 and 167 → 0x7E7616F0, as film-portra NOTES §11.1 says (**V**) |
+| `rate_table` | 0x7E6EE4D5 (pc range, not a call) | 18 (MOV q6/q3/q4/q5/q7, AVCHD q5/q3/q4, format 1; Fine/Normal) | none | peak/average written to 0xA0753564/68 match the table immediates (**V**) |
+| `enc_param_check` | 0x7EEA338C | 23 (peaks 4 M…62.5 M, peak < average, flag, mode, fps, size) | none | accept/reject matches a model that reads the cap from the image (**V**) |
+| `enc_rate_fields` | 0x7EEA57D4 / 0x7EEA5C4C | 22 (rates 4 M…50 M × both builders) | as `qp_setup` | kb/s, HRD kb/s − 1 and the 6/2 class (≥ 15.5 M) match the model (**V**) |
+
+`rec_limit` (2026-11-12): the model reads every rate, reserve, overhead and limit from the image, and each row also reports `fill_4g`: the file size at the stop point if video ran at the bitrate-table peak, as a share of 4 GiB, and whether the time-limit rate is ceil(peak/4096) (`rate_in_step`). See experiments/2026-11-12-hardware/06-bitrate-and-limit.md.
 
 **`rec_limit` stubs** (every call is logged, with its arguments):
 

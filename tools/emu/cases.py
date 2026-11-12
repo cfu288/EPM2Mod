@@ -131,39 +131,92 @@ class RecLimit(Case):
         for c in r["stub_calls"]:
             if c["stub"] in (self.S_DBG, self.S_ERR):
                 prints.append(f"{emu.cstr(c['args']['a0']).strip()} {c['args']['d1']}")
-        return {"ret": r["regs"]["d0"], "free_frames": struct.unpack_from("<I", ctx, 32)[0],
-                "free_frames2": struct.unpack_from("<I", ctx, 36)[0], "max_frames": struct.unpack_from("<I", ctx, 40)[0],
-                "prints": prints, "_r": r}
+        out = {"ret": r["regs"]["d0"], "free_frames": struct.unpack_from("<I", ctx, 32)[0],
+               "free_frames2": struct.unpack_from("<I", ctx, 36)[0], "max_frames": struct.unpack_from("<I", ctx, 40)[0],
+               "prints": prints, "_r": r}
+        out.update(self.fill(emu.image, row, out["max_frames"]))
+        return out
+
+    # Constants of 0x7E6EDE08, read from the image (stock values in comments). imm16 sites: `mov imm16,dN` (2c..2f,
+    # sign-extended), `mov imm16,aN` (24..27, zero-extended); `mov imm8,d0` (80, sign-extended) for the AVCHD overhead.
+    RATE = {(3, 6, 1): 0x7E6EDEB9, (3, 6, 0): 0x7E6EDEC3,          # 4883 / 4151 sectors/s
+            (3, 3, 1): 0x7E6EDECA, (3, 3, 0): 0x7E6EDED4,          # 3174 / 2442
+            (3, 4, 1): 0x7E6EDEDB, (3, 4, 0): 0x7E6EDEDB,          # 977 (one rate)
+            (2, 5, 1): 0x7E6EDF00, (2, 5, 0): 0x7E6EDF0A,          # 5860 / 4711
+            (2, 3, 1): 0x7E6EDF11, (2, 3, 0): 0x7E6EDF1B}          # 4711 / 4045
+    RESERVE = {(3, 6): 0x7E6EDE6B, (3, 3): 0x7E6EDE6B, (3, 4): 0x7E6EDE70}   # 832, 832, 2624; AVCHD 400 at 0x7E6EDE8A
+    # The bitrate table 0x7E6EE4A2: the peak (0xA0753564) each mode gets, `mov imm32,d0` (fc cc imm32)
+    PEAK = {(3, 6, 1): 0x7E6EE583, (3, 6, 0): 0x7E6EE58B, (3, 3, 1): 0x7E6EE59A, (3, 3, 0): 0x7E6EE5A2,
+            (3, 4, 1): 0x7E6EE5AA, (3, 4, 0): 0x7E6EE5AA, (2, 5, 1): 0x7E6EE510, (2, 5, 0): 0x7E6EE52C,
+            (2, 3, 1): 0x7E6EE52C, (2, 3, 0): 0x7E6EE540}
+    FILECAP = 8388608                                               # 4 GiB in 512-byte sectors (0x7E6EDE57)
 
     @staticmethod
-    def limit_at(image, addr):
-        """The imm16 of `mov imm16,a3` (27 lo hi) at addr."""
+    def imm16(image, addr, ops):
         o = addr - BASE
-        assert image[o] == 0x27, f"no mov imm16,a3 at 0x{addr:08x}"
-        return struct.unpack_from("<H", image, o + 1)[0]
+        assert image[o] in ops, f"0x{addr:08x}: opcode {image[o]:02x} is not one of {ops}"
+        v = struct.unpack_from("<H", image, o + 1)[0]
+        return v - 0x10000 if image[o] >= 0x2C and v & 0x8000 else v       # 2c..2f sign-extend; 24..27 zero-extend
+
+    @classmethod
+    def limit_at(cls, image, addr):
+        """The imm16 of `mov imm16,a3` (27 lo hi) at addr."""
+        return cls.imm16(image, addr, (0x27,))
+
+    @classmethod
+    def consts(cls, image, fmt, q, hi):
+        """(rate, overhead, reserve, limit) of a mode, from the image; None for a mode the routine rejects."""
+        key = (fmt, q, 1 if hi == 1 else 0)
+        if key not in cls.RATE:
+            return None
+        rate = cls.imm16(image, cls.RATE[key], (0x2C,))
+        if fmt == 3:
+            ov = cls.imm16(image, 0x7E6EDE50, (0x2C,))
+            res = cls.imm16(image, cls.RESERVE[(fmt, q)], (0x26,))
+            lim = cls.limit_at(image, 0x7E6EDEE0 if q == 4 else 0x7E6EDF20)
+        else:
+            assert image[0x7E6EDE86 - BASE] == 0x80
+            ov = struct.unpack("b", image[0x7E6EDE87 - BASE:0x7E6EDE88 - BASE])[0]
+            res = cls.imm16(image, 0x7E6EDE8A, (0x26,))
+            lim = cls.limit_at(image, 0x7E6EDF20)
+        return rate, ov, res, lim
+
+    @classmethod
+    def fill(cls, image, row, max_frames):
+        """Consistency of the stop point with the bitrate table: the file size at max_frames if video ran at exactly
+        the table peak, plus the routine's audio overhead and reserve, as a share of 4 GiB. Inputs: the emulated
+        max_frames and constants read from the image (not emulated)."""
+        c = cls.consts(image, row["fmt"], row["q"], row["hi"])
+        if c is None or max_frames == 0:
+            return {}
+        rate, ov, res, _ = c
+        o = cls.PEAK[(row["fmt"], row["q"], 1 if row["hi"] == 1 else 0)] - BASE
+        assert image[o:o + 2] == b"\xfc\xcc"
+        peak = struct.unpack_from("<I", image, o + 2)[0]
+        t = max_frames // 30
+        size = t * (peak // 8 + ov * 512) + res * 512
+        return {"peak": peak, "rate_in_step": rate == -(-peak // 4096), "fill_4g": round(size / (cls.FILECAP * 512), 4),
+                "fits_4g": size <= cls.FILECAP * 512}
 
     def model(self, row, image):
         fmt, q, hi, free = row["fmt"], row["q"], row["hi"], row["free"]
-        lim_q4, lim_other = self.limit_at(image, 0x7E6EDEE0), self.limit_at(image, 0x7E6EDF20)
-        rate, limit, a2 = 0, 0, 0          # a2: the caller's a2 (0 in this harness) where no reserve is set
-        if fmt == 3:
-            ov = 375
-            a2 = {6: 832, 3: 832, 4: 2624}.get(q, 0)
-            rate = {6: (4883, 4151), 3: (3174, 2442), 4: (977, 977)}.get(q, (0, 0))[0 if hi == 1 else 1]
-            limit = lim_q4 if q == 4 else (lim_other if q in (6, 3) else 0)
+        c = self.consts(image, fmt, q, hi)
+        if c is None:                      # rejected quality or format: rate 0, limit 0
+            rate, limit = 0, 0
+            ov = 375 if fmt == 3 else 47
+            a2 = 0 if fmt == 3 else 400    # MOV: the caller's a2 (0 in this harness), as no reserve is set
         else:
-            ov, a2 = 47, 400
-            if fmt == 2 and q in (5, 3):
-                rate = {5: (5860, 4711), 3: (4711, 4045)}[q][0 if hi == 1 else 1]
-                limit = lim_other
+            rate, ov, a2, limit = c
         if free <= a2:
             t_free = clamped = 0
         else:
             t_free = (free - a2) // (rate + ov)
-            t_cap = ((8388608 - a2) & U32) // (rate + ov)
+            t_cap = ((self.FILECAP - a2) & U32) // (rate + ov)
             clamped = min(limit, t_cap, t_free)
-        return {"ret": (t_free * 600) & U32, "free_frames": (t_free * 30) & U32, "free_frames2": (t_free * 30) & U32,
-                "max_frames": (clamped * 30) & U32}
+        out = {"ret": (t_free * 600) & U32, "free_frames": (t_free * 30) & U32, "free_frames2": (t_free * 30) & U32,
+               "max_frames": (clamped * 30) & U32}
+        out.update(self.fill(image, row, out["max_frames"]))
+        return out
 
 
 # ---- tone-curve selector (film-portra NOTES §11.1; reader of 0x7E75D6F0) ------------------------------------
@@ -574,3 +627,150 @@ class QpSizeModel(Case):
 
 
 CASES.update({c.name: c for c in (QpSetup(), QpRc(), QpSizeModel())})
+
+
+# ---- movie bitrate: the table, the encoder's parameter check, the derived encoder fields ------------------------
+# (experiments/2026-11-12-hardware/06-bitrate-and-limit.md)
+def imm32_at(image, addr, prefix):
+    o = addr - BASE
+    assert image[o:o + 2] == prefix, f"0x{addr:08x}: {image[o:o + 2].hex()} is not {prefix.hex()}"
+    return struct.unpack_from("<I", image, o + 2)[0]
+
+
+class RateTable(Case):
+    name, entry = "rate_table", 0x7E6EE4D5
+    doc = ("Bitrate table inside the record-request builder 0x7E6EE4A2: entered at 0x7E6EE4D5 with a2 = the record "
+           "descriptor {format, quality, fine} (0x605B1CC4 on the camera) and a0 = a buffer whose byte 3 is the art mode; "
+           "run to 0x7E6EE5E3 (table done) or 0x7E6EE5DC (the error print). Output: peak 0xA0753564 and average "
+           "0xA0753568. Not a function call")
+    ranges = [(0x7E6EE4D5, 0x7E6EE5E3)]
+    DESC, ART = DATA, DATA + 0x100
+    REQ = 0xA0753560
+    EXITS = {0x7E6EE5E3: "ok", 0x7E6EE5DC: "error"}
+    SITES = (0x7E6EE510, 0x7E6EE51C, 0x7E6EE52C, 0x7E6EE538, 0x7E6EE540, 0x7E6EE54C, 0x7E6EE583, 0x7E6EE58B,
+             0x7E6EE59A, 0x7E6EE5A2, 0x7E6EE5AA)                  # every `mov imm32,d0` of the table
+    MOV = {(6, 1): 0x7E6EE583, (6, 0): 0x7E6EE58B, (3, 1): 0x7E6EE59A, (3, 0): 0x7E6EE5A2, (4, 1): 0x7E6EE5AA,
+           (4, 0): 0x7E6EE5AA}
+    AVCHD = {(5, 1): (0x7E6EE510, 0x7E6EE51C), (5, 0): (0x7E6EE52C, 0x7E6EE538), (3, 1): (0x7E6EE52C, 0x7E6EE538),
+             (3, 0): (0x7E6EE540, 0x7E6EE54C)}
+
+    def rows(self):
+        return [dict(fmt=f, q=q, fine=h) for f, qs in ((3, (6, 3, 4, 5, 7)), (2, (5, 3, 4)), (1, (6,)))
+                for q in qs for h in (1, 0)]
+
+    def run(self, emu, row):
+        import json as _json, os as _os, tempfile as _tf
+        from omemu import SP0, EmuError
+        emu.write(self.DESC, bytes([row["fmt"], row["q"], row["fine"], 0]))
+        emu.write(self.ART, b"\0" * 8)
+        emu.write(self.REQ, b"\xee" * 16)
+        emu.req("reset", regs={"pc": self.entry, "sp": SP0, "mdr": 0, "psw": 0, "a0": self.ART, "a2": self.DESC})
+        fd, tfile = _tf.mkstemp(suffix=".jsonl", prefix="omemu-trace-")
+        _os.close(fd)
+        emu.req("trace", exec=tfile, format="jsonl")
+        try:
+            r = emu.req("cont", stops=list(self.EXITS))
+        finally:
+            emu.req("trace", off=True)
+        rg = emu.regs_of(r)
+        pcs = {int(_json.loads(l)["pc"], 16) for l in open(tfile)}
+        _os.unlink(tfile)
+        if r["stop"] != "break" or rg["pc"] not in self.EXITS:
+            raise EmuError(f"stop {r['stop']} at pc 0x{rg['pc']:08x}")
+        pcs.discard(rg["pc"])
+        req = emu.read(self.REQ, 12)
+        return {"exit": self.EXITS[rg["pc"]], "fmt_q": [req[0], req[1]], "peak": struct.unpack_from("<I", req, 4)[0],
+                "avg": struct.unpack_from("<I", req, 8)[0], "_r": {"pcs": pcs},
+                "_reads": [(a, 6) for a in self.SITES if a in pcs]}    # the table instructions this row ran
+
+    def model(self, row, image):
+        f, q, h = row["fmt"], row["q"], row["fine"]
+        none = {"exit": "error", "fmt_q": [f, q], "peak": 0xEEEEEEEE, "avg": 0xEEEEEEEE}
+        k = (q, 1 if h == 1 else 0)
+        if f == 3 and k in self.MOV:
+            v = imm32_at(image, self.MOV[k], b"\xfc\xcc")
+            return {"exit": "ok", "fmt_q": [f, q], "peak": v, "avg": v}
+        if f == 2 and k in self.AVCHD:
+            pk, av = self.AVCHD[k]
+            return {"exit": "ok", "fmt_q": [f, q], "peak": imm32_at(image, pk, b"\xfc\xcc"),
+                    "avg": imm32_at(image, av, b"\xfc\xcc")}
+        return none
+
+
+class EncParamCheck(Case):
+    name, entry = "enc_param_check", 0x7EEA338C
+    doc = ("Video Encode parameter check 0x7EEA338C(a0 engine; struct by value at caller sp+4: fps u16, width, height, "
+           "average b/s, flag, peak b/s, mode), called from 0x7EEA8DCD. d0 = 0 accepted, 0xAB010002 rejected. "
+           "Engine limits: +132 width 1920, +136 height 1088, +140 fps 6000")
+    ranges = [(0x7EEA338C, 0x7EEA3420)]
+    OBJ = DATA + 0x3000
+    CAP_AT = 0x7EEA33CB                      # cmp imm32,d0 (fc c8 imm32): the peak cap
+    REJECT = 0xAB010002
+    BASE_ROW = dict(fps=2997, w=1920, h=1080, flag=0, mode=1)
+
+    def rows(self):
+        rows = [dict(self.BASE_ROW, avg=p, peak=p) for p in
+                (4_000_000, 10_000_000, 16_000_000, 17_000_000, 20_000_000, 24_000_000, 24_000_001, 32_000_000,
+                 49_999_999, 50_000_000, 50_000_001, 62_500_000, 0xFFFFFFFF)]
+        rows += [dict(self.BASE_ROW, avg=20_000_000, peak=32_000_000), dict(self.BASE_ROW, avg=32_000_001, peak=32_000_000),
+                 dict(self.BASE_ROW, avg=24_000_000, peak=24_000_000, flag=1), dict(self.BASE_ROW, avg=1, peak=1, flag=2),
+                 dict(self.BASE_ROW, avg=20_000_000, peak=20_000_000, mode=0),
+                 dict(self.BASE_ROW, avg=20_000_000, peak=20_000_000, mode=3),
+                 dict(self.BASE_ROW, avg=20_000_000, peak=20_000_000, fps=99),
+                 dict(self.BASE_ROW, avg=20_000_000, peak=20_000_000, fps=6001),
+                 dict(self.BASE_ROW, avg=20_000_000, peak=20_000_000, w=1921),
+                 dict(self.BASE_ROW, avg=20_000_000, peak=20_000_000, h=63)]
+        return rows
+
+    def run(self, emu, row):
+        obj = bytearray(256)
+        for off, v in ((132, 1920), (136, 1088), (140, 6000)):
+            struct.pack_into("<I", obj, off, v)
+        emu.write(self.OBJ, obj)
+        r = emu.call(self.entry, {"a0": self.OBJ},
+                     stack=[row["fps"], row["w"], row["h"], row["avg"], row["flag"], row["peak"], row["mode"]])
+        # no _reads: every row reads the cap, but only peaks between the old and new cap change; the per-image model
+        # (which reads the cap from the image) is the check
+        return {"d0": r["regs"]["d0"], "accepted": r["regs"]["d0"] == 0, "_r": r}
+
+    def model(self, row, image):
+        cap = imm32_at(image, self.CAP_AT, b"\xfc\xc8")
+        bad = (row["fps"] < 100 or row["fps"] > 6000 or row["w"] > 1920 or row["h"] > 1088 or row["w"] < 64
+               or row["h"] < 64 or row["peak"] > cap or row["peak"] < row["avg"] or row["flag"] not in (0, 1)
+               or row["mode"] not in (1, 2, 3))
+        return {"d0": self.REJECT if bad else 0, "accepted": not bad}
+
+
+class EncRateFields(Case):
+    name, entry = "enc_rate_fields", 0x7EEA57D4
+    doc = ("Rate fields the encoder set-ups 0x7EEA57D4 (first frame) and 0x7EEA5C4C (later frames) derive from the "
+           "average bitrate ctx+28 (= the table value on MOV): the target in kb/s, the two HRD-style kb/s - 1 fields and "
+           "the 6/2 class (>= 15,500,000). Same context and stubs as qp_setup, ctx+28 = the row's rate")
+    ranges = QpSetup.ranges
+    stubs_doc = QpSetup.stubs_doc
+    # builder: (entry, frame, struct base, offsets of kb/s, class, hrd1, hrd2)
+    BUILDERS = {"first": (0x7EEA57D4, 356, 164, 32, 112, 184, 188), "frame": (0x7EEA5C4C, 436, 176, 40, 92, 252, 256)}
+    RATES = (4_000_000, 10_000_000, 13_000_000, 15_499_999, 15_500_000, 16_000_000, 17_000_000, 20_000_000,
+             24_000_000, 32_000_000, 50_000_000)
+
+    def rows(self):
+        return [dict(builder=b, rate=r) for b in ("first", "frame") for r in self.RATES]
+
+    def run(self, emu, row):
+        entry, frame, base, o_kb, o_cls, o_h1, o_h2 = self.BUILDERS[row["builder"]]
+        qp_ctx(emu, [20, 20, 20, 20], first_flag=0 if row["builder"] == "first" else 1)
+        emu.write(QP_CTX + 28, struct.pack("<I", row["rate"]))
+        emu.write(DATA, b"\0" * 64)
+        r = emu.call(entry, {"a0": QP_CTX, "a1": DATA})
+        st = emu.read(SP0 - 16 - frame + base, 264)
+        u = lambda o: struct.unpack_from("<I", st, o)[0]
+        return {"ret": r["regs"]["d0"], "kbps": u(o_kb), "cls": u(o_cls), "hrd_m1": [u(o_h1), u(o_h2)],
+                "hrd_bps_x1024": (u(o_h1) + 1) << 10, "_r": r}
+
+    def model(self, row, image):
+        kb = row["rate"] // 1000
+        return {"ret": 0, "kbps": kb, "cls": 6 if row["rate"] >= 15_500_000 else 2, "hrd_m1": [kb - 1, kb - 1],
+                "hrd_bps_x1024": kb << 10}
+
+
+CASES.update({c.name: c for c in (RateTable(), EncParamCheck(), EncRateFields())})

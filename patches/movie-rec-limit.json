@@ -1,0 +1,11 @@
+{
+  "name": "movie-rec-limit",
+  "description": "Movie: raise the 1740 s (29 min) recording cap to 7200 s, so that every H.264 mode stops at its 4 GiB file-size point instead. Uses the three values stock already uses for MOV VGA (7200 s cap, 2624-sector header reserve, ulMaxRecTime 7,200,000). Not camera-tested. Analysis: experiments/2026-11-12-hardware/06-bitrate-and-limit.md. Changes, block-0 offset = runtime - 0x7E421020: (1) 0x2CCF00 = 0x7E6EDF20, time-limit routine 0x7E6EDE08, `mov 1740,a3` -> `mov 7200,a3` (opcode 0x27 = mov imm16,a3, zero-extended; same bytes as the VGA site 0x7E6EDEE0). The cap is min'd with the 4 GiB time, which is below 7200 s in every mode, so the cap no longer binds; MOV VGA keeps its own 7200. This instruction is shared with AVCHD q5/q3 (not offered on the E-PM2). (2) 0x2CCE4B = 0x7E6EDE6B, MOV q6/q3 header reserve `mov 832,a2` -> `mov 2624,a2` (the VGA value). In a real clip, ftyp+moov+free+mdat header = 425,984 B = 832 sectors exactly: the reserve is the fixed header area holding the sample tables, which grow with duration. (3) 0x2B72CF = 0x7E6D82EF, QT parameter ulMaxRecTime for q5/q6/q3 `mov 1800000,d0` -> `mov 7200000,d0` (the VGA value; ms). Its reader in the AV library was not found; it is the only per-quality library parameter that matches the 832/2624 reserve split, so it probably sizes the header area. 4 GiB stop with reserve 2624: stock rates 1080 Fine 1594 s, 1080 Normal 1852 s, 720 Fine 2362 s, 720 Normal 2976 s; with movie-bitrate-32.json 1024 / 1344 / 1594 / 1958 s; VGA 6202 s. Applies with movie-bitrate-32.json and movie-qp-floor-16.json (no shared bytes). Restore = stock v1.6.",
+  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+  "ops": [
+    {"type": "bytes", "block": 0, "offset": "0x2CCF00", "expect": "27cc06ca1c", "new": "27201cca1c"},
+    {"type": "bytes", "block": 0, "offset": "0x2CCE4B", "expect": "264003ca27", "new": "26400aca27"},
+    {"type": "bytes", "block": 0, "offset": "0x2B72CF", "expect": "fccc40771b00ca08", "new": "fccc00dd6d00ca08"}
+  ]
+}
