@@ -494,7 +494,41 @@ class ArtKind(Case):
         return {"by_code": r1["regs"]["d0"] & 0xFFFF, "by_code2": r2["regs"]["d0"] & 0xFFFF, "_r": {"pcs": r1["pcs"] | r2["pcs"]}}
 
 
-CASES = {c.name: c for c in (Memcpy(), Strlen(), RecLimit(), CurveSelect(), GammaSelect(), MatrixChoice(), FilterType(), ArtKind())}
+class SixHandler(Case):
+    name, entry = "six_handler", 0x7E56D1C3
+    doc = ("Six-axis stage, per-art-code handler only: entered at the jump-table target (0x7E78C254, code - 9) of each "
+           "code that has a record handler, with d3 = art code; runs to the common tail 0x7E56D8D8 (reports the two "
+           "record addresses in a3 / a2) or to the Cross Process statistics path 0x7E56D5F5, which goes on to read "
+           "image planes through the pointer at P+16 (set by stock code only for picture modes 104 and 107)")
+    ranges = [(0x7E56D1C3, 0x7E56D9E8), (0x7E880FD4, 0x7E881000)]
+    TAIL, STATS, JT = 0x7E56D8D8, 0x7E56D5F5, 0x7E78C254
+
+    def rows(self):
+        return [dict(art=a) for a in (69, 70, 71, 72, 73, 79, 80, 81, 85, 86, 87, 91, 102, 103, 145, 146, 167, 168)]
+
+    def run(self, emu, row):
+        import json as _json, os as _os, tempfile as _tf
+        from omemu import SP0, EmuError
+        h = struct.unpack_from("<I", emu.image, self.JT + 4 * (row["art"] - 9) - BASE)[0]
+        emu.req("reset", regs={"pc": h, "sp": SP0, "mdr": 0, "psw": 0, "d3": row["art"], "d2": 0, "a3": 0, "a2": 0})
+        fd, tfile = _tf.mkstemp(suffix=".jsonl", prefix="omemu-trace-")
+        _os.close(fd)
+        emu.req("trace", exec=tfile, format="jsonl")
+        try:
+            r = emu.req("cont", stops=[self.TAIL, self.STATS])
+        finally:
+            emu.req("trace", off=True)
+        rg = emu.regs_of(r)
+        pcs = {int(_json.loads(l)["pc"], 16) for l in open(tfile)}
+        _os.unlink(tfile)
+        if r["stop"] != "break" or rg["pc"] not in (self.TAIL, self.STATS):
+            raise EmuError(f"stop {r['stop']} at pc 0x{rg['pc']:08x}")
+        pcs.discard(rg["pc"])
+        return {"handler": f"0x{h:08x}", "exit": "tail" if rg["pc"] == self.TAIL else "statistics (reads P+16)", "records": [f"0x{rg['a3']:08x}", f"0x{rg['a2']:08x}"],
+                "d3_kept": rg["d3"] == row["art"], "sp_ok": rg["sp"] == SP0, "_r": {"pcs": pcs}}
+
+
+CASES = {c.name: c for c in (Memcpy(), Strlen(), RecLimit(), CurveSelect(), GammaSelect(), MatrixChoice(), FilterType(), ArtKind(), SixHandler())}
 
 
 # ---- H.264 QP bounds and the software QP choice (experiments/2026-11-12-hardware/05-qp-floor.md) ----------------
