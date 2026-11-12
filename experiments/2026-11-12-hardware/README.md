@@ -2,7 +2,7 @@
 
 | Report | Source |
 |---|---|
-| [01-public-sources.md](01-public-sources.md) | Specs, reviews, community work. The sandbox firewall blocked page fetches, so facts come from search summaries until those sites are approved |
+| [01-public-sources.md](01-public-sources.md) | Specs, reviews, community work, re-checked on the real pages or archive.org copies (2026-11-12); each fact marked confirmed / corrected / unverified |
 | [02-sd-and-encoder.md](02-sd-and-encoder.md) | Firmware: the SD host driver and the H.264 encoder set-up |
 | [03-sensor-pipeline-memory.md](03-sensor-pipeline-memory.md) | Firmware: sensor readout modes, the movie image path, DRAM |
 
@@ -17,7 +17,7 @@ Labels: **V** read in our bytes; **I** inferred; **X** external source.
 | **Buffers** | 20 MiB AV heap; a 19-frame input ring (59.5 MB, V); output buffer about 1 s at the target rate (I). Overflow → RECMOVIE_BUFFER_LIMIT, and recording stops (V) | Only if the card stalls |
 | **Encoder parameter check** | `cmp 24000000,d0; bhi reject` at 0x7EEA33CB (V): a peak above 24 Mb/s is refused. Also rejected: peak < average, < 1 fps, size < 64 | **Yes, in software.** 24 Mb/s = the AVCHD 1.0 ceiling |
 | **Bitrate table** | MOV 1080 Fine/Normal 20/17 Mb/s, 720 13/10 (0x7E6EE4A2, V) | Yes, in software |
-| **Rate control** | GOP 15 (the engine allows ≤ 60), no B-frames, max QP 51, and a second QP-like value of 20 whose role is unknown (V/I). If 20 is a QP floor, extra bitrate cannot buy quality below QP 20 | **Unknown, possibly the real quality ceiling** |
+| **Rate control** | GOP 15 (the engine allows ≤ 60), no B-frames, max QP 51, and a second QP-like value of 20 whose role is unknown (V/I). If 20 is a QP floor, extra bitrate cannot buy quality below QP 20. On the Panasonic GH2 the encoder's default was a constant QP of 20 (X, confirmed on forum pages), so this may be the same parameter (I) | **Unknown, possibly the real quality ceiling** |
 | **Encoder hardware** | Registers at 0x9940xxxx, not traced; profile, level and entropy mode unknown (no SPS template in the firmware) | **Unknown** |
 
 ## What bitrate cannot fix
