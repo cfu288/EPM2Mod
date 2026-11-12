@@ -7,7 +7,7 @@ Slot = menu entry; films are assigned top to bottom in the order they were added
 equivalent: NOTES §38.1).      ../../.venv/bin/python -I slots/build_seven_films.py <tag>"""
 import json, os, re, struct, sys
 import numpy as np
-HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.join(HERE, "..", "..", ".."); B = 0x7E421020
+HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")); ROOT = os.path.join(HERE, "..", "..", ".."); B = 0x7E421020
 b0 = open(os.path.join(ROOT, "build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin"), "rb").read()
 tag = sys.argv[1] if len(sys.argv) > 1 else sys.exit("usage: build_seven_films.py <tag>   (a key of FITS: the set of fits to build)")
 R7 = json.load(open(os.path.join(HERE, "remap7_layout.json")))["slots"]
@@ -30,12 +30,15 @@ SLOTS = {
     "Diorama":          dict(per_ch=1, **g("diorama")),
     "Cross Process":    dict(tables=full((0x7E78B41C, 0x7E78B43C, 0x7E78B45C)), sat=0x7E7696B4, six=[0x7E7694FE, 0x7E76950A], matrix=0x7E768F46, m_expect=None, per_ch=8),
 }
+CHROMA = {"Pop Art": 0x7E74B8BA, "Soft Focus": 0x7E74BBCA, "Pale&Light Color": 0x7E74B91C, "Light Tone": 0x7E74B97E, "Pin Hole": 0x7E74BB68, "Diorama": 0x7E74BE16, "Cross Process": 0x7E74BAA4}   # 97-byte chroma-curve record of the slot's stills code (needs seven-fixes-1)
+WITH_CHROMA = ("3",)                       # tags whose build has seven-fixes-1 instead of slot3-chroma-linear: every slot's chroma record is written
 # film per slot: (fit file, label). Labels are at most as long as the entry's stock name.
 LABELS = {"Pop Art": "Portra", "Soft Focus": "Ektachrome", "Pale&Light Color": "Pro 400H", "Light Tone": "Kodachrome", "Pin Hole": "Vis 250D", "Diorama": "Velvia", "Cross Process": "Superia 400"}
 _OLD3 = {"Pop Art": "film-portra-xp10", "Soft Focus": "film-ektachrome-lt3", "Pale&Light Color": "film-pro400h-pa2"}
 FITS = {   # tag -> fit file per slot (out/fit_<name>.npz)
     "1": dict(_OLD3, **{"Light Tone": "cand-kodak_kodachrome_64_scanfilm", "Pin Hole": "cand-vision3250d_2383", "Diorama": "cand-fujifilm_velvia_100_scanfilm", "Cross Process": "cand-xtra400_crystalarchive"}),   # model-only first fits (NOTES 39)
     "2": dict(_OLD3, **{"Light Tone": "film-kodachrome64-2", "Pin Hole": "film-vision3250d-2", "Diorama": "film-velvia100-2", "Cross Process": "film-superia400-2"}),                                            # corrected against build 1 (NOTES 40)
+    "3": {"Pop Art": "film-portra-c1", "Soft Focus": "film-ektachrome-c1", "Pale&Light Color": "film-pro400h-c1", "Light Tone": "film-kodachrome64-c1", "Pin Hole": "film-vision3250d-c1", "Diorama": "film-velvia100-c1", "Cross Process": "film-superia400-c1"},   # refit with chroma curves (NOTES 43)
 }
 if tag not in FITS: sys.exit(f"unknown tag {tag!r}; add it to FITS")
 FILMS = {slot: (f"out/fit_{FITS[tag][slot]}.npz", LABELS[slot]) for slot in SLOTS}
@@ -53,6 +56,10 @@ for slot, (fit, label) in FILMS.items():
     gain = int(z["gain"])
     ops += [op(s["sat"], struct.pack("<2H", gain, gain)), op(s["six"][0], struct.pack("<6h", *z["S"].astype(int))), op(s["six"][1], struct.pack("<6h", *z["H"].astype(int))),
             op(s["matrix"], struct.pack("<9h", *z["A"].astype(int).ravel()), s["m_expect"])]
+    if tag in WITH_CHROMA:
+        import chroma
+        lin = chroma.quantise(chroma.LINEAR_Y); cb, cr = ((tuple(z["Cb"][:2].astype(int)) + (z["Cb_slope17"].astype(int),)), (tuple(z["Cr"][:2].astype(int)) + (z["Cr_slope17"].astype(int),))) if "Cb" in z.files else (lin, lin)
+        ops.append(op(CHROMA[slot], chroma.record(cb, cr)))
     summary[slot] = dict(fit=fit, label=label, gain=gain, S=z["S"].astype(int).tolist(), H=z["H"].astype(int).tolist(), A=z["A"].astype(int).tolist())
 json.dump(dict(name=f"seven-films-{tag}", description="Seven films, one per film slot, in menu order: " + "; ".join(f"{k} = {os.path.basename(v[0])[9:-4]}" for k, v in FILMS.items()) + ". NOTES §39.",
                ops=[o for o in ops if o["expect"] != o["new"]], **base), open(os.path.join(ROOT, f"patches/seven-films-{tag}.json"), "w"), indent=1)

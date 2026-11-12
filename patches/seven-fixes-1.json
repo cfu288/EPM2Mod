@@ -1,0 +1,121 @@
+{
+ "name": "seven-fixes-1",
+ "description": "On top of remap7b-code: plain six-axis handler for art code 167 (Diorama entry no longer runs Cross Process's statistics code through an uninitialised pointer); each film slot's stills code uses its own chroma-curve record, movie codes use a linear one; Pop Art II, Pale&Light II and Cross Process II select the type I code. NOTES \u00a743.",
+ "status": "built, NOT camera-tested",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x45ffb4",
+   "expect": "ffffffffffffffffffffffffffffffffff",
+   "new": "fcdf2296767efcde2e96767edcf8c8ceff"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b4ac",
+   "expect": "cfd5567e",
+   "new": "d40f887e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369e8c",
+   "expect": "a064567e",
+   "new": "9063567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369f08",
+   "expect": "a064567e",
+   "new": "6c65567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369fb4",
+   "expect": "a064567e",
+   "new": "2865567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36a00c",
+   "expect": "a064567e",
+   "new": "0467567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369eac",
+   "expect": "4c63567e",
+   "new": "0863567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369eb0",
+   "expect": "a064567e",
+   "new": "0863567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369eb4",
+   "expect": "d463567e",
+   "new": "0863567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369ecc",
+   "expect": "a064567e",
+   "new": "0863567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369f0c",
+   "expect": "a064567e",
+   "new": "0863567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369fb8",
+   "expect": "a064567e",
+   "new": "0863567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36a010",
+   "expect": "a064567e",
+   "new": "0863567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2fadbb",
+   "expect": "66",
+   "new": "46"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2fadd1",
+   "expect": "91",
+   "new": "47"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2faded",
+   "expect": "a7",
+   "new": "55"
+  }
+ ]
+}

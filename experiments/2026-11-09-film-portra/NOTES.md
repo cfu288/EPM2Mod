@@ -1773,3 +1773,80 @@ dominates the look. Correction to §29.4: Vision3 250D's nearest installed look 
   re-run. The cached patch readings `out/mock/read_*.npz` were kept.
 - Superseded patch specs moved to `patches/history/`; superseded firmware builds deleted.
 - `make_mock.py` / `make_mock2.py` now take the donor ORF from `shots/testraw/PB090221.ORF`.
+
+## 43. Restart cause found for Diorama; chroma curves fitted; second types; `seven-films-3` (2026-11-12; NOT flashed)
+
+### 43.1 Audit of the patched image (sub-agent, key points re-checked by me in the bytes)
+- **Bug in our remap.** `0x7E716C56` attaches a raw-plane buffer at P+16 only when the *picture mode*
+  is 104 (Grainy Film) or 107 (Cross Process). The six-axis handler of art code 167 is Cross
+  Process's (`0x7E56D5CF`, jump table 0x7E78C254): it loads (16,P) without a check and runs the
+  adaptive-hue statistics over four planes. Stock reaches 167 on the still path only from mode 107.
+  Our Diorama entry (mode 106) reaches it with P+16 = leftover stack. The reads change nothing
+  (`xp-adaptive-hue-off` discards the statistics), so output is pixel-identical, but a stale pointer
+  can fault: rare and history-dependent. Fits the first logged restart (Diorama, after a Grainy Film
+  development, the other mode that writes P+16). Does not explain a restart in another entry.
+- The three free regions are inside the copied lengths of their loaders (boot task 0x7E44A043;
+  Usr1 0x7E504AF9, two segments); no stock pointer or immediate refers into them; the constructor
+  walker uses fixed lengths that end where each region starts. New code: register / stack discipline
+  matches the stock patterns it replaces. Save path: still art processing is decided by art code
+  (`art_IsSupportType`), no wait on an effect for 102 / 145 / 167.
+- Open from the audit: the matrix chain and gamma stubs live in the Usr1-loaded segment; a still
+  developed before Usr1 finishes loading would jump into unloaded RAM. Not traced whether the camera
+  can develop that early (test: power on and shoot at once).
+
+### 43.2 Fixes (`slots/build_fixes.py` → `patches/seven-fixes-1.json`, on top of remap7b-code)
+- 167's six-axis entry → new 17-byte handler at 0x7E880FD4 (boot segment): `mov 0x7E769622,a3;
+  mov 0x7E76962E,a2; jmp 0x7E56D8D8`, the shape of every plain stock handler. Emulator case
+  `six_handler`: 167 exit "statistics (reads P+16)" → "tail", same two records; 17 other codes equal.
+- Second types: three immediates in `art_GetFilterType` (0x7E71BDDB 102 → 70, 0x7E71BDF1 145 → 71,
+  0x7E71BE0D 167 → 85). The live-view functions never looked at the type. Emulator `filter_type`:
+  mode 100 / 102 / 107 type 2 → 70 / 71 / 85.
+- Chroma jump table 0x7E78AEA4: stills codes 71, 102, 145, 167 back to their own stock handlers
+  (records 0x7E74B91C, BBCA, BB68, BE16; 70, 72, 85 already had B8BA, B97E, BAA4); movie codes 79,
+  80, 81, 87, 103, 146, 168 → 0x7E566308 (Soft Focus's record 0x7E74B858, linear, untouched), so
+  movies keep straight chroma curves as before.
+
+### 43.3 The chroma-curve stage decoded (`chroma.py`)
+- Record = x[16], y[16], slope[17], x[16], y[16], slope[16]; piecewise linear on 8-bit chroma about
+  128; `out = y[i] + slope[i]·(c − x[i])/128` for the first knot with x[i] ≥ c. It is the last
+  stage: applied to the Cb and Cr of the otherwise finished picture (BT.601 full range).
+- Check with the cached readings of the same film with Pop Art's stock curves (`A_pro400h_pa1`) and
+  with linear ones (`A_pro400h_pa1c`): curve(linear build) vs Pop Art build 0.47 / 0.50 codes rms
+  on Cb / Cr (identity: 1.79 / 2.07); 6,010 patches.
+- **Unknown: which stored curve is Cb.** All 16 stock records have two equal curves. Assumed
+  first = Cb (`chroma.FIRST_IS_CB`); the first build with unequal curves decides.
+
+### 43.4 Refits with the curves free (`fit_chroma.py`)
+Knots at 0, 28, 58, 88, 108, 128, 148, 168, 198, 228, 255; 108–148 kept at slope 1 (neutrals and
+faint colours stay with the saturation gain); 8 free heights per curve; everything else refitted
+too; objective = measured samples of each film's last build, soft-L1 3, predicted as
+curve(measured + model change). Predicted, measured → new:
+
+| film | weighted | ColorChecker ×5 EV | skin | natural | hold-out | grays |
+|---|---|---|---|---|---|---|
+| Portra | 1.251 → 0.930 | 2.58 → 1.57 | 1.36 → 1.16 | 1.33 → 1.19 | 1.35 → 1.21 | 0.98 → 0.78 |
+| Ektachrome | 1.054 → 0.826 | 2.24 → 1.67 | 1.35 → 1.09 | 1.36 → 1.24 | 1.36 → 1.26 | 0.77 → 0.59 |
+| Pro 400H | 0.958 → 0.762 | 2.33 → 1.41 | 1.14 → 1.13 | 1.19 → 1.09 | 1.22 → 1.13 | 0.61 → 0.55 |
+| Kodachrome | 1.056 → 0.852 | 1.79 → 1.35 | 0.97 → 0.83 | 1.07 → 1.05 | 1.11 → 1.05 | 0.89 → 0.71 |
+| Vision3 250D | 1.117 → 0.753 | 2.71 → 1.49 | 1.13 → 1.13 | 1.22 → 1.13 | 1.24 → 1.15 | 0.74 → 0.53 |
+| Velvia | 1.165 → 0.897 | 2.50 → 1.76 | 1.68 → 1.54 | 1.52 → 1.40 | 1.52 → 1.40 | 0.79 → 0.63 |
+| Superia | 1.140 → 0.913 | 2.66 → 1.86 | 1.56 → 1.52 | 1.39 → 1.30 | 1.39 → 1.30 | 0.74 → 0.62 |
+
+Control (Velvia, same refit with the curves held linear): weighted 1.012, ColorChecker 2.36: the
+gain is from the curves. All fitted curves compress strong chroma (slopes 0.4–0.8 outside ±20) with
+a higher saturation gain. Fits: `out/fit_film-*-c1.npz`.
+
+### 43.5 Build
+`slots/build_seven_films.py 3` → `patches/seven-films-3.json` (also writes each slot's chroma
+record). `build/seven-films-3.BIN` = remap7b-code + seven-fixes-1 + seven-structure-extra +
+seven-films-3 + xp-adaptive-hue-off + seven-labels (slot3-chroma-linear no longer needed); sha256
+`e38ece2331afcd7af98978690a64fce29273cad5ebde4f8a3b683993c8a1ea72`. Checked in the built image:
+each of the seven codes reaches its own record and the record equals the fit; movie codes →
+linear; blocks 1–3 equal to seven-films-2. Emulator: filter_type 12 changed / 0 flagged,
+matrix_choice 14 / 0, curve_select 16 / 0, art_kind 3 / 0, gamma_select as before, six_handler 1 / 0.
+
+### 43.6 White balance (item still to measure)
+The matrices for other white-balance settings are not in the firmware as literal tables (searched
+all four blocks for the 5300 K matrix in several encodings: no hit), so they cannot be simulated.
+Test on the camera: develop PB130001 with WB set to Tungsten and to Shade, in Natural and in two
+film entries; the EXIF ColorMatrix gives each setting's matrix.

@@ -13,7 +13,10 @@ z = np.load(argv[2]); cube, size = fl.load_cube(str(z["lut"]))
 tgt = lambda v: lab(np.clip(fl.apply_cube(cube, size, fl.encode(np.maximum(v, 0) / fl.V_GRAY * 0.18, "vlog")), 0, 1) * 255)
 d = load(name); J, k, ok = d["jpg"], d["kind"], d["ok"]
 print("camera ColorMatrix x256:", (d["M"] * 256).round().astype(int).ravel().tolist(), " expected:", (f.renormalise(z["A"]) * 2).ravel().tolist())
-dT = de(lab(J), tgt(d["vs"])); P = f.R(d["u"], z["G"], float(z["sat"]), z["S"], z["H"], z["P"]); dM = de(lab(J), lab(P)); dP = de(lab(P), tgt(d["vs"]))
+dT = de(lab(J), tgt(d["vs"])); P = f.R(d["u"], z["G"], float(z["sat"]), z["S"], z["H"], z["P"])
+if "Cb" in z.files:                                  # the build has fitted chroma curves (NOTES 43)
+    import chroma; P = np.clip(chroma.apply(P, tuple(z["Cb"][:2]) + (z["Cb_slope17"],), tuple(z["Cr"][:2]) + (z["Cr_slope17"],), stored=True), 0, 255)
+dM = de(lab(J), lab(P)); dP = de(lab(P), tgt(d["vs"]))
 unc = (J.min(1) > 2) & (J.max(1) < 253)
 for kk, nm in ((5, "natural colours"), (3, "near-neutrals"), (2, "gray ramp")):
     m = ok & (k == kk); mu = m & unc

@@ -30,7 +30,7 @@ Flash `build/<name>.BIN` as `DCOLYMP/E1019999.BIN`, hold OK and power on. Full s
 
 ## Patches
 
-Current film build (`seven-films-2`): `remap7b-code` + `slot3-chroma-linear` + `seven-structure-extra` + `seven-films-2` + `xp-adaptive-hue-off` + `seven-labels`. Every other film spec in the table below is in `patches/history/`.
+Current film build on the camera (`seven-films-2`): `remap7b-code` + `slot3-chroma-linear` + `seven-structure-extra` + `seven-films-2` + `xp-adaptive-hue-off` + `seven-labels`. Next, built but **not camera-tested** (`seven-films-3`): `remap7b-code` + `seven-fixes-1` + `seven-structure-extra` + `seven-films-3` + `xp-adaptive-hue-off` + `seven-labels` (fix for the Diorama entry, fitted chroma curves, second filter types; NOTES §43). Every other film spec in the table below is in `patches/history/`.
 
 | Spec | Status |
 |---|---|
