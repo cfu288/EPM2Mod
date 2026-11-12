@@ -1,0 +1,345 @@
+{
+ "case": "menu_value",
+ "stock": "/path/to/epm2-tools/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin",
+ "patched": "/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/ivl/emurun-acm4tqt2.block0.bin",
+ "rows": [
+  {
+   "row": {
+    "grow": 3,
+    "value": 0
+   },
+   "stock": {
+    "setting": [
+     111
+    ],
+    "string": 1505
+   },
+   "patched": {
+    "setting": [
+     111
+    ],
+    "string": 1505
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 3,
+    "value": 1
+   },
+   "stock": {
+    "setting": [
+     111
+    ],
+    "string": 1506
+   },
+   "patched": {
+    "setting": [
+     111
+    ],
+    "string": 1506
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 5,
+    "value": 0
+   },
+   "stock": {
+    "setting": [
+     271
+    ],
+    "string": 0
+   },
+   "patched": {
+    "setting": [
+     271
+    ],
+    "string": 0
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 5,
+    "value": 1
+   },
+   "stock": {
+    "setting": [
+     271
+    ],
+    "string": 292
+   },
+   "patched": {
+    "setting": [
+     271
+    ],
+    "string": 292
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 6,
+    "value": 0
+   },
+   "stock": {
+    "setting": [
+     34
+    ],
+    "string": 1371
+   },
+   "patched": {
+    "setting": [
+     34
+    ],
+    "string": 1371
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 6,
+    "value": 1
+   },
+   "stock": {
+    "setting": [
+     34
+    ],
+    "string": 198
+   },
+   "patched": {
+    "setting": [
+     34
+    ],
+    "string": 198
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 7,
+    "value": 0
+   },
+   "stock": {
+    "setting": [
+     2074
+    ],
+    "string": 633
+   },
+   "patched": {
+    "setting": [
+     2074
+    ],
+    "string": 633
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 7,
+    "value": 1
+   },
+   "stock": {
+    "setting": [
+     2074
+    ],
+    "string": 635
+   },
+   "patched": {
+    "setting": [
+     2074
+    ],
+    "string": 635
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 10,
+    "value": 0
+   },
+   "stock": {
+    "setting": [
+     268
+    ],
+    "string": 1371
+   },
+   "patched": {
+    "setting": [
+     268
+    ],
+    "string": 1371
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 10,
+    "value": 1
+   },
+   "stock": {
+    "setting": [
+     268
+    ],
+    "string": 0
+   },
+   "patched": {
+    "setting": [
+     268
+    ],
+    "string": 0
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 11,
+    "value": 0
+   },
+   "stock": {
+    "setting": [
+     180
+    ],
+    "string": 1371
+   },
+   "patched": {
+    "setting": [
+     482
+    ],
+    "string": 1371
+   },
+   "diff": {
+    "setting": [
+     [
+      180
+     ],
+     [
+      482
+     ]
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 11,
+    "value": 1
+   },
+   "stock": {
+    "setting": [
+     180
+    ],
+    "string": 198
+   },
+   "patched": {
+    "setting": [
+     482
+    ],
+    "string": 198
+   },
+   "diff": {
+    "setting": [
+     [
+      180
+     ],
+     [
+      482
+     ]
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 13,
+    "value": 0
+   },
+   "stock": {
+    "setting": [
+     89
+    ],
+    "string": 1371
+   },
+   "patched": {
+    "setting": [
+     89
+    ],
+    "string": 1371
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 13,
+    "value": 1
+   },
+   "stock": {
+    "setting": [
+     89
+    ],
+    "string": 198
+   },
+   "patched": {
+    "setting": [
+     89
+    ],
+    "string": 198
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 32,
+    "value": 0
+   },
+   "stock": {
+    "setting": [
+     1009
+    ],
+    "string": 23
+   },
+   "patched": {
+    "setting": [
+     1009
+    ],
+    "string": 23
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 32,
+    "value": 1
+   },
+   "stock": {
+    "setting": [
+     1009
+    ],
+    "string": 14
+   },
+   "patched": {
+    "setting": [
+     1009
+    ],
+    "string": 14
+   },
+   "diff": {},
+   "flags": []
+  }
+ ]
+}

@@ -1,0 +1,115 @@
+# rangediff -v: guards, SequencePartsBase interval states, power module, movie editor, top-menu page class
+7e969ee6 -> 7e96ad54 ratio 0.67 insns 3/3 hunks 1
+    - mov 1R8,a0
+    + mov 1R0,a0
+    ..
+7e969ef4 -> 7e96ad54 ratio 0.67 insns 3/3 hunks 1
+    - mov 1R8,a0
+    + mov 1R0,a0
+    ..
+7e997bd9 -> 7e998c41 ratio 0.85 insns 45/51 hunks 4
+    - beq A
+    - ret [],16
+    + bne A
+    ..
+    - bra A
+    + call A ,[d2],16
+    + clr d0
+    + call A ,[d2,a2],16
+    + ret [],16
+    ..
+    + clr d0
+    + call A ,[d2],16
+    + call A ,[],4
+    + bra A
+    ..
+    - mov 721,d0
+    + mov 739,d0
+    ..
+7e997f17 -> 7e998f95 ratio 0.96 insns 55/55 hunks 2
+    - mov 1R6,a0
+    + mov 1R8,a0
+    ..
+    - mov 1R8,a0
+    + mov 1R0,a0
+    ..
+7e6d4af8 -> 7e6d52c4 ratio 0.80 insns 5/5 hunks 1
+    - mov 1R8,a0
+    + mov 1R0,a0
+    ..
+7e6d4b22 -> 7e6d52ee ratio 0.97 insns 33/33 hunks 1
+    - add 1R8,a2
+    + add 1R0,a2
+    ..
+7e6d4bd5 -> 7e6d53a1 ratio 0.96 insns 26/26 hunks 1
+    - add 1R8,a2
+    + add 1R0,a2
+    ..
+7e98849b -> 7e98948e ratio 1.00 insns 168/169 hunks 1
+    + call A ,[],4
+    ..
+7edeb94c -> 7edec7e2 ratio 0.87 insns 13/17 hunks 1
+    + add -4,sp
+    + call A ,[],4
+    + mov 0,a0
+    + ret [],4
+    ..
+7edeb973 -> 7edec795 ratio 0.50 insns 4/4 hunks 2
+    - add -4,sp
+    ..
+    - mov 0,a0
+    + mov 17,d0
+    + call A ,[d2,d3,a2,a3],16
+    ..
+7edec2c0 -> 7eded156 ratio 0.91 insns 239/247 hunks 15
+    + mov 482,d0
+    + mov sp,a0
+    + inc4 a0
+    + call A ,[d2,a2],12
+    + mov 11,d0
+    + jmp A
+    + cmp 12,d0
+    + bne A
+    ..
+    - mov 11,d0
+    + mov 12,d0
+    ..
+    - cmp 13,d0
+    + cmp 14,d0
+    ..
+    - mov 13,d0
+    + mov 14,d0
+    ..
+    - cmp 31,d0
+    + cmp 32,d0
+    ..
+    - cmp 32,d0
+    + cmp 33,d0
+    ..
+    - mov 32,d0
+    + mov 33,d0
+    ..
+    - cmp 33,d0
+    + cmp 34,d0
+    ..
+    - mov a0,d3
+    - add 4,d3
+    - mov d3,a0
+    + mov a0,d2
+    + add 4,d2
+    + mov d2,a0
+    ..
+    - mov a0,d2
+    - add 8,d2
+    + mov a0,d3
+    + add 8,d3
+    ..
+    - mov d2,a0
+    - mov 33,d0
+    + mov d3,a0
+    + mov 34,d0
+    ..
+    - mov d3,a0
+    + mov d2,a0
+    ..
+functions 160 identical 149

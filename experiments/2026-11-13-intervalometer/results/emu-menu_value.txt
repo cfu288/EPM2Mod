@@ -1,0 +1,6 @@
+patched bytes: 14 in 7 runs
+chg  grow=11 value=0
+     setting: [180] -> [482]
+chg  grow=11 value=1
+     setting: [180] -> [482]
+menu_value: 16 rows, 2 changed, 14 identical, 0 flagged

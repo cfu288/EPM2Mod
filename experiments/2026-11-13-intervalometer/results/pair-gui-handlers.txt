@@ -1,0 +1,107 @@
+# GUI interval handlers paired by log string, -v
+7ecd2dc2 -> 7ecd30dd   IntervalShooting Count =                     insns 24/24 hunks 0
+7ecd2d8b -> 7ecd30a6   IntervalShooting invalid                     insns 20/20 hunks 0
+7ecda611 -> 7ecda963   IntervalShootingStartTimer NONE              insns 21/21 hunks 0
+7ecda5c6 -> 7ecda918   IntervalShootingTake =                       insns 27/27 hunks 0
+7ecda4ba -> 7ecda7e2   TimeLapseMoive Off                           insns 21/21 hunks 0
+7ecda2b6 -> 7ecda5de   cancelLensKeyReady                           insns 15/15 hunks 0
+7ecda304 -> 7ecda62c   cancelLensKeyShooting                        insns 10/10 hunks 0
+7ecda2db -> 7ecda603   cancelLensKeyShootingIntervalWait            insns 16/16 hunks 0
+7ecda322 -> 7ecda64a   cancelMenuKeyIntervalShooting                insns 16/16 hunks 0
+7ecd9ebc -> 7ecda17e   canselShootingPictureStandby                 insns 27/27 hunks 0
+7ecda3ff -> 7ecda727   changeModeDial                               insns 9/9 hunks 0
+7ecda3d7 -> 7ecda6ff   changeModeDialForIntervalWait                insns 15/15 hunks 0
+7ecda392 -> 7ecda6ba   changeModeDialForReady                       insns 15/15 hunks 0
+7ecda3ba -> 7ecda6e2   changeModeDialForShootingReady               insns 9/9 hunks 0
+7ecda801 -> 7ecdab2f   checkEndInterval                             insns 19/19 hunks 0
+7ecda76f -> 7ecdaa9d   clearIntervalChg                             insns 10/10 hunks 0
+7ecda78f -> 7ecdaabd   clearIntervalChgModeDial                     insns 11/11 hunks 0
+7ecda74b -> 7ecda81c   clearIntervalEndMode                         insns 12/12 hunks 0
+7ecd9f4b -> 7ecda20d   completeIntervalShooting Wait Cancel         insns 84/84 hunks 0
+7ecda34b -> 7ecda673   ejectMedia                                   insns 16/16 hunks 0
+7ecda374 -> 7ecda69c   ejectMediaWaitCancelInterval                 insns 10/10 hunks 0
+7ecda10b -> 7ecda3cd   endIntervalShootingForBoot                   insns 22/22 hunks 0
+7ecda4f4 -> 7ecda840   executOneShotTakingPicture ERROR             insns 20/20 hunks 0
+7ecda42e -> 7ecda756   executStartIntervalShooting ERROR =          insns 27/27 hunks 0
+7ecd2ece -> 7ecd31e9   executeClearChgModeDial SUCCESS              insns 14/14 hunks 0
+7ecd2efa -> 7ecd3215   executeClearIntervalShootingEnd SUCCESS      insns 14/16 hunks 1
+      + beq A
+      + cmp 10,d0
+      ..
+7ecda530 -> 7ecda87c   executeCreateTimeLapseMovie ERROR            insns 52/53 hunks 1
+      + mov d2,(R )
+      ..
+7ecda47c -> 7ecda7a4   executeEndIntervalShooting ERROR             insns 22/22 hunks 0
+7ecda1a0 -> 7ecda499   receiveEndCreateMovie                        insns 14/16 hunks 1
+      + clr d0
+      + mov d0,(R )
+      ..
+7ecda094 -> 7ecda356   receiveEndInterval                           insns 19/19 hunks 0
+7ecda146 -> 7ecda408   receiveEndIntervalShootingTimer              insns 17/36 hunks 1
+      + call A ,[d2,a2],20
+      + cmp 0,d0
+      + bne A
+      + call A ,[d2],8
+      + cmp 1,d0
+      + bne A
+      + mov (96,a2),d0
+      + cmp 23045,d0
+      + beq A
+      + cmp 23047,d0
+      + beq A
+      + cmp 23050,d0
+      + beq A
+      + bra A
+      + mov a2,a0
+      + call A ,[d2,a2],12
+      + bra A
+      + mov a2,a0
+      + call A ,[d2,a2],12
+      ..
+7ecda26f -> 7ecda58d   receiveEndMediaMount                         insns 10/10 hunks 0
+7ecda28d -> 7ecda5ab   receiveEndMediaMountForEndWait               insns 16/19 hunks 4
+      - mov a1,a3
+      + mov 34,d0
+      ..
+      - mov 34,d0
+      ..
+      + mov a1,a3
+      ..
+      + mov (R ),a1
+      + cmp 0,a1
+      + bne A
+      ..
+7ecda1c3 -> 7ecda4c3   receiveErrorCreateMovie                      insns 18/20 hunks 1
+      + clr d0
+      + mov d0,(R )
+      ..
+7ecda0e2 -> 7ecda3a4   receiveReqEndIntervalForWait                 insns 16/16 hunks 0
+7ecda22a -> 7ecda548   receiveSubAppServiceStopIntervalWait         insns 15/15 hunks 0
+7ecda202 -> 7ecda509   receiveSubAppServiceStopReady                insns 15/23 hunks 3
+      - mov a1,a3
+      - mov a0,a2
+      + mov a0,a3
+      + mov a1,a2
+      ..
+      - call A ,[],8
+      - mov a3,a1
+      + call A ,[],0
+      + call A ,[],0
+      + cmp 10,d0
+      + bne A
+      ..
+      + call A ,[a2],12
+      + bra A
+      + clr d0
+      + call A ,[],0
+      + mov a2,a1
+      + mov a3,a0
+      ..
+7ecda252 -> 7ecda570   receiveSubAppServiceStopWaitCancel           insns 9/9 hunks 0
+7ecda06c -> 7ecda32e   recieveEndRecord                             insns 14/14 hunks 0
+7ecda029 -> 7ecda2eb   recieveEndShootingPicture                    insns 25/25 hunks 0
+7ecda0c4 -> 7ecda386   recieveRequestEndIntervalShooting            insns 10/10 hunks 0
+7ecd9f05 -> 7ecda1c7   startIntervalShooting                        insns 23/23 hunks 0
+7ecda177 -> 7ecda470   startIntervalShootingSleepTimer              insns 15/15 hunks 0
+strings only in E-PM2: [(' IntervalShooting On ', ['0x7ecd2d50'])]
+strings only in E-PL6: []

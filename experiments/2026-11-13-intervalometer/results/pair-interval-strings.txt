@@ -1,0 +1,140 @@
+# strpair: interval/time-lapse/power strings (E-PM2 fn -> E-PL6 fn, normalised diff hunks)
+7e46bf69 -> 7e46ce96                              <interval> is one insns 21/27 hunks 1
+7e4656b3 -> 7e466543                  mode  : 0:OneShot/1:Interval\ insns 265/265 hunks 2
+7e99b118 -> 7e99c196     set   INTERVAL_SHOOTING           15       insns 324/324 hunks 0
+7e99c878 -> 7e99d8f6    Interval  %s                                insns 84/84 hunks 4
+7e93f171 -> 7e93f17f    interval    :                               insns 32/32 hunks 0
+7e9a63ec -> 7e9a75f1    t_int : interval (ms)                       insns 124/124 hunks 0
+7e46c004 -> 7e46cf31   *[usf] interval                              insns 68/73 hunks 1
+7ecd2dc2 -> 7ecd30dd   IntervalShooting Count =                     insns 24/24 hunks 0
+7ecd2d8b -> 7ecd30a6   IntervalShooting invalid                     insns 20/20 hunks 0
+7ecda611 -> 7ecda963   IntervalShootingStartTimer NONE              insns 21/21 hunks 0
+7ecda5c6 -> 7ecda918   IntervalShootingTake =                       insns 27/27 hunks 0
+7ecda4ba -> 7ecda7e2   TimeLapseMoive Off                           insns 21/21 hunks 0
+7ecda2db -> 7ecda603   cancelLensKeyShootingIntervalWait            insns 16/16 hunks 0
+7ecda322 -> 7ecda64a   cancelMenuKeyIntervalShooting                insns 16/16 hunks 0
+7ecda3d7 -> 7ecda6ff   changeModeDialForIntervalWait                insns 15/15 hunks 0
+7ecda801 -> 7ecdab2f   checkEndInterval                             insns 19/19 hunks 0
+7ecda6dd -> 7ecdaa2f   checkTimeLapseState                          insns 26/26 hunks 0
+7ecda71b -> 7ecdaa6d   checkWaitTimeLapse                           insns 19/19 hunks 0
+7ecda76f -> 7ecdaa9d   clearIntervalChg                             insns 10/10 hunks 0
+7ecda78f -> 7ecdaabd   clearIntervalChgModeDial                     insns 11/11 hunks 0
+7ecda74b -> 7ecda81c   clearIntervalEndMode                         insns 12/12 hunks 0
+7e535745 -> 7e535d14   command  | comtime [us] | interval [us] | st insns 84/84 hunks 4
+7ecd9f4b -> 7ecda20d   completeIntervalShooting Wait Cancel         insns 84/84 hunks 0
+7ecda374 -> 7ecda69c   ejectMediaWaitCancelInterval                 insns 10/10 hunks 0
+7ecda10b -> 7ecda3cd   endIntervalShootingForBoot                   insns 22/22 hunks 0
+7ecd2e04 -> 7ecd311f   excuteCancelIntervalForBoot ERROR            insns 23/23 hunks 0
+7ecda7d1 -> 7ecdaaff   excuteEndInterval                            insns 19/19 hunks 0
+7ecda42e -> 7ecda756   executStartIntervalShooting ERROR =          insns 27/27 hunks 0
+7ecd2efa -> 7ecd3215   executeClearIntervalShootingEnd SUCCESS      insns 14/16 hunks 1
+7ecda530 -> 7ecda87c   executeCreateTimeLapseMovie ERROR            insns 52/53 hunks 1
+7ecda47c -> 7ecda7a4   executeEndIntervalShooting ERROR             insns 22/22 hunks 0
+7ecda094 -> 7ecda356   receiveEndInterval                           insns 19/19 hunks 0
+7ecda146 -> 7ecda408   receiveEndIntervalShootingTimer              insns 17/36 hunks 1
+7ecda0e2 -> 7ecda3a4   receiveReqEndIntervalForWait                 insns 16/16 hunks 0
+7ecda22a -> 7ecda548   receiveSubAppServiceStopIntervalWait         insns 15/15 hunks 0
+7ecda0c4 -> 7ecda386   recieveRequestEndIntervalShooting            insns 10/10 hunks 0
+7ecd9f05 -> 7ecda1c7   startIntervalShooting                        insns 23/23 hunks 0
+7ecda177 -> 7ecda470   startIntervalShootingSleepTimer              insns 15/15 hunks 0
+7ea8a263 -> 7ea8b71a  !CUSTOMSELF_INTERVAL                          insns 29/29 hunks 0
+7ea8af81 -> 7ea8c438  (CMP)Power Management Battery Check in CmpShc insns 44/79 hunks 1
+7e9a1752 -> 7e9a289c  API_SHUTDOWN_REASON_BUTTON            = 0x01  insns 68/68 hunks 0
+7e9a1bcd -> 7e9a2d17  API_SLP_WUI_BATTERY_STATUS                    insns 119/119 hunks 0
+7e9a1b03 -> 7e9a2c4d  API_WUI_AC_ADAPTER                            insns 56/56 hunks 0
+7ecdfc0f -> 7ecdffcc  API_WUI_CONNECT_USB                           insns 140/140 hunks 0
+7e6e0d4d -> 7e6e1519  AVSCA_TrickPlay Interval addr:                insns 63/63 hunks 0
+7e9a61a0 -> 7e9a73a5  BATTERY_STATUS_EMPTY                          insns 36/36 hunks 0
+7e995c0b -> 7e996c73  CBS_END_INTERVAL_SHOOTING                     insns 2228/2228 hunks 0
+7ea8a2bb -> 7ea8b772  CUSTOMSELF_INTERVAL                           insns 33/53 hunks 1
+7ea683c1 -> 7ea69856  Cap_PlaySlide next_timer() set                insns 14/14 hunks 1
+7e686e96 -> 7e687539  Create_TimeLapseMovie buff_id                 insns 137/137 hunks 0
+7ea8ec42 -> 7ea90020  DBGSEQ INTERVAL SHOOTING INFO ON              insns 27/119 hunks 2
+7e62803b -> 7e628696  EXPOSE_INTERVAL                               insns 82/82 hunks 0
+7e9bb7a3 -> 7e9bc9a8  INTERVAL     = 0x02                           insns 77/77 hunks 0
+7e997c67 -> 7e998ce5  INTERVAL SHOOTING SLEEP TIMER(%d)             insns 10/10 hunks 0
+7e53cb7e -> 7e53d14c  INTERVAL,%d\r\n                               insns 13/13 hunks 0
+7ea981db -> 7ea99692  KIND_CUSTOM_INTERVAL                          insns 76/76 hunks 0
+7ecd1bc1 -> 7ecd1bc1  MODE_INTERVAL_SHOOTING_JUDGE_NG :             insns 16/16 hunks 0
+7e50518c -> 7e505235  MOV_EDIT                                      insns 151/151 hunks 0
+7e93fbcf -> 7e93fbdd  MOV_EDIT_INFO output                          insns 22/22 hunks 0
+7e93fc39 -> 7e93fc47  MOV_EDIT_YC_INFO output                       insns 10/10 hunks 0
+7e9a4056 -> 7e9a5253  OlyApiSettingController::resetIntervalShootin insns 13/13 hunks 0
+7e9ac4d6 -> 7e9ad6db  OlyApiShootingController::createTimeLapseMovi insns 13/13 hunks 0
+7e9ac1a7 -> 7e9ad3ac  OlyApiShootingController::endIntervalShooting insns 13/13 hunks 0
+7e9ac0dd -> 7e9ad2e2  OlyApiShootingController::startIntervalShooti insns 43/43 hunks 0
+7e982691 -> 7e983684  OlyHfwOpeShoot::createTimeLapseMovie end = %d insns 65/65 hunks 0
+7e982df3 -> 7e983de6  OlyHfwOpeShoot::endIntervalShooting end = %d  insns 52/52 hunks 0
+7e98a5ec -> 7e98b654  OlyHfwOpeShoot::isTouchShootExc TAKE_CBS_SHOO insns 85/85 hunks 0
+7e98849b -> 7e98948e  OlyHfwOpeShoot::startIntervalShooting RealTim insns 168/169 hunks 1
+7e9e7a67 -> 7e9e8cee  OlyHfwUserSettingManager::resetIntervalShooti insns 29/29 hunks 0
+7e93fb21 -> 7e93fb2f  PLAY_MOV_EDIT                                 insns 36/36 hunks 0
+7e997c8c -> 7e998d0a  PWROFF TIMER(%d)                              insns 11/11 hunks 0
+7e997d0b -> 7e998d89  SLEEP TIMER(%d)                               insns 11/11 hunks 0
+7e686d37 -> 7e6873da  Start_Play_Bgm_Sound interval                 insns 122/122 hunks 0
+7e686319 -> 7e6869bc  Start_Play_Sound_Ext interval                 insns 125/125 hunks 0
+7e6d8fb8 -> 7e6d9784  [AVCHD] ulEncodeInterval  :                   insns 259/259 hunks 0
+7e6d25be -> 7e6d2d8a  [MOV_EDIT] BuffID:                            insns 119/119 hunks 0
+7e6d465e -> 7e6d4e2a  [MOV_EDIT] Input value Error                  insns 31/31 hunks 0
+7e6d47bc -> 7e6d4f88  [MOV_EDIT] MOV_EDIT_BUSY                      insns 33/33 hunks 0
+7e6d493d -> 7e6d5109  [MOV_EDIT] Not MODE_MOVIE_KIND_MJPEG          insns 53/53 hunks 0
+7e6d4597 -> 7e6d4d63  [MOV_EDIT] Send Queue Error                   insns 68/68 hunks 0
+7e6d46be -> 7e6d4e8a  [MOV_EDIT] _pEditInfo is NULL ret :           insns 74/74 hunks 0
+7e6d4839 -> 7e6d5005  [MOV_EDIT] first mov_msg_write_exec Error ret insns 79/79 hunks 0
+7e680606 -> 7e680ca9  api_led_Set_EmergencyLowBattery_LED           insns 11/11 hunks 0
+7e680625 -> 7e680cc8  api_led_Set_EmergencyLowBattery_LEDTime       insns 7/7 hunks 0
+7e687131 -> 7e6877d4  api_power_dummy_Get_Battery_Charge_State      insns 5/5 hunks 0
+7e9a9afa -> 7e9aacff  cardFull                                      insns 33/33 hunks 0
+7ece0573 -> 7ece0958  displayBatteryEmptyAgainSubAppStateMisc       insns 15/15 hunks 0
+7ece052f -> 7ece0914  displayBatteryEmptySubAppStateMisc            insns 24/24 hunks 0
+7ea4c1ce -> 7ea4d663  execute_interval                              insns 11/11 hunks 0
+7ece47f9 -> 7ece4d0d  get=interval_shooting  =                      insns 167/167 hunks 0
+7ecda86c -> 7ecdab9a  getBatteryState                               insns 12/12 hunks 0
+7e96998b -> 7e96a7b9  getIntervalShootingState state[0x%08X]        insns 8/8 hunks 0
+7e6d15a0 -> 7e6d1d6c  interval                                      insns 249/249 hunks 0
+7e9a802d -> 7e9a9232  intervalRemainCount                           insns 279/279 hunks 0
+7e983c1f -> 7e984c12  intervalRemainCount            =%d            insns 959/959 hunks 0
+7e45e02c -> 7e45e196  interval_chk_end :                            insns 6/6 hunks 0
+7e511462 -> 7e511a31  interval_pre                                  insns 46/46 hunks 0
+7e969ace -> 7e96a908  isCreateTimeLapseMovieEnable return false for insns 36/36 hunks 0
+7e969b43 -> 7e96a97d  isEndIntervalShootingEnable return false for  insns 25/25 hunks 0
+7ea9866b -> 7ea99b22  isIntervalShooting true                       insns 13/13 hunks 0
+7ea98633 -> 7ea99aea  isIntervalShootingRelease true                insns 22/22 hunks 0
+7e969ba2 -> 7e96a9dc  isOneShotTakingPictureEnable return false for insns 35/35 hunks 0
+7e969c11 -> 7e96aa4b  isStartIntervalShootingEnable return false fo insns 32/32 hunks 0
+7ea928e6 -> 7ea93d9d  isTakeEnable IntervalShootingGuard NG         insns 296/296 hunks 0
+7e6d1a8a -> 7e6d2256  mov debug print tools               \n mov de insns 4/4 hunks 0
+7e59521a -> 7e5957d4  name    , data1   , interval  , time(us)\n    insns 130/130 hunks 0
+7ecd68d8 -> 7ecd6bb2  param : CAM_BOOT_SLEEP_BOOT_INTERVAL          insns 181/181 hunks 0
+7e9481dd -> 7e9481eb  play_mov_edit in                              insns 33/33 hunks 0
+7e947e8a -> 7e947e98  play_mov_edit in                              insns 38/38 hunks 0
+7e947f1c -> 7e947f2a  play_mov_edit_end in                          insns 16/16 hunks 0
+7e947f4c -> 7e947f5a  play_mov_edit_record in                       insns 253/253 hunks 0
+7e947eea -> 7e947ef8  play_mov_edit_start in                        insns 18/18 hunks 0
+7ea99582 -> 7ea9aa39  rcvCreateMovieFileLoadIn_active TimeLapseMovi insns 164/164 hunks 0
+7ea994b6 -> 7ea9a96d  rcvCreateMovieFileLoadIn_active TimeLapseMovi insns 72/72 hunks 0
+7ea991dd -> 7ea9a694  rcvCreateTimeLapseMovieIn_active end          insns 265/265 hunks 0
+7ea98df4 -> 7ea9a2ab  rcvEndIntervalShootingIn_active               insns 112/112 hunks 0
+7ea98808 -> 7ea99cbf  rcvStartIntervalShootingIn_active             insns 392/392 hunks 0
+7ea999e0 -> 7ea9ae97  rcvTimeLapseMovieErrorIn_active               insns 6/6 hunks 0
+7ea997e5 -> 7ea9ac9c  recordingDone_interval                        insns 36/36 hunks 0
+7ea99856 -> 7ea9ad0d  recordingDone_interval_last                   insns 13/13 hunks 0
+7ece01db -> 7ece0598  return from shutDown() : Power OFF by BATTERY insns 122/122 hunks 0
+7ece2b26 -> 7ece2dfb  search ShootingInterval                       insns 61/191 hunks 2
+7ea93fca -> 7ea95481  send To fw: evTraResShtMovStartRecordingError insns 28/28 hunks 0
+7ea986eb -> 7ea99ba2  send To fw:evTraResShtEndIntervalShooting     insns 31/31 hunks 0
+7ea9874a -> 7ea99c01  send To fw:evTraResShtEndIntervalShootingTime insns 31/31 hunks 0
+7ea987a9 -> 7ea99c60  send To fw:evTraResShtRequestEndIntervalShoot insns 31/31 hunks 0
+7ea9868c -> 7ea99b43  send To fw:evTraResShtStartIntervalShooting   insns 31/31 hunks 0
+7ea99085 -> 7ea9a53c  send To fw:evTraResShtStartIntervalShootingSl insns 47/47 hunks 0
+7ece3dcd -> 7ece42e1  set>interval_shooting  =                      insns 1055/1055 hunks 1
+7ecdff04 -> 7ece02c1  setChangeBootServiceIntervalCancel            insns 9/9 hunks 0
+7ea98f94 -> 7ea9a44b  setIntervalShootingNextTime                   insns 93/93 hunks 0
+7e969e1e -> 7e96ac58  setIntervalShootingState state[0x%08X]        insns 12/12 hunks 0
+7ece0507 -> 7ece08ec  startBatteryEmptySubAppStateMisc              insns 14/14 hunks 0
+7ea95bdf -> 7ea97096  startErrorSequenceCtrl TimeLapseGuard         insns 3145/3145 hunks 0
+7ece01b0 -> 7ece056d  startIntervalShootingSleepSubAppStateMisc     insns 15/15 hunks 0
+7ea99881 -> 7ea9ad38  startIntervalShooting_First                   insns 118/118 hunks 0
+7ece017d -> 7ece053a  startPowerOffBatteryEmptySubAppStateMisc      insns 18/18 hunks 0
+strings only in E-PM2: [(' IntervalShooting On ', ['0x7ecd2d50']), ('CBS_REQUEST_END_INTERVAL_SHOOTING', ['0x7e995c0b']), ('clearIntervalShootingState state[0x%08X]', ['0x7e9698ec'])]
+strings only in E-PL6: []

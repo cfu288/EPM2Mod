@@ -1,0 +1,43 @@
+{
+  "name": "interval-timelapse",
+  "description": "Enable interval shooting + time-lapse movie (info 482-486) on the E-PM2 v1.6 by copying the E-PL6 1.4 menu wiring into the place of the Flash RC Mode row (Shooting Menu 2, 5th row; global top-menu row 11). The interval code, guards, panels 628/636/637/638-641, the panel factory and all 34 language strings are already present and match the E-PL6 (experiments/2026-11-13-intervalometer/README.md). The E-PL6 inserted a row; the E-PM2 tables have no slack, and inserting would also need the .data tab layout and ~20 global-row constants in the GUI renumbered, so the row is replaced instead. Ops: (1) top-menu record 0x7EFFE1A0 (block-0 0xBDD180): Flash RC Mode {0, label 526, help 403, kind 0x002 toggle, param 180} -> Time Lapse Settings {0, 1357, 1358, 0x102, 1}, byte-identical to E-PL6 record 0x7EFFF8C8. (2) Shooting Menu 2 page (page 3) child list entry 0x7EFF8C68 (0xBD7C48): {panel 18, info 180, 0} -> {panel 628, info 482, 0}, as in E-PL6 0x7EFFA354; this is what OK/right opens. (3) Row-value case for global row 11 in 0x7EDEC2C0, `mov 180,d0` at 0x7EDEC339 (0x9CB319) -> `mov 482,d0`, as E-PL6 0x7EDED1CF does for its row 11, so the right column shows Off/On of 482 (the row-11 value list 0x7F0118E4 is already Off/On). (4) MODE default of 0xDE21 (info 483 Frame) at 0x7E4C3EB4 (0xA2E94): 0 -> 10. (5) MODE default of 0xDE44 (info 485 Interval Time, seconds) at 0x7E4C3EC4 (0xA2EA4): 0 -> 5. Stock 0/0 would mean no frame limit (end test is 489 == 483) and a 0 ms timer; the E-PL6 ships the same zeros. The defaults only apply when the MODE bank is reset (I). Flash RC Mode (info 180) loses its menu row. Not included: the E-PL6's sleep/power-off timer hold during intervals (0x7E998F12 calls), which needs new code; set Sleep to Off for tests. NOT BUILT, NOT CAMERA-TESTED. Restore = stock v1.6.",
+  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+  "ops": [
+    {
+      "type": "bytes",
+      "block": 0,
+      "offset": "0xBDD17C",
+      "expect": "02010c0100000e0293010200b40000000601",
+      "new": "02010c0100004d054e050201010000000601"
+    },
+    {
+      "type": "bytes",
+      "block": 0,
+      "offset": "0xBD7C44",
+      "expect": "0000000012000000b40000000000000000000000",
+      "new": "0000000074020000e20100000000000000000000"
+    },
+    {
+      "type": "bytes",
+      "block": 0,
+      "offset": "0x9CB315",
+      "expect": "a00bc9132cb4003c50ddfa",
+      "new": "a00bc9132ce2013c50ddfa"
+    },
+    {
+      "type": "bytes",
+      "block": 0,
+      "offset": "0xA2E94",
+      "expect": "21de01000000000034",
+      "new": "21de01000a00000034"
+    },
+    {
+      "type": "bytes",
+      "block": 0,
+      "offset": "0xA2EA4",
+      "expect": "44de01000000000051de0100",
+      "new": "44de01000500000051de0100"
+    }
+  ]
+}
