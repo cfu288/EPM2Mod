@@ -5,6 +5,7 @@
 | [01-public-sources.md](01-public-sources.md) | Specs, reviews, community work, re-checked on the real pages or archive.org copies (2026-11-12); each fact marked confirmed / corrected / unverified |
 | [02-sd-and-encoder.md](02-sd-and-encoder.md) | Firmware: the SD host driver and the H.264 encoder set-up |
 | [03-sensor-pipeline-memory.md](03-sensor-pipeline-memory.md) | Firmware: sensor readout modes, the movie image path, DRAM |
+| [04-mov-clip-analysis.md](04-mov-clip-analysis.md) | **A real clip: High@4.1, CAVLC, custom 4×4 matrices, QP pinned at 20 while using 41 % of the 20.48 Mb/s budget. The QP floor (0x7EEA5A1F) is the binding limit** |
 
 Labels: **V** read in our bytes; **I** inferred; **X** external source.
 
