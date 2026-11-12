@@ -1,0 +1,57 @@
+patched bytes: 6 in 3 runs
+chg  fmt=3 q=6 hi=1 free=2097152
+     fill_4g: 0.2496 -> 0.2498
+chg  fmt=3 q=6 hi=1 free=134217728
+     fill_4g: 0.9998 -> 0.9994
+     free_frames: 765780 -> 765750
+     free_frames2: 765780 -> 765750
+     max_frames: 47850 -> 47820
+     prints: ["Free Secotr : 134217728", "MAX   Time  : 25526", "Limte Time  : 1595"] -> ["Free Secotr : 134217728", "MAX   Time  : 25525", "Limte Time  : 1594"]
+     ret: 15315600 -> 15315000
+chg  fmt=3 q=6 hi=0 free=2097152
+     fill_4g: 0.2499 -> 0.2495
+     free_frames: 13890 -> 13860
+     free_frames2: 13890 -> 13860
+     max_frames: 13890 -> 13860
+     prints: ["Free Secotr : 2097152", "MAX   Time  : 463", "Limte Time  : 463"] -> ["Free Secotr : 2097152", "MAX   Time  : 462", "Limte Time  : 462"]
+     ret: 277800 -> 277200
+chg  fmt=3 q=6 hi=0 free=134217728
+     fill_4g: 0.9388 -> 0.9994
+     max_frames: 52200 -> 55560
+     prints: ["Free Secotr : 134217728", "MAX   Time  : 29654", "Limte Time  : 1740"] -> ["Free Secotr : 134217728", "MAX   Time  : 29654", "Limte Time  : 1852"]
+chg  fmt=3 q=3 hi=1 free=2097152
+     fill_4g: 0.2497 -> 0.2499
+chg  fmt=3 q=3 hi=1 free=134217728
+     fill_4g: 0.7362 -> 0.9996
+     free_frames: 1134540 -> 1134510
+     free_frames2: 1134540 -> 1134510
+     max_frames: 52200 -> 70860
+     prints: ["Free Secotr : 134217728", "MAX   Time  : 37818", "Limte Time  : 1740"] -> ["Free Secotr : 134217728", "MAX   Time  : 37817", "Limte Time  : 2362"]
+     ret: 22690800 -> 22690200
+chg  fmt=3 q=3 hi=0 free=2097152
+     fill_4g: 0.2499 -> 0.2498
+     free_frames: 22320 -> 22290
+     free_frames2: 22320 -> 22290
+     max_frames: 22320 -> 22290
+     prints: ["Free Secotr : 2097152", "MAX   Time  : 744", "Limte Time  : 744"] -> ["Free Secotr : 2097152", "MAX   Time  : 743", "Limte Time  : 743"]
+     ret: 446400 -> 445800
+chg  fmt=3 q=3 hi=0 free=134217728
+     fill_4g: 0.5843 -> 0.9995
+     free_frames: 1429350 -> 1429320
+     free_frames2: 1429350 -> 1429320
+     max_frames: 52200 -> 89280
+     prints: ["Free Secotr : 134217728", "MAX   Time  : 47645", "Limte Time  : 1740"] -> ["Free Secotr : 134217728", "MAX   Time  : 47644", "Limte Time  : 2976"]
+     ret: 28587000 -> 28586400
+chg  fmt=2 q=5 hi=0 free=134217728
+     fill_4g: 0.9868 -> 0.9993
+     max_frames: 52200 -> 52860
+     prints: ["Free Secotr : 134217728", "MAX   Time  : 28208", "Limte Time  : 1740"] -> ["Free Secotr : 134217728", "MAX   Time  : 28208", "Limte Time  : 1762"]
+chg  fmt=2 q=3 hi=1 free=134217728
+     fill_4g: 0.9868 -> 0.9993
+     max_frames: 52200 -> 52860
+     prints: ["Free Secotr : 134217728", "MAX   Time  : 28208", "Limte Time  : 1740"] -> ["Free Secotr : 134217728", "MAX   Time  : 28208", "Limte Time  : 1762"]
+chg  fmt=2 q=3 hi=0 free=134217728
+     fill_4g: 0.8488 -> 0.9995
+     max_frames: 52200 -> 61470
+     prints: ["Free Secotr : 134217728", "MAX   Time  : 32799", "Limte Time  : 1740"] -> ["Free Secotr : 134217728", "MAX   Time  : 32799", "Limte Time  : 2049"]
+rec_limit: 48 rows, 11 changed, 37 identical, 0 flagged

@@ -1,0 +1,132 @@
+
+
+# ---- H.264 QP bounds and the software QP choice (experiments/2026-11-12-hardware/05-qp-floor.md) ----------------
+from omemu import SP0  # noqa: E402
+QP_CTX, QP_OBJ, QP_VT, QP_FAKE, QP_OUT, QP_DRV = DATA + 0x10000, DATA + 0x11000, DATA + 0x11100, DATA + 0x11200, DATA + 0x12000, DATA + 0x13000
+QP_RC = [(0x7EEA6B37, 0x7EEA7266), (0x7EEA726B, 0x7EEA7995)]          # the two software QP functions
+
+
+def qp_ctx(emu, hist, frame=3, first_flag=0):
+    """Engine context: 1920x1080, 20 Mb/s, 29.97 fps, rate mode ctx+96 = 1, QP history bytes at ctx+635..638.
+    ctx+68 -> an object whose vtable entries all point at QP_FAKE (`clr d0; rets`)."""
+    ctx = bytearray(0x1000)
+    for off, fmt, v in ((68, "<I", QP_OBJ), (28, "<I", 20_000_000), (48, "<I", 2997), (12, "<I", 1920), (16, "<I", 1080),
+                        (108, "<H", 1), (52, "<I", frame), (96, "<I", 1), (104, "<I", first_flag)):
+        struct.pack_into(fmt, ctx, off, v)
+    ctx[634] = 1
+    ctx[635:639] = bytes(hist)
+    emu.write(QP_CTX, ctx)
+    emu.write(QP_OBJ, struct.pack("<I", QP_VT))
+    emu.write(QP_VT, struct.pack("<32I", *([QP_FAKE] * 32)))
+    emu.write(QP_FAKE, b"\x00\xf0\xfc")
+
+
+def qp_mean(hist, frame):
+    """0x7EEA6B37 with ctx+634 = 1: frame 0 -> the default 33 (out+25); else the integer mean of the non-zero
+    history bytes (33 if none), clamped to 51 (0x7EEA725A)."""
+    h = [q for q in hist if q]
+    q = 33 if frame == 0 or not h else sum(h) // len(h)
+    return min(q, 51)
+
+
+class QpSetup(Case):
+    name, entry = "qp_setup", 0x7EEA57D4
+    doc = ("Encoder frame set-up: 0x7EEA57D4 (first frame after start, ctx+104 = 0) and 0x7EEA5C4C (every later frame) "
+           "build the parameter struct for codec-driver vtable+20 / +24. Output: max QP, min QP, the frame QP and the "
+           "byte after it, read back from the struct on the stack (sp+164+36/37/172/173 and sp+176+44/45/248/249)")
+    ranges = [(0x7EEA57D4, 0x7EEA5C4A), (0x7EEA5C4C, 0x7EEA618F), (0x7EEA6A0B, 0x7EEA6AF3), (QP_FAKE, QP_FAKE + 3)] + QP_RC
+    stubs_doc = [(QP_FAKE, "every codec-driver vtable entry (+56, +64, +20, +24): scratch code `clr d0; rets`, "
+                           "so the driver and the hardware are not run; the struct stays on the dead stack")]
+    BUILDERS = {"first": (0x7EEA57D4, 356, 164, (36, 37, 172, 173), 0x7EEA5A1F),
+                "frame": (0x7EEA5C4C, 436, 176, (44, 45, 248, 249), 0x7EEA5EBB)}
+    MIN_IMM = {"first": 0x7EEA5A20, "frame": 0x7EEA5EBC}
+    MAX_IMM = {"first": 0x7EEA5A1B, "frame": 0x7EEA5EC1}
+
+    def rows(self):
+        return [dict(builder=b, hist=h) for b in ("first", "frame")
+                for h in ([0, 0, 0, 0], [20, 20, 20, 20], [16, 17, 16, 18], [26, 28, 30, 32])]
+
+    def run(self, emu, row):
+        entry, frame, base, offs, min_pc = self.BUILDERS[row["builder"]]
+        qp_ctx(emu, row["hist"], first_flag=0 if row["builder"] == "first" else 1)
+        emu.write(DATA, b"\0" * 64)
+        r = emu.call(entry, {"a0": QP_CTX, "a1": DATA})
+        st = emu.read(SP0 - 16 - frame + base, 260)
+        reads = [(min_pc + 1, 1)] if min_pc in r["pcs"] else []
+        return {"ret": r["regs"]["d0"], "max_qp": st[offs[0]], "min_qp": st[offs[1]], "qp": st[offs[2]],
+                "qp_b": st[offs[3]], "ctx104": emu.u32(QP_CTX + 104), "_r": r, "_reads": reads}
+
+    def model(self, row, image):
+        b = row["builder"]
+        return {"ret": 0, "max_qp": img_u8(image, self.MAX_IMM[b]), "min_qp": img_u8(image, self.MIN_IMM[b]),
+                "qp": qp_mean(row["hist"], 3), "qp_b": 16, "ctx104": 1 if b == "first" else 2}
+
+
+class QpRc(Case):
+    name, entry = "qp_rc", 0x7EEA6B37
+    doc = ("Software QP choice 0x7EEA6B37(a0 ctx, a1 out): out+16 = the next frame QP proposed to the hardware. "
+           "It averages the last 4 QPs the hardware reported (ctx+635..638); it reads no frame size and no QP floor")
+    ranges = [QP_RC[0]]
+
+    def rows(self):
+        return [dict(hist=h, frame=f) for h in ([0, 0, 0, 0], [20, 20, 20, 20], [16, 17, 16, 18], [25, 20, 20, 20],
+                                                [26, 28, 30, 32], [60, 60, 60, 60], [12, 0, 0, 0]) for f in (0, 3)]
+
+    def run(self, emu, row):
+        qp_ctx(emu, row["hist"], frame=row["frame"])
+        out = bytearray(32)
+        out[25] = 33                                         # the caller's default QP (0x7EEA58D8 / 0x7EEA5356)
+        emu.write(QP_OUT, out)
+        r = emu.call(self.entry, {"a0": QP_CTX, "a1": QP_OUT})
+        o = emu.read(QP_OUT, 32)
+        return {"ret": r["regs"]["d0"], "qp": o[16], "_r": r, "_reads": [(lo, hi - lo) for lo, hi in self.ranges]}
+
+    def model(self, row, image):
+        return {"ret": 0, "qp": qp_mean(row["hist"], row["frame"])}
+
+
+class QpSizeModel(Case):
+    name, entry = "qp_size_model", 0x7EEA3E0A
+    doc = ("Codec-driver status getter (vtable+28) 0x7EEA3E0A(a0 drv, a1 out, d0 1): after a frame it re-estimates the "
+           "driver's first-frame QP byte drv+218 from the frame size: smallest q with Qstep[q] > Qstep[qp]*(size>>10)/168 "
+           "(table 0x7F03026C), or qp+15 (max 51) on an overflow flag. Called here with `call [],0`")
+    ranges = [(0x7EEA3E0A, 0x7EEA3FE7)]
+    S_STAT, S_WAIT = 0x7EEC6B01, 0x7EEC684A
+    stubs_doc = [(S_STAT, "hardware status read (MMIO 0x994043xx): writes the row's size word at +4, overflow flag at "
+                          "+28 and reported QP 20 at +12 into the buffer at a0; returns 301"),
+                 (S_WAIT, "codec wait: returns 300")]
+    QSTEP = 0x7F03026C
+
+    def rows(self):
+        return [dict(qp=q, size=s, ovf=0) for q in (20, 33) for s in (0, 20_000, 75_000, 200_000, 600_000, 2_000_000)] + \
+               [dict(qp=q, size=75_000, ovf=1) for q in (20, 36, 40)]
+
+    def stubs(self, row):
+        def stat(emu, r):
+            st = bytearray(36)
+            struct.pack_into("<I", st, 4, row["size"])
+            st[12] = 20
+            struct.pack_into("<I", st, 28, row["ovf"])
+            emu.write(r["a0"], st)
+            return {"d0": 301}
+        return {self.S_STAT: stat, self.S_WAIT: lambda emu, r: {"d0": 300}}
+
+    def run(self, emu, row):
+        drv = bytearray(0x400)
+        drv[218] = row["qp"]
+        emu.write(QP_DRV, drv)
+        emu.write(QP_OUT, b"\0" * 32)
+        r = emu.call(self.entry, {"a0": QP_DRV, "a1": QP_OUT, "d0": 1}, frame=(0, 0), stubs=self.stubs(row))
+        return {"new_qp": emu.read(QP_DRV + 218, 1)[0], "reported_qp": emu.read(QP_OUT + 8, 1)[0], "_r": r,
+                "_reads": [(self.QSTEP, 104)] + [(lo, hi - lo) for lo, hi in self.ranges]}
+
+    def model(self, row, image):
+        q = row["qp"]
+        if row["ovf"]:
+            return {"new_qp": 51 if q > 36 else q + 15, "reported_qp": 20}
+        t = struct.unpack_from("<52H", image, self.QSTEP - BASE)
+        lim = t[q] * (row["size"] >> 10) // 168
+        return {"new_qp": next((i for i in range(52) if t[i] > lim), 51), "reported_qp": 20}
+
+
+CASES.update({c.name: c for c in (QpSetup(), QpRc(), QpSizeModel())})

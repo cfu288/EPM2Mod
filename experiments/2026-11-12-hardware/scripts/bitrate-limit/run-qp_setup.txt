@@ -1,0 +1,9 @@
+ok   builder=first hist=[0, 0, 0, 0] -> {"ret": 0, "max_qp": 51, "min_qp": 20, "qp": 33, "qp_b": 16, "ctx104": 1}
+ok   builder=first hist=[20, 20, 20, 20] -> {"ret": 0, "max_qp": 51, "min_qp": 20, "qp": 20, "qp_b": 16, "ctx104": 1}
+ok   builder=first hist=[16, 17, 16, 18] -> {"ret": 0, "max_qp": 51, "min_qp": 20, "qp": 16, "qp_b": 16, "ctx104": 1}
+ok   builder=first hist=[26, 28, 30, 32] -> {"ret": 0, "max_qp": 51, "min_qp": 20, "qp": 29, "qp_b": 16, "ctx104": 1}
+ok   builder=frame hist=[0, 0, 0, 0] -> {"ret": 0, "max_qp": 51, "min_qp": 20, "qp": 33, "qp_b": 16, "ctx104": 2}
+ok   builder=frame hist=[20, 20, 20, 20] -> {"ret": 0, "max_qp": 51, "min_qp": 20, "qp": 20, "qp_b": 16, "ctx104": 2}
+ok   builder=frame hist=[16, 17, 16, 18] -> {"ret": 0, "max_qp": 51, "min_qp": 20, "qp": 16, "qp_b": 16, "ctx104": 2}
+ok   builder=frame hist=[26, 28, 30, 32] -> {"ret": 0, "max_qp": 51, "min_qp": 20, "qp": 29, "qp_b": 16, "ctx104": 2}
+qp_setup: 8 rows, 0 failing (ok = matches the model, -- = no model)

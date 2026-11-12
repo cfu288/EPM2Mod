@@ -1,7 +1,7 @@
 # Movie bitrate and recording limit: specs (a) and (b) (2026-11-12)
 
 Labels: **V** = read in the code or bytes, or run in the emulator; **I** = inferred. Runtime = block-0 offset + 0x7E421020.
-Specs: `patches/movie-bitrate-32.json` (a), `patches/movie-rec-limit.json` (b), with `patches/movie-qp-floor-16.json` (QP).
+Specs: `experiments/2026-11-12-hardware/patches/movie-bitrate-32.json` (a), `experiments/2026-11-12-hardware/patches/movie-rec-limit.json` (b), with `experiments/2026-11-12-hardware/patches/movie-qp-floor-16.json` (QP).
 **Nothing was built.** tools/build.py was not run; nothing was written under build/. The patched block images are in
 `/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/br/` (a, b, abq, qba, neg).
 

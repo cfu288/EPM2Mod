@@ -1,0 +1,2 @@
+patched bytes: 6 in 3 runs
+qp_setup: 8 rows, 0 changed, 8 identical, 0 flagged

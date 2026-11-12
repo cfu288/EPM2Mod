@@ -1,0 +1,429 @@
+addr offset size insns callers callees strrefs data_page: 7e54a0d0 1290b0 920 424 1 0 0 0 0
+  callers (1): 7e54880e
+  callees (0): 
+7e54a0d0 <f_7e54a0d0>:
+7e54a0d0:	mov	d0,(20,sp)
+7e54a0d2:	mov	a1,a2
+7e54a0d3:	mov	572,a1
+7e54a0d6:	add	a0,a1
+7e54a0d8:	mov	a1,(24,sp)
+7e54a0da:	add	56,a1
+7e54a0dc:	mov	(a1),d0
+7e54a0dd:	btst	3,d0
+7e54a0e0:	bne	7e54a0f1 <f_7e54a0d0+0x21>
+7e54a0e2:	mov	(20,sp),a3
+7e54a0e4:	movbu	(185,a3),d0
+7e54a0e8:	mov	(24,sp),a3
+7e54a0ea:	mov	d0,(36,a3)
+7e54a0ed:	mov	d0,(7976,a0)
+7e54a0f1:	mov	(a1),d0
+7e54a0f2:	lsr	28,d0
+7e54a0f5:	btst	1,d0
+7e54a0f8:	beq	7e54a0fd <f_7e54a0d0+0x2d>
+7e54a0fa:	jmp	7e54a45c <f_7e54a0d0+0x38c>
+7e54a0fd:	mov	7512,a1
+7e54a100:	add	a0,a1
+7e54a102:	mov	a1,(28,sp)
+7e54a104:	add	7572,a0
+7e54a108:	mov	(a0),d0
+7e54a109:	or	131072,d0
+7e54a10f:	mov	d0,(a0)
+7e54a110:	mov	(20,sp),a0
+7e54a112:	movhu	(118,a0),d0
+7e54a115:	movhu	(116,a0),d3
+7e54a118:	mov	d0,(16,sp)
+7e54a11a:	movbu	(183,a0),d0
+7e54a11e:	mov	d0,(12,sp)
+7e54a120:	movbu	(184,a0),d0
+7e54a124:	mov	d0,(8,sp)
+7e54a126:	mov	(64,a0),d1
+7e54a129:	mov	(24,sp),a0
+7e54a12b:	mov	d1,(380,a0)
+7e54a12f:	mov	(24,sp),a0
+7e54a131:	mov	(12,sp),d0
+7e54a133:	add	384,a0
+7e54a137:	mov	(a0),d1
+7e54a138:	add	3,d0
+7e54a13a:	and	-262081,d1
+7e54a140:	lsr	2,d0
+7e54a143:	and	4095,d0
+7e54a147:	asl	6,d0
+7e54a14a:	or	d0,d1
+7e54a14c:	mov	d1,(a0)
+7e54a14d:	mov	(24,sp),a0
+7e54a14f:	mov	(12,sp),d0
+7e54a151:	add	376,a0
+7e54a155:	movbu	d0,(a0)
+7e54a157:	mov	(8,sp),d0
+7e54a159:	movbu	d0,(2,a0)
+7e54a15c:	mov	(20,sp),d0
+7e54a15e:	add	194,d0
+7e54a162:	mov	d0,(4,sp)
+7e54a164:	mov	d0,a0
+7e54a166:	movbu	(a0),d0
+7e54a168:	cmp	7,d0
+7e54a16a:	beq	7e54a1af <f_7e54a0d0+0xdf>
+7e54a16c:	cmp	0,d0
+7e54a16e:	beq	7e54a1af <f_7e54a0d0+0xdf>
+7e54a170:	cmp	1,d0
+7e54a172:	beq	7e54a1af <f_7e54a0d0+0xdf>
+7e54a174:	cmp	2,d0
+7e54a176:	beq	7e54a1af <f_7e54a0d0+0xdf>
+7e54a178:	cmp	3,d0
+7e54a17a:	beq	7e54a1af <f_7e54a0d0+0xdf>
+7e54a17c:	cmp	4,d0
+7e54a17e:	beq	7e54a1af <f_7e54a0d0+0xdf>
+7e54a180:	cmp	5,d0
+7e54a182:	beq	7e54a1af <f_7e54a0d0+0xdf>
+7e54a184:	cmp	22,d0
+7e54a186:	beq	7e54a1af <f_7e54a0d0+0xdf>
+7e54a188:	cmp	21,d0
+7e54a18a:	beq	7e54a193 <f_7e54a0d0+0xc3>
+7e54a18c:	cmp	20,d0
+7e54a18e:	beq	7e54a193 <f_7e54a0d0+0xc3>
+7e54a190:	jmp	7e54a318 <f_7e54a0d0+0x248>
+7e54a193:	mov	(20,sp),a0
+7e54a195:	add	96,a0
+7e54a197:	mov	(a0),d0
+7e54a198:	cmp	0,d0
+7e54a19a:	bne	7e54a19f <f_7e54a0d0+0xcf>
+7e54a19c:	jmp	7e54a318 <f_7e54a0d0+0x248>
+7e54a19f:	mov	(a0),a0
+7e54a1a1:	mov	(20,a0),d0
+7e54a1a4:	btst	1073741824,d0
+7e54a1aa:	bne	7e54a1af <f_7e54a0d0+0xdf>
+7e54a1ac:	jmp	7e54a318 <f_7e54a0d0+0x248>
+7e54a1af:	mov	(20,sp),a1
+7e54a1b1:	add	96,a1
+7e54a1b3:	mov	(a1),a0
+7e54a1b5:	movbu	(79,a0),d0
+7e54a1b8:	cmp	96,d0
+7e54a1ba:	beq	7e54a1cc <f_7e54a0d0+0xfc>
+7e54a1bc:	cmp	97,d0
+7e54a1be:	beq	7e54a1cc <f_7e54a0d0+0xfc>
+7e54a1c0:	cmp	165,d0
+7e54a1c4:	beq	7e54a1cc <f_7e54a0d0+0xfc>
+7e54a1c6:	cmp	166,d0
+7e54a1ca:	bne	7e54a226 <f_7e54a0d0+0x156>
+7e54a1cc:	mov	(4,sp),a0
+7e54a1ce:	mov	(12,sp),d1
+7e54a1d0:	movbu	(a0),d0
+7e54a1d2:	mov	(8,sp),d2
+7e54a1d4:	cmp	21,d0
+7e54a1d6:	beq	7e54a1df <f_7e54a0d0+0x10f>
+7e54a1d8:	cmp	20,d0
+7e54a1da:	beq	7e54a1df <f_7e54a0d0+0x10f>
+7e54a1dc:	jmp	7e54a31c <f_7e54a0d0+0x24c>
+7e54a1df:	mov	(a1),d0
+7e54a1e0:	cmp	0,d0
+7e54a1e2:	bne	7e54a1e7 <f_7e54a0d0+0x117>
+7e54a1e4:	jmp	7e54a31c <f_7e54a0d0+0x24c>
+7e54a1e7:	mov	(a1),a0
+7e54a1e9:	mov	(20,a0),d0
+7e54a1ec:	btst	1073741824,d0
+7e54a1f2:	bne	7e54a1f7 <f_7e54a0d0+0x127>
+7e54a1f4:	jmp	7e54a31c <f_7e54a0d0+0x24c>
+7e54a1f7:	movbu	(97,a0),d0
+7e54a1fa:	cmp	2,d0
+7e54a1fc:	beq	7e54a219 <f_7e54a0d0+0x149>
+7e54a1fe:	cmp	3,d0
+7e54a200:	beq	7e54a219 <f_7e54a0d0+0x149>
+7e54a202:	cmp	4,d0
+7e54a204:	beq	7e54a219 <f_7e54a0d0+0x149>
+7e54a206:	cmp	7,d0
+7e54a208:	beq	7e54a219 <f_7e54a0d0+0x149>
+7e54a20a:	cmp	5,d0
+7e54a20c:	beq	7e54a219 <f_7e54a0d0+0x149>
+7e54a20e:	cmp	6,d0
+7e54a210:	beq	7e54a219 <f_7e54a0d0+0x149>
+7e54a212:	cmp	8,d0
+7e54a214:	beq	7e54a219 <f_7e54a0d0+0x149>
+7e54a216:	jmp	7e54a31c <f_7e54a0d0+0x24c>
+7e54a219:	mov	(20,sp),a0
+7e54a21b:	movhu	(110,a0),d0
+7e54a21e:	movhu	(108,a0),d3
+7e54a221:	mov	d0,(16,sp)
+7e54a223:	jmp	7e54a31c <f_7e54a0d0+0x24c>
+7e54a226:	movbu	(97,a0),d0
+7e54a229:	cmp	0,d0
+7e54a22b:	beq	7e54a243 <f_7e54a0d0+0x173>
+7e54a22d:	cmp	1,d0
+7e54a22f:	beq	7e54a27c <f_7e54a0d0+0x1ac>
+7e54a231:	cmp	4,d0
+7e54a233:	beq	7e54a290 <f_7e54a0d0+0x1c0>
+7e54a235:	cmp	7,d0
+7e54a237:	beq	7e54a2a8 <f_7e54a0d0+0x1d8>
+7e54a239:	cmp	5,d0
+7e54a23b:	bne	7e54a240 <f_7e54a0d0+0x170>
+7e54a23d:	jmp	7e54a2c0 <f_7e54a0d0+0x1f0>
+7e54a240:	jmp	7e54a2d8 <f_7e54a0d0+0x208>
+7e54a243:	movbu	(96,a0),d0
+7e54a246:	cmp	1,d0
+7e54a248:	bne	7e54a263 <f_7e54a0d0+0x193>
+7e54a24a:	mov	(12,sp),d0
+7e54a24c:	mov	d3,d1
+7e54a24d:	udf01	d0,d1
+7e54a24f:	mov	(8,sp),d0
+7e54a251:	clr	d2
+7e54a252:	mov	d2,mdr
+7e54a254:	mov	(16,sp),d2
+7e54a256:	udf01	d0,d2
+7e54a258:	lsr	10,d2
+7e54a25b:	mov	1824,d0
+7e54a25e:	divu	d0,d1
+7e54a260:	jmp	7e54a31c <f_7e54a0d0+0x24c>
+7e54a263:	mov	(12,sp),d0
+7e54a265:	mov	d3,d1
+7e54a266:	udf01	d0,d1
+7e54a268:	mov	(8,sp),d0
+7e54a26a:	clr	d2
+7e54a26b:	mov	d2,mdr
+7e54a26d:	mov	(16,sp),d2
+7e54a26f:	udf01	d0,d2
+7e54a271:	mov	4608,d0
+7e54a274:	divu	d0,d1
+7e54a276:	mov	3456,d0
+7e54a279:	jmp	7e54a30d <f_7e54a0d0+0x23d>
+7e54a27c:	mov	(12,sp),d0
+7e54a27e:	mov	d3,d1
+7e54a27f:	udf01	d0,d1
+7e54a281:	mov	(8,sp),d0
+7e54a283:	clr	d2
+7e54a284:	mov	d2,mdr
+7e54a286:	mov	(16,sp),d2
+7e54a288:	udf01	d0,d2
+7e54a28a:	clr	d0
+7e54a28b:	divu	d0,d1
+7e54a28d:	clr	d0
+7e54a28e:	bra	7e54a30d <f_7e54a0d0+0x23d>
+7e54a290:	mov	(12,sp),d0
+7e54a292:	mov	d3,d1
+7e54a293:	udf01	d0,d1
+7e54a295:	mov	(8,sp),d0
+7e54a297:	clr	d2
+7e54a298:	mov	d2,mdr
+7e54a29a:	mov	(16,sp),d2
+7e54a29c:	udf01	d0,d2
+7e54a29e:	mov	1536,d0
+7e54a2a1:	divu	d0,d1
+7e54a2a3:	mov	345,d0
+7e54a2a6:	bra	7e54a30d <f_7e54a0d0+0x23d>
+7e54a2a8:	mov	(12,sp),d0
+7e54a2aa:	mov	d3,d1
+7e54a2ab:	udf01	d0,d1
+7e54a2ad:	mov	(8,sp),d0
+7e54a2af:	clr	d2
+7e54a2b0:	mov	d2,mdr
+7e54a2b2:	mov	(16,sp),d2
+7e54a2b4:	udf01	d0,d2
+7e54a2b6:	mov	1536,d0
+7e54a2b9:	divu	d0,d1
+7e54a2bb:	mov	171,d0
+7e54a2be:	bra	7e54a30d <f_7e54a0d0+0x23d>
+7e54a2c0:	mov	(12,sp),d0
+7e54a2c2:	mov	d3,d1
+7e54a2c3:	udf01	d0,d1
+7e54a2c5:	mov	(8,sp),d0
+7e54a2c7:	clr	d2
+7e54a2c8:	mov	d2,mdr
+7e54a2ca:	mov	(16,sp),d2
+7e54a2cc:	udf01	d0,d2
+7e54a2ce:	mov	1646,d0
+7e54a2d1:	divu	d0,d1
+7e54a2d3:	mov	1296,d0
+7e54a2d6:	bra	7e54a30d <f_7e54a0d0+0x23d>
+7e54a2d8:	movbu	(96,a0),d0
+7e54a2db:	cmp	1,d0
+7e54a2dd:	bne	7e54a2f7 <f_7e54a0d0+0x227>
+7e54a2df:	mov	(12,sp),d0
+7e54a2e1:	mov	d3,d1
+7e54a2e2:	udf01	d0,d1
+7e54a2e4:	mov	(8,sp),d0
+7e54a2e6:	clr	d2
+7e54a2e7:	mov	d2,mdr
+7e54a2e9:	mov	(16,sp),d2
+7e54a2eb:	udf01	d0,d2
+7e54a2ed:	mov	608,d0
+7e54a2f0:	divu	d0,d1
+7e54a2f2:	mov	205,d0
+7e54a2f5:	bra	7e54a30d <f_7e54a0d0+0x23d>
+7e54a2f7:	mov	(12,sp),d0
+7e54a2f9:	mov	d3,d1
+7e54a2fa:	udf01	d0,d1
+7e54a2fc:	mov	(8,sp),d0
+7e54a2fe:	clr	d2
+7e54a2ff:	mov	d2,mdr
+7e54a301:	mov	(16,sp),d2
+7e54a303:	udf01	d0,d2
+7e54a305:	mov	1536,d0
+7e54a308:	divu	d0,d1
+7e54a30a:	mov	691,d0
+7e54a30d:	mov	d3,(32,sp)
+7e54a30f:	clr	d3
+7e54a310:	mov	d3,mdr
+7e54a312:	divu	d0,d2
+7e54a314:	mov	(32,sp),d3
+7e54a316:	bra	7e54a31c <f_7e54a0d0+0x24c>
+7e54a318:	mov	(12,sp),d1
+7e54a31a:	mov	(8,sp),d2
+7e54a31c:	mov	(20,sp),a3
+7e54a31e:	mov	d3,(32,sp)
+7e54a320:	add	96,a3
+7e54a322:	mov	-1,d0
+7e54a324:	add	d3,d0
+7e54a325:	clr	d3
+7e54a326:	mov	d3,mdr
+7e54a328:	mov	(32,sp),d3
+7e54a32a:	mov	1,a0
+7e54a32c:	sub	a0,d1
+7e54a32e:	asl	12,d1
+7e54a331:	divu	d0,d1
+7e54a333:	mov	d1,(sp)
+7e54a335:	mov	(16,sp),d0
+7e54a337:	mov	1,d1
+7e54a339:	add	-1,d0
+7e54a33b:	sub	d1,d2
+7e54a33d:	asl	12,d2
+7e54a340:	clr	d1
+7e54a341:	mov	d1,mdr
+7e54a343:	divu	d0,d2
+7e54a345:	mov	(a3),d0
+7e54a346:	cmp	d1,d0
+7e54a347:	beq	7e54a37b <f_7e54a0d0+0x2ab>
+7e54a349:	mov	(a3),a1
+7e54a34b:	movbu	(88,a1),d0
+7e54a34e:	cmp	3,d0
+7e54a350:	beq	7e54a36c <f_7e54a0d0+0x29c>
+7e54a352:	cmp	5,d0
+7e54a354:	beq	7e54a36c <f_7e54a0d0+0x29c>
+7e54a356:	cmp	6,d0
+7e54a358:	beq	7e54a36c <f_7e54a0d0+0x29c>
+7e54a35a:	cmp	7,d0
+7e54a35c:	beq	7e54a36c <f_7e54a0d0+0x29c>
+7e54a35e:	cmp	8,d0
+7e54a360:	beq	7e54a36c <f_7e54a0d0+0x29c>
+7e54a362:	cmp	1,d0
+7e54a364:	beq	7e54a377 <f_7e54a0d0+0x2a7>
+7e54a366:	cmp	2,d0
+7e54a368:	beq	7e54a377 <f_7e54a0d0+0x2a7>
+7e54a36a:	bra	7e54a37b <f_7e54a0d0+0x2ab>
+7e54a36c:	mov	(sp),d1
+7e54a36e:	cmp	d2,d1
+7e54a36f:	blt	7e54a372 <f_7e54a0d0+0x2a2>
+7e54a371:	mov	d2,d1
+7e54a372:	mov	d1,d2
+7e54a373:	mov	d2,(sp)
+7e54a375:	bra	7e54a37b <f_7e54a0d0+0x2ab>
+7e54a377:	mov	1,d0
+7e54a379:	mov	d0,(sp)
+7e54a37b:	mov	(sp),d0
+7e54a37d:	mov	(24,sp),a0
+7e54a37f:	add	33,a2
+7e54a381:	mov	d0,(368,a0)
+7e54a385:	mov	(24,sp),a0
+7e54a387:	mov	d2,(372,a0)
+7e54a38b:	movbu	(a2),d0
+7e54a38d:	mov	(28,sp),a1
+7e54a38f:	extb	d0
+7e54a390:	add	88,a1
+7e54a392:	add	d0,d3
+7e54a393:	mov	(sp),d0
+7e54a395:	add	-1,d3
+7e54a397:	udf00	d0,d3
+7e54a399:	asr	1,d3
+7e54a39c:	mov	d3,a0
+7e54a39e:	mov	(12,sp),d3
+7e54a3a0:	mov	1,d0
+7e54a3a2:	sub	d0,d3
+7e54a3a4:	asl	11,d3
+7e54a3a7:	sub	a0,d3
+7e54a3a9:	mov	d3,(a1)
+7e54a3aa:	movbu	(a2),d0
+7e54a3ac:	mov	(28,sp),a2
+7e54a3ae:	mov	(16,sp),d1
+7e54a3b0:	extb	d0
+7e54a3b1:	add	92,a2
+7e54a3b3:	add	d1,d0
+7e54a3b4:	add	-1,d0
+7e54a3b6:	udf00	d2,d0
+7e54a3b8:	mov	d0,d1
+7e54a3b9:	mov	(8,sp),d0
+7e54a3bb:	asr	1,d1
+7e54a3be:	mov	1,d3
+7e54a3c0:	sub	d3,d0
+7e54a3c2:	asl	11,d0
+7e54a3c5:	sub	d1,d0
+7e54a3c7:	mov	d0,(a2)
+7e54a3c8:	mov	(20,sp),a0
+7e54a3ca:	mov	(84,a0),d0
+7e54a3cd:	btst	8388608,d0
+7e54a3d3:	bne	7e54a3d8 <f_7e54a0d0+0x308>
+7e54a3d5:	jmp	7e54a45c <f_7e54a0d0+0x38c>
+7e54a3d8:	mov	(4,sp),a0
+7e54a3da:	movbu	(a0),d0
+7e54a3dc:	cmp	7,d0
+7e54a3de:	beq	7e54a432 <f_7e54a0d0+0x362>
+7e54a3e0:	cmp	21,d0
+7e54a3e2:	beq	7e54a3e8 <f_7e54a0d0+0x318>
+7e54a3e4:	cmp	20,d0
+7e54a3e6:	bne	7e54a45c <f_7e54a0d0+0x38c>
+7e54a3e8:	mov	(a3),d0
+7e54a3e9:	cmp	0,d0
+7e54a3eb:	beq	7e54a45c <f_7e54a0d0+0x38c>
+7e54a3ed:	mov	(a3),a0
+7e54a3ef:	mov	(20,a0),d0
+7e54a3f2:	btst	1073741824,d0
+7e54a3f8:	beq	7e54a45c <f_7e54a0d0+0x38c>
+7e54a3fa:	movbu	(79,a0),d0
+7e54a3fd:	cmp	96,d0
+7e54a3ff:	beq	7e54a411 <f_7e54a0d0+0x341>
+7e54a401:	cmp	97,d0
+7e54a403:	beq	7e54a411 <f_7e54a0d0+0x341>
+7e54a405:	cmp	165,d0
+7e54a409:	beq	7e54a411 <f_7e54a0d0+0x341>
+7e54a40b:	cmp	166,d0
+7e54a40f:	bne	7e54a45c <f_7e54a0d0+0x38c>
+7e54a411:	mov	(a3),a0
+7e54a413:	movbu	(97,a0),d0
+7e54a416:	cmp	2,d0
+7e54a418:	beq	7e54a432 <f_7e54a0d0+0x362>
+7e54a41a:	cmp	3,d0
+7e54a41c:	beq	7e54a432 <f_7e54a0d0+0x362>
+7e54a41e:	cmp	4,d0
+7e54a420:	beq	7e54a432 <f_7e54a0d0+0x362>
+7e54a422:	cmp	7,d0
+7e54a424:	beq	7e54a432 <f_7e54a0d0+0x362>
+7e54a426:	cmp	5,d0
+7e54a428:	beq	7e54a432 <f_7e54a0d0+0x362>
+7e54a42a:	cmp	6,d0
+7e54a42c:	beq	7e54a432 <f_7e54a0d0+0x362>
+7e54a42e:	cmp	8,d0
+7e54a430:	bne	7e54a45c <f_7e54a0d0+0x38c>
+7e54a432:	mov	(20,sp),a0
+7e54a434:	mov	(a1),d1
+7e54a435:	movhu	(136,a0),d0
+7e54a439:	mov	(sp),a0
+7e54a43b:	mov	d2,(36,sp)
+7e54a43d:	exth	d0
+7e54a43e:	mov	a0,d2
+7e54a440:	udf00	d2,d0
+7e54a442:	mov	(36,sp),d2
+7e54a444:	ext	d0
+7e54a446:	mov	16,d3
+7e54a448:	div	d3,d0
+7e54a44a:	add	d1,d0
+7e54a44b:	mov	d0,(a1)
+7e54a44c:	mov	(20,sp),a0
+7e54a44e:	mov	(a2),d1
+7e54a44f:	movhu	(138,a0),d0
+7e54a453:	exth	d0
+7e54a454:	udf00	d2,d0
+7e54a456:	ext	d0
+7e54a458:	div	d3,d0
+7e54a45a:	add	d1,d0
+7e54a45b:	mov	d0,(a2)
+7e54a45c:	mov	(24,sp),a0
+7e54a45e:	mov	228,d0
+7e54a461:	mov	d0,(864,a0)
+7e54a465:	ret	[d2,d3,a2,a3],56
+

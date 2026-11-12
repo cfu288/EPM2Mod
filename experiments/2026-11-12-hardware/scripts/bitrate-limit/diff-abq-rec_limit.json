@@ -1,0 +1,2102 @@
+{
+ "case": "rec_limit",
+ "stock": "/path/to/epm2-tools/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin",
+ "patched": "/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/br/abq.block0.bin",
+ "rows": [
+  {
+   "row": {
+    "fmt": 3,
+    "q": 6,
+    "hi": 1,
+    "free": 500
+   },
+   "stock": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 6,
+    "hi": 1,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 238800,
+    "free_frames": 11940,
+    "free_frames2": 11940,
+    "max_frames": 11940,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 398",
+     "Limte Time  : 398"
+    ],
+    "peak": 20000000,
+    "rate_in_step": true,
+    "fill_4g": 0.2496,
+    "fits_4g": true
+   },
+   "patched": {
+    "ret": 153000,
+    "free_frames": 7650,
+    "free_frames2": 7650,
+    "max_frames": 7650,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 255",
+     "Limte Time  : 255"
+    ],
+    "peak": 32000000,
+    "rate_in_step": true,
+    "fill_4g": 0.2492,
+    "fits_4g": true
+   },
+   "diff": {
+    "fill_4g": [
+     0.2496,
+     0.2492
+    ],
+    "free_frames": [
+     11940,
+     7650
+    ],
+    "free_frames2": [
+     11940,
+     7650
+    ],
+    "max_frames": [
+     11940,
+     7650
+    ],
+    "peak": [
+     20000000,
+     32000000
+    ],
+    "prints": [
+     [
+      "Free Secotr : 2097152",
+      "MAX   Time  : 398",
+      "Limte Time  : 398"
+     ],
+     [
+      "Free Secotr : 2097152",
+      "MAX   Time  : 255",
+      "Limte Time  : 255"
+     ]
+    ],
+    "ret": [
+     238800,
+     153000
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 6,
+    "hi": 1,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 15315600,
+    "free_frames": 765780,
+    "free_frames2": 765780,
+    "max_frames": 47850,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 25526",
+     "Limte Time  : 1595"
+    ],
+    "peak": 20000000,
+    "rate_in_step": true,
+    "fill_4g": 0.9998,
+    "fits_4g": true
+   },
+   "patched": {
+    "ret": 9834600,
+    "free_frames": 491730,
+    "free_frames2": 491730,
+    "max_frames": 30720,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 16391",
+     "Limte Time  : 1024"
+    ],
+    "peak": 32000000,
+    "rate_in_step": true,
+    "fill_4g": 0.9998,
+    "fits_4g": true
+   },
+   "diff": {
+    "free_frames": [
+     765780,
+     491730
+    ],
+    "free_frames2": [
+     765780,
+     491730
+    ],
+    "max_frames": [
+     47850,
+     30720
+    ],
+    "peak": [
+     20000000,
+     32000000
+    ],
+    "prints": [
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 25526",
+      "Limte Time  : 1595"
+     ],
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 16391",
+      "Limte Time  : 1024"
+     ]
+    ],
+    "ret": [
+     15315600,
+     9834600
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 6,
+    "hi": 0,
+    "free": 500
+   },
+   "stock": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 6,
+    "hi": 0,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 277800,
+    "free_frames": 13890,
+    "free_frames2": 13890,
+    "max_frames": 13890,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 463",
+     "Limte Time  : 463"
+    ],
+    "peak": 17000000,
+    "rate_in_step": true,
+    "fill_4g": 0.2499,
+    "fits_4g": true
+   },
+   "patched": {
+    "ret": 201000,
+    "free_frames": 10050,
+    "free_frames2": 10050,
+    "max_frames": 10050,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 335",
+     "Limte Time  : 335"
+    ],
+    "peak": 24000000,
+    "rate_in_step": true,
+    "fill_4g": 0.2493,
+    "fits_4g": true
+   },
+   "diff": {
+    "fill_4g": [
+     0.2499,
+     0.2493
+    ],
+    "free_frames": [
+     13890,
+     10050
+    ],
+    "free_frames2": [
+     13890,
+     10050
+    ],
+    "max_frames": [
+     13890,
+     10050
+    ],
+    "peak": [
+     17000000,
+     24000000
+    ],
+    "prints": [
+     [
+      "Free Secotr : 2097152",
+      "MAX   Time  : 463",
+      "Limte Time  : 463"
+     ],
+     [
+      "Free Secotr : 2097152",
+      "MAX   Time  : 335",
+      "Limte Time  : 335"
+     ]
+    ],
+    "ret": [
+     277800,
+     201000
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 6,
+    "hi": 0,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 17792400,
+    "free_frames": 889620,
+    "free_frames2": 889620,
+    "max_frames": 52200,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 29654",
+     "Limte Time  : 1740"
+    ],
+    "peak": 17000000,
+    "rate_in_step": true,
+    "fill_4g": 0.9388,
+    "fits_4g": true
+   },
+   "patched": {
+    "ret": 12915600,
+    "free_frames": 645780,
+    "free_frames2": 645780,
+    "max_frames": 40320,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 21526",
+     "Limte Time  : 1344"
+    ],
+    "peak": 24000000,
+    "rate_in_step": true,
+    "fill_4g": 0.9992,
+    "fits_4g": true
+   },
+   "diff": {
+    "fill_4g": [
+     0.9388,
+     0.9992
+    ],
+    "free_frames": [
+     889620,
+     645780
+    ],
+    "free_frames2": [
+     889620,
+     645780
+    ],
+    "max_frames": [
+     52200,
+     40320
+    ],
+    "peak": [
+     17000000,
+     24000000
+    ],
+    "prints": [
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 29654",
+      "Limte Time  : 1740"
+     ],
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 21526",
+      "Limte Time  : 1344"
+     ]
+    ],
+    "ret": [
+     17792400,
+     12915600
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 3,
+    "hi": 1,
+    "free": 500
+   },
+   "stock": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 3,
+    "hi": 1,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 354000,
+    "free_frames": 17700,
+    "free_frames2": 17700,
+    "max_frames": 17700,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 590",
+     "Limte Time  : 590"
+    ],
+    "peak": 13000000,
+    "rate_in_step": true,
+    "fill_4g": 0.2497,
+    "fits_4g": true
+   },
+   "patched": {
+    "ret": 238800,
+    "free_frames": 11940,
+    "free_frames2": 11940,
+    "max_frames": 11940,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 398",
+     "Limte Time  : 398"
+    ],
+    "peak": 20000000,
+    "rate_in_step": true,
+    "fill_4g": 0.2498,
+    "fits_4g": true
+   },
+   "diff": {
+    "fill_4g": [
+     0.2497,
+     0.2498
+    ],
+    "free_frames": [
+     17700,
+     11940
+    ],
+    "free_frames2": [
+     17700,
+     11940
+    ],
+    "max_frames": [
+     17700,
+     11940
+    ],
+    "peak": [
+     13000000,
+     20000000
+    ],
+    "prints": [
+     [
+      "Free Secotr : 2097152",
+      "MAX   Time  : 590",
+      "Limte Time  : 590"
+     ],
+     [
+      "Free Secotr : 2097152",
+      "MAX   Time  : 398",
+      "Limte Time  : 398"
+     ]
+    ],
+    "ret": [
+     354000,
+     238800
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 3,
+    "hi": 1,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 22690800,
+    "free_frames": 1134540,
+    "free_frames2": 1134540,
+    "max_frames": 52200,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 37818",
+     "Limte Time  : 1740"
+    ],
+    "peak": 13000000,
+    "rate_in_step": true,
+    "fill_4g": 0.7362,
+    "fits_4g": true
+   },
+   "patched": {
+    "ret": 15315000,
+    "free_frames": 765750,
+    "free_frames2": 765750,
+    "max_frames": 47820,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 25525",
+     "Limte Time  : 1594"
+    ],
+    "peak": 20000000,
+    "rate_in_step": true,
+    "fill_4g": 0.9994,
+    "fits_4g": true
+   },
+   "diff": {
+    "fill_4g": [
+     0.7362,
+     0.9994
+    ],
+    "free_frames": [
+     1134540,
+     765750
+    ],
+    "free_frames2": [
+     1134540,
+     765750
+    ],
+    "max_frames": [
+     52200,
+     47820
+    ],
+    "peak": [
+     13000000,
+     20000000
+    ],
+    "prints": [
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 37818",
+      "Limte Time  : 1740"
+     ],
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 25525",
+      "Limte Time  : 1594"
+     ]
+    ],
+    "ret": [
+     22690800,
+     15315000
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 3,
+    "hi": 0,
+    "free": 500
+   },
+   "stock": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 3,
+    "hi": 0,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 446400,
+    "free_frames": 22320,
+    "free_frames2": 22320,
+    "max_frames": 22320,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 744",
+     "Limte Time  : 744"
+    ],
+    "peak": 10000000,
+    "rate_in_step": true,
+    "fill_4g": 0.2499,
+    "fits_4g": true
+   },
+   "patched": {
+    "ret": 293400,
+    "free_frames": 14670,
+    "free_frames2": 14670,
+    "max_frames": 14670,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 489",
+     "Limte Time  : 489"
+    ],
+    "peak": 16000000,
+    "rate_in_step": true,
+    "fill_4g": 0.2499,
+    "fits_4g": true
+   },
+   "diff": {
+    "free_frames": [
+     22320,
+     14670
+    ],
+    "free_frames2": [
+     22320,
+     14670
+    ],
+    "max_frames": [
+     22320,
+     14670
+    ],
+    "peak": [
+     10000000,
+     16000000
+    ],
+    "prints": [
+     [
+      "Free Secotr : 2097152",
+      "MAX   Time  : 744",
+      "Limte Time  : 744"
+     ],
+     [
+      "Free Secotr : 2097152",
+      "MAX   Time  : 489",
+      "Limte Time  : 489"
+     ]
+    ],
+    "ret": [
+     446400,
+     293400
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 3,
+    "hi": 0,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 28587000,
+    "free_frames": 1429350,
+    "free_frames2": 1429350,
+    "max_frames": 52200,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 47645",
+     "Limte Time  : 1740"
+    ],
+    "peak": 10000000,
+    "rate_in_step": true,
+    "fill_4g": 0.5843,
+    "fits_4g": true
+   },
+   "patched": {
+    "ret": 18806400,
+    "free_frames": 940320,
+    "free_frames2": 940320,
+    "max_frames": 58740,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 31344",
+     "Limte Time  : 1958"
+    ],
+    "peak": 16000000,
+    "rate_in_step": true,
+    "fill_4g": 0.9996,
+    "fits_4g": true
+   },
+   "diff": {
+    "fill_4g": [
+     0.5843,
+     0.9996
+    ],
+    "free_frames": [
+     1429350,
+     940320
+    ],
+    "free_frames2": [
+     1429350,
+     940320
+    ],
+    "max_frames": [
+     52200,
+     58740
+    ],
+    "peak": [
+     10000000,
+     16000000
+    ],
+    "prints": [
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 47645",
+      "Limte Time  : 1740"
+     ],
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 31344",
+      "Limte Time  : 1958"
+     ]
+    ],
+    "ret": [
+     28587000,
+     18806400
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 4,
+    "hi": 1,
+    "free": 500
+   },
+   "stock": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 4,
+    "hi": 1,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 929400,
+    "free_frames": 46470,
+    "free_frames2": 46470,
+    "max_frames": 46470,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 1549",
+     "Limte Time  : 1549"
+    ],
+    "peak": 4000000,
+    "rate_in_step": true,
+    "fill_4g": 0.2499,
+    "fits_4g": true
+   },
+   "patched": {
+    "ret": 929400,
+    "free_frames": 46470,
+    "free_frames2": 46470,
+    "max_frames": 46470,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 1549",
+     "Limte Time  : 1549"
+    ],
+    "peak": 4000000,
+    "rate_in_step": true,
+    "fill_4g": 0.2499,
+    "fits_4g": true
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 4,
+    "hi": 1,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 59562600,
+    "free_frames": 2978130,
+    "free_frames2": 2978130,
+    "max_frames": 186060,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 99271",
+     "Limte Time  : 6202"
+    ],
+    "peak": 4000000,
+    "rate_in_step": true,
+    "fill_4g": 0.9996,
+    "fits_4g": true
+   },
+   "patched": {
+    "ret": 59562600,
+    "free_frames": 2978130,
+    "free_frames2": 2978130,
+    "max_frames": 186060,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 99271",
+     "Limte Time  : 6202"
+    ],
+    "peak": 4000000,
+    "rate_in_step": true,
+    "fill_4g": 0.9996,
+    "fits_4g": true
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 4,
+    "hi": 0,
+    "free": 500
+   },
+   "stock": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 4,
+    "hi": 0,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 929400,
+    "free_frames": 46470,
+    "free_frames2": 46470,
+    "max_frames": 46470,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 1549",
+     "Limte Time  : 1549"
+    ],
+    "peak": 4000000,
+    "rate_in_step": true,
+    "fill_4g": 0.2499,
+    "fits_4g": true
+   },
+   "patched": {
+    "ret": 929400,
+    "free_frames": 46470,
+    "free_frames2": 46470,
+    "max_frames": 46470,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 1549",
+     "Limte Time  : 1549"
+    ],
+    "peak": 4000000,
+    "rate_in_step": true,
+    "fill_4g": 0.2499,
+    "fits_4g": true
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 4,
+    "hi": 0,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 59562600,
+    "free_frames": 2978130,
+    "free_frames2": 2978130,
+    "max_frames": 186060,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 99271",
+     "Limte Time  : 6202"
+    ],
+    "peak": 4000000,
+    "rate_in_step": true,
+    "fill_4g": 0.9996,
+    "fits_4g": true
+   },
+   "patched": {
+    "ret": 59562600,
+    "free_frames": 2978130,
+    "free_frames2": 2978130,
+    "max_frames": 186060,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 99271",
+     "Limte Time  : 6202"
+    ],
+    "peak": 4000000,
+    "rate_in_step": true,
+    "fill_4g": 0.9996,
+    "fits_4g": true
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 7,
+    "hi": 1,
+    "free": 500
+   },
+   "stock": {
+    "ret": 600,
+    "free_frames": 30,
+    "free_frames2": 30,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 1",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 600,
+    "free_frames": 30,
+    "free_frames2": 30,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 1",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 7,
+    "hi": 1,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 3355200,
+    "free_frames": 167760,
+    "free_frames2": 167760,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 5592",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 3355200,
+    "free_frames": 167760,
+    "free_frames2": 167760,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 5592",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 7,
+    "hi": 1,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 214747800,
+    "free_frames": 10737390,
+    "free_frames2": 10737390,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 357913",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 214747800,
+    "free_frames": 10737390,
+    "free_frames2": 10737390,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 357913",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 7,
+    "hi": 0,
+    "free": 500
+   },
+   "stock": {
+    "ret": 600,
+    "free_frames": 30,
+    "free_frames2": 30,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 1",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 600,
+    "free_frames": 30,
+    "free_frames2": 30,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 1",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 7,
+    "hi": 0,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 3355200,
+    "free_frames": 167760,
+    "free_frames2": 167760,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 5592",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 3355200,
+    "free_frames": 167760,
+    "free_frames2": 167760,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 5592",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 7,
+    "hi": 0,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 214747800,
+    "free_frames": 10737390,
+    "free_frames2": 10737390,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 357913",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 214747800,
+    "free_frames": 10737390,
+    "free_frames2": 10737390,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 357913",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 5,
+    "hi": 1,
+    "free": 500
+   },
+   "stock": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 5,
+    "hi": 1,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 212400,
+    "free_frames": 10620,
+    "free_frames2": 10620,
+    "max_frames": 10620,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 354",
+     "Limte Time  : 354"
+    ],
+    "peak": 24000000,
+    "rate_in_step": true,
+    "fill_4g": 0.2493,
+    "fits_4g": true
+   },
+   "patched": {
+    "ret": 212400,
+    "free_frames": 10620,
+    "free_frames2": 10620,
+    "max_frames": 10620,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 354",
+     "Limte Time  : 354"
+    ],
+    "peak": 24000000,
+    "rate_in_step": true,
+    "fill_4g": 0.2493,
+    "fits_4g": true
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 5,
+    "hi": 1,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 13632600,
+    "free_frames": 681630,
+    "free_frames2": 681630,
+    "max_frames": 42600,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 22721",
+     "Limte Time  : 1420"
+    ],
+    "peak": 24000000,
+    "rate_in_step": true,
+    "fill_4g": 0.9999,
+    "fits_4g": true
+   },
+   "patched": {
+    "ret": 13632600,
+    "free_frames": 681630,
+    "free_frames2": 681630,
+    "max_frames": 42600,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 22721",
+     "Limte Time  : 1420"
+    ],
+    "peak": 24000000,
+    "rate_in_step": true,
+    "fill_4g": 0.9999,
+    "fits_4g": true
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 5,
+    "hi": 0,
+    "free": 500
+   },
+   "stock": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 5,
+    "hi": 0,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 264000,
+    "free_frames": 13200,
+    "free_frames2": 13200,
+    "max_frames": 13200,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 440",
+     "Limte Time  : 440"
+    ],
+    "peak": 19293799,
+    "rate_in_step": true,
+    "fill_4g": 0.2496,
+    "fits_4g": true
+   },
+   "patched": {
+    "ret": 264000,
+    "free_frames": 13200,
+    "free_frames2": 13200,
+    "max_frames": 13200,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 440",
+     "Limte Time  : 440"
+    ],
+    "peak": 19293799,
+    "rate_in_step": true,
+    "fill_4g": 0.2496,
+    "fits_4g": true
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 5,
+    "hi": 0,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 16924800,
+    "free_frames": 846240,
+    "free_frames2": 846240,
+    "max_frames": 52200,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 28208",
+     "Limte Time  : 1740"
+    ],
+    "peak": 19293799,
+    "rate_in_step": true,
+    "fill_4g": 0.9868,
+    "fits_4g": true
+   },
+   "patched": {
+    "ret": 16924800,
+    "free_frames": 846240,
+    "free_frames2": 846240,
+    "max_frames": 52860,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 28208",
+     "Limte Time  : 1762"
+    ],
+    "peak": 19293799,
+    "rate_in_step": true,
+    "fill_4g": 0.9993,
+    "fits_4g": true
+   },
+   "diff": {
+    "fill_4g": [
+     0.9868,
+     0.9993
+    ],
+    "max_frames": [
+     52200,
+     52860
+    ],
+    "prints": [
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 28208",
+      "Limte Time  : 1740"
+     ],
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 28208",
+      "Limte Time  : 1762"
+     ]
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 3,
+    "hi": 1,
+    "free": 500
+   },
+   "stock": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 3,
+    "hi": 1,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 264000,
+    "free_frames": 13200,
+    "free_frames2": 13200,
+    "max_frames": 13200,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 440",
+     "Limte Time  : 440"
+    ],
+    "peak": 19293799,
+    "rate_in_step": true,
+    "fill_4g": 0.2496,
+    "fits_4g": true
+   },
+   "patched": {
+    "ret": 264000,
+    "free_frames": 13200,
+    "free_frames2": 13200,
+    "max_frames": 13200,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 440",
+     "Limte Time  : 440"
+    ],
+    "peak": 19293799,
+    "rate_in_step": true,
+    "fill_4g": 0.2496,
+    "fits_4g": true
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 3,
+    "hi": 1,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 16924800,
+    "free_frames": 846240,
+    "free_frames2": 846240,
+    "max_frames": 52200,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 28208",
+     "Limte Time  : 1740"
+    ],
+    "peak": 19293799,
+    "rate_in_step": true,
+    "fill_4g": 0.9868,
+    "fits_4g": true
+   },
+   "patched": {
+    "ret": 16924800,
+    "free_frames": 846240,
+    "free_frames2": 846240,
+    "max_frames": 52860,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 28208",
+     "Limte Time  : 1762"
+    ],
+    "peak": 19293799,
+    "rate_in_step": true,
+    "fill_4g": 0.9993,
+    "fits_4g": true
+   },
+   "diff": {
+    "fill_4g": [
+     0.9868,
+     0.9993
+    ],
+    "max_frames": [
+     52200,
+     52860
+    ],
+    "prints": [
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 28208",
+      "Limte Time  : 1740"
+     ],
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 28208",
+      "Limte Time  : 1762"
+     ]
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 3,
+    "hi": 0,
+    "free": 500
+   },
+   "stock": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 3,
+    "hi": 0,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 307200,
+    "free_frames": 15360,
+    "free_frames2": 15360,
+    "max_frames": 15360,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 512",
+     "Limte Time  : 512"
+    ],
+    "peak": 16567501,
+    "rate_in_step": true,
+    "fill_4g": 0.2498,
+    "fits_4g": true
+   },
+   "patched": {
+    "ret": 307200,
+    "free_frames": 15360,
+    "free_frames2": 15360,
+    "max_frames": 15360,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 512",
+     "Limte Time  : 512"
+    ],
+    "peak": 16567501,
+    "rate_in_step": true,
+    "fill_4g": 0.2498,
+    "fits_4g": true
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 3,
+    "hi": 0,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 19679400,
+    "free_frames": 983970,
+    "free_frames2": 983970,
+    "max_frames": 52200,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 32799",
+     "Limte Time  : 1740"
+    ],
+    "peak": 16567501,
+    "rate_in_step": true,
+    "fill_4g": 0.8488,
+    "fits_4g": true
+   },
+   "patched": {
+    "ret": 19679400,
+    "free_frames": 983970,
+    "free_frames2": 983970,
+    "max_frames": 61470,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 32799",
+     "Limte Time  : 2049"
+    ],
+    "peak": 16567501,
+    "rate_in_step": true,
+    "fill_4g": 0.9995,
+    "fits_4g": true
+   },
+   "diff": {
+    "fill_4g": [
+     0.8488,
+     0.9995
+    ],
+    "max_frames": [
+     52200,
+     61470
+    ],
+    "prints": [
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 32799",
+      "Limte Time  : 1740"
+     ],
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 32799",
+      "Limte Time  : 2049"
+     ]
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 4,
+    "hi": 1,
+    "free": 500
+   },
+   "stock": {
+    "ret": 1200,
+    "free_frames": 60,
+    "free_frames2": 60,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 2",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 1200,
+    "free_frames": 60,
+    "free_frames2": 60,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 2",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 4,
+    "hi": 1,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 26766600,
+    "free_frames": 1338330,
+    "free_frames2": 1338330,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 44611",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 26766600,
+    "free_frames": 1338330,
+    "free_frames2": 1338330,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 44611",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 4,
+    "hi": 1,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 1713412200,
+    "free_frames": 85670610,
+    "free_frames2": 85670610,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 2855687",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 1713412200,
+    "free_frames": 85670610,
+    "free_frames2": 85670610,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 2855687",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 4,
+    "hi": 0,
+    "free": 500
+   },
+   "stock": {
+    "ret": 1200,
+    "free_frames": 60,
+    "free_frames2": 60,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 2",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 1200,
+    "free_frames": 60,
+    "free_frames2": 60,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 2",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 4,
+    "hi": 0,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 26766600,
+    "free_frames": 1338330,
+    "free_frames2": 1338330,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 44611",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 26766600,
+    "free_frames": 1338330,
+    "free_frames2": 1338330,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 44611",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 4,
+    "hi": 0,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 1713412200,
+    "free_frames": 85670610,
+    "free_frames2": 85670610,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 2855687",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 1713412200,
+    "free_frames": 85670610,
+    "free_frames2": 85670610,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 2855687",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 1,
+    "q": 6,
+    "hi": 1,
+    "free": 500
+   },
+   "stock": {
+    "ret": 1200,
+    "free_frames": 60,
+    "free_frames2": 60,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 2",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 1200,
+    "free_frames": 60,
+    "free_frames2": 60,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 2",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 1,
+    "q": 6,
+    "hi": 1,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 26766600,
+    "free_frames": 1338330,
+    "free_frames2": 1338330,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 44611",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 26766600,
+    "free_frames": 1338330,
+    "free_frames2": 1338330,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 44611",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 1,
+    "q": 6,
+    "hi": 1,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 1713412200,
+    "free_frames": 85670610,
+    "free_frames2": 85670610,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 2855687",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 1713412200,
+    "free_frames": 85670610,
+    "free_frames2": 85670610,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 2855687",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 1,
+    "q": 6,
+    "hi": 0,
+    "free": 500
+   },
+   "stock": {
+    "ret": 1200,
+    "free_frames": 60,
+    "free_frames2": 60,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 2",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 1200,
+    "free_frames": 60,
+    "free_frames2": 60,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 2",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 1,
+    "q": 6,
+    "hi": 0,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 26766600,
+    "free_frames": 1338330,
+    "free_frames2": 1338330,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 44611",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 26766600,
+    "free_frames": 1338330,
+    "free_frames2": 1338330,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 44611",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 1,
+    "q": 6,
+    "hi": 0,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 1713412200,
+    "free_frames": 85670610,
+    "free_frames2": 85670610,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 2855687",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 1713412200,
+    "free_frames": 85670610,
+    "free_frames2": 85670610,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 2855687",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  }
+ ]
+}

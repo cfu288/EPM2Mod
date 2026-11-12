@@ -1,0 +1,266 @@
+7e6d8a54:	58 04       	mov	(4,sp),d0
+7e6d8a56:	fc dc 6e 5f 	mov	2122342254,a0
+7e6d8a5a:	80 7e 
+7e6d8a5c:	fc 81 14 08 	mov	d0,(0x60730814)
+7e6d8a60:	73 60 
+7e6d8a62:	fc cc 00 00 	mov	131072,d0
+7e6d8a66:	02 00 
+7e6d8a68:	cd 9e 89 20 	call	0x7e6d1406,[a2],8
+7e6d8a6c:	08 
+7e6d8a6d:	fc a5 14 08 	mov	(0x60730814),d1
+7e6d8a71:	73 60 
+7e6d8a73:	fc cc 00 00 	mov	131072,d0
+7e6d8a77:	02 00 
+7e6d8a79:	fc dc 83 5f 	mov	2122342275,a0
+7e6d8a7d:	80 7e 
+7e6d8a7f:	cd aa 89 a0 	call	0x7e6d1429,[d2,a2],12
+7e6d8a83:	0c 
+7e6d8a84:	80 01       	mov	1,d0
+7e6d8a86:	ca 77       	bra	0x7e6d8afd
+7e6d8a88:	fc cc 00 00 	mov	131072,d0
+7e6d8a8c:	02 00 
+7e6d8a8e:	fc dc 95 5f 	mov	2122342293,a0
+7e6d8a92:	80 7e 
+7e6d8a94:	cd 72 89 20 	call	0x7e6d1406,[a2],8
+7e6d8a98:	08 
+7e6d8a99:	00          	clr	d0
+7e6d8a9a:	85 1b       	mov	27,d1
+7e6d8a9c:	90 00       	mov	0,a0
+7e6d8a9e:	dd ad 1d d9 	call	0x7e46a84b,[d2,d3,a2,a3],28
+7e6d8aa2:	ff f0 1c 
+7e6d8aa5:	00          	clr	d0
+7e6d8aa6:	85 1c       	mov	28,d1
+7e6d8aa8:	90 00       	mov	0,a0
+7e6d8aaa:	dd a1 1d d9 	call	0x7e46a84b,[d2,d3,a2,a3],28
+7e6d8aae:	ff f0 1c 
+7e6d8ab1:	80 05       	mov	5,d0
+7e6d8ab3:	85 02       	mov	2,d1
+7e6d8ab5:	90 00       	mov	0,a0
+7e6d8ab7:	dd 94 1d d9 	call	0x7e46a84b,[d2,d3,a2,a3],28
+7e6d8abb:	ff f0 1c 
+7e6d8abe:	00          	clr	d0
+7e6d8abf:	81          	mov	d0,d1
+7e6d8ac0:	90 00       	mov	0,a0
+7e6d8ac2:	dd 46 65 28 	call	0x7e95f008,[],0
+7e6d8ac6:	00 00 00 
+7e6d8ac9:	80 08       	mov	8,d0
+7e6d8acb:	ca 32       	bra	0x7e6d8afd
+7e6d8acd:	fc cc 00 00 	mov	131072,d0
+7e6d8ad1:	02 00 
+7e6d8ad3:	fc dc aa 5f 	mov	2122342314,a0
+7e6d8ad7:	80 7e 
+7e6d8ad9:	cd 2d 89 20 	call	0x7e6d1406,[a2],8
+7e6d8add:	08 
+7e6d8ade:	80 02       	mov	2,d0
+7e6d8ae0:	ca 1d       	bra	0x7e6d8afd
+7e6d8ae2:	fc cc 00 00 	mov	131072,d0
+7e6d8ae6:	02 00 
+7e6d8ae8:	fc dc be 5f 	mov	2122342334,a0
+7e6d8aec:	80 7e 
+7e6d8aee:	cd 18 89 20 	call	0x7e6d1406,[a2],8
+7e6d8af2:	08 
+7e6d8af3:	80 01       	mov	1,d0
+7e6d8af5:	fc 81 10 08 	mov	d0,(0x60730810)
+7e6d8af9:	73 60 
+7e6d8afb:	80 04       	mov	4,d0
+7e6d8afd:	04          	clr	d1
+7e6d8afe:	cd 6e c3 c0 	call	0x7e6d4e6c,[d2,d3],12
+7e6d8b02:	0c 
+7e6d8b03:	df a0 10    	ret	[d2,a2],16
+7e6d8b06:	fc cc 00 00 	mov	131072,d0
+7e6d8b0a:	02 00 
+7e6d8b0c:	fc dc d3 5f 	mov	2122342355,a0
+7e6d8b10:	80 7e 
+7e6d8b12:	cc 01 02    	jmp	0x7e6d8d13
+7e6d8b15:	fc cc 00 00 	mov	131072,d0
+7e6d8b19:	02 00 
+7e6d8b1b:	fc dc e9 5f 	mov	2122342377,a0
+7e6d8b1f:	80 7e 
+7e6d8b21:	cc f2 01    	jmp	0x7e6d8d13
+7e6d8b24:	fc cc 00 00 	mov	131072,d0
+7e6d8b28:	02 00 
+7e6d8b2a:	fc dc 01 60 	mov	2122342401,a0
+7e6d8b2e:	80 7e 
+7e6d8b30:	cc e3 01    	jmp	0x7e6d8d13
+7e6d8b33:	fc cc 00 00 	mov	131072,d0
+7e6d8b37:	02 00 
+7e6d8b39:	fc dc 1b 60 	mov	2122342427,a0
+7e6d8b3d:	80 7e 
+7e6d8b3f:	cc d4 01    	jmp	0x7e6d8d13
+7e6d8b42:	fc cc 00 00 	mov	131072,d0
+7e6d8b46:	02 00 
+7e6d8b48:	fc dc 35 60 	mov	2122342453,a0
+7e6d8b4c:	80 7e 
+7e6d8b4e:	cc c5 01    	jmp	0x7e6d8d13
+7e6d8b51:	fc cc 00 00 	mov	67108864,d0
+7e6d8b55:	00 04 
+7e6d8b57:	fc dc 4a 60 	mov	2122342474,a0
+7e6d8b5b:	80 7e 
+7e6d8b5d:	cd a9 88 20 	call	0x7e6d1406,[a2],8
+7e6d8b61:	08 
+7e6d8b62:	00          	clr	d0
+7e6d8b63:	2d 01 10    	mov	4097,d1
+7e6d8b66:	cc 76 01    	jmp	0x7e6d8cdc
+7e6d8b69:	fc cc 00 00 	mov	67108864,d0
+7e6d8b6d:	00 04 
+7e6d8b6f:	fc dc 63 60 	mov	2122342499,a0
+7e6d8b73:	80 7e 
+7e6d8b75:	cd 91 88 20 	call	0x7e6d1406,[a2],8
+7e6d8b79:	08 
+7e6d8b7a:	00          	clr	d0
+7e6d8b7b:	2d 02 10    	mov	4098,d1
+7e6d8b7e:	cc 5e 01    	jmp	0x7e6d8cdc
+7e6d8b81:	fc cc 00 00 	mov	67108864,d0
+7e6d8b85:	00 04 
+7e6d8b87:	fc dc 7d 60 	mov	2122342525,a0
+7e6d8b8b:	80 7e 
+7e6d8b8d:	cd 79 88 20 	call	0x7e6d1406,[a2],8
+7e6d8b91:	08 
+7e6d8b92:	00          	clr	d0
+7e6d8b93:	2d 03 10    	mov	4099,d1
+7e6d8b96:	cc 46 01    	jmp	0x7e6d8cdc
+7e6d8b99:	fc cc 00 00 	mov	67108864,d0
+7e6d8b9d:	00 04 
+7e6d8b9f:	fc dc 99 60 	mov	2122342553,a0
+7e6d8ba3:	80 7e 
+7e6d8ba5:	cd 61 88 20 	call	0x7e6d1406,[a2],8
+7e6d8ba9:	08 
+7e6d8baa:	00          	clr	d0
+7e6d8bab:	2d 04 10    	mov	4100,d1
+7e6d8bae:	cc 2e 01    	jmp	0x7e6d8cdc
+7e6d8bb1:	fc cc 00 00 	mov	67108864,d0
+7e6d8bb5:	00 04 
+7e6d8bb7:	fc dc af 60 	mov	2122342575,a0
+7e6d8bbb:	80 7e 
+7e6d8bbd:	cd 49 88 20 	call	0x7e6d1406,[a2],8
+7e6d8bc1:	08 
+7e6d8bc2:	00          	clr	d0
+7e6d8bc3:	2d 05 10    	mov	4101,d1
+7e6d8bc6:	cc 16 01    	jmp	0x7e6d8cdc
+7e6d8bc9:	fc cc 00 00 	mov	67108864,d0
+7e6d8bcd:	00 04 
+7e6d8bcf:	fc dc c8 60 	mov	2122342600,a0
+7e6d8bd3:	80 7e 
+7e6d8bd5:	cd 31 88 20 	call	0x7e6d1406,[a2],8
+7e6d8bd9:	08 
+7e6d8bda:	00          	clr	d0
+7e6d8bdb:	2d 06 10    	mov	4102,d1
+7e6d8bde:	cc fe 00    	jmp	0x7e6d8cdc
+7e6d8be1:	fc cc 00 00 	mov	131072,d0
+7e6d8be5:	02 00 
+7e6d8be7:	fc dc e0 60 	mov	2122342624,a0
+7e6d8beb:	80 7e 
+7e6d8bed:	cd 19 88 20 	call	0x7e6d1406,[a2],8
+7e6d8bf1:	08 
+7e6d8bf2:	00          	clr	d0
+7e6d8bf3:	2d 07 10    	mov	4103,d1
+7e6d8bf6:	cc e6 00    	jmp	0x7e6d8cdc
+7e6d8bf9:	fc cc 00 00 	mov	67108864,d0
+7e6d8bfd:	00 04 
+7e6d8bff:	fc dc f6 60 	mov	2122342646,a0
+7e6d8c03:	80 7e 
+7e6d8c05:	cd 01 88 20 	call	0x7e6d1406,[a2],8
+7e6d8c09:	08 
+7e6d8c0a:	00          	clr	d0
+7e6d8c0b:	2d 08 10    	mov	4104,d1
+7e6d8c0e:	cc ce 00    	jmp	0x7e6d8cdc
+7e6d8c11:	fc cc 00 00 	mov	67108864,d0
+7e6d8c15:	00 04 
+7e6d8c17:	fc dc 0b 61 	mov	2122342667,a0
+7e6d8c1b:	80 7e 
+7e6d8c1d:	cd e9 87 20 	call	0x7e6d1406,[a2],8
+7e6d8c21:	08 
+7e6d8c22:	00          	clr	d0
+7e6d8c23:	2d 09 10    	mov	4105,d1
+7e6d8c26:	cc b6 00    	jmp	0x7e6d8cdc
+7e6d8c29:	fc cc 00 00 	mov	67108864,d0
+7e6d8c2d:	00 04 
+7e6d8c2f:	fc dc 22 61 	mov	2122342690,a0
+7e6d8c33:	80 7e 
+7e6d8c35:	cd d1 87 20 	call	0x7e6d1406,[a2],8
+7e6d8c39:	08 
+7e6d8c3a:	00          	clr	d0
+7e6d8c3b:	2d 0a 10    	mov	4106,d1
+7e6d8c3e:	cc 9e 00    	jmp	0x7e6d8cdc
+7e6d8c41:	fc cc 00 00 	mov	67108864,d0
+7e6d8c45:	00 04 
+7e6d8c47:	fc dc 39 61 	mov	2122342713,a0
+7e6d8c4b:	80 7e 
+7e6d8c4d:	cd b9 87 20 	call	0x7e6d1406,[a2],8
+7e6d8c51:	08 
+7e6d8c52:	00          	clr	d0
+7e6d8c53:	2d 0b 10    	mov	4107,d1
+7e6d8c56:	cc 86 00    	jmp	0x7e6d8cdc
+7e6d8c59:	fc cc 00 00 	mov	67108864,d0
+7e6d8c5d:	00 04 
+7e6d8c5f:	fc dc 4d 61 	mov	2122342733,a0
+7e6d8c63:	80 7e 
+7e6d8c65:	cd a1 87 20 	call	0x7e6d1406,[a2],8
+7e6d8c69:	08 
+7e6d8c6a:	00          	clr	d0
+7e6d8c6b:	2d 0c 10    	mov	4108,d1
+7e6d8c6e:	ca 6e       	bra	0x7e6d8cdc
+7e6d8c70:	fc cc 00 00 	mov	67108864,d0
+7e6d8c74:	00 04 
+7e6d8c76:	fc dc 67 61 	mov	2122342759,a0
+7e6d8c7a:	80 7e 
+7e6d8c7c:	cc 97 00    	jmp	0x7e6d8d13
+7e6d8c7f:	fc cc 00 00 	mov	524288,d0
+7e6d8c83:	08 00 
+7e6d8c85:	fc dc 7a 61 	mov	2122342778,a0
+7e6d8c89:	80 7e 
+7e6d8c8b:	cc 88 00    	jmp	0x7e6d8d13
+7e6d8c8e:	fc cc 00 00 	mov	67108864,d0
+7e6d8c92:	00 04 
+7e6d8c94:	fc dc 97 61 	mov	2122342807,a0
+7e6d8c98:	80 7e 
+7e6d8c9a:	ca 79       	bra	0x7e6d8d13
+7e6d8c9c:	fc cc 00 00 	mov	67108864,d0
+7e6d8ca0:	00 04 
+7e6d8ca2:	fc dc b3 61 	mov	2122342835,a0
+7e6d8ca6:	80 7e 
+7e6d8ca8:	ca 6b       	bra	0x7e6d8d13
+7e6d8caa:	fc cc 00 00 	mov	67108864,d0
+7e6d8cae:	00 04 
+7e6d8cb0:	fc dc cf 61 	mov	2122342863,a0
+7e6d8cb4:	80 7e 
+7e6d8cb6:	ca 5d       	bra	0x7e6d8d13
+7e6d8cb8:	fc cc 00 00 	mov	67108864,d0
+7e6d8cbc:	00 04 
+7e6d8cbe:	fc dc eb 61 	mov	2122342891,a0
+7e6d8cc2:	80 7e 
+7e6d8cc4:	ca 4f       	bra	0x7e6d8d13
+7e6d8cc6:	76          	mov	(a2),d1
+7e6d8cc7:	fc cc 00 00 	mov	67108864,d0
+7e6d8ccb:	00 04 
+7e6d8ccd:	fc dc 08 62 	mov	2122342920,a0
+7e6d8cd1:	80 7e 
+7e6d8cd3:	cd 56 87 a0 	call	0x7e6d1429,[d2,a2],12
+7e6d8cd7:	0c 
+7e6d8cd8:	00          	clr	d0
+7e6d8cd9:	2d 01 20    	mov	8193,d1
+7e6d8cdc:	cd 90 c1 c0 	call	0x7e6d4e6c,[d2,d3],12
+7e6d8ce0:	0c 
+7e6d8ce1:	80 01       	mov	1,d0
+7e6d8ce3:	fc 81 10 08 	mov	d0,(0x60730810)
+7e6d8ce7:	73 60 
+7e6d8ce9:	ca 2f       	bra	0x7e6d8d18
+7e6d8ceb:	fc cc 00 00 	mov	67108864,d0
+7e6d8cef:	00 04 
+7e6d8cf1:	fc dc 27 62 	mov	2122342951,a0
+7e6d8cf5:	80 7e 
+7e6d8cf7:	ca 1c       	bra	0x7e6d8d13
+7e6d8cf9:	fc cc 00 00 	mov	67108864,d0
+7e6d8cfd:	00 04 
+7e6d8cff:	fc dc 46 62 	mov	2122342982,a0
+7e6d8d03:	80 7e 
+7e6d8d05:	ca 0e       	bra	0x7e6d8d13
+7e6d8d07:	fc cc 00 00 	mov	67108864,d0
+7e6d8d0b:	00 04 
+7e6d8d0d:	fc dc 5e 62 	mov	2122343006,a0
+7e6d8d11:	80 7e 
+7e6d8d13:	cd f3 86 20 	call	0x7e6d1406,[a2],8
+7e6d8d17:	08 
+7e6d8d18:	df a0 10    	ret	[d2,a2],16
+7e6d8d1b:	cf a0       	movm	[d2,a2],(sp)
+7e6d8d1d:	f8 fe fc    	add	-4,sp

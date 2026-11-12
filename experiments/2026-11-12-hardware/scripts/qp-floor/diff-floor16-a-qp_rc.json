@@ -1,0 +1,301 @@
+{
+ "case": "qp_rc",
+ "stock": "/path/to/epm2-tools/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin",
+ "patched": "/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/qp/floor16-a.block0.bin",
+ "rows": [
+  {
+   "row": {
+    "hist": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "frame": 0
+   },
+   "stock": {
+    "ret": 0,
+    "qp": 33
+   },
+   "patched": {
+    "ret": 0,
+    "qp": 33
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "hist": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "frame": 3
+   },
+   "stock": {
+    "ret": 0,
+    "qp": 33
+   },
+   "patched": {
+    "ret": 0,
+    "qp": 33
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "hist": [
+     20,
+     20,
+     20,
+     20
+    ],
+    "frame": 0
+   },
+   "stock": {
+    "ret": 0,
+    "qp": 33
+   },
+   "patched": {
+    "ret": 0,
+    "qp": 33
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "hist": [
+     20,
+     20,
+     20,
+     20
+    ],
+    "frame": 3
+   },
+   "stock": {
+    "ret": 0,
+    "qp": 20
+   },
+   "patched": {
+    "ret": 0,
+    "qp": 20
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "hist": [
+     16,
+     17,
+     16,
+     18
+    ],
+    "frame": 0
+   },
+   "stock": {
+    "ret": 0,
+    "qp": 33
+   },
+   "patched": {
+    "ret": 0,
+    "qp": 33
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "hist": [
+     16,
+     17,
+     16,
+     18
+    ],
+    "frame": 3
+   },
+   "stock": {
+    "ret": 0,
+    "qp": 16
+   },
+   "patched": {
+    "ret": 0,
+    "qp": 16
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "hist": [
+     25,
+     20,
+     20,
+     20
+    ],
+    "frame": 0
+   },
+   "stock": {
+    "ret": 0,
+    "qp": 33
+   },
+   "patched": {
+    "ret": 0,
+    "qp": 33
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "hist": [
+     25,
+     20,
+     20,
+     20
+    ],
+    "frame": 3
+   },
+   "stock": {
+    "ret": 0,
+    "qp": 21
+   },
+   "patched": {
+    "ret": 0,
+    "qp": 21
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "hist": [
+     26,
+     28,
+     30,
+     32
+    ],
+    "frame": 0
+   },
+   "stock": {
+    "ret": 0,
+    "qp": 33
+   },
+   "patched": {
+    "ret": 0,
+    "qp": 33
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "hist": [
+     26,
+     28,
+     30,
+     32
+    ],
+    "frame": 3
+   },
+   "stock": {
+    "ret": 0,
+    "qp": 29
+   },
+   "patched": {
+    "ret": 0,
+    "qp": 29
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "hist": [
+     60,
+     60,
+     60,
+     60
+    ],
+    "frame": 0
+   },
+   "stock": {
+    "ret": 0,
+    "qp": 33
+   },
+   "patched": {
+    "ret": 0,
+    "qp": 33
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "hist": [
+     60,
+     60,
+     60,
+     60
+    ],
+    "frame": 3
+   },
+   "stock": {
+    "ret": 0,
+    "qp": 51
+   },
+   "patched": {
+    "ret": 0,
+    "qp": 51
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "hist": [
+     12,
+     0,
+     0,
+     0
+    ],
+    "frame": 0
+   },
+   "stock": {
+    "ret": 0,
+    "qp": 33
+   },
+   "patched": {
+    "ret": 0,
+    "qp": 33
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "hist": [
+     12,
+     0,
+     0,
+     0
+    ],
+    "frame": 3
+   },
+   "stock": {
+    "ret": 0,
+    "qp": 12
+   },
+   "patched": {
+    "ret": 0,
+    "qp": 12
+   },
+   "diff": {},
+   "flags": []
+  }
+ ]
+}

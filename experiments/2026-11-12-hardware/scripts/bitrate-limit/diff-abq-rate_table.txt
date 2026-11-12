@@ -1,0 +1,14 @@
+patched bytes: 32 in 14 runs
+chg  fmt=3 q=6 fine=1
+     avg: 20000000 -> 32000000
+     peak: 20000000 -> 32000000
+chg  fmt=3 q=6 fine=0
+     avg: 17000000 -> 24000000
+     peak: 17000000 -> 24000000
+chg  fmt=3 q=3 fine=1
+     avg: 13000000 -> 20000000
+     peak: 13000000 -> 20000000
+chg  fmt=3 q=3 fine=0
+     avg: 10000000 -> 16000000
+     peak: 10000000 -> 16000000
+rate_table: 18 rows, 4 changed, 14 identical, 0 flagged

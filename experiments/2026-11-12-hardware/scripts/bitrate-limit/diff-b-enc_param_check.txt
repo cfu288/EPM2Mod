@@ -1,0 +1,2 @@
+patched bytes: 6 in 3 runs
+enc_param_check: 23 rows, 0 changed, 23 identical, 0 flagged

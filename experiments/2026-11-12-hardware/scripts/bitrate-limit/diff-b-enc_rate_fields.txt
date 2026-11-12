@@ -1,0 +1,2 @@
+patched bytes: 6 in 3 runs
+enc_rate_fields: 22 rows, 0 changed, 22 identical, 0 flagged

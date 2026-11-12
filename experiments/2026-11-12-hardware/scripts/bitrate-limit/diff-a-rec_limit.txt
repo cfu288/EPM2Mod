@@ -1,0 +1,65 @@
+patched bytes: 24 in 9 runs
+chg  fmt=3 q=6 hi=1 free=2097152
+     fill_4g: 0.2496 -> 0.25
+     free_frames: 11940 -> 7680
+     free_frames2: 11940 -> 7680
+     max_frames: 11940 -> 7680
+     peak: 20000000 -> 32000000
+     prints: ["Free Secotr : 2097152", "MAX   Time  : 398", "Limte Time  : 398"] -> ["Free Secotr : 2097152", "MAX   Time  : 256", "Limte Time  : 256"]
+     ret: 238800 -> 153600
+chg  fmt=3 q=6 hi=1 free=134217728
+     fill_4g: 0.9998 -> 0.9995
+     free_frames: 765780 -> 491730
+     free_frames2: 765780 -> 491730
+     max_frames: 47850 -> 30720
+     peak: 20000000 -> 32000000
+     prints: ["Free Secotr : 134217728", "MAX   Time  : 25526", "Limte Time  : 1595"] -> ["Free Secotr : 134217728", "MAX   Time  : 16391", "Limte Time  : 1024"]
+     ret: 15315600 -> 9834600
+chg  fmt=3 q=6 hi=0 free=2097152
+     fill_4g: 0.2499 -> 0.2498
+     free_frames: 13890 -> 10080
+     free_frames2: 13890 -> 10080
+     max_frames: 13890 -> 10080
+     peak: 17000000 -> 24000000
+     prints: ["Free Secotr : 2097152", "MAX   Time  : 463", "Limte Time  : 463"] -> ["Free Secotr : 2097152", "MAX   Time  : 336", "Limte Time  : 336"]
+     ret: 277800 -> 201600
+chg  fmt=3 q=6 hi=0 free=134217728
+     fill_4g: 0.9388 -> 0.9997
+     free_frames: 889620 -> 645780
+     free_frames2: 889620 -> 645780
+     max_frames: 52200 -> 40350
+     peak: 17000000 -> 24000000
+     prints: ["Free Secotr : 134217728", "MAX   Time  : 29654", "Limte Time  : 1740"] -> ["Free Secotr : 134217728", "MAX   Time  : 21526", "Limte Time  : 1345"]
+     ret: 17792400 -> 12915600
+chg  fmt=3 q=3 hi=1 free=2097152
+     fill_4g: 0.2497 -> 0.2496
+     free_frames: 17700 -> 11940
+     free_frames2: 17700 -> 11940
+     max_frames: 17700 -> 11940
+     peak: 13000000 -> 20000000
+     prints: ["Free Secotr : 2097152", "MAX   Time  : 590", "Limte Time  : 590"] -> ["Free Secotr : 2097152", "MAX   Time  : 398", "Limte Time  : 398"]
+     ret: 354000 -> 238800
+chg  fmt=3 q=3 hi=1 free=134217728
+     fill_4g: 0.7362 -> 0.9998
+     free_frames: 1134540 -> 765780
+     free_frames2: 1134540 -> 765780
+     max_frames: 52200 -> 47850
+     peak: 13000000 -> 20000000
+     prints: ["Free Secotr : 134217728", "MAX   Time  : 37818", "Limte Time  : 1740"] -> ["Free Secotr : 134217728", "MAX   Time  : 25526", "Limte Time  : 1595"]
+     ret: 22690800 -> 15315600
+chg  fmt=3 q=3 hi=0 free=2097152
+     fill_4g: 0.2499 -> 0.2497
+     free_frames: 22320 -> 14670
+     free_frames2: 22320 -> 14670
+     max_frames: 22320 -> 14670
+     peak: 10000000 -> 16000000
+     prints: ["Free Secotr : 2097152", "MAX   Time  : 744", "Limte Time  : 744"] -> ["Free Secotr : 2097152", "MAX   Time  : 489", "Limte Time  : 489"]
+     ret: 446400 -> 293400
+chg  fmt=3 q=3 hi=0 free=134217728
+     fill_4g: 0.5843 -> 0.8881
+     free_frames: 1429350 -> 940320
+     free_frames2: 1429350 -> 940320
+     peak: 10000000 -> 16000000
+     prints: ["Free Secotr : 134217728", "MAX   Time  : 47645", "Limte Time  : 1740"] -> ["Free Secotr : 134217728", "MAX   Time  : 31344", "Limte Time  : 1740"]
+     ret: 28587000 -> 18806400
+rec_limit: 48 rows, 8 changed, 40 identical, 0 flagged

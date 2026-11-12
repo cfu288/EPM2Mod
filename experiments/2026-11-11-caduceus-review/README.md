@@ -7,6 +7,8 @@ This review covers four external projects, read but not run:
 - **[om-emu](https://github.com/flatpanda/om-emu):** an emulator for Olympus/OM firmware. **No licence**, so treat it as all rights reserved.
 - **[oly_fw_analysis](https://github.com/fishcu/oly_fw_analysis):** research centred on the PEN-F. Apache-2.0, except its MN103 runner, which is GPL-3.0+.
 
+The four repositories were downloaded on 2026-11-11 as tarballs of their default branch (codeload.github.com/<owner>/<repo>/tar.gz/HEAD). They were kept only in the session scratchpad, not in this repo. The reviewers' own check scripts are in `scripts/`.
+
 Each review checks the external claims against our E-PM2 bytes. Labels: **[V]** read in our bytes, **[X]** stated by the external source, **[I]** inferred.
 
 | Report | Topic |

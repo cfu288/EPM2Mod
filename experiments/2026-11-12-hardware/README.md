@@ -53,8 +53,8 @@ The SD card path is not a limit: it is UHS-I SDR50, against a stream of about 3 
 
 | Spec | Change | Expected effect | Open risk |
 |---|---|---|---|
-| `patches/movie-qp-floor-16.json` | min QP 20 → 16 in both set-ups (2 bytes) | Static scenes about 12–14 Mb/s instead of 8.4; finer texture; clip length unchanged | Whether the hardware rate control still holds the target below QP 20 |
-| `patches/movie-bitrate-32.json` | MOV 32/24/20/16 Mb/s, the check 24 → 50 M, time-limit rates moved in step (9 ops) | More bits for busy scenes; 1080 Fine clips 17:04 (4 GiB) | Encoder throughput above 24 Mb/s; **in-camera playback may refuse clips above 20 Mb/s** (Video Decode check 0x7EEB93DA) |
-| `patches/movie-rec-limit.json` | 29-min cap → 7200 s, plus VGA's header reserve and ulMaxRecTime (3 ops) | 720 Normal 49:36, 720 Fine 39:22, 1080 Normal 30:52; 1080 Fine unchanged | Header-reserve link inferred; one 10 s test clip checks it |
+| `experiments/2026-11-12-hardware/patches/movie-qp-floor-16.json` | min QP 20 → 16 in both set-ups (2 bytes) | Static scenes about 12–14 Mb/s instead of 8.4; finer texture; clip length unchanged | Whether the hardware rate control still holds the target below QP 20 |
+| `experiments/2026-11-12-hardware/patches/movie-bitrate-32.json` | MOV 32/24/20/16 Mb/s, the check 24 → 50 M, time-limit rates moved in step (9 ops) | More bits for busy scenes; 1080 Fine clips 17:04 (4 GiB) | Encoder throughput above 24 Mb/s; **in-camera playback may refuse clips above 20 Mb/s** (Video Decode check 0x7EEB93DA) |
+| `experiments/2026-11-12-hardware/patches/movie-rec-limit.json` | 29-min cap → 7200 s, plus VGA's header reserve and ulMaxRecTime (3 ops) | 720 Normal 49:36, 720 Fine 39:22, 1080 Normal 30:52; 1080 Fine unchanged | Header-reserve link inferred; one 10 s test clip checks it |
 
 The three specs share no bytes and give the same image in any order. **Suggested first camera test**, if this work resumes: QP floor alone, then a static clip and a busy clip, analysed with `scripts/qp.py`.

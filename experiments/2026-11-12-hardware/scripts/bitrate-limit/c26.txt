@@ -1,0 +1,143 @@
+7e6c25d0:	60          	mov	d0,(a0)
+7e6c25d1:	a2          	cmp	d0,d2
+7e6c25d2:	c9 09       	bne	0x7e6c25db
+7e6c25d4:	5c 04       	mov	(4,sp),a0
+7e6c25d6:	f8 54 1c    	movbu	d1,(28,a0)
+7e6c25d9:	ca 08       	bra	0x7e6c25e1
+7e6c25db:	4c          	inc	d3
+7e6c25dc:	8d          	mov	d3,d1
+7e6c25dd:	17          	extbu	d3
+7e6c25de:	f1 97       	cmp	a1,d3
+7e6c25e0:	d0          	llt	
+7e6c25e1:	af 20       	cmp	32,d3
+7e6c25e3:	c0 0a       	blt	0x7e6c25ed
+7e6c25e5:	fc cc 01 00 	mov	-268435455,d0
+7e6c25e9:	00 f0 
+7e6c25eb:	ca 41       	bra	0x7e6c262c
+7e6c25ed:	fc a8 89 02 	movbu	(0x60730289),d0
+7e6c25f1:	73 60 
+7e6c25f3:	a3          	cmp	d0,d3
+7e6c25f4:	c9 37       	bne	0x7e6c262b
+7e6c25f6:	fc a5 d8 01 	mov	(0x607301d8),d1
+7e6c25fa:	73 60 
+7e6c25fc:	54          	asl2	d0
+7e6c25fd:	fc dc 8c 02 	mov	1618150028,a0
+7e6c2601:	73 60 
+7e6c2603:	f3 50       	mov	d1,(d0,a0)
+7e6c2605:	ca 0e       	bra	0x7e6c2613
+7e6c2607:	fc a4 d8 01 	mov	(0x607301d8),d0
+7e6c260b:	73 60 
+7e6c260d:	fc 81 8c 02 	mov	d0,(0x6073028c)
+7e6c2611:	73 60 
+7e6c2613:	5c 04       	mov	(4,sp),a0
+7e6c2615:	fc a8 89 02 	movbu	(0x60730289),d0
+7e6c2619:	73 60 
+7e6c261b:	f8 50 1c    	movbu	d0,(28,a0)
+7e6c261e:	fc a8 89 02 	movbu	(0x60730289),d0
+7e6c2622:	73 60 
+7e6c2624:	40          	inc	d0
+7e6c2625:	fc 82 89 02 	movbu	d0,(0x60730289)
+7e6c2629:	73 60 
+7e6c262b:	00          	clr	d0
+7e6c262c:	df f0 30    	ret	[d2,d3,a2,a3],48
+7e6c262f:	93          	mov	a0,a3
+7e6c2630:	00          	clr	d0
+7e6c2631:	42 14       	mov	d0,(20,sp)
+7e6c2633:	80 01       	mov	1,d0
+7e6c2635:	dd 81 a9 02 	call	0x7e6ecfb6,[],0
+7e6c2639:	00 00 00 
+7e6c263c:	f8 4c 03    	movbu	(3,a0),d3
+7e6c263f:	90 20       	mov	32,a0
+7e6c2641:	f1 7c       	add	a3,a0
+7e6c2643:	43 1c       	mov	a0,(28,sp)
+7e6c2645:	f1 d0       	mov	a0,d0
+7e6c2647:	28 10       	add	16,d0
+7e6c2649:	42 0c       	mov	d0,(12,sp)
+7e6c264b:	f1 e0       	mov	d0,a0
+7e6c264d:	70          	mov	(a0),d0
+7e6c264e:	08          	clr	d2
+7e6c264f:	fc c8 00 80 	cmp	20480000,d0
+7e6c2653:	38 01 
+7e6c2655:	c6 0a       	bcc	0x7e6c265f
+7e6c2657:	fc c8 00 a0 	cmp	17408000,d0
+7e6c265b:	09 01 
+7e6c265d:	c4 0a       	bcs	0x7e6c2667
+7e6c265f:	fc cc 80 84 	mov	2000000,d0
+7e6c2663:	1e 00 
+7e6c2665:	ca 20       	bra	0x7e6c2685
+7e6c2667:	fc c8 00 20 	cmp	13312000,d0
+7e6c266b:	cb 00 
+7e6c266d:	c6 0a       	bcc	0x7e6c2677
+7e6c266f:	fc c8 00 40 	cmp	10240000,d0
+7e6c2673:	9c 00 
+7e6c2675:	c4 0a       	bcs	0x7e6c267f
+7e6c2677:	fc cc 40 42 	mov	1000000,d0
+7e6c267b:	0f 00 
+7e6c267d:	ca 08       	bra	0x7e6c2685
+7e6c267f:	fc cc 20 a1 	mov	500000,d0
+7e6c2683:	07 00 
+7e6c2685:	42 18       	mov	d0,(24,sp)
+7e6c2687:	cd 22 0a 00 	call	0x7e6c30a9,[],4
+7e6c268b:	04 
+7e6c268c:	f8 92 20    	movbu	d0,(32,sp)
+7e6c268f:	58 1c       	mov	(28,sp),d0
+7e6c2691:	4a 04       	mov	d2,(4,sp)
+7e6c2693:	28 04       	add	4,d0
+7e6c2695:	42 08       	mov	d0,(8,sp)
+7e6c2697:	f1 e0       	mov	d0,a0
+7e6c2699:	70          	mov	(a0),d0
+7e6c269a:	95 00       	mov	0,a1
+7e6c269c:	96          	mov	a1,a2
+7e6c269d:	a8          	cmp	d2,d0
+7e6c269e:	c9 13       	bne	0x7e6c26b1
+7e6c26a0:	fc a8 d1 01 	movbu	(0x607301d1),d0
+7e6c26a4:	73 60 
+7e6c26a6:	a0 04       	cmp	4,d0
+7e6c26a8:	c2 09       	bge	0x7e6c26b1
+7e6c26aa:	40          	inc	d0
+7e6c26ab:	fc 82 d1 01 	movbu	d0,(0x607301d1)
+7e6c26af:	73 60 
+7e6c26b1:	4e 10       	mov	d3,(16,sp)
+7e6c26b3:	af 6a       	cmp	106,d3
+7e6c26b5:	c8 5a       	beq	0x7e6c270f
+7e6c26b7:	af 64       	cmp	100,d3
+7e6c26b9:	c0 56       	blt	0x7e6c270f
+7e6c26bb:	f8 b8 20    	movbu	(32,sp),d0
+7e6c26be:	a0 1e       	cmp	30,d0
+7e6c26c0:	c2 4f       	bge	0x7e6c270f
+7e6c26c2:	89          	mov	d2,d1
+7e6c26c3:	94          	mov	a1,a0
+7e6c26c4:	8f 1e       	mov	30,d3
+7e6c26c6:	f2 d3       	ext	d3
+7e6c26c8:	f2 63       	div	d0,d3
+7e6c26ca:	f8 c8 01    	asr	1,d0
+7e6c26cd:	f6 03       	udf00	d0,d3
+7e6c26cf:	a7          	cmp	d1,d3
+7e6c26d0:	c3 1d       	ble	0x7e6c26ed
+7e6c26d2:	db          	setlb	
+7e6c26d3:	15          	extbu	d1
+7e6c26d4:	e5          	add	d1,d1
+7e6c26d5:	4f 24       	mov	a3,(36,sp)
+7e6c26d7:	fc df b6 01 	mov	1618149814,a3
+7e6c26db:	73 60 
+7e6c26dd:	f4 87       	movhu	(d1,a3),d0
+7e6c26df:	5f 24       	mov	(36,sp),a3
+7e6c26e1:	f1 61       	add	d0,a1
+7e6c26e3:	16          	extbu	d2
+7e6c26e4:	48          	inc	d2
+7e6c26e5:	f1 d1       	mov	a0,d1
+7e6c26e7:	44          	inc	d1
+7e6c26e8:	15          	extbu	d1
+7e6c26e9:	f1 e4       	mov	d1,a0
+7e6c26eb:	ad          	cmp	d3,d1
+7e6c26ec:	d0          	llt	
+7e6c26ed:	16          	extbu	d2
+7e6c26ee:	aa 00       	cmp	0,d2
+7e6c26f0:	c9 05       	bne	0x7e6c26f5
+7e6c26f2:	00          	clr	d0
+7e6c26f3:	ca 09       	bra	0x7e6c26fc
+7e6c26f5:	00          	clr	d0
+7e6c26f6:	f2 f2       	mov	d0,mdr
+7e6c26f8:	f1 d4       	mov	a1,d0
+7e6c26fa:	f2 78       	divu	d2,d0
+7e6c26fc:	fa c8 00 01 	cmp	256,d0

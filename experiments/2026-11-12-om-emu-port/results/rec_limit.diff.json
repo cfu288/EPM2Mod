@@ -1,0 +1,1693 @@
+{
+ "case": "rec_limit",
+ "stock": "/path/to/epm2-tools/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin",
+ "patched": "/tmp/emurun-m5gbaged.block0.bin",
+ "rows": [
+  {
+   "row": {
+    "fmt": 3,
+    "q": 6,
+    "hi": 1,
+    "free": 500
+   },
+   "stock": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 6,
+    "hi": 1,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 238800,
+    "free_frames": 11940,
+    "free_frames2": 11940,
+    "max_frames": 11940,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 398",
+     "Limte Time  : 398"
+    ]
+   },
+   "patched": {
+    "ret": 238800,
+    "free_frames": 11940,
+    "free_frames2": 11940,
+    "max_frames": 11940,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 398",
+     "Limte Time  : 398"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 6,
+    "hi": 1,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 15315600,
+    "free_frames": 765780,
+    "free_frames2": 765780,
+    "max_frames": 47850,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 25526",
+     "Limte Time  : 1595"
+    ]
+   },
+   "patched": {
+    "ret": 15315600,
+    "free_frames": 765780,
+    "free_frames2": 765780,
+    "max_frames": 47850,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 25526",
+     "Limte Time  : 1595"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 6,
+    "hi": 0,
+    "free": 500
+   },
+   "stock": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 6,
+    "hi": 0,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 277800,
+    "free_frames": 13890,
+    "free_frames2": 13890,
+    "max_frames": 13890,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 463",
+     "Limte Time  : 463"
+    ]
+   },
+   "patched": {
+    "ret": 277800,
+    "free_frames": 13890,
+    "free_frames2": 13890,
+    "max_frames": 13890,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 463",
+     "Limte Time  : 463"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 6,
+    "hi": 0,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 17792400,
+    "free_frames": 889620,
+    "free_frames2": 889620,
+    "max_frames": 52200,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 29654",
+     "Limte Time  : 1740"
+    ]
+   },
+   "patched": {
+    "ret": 17792400,
+    "free_frames": 889620,
+    "free_frames2": 889620,
+    "max_frames": 55590,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 29654",
+     "Limte Time  : 1853"
+    ]
+   },
+   "diff": {
+    "max_frames": [
+     52200,
+     55590
+    ],
+    "prints": [
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 29654",
+      "Limte Time  : 1740"
+     ],
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 29654",
+      "Limte Time  : 1853"
+     ]
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 3,
+    "hi": 1,
+    "free": 500
+   },
+   "stock": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 3,
+    "hi": 1,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 354000,
+    "free_frames": 17700,
+    "free_frames2": 17700,
+    "max_frames": 17700,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 590",
+     "Limte Time  : 590"
+    ]
+   },
+   "patched": {
+    "ret": 354000,
+    "free_frames": 17700,
+    "free_frames2": 17700,
+    "max_frames": 17700,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 590",
+     "Limte Time  : 590"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 3,
+    "hi": 1,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 22690800,
+    "free_frames": 1134540,
+    "free_frames2": 1134540,
+    "max_frames": 52200,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 37818",
+     "Limte Time  : 1740"
+    ]
+   },
+   "patched": {
+    "ret": 22690800,
+    "free_frames": 1134540,
+    "free_frames2": 1134540,
+    "max_frames": 70890,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 37818",
+     "Limte Time  : 2363"
+    ]
+   },
+   "diff": {
+    "max_frames": [
+     52200,
+     70890
+    ],
+    "prints": [
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 37818",
+      "Limte Time  : 1740"
+     ],
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 37818",
+      "Limte Time  : 2363"
+     ]
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 3,
+    "hi": 0,
+    "free": 500
+   },
+   "stock": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 3,
+    "hi": 0,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 446400,
+    "free_frames": 22320,
+    "free_frames2": 22320,
+    "max_frames": 22320,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 744",
+     "Limte Time  : 744"
+    ]
+   },
+   "patched": {
+    "ret": 446400,
+    "free_frames": 22320,
+    "free_frames2": 22320,
+    "max_frames": 22320,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 744",
+     "Limte Time  : 744"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 3,
+    "hi": 0,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 28587000,
+    "free_frames": 1429350,
+    "free_frames2": 1429350,
+    "max_frames": 52200,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 47645",
+     "Limte Time  : 1740"
+    ]
+   },
+   "patched": {
+    "ret": 28587000,
+    "free_frames": 1429350,
+    "free_frames2": 1429350,
+    "max_frames": 89310,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 47645",
+     "Limte Time  : 2977"
+    ]
+   },
+   "diff": {
+    "max_frames": [
+     52200,
+     89310
+    ],
+    "prints": [
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 47645",
+      "Limte Time  : 1740"
+     ],
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 47645",
+      "Limte Time  : 2977"
+     ]
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 4,
+    "hi": 1,
+    "free": 500
+   },
+   "stock": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 4,
+    "hi": 1,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 929400,
+    "free_frames": 46470,
+    "free_frames2": 46470,
+    "max_frames": 46470,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 1549",
+     "Limte Time  : 1549"
+    ]
+   },
+   "patched": {
+    "ret": 929400,
+    "free_frames": 46470,
+    "free_frames2": 46470,
+    "max_frames": 46470,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 1549",
+     "Limte Time  : 1549"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 4,
+    "hi": 1,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 59562600,
+    "free_frames": 2978130,
+    "free_frames2": 2978130,
+    "max_frames": 186060,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 99271",
+     "Limte Time  : 6202"
+    ]
+   },
+   "patched": {
+    "ret": 59562600,
+    "free_frames": 2978130,
+    "free_frames2": 2978130,
+    "max_frames": 186060,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 99271",
+     "Limte Time  : 6202"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 4,
+    "hi": 0,
+    "free": 500
+   },
+   "stock": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 4,
+    "hi": 0,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 929400,
+    "free_frames": 46470,
+    "free_frames2": 46470,
+    "max_frames": 46470,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 1549",
+     "Limte Time  : 1549"
+    ]
+   },
+   "patched": {
+    "ret": 929400,
+    "free_frames": 46470,
+    "free_frames2": 46470,
+    "max_frames": 46470,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 1549",
+     "Limte Time  : 1549"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 4,
+    "hi": 0,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 59562600,
+    "free_frames": 2978130,
+    "free_frames2": 2978130,
+    "max_frames": 186060,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 99271",
+     "Limte Time  : 6202"
+    ]
+   },
+   "patched": {
+    "ret": 59562600,
+    "free_frames": 2978130,
+    "free_frames2": 2978130,
+    "max_frames": 186060,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 99271",
+     "Limte Time  : 6202"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 7,
+    "hi": 1,
+    "free": 500
+   },
+   "stock": {
+    "ret": 600,
+    "free_frames": 30,
+    "free_frames2": 30,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 1",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 600,
+    "free_frames": 30,
+    "free_frames2": 30,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 1",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 7,
+    "hi": 1,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 3355200,
+    "free_frames": 167760,
+    "free_frames2": 167760,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 5592",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 3355200,
+    "free_frames": 167760,
+    "free_frames2": 167760,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 5592",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 7,
+    "hi": 1,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 214747800,
+    "free_frames": 10737390,
+    "free_frames2": 10737390,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 357913",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 214747800,
+    "free_frames": 10737390,
+    "free_frames2": 10737390,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 357913",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 7,
+    "hi": 0,
+    "free": 500
+   },
+   "stock": {
+    "ret": 600,
+    "free_frames": 30,
+    "free_frames2": 30,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 1",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 600,
+    "free_frames": 30,
+    "free_frames2": 30,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 1",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 7,
+    "hi": 0,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 3355200,
+    "free_frames": 167760,
+    "free_frames2": 167760,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 5592",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 3355200,
+    "free_frames": 167760,
+    "free_frames2": 167760,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 5592",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 3,
+    "q": 7,
+    "hi": 0,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 214747800,
+    "free_frames": 10737390,
+    "free_frames2": 10737390,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 357913",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 214747800,
+    "free_frames": 10737390,
+    "free_frames2": 10737390,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[QT] Parameter Error quality: 7",
+     "[QT] Parameter Error quality: 7",
+     "MAX   Time  : 357913",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 5,
+    "hi": 1,
+    "free": 500
+   },
+   "stock": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 5,
+    "hi": 1,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 212400,
+    "free_frames": 10620,
+    "free_frames2": 10620,
+    "max_frames": 10620,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 354",
+     "Limte Time  : 354"
+    ]
+   },
+   "patched": {
+    "ret": 212400,
+    "free_frames": 10620,
+    "free_frames2": 10620,
+    "max_frames": 10620,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 354",
+     "Limte Time  : 354"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 5,
+    "hi": 1,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 13632600,
+    "free_frames": 681630,
+    "free_frames2": 681630,
+    "max_frames": 42600,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 22721",
+     "Limte Time  : 1420"
+    ]
+   },
+   "patched": {
+    "ret": 13632600,
+    "free_frames": 681630,
+    "free_frames2": 681630,
+    "max_frames": 42600,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 22721",
+     "Limte Time  : 1420"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 5,
+    "hi": 0,
+    "free": 500
+   },
+   "stock": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 5,
+    "hi": 0,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 264000,
+    "free_frames": 13200,
+    "free_frames2": 13200,
+    "max_frames": 13200,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 440",
+     "Limte Time  : 440"
+    ]
+   },
+   "patched": {
+    "ret": 264000,
+    "free_frames": 13200,
+    "free_frames2": 13200,
+    "max_frames": 13200,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 440",
+     "Limte Time  : 440"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 5,
+    "hi": 0,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 16924800,
+    "free_frames": 846240,
+    "free_frames2": 846240,
+    "max_frames": 52200,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 28208",
+     "Limte Time  : 1740"
+    ]
+   },
+   "patched": {
+    "ret": 16924800,
+    "free_frames": 846240,
+    "free_frames2": 846240,
+    "max_frames": 52860,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 28208",
+     "Limte Time  : 1762"
+    ]
+   },
+   "diff": {
+    "max_frames": [
+     52200,
+     52860
+    ],
+    "prints": [
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 28208",
+      "Limte Time  : 1740"
+     ],
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 28208",
+      "Limte Time  : 1762"
+     ]
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 3,
+    "hi": 1,
+    "free": 500
+   },
+   "stock": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 3,
+    "hi": 1,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 264000,
+    "free_frames": 13200,
+    "free_frames2": 13200,
+    "max_frames": 13200,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 440",
+     "Limte Time  : 440"
+    ]
+   },
+   "patched": {
+    "ret": 264000,
+    "free_frames": 13200,
+    "free_frames2": 13200,
+    "max_frames": 13200,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 440",
+     "Limte Time  : 440"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 3,
+    "hi": 1,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 16924800,
+    "free_frames": 846240,
+    "free_frames2": 846240,
+    "max_frames": 52200,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 28208",
+     "Limte Time  : 1740"
+    ]
+   },
+   "patched": {
+    "ret": 16924800,
+    "free_frames": 846240,
+    "free_frames2": 846240,
+    "max_frames": 52860,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 28208",
+     "Limte Time  : 1762"
+    ]
+   },
+   "diff": {
+    "max_frames": [
+     52200,
+     52860
+    ],
+    "prints": [
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 28208",
+      "Limte Time  : 1740"
+     ],
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 28208",
+      "Limte Time  : 1762"
+     ]
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 3,
+    "hi": 0,
+    "free": 500
+   },
+   "stock": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 0,
+    "free_frames": 0,
+    "free_frames2": 0,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "MAX   Time  : 0",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 3,
+    "hi": 0,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 307200,
+    "free_frames": 15360,
+    "free_frames2": 15360,
+    "max_frames": 15360,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 512",
+     "Limte Time  : 512"
+    ]
+   },
+   "patched": {
+    "ret": 307200,
+    "free_frames": 15360,
+    "free_frames2": 15360,
+    "max_frames": 15360,
+    "prints": [
+     "Free Secotr : 2097152",
+     "MAX   Time  : 512",
+     "Limte Time  : 512"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 3,
+    "hi": 0,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 19679400,
+    "free_frames": 983970,
+    "free_frames2": 983970,
+    "max_frames": 52200,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 32799",
+     "Limte Time  : 1740"
+    ]
+   },
+   "patched": {
+    "ret": 19679400,
+    "free_frames": 983970,
+    "free_frames2": 983970,
+    "max_frames": 61470,
+    "prints": [
+     "Free Secotr : 134217728",
+     "MAX   Time  : 32799",
+     "Limte Time  : 2049"
+    ]
+   },
+   "diff": {
+    "max_frames": [
+     52200,
+     61470
+    ],
+    "prints": [
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 32799",
+      "Limte Time  : 1740"
+     ],
+     [
+      "Free Secotr : 134217728",
+      "MAX   Time  : 32799",
+      "Limte Time  : 2049"
+     ]
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 4,
+    "hi": 1,
+    "free": 500
+   },
+   "stock": {
+    "ret": 1200,
+    "free_frames": 60,
+    "free_frames2": 60,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 2",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 1200,
+    "free_frames": 60,
+    "free_frames2": 60,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 2",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 4,
+    "hi": 1,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 26766600,
+    "free_frames": 1338330,
+    "free_frames2": 1338330,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 44611",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 26766600,
+    "free_frames": 1338330,
+    "free_frames2": 1338330,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 44611",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 4,
+    "hi": 1,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 1713412200,
+    "free_frames": 85670610,
+    "free_frames2": 85670610,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 2855687",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 1713412200,
+    "free_frames": 85670610,
+    "free_frames2": 85670610,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 2855687",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 4,
+    "hi": 0,
+    "free": 500
+   },
+   "stock": {
+    "ret": 1200,
+    "free_frames": 60,
+    "free_frames2": 60,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 2",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 1200,
+    "free_frames": 60,
+    "free_frames2": 60,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 2",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 4,
+    "hi": 0,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 26766600,
+    "free_frames": 1338330,
+    "free_frames2": 1338330,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 44611",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 26766600,
+    "free_frames": 1338330,
+    "free_frames2": 1338330,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 44611",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 2,
+    "q": 4,
+    "hi": 0,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 1713412200,
+    "free_frames": 85670610,
+    "free_frames2": 85670610,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 2855687",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 1713412200,
+    "free_frames": 85670610,
+    "free_frames2": 85670610,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[AVCHD] Parameter Error quality: 4",
+     "MAX   Time  : 2855687",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 1,
+    "q": 6,
+    "hi": 1,
+    "free": 500
+   },
+   "stock": {
+    "ret": 1200,
+    "free_frames": 60,
+    "free_frames2": 60,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 2",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 1200,
+    "free_frames": 60,
+    "free_frames2": 60,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 2",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 1,
+    "q": 6,
+    "hi": 1,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 26766600,
+    "free_frames": 1338330,
+    "free_frames2": 1338330,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 44611",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 26766600,
+    "free_frames": 1338330,
+    "free_frames2": 1338330,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 44611",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 1,
+    "q": 6,
+    "hi": 1,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 1713412200,
+    "free_frames": 85670610,
+    "free_frames2": 85670610,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 2855687",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 1713412200,
+    "free_frames": 85670610,
+    "free_frames2": 85670610,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 2855687",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 1,
+    "q": 6,
+    "hi": 0,
+    "free": 500
+   },
+   "stock": {
+    "ret": 1200,
+    "free_frames": 60,
+    "free_frames2": 60,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 2",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 1200,
+    "free_frames": 60,
+    "free_frames2": 60,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 500",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 2",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 1,
+    "q": 6,
+    "hi": 0,
+    "free": 2097152
+   },
+   "stock": {
+    "ret": 26766600,
+    "free_frames": 1338330,
+    "free_frames2": 1338330,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 44611",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 26766600,
+    "free_frames": 1338330,
+    "free_frames2": 1338330,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 2097152",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 44611",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fmt": 1,
+    "q": 6,
+    "hi": 0,
+    "free": 134217728
+   },
+   "stock": {
+    "ret": 1713412200,
+    "free_frames": 85670610,
+    "free_frames2": 85670610,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 2855687",
+     "Limte Time  : 0"
+    ]
+   },
+   "patched": {
+    "ret": 1713412200,
+    "free_frames": 85670610,
+    "free_frames2": 85670610,
+    "max_frames": 0,
+    "prints": [
+     "Free Secotr : 134217728",
+     "[QT] Parameter Error Format: 1",
+     "MAX   Time  : 2855687",
+     "Limte Time  : 0"
+    ]
+   },
+   "diff": {},
+   "flags": []
+  }
+ ]
+}

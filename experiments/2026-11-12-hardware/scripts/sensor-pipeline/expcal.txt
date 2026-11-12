@@ -1,0 +1,394 @@
+addr offset size insns callers callees strrefs data_page: 7e635fb5 214f95 107 44 6 8 0 0 0
+  callers (5): 7e632889 7e649c2c 7e649d34 7e65d763 7e661b28
+  callees (8): 7e5082b6 7e636020 7e636317 7e636513 7e6369ca 7e641c2e 7e641d60 7e64b325
+7e635fb5 <f_7e635fb5>:
+7e635fb5:	mov	a0,a2
+7e635fb6:	mov	112,d0
+7e635fb8:	mov	0,a0
+7e635fba:	clr	d1
+7e635fbb:	call	7e641c2e <f_7e641c2e>,[d2,d3,a2],20
+7e635fc2:	mov	a0,a3
+7e635fc3:	clr	d0
+7e635fc4:	mov	112,d1
+7e635fc6:	call	7e5082b6 <f_7e5082b6>,[d2,d3],8
+7e635fcd:	mov	(4,a2),d0
+7e635fd0:	call	7e64b325 <f_7e64b325>,[d2,d3],12
+7e635fd7:	mov	a0,(a3)
+7e635fd9:	movbu	(a2),d0
+7e635fdb:	clr	d2
+7e635fdc:	cmp	d2,d0
+7e635fdd:	bne	7e635fe8 <f_7e635fb5+0x33>
+7e635fdf:	mov	a3,a1
+7e635fe0:	mov	a2,a0
+7e635fe1:	call	7e636020 <f_7e636020>,[a2,a3],12
+7e635fe6:	bra	7e636010 <f_7e635fb5+0x5b>
+7e635fe8:	cmp	1,d0
+7e635fea:	bne	7e635ff5 <f_7e635fb5+0x40>
+7e635fec:	mov	a3,a1
+7e635fed:	mov	a2,a0
+7e635fee:	call	7e636317 <f_7e636317>,[a2,a3],12
+7e635ff3:	bra	7e636010 <f_7e635fb5+0x5b>
+7e635ff5:	cmp	2,d0
+7e635ff7:	bne	7e636002 <f_7e635fb5+0x4d>
+7e635ff9:	mov	a3,a1
+7e635ffa:	mov	a2,a0
+7e635ffb:	call	7e636513 <f_7e636513>,[a2,a3],12
+7e636000:	bra	7e636010 <f_7e635fb5+0x5b>
+7e636002:	movbu	(a2),d1
+7e636004:	mov	740,d0
+7e636007:	mov	a2,a0
+7e636008:	call	7e6369ca <f_7e6369ca>,[d2,d3,a2],36
+7e63600d:	mov	32384,d2
+7e636010:	mov	0,a1
+7e636012:	clr	d0
+7e636013:	mov	a3,a0
+7e636014:	call	7e641d60 <f_7e641d60>,[d2,a2],16
+7e63601b:	mov	d2,d0
+7e63601c:	exthu	d0
+7e63601d:	ret	[d2,a2,a3],16
+
+----
+addr offset size insns callers callees strrefs data_page: 7e636020 215000 38 16 1 5 0 0 0
+  callers (1): 7e635fb5
+  callees (5): 7e636046 7e636240 7e636298 7e6362af 7e636306
+7e636020 <f_7e636020>:
+7e636020:	mov	a1,a3
+7e636021:	mov	a0,a2
+7e636022:	call	7e636046 <f_7e636046>,[a2,a3],12
+7e636027:	mov	a2,a0
+7e636028:	mov	a3,a1
+7e636029:	call	7e636240 <f_7e636240>,[d2,a2],8
+7e63602e:	mov	a2,a0
+7e63602f:	mov	a3,a1
+7e636030:	call	7e636298 <f_7e636298>,[a2,a3],12
+7e636035:	mov	a2,a0
+7e636036:	mov	a3,a1
+7e636037:	call	7e6362af <f_7e6362af>,[a2,a3],12
+7e63603c:	mov	a3,a1
+7e63603d:	mov	a2,a0
+7e63603e:	call	7e636306 <f_7e636306>,[a2,a3],12
+7e636043:	ret	[a2,a3],12
+
+----
+addr offset size insns callers callees strrefs data_page: 7e636079 215059 40 15 1 0 0 0 0
+  callers (1): 7e636046
+  callees (0): 
+7e636079 <f_7e636079>:
+7e636079:	mov	(20,a0),a0
+7e63607c:	movhu	(4,a0),d0
+7e63607f:	add	8,d0
+7e636081:	and	65520,d0
+7e636085:	mov	d0,d1
+7e636086:	exth	d1
+7e636087:	cmp	4480,d1
+7e63608b:	ble	7e636092 <f_7e636079+0x19>
+7e63608d:	mov	4480,d0
+7e636090:	bra	7e63609b <f_7e636079+0x22>
+7e636092:	cmp	256,d1
+7e636096:	bge	7e63609b <f_7e636079+0x22>
+7e636098:	mov	256,d0
+7e63609b:	movhu	d0,(80,a1)
+7e63609e:	retf	[],0
+
+----
+addr offset size insns callers callees strrefs data_page: 7e6360a1 215081 90 46 1 1 0 0 0
+  callers (1): 7e636046
+  callees (1): 7e69b34c
+7e6360a1 <f_7e6360a1>:
+7e6360a1:	mov	a1,a2
+7e6360a2:	mov	(a2),a1
+7e6360a4:	add	80,a2
+7e6360a6:	mov	(28,a1),d2
+7e6360a9:	movhu	(36,a1),d3
+7e6360ac:	movhu	(a2),d0
+7e6360ae:	mov	a0,a3
+7e6360af:	exth	d0
+7e6360b0:	call	7e69b34c <f_7e69b34c>,[d2,d3],16
+7e6360b7:	movhu	(14,a3),d1
+7e6360ba:	lsr	4,d2
+7e6360bd:	exth	d3
+7e6360be:	udf01	d2,d0
+7e6360c0:	add	d3,d1
+7e6360c1:	asl	4,d1
+7e6360c4:	cmp	d1,d0
+7e6360c5:	bcc	7e6360cc <f_7e6360a1+0x2b>
+7e6360c7:	mov	a2,a0
+7e6360c8:	inc4	a0
+7e6360c9:	clr	d0
+7e6360ca:	bra	7e6360db <f_7e6360a1+0x3a>
+7e6360cc:	movhu	(12,a3),d2
+7e6360cf:	mov	a2,a0
+7e6360d0:	inc4	a0
+7e6360d1:	sub	d1,d0
+7e6360d3:	asl	4,d2
+7e6360d6:	clr	d1
+7e6360d7:	mov	d1,mdr
+7e6360d9:	divu	d2,d0
+7e6360db:	mov	d0,(a0)
+7e6360dc:	mov	(a0),d1
+7e6360dd:	add	16,a3
+7e6360df:	movhu	(a3),d0
+7e6360e1:	clr	d2
+7e6360e2:	mov	d2,mdr
+7e6360e4:	divu	d0,d1
+7e6360e6:	inc	d1
+7e6360e7:	mov	d1,(8,a2)
+7e6360ea:	movhu	(a3),d0
+7e6360ec:	mov	(a0),d2
+7e6360ed:	udf01	d1,d0
+7e6360ef:	sub	d2,d0
+7e6360f1:	mov	1,d1
+7e6360f3:	sub	d1,d0
+7e6360f5:	mov	d0,(12,a2)
+7e6360f8:	ret	[d2,d3,a2,a3],20
+
+----
+addr offset size insns callers callees strrefs data_page: 7e6360fb 2150db 125 67 1 0 0 0 0
+  callers (1): 7e636046
+  callees (0): 
+7e6360fb <f_7e6360fb>:
+7e6360fb:	mov	a0,(sp)
+7e6360fd:	mov	(sp),d3
+7e6360ff:	mov	(a1),a2
+7e636101:	add	16,d3
+7e636103:	movhu	(56,a2),d0
+7e636106:	mov	d3,a2
+7e636108:	mov	80,a3
+7e63610a:	add	a1,a3
+7e63610c:	mov	(a1),a1
+7e63610e:	movhu	(a2),d1
+7e636110:	mov	8,a0
+7e636112:	mov	12,a2
+7e636114:	add	a3,a0
+7e636116:	mov	(a0),d2
+7e636117:	add	a3,a2
+7e636119:	udf01	d2,d1
+7e63611b:	movhu	(58,a1),d2
+7e63611e:	sub	d0,d1
+7e636120:	mov	(a2),d0
+7e636121:	cmp	d2,d0
+7e636122:	bcc	7e63613b <f_7e6360fb+0x40>
+7e636124:	mov	(4,a3),d0
+7e636127:	mov	20,a1
+7e636129:	mov	d0,(16,a3)
+7e63612c:	mov	(a0),d0
+7e63612d:	add	a3,a1
+7e63612f:	inc	d0
+7e636130:	mov	d0,(a1)
+7e636131:	mov	(a2),d1
+7e636132:	mov	d3,a0
+7e636134:	movhu	(a0),d0
+7e636136:	add	24,a3
+7e636138:	add	d1,d0
+7e636139:	bra	7e636168 <f_7e6360fb+0x6d>
+7e63613b:	cmp	d1,d0
+7e63613c:	bls	7e636159 <f_7e6360fb+0x5e>
+7e63613e:	mov	(a0),d2
+7e63613f:	mov	d3,a1
+7e636141:	movhu	(a1),d0
+7e636143:	mov	20,a1
+7e636145:	udf01	d2,d0
+7e636147:	sub	d1,d0
+7e636149:	mov	1,d2
+7e63614b:	sub	d2,d0
+7e63614d:	mov	d0,(16,a3)
+7e636150:	mov	(a0),d0
+7e636151:	add	a3,a1
+7e636153:	mov	d0,(a1)
+7e636154:	add	24,a3
+7e636156:	mov	d1,(a3)
+7e636157:	bra	7e636169 <f_7e6360fb+0x6e>
+7e636159:	mov	(4,a3),d0
+7e63615c:	mov	20,a1
+7e63615e:	mov	d0,(16,a3)
+7e636161:	mov	(a0),d0
+7e636162:	add	a3,a1
+7e636164:	mov	d0,(a1)
+7e636165:	mov	(a2),d0
+7e636166:	add	24,a3
+7e636168:	mov	d0,(a3)
+7e636169:	mov	(a1),d0
+7e63616a:	mov	(sp),a0
+7e63616c:	add	28,a0
+7e63616e:	movhu	d0,(32,a0)
+7e636171:	mov	(a3),d0
+7e636172:	movhu	d0,(34,a0)
+----
+addr offset size insns callers callees strrefs data_page: 7e636178 215158 142 76 1 0 0 0 0
+  callers (1): 7e636046
+  callees (0): 
+7e636178 <f_7e636178>:
+7e636178:	mov	a0,(4,sp)
+7e63617a:	mov	80,a3
+7e63617c:	add	a1,a3
+7e63617e:	mov	8,a0
+7e636180:	add	a3,a0
+7e636182:	mov	a0,(sp)
+7e636184:	mov	(a1),a2
+7e636186:	mov	(a1),a1
+7e636188:	movhu	(56,a2),d0
+7e63618b:	mov	(a0),d2
+7e63618c:	mov	(4,sp),a0
+7e63618e:	mov	-2,d3
+7e636190:	add	16,a0
+7e636192:	movhu	(a0),d1
+7e636194:	udf01	d2,d1
+7e636196:	movhu	(58,a1),d2
+7e636199:	mov	12,a1
+7e63619b:	add	a3,a1
+7e63619d:	sub	d0,d1
+7e63619f:	mov	(a1),d0
+7e6361a0:	and	d3,d1
+7e6361a2:	cmp	d2,d0
+7e6361a3:	bcc	7e6361c8 <f_7e636178+0x50>
+7e6361a5:	mov	(a1),d1
+7e6361a6:	movhu	(a0),d0
+7e6361a8:	mov	24,a2
+7e6361aa:	add	a3,a2
+7e6361ac:	add	d1,d0
+7e6361ad:	inc	d0
+7e6361ae:	and	d3,d0
+7e6361b0:	mov	d0,(a2)
+7e6361b1:	mov	(4,a3),d0
+7e6361b4:	mov	(a1),d2
+7e6361b5:	movhu	(a0),d1
+7e6361b7:	add	d2,d1
+7e6361b8:	and	1,d1
+7e6361bb:	sub	d1,d0
+7e6361bd:	mov	d0,(16,a3)
+7e6361c0:	mov	(sp),a0
+7e6361c2:	add	20,a3
+7e6361c4:	mov	(a0),d0
+7e6361c5:	inc	d0
+7e6361c6:	bra	7e6361f6 <f_7e636178+0x7e>
+7e6361c8:	cmp	d1,d0
+7e6361c9:	bls	7e6361dd <f_7e636178+0x65>
+7e6361cb:	mov	24,a2
+7e6361cd:	add	a3,a2
+7e6361cf:	mov	d1,(a2)
+7e6361d0:	mov	(sp),a1
+7e6361d2:	movhu	(a0),d0
+7e6361d4:	mov	(a1),d2
+7e6361d5:	udf01	d2,d0
+7e6361d7:	sub	d1,d0
+7e6361d9:	mov	1,d1
+7e6361db:	bra	7e6361ec <f_7e636178+0x74>
+7e6361dd:	inc	d0
+7e6361de:	and	d3,d0
+7e6361e0:	mov	24,a2
+7e6361e2:	add	a3,a2
+7e6361e4:	mov	d0,(a2)
+7e6361e5:	mov	(a1),d1
+7e6361e6:	mov	(4,a3),d0
+7e6361e9:	and	1,d1
+7e6361ec:	sub	d1,d0
+7e6361ee:	mov	d0,(16,a3)
+7e6361f1:	mov	(sp),a0
+----
+addr offset size insns callers callees strrefs data_page: 7e636206 2151e6 58 25 1 2 0 0 0
+  callers (1): 7e636046
+  callees (2): 7e640ffb 7e69b37c
+7e636206 <f_7e636206>:
+7e636206:	mov	a1,a2
+7e636207:	mov	(a2),a1
+7e636209:	add	80,a2
+7e63620b:	movhu	(36,a1),d3
+7e63620e:	mov	(16,a2),d2
+7e636211:	movhu	(12,a0),d1
+7e636214:	movhu	(14,a0),d0
+7e636217:	exth	d3
+7e636218:	udf01	d2,d1
+7e63621a:	add	d0,d1
+7e63621b:	add	d3,d1
+7e63621c:	mov	(4,a0),d0
+7e63621f:	call	7e640ffb <f_7e640ffb>,[d2,d3,a2],16
+7e636226:	call	7e69b37c <f_7e69b37c>,[d2],8
+7e63622d:	movhu	(a2),d1
+7e63622f:	exth	d0
+7e636230:	exth	d1
+7e636231:	sub	d1,d0
+7e636233:	mov	d0,d1
+7e636234:	exth	d1
+7e636235:	cmp	0,d1
+7e636237:	bge	7e63623a <f_7e636206+0x34>
+7e636239:	clr	d0
+7e63623a:	movhu	d0,(28,a2)
+7e63623d:	ret	[d2,d3,a2],16
+
+----
+addr offset size insns callers callees strrefs data_page: 7e636240 215220 88 40 1 0 0 0 0
+  callers (1): 7e636020
+  callees (0): 
+7e636240 <f_7e636240>:
+7e636240:	add	20,a0
+7e636242:	mov	(a0),a2
+7e636244:	mov	(a2),d0
+7e636245:	btst	1024,d0
+7e636249:	beq	7e636250 <f_7e636240+0x10>
+7e63624b:	movhu	(6,a2),d1
+7e63624e:	bra	7e636259 <f_7e636240+0x19>
+7e636250:	movhu	(6,a2),d1
+7e636253:	movhu	(108,a1),d0
+7e636256:	exth	d1
+7e636257:	exth	d0
+7e636258:	add	d0,d1
+7e636259:	mov	(a1),a2
+7e63625b:	mov	d1,d2
+7e63625c:	movhu	(60,a2),d0
+7e63625f:	exth	d2
+7e636260:	exth	d0
+7e636261:	cmp	d0,d2
+7e636262:	ble	7e636269 <f_7e636240+0x29>
+7e636264:	movhu	(60,a2),d0
+7e636267:	bra	7e636273 <f_7e636240+0x33>
+7e636269:	movhu	(62,a2),d0
+7e63626c:	exth	d0
+7e63626d:	cmp	d0,d2
+7e63626e:	bge	7e636278 <f_7e636240+0x38>
+7e636270:	movhu	(62,a2),d0
+7e636273:	movhu	d0,(42,a1)
+7e636276:	bra	7e63627b <f_7e636240+0x3b>
+7e636278:	movhu	d1,(42,a1)
+7e63627b:	mov	(a0),a2
+7e63627d:	movhu	(6,a2),d0
+7e636280:	movhu	d0,(38,a2)
+7e636283:	mov	(a0),a2
+7e636285:	movhu	(8,a2),d0
+7e636288:	movhu	d0,(40,a2)
+7e63628b:	mov	(a0),a2
+7e63628d:	mov	(a0),a0
+7e63628f:	movhu	(4,a2),d0
+7e636292:	movhu	d0,(36,a0)
+7e636295:	retf	[d2,a2],8
+
+----
+addr offset size insns callers callees strrefs data_page: 7e640ffb 21ffdb 57 24 1 1 0 0 0
+  callers (1): 7e636206
+  callees (1): 7e64b325
+7e640ffb <f_7e640ffb>:
+7e640ffb:	mov	d1,a2
+7e640ffd:	call	7e64b325 <f_7e64b325>,[d2,d3],12
+7e641004:	mov	(32,a0),d2
+7e641007:	mov	15,d3
+7e641009:	and	d2,d3
+7e64100b:	mov	a2,d0
+7e64100d:	udf01	d0,d3
+7e64100f:	lsr	4,d3
+7e641012:	mov	240,d0
+7e641015:	and	d2,d0
+7e641017:	lsr	4,d0
+7e64101a:	mov	a2,d1
+7e64101c:	udf01	d1,d0
+7e64101e:	add	d0,d3
+7e64101f:	lsr	4,d3
+7e641022:	lsr	8,d2
+7e641025:	udf01	d1,d2
+7e641027:	mov	d2,d0
+7e641028:	add	d3,d0
+7e641029:	mov	1000,d1
+7e64102c:	clr	d2
+7e64102d:	mov	d2,mdr
+7e64102f:	divu	d1,d0
+7e641031:	ret	[d2,d3,a2],16
+
+----

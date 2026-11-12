@@ -1,0 +1,535 @@
+{
+ "case": "enc_param_check",
+ "stock": "/path/to/epm2-tools/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin",
+ "patched": "/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/br/a.block0.bin",
+ "rows": [
+  {
+   "row": {
+    "fps": 2997,
+    "w": 1920,
+    "h": 1080,
+    "flag": 0,
+    "mode": 1,
+    "avg": 4000000,
+    "peak": 4000000
+   },
+   "stock": {
+    "d0": 0,
+    "accepted": true
+   },
+   "patched": {
+    "d0": 0,
+    "accepted": true
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fps": 2997,
+    "w": 1920,
+    "h": 1080,
+    "flag": 0,
+    "mode": 1,
+    "avg": 10000000,
+    "peak": 10000000
+   },
+   "stock": {
+    "d0": 0,
+    "accepted": true
+   },
+   "patched": {
+    "d0": 0,
+    "accepted": true
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fps": 2997,
+    "w": 1920,
+    "h": 1080,
+    "flag": 0,
+    "mode": 1,
+    "avg": 16000000,
+    "peak": 16000000
+   },
+   "stock": {
+    "d0": 0,
+    "accepted": true
+   },
+   "patched": {
+    "d0": 0,
+    "accepted": true
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fps": 2997,
+    "w": 1920,
+    "h": 1080,
+    "flag": 0,
+    "mode": 1,
+    "avg": 17000000,
+    "peak": 17000000
+   },
+   "stock": {
+    "d0": 0,
+    "accepted": true
+   },
+   "patched": {
+    "d0": 0,
+    "accepted": true
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fps": 2997,
+    "w": 1920,
+    "h": 1080,
+    "flag": 0,
+    "mode": 1,
+    "avg": 20000000,
+    "peak": 20000000
+   },
+   "stock": {
+    "d0": 0,
+    "accepted": true
+   },
+   "patched": {
+    "d0": 0,
+    "accepted": true
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fps": 2997,
+    "w": 1920,
+    "h": 1080,
+    "flag": 0,
+    "mode": 1,
+    "avg": 24000000,
+    "peak": 24000000
+   },
+   "stock": {
+    "d0": 0,
+    "accepted": true
+   },
+   "patched": {
+    "d0": 0,
+    "accepted": true
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fps": 2997,
+    "w": 1920,
+    "h": 1080,
+    "flag": 0,
+    "mode": 1,
+    "avg": 24000001,
+    "peak": 24000001
+   },
+   "stock": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "patched": {
+    "d0": 0,
+    "accepted": true
+   },
+   "diff": {
+    "accepted": [
+     false,
+     true
+    ],
+    "d0": [
+     2868969474,
+     0
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fps": 2997,
+    "w": 1920,
+    "h": 1080,
+    "flag": 0,
+    "mode": 1,
+    "avg": 32000000,
+    "peak": 32000000
+   },
+   "stock": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "patched": {
+    "d0": 0,
+    "accepted": true
+   },
+   "diff": {
+    "accepted": [
+     false,
+     true
+    ],
+    "d0": [
+     2868969474,
+     0
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fps": 2997,
+    "w": 1920,
+    "h": 1080,
+    "flag": 0,
+    "mode": 1,
+    "avg": 49999999,
+    "peak": 49999999
+   },
+   "stock": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "patched": {
+    "d0": 0,
+    "accepted": true
+   },
+   "diff": {
+    "accepted": [
+     false,
+     true
+    ],
+    "d0": [
+     2868969474,
+     0
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fps": 2997,
+    "w": 1920,
+    "h": 1080,
+    "flag": 0,
+    "mode": 1,
+    "avg": 50000000,
+    "peak": 50000000
+   },
+   "stock": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "patched": {
+    "d0": 0,
+    "accepted": true
+   },
+   "diff": {
+    "accepted": [
+     false,
+     true
+    ],
+    "d0": [
+     2868969474,
+     0
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fps": 2997,
+    "w": 1920,
+    "h": 1080,
+    "flag": 0,
+    "mode": 1,
+    "avg": 50000001,
+    "peak": 50000001
+   },
+   "stock": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "patched": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fps": 2997,
+    "w": 1920,
+    "h": 1080,
+    "flag": 0,
+    "mode": 1,
+    "avg": 62500000,
+    "peak": 62500000
+   },
+   "stock": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "patched": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fps": 2997,
+    "w": 1920,
+    "h": 1080,
+    "flag": 0,
+    "mode": 1,
+    "avg": 4294967295,
+    "peak": 4294967295
+   },
+   "stock": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "patched": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fps": 2997,
+    "w": 1920,
+    "h": 1080,
+    "flag": 0,
+    "mode": 1,
+    "avg": 20000000,
+    "peak": 32000000
+   },
+   "stock": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "patched": {
+    "d0": 0,
+    "accepted": true
+   },
+   "diff": {
+    "accepted": [
+     false,
+     true
+    ],
+    "d0": [
+     2868969474,
+     0
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fps": 2997,
+    "w": 1920,
+    "h": 1080,
+    "flag": 0,
+    "mode": 1,
+    "avg": 32000001,
+    "peak": 32000000
+   },
+   "stock": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "patched": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fps": 2997,
+    "w": 1920,
+    "h": 1080,
+    "flag": 1,
+    "mode": 1,
+    "avg": 24000000,
+    "peak": 24000000
+   },
+   "stock": {
+    "d0": 0,
+    "accepted": true
+   },
+   "patched": {
+    "d0": 0,
+    "accepted": true
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fps": 2997,
+    "w": 1920,
+    "h": 1080,
+    "flag": 2,
+    "mode": 1,
+    "avg": 1,
+    "peak": 1
+   },
+   "stock": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "patched": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fps": 2997,
+    "w": 1920,
+    "h": 1080,
+    "flag": 0,
+    "mode": 0,
+    "avg": 20000000,
+    "peak": 20000000
+   },
+   "stock": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "patched": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fps": 2997,
+    "w": 1920,
+    "h": 1080,
+    "flag": 0,
+    "mode": 3,
+    "avg": 20000000,
+    "peak": 20000000
+   },
+   "stock": {
+    "d0": 0,
+    "accepted": true
+   },
+   "patched": {
+    "d0": 0,
+    "accepted": true
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fps": 99,
+    "w": 1920,
+    "h": 1080,
+    "flag": 0,
+    "mode": 1,
+    "avg": 20000000,
+    "peak": 20000000
+   },
+   "stock": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "patched": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fps": 6001,
+    "w": 1920,
+    "h": 1080,
+    "flag": 0,
+    "mode": 1,
+    "avg": 20000000,
+    "peak": 20000000
+   },
+   "stock": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "patched": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fps": 2997,
+    "w": 1921,
+    "h": 1080,
+    "flag": 0,
+    "mode": 1,
+    "avg": 20000000,
+    "peak": 20000000
+   },
+   "stock": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "patched": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fps": 2997,
+    "w": 1920,
+    "h": 63,
+    "flag": 0,
+    "mode": 1,
+    "avg": 20000000,
+    "peak": 20000000
+   },
+   "stock": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "patched": {
+    "d0": 2868969474,
+    "accepted": false
+   },
+   "diff": {},
+   "flags": []
+  }
+ ]
+}

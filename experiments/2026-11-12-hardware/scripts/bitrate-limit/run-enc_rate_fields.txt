@@ -1,0 +1,23 @@
+ok   builder=first rate=4000000 -> {"ret": 0, "kbps": 4000, "cls": 2, "hrd_m1": [3999, 3999], "hrd_bps_x1024": 4096000}
+ok   builder=first rate=10000000 -> {"ret": 0, "kbps": 10000, "cls": 2, "hrd_m1": [9999, 9999], "hrd_bps_x1024": 10240000}
+ok   builder=first rate=13000000 -> {"ret": 0, "kbps": 13000, "cls": 2, "hrd_m1": [12999, 12999], "hrd_bps_x1024": 13312000}
+ok   builder=first rate=15499999 -> {"ret": 0, "kbps": 15499, "cls": 2, "hrd_m1": [15498, 15498], "hrd_bps_x1024": 15870976}
+ok   builder=first rate=15500000 -> {"ret": 0, "kbps": 15500, "cls": 6, "hrd_m1": [15499, 15499], "hrd_bps_x1024": 15872000}
+ok   builder=first rate=16000000 -> {"ret": 0, "kbps": 16000, "cls": 6, "hrd_m1": [15999, 15999], "hrd_bps_x1024": 16384000}
+ok   builder=first rate=17000000 -> {"ret": 0, "kbps": 17000, "cls": 6, "hrd_m1": [16999, 16999], "hrd_bps_x1024": 17408000}
+ok   builder=first rate=20000000 -> {"ret": 0, "kbps": 20000, "cls": 6, "hrd_m1": [19999, 19999], "hrd_bps_x1024": 20480000}
+ok   builder=first rate=24000000 -> {"ret": 0, "kbps": 24000, "cls": 6, "hrd_m1": [23999, 23999], "hrd_bps_x1024": 24576000}
+ok   builder=first rate=32000000 -> {"ret": 0, "kbps": 32000, "cls": 6, "hrd_m1": [31999, 31999], "hrd_bps_x1024": 32768000}
+ok   builder=first rate=50000000 -> {"ret": 0, "kbps": 50000, "cls": 6, "hrd_m1": [49999, 49999], "hrd_bps_x1024": 51200000}
+ok   builder=frame rate=4000000 -> {"ret": 0, "kbps": 4000, "cls": 2, "hrd_m1": [3999, 3999], "hrd_bps_x1024": 4096000}
+ok   builder=frame rate=10000000 -> {"ret": 0, "kbps": 10000, "cls": 2, "hrd_m1": [9999, 9999], "hrd_bps_x1024": 10240000}
+ok   builder=frame rate=13000000 -> {"ret": 0, "kbps": 13000, "cls": 2, "hrd_m1": [12999, 12999], "hrd_bps_x1024": 13312000}
+ok   builder=frame rate=15499999 -> {"ret": 0, "kbps": 15499, "cls": 2, "hrd_m1": [15498, 15498], "hrd_bps_x1024": 15870976}
+ok   builder=frame rate=15500000 -> {"ret": 0, "kbps": 15500, "cls": 6, "hrd_m1": [15499, 15499], "hrd_bps_x1024": 15872000}
+ok   builder=frame rate=16000000 -> {"ret": 0, "kbps": 16000, "cls": 6, "hrd_m1": [15999, 15999], "hrd_bps_x1024": 16384000}
+ok   builder=frame rate=17000000 -> {"ret": 0, "kbps": 17000, "cls": 6, "hrd_m1": [16999, 16999], "hrd_bps_x1024": 17408000}
+ok   builder=frame rate=20000000 -> {"ret": 0, "kbps": 20000, "cls": 6, "hrd_m1": [19999, 19999], "hrd_bps_x1024": 20480000}
+ok   builder=frame rate=24000000 -> {"ret": 0, "kbps": 24000, "cls": 6, "hrd_m1": [23999, 23999], "hrd_bps_x1024": 24576000}
+ok   builder=frame rate=32000000 -> {"ret": 0, "kbps": 32000, "cls": 6, "hrd_m1": [31999, 31999], "hrd_bps_x1024": 32768000}
+ok   builder=frame rate=50000000 -> {"ret": 0, "kbps": 50000, "cls": 6, "hrd_m1": [49999, 49999], "hrd_bps_x1024": 51200000}
+enc_rate_fields: 22 rows, 0 failing (ok = matches the model, -- = no model)

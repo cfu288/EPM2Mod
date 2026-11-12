@@ -1,0 +1,24 @@
+ok   fps=2997 w=1920 h=1080 flag=0 mode=1 avg=4000000 peak=4000000 -> {"d0": 0, "accepted": true}
+ok   fps=2997 w=1920 h=1080 flag=0 mode=1 avg=10000000 peak=10000000 -> {"d0": 0, "accepted": true}
+ok   fps=2997 w=1920 h=1080 flag=0 mode=1 avg=16000000 peak=16000000 -> {"d0": 0, "accepted": true}
+ok   fps=2997 w=1920 h=1080 flag=0 mode=1 avg=17000000 peak=17000000 -> {"d0": 0, "accepted": true}
+ok   fps=2997 w=1920 h=1080 flag=0 mode=1 avg=20000000 peak=20000000 -> {"d0": 0, "accepted": true}
+ok   fps=2997 w=1920 h=1080 flag=0 mode=1 avg=24000000 peak=24000000 -> {"d0": 0, "accepted": true}
+ok   fps=2997 w=1920 h=1080 flag=0 mode=1 avg=24000001 peak=24000001 -> {"d0": 2868969474, "accepted": false}
+ok   fps=2997 w=1920 h=1080 flag=0 mode=1 avg=32000000 peak=32000000 -> {"d0": 2868969474, "accepted": false}
+ok   fps=2997 w=1920 h=1080 flag=0 mode=1 avg=49999999 peak=49999999 -> {"d0": 2868969474, "accepted": false}
+ok   fps=2997 w=1920 h=1080 flag=0 mode=1 avg=50000000 peak=50000000 -> {"d0": 2868969474, "accepted": false}
+ok   fps=2997 w=1920 h=1080 flag=0 mode=1 avg=50000001 peak=50000001 -> {"d0": 2868969474, "accepted": false}
+ok   fps=2997 w=1920 h=1080 flag=0 mode=1 avg=62500000 peak=62500000 -> {"d0": 2868969474, "accepted": false}
+ok   fps=2997 w=1920 h=1080 flag=0 mode=1 avg=4294967295 peak=4294967295 -> {"d0": 2868969474, "accepted": false}
+ok   fps=2997 w=1920 h=1080 flag=0 mode=1 avg=20000000 peak=32000000 -> {"d0": 2868969474, "accepted": false}
+ok   fps=2997 w=1920 h=1080 flag=0 mode=1 avg=32000001 peak=32000000 -> {"d0": 2868969474, "accepted": false}
+ok   fps=2997 w=1920 h=1080 flag=1 mode=1 avg=24000000 peak=24000000 -> {"d0": 0, "accepted": true}
+ok   fps=2997 w=1920 h=1080 flag=2 mode=1 avg=1 peak=1 -> {"d0": 2868969474, "accepted": false}
+ok   fps=2997 w=1920 h=1080 flag=0 mode=0 avg=20000000 peak=20000000 -> {"d0": 2868969474, "accepted": false}
+ok   fps=2997 w=1920 h=1080 flag=0 mode=3 avg=20000000 peak=20000000 -> {"d0": 0, "accepted": true}
+ok   fps=99 w=1920 h=1080 flag=0 mode=1 avg=20000000 peak=20000000 -> {"d0": 2868969474, "accepted": false}
+ok   fps=6001 w=1920 h=1080 flag=0 mode=1 avg=20000000 peak=20000000 -> {"d0": 2868969474, "accepted": false}
+ok   fps=2997 w=1921 h=1080 flag=0 mode=1 avg=20000000 peak=20000000 -> {"d0": 2868969474, "accepted": false}
+ok   fps=2997 w=1920 h=63 flag=0 mode=1 avg=20000000 peak=20000000 -> {"d0": 2868969474, "accepted": false}
+enc_param_check: 23 rows, 0 failing (ok = matches the model, -- = no model)

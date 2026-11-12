@@ -1,0 +1,623 @@
+{
+ "case": "enc_rate_fields",
+ "stock": "/path/to/epm2-tools/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin",
+ "patched": "/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/br/b.block0.bin",
+ "rows": [
+  {
+   "row": {
+    "builder": "first",
+    "rate": 4000000
+   },
+   "stock": {
+    "ret": 0,
+    "kbps": 4000,
+    "cls": 2,
+    "hrd_m1": [
+     3999,
+     3999
+    ],
+    "hrd_bps_x1024": 4096000
+   },
+   "patched": {
+    "ret": 0,
+    "kbps": 4000,
+    "cls": 2,
+    "hrd_m1": [
+     3999,
+     3999
+    ],
+    "hrd_bps_x1024": 4096000
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "builder": "first",
+    "rate": 10000000
+   },
+   "stock": {
+    "ret": 0,
+    "kbps": 10000,
+    "cls": 2,
+    "hrd_m1": [
+     9999,
+     9999
+    ],
+    "hrd_bps_x1024": 10240000
+   },
+   "patched": {
+    "ret": 0,
+    "kbps": 10000,
+    "cls": 2,
+    "hrd_m1": [
+     9999,
+     9999
+    ],
+    "hrd_bps_x1024": 10240000
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "builder": "first",
+    "rate": 13000000
+   },
+   "stock": {
+    "ret": 0,
+    "kbps": 13000,
+    "cls": 2,
+    "hrd_m1": [
+     12999,
+     12999
+    ],
+    "hrd_bps_x1024": 13312000
+   },
+   "patched": {
+    "ret": 0,
+    "kbps": 13000,
+    "cls": 2,
+    "hrd_m1": [
+     12999,
+     12999
+    ],
+    "hrd_bps_x1024": 13312000
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "builder": "first",
+    "rate": 15499999
+   },
+   "stock": {
+    "ret": 0,
+    "kbps": 15499,
+    "cls": 2,
+    "hrd_m1": [
+     15498,
+     15498
+    ],
+    "hrd_bps_x1024": 15870976
+   },
+   "patched": {
+    "ret": 0,
+    "kbps": 15499,
+    "cls": 2,
+    "hrd_m1": [
+     15498,
+     15498
+    ],
+    "hrd_bps_x1024": 15870976
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "builder": "first",
+    "rate": 15500000
+   },
+   "stock": {
+    "ret": 0,
+    "kbps": 15500,
+    "cls": 6,
+    "hrd_m1": [
+     15499,
+     15499
+    ],
+    "hrd_bps_x1024": 15872000
+   },
+   "patched": {
+    "ret": 0,
+    "kbps": 15500,
+    "cls": 6,
+    "hrd_m1": [
+     15499,
+     15499
+    ],
+    "hrd_bps_x1024": 15872000
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "builder": "first",
+    "rate": 16000000
+   },
+   "stock": {
+    "ret": 0,
+    "kbps": 16000,
+    "cls": 6,
+    "hrd_m1": [
+     15999,
+     15999
+    ],
+    "hrd_bps_x1024": 16384000
+   },
+   "patched": {
+    "ret": 0,
+    "kbps": 16000,
+    "cls": 6,
+    "hrd_m1": [
+     15999,
+     15999
+    ],
+    "hrd_bps_x1024": 16384000
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "builder": "first",
+    "rate": 17000000
+   },
+   "stock": {
+    "ret": 0,
+    "kbps": 17000,
+    "cls": 6,
+    "hrd_m1": [
+     16999,
+     16999
+    ],
+    "hrd_bps_x1024": 17408000
+   },
+   "patched": {
+    "ret": 0,
+    "kbps": 17000,
+    "cls": 6,
+    "hrd_m1": [
+     16999,
+     16999
+    ],
+    "hrd_bps_x1024": 17408000
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "builder": "first",
+    "rate": 20000000
+   },
+   "stock": {
+    "ret": 0,
+    "kbps": 20000,
+    "cls": 6,
+    "hrd_m1": [
+     19999,
+     19999
+    ],
+    "hrd_bps_x1024": 20480000
+   },
+   "patched": {
+    "ret": 0,
+    "kbps": 20000,
+    "cls": 6,
+    "hrd_m1": [
+     19999,
+     19999
+    ],
+    "hrd_bps_x1024": 20480000
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "builder": "first",
+    "rate": 24000000
+   },
+   "stock": {
+    "ret": 0,
+    "kbps": 24000,
+    "cls": 6,
+    "hrd_m1": [
+     23999,
+     23999
+    ],
+    "hrd_bps_x1024": 24576000
+   },
+   "patched": {
+    "ret": 0,
+    "kbps": 24000,
+    "cls": 6,
+    "hrd_m1": [
+     23999,
+     23999
+    ],
+    "hrd_bps_x1024": 24576000
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "builder": "first",
+    "rate": 32000000
+   },
+   "stock": {
+    "ret": 0,
+    "kbps": 32000,
+    "cls": 6,
+    "hrd_m1": [
+     31999,
+     31999
+    ],
+    "hrd_bps_x1024": 32768000
+   },
+   "patched": {
+    "ret": 0,
+    "kbps": 32000,
+    "cls": 6,
+    "hrd_m1": [
+     31999,
+     31999
+    ],
+    "hrd_bps_x1024": 32768000
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "builder": "first",
+    "rate": 50000000
+   },
+   "stock": {
+    "ret": 0,
+    "kbps": 50000,
+    "cls": 6,
+    "hrd_m1": [
+     49999,
+     49999
+    ],
+    "hrd_bps_x1024": 51200000
+   },
+   "patched": {
+    "ret": 0,
+    "kbps": 50000,
+    "cls": 6,
+    "hrd_m1": [
+     49999,
+     49999
+    ],
+    "hrd_bps_x1024": 51200000
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "builder": "frame",
+    "rate": 4000000
+   },
+   "stock": {
+    "ret": 0,
+    "kbps": 4000,
+    "cls": 2,
+    "hrd_m1": [
+     3999,
+     3999
+    ],
+    "hrd_bps_x1024": 4096000
+   },
+   "patched": {
+    "ret": 0,
+    "kbps": 4000,
+    "cls": 2,
+    "hrd_m1": [
+     3999,
+     3999
+    ],
+    "hrd_bps_x1024": 4096000
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "builder": "frame",
+    "rate": 10000000
+   },
+   "stock": {
+    "ret": 0,
+    "kbps": 10000,
+    "cls": 2,
+    "hrd_m1": [
+     9999,
+     9999
+    ],
+    "hrd_bps_x1024": 10240000
+   },
+   "patched": {
+    "ret": 0,
+    "kbps": 10000,
+    "cls": 2,
+    "hrd_m1": [
+     9999,
+     9999
+    ],
+    "hrd_bps_x1024": 10240000
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "builder": "frame",
+    "rate": 13000000
+   },
+   "stock": {
+    "ret": 0,
+    "kbps": 13000,
+    "cls": 2,
+    "hrd_m1": [
+     12999,
+     12999
+    ],
+    "hrd_bps_x1024": 13312000
+   },
+   "patched": {
+    "ret": 0,
+    "kbps": 13000,
+    "cls": 2,
+    "hrd_m1": [
+     12999,
+     12999
+    ],
+    "hrd_bps_x1024": 13312000
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "builder": "frame",
+    "rate": 15499999
+   },
+   "stock": {
+    "ret": 0,
+    "kbps": 15499,
+    "cls": 2,
+    "hrd_m1": [
+     15498,
+     15498
+    ],
+    "hrd_bps_x1024": 15870976
+   },
+   "patched": {
+    "ret": 0,
+    "kbps": 15499,
+    "cls": 2,
+    "hrd_m1": [
+     15498,
+     15498
+    ],
+    "hrd_bps_x1024": 15870976
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "builder": "frame",
+    "rate": 15500000
+   },
+   "stock": {
+    "ret": 0,
+    "kbps": 15500,
+    "cls": 6,
+    "hrd_m1": [
+     15499,
+     15499
+    ],
+    "hrd_bps_x1024": 15872000
+   },
+   "patched": {
+    "ret": 0,
+    "kbps": 15500,
+    "cls": 6,
+    "hrd_m1": [
+     15499,
+     15499
+    ],
+    "hrd_bps_x1024": 15872000
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "builder": "frame",
+    "rate": 16000000
+   },
+   "stock": {
+    "ret": 0,
+    "kbps": 16000,
+    "cls": 6,
+    "hrd_m1": [
+     15999,
+     15999
+    ],
+    "hrd_bps_x1024": 16384000
+   },
+   "patched": {
+    "ret": 0,
+    "kbps": 16000,
+    "cls": 6,
+    "hrd_m1": [
+     15999,
+     15999
+    ],
+    "hrd_bps_x1024": 16384000
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "builder": "frame",
+    "rate": 17000000
+   },
+   "stock": {
+    "ret": 0,
+    "kbps": 17000,
+    "cls": 6,
+    "hrd_m1": [
+     16999,
+     16999
+    ],
+    "hrd_bps_x1024": 17408000
+   },
+   "patched": {
+    "ret": 0,
+    "kbps": 17000,
+    "cls": 6,
+    "hrd_m1": [
+     16999,
+     16999
+    ],
+    "hrd_bps_x1024": 17408000
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "builder": "frame",
+    "rate": 20000000
+   },
+   "stock": {
+    "ret": 0,
+    "kbps": 20000,
+    "cls": 6,
+    "hrd_m1": [
+     19999,
+     19999
+    ],
+    "hrd_bps_x1024": 20480000
+   },
+   "patched": {
+    "ret": 0,
+    "kbps": 20000,
+    "cls": 6,
+    "hrd_m1": [
+     19999,
+     19999
+    ],
+    "hrd_bps_x1024": 20480000
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "builder": "frame",
+    "rate": 24000000
+   },
+   "stock": {
+    "ret": 0,
+    "kbps": 24000,
+    "cls": 6,
+    "hrd_m1": [
+     23999,
+     23999
+    ],
+    "hrd_bps_x1024": 24576000
+   },
+   "patched": {
+    "ret": 0,
+    "kbps": 24000,
+    "cls": 6,
+    "hrd_m1": [
+     23999,
+     23999
+    ],
+    "hrd_bps_x1024": 24576000
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "builder": "frame",
+    "rate": 32000000
+   },
+   "stock": {
+    "ret": 0,
+    "kbps": 32000,
+    "cls": 6,
+    "hrd_m1": [
+     31999,
+     31999
+    ],
+    "hrd_bps_x1024": 32768000
+   },
+   "patched": {
+    "ret": 0,
+    "kbps": 32000,
+    "cls": 6,
+    "hrd_m1": [
+     31999,
+     31999
+    ],
+    "hrd_bps_x1024": 32768000
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "builder": "frame",
+    "rate": 50000000
+   },
+   "stock": {
+    "ret": 0,
+    "kbps": 50000,
+    "cls": 6,
+    "hrd_m1": [
+     49999,
+     49999
+    ],
+    "hrd_bps_x1024": 51200000
+   },
+   "patched": {
+    "ret": 0,
+    "kbps": 50000,
+    "cls": 6,
+    "hrd_m1": [
+     49999,
+     49999
+    ],
+    "hrd_bps_x1024": 51200000
+   },
+   "diff": {},
+   "flags": []
+  }
+ ]
+}

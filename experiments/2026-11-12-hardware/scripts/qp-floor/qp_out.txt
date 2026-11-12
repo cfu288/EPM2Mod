@@ -1,0 +1,4 @@
+slices per frame {1: 420} slice types {'I': 28, 'P': 392}
+I-frame QP: min 20 max 25 dist [(20, 27), (25, 1)]
+P-frame QP: min 20 max 22 dist [(20, 391), (22, 1)]
+largest frames (n, key, bytes, qp): [(31, True, 129501, 20), (316, True, 117003, 20), (1, True, 114429, 25), (406, True, 112301, 20), (284, False, 98020, 20)]

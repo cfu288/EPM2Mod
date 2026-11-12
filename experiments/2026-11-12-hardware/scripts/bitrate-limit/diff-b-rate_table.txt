@@ -1,0 +1,2 @@
+patched bytes: 6 in 3 runs
+rate_table: 18 rows, 0 changed, 18 identical, 0 flagged
