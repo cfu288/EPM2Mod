@@ -1,0 +1,135 @@
+{
+ "name": "four-code",
+ "description": "Four film slots (replaces slot3-code): the three-film structure plus Pale&Light I (codes 71 / 80) as a generic slot: gamma stub, matrix, shared look, linear chroma, WB multipliers 1.0. No effect filter is touched. NOTES \u00a736.",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x45ff3c",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "16f8bb1c888dfcdcdcb3787eddcaa7ceffc008f012888dfcdcfcb3787eddb9a7ceffc008f013fcdc7cb4787edccaa8ceffa055c81ba057c817a048c818a051c814a046c815a04fc811dcc6b7ceffdc0eb7ceffdc14b7cefff1ecfcddc20f887edca8b7ceffff000100000000000000010000000000000001"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x88f868",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "fcdd1c09cb7e16f8bb1c888df001dd9cae8bffc008f012888df82104dd8eae8bffc008f013f82108dca2af8bffa055c820a057c81ca048c820a051c81ca046c820a04fc81ca047c820a050c81cca27fcdd468f767eca18fcdd588f767eca10fcddc20f887eca08fcdd0809cb7ef1ecdc6dbe8bffdc6fbe8bfff1ecdc61be8bff000100000000000000010000000000000001ffff2809cb7e4809cb7e6809cb7ebce7747e7c3b037fbc17757e7c3b037fbc47757e7c3b037fbc77757e7c3b037fbce7747e7c3d037fbc17757e7c3d037fbc47757e7c3d037fbc77757e7c3d037fbce7747ef0e8757ebc17757ef0e8757ebc47757ef0e8757ebc77757ef0e8757e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x14b685",
+   "expect": "a046c811a0",
+   "new": "dc10427400"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x14a787",
+   "expect": "47",
+   "new": "46"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b138",
+   "expect": "22b8567e",
+   "new": "61b8567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b140",
+   "expect": "e7b7567e",
+   "new": "8808cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b150",
+   "expect": "22b8567e",
+   "new": "61b8567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b178",
+   "expect": "61b8567e",
+   "new": "5c0f887e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b17c",
+   "expect": "00000000",
+   "new": "09000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b180",
+   "expect": "61b8567e",
+   "new": "5c0f887e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b188",
+   "expect": "e7b7567e",
+   "new": "8808cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1a0",
+   "expect": "f0b7567e",
+   "new": "61b8567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1b8",
+   "expect": "f0b7567e",
+   "new": "61b8567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b9c0",
+   "expect": "fce8567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369e8c",
+   "expect": "9063567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b9e4",
+   "expect": "fce8567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369eb0",
+   "expect": "9063567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x347d98",
+   "expect": "c8001601",
+   "new": "00010001"
+  }
+ ],
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "built, NOT camera-tested"
+}

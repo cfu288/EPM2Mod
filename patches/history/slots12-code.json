@@ -1,0 +1,583 @@
+{
+ "name": "slots12-code",
+ "description": "Twelve film slots (replaces slot3-code / slots7-code): code areas, gamma hash, look / chroma / effect dispatch, WB pairs, and the art_GetFilterType immediates that send Grainy Film, Gentle Sepia, Dramatic Tone, Key Line, Watercolor to the numbers 102, 106, 108, 145, 167. NOTES \u00a733.",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x45ff3c",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "16f8bb1c888dfcdcdcb3787eddcaa7ceffc008f012888dfcdcfcb3787eddb9a7ceffc008f013fcdc7cb4787edccaa8ceffa055c81ba057c817a048c818a051c814a046c815a04fc811dcc6b7ceffdc0eb7ceffdc14b7cefff1ecfcddc20f887edca8b7ceffff000100000000000000010000000000000001"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x88f868",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "fcdd6c0acb7eca40fcdd780acb7eca38fcdd840acb7eca30fcdd900acb7eca28fcdd9c0acb7eca20fcdda80acb7eca18fcddb40acb7eca10fcddc00acb7eca08fcddcc0acb7e16f8bb1c888df001dd5cae8bffc008f012888df82104dd4eae8bffc008f013f82108dc62af8bffa055c838a057c834a048c838a051c834a046c838a04fc834a047c838a050c834a045c838a04ec834a049c838a052c834a056c838a058c834ca3ffcdd468f767eca30fcdd588f767eca28fcddc20f887eca20fcddc809cb7eca18fcddda09cb7eca10fcddec09cb7eca08fcddfe09cb7ef1ecdcfdbd8bffa066c82ba067c827a06ac82ba06cc82ffac89100c831fac89200c82bfac8a700c82dfac8a800c827dcd7bd8bfffcdd100acb7eca20fcdd220acb7eca18fcdd340acb7eca10fcdd460acb7eca08fcdd580acb7ef1ecdca3bd8bffffff000100000000000000010000000000000001000100000000000000010000000000000001000100000000000000010000000000000001000100000000000000010000000000000001000100000000000000010000000000000001000100000000000000010000000000000001000100000000000000010000000000000001000100000000000000010000000000000001000100000000000000010000000000000001ffffd80acb7ef80acb7e180bcb7e380bcb7e580bcb7e780bcb7e980bcb7eb80bcb7ed80bcb7ef80bcb7e180ccb7e380ccb7e580ccb7e780ccb7e980ccb7eb80ccb7ed80ccb7ef80ccb7e180dcb7e380dcb7e580dcb7e780dcb7e980dcb7eb80dcb7ed80dcb7ef80dcb7e180ecb7ebce7747e7c3b037fbc17757e7c3b037fbc47757e7c3b037fbc77757e7c3b037fbce7747e7c3d037fbc17757e7c3d037fbc47757e7c3d037fbc77757e7c3d037fbce7747ef0e4757ebc17757ef0e4757ebc47757ef0e4757ebc77757ef0e4757ebce7747ef0e8757ebc17757ef0e8757ebc47757ef0e8757ebc77757ef0e8757ebce7747ef0ec757ebc17757ef0ec757ebc47757ef0ec757ebc77757ef0ec757ebce7747ef0f0757ebc17757ef0f0757ebc47757ef0f0757ebc77757ef0f0757ebce7747ef0fa757ebc17757ef0fa757ebc47757ef0fa757ebc77757ef0fa757ebce7747ef0f8757ebc17757ef0f8757ebc47757ef0f8757ebc77757ef0f8757ebce7747ef016767ebc17757ef016767ebc47757ef016767ebc77757ef016767ebce7747ef0fc757ebc17757ef0fc757ebc47757ef0fc757ebc77757ef0fc757ebce7747ef0fe757ebc17757ef0fe757ebc47757ef0fe757ebc77757ef0fe757ebce7747ebcef747ebc17757ebcef747ebc47757ebcef747ebc77757ebcef747ebce7747ebc1f757ebc17757ebc1f757ebc47757ebc1f757ebc77757ebc1f757ebce7747ebc21757ebc17757ebc21757ebc47757ebc21757ebc77757ebc21757ebce7747ebc4f757ebc17757ebc4f757ebc47757ebc4f757ebc77757ebc4f757ebce7747ebc51757ebc17757ebc51757ebc47757ebc51757ebc77757ebc51757ebce7747ebc7f757ebc17757ebc7f757ebc47757ebc7f757ebc77757ebc7f757ebce7747ebc81757ebc17757ebc81757ebc47757ebc81757ebc77757ebc81757ebce7747ebcf3747ebc17757ebcf3747ebc47757ebcf3747ebc77757ebcf3747ebce7747ebc23757ebc17757ebc23757ebc47757ebc23757ebc77757ebc23757ebce7747ebc25757ebc17757ebc25757ebc47757ebc25757ebc77757ebc25757ebce7747ebc53757ebc17757ebc53757ebc47757ebc53757ebc77757ebc53757ebce7747ebc55757ebc17757ebc55757ebc47757ebc55757ebc77757ebc55757ebce7747ebc83757ebc17757ebc83757ebc47757ebc83757ebc77757ebc83757ebce7747ebc85757ebc17757ebc85757ebc47757ebc85757ebc77757ebc85757ebce7747ebc03757ebc17757ebc03757ebc47757ebc03757ebc77757ebc03757ebce7747ebc33757ebc17757ebc33757ebc47757ebc33757ebc77757ebc33757e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x14b685",
+   "expect": "a046c811a0",
+   "new": "dc50427400"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x14a787",
+   "expect": "47",
+   "new": "45"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b138",
+   "expect": "22b8567e",
+   "new": "a808cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b140",
+   "expect": "e7b7567e",
+   "new": "8808cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b150",
+   "expect": "22b8567e",
+   "new": "a808cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b158",
+   "expect": "2ab8567e",
+   "new": "c808cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b160",
+   "expect": "2ab8567e",
+   "new": "c808cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b174",
+   "expect": "00000000",
+   "new": "08000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b178",
+   "expect": "61b8567e",
+   "new": "9008cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b17c",
+   "expect": "00000000",
+   "new": "09000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b180",
+   "expect": "61b8567e",
+   "new": "5c0f887e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b188",
+   "expect": "e7b7567e",
+   "new": "8808cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b194",
+   "expect": "00000000",
+   "new": "03000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b198",
+   "expect": "61b8567e",
+   "new": "9808cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1a0",
+   "expect": "f0b7567e",
+   "new": "61b8567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1a4",
+   "expect": "00000000",
+   "new": "0c000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1a8",
+   "expect": "61b8567e",
+   "new": "9808cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1b8",
+   "expect": "f0b7567e",
+   "new": "61b8567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1c4",
+   "expect": "00000000",
+   "new": "10000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1c8",
+   "expect": "61b8567e",
+   "new": "a008cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1cc",
+   "expect": "00000000",
+   "new": "12000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1d0",
+   "expect": "61b8567e",
+   "new": "a008cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1d4",
+   "expect": "00000000",
+   "new": "24000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1d8",
+   "expect": "61b8567e",
+   "new": "b008cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1dc",
+   "expect": "00000000",
+   "new": "26000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1e0",
+   "expect": "61b8567e",
+   "new": "b808cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1e4",
+   "expect": "00000000",
+   "new": "4b000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1e8",
+   "expect": "61b8567e",
+   "new": "c008cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1ec",
+   "expect": "00000000",
+   "new": "4c000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1f0",
+   "expect": "61b8567e",
+   "new": "c008cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1f8",
+   "expect": "61b8567e",
+   "new": "5c0f887e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b22c",
+   "expect": "00000000",
+   "new": "ffffffff"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b230",
+   "expect": "61b8567e",
+   "new": "9008cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b9c0",
+   "expect": "fce8567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369e8c",
+   "expect": "9063567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b9e4",
+   "expect": "fce8567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369eb0",
+   "expect": "9063567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b9b8",
+   "expect": "eae8567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369e84",
+   "expect": "0863567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b9dc",
+   "expect": "eae8567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369ea8",
+   "expect": "0863567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b9c8",
+   "expect": "0ee9567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369e94",
+   "expect": "1864567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b9ec",
+   "expect": "0ee9567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369eb8",
+   "expect": "1864567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b9fc",
+   "expect": "41e9567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369ec8",
+   "expect": "5c64567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36ba04",
+   "expect": "41e9567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369ed0",
+   "expect": "5c64567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36ba3c",
+   "expect": "65e9567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369f08",
+   "expect": "6c65567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36ba40",
+   "expect": "65e9567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369f0c",
+   "expect": "6c65567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36ba4c",
+   "expect": "6ee9567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369f18",
+   "expect": "b065567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36ba54",
+   "expect": "77e9567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369f20",
+   "expect": "f465567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36bae8",
+   "expect": "5ce9567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369fb4",
+   "expect": "2865567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36baec",
+   "expect": "5ce9567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369fb8",
+   "expect": "2865567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36bb40",
+   "expect": "c5e9567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36a00c",
+   "expect": "0467567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36bb44",
+   "expect": "c5e9567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36a010",
+   "expect": "0467567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x347d98",
+   "expect": "c8001601fa00e7000801da00eb001a013201fe00",
+   "new": "0001000100010001000100010001000100010001"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x43b448",
+   "expect": "15a6727e",
+   "new": "65a6727e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x43b4b0",
+   "expect": "25a6727e",
+   "new": "65a6727e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x43b450",
+   "expect": "15a6727e",
+   "new": "65a6727e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x43b460",
+   "expect": "15a6727e",
+   "new": "65a6727e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3096d7",
+   "expect": "45",
+   "new": "ff"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x309719",
+   "expect": "45",
+   "new": "ff"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2fae19",
+   "expect": "8a4a",
+   "new": "8a66"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2fae2b",
+   "expect": "8a5b",
+   "new": "8a6a"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2fae30",
+   "expect": "8a60",
+   "new": "8a6c"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2fae5e",
+   "expect": "2ea300",
+   "new": "2e9100"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2fae6f",
+   "expect": "2eb500",
+   "new": "2ea700"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36a3bc",
+   "expect": "bcef747ebcf1747ebc1f757ebc21757ebc4f757ebc51757ebc7f757ebc81757e",
+   "new": "bce7747ebcf1747ebc17757ebcf1747ebc47757ebcf1747ebc77757ebcf1747e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36a3dc",
+   "expect": "bcf3747ebcf5747ebc23757ebc25757ebc53757ebc55757ebc83757ebc85757e",
+   "new": "bce7747ebcf5747ebc17757ebcf5747ebc47757ebcf5747ebc77757ebcf5747e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36a45c",
+   "expect": "bc03757ebc05757ebc33757ebc35757ebc63757ebc65757ebc93757ebc95757e",
+   "new": "bce7747ebc05757ebc17757ebc05757ebc47757ebc05757ebc77757ebc05757e"
+  }
+ ],
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "built, NOT camera-tested"
+}

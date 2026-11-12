@@ -1,0 +1,380 @@
+{
+ "name": "slots7-code",
+ "description": "Seven film slots (replaces slot3-code): code areas 0x7E880F5C (120 B) and 0x7ECB0888, gamma hash, look / chroma / effect dispatch, WB pairs. Use with the -s3 film patches, film-pro400h-pa*, slot3-chroma-linear and a look for each new slot. NOTES \u00a732.",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x45ff3c",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "16f8bb1c888dfcdcdcb3787eddcaa7ceffc008f012888dfcdcfcb3787eddb9a7ceffc008f013fcdc7cb4787edccaa8ceffa055c81ba057c817a048c818a051c814a046c815a04fc811dcc6b7ceffdc0eb7ceffdc14b7cefff1ecfcddc20f887edca8b7ceffff000100000000000000010000000000000001"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x88f868",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "fcdd9009cb7eca18fcdd9c09cb7eca10fcdda809cb7eca08fcddb409cb7e16f8bb1c888df001dd84ae8bffc008f012888df82104dd76ae8bffc008f013f82108dc8aaf8bffa055c83ba057c837a048c83ba051c837a046c83ba04fc837a047c83ba050c837a045c83ba04ec837a049c83ba052c837a056c83ba058c837dc66be8bfffcdd468f767eca30fcdd588f767eca28fcddc20f887eca20fcdd4809cb7eca18fcdd5a09cb7eca10fcdd6c09cb7eca08fcdd7e09cb7ef1ecdc22be8bffff000100000000000000010000000000000001000100000000000000010000000000000001000100000000000000010000000000000001000100000000000000010000000000000001c009cb7ee009cb7e000acb7e200acb7e400acb7e600acb7e800acb7ea00acb7ec00acb7ee00acb7e000bcb7e200bcb7ebce7747e400bcb7ebc17757e400bcb7ebc47757e400bcb7ebc77757e400bcb7ebce7747e400dcb7ebc17757e400dcb7ebc47757e400dcb7ebc77757e400dcb7ebce7747e7c3b037fbc17757e7c3b037fbc47757e7c3b037fbc77757e7c3b037fbce7747e7c3d037fbc17757e7c3d037fbc47757e7c3d037fbc77757e7c3d037fbce7747ef0e4757ebc17757ef0e4757ebc47757ef0e4757ebc77757ef0e4757ebce7747ef0e8757ebc17757ef0e8757ebc47757ef0e8757ebc77757ef0e8757ebce7747ef0ec757ebc17757ef0ec757ebc47757ef0ec757ebc77757ef0ec757ebce7747ef0f0757ebc17757ef0f0757ebc47757ef0f0757ebc77757ef0f0757ebce7747ef0f8757ebc17757ef0f8757ebc47757ef0f8757ebc77757ef0f8757ebce7747ef0fa757ebc17757ef0fa757ebc47757ef0fa757ebc77757ef0fa757ebce7747ef016767ebc17757ef016767ebc47757ef016767ebc77757ef016767ebce7747ef0fc757ebc17757ef0fc757ebc47757ef0fc757ebc77757ef0fc757e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x14b685",
+   "expect": "a046c811a0",
+   "new": "dc28427400"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x14a787",
+   "expect": "47",
+   "new": "45"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b138",
+   "expect": "22b8567e",
+   "new": "61b8567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b140",
+   "expect": "e7b7567e",
+   "new": "8808cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b150",
+   "expect": "22b8567e",
+   "new": "61b8567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b174",
+   "expect": "00000000",
+   "new": "08000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b178",
+   "expect": "61b8567e",
+   "new": "9008cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b17c",
+   "expect": "00000000",
+   "new": "09000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b180",
+   "expect": "61b8567e",
+   "new": "5c0f887e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b188",
+   "expect": "e7b7567e",
+   "new": "8808cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b194",
+   "expect": "00000000",
+   "new": "03000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b198",
+   "expect": "61b8567e",
+   "new": "9808cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1a0",
+   "expect": "f0b7567e",
+   "new": "61b8567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1a4",
+   "expect": "00000000",
+   "new": "0c000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1a8",
+   "expect": "61b8567e",
+   "new": "9808cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1b8",
+   "expect": "f0b7567e",
+   "new": "61b8567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1c4",
+   "expect": "00000000",
+   "new": "10000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1c8",
+   "expect": "61b8567e",
+   "new": "a008cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1cc",
+   "expect": "00000000",
+   "new": "12000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1d0",
+   "expect": "61b8567e",
+   "new": "a008cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1d8",
+   "expect": "61b8567e",
+   "new": "5c0f887e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b22c",
+   "expect": "00000000",
+   "new": "ffffffff"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b230",
+   "expect": "61b8567e",
+   "new": "9008cb7e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b9c0",
+   "expect": "fce8567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369e8c",
+   "expect": "9063567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b9e4",
+   "expect": "fce8567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369eb0",
+   "expect": "9063567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b9b8",
+   "expect": "eae8567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369e84",
+   "expect": "0863567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b9dc",
+   "expect": "eae8567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369ea8",
+   "expect": "0863567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b9c8",
+   "expect": "0ee9567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369e94",
+   "expect": "1864567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b9ec",
+   "expect": "0ee9567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369eb8",
+   "expect": "1864567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b9fc",
+   "expect": "41e9567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369ec8",
+   "expect": "5c64567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36ba04",
+   "expect": "41e9567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369ed0",
+   "expect": "5c64567e",
+   "new": "a064567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36ba3c",
+   "expect": "65e9567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36ba40",
+   "expect": "65e9567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36bae8",
+   "expect": "5ce9567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36baec",
+   "expect": "5ce9567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36bb40",
+   "expect": "c5e9567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36bb44",
+   "expect": "c5e9567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36ba4c",
+   "expect": "6ee9567e",
+   "new": "4ae9567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x347d98",
+   "expect": "c8001601fa00e700",
+   "new": "0001000100010001"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x43b448",
+   "expect": "15a6727e",
+   "new": "65a6727e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x43b4b0",
+   "expect": "25a6727e",
+   "new": "65a6727e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3096d7",
+   "expect": "45",
+   "new": "ff"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x309719",
+   "expect": "45",
+   "new": "ff"
+  }
+ ],
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "built, NOT camera-tested"
+}

@@ -1,0 +1,23 @@
+{
+ "name": "xp-adaptive-hue-off",
+ "description": "Code immediates only: in 0x7E5460F0 the tests 'dominant bin is B (2)' and 'is C (4)' become comparisons with 0x7F / 0x7E, so the scene-adaptive hue of Cross Process I and II is never added (CODE_DIG \u00a72). The ROM hue record is still copied.",
+ "status": "camera-tested 2026-11-12 as part of build/seven-films-2.BIN (sha256 1f7d0db62f906da4e10de0ad3546f58f4eb5d1b008ae8e4baeb7a1e2b5170c01); see docs/camera-log.md",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x125141",
+   "expect": "02",
+   "new": "7f"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x125147",
+   "expect": "04",
+   "new": "7e"
+  }
+ ]
+}

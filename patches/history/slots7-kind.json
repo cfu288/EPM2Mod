@@ -1,0 +1,72 @@
+{
+ "name": "slots7-kind",
+ "description": "Soft Focus, Pin Hole, Diorama. The record code's three filter classifications (by menu entry: table 0x7E8522AC read by 0x7E70DBDE; by number: table 0x7E8520E0 read by 0x7E70DBB6 and hash 0x7E852354 read by 0x7E70E298) set to the value of the colour-only filters (1) for converted effect filters. Reason: with the effect removed but the classification left at 3 / 4, live view froze (NOTES \u00a734).",
+ "status": "built, NOT camera-tested",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x431290",
+   "expect": "f8db707e",
+   "new": "f4db707e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x4312a0",
+   "expect": "fcdb707e",
+   "new": "f4db707e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x4312a4",
+   "expect": "f8db707e",
+   "new": "f4db707e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x4310c0",
+   "expect": "d5db707e",
+   "new": "d1db707e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x4310d0",
+   "expect": "d5db707e",
+   "new": "d1db707e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x431104",
+   "expect": "d5db707e",
+   "new": "d1db707e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x431340",
+   "expect": "d9e2707e",
+   "new": "d5e2707e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x431360",
+   "expect": "d9e2707e",
+   "new": "d5e2707e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x4313d8",
+   "expect": "d9e2707e",
+   "new": "d5e2707e"
+  }
+ ]
+}

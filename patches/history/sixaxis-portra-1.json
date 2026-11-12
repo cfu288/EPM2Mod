@@ -1,0 +1,23 @@
+{
+ "name": "sixaxis-portra-1",
+ "description": "Cross Process I six-axis records (saturation 0x7E7694FE, hue 0x7E76950A; slot order R G B Y C M) set to values fitted to the Portra target with the provisional model from sixaxis-probe-1 (fit_sixaxis.py, NOTES \u00a718). Apply on top of film-portra-xp.",
+ "status": "built, NOT camera-tested",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3484de",
+   "expect": "000003000000000000000000",
+   "new": "1500d8ff2700e5ff1000f4ff"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3484ea",
+   "expect": "000003000000000000000000",
+   "new": "feff14000e001400f7ff1400"
+  }
+ ]
+}

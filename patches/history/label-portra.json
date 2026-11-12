@@ -1,0 +1,16 @@
+{
+ "name": "label-portra",
+ "description": "Rename the menu label 'Cross Process' to 'Portra 400' (20 English-text copies in block 1; padded with NULs to the same length, each string is reached through its own pointer). Text only. Note: the label is shared by Cross Process I and II. Translated labels in other languages are not changed.",
+ "status": "built, NOT camera-tested",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {
+   "type": "utf16-replace-all",
+   "block": 1,
+   "old": "Cross Process",
+   "new": "Portra 400\u0000\u0000\u0000",
+   "count": 20
+  }
+ ]
+}
