@@ -1975,3 +1975,32 @@ without an anchor measurement; `--edge-weight` adds the gamut-edge patches (GRKi
 - Remaining ideas, none started: sub-code dither is not available; a 3-D stage does not exist in
   this pipeline; a different matrix per white-balance preset is not possible (one art matrix per
   film), and §44 showed it is not needed.
+
+## 47. Movie mode freezes in the three remapped entries; fix `seven-movie-1` → `seven-films-6` (2026-11-12; NOT flashed)
+
+- User: in movie mode the display freezes with Velvia (Diorama), Vis 250D (Pin Hole) or Ektachrome
+  (Soft Focus) selected; leaving the entry un-freezes it. The other four film entries are fine.
+- Cause: the same disagreement as §37.2, in the half we had left stock. In movie mode
+  `mov_art_set_artmode` / `mov_art_exec_init` take the art code from `art_GetFilterType` (102 / 145 /
+  167, colour only), while the live-view functions' **movie** tables 0x7E7FF008 and 0x7E80782C still
+  gave the stock effect codes 78 / 82 / 88 for entries 101 / 105 / 106. (`art_chk_type_mov`
+  0x7E71C28B tests stills code numbers, i.e. the `art_GetFilterType` value.)
+- Stock pairs, from the two table pairs: 70/79, 71/80, 72/81, 85/87, 145/146 (entry 110), and by
+  shared handlers 102/103 and 167/168.
+- `slots/build_movie_map.py` → `patches/seven-movie-1.json` (8 ops, 44 bytes):
+  - movie-table entries 101 → new stub `mov 103,d2; jmp tail`, 106 → new stub `mov 168,d2; jmp
+    tail` (four stubs, 30 bytes at 0x7ECB0B80, each jumping to its own function's tail 0x7E6CC14E /
+    0x7E6DBBC4), 105 → the stock stub of entry 110 (146);
+  - six-axis jump-table entry of 168 → the plain handler 0x7E880FD4 (as 167 in §43.2; otherwise the
+    Diorama entry in movie mode would run the Cross Process statistics path with the unset pointer).
+- `build/seven-films-6.BIN` = remap7b-code + seven-fixes-1 + seven-movie-1 + seven-structure-extra
+  + seven-films-5 + xp-adaptive-hue-off + seven-labels; sha256
+  `5badb0796731b40a27ef015e57da134d7d793486d4c6262a3f483c1aae60fd05`; 44 bytes differ from the
+  tested seven-films-5 (the list above); stills data identical. Emulator: `six_handler` 167 and
+  168 → tail; `filter_type` unchanged from seven-films-5. The two live-view functions are not
+  emulated; the patched tables were read back from the built image (101 → 103, 105 → 146, 106 → 168
+  in both).
+- What a movie will look like in the seven film entries is not measured. From the tables: the movie
+  codes share each film's matrix, saturation and six-axis records; chroma curves are straight
+  (§43.2); the per-channel curves are the film's only in Kodachrome and Superia (their records have
+  all 24 tables); the other five have film curves for stills only. So expect a partial look.

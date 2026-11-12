@@ -30,7 +30,7 @@ Flash `build/<name>.BIN` as `DCOLYMP/E1019999.BIN`, hold OK and power on. Full s
 
 ## Patches
 
-Current film build (`seven-films-5`, camera-tested 2026-11-12): `remap7b-code` + `seven-fixes-1` + `seven-structure-extra` + `seven-films-5` + `xp-adaptive-hue-off` + `seven-labels`. Every other film spec in the table below is in `patches/history/`.
+Current film build on the camera (`seven-films-5`, camera-tested 2026-11-12): `remap7b-code` + `seven-fixes-1` + `seven-structure-extra` + `seven-films-5` + `xp-adaptive-hue-off` + `seven-labels`. Built, **not camera-tested** (`seven-films-6`): the same with `seven-movie-1` after `seven-fixes-1`, which stops the display freezing in movie mode in the Ektachrome, Vis 250D and Velvia entries (NOTES §47). Every other film spec in the table below is in `patches/history/`.
 
 | Spec | Status |
 |---|---|
