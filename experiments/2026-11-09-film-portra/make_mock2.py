@@ -29,7 +29,7 @@ import numpy as np
 import orfcodec
 from mocklib import fl, M5300
 
-DONOR = "shots/testraw/PB090221.ORF"
+DONOR = os.environ.get("ORF_DONOR", os.path.join(os.path.dirname(os.path.abspath(__file__)), "testraw", "PB130001.ORF"))   # any E-PM2 ORF: its header (everything before the raw strip) and the strip's first 7 bytes are reused
 H, W, P, X0, Y0, NC, NR = 3472, 4640, 48, 16, 8, 96, 72
 BLACK, UMAX, VG = 255, 3790.0, fl.V_GRAY
 WB = np.array([520 / 256, 1.0, 470 / 256]); MINV = np.linalg.inv(M5300)

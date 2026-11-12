@@ -43,14 +43,14 @@ STOCK = {"Natural": ("B3", IDENTITY), "Vivid": ("M1-vivid", IDENTITY), "Muted": 
          "Portrait": ("M3-portrait", 0x7E75DAF0), "Natural Sat -2": ("N3-sat-2", IDENTITY),
          "Natural Sat +2": ("N4-sat+2", IDENTITY), "Natural Con +2": ("N2-con+2", 0x7E75D4F0),
          "Low Key": ("G2-lowkey", 0x7E75E2F0)}
-_b0 = open(tone.BLOCK0, "rb").read()
+_b0 = open(tone.BLOCK0, "rb").read() if os.path.exists(tone.BLOCK0) else None      # stock block 0 (not in git); only the firmware-table helpers need it
 
 
 def table(a):
     return np.array(struct.unpack("<256H", _b0[a - tone.BASE:a - tone.BASE + 512]), float)
 
 
-BASE = table(BASE_GAMMA)
+BASE = table(BASE_GAMMA) if _b0 is not None else None
 X = np.arange(256)
 
 

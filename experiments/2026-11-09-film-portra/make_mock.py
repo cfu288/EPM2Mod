@@ -20,7 +20,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import orfcodec
 
-DONOR = "shots/testraw/PB090221.ORF"
+DONOR = os.environ.get("ORF_DONOR", os.path.join(os.path.dirname(os.path.abspath(__file__)), "testraw", "PB130001.ORF"))   # any E-PM2 ORF: its header (everything before the raw strip) and the strip's first 7 bytes are reused
 H, W, P, X0, Y0, NC, NR = 3472, 4640, 48, 16, 8, 96, 72
 BLACK, UMAX = 255, 3790.0
 WB = np.array([528 / 256, 1.0, 460 / 256])

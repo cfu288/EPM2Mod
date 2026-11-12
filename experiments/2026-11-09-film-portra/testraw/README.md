@@ -24,6 +24,30 @@ sha256:
 6ccc083639801bf4e55480c7959b9755f4068a849fb813b9bafaea78286a0c6f  PB130002.ORF
 ```
 
+## Regenerating them
+
+From this folder's parent, with nothing but the repository (no firmware, no camera files):
+
+```
+python3 make_mock2.py      # -> out/mock/PB130001.ORF, PB130002.ORF and their layouts
+python3 make_mock.py       # -> out/mock/PB120001.ORF and its layout
+```
+
+Needs Python with numpy, scipy and numba, and `exiftool` on the path. The patch colours come from
+fixed random seeds, so the output is byte-identical to the files here (checked from a fresh clone).
+
+The generators need one existing E-PM2 ORF as a **donor**: they reuse its header (everything before
+the raw data) and write their own raw data after it. By default the donor is `PB130001.ORF` in this
+folder. To build from your own camera's file instead, so the header carries your camera's white
+balance, matrix and calibration:
+
+```
+ORF_DONOR=/path/to/any-E-PM2-photo.ORF python3 make_mock2.py
+```
+
+The raw data is then the same; only the header differs. If the three ORF files are ever removed
+from the repository, this is how to make them again.
+
 Things to know:
 
 - The header (EXIF and maker notes, including white balance 5300 K and the colour matrix) comes from

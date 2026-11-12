@@ -5,13 +5,14 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sp = importlib.util.spec_from_file_location("fl", os.path.join(HERE, "fit_look.py")); fl = importlib.util.module_from_spec(sp); sp.loader.exec_module(fl)
 lab, de = fl.srgb_to_lab, fl.de2000
 K, X, N1, LUMA = 0.0621, np.arange(256), np.arange(1024), np.array([.299, .587, .114])
-BASE, IDENT = fl.table(0x7E74E9BC), fl.table(fl.IDENTITY)
+HAVE_FW = fl._b0 is not None            # without the stock firmware block only the sample sets and constants work (enough for make_mock*.py)
+BASE, IDENT = (fl.table(0x7E74E9BC), fl.table(fl.IDENTITY)) if HAVE_FW else (None, None)
 IDG = np.tile(N1.astype(float), (3, 1))
 M5300 = np.array([418, -140, -22, -56, 360, -48, 14, -132, 374]).reshape(3, 3) / 256.0
 CP0 = np.array([0, 3, 0, 0, 0, 0.0])
-Xv = np.load(os.path.join(HERE, "out", "sixaxis_rank_lin.npy")).reshape(6, 2, 3)
+_xv = os.path.join(HERE, "out", "sixaxis_rank_lin.npy"); Xv = np.load(_xv).reshape(6, 2, 3) if os.path.exists(_xv) else None
 CUBE = os.path.join(HERE, "out/lut/spektrafilm_v034_portra400_portraendura_1lut_vlog_srgb/lut_v034_portra400_portraendura.cube")
-_cube, _size = fl.load_cube(CUBE)
+_cube, _size = fl.load_cube(CUBE) if os.path.exists(CUBE) else (None, None)
 def target_rgb(lin): return np.clip(fl.apply_cube(_cube, _size, fl.encode(lin, "vlog")), 0, 1) * 255
 def target(v): return lab(target_rgb(v / fl.V_GRAY * 0.18))
 
