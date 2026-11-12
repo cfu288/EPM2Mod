@@ -1,0 +1,12 @@
+#!/bin/sh
+# Refuse commits that add machine-specific details: home-directory paths, session scratch paths, user@host targets.
+# Use placeholders instead (/path/to/..., USER@HOST, /tmp/scratch). Enable: git config core.hooksPath .githooks
+pattern='/home/[A-Za-z0-9._-]+/|/Users/[A-Za-z0-9._-]+/|/tmp/claude-[0-9]+|-home-[a-z0-9]+-|[A-Za-z0-9._-]+@[A-Za-z0-9-]+:[/~]'
+allow='USER@HOST:|git@github\.com:|/home/user/|/Users/user/'
+hits=$(git diff --cached -U0 --no-color --diff-filter=AM -- . ':(exclude).githooks' | grep -E '^\+' | grep -v -E '^\+\+\+ ' | grep -E "$pattern" | grep -v -E "$allow" | head -5)
+if [ -n "$hits" ]; then
+  echo "pre-commit: machine-specific paths or hosts in the staged changes (use /path/to, USER@HOST, /tmp/scratch):" >&2
+  printf '%s\n' "$hits" | cut -c1-160 >&2
+  exit 1
+fi
+exit 0

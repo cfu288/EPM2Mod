@@ -64,4 +64,4 @@ Current film build on the camera (`seven-films-5`, camera-tested 2026-11-12): `r
 
 Landscape research: `../reports/Olympus firmware modding landscape.md` and `../research_notes/Olympus firmware modding landscape/`.
 
-Commits follow Conventional Commits. Run `git config core.hooksPath .githooks` once. See [docs/conventions.md](docs/conventions.md).
+Commits follow Conventional Commits. Run `git config core.hooksPath .githooks` once: it enables the commit-message check and a check that refuses machine-specific paths and host names (use `/path/to/...`, `USER@HOST`). See [docs/conventions.md](docs/conventions.md).
