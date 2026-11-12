@@ -88,6 +88,12 @@ Ranked by value, risk and effort (02):
 - **oly_fw_analysis's GNU-simulator runner** (GPL-3.0) gets about 300 E-PM2 multiply sites and the float helpers wrong. It is not recommended.
 - **Our own minimal MN103 function emulator.** No external code is involved and our own disassembler already decodes the instruction set. It is the cleanest path for data-edit and small-routine tests, at an estimated effort of days.
 
+## 4d. Done 2026-11-12: om-emu runs E-PM2 functions
+
+`tools/emu/` runs single E-PM2 functions in om-emu (at ~/opt/om-emu, Node 26 at ~/opt/node26), stock against patched. See tools/emu/README.md.
+- **Recording limit:** the routine 0x7E6EDE08, 48 cases. A 1740 → 3600 edit changes exactly the 6 rows stock clamps at 1740 s; each new value is the 4 GiB cap.
+- **Tone-curve selector** 0x7E56E837: `film-portra.json` also changes art codes 9/13/55/129/133, which share Portrait's Contrast-0 table. Trace those before flashing it.
+
 ## 5. Proposed order
 
 1. **Now, our own code (no approval):** items 4a.1–4a.4 and 4a.6, which make every future flash safer, and the docs/flashing.md limits in §3. Then 4a.5, 4a.7–4a.10.

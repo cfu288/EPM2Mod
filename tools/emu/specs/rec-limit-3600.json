@@ -1,0 +1,10 @@
+{
+ "name": "rec-limit-3600",
+ "description": "EMULATOR TEST INPUT ONLY (not a camera patch): the movie time limit `mov 1740,a3` at 0x7E6EDF20 (block offset 0x2CCF00) becomes `mov 3600,a3`; a 2-byte change of the imm16.",
+ "status": "emulator test input, not built for the camera",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {"type": "bytes", "block": 0, "offset": "0x2CCF01", "expect": "cc06", "new": "100e"}
+ ]
+}
