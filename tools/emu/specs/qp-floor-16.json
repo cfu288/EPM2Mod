@@ -1,0 +1,10 @@
+{
+ "name": "qp-floor-16",
+ "description": "EMULATOR TEST INPUT ONLY (not a camera patch): the H.264 minimum-QP immediate `mov 20,d0` at 0x7EEA5A1F (block offset 0xA84A00) becomes `mov 16,d0`. This is the first-frame set-up 0x7EEA57D4 only; the per-frame set-up 0x7EEA5C4C has its own `mov 20,d0` at 0x7EEA5EBB (offset 0xA84E9C), see qp-floor-16-both.json and experiments/2026-11-12-hardware/05-qp-floor.md.",
+ "status": "emulator test input, not built for the camera",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {"type": "bytes", "block": 0, "offset": "0xA84A00", "expect": "14", "new": "10"}
+ ]
+}

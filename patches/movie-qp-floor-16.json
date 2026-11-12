@@ -1,0 +1,10 @@
+{
+  "name": "movie-qp-floor-16",
+  "description": "Movie: lower the H.264 encoder's minimum QP from 20 to 16. There are two set-ups: the first frame (0x7EEA57D4, `mov 20,d0` at 0x7EEA5A1F, block-0 offset 0xA84A00) and every later frame (0x7EEA5C4C, `mov 20,d0` at 0x7EEA5EBB, offset 0xA84E9C). Both write the codec register 0x994043A8 as max<<8|min. The stock encoder holds QP at 20 while using only ~41% of its 20.48 Mb/s budget (experiments/2026-11-12-hardware/04-mov-clip-analysis.md, 05-qp-floor.md). The bitrate target, HRD buffer and 24 Mb/s parameter check are unchanged. Movie-only; restore = stock v1.6.",
+  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+  "ops": [
+    {"type": "bytes", "block": 0, "offset": "0xA849FC", "expect": "f892c88014f892c9", "new": "f892c88010f892c9"},
+    {"type": "bytes", "block": 0, "offset": "0xA84E98", "expect": "92a9018014f892dd", "new": "92a9018010f892dd"}
+  ]
+}

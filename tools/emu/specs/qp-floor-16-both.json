@@ -1,0 +1,11 @@
+{
+ "name": "qp-floor-16-both",
+ "description": "EMULATOR TEST INPUT ONLY (not a camera patch): both H.264 minimum-QP immediates 20 -> 16: `mov 20,d0` at 0x7EEA5A1F (offset 0xA84A00, first-frame set-up 0x7EEA57D4) and at 0x7EEA5EBB (offset 0xA84E9C, per-frame set-up 0x7EEA5C4C).",
+ "status": "emulator test input, not built for the camera",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {"type": "bytes", "block": 0, "offset": "0xA84A00", "expect": "14", "new": "10"},
+  {"type": "bytes", "block": 0, "offset": "0xA84E9C", "expect": "14", "new": "10"}
+ ]
+}
