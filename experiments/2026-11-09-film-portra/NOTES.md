@@ -1947,3 +1947,31 @@ without an anchor measurement; `--edge-weight` adds the gamut-edge patches (GRKi
   `0443a38804061afaf17a12906a6969101d9f54ffe006e0aeca0d21d68f9b29ae`; differs from the tested
   seven-films-3 only inside the film data tables. Supersedes seven-films-4 (same anchor, old model).
 - `check_film.py` now scores with model2 and prints all groups.
+
+## 46. `seven-films-5` on the camera: final; model at the rounding floor (2026-11-12)
+
+- Upload: `shots/films5/` (12 files), copies in `shots/measured/` (`F5_*`, `M_natural`, `M_vivid`,
+  `M_muted`, `M_portrait`). EXIF matrices as predicted in all seven.
+- Camera vs target, seven-films-3 → seven-films-5 (anchored prediction of §45.3 in brackets):
+  ColorChecker: Portra 1.68 → 1.63 (1.58), Ektachrome 1.78 → 1.69 (1.64), Pro 400H 1.61 → 1.51
+  (1.50), Kodachrome 1.41 → 1.36 (1.32), Vision3 1.71 → 1.63 (1.57), Velvia 1.89 → 1.91 (1.81),
+  Superia 2.13 → 1.96 (1.97). Skin: 1.26 → 1.15, 1.13 → 1.18, 1.37 → 1.01, 0.90 → 0.80, 1.16 → 1.00,
+  1.65 → 1.56, 1.70 → 1.65. Natural: 1.27 → 1.26, 1.29 → 1.27, 1.16 → 1.15, 1.08 → 1.06, 1.24 → 1.19,
+  1.48 → 1.44, 1.37 → 1.36. Gamut edge: 16.3 → 14.1, 16.7 → 13.9, 16.4 → 15.0, 17.8 → 15.8,
+  16.4 → 12.7, 20.7 → 16.8, 15.0 → 12.0 (predicted 14.2, 13.9, 15.2, 15.6, 12.8, 16.9, 12.2).
+  Full table in `docs/film-emulation.md` §4. Predictions held to about 0.1 everywhere: no further
+  correction round.
+- Stock picture modes on the same image (`calib_model.py`, modes with their stock look tables and
+  six-axis records): the model, never fitted on them, gives Natural 0.89, Vivid 0.92, Muted 0.86,
+  Portrait 0.90 on natural colours. So it generalises beyond the film slots.
+- Recalibration with the 21 film renderings + the four modes, tested on seven-films-5 (not
+  fitted): natural 0.92 → 0.92, ColorChecker 0.89 → 0.87, skin 0.78 → 0.73, gamut edge 1.28 → 1.15;
+  Muted skin 1.32 → 0.58. K and the saturation scale did not move. Saved to `calib/model2.npz`
+  (with one saturation value per mode: Natural 1.072, Vivid 1.183, Muted 1.069, Portrait 1.076).
+- **The model is at the floor**: camera vs model 0.9 on natural colours against a rounding floor of
+  about 0.8 (JPEG 8-bit and the camera's own rounding). What separates the films from their targets
+  now (1.1–1.5 natural, 1.4–2.0 ColorChecker) is what the camera's adjustable parts can express plus
+  that floor, not model error. Out-of-range colours are capped by the camera's chroma limit.
+- Remaining ideas, none started: sub-code dither is not available; a 3-D stage does not exist in
+  this pipeline; a different matrix per white-balance preset is not possible (one art matrix per
+  film), and §44 showed it is not needed.

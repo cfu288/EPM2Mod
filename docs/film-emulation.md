@@ -22,12 +22,12 @@ look. Live view shows it too.
 | **Superia 400** | Cross Process | Fuji Superia X-tra 400 negative, printed on Fuji Crystal Archive paper |
 | Gentle Sepia, Dramatic Tone, Key Line, Watercolor | (unchanged) | |
 
-Current build on the camera: `build/seven-films-2.BIN`, built with
+Current build on the camera: `build/seven-films-5.BIN`, built with
 
 ```
-python3 tools/build.py patches/remap7b-code.json patches/slot3-chroma-linear.json \
-    patches/seven-structure-extra.json patches/seven-films-2.json \
-    patches/xp-adaptive-hue-off.json patches/seven-labels.json -o build/seven-films-2.BIN
+python3 tools/build.py patches/remap7b-code.json patches/seven-fixes-1.json \
+    patches/seven-structure-extra.json patches/seven-films-5.json \
+    patches/xp-adaptive-hue-off.json patches/seven-labels.json -o build/seven-films-5.BIN
 ```
 
 Earlier and failed patch specs are kept in `patches/history/` as a record; do not build from them
@@ -126,15 +126,17 @@ Camera versus target, average ΔE, measured with the test file:
 
 | Group | Portra | Ektachrome | Pro 400H | Kodachrome | Vis 250D | Velvia | Superia 400 | Camera's Natural mode vs the same targets |
 |---|---|---|---|---|---|---|---|---|
-| Natural colours | 1.33 | 1.36 | 1.19 | 1.07 | 1.22 | 1.52 | 1.39 | about 3.5 to 6 |
-| Hold-out colours | 1.35 | 1.36 | 1.22 | 1.11 | 1.24 | 1.52 | 1.39 | about 3.5 to 6 |
-| Skin series | 1.36 | 1.35 | 1.14 | 0.97 | 1.13 | 1.68 | 1.56 | about 5 |
-| Grays | 0.98 | 0.77 | 0.61 | 0.89 | 0.74 | 0.79 | 0.74 | about 3 to 5 |
-| Near-neutrals | 1.08 | 1.04 | 0.92 | 0.86 | 0.91 | 1.06 | 1.10 | about 4.5 |
-| ColorChecker, five exposures | 2.58 | 2.24 | 2.33 | 1.79 | 2.71 | 2.50 | 2.66 | about 5 to 7 |
+| Natural colours | 1.26 | 1.27 | 1.15 | 1.06 | 1.19 | 1.44 | 1.36 | 3.9 to 6.0 |
+| Hold-out colours | 1.26 | 1.30 | 1.19 | 1.08 | 1.20 | 1.47 | 1.39 | about the same |
+| Skin series | 1.15 | 1.18 | 1.01 | 0.80 | 1.00 | 1.56 | 1.65 | 4.3 to 6.2 |
+| Grays | 0.78 | 0.72 | 0.67 | 0.68 | 0.73 | 0.81 | 0.75 | 2.8 to 4.7 |
+| Near-neutrals | 1.00 | 0.91 | 0.91 | 0.85 | 0.93 | 0.99 | 0.98 | 3.1 to 5.1 |
+| ColorChecker, five exposures | 1.63 | 1.69 | 1.51 | 1.36 | 1.63 | 1.91 | 1.96 | 5.6 to 7.8 |
+| Out-of-range colours | 14.1 | 13.9 | 15.0 | 15.8 | 12.7 | 16.8 | 12.0 | 14 to 22 |
 
-Each film had one model-only first fit and one correction round against its own measurement
-(Portra and Ektachrome had more while the method was being developed).
+These are from build `seven-films-5`. Each film went through a model-only first fit and two to
+four correction rounds as the method grew: plain correction, then the chroma curves, then the
+second camera model.
 
 How to read this:
 
@@ -142,8 +144,11 @@ How to read this:
 - **Strongly saturated chart colours are the weak spot** (individual patches 3 to 10 off, worst when
   overexposed). This is a limit of the camera's adjustable parts, not of the tuning: the model
   predicted most of it.
-- **Very bright, extreme colours** (pure cyan, pure green at high brightness) are far off, 13 and
-  more. The camera compresses them in a way we have not modelled. Natural scenes rarely contain them.
+- **Out-of-range colours** (colours so saturated that one channel goes negative after the camera's
+  colour matrix: the deepest yellows, cyans, greens, magentas) stay far off, 12 to 17. We now know
+  why. The camera carries the negative value through its brightness curves, which darkens the
+  colour, and limits how strong colour may get. The model reproduces this to about 1, so the fit
+  does what can be done; the rest is a hard limit of the camera. Stock Natural is no better (14 to 22).
 - **There is a floor of about 0.8** on natural colours and about 0.9 on grays. The JPEG stores 256
   levels per channel and the camera rounds at several steps, so its output scatters by about one
   level around anything we ask for. Grays are already at that floor.
