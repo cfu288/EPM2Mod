@@ -1897,3 +1897,53 @@ film entries; the EXIF ColorMatrix gives each setting's matrix.
 - `build/seven-films-4.BIN` (same patch list with seven-films-4), sha256
   `06ba7e02e1f2f2b9ad35fc4a08f6b244a9fccb31ddd4d6277c9eeca1bfeff4b6`. Differs from seven-films-3
   only inside the film data tables (checked byte by byte); blocks 1–3 equal. NOT flashed.
+
+## 45. Second camera model: out-of-range colours, recalibration on the synthetic image; `seven-films-5` (2026-11-12; NOT flashed)
+
+User: the goal is the best reasonable accuracy; improve the model rather than stop at its limit.
+
+### 45.1 Where the first model was wrong (`eval_model.py`, 21 renderings of test image A with known settings)
+- Ordinary groups: camera vs model 0.7–1.05, no structure worth modelling except a −0.3 code offset
+  on neutral patches (adding it to the model did not help).
+- **Gamut-edge patches: 9.2.** Reading single patches of stock Natural showed the rule. Example:
+  scene-linear (after the colour matrix) 4578, −827, 1807 → camera 161, 0, 204; old model 255, 0, 253.
+  1. A negative value after the matrix is not clipped: it goes through the tone curves with its
+     sign (curve(−x) = −curve(x)), base table and per-channel table alike, and so lowers the luma.
+  2. Luma below 0 is held at 0.
+  3. Cb and Cr are limited to ± about 122 codes around 128 (after the saturation gain, before the
+     chroma curves).
+  With these three (`model2.py`) the example gives 161, 0, 204; gamut-edge 9.21 → 0.89 (limit 122),
+  other groups unchanged, ColorChecker 1.05 → 1.00. Without the odd per-channel tables: 9.04.
+- Consequence: the saturated colours where the old fits "could not" reach the target were partly a
+  model blind spot. Any colour whose matrix output has a negative component (deep yellows, cyans,
+  saturated greens and magentas) is affected, not only artificial extremes.
+
+### 45.2 Recalibration without photographed charts (`calib_model.py` → `calib/model2.npz`, in git)
+- Refitted on 14 renderings of test image A (builds before seven-films-3): the 12 six-axis direction
+  vectors (ridge towards the old ones, because the red hue value is 0 in every film and the free fit
+  sent that direction to nonsense), the exposure scale K (× 0.9964) and saturation per gain unit
+  (× 1.032 → 0.003839). Chroma limit chosen by ΔE on all patches: 124.
+- Held-out test, the seven renderings of seven-films-3: natural 1.02 → 0.91, hold-out 1.04 → 0.92,
+  ColorChecker 1.04 (1.12 with the old model) → 0.89, skin 0.89 → 0.79, grays 0.73, gamut edge
+  9.20 (old model) → 1.09.
+- The model's fitted constants now come from the synthetic RAW only. Still from the firmware: the
+  two tone tables, the matrix rounding rule. Still from a camera file: the 5300 K matrix (EXIF).
+
+### 45.3 `fit_film2.py`
+Everything in one fit with model2: matrix, three curves, six-axis, gain, two chroma curves; with or
+without an anchor measurement; `--edge-weight` adds the gamut-edge patches (GRKit's set has none).
+- Trade-off, Velvia, predicted: weight 0 → edge 20.7, ColorChecker 1.76; 0.25 → 16.9, 1.81; 1 →
+  15.3, 1.90; 4 → 12.1, 2.50. Portra at 1: edge 16.3 → 11.4, ColorChecker 1.68 → 1.74.
+  The camera's chroma limit caps what is reachable. **Chosen: 0.25** (near-free); the GRKit-only
+  variant is `--edge-weight 0`. Deviation from GRKit's sample set, flagged to the user.
+- Refits of all seven against the seven-films-3 measurements (`out/fit_film-*-m1.npz`), measured →
+  predicted, ColorChecker / skin / natural / gamut edge: Portra 1.68 → 1.58 / 1.26 → 1.19 / 1.27 →
+  1.22 / 16.3 → 14.2; Ektachrome 1.78 → 1.64 / 1.13 → 1.15 / 1.29 → 1.26 / 16.7 → 13.9; Pro 400H
+  1.61 → 1.50 / 1.37 → 1.03 / 1.16 → 1.14 / 16.4 → 15.2; Kodachrome 1.41 → 1.32 / 0.90 → 0.84 /
+  1.08 → 1.06 / 17.8 → 15.6; Vision3 1.71 → 1.57 / 1.16 → 1.03 / 1.24 → 1.16 / 16.4 → 12.8; Velvia
+  1.89 → 1.81 / 1.65 → 1.60 / 1.48 → 1.41 / 20.7 → 16.9; Superia 2.13 → 1.97 / 1.70 → 1.72 / 1.37
+  → 1.35 / 15.0 → 12.2.
+- `build/seven-films-5.BIN` (patch list of seven-films-3 with `seven-films-5`), sha256
+  `0443a38804061afaf17a12906a6969101d9f54ffe006e0aeca0d21d68f9b29ae`; differs from the tested
+  seven-films-3 only inside the film data tables. Supersedes seven-films-4 (same anchor, old model).
+- `check_film.py` now scores with model2 and prints all groups.

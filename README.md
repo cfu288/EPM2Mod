@@ -30,7 +30,7 @@ Flash `build/<name>.BIN` as `DCOLYMP/E1019999.BIN`, hold OK and power on. Full s
 
 ## Patches
 
-Current film build on the camera (`seven-films-3`, camera-tested 2026-11-12): `remap7b-code` + `seven-fixes-1` + `seven-structure-extra` + `seven-films-3` + `xp-adaptive-hue-off` + `seven-labels`. Built, **not camera-tested**: `seven-films-4` (the same list with `seven-films-4`: one correction round of the seven looks; NOTES §44). `slot3-chroma-linear` and `seven-films-2` are superseded.
+Current film build on the camera (`seven-films-3`, camera-tested 2026-11-12): `remap7b-code` + `seven-fixes-1` + `seven-structure-extra` + `seven-films-3` + `xp-adaptive-hue-off` + `seven-labels`. Built, **not camera-tested**: `seven-films-5` (the same list with `seven-films-5`: all seven looks refitted with the second camera model, which handles out-of-range colours; NOTES §45). `seven-films-4` (an earlier correction with the first model), `slot3-chroma-linear` and `seven-films-2` are superseded.
 
 | Spec | Status |
 |---|---|

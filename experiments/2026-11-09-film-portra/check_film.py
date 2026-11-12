@@ -13,12 +13,11 @@ z = np.load(argv[2]); cube, size = fl.load_cube(str(z["lut"]))
 tgt = lambda v: lab(np.clip(fl.apply_cube(cube, size, fl.encode(np.maximum(v, 0) / fl.V_GRAY * 0.18, "vlog")), 0, 1) * 255)
 d = load(name); J, k, ok = d["jpg"], d["kind"], d["ok"]
 print("camera ColorMatrix x256:", (d["M"] * 256).round().astype(int).ravel().tolist(), " expected:", (f.renormalise(z["A"]) * 2).ravel().tolist())
-dT = de(lab(J), tgt(d["vs"])); P = f.R(d["u"], z["G"], float(z["sat"]), z["S"], z["H"], z["P"])
-if "Cb" in z.files:                                  # the build has fitted chroma curves (NOTES 43)
-    import chroma; P = np.clip(chroma.apply(P, tuple(z["Cb"][:2]) + (z["Cb_slope17"],), tuple(z["Cr"][:2]) + (z["Cr_slope17"],), stored=True), 0, 255)
+dT = de(lab(J), tgt(d["vs"])); import model2 as M2
+P = M2.render(d["u"], z["G"], M2.gain_of(z), z["S"], z["H"], z["P"], M2.chroma_of(z))          # second model (NOTES 45)
 dM = de(lab(J), lab(P)); dP = de(lab(P), tgt(d["vs"]))
 unc = (J.min(1) > 2) & (J.max(1) < 253)
-for kk, nm in ((5, "natural colours"), (3, "near-neutrals"), (2, "gray ramp")):
+for kk, nm in ((5, "natural colours"), (7, "ColorChecker x5"), (8, "skin series"), (6, "GRKit grays"), (3, "near-neutrals"), (2, "gray ramp"), (10, "gamut edge")):
     m = ok & (k == kk); mu = m & unc
     if not m.any(): continue                              # the blue-scene image (mock2b) has no near-neutrals or gray ramp
     print(f"  {nm:15s}: camera vs target {dT[m].mean():.2f} (p95 {np.percentile(dT[m], 95):.2f}, max {dT[m].max():.2f}) | predicted {dP[m].mean():.2f} | camera vs model {dM[mu].mean():.2f}  (n={m.sum()})")

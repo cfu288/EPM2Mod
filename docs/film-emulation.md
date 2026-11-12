@@ -245,12 +245,18 @@ Side effects on entries we did not turn into films: the second types (Pop Art II
 
 1. Make the target: `spektrafilm-lut build …` for a negative with a print paper, `bake_slide.py` for
    a slide film.
-2. Fit: `fit_film.py --lut <target> --slot xp1 --name <name>`. The fitted numbers do not depend on
-   the slot; the slot only decides where a stand-alone patch would write them.
-3. Put the fit file into the `FILMS` table of `experiments/2026-11-09-film-portra/slots/build_seven_films.py`
-   (and a label no longer than the entry's stock name), run it, build with `tools/build.py` as in
-   section 1, flash, develop `PB130001.ORF` with that look, copy the JPEG back.
-4. Correct: `fit_film.py … --anchor <measurement> <first fit> --robust 3`, rebuild, flash, check again.
+2. Fit: `fit_film2.py --lut <target> --name <name>` (second camera model: matrix, three curves,
+   per-hue values, saturation and the two chroma curves in one go).
+3. Put the fit's name into a new entry of the `FITS` table in
+   `experiments/2026-11-09-film-portra/slots/build_seven_films.py` (and a label no longer than the
+   entry's stock name in `LABELS`), run it with the new tag, build with `tools/build.py`, flash,
+   develop `PB130001.ORF` with that look, copy the JPEG back.
+4. Correct: `fit_film2.py --name <name2> --anchor <reading of that JPEG> out/fit_<name>.npz`,
+   rebuild, flash, check again with `check_film.py`.
+
+The model's fitted constants come from developments of the synthetic test image alone
+(`calib_model.py`, stored in `calib/model2.npz`), so none of this needs the photographed charts of
+the early stages.
 
 Before using a new menu entry as a slot, develop the test file with its **stock** look first and
 check that the model reproduces it to about 0.9 ΔE. A worse match means the entry has processing
