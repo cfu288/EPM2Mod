@@ -52,7 +52,7 @@ class Film:
         if not label or "\0" in self.label or len(label) > len(entry):
             raise BuildError(
                 f"the label '{self.label}' must be 1 to {len(self.entry)} "
-                f"characters, not longer than the menu entry '{self.entry}'"
+                f"UTF-16 units, not longer than the menu entry '{self.entry}'"
             )
         if not is_repo_relative(self.fit):
             raise BuildError(

@@ -14,6 +14,7 @@ Text is written as UTF-8 with the line ends it is given, on every platform.
 
 from __future__ import annotations
 
+import errno
 import json
 import os
 from pathlib import Path
@@ -25,6 +26,16 @@ from .errors import Epm2ModError, FileError
 Log = Callable[[str], None]
 
 _PART_SUFFIX = ".part"
+#: Reasons for which a folder cannot be flushed on some platforms and file
+#: systems. They do not mean that data was lost.
+_NO_FOLDER_SYNC = {
+    errno.EINVAL,
+    errno.ENOTSUP,
+    errno.EBADF,
+    errno.EACCES,
+    errno.EPERM,
+    errno.EISDIR,
+}
 
 
 def silent(line: str) -> None:
@@ -68,9 +79,19 @@ def read_json(path: Path, error: type[Epm2ModError] = FileError) -> Any:
     """
     text = read_text(path, error)
     try:
-        return json.loads(text)
+        return json.loads(text, object_pairs_hook=_no_duplicates)
     except (ValueError, RecursionError) as reason:
         raise error(f"{path}: not JSON: {reason}") from None
+
+
+def _no_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    """Return a JSON object as a dict, or raise if it gives a key twice."""
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"the key '{key}' is there twice")
+        result[key] = value
+    return result
 
 
 def part_path(path: Path) -> Path:
@@ -79,7 +100,13 @@ def part_path(path: Path) -> Path:
 
 
 def sync_folder(folder: Path) -> None:
-    """Flush a folder's entry table to the device, where the platform can."""
+    """Flush a folder's entry table to the device, where the platform can.
+
+    Raises:
+        OSError: if the flush fails for a reason that can mean lost data (for
+            example an input/output error or a full device). A platform or
+            file system that cannot flush a folder is not an error.
+    """
     if not hasattr(os, "O_DIRECTORY"):
         return
     try:
@@ -88,8 +115,9 @@ def sync_folder(folder: Path) -> None:
         return
     try:
         os.fsync(handle)
-    except OSError:
-        pass
+    except OSError as reason:
+        if reason.errno not in _NO_FOLDER_SYNC:
+            raise
     finally:
         os.close(handle)
 
@@ -102,7 +130,9 @@ def write_bytes(
 ) -> None:
     """Write a file, all or nothing, and flush it to the device.
 
-    The folder is made if it is missing.
+    The folder is made if it is missing. The temporary file is always a new
+    file: something that already has its name is removed first, and a symbolic
+    link there is not followed.
 
     Args:
         path: the file to write.
@@ -121,7 +151,10 @@ def write_bytes(
     temporary = part_path(path)
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
-        with temporary.open("wb") as handle:
+        remove(temporary)
+        flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+        flags |= getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_BINARY", 0)
+        with os.fdopen(os.open(temporary, flags, 0o666), "wb") as handle:
             handle.write(data)
             handle.flush()
             os.fsync(handle.fileno())

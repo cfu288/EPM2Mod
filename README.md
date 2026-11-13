@@ -90,8 +90,8 @@ that the result is the tested build.
 
 **Steps:**
 
-1. Get this repository. On GitHub, click **Code → Download ZIP**, then unzip the file. As an
-   alternative, use git:
+1. Get this repository. On GitHub, click **Code → Download ZIP**, then unzip the file. Open a
+   terminal in the unzipped folder. As an alternative, use git:
 
    ```bash
    git clone https://github.com/cfu288/EPM2Mod.git

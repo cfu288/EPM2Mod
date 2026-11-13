@@ -171,19 +171,19 @@ class BuildDescription:
         return raw
 
 
-def description_from_json(
-    name: str, raw: Any, today: datetime.date | None = None
-) -> BuildDescription:
+def description_from_json(name: str, raw: Any) -> BuildDescription:
     """Build a description from its JSON form.
+
+    The test date is checked for its form only. That it is not in the future
+    is checked when a test is recorded (``pipeline.record_test``), not here: a
+    recorded build must stay readable on a computer whose clock is wrong.
 
     Args:
         name: the build's name.
         raw: the parsed JSON.
-        today: the current date, for the check of the test date; for tests.
 
     Raises:
-        BuildError: if the name or the JSON is not valid, or the test date is
-            in the future.
+        BuildError: if the name or the JSON is not valid.
     """
     if not isinstance(raw, dict):
         raise BuildError(f"{name}: a build description must be a JSON object")
@@ -196,8 +196,6 @@ def description_from_json(
     if not isinstance(specs, list):
         raise BuildError(f"{name}: 'specs' must be a list of paths")
     sha256, tested = raw.get("sha256"), raw.get("camera_tested")
-    if tested is not None:
-        check_test_date(_check_date(tested, name), today or datetime.date.today())
     return BuildDescription(
         name=name,
         what=what.strip(),
@@ -243,7 +241,7 @@ def pinned_description(paths: RepoPaths) -> BuildDescription:
             ``builds/``, or names a build that is not tested.
     """
     raw = read_json(paths.pinned, BuildError)
-    target = raw.get("build") if isinstance(raw, dict) else None
+    target = raw.get("build") if isinstance(raw, dict) and len(raw) == 1 else None
     prefix = paths.builds.name + "/"
     if (
         not isinstance(target, str)

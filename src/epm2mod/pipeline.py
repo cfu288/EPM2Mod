@@ -22,7 +22,15 @@ What ``make`` guarantees about files:
   and read back (``fileio.write_bytes``). No final name ever holds part of a
   file.
 * On the SD card the new file replaces an older one only when it is complete
-  and was read back from the card.
+  and was read back from the card. The card is never given a part of a file
+  under the camera's file name.
+* ``--card`` takes only the top folder of a mounted volume, so a mistyped path
+  is not reported as a write to the card.
+
+These guarantees hold when a step fails and when the run is stopped by Ctrl-C
+or by a termination signal that the command line turns into an interrupt
+(``cli.interruptible``). They cannot hold when the process is killed outright
+or the power fails: then a ``.part`` file can stay, and the next run removes it.
 
 ``record_test`` is the separate step that turns a candidate into a tested build
 after a camera test.
@@ -31,6 +39,7 @@ after a camera test.
 from __future__ import annotations
 
 import datetime
+import os
 import shutil
 import subprocess
 import sys
@@ -145,10 +154,17 @@ def card_target(card: Path, stock: StockFirmware) -> Path:
     return card / CARD_FOLDER / stock.card_name
 
 
-def check_card(card: Path, stock: StockFirmware) -> list[str]:
-    """Check an SD card's firmware folder, before any work is done.
+def is_volume(folder: Path) -> bool:
+    """Return True if ``folder`` is the top folder of a mounted volume."""
+    return os.path.ismount(folder)
 
-    Only the content of the folder is checked. A card that is read-only or
+
+def check_card(card: Path, stock: StockFirmware) -> list[str]:
+    """Check an SD card's mount point and firmware folder, before any work is done.
+
+    ``card`` must be the top folder of a mounted volume. A folder that is not
+    one (a mistyped path, a mount point with no card in it) is refused, so that
+    it is never reported as a write to the card. A card that is read-only or
     full is found later, when the file is written.
 
     The camera's updater needs the firmware to be the only file in its folder.
@@ -164,12 +180,19 @@ def check_card(card: Path, stock: StockFirmware) -> list[str]:
         The names in the firmware folder that start with a dot.
 
     Raises:
-        BuildError: if ``card`` is not a folder, or the firmware folder cannot
-            be read or holds other files.
+        BuildError: if ``card`` is not the top folder of a mounted volume, or
+            the firmware folder cannot be read or holds other files.
     """
     if not card.is_dir():
         raise BuildError(
             f"{card}: no such folder. Give the place where the SD card is mounted."
+        )
+    if not is_volume(card):
+        raise BuildError(
+            f"{card}: is a folder, but not the top of a mounted volume, so it "
+            "is not an SD card. Give the place where the card is mounted (for "
+            "example /Volumes/NAME or E:\\). To get the files in a folder, run "
+            f"the command without --card and copy build/card/{CARD_FOLDER}."
         )
     target = card_target(card, stock)
     folder = target.parent
@@ -214,7 +237,14 @@ def copy_to_card(image: bytes, card: Path, stock: StockFirmware) -> Path:
     """
     check_card(card, stock)
     target = card_target(card, stock)
-    write_bytes(target, image, BuildError, read_back=True)
+    try:
+        write_bytes(target, image, BuildError, read_back=True)
+    except BuildError as error:
+        raise BuildError(
+            f"{error}\nThe new firmware is NOT on the card. Look in "
+            f"{target.parent} before you use the card: an older {target.name} "
+            "can still be there."
+        ) from None
     return target
 
 
@@ -227,8 +257,9 @@ def clear_outputs(paths: RepoPaths, name: str | None) -> None:
     """Remove what an earlier run left: the card folder and one build's image.
 
     A caller that may fail before ``make`` runs (for example while it reads
-    the build description) calls this first, so that a failed run never leaves
-    the firmware of an earlier run in place.
+    the build description) calls this first. The card folder, which is what a
+    user copies to the SD card, is then never the one of an earlier run. The
+    image of a build is removed only if the caller knows the build's name.
 
     Args:
         paths: the repository.
@@ -277,13 +308,16 @@ def make(
 
     Raises:
         Epm2ModError: with a message for the user, if any step fails. Then
-            ``build/NAME.BIN`` and ``build/card`` do not exist, and a firmware
-            file on the SD card is as it was before. The same holds if the run
-            is interrupted while it writes.
+            ``build/NAME.BIN`` and ``build/card`` do not exist. The same holds
+            if the run is interrupted (see the module text). The SD card then
+            holds the firmware file it had before; only if the failure came
+            after the new file took its name does it hold the complete new file.
     """
     image = image_path(paths, description.name)
     card_copy = card_target(paths.card, stock)
     clear_outputs(paths, description.name)
+    if card is not None:
+        card = card.absolute()
     hidden = check_card(card, stock) if card is not None else []
     specs = load_specs(paths, description)
 

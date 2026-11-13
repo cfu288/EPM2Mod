@@ -41,7 +41,8 @@ Examples: `feat(patch/movie-limit): raise 29-min cap to 9 h`, `docs(camera-log):
 
 - **`src/epm2mod/` is production code.** It makes the firmware that goes on a camera. Rules:
   formatted with black (line length 88), type-checked with `mypy --strict`, a docstring on every
-  module, class and function, and a test for each behaviour (see *Tests*). The pre-commit hook
+  module, class and function of the package (a test checks this; the test files need docstrings
+  on helpers only where the name does not say enough), and a test for each behaviour (see *Tests*). The pre-commit hook
   formats the staged files of the package and its tests and runs mypy. To run the checks by hand:
 
   ```bash

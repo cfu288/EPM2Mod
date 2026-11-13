@@ -167,7 +167,7 @@ def http_get(request: urllib.request.Request, limit: int) -> bytes:
                     raise StockError(
                         f"{request.full_url}: the answer is larger than {limit} bytes"
                     )
-    except (OSError, http.client.HTTPException) as error:
+    except (OSError, ValueError, http.client.HTTPException) as error:
         raise StockError(f"{request.full_url}: download failed: {error}") from None
     return bytes(body)
 

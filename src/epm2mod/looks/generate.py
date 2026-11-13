@@ -28,6 +28,7 @@ from __future__ import annotations
 import re
 import struct
 import zipfile
+import zlib
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -342,7 +343,14 @@ def load_fit(path: Path) -> dict[str, NDArray[Any]]:
                 raise BuildError(f"{path}: is not a numpy .npz archive")
             with loaded as archive:
                 return {key: archive[key] for key in archive.files}
-    except (OSError, ValueError, EOFError, zipfile.BadZipFile) as error:
+    except (
+        OSError,
+        ValueError,
+        EOFError,
+        NotImplementedError,
+        zipfile.BadZipFile,
+        zlib.error,
+    ) as error:
         raise BuildError(f"{path}: cannot be read as a fit file: {error}") from None
 
 

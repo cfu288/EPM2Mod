@@ -156,7 +156,11 @@ class Container:
         return all(block.checksum_ok for block in self.blocks)
 
     def with_payloads(self, payloads: Sequence[bytes]) -> Container:
-        """Return a copy with new payloads, one per block, of unchanged lengths."""
+        """Return a copy with new payloads, one per block, of unchanged lengths.
+
+        Raises:
+            ContainerError: if the number of payloads or a length differs.
+        """
         if len(payloads) != len(self.blocks):
             raise ContainerError(
                 f"{len(payloads)} payloads for {len(self.blocks)} blocks"

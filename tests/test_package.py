@@ -12,16 +12,19 @@ from __future__ import annotations
 import ast
 import contextlib
 import datetime
+import errno
 import http.client
 import io
 import json
 import os
 import shutil
+import signal
 import struct
 import subprocess
 import sys
 import tempfile
 import unittest
+import urllib.request
 from pathlib import Path
 from typing import Any, Iterator
 from unittest import mock
@@ -59,6 +62,7 @@ from epm2mod.paths import RepoPaths, is_repo_relative  # noqa: E402
 PATHS = RepoPaths(ROOT)
 HAVE_STOCK = stock.stock_path(PATHS).is_file()
 TODAY = datetime.date(2026, 11, 20)
+REAL_IS_VOLUME = pipeline.is_volume
 
 
 TINY = make_container(
@@ -139,6 +143,12 @@ class RepoCase(unittest.TestCase):
         self.repo = TinyRepo(Path(folder) / "repo")
         self.card = Path(folder) / "card"
         self.card.mkdir()
+        # The stand-in card is a plain folder; say that it is a mounted volume.
+        patcher = mock.patch.object(
+            pipeline, "is_volume", side_effect=lambda folder: folder == self.card
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     def make(
         self, description: builds.BuildDescription, **kw: Any
@@ -302,6 +312,39 @@ class SpecTests(unittest.TestCase):
         payload = container.parse(applied.image).blocks[0].payload
         self.assertTrue(payload.startswith("WXYZAA".encode("utf-16-le")))
         self.assertTrue(applied.log[1].endswith("x1"))
+
+    def test_only_text_on_an_even_offset_counts(self) -> None:
+        def utf16(text: str) -> bytes:
+            return text.encode("utf-16-le")
+
+        def run(payload: bytes, count: int | None) -> bytes:
+            data = make_container([payload.ljust(48, b"\xff")])
+            op: dict[str, Any] = {
+                "type": "utf16-replace-all",
+                "block": 0,
+                "old": "AB",
+                "new": "xy",
+            }
+            if count is not None:
+                op["count"] = count
+            raw = {
+                "name": "s",
+                "base": "x",
+                "base_sha256": sha256_bytes(data),
+                "ops": [op],
+            }
+            image = spec.apply_specs(data, [spec.spec_from_json(raw)]).image
+            return container.parse(image).blocks[0].payload
+
+        even, odd = utf16("AB"), b"\xff" + utf16("AB") + b"\xff"
+        both = even + b"\xff\xff" + odd
+        changed = run(both, 1)
+        self.assertEqual(changed[:4], utf16("xy"))
+        self.assertEqual(changed[6:12], odd)
+        with self.assertRaisesRegex(SpecError, "found 1 copies"):
+            run(both, 2)
+        with self.assertRaisesRegex(SpecError, "no copy found"):
+            run(odd, None)
 
     def test_refusals(self) -> None:
         cases: dict[str, dict[str, Any]] = {
@@ -551,6 +594,47 @@ class PathAndFileTests(unittest.TestCase):
             self.assertEqual(target.read_bytes(), b"old")
             self.assertEqual([p.name for p in target.parent.iterdir()], ["f.bin"])
 
+    def test_a_write_is_flushed_to_the_device(self) -> None:
+        with tempfile.TemporaryDirectory() as folder:
+            with mock.patch("epm2mod.fileio.os.fsync", wraps=os.fsync) as flush:
+                fileio.write_bytes(Path(folder) / "f.bin", b"data")
+            self.assertGreaterEqual(flush.call_count, 1)
+            failing = OSError(errno.EIO, "Input/output error")
+            with mock.patch("epm2mod.fileio.os.fsync", side_effect=failing):
+                with self.assertRaisesRegex(FileError, "Input/output error"):
+                    fileio.write_bytes(Path(folder) / "g.bin", b"data")
+            self.assertFalse((Path(folder) / "g.bin").exists())
+
+    @unittest.skipUnless(hasattr(os, "O_DIRECTORY"), "no folder flush here")
+    def test_a_folder_flush_reports_lost_data_only(self) -> None:
+        with tempfile.TemporaryDirectory() as folder:
+            for code, raises in ((errno.EINVAL, False), (errno.ENOSPC, True)):
+                error = OSError(code, os.strerror(code))
+                with mock.patch("epm2mod.fileio.os.fsync", side_effect=error):
+                    if raises:
+                        with self.assertRaises(OSError):
+                            fileio.sync_folder(Path(folder))
+                    else:
+                        fileio.sync_folder(Path(folder))
+
+    @unittest.skipUnless(hasattr(os, "symlink"), "no symbolic links here")
+    def test_a_link_at_the_temporary_name_is_not_followed(self) -> None:
+        with tempfile.TemporaryDirectory() as folder:
+            victim, target = Path(folder) / "victim.txt", Path(folder) / "f.bin"
+            victim.write_bytes(b"keep me")
+            fileio.part_path(target).symlink_to(victim)
+            fileio.write_bytes(target, b"data")
+            self.assertEqual(victim.read_bytes(), b"keep me")
+            self.assertEqual(target.read_bytes(), b"data")
+            self.assertFalse(target.is_symlink())
+
+    def test_a_json_key_that_is_there_twice_is_refused(self) -> None:
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "f.json"
+            path.write_text('{"a": 1, "b": {"c": 1, "c": 2}}')
+            with self.assertRaisesRegex(FileError, "'c' is there twice"):
+                fileio.read_json(path)
+
     def test_line_ends_are_written_as_given(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / "f.txt"
@@ -643,16 +727,16 @@ class BuildDescriptionTests(unittest.TestCase):
             with self.assertRaises(BuildError):
                 candidate.as_tested(sha, date)
 
-    def test_a_test_date_in_the_future_is_refused_when_a_description_is_read(
-        self,
-    ) -> None:
+    def test_reading_a_description_does_not_use_the_clock(self) -> None:
         record = {**self.GOOD, "sha256": "a" * 64}
-        today = {**record, "camera_tested": TODAY.isoformat()}
-        self.assertTrue(builds.description_from_json("b", today, TODAY).tested)
-        tomorrow = {**record, "camera_tested": "2026-11-21"}
-        with self.assertRaises(BuildError) as raised:
-            builds.description_from_json("b", tomorrow, TODAY)
-        self.assertIn("future", str(raised.exception))
+        far = {**record, "camera_tested": "2999-01-01"}
+        # Reading does not look at the clock: a recorded build stays readable.
+        self.assertTrue(builds.description_from_json("b", far).tested)
+        with self.assertRaisesRegex(BuildError, "future"):
+            builds.check_test_date("2999-01-01", TODAY)
+        for what in ("a <b> c", "<!-- x -->"):
+            with self.assertRaisesRegex(BuildError, "plain text"):
+                builds.description_from_json("b", {**self.GOOD, "what": what})
 
     def test_a_description_file(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
@@ -693,6 +777,7 @@ class BuildDescriptionTests(unittest.TestCase):
                 {"build": "builds/sub/b.json"},
                 {"build": "patches/b.json"},
                 {"build": 5},
+                {"build": "builds/b.json", "other": 1},
                 [],
             ]
             for pointer in pointers:
@@ -766,6 +851,22 @@ class StockTests(RepoCase):
         with answers() as opened:
             self.assertEqual(stock.obtain_stock(self.repo.paths, TINY_STOCK), TINY)
             opened.assert_not_called()
+
+    def test_an_answer_that_is_too_large_is_refused(self) -> None:
+        request = urllib.request.Request("https://example.invalid/f")
+        with answers(b"12345"):
+            self.assertEqual(stock.http_get(request, 5), b"12345")
+        with answers(b"123456"), self.assertRaisesRegex(StockError, "larger than 5"):
+            stock.http_get(request, 5)
+
+    def test_an_address_that_cannot_be_used_is_a_download_error(self) -> None:
+        request = urllib.request.Request("https://example.invalid/f")
+        with mock.patch(
+            "epm2mod.stock.urllib.request.urlopen",
+            side_effect=UnicodeEncodeError("idna", "x", 0, 1, "label too long"),
+        ):
+            with self.assertRaisesRegex(StockError, "download failed"):
+                stock.http_get(request, 5)
 
     def test_fetch_keeps_nothing_when_the_download_is_wrong(self) -> None:
         path = stock.stock_path(self.repo.paths, TINY_STOCK)
@@ -869,6 +970,16 @@ class MakeTests(RepoCase):
         self.make(self.repo.tested, card=self.card, log=lines.append)  # again: allowed
         self.assertTrue(any("._E1019999.BIN" in line for line in lines))
 
+    def test_a_folder_that_is_not_a_mounted_volume_is_not_a_card(self) -> None:
+        self.assertTrue(REAL_IS_VOLUME(Path(self.card.anchor)))
+        self.assertFalse(REAL_IS_VOLUME(self.card))
+        plain = self.card.parent / "plain-folder"
+        plain.mkdir()
+        with self.assertRaisesRegex(BuildError, "not the top of a mounted volume"):
+            self.make(self.repo.tested, card=plain)
+        self.assertEqual(list(plain.iterdir()), [])
+        self.assertEqual(self.repo.outputs(), [])
+
     def test_a_card_problem_is_found_before_any_work(self) -> None:
         folder = self.card / "DCOLYMP"
         folder.mkdir()
@@ -902,7 +1013,7 @@ class MakeTests(RepoCase):
             real_write(path, data, error, read_back)
 
         with mock.patch("epm2mod.pipeline.write_bytes", side_effect=fail_on_card):
-            with self.assertRaises(BuildError):
+            with self.assertRaisesRegex(BuildError, "NOT on the card"):
                 self.make(self.repo.tested, card=self.card)
         self.assertEqual(target.read_bytes(), b"older firmware")
         self.assertEqual(self.repo.outputs(), [])
@@ -1064,6 +1175,18 @@ class CommandLineTests(RepoCase):
             self.assertEqual(status, status_wanted, text)
             self.assertEqual(out.exists(), status_wanted == 0)
 
+    def test_apply_of_several_specs_does_not_use_a_single_spec_sha256(self) -> None:
+        first = {**spec_json("b", [BYTE_OP]), "expected_sha256": "0" * 64}
+        other_op = {**BYTE_OP, "offset": "0x20", "expect": "2021"}
+        files = [
+            str(self.repo.write_json("patches/b.json", first)),
+            str(self.repo.write_json("patches/c.json", spec_json("c", [other_op]))),
+        ]
+        out = self.repo.paths.root / "x.BIN"
+        status, text = self.run_cli("apply", *files, "-o", str(out))
+        self.assertEqual(status, 0, text)
+        self.assertTrue(out.exists())
+
     def test_apply_does_not_write_over_the_stock_firmware(self) -> None:
         spec_file = str(self.repo.paths.resolve("patches/a.json"))
         stock_file = stock.stock_path(self.repo.paths, TINY_STOCK)
@@ -1084,6 +1207,26 @@ class CommandLineTests(RepoCase):
             status, text = self.run_cli("looks")
         self.assertEqual(status, 1, text)
         self.assertIn("numpy is needed", text)
+
+    @unittest.skipUnless(hasattr(signal, "SIGTERM"), "no SIGTERM here")
+    def test_a_termination_signal_is_an_interrupt(self) -> None:
+        before = signal.getsignal(signal.SIGTERM)
+        with self.assertRaises(KeyboardInterrupt):
+            with cli.interruptible():
+                signal.raise_signal(signal.SIGTERM)
+        self.assertIs(signal.getsignal(signal.SIGTERM), before)
+
+    def test_an_interrupted_command_leaves_no_output_and_says_so(self) -> None:
+        self.assertEqual(self.run_cli("make")[0], 0)
+
+        def terminate(*args: Any, **kw: Any) -> None:
+            signal.raise_signal(signal.SIGTERM)
+
+        with mock.patch("epm2mod.pipeline.write_bytes", side_effect=terminate):
+            status, text = self.run_cli("make")
+        self.assertEqual(status, 130, text)
+        self.assertIn("interrupted", text)
+        self.assertEqual(self.repo.outputs(), [])
 
     def test_python_m_epm2mod(self) -> None:
         env = {**os.environ, "PYTHONPATH": str(ROOT / "src")}
@@ -1193,6 +1336,13 @@ class ReadmeTests(unittest.TestCase):
         self.assertIn(stock.EPM2_V16.sha256, fresh)
         self.assertEqual(readme.update(fresh, PATHS), fresh)
         self.assertIn("-->\r\n", fresh)
+
+    def test_the_builds_table_lists_tested_builds_only(self) -> None:
+        with tempfile.TemporaryDirectory() as folder:
+            repo = TinyRepo(Path(folder))
+            table = readme.builds_block(repo.paths)
+        self.assertIn("| `good` (pinned) | A tiny build | 1 | 2026-11-13 |", table)
+        self.assertNotIn("new", table)
 
     def test_cell(self) -> None:
         self.assertEqual(readme.cell("a | b\nc"), "a \\| b c")

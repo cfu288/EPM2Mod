@@ -13,16 +13,18 @@
 
 Exit status: 0 for success, 1 for an error that is reported as one message (or,
 for ``info``, ``readme --check`` and ``looks``, a check that failed), 2 for a
-wrong command line.
+wrong command line, 130 if the run was interrupted.
 """
 
 from __future__ import annotations
 
 import argparse
+import contextlib
 import io
+import signal
 import sys
 from pathlib import Path
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Iterator, Sequence
 
 from . import __version__, readme
 from .builds import (
@@ -60,10 +62,14 @@ def _description(paths: RepoPaths, argument: str) -> BuildDescription:
 
 
 def _make(args: argparse.Namespace, paths: RepoPaths) -> int:
-    """Run ``epm2mod make``."""
+    """Run ``epm2mod make``.
+
+    What an earlier run left is removed before anything can fail: always the
+    card folder, and the image of the build if a build is named.
+    """
+    clear_outputs(paths, None if args.build is None else Path(args.build).stem)
     if args.card == "":
         raise BuildError("--card needs the place where the SD card is mounted")
-    clear_outputs(paths, None if args.build is None else Path(args.build).stem)
     description = (
         pinned_description(paths)
         if args.build is None
@@ -239,7 +245,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     looks_cmd = command(
-        "looks", _looks, "Compare the film-look patch specs with the generated ones."
+        "looks", _looks, "Check or write the generated film-look patch specs."
     )
     looks_mode = looks_cmd.add_mutually_exclusive_group()
     looks_mode.add_argument(
@@ -251,6 +257,34 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+@contextlib.contextmanager
+def interruptible() -> Iterator[None]:
+    """Turn termination signals into ``KeyboardInterrupt`` for a block.
+
+    Closing the terminal or stopping the process politely then runs the same
+    clean-up as Ctrl-C. The handlers that were there before are put back.
+    Outside the main thread, where handlers cannot be set, nothing is changed.
+    """
+
+    def interrupt(number: int, frame: object) -> None:
+        """Raise the interrupt in the main thread."""
+        raise KeyboardInterrupt
+
+    names = ("SIGTERM", "SIGHUP", "SIGBREAK")
+    signals = [getattr(signal, name) for name in names if hasattr(signal, name)]
+    before = {}
+    try:
+        for number in signals:
+            before[number] = signal.signal(number, interrupt)
+    except ValueError:
+        pass
+    try:
+        yield
+    finally:
+        for number, handler in before.items():
+            signal.signal(number, handler)
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     """Run the ``epm2mod`` command and return its exit status."""
     args = build_parser().parse_args(argv)
@@ -260,7 +294,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             stream.reconfigure(errors="backslashreplace")
     handler: Handler = args.run
     try:
-        return handler(args, repo_paths())
+        with interruptible():
+            return handler(args, repo_paths())
     except Epm2ModError as error:
         print(f"epm2mod: {error}", file=sys.stderr)
         return 1
+    except KeyboardInterrupt:
+        print("epm2mod: interrupted; nothing was left half-written", file=sys.stderr)
+        return 130

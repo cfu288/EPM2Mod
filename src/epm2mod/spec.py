@@ -150,7 +150,8 @@ class PatchSpec:
     Attributes:
         name: the spec's name.
         description: free text.
-        base: path of the stock firmware, relative to the repository root.
+        base: a note for people: the stock firmware file the spec is for. It
+            is not read; ``base_sha256`` is what ties a spec to its firmware.
         base_sha256: SHA-256 that the stock firmware must have.
         ops: the operations, in order.
         expected_sha256: SHA-256 of the firmware made from this spec alone, if known.
