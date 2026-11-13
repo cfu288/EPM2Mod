@@ -44,7 +44,7 @@ def pinned_block(paths: RepoPaths) -> str:
     what = pinned.what[:1].lower() + pinned.what[1:]
     return (
         f"The pinned build is **`{pinned.name}`**: {what}. "
-        f"It was flashed and tested on a real E-PM2 on {pinned.camera_tested} "
+        f"We tested this build on a real E-PM2 on {pinned.camera_tested} "
         "([camera log](docs/camera-log.md)).\n\n"
         "| | sha256 |\n|---|---|\n"
         f"| Stock firmware, `{EPM2_V16.file_name}` | `{EPM2_V16.sha256}` |\n"

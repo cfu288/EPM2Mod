@@ -57,7 +57,7 @@ What was in the firmware, how the patch works, how it was checked and what is no
 ## Install the latest tested firmware
 
 <!-- BEGIN GENERATED: pinned-build -->
-The pinned build is **`seven-films-6-interval-240`**: seven film looks as art filters, and interval shooting with up to 240 frames. It was flashed and tested on a real E-PM2 on 2026-11-13 ([camera log](docs/camera-log.md)).
+The pinned build is **`seven-films-6-interval-240`**: seven film looks as art filters, and interval shooting with up to 240 frames. We tested this build on a real E-PM2 on 2026-11-13 ([camera log](docs/camera-log.md)).
 
 | | sha256 |
 |---|---|
@@ -65,56 +65,98 @@ The pinned build is **`seven-films-6-interval-240`**: seven film looks as art fi
 | Pinned build, `seven-films-6-interval-240` | `01837f962f8a8ca0d189d9cd65ad9b5b35402ca3f3ed54a3872af044e050de11` |
 <!-- END GENERATED: pinned-build -->
 
-No firmware is distributed here, because it is the maker's copyrighted software. One command
-downloads Olympus's own v1.6 firmware from the maker's update server, applies this repository's
-patches, and checks that the result is byte-for-byte the tested build.
+This repository does not contain firmware. The firmware is the maker's copyrighted software. One
+command downloads the maker's v1.6 firmware, applies the patches of this repository, and makes sure
+that the result is the tested build.
 
-**You need:** a computer with [uv](https://docs.astral.sh/uv/getting-started/installation/), an SD card, a
-fully charged battery, and an E-PM2 with body firmware 1.6 (Setup menu → Firmware). uv gets the right
-Python for you; nothing else has to be installed.
+**You need:**
 
-1. **Get this repository.** Click **Code → Download ZIP** on GitHub and unzip it, or:
+- a computer with [uv](https://docs.astral.sh/uv/getting-started/installation/). uv gets the correct
+  Python for you.
+- an SD card
+- a fully charged battery
+- an E-PM2 with body firmware 1.6. To see the version, open Setup menu → Firmware.
+
+**Steps:**
+
+1. Get this repository. On GitHub, click **Code → Download ZIP**, then unzip the file. As an
+   alternative, use git:
 
    ```bash
    git clone https://github.com/cfu288/EPM2Mod.git
    cd EPM2Mod
    ```
 
-2. **Make the firmware.** Put the SD card in the computer and give its location:
+2. Put the SD card in the computer.
+
+3. Run this command. Give the location of the card after `--card`.
 
    ```bash
-   uv run tools/make_firmware.py --card /Volumes/NAME       # macOS; Linux: the card's mount point; Windows: E:\
+   uv run tools/make_firmware.py --card /Volumes/NAME
    ```
 
-   The script does four things and stops with a message if one of them fails:
+   On macOS the location is `/Volumes/NAME`. On Windows it is a drive letter, for example `E:\`. On
+   Linux it is the mount point of the card.
 
-   | Step | What it does |
+   The script does five steps. If a step fails, the script stops and tells you the cause. It does
+   not write an incorrect file.
+
+   | Step | What the script does |
    |---|---|
-   | 1 | Downloads `OLY_E_101_1600_0000_0000.BIN` (43 MB) from the maker's update server, if it is not there yet, and checks its sha256 |
-   | 2 | Applies the patch specs of the pinned build, in order |
-   | 3 | Checks that the result has the sha256 of the tested build. If not, it writes nothing |
-   | 4 | Copies the result to the card as `DCOLYMP/E1019999.BIN` and checks the copy |
+   | 1 | It downloads the maker's firmware file (43 MB), if the file is not there. It makes sure that the file is correct. |
+   | 2 | It makes sure that the patches do not use the same bytes. Only an untested build needs this step. |
+   | 3 | It applies the patches. |
+   | 4 | It makes sure that the result is the tested build. |
+   | 5 | It writes the firmware to the card as `DCOLYMP/E1019999.BIN`. It reads the file again to make sure that the copy is correct. |
 
-   Without `--card`, the file goes to `build/card/DCOLYMP/E1019999.BIN`. Copy the `DCOLYMP` folder
-   to the card yourself. The firmware must be the only file in `DCOLYMP`.
+4. Eject the card. Put the card in the camera.
 
-3. **Flash.** Eject the card and put it in the camera. With the camera off, hold **OK** and switch
-   the camera on. The lamp is solid orange for about one minute: do not touch the camera. When the
-   lamp blinks, the update is complete. Switch the camera off, then on.
+5. Make sure that the camera is off. Hold the **OK** button and push the **ON/OFF** button.
 
-4. **Check.** The art filter list shows Portra, Ektachrome, Pro 400H, Kodachrome, Vis 250D, Velvia
-   and Superia 400. Shooting Menu 2 shows Time Lapse Settings.
+6. Wait. The lamp is orange for approximately one minute. Do not touch the camera during this time.
+   When the lamp blinks, the update is complete.
 
-**To go back to the original firmware:** copy `firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN`
-(step 2 downloaded it) to the card as `DCOLYMP/E1019999.BIN`, and do step 3.
-More detail on flashing: [docs/flashing.md](docs/flashing.md).
+7. Push the **ON/OFF** button to stop the camera. Push it again to start the camera.
 
-### Builds
+8. Make sure that the update is correct. The art filter list shows Portra, Ektachrome, Pro 400H,
+   Kodachrome, Vis 250D, Velvia and Superia 400. Shooting Menu 2 shows Time Lapse Settings.
 
-Each firmware build has a description in [`builds/`](builds/): the patch specs in order and, after a
-camera test, the sha256 of the result and the date. [`pinned-build.json`](pinned-build.json) names the
-description of the last build that was tested on a camera. Give a description to the same script to
-make that build:
+### If you do not give `--card`
+
+The script writes the firmware to `build/card/DCOLYMP/E1019999.BIN`. Copy the `DCOLYMP` folder to
+the card. The firmware must be the only file in `DCOLYMP`.
+
+### To go back to the original firmware
+
+1. Run `uv run tools/fetch_stock.py`. This command downloads the maker's firmware file, or makes
+   sure that the file you have is correct.
+2. Copy `firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN` to the card as `DCOLYMP/E1019999.BIN`.
+   It must be the only file in `DCOLYMP`.
+3. Do steps 4 to 7.
+
+More about the update procedure: [docs/flashing.md](docs/flashing.md).
+
+### Limits of this build
+
+- A movie gets only a part of each film look.
+- Type II of Portra, Pro 400H and Superia is the same as type I.
+- The film looks do not add grain or halation.
+- Each interval frame uses the mechanical shutter.
+- Not yet tested: a full sequence of 240 frames, the cancellation of a sequence, and intervals
+  longer than 90 seconds.
+
+### Warning
+
+**Use this firmware at your own risk.** It is unofficial. It is for the E-PM2 with body firmware 1.6
+only. Olympus and OM Digital Solutions have no part in it. An incorrect or interrupted update can
+make a camera unusable. Do not put a firmware file for a different camera model on the card.
+
+## Builds, for developers
+
+Each firmware build has a description file in [`builds/`](builds/). The description names the patch
+specs in order. After a camera test it also holds the sha256 of the result and the date.
+[`pinned-build.json`](pinned-build.json) names the description of the last tested build. To make a
+different build, give its description to the script:
 
 ```bash
 uv run tools/make_firmware.py builds/seven-films-6.json
@@ -128,33 +170,14 @@ uv run tools/make_firmware.py builds/seven-films-6.json
 | `seven-films-6-interval` | Seven film looks as art filters, and interval shooting with up to 99 frames | 8 | 2026-11-13 | `f52ea6976ac2e9c567b2c07d7556b96b6431c8fcd2d90de195abdb76059e0104` |
 <!-- END GENERATED: builds -->
 
-To download and check the stock firmware only: `uv run tools/fetch_stock.py`.
+The project makes its own firmware with the same script. The procedure for a new build is in
+[docs/conventions.md](docs/conventions.md), section "Making firmware".
 
-The scripts use the Python standard library only, so `python3 tools/make_firmware.py` works too if
-you have Python 3.10 or newer.
+The scripts use only the Python standard library. If you have Python 3.10 or newer, you can use
+`python3` in place of `uv run`.
 
-This is also how the project makes its own firmware. A new combination of patch specs gets a
-description in `builds/`, is made with this script, and is pinned after it passes a camera test:
-[docs/conventions.md](docs/conventions.md), "Making firmware".
-
-The build refuses a wrong base file and checks every byte it replaces. For a build that has no
-recorded sha256 yet, the script first runs `tools/freespace.py check`: it fails if two specs use the
-same bytes or if a spec writes where the camera does not load the firmware.
-
-Limits of this build:
-
-- Movies get only part of each look.
-- The second type (II) of Portra, Pro 400H and Superia is the same as type I.
-- Grain and halation are not simulated.
-- Interval shooting: a full 240-frame sequence, cancelling a sequence and intervals longer than 90
-  seconds are not yet reported as tested. Each frame uses the mechanical shutter.
-
-**At your own risk.** This is unofficial, for the E-PM2 with body firmware 1.6 only, and not affiliated with
-Olympus or OM Digital Solutions. A wrong or interrupted flash can leave a camera unusable. Never put a
-firmware file for another model on the card.
-
-To run the project's own tests (some need the stock firmware file):
-`uv run python -m unittest discover -s tests`.
+To run the tests: `uv run python -m unittest discover -s tests`. Some tests need the maker's
+firmware file.
 
 ## Layout
 
