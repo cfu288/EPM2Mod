@@ -58,7 +58,7 @@ The pinned build is **`seven-films-6-interval-240`**: the seven film looks, and 
 with up to 240 frames. It was flashed and tested on a real E-PM2 on 2026-11-13
 ([camera log](docs/camera-log.md)).
 
-No firmware is distributed here: the maker's licence does not let others share it. One command
+No firmware is distributed here, because it is the maker's copyrighted software. One command
 downloads Olympus's own v1.6 firmware from the maker's update server, applies this repository's
 patches, and checks that the result is byte-for-byte the tested build.
 
