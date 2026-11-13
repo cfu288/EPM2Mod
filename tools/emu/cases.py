@@ -828,6 +828,7 @@ BODIES = {
                   value=(0x7EDED156, 0x7EDED3B9), fmt=(0x7EE02C6E, 0x7EE02CB2), get=0x7EE02BCC, ptrs=0x602BE89C),
 }
 CAVE = (0x7F033DE0, 0x7F033E13)   # interval-timelapse-insert.json: value-switch cave (rows 11 and 12)
+PAD2 = (0x7ECB0BA4, 0x7ECB1000)   # interval-timelapse-v2.json: all added code is in the segment-2 padding
 MEMSET = 0x7E500D73               # same address in both bodies
 
 
@@ -962,7 +963,7 @@ class MenuValue(Case):
     doc = ("main-menu right-column value of global row d0 (E-PM2 0x7EDEC2C0, E-PL6 0x7EDED156): reads the row's setting "
            "through getSetting and maps it to a string id with the row formatter (per-row {value, string} lists through "
            "the .data pointer table); writes the string id to (a3 = d1). Rows 1-37; the date row (kind 0x106) and the IS row (kind 0, NULL list) are skipped")
-    ranges = [BODIES[b][k] for b in BODIES for k in ("value", "fmt")] + [CAVE]
+    ranges = [BODIES[b][k] for b in BODIES for k in ("value", "fmt")] + [CAVE, PAD2]
     stubs_doc = [(0x7EE01D38, "getSetting(d0 id, a0 out): writes the row's value to *a0; the id is logged (E-PL6 0x7EE02BCC)")]
     # model: the info a row's value case reads = the top-table param, except these labels (V: switch disassembly)
     INFO_BY_LABEL = {363: 34, 1357: 482, 175: (31, 265)}      # Digital Tele-converter, Time Lapse, monitor adjust
@@ -1105,7 +1106,7 @@ class IvlSelector(Case):
     name, entry = "ivl_selector", 0x7E997BD9
     doc = ("interval sleep-timer selector (E-PM2 0x7E997BD9, E-PL6 0x7E998C41; patched: jmp to T2 0x7F033E40): d0 = mode; "
            "getter(482/489/487) from the row; logs the calls to isst / restore / hold / print in order")
-    ranges = [(0x7E997BD9, 0x7E997C67), (0x7E998C41, 0x7E998CE5), AWAKE_CAVE]
+    ranges = [(0x7E997BD9, 0x7E997C67), (0x7E998C41, 0x7E998CE5), AWAKE_CAVE, PAD2]
 
     def rows(self):
         return [dict(mode=m, i482=a, i489=b, i487=c) for m in (0, 1, 2, 3, 4) for a in (0, 1) for b in (0, 3)
@@ -1144,7 +1145,7 @@ class IvlStart(Case):
     name, entry = "ivl_start", 0x7E98849B
     doc = ("OlyHfwOpeShoot::startIntervalShooting (E-PM2 0x7E98849B, E-PL6 0x7E98948E): every callee stubbed by role; "
            "rows drive each branch (guard, busy, release, RTC error, next-time validity, > 90 s, event object, result)")
-    ranges = [(0x7E98849B, 0x7E988693), (0x7E98948E, 0x7E98968D), AWAKE_CAVE]
+    ranges = [(0x7E98849B, 0x7E988693), (0x7E98948E, 0x7E98968D), AWAKE_CAVE, PAD2]
     OBJ = DATA + 0x400
 
     def rows(self):
@@ -1186,3 +1187,54 @@ class IvlStart(Case):
 
 
 CASES.update({c.name: c for c in (IvlSelector(), IvlStart())})
+
+
+# ---- time-lapse-movie guard flag (interval-timelapse-v2.json; E-PL6 RAM 0x602B4B20, E-PM2 v2 RAM 0x602BE878) -------
+GUARD = {
+    "E-PM2": dict(flag=0x602BE878, res=0x602B4AF8, vget=(0x7E969A6A, 0x7E969A73), vram=0x602B0D08,
+                  fn={"create": (0x7ECDA530, 0x7ECDA5C6, (0xB0, 28)), "end": (0x7ECDA1A0, 0x7ECDA1C3, (0, 0)),
+                      "error": (0x7ECDA1C3, 0x7ECDA1F3, (0, 0)), "mount": (0x7ECDA28D, 0x7ECDA2B6, (0, 0))},
+                  roles={0x7ECD50FE: "pre1", 0x7ECD360A: "pre2", 0x7ECE6D79: "getinst", 0x7ECE631E: "print",
+                         0x7ECD9F4B: "complete", 0x7ECD50DE: "mountpre", 0x7ECDA7D1: "checkend", 0x7ECD5ECA: "timer"}),
+    "E-PL6": dict(flag=0x602B4B20, res=0x602B4B18, vget=(0x7E96A8A4, 0x7E96A8AD), vram=0x602B0D0C,
+                  fn={"create": (0x7ECDA87C, 0x7ECDA918, (0xB0, 28)), "end": (0x7ECDA499, 0x7ECDA4C3, (0, 0)),
+                      "error": (0x7ECDA4C3, 0x7ECDA4FA, (0, 0)), "mount": (0x7ECDA5AB, 0x7ECDA5DE, (0, 0))},
+                  roles={0x7ECD544E: "pre1", 0x7ECD3929: "pre2", 0x7ECE72EB: "getinst", 0x7ECE6890: "print",
+                         0x7ECDA20D: "complete", 0x7ECD542E: "mountpre", 0x7ECDAAFF: "checkend", 0x7ECD6215: "timer"}),
+}
+
+
+class IvlMovieGuard(Case):
+    name, entry = "ivl_movie_guard", 0x7ECDA530
+    doc = ("GUI time-lapse-movie guard flag: createTimeLapseMovie (set on an accepted request), receiveEndCreateMovie / "
+           "receiveErrorCreateMovie (clear), receiveEndMediaMountForEndWait (skip the end check while set). Callees "
+           "stubbed by role; the virtual create request (vt+364) is a real getter that returns the row's result")
+    ranges = [r for b in GUARD.values() for r in [b["vget"]] + [f[:2] for f in b["fn"].values()]] + [PAD2]
+    OBJ, THIS, VT = DATA + 0x600, DATA + 0x700, DATA + 0x800
+
+    def rows(self):
+        return ([dict(fn="create", pre1=a, pre2=b, req=c, flag=0) for a, b, c in
+                 ((1, 0, 0), (1, 0, 1), (0, 0, 0), (1, 1, 0))]
+                + [dict(fn=f, flag=v) for f in ("end", "error", "mount") for v in (0, 1)])
+
+    def run(self, emu, row):
+        prof = GUARD[body_of(emu.image)]
+        lo, hi, frame = prof["fn"][row["fn"]]
+        emu.write(prof["flag"], struct.pack("<I", row["flag"]))
+        emu.write(prof["res"], struct.pack("<I", 0x55))
+        emu.write(self.THIS, b"\0" * 128)
+        emu.write(self.OBJ, struct.pack("<I", self.VT))
+        emu.write(self.VT + 364, struct.pack("<I", prof["vget"][0]))
+        emu.write(prof["vram"], struct.pack("<I", row.get("req", 0)))
+        log = []
+        behave = {"pre1": lambda e, r: {"d0": row.get("pre1", 0)}, "pre2": lambda e, r: {"d0": row.get("pre2", 0)},
+                  "getinst": lambda e, r: {"a0": self.OBJ}}
+        r = emu.call(lo, {"a0": DATA + 0x900, "a1": self.THIS}, frame=frame,
+                     stubs=spy(prof["roles"], behave, log, skip=("print",)))
+        this = emu.read(self.THIS, 128)
+        u = lambda o: struct.unpack_from("<I", this, o)[0]
+        return {"calls": [c[0] for c in log], "flag": emu.u32(prof["flag"]), "result": emu.u32(prof["res"]),
+                "this": [u(28), u(92), u(108), u(116)], "_r": r}
+
+
+CASES.update({c.name: c for c in (IvlMovieGuard(),)})

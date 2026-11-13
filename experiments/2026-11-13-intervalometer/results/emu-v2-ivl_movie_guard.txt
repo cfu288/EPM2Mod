@@ -1,0 +1,10 @@
+patched bytes: 921 in 76 runs
+chg  fn=create pre1=1 pre2=0 req=0 flag=0
+     flag: 0 -> 1
+chg  fn=end flag=1
+     flag: 1 -> 0
+chg  fn=error flag=1
+     flag: 1 -> 0
+chg  fn=mount flag=1
+     calls: ["mountpre", "checkend"] -> ["mountpre"]
+ivl_movie_guard: 10 rows, 4 changed, 6 identical, 0 flagged

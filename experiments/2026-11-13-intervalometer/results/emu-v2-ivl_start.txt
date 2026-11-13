@@ -1,0 +1,18 @@
+patched bytes: 921 in 76 runs
+chg  release=0 guard=1 busy=0 ace4=0 rtc_err=0 valid=1 fs_err=0 dt=120 obj=1 res=0
+     calls: [["guard", 0], ["busy"], ["ace4"], ["rtc"], ["tosec"], ["get", 487], ["fromsec"], ["valid"], ["sel", 2], ["evinit"], ["new"], ["evget"], ["ctor"], ["exec"], ["evfree"]] -> [["guard", 0], ["busy"], ["ace4"], ["rtc"], ["hold"], ["tosec"], ["get", 487], ["fromsec"], ["valid"], ["sel", 2], ["evinit"], ["new"], ["evget"], ["ctor"], ["exec"], ["evfree"]]
+chg  release=0 guard=1 busy=0 ace4=0 rtc_err=0 valid=0 fs_err=0 dt=120 obj=1 res=0
+     calls: [["guard", 0], ["busy"], ["ace4"], ["rtc"], ["tosec"], ["get", 487], ["fromsec"], ["valid"]] -> [["guard", 0], ["busy"], ["ace4"], ["rtc"], ["hold"], ["tosec"], ["get", 487], ["fromsec"], ["valid"]]
+chg  release=0 guard=1 busy=0 ace4=0 rtc_err=0 valid=1 fs_err=1 dt=120 obj=1 res=0
+     calls: [["guard", 0], ["busy"], ["ace4"], ["rtc"], ["tosec"], ["get", 487], ["fromsec"], ["valid"]] -> [["guard", 0], ["busy"], ["ace4"], ["rtc"], ["hold"], ["tosec"], ["get", 487], ["fromsec"], ["valid"]]
+chg  release=0 guard=1 busy=0 ace4=0 rtc_err=0 valid=1 fs_err=0 dt=30 obj=1 res=0
+     calls: [["guard", 0], ["busy"], ["ace4"], ["rtc"], ["tosec"], ["get", 487], ["fromsec"], ["valid"], ["evinit"], ["new"], ["evget"], ["ctor"], ["exec"], ["evfree"]] -> [["guard", 0], ["busy"], ["ace4"], ["rtc"], ["hold"], ["tosec"], ["get", 487], ["fromsec"], ["valid"], ["evinit"], ["new"], ["evget"], ["ctor"], ["exec"], ["evfree"]]
+chg  release=0 guard=1 busy=0 ace4=0 rtc_err=0 valid=1 fs_err=0 dt=120 obj=0 res=0
+     calls: [["guard", 0], ["busy"], ["ace4"], ["rtc"], ["tosec"], ["get", 487], ["fromsec"], ["valid"], ["sel", 2], ["evinit"], ["new"], ["exec"], ["evfree"]] -> [["guard", 0], ["busy"], ["ace4"], ["rtc"], ["hold"], ["tosec"], ["get", 487], ["fromsec"], ["valid"], ["sel", 2], ["evinit"], ["new"], ["exec"], ["evfree"]]
+chg  release=0 guard=1 busy=0 ace4=0 rtc_err=0 valid=1 fs_err=0 dt=120 obj=1 res=4026531841
+     calls: [["guard", 0], ["busy"], ["ace4"], ["rtc"], ["tosec"], ["get", 487], ["fromsec"], ["valid"], ["sel", 2], ["evinit"], ["new"], ["evget"], ["ctor"], ["exec"], ["sel", 0], ["evfree"]] -> [["guard", 0], ["busy"], ["ace4"], ["rtc"], ["hold"], ["tosec"], ["get", 487], ["fromsec"], ["valid"], ["sel", 2], ["evinit"], ["new"], ["evget"], ["ctor"], ["exec"], ["sel", 0], ["evfree"]]
+chg  release=0 guard=1 busy=0 ace4=0 rtc_err=0 valid=1 fs_err=0 dt=120 obj=1 res=4026531928
+     calls: [["guard", 0], ["busy"], ["ace4"], ["rtc"], ["tosec"], ["get", 487], ["fromsec"], ["valid"], ["sel", 2], ["evinit"], ["new"], ["evget"], ["ctor"], ["exec"], ["sel", 0], ["evfree"]] -> [["guard", 0], ["busy"], ["ace4"], ["rtc"], ["hold"], ["tosec"], ["get", 487], ["fromsec"], ["valid"], ["sel", 2], ["evinit"], ["new"], ["evget"], ["ctor"], ["exec"], ["sel", 0], ["evfree"]]
+chg  release=0 guard=1 busy=0 ace4=0 rtc_err=0 valid=1 fs_err=0 dt=30 obj=1 res=4026531841
+     calls: [["guard", 0], ["busy"], ["ace4"], ["rtc"], ["tosec"], ["get", 487], ["fromsec"], ["valid"], ["evinit"], ["new"], ["evget"], ["ctor"], ["exec"], ["evfree"]] -> [["guard", 0], ["busy"], ["ace4"], ["rtc"], ["hold"], ["tosec"], ["get", 487], ["fromsec"], ["valid"], ["evinit"], ["new"], ["evget"], ["ctor"], ["exec"], ["evfree"]]
+ivl_start: 14 rows, 8 changed, 6 identical, 0 flagged

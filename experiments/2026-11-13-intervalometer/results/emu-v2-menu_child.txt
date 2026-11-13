@@ -1,0 +1,15 @@
+patched bytes: 921 in 76 runs
+FAIL tab=1 row=0
+     reads patched bytes but unchanged
+FAIL tab=1 row=1
+     reads patched bytes but unchanged
+FAIL tab=1 row=2
+     reads patched bytes but unchanged
+FAIL tab=1 row=3
+     reads patched bytes but unchanged
+chg  tab=1 row=4
+     panel: 18 -> 628
+chg  tab=1 row=5
+     absent: true -> null
+     panel: null -> 18
+menu_child: 43 rows, 2 changed, 41 identical, 4 flagged

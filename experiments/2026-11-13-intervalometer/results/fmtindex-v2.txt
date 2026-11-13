@@ -1,0 +1,26 @@
+7ede3736  mov 34,d0    -> call 0x7ee01dda
+7ede3769  mov 34,d0    -> call 0x7ee01dda
+7ede4fec  mov 34,d0    -> call 0x7ee01dda
+7ede5009  mov 34,d0    -> call 0x7ee01dda
+7ede5489  mov 5,d0     -> call 0x7ee01dda
+7edea21f  mov 34,d0    -> call 0x7ee01dda
+7edea252  mov 34,d0    -> call 0x7ee01dda
+7edfd3d6  mov 34,d0    -> call 0x7ee01dda
+7edfd3ef  mov 34,d0    -> call 0x7ee01dda
+7ede50a3  mov 34,d0    -> call 0x7ee01e8c
+7ede50bd  mov 34,d0    -> call 0x7ee01e8c
+7ede5222  mov 34,d0    -> call 0x7ee01e8c
+7ede523c  mov 34,d0    -> call 0x7ee01e8c
+7ede5290  mov 34,d0    -> call 0x7ee01e8c
+7ede52aa  mov 34,d0    -> call 0x7ee01e8c
+7edfd483  mov 34,d0    -> call 0x7ee01e8c
+7edfd499  mov 34,d0    -> call 0x7ee01e8c
+7edfd6cb  mov 34,d0    -> call 0x7ee01e8c
+7edfd6e1  mov 34,d0    -> call 0x7ee01e8c
+7edfd731  mov 34,d0    -> call 0x7ee01e8c
+7edfd747  mov 34,d0    -> call 0x7ee01e8c
+7edec462  mov 34,d0    -> call 0x7ee01dda
+7edec491  mov 34,d0    -> call 0x7ee01dda
+7edec4c5  mov 35,d0    -> call 0x7ee01dda
+switch tail 0x7EDEC437 receives rows [3, 5, 6, 7, 8, 10, 11, 12, 14, 33]
+largest row index 35 -> slot address 0x602be900 (table 0x602BE874..0x602BE907, 37 slots; next variable 0x602BE908): IN BOUNDS

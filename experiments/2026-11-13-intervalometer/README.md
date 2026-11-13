@@ -4,7 +4,8 @@ Goal: enable the dormant interval / time-lapse feature (info 482–486), using t
 
 - **Labels:** **V** = read in the bytes or run in the emulator; **I** = inferred.
 - **Addresses:** E-PM2 v1.6 runtime addresses (base 0x7E421020) unless the E-PL6 is named. The E-PL6 1.4 block 0 has the same base.
-- **Specs (all block 0 only, none built):**
+- **Specs (all block 0 only, none built). Use v2; the others are kept for reference:**
+  - [patches/interval-timelapse-v2.json](patches/interval-timelapse-v2.json): **the current spec** (48 ops, 921 bytes on stock). It is insert + keep-awake + the movie guard, with everything added moved out of the film builds' way. It applies on stock and on the seven-films-6 set. See §12.
   - [patches/interval-timelapse.json](patches/interval-timelapse.json): **replace** Flash RC Mode (5 ops, 14 bytes; the fallback).
   - [patches/interval-timelapse-insert.json](patches/interval-timelapse-insert.json): **insert** the row exactly as the E-PL6 does (43 ops, 626 bytes changed). See §10.
   - [patches/interval-timelapse-insert-awake.json](patches/interval-timelapse-insert-awake.json): insert + the E-PL6 **keep-awake** timer hold (47 ops, 818 bytes changed). See §11.
@@ -98,8 +99,8 @@ How the bodies were compared:
 | 7 | Card full (`cardFull` 0x7E9A9AFA), battery (`shutDown() Power OFF by BATTERY` 0x7ECE01DB, LED), `intervalRemainCount`, wake-up (`CAM_INTERVAL_*` 0x7ECD68D8), `TimeLapseGuard` error sequence 0x7EA95BDF | Same (V) | — |
 | 8 | GUI `executeClearIntervalShootingEnd` 0x7ECD2EFA, `receiveSubAppServiceStopReady` 0x7ECDA202 | The E-PL6 also skips / branches on GUI state **10**, which the E-PM2 does not have (EVF auto-switch era) | No (I) |
 | 9 | GUI `receiveEndIntervalShootingTimer` 0x7ECDA146 | The E-PL6 adds an AF-lock / zoom-frame restore (`getAflState` 344, `changeZoomStateScrollToFrame*`) | No (I): a magnified-LV nicety |
-| 10 | GUI `createTimeLapseMovie` 0x7ECDA530, `receiveEndCreateMovie` / `receiveErrorCreateMovie` 0x7ECDA1A0 / 0x7ECDA1C3 | The E-PL6 sets / clears an extra flag 0x602B4B20 around movie creation | No (I): its reader is E-PL6-only code |
-| 11 | GUI `receiveEndMediaMountForEndWait` 0x7ECDA28D | The E-PL6 adds a NULL check of a RAM pointer | No (I) |
+| 10 | GUI `createTimeLapseMovie` 0x7ECDA530, `receiveEndCreateMovie` / `receiveErrorCreateMovie` 0x7ECDA1A0 / 0x7ECDA1C3 | The E-PL6 sets a **time-lapse-movie guard flag** (RAM 0x602B4B20) to 1 after an accepted movie request (0x7ECDA8C1) and clears it when the movie ends or fails (0x7ECDA4B3, 0x7ECDA4DD). These 3 sites and row 11 are the only users of the flag (V) | **Yes with Time Lapse Movie On** (I; review 2 S2). Ported only in v2 (§12) |
+| 11 | GUI `receiveEndMediaMountForEndWait` 0x7ECDA28D | The E-PL6 **tests the same flag** (0x7ECDA5CA) and skips the end check while a movie is being made. The E-PM2 has this handler without the test (corrected: this is not a NULL check, and the reader is not E-PL6-only code) | As row 10 |
 | 12 | GUI mode-change 0x7ECD5270 / 0x7ECD5E61 | Same logic. If the 6 date/time fields from the clock getter are all 0, 482 is cleared (V code; "clock" is I) | — (set the clock) |
 | 13 | 0x7ECD5D80 and others | Event ids +1 (renumbering) | No |
 
@@ -184,7 +185,7 @@ The new cases are in `tools/emu/cases.py`. Each has an independent Python model 
 | (a) top table | 37 rows + terminator at **0x7F033C00**, byte-identical to E-PL6 0x7EFFF864. 6 imm32 → 0x7F033C00 (0x7EDEC0A5, …0FA, …121, …7A6, 0x7EDECF42, 0x7EDED085). The old table stays, now unreferenced | its own table |
 | (b) .data tab layout (ROM 0x7E8EE8A2) | tab 1 = 7–12, tabs 2–5 +1, tab-1 count 5 → 6: equal to E-PL6 | 0x7E8EE8CA |
 | (c) page 3 list | {13, 14, 15, 16, (628, 482), 18} + terminator at **0x7F033D80**; record pointer 0x7EFFA4B0 → it | 0x7EFFA324 |
-| (d1) .data row value lists (RAM 0x602BE874, 40 entries) | Off/On inserted at row 11, rows 11–38 → 12–39. Non-zero rows {3, 5, 6, 7, 10, 11, 12, 14, 33, 34, 35} and every list's content equal the E-PL6 | RAM 0x602BE89C (41 entries) |
+| (d1) .data row value lists (RAM 0x602BE874; **37 slots, not 40**: corrected in §12) | Off/On inserted at row 11, rows 11–38 → 12–39. Non-zero rows {3, 5, 6, 7, 10, 11, 12, 14, 33, 34, 35} and every list's content equal the E-PL6 | RAM 0x602BE89C (41 entries) |
 | (d2) value switch 0x7EDEC2C0 | the constants for rows 13, 31, 32, 33 and 34 +1 (10 sites). The old row-11 case at 0x7EDEC335 becomes `jmp 0x7F033DE0`, a **51-byte cave** that maps row 11 → getSetting(482) and row 12 → getSetting(180), then returns to the formatter tail 0x7EDEC432 or the next case 0x7EDEC34A. The 16 bytes after the jmp are left, unreachable (the only branches into the block target its start) | the case inserted in line, 0x7EDED1CB–0x7EDED1F2 |
 | (d3) panel row arguments | 20 × `mov 33,d0` → 34: the formatter / reverse formatter calls in the 10 monitor-adjust panel functions (0x7EDE35AC … 0x7EDFD725) | 34 at all 20 |
 | (e) defaults | 483 = 10, 485 = 5 s, as the replace spec | — |
@@ -279,7 +280,92 @@ The new cases are in `tools/emu/cases.py`. Each has an independent Python model 
 - if a run ends through a path that never calls the selector with mode 0, the timers stay held until the next restore (the E-PL6 has the same design);
 - power-off is held for the whole run, so the battery drains faster on long runs.
 
+## 12. v2 after the two reviews (`interval-timelapse-v2.json`) (V unless marked)
+Reviews: [review-1-memory.md](review-1-memory.md), [review-2-code.md](review-2-code.md). v2 is the insert + keep-awake spec with the fixes below. The three earlier specs are unchanged.
+
+### 12.1 B1: a new home for everything added
+- **The collision (V, `scripts/specscan.py`).** `seven-films-5` (on the camera as seven-films-6) writes 0x7F033B7C–0x7F033F7B. The insert specs wrote 0x7F033C00–0x7F033EF0. So `-insert` and `-insert-awake` **cannot be combined with the films**, and built alone they would remove the films.
+- **New place:** the segment-2 padding, **0x7ECB0BA4–0x7ECB0EE2** (831 B used; free up to 0x7ECB0FFF).
+
+| Check | Result |
+|---|---|
+| 0xFF in stock | 0x7ECB0888–0x7ECB0FFF is all 0xFF |
+| 0xFF after the film set | The film set ends at 0x7ECB0B9D (remap7b-code 0x7ECB0888 + 760 B, seven-movie-1 0x7ECB0B80 + 30 B). 0x7ECB0B9E–0x7ECB0FFF is 0xFF in the scratch-built films block 0. v2 starts at 0x7ECB0BA4, so its 4 context bytes are 0xFF on both bases |
+| Loaded at boot | Usr1 0x7E504BF2–0x7E504C18: SYSFMEM read, source 0x80794800, destination 0xBE8F5800, size `0x7ECB1000 − 0x7E8F5800`. This is before the segment-3 load, so segment-3 GUI code can always read the table, and the two segment-2 hooks no longer jump into a later segment (review 2 S1, review 1 §7.1) |
+| Unreferenced | An any-alignment scan of 0x7ECB0888–0x7ECB1000 (and the 0xBE… alias) finds only the copy-end constant 0x7ECB1000 |
+| Code already runs there | remap7b-code puts code at 0x7ECB0888 (`mov imm,a1; bra; … call 0x7E56B732`). It is in every seven-films build, which are camera-tested (docs/camera-log.md) |
+| Every spec in `patches/` | None of the 8 current specs touches the range or any v2 op window (0 overlaps, including the .data and menu-table ops). **Three superseded specs in `patches/history/` do use the padding** (film-vision3-250d-pl1, slots7-neutral, slots12-code: 0x7ECB0888–0x7ECB0F3F), so v2 cannot be combined with those. Only 0x7ECB0F40–0x7ECB0FFF (192 B) is free of every spec ever written, which is too small. `results/specscan-v2.txt` |
+
+- **Layout:**
+
+  | Address | Size | Contents |
+  |---|---|---|
+  | 0x7ECB0BA4 | 380 B | top table |
+  | 0x7ECB0D24 | 84 B | page-3 list |
+  | 0x7ECB0D78 | 51 B | value-switch cave |
+  | 0x7ECB0DB0 | 18 B | T1 |
+  | 0x7ECB0DC8 | 177 B | T2 |
+  | 0x7ECB0E80 / E98 / EB0 / EC8 | | movie-guard trampolines |
+
+  All 6 table pointers, the record pointer and the 7 `jmp` hooks are regenerated (`scripts/mkspec_v2.py`), and the trampolines are re-assembled at the new addresses.
+- **Review 2 N2 stays (I).** An unused tab slot (0xFF) would index base + 2,544, which is 0x7ECB1594, in the unloaded gap. As in stock and the E-PL6, the cursor is bounded by the tab counts, so the slot is not read.
+- **Applies on both bases (V, `tools/emu/patchblock.py` into scratch):**
+  - stock + v2: block-0 sha256 `d8c35ce3…2c327f69`, 921 bytes changed;
+  - the seven-films-6 specs + v2: `8992f2c2…693d28ec`.
+
+### 12.2 S2: the time-lapse-movie guard flag
+- **E-PL6 sites (re-derived; the flag address occurs exactly 4 times in its code):** set at 0x7ECDA8C1, clear at 0x7ECDA4B3 and 0x7ECDA4DD, test at 0x7ECDA5CA.
+- **E-PM2 flag: RAM 0x602BE878**, the row-1 slot of the value-list pointer table.
+  - The table is read only by the two formatters, indexed by row.
+  - No call passes row 1: the indices are 3, 5–8, 10–12, 14 and 33–35 (`results/fmtindex-v2.txt`).
+  - No code immediate equals 0x602BE875–0x602BE87F.
+  - Its .data initial value is 0, so it starts cleared at every boot, like the E-PL6's.
+- **Hooks (each replaces a call, which the trampoline re-issues with the same frame):**
+
+  | Function | Hook → trampoline | Trampoline |
+  |---|---|---|
+  | `createTimeLapseMovie`, accepted path | 0x7ECDA56C → 0x7ECB0E80 | print call; `mov 1,d2`; `mov d2,(flag)`; `jmp 0x7ECDA5AE` |
+  | `receiveEndCreateMovie` | 0x7ECDA1B2 → 0x7ECB0E98 | print call; `clr d0`; `mov d0,(flag)`; back to 0x7ECDA1B9 |
+  | `receiveErrorCreateMovie` | 0x7ECDA1D5 → 0x7ECB0EB0 | the same; back to 0x7ECDA1DC |
+  | `receiveEndMediaMountForEndWait` | 0x7ECDA2A7 → 0x7ECB0EC8 | `call 0x7ECD50DE,[],0`; `mov (flag),a1`; `cmp 0,a1`; if set, `jmp 0x7ECDA2B3` (the `ret`); else back to 0x7ECDA2AC |
+
+  After each hook, d0 / a0 / a1 are set again by the following code, as on the E-PL6.
+
+### 12.3 S3 and the notes
+- **Description:** rewritten. The "Not ported" sentence is gone, the "rows 11-38" wording is fixed, and it says that the defaults are not E-PL6 parity.
+- **Value-list table = 37 slots** (rows 0–36; 0x602BE908 is another variable). §10 said 40.
+  - v2 edits only slots 12–35 (96 B at ROM 0x7E8EED64).
+  - The older specs also rewrote slots 36–39 with the same zero bytes, which was harmless.
+- **Bound check (`scripts/fmtindex.py` on the films + v2 image):** all 25 call sites of 0x7EE01DDA / 0x7EE01E8C pass a constant. The largest is **35**, which is slot 0x602BE900 and in bounds. Row 37 (Firmware) has no value case, as on the E-PL6.
+
+### 12.4 Emulator on five images (`results/compare-v2*.txt|json`, `results/emu-v2-*`)
+Images: stock, films, stock + v2, films + v2, E-PL6 1.4. Model errors: 0 in every case on every image.
+
+| Case | Rows | stock+v2 ≠ E-PL6 | films+v2 ≠ E-PL6 | films ≠ stock | stock ≠ v2 |
+|---|---|---|---|---|---|
+| `menu_help` | 43 | 0 | 0 | 0 | 27 |
+| `menu_child` | 43 | 0 | 0 | 0 | 2 |
+| `menu_value` | 74 | 0 | 0 | 0 | 54 |
+| `ivl_selector` | 40 | 0 | 0 | 0 | 24 |
+| `ivl_start` (calls + return) | 14 | 0 | 0 | 0 | 8 (one `hold` each); the frame is identical to its base in 14/14 |
+| `ivl_movie_guard` (new: 4 create paths, end, error, mount × flag 0/1) | 10 | 0 | 0 | 0 | 4: flag set on an accepted request, cleared on end and on error, end check skipped while set |
+
+- **`ivl_guard`:** 192/192 unchanged.
+- **emurun flags:** `emurun diff` still flags 10 + 4 menu rows as "reads patched bytes but unchanged". These are rows read from the relocated table, with the same values.
+
+### 12.5 Test plan and risk changes for v2
+- **Base:** flash v2 **on top of the film set** (the seven-films-6 specs + v2). Restore = seven-films-6. Check first that the seven films still work (one photo in a film entry).
+- **Step 5 (movie):** the guard is now in. Still do it last, with a card that can be lost. Also remove and re-insert nothing during movie creation: the media-mount path is the one the flag protects, and it is only emulated.
+- **Step 8 (Sleep = 1 min, 75 s interval):** expected to run without sleeping, as in §11.
+- **Remaining (I):**
+  - all added code runs from the segment-2 padding, as remap7b-code's does;
+  - the flag shares a table slot that only a row-1 formatter call could read, and none exists;
+  - no spec has an `expected_sha256` until a build is camera-tested.
+
 ## Files
+- `patches/interval-timelapse-v2.json`: the current spec (§12).
+  - generator: `scripts/mk_v2_gen.py` → `mkspec_v2.py` (+ `guard_part.py`);
+  - checks: `scripts/specscan.py`, `scripts/fmtindex.py`.
 - `patches/interval-timelapse.json`: the replace spec.
 - `patches/interval-timelapse-insert.json`: the insert spec (ops carry a `_why` note; build.py ignores it).
 - `scripts/` (insert spec):

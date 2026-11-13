@@ -1,0 +1,934 @@
+{
+ "case": "menu_help",
+ "stock": "/path/to/EPM2Mod/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin",
+ "patched": "/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/ivl/emurun-dv_7li4p.block0.bin",
+ "rows": [
+  {
+   "row": {
+    "tab": 0,
+    "row": -1
+   },
+   "stock": {
+    "block": 45,
+    "help": 397
+   },
+   "patched": {
+    "block": 45,
+    "help": 397
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 1,
+    "row": -1
+   },
+   "stock": {
+    "block": 45,
+    "help": 405
+   },
+   "patched": {
+    "block": 45,
+    "help": 405
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 2,
+    "row": -1
+   },
+   "stock": {
+    "block": 45,
+    "help": 411
+   },
+   "patched": {
+    "block": 45,
+    "help": 411
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 3,
+    "row": -1
+   },
+   "stock": {
+    "block": 45,
+    "help": 480
+   },
+   "patched": {
+    "block": 45,
+    "help": 480
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 4,
+    "row": -1
+   },
+   "stock": {
+    "block": 45,
+    "help": 488
+   },
+   "patched": {
+    "block": 45,
+    "help": 488
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 5,
+    "row": -1
+   },
+   "stock": {
+    "block": 45,
+    "help": 493
+   },
+   "patched": {
+    "block": 45,
+    "help": 493
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 0,
+    "row": 0
+   },
+   "stock": {
+    "block": 45,
+    "help": 392,
+    "grow": 1
+   },
+   "patched": {
+    "block": 45,
+    "help": 392,
+    "grow": 1
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "tab": 0,
+    "row": 1
+   },
+   "stock": {
+    "block": 45,
+    "help": 393,
+    "grow": 2
+   },
+   "patched": {
+    "block": 45,
+    "help": 393,
+    "grow": 2
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "tab": 0,
+    "row": 2
+   },
+   "stock": {
+    "block": 45,
+    "help": 394,
+    "grow": 3
+   },
+   "patched": {
+    "block": 45,
+    "help": 394,
+    "grow": 3
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "tab": 0,
+    "row": 3
+   },
+   "stock": {
+    "block": 45,
+    "help": 395,
+    "grow": 4
+   },
+   "patched": {
+    "block": 45,
+    "help": 395,
+    "grow": 4
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "tab": 0,
+    "row": 4
+   },
+   "stock": {
+    "block": 45,
+    "help": 396,
+    "grow": 5
+   },
+   "patched": {
+    "block": 45,
+    "help": 396,
+    "grow": 5
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "tab": 0,
+    "row": 5
+   },
+   "stock": {
+    "block": 45,
+    "help": 404,
+    "grow": 6
+   },
+   "patched": {
+    "block": 45,
+    "help": 404,
+    "grow": 6
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "tab": 1,
+    "row": 0
+   },
+   "stock": {
+    "block": 45,
+    "help": 398,
+    "grow": 7
+   },
+   "patched": {
+    "block": 45,
+    "help": 398,
+    "grow": 7
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "tab": 1,
+    "row": 1
+   },
+   "stock": {
+    "block": 45,
+    "help": 1738,
+    "grow": 8
+   },
+   "patched": {
+    "block": 45,
+    "help": 1738,
+    "grow": 8
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "tab": 1,
+    "row": 2
+   },
+   "stock": {
+    "block": 45,
+    "help": 400,
+    "grow": 9
+   },
+   "patched": {
+    "block": 45,
+    "help": 400,
+    "grow": 9
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "tab": 1,
+    "row": 3
+   },
+   "stock": {
+    "block": 45,
+    "help": 401,
+    "grow": 10
+   },
+   "patched": {
+    "block": 45,
+    "help": 401,
+    "grow": 10
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "tab": 1,
+    "row": 4
+   },
+   "stock": {
+    "block": 45,
+    "help": 403,
+    "grow": 11
+   },
+   "patched": {
+    "block": 45,
+    "help": 1358,
+    "grow": 11
+   },
+   "diff": {
+    "help": [
+     403,
+     1358
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 1,
+    "row": 5
+   },
+   "stock": {
+    "absent": true
+   },
+   "patched": {
+    "block": 45,
+    "help": 403,
+    "grow": 12
+   },
+   "diff": {
+    "absent": [
+     true,
+     null
+    ],
+    "block": [
+     null,
+     45
+    ],
+    "grow": [
+     null,
+     12
+    ],
+    "help": [
+     null,
+     403
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 2,
+    "row": 0
+   },
+   "stock": {
+    "block": 45,
+    "help": 406,
+    "grow": 12
+   },
+   "patched": {
+    "block": 45,
+    "help": 406,
+    "grow": 13
+   },
+   "diff": {
+    "grow": [
+     12,
+     13
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 2,
+    "row": 1
+   },
+   "stock": {
+    "block": 45,
+    "help": 407,
+    "grow": 13
+   },
+   "patched": {
+    "block": 45,
+    "help": 407,
+    "grow": 14
+   },
+   "diff": {
+    "grow": [
+     13,
+     14
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 2,
+    "row": 2
+   },
+   "stock": {
+    "block": 45,
+    "help": 408,
+    "grow": 14
+   },
+   "patched": {
+    "block": 45,
+    "help": 408,
+    "grow": 15
+   },
+   "diff": {
+    "grow": [
+     14,
+     15
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 2,
+    "row": 3
+   },
+   "stock": {
+    "block": 45,
+    "help": 409,
+    "grow": 15
+   },
+   "patched": {
+    "block": 45,
+    "help": 409,
+    "grow": 16
+   },
+   "diff": {
+    "grow": [
+     15,
+     16
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 2,
+    "row": 4
+   },
+   "stock": {
+    "block": 45,
+    "help": 410,
+    "grow": 16
+   },
+   "patched": {
+    "block": 45,
+    "help": 410,
+    "grow": 17
+   },
+   "diff": {
+    "grow": [
+     16,
+     17
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 2,
+    "row": 5
+   },
+   "stock": {
+    "block": 45,
+    "help": 1720,
+    "grow": 17
+   },
+   "patched": {
+    "block": 45,
+    "help": 1720,
+    "grow": 18
+   },
+   "diff": {
+    "grow": [
+     17,
+     18
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 3,
+    "row": 0
+   },
+   "stock": {
+    "block": 45,
+    "help": 412,
+    "grow": 18
+   },
+   "patched": {
+    "block": 45,
+    "help": 412,
+    "grow": 19
+   },
+   "diff": {
+    "grow": [
+     18,
+     19
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 3,
+    "row": 1
+   },
+   "stock": {
+    "block": 45,
+    "help": 413,
+    "grow": 19
+   },
+   "patched": {
+    "block": 45,
+    "help": 413,
+    "grow": 20
+   },
+   "diff": {
+    "grow": [
+     19,
+     20
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 3,
+    "row": 2
+   },
+   "stock": {
+    "block": 45,
+    "help": 1318,
+    "grow": 20
+   },
+   "patched": {
+    "block": 45,
+    "help": 1318,
+    "grow": 21
+   },
+   "diff": {
+    "grow": [
+     20,
+     21
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 3,
+    "row": 3
+   },
+   "stock": {
+    "block": 45,
+    "help": 415,
+    "grow": 21
+   },
+   "patched": {
+    "block": 45,
+    "help": 415,
+    "grow": 22
+   },
+   "diff": {
+    "grow": [
+     21,
+     22
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 3,
+    "row": 4
+   },
+   "stock": {
+    "block": 45,
+    "help": 416,
+    "grow": 22
+   },
+   "patched": {
+    "block": 45,
+    "help": 416,
+    "grow": 23
+   },
+   "diff": {
+    "grow": [
+     22,
+     23
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 3,
+    "row": 5
+   },
+   "stock": {
+    "block": 45,
+    "help": 417,
+    "grow": 23
+   },
+   "patched": {
+    "block": 45,
+    "help": 417,
+    "grow": 24
+   },
+   "diff": {
+    "grow": [
+     23,
+     24
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 3,
+    "row": 6
+   },
+   "stock": {
+    "block": 45,
+    "help": 418,
+    "grow": 24
+   },
+   "patched": {
+    "block": 45,
+    "help": 418,
+    "grow": 25
+   },
+   "diff": {
+    "grow": [
+     24,
+     25
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 3,
+    "row": 7
+   },
+   "stock": {
+    "block": 45,
+    "help": 419,
+    "grow": 25
+   },
+   "patched": {
+    "block": 45,
+    "help": 419,
+    "grow": 26
+   },
+   "diff": {
+    "grow": [
+     25,
+     26
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 3,
+    "row": 8
+   },
+   "stock": {
+    "block": 45,
+    "help": 420,
+    "grow": 26
+   },
+   "patched": {
+    "block": 45,
+    "help": 420,
+    "grow": 27
+   },
+   "diff": {
+    "grow": [
+     26,
+     27
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 3,
+    "row": 9
+   },
+   "stock": {
+    "block": 45,
+    "help": 421,
+    "grow": 27
+   },
+   "patched": {
+    "block": 45,
+    "help": 421,
+    "grow": 28
+   },
+   "diff": {
+    "grow": [
+     27,
+     28
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 4,
+    "row": 0
+   },
+   "stock": {
+    "block": 45,
+    "help": 481,
+    "grow": 28
+   },
+   "patched": {
+    "block": 45,
+    "help": 481,
+    "grow": 29
+   },
+   "diff": {
+    "grow": [
+     28,
+     29
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 4,
+    "row": 1
+   },
+   "stock": {
+    "block": 45,
+    "help": 589,
+    "grow": 29
+   },
+   "patched": {
+    "block": 45,
+    "help": 589,
+    "grow": 30
+   },
+   "diff": {
+    "grow": [
+     29,
+     30
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 4,
+    "row": 2
+   },
+   "stock": {
+    "block": 45,
+    "help": 482,
+    "grow": 30
+   },
+   "patched": {
+    "block": 45,
+    "help": 482,
+    "grow": 31
+   },
+   "diff": {
+    "grow": [
+     30,
+     31
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 5,
+    "row": 0
+   },
+   "stock": {
+    "block": 45,
+    "help": 1024,
+    "grow": 31
+   },
+   "patched": {
+    "block": 45,
+    "help": 1024,
+    "grow": 32
+   },
+   "diff": {
+    "grow": [
+     31,
+     32
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 5,
+    "row": 1
+   },
+   "stock": {
+    "block": 45,
+    "help": 1117,
+    "grow": 32
+   },
+   "patched": {
+    "block": 45,
+    "help": 1117,
+    "grow": 33
+   },
+   "diff": {
+    "grow": [
+     32,
+     33
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 5,
+    "row": 2
+   },
+   "stock": {
+    "block": 45,
+    "help": 489,
+    "grow": 33
+   },
+   "patched": {
+    "block": 45,
+    "help": 489,
+    "grow": 34
+   },
+   "diff": {
+    "grow": [
+     33,
+     34
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 5,
+    "row": 3
+   },
+   "stock": {
+    "block": 45,
+    "help": 490,
+    "grow": 34
+   },
+   "patched": {
+    "block": 45,
+    "help": 490,
+    "grow": 35
+   },
+   "diff": {
+    "grow": [
+     34,
+     35
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 5,
+    "row": 4
+   },
+   "stock": {
+    "block": 45,
+    "help": 491,
+    "grow": 35
+   },
+   "patched": {
+    "block": 45,
+    "help": 491,
+    "grow": 36
+   },
+   "diff": {
+    "grow": [
+     35,
+     36
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "tab": 5,
+    "row": 5
+   },
+   "stock": {
+    "block": 45,
+    "help": 492,
+    "grow": 36
+   },
+   "patched": {
+    "block": 45,
+    "help": 492,
+    "grow": 37
+   },
+   "diff": {
+    "grow": [
+     36,
+     37
+    ]
+   },
+   "flags": []
+  }
+ ]
+}

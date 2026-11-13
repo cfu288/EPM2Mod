@@ -1,0 +1,152 @@
+patched bytes: 921 in 76 runs
+chg  grow=11 value=0
+     label: 526 -> 1357
+     setting: [180] -> [482]
+chg  grow=11 value=1
+     label: 526 -> 1357
+     setting: [180] -> [482]
+chg  grow=12 value=0
+     label: 262 -> 526
+     setting: [] -> [180]
+     string: 0 -> 1371
+chg  grow=12 value=1
+     label: 262 -> 526
+     setting: [] -> [180]
+     string: 0 -> 198
+chg  grow=13 value=0
+     label: 226 -> 262
+     setting: [89] -> []
+     string: 1371 -> 0
+chg  grow=13 value=1
+     label: 226 -> 262
+     setting: [89] -> []
+     string: 198 -> 0
+chg  grow=14 value=0
+     label: 115 -> 226
+     setting: [] -> [89]
+     string: 0 -> 1371
+chg  grow=14 value=1
+     label: 115 -> 226
+     setting: [] -> [89]
+     string: 0 -> 198
+chg  grow=15 value=0
+     label: 1966 -> 115
+chg  grow=15 value=1
+     label: 1966 -> 115
+chg  grow=16 value=0
+     label: 212 -> 1966
+chg  grow=16 value=1
+     label: 212 -> 1966
+chg  grow=17 value=0
+     label: 1719 -> 212
+chg  grow=17 value=1
+     label: 1719 -> 212
+chg  grow=18 value=0
+     label: 48 -> 1719
+chg  grow=18 value=1
+     label: 48 -> 1719
+chg  grow=19 value=0
+     label: 79 -> 48
+chg  grow=19 value=1
+     label: 79 -> 48
+chg  grow=20 value=0
+     label: 1305 -> 79
+chg  grow=20 value=1
+     label: 1305 -> 79
+chg  grow=21 value=0
+     label: 108 -> 1305
+chg  grow=21 value=1
+     label: 108 -> 1305
+chg  grow=22 value=0
+     label: 127 -> 108
+chg  grow=22 value=1
+     label: 127 -> 108
+chg  grow=23 value=0
+     label: 135 -> 127
+chg  grow=23 value=1
+     label: 135 -> 127
+chg  grow=24 value=0
+     label: 146 -> 135
+chg  grow=24 value=1
+     label: 146 -> 135
+chg  grow=25 value=0
+     label: 217 -> 146
+chg  grow=25 value=1
+     label: 217 -> 146
+chg  grow=26 value=0
+     label: 179 -> 217
+chg  grow=26 value=1
+     label: 179 -> 217
+chg  grow=27 value=0
+     label: 81 -> 179
+chg  grow=27 value=1
+     label: 81 -> 179
+chg  grow=28 value=0
+     label: 268 -> 81
+chg  grow=28 value=1
+     label: 268 -> 81
+chg  grow=29 value=0
+     label: 270 -> 268
+chg  grow=29 value=1
+     label: 270 -> 268
+chg  grow=30 value=0
+     label: 269 -> 270
+chg  grow=30 value=1
+     label: 269 -> 270
+chg  grow=31 value=0
+     label: null -> 269
+     setting: null -> []
+     skipped: "date row" -> null
+     string: null -> 0
+chg  grow=31 value=1
+     label: null -> 269
+     setting: null -> []
+     skipped: "date row" -> null
+     string: null -> 0
+chg  grow=32 value=0
+     label: 1688 -> null
+     setting: [1009] -> null
+     skipped: null -> "date row"
+     string: 23 -> null
+chg  grow=32 value=1
+     label: 1688 -> null
+     setting: [1009] -> null
+     skipped: null -> "date row"
+     string: 14 -> null
+chg  grow=33 value=0
+     label: 175 -> 1688
+     setting: [31, 265] -> [1009]
+     string: 0 -> 23
+chg  grow=33 value=1
+     label: 175 -> 1688
+     setting: [31, 265] -> [1009]
+     string: 0 -> 14
+chg  grow=34 value=0
+     label: 218 -> 175
+     setting: [19] -> [31, 265]
+     string: 1371 -> 0
+chg  grow=34 value=1
+     label: 218 -> 175
+     setting: [19] -> [31, 265]
+chg  grow=35 value=0
+     label: 168 -> 218
+     setting: [] -> [19]
+     string: 0 -> 1371
+chg  grow=35 value=1
+     label: 168 -> 218
+     setting: [] -> [19]
+chg  grow=36 value=0
+     label: 134 -> 168
+chg  grow=36 value=1
+     label: 134 -> 168
+chg  grow=37 value=0
+     absent: true -> null
+     label: null -> 134
+     setting: null -> []
+     string: null -> 0
+chg  grow=37 value=1
+     absent: true -> null
+     label: null -> 134
+     setting: null -> []
+     string: null -> 0
+menu_value: 74 rows, 54 changed, 20 identical, 0 flagged

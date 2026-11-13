@@ -1,0 +1,399 @@
+{
+ "case": "ivl_movie_guard",
+ "stock": "/path/to/EPM2Mod/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin",
+ "patched": "/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/ivl/emurun-9s3m3fum.block0.bin",
+ "rows": [
+  {
+   "row": {
+    "fn": "create",
+    "pre1": 1,
+    "pre2": 0,
+    "req": 0,
+    "flag": 0
+   },
+   "stock": {
+    "calls": [
+     "pre1",
+     "pre2",
+     "getinst"
+    ],
+    "flag": 0,
+    "result": 0,
+    "this": [
+     155,
+     23300,
+     2,
+     0
+    ]
+   },
+   "patched": {
+    "calls": [
+     "pre1",
+     "pre2",
+     "getinst"
+    ],
+    "flag": 1,
+    "result": 0,
+    "this": [
+     155,
+     23300,
+     2,
+     0
+    ]
+   },
+   "diff": {
+    "flag": [
+     0,
+     1
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fn": "create",
+    "pre1": 1,
+    "pre2": 0,
+    "req": 1,
+    "flag": 0
+   },
+   "stock": {
+    "calls": [
+     "pre1",
+     "pre2",
+     "getinst",
+     "complete"
+    ],
+    "flag": 0,
+    "result": 0,
+    "this": [
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "patched": {
+    "calls": [
+     "pre1",
+     "pre2",
+     "getinst",
+     "complete"
+    ],
+    "flag": 0,
+    "result": 0,
+    "this": [
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fn": "create",
+    "pre1": 0,
+    "pre2": 0,
+    "req": 0,
+    "flag": 0
+   },
+   "stock": {
+    "calls": [
+     "pre1"
+    ],
+    "flag": 0,
+    "result": 1,
+    "this": [
+     155,
+     23300,
+     2,
+     0
+    ]
+   },
+   "patched": {
+    "calls": [
+     "pre1"
+    ],
+    "flag": 0,
+    "result": 1,
+    "this": [
+     155,
+     23300,
+     2,
+     0
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fn": "create",
+    "pre1": 1,
+    "pre2": 1,
+    "req": 0,
+    "flag": 0
+   },
+   "stock": {
+    "calls": [
+     "pre1",
+     "pre2"
+    ],
+    "flag": 0,
+    "result": 1,
+    "this": [
+     155,
+     23300,
+     2,
+     0
+    ]
+   },
+   "patched": {
+    "calls": [
+     "pre1",
+     "pre2"
+    ],
+    "flag": 0,
+    "result": 1,
+    "this": [
+     155,
+     23300,
+     2,
+     0
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fn": "end",
+    "flag": 0
+   },
+   "stock": {
+    "calls": [
+     "complete"
+    ],
+    "flag": 0,
+    "result": 85,
+    "this": [
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "patched": {
+    "calls": [
+     "complete"
+    ],
+    "flag": 0,
+    "result": 85,
+    "this": [
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fn": "end",
+    "flag": 1
+   },
+   "stock": {
+    "calls": [
+     "complete"
+    ],
+    "flag": 1,
+    "result": 85,
+    "this": [
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "patched": {
+    "calls": [
+     "complete"
+    ],
+    "flag": 0,
+    "result": 85,
+    "this": [
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "diff": {
+    "flag": [
+     1,
+     0
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fn": "error",
+    "flag": 0
+   },
+   "stock": {
+    "calls": [
+     "timer"
+    ],
+    "flag": 0,
+    "result": 85,
+    "this": [
+     155,
+     0,
+     0,
+     2
+    ]
+   },
+   "patched": {
+    "calls": [
+     "timer"
+    ],
+    "flag": 0,
+    "result": 85,
+    "this": [
+     155,
+     0,
+     0,
+     2
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fn": "error",
+    "flag": 1
+   },
+   "stock": {
+    "calls": [
+     "timer"
+    ],
+    "flag": 1,
+    "result": 85,
+    "this": [
+     155,
+     0,
+     0,
+     2
+    ]
+   },
+   "patched": {
+    "calls": [
+     "timer"
+    ],
+    "flag": 0,
+    "result": 85,
+    "this": [
+     155,
+     0,
+     0,
+     2
+    ]
+   },
+   "diff": {
+    "flag": [
+     1,
+     0
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "fn": "mount",
+    "flag": 0
+   },
+   "stock": {
+    "calls": [
+     "mountpre",
+     "checkend"
+    ],
+    "flag": 0,
+    "result": 85,
+    "this": [
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "patched": {
+    "calls": [
+     "mountpre",
+     "checkend"
+    ],
+    "flag": 0,
+    "result": 85,
+    "this": [
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "fn": "mount",
+    "flag": 1
+   },
+   "stock": {
+    "calls": [
+     "mountpre",
+     "checkend"
+    ],
+    "flag": 1,
+    "result": 85,
+    "this": [
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "patched": {
+    "calls": [
+     "mountpre"
+    ],
+    "flag": 1,
+    "result": 85,
+    "this": [
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "diff": {
+    "calls": [
+     [
+      "mountpre",
+      "checkend"
+     ],
+     [
+      "mountpre"
+     ]
+    ]
+   },
+   "flags": []
+  }
+ ]
+}

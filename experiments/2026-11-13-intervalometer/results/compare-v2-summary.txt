@@ -1,0 +1,7 @@
+menu_help        rows  43 | v2!=epl6  0 | v2films!=epl6  0 | v2films!=v2  0 | films!=stock  0 | stock!=v2 27 | model errors 0
+menu_child       rows  43 | v2!=epl6  0 | v2films!=epl6  0 | v2films!=v2  0 | films!=stock  0 | stock!=v2  2 | model errors 0
+menu_value       rows  74 | v2!=epl6  0 | v2films!=epl6  0 | v2films!=v2  0 | films!=stock  0 | stock!=v2 54 | model errors 0
+ivl_selector     rows  40 | v2!=epl6  0 | v2films!=epl6  0 | v2films!=v2  0 | films!=stock  0 | stock!=v2 24 | model errors 0
+ivl_start        rows  14 | v2!=epl6  0 | v2films!=epl6  0 | v2films!=v2  0 | films!=stock  0 | stock!=v2  8 | model errors 0
+ivl_movie_guard  rows  10 | v2!=epl6  0 | v2films!=epl6  0 | v2films!=v2  0 | films!=stock  0 | stock!=v2  4 | model errors 0
+ivl_start frame: v2==stock in 14 of 14 ; v2films==films in 14
