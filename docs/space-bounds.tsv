@@ -1,0 +1,9 @@
+# Hand-maintained list of proven object bounds for tools/freespace.py (check "predecessor").
+# A row says: the reader at `site` reads the object that starts at `object` and stops at `bound` (exclusive).
+# Columns (tab-separated): object, bound, site, expected bytes at the site (hex; the tool stops if they differ), evidence.
+7E880F44	7E880F5C	7E44B6C0	fcce18000000aa00c86bfcde440f887edc54000000	static-constructor walker 0x7E44B6B0, id 1: byte count 24 in d2, table 0x7E880F44 in a2; the loop 0x7E44B724 subtracts 4 per call and has no terminator
+7ECB083C	7ECB0888	7E44B6D5	fcce4c000000aa00c856fcde3c08cb7edc3f000000	static-constructor walker, id 2: byte count 76, table 0x7ECB083C
+7F033AC8	7F033B7C	7E44B6EA	fcceb4000000aa00c841fcdec83a037fdc2a000000	static-constructor walker, id 3: byte count 180, table 0x7F033AC8
+7E880F44	7E880F5C	7E44B724	f002f8fee0f0f0f8fe20522afcc1f3dfa00c	the walker loop itself: calls (a2), a2 += 4, d2 -= 4, loops while d2 > 0, then ret
+7EBF0FA0	7EBF1090	7E99BB08	482208aa1ec4e1	`sdk` command table (30 x 8 B) reader 1, base loaded at 0x7E99BAE8: inc d2; add 8,a2; cmp 30,d2; bcs
+7EBF0FA0	7EBF1090	7E99D017	4c2208af1ec4d4	`sdk` command table reader 2 (help print), base loaded at 0x7E99CFEA: inc d3; add 8,a2; cmp 30,d3; bcs. Emulator run in experiments/2026-11-13-reclaim-space section 6: 0 reads past the table

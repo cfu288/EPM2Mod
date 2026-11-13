@@ -1,0 +1,7 @@
+# Hand-maintained list of pointer windows that are explained by hand, for tools/freespace.py (check "pointers").
+# A row covers every window whose site lies in [first site, end). Use end = first site + 4 for one window.
+# Columns (tab-separated): first site, end (exclusive), expected bytes at the first site (hex; the tool stops if they differ), evidence.
+# Not listed here: the 0x7EBF22C0 windows of the reclaim study (low word of the doubles 0.002692 / 0.001346 at
+# 0x7F0E5830, 0x7F0E64E8, 0x7F0E6D18, 0x7F0E71F8); the tool's own `double` rule explains them.
+7E86DD80	7E8808C0	434d494f010009dc	CMIO blob (experiments/2026-11-08-feature-map/sections/14d-data-and-blobs.md section 3.2): 76,608 bytes at 7.95 bits/byte with the header "CMIO"; its one reader 0x7E5586B9 copies it whole into the ORF file, so no code reads its bytes as addresses
+7E8F21D0	7E8F29E0	00003040000000000000000000000000	numeric table in the .data image: 129 rows of 16 B whose first word falls by exactly 0x2000 per row from 0x40300000 to 0x40200000 (as float32: 2.75 down to 2.5 in equal steps), followed by small integer columns. An arithmetic sequence of numbers, not flash addresses of objects

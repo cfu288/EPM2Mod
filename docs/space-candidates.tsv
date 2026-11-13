@@ -1,0 +1,21 @@
+# Hand-maintained list of reclaimed areas (existing content that nothing reads) for tools/freespace.py.
+# Columns (tab-separated): start, end (exclusive), kind (text | code), status, source, note.
+# status: checked = verified by hand in the source study; auto = found by an automatic rule only
+#         (the tool gives NEEDS-DECISION for auto rows).
+# Seeded from experiments/2026-11-13-reclaim-space/README.md section 4 (rows 1-10). Row 11 is 0xFF and is found by the tool.
+7EBF1090	7EBF3BAD	text	checked	reclaim-space row 1	`sdk` shell group and method name list, 1,205 strings. Last byte is 0x7EBF3BAC (the NUL of "%1s, %d\n"); 0x7EBF3BAD is the referenced string "Adapter Info". The study's "0x7EBF1090-0x7EBF3BAD" is start and exclusive end
+7EBB1F4C	7EBB304C	text	checked	reclaim-space row 2	Bluetooth debug strings (135)
+7EE541B3	7EE548B1	code	checked	reclaim-space row 3	3D-engine float helpers, called only from rows 4, 7 and each other
+7EE40B17	7EE411F6	code	checked	reclaim-space row 4	same cluster
+7EE5382E	7EE53D6A	code	checked	reclaim-space row 5	same cluster
+7EE3CBF2	7EE3CFE2	code	checked	reclaim-space row 6	same cluster
+7EE46D27	7EE4709D	code	checked	reclaim-space row 7	same cluster
+7EE40728	7EE40877	code	checked	reclaim-space row 8	same cluster
+7EE46C39	7EE46CB0	code	checked	reclaim-space row 8	same cluster
+7E813170	7E813ED0	text	auto	reclaim-space row 9	mode-table name strings; automatic rule only
+7E79944E	7E79A16B	text	auto	reclaim-space row 9	file callback strings; automatic rule only
+7E805088	7E805CE8	text	auto	reclaim-space row 9	[AVCHD] AvmidApi record prints; automatic rule only
+7E7D6717	7E7D71FD	text	auto	reclaim-space row 9	api_tft_* strings; automatic rule only
+7E50A201	7E50A3C2	code	checked	reclaim-space row 10	unreferenced function
+7E53A55C	7E53A700	code	checked	reclaim-space row 10	unreferenced function
+7E50C46E	7E50C517	code	checked	reclaim-space row 10	unreferenced function
