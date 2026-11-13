@@ -16,7 +16,7 @@ touched. A test fails if the README is not up to date.
 from __future__ import annotations
 
 import re
-from typing import Callable
+from collections.abc import Callable
 
 from .builds import all_descriptions, pinned_description
 from .errors import BuildError
@@ -26,7 +26,7 @@ from .paths import RepoPaths
 from .stock import EPM2_V16
 
 _BLOCK = re.compile(
-    r"(<!-- BEGIN GENERATED: (?P<name>[a-z-]+) -->\n)(?P<body>.*?)"
+    r"(<!-- BEGIN GENERATED: (?P<name>[a-z-]+) -->\r?\n)(?P<body>.*?)"
     r"(<!-- END GENERATED: (?P=name) -->)",
     re.DOTALL,
 )
@@ -34,14 +34,19 @@ _MARKER = re.compile(r"<!-- (?:BEGIN|END) GENERATED: [^>]*-->")
 
 
 def cell(text: str) -> str:
-    """Return ``text`` made safe for one cell of a Markdown table."""
-    return " ".join(text.split()).replace("|", "\\|")
+    """Return ``text`` made safe for one cell of a Markdown table.
+
+    White space becomes single spaces, ``|`` is escaped, and ``<`` and ``>``
+    become entities, so the text cannot end the cell or hold a marker comment.
+    """
+    escaped = " ".join(text.split()).replace("&", "&amp;")
+    return escaped.replace("<", "&lt;").replace(">", "&gt;").replace("|", "\\|")
 
 
 def pinned_block(paths: RepoPaths) -> str:
     """Return the text that names the pinned build and gives the two SHA-256 values."""
     pinned = pinned_description(paths)
-    what = pinned.what[:1].lower() + pinned.what[1:]
+    what = cell(pinned.what[:1].lower() + pinned.what[1:]).rstrip(".")
     return (
         f"The pinned build is **`{pinned.name}`**: {what}. "
         f"We tested this build on a real E-PM2 on {pinned.camera_tested} "
@@ -98,6 +103,7 @@ def update(text: str, paths: RepoPaths) -> str:
     seen: list[str] = []
 
     def replace(match: re.Match[str]) -> str:
+        """Return the block of one marker pair, made fresh."""
         name = match.group("name")
         if name not in BLOCKS:
             raise BuildError(f"README: unknown generated block '{name}'")

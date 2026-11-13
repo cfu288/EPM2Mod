@@ -3,11 +3,15 @@
 #
 # 1. Refuse machine-specific details in the staged changes: home-directory paths, session
 #    scratch paths, user@host targets. Use placeholders (/path/to/..., USER@HOST, /tmp/scratch).
-# 2. For the production code (src/epm2mod, tests/test_package.py, tests/test_looks.py):
-#    format the staged files with black and stage the result, then type-check with mypy.
-#    mypy reads the working tree, so a file of the package with unstaged changes stops the
+# 2. For the production code (src/epm2mod and the three test files named below): when a
+#    staged change adds, changes or deletes one of its files, format the staged files with
+#    black and stage the result, then type-check with mypy.
+#    mypy reads the working tree, so a production file with unstaged changes stops the
 #    commit. This part needs uv; without uv the commit is refused (git commit --no-verify
 #    skips the hook).
+#    Limit: `git commit PATH...` and `git commit -a` commit from a temporary index. The
+#    hook then checks the right files, but a file that black reformats is committed as it
+#    was. Run `git add` first and commit without paths.
 pattern='/home/[A-Za-z0-9._-]+/|/Users/[A-Za-z0-9._-]+/|/tmp/claude-[0-9]+|-home-[a-z0-9]+-|[A-Za-z0-9._-]+@[A-Za-z0-9-]+:[/~]'
 allow='USER@HOST:|git@github\.com:|/home/user/|/Users/user/'
 hits=$(git diff --cached -U0 --no-color --no-renames --diff-filter=AM -- . ':(exclude).githooks' | grep -E '^\+' | grep -v -E '^\+\+\+ ' | grep -E "$pattern" | grep -v -E "$allow" | head -5)
@@ -19,9 +23,9 @@ fi
 
 root=$(git rev-parse --show-toplevel) || exit 1
 cd "$root" || exit 1
-production="src/epm2mod tests/test_package.py tests/test_looks.py"
+production="src/epm2mod tests/support.py tests/test_package.py tests/test_looks.py"
 # shellcheck disable=SC2086
-if git diff --cached --quiet --no-renames --diff-filter=AM -- $production; then
+if git diff --cached --quiet --no-renames --diff-filter=AMD -- $production; then
   exit 0
 fi
 if ! command -v uv >/dev/null 2>&1; then
@@ -38,9 +42,9 @@ fi
 # shellcheck disable=SC2086
 git diff --cached --name-only -z --no-renames --diff-filter=AM -- $production |
   grep -z '\.py$' |
-  xargs -0 uv run --quiet black --quiet -- || { echo "pre-commit: black failed" >&2; exit 1; }
+  xargs -0 -r uv run --quiet black --quiet -- || { echo "pre-commit: black failed" >&2; exit 1; }
 # shellcheck disable=SC2086
-git add -u -- $production
+git add -u -- $production || { echo "pre-commit: git add failed" >&2; exit 1; }
 if ! uv run --quiet mypy; then
   echo "pre-commit: mypy found type errors" >&2
   exit 1

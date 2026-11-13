@@ -73,7 +73,16 @@ class RepoPaths:
         return self.output / "map" / "linear.txt"
 
     def resolve(self, relative: str) -> Path:
-        """Return the absolute path of a path written relative to the root."""
+        """Return the absolute path of a plain path written relative to the root.
+
+        Raises:
+            RepositoryError: if ``relative`` is not a plain path inside the
+                repository (see ``is_repo_relative``).
+        """
+        if not is_repo_relative(relative):
+            raise RepositoryError(
+                f"{relative!r} is not a plain path inside the repository"
+            )
         return self.root / relative
 
     def relative(self, path: Path) -> str:
@@ -92,9 +101,12 @@ def is_repo_relative(text: str) -> bool:
     """Return True if ``text`` is a plain path inside the repository.
 
     Plain means: written with forward slashes, not absolute on any platform
-    (no leading slash, no drive letter), and with no ``.`` or ``..`` parts.
+    (no leading slash, no drive letter), with no ``.`` or ``..`` parts, and
+    without control characters.
     """
     if not text or "\\" in text or ":" in text:
+        return False
+    if any(ord(char) < 0x20 or 0xD800 <= ord(char) <= 0xDFFF for char in text):
         return False
     path = PurePosixPath(text)
     if path.is_absolute() or path.as_posix() != text:

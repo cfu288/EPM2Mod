@@ -9,7 +9,7 @@
     epm2mod apply SPEC... -o OUT.BIN              apply patch specs (no build description)
     epm2mod info FIRMWARE.BIN                     describe a firmware file
     epm2mod readme [--check]                      refresh the generated parts of README.md
-    epm2mod looks [--write]                       check or write the film-look patch specs
+    epm2mod looks [--check | --write]             check or write the film-look patch specs
 
 Exit status: 0 for success, 1 for an error that is reported as one message (or,
 for ``info``, ``readme --check`` and ``looks``, a check that failed), 2 for a
@@ -19,9 +19,10 @@ wrong command line.
 from __future__ import annotations
 
 import argparse
+import io
 import sys
 from pathlib import Path
-from typing import Callable, Sequence
+from collections.abc import Callable, Sequence
 
 from . import __version__, readme
 from .builds import (
@@ -30,14 +31,14 @@ from .builds import (
     load_description,
     pinned_description,
 )
-from .container import describe
-from .errors import BuildError, Epm2ModError
+from .container import describe, parse
+from .errors import BuildError, ContainerError, Epm2ModError
 from .fileio import read_bytes, write_bytes
 from .hashing import sha256_bytes
 from .paths import RepoPaths, repo_paths
-from .pipeline import make, record_test
+from .pipeline import clear_outputs, make, record_test
 from .spec import apply_specs, load_spec
-from .stock import EPM2_V16, fetch, read_stock
+from .stock import EPM2_V16, fetch, read_stock, stock_path
 
 Handler = Callable[[argparse.Namespace, RepoPaths], int]
 
@@ -46,10 +47,11 @@ def _description(paths: RepoPaths, argument: str) -> BuildDescription:
     """Return the build description that a command-line argument names.
 
     The argument is a path to a file in the repository's ``builds/`` folder,
-    relative to the current folder or absolute.
+    relative to the current folder or absolute. Symbolic links are followed
+    before the comparison, so the file itself must be in that folder.
     """
-    path = Path(argument).absolute()
-    if path.parent != paths.builds.absolute():
+    path = Path(argument).resolve()
+    if not argument or path.parent != paths.builds.resolve():
         raise BuildError(
             f"{argument}: a build description must be a file in "
             f"{paths.relative(paths.builds)}/"
@@ -59,18 +61,23 @@ def _description(paths: RepoPaths, argument: str) -> BuildDescription:
 
 def _make(args: argparse.Namespace, paths: RepoPaths) -> int:
     """Run ``epm2mod make``."""
+    if args.card == "":
+        raise BuildError("--card needs the place where the SD card is mounted")
+    clear_outputs(paths, None if args.build is None else Path(args.build).stem)
     description = (
-        _description(paths, args.build) if args.build else pinned_description(paths)
+        pinned_description(paths)
+        if args.build is None
+        else _description(paths, args.build)
     )
-    card = Path(args.card) if args.card else None
-    make(paths, description, card=card, log=print)
+    card = None if args.card is None else Path(args.card)
+    make(paths, description, card=card, log=print, stock=EPM2_V16)
     return 0
 
 
 def _pin(args: argparse.Namespace, paths: RepoPaths) -> int:
     """Run ``epm2mod pin``."""
     description = _description(paths, args.build)
-    record_test(paths, description, args.sha256, args.date, log=print)
+    record_test(paths, description, args.sha256, args.date, log=print, stock=EPM2_V16)
     return 0
 
 
@@ -104,7 +111,9 @@ def _apply(args: argparse.Namespace, paths: RepoPaths) -> int:
             f"the spec expects {expected}; nothing was written"
         )
     out = Path(args.out)
-    write_bytes(out, applied.image)
+    if out.resolve() == stock_path(paths, EPM2_V16).resolve():
+        raise BuildError(f"{out} is the stock firmware file; give another name")
+    write_bytes(out, applied.image, read_back=True)
     print(f"wrote {out} ({applied.changed_bytes} bytes differ from stock)")
     print(f"sha256 {digest}")
     return 0
@@ -113,10 +122,13 @@ def _apply(args: argparse.Namespace, paths: RepoPaths) -> int:
 def _info(args: argparse.Namespace, paths: RepoPaths) -> int:
     """Run ``epm2mod info``."""
     data = read_bytes(Path(args.firmware))
-    lines = describe(data)
+    try:
+        container = parse(data)
+    except ContainerError as error:
+        raise ContainerError(f"{args.firmware}: {error}") from None
     print(f"{args.firmware}  size={len(data)}  sha256={sha256_bytes(data)}")
-    print("\n".join("  " + line for line in lines))
-    return 1 if any("checksum=BAD" in line for line in lines) else 0
+    print("\n".join("  " + line for line in describe(container)))
+    return 0 if container.checksums_ok else 1
 
 
 def _readme(args: argparse.Namespace, paths: RepoPaths) -> int:
@@ -135,15 +147,24 @@ def _looks(args: argparse.Namespace, paths: RepoPaths) -> int:
     """Run ``epm2mod looks``."""
     try:
         from .looks import generate
-    except ImportError:
+    except ModuleNotFoundError as error:
+        if error.name != "numpy":
+            raise
         raise BuildError(
-            "numpy is needed for the film specs: uv run --extra looks epm2mod looks"
+            "numpy is needed for the film specs. In a checkout, 'uv run epm2mod "
+            "looks' installs it."
         ) from None
     if args.write:
-        changed = generate.write(paths)
+        changed = generate.write(paths, EPM2_V16)
         print("\n".join(f"wrote {path}" for path in changed) or "no spec changed")
+        if changed:
+            print(
+                "If the operations of a spec changed, the spec is now marked 'NOT "
+                "camera-tested' and a tested build that uses it no longer gives its "
+                "recorded sha256. 'epm2mod make' tells you."
+            )
         return 0
-    stale = generate.stale(paths)
+    stale = generate.stale(paths, EPM2_V16)
     if stale:
         print("\n".join(f"{path}: differs from the generated spec" for path in stale))
         print("run 'epm2mod looks --write'")
@@ -162,6 +183,7 @@ def build_parser() -> argparse.ArgumentParser:
     commands = parser.add_subparsers(dest="command", required=True)
 
     def command(name: str, handler: Handler, text: str) -> argparse.ArgumentParser:
+        """Add a sub-command with its handler and return its parser."""
         sub = commands.add_parser(name, help=text, description=text)
         sub.set_defaults(run=handler)
         return sub
@@ -219,7 +241,11 @@ def build_parser() -> argparse.ArgumentParser:
     looks_cmd = command(
         "looks", _looks, "Compare the film-look patch specs with the generated ones."
     )
-    looks_cmd.add_argument(
+    looks_mode = looks_cmd.add_mutually_exclusive_group()
+    looks_mode.add_argument(
+        "--check", action="store_true", help="compare only; this is the default"
+    )
+    looks_mode.add_argument(
         "--write", action="store_true", help="write the generated specs to patches/"
     )
     return parser
@@ -228,6 +254,10 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     """Run the ``epm2mod`` command and return its exit status."""
     args = build_parser().parse_args(argv)
+    for stream in (sys.stdout, sys.stderr):
+        # A console that cannot show a character must not stop a run half-way.
+        if isinstance(stream, io.TextIOWrapper):
+            stream.reconfigure(errors="backslashreplace")
     handler: Handler = args.run
     try:
         return handler(args, repo_paths())

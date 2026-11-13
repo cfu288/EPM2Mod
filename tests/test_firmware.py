@@ -5,7 +5,7 @@ Run: python3 -m unittest discover -s tests
 Tests that need firmware BINs are skipped when the files are absent.
 """
 
-import contextlib, glob, hashlib, io, json, os, sys, tempfile, unittest
+import contextlib, glob, hashlib, io, json, os, pathlib, sys, tempfile, unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
@@ -27,7 +27,7 @@ class TestStock(unittest.TestCase):
     def test_round_trip_all_versions(self):
         for path in STOCK:
             with self.subTest(path=os.path.basename(path)):
-                raw = open(path, "rb").read()
+                raw = pathlib.Path(path).read_bytes()
                 blocks, tail = oetool.parse(raw)
                 self.assertTrue(all(b["ok"] for b in blocks))
                 self.assertEqual(oetool.build(blocks, tail), raw)
@@ -37,14 +37,14 @@ class TestStock(unittest.TestCase):
 class TestPatchSpecs(unittest.TestCase):
     def test_specs_with_expected_hash_reproduce(self):
         for spec in glob.glob(os.path.join(ROOT, "patches/*.json")):
-            s = json.load(open(spec))
+            s = json.loads(pathlib.Path(spec).read_text(encoding="utf-8"))
             if not s.get("expected_sha256"):
                 continue
             with self.subTest(spec=os.path.basename(spec)), tempfile.TemporaryDirectory() as folder:
                 out = os.path.join(folder, s["name"] + ".BIN")
                 with contextlib.redirect_stdout(io.StringIO()):
                     self.assertTrue(build.build([spec], out))
-                self.assertEqual(hashlib.sha256(open(out, "rb").read()).hexdigest(), s["expected_sha256"])
+                self.assertEqual(hashlib.sha256(pathlib.Path(out).read_bytes()).hexdigest(), s["expected_sha256"])
 
 
 if __name__ == "__main__":

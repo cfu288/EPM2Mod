@@ -11,8 +11,10 @@ A patch spec is a JSON file::
       "expected_sha256": "..."        (optional: the result of this spec alone)
     }
 
-Other keys (``status``, ``attribution``) are notes for people. They are not
-read here.
+``status``, ``attribution`` and ``inputs_sha256`` are notes that other tools and
+people write; they are accepted and not read here. So is any key that starts
+with ``_``, in a spec or in an operation. Every other unknown key is an error,
+so a misspelt key cannot silently switch a check off.
 
 There are two kinds of operation. Both keep the size of the firmware, and both
 refuse to write unless they find what they expect::
@@ -29,7 +31,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Mapping, Sequence, TypeVar, Union
+from collections.abc import Mapping, Sequence
+from typing import Any, TypeVar, Union
 
 from .container import parse, serialize
 from .errors import ContainerError, SpecError
@@ -39,6 +42,12 @@ from .hashing import is_sha256, sha256_bytes
 UTF16 = "utf-16-le"
 _UTF16_UNIT = 2
 _COMPARE_CHUNK = 1 << 16
+#: Keys that start with this are notes for people; they are never read.
+NOTE_PREFIX = "_"
+_SPEC_KEYS = {"name", "description", "base", "base_sha256", "ops", "expected_sha256"}
+_SPEC_NOTE_KEYS = {"status", "attribution", "inputs_sha256"}
+_BYTES_KEYS = {"type", "block", "offset", "expect", "new"}
+_TEXT_KEYS = {"type", "block", "old", "new", "count"}
 
 T = TypeVar("T")
 
@@ -58,6 +67,24 @@ class BytesOp:
     offset: int
     expect: bytes
     new: bytes
+
+    def __post_init__(self) -> None:
+        """Check the operation. Every instance is valid.
+
+        Raises:
+            SpecError: if a number is negative, the two byte strings differ in
+                length, or they are empty.
+        """
+        if self.block < 0 or self.offset < 0:
+            raise SpecError(
+                "a bytes operation needs a block and an offset of 0 or more"
+            )
+        if len(self.expect) != len(self.new):
+            raise SpecError(
+                f"'expect' has {len(self.expect)} bytes and 'new' has {len(self.new)}"
+            )
+        if not self.new:
+            raise SpecError("'expect' and 'new' are empty")
 
     def describe(self) -> str:
         """Return a one-line description of the operation."""
@@ -86,6 +113,27 @@ class Utf16ReplaceAllOp:
     old: str
     new: str
     count: int | None
+
+    def __post_init__(self) -> None:
+        """Check the operation. Every instance is valid.
+
+        Raises:
+            SpecError: if the block is negative, a text cannot be written as
+                UTF-16, the texts are empty or differ in length, or the count
+                is less than 1.
+        """
+        if self.block < 0:
+            raise SpecError("a text operation needs a block of 0 or more")
+        try:
+            old, new = self.old.encode(UTF16), self.new.encode(UTF16)
+        except UnicodeEncodeError as error:
+            raise SpecError(f"a text cannot be written as UTF-16: {error}") from None
+        if not old:
+            raise SpecError("'old' is empty")
+        if len(old) != len(new):
+            raise SpecError(f"'{self.old}' and '{self.new}' differ in length")
+        if self.count is not None and self.count < 1:
+            raise SpecError("'count' must be 1 or more")
 
     def describe(self) -> str:
         """Return a one-line description of the operation."""
@@ -116,6 +164,17 @@ class PatchSpec:
     ops: tuple[Op, ...]
     expected_sha256: str | None = None
     source: Path | None = None
+
+    def __post_init__(self) -> None:
+        """Check the two SHA-256 fields.
+
+        Raises:
+            SpecError: if one of them is not 64 lower-case hexadecimal digits.
+        """
+        if not is_sha256(self.base_sha256):
+            raise SpecError("'base_sha256' must be 64 lower-case hex digits")
+        if self.expected_sha256 is not None and not is_sha256(self.expected_sha256):
+            raise SpecError("'expected_sha256' must be 64 lower-case hex digits")
 
 
 def _require(mapping: Mapping[str, Any], key: str, kind: type[T], where: str) -> T:
@@ -159,14 +218,13 @@ def _offset(mapping: Mapping[str, Any], where: str) -> int:
     return value
 
 
-def _utf16(text: str, key: str, where: str) -> bytes:
-    """Return ``text`` as UTF-16 bytes."""
-    try:
-        return text.encode(UTF16)
-    except UnicodeEncodeError as error:
-        raise SpecError(
-            f"{where}: '{key}' cannot be written as UTF-16: {error}"
-        ) from None
+def _closed(raw: Mapping[str, Any], allowed: set[str], where: str) -> None:
+    """Raise if ``raw`` has a key that is not allowed and is not a note."""
+    unknown = sorted(
+        key for key in raw if key not in allowed and not key.startswith(NOTE_PREFIX)
+    )
+    if unknown:
+        raise SpecError(f"{where}: unknown key(s): {', '.join(unknown)}")
 
 
 def op_from_json(raw: Mapping[str, Any], where: str) -> Op:
@@ -177,35 +235,38 @@ def op_from_json(raw: Mapping[str, Any], where: str) -> Op:
         where: text that names the operation in error messages.
 
     Raises:
-        SpecError: if a field is missing or wrong, or the type is not known.
+        SpecError: if a field is missing, wrong or unknown, or the type is not
+            known.
     """
     kind = _require(raw, "type", str, where)
     block = _require(raw, "block", int, where)
-    if block < 0:
-        raise SpecError(f"{where}: 'block' must not be negative")
-    if kind == "bytes":
-        offset = _offset(raw, where)
-        expect, new = _hex(raw, "expect", where), _hex(raw, "new", where)
-        if len(expect) != len(new):
-            raise SpecError(
-                f"{where}: 'expect' has {len(expect)} bytes and 'new' has {len(new)}"
+    try:
+        if kind == "bytes":
+            _closed(raw, _BYTES_KEYS, where)
+            return BytesOp(
+                block,
+                _offset(raw, where),
+                _hex(raw, "expect", where),
+                _hex(raw, "new", where),
             )
-        if not new:
-            raise SpecError(f"{where}: 'expect' and 'new' are empty")
-        return BytesOp(block, offset, expect, new)
-    if kind == "utf16-replace-all":
-        old = _require(raw, "old", str, where)
-        new_text = _require(raw, "new", str, where)
-        if not old:
-            raise SpecError(f"{where}: 'old' is empty")
-        if len(_utf16(old, "old", where)) != len(_utf16(new_text, "new", where)):
-            raise SpecError(f"{where}: '{old}' and '{new_text}' differ in length")
-        count = raw.get("count")
-        if count is not None and (
-            not isinstance(count, int) or isinstance(count, bool) or count < 1
-        ):
-            raise SpecError(f"{where}: 'count' must be a whole number of 1 or more")
-        return Utf16ReplaceAllOp(block, old, new_text, count)
+        if kind == "utf16-replace-all":
+            _closed(raw, _TEXT_KEYS, where)
+            count = raw.get("count")
+            if count is not None and (
+                not isinstance(count, int) or isinstance(count, bool)
+            ):
+                raise SpecError("'count' must be a whole number")
+            return Utf16ReplaceAllOp(
+                block,
+                _require(raw, "old", str, where),
+                _require(raw, "new", str, where),
+                count,
+            )
+    except SpecError as error:
+        text = str(error)
+        raise SpecError(
+            text if text.startswith(where) else f"{where}: {text}"
+        ) from None
     raise SpecError(f"{where}: unknown operation type '{kind}'")
 
 
@@ -217,11 +278,12 @@ def spec_from_json(raw: Any, source: Path | None = None) -> PatchSpec:
         source: the file it came from, for error messages.
 
     Raises:
-        SpecError: if the JSON is not a valid spec.
+        SpecError: if the JSON is not a valid spec, or has an unknown key.
     """
     where = str(source) if source else "spec"
     if not isinstance(raw, Mapping):
         raise SpecError(f"{where}: a spec must be a JSON object")
+    _closed(raw, _SPEC_KEYS | _SPEC_NOTE_KEYS, where)
     name = _require(raw, "name", str, where)
     ops = []
     for index, item in enumerate(_require(raw, "ops", list, where)):
@@ -229,24 +291,27 @@ def spec_from_json(raw: Any, source: Path | None = None) -> PatchSpec:
         if not isinstance(item, Mapping):
             raise SpecError(f"{op_where}: an operation must be a JSON object")
         ops.append(op_from_json(item, op_where))
-    base_sha256 = _require(raw, "base_sha256", str, where)
-    if not is_sha256(base_sha256):
-        raise SpecError(f"{where}: 'base_sha256' must be 64 lower-case hex digits")
-    expected = raw.get("expected_sha256")
-    if expected is not None and not is_sha256(expected):
-        raise SpecError(f"{where}: 'expected_sha256' must be 64 lower-case hex digits")
     description = raw.get("description", "")
     if not isinstance(description, str):
         raise SpecError(f"{where}: 'description' must be str")
-    return PatchSpec(
-        name=name,
-        description=description,
-        base=_require(raw, "base", str, where),
-        base_sha256=base_sha256,
-        ops=tuple(ops),
-        expected_sha256=expected,
-        source=source,
-    )
+    expected = raw.get("expected_sha256")
+    if expected is not None and not isinstance(expected, str):
+        raise SpecError(f"{where}: 'expected_sha256' must be str")
+    try:
+        return PatchSpec(
+            name=name,
+            description=description,
+            base=_require(raw, "base", str, where),
+            base_sha256=_require(raw, "base_sha256", str, where),
+            ops=tuple(ops),
+            expected_sha256=expected,
+            source=source,
+        )
+    except SpecError as error:
+        text = str(error)
+        raise SpecError(
+            text if text.startswith(where) else f"{where}: {text}"
+        ) from None
 
 
 def load_spec(path: Path) -> PatchSpec:

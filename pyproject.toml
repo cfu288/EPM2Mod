@@ -3,7 +3,8 @@ name = "epm2mod"
 dynamic = ["version"]
 description = "Build and check custom firmware for the Olympus PEN E-PM2"
 readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE", "NOTICE.md"]
 requires-python = ">=3.10"
 dependencies = []
 
@@ -51,5 +52,5 @@ target-version = ["py310"]
 [tool.mypy]
 python_version = "3.10"
 strict = true
-files = ["src/epm2mod", "tests/test_package.py", "tests/test_looks.py"]
-mypy_path = "src"
+files = ["src/epm2mod", "tests/support.py", "tests/test_package.py", "tests/test_looks.py"]
+mypy_path = ["src", "tests"]

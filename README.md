@@ -19,40 +19,51 @@ Full-resolution sheet: [docs/film-sim-comparison.pdf](docs/film-sim-comparison.p
 
 ## Film looks
 
-Seven of the twelve art-filter menu entries are replaced by film looks. They work for stills and
-live view, straight out of the camera as JPEG.
+Film looks replace seven of the twelve art filters. They work for still pictures and for live view.
+The camera writes the look into the JPEG.
 
 <!-- BEGIN GENERATED: films -->
 | Menu name | Film | Replaces |
 |---|---|---|
 | Portra | Kodak Portra 400 (negative, on Kodak Portra Endura paper) | Pop Art |
 | Ektachrome | Kodak Ektachrome 100 (slide) | Soft Focus |
-| Pro 400H | Fuji Pro 400H (negative, on Fuji Crystal Archive paper) | Pale&Light Color |
+| Pro 400H | Fuji Pro 400H (negative, on Fuji Crystal Archive paper) | Pale&amp;Light Color |
 | Kodachrome | Kodak Kodachrome 64 (slide) | Light Tone |
 | Vis 250D | Kodak Vision3 250D (cinema negative, on Kodak 2383 print film) | Pin Hole |
 | Velvia | Fuji Velvia 100 (slide) | Diorama |
 | Superia 400 | Fuji Superia X-tra 400 (negative, on Fuji Crystal Archive paper) | Cross Process |
 <!-- END GENERATED: films -->
 
-Grainy Film, Gentle Sepia, Dramatic Tone, Key Line and Watercolor are unchanged. Colour and tone only:
-no grain, no halation. The looks are fitted to [spektrafilm](https://github.com/andreavolpato/spektrafilm)
-simulations of each film and measured on the camera with a synthetic test RAW; average colour error is
-about 1.1 to 1.5 ΔE2000 on natural colours (stock Natural against the same targets: 4 to 6).
-How it works, how it was measured and what the limits are: **[docs/film-emulation.md](docs/film-emulation.md)**.
+- Grainy Film, Gentle Sepia, Dramatic Tone, Key Line and Watercolor do not change.
+- A film look changes colour and tone only. It does not add grain or halation.
+- Each look is fitted to a [spektrafilm](https://github.com/andreavolpato/spektrafilm) simulation
+  of the film.
+- We measured each look on the camera with a synthetic test RAW file. The average colour error on
+  natural colours is 1.1 to 1.5 ΔE2000. ΔE2000 is a standard measure of colour difference: 1 is
+  about the smallest difference that you can see. The stock Natural mode is 4 to 6 from the same
+  targets.
+
+[docs/film-emulation.md](docs/film-emulation.md) tells you how the looks work, how we measured them
+and what their limits are.
 
 ## Interval shooting
 
-The E-PM2 firmware contains the interval-shooting code of its sister model, the E-PL6, but no menu
-entry for it. The mod adds the entry: **Shooting Menu 2 → Time Lapse Settings**. Set the number of
-frames, the start waiting time, the interval time (1 second or more), and if the camera makes a
-time-lapse movie when the sequence is complete. The camera stays awake during a sequence.
+The E-PM2 firmware contains the interval-shooting code of the E-PL6, but no menu entry for it. The
+mod adds the entry: **Shooting Menu 2 → Time Lapse Settings**. In this menu you set:
 
-The frame count goes from 1 to 99 in steps of 1, then from 100 to 240 in steps of 5. The stock
-E-PL6 stops at 99. The steps are there because the menu's value list holds 128 entries at most; the
-firmware keeps the count in one byte. Each frame uses the mechanical shutter.
+- the number of frames
+- the waiting time before the first frame
+- the interval between frames (1 second or more)
+- whether the camera makes a time-lapse movie at the end of the sequence
 
-What was in the firmware, how the patch works, how it was checked and what is not yet tested:
-[experiments/2026-11-13-intervalometer/README.md](experiments/2026-11-13-intervalometer/README.md).
+The camera stays on during a sequence. Each frame uses the mechanical shutter.
+
+The number of frames goes from 1 to 99 in steps of 1, then from 100 to 240 in steps of 5. The stock
+E-PL6 stops at 99. The steps of 5 are necessary because the menu list can hold only 128 values.
+
+[experiments/2026-11-13-intervalometer/README.md](experiments/2026-11-13-intervalometer/README.md)
+tells you what was in the firmware, how the patch works, how we checked it and what is not yet
+tested.
 
 ## Install the latest tested firmware
 
@@ -151,16 +162,11 @@ More about the update procedure: [docs/flashing.md](docs/flashing.md).
 only. Olympus and OM Digital Solutions have no part in it. An incorrect or interrupted update can
 make a camera unusable. Do not put a firmware file for a different camera model on the card.
 
-## Builds, for developers
+## For developers
 
 Each firmware build has a description file in [`builds/`](builds/). The description names the patch
-specs in order. After a camera test it also holds the sha256 of the result and the date.
-[`pinned-build.json`](pinned-build.json) names the description of the last tested build. To make a
-different build, give its description to the script:
-
-```bash
-uv run tools/make_firmware.py builds/seven-films-6.json
-```
+specs in order. After a camera test it also holds the sha256 of the result and the date of the test.
+[`pinned-build.json`](pinned-build.json) names the description of the last tested build.
 
 <!-- BEGIN GENERATED: builds -->
 | Build | What | Patch specs | Camera-tested | sha256 |
@@ -170,72 +176,40 @@ uv run tools/make_firmware.py builds/seven-films-6.json
 | `seven-films-6-interval` | Seven film looks as art filters, and interval shooting with up to 99 frames | 8 | 2026-11-13 | `f52ea6976ac2e9c567b2c07d7556b96b6431c8fcd2d90de195abdb76059e0104` |
 <!-- END GENERATED: builds -->
 
-The project makes its own firmware with the same script. The procedure for a new build is in
-[docs/conventions.md](docs/conventions.md), section "Making firmware".
+To make a different build, give its description to the script:
 
-The scripts use only the Python standard library. If you have Python 3.10 or newer, you can use
-`python3` in place of `uv run`.
+```bash
+uv run tools/make_firmware.py builds/seven-films-6.json
+```
 
-To run the tests: `uv run python -m unittest discover -s tests`. Some tests need the maker's
-firmware file.
+The scripts in `tools/` that make firmware use only the Python standard library. If you have
+Python 3.10 or newer, you can use `python3` in place of `uv run`.
 
-## Layout
+To run the tests:
 
-| Path | What |
+```bash
+uv run python -m unittest discover -s tests
+```
+
+Some tests need the maker's firmware file. Without the file, the test run skips them.
+
+| To learn about | Read |
 |---|---|
-| `src/epm2mod/` | the Python package that makes the firmware: container format, patch specs, stock download, build descriptions, the build steps, the film-spec generator. Typed, formatted with black, tested. Command: `uv run epm2mod --help` |
-| `tools/make_firmware.py`, `tools/fetch_stock.py` | the package's two main commands as stand-alone scripts |
-| `tools/oetool.py`, `tools/build.py` | older command-line forms, kept for the scripts that call them; they use the package |
-| `builds/`, `pinned-build.json` | one description per firmware build; the pointer to the last camera-tested one |
-| `looks/` | the film list and the fitted values that the film patch specs are generated from |
-| `tools/disasm.py`, `tools/fwmap.py` | MN103 disassembly (GNU objdump, `scripts/build-binutils-mn10300.sh`) and the block-0 function database with `fn`/`str`/`range`/`xref`/`tasks` queries |
-| `patches/` | one spec per mod, with a status and expected hash once camera-tested; `patches/history/` holds superseded and failed specs (record only) |
-| `firmware/` | stock and reference BINs (git-ignored), `SHA256SUMS`, provenance |
-| `docs/` | [firmware map](docs/firmware-map.md) (what the firmware contains and where), [flashing](docs/flashing.md), [camera log](docs/camera-log.md), [format](docs/firmware-format.md), [verification](docs/verification.md), [conventions](docs/conventions.md) |
-| `experiments/` | dated ad-hoc work; promote results into tools/patches/docs |
-| `tests/` | unittest suite |
-
-## Patches
-
-The current build is described under *Install the latest tested firmware* above. Every other film spec in the table below is in `patches/history/`; the table is the development history.
-
-| Spec | Status |
-|---|---|
-| `pixel-hacking` | camera-tested, works (PoC: renames a menu label) |
-| `curve-probe-2` | built, **not camera-tested** (Cross Process I := Natural + Saturation +2; verifies the per-channel base-gamma tables, NOTES §14.3) |
-| `film-portra-xp` (+ `label-portra`) | **camera-tested 2026-11-11, works** as `build/film-portra-xp-labelled.BIN` (Portra 400 in the Cross Process I slot; NOTES §14.4, §15) |
-| `film-portra-xp2` (+ `label-portra`) | built, **not camera-tested** (as above plus a fitted luma look curve; NOTES §16.3) |
-| `film-portra-xp` + `label-portra` | camera-tested 2026-11-11, works (first Portra build) |
-| + `sixaxis-probe-1` / `sixaxis-portra-1` (xp3) | camera-tested 2026-11-11, work (see docs/camera-log.md) |
-| `sixaxis-portra-2` (xp4), `sixaxis-portra-3` (xp5) | built, not camera-tested |
-| `xp-adaptive-hue-off`, `film-portra-xp7` (xp6 / xp7 builds) | xp7 flashed OK 2026-11-12; first patches that change code bytes (NOTES §22–23) |
-| `film-portra-xp8` | flashed OK 2026-11-12; measured with the synthetic test RAW (NOTES §23–25) |
-| `film-portra-xp9` | flashed OK 2026-11-12; mock natural colours ΔE 1.31 vs target, as predicted (NOTES §25) |
-| `film-ektachrome-pa2` | built, **not camera-tested**; Ektachrome 100 in the Pop Art II slot, data only (NOTES §26) |
-| `film-ektachrome-lt`, `label-ektachrome-lt` | flashed OK 2026-11-12; Ektachrome 100 in the Light Tone slot, ΔE 1.55 on mock natural colours (NOTES §26.5–26.6; slot map in `docs/art-filter-slots.md`) |
-| `film-ektachrome-lt2` | flashed OK 2026-11-12; ΔE 1.39 on mock natural colours, as predicted (NOTES §26.6) |
-| `film-portra-xp10`, `film-ektachrome-lt3` | flashed OK 2026-11-12 (current build); refits against the measured fit objective; scene-independence confirmed with the blue-scene test RAW (NOTES §27–28) |
-| `slot3-code`, `film-pro400h-pa1`, `label-pro400h-pa` (+ `…-s3` copies of the two film patches) | flashed OK 2026-11-12 (`three-films-1`): **first new code, works**; third film (Fuji Pro 400H) in the Pop Art entry, look distorted by Pop Art's chroma curves (NOTES §29–30) |
-| `slot3-chroma-linear` | flashed OK 2026-11-12 (`three-films-2`, current build): Pro 400H natural colours ΔE 1.20 (NOTES §30.4) |
-| `film-pro400h-pa2` | built, **not camera-tested** (`three-films-3`): correction refit of Pro 400H (NOTES §30.4) |
-| `slots7-code`, `slots7-neutral` | built, **not camera-tested** (`seven-slots-neutral`): Pale&Light, Soft Focus, Pin Hole and Diorama as film slots with a neutral test look; emulator-checked (docs/art-slots-evaluation.md, NOTES §32) |
-| `slots12-code`, `slots12-neutral`, `film-pro400h-pa2-s12` | built, **do not flash** (uses effect numbers 106 / 108; NOTES §35) (`twelve-slots-neutral`): all twelve visible filters as film slots; the five effect filters use the numbers of hidden second types; emulator-checked (docs/art-slots-evaluation.md §4, NOTES §33) |
-| `slots7-kind` | flashed 2026-11-12 with slots7-code (`seven-slots-neutral-b`): **live view freezes** in Soft Focus, Pin Hole, Diorama (NOTES §34–35) |
-| `remap7-code`, `remap7-neutral` | flashed 2026-11-12 (`seven-slots-remap-neutral`): **live view freezes** in Soft Focus, Pin Hole, Diorama (NOTES §35–36) |
-| `four-code`, `four-neutral` | built, **not camera-tested** (`four-slots-neutral`): the three films + Pale&Light as a fourth slot; no effect filter touched (NOTES §36) |
-| `remap7b-code` | flashed OK 2026-11-12 (`seven-slots-remap2-neutral`, current build): **live view no longer freezes** in the three remapped entries (NOTES §37) |
-| `seven-structure-extra`, `seven-films-1`, `seven-labels` | **camera-tested** (`seven-films-1`, 2026-11-12; `seven-films-2`, corrected fits for the four new films, camera-tested the same day; open: rare restart when RAW Data Edit saves, see camera log): seven films in menu order: Portra 400, Ektachrome 100, Pro 400H, Kodachrome 64, Vision3 250D, Velvia 100, Superia X-tra 400 (NOTES §39) |
-| `curve-probe-1`, `film-portra` | superseded drafts, not camera-tested (NOTES §12.5, §13) |
+| Where each file goes, the code rules, the commit rules, and how to make and test a new build | [docs/conventions.md](docs/conventions.md) |
+| What the firmware contains and where | [docs/firmware-map.md](docs/firmware-map.md) |
+| The firmware file format | [docs/firmware-format.md](docs/firmware-format.md) |
+| The update procedure and recovery | [docs/flashing.md](docs/flashing.md) |
+| Each update that we did on a camera, with its result | [docs/camera-log.md](docs/camera-log.md) |
+| How we check a patch before a camera test | [docs/verification.md](docs/verification.md) |
+| The patch specs that are not in the current build, and their history | [patches/history/README.md](patches/history/README.md) |
 
 ## Licence
 
-Code, documentation and notes: [MIT](LICENSE). Some material keeps other terms: the film look data is
-derived from [spektrafilm](https://github.com/andreavolpato/spektrafilm) by Andrea Volpato (CC BY-SA 4.0),
-and excerpts of the Olympus firmware remain Olympus's. No firmware and no third-party tool is included.
-Details and credits: [NOTICE.md](NOTICE.md).
+Code, documentation and notes: [MIT](LICENSE). Some material has other terms:
 
-## Background
+- The film look data is derived from [spektrafilm](https://github.com/andreavolpato/spektrafilm) by
+  Andrea Volpato (CC BY-SA 4.0).
+- Excerpts of the Olympus firmware remain the property of Olympus.
 
-Landscape research: `../reports/Olympus firmware modding landscape.md` and `../research_notes/Olympus firmware modding landscape/`.
-
-Commits follow Conventional Commits. Run `git config core.hooksPath .githooks` once: it enables the commit-message check and a check that refuses machine-specific paths and host names (use `/path/to/...`, `USER@HOST`). See [docs/conventions.md](docs/conventions.md).
+This repository includes no firmware and no third-party tool. [NOTICE.md](NOTICE.md) gives the
+details and the credits.

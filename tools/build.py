@@ -18,7 +18,7 @@ import os
 import sys
 
 import _package  # noqa: F401
-from epm2mod.container import describe
+from epm2mod.container import describe, parse
 from epm2mod.errors import Epm2ModError
 from epm2mod.fileio import read_bytes, write_bytes
 from epm2mod.hashing import sha256_bytes
@@ -60,7 +60,8 @@ def build(spec_paths, out=None):
         raise SystemExit(str(error)) from None
     print("\n".join(applied.log))
     digest = sha256_bytes(applied.image)
-    lines = describe(applied.image)
+    container = parse(applied.image)
+    lines = describe(container)
     out = out or os.path.join(ROOT, "build", "+".join(spec.name for spec in specs) + ".BIN")
     print(f"{out}  size={len(applied.image)}  sha256={digest}")
     print("\n".join("  " + line for line in lines))
@@ -74,8 +75,8 @@ def build(spec_paths, out=None):
     except Epm2ModError as error:
         raise SystemExit(str(error)) from None
     print(f"wrote {os.path.relpath(out, ROOT)}  ({applied.changed_bytes} bytes differ from base)")
-    print("flash as DCOLYMP/E1019999.BIN")
-    return all("checksum=BAD" not in line for line in lines)
+    print("This file is not checked against a tested build. For a camera, use tools/make_firmware.py.")
+    return container.checksums_ok
 
 
 if __name__ == "__main__":

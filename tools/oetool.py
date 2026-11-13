@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.10"
+# dependencies = []
+# ///
 """Olympus "OE" firmware container tool (the older command-line form).
 
     oetool.py info   FW.BIN
@@ -24,9 +28,28 @@ encode = _c.scramble
 wsum = _c.word_sum
 
 
+def _read(path):
+    with open(path, "rb") as handle:
+        return handle.read()
+
+
+def _write(path, data):
+    with open(path, "wb") as handle:
+        handle.write(data)
+
+
 def parse(d):
-    """Return (blocks as dicts, tail) of a firmware file."""
-    parsed = _c.parse(d)
+    """Return (blocks as dicts, tail) of a firmware file.
+
+    Data that does not start with a block gives no blocks and the whole data as the tail, as
+    this tool always did. Data that ends inside a block raises ValueError.
+    """
+    if d[:2] != _c.MAGIC:
+        return [], d
+    try:
+        parsed = _c.parse(d)
+    except _c.ContainerError as error:
+        raise ValueError(str(error)) from None
     blocks = [
         dict(off=b.offset, header=b.header, trailer=b.trailer, payload=b.payload, ok=b.checksum_ok, addr=b.load_address, kind=b.kind)
         for b in parsed.blocks
@@ -36,8 +59,8 @@ def parse(d):
 
 def build(blocks, tail):
     """Return the firmware file of blocks (dicts with header, trailer, payload) and a tail."""
-    made = [_c.Block(b.get("off", 0), b["header"], b["trailer"], b["payload"], False) for b in blocks]
     try:
+        made = tuple(_c.Block(b.get("off", 0), b["header"], b["trailer"], b["payload"], False) for b in blocks)
         return _c.serialize(_c.Container(made, tail))
     except _c.ContainerError as error:
         raise ValueError(str(error)) from None
@@ -45,43 +68,45 @@ def build(blocks, tail):
 
 def info(path):
     """Print a description of a firmware file. Return True if every checksum is right."""
-    d = open(path, "rb").read()
-    lines = _c.describe(d)
+    d = _read(path)
+    blocks, tail = parse(d)
     print(f"{path}  size={len(d)}  sha256={hashlib.sha256(d).hexdigest()}")
-    print("\n".join("  " + line for line in lines))
-    return all("checksum=BAD" not in line for line in lines)
+    for n, b in enumerate(blocks):
+        print(f"  block{n} @0x{b['off']:08x} kind=0x{b['kind']:04x} addr=0x{b['addr']:08x} len={len(b['payload'])} checksum={'OK' if b['ok'] else 'BAD'}")
+    print(f"  tail len={len(tail)} sha256={hashlib.sha256(tail).hexdigest()[:16]}")
+    return all(b["ok"] for b in blocks)
 
 
 def unpack(path, outdir):
     """Write the blocks (unscrambled), the tail and a manifest to a folder."""
-    blocks, tail = parse(open(path, "rb").read())
+    blocks, tail = parse(_read(path))
     os.makedirs(outdir, exist_ok=True)
     man = {"source": os.path.basename(path), "blocks": []}
     for n, b in enumerate(blocks):
         fn = f"block{n}_{b['kind']:04x}.bin"
-        open(os.path.join(outdir, fn), "wb").write(b["payload"])
+        _write(os.path.join(outdir, fn), b["payload"])
         man["blocks"].append(dict(file=fn, header=b["header"].hex(), trailer=b["trailer"].hex()))
-    open(os.path.join(outdir, "tail.bin"), "wb").write(tail)
-    json.dump(man, open(os.path.join(outdir, "manifest.json"), "w"), indent=1)
+    _write(os.path.join(outdir, "tail.bin"), tail)
+    _write(os.path.join(outdir, "manifest.json"), json.dumps(man, indent=1).encode())
     print(f"unpacked {len(blocks)} blocks + tail to {outdir}")
 
 
 def pack(indir, outpath):
     """Rebuild a firmware file from a folder that `unpack` wrote."""
-    man = json.load(open(os.path.join(indir, "manifest.json")))
+    man = json.loads(_read(os.path.join(indir, "manifest.json")))
     blocks = [
-        dict(header=bytes.fromhex(b["header"]), trailer=bytes.fromhex(b["trailer"]), payload=open(os.path.join(indir, b["file"]), "rb").read())
+        dict(header=bytes.fromhex(b["header"]), trailer=bytes.fromhex(b["trailer"]), payload=_read(os.path.join(indir, b["file"])))
         for b in man["blocks"]
     ]
-    tail = open(os.path.join(indir, "tail.bin"), "rb").read()
+    tail = _read(os.path.join(indir, "tail.bin"))
     image = build(blocks, tail)  # may raise: build first, so no empty file is left
-    open(outpath, "wb").write(image)
+    _write(outpath, image)
     return info(outpath)
 
 
 def patch(src, dst, specs):
     """Replace bytes: specs are (block, offset, new bytes, expected bytes or None)."""
-    blocks, tail = parse(open(src, "rb").read())
+    blocks, tail = parse(_read(src))
     for blk, off, new, expect in specs:
         p = bytearray(blocks[blk]["payload"])
         cur = bytes(p[off:off + len(new)])
@@ -91,7 +116,7 @@ def patch(src, dst, specs):
         blocks[blk]["payload"] = bytes(p)
         print(f"block{blk}+0x{off:x}: {cur.hex()} -> {new.hex()}")
     image = build(blocks, tail)  # may raise: build first, so no empty file is left
-    open(dst, "wb").write(image)
+    _write(dst, image)
     return info(dst)
 
 

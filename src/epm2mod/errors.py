@@ -32,4 +32,10 @@ class StockError(Epm2ModError):
 
 
 class BuildError(Epm2ModError):
-    """A build description is malformed, or a build did not give the expected result."""
+    """A build cannot be made, written or recorded.
+
+    This covers a malformed build description or film list, a fit file that
+    cannot be used, a failed free-space check, a result with the wrong SHA-256,
+    an SD card that cannot take the firmware, and a README whose generated
+    parts cannot be found.
+    """

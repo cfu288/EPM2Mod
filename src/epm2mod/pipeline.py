@@ -18,10 +18,11 @@ What ``make`` guarantees about files:
 * The outputs of an earlier run for the same build, and the whole ``build/card``
   folder, are removed before anything else is done. After a failed run they are
   absent; they never hold another build.
-* A firmware file gets its final name only when all of it is written and
-  flushed (``fileio.write_bytes``). No final name ever holds part of a file.
+* A firmware file gets its final name only when all of it is written, flushed
+  and read back (``fileio.write_bytes``). No final name ever holds part of a
+  file.
 * On the SD card the new file replaces an older one only when it is complete
-  and its SHA-256 was read back and found right.
+  and was read back from the card.
 
 ``record_test`` is the separate step that turns a candidate into a tested build
 after a camera test.
@@ -38,7 +39,7 @@ from pathlib import Path
 
 from .builds import BuildDescription, check_test_date, pin
 from .errors import BuildError
-from .fileio import Log, part_path, read_bytes, remove, silent, write_bytes
+from .fileio import Log, describe_os_error, part_path, silent, write_bytes
 from .hashing import sha256_bytes
 from .paths import RepoPaths
 from .spec import Applied, PatchSpec, apply_specs, load_spec
@@ -76,23 +77,23 @@ def load_specs(paths: RepoPaths, description: BuildDescription) -> list[PatchSpe
 
 
 def build_image(
-    paths: RepoPaths, description: BuildDescription, stock_data: bytes
+    description: BuildDescription, specs: list[PatchSpec], stock_data: bytes
 ) -> tuple[Applied, str]:
     """Apply a build's specs to the stock firmware, in memory, and check the result.
 
     Args:
-        paths: the repository.
         description: the build.
+        specs: the build's patch specs, as ``load_specs`` returns them.
         stock_data: the checked bytes of the stock firmware.
 
     Returns:
         The applied result and the SHA-256 of its image.
 
     Raises:
-        SpecError: if a spec is missing, not valid, or does not fit.
+        SpecError: if a spec does not fit the firmware.
         BuildError: if the build has a recorded SHA-256 and the result has another.
     """
-    applied = apply_specs(stock_data, load_specs(paths, description))
+    applied = apply_specs(stock_data, specs)
     digest = sha256_bytes(applied.image)
     if description.sha256 is not None and digest != description.sha256:
         raise BuildError(
@@ -145,11 +146,15 @@ def card_target(card: Path, stock: StockFirmware) -> Path:
 
 
 def check_card(card: Path, stock: StockFirmware) -> list[str]:
-    """Check that an SD card can take the firmware file, before any work is done.
+    """Check an SD card's firmware folder, before any work is done.
+
+    Only the content of the folder is checked. A card that is read-only or
+    full is found later, when the file is written.
 
     The camera's updater needs the firmware to be the only file in its folder.
     Other files there are an error; they are not deleted. Names that start with
-    a dot (which some computers add and hide) are reported, not refused.
+    a dot (which some computers add and hide) are reported, not refused. A
+    temporary file that an interrupted run left is ours and is ignored.
 
     Args:
         card: the folder where the card is mounted.
@@ -174,7 +179,9 @@ def check_card(card: Path, stock: StockFirmware) -> list[str]:
     try:
         names = sorted(entry.name for entry in folder.iterdir())
     except OSError as error:
-        raise BuildError(f"{folder}: cannot be read: {error.strerror}") from None
+        raise BuildError(
+            f"{folder}: cannot be read: {describe_os_error(error)}"
+        ) from None
     others = [name for name in names if name not in ours and not name.startswith(".")]
     if others:
         raise BuildError(
@@ -184,21 +191,17 @@ def check_card(card: Path, stock: StockFirmware) -> list[str]:
     return [name for name in names if name.startswith(".")]
 
 
-def copy_to_card(image: bytes, sha256: str, card: Path, stock: StockFirmware) -> Path:
+def copy_to_card(image: bytes, card: Path, stock: StockFirmware) -> Path:
     """Write the firmware to an SD card and check what was written.
 
     The data goes to a temporary name in the firmware folder, is flushed to the
-    card, is read back and compared with ``sha256``, and only then takes the
-    camera's file name. If anything fails, the temporary file is removed and a
-    firmware file that was on the card before is still there, unchanged.
-
-    The read-back goes through the operating system, which may answer from its
-    own memory. It proves that the data was accepted and flushed, not that the
-    card stores it without error.
+    card and read back, and only then takes the camera's file name
+    (``fileio.write_bytes`` with ``read_back``). If anything fails, the
+    temporary file is removed and a firmware file that was on the card before
+    is still there, unchanged.
 
     Args:
         image: the firmware file.
-        sha256: the SHA-256 that ``image`` has.
         card: the folder where the card is mounted.
         stock: the stock firmware, for the camera's file name.
 
@@ -211,28 +214,35 @@ def copy_to_card(image: bytes, sha256: str, card: Path, stock: StockFirmware) ->
     """
     check_card(card, stock)
     target = card_target(card, stock)
-    temporary = part_path(target)
-    write_bytes(temporary, image, BuildError)
-    try:
-        copied = sha256_bytes(read_bytes(temporary, BuildError))
-        if copied != sha256:
-            raise BuildError(
-                "The data read back from the card was not the firmware. Nothing "
-                "was changed on the card. Try again, or try another card."
-            )
-        try:
-            temporary.replace(target)
-        except OSError as error:
-            raise BuildError(f"{target}: cannot be written: {error.strerror}") from None
-    finally:
-        remove(temporary)
+    write_bytes(target, image, BuildError, read_back=True)
     return target
 
 
-def _clear_outputs(paths: RepoPaths, image: Path) -> None:
-    """Remove what an earlier run left: the build's image and the card folder."""
+def image_path(paths: RepoPaths, name: str) -> Path:
+    """Return where the firmware file of the build called ``name`` is written."""
+    return paths.output / f"{name}.BIN"
+
+
+def clear_outputs(paths: RepoPaths, name: str | None) -> None:
+    """Remove what an earlier run left: the card folder and one build's image.
+
+    A caller that may fail before ``make`` runs (for example while it reads
+    the build description) calls this first, so that a failed run never leaves
+    the firmware of an earlier run in place.
+
+    Args:
+        paths: the repository.
+        name: the build whose image is removed, or None for the card folder only.
+
+    Raises:
+        BuildError: if something cannot be removed.
+    """
+    stale_files = []
+    if name is not None:
+        image = image_path(paths, name)
+        stale_files = [image, part_path(image)]
     try:
-        for stale in (image, part_path(image)):
+        for stale in stale_files:
             if stale.exists() or stale.is_symlink():
                 stale.unlink()
         if paths.card.is_symlink():
@@ -241,7 +251,8 @@ def _clear_outputs(paths: RepoPaths, image: Path) -> None:
             shutil.rmtree(paths.card)
     except OSError as error:
         raise BuildError(
-            f"cannot remove the outputs of an earlier run: {error}"
+            "cannot remove the outputs of an earlier run: "
+            f"{describe_os_error(error)}"
         ) from None
 
 
@@ -267,12 +278,14 @@ def make(
     Raises:
         Epm2ModError: with a message for the user, if any step fails. Then
             ``build/NAME.BIN`` and ``build/card`` do not exist, and a firmware
-            file on the SD card is as it was before.
+            file on the SD card is as it was before. The same holds if the run
+            is interrupted while it writes.
     """
-    image = paths.output / f"{description.name}.BIN"
+    image = image_path(paths, description.name)
     card_copy = card_target(paths.card, stock)
-    _clear_outputs(paths, image)
+    clear_outputs(paths, description.name)
     hidden = check_card(card, stock) if card is not None else []
+    specs = load_specs(paths, description)
 
     stock_data = obtain_stock(paths, stock, log)
     log("1/5 stock firmware: ok")
@@ -285,7 +298,7 @@ def make(
     else:
         log("2/5 free-space check: " + check_free_space(paths, description))
 
-    applied, digest = build_image(paths, description, stock_data)
+    applied, digest = build_image(description, specs, stock_data)
     log(
         f"3/5 applied {len(description.specs)} patch specs "
         f"({applied.changed_bytes} bytes changed)"
@@ -302,15 +315,11 @@ def make(
         )
 
     try:
-        write_bytes(image, applied.image, BuildError)
-        write_bytes(card_copy, applied.image, BuildError)
-        on_card = (
-            copy_to_card(applied.image, digest, card, stock)
-            if card is not None
-            else None
-        )
-    except BuildError:
-        _clear_outputs(paths, image)
+        write_bytes(image, applied.image, BuildError, read_back=True)
+        write_bytes(card_copy, applied.image, BuildError, read_back=True)
+        on_card = copy_to_card(applied.image, card, stock) if card is not None else None
+    except BaseException:
+        clear_outputs(paths, description.name)
         raise
     log(
         f"5/5 {description.name}: {description.what}\n"
@@ -369,7 +378,7 @@ def record_test(
     """
     check_test_date(date, today or datetime.date.today())
     tested = description.as_tested(sha256, date)
-    _, digest = build_image(paths, tested, read_stock(paths, stock))
+    _, digest = build_image(tested, load_specs(paths, tested), read_stock(paths, stock))
     pin(paths, tested)
     log(
         f"pinned: {tested.name}, camera-tested {date}, sha256 {digest}. "

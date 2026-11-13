@@ -9,7 +9,7 @@ Two rules hold for every file the package writes:
 * **No bare ``OSError``.** A failure is reported as a ``FileError`` (or the
   error type the caller asks for) with the path in the message.
 
-Text is written as UTF-8 with ``\\n`` line ends on every platform.
+Text is written as UTF-8 with the line ends it is given, on every platform.
 """
 
 from __future__ import annotations
@@ -24,9 +24,6 @@ from .errors import Epm2ModError, FileError
 #: A function that takes one line of progress text.
 Log = Callable[[str], None]
 
-#: How many bytes are read or written at a time.
-BLOCK_SIZE = 1 << 20
-
 _PART_SUFFIX = ".part"
 
 
@@ -34,7 +31,7 @@ def silent(line: str) -> None:
     """Discard a line of progress text."""
 
 
-def _describe(error: OSError) -> str:
+def describe_os_error(error: OSError) -> str:
     """Return the reason of an ``OSError`` as text."""
     return error.strerror or str(error)
 
@@ -48,7 +45,7 @@ def read_bytes(path: Path, error: type[Epm2ModError] = FileError) -> bytes:
     try:
         return path.read_bytes()
     except OSError as reason:
-        raise error(f"{path}: cannot be read: {_describe(reason)}") from None
+        raise error(f"{path}: cannot be read: {describe_os_error(reason)}") from None
 
 
 def read_text(path: Path, error: type[Epm2ModError] = FileError) -> str:
@@ -72,7 +69,7 @@ def read_json(path: Path, error: type[Epm2ModError] = FileError) -> Any:
     text = read_text(path, error)
     try:
         return json.loads(text)
-    except ValueError as reason:
+    except (ValueError, RecursionError) as reason:
         raise error(f"{path}: not JSON: {reason}") from None
 
 
@@ -81,7 +78,7 @@ def part_path(path: Path) -> Path:
     return path.with_name(path.name + _PART_SUFFIX)
 
 
-def _sync_folder(folder: Path) -> None:
+def sync_folder(folder: Path) -> None:
     """Flush a folder's entry table to the device, where the platform can."""
     if not hasattr(os, "O_DIRECTORY"):
         return
@@ -97,14 +94,29 @@ def _sync_folder(folder: Path) -> None:
         os.close(handle)
 
 
-def write_bytes(path: Path, data: bytes, error: type[Epm2ModError] = FileError) -> None:
+def write_bytes(
+    path: Path,
+    data: bytes,
+    error: type[Epm2ModError] = FileError,
+    read_back: bool = False,
+) -> None:
     """Write a file, all or nothing, and flush it to the device.
 
     The folder is made if it is missing.
 
+    Args:
+        path: the file to write.
+        data: its content.
+        error: the type of error to raise.
+        read_back: if True, the temporary file is read again after the flush
+            and must hold ``data`` before it takes the final name. The read
+            goes through the operating system, which may answer from its own
+            memory: it shows that the device accepted the data, not that the
+            device stores it without error.
+
     Raises:
-        Epm2ModError: of type ``error``, if the file cannot be written. The
-            final name is untouched then.
+        Epm2ModError: of type ``error``, if the file cannot be written or the
+            data read back differs. The final name is untouched then.
     """
     temporary = part_path(path)
     try:
@@ -113,11 +125,14 @@ def write_bytes(path: Path, data: bytes, error: type[Epm2ModError] = FileError) 
             handle.write(data)
             handle.flush()
             os.fsync(handle.fileno())
+        if read_back and temporary.read_bytes() != data:
+            raise error(f"{path}: the data read back differs from the data written")
         os.replace(temporary, path)
-        _sync_folder(path.parent)
+        sync_folder(path.parent)
     except OSError as reason:
+        raise error(f"{path}: cannot be written: {describe_os_error(reason)}") from None
+    finally:
         remove(temporary)
-        raise error(f"{path}: cannot be written: {_describe(reason)}") from None
 
 
 def write_text(path: Path, text: str, error: type[Epm2ModError] = FileError) -> None:

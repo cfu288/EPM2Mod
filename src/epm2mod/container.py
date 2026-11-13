@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import struct
 from dataclasses import dataclass, replace
-from typing import Sequence
+from collections.abc import Sequence
 
 from .errors import ContainerError
 from .hashing import sha256_bytes
@@ -88,6 +88,24 @@ class Block:
     payload: bytes
     checksum_ok: bool
 
+    def __post_init__(self) -> None:
+        """Check the sizes of the parts. Every instance can be serialized.
+
+        Raises:
+            ContainerError: if the header or the trailer has the wrong size, or
+                the payload length is not a multiple of 16.
+        """
+        if len(self.header) != HEADER_SIZE or len(self.trailer) != TRAILER_SIZE:
+            raise ContainerError(
+                f"block at {self.offset:#x}: the header and the trailer must be "
+                f"{HEADER_SIZE} and {TRAILER_SIZE} bytes"
+            )
+        if len(self.payload) % ROW:
+            raise ContainerError(
+                f"block at {self.offset:#x}: payload length {len(self.payload)} "
+                f"is not a multiple of {ROW}"
+            )
+
     @property
     def load_address(self) -> int:
         """The address field of the header."""
@@ -129,7 +147,7 @@ class Container:
         tail: the bytes after the last block, unchanged.
     """
 
-    blocks: Sequence[Block]
+    blocks: tuple[Block, ...]
     tail: bytes
 
     @property
@@ -147,7 +165,7 @@ class Container:
             block if payload == block.payload else block.with_payload(payload)
             for block, payload in zip(self.blocks, payloads)
         ]
-        return Container(blocks, self.tail)
+        return Container(tuple(blocks), self.tail)
 
 
 def parse(data: bytes) -> Container:
@@ -195,14 +213,16 @@ def parse(data: bytes) -> Container:
         offset = end
     if not blocks:
         raise ContainerError("not a firmware container: no block at the start")
-    return Container(blocks, data[offset:])
+    return Container(tuple(blocks), data[offset:])
 
 
 def serialize(container: Container) -> bytes:
     """Write a container back to bytes, with fresh checksums.
 
-    A container that was parsed and not changed serializes to the bytes it was
-    parsed from.
+    A container that was parsed from a file with right checksums, and not
+    changed, serializes to the bytes it was parsed from. A block whose stored
+    checksum was wrong gets a right one: check ``checksums_ok`` before you
+    serialize if the input must be sound.
 
     Raises:
         ContainerError: if a payload's length differs from the length in its header.
@@ -224,9 +244,8 @@ def serialize(container: Container) -> bytes:
     return bytes(out + container.tail)
 
 
-def describe(data: bytes) -> list[str]:
-    """Return one line of text per block of a firmware file, and one for the tail."""
-    container = parse(data)
+def describe(container: Container) -> list[str]:
+    """Return one line of text per block of a container, and one for the tail."""
     lines = [
         f"block{index} @{block.offset:#010x} kind={block.kind:#06x} "
         f"addr={block.load_address:#010x} len={len(block.payload)} "

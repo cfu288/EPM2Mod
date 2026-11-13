@@ -42,22 +42,24 @@ def _check_sha256(value: object, where: str) -> str:
     """Return ``value`` if it is 64 lower-case hexadecimal digits, else raise."""
     if not is_sha256(value):
         raise BuildError(f"{where}: 'sha256' must be 64 lower-case hexadecimal digits")
-    assert isinstance(value, str)
     return value
 
 
-def _check_date(value: object, where: str) -> str:
-    """Return ``value`` if it is a date written as YYYY-MM-DD, else raise."""
-    parsed = None
+def _parse_date(value: object, where: str) -> datetime.date:
+    """Return the date that ``value`` writes as YYYY-MM-DD, else raise."""
     if isinstance(value, str):
         try:
             parsed = datetime.date.fromisoformat(value)
         except ValueError:
             parsed = None
-    if parsed is None or parsed.isoformat() != value:
-        raise BuildError(f"{where}: the date must be written YYYY-MM-DD, got {value!r}")
-    assert isinstance(value, str)
-    return value
+        if parsed is not None and parsed.isoformat() == value:
+            return parsed
+    raise BuildError(f"{where}: the date must be written YYYY-MM-DD, got {value!r}")
+
+
+def _check_date(value: object, where: str) -> str:
+    """Return ``value`` if it is a date written as YYYY-MM-DD, else raise."""
+    return _parse_date(value, where).isoformat()
 
 
 def check_spec_path(text: object, where: str) -> str:
@@ -109,8 +111,16 @@ class BuildDescription:
                 f"{self.name!r}: a build name has lower-case letters, digits, "
                 "'.', '_' and '-' only, and starts with a letter or a digit"
             )
-        if not self.what.strip() or "\n" in self.what:
-            raise BuildError(f"{self.name}: 'what' must be one line of text")
+        if (
+            not self.what.strip()
+            or any(ord(char) < 0x20 for char in self.what)
+            or "<" in self.what
+            or ">" in self.what
+        ):
+            raise BuildError(
+                f"{self.name}: 'what' must be one line of plain text, "
+                "without '<' or '>'"
+            )
         if not self.specs:
             raise BuildError(f"{self.name}: 'specs' must name one or more specs")
         for spec in self.specs:
@@ -161,15 +171,19 @@ class BuildDescription:
         return raw
 
 
-def description_from_json(name: str, raw: Any) -> BuildDescription:
+def description_from_json(
+    name: str, raw: Any, today: datetime.date | None = None
+) -> BuildDescription:
     """Build a description from its JSON form.
 
     Args:
         name: the build's name.
         raw: the parsed JSON.
+        today: the current date, for the check of the test date; for tests.
 
     Raises:
-        BuildError: if the name or the JSON is not valid.
+        BuildError: if the name or the JSON is not valid, or the test date is
+            in the future.
     """
     if not isinstance(raw, dict):
         raise BuildError(f"{name}: a build description must be a JSON object")
@@ -182,6 +196,8 @@ def description_from_json(name: str, raw: Any) -> BuildDescription:
     if not isinstance(specs, list):
         raise BuildError(f"{name}: 'specs' must be a list of paths")
     sha256, tested = raw.get("sha256"), raw.get("camera_tested")
+    if tested is not None:
+        check_test_date(_check_date(tested, name), today or datetime.date.today())
     return BuildDescription(
         name=name,
         what=what.strip(),
@@ -252,8 +268,7 @@ def check_test_date(date: str, today: datetime.date) -> str:
     Raises:
         BuildError: if it is malformed or in the future.
     """
-    _check_date(date, "the test date")
-    if datetime.date.fromisoformat(date) > today:
+    if _parse_date(date, "the test date") > today:
         raise BuildError(f"the test date {date} is in the future")
     return date
 

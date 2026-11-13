@@ -13,10 +13,12 @@ Every operation states the bytes it replaces. They are the bytes of the stock
 firmware, except for a matrix table that an earlier spec creates: there the
 expected bytes are the identity matrix that the earlier spec writes.
 
-A spec file holds generated fields (name, description, attribution, base,
-operations) and one field that people write: ``status``, the note about the
-camera test. ``write`` replaces the generated fields and keeps ``status`` when
-the operations did not change.
+A spec file holds generated fields (name, attribution, description, operations,
+base, base_sha256 and inputs_sha256, a digest of the film list and the fit
+files) and notes that people write, above all ``status``, the note about the
+camera test. ``write`` replaces the generated fields. It keeps the notes if
+the operations did not change; if they changed, ``status`` is reset and
+``expected_sha256`` is dropped, because they describe other bytes.
 
 This module needs numpy.
 """
@@ -25,9 +27,11 @@ from __future__ import annotations
 
 import re
 import struct
+import zipfile
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
@@ -39,7 +43,7 @@ from ..paths import RepoPaths
 from ..spec import UTF16, BytesOp, Op, op_to_json
 from ..stock import EPM2_V16, StockFirmware, read_stock
 from . import slots
-from .films import Film, load_films
+from .films import Film, inputs_digest, load_films
 
 FloatArray = NDArray[np.float64]
 #: A fit file: arrays by name.
@@ -63,7 +67,15 @@ _CHROMA_KNOTS = 16
 _CHROMA_SLOPES = {"Cb": 17, "Cr": 16}
 _CHROMA_SLOPE_ARRAY = 17
 #: The spec fields that the generator owns. ``status`` is written by people.
-_GENERATED_KEYS = ("name", "attribution", "description", "ops", "base", "base_sha256")
+_GENERATED_KEYS = (
+    "name",
+    "attribution",
+    "description",
+    "ops",
+    "base",
+    "base_sha256",
+    "inputs_sha256",
+)
 
 
 @dataclass(frozen=True)
@@ -74,12 +86,14 @@ class GeneratedSpec:
         path: where the spec belongs, relative to the repository root.
         description: text for the spec's ``description`` field.
         ops: the operations.
+        inputs_sha256: digest of the film list and fit files it was made from.
         attribution: text for an ``attribution`` field, or None.
     """
 
     path: str
     description: str
     ops: tuple[Op, ...]
+    inputs_sha256: str
     attribution: str | None = None
 
     @property
@@ -97,6 +111,7 @@ class GeneratedSpec:
             ops=[op_to_json(op) for op in self.ops],
             base=stock.relative_path,
             base_sha256=stock.sha256,
+            inputs_sha256=self.inputs_sha256,
         )
         return fields
 
@@ -162,10 +177,17 @@ def whole_numbers(
 
     Raises:
         BuildError: if the array has another size, holds a value that is not a
-            whole number, or holds a value outside the range.
+            finite whole number, or holds a value outside the range.
     """
-    array = np.asarray(values, dtype=np.float64).ravel()
-    if array.size != count or not np.array_equal(array, np.round(array)):
+    try:
+        array = np.asarray(values, dtype=np.float64).ravel()
+    except (TypeError, ValueError):
+        raise BuildError(f"{where}: {what} must be numbers") from None
+    if (
+        array.size != count
+        or not np.all(np.isfinite(array))
+        or not np.array_equal(array, np.round(array))
+    ):
         raise BuildError(f"{where}: {what} must be {count} whole numbers")
     numbers = [int(value) for value in array]
     if any(not low <= number <= high for number in numbers):
@@ -207,25 +229,27 @@ def film_ops(program: Program, film: Film, fit: Fit) -> list[BytesOp]:
     """
     where = film.fit
     slot = slots.slot_for(film.entry)
-    curves = np.asarray(_array(fit, "G", where), dtype=np.float64)
-    if curves.shape != (3, slots.CURVE_POINTS):
+    try:
+        curves = np.asarray(_array(fit, "G", where), dtype=np.float64)
+    except (TypeError, ValueError):
+        raise BuildError(f"{where}: 'G' must be numbers") from None
+    if curves.shape != (3, slots.CURVE_POINTS) or not np.all(np.isfinite(curves)):
         raise BuildError(
-            f"{where}: 'G' must be 3 curves of {slots.CURVE_POINTS} points"
+            f"{where}: 'G' must be 3 curves of {slots.CURVE_POINTS} finite numbers"
         )
     defaults = program.record(slots.DEFAULT_RECORD)
     grid = np.arange(slots.CURVE_POINTS, dtype=np.float64)
 
     targets: list[tuple[int, int, int]]  # (table, default table, channel)
-    if slot.tables is not None:
+    if isinstance(slot.tone, slots.Tables):
         targets = [
             (table, defaults[slots.STILLS_TABLE], channel)
-            for channel, table in enumerate(slot.tables)
+            for channel, table in enumerate(slot.tone.addresses)
         ]
     else:
-        assert slot.records is not None  # Slot.__post_init__
         targets = [
             (table, default, channel)
-            for channel, record in enumerate(slot.records)
+            for channel, record in enumerate(slot.tone.addresses)
             for table, default in zip(program.record(record), defaults)
         ]
     ops = [
@@ -304,16 +328,21 @@ def _changing(ops: Sequence[BytesOp]) -> tuple[Op, ...]:
     return tuple(op for op in ops if op.expect != op.new)
 
 
-def _load_fit(path: Path) -> dict[str, NDArray[Any]]:
+def load_fit(path: Path) -> dict[str, NDArray[Any]]:
     """Return the arrays of a fit file.
 
     Raises:
-        BuildError: if the file cannot be read as a numpy archive.
+        BuildError: if the file is missing or is not a numpy ``.npz`` archive
+            of plain arrays.
     """
     try:
-        with np.load(path) as archive:
-            return {key: archive[key] for key in archive.files}
-    except (OSError, ValueError) as error:
+        with path.open("rb") as handle:
+            loaded = np.load(handle)
+            if not isinstance(loaded, np.lib.npyio.NpzFile):
+                raise BuildError(f"{path}: is not a numpy .npz archive")
+            with loaded as archive:
+                return {key: archive[key] for key in archive.files}
+    except (OSError, ValueError, EOFError, zipfile.BadZipFile) as error:
         raise BuildError(f"{path}: cannot be read as a fit file: {error}") from None
 
 
@@ -332,12 +361,13 @@ def generate(paths: RepoPaths, stock: StockFirmware = EPM2_V16) -> list[Generate
         StockError: if the stock firmware is missing or is another file.
     """
     film_list = load_films(paths)
+    digest = inputs_digest(paths, film_list)
     container = parse(read_stock(paths, stock))
     program = Program(container.blocks[PROGRAM_BLOCK].payload)
 
     looks: list[BytesOp] = []
     for film in film_list.films:
-        looks += film_ops(program, film, _load_fit(paths.resolve(film.fit)))
+        looks += film_ops(program, film, load_fit(paths.resolve(film.fit)))
 
     films_text = "; ".join(f"{film.entry} = {film.film}" for film in film_list.films)
     labels_text = ", ".join(
@@ -350,6 +380,7 @@ def generate(paths: RepoPaths, stock: StockFirmware = EPM2_V16) -> list[Generate
                 "Seven film looks, one per film slot, in menu order: " f"{films_text}."
             ),
             ops=_changing(looks),
+            inputs_sha256=digest,
             attribution=ATTRIBUTION,
         ),
         GeneratedSpec(
@@ -359,6 +390,7 @@ def generate(paths: RepoPaths, stock: StockFirmware = EPM2_V16) -> list[Generate
                 "strings; longer texts that contain a name are left alone."
             ),
             ops=tuple(label_ops(container.blocks[TEXT_BLOCK].payload, film_list.films)),
+            inputs_sha256=digest,
         ),
         GeneratedSpec(
             path=film_list.structure_spec,
@@ -368,12 +400,13 @@ def generate(paths: RepoPaths, stock: StockFirmware = EPM2_V16) -> list[Generate
                 "tone-curve handler for the Light Tone codes."
             ),
             ops=_changing(structure_ops(program)),
+            inputs_sha256=digest,
         ),
     ]
 
 
-def _committed(paths: RepoPaths, spec: GeneratedSpec) -> dict[str, Any] | None:
-    """Return the JSON of the committed copy of a spec, or None if it is absent."""
+def _on_disk(paths: RepoPaths, spec: GeneratedSpec) -> dict[str, Any] | None:
+    """Return the JSON of the spec file in the repository, or None if it is absent."""
     path = paths.resolve(spec.path)
     if not path.exists():
         return None
@@ -383,44 +416,43 @@ def _committed(paths: RepoPaths, spec: GeneratedSpec) -> dict[str, Any] | None:
     return raw
 
 
-def _is_current(committed: dict[str, Any] | None, fields: dict[str, Any]) -> bool:
-    """Return True if a committed spec holds exactly the generated fields."""
-    if committed is None:
+def _is_current(on_disk: dict[str, Any] | None, fields: dict[str, Any]) -> bool:
+    """Return True if a spec file holds exactly the generated fields."""
+    if on_disk is None:
         return False
-    return {key: committed.get(key) for key in _GENERATED_KEYS} == {
+    return {key: on_disk.get(key) for key in _GENERATED_KEYS} == {
         key: fields.get(key) for key in _GENERATED_KEYS
     }
 
 
 def stale(paths: RepoPaths, stock: StockFirmware = EPM2_V16) -> list[str]:
-    """Return the paths of the committed specs whose generated fields are out of date."""
+    """Return the paths of the spec files whose generated fields are out of date."""
     return [
         spec.path
         for spec in generate(paths, stock)
-        if not _is_current(_committed(paths, spec), spec.generated_fields(stock))
+        if not _is_current(_on_disk(paths, spec), spec.generated_fields(stock))
     ]
 
 
 def write(paths: RepoPaths, stock: StockFirmware = EPM2_V16) -> list[str]:
     """Bring the spec files up to date and return the paths that changed.
 
-    The generated fields are replaced. ``status`` is kept if the operations did
-    not change. If they changed, ``status`` becomes "built, NOT camera-tested":
-    the old test record does not apply to the new bytes. Other fields that
-    people added are kept.
+    The generated fields are replaced. Notes that people added are kept. If the
+    operations changed, ``status`` becomes "built, NOT camera-tested" and
+    ``expected_sha256`` is removed: they described other bytes.
     """
     changed = []
     for spec in generate(paths, stock):
         fields = spec.generated_fields(stock)
-        committed = _committed(paths, spec)
-        if _is_current(committed, fields):
+        on_disk = _on_disk(paths, spec)
+        if _is_current(on_disk, fields):
             continue
         extra = {
             key: value
-            for key, value in (committed or {}).items()
+            for key, value in (on_disk or {}).items()
             if key not in _GENERATED_KEYS
         }
-        if committed is None or committed.get("ops") != fields["ops"]:
+        if on_disk is None or on_disk.get("ops") != fields["ops"]:
             extra["status"] = NEW_STATUS
             extra.pop("expected_sha256", None)
         write_json(paths.resolve(spec.path), {**fields, **extra}, BuildError)

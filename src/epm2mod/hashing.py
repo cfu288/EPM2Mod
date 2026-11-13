@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import re
+from typing import TypeGuard
 
 _SHA256 = re.compile(r"[0-9a-f]{64}")
 
@@ -13,6 +14,6 @@ def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def is_sha256(text: object) -> bool:
+def is_sha256(text: object) -> TypeGuard[str]:
     """Return True if ``text`` is a SHA-256 written as 64 lower-case hexadecimal digits."""
     return isinstance(text, str) and _SHA256.fullmatch(text) is not None

@@ -44,49 +44,61 @@ IDENTITY_MATRIX = (256, 0, 0, 0, 256, 0, 0, 0, 256)
 
 
 @dataclass(frozen=True)
+class Tables:
+    """Three tone tables of a slot: red, green, blue.
+
+    Each table is written from the default table that still pictures use.
+
+    Attributes:
+        addresses: the three table addresses.
+    """
+
+    addresses: tuple[int, int, int]
+
+
+@dataclass(frozen=True)
+class Records:
+    """Three tone records of a slot: red, green, blue.
+
+    Each record holds eight table addresses. Every table is written from the
+    default table of the same index.
+
+    Attributes:
+        addresses: the three record addresses.
+    """
+
+    addresses: tuple[int, int, int]
+
+
+@dataclass(frozen=True)
 class Slot:
     """The firmware addresses of one film slot.
 
-    Exactly one of ``tables`` and ``records`` is used. ``tables`` gives three
-    table addresses (red, green, blue), each written from the stills default
-    table. ``records`` gives three record addresses; each record holds eight
-    table addresses, and every table is written from the default table of the
-    same index.
-
     Attributes:
         entry: the stock name of the menu entry.
+        tone: where the slot's tone curves go: three tables, or three records.
         saturation: address of the pair of saturation gains.
         six_axis: addresses of the six saturation values and the six hue values.
         matrix: address of the 3 x 3 matrix.
         matrix_is_new: True if an earlier spec created the matrix table (then
             it holds the identity); False if the stock firmware has it.
         chroma: address of the 97-byte chroma-curve record.
-        tables: three tone-table addresses, or None.
-        records: three tone-record addresses, or None.
     """
 
     entry: str
+    tone: Tables | Records
     saturation: int
     six_axis: tuple[int, int]
     matrix: int
     matrix_is_new: bool
     chroma: int
-    tables: tuple[int, int, int] | None = None
-    records: tuple[int, int, int] | None = None
-
-    def __post_init__(self) -> None:
-        """Check that the slot has tables or records, and not both."""
-        if (self.tables is None) == (self.records is None):
-            raise ValueError(
-                f"slot {self.entry!r}: exactly one of 'tables' and 'records' is needed"
-            )
 
 
 #: The seven film slots, in menu order.
 SLOTS: tuple[Slot, ...] = (
     Slot(
         entry="Pop Art",
-        tables=(0x7E74F1BC, 0x7E74F5BC, 0x7E7505BC),
+        tone=Tables((0x7E74F1BC, 0x7E74F5BC, 0x7E7505BC)),
         saturation=0x7E7696A0,
         six_axis=(0x7E769486, 0x7E769492),
         matrix=0x7E880FC2,
@@ -95,7 +107,7 @@ SLOTS: tuple[Slot, ...] = (
     ),
     Slot(
         entry="Soft Focus",
-        tables=(0x7E75FAF0, 0x7E75F8F0, 0x7E7616F0),
+        tone=Tables((0x7E75FAF0, 0x7E75F8F0, 0x7E7616F0)),
         saturation=0x7E7696BC,
         six_axis=(0x7E76952E, 0x7E76953A),
         matrix=0x7ECB099A,
@@ -104,7 +116,7 @@ SLOTS: tuple[Slot, ...] = (
     ),
     Slot(
         entry="Pale&Light Color",
-        tables=(0x7F033B7C, 0x7F033D7C, 0x7E75E8F0),
+        tone=Tables((0x7F033B7C, 0x7F033D7C, 0x7E75E8F0)),
         saturation=0x7E7696A4,
         six_axis=(0x7E76949E, 0x7E7694AA),
         matrix=0x7ECB0988,
@@ -113,7 +125,7 @@ SLOTS: tuple[Slot, ...] = (
     ),
     Slot(
         entry="Light Tone",
-        records=(0x7E78B49C, 0x7E78B4BC, 0x7E78B4DC),
+        tone=Records((0x7E78B49C, 0x7E78B4BC, 0x7E78B4DC)),
         saturation=0x7E7696A8,
         six_axis=(0x7E7694B6, 0x7E7694C2),
         matrix=0x7E768F58,
@@ -122,7 +134,7 @@ SLOTS: tuple[Slot, ...] = (
     ),
     Slot(
         entry="Pin Hole",
-        tables=(0x7E74EFBC, 0x7E751FBC, 0x7E7521BC),
+        tone=Tables((0x7E74EFBC, 0x7E751FBC, 0x7E7521BC)),
         saturation=0x7E7696B8,
         six_axis=(0x7E769516, 0x7E769522),
         matrix=0x7ECB09AC,
@@ -131,7 +143,7 @@ SLOTS: tuple[Slot, ...] = (
     ),
     Slot(
         entry="Diorama",
-        tables=(0x7E754FBC, 0x7E7551BC, 0x7E757FBC),
+        tone=Tables((0x7E754FBC, 0x7E7551BC, 0x7E757FBC)),
         saturation=0x7E7696EC,
         six_axis=(0x7E769622, 0x7E76962E),
         matrix=0x7ECB09BE,
@@ -140,7 +152,7 @@ SLOTS: tuple[Slot, ...] = (
     ),
     Slot(
         entry="Cross Process",
-        records=(0x7E78B41C, 0x7E78B43C, 0x7E78B45C),
+        tone=Records((0x7E78B41C, 0x7E78B43C, 0x7E78B45C)),
         saturation=0x7E7696B4,
         six_axis=(0x7E7694FE, 0x7E76950A),
         matrix=0x7E768F46,

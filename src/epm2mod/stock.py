@@ -20,13 +20,15 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from .errors import StockError
-from .fileio import BLOCK_SIZE, Log, read_bytes, silent, write_bytes
+from .fileio import Log, read_bytes, silent, write_bytes
 from .hashing import sha256_bytes
 from .paths import RepoPaths
 
 CATALOG_URL = "https://fw01.om-digitalsolutions.net/ww_inform/fcache.do"
 USER_AGENT = "Olympus"
 _TIMEOUT_SECONDS = 120
+#: How many bytes of an answer are read at a time.
+_READ_SIZE = 1 << 20
 _CATALOG_LIMIT = 1 << 20
 
 
@@ -123,7 +125,7 @@ def download_url(answer: bytes, stock: StockFirmware) -> str:
     """
     try:
         info = ElementTree.fromstring(answer).find(".//firmware_info")
-    except ElementTree.ParseError as error:
+    except (ElementTree.ParseError, LookupError, ValueError) as error:
         raise StockError(f"the catalog's answer is not XML: {error}") from None
     offered = info.findtext("file_name") if info is not None else None
     if (
@@ -136,7 +138,11 @@ def download_url(answer: bytes, stock: StockFirmware) -> str:
             f"(it offers {offered or 'nothing'})"
         )
     url = info.findtext("url") or ""
-    if urllib.parse.urlsplit(url).scheme != "https":
+    try:
+        parts = urllib.parse.urlsplit(url)
+    except ValueError:
+        parts = None
+    if parts is None or parts.scheme != "https" or not parts.hostname:
         raise StockError(f"the catalog gave an address that is not HTTPS: {url!r}")
     return url
 
@@ -155,7 +161,7 @@ def http_get(request: urllib.request.Request, limit: int) -> bytes:
     body = bytearray()
     try:
         with urllib.request.urlopen(request, timeout=_TIMEOUT_SECONDS) as response:
-            for block in iter(lambda: response.read(BLOCK_SIZE), b""):
+            for block in iter(lambda: response.read(_READ_SIZE), b""):
                 body += block
                 if len(body) > limit:
                     raise StockError(
