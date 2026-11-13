@@ -367,6 +367,7 @@ Images: stock, films, stock + v2, films + v2, E-PL6 1.4. Model errors: 0 in ever
 | Date | Build | Result |
 |---|---|---|
 | 2026-11-13 | `build/seven-films-6-interval.BIN` = the seven-films-6 specs + `interval-timelapse-v2.json` | **Works** (user report: "It works!", interval shooting runs). Not yet reported: which steps of §7 / §12.5 passed (movie, cancel paths, > 90 s sleep, Sleep = 1 min, card full) |
+| 2026-11-13 | `seven-films-6-interval-240.BIN` = the films + `interval-timelapse-v2.json` + `interval-frames-240.json` | **"Seems to work"** (user report; still testing; which steps passed is not yet reported) |
 
 **Can the frame count go above 99? Yes, to 240, with data edits only:** [patches/interval-frames-240.json](patches/interval-frames-240.json) (6 ops; not built, not camera-tested). This replaces the earlier "not with a safe patch" answer, which missed that the editor can compose a number label. Evidence: `results/framecap.txt`, `results/emu-frames240-*`, `scripts/mkspec_frames240.py`.
 
@@ -437,6 +438,37 @@ Images: stock, films, stock + v2, films + v2, E-PL6 1.4. Model errors: 0 in ever
 
 - **Risks (I):** the empty unit string may draw differently from "sec" (spacing); an untraced clamp may pull 240 back to 99.
 - **Shutter wear:** 240 frames is 240 actuations.
+
+## 14. Interval Time = 0 (2026-11-13): not safe, no spec
+
+**Verdict: unsafe (it would not shoot back to back; the sequence would stop after a frame). No spec was written.**
+
+- **Where the 1 s minimum is (V).**
+  - The Interval Time editor (page 640) is a subclass of the Start Waiting Time editor (page 639). Both are h:mm:ss, with per-field min/max bytes at 0x7EFE22D0 / 0x7EFE22D3, and all-zero is reachable in both.
+  - Page 640 adds the helper 0x7EDFF71D "h = m = s = 0?". Its commit slot (vt slot 37, 0x7EDFF702) **skips the store when the value is zero**. Its enter / up / down slots set a state word (this+550 = 4) while it is zero.
+  - Page 639 commits zero, so Start Waiting Time 0 is allowed.
+  - 484 and 485 have no mcon value list, and no start guard reads 485 (the guards read only 482; `startIntervalShooting` reads 487).
+- **What the engine does with 485 = 0 (V).**
+  - `recordingDone_interval` 0x7EA997E5 calls the interval timer (this+428, vt+92) with `(14, 485 × 1000 ms)` for every value ≤ 90. It has **no zero case**.
+  - **The same call with 0 ms is the engine's "timer stop".** At 0x7EA95F40 it is logged as `startErrorSequenceCtrl Timer Stop`; `rcvEndIntervalShootingIn_active` (0x7EA98EDE) uses it too.
+  - The first frame is different: `startIntervalShooting_First` 0x7EA99881 tests 484 == 0 and shoots directly instead of arming a 0 ms timer. So Olympus handled 0 explicitly where they allowed it.
+- **Failure mode (I for the last step).** With 485 = 0, after frame 1 the engine stops its own timer and waits for a timer event that never comes. No frame 2. The sequence stays open until MENU / shutter / mode dial cancels it. With the v2 keep-awake the sleep and power-off timers are held meanwhile, so the camera stays on.
+- **Emulator** (`ivl_shot_done`, stock code in the films + v2 + frames image; `results/run-ivl_shot_done.txt`): the timer argument is captured through a real store function.
+
+  | 485 | Timer call |
+  |---|---|
+  | 0 | `(14, 0)` |
+  | 1 | `(14, 1000)` |
+  | 2 | `(14, 2000)` |
+  | 90 | `(14, 90000)` |
+  | 91, 120 | no timer call; next-time path |
+
+  The call order is identical for 0, 1 and 2 (`get 485`, `set 487 = 0`, timer, post-shot helper). Only the argument differs, and 0 is the stop code. 7/7 rows match the model.
+- **Other bodies.**
+  - E-PL6 1.4: the same editor class and the same engine function (both compare equal after address normalisation), so the same 1 s minimum.
+  - E-M10 / E-PL7: not traced (a different menu system; their engine was not compared).
+- **What a real "0 = back to back" would need:** new engine code in `recordingDone_interval` that, for 0, posts the shoot event directly the way the first-frame path does, plus the two editor edits. That changes the state machine while the previous frame may still be writing. The sequential drive modes already do this job.
+- **If it is ever wanted:** on a donor body, set 485 = 0 through the debug shell (`prmdbg setval 0xDE44 0`), start a sequence and watch whether frame 2 comes. Expect it not to.
 
 ## Files
 - `patches/interval-frames-240.json`: Frame up to 240, on top of v2 (§13); generator `scripts/mkspec_frames240.py`.

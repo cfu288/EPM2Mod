@@ -1327,3 +1327,51 @@ class FramesEditor(Case):
 
 
 CASES.update({c.name: c for c in (FramesStep(), FramesEditor())})
+
+
+# ---- recordingDone_interval: what the engine does with Interval Time (info 485) = 0, 1, 2 ... (E-PM2 stock code) ---
+class IvlShotDone(Case):
+    name, entry = "ivl_shot_done", 0x7EA997E5
+    doc = ("SequencePartsBase recordingDone_interval 0x7EA997E5: reads info 485 (s); <= 90 -> clears 487 and calls the "
+           "interval timer (this+428, vt+92) with (14, 485 x 1000 ms); > 90 -> next-time path 0x7EA98F94. The virtual "
+           "timer call lands on a real `mov d1,(0x602A9B50); retf` (0x7E505727) so its ms argument is captured")
+    ranges = [(0x7EA997E5, 0x7EA99856), (0x7E505727, 0x7E505730)]
+    S_LOG, S_GET, S_SET, S_AFTER, S_NEXT = 0x7EA99A22, 0x7E6FCC91, 0x7E6FCC72, 0x7EA93692, 0x7EA98F94
+    THIS, OBJ, VT, CAP = DATA + 0x1800, DATA + 0x1C00, DATA + 0x1D00, 0x602A9B50
+    stubs_doc = [(S_LOG, "sequence log (a1 = text): the text is recorded"), (S_GET, "Get_CameraInfo_Simple(485): the row's value"),
+                 (S_SET, "Set_CameraInfo_Simple(d0 id, d1 value): recorded"), (S_AFTER, "post-shot helper: recorded"),
+                 (S_NEXT, "setIntervalShootingNextTime(d0 = interval s): recorded")]
+
+    def rows(self):
+        return [dict(i485=v) for v in (0, 1, 2, 30, 90, 91, 120)]
+
+    def run(self, emu, row):
+        emu.write(self.THIS, b"\0" * 512)
+        emu.write(self.THIS + 428, struct.pack("<I", self.OBJ))
+        emu.write(self.OBJ, struct.pack("<I", self.VT))
+        emu.write(self.VT + 92, struct.pack("<I", 0x7E505727))
+        emu.write(self.CAP, struct.pack("<I", 0xDEADBEEF))
+        log = []
+
+        def lg(e, r):
+            log.append(["log", e.cstr(r["a1"])])
+            return {}
+        stubs = {self.S_LOG: lg,
+                 self.S_GET: lambda e, r: (log.append(["get", r["d0"] & 0xFFFF]), {"d0": row["i485"]})[1],
+                 self.S_SET: lambda e, r: (log.append(["set", r["d0"] & 0xFFFF, r["d1"]]), {"d0": 0})[1],
+                 self.S_AFTER: lambda e, r: (log.append(["after"]), {})[1],
+                 self.S_NEXT: lambda e, r: (log.append(["next_time", r["d0"]]), {})[1]}
+        r = emu.call(self.entry, {"a0": self.THIS}, frame=(0xA0, 12), stubs=stubs)
+        cap = emu.u32(self.CAP)
+        return {"calls": log, "timer_ms": None if cap == 0xDEADBEEF else cap, "_r": r}
+
+    def model(self, row, image):
+        v = row["i485"]
+        if v <= 90:
+            return {"calls": [["log", "recordingDone_interval"], ["get", 485], ["log", "recordingDone_interval Shoot"],
+                              ["set", 487, 0], ["after"]], "timer_ms": v * 1000}
+        return {"calls": [["log", "recordingDone_interval"], ["get", 485], ["log", "recordingDone_interval Sleep"],
+                          ["next_time", v], ["after"]], "timer_ms": None}
+
+
+CASES.update({c.name: c for c in (IvlShotDone(),)})

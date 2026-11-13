@@ -1,0 +1,8 @@
+ok   i485=0 -> {"calls": [["log", "recordingDone_interval"], ["get", 485], ["log", "recordingDone_interval Shoot"], ["set", 487, 0], ["after"]], "timer_ms": 0}
+ok   i485=1 -> {"calls": [["log", "recordingDone_interval"], ["get", 485], ["log", "recordingDone_interval Shoot"], ["set", 487, 0], ["after"]], "timer_ms": 1000}
+ok   i485=2 -> {"calls": [["log", "recordingDone_interval"], ["get", 485], ["log", "recordingDone_interval Shoot"], ["set", 487, 0], ["after"]], "timer_ms": 2000}
+ok   i485=30 -> {"calls": [["log", "recordingDone_interval"], ["get", 485], ["log", "recordingDone_interval Shoot"], ["set", 487, 0], ["after"]], "timer_ms": 30000}
+ok   i485=90 -> {"calls": [["log", "recordingDone_interval"], ["get", 485], ["log", "recordingDone_interval Shoot"], ["set", 487, 0], ["after"]], "timer_ms": 90000}
+ok   i485=91 -> {"calls": [["log", "recordingDone_interval"], ["get", 485], ["log", "recordingDone_interval Sleep"], ["next_time", 91], ["after"]], "timer_ms": null}
+ok   i485=120 -> {"calls": [["log", "recordingDone_interval"], ["get", 485], ["log", "recordingDone_interval Sleep"], ["next_time", 120], ["after"]], "timer_ms": null}
+ivl_shot_done: 7 rows, 0 failing (ok = matches the model, -- = no model)
