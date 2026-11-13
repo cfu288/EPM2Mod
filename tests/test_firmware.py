@@ -49,3 +49,19 @@ class TestPatchSpecs(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PinnedBuild(unittest.TestCase):
+    """pinned-build.json must name specs that exist and build to the sha256 it states."""
+
+    def test_pinned_build(self):
+        import hashlib, json, subprocess, sys, tempfile
+        pin = json.load(open(os.path.join(ROOT, "pinned-build.json")))
+        for spec in pin["specs"]:
+            self.assertTrue(os.path.exists(os.path.join(ROOT, spec)), spec)
+        if not os.path.exists(os.path.join(ROOT, pin["base"])):
+            self.skipTest("stock firmware not present")
+        with tempfile.TemporaryDirectory() as d:
+            out = os.path.join(d, "pinned.BIN")
+            subprocess.run([sys.executable, os.path.join(ROOT, "tools", "build.py"), *pin["specs"], "-o", out], cwd=ROOT, check=True, capture_output=True)
+            self.assertEqual(hashlib.sha256(open(out, "rb").read()).hexdigest(), pin["sha256"])

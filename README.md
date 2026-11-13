@@ -52,95 +52,111 @@ firmware keeps the count in one byte. Each frame uses the mechanical shutter.
 What was in the firmware, how the patch works, how it was checked and what is not yet tested:
 [experiments/2026-11-13-intervalometer/README.md](experiments/2026-11-13-intervalometer/README.md).
 
-## Build and flash the latest build
+## Install the latest tested firmware
 
-The latest known-good build is **`seven-films-6-interval-240`**: the seven film looks and interval
-shooting with up to 240 frames. It was flashed and tested on a real E-PM2 on 2026-11-13 ([camera log](docs/camera-log.md)). No firmware is distributed here. You build the image from
-Olympus's own v1.6 firmware file and the patch specs in this repository.
+The pinned build is **`seven-films-6-interval-240`**: the seven film looks, and interval shooting
+with up to 240 frames. It was flashed and tested on a real E-PM2 on 2026-11-13
+([camera log](docs/camera-log.md)).
 
-**You need:** Python 3 (no extra packages), an SD card, a charged battery, and an E-PM2 with body
-firmware 1.6.
+No firmware is distributed here: the maker's licence does not let others share it. One command
+downloads Olympus's own v1.6 firmware from the maker's update server, applies this repository's
+patches, and checks that the result is byte-for-byte the tested build.
 
-1. Get the repository.
+**You need:** a computer with [Python 3](https://www.python.org/downloads/) (no extra packages), an SD
+card, a fully charged battery, and an E-PM2 with body firmware 1.6 (Setup menu → Firmware).
+
+1. **Get this repository.** Click **Code → Download ZIP** on GitHub and unzip it, or:
 
    ```bash
    git clone https://github.com/cfu288/EPM2Mod.git
    cd EPM2Mod
    ```
 
-2. Put the stock E-PM2 v1.6 firmware file here: `firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN`.
-   Where to get it: [firmware/README.md](firmware/README.md). Check the file:
+2. **Make the firmware.** Put the SD card in the computer and give its location:
 
    ```bash
-   sha256sum firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN      # macOS: shasum -a 256 ...
-   # 34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300
+   python3 tools/make_firmware.py --card /Volumes/NAME       # macOS; Linux: the card's mount point; Windows: E:\
    ```
 
-3. Build.
+   The script does four things and stops with a message if one of them fails:
 
-   ```bash
-   python3 tools/build.py \
-       patches/remap7b-code.json patches/seven-fixes-1.json patches/seven-movie-1.json \
-       patches/seven-structure-extra.json patches/seven-films-5.json \
-       patches/xp-adaptive-hue-off.json patches/seven-labels.json \
-       experiments/2026-11-13-intervalometer/patches/interval-timelapse-v2.json \
-       experiments/2026-11-13-intervalometer/patches/interval-frames-240.json \
-       -o build/seven-films-6-interval-240.BIN
-   ```
+   | Step | What it does |
+   |---|---|
+   | 1 | Downloads `OLY_E_101_1600_0000_0000.BIN` (43 MB) from the maker's update server, if it is not there yet, and checks its sha256 |
+   | 2 | Applies the nine patch specs of the pinned build, in order |
+   | 3 | Checks that the result has the sha256 of the tested build. If not, it deletes the result |
+   | 4 | Copies the result to the card as `DCOLYMP/E1019999.BIN` and checks the copy |
 
-   The order of the specs matters. The build tool refuses a wrong base file and checks every byte it
-   replaces.
+   Without `--card`, the file goes to `build/card/DCOLYMP/E1019999.BIN`. Copy the `DCOLYMP` folder
+   to the card yourself. The firmware must be the only file in `DCOLYMP`.
 
-4. Check the result. The build is reproducible, so the hash must be the same as this one:
+3. **Flash.** Eject the card and put it in the camera. With the camera off, hold **OK** and switch
+   the camera on. The lamp is solid orange for about one minute: do not touch the camera. When the
+   lamp blinks, the update is complete. Switch the camera off, then on.
 
-   ```bash
-   sha256sum build/seven-films-6-interval-240.BIN
-   # 01837f962f8a8ca0d189d9cd65ad9b5b35402ca3f3ed54a3872af044e050de11
-   ```
+4. **Check.** The art filter list shows Portra, Ektachrome, Pro 400H, Kodachrome, Vis 250D, Velvia
+   and Superia 400. Shooting Menu 2 shows Time Lapse Settings.
 
-5. Copy the file to the SD card as `DCOLYMP/E1019999.BIN`. It must be the only file in `DCOLYMP`.
-
-   ```bash
-   mkdir -p /Volumes/SDCARD/DCOLYMP            # macOS; on Linux use the card's mount point
-   rm -f /Volumes/SDCARD/DCOLYMP/*
-   cp build/seven-films-6-interval-240.BIN /Volumes/SDCARD/DCOLYMP/E1019999.BIN
-   shasum -a 256 /Volumes/SDCARD/DCOLYMP/E1019999.BIN     # must be the hash of step 4
-   diskutil eject /Volumes/SDCARD
-   ```
-
-6. Flash. Put the card in the camera. With the camera off, hold **OK** and switch the camera on.
-   The lamp is solid orange for about one minute: do not touch the camera. When the lamp blinks, the
-   update is complete. Switch the camera off, then on.
-
-7. Check. The art filter list shows Portra, Ektachrome, Pro 400H, Kodachrome, Vis 250D, Velvia and
-   Superia 400. Shooting Menu 2 shows Time Lapse Settings.
-
-For the film looks only, leave out the two `interval-…` lines. That build is
-`seven-films-6`, sha256 `5badb0796731b40a27ef015e57da134d7d793486d4c6262a3f483c1aae60fd05`.
-With `interval-timelapse-v2.json` but without `interval-frames-240.json`, the frame count stops at
-99 as on the E-PL6 (`seven-films-6-interval`, sha256
-`f52ea6976ac2e9c567b2c07d7556b96b6431c8fcd2d90de195abdb76059e0104`).
-
-Before you build a different combination of specs, run
-`python3 tools/freespace.py check SPEC…` with the same list. It fails if two specs use the same
-bytes or if a spec writes where the camera does not load the firmware.
-
-**To go back to the original firmware,** do steps 5 and 6 with the stock file of step 2.
+**To go back to the original firmware:** copy `firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN`
+(step 2 downloaded it) to the card as `DCOLYMP/E1019999.BIN`, and do step 3.
 More detail on flashing: [docs/flashing.md](docs/flashing.md).
+
+### What the pinned build is
+
+[`pinned-build.json`](pinned-build.json) names the stock firmware, the patch specs in order, and the
+sha256 of the result. It always describes the last build that was tested on a camera.
+
+| | sha256 |
+|---|---|
+| Stock firmware, `OLY_E_101_1600_0000_0000.BIN` | `34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300` |
+| Pinned build, `seven-films-6-interval-240` | `01837f962f8a8ca0d189d9cd65ad9b5b35402ca3f3ed54a3872af044e050de11` |
+
+The two scripts, if you want to run the steps one at a time:
+
+```bash
+python3 tools/fetch_stock.py        # download and check the stock firmware only
+python3 tools/make_firmware.py      # patch, check, and write build/card/DCOLYMP/E1019999.BIN
+```
+
+### Other builds
+
+`tools/make_firmware.py` runs `tools/build.py` with the specs of the pinned build. To make a
+different build, run `tools/build.py` yourself with the specs you want, in this order:
+
+```bash
+python3 tools/build.py \
+    patches/remap7b-code.json patches/seven-fixes-1.json patches/seven-movie-1.json \
+    patches/seven-structure-extra.json patches/seven-films-5.json \
+    patches/xp-adaptive-hue-off.json patches/seven-labels.json \
+    experiments/2026-11-13-intervalometer/patches/interval-timelapse-v2.json \
+    experiments/2026-11-13-intervalometer/patches/interval-frames-240.json \
+    -o build/seven-films-6-interval-240.BIN
+```
+
+| Build | Specs | sha256 |
+|---|---|---|
+| `seven-films-6-interval-240` (pinned) | all nine | `01837f96…e050de11` |
+| `seven-films-6-interval`: frame count stops at 99, as on the E-PL6 | without `interval-frames-240.json` | `f52ea6976ac2e9c567b2c07d7556b96b6431c8fcd2d90de195abdb76059e0104` |
+| `seven-films-6`: film looks only | without the two `interval-…` specs | `5badb0796731b40a27ef015e57da134d7d793486d4c6262a3f483c1aae60fd05` |
+
+The build tool refuses a wrong base file and checks every byte it replaces. Before you build a
+different combination of specs, run `python3 tools/freespace.py check SPEC…` with the same list.
+It fails if two specs use the same bytes or if a spec writes where the camera does not load the
+firmware.
 
 Limits of this build:
 
 - Movies get only part of each look.
 - The second type (II) of Portra, Pro 400H and Superia is the same as type I.
 - Grain and halation are not simulated.
-- Interval shooting: at most 99 frames. The time-lapse movie, cancelling a sequence and intervals
-  longer than 90 seconds are not yet reported as tested.
+- Interval shooting: a full 240-frame sequence, cancelling a sequence and intervals longer than 90
+  seconds are not yet reported as tested. Each frame uses the mechanical shutter.
 
 **At your own risk.** This is unofficial, for the E-PM2 with body firmware 1.6 only, and not affiliated with
 Olympus or OM Digital Solutions. A wrong or interrupted flash can leave a camera unusable. Never put a
 firmware file for another model on the card.
 
-To run the project's own tests (they need the stock firmware file of step 2):
+To run the project's own tests (they need the stock firmware file):
 `python3 -m unittest discover -s tests`.
 
 ## Layout
@@ -158,7 +174,7 @@ To run the project's own tests (they need the stock firmware file of step 2):
 
 ## Patches
 
-The current film build is described under *Build and flash the latest build* above. Every other film spec in the table below is in `patches/history/`; the table is the development history.
+The current build is described under *Install the latest tested firmware* above. Every other film spec in the table below is in `patches/history/`; the table is the development history.
 
 | Spec | Status |
 |---|---|

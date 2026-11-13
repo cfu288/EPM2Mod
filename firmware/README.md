@@ -10,7 +10,7 @@ cd firmware && sha256sum -c SHA256SUMS
 |---|---|
 | `stock/E-PM2/OLY_E_101_{1101,1203,1300,1400,1501,1600}_0000_0000.BIN` | github.com/thrains0220-byte/ep5-fw-reverse `firmware/pre_fix/*.BIN.lzma` (said to come from xdel.ru `pre_fix/`). Hashes match that repo's MANIFEST.sha256. |
 
-The official source is the updater catalog `fw01.om-digitalsolutions.net/ww_inform/fcache.do` (hard_code `OLYE101000000000`). It now returns CloudFront-signed URLs. See [../docs/verification.md](../docs/verification.md) for how the files were checked.
+**To get the v1.6 file, run `python3 tools/fetch_stock.py`.** It asks the maker's updater catalog `fw01.om-digitalsolutions.net/ww_inform/fcache.do` (hard_code `OLYE101000000000`) for the download address, downloads the file and checks its sha256. Checked on 2026-11-13: the catalog offers `OLY_E_101_1600_0000_0000.BIN`, and the file is byte-identical to the copy this project was built on (sha256 `34d339ac…c3e300`). The older versions are not offered there. See [../docs/verification.md](../docs/verification.md) for how the files were checked.
 
 ## Removed: E-PL5 v1.6 reference
 
