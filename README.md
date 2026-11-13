@@ -1,19 +1,75 @@
 # epm2-tools
 
-Film looks (seven films as art-filter menu entries: Portra 400, Ektachrome 100, Pro 400H, Kodachrome 64, Vision3 250D, Velvia 100, Superia 400): plain-language summary in [docs/film-emulation.md](docs/film-emulation.md); which other filters can become film slots: [docs/art-slots-evaluation.md](docs/art-slots-evaluation.md).
+Custom firmware tooling for the Olympus PEN **E-PM2** (model 1010, TruePic VI, body firmware 1.6), and
+a firmware mod built with it: **seven film looks as in-camera art filters**.
 
-Custom firmware tooling for the Olympus PEN **E-PM2** (model 1010, TruePic VI, body firmware 1.6).
+![Six photos, each developed in the camera with stock Natural and the seven film looks](docs/images/film-sim-comparison.jpg)
 
-**Status (2026-11-08):** modified firmware flashes and runs on a real E-PM2 via the SD-card updater. See [docs/camera-log.md](docs/camera-log.md).
+Each row is one RAW file developed in the camera; the first column is the stock Natural mode.
+Full-resolution sheet: [docs/film-sim-comparison.pdf](docs/film-sim-comparison.pdf).
 
-## Quick start
+## Film looks
+
+Seven of the twelve art-filter menu entries are replaced by film looks. They work for stills and
+live view, straight out of the camera as JPEG.
+
+| Menu name | Film | Replaces |
+|---|---|---|
+| Portra | Kodak Portra 400 (on Portra Endura paper) | Pop Art |
+| Ektachrome | Kodak Ektachrome 100 (slide) | Soft Focus |
+| Pro 400H | Fuji Pro 400H (on Crystal Archive paper) | Pale&Light Color |
+| Kodachrome | Kodak Kodachrome 64 (slide) | Light Tone |
+| Vis 250D | Kodak Vision3 250D (on 2383 print film) | Pin Hole |
+| Velvia | Fuji Velvia 100 (slide) | Diorama |
+| Superia 400 | Fuji Superia X-tra 400 (on Crystal Archive paper) | Cross Process |
+
+Grainy Film, Gentle Sepia, Dramatic Tone, Key Line and Watercolor are unchanged. Colour and tone only:
+no grain, no halation. The looks are fitted to [spektrafilm](https://github.com/andreavolpato/spektrafilm)
+simulations of each film and measured on the camera with a synthetic test RAW; average colour error is
+about 1.1 to 1.5 ΔE2000 on natural colours (stock Natural against the same targets: 4 to 6).
+How it works, how it was measured and what the limits are: **[docs/film-emulation.md](docs/film-emulation.md)**.
+
+## Latest known-good build
+
+**`seven-films-5`**, flashed and measured on a real E-PM2 on 2026-11-12 ([camera log](docs/camera-log.md)).
+
+No firmware is distributed here. You build the image from Olympus's own v1.6 firmware file plus the
+patch specs in this repository:
 
 ```bash
-python3 tools/build.py patches/pixel-hacking.json      # -> build/pixel-hacking.BIN
+# 1. put the stock E-PM2 v1.6 firmware at firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN
+#    sha256 34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300   (sources: firmware/README.md)
+# 2. build
+python3 tools/build.py patches/remap7b-code.json patches/seven-fixes-1.json \
+    patches/seven-structure-extra.json patches/seven-films-5.json \
+    patches/xp-adaptive-hue-off.json patches/seven-labels.json -o build/seven-films-5.BIN
+# 3. check: sha256 of build/seven-films-5.BIN must be
+#    0443a38804061afaf17a12906a6969101d9f54ffe006e0aeca0d21d68f9b29ae
+```
+
+Flash it as `DCOLYMP/E1019999.BIN` on the SD card, hold OK and power on. Full steps, and how to go back
+to stock: [docs/flashing.md](docs/flashing.md).
+
+Known issues in this build:
+
+- In **movie mode** the display freezes while Ektachrome, Vis 250D or Velvia is selected (leaving the entry
+  un-freezes it). Fixed in `seven-films-6` (the same list with `patches/seven-movie-1.json` after
+  `seven-fixes-1`), which is built but **not yet camera-tested**.
+- Movies get only part of each look. The second type (II) of Portra, Pro 400H and Superia is the same as type I.
+
+**At your own risk.** This is unofficial, for the E-PM2 with body firmware 1.6 only, and not affiliated with
+Olympus or OM Digital Solutions. A wrong or interrupted flash can leave a camera unusable. The build tool
+refuses any other base file; never put a firmware file for another model on the card.
+
+## Tooling quick start
+
+```bash
+python3 tools/build.py patches/pixel-hacking.json      # -> build/pixel-hacking.BIN (proof of concept: renames one menu label)
 python3 -m unittest discover -s tests                   # round-trip + reproducible builds
 ```
 
-Flash `build/<name>.BIN` as `DCOLYMP/E1019999.BIN`, hold OK and power on. Full steps: [docs/flashing.md](docs/flashing.md).
+Modified firmware has flashed and run on a real E-PM2 through the SD-card updater since 2026-11-08; every
+flash is in [docs/camera-log.md](docs/camera-log.md).
 
 ## Layout
 
@@ -30,7 +86,7 @@ Flash `build/<name>.BIN` as `DCOLYMP/E1019999.BIN`, hold OK and power on. Full s
 
 ## Patches
 
-Current film build on the camera (`seven-films-5`, camera-tested 2026-11-12): `remap7b-code` + `seven-fixes-1` + `seven-structure-extra` + `seven-films-5` + `xp-adaptive-hue-off` + `seven-labels`. Built, **not camera-tested** (`seven-films-6`): the same with `seven-movie-1` after `seven-fixes-1`, which stops the display freezing in movie mode in the Ektachrome, Vis 250D and Velvia entries (NOTES §47). Every other film spec in the table below is in `patches/history/`.
+The current film build is described under *Latest known-good build* above. Every other film spec in the table below is in `patches/history/`; the table is the development history.
 
 | Spec | Status |
 |---|---|
