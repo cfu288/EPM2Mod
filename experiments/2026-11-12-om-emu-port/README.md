@@ -3,7 +3,7 @@
 om-emu (github.com/flatpanda/om-emu, a JavaScript emulator of Olympus/OM firmware) now runs single E-PM2 v1.6 functions, stock against patched.
 
 - **Tool:** `tools/emu/`. Setup and usage are in tools/emu/README.md; the cases are in tools/emu/cases.py. It uses om-emu installed at `~/opt/om-emu` and Node 26.13.1 at `~/opt/node26`. Both live outside the repo, and Node is not on the shared PATH.
-- **om-emu changes:** `om-emu-changes.diff`, the same changes as tools/emu/om-emu-E101.patch:
+- **om-emu changes:** kept outside the repo at `~/opt/om-emu-E101.patch` (om-emu has no licence). They are:
   - a local **E101** model on the E118-family board, with image base 0x7E421020 and 512 MiB DRAM;
   - the compositor and OSD models moved off 0x9C000000, which is a per-CPU window on the E-PM2;
   - a function-only mode.

@@ -7,7 +7,7 @@ Labels: **V** = ran in the emulator and checked against an independent Python mo
 ## Setup
 
 - **Node 26:** `~/opt/node26/bin/node` (v26.13.1). The system node 22 is too old. Override it with `OM_EMU_NODE`.
-- **om-emu:** `~/opt/om-emu`, with the local E101 changes in `om-emu-E101.patch` (also kept at `~/opt/om-emu-E101.patch`). Override the path with `OM_EMU_DIR`. To set up a fresh copy: `cd ~/opt/om-emu && patch -p1 < .../tools/emu/om-emu-E101.patch`.
+- **om-emu:** `~/opt/om-emu`, with the local E101 changes kept **outside the repo** at `~/opt/om-emu-E101.patch` (om-emu has no licence, so neither its source nor diffs of it are committed). Override the path with `OM_EMU_DIR`. To set up a fresh copy: `cd ~/opt/om-emu && patch -p1 < .../tools/emu/om-emu-E101.patch`.
 - **Stock block 0:** `build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin`. This is the descrambled OE payload, sha256 `1b7c4bb1…71468d`; the harness checks it.
 
 ### What the om-emu patch adds
@@ -38,7 +38,7 @@ om-emu refuses an unknown model. Its lab is written for the OM-1 (E143), so the 
 | `cases.py` | Named cases: entry, allowed code ranges, stubs, input rows, outputs, and a Python model of the expected outputs. |
 | `emurun.py` | CLI: `list`, `run CASE` (one image, checked against the model) and `diff CASE --patch SPEC…` or `--image BLOCK0` (stock against patched). Exits 1 on any mismatch, fault, stray code or unexpected change. |
 | `specs/rec-limit-3600.json` | Emulator test input only, not a camera patch: changes the recording-limit imm16 1740 to 3600 (2 bytes). |
-| `om-emu-E101.patch` | The om-emu changes above (`patch -p1` in the om-emu root). |
+| `~/opt/om-emu-E101.patch` (outside the repo) | The om-emu changes above (`patch -p1` in the om-emu root). |
 
 ## Usage
 

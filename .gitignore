@@ -22,3 +22,7 @@ __pycache__/
 *.pyc
 .venv/
 .DS_Store
+
+# om-emu has no licence: keep its source and diffs outside the repo (~/opt/om-emu, ~/opt/om-emu-E101.patch)
+**/om-emu-E101.patch
+**/om-emu-changes.diff
