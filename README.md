@@ -1,5 +1,7 @@
 # EPM2Mod
 
+![Olympus PEN E-PM2](docs/images/epm2.jpg)
+
 Repository containing the current work for creating a custom firmware mod for the Olympus PEN **E-PM2**. The goal is to unlock or add new features to this camera. Currently, we've implemented replacing the default art filters with film simulations like Portra, Ektachrome, etc., and enabled interval shooting (up to 99 shots), a feature of the E-PL6.
 
 | Feature | What you get | Status |
