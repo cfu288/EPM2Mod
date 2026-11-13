@@ -51,17 +51,24 @@ if __name__ == "__main__":
     unittest.main()
 
 
-class PinnedBuild(unittest.TestCase):
-    """pinned-build.json must name specs that exist and build to the sha256 it states."""
+class BuildDescriptions(unittest.TestCase):
+    """Every builds/*.json names specs that exist; the tested ones build to the sha256 they state.
+    pinned-build.json names a tested description."""
 
-    def test_pinned_build(self):
-        import hashlib, json, subprocess, sys, tempfile
-        pin = json.load(open(os.path.join(ROOT, "pinned-build.json")))
-        for spec in pin["specs"]:
-            self.assertTrue(os.path.exists(os.path.join(ROOT, spec)), spec)
-        if not os.path.exists(os.path.join(ROOT, pin["base"])):
-            self.skipTest("stock firmware not present")
-        with tempfile.TemporaryDirectory() as d:
-            out = os.path.join(d, "pinned.BIN")
-            subprocess.run([sys.executable, os.path.join(ROOT, "tools", "build.py"), *pin["specs"], "-o", out], cwd=ROOT, check=True, capture_output=True)
-            self.assertEqual(hashlib.sha256(open(out, "rb").read()).hexdigest(), pin["sha256"])
+    def test_descriptions(self):
+        import subprocess, tempfile
+        pinned = json.load(open(os.path.join(ROOT, "pinned-build.json")))["build"]
+        names = sorted(glob.glob(os.path.join(ROOT, "builds", "*.json")))
+        self.assertIn(os.path.join(ROOT, pinned), names)
+        for path in names:
+            d = json.load(open(path))
+            for spec in d["specs"]:
+                self.assertTrue(os.path.exists(os.path.join(ROOT, spec)), f"{path}: {spec}")
+            if os.path.relpath(path, ROOT) == pinned:
+                self.assertTrue(d.get("sha256") and d.get("camera_tested"), "the pinned build must be a tested one")
+            if not d.get("sha256") or not os.path.exists(os.path.join(ROOT, d["base"])):
+                continue
+            with tempfile.TemporaryDirectory() as tmp:
+                out = os.path.join(tmp, "x.BIN")
+                subprocess.run([sys.executable, os.path.join(ROOT, "tools", "build.py"), *d["specs"], "-o", out], cwd=ROOT, check=True, capture_output=True)
+                self.assertEqual(hashlib.sha256(open(out, "rb").read()).hexdigest(), d["sha256"], path)

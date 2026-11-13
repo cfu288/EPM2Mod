@@ -84,7 +84,7 @@ Python for you; nothing else has to be installed.
    | Step | What it does |
    |---|---|
    | 1 | Downloads `OLY_E_101_1600_0000_0000.BIN` (43 MB) from the maker's update server, if it is not there yet, and checks its sha256 |
-   | 2 | Applies the nine patch specs of the pinned build, in order |
+   | 2 | Applies the nine patch specs of the pinned build, in order (`tools/build.py`) |
    | 3 | Checks that the result has the sha256 of the tested build. If not, it deletes the result |
    | 4 | Copies the result to the card as `DCOLYMP/E1019999.BIN` and checks the copy |
 
@@ -104,49 +104,42 @@ More detail on flashing: [docs/flashing.md](docs/flashing.md).
 
 ### What the pinned build is
 
-[`pinned-build.json`](pinned-build.json) names the stock firmware, the patch specs in order, and the
-sha256 of the result. It always describes the last build that was tested on a camera.
+[`pinned-build.json`](pinned-build.json) names the description of the last build that was tested on a
+camera. The description, [`builds/seven-films-6-interval-240.json`](builds/seven-films-6-interval-240.json),
+names the stock firmware, the patch specs in order, and the sha256 of the result.
 
 | | sha256 |
 |---|---|
 | Stock firmware, `OLY_E_101_1600_0000_0000.BIN` | `34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300` |
 | Pinned build, `seven-films-6-interval-240` | `01837f962f8a8ca0d189d9cd65ad9b5b35402ca3f3ed54a3872af044e050de11` |
 
-The two scripts, if you want to run the steps one at a time:
-
-```bash
-uv run tools/fetch_stock.py        # download and check the stock firmware only
-uv run tools/make_firmware.py      # patch, check, and write build/card/DCOLYMP/E1019999.BIN
-```
-
-### Other builds
+To download and check the stock firmware only: `uv run tools/fetch_stock.py`.
 
 The scripts use the Python standard library only, so `python3 tools/make_firmware.py` works too if
 you have Python 3.9 or newer.
 
-`tools/make_firmware.py` runs `tools/build.py` with the specs of the pinned build. To make a
-different build, run `tools/build.py` yourself with the specs you want, in this order:
+### Other builds
+
+Each tested build has a description in [`builds/`](builds/). Give one to the same script:
 
 ```bash
-uv run tools/build.py \
-    patches/remap7b-code.json patches/seven-fixes-1.json patches/seven-movie-1.json \
-    patches/seven-structure-extra.json patches/seven-films-5.json \
-    patches/xp-adaptive-hue-off.json patches/seven-labels.json \
-    experiments/2026-11-13-intervalometer/patches/interval-timelapse-v2.json \
-    experiments/2026-11-13-intervalometer/patches/interval-frames-240.json \
-    -o build/seven-films-6-interval-240.BIN
+uv run tools/make_firmware.py builds/seven-films-6.json
 ```
 
-| Build | Specs | sha256 |
+| Build | What | sha256 |
 |---|---|---|
-| `seven-films-6-interval-240` (pinned) | all nine | `01837f96…e050de11` |
-| `seven-films-6-interval`: frame count stops at 99, as on the E-PL6 | without `interval-frames-240.json` | `f52ea6976ac2e9c567b2c07d7556b96b6431c8fcd2d90de195abdb76059e0104` |
-| `seven-films-6`: film looks only | without the two `interval-…` specs | `5badb0796731b40a27ef015e57da134d7d793486d4c6262a3f483c1aae60fd05` |
+| `seven-films-6-interval-240` (pinned) | film looks; interval shooting up to 240 frames | `01837f962f8a8ca0d189d9cd65ad9b5b35402ca3f3ed54a3872af044e050de11` |
+| `seven-films-6-interval` | film looks; interval shooting up to 99 frames, as on the E-PL6 | `f52ea6976ac2e9c567b2c07d7556b96b6431c8fcd2d90de195abdb76059e0104` |
+| `seven-films-6` | film looks only | `5badb0796731b40a27ef015e57da134d7d793486d4c6262a3f483c1aae60fd05` |
 
-The build tool refuses a wrong base file and checks every byte it replaces. Before you build a
-different combination of specs, run `uv run tools/freespace.py check SPEC…` with the same list.
-It fails if two specs use the same bytes or if a spec writes where the camera does not load the
-firmware.
+This is also how the project makes its own firmware. A new combination of patch specs gets a
+description in `builds/`, is made with this script, and is pinned after it passes a camera test:
+[docs/conventions.md](docs/conventions.md), "Making firmware". The script runs `tools/build.py`,
+which applies the specs.
+
+The build tool refuses a wrong base file and checks every byte it replaces. For a build that has no
+recorded sha256 yet, the script first runs `tools/freespace.py check`: it fails if two specs use the
+same bytes or if a spec writes where the camera does not load the firmware.
 
 Limits of this build:
 
