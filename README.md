@@ -42,18 +42,19 @@ How it works, how it was measured and what the limits are: **[docs/film-emulatio
 
 The E-PM2 firmware contains the interval-shooting code of its sister model, the E-PL6, but no menu
 entry for it. The mod adds the entry: **Shooting Menu 2 → Time Lapse Settings**. Set the number of
-frames (1 to 99), the start waiting time, the interval time, and if the camera makes a time-lapse
-movie when the sequence is complete. The camera stays awake during a sequence.
+frames, the start waiting time, the interval time (1 second or more), and if the camera makes a
+time-lapse movie when the sequence is complete. The camera stays awake during a sequence.
 
-The frame count stops at 99 because the firmware keeps it in one byte and has menu text for 99
-values only. The E-PL6 has the same limit. Each frame uses the mechanical shutter.
+The frame count goes from 1 to 99 in steps of 1, then from 100 to 240 in steps of 5. The stock
+E-PL6 stops at 99. The steps are there because the menu's value list holds 128 entries at most; the
+firmware keeps the count in one byte. Each frame uses the mechanical shutter.
 
 How it works and what is not yet tested: [experiments/2026-11-13-intervalometer/README.md](experiments/2026-11-13-intervalometer/README.md).
 
 ## Build and flash the latest build
 
-The latest known-good build is **`seven-films-6-interval`**: the seven film looks and interval
-shooting. It was flashed and tested on a real E-PM2 on 2026-11-13 ([camera log](docs/camera-log.md)). No firmware is distributed here. You build the image from
+The latest known-good build is **`seven-films-6-interval-240`**: the seven film looks and interval
+shooting with up to 240 frames. It was flashed and tested on a real E-PM2 on 2026-11-13 ([camera log](docs/camera-log.md)). No firmware is distributed here. You build the image from
 Olympus's own v1.6 firmware file and the patch specs in this repository.
 
 **You need:** Python 3 (no extra packages), an SD card, a charged battery, and an E-PM2 with body
@@ -82,7 +83,8 @@ firmware 1.6.
        patches/seven-structure-extra.json patches/seven-films-5.json \
        patches/xp-adaptive-hue-off.json patches/seven-labels.json \
        experiments/2026-11-13-intervalometer/patches/interval-timelapse-v2.json \
-       -o build/seven-films-6-interval.BIN
+       experiments/2026-11-13-intervalometer/patches/interval-frames-240.json \
+       -o build/seven-films-6-interval-240.BIN
    ```
 
    The order of the specs matters. The build tool refuses a wrong base file and checks every byte it
@@ -91,8 +93,8 @@ firmware 1.6.
 4. Check the result. The build is reproducible, so the hash must be the same as this one:
 
    ```bash
-   sha256sum build/seven-films-6-interval.BIN
-   # f52ea6976ac2e9c567b2c07d7556b96b6431c8fcd2d90de195abdb76059e0104
+   sha256sum build/seven-films-6-interval-240.BIN
+   # 01837f962f8a8ca0d189d9cd65ad9b5b35402ca3f3ed54a3872af044e050de11
    ```
 
 5. Copy the file to the SD card as `DCOLYMP/E1019999.BIN`. It must be the only file in `DCOLYMP`.
@@ -100,7 +102,7 @@ firmware 1.6.
    ```bash
    mkdir -p /Volumes/SDCARD/DCOLYMP            # macOS; on Linux use the card's mount point
    rm -f /Volumes/SDCARD/DCOLYMP/*
-   cp build/seven-films-6-interval.BIN /Volumes/SDCARD/DCOLYMP/E1019999.BIN
+   cp build/seven-films-6-interval-240.BIN /Volumes/SDCARD/DCOLYMP/E1019999.BIN
    shasum -a 256 /Volumes/SDCARD/DCOLYMP/E1019999.BIN     # must be the hash of step 4
    diskutil eject /Volumes/SDCARD
    ```
@@ -112,8 +114,15 @@ firmware 1.6.
 7. Check. The art filter list shows Portra, Ektachrome, Pro 400H, Kodachrome, Vis 250D, Velvia and
    Superia 400. Shooting Menu 2 shows Time Lapse Settings.
 
-For the film looks only, leave out the `interval-timelapse-v2.json` line. That build is
+For the film looks only, leave out the two `interval-…` lines. That build is
 `seven-films-6`, sha256 `5badb0796731b40a27ef015e57da134d7d793486d4c6262a3f483c1aae60fd05`.
+With `interval-timelapse-v2.json` but without `interval-frames-240.json`, the frame count stops at
+99 as on the E-PL6 (`seven-films-6-interval`, sha256
+`f52ea6976ac2e9c567b2c07d7556b96b6431c8fcd2d90de195abdb76059e0104`).
+
+Before you build a different combination of specs, run
+`python3 tools/freespace.py check SPEC…` with the same list. It fails if two specs use the same
+bytes or if a spec writes where the camera does not load the firmware.
 
 **To go back to the original firmware,** do steps 5 and 6 with the stock file of step 2.
 More detail on flashing: [docs/flashing.md](docs/flashing.md).
