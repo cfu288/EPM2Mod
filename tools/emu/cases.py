@@ -1238,3 +1238,92 @@ class IvlMovieGuard(Case):
 
 
 CASES.update({c.name: c for c in (IvlMovieGuard(),)})
+
+
+# ---- frame-count choices of interval shooting (interval-frames-255.json; E-PM2 only) ----------------------------
+FR_REC, FR_DESC, FR_ROWS = 0x7E84C5FC, 0x7F00C6EC, 0x7EFF0460
+FR_PROBE = (0, 1, 2, 10, 72, 73, 75, 99, 100, 150, 155, 160, 250, 255)
+
+
+def fr_list(image):
+    info, key, raw, gui, tot, es, clamp, ty, z = struct.unpack_from("<HHIIHHBBH", image, FR_REC - BASE)
+    return list(image[raw - BASE:raw - BASE + tot]), raw, clamp
+
+
+def fr_items(image):
+    info, cnt, x4, x8, items = struct.unpack_from("<HHIII", image, FR_DESC - BASE)
+    out = []
+    for k in range(cnt):
+        it = image[items - BASE + 28 * k:items - BASE + 28 * k + 28]
+        out.append((it[1], list(struct.unpack_from("<5H", it, 2)), struct.unpack_from("<I", it, 16)[0]))
+    return out
+
+
+class FramesStep(Case):
+    name, entry = "frames_step", 0x7E7074B5
+    doc = ("mcon u8 value-list step 0x7E7074B5 (a0 list, d0 count, d1 current, a1 0 = next / 1 = previous, clamp "
+           "flag on the stack) on the list of info 483 from record 0x7E84C5FC: the value after one step")
+    ranges = [(0x7E7074B5, 0x7E7074FD)]
+
+    def rows(self):
+        return [dict(cur=c, prev=p) for c in sorted(set(FR_PROBE) | set(range(95, 106))) for p in (0, 1)]
+
+    def run(self, emu, row):
+        lst, raw, clamp = fr_list(emu.image)
+        r = emu.call(self.entry, {"a0": raw, "d0": len(lst), "d1": row["cur"], "a1": row["prev"]},
+                     stack=(clamp,), frame=(0xC0, 12))
+        return {"value": r["regs"]["d0"] & 0xFF, "_r": r, "_reads": [(raw, len(lst))]}
+
+    def model(self, row, image):
+        lst, raw, clamp = fr_list(image)
+        n = len(lst)
+        i = lst.index(row["cur"]) if row["cur"] in lst[:n - 1] else n - 1
+        if row["prev"]:
+            j = i - 1 if i > 0 else (0 if clamp else n - 1)
+        else:
+            j = i + 1 if i < n - 1 else (n - 1 if clamp else 0)
+        return {"value": lst[j]}
+
+
+class FramesEditor(Case):
+    name, entry = "frames_editor", 0x7EDC81A8
+    doc = ("frame editor (list 638): 0x7EDC81A8 finds the item index of the stored value of info 483 in the list "
+           "descriptor 0x7F00C6EC (0 when it has no item); output = that item's value, kind and label arguments")
+    ranges = [(0x7EDC81A8, 0x7EDC8208)]
+    S_ST, S_GET = 0x7EDCD7CA, 0x7EE01D38
+    THIS = DATA + 0x1000
+    stubs_doc = [(S_ST, "page state getter (a1 = out): writes 0 to out+4"),
+                 (S_GET, "getSetting(d0 = 483, a0 out): writes the row's stored value")]
+
+    def rows(self):
+        return [dict(stored=v) for v in range(0, 256)]
+
+    def run(self, emu, row):
+        cnt = struct.unpack_from("<H", emu.image, FR_DESC - BASE + 2)[0]
+        emu.write(self.THIS, b"\0" * 1760)
+        emu.write(self.THIS + 172, struct.pack("<I", FR_DESC))
+        emu.write(self.THIS + 1742, struct.pack("<H", cnt))
+        ids = []
+
+        def st(e, r):
+            e.write(r["a1"], b"\0" * 8)
+            return {}
+
+        def get(e, r):
+            ids.append(r["d0"] & 0xFFFF)
+            e.write(r["a0"], struct.pack("<I", row["stored"]))
+            return {"d0": 0}
+        r = emu.call(self.entry, {"a0": self.THIS, "d0": 0}, stubs={self.S_ST: st, self.S_GET: get})
+        idx = r["regs"]["d0"] & 0xFF
+        kind, args, value = fr_items(emu.image)[idx]
+        items = struct.unpack_from("<I", emu.image, FR_DESC - BASE + 12)[0]
+        return {"index": idx, "item_value": value, "kind": kind, "args": args[:2], "ids": ids, "_r": r,
+                "_reads": [(items, 28 * cnt)]}
+
+    def model(self, row, image):
+        its = fr_items(image)
+        idx = next((k for k, it in enumerate(its) if it[2] == row["stored"]), 0)
+        return {"index": idx, "item_value": its[idx][2], "kind": its[idx][0], "args": its[idx][1][:2], "ids": [483]}
+
+
+CASES.update({c.name: c for c in (FramesStep(), FramesEditor())})

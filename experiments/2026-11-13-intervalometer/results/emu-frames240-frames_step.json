@@ -1,0 +1,818 @@
+{
+ "case": "frames_step",
+ "stock": "/path/to/EPM2Mod/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin",
+ "patched": "/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/ivl/emurun-96daj9mz.block0.bin",
+ "rows": [
+  {
+   "row": {
+    "cur": 0,
+    "prev": 0
+   },
+   "stock": {
+    "value": 99
+   },
+   "patched": {
+    "value": 240
+   },
+   "diff": {
+    "value": [
+     99,
+     240
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 0,
+    "prev": 1
+   },
+   "stock": {
+    "value": 98
+   },
+   "patched": {
+    "value": 235
+   },
+   "diff": {
+    "value": [
+     98,
+     235
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 1,
+    "prev": 0
+   },
+   "stock": {
+    "value": 2
+   },
+   "patched": {
+    "value": 2
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "cur": 1,
+    "prev": 1
+   },
+   "stock": {
+    "value": 1
+   },
+   "patched": {
+    "value": 1
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "cur": 2,
+    "prev": 0
+   },
+   "stock": {
+    "value": 3
+   },
+   "patched": {
+    "value": 3
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "cur": 2,
+    "prev": 1
+   },
+   "stock": {
+    "value": 1
+   },
+   "patched": {
+    "value": 1
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "cur": 10,
+    "prev": 0
+   },
+   "stock": {
+    "value": 11
+   },
+   "patched": {
+    "value": 11
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "cur": 10,
+    "prev": 1
+   },
+   "stock": {
+    "value": 9
+   },
+   "patched": {
+    "value": 9
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "cur": 72,
+    "prev": 0
+   },
+   "stock": {
+    "value": 73
+   },
+   "patched": {
+    "value": 73
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "cur": 72,
+    "prev": 1
+   },
+   "stock": {
+    "value": 71
+   },
+   "patched": {
+    "value": 71
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "cur": 73,
+    "prev": 0
+   },
+   "stock": {
+    "value": 74
+   },
+   "patched": {
+    "value": 74
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "cur": 73,
+    "prev": 1
+   },
+   "stock": {
+    "value": 72
+   },
+   "patched": {
+    "value": 72
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "cur": 75,
+    "prev": 0
+   },
+   "stock": {
+    "value": 76
+   },
+   "patched": {
+    "value": 76
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "cur": 75,
+    "prev": 1
+   },
+   "stock": {
+    "value": 74
+   },
+   "patched": {
+    "value": 74
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "cur": 95,
+    "prev": 0
+   },
+   "stock": {
+    "value": 96
+   },
+   "patched": {
+    "value": 96
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "cur": 95,
+    "prev": 1
+   },
+   "stock": {
+    "value": 94
+   },
+   "patched": {
+    "value": 94
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "cur": 96,
+    "prev": 0
+   },
+   "stock": {
+    "value": 97
+   },
+   "patched": {
+    "value": 97
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "cur": 96,
+    "prev": 1
+   },
+   "stock": {
+    "value": 95
+   },
+   "patched": {
+    "value": 95
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "cur": 97,
+    "prev": 0
+   },
+   "stock": {
+    "value": 98
+   },
+   "patched": {
+    "value": 98
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "cur": 97,
+    "prev": 1
+   },
+   "stock": {
+    "value": 96
+   },
+   "patched": {
+    "value": 96
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "cur": 98,
+    "prev": 0
+   },
+   "stock": {
+    "value": 99
+   },
+   "patched": {
+    "value": 99
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "cur": 98,
+    "prev": 1
+   },
+   "stock": {
+    "value": 97
+   },
+   "patched": {
+    "value": 97
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "cur": 99,
+    "prev": 0
+   },
+   "stock": {
+    "value": 99
+   },
+   "patched": {
+    "value": 100
+   },
+   "diff": {
+    "value": [
+     99,
+     100
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 99,
+    "prev": 1
+   },
+   "stock": {
+    "value": 98
+   },
+   "patched": {
+    "value": 98
+   },
+   "diff": {},
+   "flags": [
+    "reads patched bytes but unchanged"
+   ]
+  },
+  {
+   "row": {
+    "cur": 100,
+    "prev": 0
+   },
+   "stock": {
+    "value": 99
+   },
+   "patched": {
+    "value": 105
+   },
+   "diff": {
+    "value": [
+     99,
+     105
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 100,
+    "prev": 1
+   },
+   "stock": {
+    "value": 98
+   },
+   "patched": {
+    "value": 99
+   },
+   "diff": {
+    "value": [
+     98,
+     99
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 101,
+    "prev": 0
+   },
+   "stock": {
+    "value": 99
+   },
+   "patched": {
+    "value": 240
+   },
+   "diff": {
+    "value": [
+     99,
+     240
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 101,
+    "prev": 1
+   },
+   "stock": {
+    "value": 98
+   },
+   "patched": {
+    "value": 235
+   },
+   "diff": {
+    "value": [
+     98,
+     235
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 102,
+    "prev": 0
+   },
+   "stock": {
+    "value": 99
+   },
+   "patched": {
+    "value": 240
+   },
+   "diff": {
+    "value": [
+     99,
+     240
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 102,
+    "prev": 1
+   },
+   "stock": {
+    "value": 98
+   },
+   "patched": {
+    "value": 235
+   },
+   "diff": {
+    "value": [
+     98,
+     235
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 103,
+    "prev": 0
+   },
+   "stock": {
+    "value": 99
+   },
+   "patched": {
+    "value": 240
+   },
+   "diff": {
+    "value": [
+     99,
+     240
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 103,
+    "prev": 1
+   },
+   "stock": {
+    "value": 98
+   },
+   "patched": {
+    "value": 235
+   },
+   "diff": {
+    "value": [
+     98,
+     235
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 104,
+    "prev": 0
+   },
+   "stock": {
+    "value": 99
+   },
+   "patched": {
+    "value": 240
+   },
+   "diff": {
+    "value": [
+     99,
+     240
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 104,
+    "prev": 1
+   },
+   "stock": {
+    "value": 98
+   },
+   "patched": {
+    "value": 235
+   },
+   "diff": {
+    "value": [
+     98,
+     235
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 105,
+    "prev": 0
+   },
+   "stock": {
+    "value": 99
+   },
+   "patched": {
+    "value": 110
+   },
+   "diff": {
+    "value": [
+     99,
+     110
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 105,
+    "prev": 1
+   },
+   "stock": {
+    "value": 98
+   },
+   "patched": {
+    "value": 100
+   },
+   "diff": {
+    "value": [
+     98,
+     100
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 150,
+    "prev": 0
+   },
+   "stock": {
+    "value": 99
+   },
+   "patched": {
+    "value": 155
+   },
+   "diff": {
+    "value": [
+     99,
+     155
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 150,
+    "prev": 1
+   },
+   "stock": {
+    "value": 98
+   },
+   "patched": {
+    "value": 145
+   },
+   "diff": {
+    "value": [
+     98,
+     145
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 155,
+    "prev": 0
+   },
+   "stock": {
+    "value": 99
+   },
+   "patched": {
+    "value": 160
+   },
+   "diff": {
+    "value": [
+     99,
+     160
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 155,
+    "prev": 1
+   },
+   "stock": {
+    "value": 98
+   },
+   "patched": {
+    "value": 150
+   },
+   "diff": {
+    "value": [
+     98,
+     150
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 160,
+    "prev": 0
+   },
+   "stock": {
+    "value": 99
+   },
+   "patched": {
+    "value": 165
+   },
+   "diff": {
+    "value": [
+     99,
+     165
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 160,
+    "prev": 1
+   },
+   "stock": {
+    "value": 98
+   },
+   "patched": {
+    "value": 155
+   },
+   "diff": {
+    "value": [
+     98,
+     155
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 250,
+    "prev": 0
+   },
+   "stock": {
+    "value": 99
+   },
+   "patched": {
+    "value": 240
+   },
+   "diff": {
+    "value": [
+     99,
+     240
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 250,
+    "prev": 1
+   },
+   "stock": {
+    "value": 98
+   },
+   "patched": {
+    "value": 235
+   },
+   "diff": {
+    "value": [
+     98,
+     235
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 255,
+    "prev": 0
+   },
+   "stock": {
+    "value": 99
+   },
+   "patched": {
+    "value": 240
+   },
+   "diff": {
+    "value": [
+     99,
+     240
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "cur": 255,
+    "prev": 1
+   },
+   "stock": {
+    "value": 98
+   },
+   "patched": {
+    "value": 235
+   },
+   "diff": {
+    "value": [
+     98,
+     235
+    ]
+   },
+   "flags": []
+  }
+ ]
+}

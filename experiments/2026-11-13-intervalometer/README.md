@@ -362,35 +362,84 @@ Images: stock, films, stock + v2, films + v2, E-PL6 1.4. Model errors: 0 in ever
   - the flag shares a table slot that only a row-1 formatter call could read, and none exists;
   - no spec has an `expected_sha256` until a build is camera-tested.
 
-## 13. Camera result, and the 99-frame cap (2026-11-13)
+## 13. Camera result, and frames above 99 (2026-11-13)
 
 | Date | Build | Result |
 |---|---|---|
 | 2026-11-13 | `build/seven-films-6-interval.BIN` = the seven-films-6 specs + `interval-timelapse-v2.json` | **Works** (user report: "It works!", interval shooting runs). Not yet reported: which steps of §7 / §12.5 passed (movie, cancel paths, > 90 s sleep, Sleep = 1 min, card full) |
 
-**Can the frame count go above 99? Not with a safe patch. No `interval-frames-max.json` was written.** Evidence: `results/framecap.txt` (`scripts/framecap.py`).
+**Can the frame count go above 99? Yes, to 240, with data edits only:** [patches/interval-frames-240.json](patches/interval-frames-240.json) (6 ops; not built, not camera-tested). This replaces the earlier "not with a safe patch" answer, which missed that the editor can compose a number label. Evidence: `results/framecap.txt`, `results/emu-frames240-*`, `scripts/mkspec_frames240.py`.
 
-The cap is in four places:
+### 13.1 Where 99 came from (V)
 
-| Layer | What holds 99 (V) | To go higher |
+| Layer | Stock | In the spec |
 |---|---|---|
-| Storage | prm 0xDE21 is **one u8** (the tag's low nibble 1; default record 0x7E4C3EB4) | Hard limit **255**. 999 needs a u16 tag, which changes the saved MODE bank layout and Myset. That is not a patch |
-| mcon value list | record 0x7E84C5FC: 99 u8 values 1..99 at 0x7E849F56, clamp at the ends. It is packed between the lists of 482 and 486 | Up to 255 only by moving the list to free space |
-| GUI option table | 99 rows of 32 B `{483, value, kind 2, label string}` at 0x7EFF5160–0x7EFF5DBF. The editor page (pages 148 / 638) picks rows by index and steps through them. The rows of 474 and 484 touch it on both sides | One new 32-byte row per extra value (156 rows = 4,992 B for 255). There is no slack, and the padding has about 280 B left |
-| Label strings | each row names its own block-1 string: "1f" … "99f" (ids 1815, 42, 1347, … 1910) | "100f" and up do not exist in any of the 34 language tables. The tables have a fixed 1,970 ids |
+| Storage | prm 0xDE21 is **one u8** (default record 0x7E4C3EB4). 489 "frames done" is u32 (0xDE84) | Unchanged. 240 fits. 999 would need a wider tag, which changes the saved MODE bank and Myset layout |
+| mcon value list | record 0x7E84C5FC: 99 × u8 (1..99) at 0x7E849F56, clamped, packed between the lists of 482 and 486. Step function 0x7E7074B5 | New 128-byte list at **0x7E4C9100**; the record gets the pointer and total 128 |
+| Frame editor (page class of lists 148 / 638) | descriptor 0x7F00C6EC `{483, count 99, …, items 0x7F00ABD0}`; 99 items of 28 B `{0, kind, u16 args[5], 2000, value, 0xC0, 0xC5}`, values 99 down to 1, kind 2 = label string "99f" … "1f" | 128 items at **0x7EBF1100**; the descriptor gets count 128 and the pointer |
+| Value shown in the Time Lapse Settings list (0x7EDE2192, table 0x7EFF0460: 762 rows of 32 B `{info, value, kind, args…}`) | 99 rows `{483, v, 2, label}`; a value with no row shows nothing | The row of value 99 becomes kind 4 |
 
-- **Other limits:** the editor keeps its row index as a signed byte (`extb` at 0x7EE01799), so one field can have at most 127 choices (V code, I consequence).
-- **Other bodies:**
-  - E-PL6 1.4: the same 99 (record at block-0 offset 0x42C438).
-  - E-M10 1.4 and E-PL7 1.4: info 478 is only on/off, and there is **no value-list record for the frame count**. They use a different (numeric) editor with wider storage (I). That is a different design, not a constant we can copy.
-- **Readers that would be fine up to 255 (V):**
-  - 489 "frames done" is u32 (0xDE84);
-  - the end test compares two u32 getter results (0x7EA89F39, 0x7ECDA5C8).
-- **Not traced, because the editor already blocks the change:** the on-screen counter digits, the movie maker's frame limits, and file numbering.
-- **Longer runs today:** run a second 99-frame sequence. The file numbers continue.
-- **Untested idea (I):** a stored 483 = 0 can never equal 489, so it may mean "until cancelled or card full". The menu cannot select 0, and this was not tested.
+### 13.2 How a row is drawn, and composition (V)
+- **Kinds:** kind 2 = one label string. **Kind 4 = number + unit string.** The stock Custom Self-timer "Timer" editor (list 632, info 475) uses it for "1 sec" … "30 sec": items `{kind 4, args (N, 247 "sec")}`. 149 stock editor items are kind 4.
+- **List page shortcut:** in the list page, the first kind-4 row of an info prints the **current value** with that row's unit, whatever the row's own value is (0x7EDE2375; info 474 is excluded).
+- **No per-value string is needed** for a composed label. Unit string 0 is the empty string in all 34 languages, so the new labels read "100" … "240". There is no stand-alone localized "f" unit to reuse: the stock labels are whole strings per language ("99f", "99Bill.", "模式99").
+- **Editor type 39 is not usable for a count.** The Start Waiting Time / Interval Time editors (639 / 640) are table kind 12, which the code handles only for info 484 / 485 and formats as h:mm:ss through a date helper.
+- **List length limit:** the editor keeps its row index in a byte and **sign-extends it before the ×28 item lookup** in the key handler (`extb d1; udf00 28,d1` at 0x7EE017BB and 0x7EE017FC). Index 128 would address item −128. So the limit is **128 rows**, not 240. The look-up of the stored value (0x7EDC81A8) and the draw slot use the index unsigned.
+- **Design (preference 2):** 1–99 by 1 with the stock labels, then **100, 105, … 240** = 99 + 29 = 128 rows (the last index is 127).
+
+### 13.3 Block 1 (not needed; for the record, V)
+- **Layout:** a directory of 16-byte records; one blob per language with `{u32 ptr_array, u32 ptr_array_end}`, a UTF-16LE NUL-terminated pool, then 1,970 pointers (runtime base 0xBFF3D000), then a footer.
+- **Pool:** each id has its own string: no two ids share an offset, and there is no slack between strings (checked for English, Japanese and German).
+- **Labels are not language-neutral:** "1f" … "99f" have 20 different spellings.
+- **`tools/build.py`** has only an equal-length `utf16-replace-all` for block 1. New strings would need a "rebuild language blob" op (new pool + pointers + directory sizes).
+
+### 13.4 The new homes (V)
+
+| Range | Why it is safe | Other specs |
+|---|---|---|
+| 0x7E4C9100–0x7E4C917F (mcon list) | 0xFF padding 0x7E4C90CA–0x7E4C97FF at the end of the range the **reset stub** loads (0x7E430000–0x7E4C9800, review 1 §0). The only window into it is the copy-end constant. The record is boot-part data, so its list does not depend on a Usr1 segment | untouched by every spec in `patches/` and `patches/history/` |
+| 0x7EBF1100–0x7EBF1EFF (editor items, 3,584 B) | Inside the unreferenced `sdk` shell name list 0x7EBF1090–0x7EBF3BAC (class A in `experiments/2026-11-13-reclaim-space`; my scan again finds no window into the part used). Segment 2, loaded before the GUI segment. Cost: that debug-shell name text is overwritten | untouched by every spec |
+
+- **Applies on:** stock, and the film set + v2 (scratch build of block 0, sha256 `7d460c4c7288…`).
+- **Overlaps:** 0 with all specs, including v2.
+
+### 13.5 Emulator (V)
+
+| Case | Rows | Stock | Patched |
+|---|---|---|---|
+| `frames_step` (0x7E7074B5 on the record's list: next / previous, clamp) | 46 | 46/46 vs model | 99 → next = **100**; 100 → 105; 105 → previous 100; 235 → 240; 240 → next 240 (clamp). A stored value that is not in the list (0, 101–104, 250) steps to 240 / 235. Rows up to 98 are unchanged (flagged only as "reads patched bytes": the list moved) |
+| `frames_editor` (0x7EDC81A8: item of the stored value, for every stored byte 0–255) | 256 | 256/256 | each of the 128 values finds its own item (10 → index 118, label 1821 "10f"; 100 → index 28, kind 4 number 100; 240 → index 0). Any other stored byte opens on index 0 = 240, as stock opens on 99. The largest index is 127 |
+| Menu, selector, start, movie-guard and guard cases on films + v2 + frames | 416 | — | all still match their models |
+
+### 13.6 Is 240 safe end to end?
+
+| Reader | Finding |
+|---|---|
+| prm save / restore, Myset | one byte; 240 < 256 (V) |
+| End test | 483 == 489 on u32 getter results (0x7EA89F39, 0x7ECDA5C8) (V) |
+| Movie maker | The request passes 489 as the frame count (0x7EA9938E). MOV_EDIT is a start / per-frame "make" / end stream, and it sizes its table from its argument (0x7E6D4B82, 2 × n). No `cmp 99/100` in the request, API or MOV_EDIT ranges (V for the scan; I that nothing else caps it). At the 10 fps the E-PL6 documents (external), 240 frames is a 24 s clip, far below the 4 GiB limit |
+| Other caps (clamp other than the mcon list, on-screen counter digits, remaining-shots check) | **Not traced.** A counter that shows only 2 digits would be cosmetic |
+
+### 13.6b Independent review (review-4-frames240.md, 2026-11-13): no blocker
+
+- **S1 (I):** the "number + unit" row kind (4) is not used in stock by *this* editor's page class (list 638 shares its class with list 148, kinds 3 and 8; Custom Self-timer's list 632 is another class), and no stock kind-4 row has an empty unit. So the labels "100"…"240" are **untested on this screen**. If they draw wrongly the fault is cosmetic: confirm stores the item value, not the label. Camera test 1 is the gate.
+- **S2 (V):** 128 is the mcon error value for u8 lists, so no list value may be 128. The list has 125 and 130; the generator now asserts it.
+- **S3 (I):** the movie maker's frame-count scaling and the on-screen counter above 99 are not proven by reading. Add a 240-frame run with Time Lapse Movie On.
+- **Confirmed (V):** nothing stores an index (editor, prm and Myset hold the raw value); the value list at 0x7E4C9100 is loaded unconditionally by the reset stub and is the right home (every getter scans it from segment-1 code); 128 rows is the exact maximum; no overlap with any spec; no code touched.
+- **Do not** make a frame value "unavailable" in a later patch: the page object holds only 39 row structures and that path writes past them.
+
+### 13.7 Camera tests for `interval-frames-240`
+1. In the Frame editor, scroll from 99 up: 100, 105 … 240. The labels show as plain numbers; scrolling stops at 240 and at 1. 1–99 are unchanged.
+2. Choose 240, leave and re-enter the menu: the list shows "240"; power-cycle and check again. Check that 99 shows "99" and 98 shows "98f".
+3. Run 105 frames at 1 s: it stops at 105, with 105 files. Note what the on-screen counter does past 99.
+4. With Time Lapse Movie On, run 120 frames at 1 s: check the clip plays and its length (about 12 s at 10 fps).
+5. Save and load a Myset with Frame = 240.
+
+- **Risks (I):** the empty unit string may draw differently from "sec" (spacing); an untraced clamp may pull 240 back to 99.
+- **Shutter wear:** 240 frames is 240 actuations.
 
 ## Files
+- `patches/interval-frames-240.json`: Frame up to 240, on top of v2 (§13); generator `scripts/mkspec_frames240.py`.
 - `patches/interval-timelapse-v2.json`: the current spec (§12).
   - generator: `scripts/mk_v2_gen.py` → `mkspec_v2.py` (+ `guard_part.py`);
   - checks: `scripts/specscan.py`, `scripts/fmtindex.py`.

@@ -1,0 +1,94 @@
+patched bytes: 3468 in 264 runs
+chg  cur=0 prev=0
+     value: 99 -> 240
+chg  cur=0 prev=1
+     value: 98 -> 235
+FAIL cur=1 prev=0
+     reads patched bytes but unchanged
+FAIL cur=1 prev=1
+     reads patched bytes but unchanged
+FAIL cur=2 prev=0
+     reads patched bytes but unchanged
+FAIL cur=2 prev=1
+     reads patched bytes but unchanged
+FAIL cur=10 prev=0
+     reads patched bytes but unchanged
+FAIL cur=10 prev=1
+     reads patched bytes but unchanged
+FAIL cur=72 prev=0
+     reads patched bytes but unchanged
+FAIL cur=72 prev=1
+     reads patched bytes but unchanged
+FAIL cur=73 prev=0
+     reads patched bytes but unchanged
+FAIL cur=73 prev=1
+     reads patched bytes but unchanged
+FAIL cur=75 prev=0
+     reads patched bytes but unchanged
+FAIL cur=75 prev=1
+     reads patched bytes but unchanged
+FAIL cur=95 prev=0
+     reads patched bytes but unchanged
+FAIL cur=95 prev=1
+     reads patched bytes but unchanged
+FAIL cur=96 prev=0
+     reads patched bytes but unchanged
+FAIL cur=96 prev=1
+     reads patched bytes but unchanged
+FAIL cur=97 prev=0
+     reads patched bytes but unchanged
+FAIL cur=97 prev=1
+     reads patched bytes but unchanged
+FAIL cur=98 prev=0
+     reads patched bytes but unchanged
+FAIL cur=98 prev=1
+     reads patched bytes but unchanged
+chg  cur=99 prev=0
+     value: 99 -> 100
+FAIL cur=99 prev=1
+     reads patched bytes but unchanged
+chg  cur=100 prev=0
+     value: 99 -> 105
+chg  cur=100 prev=1
+     value: 98 -> 99
+chg  cur=101 prev=0
+     value: 99 -> 240
+chg  cur=101 prev=1
+     value: 98 -> 235
+chg  cur=102 prev=0
+     value: 99 -> 240
+chg  cur=102 prev=1
+     value: 98 -> 235
+chg  cur=103 prev=0
+     value: 99 -> 240
+chg  cur=103 prev=1
+     value: 98 -> 235
+chg  cur=104 prev=0
+     value: 99 -> 240
+chg  cur=104 prev=1
+     value: 98 -> 235
+chg  cur=105 prev=0
+     value: 99 -> 110
+chg  cur=105 prev=1
+     value: 98 -> 100
+chg  cur=150 prev=0
+     value: 99 -> 155
+chg  cur=150 prev=1
+     value: 98 -> 145
+chg  cur=155 prev=0
+     value: 99 -> 160
+chg  cur=155 prev=1
+     value: 98 -> 150
+chg  cur=160 prev=0
+     value: 99 -> 165
+chg  cur=160 prev=1
+     value: 98 -> 155
+chg  cur=250 prev=0
+     value: 99 -> 240
+chg  cur=250 prev=1
+     value: 98 -> 235
+chg  cur=255 prev=0
+     value: 99 -> 240
+chg  cur=255 prev=1
+     value: 98 -> 235
+frames_step: 46 rows, 25 changed, 21 identical, 21 flagged
