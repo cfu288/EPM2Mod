@@ -18,8 +18,8 @@ for t in sorted(scenes):
     h = max(round(W * im.height / im.width) for im in ims.values()); rows.append((t, ims, h))
 width = 2 * M + len(LOOKS) * W + (len(LOOKS) - 1) * GAP; height = 2 * M + HEAD + sum(h + CAP + GAP for _, _, h in rows)
 page = Image.new("RGB", (width, height), "white"); d = ImageDraw.Draw(page)
-d.text((M, M - 20), "Film looks for the Olympus E-PM2", font=font(64, True), fill="black")
-d.text((M, M + 62), "Each row shows one RAW file. The camera developed the file with each look. Each column shows one look. The first column shows the standard Natural mode.", font=font(30), fill=(90, 90, 90))
+d.text((M, M - 20), "Adding film emulations to the Olympus E-PM2 using custom firmware", font=font(64, True), fill="black")
+d.text((M, M + 62), "Below are some additional optional emulations you can apply in camera to your shots. The first column is the default \"Natural\" profile in camera.", font=font(30), fill=(90, 90, 90))
 y = M + HEAD
 for c, (_, name, label) in enumerate(LOOKS):
     x = M + c * (W + GAP); d.text((x + W / 2, y - 62), name, font=font(40, True), fill="black", anchor="mm"); d.text((x + W / 2, y - 22), f"Menu name: {label}" if c else label, font=font(26), fill=(110, 110, 110), anchor="mm")
