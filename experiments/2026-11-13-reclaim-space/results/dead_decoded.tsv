@@ -1,0 +1,188 @@
+start	end	size	segment	insns	non_pad_insns	first_mnemonics
+7ee541b3	7ee548b1	1790	3	674	674	mov mov mov mov mov add
+7ee40b17	7ee411f6	1759	3	856	856	mov mov mov add mov mov
+7ee5382e	7ee53d6a	1340	3	578	578	add mov mov mov mov mov
+7ee3cbf2	7ee3cfe2	1008	3	399	399	mov mov mov mov mov mov
+7ee46d27	7ee4709d	886	3	412	412	mov mov mov movhu mov mov
+7e50a201	7e50a3c2	449	1	179	179	mov mov call call clr clr
+7e53a55c	7e53a700	420	1	141	141	mov mov mov mov inc4 mov
+7ee40728	7ee40877	335	3	155	155	mov mov mov mov mov mov
+7e50c46e	7e50c517	169	1	71	71	mov mov extbu cmp beq ret
+7ee46c39	7ee46cb0	119	3	54	54	mov mov movhu mov mov mov
+7e539fff	7e53a049	74	1	16	16	call cmp beq mov call ret
+7ee3d3ca	7ee3d413	73	3	36	36	mov mov mov add mov mov
+7e50ba5f	7e50baa6	71	1	18	18	mov call mov movbu cmp bne
+7e5090b8	7e5090f5	61	1	16	16	mov cmp beq mov call mov
+7e50978b	7e5097bb	48	1	12	12	clr movbu retf movbu cmp bne
+7e880e4a	7e880e63	25	1	9	9	blt and cmp bne call and
+7e538f77	7e538f80	9	1	2	2	movhu retf
+7ece4126	7ece412e	8	3	4	4	bra bra bra bra
+7e8fbd6f	7e8fbd75	6	2	2	2	jmp jmp
+7e9665f5	7e9665fb	6	2	2	2	jmp jmp
+7eb11e6b	7eb11e71	6	2	3	3	bra bra bra
+7ed9ff6d	7ed9ff73	6	3	3	3	bra bra bra
+7ee74ff8	7ee74ffe	6	3	3	3	bra bra bra
+7ee82f03	7ee82f09	6	3	2	2	jmp jmp
+7ee8310b	7ee83111	6	3	2	2	jmp jmp
+7e532a2d	7e532a31	4	1	2	2	bra bra
+7e564e77	7e564e7b	4	1	2	2	bra bra
+7e564ed5	7e564ed9	4	1	2	2	bra bra
+7e5650d3	7e5650d7	4	1	2	2	bra bra
+7e56512f	7e565133	4	1	2	2	bra bra
+7e565194	7e565198	4	1	2	2	bra bra
+7e5651f0	7e5651f4	4	1	2	2	bra bra
+7e566d4e	7e566d52	4	1	2	2	bra bra
+7eb11e3f	7eb11e43	4	2	2	2	bra bra
+7ecd7ecf	7ecd7ed3	4	3	2	2	bra bra
+7ece4046	7ece404a	4	3	2	2	bra bra
+7ece45ef	7ece45f3	4	3	2	2	bra bra
+7ed153a5	7ed153a9	4	3	2	2	bra bra
+7ee1bcba	7ee1bcbe	4	3	2	2	bra bra
+7e53e12a	7e53e12d	3	1	1	1	retf
+7e966496	7e966499	3	2	1	1	jmp
+7e966546	7e966549	3	2	1	1	jmp
+7e9a0db8	7e9a0dbb	3	2	1	1	jmp
+7ee82dde	7ee82de1	3	3	1	1	jmp
+7ee83054	7ee83057	3	3	1	1	jmp
+7ee831b3	7ee831b6	3	3	1	1	jmp
+7e4fffa6	7e4fffa8	2	1	1	1	bra
+7e520f5f	7e520f61	2	1	1	1	bra
+7e520fc9	7e520fcb	2	1	1	1	bra
+7e52c6d1	7e52c6d3	2	1	1	1	bra
+7e52c813	7e52c815	2	1	1	1	bra
+7e52d714	7e52d716	2	1	1	1	bra
+7e5329df	7e5329e1	2	1	1	1	bra
+7e532a62	7e532a64	2	1	1	1	bra
+7e543b1b	7e543b1d	2	1	1	1	bra
+7e5625c6	7e5625c8	2	1	1	1	bra
+7e564e00	7e564e02	2	1	1	1	bra
+7e564e14	7e564e16	2	1	1	1	bra
+7e564e84	7e564e86	2	1	1	1	bra
+7e564ee2	7e564ee4	2	1	1	1	bra
+7e564f9b	7e564f9d	2	1	1	1	bra
+7e564faf	7e564fb1	2	1	1	1	bra
+7e565000	7e565002	2	1	1	1	bra
+7e565014	7e565016	2	1	1	1	bra
+7e565065	7e565067	2	1	1	1	bra
+7e565079	7e56507b	2	1	1	1	bra
+7e56a7ea	7e56a7ec	2	1	1	1	bra
+7e56d982	7e56d984	2	1	1	1	bra
+7e56f810	7e56f812	2	1	1	1	bra
+7e56f81c	7e56f81e	2	1	1	1	bra
+7e56f839	7e56f83b	2	1	1	1	bra
+7e56ff2d	7e56ff2f	2	1	1	1	bra
+7e585472	7e585474	2	1	1	1	bra
+7e598d09	7e598d0b	2	1	1	1	bra
+7e598d1b	7e598d1d	2	1	1	1	bra
+7e5c670c	7e5c670e	2	1	1	1	bra
+7e5dc565	7e5dc567	2	1	1	1	bra
+7e5dce26	7e5dce28	2	1	1	1	bra
+7e5f6856	7e5f6858	2	1	1	1	bra
+7e6173e3	7e6173e5	2	1	1	1	bra
+7e617c51	7e617c53	2	1	1	1	bra
+7e61a01a	7e61a01c	2	1	1	1	bra
+7e6296f9	7e6296fb	2	1	1	1	bra
+7e66557e	7e665580	2	1	1	1	bra
+7e6655dc	7e6655de	2	1	1	1	bra
+7e665639	7e66563b	2	1	1	1	bra
+7e665697	7e665699	2	1	1	1	bra
+7e6656f5	7e6656f7	2	1	1	1	bra
+7e683897	7e683899	2	1	1	1	bra
+7e686626	7e686628	2	1	1	1	bra
+7e6b017f	7e6b0181	2	1	1	1	bra
+7e6b9dfe	7e6b9e00	2	1	1	1	bra
+7e6cc24d	7e6cc24f	2	1	1	1	bra
+7e6cc52a	7e6cc52c	2	1	1	1	bra
+7e6ced99	7e6ced9b	2	1	1	1	bra
+7e6d1c50	7e6d1c52	2	1	1	1	bra
+7e6d7fa7	7e6d7fa9	2	1	1	1	bra
+7e6d7ff3	7e6d7ff5	2	1	1	1	bra
+7e6de3f0	7e6de3f2	2	1	1	1	bra
+7e6de486	7e6de488	2	1	1	1	bra
+7e6de4ad	7e6de4af	2	1	1	1	bra
+7e6de6ab	7e6de6ad	2	1	1	1	bra
+7e6de78b	7e6de78d	2	1	1	1	bra
+7e6de7b2	7e6de7b4	2	1	1	1	bra
+7e7211ed	7e7211ef	2	1	1	1	bra
+7e8fa0eb	7e8fa0ed	2	2	1	1	bra
+7e9006f3	7e9006f5	2	2	1	1	bra
+7e90079a	7e90079c	2	2	1	1	bra
+7e913e93	7e913e95	2	2	1	1	bra
+7e91cdbb	7e91cdbd	2	2	1	1	bra
+7e927b8a	7e927b8c	2	2	1	1	bra
+7e932cf0	7e932cf2	2	2	1	1	bra
+7e94c885	7e94c887	2	2	1	1	bra
+7e987d90	7e987d92	2	2	1	1	bra
+7e9a152b	7e9a152d	2	2	1	1	bra
+7e9e6f08	7e9e6f0a	2	2	1	1	bra
+7e9e6f19	7e9e6f1b	2	2	1	1	bra
+7e9e6f2c	7e9e6f2e	2	2	1	1	bra
+7e9e6f44	7e9e6f46	2	2	1	1	bra
+7ea1b82a	7ea1b82c	2	2	1	1	bra
+7ea1d098	7ea1d09a	2	2	1	1	bra
+7ea46d73	7ea46d75	2	2	1	1	bra
+7ea46dac	7ea46dae	2	2	1	1	bra
+7ea46df4	7ea46df6	2	2	1	1	bra
+7ea47090	7ea47092	2	2	1	1	bra
+7ea47385	7ea47387	2	2	1	1	bra
+7eafec31	7eafec33	2	2	1	1	bra
+7eb0ffc4	7eb0ffc6	2	2	1	1	bra
+7eb11764	7eb11766	2	2	1	1	bra
+7eb1181f	7eb11821	2	2	1	1	bra
+7eb11825	7eb11827	2	2	1	1	bra
+7eb11848	7eb1184a	2	2	1	1	bra
+7eb118b4	7eb118b6	2	2	1	1	bra
+7eb11963	7eb11965	2	2	1	1	bra
+7eb11ea5	7eb11ea7	2	2	1	1	bra
+7eb11f91	7eb11f93	2	2	1	1	bra
+7eb1391f	7eb13921	2	2	1	1	bra
+7ecd15fd	7ecd15ff	2	3	1	1	bra
+7ecd456e	7ecd4570	2	3	1	1	bra
+7ecd45bb	7ecd45bd	2	3	1	1	bra
+7ece45c0	7ece45c2	2	3	1	1	bra
+7ecea54b	7ecea54d	2	3	1	1	bra
+7ecea569	7ecea56b	2	3	1	1	bra
+7ed0c45a	7ed0c45c	2	3	1	1	bra
+7ed123bb	7ed123bd	2	3	1	1	bra
+7ed124ea	7ed124ec	2	3	1	1	bra
+7ed13067	7ed13069	2	3	1	1	bra
+7ed15351	7ed15353	2	3	1	1	bra
+7ed15521	7ed15523	2	3	1	1	bra
+7ed430a6	7ed430a8	2	3	1	1	bra
+7ed7f08c	7ed7f08e	2	3	1	1	bra
+7ed8dc10	7ed8dc12	2	3	1	1	bra
+7eda0f97	7eda0f99	2	3	1	1	bra
+7eda0fb0	7eda0fb2	2	3	1	1	bra
+7eda11a0	7eda11a2	2	3	1	1	bra
+7eda11b9	7eda11bb	2	3	1	1	bra
+7edafb36	7edafb38	2	3	1	1	bra
+7edc341f	7edc3421	2	3	1	1	bra
+7edc345a	7edc345c	2	3	1	1	bra
+7edc75e8	7edc75ea	2	3	1	1	bra
+7edc765d	7edc765f	2	3	1	1	bra
+7ede0b92	7ede0b94	2	3	1	1	bra
+7ede5a94	7ede5a96	2	3	1	1	bra
+7edebcc3	7edebcc5	2	3	1	1	bra
+7edfdc00	7edfdc02	2	3	1	1	bra
+7ee022fa	7ee022fc	2	3	1	1	bra
+7ee02347	7ee02349	2	3	1	1	bra
+7ee04810	7ee04812	2	3	1	1	bra
+7ee04826	7ee04828	2	3	1	1	bra
+7ee0483c	7ee0483e	2	3	1	1	bra
+7ee048b1	7ee048b3	2	3	1	1	bra
+7ee093bf	7ee093c1	2	3	1	1	bra
+7ee093ed	7ee093ef	2	3	1	1	bra
+7ee09467	7ee09469	2	3	1	1	bra
+7ee09530	7ee09532	2	3	1	1	bra
+7ee0b0bf	7ee0b0c1	2	3	1	1	bra
+7ee0b14b	7ee0b14d	2	3	1	1	bra
+7ee0b152	7ee0b154	2	3	1	1	bra
+7ee0b16e	7ee0b170	2	3	1	1	bra
+7ee1ac86	7ee1ac88	2	3	1	1	bra
+7ee1acb4	7ee1acb6	2	3	1	1	bra
+7ee1af22	7ee1af24	2	3	1	1	bra
+7ee1b009	7ee1b00b	2	3	1	1	bra
+7ee27acf	7ee27ad1	2	3	1	1	bra
+7ee69cac	7ee69cae	2	3	1	1	bra
+7ee74fc6	7ee74fc8	2	3	1	1	bra
+7e880f43	7e880f44	1	1	1	0	break

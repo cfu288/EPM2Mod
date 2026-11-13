@@ -1,0 +1,84 @@
+start	end	size	segment	kind	evidence
+7e813170	7e813ed0	3424	1	strings	105 unreferenced strings, first b'app_mode_table_interace_get_default_table\x00a
+7e79944e	7e79a16b	3357	1	strings	113 unreferenced strings, first b'[CALLBACK] search_file_find %s\x00last_seek(%d
+7e805088	7e805ce8	3168	1	strings	114 unreferenced strings, first b'[AVCHD] REC INIT Error\x00[AVCHD] Video 1080i\
+7e7d6717	7e7d71fd	2790	1	strings	107 unreferenced strings, first b'api_tft_Set_Color_OSD\x00Set_Color_OSD palette
+7e7ccd44	7e7cd2b8	1396	1	strings	40 unreferenced strings, first b'Play_MoviePicture_Exec\r\x00api_movie_Play_Mov
+7e7d734e	7e7d7755	1031	1	strings	40 unreferenced strings, first b'api_tft_Set_Current_OSD\x00Set_Current_OSD pla
+7e7d777b	7e7d7b51	982	1	strings	31 unreferenced strings, first b'api_tft_Set_Transparent_ALL_OSD\x00api_tft_Set
+7e793d4b	7e7940ac	865	1	strings	35 unreferenced strings, first b'path %s\x001 read_from_flash(%d)\x00cardchk fa
+7e7d82f2	7e7d85b3	705	1	strings	24 unreferenced strings, first b'api_tft_Get_Brightness_Mode\x00api_tft_Copy_Ar
+7e7d8bed	7e7d8e54	615	1	strings	15 unreferenced strings, first b'api_tft_Get_CharacterSize_OSD_OutPut_Type\x00G
+7e7d9a09	7e7d9c55	588	1	strings	14 unreferenced strings, first b'api_tft_dummy_Display_Animation_Get_Index_Posi
+7e7c0015	7e7c0254	575	1	strings	36 unreferenced strings, first b'Attachment_MODE_LENS_ATTACHMENT_TELE\x00Attach
+7e7d7eaa	7e7d80d4	554	1	strings	18 unreferenced strings, first b'Draw_Image_Trimming imgbuff_size_x \x00Draw_Im
+7e7c2eea	7e7c30f3	521	1	strings	14 unreferenced strings, first b'api_disp_Disp_UpdateScreen\x00Disp_UpdateScree
+7e50a201	7e50a3c2	449	1	code	no reference from live code or data
+7e7d870b	7e7d88c6	443	1	strings	12 unreferenced strings, first b'api_tft_Draw_Image_Multi_Raw_Index\x00Draw_Ima
+7e7cca75	7e7ccc2f	442	1	strings	17 unreferenced strings, first b'Resume_Play_Movie\r\x00api_movie_Resume_Play_M
+7e53a55c	7e53a700	420	1	code	no reference from live code or data
+7e7bfe50	7e7bffef	415	1	strings	18 unreferenced strings, first b'*********************count********************
+7e79a179	7e79a30d	404	1	strings	14 unreferenced strings, first b'delete dir failed because some files exist.\x0
+7e7d121d	7e7d1393	374	1	strings	11 unreferenced strings, first b'api_play_Edit_PlayPicture_Trimming\x00Edit_Pla
+7e7d03f5	7e7d0565	368	1	strings	9 unreferenced strings, first b'api_play_Get_PlayHandle_ExifTag_ASCII\x00api_p
+7e7d88fe	7e7d8a5e	352	1	strings	13 unreferenced strings, first b'api_tft_Get_MainArea_HDMI\x00Get_MainArea_HDMI
+7e798ca0	7e798de8	328	1	strings	13 unreferenced strings, first b' + filemems_allocate_mem(%d)\x00temp(0x%08x)\x
+7e7ca7d2	7e7ca90c	314	1	strings	8 unreferenced strings, first b'api_info_dummy_Get_FineTune_Empty_Record_Num\x
+7e7d5aaf	7e7d5bdc	301	1	strings	9 unreferenced strings, first b'api_rec_dummy_Ready_SensorCleaning\x00api_rec_
+7e7cbfe4	7e7cc10d	297	1	strings	9 unreferenced strings, first b'api_movie_Get_MovieInformation\x00Get_MovieInf
+7e7d4962	7e7d4a8b	297	1	strings	11 unreferenced strings, first b'api_rec_Take_Picture_Auto\x00Take_Picture_Auto
+7e7cac53	7e7cad5e	267	1	strings	7 unreferenced strings, first b'api_lcd_dummy_Set_BlinkTime_FinderLCD\x00api_l
+7e79a314	7e79a41c	264	1	strings	9 unreferenced strings, first b'op_bytes %d\x00filewrap_get_media_status(%d) :
+7e7d5c44	7e7d5d47	259	1	strings	7 unreferenced strings, first b'api_rec_dummy_Get_One_Touch_Light\x00api_rec_d
+7e7d2d6d	7e7d2e66	249	1	strings	8 unreferenced strings, first b'api_rec_Get_FocalLength_Infomation\x00Get_Foca
+7e7d90b3	7e7d91a9	246	1	strings	11 unreferenced strings, first b'api_tft_Copy_Area_OSD\x00Copy_Area_OSD src_h \
+7e8090c1	7e8091b0	239	1	strings	10 unreferenced strings, first b'AvmidApi_setvideoparam \n\x00AVSCA_SetVideoPar
+7e7d592c	7e7d5a1a	238	1	strings	7 unreferenced strings, first b'api_rec_dummy_Start_TakeComposite\x00api_rec_d
+7e7d5ed7	7e7d5fbc	229	1	strings	6 unreferenced strings, first b'api_rec_dummy_MultiExp_Get_Count\x00api_rec_du
+7e7ceabd	7e7ceb94	215	1	strings	6 unreferenced strings, first b'api_oldb_dummy_Get_DB_File_Attribute\x00api_ol
+7e7d5d90	7e7d5e61	209	1	strings	6 unreferenced strings, first b'api_rec_dummy_Get_FocalLength_Underwater_Macro
+7e7d5838	7e7d5908	208	1	strings	6 unreferenced strings, first b'api_rec_dummy_Get_FocalLength_Tele\x00api_rec_
+7e50c46e	7e50c517	169	1	code	no reference from live code or data
+7e7ffdc7	7e7ffe6e	167	1	strings	5 unreferenced strings, first b'[mov_buff]mov_buff_base_yuv_free() start\n\x00
+7e7cb3d9	7e7cb469	144	1	strings	6 unreferenced strings, first b'api_media_Set_FA_Config\x00Set_FA_Config appmo
+7e7c1651	7e7c16de	141	1	strings	5 unreferenced strings, first b'api_comm_Receive_CommandUSB\x00api_comm_Receiv
+7e7d37b8	7e7d383e	134	1	strings	6 unreferenced strings, first b'Retry_Reserve_Media media\x00Retry_Reserve_Med
+7e7ff4e6	7e7ff568	130	1	strings	6 unreferenced strings, first b'[MOV_ART] ucType : \x00[MOV_ART] ucSoft : \x00
+7e73413c	7e7341b5	121	1	strings	5 unreferenced strings, first b'[WrapWrap]imdfunc req_qname :\x00imdfunc()\n\x
+7e7959cd	7e795a44	119	1	strings	5 unreferenced strings, first b'remain err\x00not remain err\x00cluster_append
+7e804d42	7e804da4	98	1	strings	5 unreferenced strings, first b'error multi mode:\x00error mov_multi_center:\x
+7e539fff	7e53a049	74	1	code	no reference from live code or data
+7e50ba5f	7e50baa6	71	1	code	no reference from live code or data
+7e5090b8	7e5090f5	61	1	code	no reference from live code or data
+7e50978b	7e5097bb	48	1	code	no reference from live code or data
+7ebf22c8	7ebf3bad	6373	2	strings	752 unreferenced strings, first b'M71\x00getReleaseSetting\x00M72\x00cancelRecvi
+7ebf10a2	7ebf22b6	4628	2	strings	451 unreferenced strings, first b'B**: SettingController\x00C**: BackGroundCtrl\
+7ebb1f4c	7ebb304c	4352	2	strings	135 unreferenced strings, first b'0000\x00BT_SetPin()\n\x00chk_btdev\n\x00link_c
+7ec3943f	7ec396d2	659	2	strings	20 unreferenced strings, first b'    tmp_w %d\x00    tmp_h %d\x00CapPlt_PlayTri
+7ec1067a	7ec108f0	630	2	strings	13 unreferenced strings, first b'@@@@@@@@@@@@OlyHfwOpeEdtBty::moveCurrent#\x00@
+7ebb33a7	7ebb3598	497	2	strings	31 unreferenced strings, first b'<State> \x00 | \x00BDS_TRUSTED\x00BDS_PAIRED, 
+7ebc13f1	7ebc15a0	431	2	strings	13 unreferenced strings, first b'aud_dev_wm8946_gpio_config\x00aud_dev_wm8946_g
+7ec10dd4	7ec10f7d	425	2	strings	10 unreferenced strings, first b'@@@@@@@@@@@@OlyHfwOpeEdtCol::moveCurrent#\x00@
+7ec11ffb	7ec121a3	424	2	strings	9 unreferenced strings, first b'@@@@@@@@@@@@OlyHfwOpeEdtRey::moveCurrent#\x00@
+7ec1280e	7ec129b6	424	2	strings	9 unreferenced strings, first b'@@@@@@@@@@@@OlyHfwOpeEdtSdw::moveCurrent#\x00@
+7ec12d62	7ec12f0a	424	2	strings	9 unreferenced strings, first b'@@@@@@@@@@@@OlyHfwOpeEdtTrm::moveCurrent#\x00@
+7ec17e5d	7ec17fff	418	2	strings	12 unreferenced strings, first b'OlyHfwOpePlySsh::getCollectionCount#\x00OlyHfw
+7ec281fd	7ec28397	410	2	strings	5 unreferenced strings, first b'    makeImage\x00Draw_Image(panorama_plyh[%d],
+7ebd887e	7ebd89b4	310	2	strings	12 unreferenced strings, first b'EditCalendar::start\x00EditCalendar::singleMod
+7ebb323f	7ebb336a	299	2	strings	13 unreferenced strings, first b' Time  = %02d:%02d:%02d\x00 Speed = %d.%d Kbps
+7ec109df	7ec10b0a	299	2	strings	6 unreferenced strings, first b'@@@@@@@@@@@@OlyHfwOpeEdtBty::startExpandAnimat
+7ec4baec	7ec4bbec	256	2	strings	13 unreferenced strings, first b'TerminateEnd\x00Cmp TarminateEnd\x00stopTransi
+7ebecb5b	7ebecc4d	242	2	strings	5 unreferenced strings, first b'OlyHfwOpeShoot::isShootEnable TAKE_FUNC_SAMPLE
+7ebf557f	7ebf5629	170	2	strings	20 unreferenced strings, first b'dbglvl\x00debug\x00dump\x00dbgall\x00dbgstate\
+7ebc3402	7ebc349a	152	2	strings	7 unreferenced strings, first b'WatchDog\x00aud_seq_rec_force_end-post_end\n\x
+7ebbbb1b	7ebbbb97	124	2	strings	5 unreferenced strings, first b'play_load_set_buff_id in \x00    BuffID \x00pl
+7ee541b3	7ee548b1	1790	3	code	no reference from live code or data
+7ee40b17	7ee411f6	1759	3	code	no reference from live code or data
+7ee5382e	7ee53d6a	1340	3	code	no reference from live code or data
+7ee3cbf2	7ee3cfe2	1008	3	code	no reference from live code or data
+7ee46d27	7ee4709d	886	3	code	no reference from live code or data
+7ee40728	7ee40877	335	3	code	no reference from live code or data
+7f02b645	7f02b73e	249	3	strings	6 unreferenced strings, first b'1.0.6 or earlier\x00The png struct allocated b
+7eeeba0b	7eeebaa0	149	3	strings	8 unreferenced strings, first b'***** HISTOGRAM *****\x00***** HIGH_SHADO ****
+7ee46c39	7ee46cb0	119	3	code	no reference from live code or data
+7ee3d3ca	7ee3d413	73	3	code	no reference from live code or data

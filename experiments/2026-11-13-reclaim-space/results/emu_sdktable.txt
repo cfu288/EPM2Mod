@@ -1,0 +1,2 @@
+inputs: 30 table names + 9 others + help; dispatch mismatches: 0
+reads logged in the table 0x7EBF0FA0+240: 758; reads in the candidate 0x7EBF1090-0x7EBF3BAD: 0; dropped 0, more 0
