@@ -2,7 +2,7 @@
 
 Repository containing the current work for creating a custom firmaware mod for the Olympus PEN **E-PM2**. The goal is to unlock or add new features to this camera. Currently, we've implemented replacing the default art filters with film simulations like Portra, Ektachrome, etc. See below for an example:
 
-![Six photos, each developed in the camera with stock Natural and the seven film looks](docs/images/film-sim-comparison.jpg)
+![Eight photos, each developed in the camera with stock Natural and the seven film looks](docs/images/film-sim-comparison.jpg)
 
 Each row shows one RAW file. The camera developed the file with each look. The first column shows the standard Natural mode.
 Full-resolution sheet: [docs/film-sim-comparison.pdf](docs/film-sim-comparison.pdf).
