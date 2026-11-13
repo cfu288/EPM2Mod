@@ -116,6 +116,13 @@ The current film build is described under *Latest known-good build* above. Every
 | `seven-structure-extra`, `seven-films-1`, `seven-labels` | **camera-tested** (`seven-films-1`, 2026-11-12; `seven-films-2`, corrected fits for the four new films, camera-tested the same day; open: rare restart when RAW Data Edit saves, see camera log): seven films in menu order: Portra 400, Ektachrome 100, Pro 400H, Kodachrome 64, Vision3 250D, Velvia 100, Superia X-tra 400 (NOTES §39) |
 | `curve-probe-1`, `film-portra` | superseded drafts, not camera-tested (NOTES §12.5, §13) |
 
+## Licence
+
+Code, documentation and notes: [MIT](LICENSE). Some material keeps other terms: the film look data is
+derived from [spektrafilm](https://github.com/andreavolpato/spektrafilm) by Andrea Volpato (CC BY-SA 4.0),
+and excerpts of the Olympus firmware remain Olympus's. No firmware and no third-party tool is included.
+Details and credits: [NOTICE.md](NOTICE.md).
+
 ## Background
 
 Landscape research: `../reports/Olympus firmware modding landscape.md` and `../research_notes/Olympus firmware modding landscape/`.

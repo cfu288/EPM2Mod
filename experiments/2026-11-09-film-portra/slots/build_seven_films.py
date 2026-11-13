@@ -45,6 +45,7 @@ FITS = {   # tag -> fit file per slot (out/fit_<name>.npz)
 if tag not in FITS: sys.exit(f"unknown tag {tag!r}; add it to FITS")
 FILMS = {slot: (f"out/fit_{FITS[tag][slot]}.npz", LABELS[slot]) for slot in SLOTS}
 base = dict(base="firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN", base_sha256="34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300", status="built, NOT camera-tested")
+ATTRIB = "Film look data derived from spektrafilm by Andrea Volpato, https://github.com/andreavolpato/spektrafilm. Licensed CC BY-SA 4.0. Modified: fitted to the Olympus E-PM2's adjustable stages. See NOTICE.md."
 ident_look = b0[0x7E75B8F0 - B:0x7E75B8F0 - B + 512]
 extra = [op(a, ident_look) for a in (0x7E75F2F0, 0x7E75EAF0, 0x7E75E6F0)]                          # look tables of Cross Process I (shared by the generic slots), Light Tone, Pop Art I := the stock "identity" table
 extra += [op(0x7E78C154 + 8 * i + 4, struct.pack("<I", 0x7E56B82A)) for i in (2, 11)]             # Light Tone 72 / 81 -> the three-record handler of Cross Process II
@@ -63,7 +64,7 @@ for slot, (fit, label) in FILMS.items():
         lin = chroma.quantise(chroma.LINEAR_Y); cb, cr = ((tuple(z["Cb"][:2].astype(int)) + (z["Cb_slope17"].astype(int),)), (tuple(z["Cr"][:2].astype(int)) + (z["Cr_slope17"].astype(int),))) if "Cb" in z.files else (lin, lin)
         ops.append(op(CHROMA[slot], chroma.record(cb, cr)))
     summary[slot] = dict(fit=fit, label=label, gain=gain, S=z["S"].astype(int).tolist(), H=z["H"].astype(int).tolist(), A=z["A"].astype(int).tolist())
-json.dump(dict(name=f"seven-films-{tag}", description="Seven films, one per film slot, in menu order: " + "; ".join(f"{k} = {os.path.basename(v[0])[9:-4]}" for k, v in FILMS.items()) + ". NOTES §39.",
+json.dump(dict(name=f"seven-films-{tag}", attribution=ATTRIB, description="Seven films, one per film slot, in menu order: " + "; ".join(f"{k} = {os.path.basename(v[0])[9:-4]}" for k, v in FILMS.items()) + ". NOTES §39.",
                ops=[o for o in ops if o["expect"] != o["new"]], **base), open(os.path.join(ROOT, f"patches/seven-films-{tag}.json"), "w"), indent=1)
 json.dump(summary, open(os.path.join(HERE, f"seven_films_{tag}.json"), "w"), indent=1)
 # labels: only the entry's own string (preceded by NUL or by an '@Axxx@' tag, followed by NUL), not longer strings that contain it
