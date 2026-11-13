@@ -7,7 +7,7 @@ For each case and row: every image's outputs, its model check, and which images 
 Uses tools/emu (om-emu). Rows are compared on public outputs only (keys without a leading '_').
 """
 import json, sys, os
-sys.path.insert(0, '/path/to/epm2-tools/tools/emu')
+sys.path.insert(0, '/path/to/EPM2Mod/tools/emu')
 import emurun
 from cases import CASES
 out = sys.argv[1]

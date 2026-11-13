@@ -11,7 +11,7 @@ This procedure is **confirmed on the E-PM2** (see [camera-log.md](camera-log.md)
 3. Copy it to the card as **`DCOLYMP/E1019999.BIN`**. It must be the only file in `DCOLYMP`. Check the sha256 on the card against the build output.
    From the Mac:
    ```bash
-   scp USER@HOST:/path/to/epm2-tools/build/NAME.BIN \
+   scp USER@HOST:/path/to/EPM2Mod/build/NAME.BIN \
      /Volumes/SDCARD/DCOLYMP/E1019999.BIN
    shasum -a 256 /Volumes/SDCARD/DCOLYMP/E1019999.BIN
    cd ~ && diskutil eject /Volumes/SDCARD

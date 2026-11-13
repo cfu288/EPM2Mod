@@ -4,9 +4,9 @@
 import json, struct
 B=0x7E421020; K=0x1E6304C0                       # .data ROM image = RAM + K
 SC='/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/ivl/'
-D=bytearray(open('/path/to/epm2-tools/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin','rb').read())
+D=bytearray(open('/path/to/EPM2Mod/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin','rb').read())
 P=open(SC+'blocks/OLY_E_112_1400_0000_0000.BIN.block0.bin','rb').read()
-OUT='/path/to/epm2-tools/experiments/2026-11-13-intervalometer/patches/interval-timelapse-insert.json'
+OUT='/path/to/EPM2Mod/experiments/2026-11-13-intervalometer/patches/interval-timelapse-insert.json'
 rd=lambda X,a,n: bytes(X[a-B:a-B+n])
 u32=lambda X,a: struct.unpack_from('<I',X,a-B)[0]
 edits=[]                                           # (addr, old, new, why)

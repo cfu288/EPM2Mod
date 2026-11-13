@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0,'/path/to/epm2-tools/tools')
+sys.path.insert(0,'/path/to/EPM2Mod/tools')
 import disasm
 for fw in sys.argv[2:]:
     for b in (0,1):

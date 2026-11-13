@@ -1,7 +1,7 @@
 import sys, struct
 sys.path.insert(0, "/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/qp/live")
 from omemu import Emu, DATA, SP0
-STOCK_BLOCK0 = "/path/to/epm2-tools/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin"
+STOCK_BLOCK0 = "/path/to/EPM2Mod/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin"
 CTX, OBJ, VT, FAKE = DATA + 0x10000, DATA + 0x11000, DATA + 0x11100, DATA + 0x11200
 def setup(emu, ctxfields):
     ctx = bytearray(0x1000)

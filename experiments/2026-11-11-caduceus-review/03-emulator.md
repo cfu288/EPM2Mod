@@ -204,7 +204,7 @@ mkdir -p "$S/run" && cp -a "$S/ext/om-emu" "$S/run/om-emu"     # work copy; ext/
 #   image_base 0x7E421020, rom_len 0xD7FFC0, rom_sha256 of our block 0, a board family "E101" with the §2.3 values
 cd "$S/run/om-emu"
 OM_EMU_MODEL=E101 node emu/bin/debug.mjs \
-  --image /path/to/epm2-tools/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin \
+  --image /path/to/EPM2Mod/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin \
   --entry 0x7E5018BC --reg d0=0x40400000 --reg d1=0x3F800000 --reg mdr=0x7E421020 \
   --stop 0x7E421020 --insn-limit 1000                    # fsub stub, retf to MDR; expect d0 = 0x40000000
 ```
@@ -237,7 +237,7 @@ OM_EMU_MODEL=E101 node emu/bin/debug.mjs \
   - `emu/refs/mt19937.mjs` carries the MT19937 BSD-style notice and PSF licence text [X: emu/refs/mt19937.mjs:11-42].
 - **What this means** [I, not legal advice]:
   - Treat om-emu as all rights reserved. We may read it and cite facts (addresses, register offsets) with attribution.
-  - Do not copy or adapt its code into epm2-tools.
+  - Do not copy or adapt its code into EPM2Mod.
   - Running a modified private copy is a grey area for the user to decide.
   - caduceus-om3 handles it the same way: om-emu is "not included and keeps its own licence"
     [X: caduceus-om3/NOTICE:21].

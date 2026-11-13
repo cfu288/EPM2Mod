@@ -10,7 +10,7 @@ def load(p):
         if len(f)<4 or f[0]=='fn': continue
         m[f[3]].add(int(f[0],16))
     return m
-SA=load('/path/to/epm2-tools/build/map/strrefs.tsv'); SB=load(S+'map-112_1400/strrefs.tsv')
+SA=load('/path/to/EPM2Mod/build/map/strrefs.tsv'); SB=load(S+'map-112_1400/strrefs.tsv')
 rx=re.compile(sys.argv[1]); v='-v' in sys.argv
 done=set(); onlyA=[]; onlyB=[]
 for t in sorted(set(SA)|set(SB)):

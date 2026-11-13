@@ -1,7 +1,7 @@
 import sys, struct
 sys.path.insert(0, "/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/qp/live")
 from omemu import Emu, DATA, SP0
-IMG = "/path/to/epm2-tools/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin"
+IMG = "/path/to/EPM2Mod/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin"
 DRV, OUT = DATA + 0x20000, DATA + 0x21000
 def st_stub(size, ovf, rq):
     def f(emu, r):

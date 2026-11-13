@@ -19,7 +19,7 @@ The next coverage round draws NEW random functions and checks your section again
   - args in d0, d1, then the stack; a0/a1 are pointers; the result is in d0/a0;
   - `call target,[regs],N` (the callee frame is set up by the caller's `call`); functions reached through pointers start with `movm`.
 
-**Tools** (run from /path/to/epm2-tools). USE THE IMPROVED DATABASE: add `--out $S/map-test` to every fwmap command (S=/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad). It has 74,554 functions, including callbacks, IRQ and state handlers that the old build/map merges.
+**Tools** (run from /path/to/EPM2Mod). USE THE IMPROVED DATABASE: add `--out $S/map-test` to every fwmap command (S=/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad). It has 74,554 functions, including callbacks, IRQ and state handlers that the old build/map merges.
 - `python3 tools/fwmap.py --out $S/map-test fn ADDR [--dis] | str REGEX | range LO HI [-n K] | xref ADDR`
 - `python3 tools/disasm.py ADDR --len N [--before N]`
 - $S/map-test/functions.txt (grep only), calls.tsv, strrefs.tsv, ptrs.tsv

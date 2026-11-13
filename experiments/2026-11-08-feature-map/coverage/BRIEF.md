@@ -5,7 +5,7 @@ You are testing how well a firmware map explains the real code. Assume the map i
 **Target:** Olympus PEN E-PM2 v1.6, block 0 (MN103/AM33, uITRON), runtime address = 0x7E421020 + offset.
 
 **The map** (read what you need):
-- /path/to/epm2-tools/docs/firmware-map.md — the regions table and the feature inventory;
+- /path/to/EPM2Mod/docs/firmware-map.md — the regions table and the feature inventory;
 - experiments/2026-11-08-feature-map/modules.tsv — source files in link order with code ranges;
 - experiments/2026-11-08-feature-map/tasks.tsv;
 - experiments/2026-11-08-feature-map/sections/*.md — detail by subsystem. Since round C1 the map also has:
@@ -41,7 +41,7 @@ You are testing how well a firmware map explains the real code. Assume the map i
 
   Use the byte/instruction signatures in 13c, 13d, 14a, 14c and 14e to classify framework, GUI and C3D glue. build/map/functions.tsv column 9 (`suspect`) flags probable data decoded as code.
 
-**Tools** (run from /path/to/epm2-tools):
+**Tools** (run from /path/to/EPM2Mod):
 - `python3 tools/fwmap.py fn ADDR [--dis] | str REGEX | range LO HI | xref ADDR`
 - `python3 tools/disasm.py ADDR --len N [--before N]`
 - build/map/ (functions.txt is 168 MB: grep only)

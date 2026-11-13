@@ -57,7 +57,7 @@ Calling om-emu's debugger directly, for example memcpy through a hand-written `c
 
 ```sh
 cd ~/opt/om-emu && OM_EMU_MODEL=E101 ~/opt/node26/bin/node emu/bin/debug.mjs \
-  --image /path/to/epm2-tools/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin \
+  --image /path/to/EPM2Mod/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin \
   --entry 0x7D000000 --write 0x7D000000=ddfa815001a008 \
   --write 0x7D200000=000102030405060708090a0b0c0d0e0f \
   --reg a0=0x7D300000 --reg a1=0x7D200000 --reg d0=16 --reg sp=0x7D100000 \

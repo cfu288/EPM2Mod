@@ -1,7 +1,7 @@
 # Build normalised per-function text for both bodies and anchor-match them.
 import re, pickle, sys, collections, hashlib
 S='/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/'
-SRC={'pm2':'/path/to/epm2-tools/build/map/functions.txt','pl6':S+'map-112_1400/functions.txt'}
+SRC={'pm2':'/path/to/EPM2Mod/build/map/functions.txt','pl6':S+'map-112_1400/functions.txt'}
 def normline(s):
     s=re.sub(r'<[^>]*>','',s)
     s=re.sub(r'\b(0x)?7[ef][0-9a-f]{6}\b','A',s)

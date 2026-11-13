@@ -1,4 +1,4 @@
-# epm2-tools
+# EPM2Mod
 
 Custom firmware tooling for the Olympus PEN **E-PM2** (model 1010, TruePic VI, body firmware 1.6), and
 a firmware mod built with it: **seven film looks as in-camera art filters**.

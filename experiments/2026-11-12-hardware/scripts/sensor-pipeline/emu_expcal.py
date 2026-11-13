@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, '/path/to/epm2-tools/tools/emu')
+sys.path.insert(0, '/path/to/EPM2Mod/tools/emu')
 import omemu
 e = omemu.Emu()
 e.load(omemu.STOCK_BLOCK0)

@@ -5,9 +5,9 @@ sys.path.insert(0,'/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/
 from dis import dis, norm
 S='/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/'
 def size(addr, pl6=False):
-    cmd=['python3','/path/to/epm2-tools/tools/fwmap.py']
+    cmd=['python3','/path/to/EPM2Mod/tools/fwmap.py']
     if pl6: cmd+=['--fw',S+'dl-bodies/112_1400/OLY_E_112_1400_0000_0000.BIN','--base','0x7E421020','--out',S+'map-112_1400']
-    out=subprocess.run(cmd+['fn',hex(addr)],capture_output=True,text=True,cwd='/path/to/epm2-tools').stdout
+    out=subprocess.run(cmd+['fn',hex(addr)],capture_output=True,text=True,cwd='/path/to/EPM2Mod').stdout
     f=out.split('\n')[0].split(); return int(f[f.index('data_page:')+1],16), int(f[f.index('data_page:')+3])
 PAIRS=[l.split(':')[0].split(' -> ') for l in open(sys.argv[1]) if ' -> ' in l]
 seen=set()

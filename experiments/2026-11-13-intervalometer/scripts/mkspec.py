@@ -1,8 +1,8 @@
 # mkspec.py: build the ops of interval-timelapse.json from the stock block 0 (4 context bytes each side)
 import json, struct, sys
 B=0x7E421020
-D=open('/path/to/epm2-tools/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin','rb').read()
-SPEC='/path/to/epm2-tools/experiments/2026-11-13-intervalometer/patches/interval-timelapse.json'
+D=open('/path/to/EPM2Mod/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin','rb').read()
+SPEC='/path/to/EPM2Mod/experiments/2026-11-13-intervalometer/patches/interval-timelapse.json'
 EDITS=[  # (runtime addr, stock bytes, new bytes)
  (0x7EFFE1A0, struct.pack('<5H',0,526,403,0x002,180), struct.pack('<5H',0,1357,1358,0x102,1)),
  (0x7EFF8C68, struct.pack('<3I',18,180,0),            struct.pack('<3I',628,482,0)),
