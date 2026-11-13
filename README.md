@@ -49,7 +49,8 @@ The frame count goes from 1 to 99 in steps of 1, then from 100 to 240 in steps o
 E-PL6 stops at 99. The steps are there because the menu's value list holds 128 entries at most; the
 firmware keeps the count in one byte. Each frame uses the mechanical shutter.
 
-How it works and what is not yet tested: [experiments/2026-11-13-intervalometer/README.md](experiments/2026-11-13-intervalometer/README.md).
+What was in the firmware, how the patch works, how it was checked and what is not yet tested:
+[experiments/2026-11-13-intervalometer/README.md](experiments/2026-11-13-intervalometer/README.md).
 
 ## Build and flash the latest build
 
