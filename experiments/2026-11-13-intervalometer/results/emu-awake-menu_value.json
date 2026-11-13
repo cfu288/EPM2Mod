@@ -1,0 +1,1893 @@
+{
+ "case": "menu_value",
+ "stock": "/path/to/EPM2Mod/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin",
+ "patched": "/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/ivl/emurun-o2u1qqmn.block0.bin",
+ "rows": [
+  {
+   "row": {
+    "grow": 1,
+    "value": 0
+   },
+   "stock": {
+    "label": 85,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 85,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 1,
+    "value": 1
+   },
+   "stock": {
+    "label": 85,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 85,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 2,
+    "value": 0
+   },
+   "stock": {
+    "label": 225,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 225,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 2,
+    "value": 1
+   },
+   "stock": {
+    "label": 225,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 225,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 3,
+    "value": 0
+   },
+   "stock": {
+    "label": 203,
+    "setting": [
+     111
+    ],
+    "string": 1505
+   },
+   "patched": {
+    "label": 203,
+    "setting": [
+     111
+    ],
+    "string": 1505
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 3,
+    "value": 1
+   },
+   "stock": {
+    "label": 203,
+    "setting": [
+     111
+    ],
+    "string": 1506
+   },
+   "patched": {
+    "label": 203,
+    "setting": [
+     111
+    ],
+    "string": 1506
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 4,
+    "value": 0
+   },
+   "stock": {
+    "label": 213,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 213,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 4,
+    "value": 1
+   },
+   "stock": {
+    "label": 213,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 213,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 5,
+    "value": 0
+   },
+   "stock": {
+    "label": 70,
+    "setting": [
+     271
+    ],
+    "string": 0
+   },
+   "patched": {
+    "label": 70,
+    "setting": [
+     271
+    ],
+    "string": 0
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 5,
+    "value": 1
+   },
+   "stock": {
+    "label": 70,
+    "setting": [
+     271
+    ],
+    "string": 292
+   },
+   "patched": {
+    "label": 70,
+    "setting": [
+     271
+    ],
+    "string": 292
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 6,
+    "value": 0
+   },
+   "stock": {
+    "label": 363,
+    "setting": [
+     34
+    ],
+    "string": 1371
+   },
+   "patched": {
+    "label": 363,
+    "setting": [
+     34
+    ],
+    "string": 1371
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 6,
+    "value": 1
+   },
+   "stock": {
+    "label": 363,
+    "setting": [
+     34
+    ],
+    "string": 198
+   },
+   "patched": {
+    "label": 363,
+    "setting": [
+     34
+    ],
+    "string": 198
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 7,
+    "value": 0
+   },
+   "stock": {
+    "label": 1648,
+    "setting": [
+     2074
+    ],
+    "string": 633
+   },
+   "patched": {
+    "label": 1648,
+    "setting": [
+     2074
+    ],
+    "string": 633
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 7,
+    "value": 1
+   },
+   "stock": {
+    "label": 1648,
+    "setting": [
+     2074
+    ],
+    "string": 635
+   },
+   "patched": {
+    "label": 1648,
+    "setting": [
+     2074
+    ],
+    "string": 635
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 8,
+    "value": 0
+   },
+   "stock": {
+    "skipped": "IS row: NULL value list, the formatter reads address 0"
+   },
+   "patched": {
+    "skipped": "IS row: NULL value list, the formatter reads address 0"
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 8,
+    "value": 1
+   },
+   "stock": {
+    "skipped": "IS row: NULL value list, the formatter reads address 0"
+   },
+   "patched": {
+    "skipped": "IS row: NULL value list, the formatter reads address 0"
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 9,
+    "value": 0
+   },
+   "stock": {
+    "label": 76,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 76,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 9,
+    "value": 1
+   },
+   "stock": {
+    "label": 76,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 76,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 10,
+    "value": 0
+   },
+   "stock": {
+    "label": 182,
+    "setting": [
+     268
+    ],
+    "string": 1371
+   },
+   "patched": {
+    "label": 182,
+    "setting": [
+     268
+    ],
+    "string": 1371
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 10,
+    "value": 1
+   },
+   "stock": {
+    "label": 182,
+    "setting": [
+     268
+    ],
+    "string": 0
+   },
+   "patched": {
+    "label": 182,
+    "setting": [
+     268
+    ],
+    "string": 0
+   },
+   "diff": {},
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 11,
+    "value": 0
+   },
+   "stock": {
+    "label": 526,
+    "setting": [
+     180
+    ],
+    "string": 1371
+   },
+   "patched": {
+    "label": 1357,
+    "setting": [
+     482
+    ],
+    "string": 1371
+   },
+   "diff": {
+    "label": [
+     526,
+     1357
+    ],
+    "setting": [
+     [
+      180
+     ],
+     [
+      482
+     ]
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 11,
+    "value": 1
+   },
+   "stock": {
+    "label": 526,
+    "setting": [
+     180
+    ],
+    "string": 198
+   },
+   "patched": {
+    "label": 1357,
+    "setting": [
+     482
+    ],
+    "string": 198
+   },
+   "diff": {
+    "label": [
+     526,
+     1357
+    ],
+    "setting": [
+     [
+      180
+     ],
+     [
+      482
+     ]
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 12,
+    "value": 0
+   },
+   "stock": {
+    "label": 262,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 526,
+    "setting": [
+     180
+    ],
+    "string": 1371
+   },
+   "diff": {
+    "label": [
+     262,
+     526
+    ],
+    "setting": [
+     [],
+     [
+      180
+     ]
+    ],
+    "string": [
+     0,
+     1371
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 12,
+    "value": 1
+   },
+   "stock": {
+    "label": 262,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 526,
+    "setting": [
+     180
+    ],
+    "string": 198
+   },
+   "diff": {
+    "label": [
+     262,
+     526
+    ],
+    "setting": [
+     [],
+     [
+      180
+     ]
+    ],
+    "string": [
+     0,
+     198
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 13,
+    "value": 0
+   },
+   "stock": {
+    "label": 226,
+    "setting": [
+     89
+    ],
+    "string": 1371
+   },
+   "patched": {
+    "label": 262,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     226,
+     262
+    ],
+    "setting": [
+     [
+      89
+     ],
+     []
+    ],
+    "string": [
+     1371,
+     0
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 13,
+    "value": 1
+   },
+   "stock": {
+    "label": 226,
+    "setting": [
+     89
+    ],
+    "string": 198
+   },
+   "patched": {
+    "label": 262,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     226,
+     262
+    ],
+    "setting": [
+     [
+      89
+     ],
+     []
+    ],
+    "string": [
+     198,
+     0
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 14,
+    "value": 0
+   },
+   "stock": {
+    "label": 115,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 226,
+    "setting": [
+     89
+    ],
+    "string": 1371
+   },
+   "diff": {
+    "label": [
+     115,
+     226
+    ],
+    "setting": [
+     [],
+     [
+      89
+     ]
+    ],
+    "string": [
+     0,
+     1371
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 14,
+    "value": 1
+   },
+   "stock": {
+    "label": 115,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 226,
+    "setting": [
+     89
+    ],
+    "string": 198
+   },
+   "diff": {
+    "label": [
+     115,
+     226
+    ],
+    "setting": [
+     [],
+     [
+      89
+     ]
+    ],
+    "string": [
+     0,
+     198
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 15,
+    "value": 0
+   },
+   "stock": {
+    "label": 1966,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 115,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     1966,
+     115
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 15,
+    "value": 1
+   },
+   "stock": {
+    "label": 1966,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 115,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     1966,
+     115
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 16,
+    "value": 0
+   },
+   "stock": {
+    "label": 212,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 1966,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     212,
+     1966
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 16,
+    "value": 1
+   },
+   "stock": {
+    "label": 212,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 1966,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     212,
+     1966
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 17,
+    "value": 0
+   },
+   "stock": {
+    "label": 1719,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 212,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     1719,
+     212
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 17,
+    "value": 1
+   },
+   "stock": {
+    "label": 1719,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 212,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     1719,
+     212
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 18,
+    "value": 0
+   },
+   "stock": {
+    "label": 48,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 1719,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     48,
+     1719
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 18,
+    "value": 1
+   },
+   "stock": {
+    "label": 48,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 1719,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     48,
+     1719
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 19,
+    "value": 0
+   },
+   "stock": {
+    "label": 79,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 48,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     79,
+     48
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 19,
+    "value": 1
+   },
+   "stock": {
+    "label": 79,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 48,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     79,
+     48
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 20,
+    "value": 0
+   },
+   "stock": {
+    "label": 1305,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 79,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     1305,
+     79
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 20,
+    "value": 1
+   },
+   "stock": {
+    "label": 1305,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 79,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     1305,
+     79
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 21,
+    "value": 0
+   },
+   "stock": {
+    "label": 108,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 1305,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     108,
+     1305
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 21,
+    "value": 1
+   },
+   "stock": {
+    "label": 108,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 1305,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     108,
+     1305
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 22,
+    "value": 0
+   },
+   "stock": {
+    "label": 127,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 108,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     127,
+     108
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 22,
+    "value": 1
+   },
+   "stock": {
+    "label": 127,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 108,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     127,
+     108
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 23,
+    "value": 0
+   },
+   "stock": {
+    "label": 135,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 127,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     135,
+     127
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 23,
+    "value": 1
+   },
+   "stock": {
+    "label": 135,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 127,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     135,
+     127
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 24,
+    "value": 0
+   },
+   "stock": {
+    "label": 146,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 135,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     146,
+     135
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 24,
+    "value": 1
+   },
+   "stock": {
+    "label": 146,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 135,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     146,
+     135
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 25,
+    "value": 0
+   },
+   "stock": {
+    "label": 217,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 146,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     217,
+     146
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 25,
+    "value": 1
+   },
+   "stock": {
+    "label": 217,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 146,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     217,
+     146
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 26,
+    "value": 0
+   },
+   "stock": {
+    "label": 179,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 217,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     179,
+     217
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 26,
+    "value": 1
+   },
+   "stock": {
+    "label": 179,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 217,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     179,
+     217
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 27,
+    "value": 0
+   },
+   "stock": {
+    "label": 81,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 179,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     81,
+     179
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 27,
+    "value": 1
+   },
+   "stock": {
+    "label": 81,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 179,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     81,
+     179
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 28,
+    "value": 0
+   },
+   "stock": {
+    "label": 268,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 81,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     268,
+     81
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 28,
+    "value": 1
+   },
+   "stock": {
+    "label": 268,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 81,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     268,
+     81
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 29,
+    "value": 0
+   },
+   "stock": {
+    "label": 270,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 268,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     270,
+     268
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 29,
+    "value": 1
+   },
+   "stock": {
+    "label": 270,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 268,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     270,
+     268
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 30,
+    "value": 0
+   },
+   "stock": {
+    "label": 269,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 270,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     269,
+     270
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 30,
+    "value": 1
+   },
+   "stock": {
+    "label": 269,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 270,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     269,
+     270
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 31,
+    "value": 0
+   },
+   "stock": {
+    "skipped": "date row"
+   },
+   "patched": {
+    "label": 269,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     null,
+     269
+    ],
+    "setting": [
+     null,
+     []
+    ],
+    "skipped": [
+     "date row",
+     null
+    ],
+    "string": [
+     null,
+     0
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 31,
+    "value": 1
+   },
+   "stock": {
+    "skipped": "date row"
+   },
+   "patched": {
+    "label": 269,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     null,
+     269
+    ],
+    "setting": [
+     null,
+     []
+    ],
+    "skipped": [
+     "date row",
+     null
+    ],
+    "string": [
+     null,
+     0
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 32,
+    "value": 0
+   },
+   "stock": {
+    "label": 1688,
+    "setting": [
+     1009
+    ],
+    "string": 23
+   },
+   "patched": {
+    "skipped": "date row"
+   },
+   "diff": {
+    "label": [
+     1688,
+     null
+    ],
+    "setting": [
+     [
+      1009
+     ],
+     null
+    ],
+    "skipped": [
+     null,
+     "date row"
+    ],
+    "string": [
+     23,
+     null
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 32,
+    "value": 1
+   },
+   "stock": {
+    "label": 1688,
+    "setting": [
+     1009
+    ],
+    "string": 14
+   },
+   "patched": {
+    "skipped": "date row"
+   },
+   "diff": {
+    "label": [
+     1688,
+     null
+    ],
+    "setting": [
+     [
+      1009
+     ],
+     null
+    ],
+    "skipped": [
+     null,
+     "date row"
+    ],
+    "string": [
+     14,
+     null
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 33,
+    "value": 0
+   },
+   "stock": {
+    "label": 175,
+    "setting": [
+     31,
+     265
+    ],
+    "string": 0
+   },
+   "patched": {
+    "label": 1688,
+    "setting": [
+     1009
+    ],
+    "string": 23
+   },
+   "diff": {
+    "label": [
+     175,
+     1688
+    ],
+    "setting": [
+     [
+      31,
+      265
+     ],
+     [
+      1009
+     ]
+    ],
+    "string": [
+     0,
+     23
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 33,
+    "value": 1
+   },
+   "stock": {
+    "label": 175,
+    "setting": [
+     31,
+     265
+    ],
+    "string": 0
+   },
+   "patched": {
+    "label": 1688,
+    "setting": [
+     1009
+    ],
+    "string": 14
+   },
+   "diff": {
+    "label": [
+     175,
+     1688
+    ],
+    "setting": [
+     [
+      31,
+      265
+     ],
+     [
+      1009
+     ]
+    ],
+    "string": [
+     0,
+     14
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 34,
+    "value": 0
+   },
+   "stock": {
+    "label": 218,
+    "setting": [
+     19
+    ],
+    "string": 1371
+   },
+   "patched": {
+    "label": 175,
+    "setting": [
+     31,
+     265
+    ],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     218,
+     175
+    ],
+    "setting": [
+     [
+      19
+     ],
+     [
+      31,
+      265
+     ]
+    ],
+    "string": [
+     1371,
+     0
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 34,
+    "value": 1
+   },
+   "stock": {
+    "label": 218,
+    "setting": [
+     19
+    ],
+    "string": 0
+   },
+   "patched": {
+    "label": 175,
+    "setting": [
+     31,
+     265
+    ],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     218,
+     175
+    ],
+    "setting": [
+     [
+      19
+     ],
+     [
+      31,
+      265
+     ]
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 35,
+    "value": 0
+   },
+   "stock": {
+    "label": 168,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 218,
+    "setting": [
+     19
+    ],
+    "string": 1371
+   },
+   "diff": {
+    "label": [
+     168,
+     218
+    ],
+    "setting": [
+     [],
+     [
+      19
+     ]
+    ],
+    "string": [
+     0,
+     1371
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 35,
+    "value": 1
+   },
+   "stock": {
+    "label": 168,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 218,
+    "setting": [
+     19
+    ],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     168,
+     218
+    ],
+    "setting": [
+     [],
+     [
+      19
+     ]
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 36,
+    "value": 0
+   },
+   "stock": {
+    "label": 134,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 168,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     134,
+     168
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 36,
+    "value": 1
+   },
+   "stock": {
+    "label": 134,
+    "setting": [],
+    "string": 0
+   },
+   "patched": {
+    "label": 168,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "label": [
+     134,
+     168
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 37,
+    "value": 0
+   },
+   "stock": {
+    "absent": true
+   },
+   "patched": {
+    "label": 134,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "absent": [
+     true,
+     null
+    ],
+    "label": [
+     null,
+     134
+    ],
+    "setting": [
+     null,
+     []
+    ],
+    "string": [
+     null,
+     0
+    ]
+   },
+   "flags": []
+  },
+  {
+   "row": {
+    "grow": 37,
+    "value": 1
+   },
+   "stock": {
+    "absent": true
+   },
+   "patched": {
+    "label": 134,
+    "setting": [],
+    "string": 0
+   },
+   "diff": {
+    "absent": [
+     true,
+     null
+    ],
+    "label": [
+     null,
+     134
+    ],
+    "setting": [
+     null,
+     []
+    ],
+    "string": [
+     null,
+     0
+    ]
+   },
+   "flags": []
+  }
+ ]
+}

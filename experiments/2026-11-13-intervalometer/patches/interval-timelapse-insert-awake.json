@@ -1,0 +1,384 @@
+{
+ "name": "interval-timelapse-insert-awake",
+ "description": "Enable interval shooting + time-lapse movie (info 482-486) on the E-PM2 v1.6 by reproducing the E-PL6 1.4 menu wiring exactly: Time Lapse Settings is inserted as global row 11 (Shooting Menu 2, 5th row) and Flash RC Mode moves to row 12 and stays. Alternative to interval-timelapse.json (which replaces Flash RC Mode); see experiments/2026-11-13-intervalometer/README.md section 10. Free space: 0xFF padding 0x7F033C00-0x7F033FFF inside the Usr1 copy 0x80B6A800 -> 0x7ECCB800-0x7F034000 (0x7E504D50: size 0x368800), after the segment-3 constructor table (walked by count, 180 bytes) and one FF word; no code immediate or data word points into 0x7F033B7C-0x7F034000. (a) A 37-row top table (= E-PL6 0x7EFFF864 byte for byte) at 0x7F033C00; the 6 imm32 loads of 0x7EFFE13C (0x7EDEC0A5, 0x7EDEC0FA, 0x7EDEC121, 0x7EDEC7A6, 0x7EDECF42, 0x7EDED085) point to it; the old table stays, unreferenced. (b) .data tab layout (ROM 0x7E8EE8A2, RAM 0x602BE3E2): tab 1 = rows 7-12, later tabs +1, tab-1 count 5 -> 6 (= E-PL6). (c) Page 3's 12-byte child list {13,14,15,16,(628,482),18} (= E-PL6) at 0x7F033D80; the page-3 record pointer 0x7EFFA4B0 points to it. (d) .data per-row value-list pointers (RAM 0x602BE874): Off/On at row 11, rows 11-38 shifted to 12-39. Value switch 0x7EDEC2C0: row constants 13, 31, 32, 33, 34 -> +1 (10 sites); the old row-11 case at 0x7EDEC335 becomes `jmp 0x7F033DE0`, a 51-byte cave that does row 11 -> getSetting(482) and row 12 -> getSetting(180) and returns to the switch (the E-PL6 inserted the same case in line). The 20 `mov 33,d0` row arguments of the formatter 0x7EE01DDA / reverse formatter 0x7EE01E8C in the monitor-adjust panels -> 34 (E-PL6 has 34 at all 20). (e) MODE defaults 483 Frame 0 -> 10, 485 Interval Time 0 -> 5 s. Not ported: the E-PL6 sleep/power-off timer hold (0x7E998F12 calls). NOT BUILT, NOT CAMERA-TESTED. Restore = stock v1.6. KEEP-AWAKE (this file only): the E-PL6's sleep/power-off timer hold during interval shooting is ported with two trampolines in the same padding (0x7F033E20-..., after the insert cave). (f) startIntervalShooting: `jmp 0x7F033E20` at 0x7E98855F (fresh-start branch, after the RTC read, when (32,sp) == 0); the trampoline calls 0x7E997E94 (timer hold, = E-PL6 0x7E998F12) with frame [],4, runs the 6 displaced bytes (clr d0; mov d0,(20,sp); mov sp,a0; add 20,a0) and jumps back to 0x7E988565, as E-PL6 0x7E989552 places the call. (g) The interval sleep-timer selector 0x7E997BD9 becomes `jmp 0x7F033E40`, a rewrite of E-PL6 0x7E998C41 with E-PM2 callees: mode 0, or mode 1 with 482 == 0 or 489 == 487 == 0 -> set interval sleep timer 0x7E997C67(0), then timer restore 0x7E997DC9(0); mode 1 running (489 != 0 or 487 != 0) -> hold 0x7E997E94; mode 2 unchanged (0 or 60001 ms); mode 3 -> 0x7E997C67(0), then hold; other -> the stock assert print. Returns `ret [],16` as the original.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA2E94",
+   "expect": "21de01000000000034",
+   "new": "21de01000a00000034",
+   "_why": "default 0xDE21 (483 Frame) 0 -> 10"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA2EA4",
+   "expect": "44de01000000000051de0100",
+   "new": "44de01000500000051de0100",
+   "_why": "default 0xDE44 (485 Interval, s) 0 -> 5"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x4CD87E",
+   "expect": "000000000708090a0bffffffffffffff00000000000000000c0d0e0f1011ffffffffffff000000000000000012131415161718191a1bffff00000000000000001c1d1effffffffffffffffff00000000000000001f2021222324ffffffffffff00000000000000000605060a03068d019501",
+   "new": "000000000708090a0b0cffffffffffff00000000000000000d0e0f101112ffffffffffff0000000000000000131415161718191a1b1cffff00000000000000001d1e1fffffffffffffffffff0000000000000000202122232425ffffffffffff00000000000000000606060a03068d019501",
+   "_why": ".data tab layout tabs 1-5 and counts (= E-PL6)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x4CDD10",
+   "expect": "010000000000000000000000000000005c17017f00000000fc17017fe418017f2c18017f0000000000000000bc18017fe418017f00000000e418017f000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000fc18017fe41a017f641b017f00000000000000000000000000000000000000003591e07e",
+   "new": "010000000000000000000000000000005c17017f00000000fc17017fe418017f2c18017f0000000000000000bc18017fe418017fe418017f00000000e418017f000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000fc18017fe41a017f641b017f000000000000000000000000000000003591e07e",
+   "_why": ".data row value-list pointers renumbered (+ Off/On at row 11)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x56753B",
+   "expect": "20acc96d0042143c201499ddcd43",
+   "new": "20acc96ddcc1b86a001499ddcd43",
+   "_why": "startIntervalShooting: jmp T1 at 0x7E98855F (1 byte left, unreachable)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x576BB5",
+   "expect": "00df0004a000c864a001c80ca0",
+   "new": "00df0004dc67c2690001c80ca0",
+   "_why": "sleep-timer selector 0x7E997BD9: jmp T2 (old body unreachable)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9C2712",
+   "expect": "59385c148021dda2e601",
+   "new": "59385c148022dda2e601",
+   "_why": "panel formatter row 33 -> 34 at 0x7ede3736"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9C2745",
+   "expect": "59385c148021dd6fe601",
+   "new": "59385c148022dd6fe601",
+   "_why": "panel formatter row 33 -> 34 at 0x7ede3769"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9C3FC8",
+   "expect": "5904f1e88021ddeccd01",
+   "new": "5904f1e88022ddeccd01",
+   "_why": "panel formatter row 33 -> 34 at 0x7ede4fec"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9C3FE5",
+   "expect": "5904f1e88021ddcfcd01",
+   "new": "5904f1e88022ddcfcd01",
+   "_why": "panel formatter row 33 -> 34 at 0x7ede5009"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9C407F",
+   "expect": "2a04f1e88021dde7cd01",
+   "new": "2a04f1e88022dde7cd01",
+   "_why": "panel formatter row 33 -> 34 at 0x7ede50a3"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9C4099",
+   "expect": "04f1e8118021ddcdcd01",
+   "new": "04f1e8118022ddcdcd01",
+   "_why": "panel formatter row 33 -> 34 at 0x7ede50bd"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9C41FE",
+   "expect": "2a04f1e88021dd68cc01",
+   "new": "2a04f1e88022dd68cc01",
+   "_why": "panel formatter row 33 -> 34 at 0x7ede5222"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9C4218",
+   "expect": "04f1e8118021dd4ecc01",
+   "new": "04f1e8118022dd4ecc01",
+   "_why": "panel formatter row 33 -> 34 at 0x7ede523c"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9C426C",
+   "expect": "3e1152988021ddfacb01",
+   "new": "3e1152988022ddfacb01",
+   "_why": "panel formatter row 33 -> 34 at 0x7ede5290"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9C4286",
+   "expect": "a90098118021dde0cb01",
+   "new": "a90098118022dde0cb01",
+   "_why": "panel formatter row 33 -> 34 at 0x7ede52aa"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9C91FB",
+   "expect": "59345c248021ddb97b01",
+   "new": "59345c248022ddb97b01",
+   "_why": "panel formatter row 33 -> 34 at 0x7edea21f"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9C922E",
+   "expect": "59345c248021dd867b01",
+   "new": "59345c248022dd867b01",
+   "_why": "panel formatter row 33 -> 34 at 0x7edea252"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9CB081",
+   "expect": "f400fcdc3ce1ff7eec28fff9",
+   "new": "f400fcdc003c037fec28fff9",
+   "_why": "top-table imm32 0x7edec0a5"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9CB0D6",
+   "expect": "000afcc03ce1ff7ef1e0f860",
+   "new": "000afcc0003c037ff1e0f860",
+   "_why": "top-table imm32 0x7edec0fa"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9CB0FD",
+   "expect": "000afcc03ce1ff7ef1e0f844",
+   "new": "000afcc0003c037ff1e0f844",
+   "_why": "top-table imm32 0x7edec121"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9CB311",
+   "expect": "0acc0001a00bc9132cb4003c50",
+   "new": "0acc0001dcab7a2400b4003c50",
+   "_why": "value switch: old row-11 case -> jmp cave"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9CB33A",
+   "expect": "06ccd700a00dc9128059",
+   "new": "06ccd700a00ec9128059",
+   "_why": "switch row 13 -> 14"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9CB349",
+   "expect": "0100a00c800dccc300a01fc805ccaa",
+   "new": "0100a00c800eccc300a020c805ccaa",
+   "_why": "switch row 13 -> 14; switch row 31 -> 32"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9CB3FC",
+   "expect": "08dff024a020c9232cf1",
+   "new": "08dff024a021c9232cf1",
+   "_why": "switch row 32 -> 33"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9CB40C",
+   "expect": "0100a00c802059043c20",
+   "new": "0100a00c802159043c20",
+   "_why": "switch row 32 -> 33"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9CB421",
+   "expect": "73dff024a021c96a3cf1",
+   "new": "73dff024a022c96a3cf1",
+   "_why": "switch row 33 -> 34"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9CB43E",
+   "expect": "5904f1e88021dd765901",
+   "new": "5904f1e88022dd765901",
+   "_why": "switch row 33 -> 34"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9CB46D",
+   "expect": "5904f1e88021dd475901",
+   "new": "5904f1e88022dd475901",
+   "_why": "switch row 33 -> 34"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9CB48D",
+   "expect": "00ffca49a022c9583c50",
+   "new": "00ffca49a023c9583c50",
+   "_why": "switch row 34 -> 35"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9CB4A1",
+   "expect": "043c20088022dd135901",
+   "new": "043c20088023dd135901",
+   "_why": "switch row 34 -> 35"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9CB782",
+   "expect": "010afcc13ce1ff7ef1e4f860",
+   "new": "010afcc1003c037ff1e4f860",
+   "_why": "top-table imm32 0x7edec7a6"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9CBF1E",
+   "expect": "2b60fcdc3ce1ff7e18f90014",
+   "new": "2b60fcdc003c037f18f90014",
+   "_why": "top-table imm32 0x7edecf42"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9CC061",
+   "expect": "f1e5fcd13ce1ff7ef861faf8",
+   "new": "f1e5fcd1003c037ff861faf8",
+   "_why": "top-table imm32 0x7eded085"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9DC3B2",
+   "expect": "5904f1e88021cd024af0",
+   "new": "5904f1e88022cd024af0",
+   "_why": "panel formatter row 33 -> 34 at 0x7edfd3d6"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9DC3CB",
+   "expect": "5904f1e88021cde949f0",
+   "new": "5904f1e88022cde949f0",
+   "_why": "panel formatter row 33 -> 34 at 0x7edfd3ef"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9DC45F",
+   "expect": "2a04f1e88021cd074af0",
+   "new": "2a04f1e88022cd074af0",
+   "_why": "panel formatter row 33 -> 34 at 0x7edfd483"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9DC475",
+   "expect": "04f1e8118021cdf149f0",
+   "new": "04f1e8118022cdf149f0",
+   "_why": "panel formatter row 33 -> 34 at 0x7edfd499"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9DC6A7",
+   "expect": "2a0cf1e88021cdbf47f0",
+   "new": "2a0cf1e88022cdbf47f0",
+   "_why": "panel formatter row 33 -> 34 at 0x7edfd6cb"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9DC6BD",
+   "expect": "04f1e8118021cda947f0",
+   "new": "04f1e8118022cda947f0",
+   "_why": "panel formatter row 33 -> 34 at 0x7edfd6e1"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9DC70D",
+   "expect": "3e1152988021cd5947f0",
+   "new": "3e1152988022cd5947f0",
+   "_why": "panel formatter row 33 -> 34 at 0x7edfd731"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x9DC723",
+   "expect": "ad0098118021cd4347f0",
+   "new": "ad0098118022cd4347f0",
+   "_why": "panel formatter row 33 -> 34 at 0x7edfd747"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBD948C",
+   "expect": "02000000388cff7e00000000",
+   "new": "02000000803d037f00000000",
+   "_why": "page-3 record child pointer"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xC12BDC",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "ffffffff000055008801000101000000e1008901000101000000cb008a0101016f000000d5008b0100010100000046008c0102010f0100006b01940102002100000070068e0101001a0800009300ca060000280100004c009001000101000000b600910102010c0100004d054e050201010000000e0293010200b400000006019601000101000000e200970102015900000073009801000101000000ae079901000101000000d4009a01000101000000b706b80600010100a60030009c0100010100a7004f009d0100010100a8001905260500010100a9006c009f0100010100aa007f00a00100010100ab008700a10100010100ac009200a20100010100ad00d900a30100010100ae00b300a40100010100af005100a501000101004a080c01e101000101004b080e014d02000101004c080d01e201000101000000fd00000406010100000098065d040201f1030000af00e901070101000000da00ea01020113000000a800eb010001010000008600ec010001010000000000000000000000ffffffff0d0000001a080000000000000e00000028010000000000000f000000aa08000000000000100000000c0100000000000074020000e20100000000000012000000b400000000000000000000000000000000000000ffffffff",
+   "_why": "37-row top-menu table (= E-PL6 0x7EFFF864 byte for byte); page-3 child list with {628,482} (= E-PL6)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xC12DBC",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "ffffffffa00bc80ba00cc81adc6285dbff2ce2013c50dd46dfdcffa00c800bdc3786dbff2cb4003c50dd33dfdcffa00c800cdc2486dbffffffffff",
+   "_why": "value-switch cave: row 11 -> getSetting(482), row 12 -> getSetting(180)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xC12DFC",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "ffffffffdd744096ff00040042143c2014dc384795ffffffffff",
+   "_why": "keep-awake T1: call 0x7E997E94 (timer hold), displaced 6 bytes, jmp 0x7E988565"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xC12E1C",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "ffffffffa000c83da001c80fa002c847a003c871dc800000002ce201dd398e6cff0004a000c81e2ce901dd2b8e6cff0004a000c9582ce701dd1d8e6cff0004a000c94adde83d96ff801000dd423f96ffa010df00102ce201ddfd8d6cff0004a001c9512ce701ddef8d6cff0004a000c70afccc61ea0000ca0300ddb13d96ff8010ca3100dda73d96ff8010ddcd3f96ff0004ca20fccc4d07bf7e4204fccc5d07bf7e42082cd102420c8004dd023293ffa00cdf0010ffffffff",
+   "_why": "keep-awake T2: sleep-timer selector as E-PL6 0x7E998C41 (177 bytes)"
+  }
+ ]
+}

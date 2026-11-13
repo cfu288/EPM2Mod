@@ -4,15 +4,16 @@ Goal: enable the dormant interval / time-lapse feature (info 482–486), using t
 
 - **Labels:** **V** = read in the bytes or run in the emulator; **I** = inferred.
 - **Addresses:** E-PM2 v1.6 runtime addresses (base 0x7E421020) unless the E-PL6 is named. The E-PL6 1.4 block 0 has the same base.
-- **Specs (both block 0 only, neither built):**
+- **Specs (all block 0 only, none built):**
   - [patches/interval-timelapse.json](patches/interval-timelapse.json): **replace** Flash RC Mode (5 ops, 14 bytes; the fallback).
   - [patches/interval-timelapse-insert.json](patches/interval-timelapse-insert.json): **insert** the row exactly as the E-PL6 does (43 ops, 626 bytes changed). See §10.
+  - [patches/interval-timelapse-insert-awake.json](patches/interval-timelapse-insert-awake.json): insert + the E-PL6 **keep-awake** timer hold (47 ops, 818 bytes changed). See §11.
 
 ## Summary
 - **Missing on the E-PM2:** only menu wiring, in four places. The interval engine, the guards, panels 628/636/637/638–641, the panel factory entries and all 34 languages' strings are already there and match the E-PL6 (V).
 - **Approach, replace spec:** the E-PL6's Time Lapse row goes into the place of **Flash RC Mode** (Shooting Menu 2, last row), and Flash RC Mode loses its menu row.
 - **Approach, insert spec:** a 37-row menu matching the E-PL6. In the emulator, every row's help, OK target and value matches the E-PL6 1.4 (V, §10).
-- **Not ported:** the E-PL6 holds the sleep and power-off timers while a sequence runs (0x7E998F12 and its new callers). That needs new code. For tests, set Sleep to Off.
+- **Keep-awake:** the E-PL6 holds the sleep and power-off timers while a sequence runs (0x7E998F12 and its new callers). Only the `-insert-awake` spec ports this (two trampolines, §11). With the other two specs, set Sleep to Off for tests.
 
 ## 1. The menu row
 
@@ -89,7 +90,7 @@ How the bodies were compared:
 | # | Where (E-PM2 → E-PL6) | Difference | Needed? |
 |---|---|---|---|
 | 1 | Menu (a)–(d) above | The extra row / child / value case | **Yes** (V). This is the spec |
-| 2 | `startIntervalShooting` 0x7E98849B → 0x7E98948E | The E-PL6 adds `call 0x7E998F12` on the fresh-start branch, after the RealTime/next-time read. **0x7E998F12 = E-PM2 0x7E997E94** (same code, OlyHfwPower): flag 0x602B2074 = 1, `PWROFF TIMER(0)`, `SLEEP TIMER(0)`, flag = 0. It disables the auto power-off and sleep timers. The E-PM2 already calls it from format, erase-all, pixel mapping and other long jobs. It is a power hold, not a bug fix (V code; I purpose) | Robustness (I). Not in the spec: it needs a code cave |
+| 2 | `startIntervalShooting` 0x7E98849B → 0x7E98948E | The E-PL6 adds `call 0x7E998F12` on the fresh-start branch, after the RealTime/next-time read. **0x7E998F12 = E-PM2 0x7E997E94** (same code, OlyHfwPower): flag 0x602B2074 = 1, `PWROFF TIMER(0)`, `SLEEP TIMER(0)`, flag = 0. It disables the auto power-off and sleep timers. The E-PM2 already calls it from format, erase-all, pixel mapping and other long jobs. It is a power hold, not a bug fix (V code; I purpose) | Robustness (I). Ported only in the `-insert-awake` spec (§11) |
 | 3 | Interval sleep-timer selector 0x7E997BD9 → 0x7E998C41 | Mode 1 (482 on, sequence running) and mode 3: the E-PL6 also calls 0x7E998F12. Mode 0 / not running: it also calls 0x7E998E47(0) (= E-PM2 0x7E997DC9, the timer restore; I). The E-PM2 only sets the interval sleep timer (0 or 60001 ms) | Same as #2: the timers are held during the run and restored at the end |
 | 4 | Guards 0x7E969C11 / 0x7E969ACE / 0x7E969B43 / 0x7E969BA2, interval state set/get/clear | Same | — (V) |
 | 5 | SequencePartsBase interval states 0x7EA98600–0x7EA99A80 (start, end, next time, first shot, shot done, movie, error) | Same (V, 30 functions) | — |
@@ -145,7 +146,9 @@ The new cases are in `tools/emu/cases.py`. Each has an independent Python model 
 5. **Movie:** set Time Lapse Movie On, run 10 frames at 2 s, and check for an MJPEG 720p MOV after the stills (mov_edit accepts only that format).
 6. **Cancel paths:** start a run, then press MENU, the shutter, and the mode dial. Each must end the sequence cleanly. Also check that Multiple Exposure turns interval Off (mcon interlock, 10a §1.1).
 7. **Long interval:** Interval 120 s, 3 frames. The camera should sleep between frames and wake to shoot (RTC path).
-8. **Sleep timer:** with Sleep = 1 min, a 75 s interval and 3 frames. This tests whether the missing E-PL6 timer hold matters.
+8. **Sleep timer:** with Sleep = 1 min, a 75 s interval and 3 frames.
+   - With `-insert-awake`, all 3 frames should be taken with no sleep in between (the timers are held), and after the run the normal 1-min sleep should come back.
+   - With the other specs, this tests whether the missing hold matters.
 9. **Card full:** a nearly full card, 99 frames at 1 s. It should stop with a card-full message and no hang.
 10. **Restore:** flash stock v1.6. Flash RC Mode returns.
 
@@ -155,7 +158,7 @@ The new cases are in `tools/emu/cases.py`. Each has an independent Python model 
 - **Overheating:** long ≤ 90 s runs keep the sensor and LV powered (I). The E-PM2 has no fan or heat warning found for this path. Watch for a temperature warning.
 - **Card full:** the `cardFull` handling and the error sequence are the same as the E-PL6's (V). The movie needs room after the stills (I).
 - **Live View:** frames ≤ 90 s keep LV on. The E-PL6's extra zoom-frame restore (#9) is absent, so a magnified LV may not come back (I).
-- **Sleep / power-off:** the E-PM2 lacks the E-PL6 timer hold (#2, #3). With Sleep ≠ Off, the normal sleep may interrupt a 61–90 s interval run (I). Workaround: Sleep = Off. A follow-up spec can port the two calls with a code cave.
+- **Sleep / power-off:** the E-PM2 lacks the E-PL6 timer hold (#2, #3). With Sleep ≠ Off, the normal sleep may interrupt a 61–90 s interval run (I). Workaround: Sleep = Off, or use the `-insert-awake` spec (§11).
 - **Mode dial:** the mode-change path 0x7ECD5270 clears 482 when the clock check fails (V). Dial changes during a run go through `changeModeDialForIntervalWait` (the same as the E-PL6). Movie / ART / SCN behaviour is untested.
 - **Lost feature:** Flash RC Mode has no menu row while patched (V).
 - **Overlay:** all patched code and tables beyond 0x7E881000 load as overlays. The emulator maps the whole block, so it does not test overlay loading (I).
@@ -234,6 +237,48 @@ The new cases are in `tools/emu/cases.py`. Each has an independent Python model 
 - Language and Rec View show their values;
 - Custom Menu entries open the right pages.
 
+## 11. Keep-awake port (`interval-timelapse-insert-awake.json` = the insert spec + 4 ops) (V unless marked)
+**What the E-PL6 does (re-checked in its disassembly):**
+- **`startIntervalShooting` 0x7E98948E:** the extra `call 0x7E998F12,[],4` is at 0x7E989552.
+  - It comes right after `movhu (32,sp),d0 / cmp d3,d0 / bne` (the RTC read 0x7E68CF5D succeeded), and before `clr d0; mov d0,(20,sp)` and the seconds conversion.
+  - It is the only added call: the call lists are otherwise identical, 32 vs 33.
+- **Selector 0x7E998C41, by branch:**
+
+  | Branch | E-PL6 calls |
+  |---|---|
+  | mode 0, or mode 1 with 482 = 0 or 489 = 487 = 0 | `isst(0)`, then `restore(0)` (0x7E998E47) |
+  | mode 1 with 489 ≠ 0 or 487 ≠ 0 | `hold` (E-PM2 only returns) |
+  | mode 2 | unchanged: `isst(0 or 60001)` |
+  | mode 3 | `isst(0)`, then `hold` |
+  | other | the assert print |
+
+**The E-PM2 port:** trampolines go in the verified padding, after the insert spec's cave. The call and return encodings below were checked with our objdump.
+
+| Site | Hook (5 bytes) | Trampoline |
+|---|---|---|
+| 0x7E98855F (after `bne 0x7E9885CA`) | `dc` jmp 0x7F033E20; the 6th displaced byte at 0x7E988564 is left and unreachable (no branch targets 0x7E988560–64) | **0x7F033E20, 18 B:** `call 0x7E997E94,[],4` (the frame the E-PM2's own callers use) → the 6 displaced bytes exactly (`clr d0; mov d0,(20,sp); mov sp,a0; add 20,a0`) → `jmp 0x7E988565` |
+| 0x7E997BD9 (selector entry) | `dc` jmp 0x7F033E40; the old body is unreachable | **0x7F033E40, 177 B:** E-PL6 0x7E998C41 re-assembled with E-PM2 callees: getter 0x7E6FCC91 `[],4`; `isst` 0x7E997C67 `[d2],16`; `restore` 0x7E997DC9 `[d2,a2],16`; `hold` 0x7E997E94 `[],4`; the stock assert print (0x7EBF074D/075D, line 721). Calls are `dd` d32 and branches rel8; it ends with `ret [],16`, the frame all 9 callers use |
+
+**Register and flag safety of T1 (V for the code; MN103 call convention I):**
+- The call clobbers d0, d1, a0, a1, MDR and the loop registers, exactly as the E-PL6's own call at the same point does.
+- After the hook, d0 and a0 are set by the displaced code, a1 at 0x7E988565, and d1 at 0x7E988581. LIR/LAR are reloaded by `setlb` at 0x7E988583. The flags come from `add 20,a0`, as in stock.
+- d2, d3, a2 and a3 are callee-saved. T2 replaces a whole function, so no state crosses its hook.
+
+**Emulator:** `results/compare-awake.txt|json` and `results/emu-awake-*`. The new cases are `ivl_selector` and `ivl_start`; every callee is stubbed by role and logged in call order.
+
+| Case | Rows | stock (model) | patched vs E-PL6 1.4 | stock vs patched |
+|---|---|---|---|---|
+| `ivl_selector` (modes 0–4 × 482 × 489 × 487) | 40 | 40/40 | **call sequence identical in 40/40** (the E-PL6 also matches the model, 40/40) | 24 changed: the extra `restore` / `hold` only, in the branches listed above; 16 identical (all of mode 2 and mode 4) |
+| `ivl_start` (guard, busy, release, RTC error, validity, ≤ / > 90 s, NULL object, results) | 14 | 14/14 | **calls and return value identical in 14/14**. The frame differs only in body-specific return addresses and string pointers | 8 changed, each by exactly one `hold` after the RTC read on the fresh-start branch. Return values and the whole frame (84 B + saved registers) are identical in 14/14 |
+
+- **Menu cases:** they give the same results as the insert spec.
+- **Not tested here:** whether the held timers come back after a run on the camera (restore happens in mode 0, as on the E-PL6); timing; sleep/wake above 90 s.
+
+**Remaining risk (I):**
+- two more code edits running from the rodata padding;
+- if a run ends through a path that never calls the selector with mode 0, the timers stay held until the next restore (the E-PL6 has the same design);
+- power-off is held for the whole run, so the battery drains faster on long runs.
+
 ## Files
 - `patches/interval-timelapse.json`: the replace spec.
 - `patches/interval-timelapse-insert.json`: the insert spec (ops carry a `_why` note; build.py ignores it).
@@ -242,7 +287,8 @@ The new cases are in `tools/emu/cases.py`. Each has an independent Python model 
   - `refscan.py`: reference scan;
   - `rowsites.py`, `fmtsites.py`: row constants;
   - `datadiff.py`: .data diff;
-  - `compare_bodies.py`: runs the menu cases on several images.
+  - `compare_bodies.py`: runs cases on several images (`--cases=`);
+  - keep-awake: `mkspec_awake.py`, the insert generator + `awake_part.py` (trampolines and a small MN103 assembler).
 - `scripts/`: helpers. Run them with `python3 -I`; they use the scratch block copies.
   - `extract.py`, `langs.py`: block and language extraction;
   - `dis.py`, `cmp.py`, `side.py`: disassembly and side-by-side;

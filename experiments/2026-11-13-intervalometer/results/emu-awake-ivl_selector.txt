@@ -1,0 +1,50 @@
+patched bytes: 818 in 73 runs
+chg  mode=0 i482=0 i489=0 i487=0
+     calls: [["isst", 0]] -> [["isst", 0], ["restore", 0]]
+chg  mode=0 i482=0 i489=0 i487=50
+     calls: [["isst", 0]] -> [["isst", 0], ["restore", 0]]
+chg  mode=0 i482=0 i489=3 i487=0
+     calls: [["isst", 0]] -> [["isst", 0], ["restore", 0]]
+chg  mode=0 i482=0 i489=3 i487=50
+     calls: [["isst", 0]] -> [["isst", 0], ["restore", 0]]
+chg  mode=0 i482=1 i489=0 i487=0
+     calls: [["isst", 0]] -> [["isst", 0], ["restore", 0]]
+chg  mode=0 i482=1 i489=0 i487=50
+     calls: [["isst", 0]] -> [["isst", 0], ["restore", 0]]
+chg  mode=0 i482=1 i489=3 i487=0
+     calls: [["isst", 0]] -> [["isst", 0], ["restore", 0]]
+chg  mode=0 i482=1 i489=3 i487=50
+     calls: [["isst", 0]] -> [["isst", 0], ["restore", 0]]
+chg  mode=1 i482=0 i489=0 i487=0
+     calls: [["get", 482], ["isst", 0]] -> [["get", 482], ["isst", 0], ["restore", 0]]
+chg  mode=1 i482=0 i489=0 i487=50
+     calls: [["get", 482], ["isst", 0]] -> [["get", 482], ["isst", 0], ["restore", 0]]
+chg  mode=1 i482=0 i489=3 i487=0
+     calls: [["get", 482], ["isst", 0]] -> [["get", 482], ["isst", 0], ["restore", 0]]
+chg  mode=1 i482=0 i489=3 i487=50
+     calls: [["get", 482], ["isst", 0]] -> [["get", 482], ["isst", 0], ["restore", 0]]
+chg  mode=1 i482=1 i489=0 i487=0
+     calls: [["get", 482], ["get", 489], ["get", 487], ["isst", 0]] -> [["get", 482], ["get", 489], ["get", 487], ["isst", 0], ["restore", 0]]
+chg  mode=1 i482=1 i489=0 i487=50
+     calls: [["get", 482], ["get", 489], ["get", 487]] -> [["get", 482], ["get", 489], ["get", 487], ["hold"]]
+chg  mode=1 i482=1 i489=3 i487=0
+     calls: [["get", 482], ["get", 489]] -> [["get", 482], ["get", 489], ["hold"]]
+chg  mode=1 i482=1 i489=3 i487=50
+     calls: [["get", 482], ["get", 489]] -> [["get", 482], ["get", 489], ["hold"]]
+chg  mode=3 i482=0 i489=0 i487=0
+     calls: [["isst", 0]] -> [["isst", 0], ["hold"]]
+chg  mode=3 i482=0 i489=0 i487=50
+     calls: [["isst", 0]] -> [["isst", 0], ["hold"]]
+chg  mode=3 i482=0 i489=3 i487=0
+     calls: [["isst", 0]] -> [["isst", 0], ["hold"]]
+chg  mode=3 i482=0 i489=3 i487=50
+     calls: [["isst", 0]] -> [["isst", 0], ["hold"]]
+chg  mode=3 i482=1 i489=0 i487=0
+     calls: [["isst", 0]] -> [["isst", 0], ["hold"]]
+chg  mode=3 i482=1 i489=0 i487=50
+     calls: [["isst", 0]] -> [["isst", 0], ["hold"]]
+chg  mode=3 i482=1 i489=3 i487=0
+     calls: [["isst", 0]] -> [["isst", 0], ["hold"]]
+chg  mode=3 i482=1 i489=3 i487=50
+     calls: [["isst", 0]] -> [["isst", 0], ["hold"]]
+ivl_selector: 40 rows, 24 changed, 16 identical, 0 flagged

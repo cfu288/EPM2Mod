@@ -6,7 +6,7 @@ reading of the disassembly / notes), or None where no model is given.
 Addresses: E-PM2 v1.6 runtime addresses.
 """
 import hashlib, struct
-from omemu import BASE, DATA
+from omemu import BASE, DATA, SP0
 
 U32 = 0xFFFFFFFF
 
@@ -1067,3 +1067,122 @@ class IvlGuard(Case):
 
 
 CASES.update({c.name: c for c in (MenuHelp(), MenuChild(), MenuValue(), IvlGuard())})
+
+
+# ---- keep-awake port (interval-timelapse-insert-awake.json): interval sleep-timer selector and startIntervalShooting --
+# Callees are stubbed by role; each stub logs (role, d0) in call order. Profiles name the same roles in both bodies.
+AWAKE = {
+    "E-PM2": dict(sel=0x7E997BD9, start=0x7E98849B,
+                  roles={0x7E6FCC91: "get", 0x7E997C67: "isst", 0x7E997DC9: "restore", 0x7E997E94: "hold",
+                         0x7E9670E9: "print", 0x7E99A33A: "log", 0x7E96E86E: "lock", 0x7E96E87E: "unlock",
+                         0x7E969C11: "guard", 0x7E969AA1: "busy", 0x7E68ACE4: "ace4", 0x7E68C880: "rtc",
+                         0x7E68C933: "tosec", 0x7E68C93D: "fromsec", 0x7E68C947: "valid", 0x7E997BD9: "sel",
+                         0x7E9E60BC: "evinit", 0x7EBA62DB: "new", 0x7E9991C5: "evget", 0x7E971CB7: "ctor",
+                         0x7E9991D4: "exec", 0x7E9E60D0: "evfree"}),
+    "E-PL6": dict(sel=0x7E998C41, start=0x7E98948E,
+                  roles={0x7E6FD4F5: "get", 0x7E998CE5: "isst", 0x7E998E47: "restore", 0x7E998F12: "hold",
+                         0x7E967F17: "print", 0x7E99B3B8: "log", 0x7E96F735: "lock", 0x7E96F745: "unlock",
+                         0x7E96AA4B: "guard", 0x7E96A8DB: "busy", 0x7E68B3B7: "ace4", 0x7E68CF5D: "rtc",
+                         0x7E68D010: "tosec", 0x7E68D01A: "fromsec", 0x7E68D024: "valid", 0x7E998C41: "sel",
+                         0x7E9E72C1: "evinit", 0x7EBA7792: "new", 0x7E99A243: "evget", 0x7E972CA4: "ctor",
+                         0x7E99A252: "exec", 0x7E9E72D5: "evfree"}),
+}
+AWAKE_CAVE = (0x7F033E20, 0x7F033EF1)
+
+
+def spy(roles, behave, log, skip=("print",)):
+    """stubs for every role: log (role, d0) unless in skip, then behave[role](emu, regs) or return d0 = 0"""
+    def mk(role):
+        def f(e, r):
+            if role not in skip:
+                log.append([role] if role == "hold" else [role, r["d0"] & 0xFFFFFFFF])     # hold takes no argument
+            return behave[role](e, r) if role in behave else {"d0": 0}
+        return f
+    return {a: mk(role) for a, role in roles.items()}
+
+
+class IvlSelector(Case):
+    name, entry = "ivl_selector", 0x7E997BD9
+    doc = ("interval sleep-timer selector (E-PM2 0x7E997BD9, E-PL6 0x7E998C41; patched: jmp to T2 0x7F033E40): d0 = mode; "
+           "getter(482/489/487) from the row; logs the calls to isst / restore / hold / print in order")
+    ranges = [(0x7E997BD9, 0x7E997C67), (0x7E998C41, 0x7E998CE5), AWAKE_CAVE]
+
+    def rows(self):
+        return [dict(mode=m, i482=a, i489=b, i487=c) for m in (0, 1, 2, 3, 4) for a in (0, 1) for b in (0, 3)
+                for c in (0, 50)]
+
+    def run(self, emu, row):
+        prof = AWAKE[body_of(emu.image)]
+        log = []
+        vals = {482: row["i482"], 489: row["i489"], 487: row["i487"]}
+        behave = {"get": lambda e, r: {"d0": vals[r["d0"] & 0xFFFF]}}
+        roles = {a: k for a, k in prof["roles"].items() if k in ("get", "isst", "restore", "hold", "print")}
+        r = emu.call(prof["sel"], {"d0": row["mode"]}, frame=(0x00, 16), stubs=spy(roles, behave, log, skip=()))
+        return {"calls": log, "_r": r}
+
+    def model(self, row, image):
+        """E-PL6 0x7E998C41 (the port target) in Python; the stock E-PM2 model is the same without restore / hold"""
+        m, a, b, c = row["mode"], row["i482"], row["i489"], row["i487"]
+        pl6 = body_of(image) == "E-PL6" or image[0x7E997BD9 - BASE] == 0xDC
+        L = []
+        if m == 0 or (m == 1 and (a == 0 or (b == 0 and c == 0))):
+            if m == 1:
+                L += [["get", 482]] + ([["get", 489], ["get", 487]] if a else [])
+            L += [["isst", 0]] + ([["restore", 0]] if pl6 else [])
+        elif m == 1:
+            L += [["get", 482], ["get", 489]] + ([] if b else [["get", 487]]) + ([["hold"]] if pl6 else [])
+        elif m == 2:
+            L += [["get", 482]] + ([["get", 487], ["isst", 60001 if c else 0]] if a == 1 else [])
+        elif m == 3:
+            L += [["isst", 0]] + ([["hold"]] if pl6 else [])
+        else:
+            L += [["print", 4]]
+        return {"calls": L}
+
+
+class IvlStart(Case):
+    name, entry = "ivl_start", 0x7E98849B
+    doc = ("OlyHfwOpeShoot::startIntervalShooting (E-PM2 0x7E98849B, E-PL6 0x7E98948E): every callee stubbed by role; "
+           "rows drive each branch (guard, busy, release, RTC error, next-time validity, > 90 s, event object, result)")
+    ranges = [(0x7E98849B, 0x7E988693), (0x7E98948E, 0x7E98968D), AWAKE_CAVE]
+    OBJ = DATA + 0x400
+
+    def rows(self):
+        base = dict(release=0, guard=1, busy=0, ace4=0, rtc_err=0, valid=1, fs_err=0, dt=120, obj=1, res=0)
+        var = [{}, dict(guard=0), dict(busy=1), dict(ace4=1), dict(release=1), dict(rtc_err=1), dict(valid=0),
+               dict(fs_err=1), dict(dt=30), dict(obj=0), dict(res=0xF0000001), dict(res=0xF0000058),
+               dict(dt=30, res=0xF0000001), dict(release=1, res=0xF0000001)]
+        return [dict(base, **v) for v in var]
+
+    def run(self, emu, row):
+        prof = AWAKE[body_of(emu.image)]
+        log = []
+        now = 1000
+
+        def rtc(e, r):
+            e.write(r["a0"], b"\0" * 8 + struct.pack("<H", row["rtc_err"]) + b"\0" * 6)
+            return {"d0": 0}
+
+        def tosec(e, r):
+            e.write(r["a0"], struct.pack("<I", now))
+            return {"d0": 0}
+
+        def fromsec(e, r):
+            e.write(r["a0"], b"\0" * 8 + struct.pack("<H", row["fs_err"]) + b"\0" * 2)
+            return {"d0": 0}
+        behave = {"guard": lambda e, r: {"d0": row["guard"]}, "busy": lambda e, r: {"d0": row["busy"]},
+                  "ace4": lambda e, r: {"d0": row["ace4"]}, "rtc": rtc, "tosec": tosec, "fromsec": fromsec,
+                  "get": lambda e, r: {"d0": now + row["dt"]}, "valid": lambda e, r: {"d0": row["valid"]},
+                  "new": lambda e, r: {"a0": self.OBJ if row["obj"] else 0},
+                  "evget": lambda e, r: {"a0": DATA + 0x500}, "ctor": lambda e, r: {"a0": self.OBJ},
+                  "exec": lambda e, r: {"d0": row["res"]}}
+        r = emu.call(prof["start"], {"d0": row["release"]}, frame=(0xF0, 84),
+                     stubs=spy(prof["roles"], behave, log, skip=("print", "log", "lock", "unlock")))
+        calls = [c if c[0] in ("sel", "get", "guard") else [c[0]] for c in log]
+        # the function's frame after return: regs save + 84-byte frame below the caller's sp, minus word 0 of each
+        # frame (the return address the last call left there)
+        fr = emu.read(SP0 - 100, 100)
+        return {"ret": r["regs"]["d0"], "calls": calls, "frame": fr[4:].hex(), "_r": r}
+
+
+CASES.update({c.name: c for c in (IvlSelector(), IvlStart())})

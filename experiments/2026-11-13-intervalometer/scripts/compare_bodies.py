@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Run the menu cases on several block-0 images and compare them row for row.
 
-    python3 compare_bodies.py OUT.json NAME=BLOCK0 ...      (first image = reference for the 'vs' columns)
+    python3 compare_bodies.py [--cases=a,b] OUT.json NAME=BLOCK0 ...      (first image = reference for the 'vs' columns)
 
 For each case and row: every image's outputs, its model check, and which images differ from the others.
 Uses tools/emu (om-emu). Rows are compared on public outputs only (keys without a leading '_').
@@ -10,10 +10,14 @@ import json, sys, os
 sys.path.insert(0, '/path/to/EPM2Mod/tools/emu')
 import emurun
 from cases import CASES
-out = sys.argv[1]
-imgs = [a.split('=', 1) for a in sys.argv[2:]]
+args = sys.argv[1:]
+cases = ('menu_help', 'menu_child', 'menu_value')
+if args[0].startswith('--cases='):
+    cases = tuple(args.pop(0).split('=', 1)[1].split(','))
+out = args[0]
+imgs = [a.split('=', 1) for a in args[1:]]
 report = {}
-for cname in ('menu_help', 'menu_child', 'menu_value'):
+for cname in cases:
     case = CASES[cname]
     res = {n: emurun.run_image(case, p) for n, p in imgs}
     rows = []
