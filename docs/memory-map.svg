@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1330 1134" width="1330" height="1134" font-family="Helvetica,Arial,sans-serif" font-size="11">
-<rect width="1330" height="1134" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1520 1134" width="1520" height="1134" font-family="Helvetica,Arial,sans-serif" font-size="11">
+<rect width="1520" height="1134" fill="#ffffff"/>
 <text x="96" y="22" font-size="16" font-weight="bold">Olympus E-PM2 v1.6, firmware block 0 (13.5 MiB) with the current patch stack</text>
-<text x="96" y="40" fill="#444">Address order, left to right, top to bottom. One cell = 256 bytes; one row = 64 KiB. A cell shows the most important thing inside it, so small patches are visible.</text>
+<text x="96" y="40" fill="#444">Address order, left to right, top to bottom. One cell = 256 bytes; one row = 64 KiB. A cell shows the most important thing inside it, so small patches are visible. Black bars: ranges copied to RAM.</text>
 <rect x="96" y="58" width="12" height="12" fill="#00b4d8" stroke="#555" stroke-width="0.5"/><text x="114" y="68">changed by the interval patches: 4,389 B</text>
 <rect x="446" y="58" width="12" height="12" fill="#e0409f" stroke="#555" stroke-width="0.5"/><text x="464" y="68">changed by the film patches: 22.7 KiB</text>
 <rect x="796" y="58" width="12" height="12" fill="#7CFC00" stroke="#555" stroke-width="0.5"/><text x="814" y="68">free, verified for code: 395 B</text>
@@ -452,23 +452,39 @@
 <text x="90" y="863" text-anchor="end" fill="#333">0x7EF21020</text><line x1="92" y1="854" x2="96" y2="854" stroke="#333"/>
 <text x="90" y="927" text-anchor="end" fill="#333">0x7F021020</text><line x1="92" y1="918" x2="96" y2="918" stroke="#333"/>
 <text x="90" y="991" text-anchor="end" fill="#333">0x7F121020</text><line x1="92" y1="982" x2="96" y2="982" stroke="#333"/>
-<line x1="1128" y1="150" x2="1128" y2="154" stroke="#222" stroke-width="2"/>
-<line x1="1128" y1="150" x2="1128" y2="194" stroke="#222" stroke-width="2"/>
-<text x="1134" y="176.0">kernel, drivers <tspan fill="#666">(reset)</tspan></text>
-<line x1="1128" y1="202" x2="1128" y2="430" stroke="#222" stroke-width="2"/>
-<text x="1134" y="320.0">segment 1 <tspan fill="#666">(boot task)</tspan></text>
-<line x1="1128" y1="450" x2="1128" y2="462" stroke="#222" stroke-width="2"/>
-<text x="1134" y="460.0">.data image <tspan fill="#666">(reset)</tspan></text>
-<line x1="1128" y1="458" x2="1128" y2="698" stroke="#222" stroke-width="2"/>
-<text x="1134" y="582.0">segment 2 <tspan fill="#666">(Usr1)</tspan></text>
-<line x1="1128" y1="702" x2="1128" y2="926" stroke="#222" stroke-width="2"/>
-<text x="1134" y="818.0">segment 3 <tspan fill="#666">(Usr1)</tspan></text>
-<line x1="1128" y1="930" x2="1128" y2="938" stroke="#222" stroke-width="2"/>
-<line x1="1128" y1="938" x2="1128" y2="970" stroke="#222" stroke-width="2"/>
-<text x="1134" y="958.0">overlay B <tspan fill="#666">(on demand)</tspan></text>
-<line x1="1128" y1="970" x2="1128" y2="982" stroke="#222" stroke-width="2"/>
-<text x="1134" y="980.0">third Usr1 load <tspan fill="#666">(Usr1)</tspan></text>
-<line x1="1128" y1="990" x2="1128" y2="994" stroke="#222" stroke-width="2"/>
+<line x1="1128" y1="150" x2="1128" y2="154" stroke="#222" stroke-width="3"/>
+<line x1="1128" y1="150" x2="1128" y2="194" stroke="#222" stroke-width="3"/>
+<line x1="1128" y1="202" x2="1128" y2="430" stroke="#222" stroke-width="3"/>
+<line x1="1128" y1="450" x2="1128" y2="462" stroke="#222" stroke-width="3"/>
+<line x1="1128" y1="458" x2="1128" y2="698" stroke="#222" stroke-width="3"/>
+<line x1="1128" y1="702" x2="1128" y2="926" stroke="#222" stroke-width="3"/>
+<line x1="1128" y1="930" x2="1128" y2="938" stroke="#222" stroke-width="3"/>
+<line x1="1128" y1="938" x2="1128" y2="970" stroke="#222" stroke-width="3"/>
+<line x1="1128" y1="970" x2="1128" y2="982" stroke="#222" stroke-width="3"/>
+<line x1="1128" y1="990" x2="1128" y2="994" stroke="#222" stroke-width="3"/>
+<polyline points="1132,151 1142,151 1148,151" fill="none" stroke="#888" stroke-width="0.7"/><text x="1152" y="154">reset code, kernel <tspan fill="#777">0x7E421020</tspan></text>
+<polyline points="1132,159 1142,164 1148,164" fill="none" stroke="#888" stroke-width="0.7"/><text x="1152" y="167">drivers, debug shell, peripheral tasks <tspan fill="#777">0x7E44B000</tspan></text>
+<polyline points="1132,191 1142,191 1148,191" fill="none" stroke="#888" stroke-width="0.7"/><text x="1152" y="194">blank, never loaded <tspan fill="#777">0x7E4C9800</tspan></text>
+<polyline points="1132,203 1142,204 1148,204" fill="none" stroke="#888" stroke-width="0.7"/><text x="1152" y="207">C runtime, start-up tasks <tspan fill="#777">0x7E4FE000</tspan></text>
+<polyline points="1132,215 1142,217 1148,217" fill="none" stroke="#888" stroke-width="0.7"/><text x="1152" y="220">firmware update, lens, stabiliser, image library, AF <tspan fill="#777">0x7E521133</tspan></text>
+<polyline points="1132,279 1142,279 1148,279" fill="none" stroke="#888" stroke-width="0.7"/><text x="1152" y="282">exposure, HDMI, movie, face detection, mode controller <tspan fill="#777">0x7E6211E1</tspan></text>
+<polyline points="1132,335 1142,335 1148,335" fill="none" stroke="#888" stroke-width="0.7"/><text x="1152" y="338">still recording, art filters <tspan fill="#777">0x7E70B3F8</tspan></text>
+<polyline points="1132,347 1142,348 1148,348" fill="none" stroke="#888" stroke-width="0.7"/><text x="1152" y="351">segment-1 data: tone curves, colour tables, strings <tspan fill="#777">0x7E731588</tspan></text>
+<polyline points="1132,427 1142,427 1148,427" fill="none" stroke="#888" stroke-width="0.7"/><text x="1152" y="430">blank, never loaded <tspan fill="#777">0x7E881000</tspan></text>
+<polyline points="1132,451 1142,451 1148,451" fill="none" stroke="#888" stroke-width="0.7"/><text x="1152" y="454">.data image <tspan fill="#777">0x7E8DA000</tspan></text>
+<polyline points="1132,459 1142,464 1148,464" fill="none" stroke="#888" stroke-width="0.7"/><text x="1152" y="467">playback, Bluetooth, audio <tspan fill="#777">0x7E8F5800</tspan></text>
+<polyline points="1132,487 1142,487 1148,487" fill="none" stroke="#888" stroke-width="0.7"/><text x="1152" y="490">C++ app layer: shooting sequences, sdk shell <tspan fill="#777">0x7E965FD1</tspan></text>
+<polyline points="1132,627 1142,627 1148,627" fill="none" stroke="#888" stroke-width="0.7"/><text x="1152" y="630">device classes, Smart Skin <tspan fill="#777">0x7EBA0AA9</tspan></text>
+<polyline points="1132,631 1142,640 1148,640" fill="none" stroke="#888" stroke-width="0.7"/><text x="1152" y="643">segment-2 data <tspan fill="#777">0x7EBABF90</tspan></text>
+<polyline points="1132,695 1142,695 1148,695" fill="none" stroke="#888" stroke-width="0.7"/><text x="1152" y="698">blank, never loaded <tspan fill="#777">0x7ECB1000</tspan></text>
+<polyline points="1132,703 1142,708 1148,708" fill="none" stroke="#888" stroke-width="0.7"/><text x="1152" y="711">GUI code: menus, live view, playback screens <tspan fill="#777">0x7ECCB800</tspan></text>
+<polyline points="1132,783 1142,783 1148,783" fill="none" stroke="#888" stroke-width="0.7"/><text x="1152" y="786">3D graphics stack (GL, 3D engine, png, zlib) <tspan fill="#777">0x7EE02095</tspan></text>
+<polyline points="1132,815 1142,815 1148,815" fill="none" stroke="#888" stroke-width="0.7"/><text x="1152" y="818">video plug-ins (H.264, MP4) <tspan fill="#777">0x7EE8F4F4</tspan></text>
+<polyline points="1132,831 1142,831 1148,831" fill="none" stroke="#888" stroke-width="0.7"/><text x="1152" y="834">segment-3 data: menu tables, GUI strings <tspan fill="#777">0x7EECE319</tspan></text>
+<polyline points="1132,923 1142,923 1148,923" fill="none" stroke="#888" stroke-width="0.7"/><text x="1152" y="926">blank, never loaded <tspan fill="#777">0x7F034000</tspan></text>
+<polyline points="1132,931 1142,936 1148,936" fill="none" stroke="#888" stroke-width="0.7"/><text x="1152" y="939">overlay A: BASIC, PictBridge, red-eye <tspan fill="#777">0x7F05C000</tspan></text>
+<polyline points="1132,939 1142,949 1148,949" fill="none" stroke="#888" stroke-width="0.7"/><text x="1152" y="952">overlay B: factory adjustment, USB (PTP/MTP) <tspan fill="#777">0x7F080000</tspan></text>
+<polyline points="1132,971 1142,971 1148,971" fill="none" stroke="#888" stroke-width="0.7"/><text x="1152" y="974">third start-up load, SRAM image <tspan fill="#777">0x7F100000</tspan></text>
 <text x="96" y="1036" font-weight="bold">Share of block 0</text>
 <rect x="96.00" y="1044" width="567.79" height="26" fill="#3566b8"/>
 <text x="100.00" y="1061" fill="#fff">55.4%</text>

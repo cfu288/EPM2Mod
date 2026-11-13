@@ -30,6 +30,32 @@ LOADS = [
     (0x7F100000, 0x7F119000, "third Usr1 load", "Usr1"),
     (0x7F14B000, 0x7F14B820, "SRAM image", "reset"),
 ]
+# (start, what is there) - from docs/firmware-map.md, "Address regions of block 0"
+MODULES = [
+    (0x7E421020, "reset code, kernel"),
+    (0x7E44B000, "drivers, debug shell, peripheral tasks"),
+    (0x7E4C9800, "blank, never loaded"),
+    (0x7E4FE000, "C runtime, start-up tasks"),
+    (0x7E521133, "firmware update, lens, stabiliser, image library, AF"),
+    (0x7E6211E1, "exposure, HDMI, movie, face detection, mode controller"),
+    (0x7E70B3F8, "still recording, art filters"),
+    (0x7E731588, "segment-1 data: tone curves, colour tables, strings"),
+    (0x7E881000, "blank, never loaded"),
+    (0x7E8DA000, ".data image"),
+    (0x7E8F5800, "playback, Bluetooth, audio"),
+    (0x7E965FD1, "C++ app layer: shooting sequences, sdk shell"),
+    (0x7EBA0AA9, "device classes, Smart Skin"),
+    (0x7EBABF90, "segment-2 data"),
+    (0x7ECB1000, "blank, never loaded"),
+    (0x7ECCB800, "GUI code: menus, live view, playback screens"),
+    (0x7EE02095, "3D graphics stack (GL, 3D engine, png, zlib)"),
+    (0x7EE8F4F4, "video plug-ins (H.264, MP4)"),
+    (0x7EECE319, "segment-3 data: menu tables, GUI strings"),
+    (0x7F034000, "blank, never loaded"),
+    (0x7F05C000, "overlay A: BASIC, PictBridge, red-eye"),
+    (0x7F080000, "overlay B: factory adjustment, USB (PTP/MTP)"),
+    (0x7F100000, "third start-up load, SRAM image"),
+]
 RODATA = [(0x7E731588, 0x7E8808C0), (0x7EBABF90, 0x7ECB083C), (0x7EECE319, 0x7F034000)]
 DATA_IMAGE = (0x7E8DA000, 0x7E8F3114)
 
@@ -128,7 +154,7 @@ def classify(specs):
 def render(cls, out):
     n = len(cls)
     rows = (n + CELL * COLS - 1) // (CELL * COLS)
-    left, top, right = 96, 150, 210
+    left, top, right = 96, 150, 400
     W, H = left + COLS * PX + right, top + rows * PX + 120
     prio = {k: v[0] for k, v in CLASSES.items()}
     totals = dict.fromkeys(CLASSES, 0)
@@ -140,7 +166,8 @@ def render(cls, out):
            f'<text x="{left}" y="22" font-size="16" font-weight="bold">Olympus E-PM2 v1.6, firmware block 0 '
            f'({n / 1048576:.1f} MiB) with the current patch stack</text>',
            f'<text x="{left}" y="40" fill="#444">Address order, left to right, top to bottom. One cell = 256 bytes; '
-           f'one row = 64 KiB. A cell shows the most important thing inside it, so small patches are visible.</text>']
+           f'one row = 64 KiB. A cell shows the most important thing inside it, so small patches are visible. '
+           f'Black bars: ranges copied to RAM.</text>']
     # legend
     x, y = left, 58
     for i, (k, (_, col, label)) in enumerate(CLASSES.items()):
@@ -170,17 +197,22 @@ def render(cls, out):
         a = BASE + r * COLS * CELL
         svg.append(f'<text x="{left - 6}" y="{top + r * PX + 9}" text-anchor="end" fill="#333">0x{a:08X}</text>'
                    f'<line x1="{left - 4}" y1="{top + r * PX}" x2="{left}" y2="{top + r * PX}" stroke="#333"/>')
-    # load-range brackets on the right
+    # right side: black bars = ranges copied to RAM; labels = what is there (docs/firmware-map.md)
     xr = left + COLS * PX + 8
     for lo, hi, name, when in LOADS:
         r0 = (lo - BASE) // (CELL * COLS)
         r1 = (min(hi, BASE + n) - 1 - BASE) // (CELL * COLS)
-        if r0 >= rows:
-            continue
-        y0, y1 = top + r0 * PX, top + (r1 + 1) * PX
-        svg.append(f'<line x1="{xr}" y1="{y0}" x2="{xr}" y2="{y1}" stroke="#222" stroke-width="2"/>')
-        if y1 - y0 >= 10:
-            svg.append(f'<text x="{xr + 6}" y="{(y0 + y1) / 2 + 4}">{name} <tspan fill="#666">({when})</tspan></text>')
+        if r0 < rows:
+            svg.append(f'<line x1="{xr}" y1="{top + r0 * PX}" x2="{xr}" y2="{top + (r1 + 1) * PX}" '
+                       f'stroke="#222" stroke-width="3"/>')
+    last = 0
+    for a, name in MODULES:
+        y0 = top + (a - BASE) // (CELL * COLS) * PX
+        y = max(y0 + 4, last + 13)
+        last = y
+        svg.append(f'<polyline points="{xr + 4},{y0 + 1} {xr + 14},{y - 3} {xr + 20},{y - 3}" fill="none" '
+                   f'stroke="#888" stroke-width="0.7"/>'
+                   f'<text x="{xr + 24}" y="{y}">{name} <tspan fill="#777">0x{a:08X}</tspan></text>')
     # totals bar
     by = top + rows * PX + 30
     svg.append(f'<text x="{left}" y="{by - 8}" font-weight="bold">Share of block 0</text>')
