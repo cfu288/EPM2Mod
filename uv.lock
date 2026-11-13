@@ -901,7 +901,6 @@ wheels = [
 
 [[package]]
 name = "epm2mod"
-version = "0.1.0"
 source = { editable = "." }
 default-groups = ["dev", "research"]
 

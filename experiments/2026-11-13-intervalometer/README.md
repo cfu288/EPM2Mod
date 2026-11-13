@@ -137,3 +137,7 @@ Specs 1–3 are kept for reference only. Do not build spec 2 or 3 with the film 
 | `scripts/` | Spec generators (`mkspec_v2.py`, `mkspec_frames240.py`), cross-body comparison and scan helpers. NOTES "Files" lists each one |
 | `results/` | Emulator output, function pairing, scans |
 | `tools/emu/cases.py` (repo root) | The emulator cases: `menu_help`, `menu_child`, `menu_value`, `ivl_guard`, `ivl_selector`, `ivl_start`, `ivl_movie_guard`, `ivl_shot_done`, `frames_step`, `frames_editor` |
+
+> **Where the shipped specs are.** `interval-timelapse-v2.json` and `interval-frames-240.json` are
+> part of the pinned firmware build, so they live in `patches/` at the top of the repository. The
+> other specs in this folder's `patches/` are earlier versions, kept as a record.

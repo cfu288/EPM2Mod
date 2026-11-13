@@ -8,7 +8,7 @@
   "patches/seven-films-5.json",
   "patches/xp-adaptive-hue-off.json",
   "patches/seven-labels.json",
-  "experiments/2026-11-13-intervalometer/patches/interval-timelapse-v2.json"
+  "patches/interval-timelapse-v2.json"
  ],
  "sha256": "f52ea6976ac2e9c567b2c07d7556b96b6431c8fcd2d90de195abdb76059e0104",
  "camera_tested": "2026-11-13"

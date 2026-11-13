@@ -364,7 +364,7 @@ Images: stock, films, stock + v2, films + v2, E-PL6 1.4. Model errors: 0 in ever
 | 2026-11-13 | `build/seven-films-6-interval.BIN` = the seven-films-6 specs + `interval-timelapse-v2.json` | **Works** (user report: "It works!", interval shooting runs). Not yet reported: which steps of §7 / §12.5 passed (movie, cancel paths, > 90 s sleep, Sleep = 1 min, card full) |
 | 2026-11-13 | `seven-films-6-interval-240.BIN` = the films + `interval-timelapse-v2.json` + `interval-frames-240.json` | **"Seems to work"** (user report; still testing; which steps passed is not yet reported) |
 
-**Can the frame count go above 99? Yes, to 240, with data edits only:** [patches/interval-frames-240.json](patches/interval-frames-240.json) (6 ops; not built, not camera-tested). This replaces the earlier "not with a safe patch" answer, which missed that the editor can compose a number label. Evidence: `results/framecap.txt`, `results/emu-frames240-*`, `scripts/mkspec_frames240.py`.
+**Can the frame count go above 99? Yes, to 240, with data edits only:** [patches/interval-frames-240.json](../../patches/interval-frames-240.json) (6 ops; not built, not camera-tested). This replaces the earlier "not with a safe patch" answer, which missed that the editor can compose a number label. Evidence: `results/framecap.txt`, `results/emu-frames240-*`, `scripts/mkspec_frames240.py`.
 
 ### 13.1 Where 99 came from (V)
 

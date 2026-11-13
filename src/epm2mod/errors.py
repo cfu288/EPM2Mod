@@ -1,14 +1,22 @@
 """Exception types of the package.
 
 Every error that a user can cause or meet (a wrong file, a failed download, a
-spec that does not fit the firmware) is an ``Epm2ModError``. The command-line
-interface prints its message and exits with status 1. Other exceptions are
-programming errors and are not caught.
+spec that does not fit the firmware, a full disk) is an ``Epm2ModError``. The
+command-line interface prints its message and exits with status 1. Any other
+exception is a programming error; it is not caught and shows a traceback.
 """
 
 
 class Epm2ModError(Exception):
     """Base class of the errors that the package reports to the user."""
+
+
+class RepositoryError(Epm2ModError):
+    """The command was not run inside a checkout of the repository."""
+
+
+class FileError(Epm2ModError):
+    """A file cannot be read or written (missing, no permission, disk full)."""
 
 
 class ContainerError(Epm2ModError):

@@ -74,7 +74,8 @@ def pack(indir, outpath):
         for b in man["blocks"]
     ]
     tail = open(os.path.join(indir, "tail.bin"), "rb").read()
-    open(outpath, "wb").write(build(blocks, tail))
+    image = build(blocks, tail)  # may raise: build first, so no empty file is left
+    open(outpath, "wb").write(image)
     return info(outpath)
 
 
@@ -89,7 +90,8 @@ def patch(src, dst, specs):
         p[off:off + len(new)] = new
         blocks[blk]["payload"] = bytes(p)
         print(f"block{blk}+0x{off:x}: {cur.hex()} -> {new.hex()}")
-    open(dst, "wb").write(build(blocks, tail))
+    image = build(blocks, tail)  # may raise: build first, so no empty file is left
+    open(dst, "wb").write(image)
     return info(dst)
 
 

@@ -1,6 +1,7 @@
 {
  "name": "seven-films-5",
- "description": "Seven films, one per film slot, in menu order: Pop Art = portra-m1; Soft Focus = ektachrome-m1; Pale&Light Color = pro400h-m1; Light Tone = kodachrome64-m1; Pin Hole = vision3250d-m1; Diorama = velvia100-m1; Cross Process = superia400-m1. NOTES \u00a739.",
+ "attribution": "Film look data derived from spektrafilm by Andrea Volpato, https://github.com/andreavolpato/spektrafilm. Licensed CC BY-SA 4.0. Modified: fitted to the Olympus E-PM2's adjustable stages. See NOTICE.md.",
+ "description": "Seven film looks, one per film slot, in menu order: Pop Art = Kodak Portra 400; Soft Focus = Kodak Ektachrome 100; Pale&Light Color = Fuji Pro 400H; Light Tone = Kodak Kodachrome 64; Pin Hole = Kodak Vision3 250D; Diorama = Fuji Velvia 100; Cross Process = Fuji Superia X-tra 400.",
  "ops": [
   {
    "type": "bytes",
@@ -691,6 +692,5 @@
  ],
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "camera-tested 2026-11-12 as part of build/seven-films-5.BIN (sha256 0443a38804061afaf17a12906a6969101d9f54ffe006e0aeca0d21d68f9b29ae); see docs/camera-log.md",
- "attribution": "Film look data derived from spektrafilm by Andrea Volpato, https://github.com/andreavolpato/spektrafilm. Licensed CC BY-SA 4.0. Modified: fitted to the Olympus E-PM2's adjustable stages. See NOTICE.md."
+ "status": "camera-tested 2026-11-12 as part of build/seven-films-5.BIN (sha256 0443a38804061afaf17a12906a6969101d9f54ffe006e0aeca0d21d68f9b29ae); see docs/camera-log.md"
 }

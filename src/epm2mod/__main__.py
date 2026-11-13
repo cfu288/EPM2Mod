@@ -1,5 +1,7 @@
 """Run the ``epm2mod`` command: ``python -m epm2mod``."""
 
-from .cli import run
+import sys
 
-run()
+from .cli import main
+
+sys.exit(main())

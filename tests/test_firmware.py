@@ -5,7 +5,7 @@ Run: python3 -m unittest discover -s tests
 Tests that need firmware BINs are skipped when the files are absent.
 """
 
-import glob, hashlib, json, os, sys, unittest
+import contextlib, glob, hashlib, io, json, os, sys, tempfile, unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
@@ -40,17 +40,11 @@ class TestPatchSpecs(unittest.TestCase):
             s = json.load(open(spec))
             if not s.get("expected_sha256"):
                 continue
-            with self.subTest(spec=os.path.basename(spec)):
-                out = os.path.join(ROOT, "build", "_test_" + s["name"] + ".BIN")
-                try:
+            with self.subTest(spec=os.path.basename(spec)), tempfile.TemporaryDirectory() as folder:
+                out = os.path.join(folder, s["name"] + ".BIN")
+                with contextlib.redirect_stdout(io.StringIO()):
                     self.assertTrue(build.build([spec], out))
-                    self.assertEqual(
-                        hashlib.sha256(open(out, "rb").read()).hexdigest(),
-                        s["expected_sha256"],
-                    )
-                finally:
-                    if os.path.exists(out):
-                        os.remove(out)
+                self.assertEqual(hashlib.sha256(open(out, "rb").read()).hexdigest(), s["expected_sha256"])
 
 
 if __name__ == "__main__":

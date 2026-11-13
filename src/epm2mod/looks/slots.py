@@ -10,7 +10,6 @@ How they were found: ``docs/art-filter-slots.md`` and
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Tuple
 
 #: Run-time address of the first payload byte of block 0.
 BLOCK0_BASE = 0x7E421020
@@ -68,16 +67,23 @@ class Slot:
 
     entry: str
     saturation: int
-    six_axis: Tuple[int, int]
+    six_axis: tuple[int, int]
     matrix: int
     matrix_is_new: bool
     chroma: int
-    tables: Optional[Tuple[int, int, int]] = None
-    records: Optional[Tuple[int, int, int]] = None
+    tables: tuple[int, int, int] | None = None
+    records: tuple[int, int, int] | None = None
+
+    def __post_init__(self) -> None:
+        """Check that the slot has tables or records, and not both."""
+        if (self.tables is None) == (self.records is None):
+            raise ValueError(
+                f"slot {self.entry!r}: exactly one of 'tables' and 'records' is needed"
+            )
 
 
 #: The seven film slots, in menu order.
-SLOTS: Tuple[Slot, ...] = (
+SLOTS: tuple[Slot, ...] = (
     Slot(
         entry="Pop Art",
         tables=(0x7E74F1BC, 0x7E74F5BC, 0x7E7505BC),

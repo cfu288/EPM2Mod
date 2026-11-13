@@ -1,4 +1,4 @@
-# mkspec_frames240.py: build experiments/2026-11-13-intervalometer/patches/interval-frames-240.json
+# mkspec_frames240.py: build patches/interval-frames-240.json
 # Frame count (info 483): 1-99 by 1 (stock labels), then 100-240 by 5 (composed number labels) = 128 choices,
 # the most the list editor can index (its key handler sign-extends the byte index: 0x7EE017BB / 0x7EE017FC).
 import json, struct
@@ -6,7 +6,7 @@ B=0x7E421020
 SC='/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/ivl/'
 D=bytearray(open('/path/to/EPM2Mod/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin','rb').read())
 FV=open(SC+'v2-films.block0.bin','rb').read()                      # films + interval-timelapse-v2, built in scratch
-OUT='/path/to/EPM2Mod/experiments/2026-11-13-intervalometer/patches/interval-frames-240.json'
+OUT='/path/to/EPM2Mod/patches/interval-frames-240.json'
 VALUES=list(range(1,100))+list(range(100,241,5))
 assert len(VALUES)==128 and max(VALUES)==240
 assert 128 not in VALUES  # 128 is the mcon error value for u8 lists (cmp 128 at 0x7E6FCAD6); review-4 S2

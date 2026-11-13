@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Any, Dict, Tuple
+from typing import Any
 
+from ..builds import check_spec_path
 from ..errors import BuildError
-from ..paths import RepoPaths
+from ..fileio import read_json
+from ..paths import RepoPaths, is_repo_relative
 from .slots import SLOTS
 
 
@@ -42,13 +42,13 @@ class FilmList:
         structure_spec: path of the patch spec with what the slots share.
     """
 
-    films: Tuple[Film, ...]
+    films: tuple[Film, ...]
     films_spec: str
     labels_spec: str
     structure_spec: str
 
 
-def _text(raw: Dict[str, Any], key: str, where: str) -> str:
+def _text(raw: dict[str, Any], key: str, where: str) -> str:
     """Return a non-empty text field."""
     value = raw.get(key)
     if not isinstance(value, str) or not value:
@@ -61,16 +61,11 @@ def load_films(paths: RepoPaths) -> FilmList:
 
     Raises:
         BuildError: if the file is missing or malformed, an entry is not a film
-            slot or appears twice, a slot has no film, or a label is longer
-            than the entry it replaces.
+            slot or appears twice, a slot has no film, a label is longer than
+            the entry it replaces, or a path is not a plain path in the repository.
     """
-    path: Path = paths.films
-    try:
-        raw = json.loads(path.read_text(encoding="utf-8"))
-    except OSError as error:
-        raise BuildError(f"{path}: cannot be read: {error.strerror}") from None
-    except ValueError as error:
-        raise BuildError(f"{path}: not JSON: {error}") from None
+    path = paths.films
+    raw = read_json(path, BuildError)
     if not isinstance(raw, dict) or not isinstance(raw.get("films"), list):
         raise BuildError(f"{path}: must be an object with a 'films' list")
     specs = raw.get("specs")
@@ -88,6 +83,11 @@ def load_films(paths: RepoPaths) -> FilmList:
             label=_text(item, "label", where),
             fit=_text(item, "fit", where),
         )
+        if not is_repo_relative(film.fit):
+            raise BuildError(
+                f"{where}: 'fit' must be a path inside the repository, written "
+                "with forward slashes"
+            )
         if len(film.label) > len(film.entry):
             raise BuildError(
                 f"{where}: the label '{film.label}' is longer than the menu "
@@ -103,7 +103,7 @@ def load_films(paths: RepoPaths) -> FilmList:
         )
     return FilmList(
         films=tuple(films),
-        films_spec=_text(specs, "films", f"{path} specs"),
-        labels_spec=_text(specs, "labels", f"{path} specs"),
-        structure_spec=_text(specs, "structure", f"{path} specs"),
+        films_spec=check_spec_path(specs.get("films"), f"{path} specs"),
+        labels_spec=check_spec_path(specs.get("labels"), f"{path} specs"),
+        structure_spec=check_spec_path(specs.get("structure"), f"{path} specs"),
     )

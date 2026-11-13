@@ -76,8 +76,8 @@ CLASSES = {
 DEFAULT_SPECS = ["patches/remap7b-code.json", "patches/seven-fixes-1.json", "patches/seven-movie-1.json",
                  "patches/seven-structure-extra.json", "patches/seven-films-5.json",
                  "patches/xp-adaptive-hue-off.json", "patches/seven-labels.json",
-                 "experiments/2026-11-13-intervalometer/patches/interval-timelapse-v2.json",
-                 "experiments/2026-11-13-intervalometer/patches/interval-frames-240.json"]
+                 "patches/interval-timelapse-v2.json",
+                 "patches/interval-frames-240.json"]
 
 
 def classify(specs):

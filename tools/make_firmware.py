@@ -5,13 +5,12 @@
 # ///
 """Make a firmware build: download the stock firmware, apply the patch specs, check the result.
 
-    uv run tools/make_firmware.py                               the pinned build
-    uv run tools/make_firmware.py --card /Volumes/NAME          the same, copied to that SD card
-    uv run tools/make_firmware.py builds/NAME.json              another build
-    uv run tools/make_firmware.py builds/NAME.json --pin DATE   record a passed camera test and pin
+    uv run tools/make_firmware.py                        the pinned build
+    uv run tools/make_firmware.py --card /Volumes/NAME   the same, written to that SD card
+    uv run tools/make_firmware.py builds/NAME.json       another build
 
-This is `epm2mod make` (src/epm2mod/cli.py) for people who have not installed the package.
-Python standard library only; `uv run` gets a Python for you, or use `python3` in its place.
+This is `epm2mod make` (src/epm2mod/pipeline.py) for people who have not installed the package.
+Python standard library only; `uv run` gets a Python for you, or use `python3` (3.10 or newer).
 """
 import sys
 

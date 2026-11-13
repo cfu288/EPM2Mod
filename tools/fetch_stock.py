@@ -8,7 +8,7 @@
     uv run tools/fetch_stock.py     -> firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN
 
 This is `epm2mod fetch-stock` (src/epm2mod/stock.py) for people who have not installed the package.
-Python standard library only; `uv run` gets a Python for you, or use `python3` in its place.
+Python standard library only; `uv run` gets a Python for you, or use `python3` (3.10 or newer).
 """
 import sys
 

@@ -1,6 +1,6 @@
 {
  "name": "seven-labels",
- "description": "Menu labels of the seven film slots (replaces label-portra, label-ektachrome-lt, label-pro400h-pa): 'Pop Art' -> 'Portra', 'Soft Focus' -> 'Ektachrome', 'Pale&Light Color' -> 'Pro 400H', 'Light Tone' -> 'Kodachrome', 'Pin Hole' -> 'Vis 250D', 'Diorama' -> 'Velvia', 'Cross Process' -> 'Superia 400'. Only the entry's own strings; longer strings containing the name (e.g. 'Add Soft Focus Effect') are left alone.",
+ "description": "Menu labels of the seven film slots: 'Pop Art' -> 'Portra', 'Soft Focus' -> 'Ektachrome', 'Pale&Light Color' -> 'Pro 400H', 'Light Tone' -> 'Kodachrome', 'Pin Hole' -> 'Vis 250D', 'Diorama' -> 'Velvia', 'Cross Process' -> 'Superia 400'. Only whole strings; longer texts that contain a name are left alone.",
  "ops": [
   {
    "type": "bytes",

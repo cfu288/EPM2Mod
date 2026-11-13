@@ -23,7 +23,8 @@ Examples: `feat(patch/movie-limit): raise 29-min cap to 9 h`, `docs(camera-log):
 
 ## Where things go
 
-- **`tools/`:** reusable, tested code.
+- **`src/epm2mod/`:** the production package (see *Production code and research code*).
+- **`tools/`:** stand-alone scripts: thin commands over the package, and analysis tools.
 - **`patches/`:** one JSON spec per mod. Every op states the bytes it expects to replace. Add `expected_sha256` and `status` once a build has been camera-tested.
 - **`docs/`:** durable knowledge. Facts there must be sourced or reproducible.
 - **`experiments/YYYY-MM-DD-slug/`:** ad-hoc scripts and `NOTES.md`. Anything bulky goes in its `out/` subfolder, which is git-ignored. Promote findings into `docs/` or `tools/` once they hold up.
@@ -34,12 +35,14 @@ Examples: `feat(patch/movie-limit): raise 29-min cap to 9 h`, `docs(camera-log):
 
 - **`src/epm2mod/` is production code.** It makes the firmware that goes on a camera. Rules:
   formatted with black (line length 88), type-checked with `mypy --strict`, a docstring on every
-  module, class and function, and tests in `tests/test_package.py`. The pre-commit hook formats the
-  staged files of the package and runs mypy. By hand: `uv run black src tests/test_package.py`,
-  `uv run mypy`, `uv run python -m unittest discover -s tests`.
+  module, class and function, and tests in `tests/test_package.py` and `tests/test_looks.py`. The
+  pre-commit hook formats the staged files of the package and its tests and runs mypy. By hand:
+  `uv run black src tests/test_package.py tests/test_looks.py`, `uv run mypy`,
+  `uv run python -m unittest discover -s tests`.
 - **`experiments/` is research code.** It may be rough. It may import the package; the package never
-  imports from `experiments/`. When a result becomes part of how firmware is made, move the code
-  into the package and the data into a top-level folder (as `looks/` was).
+  imports from `experiments/`, and a build description may only name patch specs in `patches/`.
+  When a result becomes part of how firmware is made, move the code into the package, the data into
+  a top-level folder (as `looks/` was) and the spec into `patches/`.
 - **`tools/`** holds stand-alone scripts. `make_firmware.py`, `fetch_stock.py`, `build.py` and
   `oetool.py` are thin commands over the package. The others (`freespace.py`, `fwmap.py`,
   `disasm.py`, `memmap_svg.py`, `emu/`) are analysis tools.
@@ -60,17 +63,23 @@ A build description is a file in `builds/`: what the build is, and the patch spe
 build's name is the file name. `pinned-build.json` names the description of the last camera-tested
 build.
 
-1. **New build:** write `builds/NAME.json` with `what` and `specs`. Leave out `sha256` and
-   `camera_tested`. Copy an existing description and change it.
+1. **New build:** write `builds/NAME.json` with `what` and `specs` (files in `patches/`). Leave out
+   `sha256` and `camera_tested`. Copy an existing description and change it.
 2. **Make it:** `uv run tools/make_firmware.py builds/NAME.json`. For a build without a recorded
    sha256 the script runs `tools/freespace.py check` first, then prints the sha256 and says that the
    build is a candidate.
 3. **Log it** in [camera-log.md](camera-log.md) with that sha256, then flash
    `build/card/DCOLYMP/E1019999.BIN` (or `build/NAME.BIN`).
-4. **If the camera test passes:** `uv run tools/make_firmware.py builds/NAME.json --pin YYYY-MM-DD`.
-   This writes the sha256 and the date into the description and makes it the pinned build. Then run
-   `uv run epm2mod readme`, write the result in the camera log, and commit.
+4. **If the camera test passes:**
+   `uv run epm2mod pin builds/NAME.json --date YYYY-MM-DD --sha256 THE_SHA256_FROM_THE_LOG`.
+   The command makes the build again in memory and records the test only if the result has that
+   sha256, so a spec that changed after the flash cannot be recorded as tested. It writes the sha256
+   and the date into the description and makes it the pinned build. Then run `uv run epm2mod readme`,
+   write the result in the camera log, and commit.
 5. **If it fails:** write the result in the camera log. Keep or delete the description; never pin it.
+
+A test record is never changed. A build that changes after its test gets a description with a new
+name.
 
 The tests build every description that has a sha256 and compare the result.
 

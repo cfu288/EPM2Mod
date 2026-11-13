@@ -4,26 +4,30 @@ The download asks the maker's update catalog for the address of the file, with
 the request that the maker's own updater program sends. The camera model code
 is real; the network address and the serial number are placeholders. Nothing
 about the user or the user's camera is sent.
+
+A downloaded file is kept only if its size and SHA-256 are the expected ones,
+so the address it came from does not have to be trusted.
 """
 
 from __future__ import annotations
 
 import datetime
-import urllib.error
+import http.client
+import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ElementTree
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Optional
 
 from .errors import StockError
-from .hashing import sha256_file
+from .fileio import BLOCK_SIZE, Log, read_bytes, silent, write_bytes
+from .hashing import sha256_bytes
 from .paths import RepoPaths
 
 CATALOG_URL = "https://fw01.om-digitalsolutions.net/ww_inform/fcache.do"
 USER_AGENT = "Olympus"
 _TIMEOUT_SECONDS = 120
-_BLOCK_SIZE = 1 << 20
+_CATALOG_LIMIT = 1 << 20
 
 
 @dataclass(frozen=True)
@@ -73,17 +77,34 @@ _REQUEST = (
     "<serial_no>000000000</serial_no></hardware_info></hardwares></firmware_demand>"
 )
 
-Log = Callable[[str], None]
-
 
 def stock_path(paths: RepoPaths, stock: StockFirmware = EPM2_V16) -> Path:
     """Return where the stock firmware file is kept."""
     return paths.resolve(stock.relative_path)
 
 
-def is_stock(path: Path, stock: StockFirmware = EPM2_V16) -> bool:
-    """Return True if ``path`` is a file with the stock firmware's SHA-256."""
-    return path.is_file() and sha256_file(path) == stock.sha256
+def read_stock(paths: RepoPaths, stock: StockFirmware = EPM2_V16) -> bytes:
+    """Return the bytes of the stock firmware file, after checking their SHA-256.
+
+    The check is made on the bytes that are returned, so the caller works on
+    exactly what was verified.
+
+    Raises:
+        StockError: if the file is missing, cannot be read, or is another file.
+    """
+    path = stock_path(paths, stock)
+    if not path.exists():
+        raise StockError(
+            f"{stock.relative_path} is missing: run 'epm2mod fetch-stock' "
+            "(tools/fetch_stock.py)"
+        )
+    data = read_bytes(path, StockError)
+    if sha256_bytes(data) != stock.sha256:
+        raise StockError(
+            f"{stock.relative_path} is not {stock.file_name} (the sha256 differs). "
+            "Move it away and run 'epm2mod fetch-stock'."
+        )
+    return data
 
 
 def catalog_request(stock: StockFirmware, now: datetime.datetime) -> bytes:
@@ -115,35 +136,51 @@ def download_url(answer: bytes, stock: StockFirmware) -> str:
             f"(it offers {offered or 'nothing'})"
         )
     url = info.findtext("url") or ""
-    if not url.startswith("https://"):
+    if urllib.parse.urlsplit(url).scheme != "https":
         raise StockError(f"the catalog gave an address that is not HTTPS: {url!r}")
     return url
 
 
-def _open(request: urllib.request.Request) -> "urllib.request._UrlopenRet":
-    """Open a request; network errors become ``StockError``."""
+def http_get(request: urllib.request.Request, limit: int) -> bytes:
+    """Return the body of the answer to an HTTP request.
+
+    Args:
+        request: the request.
+        limit: the largest body that is accepted, in bytes.
+
+    Raises:
+        StockError: if the request fails, the answer is cut short, or the body
+            is larger than ``limit``.
+    """
+    body = bytearray()
     try:
-        return urllib.request.urlopen(request, timeout=_TIMEOUT_SECONDS)  # noqa: S310
-    except (urllib.error.URLError, TimeoutError, OSError) as error:
-        raise StockError(f"download failed: {error}") from None
+        with urllib.request.urlopen(request, timeout=_TIMEOUT_SECONDS) as response:
+            for block in iter(lambda: response.read(BLOCK_SIZE), b""):
+                body += block
+                if len(body) > limit:
+                    raise StockError(
+                        f"{request.full_url}: the answer is larger than {limit} bytes"
+                    )
+    except (OSError, http.client.HTTPException) as error:
+        raise StockError(f"{request.full_url}: download failed: {error}") from None
+    return bytes(body)
 
 
 def fetch(
     paths: RepoPaths,
     stock: StockFirmware = EPM2_V16,
-    log: Optional[Log] = None,
+    log: Log = silent,
 ) -> Path:
     """Make sure the stock firmware file is in the repository, and return its path.
 
     If the file is there and has the right SHA-256, nothing is downloaded. If a
-    different file is there, it is left alone and an error is raised. The
-    download goes to a ``.part`` file that is renamed only after its size and
-    SHA-256 are right.
+    different file is there, it is left alone and an error is raised. A
+    downloaded file is written only after its size and SHA-256 are right.
 
     Args:
         paths: the repository.
         stock: which firmware.
-        log: where progress lines go; None for silence.
+        log: where progress lines go.
 
     Returns:
         The path of the checked file.
@@ -152,44 +189,43 @@ def fetch(
         StockError: if another file is in the way, the catalog does not offer
             the firmware, the download fails, or the downloaded file is wrong.
     """
-    say = log or (lambda line: None)
     destination = stock_path(paths, stock)
     if destination.exists():
-        if is_stock(destination, stock):
-            say(f"already there and correct: {paths.relative(destination)}")
-            return destination
-        raise StockError(
-            f"{paths.relative(destination)} exists but is not {stock.file_name} "
-            "(the sha256 differs). Move it away and run this again."
-        )
+        read_stock(paths, stock)
+        log(f"already there and correct: {paths.relative(destination)}")
+        return destination
+    headers = {"User-Agent": USER_AGENT, "Content-Type": "text/xml; Charset=UTF-8"}
     now = datetime.datetime.now(datetime.timezone.utc)
-    request = urllib.request.Request(
-        CATALOG_URL,
-        data=catalog_request(stock, now),
-        headers={"User-Agent": USER_AGENT, "Content-Type": "text/xml; Charset=UTF-8"},
+    catalog = urllib.request.Request(
+        CATALOG_URL, data=catalog_request(stock, now), headers=headers
     )
-    with _open(request) as response:
-        url = download_url(response.read(), stock)
-    host = url.split("/")[2]
-    say(f"downloading {stock.file_name} ({stock.size / 1e6:.0f} MB) from {host}")
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    part = destination.with_name(destination.name + ".part")
-    try:
-        download = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-        with _open(download) as response, part.open("wb") as handle:
-            for block in iter(lambda: response.read(_BLOCK_SIZE), b""):
-                handle.write(block)
-        size, digest = part.stat().st_size, sha256_file(part)
-        if size != stock.size or digest != stock.sha256:
-            raise StockError(
-                f"the downloaded file is not {stock.file_name} "
-                f"(size {size}, sha256 {digest}); nothing was kept"
-            )
-        part.replace(destination)
-    except OSError as error:
-        raise StockError(f"download failed: {error}") from None
-    finally:
-        if part.exists():
-            part.unlink()
-    say(f"ok: {paths.relative(destination)} sha256 {stock.sha256}")
+    url = download_url(http_get(catalog, _CATALOG_LIMIT), stock)
+    host = urllib.parse.urlsplit(url).hostname
+    log(f"downloading {stock.file_name} ({stock.size / 1e6:.0f} MB) from {host}")
+    download = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    data = http_get(download, stock.size)
+    digest = sha256_bytes(data)
+    if len(data) != stock.size or digest != stock.sha256:
+        raise StockError(
+            f"the downloaded file is not {stock.file_name} "
+            f"(size {len(data)}, sha256 {digest}); nothing was kept"
+        )
+    write_bytes(destination, data, StockError)
+    log(f"ok: {paths.relative(destination)} sha256 {stock.sha256}")
     return destination
+
+
+def obtain_stock(
+    paths: RepoPaths,
+    stock: StockFirmware = EPM2_V16,
+    log: Log = silent,
+) -> bytes:
+    """Return the checked bytes of the stock firmware; download the file if it is absent.
+
+    Raises:
+        StockError: as ``fetch`` and ``read_stock``.
+    """
+    if not stock_path(paths, stock).exists():
+        log("the stock firmware is not here: downloading it")
+        fetch(paths, stock, log)
+    return read_stock(paths, stock)

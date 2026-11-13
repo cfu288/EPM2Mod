@@ -3,35 +3,48 @@
 ``make`` is the one way firmware is made in this repository, for a user who
 installs the pinned build and for a developer who tries a new one:
 
-1. the stock firmware is found, or downloaded, and its SHA-256 is checked;
+1. the stock firmware is read (downloaded first if it is absent) and its
+   SHA-256 is checked;
 2. for a candidate (a build with no recorded SHA-256), the free-space check
    runs on the spec list;
-3. the patch specs are applied;
+3. the patch specs are applied, in memory;
 4. the SHA-256 of the result is compared with the recorded one (tested build)
    or reported (candidate);
-5. the firmware is written to ``build/NAME.BIN`` and, under the name the
-   camera looks for, to ``build/card/DCOLYMP/``; optionally also to an SD card.
+5. the firmware is written to ``build/NAME.BIN`` and, under the name the camera
+   looks for, to ``build/card/DCOLYMP/``; optionally also to an SD card.
 
-A wrong result is never left on disk under a name that looks usable.
+What ``make`` guarantees about files:
+
+* The outputs of an earlier run for the same build, and the whole ``build/card``
+  folder, are removed before anything else is done. After a failed run they are
+  absent; they never hold another build.
+* A firmware file gets its final name only when all of it is written and
+  flushed (``fileio.write_bytes``). No final name ever holds part of a file.
+* On the SD card the new file replaces an older one only when it is complete
+  and its SHA-256 was read back and found right.
+
+``record_test`` is the separate step that turns a candidate into a tested build
+after a camera test.
 """
 
 from __future__ import annotations
 
+import datetime
 import shutil
 import subprocess
 import sys
 from dataclasses import dataclass
-from pathlib import Path, PurePosixPath
-from typing import Callable, List, Optional
+from pathlib import Path
 
-from .builds import BuildDescription, pin
+from .builds import BuildDescription, check_test_date, pin
 from .errors import BuildError
-from .hashing import sha256_bytes, sha256_file
+from .fileio import Log, part_path, read_bytes, remove, silent, write_bytes
+from .hashing import sha256_bytes
 from .paths import RepoPaths
-from .spec import PatchSpec, apply_specs, load_spec
-from .stock import CARD_FOLDER, EPM2_V16, StockFirmware, fetch, is_stock, stock_path
+from .spec import Applied, PatchSpec, apply_specs, load_spec
+from .stock import CARD_FOLDER, EPM2_V16, StockFirmware, obtain_stock, read_stock
 
-Log = Callable[[str], None]
+_CHECK_OUTPUT_LIMIT = 3000
 
 
 @dataclass(frozen=True)
@@ -39,7 +52,7 @@ class MakeResult:
     """What ``make`` produced.
 
     Attributes:
-        description: the build that was made; after ``pin_date`` it holds the test record.
+        description: the build that was made.
         image: the firmware file, ``build/NAME.BIN``.
         card_copy: the copy under the camera's file name, in ``build/card``.
         on_card: the copy on the SD card, or None if no card was given.
@@ -49,38 +62,45 @@ class MakeResult:
     description: BuildDescription
     image: Path
     card_copy: Path
-    on_card: Optional[Path]
+    on_card: Path | None
     sha256: str
 
 
-def load_specs(paths: RepoPaths, description: BuildDescription) -> List[PatchSpec]:
+def load_specs(paths: RepoPaths, description: BuildDescription) -> list[PatchSpec]:
     """Read the patch specs of a build, in order.
 
     Raises:
-        BuildError: if a spec path is absolute or has '..' in it.
         SpecError: if a spec is missing or not valid.
     """
-    specs = []
-    for relative in description.specs:
-        parts = PurePosixPath(relative).parts
-        if PurePosixPath(relative).is_absolute() or ".." in parts or "\\" in relative:
-            raise BuildError(
-                f"{description.name}: '{relative}' must be a path inside the "
-                "repository, written with forward slashes and without '..'"
-            )
-        specs.append(load_spec(paths.resolve(relative)))
-    return specs
+    return [load_spec(paths.resolve(relative)) for relative in description.specs]
 
 
-def ensure_stock(paths: RepoPaths, stock: StockFirmware, log: Log) -> Path:
-    """Return the path of the checked stock firmware; download it if it is absent."""
-    path = stock_path(paths, stock)
-    if not path.exists():
-        log("the stock firmware is not here: downloading it")
-        return fetch(paths, stock, log)
-    if not is_stock(path, stock):
-        return fetch(paths, stock, log)  # raises: another file is in the way
-    return path
+def build_image(
+    paths: RepoPaths, description: BuildDescription, stock_data: bytes
+) -> tuple[Applied, str]:
+    """Apply a build's specs to the stock firmware, in memory, and check the result.
+
+    Args:
+        paths: the repository.
+        description: the build.
+        stock_data: the checked bytes of the stock firmware.
+
+    Returns:
+        The applied result and the SHA-256 of its image.
+
+    Raises:
+        SpecError: if a spec is missing, not valid, or does not fit.
+        BuildError: if the build has a recorded SHA-256 and the result has another.
+    """
+    applied = apply_specs(stock_data, load_specs(paths, description))
+    digest = sha256_bytes(applied.image)
+    if description.sha256 is not None and digest != description.sha256:
+        raise BuildError(
+            f"{description.name}: the result is not the recorded build.\n"
+            f"  expected {description.sha256}\n  got      {digest}\n"
+            "Nothing was written."
+        )
+    return applied, digest
 
 
 def check_free_space(paths: RepoPaths, description: BuildDescription) -> str:
@@ -108,63 +128,128 @@ def check_free_space(paths: RepoPaths, description: BuildDescription) -> str:
         hint = ""
         if not paths.firmware_map.exists():
             hint = (
-                f"\nThe firmware map ({paths.relative(paths.firmware_map)}) is missing. "
-                "A new build needs it: see tools/fwmap.py and tools/freespace.py."
+                f"\nThe firmware map ({paths.relative(paths.firmware_map)}) is "
+                "missing. A new build needs it: see tools/fwmap.py and "
+                "tools/freespace.py."
             )
         raise BuildError(
-            f"{output[-3000:]}\nthe free-space check failed: nothing was built{hint}"
+            f"{output[-_CHECK_OUTPUT_LIMIT:]}\n"
+            f"the free-space check failed: nothing was built{hint}"
         )
     return output.splitlines()[-1] if output else "ok"
 
 
-def copy_to_card(image: Path, sha256: str, card: Path, stock: StockFirmware) -> Path:
-    """Copy the firmware to an SD card and check the copy.
+def card_target(card: Path, stock: StockFirmware) -> Path:
+    """Return where the firmware file goes on an SD card mounted at ``card``."""
+    return card / CARD_FOLDER / stock.card_name
 
-    The file goes to ``CARD/DCOLYMP/<camera's file name>``. The camera's updater
-    needs it to be the only file in that folder, so other files there are an
-    error; they are not deleted.
+
+def check_card(card: Path, stock: StockFirmware) -> list[str]:
+    """Check that an SD card can take the firmware file, before any work is done.
+
+    The camera's updater needs the firmware to be the only file in its folder.
+    Other files there are an error; they are not deleted. Names that start with
+    a dot (which some computers add and hide) are reported, not refused.
+
+    Args:
+        card: the folder where the card is mounted.
+        stock: the stock firmware, for the camera's file name.
+
+    Returns:
+        The names in the firmware folder that start with a dot.
 
     Raises:
-        BuildError: if ``card`` is not a folder, other files are in the way,
-            the copy fails, or the copy differs from the firmware.
+        BuildError: if ``card`` is not a folder, or the firmware folder cannot
+            be read or holds other files.
     """
     if not card.is_dir():
         raise BuildError(
             f"{card}: no such folder. Give the place where the SD card is mounted."
         )
-    folder = card / CARD_FOLDER
-    target = folder / stock.card_name
+    target = card_target(card, stock)
+    folder = target.parent
+    if not folder.exists():
+        return []
+    ours = {target.name, part_path(target).name}
     try:
-        folder.mkdir(exist_ok=True)
-        others = sorted(
-            entry.name
-            for entry in folder.iterdir()
-            if not entry.name.startswith(".") and entry.name != stock.card_name
-        )
-        if others:
-            raise BuildError(
-                f"{folder} holds other files ({', '.join(others[:4])}). The firmware "
-                "must be the only file there. Remove them and run this again."
-            )
-        shutil.copyfile(image, target)
-        copied = sha256_file(target)
+        names = sorted(entry.name for entry in folder.iterdir())
     except OSError as error:
-        raise BuildError(f"cannot write to the card: {error}") from None
-    if copied != sha256:
-        target.unlink()
+        raise BuildError(f"{folder}: cannot be read: {error.strerror}") from None
+    others = [name for name in names if name not in ours and not name.startswith(".")]
+    if others:
         raise BuildError(
-            "The copy on the card was not the same as the firmware and was removed. "
-            "Try again, or try another card."
+            f"{folder} holds other files ({', '.join(others[:4])}). The firmware "
+            "must be the only file there. Remove them and run this again."
         )
+    return [name for name in names if name.startswith(".")]
+
+
+def copy_to_card(image: bytes, sha256: str, card: Path, stock: StockFirmware) -> Path:
+    """Write the firmware to an SD card and check what was written.
+
+    The data goes to a temporary name in the firmware folder, is flushed to the
+    card, is read back and compared with ``sha256``, and only then takes the
+    camera's file name. If anything fails, the temporary file is removed and a
+    firmware file that was on the card before is still there, unchanged.
+
+    The read-back goes through the operating system, which may answer from its
+    own memory. It proves that the data was accepted and flushed, not that the
+    card stores it without error.
+
+    Args:
+        image: the firmware file.
+        sha256: the SHA-256 that ``image`` has.
+        card: the folder where the card is mounted.
+        stock: the stock firmware, for the camera's file name.
+
+    Returns:
+        The path of the file on the card.
+
+    Raises:
+        BuildError: if the card cannot take the file (see ``check_card``), the
+            write fails, or the data read back differs.
+    """
+    check_card(card, stock)
+    target = card_target(card, stock)
+    temporary = part_path(target)
+    write_bytes(temporary, image, BuildError)
+    try:
+        copied = sha256_bytes(read_bytes(temporary, BuildError))
+        if copied != sha256:
+            raise BuildError(
+                "The data read back from the card was not the firmware. Nothing "
+                "was changed on the card. Try again, or try another card."
+            )
+        try:
+            temporary.replace(target)
+        except OSError as error:
+            raise BuildError(f"{target}: cannot be written: {error.strerror}") from None
+    finally:
+        remove(temporary)
     return target
+
+
+def _clear_outputs(paths: RepoPaths, image: Path) -> None:
+    """Remove what an earlier run left: the build's image and the card folder."""
+    try:
+        for stale in (image, part_path(image)):
+            if stale.exists() or stale.is_symlink():
+                stale.unlink()
+        if paths.card.is_symlink():
+            paths.card.unlink()
+        elif paths.card.exists():
+            shutil.rmtree(paths.card)
+    except OSError as error:
+        raise BuildError(
+            f"cannot remove the outputs of an earlier run: {error}"
+        ) from None
 
 
 def make(
     paths: RepoPaths,
     description: BuildDescription,
-    card: Optional[Path] = None,
-    pin_date: Optional[str] = None,
-    log: Optional[Log] = None,
+    card: Path | None = None,
+    log: Log = silent,
     stock: StockFirmware = EPM2_V16,
 ) -> MakeResult:
     """Make a firmware build.
@@ -172,80 +257,122 @@ def make(
     Args:
         paths: the repository.
         description: the build to make.
-        card: mount point of an SD card to copy the firmware to, or None.
-        pin_date: ISO date of a passed camera test. If given, the SHA-256 and
-            the date are recorded in the description and it becomes the pinned
-            build.
-        log: where progress lines go; None for silence.
+        card: mount point of an SD card to write the firmware to, or None.
+        log: where progress lines go.
         stock: the stock firmware the build starts from.
 
     Returns:
         The paths of what was written, and the SHA-256.
 
     Raises:
-        Epm2ModError: with a message for the user, if any step fails. No
-            firmware file is left behind then.
+        Epm2ModError: with a message for the user, if any step fails. Then
+            ``build/NAME.BIN`` and ``build/card`` do not exist, and a firmware
+            file on the SD card is as it was before.
     """
-    say = log or (lambda line: None)
-    if card is not None and not card.is_dir():
-        raise BuildError(
-            f"{card}: no such folder. Give the place where the SD card is mounted."
-        )
-    specs = load_specs(paths, description)
-    stock_file = ensure_stock(paths, stock, say)
-    say("1/5 stock firmware: ok")
+    image = paths.output / f"{description.name}.BIN"
+    card_copy = card_target(paths.card, stock)
+    _clear_outputs(paths, image)
+    hidden = check_card(card, stock) if card is not None else []
+
+    stock_data = obtain_stock(paths, stock, log)
+    log("1/5 stock firmware: ok")
 
     if description.tested:
-        say(
-            "2/5 free-space check: not needed, the result is compared with the recorded sha256"
+        log(
+            "2/5 free-space check: not needed, the result is compared with the "
+            "recorded sha256"
         )
     else:
-        say("2/5 free-space check: " + check_free_space(paths, description))
+        log("2/5 free-space check: " + check_free_space(paths, description))
 
-    applied = apply_specs(stock_file.read_bytes(), specs)
-    say(f"3/5 applied {len(specs)} patch specs ({applied.changed_bytes} bytes changed)")
-
-    digest = sha256_bytes(applied.image)
-    if description.sha256 is not None and digest != description.sha256:
-        raise BuildError(
-            "The result is not the recorded build.\n"
-            f"  expected {description.sha256}\n  got      {digest}\nNothing was written."
-        )
+    applied, digest = build_image(paths, description, stock_data)
+    log(
+        f"3/5 applied {len(description.specs)} patch specs "
+        f"({applied.changed_bytes} bytes changed)"
+    )
     if description.tested:
-        say(
-            f"4/5 sha256 {digest}: this is the build that was tested on {description.camera_tested}"
+        log(
+            f"4/5 sha256 {digest}: this is the build that was tested on "
+            f"{description.camera_tested}"
         )
     else:
-        say(
+        log(
             f"4/5 sha256 {digest}\n    CANDIDATE: this build is NOT camera-tested. "
             "Write the sha256 in docs/camera-log.md before you flash it."
         )
 
-    image = paths.output / f"{description.name}.BIN"
-    card_copy = paths.card / CARD_FOLDER / stock.card_name
-    image.parent.mkdir(parents=True, exist_ok=True)
-    image.write_bytes(applied.image)
-    if paths.card.exists():
-        shutil.rmtree(paths.card)
-    card_copy.parent.mkdir(parents=True)
-    shutil.copyfile(image, card_copy)
-    say(
-        f"5/5 {description.name}: {description.what}\n"
-        f"    firmware: {paths.relative(image)}    for the card: {paths.relative(card_copy)}"
-    )
-
-    on_card = copy_to_card(image, digest, card, stock) if card is not None else None
-    if on_card is not None:
-        say(
-            f"on the card: {on_card}  (checked)\n"
-            "Eject the card. Then, with the camera off, hold OK and switch the camera on."
+    try:
+        write_bytes(image, applied.image, BuildError)
+        write_bytes(card_copy, applied.image, BuildError)
+        on_card = (
+            copy_to_card(applied.image, digest, card, stock)
+            if card is not None
+            else None
         )
-
-    if pin_date is not None:
-        description = description.as_tested(digest, pin_date)
-        pin(paths, description)
-        say(
-            f"pinned: {description.name} (camera-tested {pin_date}). "
-            "Run 'epm2mod readme' and commit."
+    except BuildError:
+        _clear_outputs(paths, image)
+        raise
+    log(
+        f"5/5 {description.name}: {description.what}\n"
+        f"    firmware: {paths.relative(image)}    "
+        f"for the card: {paths.relative(card_copy)}"
+    )
+    if on_card is not None:
+        log(f"on the card: {on_card}  (written, flushed and read back)")
+        if hidden:
+            log(
+                f"    note: {on_card.parent} also holds {', '.join(hidden[:4])}. "
+                "If the camera does not start the update, remove them."
+            )
+        log(
+            "Eject the card. Then, with the camera off, hold OK and switch the "
+            "camera on."
         )
     return MakeResult(description, image, card_copy, on_card, digest)
+
+
+def record_test(
+    paths: RepoPaths,
+    description: BuildDescription,
+    sha256: str,
+    date: str,
+    log: Log = silent,
+    stock: StockFirmware = EPM2_V16,
+    today: datetime.date | None = None,
+) -> BuildDescription:
+    """Record a passed camera test and make the build the pinned one.
+
+    ``sha256`` is the SHA-256 of the firmware file that was on the camera, as
+    written in the camera log before the flash. The build is made again in
+    memory, and the test is recorded only if the result has that SHA-256. So a
+    spec that changed after the flash cannot be recorded as tested.
+
+    A description that already holds this record is only pinned again. A
+    description with another record is refused.
+
+    Args:
+        paths: the repository.
+        description: the build that was tested.
+        sha256: SHA-256 of the firmware file that was flashed.
+        date: the date of the test, YYYY-MM-DD; not in the future.
+        log: where progress lines go.
+        stock: the stock firmware the build starts from.
+        today: the current date; for tests.
+
+    Returns:
+        The description with the test record.
+
+    Raises:
+        BuildError: if the date or the SHA-256 is wrong, the build has another
+            record, or the build no longer gives that SHA-256.
+        StockError: if the stock firmware is missing or wrong.
+    """
+    check_test_date(date, today or datetime.date.today())
+    tested = description.as_tested(sha256, date)
+    _, digest = build_image(paths, tested, read_stock(paths, stock))
+    pin(paths, tested)
+    log(
+        f"pinned: {tested.name}, camera-tested {date}, sha256 {digest}. "
+        "Run 'epm2mod readme', write the result in docs/camera-log.md, and commit."
+    )
+    return tested

@@ -1,6 +1,6 @@
 {
  "name": "seven-structure-extra",
- "description": "Structure the three first film patches carried besides their look: stock identity look table for Cross Process I, Light Tone and Pop Art I; Light Tone's gamma hash entries. For builds with remap7b-code that take their films from seven-films-*.json. NOTES \u00a739.",
+ "description": "What the film slots share: the stock identity look table for Cross Process I, Light Tone and Pop Art I, and the three-record tone-curve handler for the Light Tone codes.",
  "ops": [
   {
    "type": "bytes",

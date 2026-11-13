@@ -10,28 +10,74 @@ A build description is a JSON file in ``builds/``::
     }
 
 The name of a build is the name of its file without ``.json``; it is not
-written inside the file. The spec paths are relative to the repository root and
-are applied in the order given. ``sha256`` and ``camera_tested`` are either both
-present (a tested build) or both absent (a candidate).
+written inside the file. The specs are files in ``patches/``, written relative
+to the repository root, and are applied in the order given. ``sha256`` and
+``camera_tested`` are either both present (a tested build) or both absent (a
+candidate).
 
-``pinned-build.json`` at the top of the repository holds ``{"build": "builds/NAME.json"}``:
-the description of the last build that passed a camera test.
+``pinned-build.json`` at the top of the repository holds
+``{"build": "builds/NAME.json"}``: the description of the last build that
+passed a camera test.
 """
 
 from __future__ import annotations
 
 import datetime
-import json
 import re
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from .errors import BuildError
-from .paths import RepoPaths
+from .fileio import read_json, write_json
+from .hashing import is_sha256
+from .paths import SPEC_FOLDER, RepoPaths, is_repo_relative
 
-_SHA256 = re.compile(r"^[0-9a-f]{64}$")
-_NAME = re.compile(r"^[a-z0-9][a-z0-9._-]*$")
+_NAME = re.compile(r"[a-z0-9][a-z0-9._-]*")
+_KEYS = {"what", "specs", "sha256", "camera_tested"}
+_SUFFIX = ".json"
+
+
+def _check_sha256(value: object, where: str) -> str:
+    """Return ``value`` if it is 64 lower-case hexadecimal digits, else raise."""
+    if not is_sha256(value):
+        raise BuildError(f"{where}: 'sha256' must be 64 lower-case hexadecimal digits")
+    assert isinstance(value, str)
+    return value
+
+
+def _check_date(value: object, where: str) -> str:
+    """Return ``value`` if it is a date written as YYYY-MM-DD, else raise."""
+    parsed = None
+    if isinstance(value, str):
+        try:
+            parsed = datetime.date.fromisoformat(value)
+        except ValueError:
+            parsed = None
+    if parsed is None or parsed.isoformat() != value:
+        raise BuildError(f"{where}: the date must be written YYYY-MM-DD, got {value!r}")
+    assert isinstance(value, str)
+    return value
+
+
+def check_spec_path(text: object, where: str) -> str:
+    """Return ``text`` if it names a patch spec file in ``patches/``, else raise.
+
+    A spec path is relative to the repository root, has forward slashes, no
+    ``.`` or ``..`` parts, starts with ``patches/`` and ends with ``.json``.
+    """
+    if (
+        not isinstance(text, str)
+        or not is_repo_relative(text)
+        or not text.startswith(SPEC_FOLDER + "/")
+        or not text.endswith(_SUFFIX)
+    ):
+        raise BuildError(
+            f"{where}: {text!r} is not a patch spec: it must be a .json file in "
+            f"{SPEC_FOLDER}/, written relative to the repository root with "
+            "forward slashes"
+        )
+    return text
 
 
 @dataclass(frozen=True)
@@ -43,53 +89,76 @@ class BuildDescription:
         what: one line that says what the build gives the user.
         specs: the patch specs, relative to the repository root, in order.
         sha256: SHA-256 of the firmware file, if the build passed a camera test.
-        camera_tested: ISO date of that test, if any.
+        camera_tested: ISO date of that test; present exactly when ``sha256`` is.
     """
 
     name: str
     what: str
-    specs: Tuple[str, ...]
-    sha256: Optional[str] = None
-    camera_tested: Optional[str] = None
+    specs: tuple[str, ...]
+    sha256: str | None = None
+    camera_tested: str | None = None
+
+    def __post_init__(self) -> None:
+        """Check the description. Every instance is valid.
+
+        Raises:
+            BuildError: if a field is not valid.
+        """
+        if not _NAME.fullmatch(self.name):
+            raise BuildError(
+                f"{self.name!r}: a build name has lower-case letters, digits, "
+                "'.', '_' and '-' only, and starts with a letter or a digit"
+            )
+        if not self.what.strip() or "\n" in self.what:
+            raise BuildError(f"{self.name}: 'what' must be one line of text")
+        if not self.specs:
+            raise BuildError(f"{self.name}: 'specs' must name one or more specs")
+        for spec in self.specs:
+            check_spec_path(spec, self.name)
+        if len(set(self.specs)) != len(self.specs):
+            raise BuildError(f"{self.name}: 'specs' names a spec more than once")
+        if (self.sha256 is None) != (self.camera_tested is None):
+            raise BuildError(
+                f"{self.name}: 'sha256' and 'camera_tested' must both be present "
+                "or both absent"
+            )
+        if self.sha256 is not None:
+            _check_sha256(self.sha256, self.name)
+            _check_date(self.camera_tested, self.name)
 
     @property
     def tested(self) -> bool:
         """True if the build passed a camera test and its SHA-256 is recorded."""
         return self.sha256 is not None
 
-    def as_tested(self, sha256: str, date: str) -> "BuildDescription":
+    def as_tested(self, sha256: str, date: str) -> BuildDescription:
         """Return a copy that records a passed camera test.
 
+        A description that already has a test record is returned unchanged if
+        the record is the same one. A different record is refused: a test
+        record is never rewritten.
+
         Raises:
-            BuildError: if ``sha256`` or ``date`` is malformed.
+            BuildError: if ``sha256`` or ``date`` is malformed, or the
+                description has another test record.
         """
-        _check_sha256(sha256, self.name)
-        _check_date(date, self.name)
+        if self.tested:
+            if (self.sha256, self.camera_tested) == (sha256, date):
+                return self
+            raise BuildError(
+                f"{self.name}: already has a test record "
+                f"({self.camera_tested}, sha256 {self.sha256}); it is not changed. "
+                "A changed build needs a description with a new name."
+            )
         return replace(self, sha256=sha256, camera_tested=date)
 
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         """Return the JSON form of the description."""
-        raw: Dict[str, Any] = {"what": self.what, "specs": list(self.specs)}
-        if self.sha256 is not None and self.camera_tested is not None:
+        raw: dict[str, Any] = {"what": self.what, "specs": list(self.specs)}
+        if self.sha256 is not None:
             raw["sha256"] = self.sha256
             raw["camera_tested"] = self.camera_tested
         return raw
-
-
-def _check_sha256(value: str, where: str) -> None:
-    """Raise unless ``value`` is 64 lower-case hexadecimal digits."""
-    if not _SHA256.match(value):
-        raise BuildError(f"{where}: 'sha256' must be 64 lower-case hexadecimal digits")
-
-
-def _check_date(value: str, where: str) -> None:
-    """Raise unless ``value`` is a date written as YYYY-MM-DD."""
-    try:
-        parsed = datetime.date.fromisoformat(value)
-    except ValueError:
-        parsed = None
-    if parsed is None or parsed.isoformat() != value:
-        raise BuildError(f"{where}: the date must be written YYYY-MM-DD, got {value!r}")
 
 
 def description_from_json(name: str, raw: Any) -> BuildDescription:
@@ -102,38 +171,24 @@ def description_from_json(name: str, raw: Any) -> BuildDescription:
     Raises:
         BuildError: if the name or the JSON is not valid.
     """
-    if not _NAME.match(name):
-        raise BuildError(
-            f"{name!r}: a build name has lower-case letters, digits, '.', '_' "
-            "and '-' only, and starts with a letter or a digit"
-        )
     if not isinstance(raw, dict):
         raise BuildError(f"{name}: a build description must be a JSON object")
-    unknown = sorted(set(raw) - {"what", "specs", "sha256", "camera_tested"})
+    unknown = sorted(set(raw) - _KEYS)
     if unknown:
         raise BuildError(f"{name}: unknown key(s): {', '.join(unknown)}")
     what, specs = raw.get("what"), raw.get("specs")
-    if not isinstance(what, str) or not what.strip():
-        raise BuildError(f"{name}: 'what' must be a line of text")
-    if (
-        not isinstance(specs, list)
-        or not specs
-        or not all(isinstance(spec, str) and spec for spec in specs)
-    ):
-        raise BuildError(f"{name}: 'specs' must be a list of one or more paths")
-    if len(set(specs)) != len(specs):
-        raise BuildError(f"{name}: 'specs' names a spec more than once")
+    if not isinstance(what, str):
+        raise BuildError(f"{name}: 'what' must be one line of text")
+    if not isinstance(specs, list):
+        raise BuildError(f"{name}: 'specs' must be a list of paths")
     sha256, tested = raw.get("sha256"), raw.get("camera_tested")
-    if (sha256 is None) != (tested is None):
-        raise BuildError(
-            f"{name}: 'sha256' and 'camera_tested' must both be present or both absent"
-        )
-    if sha256 is not None:
-        if not isinstance(sha256, str) or not isinstance(tested, str):
-            raise BuildError(f"{name}: 'sha256' and 'camera_tested' must be text")
-        _check_sha256(sha256, name)
-        _check_date(tested, name)
-    return BuildDescription(name, what.strip(), tuple(specs), sha256, tested)
+    return BuildDescription(
+        name=name,
+        what=what.strip(),
+        specs=tuple(check_spec_path(spec, name) for spec in specs),
+        sha256=None if sha256 is None else _check_sha256(sha256, name),
+        camera_tested=None if tested is None else _check_date(tested, name),
+    )
 
 
 def load_description(path: Path) -> BuildDescription:
@@ -142,61 +197,65 @@ def load_description(path: Path) -> BuildDescription:
     Raises:
         BuildError: if the file is missing, is not JSON, or is not valid.
     """
-    if path.suffix != ".json":
-        raise BuildError(f"{path}: a build description is a .json file")
-    try:
-        raw = json.loads(path.read_text(encoding="utf-8"))
-    except OSError as error:
-        raise BuildError(f"{path}: cannot be read: {error.strerror}") from None
-    except ValueError as error:
-        raise BuildError(f"{path}: not JSON: {error}") from None
-    return description_from_json(path.stem, raw)
+    if path.suffix != _SUFFIX:
+        raise BuildError(f"{path}: a build description is a {_SUFFIX} file")
+    return description_from_json(path.stem, read_json(path, BuildError))
+
+
+def description_path(paths: RepoPaths, name: str) -> Path:
+    """Return the path of the description of the build called ``name``."""
+    return paths.builds / f"{name}{_SUFFIX}"
 
 
 def save_description(paths: RepoPaths, description: BuildDescription) -> Path:
     """Write a description to ``builds/NAME.json`` and return the path."""
     path = description_path(paths, description.name)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    _write_json(path, description.to_json())
+    write_json(path, description.to_json(), BuildError)
     return path
 
 
-def description_path(paths: RepoPaths, name: str) -> Path:
-    """Return the path of the description of the build called ``name``."""
-    return paths.builds / f"{name}.json"
-
-
-def all_descriptions(paths: RepoPaths) -> List[BuildDescription]:
+def all_descriptions(paths: RepoPaths) -> list[BuildDescription]:
     """Return every description in ``builds/``, sorted by name."""
-    return [load_description(path) for path in sorted(paths.builds.glob("*.json"))]
+    return [load_description(path) for path in sorted(paths.builds.glob("*" + _SUFFIX))]
 
 
 def pinned_description(paths: RepoPaths) -> BuildDescription:
     """Return the description that ``pinned-build.json`` names.
 
     Raises:
-        BuildError: if the pointer file is malformed, points outside ``builds/``,
-            or names a build that is not tested.
+        BuildError: if the pointer file is malformed, does not name a file in
+            ``builds/``, or names a build that is not tested.
     """
-    try:
-        raw = json.loads(paths.pinned.read_text(encoding="utf-8"))
-    except OSError as error:
-        raise BuildError(f"{paths.pinned}: cannot be read: {error.strerror}") from None
-    except ValueError as error:
-        raise BuildError(f"{paths.pinned}: not JSON: {error}") from None
+    raw = read_json(paths.pinned, BuildError)
     target = raw.get("build") if isinstance(raw, dict) else None
-    if not isinstance(target, str):
-        raise BuildError(f'{paths.pinned}: must be {{"build": "builds/NAME.json"}}')
-    path = paths.resolve(target)
-    if path.parent.resolve() != paths.builds.resolve():
-        raise BuildError(f"{paths.pinned}: {target} is not a file in builds/")
-    description = load_description(path)
+    prefix = paths.builds.name + "/"
+    if (
+        not isinstance(target, str)
+        or not is_repo_relative(target)
+        or not target.startswith(prefix)
+        or "/" in target[len(prefix) :]
+    ):
+        raise BuildError(
+            f'{paths.pinned}: must be {{"build": "{prefix}NAME{_SUFFIX}"}}'
+        )
+    description = load_description(paths.resolve(target))
     if not description.tested:
         raise BuildError(
-            f"{paths.pinned}: {target} is not a camera-tested build "
-            "(it has no sha256)"
+            f"{paths.pinned}: {target} is not a camera-tested build (it has no sha256)"
         )
     return description
+
+
+def check_test_date(date: str, today: datetime.date) -> str:
+    """Return ``date`` if it is a well-formed date that is not after ``today``.
+
+    Raises:
+        BuildError: if it is malformed or in the future.
+    """
+    _check_date(date, "the test date")
+    if datetime.date.fromisoformat(date) > today:
+        raise BuildError(f"the test date {date} is in the future")
+    return date
 
 
 def pin(paths: RepoPaths, description: BuildDescription) -> None:
@@ -213,11 +272,4 @@ def pin(paths: RepoPaths, description: BuildDescription) -> None:
             f"{description.name}: only a camera-tested build can be pinned"
         )
     path = save_description(paths, description)
-    _write_json(paths.pinned, {"build": paths.relative(path)})
-
-
-def _write_json(path: Path, raw: Dict[str, Any]) -> None:
-    """Write JSON with the repository's layout: one-space indent, final newline."""
-    temporary = path.with_name(path.name + ".tmp")
-    temporary.write_text(json.dumps(raw, indent=1) + "\n", encoding="utf-8")
-    temporary.replace(path)
+    write_json(paths.pinned, {"build": paths.relative(path)}, BuildError)

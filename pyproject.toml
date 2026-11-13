@@ -1,6 +1,6 @@
 [project]
 name = "epm2mod"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Build and check custom firmware for the Olympus PEN E-PM2"
 readme = "README.md"
 license = { text = "MIT" }
@@ -38,6 +38,9 @@ default-groups = ["dev", "research"]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.hatch.version]
+path = "src/epm2mod/__init__.py"
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/epm2mod"]
 
@@ -48,4 +51,5 @@ target-version = ["py310"]
 [tool.mypy]
 python_version = "3.10"
 strict = true
-files = ["src/epm2mod"]
+files = ["src/epm2mod", "tests/test_package.py", "tests/test_looks.py"]
+mypy_path = "src"

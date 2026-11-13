@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import hashlib
-from pathlib import Path
+import re
 
-_BLOCK_SIZE = 1 << 20
+_SHA256 = re.compile(r"[0-9a-f]{64}")
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -13,13 +13,6 @@ def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def sha256_file(path: Path) -> str:
-    """Return the SHA-256 of a file as lower-case hexadecimal.
-
-    The file is read in blocks, so its size does not matter.
-    """
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(_BLOCK_SIZE), b""):
-            digest.update(block)
-    return digest.hexdigest()
+def is_sha256(text: object) -> bool:
+    """Return True if ``text`` is a SHA-256 written as 64 lower-case hexadecimal digits."""
+    return isinstance(text, str) and _SHA256.fullmatch(text) is not None

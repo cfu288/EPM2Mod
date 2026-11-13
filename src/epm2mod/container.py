@@ -20,9 +20,10 @@ from __future__ import annotations
 
 import struct
 from dataclasses import dataclass, replace
-from typing import List, Sequence, Tuple
+from typing import Sequence
 
 from .errors import ContainerError
+from .hashing import sha256_bytes
 
 #: Position, in a scrambled 16-byte row, of each byte of the plain row.
 LANES = (1, 3, 0, 2, 6, 4, 7, 5, 11, 10, 9, 8, 13, 14, 12, 15)
@@ -65,7 +66,7 @@ def word_sum(data: bytes) -> int:
     """
     if len(data) % 4:
         raise ContainerError(f"length {len(data)} is not a multiple of 4")
-    words: Tuple[int, ...] = struct.unpack(f"<{len(data) // 4}I", data)
+    words: tuple[int, ...] = struct.unpack(f"<{len(data) // 4}I", data)
     return sum(words) & _WORD_MASK
 
 
@@ -102,7 +103,7 @@ class Block:
         """The kind field of the header (0x0100 is the main program)."""
         return int(struct.unpack_from("<H", self.header, 20)[0])
 
-    def with_payload(self, payload: bytes) -> "Block":
+    def with_payload(self, payload: bytes) -> Block:
         """Return a copy of the block with another payload of the same length.
 
         The checksum of the copy is not valid until the container is
@@ -136,7 +137,7 @@ class Container:
         """True if every block's stored checksum is right."""
         return all(block.checksum_ok for block in self.blocks)
 
-    def with_payloads(self, payloads: Sequence[bytes]) -> "Container":
+    def with_payloads(self, payloads: Sequence[bytes]) -> Container:
         """Return a copy with new payloads, one per block, of unchanged lengths."""
         if len(payloads) != len(self.blocks):
             raise ContainerError(
@@ -158,14 +159,22 @@ def parse(data: bytes) -> Container:
     Returns:
         The blocks, with unscrambled payloads, and the tail.
 
+    The tail is everything after the last block. Its content is not checked:
+    the container has no checksum for it, so only a SHA-256 of the whole file
+    shows a damaged tail.
+
     Raises:
-        ContainerError: if the file does not start with a block, or a block is
-            cut short, or a payload length is not a multiple of 16.
+        ContainerError: if the file does not start with a block, or it ends
+            inside a block, or a payload length is not a multiple of 16.
     """
-    blocks: List[Block] = []
+    blocks: list[Block] = []
     offset = 0
     minimum = HEADER_SIZE + TRAILER_SIZE
-    while offset + minimum <= len(data) and data[offset : offset + 2] == MAGIC:
+    while data[offset : offset + 2] == MAGIC:
+        if offset + minimum > len(data):
+            raise ContainerError(
+                f"block at {offset:#x}: the file ends inside the block's header"
+            )
         header = data[offset : offset + HEADER_SIZE]
         length = int(struct.unpack_from("<I", header, 12)[0])
         if length % ROW:
@@ -215,10 +224,8 @@ def serialize(container: Container) -> bytes:
     return bytes(out + container.tail)
 
 
-def describe(data: bytes) -> List[str]:
+def describe(data: bytes) -> list[str]:
     """Return one line of text per block of a firmware file, and one for the tail."""
-    from .hashing import sha256_bytes
-
     container = parse(data)
     lines = [
         f"block{index} @{block.offset:#010x} kind={block.kind:#06x} "

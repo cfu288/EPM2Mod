@@ -20,6 +20,7 @@ import sys
 import _package  # noqa: F401
 from epm2mod.container import describe
 from epm2mod.errors import Epm2ModError
+from epm2mod.fileio import read_bytes, write_bytes
 from epm2mod.hashing import sha256_bytes
 from epm2mod.spec import apply_op as _apply_op
 from epm2mod.spec import apply_specs, load_spec, op_from_json
@@ -43,33 +44,38 @@ def apply_op(blocks, op):
 
 
 def build(spec_paths, out=None):
-    """Apply specs to the stock firmware and write the result. Return True if all checks pass."""
+    """Apply specs to the stock firmware and write the result. Return True if all checks pass.
+
+    If there is one spec and it has an `expected_sha256` that the result does not have, nothing
+    is written and the return value is False.
+    """
     try:
         specs = [load_spec(Path(path)) for path in spec_paths]
         bases = {spec.base for spec in specs}
         if len(bases) != 1:
             raise SystemExit(f"specs use different bases: {sorted(bases)}")
-        stock = open(os.path.join(ROOT, specs[0].base), "rb").read()
+        stock = read_bytes(Path(ROOT) / specs[0].base)
         applied = apply_specs(stock, specs)
     except Epm2ModError as error:
         raise SystemExit(str(error)) from None
     print("\n".join(applied.log))
-    out = out or os.path.join(ROOT, "build", "+".join(spec.name for spec in specs) + ".BIN")
-    os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
-    with open(out, "wb") as handle:
-        handle.write(applied.image)
     digest = sha256_bytes(applied.image)
     lines = describe(applied.image)
+    out = out or os.path.join(ROOT, "build", "+".join(spec.name for spec in specs) + ".BIN")
     print(f"{out}  size={len(applied.image)}  sha256={digest}")
     print("\n".join("  " + line for line in lines))
-    ok = all("checksum=BAD" not in line for line in lines)
     if len(specs) == 1 and specs[0].expected_sha256:
-        match = digest == specs[0].expected_sha256
-        print(f"expected_sha256: {'MATCH' if match else 'MISMATCH'}")
-        ok = ok and match
+        if digest != specs[0].expected_sha256:
+            print("expected_sha256: MISMATCH; nothing was written")
+            return False
+        print("expected_sha256: MATCH")
+    try:
+        write_bytes(Path(out), applied.image)
+    except Epm2ModError as error:
+        raise SystemExit(str(error)) from None
     print(f"wrote {os.path.relpath(out, ROOT)}  ({applied.changed_bytes} bytes differ from base)")
     print("flash as DCOLYMP/E1019999.BIN")
-    return ok
+    return all("checksum=BAD" not in line for line in lines)
 
 
 if __name__ == "__main__":
