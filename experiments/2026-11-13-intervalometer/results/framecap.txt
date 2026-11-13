@@ -1,0 +1,8 @@
+mcon value-list record 0x7e84c5fc: info 483 key 128 raw 0x7e849f56 gui 0x0 total 99 elem 1 clamp 1 type 1 (1 = u8)
+  list = 1..99, contiguous: True; byte before 0x1 (list of 482), byte after 0x0 (list of 486)
+GUI option rows {info 483, value, kind 2, id, 16 zero bytes} (32 B each): 99 rows, 0x7eff5160..0x7eff5dc0, values 1..99, id = value + 0x716 for all: False
+  row before: info 474 value 30; row after: info 484 value 0 (no slack)
+prm 0xde21: record 0x7e4c3eb4 tag 0xde21 count 1, type by low nibble 1 (1 = u8, 4 = u32)
+prm 0xde84: record 0x7e4c3ee4 tag 0xde84 count 1, type by low nibble 4 (1 = u8, 4 = u32)
+option-row label strings (block 1, English): 1 -> '1f' (id 1815), 2 -> '2f' (42), 3 -> '3f' (1347) ... 99 -> '99f' (1910); strings matching <3+ digits>f in the E-PM2 English table: 0
+other bodies, value-list records (info, total bytes): E-PL6 1.4 483 -> 99 x u8 (1..99); E-M10 1.4 and E-PL7 1.4: 478 -> 2 (on/off), no list record for a frame count

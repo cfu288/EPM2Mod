@@ -362,6 +362,34 @@ Images: stock, films, stock + v2, films + v2, E-PL6 1.4. Model errors: 0 in ever
   - the flag shares a table slot that only a row-1 formatter call could read, and none exists;
   - no spec has an `expected_sha256` until a build is camera-tested.
 
+## 13. Camera result, and the 99-frame cap (2026-11-13)
+
+| Date | Build | Result |
+|---|---|---|
+| 2026-11-13 | `build/seven-films-6-interval.BIN` = the seven-films-6 specs + `interval-timelapse-v2.json` | **Works** (user report: "It works!", interval shooting runs). Not yet reported: which steps of §7 / §12.5 passed (movie, cancel paths, > 90 s sleep, Sleep = 1 min, card full) |
+
+**Can the frame count go above 99? Not with a safe patch. No `interval-frames-max.json` was written.** Evidence: `results/framecap.txt` (`scripts/framecap.py`).
+
+The cap is in four places:
+
+| Layer | What holds 99 (V) | To go higher |
+|---|---|---|
+| Storage | prm 0xDE21 is **one u8** (the tag's low nibble 1; default record 0x7E4C3EB4) | Hard limit **255**. 999 needs a u16 tag, which changes the saved MODE bank layout and Myset. That is not a patch |
+| mcon value list | record 0x7E84C5FC: 99 u8 values 1..99 at 0x7E849F56, clamp at the ends. It is packed between the lists of 482 and 486 | Up to 255 only by moving the list to free space |
+| GUI option table | 99 rows of 32 B `{483, value, kind 2, label string}` at 0x7EFF5160–0x7EFF5DBF. The editor page (pages 148 / 638) picks rows by index and steps through them. The rows of 474 and 484 touch it on both sides | One new 32-byte row per extra value (156 rows = 4,992 B for 255). There is no slack, and the padding has about 280 B left |
+| Label strings | each row names its own block-1 string: "1f" … "99f" (ids 1815, 42, 1347, … 1910) | "100f" and up do not exist in any of the 34 language tables. The tables have a fixed 1,970 ids |
+
+- **Other limits:** the editor keeps its row index as a signed byte (`extb` at 0x7EE01799), so one field can have at most 127 choices (V code, I consequence).
+- **Other bodies:**
+  - E-PL6 1.4: the same 99 (record at block-0 offset 0x42C438).
+  - E-M10 1.4 and E-PL7 1.4: info 478 is only on/off, and there is **no value-list record for the frame count**. They use a different (numeric) editor with wider storage (I). That is a different design, not a constant we can copy.
+- **Readers that would be fine up to 255 (V):**
+  - 489 "frames done" is u32 (0xDE84);
+  - the end test compares two u32 getter results (0x7EA89F39, 0x7ECDA5C8).
+- **Not traced, because the editor already blocks the change:** the on-screen counter digits, the movie maker's frame limits, and file numbering.
+- **Longer runs today:** run a second 99-frame sequence. The file numbers continue.
+- **Untested idea (I):** a stored 483 = 0 can never equal 489, so it may mean "until cancelled or card full". The menu cannot select 0, and this was not tested.
+
 ## Files
 - `patches/interval-timelapse-v2.json`: the current spec (§12).
   - generator: `scripts/mk_v2_gen.py` → `mkspec_v2.py` (+ `guard_part.py`);
