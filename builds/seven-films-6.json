@@ -1,9 +1,5 @@
 {
- "name": "seven-films-6",
  "what": "Seven film looks as art filters",
- "camera_tested": "2026-11-13",
- "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
- "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",
@@ -13,5 +9,6 @@
   "patches/xp-adaptive-hue-off.json",
   "patches/seven-labels.json"
  ],
- "sha256": "5badb0796731b40a27ef015e57da134d7d793486d4c6262a3f483c1aae60fd05"
+ "sha256": "5badb0796731b40a27ef015e57da134d7d793486d4c6262a3f483c1aae60fd05",
+ "camera_tested": "2026-11-13"
 }

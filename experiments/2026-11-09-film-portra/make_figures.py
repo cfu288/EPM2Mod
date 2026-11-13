@@ -1,4 +1,4 @@
-"""Figures for README.md, from the camera readings in out/mock/ and the fits in fits/ (NOTES §45-46).
+"""Figures for README.md, from the camera readings in out/mock/ and the fits in looks/fits/ (top of the repository) (NOTES §45-46).
    ../../.venv/bin/python -I make_figures.py        -> figures/*.png"""
 import os, sys
 sys.argv = ["x"]; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -20,7 +20,7 @@ def target_of(z):
     cube, size = fl.load_cube(str(z["lut"])); return lambda v: np.clip(fl.apply_cube(cube, size, fl.encode(np.maximum(v, 0) / fl.V_GRAY * 0.18, "vlog")), 0, 1) * 255
 nat = load("M_natural"); D = {}
 for name, rd, ft in FILMS:
-    z = np.load(f"fits/fit_film-{ft}-m1.npz"); d = load("F5_" + rd); T = target_of(z)(d["vs"])
+    z = np.load(f"../../looks/fits/{ft}.npz"); d = load("F5_" + rd); T = target_of(z)(d["vs"])
     D[name] = dict(z=z, d=d, T=T, J=d["jpg"], k=d["kind"], ok=d["ok"], model=M2.render(d["u"], z["G"], M2.gain_of(z), z["S"], z["H"], z["P"], M2.chroma_of(z)))
 mean = lambda dd, m: float(dd[m].mean())
 def save(fig, name): fig.savefig(f"figures/{name}.png", dpi=170, bbox_inches="tight"); plt.close(fig); print("wrote", f"figures/{name}.png")

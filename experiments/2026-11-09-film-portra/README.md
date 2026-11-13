@@ -32,8 +32,8 @@ flowchart TD
     S[Sample colours<br/>grays, ColorChecker, skin, natural colours] --> F
     B --> F[Fit<br/>fit_film2.py]
     M[Camera model<br/>model2.py + calib/model2.npz] --> F
-    F --> P[Stage numbers of the look<br/>fits/*.npz]
-    P -->|slots/build_seven_films.py| J[Patch spec<br/>patches/seven-films-N.json]
+    F --> P[Stage numbers of the look<br/>looks/fits/*.npz]
+    P -->|epm2mod looks| J[Patch spec<br/>patches/seven-films-N.json]
     J -->|tools/build.py + stock firmware| BIN[Firmware image]
     BIN -->|flash| CAM[Camera]
     T[Synthetic test RAW<br/>testraw/PB130001.ORF] -->|RAW Data Edit with the look| CAM
@@ -89,7 +89,7 @@ shared patches came out the same, within one level.
 |---|---|---|
 | Synthetic test RAWs and their patch layouts | `.ORF`, `.npz` | `testraw/` |
 | Camera model constants | 12 direction vectors, exposure scale, saturation scale, chroma limit | `calib/model2.npz` |
-| The seven looks | per film: 3 curves × 1,024 points, gain, 6 + 6 per-hue values, 3 × 3 matrix, 2 chroma curves | `fits/*.npz` |
+| The seven looks | per film: 3 curves × 1,024 points, gain, 6 + 6 per-hue values, 3 × 3 matrix, 2 chroma curves | `looks/fits/*.npz` (top of the repository) |
 | The seven looks as firmware bytes | patch spec: address, expected bytes, new bytes | `patches/seven-films-5.json` |
 | Patch readings | per JPEG: RGB of each patch | `out/mock/read_*.npz` (not in git) |
 | Scores | ΔE2000 per group | the tables and figures below |
@@ -279,9 +279,10 @@ weak colour alone.
 | `fit_film2.py` | fits a film target with the model; `--anchor` for a correction round against a measurement |
 | `check_film.py`, `make_figures.py`, `make_comparison.py` | score of one camera JPEG; the figures above; the photo comparison sheet |
 | `bake_slide.py` | target LUT for slide films (spektrafilm with the print step off) |
-| `slots/build_seven_films.py`, `slots/build_fixes.py`, `slots/build_movie_map.py` | write the patch specs of the current build |
+| `slots/build_fixes.py`, `slots/build_movie_map.py` | write the two patch specs of the current build that hold new code (they need the MN10300 assembler) |
+| `slots/build_seven_films.py` | the first generator of the film specs. The current one is in the package: `uv run epm2mod looks` (`src/epm2mod/looks/`, data in `looks/`) |
 | `slots/`, `slot3/` (other files) | assembly for the new code, and the generators of earlier builds |
-| `fits/`, `calib/`, `testraw/`, `figures/` | the seven looks, the model constants, the test RAWs, the figures |
+| `calib/`, `testraw/`, `figures/` | the model constants, the test RAWs, the figures. The seven looks are in `looks/fits/` at the top of the repository |
 | `fit_film.py`, `fit_xp9.py`, other `analyze_*`, `fit_*`, `check_*`, `extract.py`, `make_chart.py`, `make_mock.py` | earlier stages (photographed chart, first test image, first model); kept because NOTES refers to them |
 
 Run the scripts from this folder. They need Python with numpy, scipy, numba, Pillow, rawpy and
@@ -291,6 +292,6 @@ RAW generators and the patch generator work from the repository alone.
 
 To add or change a film: see section 8 of [`docs/film-emulation.md`](../../docs/film-emulation.md).
 
-The film look data in `fits/` and in the patch specs is derived from
+The film look data in `looks/fits/` and in the patch specs is derived from
 [spektrafilm](https://github.com/andreavolpato/spektrafilm) by Andrea Volpato (CC BY-SA 4.0). See
 [`NOTICE.md`](../../NOTICE.md).

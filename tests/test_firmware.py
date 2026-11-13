@@ -1,7 +1,10 @@
-"""Run: python3 -m unittest discover -s tests
+"""Tests of the older command-line tools in tools/ (they call the epm2mod package).
+
+Run: python3 -m unittest discover -s tests
 
 Tests that need firmware BINs are skipped when the files are absent.
 """
+
 import glob, hashlib, json, os, sys, unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -41,7 +44,10 @@ class TestPatchSpecs(unittest.TestCase):
                 out = os.path.join(ROOT, "build", "_test_" + s["name"] + ".BIN")
                 try:
                     self.assertTrue(build.build([spec], out))
-                    self.assertEqual(hashlib.sha256(open(out, "rb").read()).hexdigest(), s["expected_sha256"])
+                    self.assertEqual(
+                        hashlib.sha256(open(out, "rb").read()).hexdigest(),
+                        s["expected_sha256"],
+                    )
                 finally:
                     if os.path.exists(out):
                         os.remove(out)
@@ -49,26 +55,3 @@ class TestPatchSpecs(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-
-class BuildDescriptions(unittest.TestCase):
-    """Every builds/*.json names specs that exist; the tested ones build to the sha256 they state.
-    pinned-build.json names a tested description."""
-
-    def test_descriptions(self):
-        import subprocess, tempfile
-        pinned = json.load(open(os.path.join(ROOT, "pinned-build.json")))["build"]
-        names = sorted(glob.glob(os.path.join(ROOT, "builds", "*.json")))
-        self.assertIn(os.path.join(ROOT, pinned), names)
-        for path in names:
-            d = json.load(open(path))
-            for spec in d["specs"]:
-                self.assertTrue(os.path.exists(os.path.join(ROOT, spec)), f"{path}: {spec}")
-            if os.path.relpath(path, ROOT) == pinned:
-                self.assertTrue(d.get("sha256") and d.get("camera_tested"), "the pinned build must be a tested one")
-            if not d.get("sha256") or not os.path.exists(os.path.join(ROOT, d["base"])):
-                continue
-            with tempfile.TemporaryDirectory() as tmp:
-                out = os.path.join(tmp, "x.BIN")
-                subprocess.run([sys.executable, os.path.join(ROOT, "tools", "build.py"), *d["specs"], "-o", out], cwd=ROOT, check=True, capture_output=True)
-                self.assertEqual(hashlib.sha256(open(out, "rb").read()).hexdigest(), d["sha256"], path)

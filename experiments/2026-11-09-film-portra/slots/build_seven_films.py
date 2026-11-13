@@ -1,4 +1,5 @@
-"""Seven films in menu order (NOTES §39). Writes
+"""Seven films in menu order (NOTES §39). SUPERSEDED for the current build by `uv run epm2mod looks`
+(src/epm2mod/looks/, data in looks/); kept as the record of how builds 1-5 were generated. Writes
   patches/seven-structure-extra.json   what the three old film patches used to carry besides the look itself
   patches/seven-films-<tag>.json       one fitted film per slot
   patches/seven-labels.json            menu labels (exact strings only)
@@ -54,7 +55,7 @@ json.dump(dict(name="seven-structure-extra", description="Structure the three fi
           open(os.path.join(ROOT, "patches/seven-structure-extra.json"), "w"), indent=1)
 ops = []; summary = {}
 for slot, (fit, label) in FILMS.items():
-    _f = os.path.join(HERE, "..", fit); z = np.load(_f if os.path.exists(_f) else os.path.join(HERE, "..", "fits", os.path.basename(fit))); s = SLOTS[slot]          # out/ (not in git) first, then the published fits/; n = len(s["tables"]) // 3
+    _f = os.path.join(HERE, "..", fit); z = np.load(_f); s = SLOTS[slot]; n = len(s["tables"]) // 3   # the working fits in out/ (not in git); the published fits and the current generator: looks/ and `epm2mod looks`
     for i, (t, d) in enumerate(s["tables"]): ops.append(op(t, pack(np.interp(tab(d), np.arange(1024), z["G"][i // n]))))
     gain = int(z["gain"])
     ops += [op(s["sat"], struct.pack("<2H", gain, gain)), op(s["six"][0], struct.pack("<6h", *z["S"].astype(int))), op(s["six"][1], struct.pack("<6h", *z["H"].astype(int))),

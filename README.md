@@ -22,15 +22,17 @@ Full-resolution sheet: [docs/film-sim-comparison.pdf](docs/film-sim-comparison.p
 Seven of the twelve art-filter menu entries are replaced by film looks. They work for stills and
 live view, straight out of the camera as JPEG.
 
+<!-- BEGIN GENERATED: films -->
 | Menu name | Film | Replaces |
 |---|---|---|
-| Portra | Kodak Portra 400 (on Portra Endura paper) | Pop Art |
+| Portra | Kodak Portra 400 (negative, on Kodak Portra Endura paper) | Pop Art |
 | Ektachrome | Kodak Ektachrome 100 (slide) | Soft Focus |
-| Pro 400H | Fuji Pro 400H (on Crystal Archive paper) | Pale&Light Color |
+| Pro 400H | Fuji Pro 400H (negative, on Fuji Crystal Archive paper) | Pale&Light Color |
 | Kodachrome | Kodak Kodachrome 64 (slide) | Light Tone |
-| Vis 250D | Kodak Vision3 250D (on 2383 print film) | Pin Hole |
+| Vis 250D | Kodak Vision3 250D (cinema negative, on Kodak 2383 print film) | Pin Hole |
 | Velvia | Fuji Velvia 100 (slide) | Diorama |
-| Superia 400 | Fuji Superia X-tra 400 (on Crystal Archive paper) | Cross Process |
+| Superia 400 | Fuji Superia X-tra 400 (negative, on Fuji Crystal Archive paper) | Cross Process |
+<!-- END GENERATED: films -->
 
 Grainy Film, Gentle Sepia, Dramatic Tone, Key Line and Watercolor are unchanged. Colour and tone only:
 no grain, no halation. The looks are fitted to [spektrafilm](https://github.com/andreavolpato/spektrafilm)
@@ -54,9 +56,14 @@ What was in the firmware, how the patch works, how it was checked and what is no
 
 ## Install the latest tested firmware
 
-The pinned build is **`seven-films-6-interval-240`**: the seven film looks, and interval shooting
-with up to 240 frames. It was flashed and tested on a real E-PM2 on 2026-11-13
-([camera log](docs/camera-log.md)).
+<!-- BEGIN GENERATED: pinned-build -->
+The pinned build is **`seven-films-6-interval-240`**: seven film looks as art filters, and interval shooting with up to 240 frames. It was flashed and tested on a real E-PM2 on 2026-11-13 ([camera log](docs/camera-log.md)).
+
+| | sha256 |
+|---|---|
+| Stock firmware, `OLY_E_101_1600_0000_0000.BIN` | `34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300` |
+| Pinned build, `seven-films-6-interval-240` | `01837f962f8a8ca0d189d9cd65ad9b5b35402ca3f3ed54a3872af044e050de11` |
+<!-- END GENERATED: pinned-build -->
 
 No firmware is distributed here, because it is the maker's copyrighted software. One command
 downloads Olympus's own v1.6 firmware from the maker's update server, applies this repository's
@@ -84,8 +91,8 @@ Python for you; nothing else has to be installed.
    | Step | What it does |
    |---|---|
    | 1 | Downloads `OLY_E_101_1600_0000_0000.BIN` (43 MB) from the maker's update server, if it is not there yet, and checks its sha256 |
-   | 2 | Applies the nine patch specs of the pinned build, in order (`tools/build.py`) |
-   | 3 | Checks that the result has the sha256 of the tested build. If not, it deletes the result |
+   | 2 | Applies the patch specs of the pinned build, in order |
+   | 3 | Checks that the result has the sha256 of the tested build. If not, it writes nothing |
    | 4 | Copies the result to the card as `DCOLYMP/E1019999.BIN` and checks the copy |
 
    Without `--card`, the file goes to `build/card/DCOLYMP/E1019999.BIN`. Copy the `DCOLYMP` folder
@@ -102,42 +109,35 @@ Python for you; nothing else has to be installed.
 (step 2 downloaded it) to the card as `DCOLYMP/E1019999.BIN`, and do step 3.
 More detail on flashing: [docs/flashing.md](docs/flashing.md).
 
-### What the pinned build is
+### Builds
 
-[`pinned-build.json`](pinned-build.json) names the description of the last build that was tested on a
-camera. The description, [`builds/seven-films-6-interval-240.json`](builds/seven-films-6-interval-240.json),
-names the stock firmware, the patch specs in order, and the sha256 of the result.
-
-| | sha256 |
-|---|---|
-| Stock firmware, `OLY_E_101_1600_0000_0000.BIN` | `34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300` |
-| Pinned build, `seven-films-6-interval-240` | `01837f962f8a8ca0d189d9cd65ad9b5b35402ca3f3ed54a3872af044e050de11` |
-
-To download and check the stock firmware only: `uv run tools/fetch_stock.py`.
-
-The scripts use the Python standard library only, so `python3 tools/make_firmware.py` works too if
-you have Python 3.9 or newer.
-
-### Other builds
-
-Each tested build has a description in [`builds/`](builds/). Give one to the same script:
+Each firmware build has a description in [`builds/`](builds/): the patch specs in order and, after a
+camera test, the sha256 of the result and the date. [`pinned-build.json`](pinned-build.json) names the
+description of the last build that was tested on a camera. Give a description to the same script to
+make that build:
 
 ```bash
 uv run tools/make_firmware.py builds/seven-films-6.json
 ```
 
-| Build | What | sha256 |
-|---|---|---|
-| `seven-films-6-interval-240` (pinned) | film looks; interval shooting up to 240 frames | `01837f962f8a8ca0d189d9cd65ad9b5b35402ca3f3ed54a3872af044e050de11` |
-| `seven-films-6-interval` | film looks; interval shooting up to 99 frames, as on the E-PL6 | `f52ea6976ac2e9c567b2c07d7556b96b6431c8fcd2d90de195abdb76059e0104` |
-| `seven-films-6` | film looks only | `5badb0796731b40a27ef015e57da134d7d793486d4c6262a3f483c1aae60fd05` |
+<!-- BEGIN GENERATED: builds -->
+| Build | What | Patch specs | Camera-tested | sha256 |
+|---|---|---|---|---|
+| `seven-films-6-interval-240` (pinned) | Seven film looks as art filters, and interval shooting with up to 240 frames | 9 | 2026-11-13 | `01837f962f8a8ca0d189d9cd65ad9b5b35402ca3f3ed54a3872af044e050de11` |
+| `seven-films-6` | Seven film looks as art filters | 7 | 2026-11-13 | `5badb0796731b40a27ef015e57da134d7d793486d4c6262a3f483c1aae60fd05` |
+| `seven-films-6-interval` | Seven film looks as art filters, and interval shooting with up to 99 frames | 8 | 2026-11-13 | `f52ea6976ac2e9c567b2c07d7556b96b6431c8fcd2d90de195abdb76059e0104` |
+<!-- END GENERATED: builds -->
+
+To download and check the stock firmware only: `uv run tools/fetch_stock.py`.
+
+The scripts use the Python standard library only, so `python3 tools/make_firmware.py` works too if
+you have Python 3.10 or newer.
 
 This is also how the project makes its own firmware. A new combination of patch specs gets a
 description in `builds/`, is made with this script, and is pinned after it passes a camera test:
-[docs/conventions.md](docs/conventions.md), "Making firmware". The script runs `tools/build.py`,
-which applies the specs.
+[docs/conventions.md](docs/conventions.md), "Making firmware".
 
-The build tool refuses a wrong base file and checks every byte it replaces. For a build that has no
+The build refuses a wrong base file and checks every byte it replaces. For a build that has no
 recorded sha256 yet, the script first runs `tools/freespace.py check`: it fails if two specs use the
 same bytes or if a spec writes where the camera does not load the firmware.
 
@@ -153,15 +153,18 @@ Limits of this build:
 Olympus or OM Digital Solutions. A wrong or interrupted flash can leave a camera unusable. Never put a
 firmware file for another model on the card.
 
-To run the project's own tests (they need the stock firmware file):
-`python3 -m unittest discover -s tests`.
+To run the project's own tests (some need the stock firmware file):
+`uv run python -m unittest discover -s tests`.
 
 ## Layout
 
 | Path | What |
 |---|---|
-| `tools/oetool.py` | OE container: `info`, `unpack`, `pack`, `patch` (recomputes checksums) |
-| `tools/build.py` | applies JSON patch specs to a stock BIN → `build/` |
+| `src/epm2mod/` | the Python package that makes the firmware: container format, patch specs, stock download, build descriptions, the build steps, the film-spec generator. Typed, formatted with black, tested. Command: `uv run epm2mod --help` |
+| `tools/make_firmware.py`, `tools/fetch_stock.py` | the package's two main commands as stand-alone scripts |
+| `tools/oetool.py`, `tools/build.py` | older command-line forms, kept for the scripts that call them; they use the package |
+| `builds/`, `pinned-build.json` | one description per firmware build; the pointer to the last camera-tested one |
+| `looks/` | the film list and the fitted values that the film patch specs are generated from |
 | `tools/disasm.py`, `tools/fwmap.py` | MN103 disassembly (GNU objdump, `scripts/build-binutils-mn10300.sh`) and the block-0 function database with `fn`/`str`/`range`/`xref`/`tasks` queries |
 | `patches/` | one spec per mod, with a status and expected hash once camera-tested; `patches/history/` holds superseded and failed specs (record only) |
 | `firmware/` | stock and reference BINs (git-ignored), `SHA256SUMS`, provenance |

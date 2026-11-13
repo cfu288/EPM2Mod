@@ -1,101 +1,80 @@
 #!/usr/bin/env python3
-"""Build a flashable E-PM2 firmware image from a stock BIN plus one or more patch specs.
+# /// script
+# requires-python = ">=3.10"
+# dependencies = []
+# ///
+"""Apply patch specs to the stock firmware (the older command-line form).
 
-    python3 tools/build.py patches/pixel-hacking.json [patches/other.json ...] [-o build/NAME.BIN]
+    python3 tools/build.py SPEC [SPEC ...] [-o build/NAME.BIN]
 
-Each spec is JSON:
-  {
-    "name": "pixel-hacking",
-    "description": "...",
-    "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",   # path relative to repo root
-    "base_sha256": "...",                                            # build refuses a different base
-    "ops": [ ...see below... ],
-    "expected_sha256": "..."    # optional; set once a build has been camera-tested
-  }
+The work is done by the `epm2mod` package (src/epm2mod/spec.py); the spec format is described
+there. This file keeps the command and the two functions that older scripts in tools/ and
+experiments/ call: `apply_op(blocks, op)` and `build(spec_paths, out)`.
 
-Ops (all edits keep sizes; every op checks the bytes it replaces):
-  {"type": "bytes", "block": 0, "offset": "0x2CCEC0", "expect": "hex", "new": "hex"}
-  {"type": "utf16-replace-all", "block": 1, "old": "text", "new": "same-length text", "count": 16}
-
-When several specs are given they are applied in order. All specs must share the same base.
+To make firmware for a camera, use tools/make_firmware.py with a build description.
 """
-import argparse, hashlib, json, os, sys
+import argparse
+import os
+import sys
+
+import _package  # noqa: F401
+from epm2mod.container import describe
+from epm2mod.errors import Epm2ModError
+from epm2mod.hashing import sha256_bytes
+from epm2mod.spec import apply_op as _apply_op
+from epm2mod.spec import apply_specs, load_spec, op_from_json
+from pathlib import Path
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(ROOT, "tools"))
-import oetool  # noqa: E402
-
-
-def sha(b):
-    return hashlib.sha256(b).hexdigest()
 
 
 def apply_op(blocks, op):
-    blk = op["block"]
-    p = bytearray(blocks[blk]["payload"])
-    if op["type"] == "bytes":
-        off = int(op["offset"], 0) if isinstance(op["offset"], str) else op["offset"]
-        old, new = bytes.fromhex(op["expect"]), bytes.fromhex(op["new"])
-        if len(old) != len(new):
-            raise SystemExit(f"bytes op at block{blk}+{off:#x}: expect/new length differ")
-        cur = bytes(p[off:off + len(old)])
-        if cur != old:
-            raise SystemExit(f"block{blk}+{off:#x}: found {cur.hex()}, expected {old.hex()}")
-        p[off:off + len(new)] = new
-        print(f"  block{blk}+{off:#x}: {old.hex()} -> {new.hex()}")
-    elif op["type"] == "utf16-replace-all":
-        old, new = op["old"].encode("utf-16le"), op["new"].encode("utf-16le")
-        if len(old) != len(new):
-            raise SystemExit(f"utf16 op '{op['old']}' -> '{op['new']}': lengths differ")
-        hits, i = [], p.find(old)
-        while i >= 0:
-            if i % 2 == 0:
-                hits.append(i)
-            i = p.find(old, i + 1)
-        if "count" in op and len(hits) != op["count"]:
-            raise SystemExit(f"'{op['old']}': found {len(hits)} aligned copies, spec expects {op['count']}")
-        for h in hits:
-            p[h:h + len(new)] = new
-        print(f"  block{blk}: '{op['old']}' -> '{op['new']}' x{len(hits)}")
-    else:
-        raise SystemExit(f"unknown op type {op['type']}")
-    blocks[blk]["payload"] = bytes(p)
+    """Apply one operation (its JSON form) to blocks in the form `oetool.parse` returns.
+
+    Exits with a message if the operation does not fit, as the older tool did.
+    """
+    payloads = [bytearray(block["payload"]) for block in blocks]
+    try:
+        line = _apply_op(payloads, op_from_json(op, "op"))
+    except Epm2ModError as error:
+        raise SystemExit(str(error)) from None
+    blocks[op["block"]]["payload"] = bytes(payloads[op["block"]])
+    print("  " + line)
 
 
 def build(spec_paths, out=None):
-    specs = [json.load(open(s)) for s in spec_paths]
-    bases = {s["base"] for s in specs}
-    if len(bases) != 1:
-        raise SystemExit(f"specs use different bases: {bases}")
-    base_path = os.path.join(ROOT, specs[0]["base"])
-    raw = open(base_path, "rb").read()
-    for s in specs:
-        if sha(raw) != s["base_sha256"]:
-            raise SystemExit(f"{s['name']}: base sha256 {sha(raw)} != {s['base_sha256']}")
-    blocks, tail = oetool.parse(raw)
-    for s in specs:
-        print(f"[{s['name']}]")
-        for op in s["ops"]:
-            apply_op(blocks, op)
-    img = oetool.build(blocks, tail)
-    out = out or os.path.join(ROOT, "build", "+".join(s["name"] for s in specs) + ".BIN")
-    os.makedirs(os.path.dirname(out), exist_ok=True)
-    open(out, "wb").write(img)
-    ok = oetool.info(out)
-    digest = sha(img)
-    if len(specs) == 1 and specs[0].get("expected_sha256"):
-        match = digest == specs[0]["expected_sha256"]
+    """Apply specs to the stock firmware and write the result. Return True if all checks pass."""
+    try:
+        specs = [load_spec(Path(path)) for path in spec_paths]
+        bases = {spec.base for spec in specs}
+        if len(bases) != 1:
+            raise SystemExit(f"specs use different bases: {sorted(bases)}")
+        stock = open(os.path.join(ROOT, specs[0].base), "rb").read()
+        applied = apply_specs(stock, specs)
+    except Epm2ModError as error:
+        raise SystemExit(str(error)) from None
+    print("\n".join(applied.log))
+    out = out or os.path.join(ROOT, "build", "+".join(spec.name for spec in specs) + ".BIN")
+    os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
+    with open(out, "wb") as handle:
+        handle.write(applied.image)
+    digest = sha256_bytes(applied.image)
+    lines = describe(applied.image)
+    print(f"{out}  size={len(applied.image)}  sha256={digest}")
+    print("\n".join("  " + line for line in lines))
+    ok = all("checksum=BAD" not in line for line in lines)
+    if len(specs) == 1 and specs[0].expected_sha256:
+        match = digest == specs[0].expected_sha256
         print(f"expected_sha256: {'MATCH' if match else 'MISMATCH'}")
         ok = ok and match
-    diff = sum(a != b for a, b in zip(raw, img))
-    print(f"wrote {os.path.relpath(out, ROOT)}  ({diff} bytes differ from base)")
-    print(f"flash as DCOLYMP/E1019999.BIN")
+    print(f"wrote {os.path.relpath(out, ROOT)}  ({applied.changed_bytes} bytes differ from base)")
+    print("flash as DCOLYMP/E1019999.BIN")
     return ok
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("specs", nargs="+")
-    ap.add_argument("-o", "--out")
-    a = ap.parse_args()
-    sys.exit(0 if build(a.specs, a.out) else 1)
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("specs", nargs="+")
+    parser.add_argument("-o", "--out")
+    arguments = parser.parse_args()
+    sys.exit(0 if build(arguments.specs, arguments.out) else 1)

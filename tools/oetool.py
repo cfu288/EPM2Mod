@@ -1,85 +1,59 @@
 #!/usr/bin/env python3
-"""Olympus "OE" firmware container tool (tested on E-PM2 / model 1010).
+"""Olympus "OE" firmware container tool (the older command-line form).
 
-Container layout, repeated per block, then an opaque tail (H8 sub-MCU "OM" image):
-  header  32 bytes  'OE' | model(2) | ... | load addr @8 (LE) | payload len @12 (LE) | kind @20
-  payload len bytes, scrambled: 16-byte lanes permuted by LANES, then XOR 0xFF
-  trailer 32 bytes  = header[0:28] + checksum word
-  checksum: sum of all LE u32 words of header + DECODED payload + trailer == 0 (mod 2^32)
+    oetool.py info   FW.BIN
+    oetool.py unpack FW.BIN OUTDIR          -> OUTDIR/manifest.json, blockN_<kind>.bin, tail.bin
+    oetool.py pack   OUTDIR NEW.BIN         -> rebuilds the container, recomputes the checksums
+    oetool.py patch  FW.BIN NEW.BIN BLOCK OFFSET HEXBYTES [--expect HEXBYTES] ...
 
-Usage:
-  oetool.py info   FW.BIN
-  oetool.py unpack FW.BIN OUTDIR          -> OUTDIR/manifest.json, blockN_<kind>.bin, tail.bin
-  oetool.py pack   OUTDIR NEW.BIN         -> rebuilds container, recomputes checksums
-  oetool.py patch  FW.BIN NEW.BIN BLOCK OFFSET HEXBYTES [--expect HEXBYTES] ...
+The format and the code are in the `epm2mod` package (src/epm2mod/container.py). This file keeps
+the command and the functions that older scripts in tools/ and experiments/ call. Blocks are
+dicts here: `off`, `header`, `trailer`, `payload` (unscrambled), `ok`, `addr`, `kind`.
 """
-import json, struct, sys, os, hashlib
+import hashlib
+import json
+import os
+import sys
 
-LANES = (1, 3, 0, 2, 6, 4, 7, 5, 11, 10, 9, 8, 13, 14, 12, 15)
-MASK = 0xFFFFFFFF
+import _package  # noqa: F401
+from epm2mod import container as _c
 
-
-def decode(enc):
-    out = bytearray(len(enc))
-    for o, i in enumerate(LANES):
-        out[o::16] = bytes(x ^ 0xFF for x in enc[i::16])
-    return bytes(out)
-
-
-def encode(dec):
-    out = bytearray(len(dec))
-    for o, i in enumerate(LANES):
-        out[i::16] = bytes(x ^ 0xFF for x in dec[o::16])
-    return bytes(out)
-
-
-def wsum(b):
-    return sum(struct.unpack(f"<{len(b)//4}I", b)) & MASK
+LANES = _c.LANES
+decode = _c.descramble
+encode = _c.scramble
+wsum = _c.word_sum
 
 
 def parse(d):
-    blocks, off = [], 0
-    while off + 64 <= len(d) and d[off:off + 2] == b"OE":
-        h = d[off:off + 32]
-        L = struct.unpack_from("<I", h, 12)[0]
-        if L % 16:
-            raise ValueError(f"block @0x{off:x}: length {L} not a multiple of 16")
-        t = d[off + 32 + L:off + 64 + L]
-        dec = decode(d[off + 32:off + 32 + L])
-        ok = (wsum(h) + wsum(dec) + wsum(t)) & MASK == 0
-        blocks.append(dict(off=off, header=h, trailer=t, payload=dec, ok=ok,
-                           addr=struct.unpack_from("<I", h, 8)[0],
-                           kind=struct.unpack_from("<H", h, 20)[0]))
-        off += 64 + L
-    return blocks, d[off:]
+    """Return (blocks as dicts, tail) of a firmware file."""
+    parsed = _c.parse(d)
+    blocks = [
+        dict(off=b.offset, header=b.header, trailer=b.trailer, payload=b.payload, ok=b.checksum_ok, addr=b.load_address, kind=b.kind)
+        for b in parsed.blocks
+    ]
+    return blocks, parsed.tail
 
 
 def build(blocks, tail):
-    out = bytearray()
-    for b in blocks:
-        h, dec = b["header"], b["payload"]
-        if struct.unpack_from("<I", h, 12)[0] != len(dec):
-            raise ValueError("payload size changed; resizing blocks is not supported")
-        t = bytearray(b["trailer"])
-        t[28:32] = b"\0\0\0\0"
-        ck = (-(wsum(h) + wsum(dec) + wsum(bytes(t)))) & MASK
-        struct.pack_into("<I", t, 28, ck)
-        out += h + encode(dec) + t
-    return bytes(out + tail)
+    """Return the firmware file of blocks (dicts with header, trailer, payload) and a tail."""
+    made = [_c.Block(b.get("off", 0), b["header"], b["trailer"], b["payload"], False) for b in blocks]
+    try:
+        return _c.serialize(_c.Container(made, tail))
+    except _c.ContainerError as error:
+        raise ValueError(str(error)) from None
 
 
 def info(path):
+    """Print a description of a firmware file. Return True if every checksum is right."""
     d = open(path, "rb").read()
-    blocks, tail = parse(d)
+    lines = _c.describe(d)
     print(f"{path}  size={len(d)}  sha256={hashlib.sha256(d).hexdigest()}")
-    for n, b in enumerate(blocks):
-        print(f"  block{n} @0x{b['off']:08x} kind=0x{b['kind']:04x} addr=0x{b['addr']:08x} "
-              f"len={len(b['payload'])} checksum={'OK' if b['ok'] else 'BAD'}")
-    print(f"  tail len={len(tail)} sha256={hashlib.sha256(tail).hexdigest()[:16]}")
-    return all(b["ok"] for b in blocks)
+    print("\n".join("  " + line for line in lines))
+    return all("checksum=BAD" not in line for line in lines)
 
 
 def unpack(path, outdir):
+    """Write the blocks (unscrambled), the tail and a manifest to a folder."""
     blocks, tail = parse(open(path, "rb").read())
     os.makedirs(outdir, exist_ok=True)
     man = {"source": os.path.basename(path), "blocks": []}
@@ -93,15 +67,19 @@ def unpack(path, outdir):
 
 
 def pack(indir, outpath):
+    """Rebuild a firmware file from a folder that `unpack` wrote."""
     man = json.load(open(os.path.join(indir, "manifest.json")))
-    blocks = [dict(header=bytes.fromhex(b["header"]), trailer=bytes.fromhex(b["trailer"]),
-                   payload=open(os.path.join(indir, b["file"]), "rb").read()) for b in man["blocks"]]
+    blocks = [
+        dict(header=bytes.fromhex(b["header"]), trailer=bytes.fromhex(b["trailer"]), payload=open(os.path.join(indir, b["file"]), "rb").read())
+        for b in man["blocks"]
+    ]
     tail = open(os.path.join(indir, "tail.bin"), "rb").read()
     open(outpath, "wb").write(build(blocks, tail))
     return info(outpath)
 
 
 def patch(src, dst, specs):
+    """Replace bytes: specs are (block, offset, new bytes, expected bytes or None)."""
     blocks, tail = parse(open(src, "rb").read())
     for blk, off, new, expect in specs:
         p = bytearray(blocks[blk]["payload"])
