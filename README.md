@@ -62,8 +62,9 @@ No firmware is distributed here, because it is the maker's copyrighted software.
 downloads Olympus's own v1.6 firmware from the maker's update server, applies this repository's
 patches, and checks that the result is byte-for-byte the tested build.
 
-**You need:** a computer with [Python 3](https://www.python.org/downloads/) (no extra packages), an SD
-card, a fully charged battery, and an E-PM2 with body firmware 1.6 (Setup menu → Firmware).
+**You need:** a computer with [uv](https://docs.astral.sh/uv/getting-started/installation/), an SD card, a
+fully charged battery, and an E-PM2 with body firmware 1.6 (Setup menu → Firmware). uv gets the right
+Python for you; nothing else has to be installed.
 
 1. **Get this repository.** Click **Code → Download ZIP** on GitHub and unzip it, or:
 
@@ -75,7 +76,7 @@ card, a fully charged battery, and an E-PM2 with body firmware 1.6 (Setup menu �
 2. **Make the firmware.** Put the SD card in the computer and give its location:
 
    ```bash
-   python3 tools/make_firmware.py --card /Volumes/NAME       # macOS; Linux: the card's mount point; Windows: E:\
+   uv run tools/make_firmware.py --card /Volumes/NAME       # macOS; Linux: the card's mount point; Windows: E:\
    ```
 
    The script does four things and stops with a message if one of them fails:
@@ -114,17 +115,20 @@ sha256 of the result. It always describes the last build that was tested on a ca
 The two scripts, if you want to run the steps one at a time:
 
 ```bash
-python3 tools/fetch_stock.py        # download and check the stock firmware only
-python3 tools/make_firmware.py      # patch, check, and write build/card/DCOLYMP/E1019999.BIN
+uv run tools/fetch_stock.py        # download and check the stock firmware only
+uv run tools/make_firmware.py      # patch, check, and write build/card/DCOLYMP/E1019999.BIN
 ```
 
 ### Other builds
+
+The scripts use the Python standard library only, so `python3 tools/make_firmware.py` works too if
+you have Python 3.9 or newer.
 
 `tools/make_firmware.py` runs `tools/build.py` with the specs of the pinned build. To make a
 different build, run `tools/build.py` yourself with the specs you want, in this order:
 
 ```bash
-python3 tools/build.py \
+uv run tools/build.py \
     patches/remap7b-code.json patches/seven-fixes-1.json patches/seven-movie-1.json \
     patches/seven-structure-extra.json patches/seven-films-5.json \
     patches/xp-adaptive-hue-off.json patches/seven-labels.json \
@@ -140,7 +144,7 @@ python3 tools/build.py \
 | `seven-films-6`: film looks only | without the two `interval-…` specs | `5badb0796731b40a27ef015e57da134d7d793486d4c6262a3f483c1aae60fd05` |
 
 The build tool refuses a wrong base file and checks every byte it replaces. Before you build a
-different combination of specs, run `python3 tools/freespace.py check SPEC…` with the same list.
+different combination of specs, run `uv run tools/freespace.py check SPEC…` with the same list.
 It fails if two specs use the same bytes or if a spec writes where the camera does not load the
 firmware.
 

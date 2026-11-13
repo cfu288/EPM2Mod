@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """Make the pinned firmware of this repository: download, patch, check. One command.
 
-    python3 tools/make_firmware.py                       -> build/card/DCOLYMP/E1019999.BIN
-    python3 tools/make_firmware.py --card /Volumes/NAME  -> the same, and copied to that SD card
+    uv run tools/make_firmware.py                       -> build/card/DCOLYMP/E1019999.BIN
+    uv run tools/make_firmware.py --card /Volumes/NAME  -> the same, and copied to that SD card
 
 The pinned build is the last build that was tested on a camera. pinned-build.json at the top of the
 repository describes it: the stock firmware it starts from, the patch specs in order, and the sha256
@@ -13,7 +17,7 @@ the result must have. This script
   3. compares the result with the pinned sha256, and deletes it if it differs,
   4. writes a copy under the name the camera looks for (DCOLYMP/E1019999.BIN),
   5. with --card, copies that file to the SD card and checks the copy.
-Python standard library only.
+Python standard library only; `uv run` gets a Python for you, or use `python3` in its place.
 """
 import argparse, hashlib, json, os, shutil, subprocess, sys
 

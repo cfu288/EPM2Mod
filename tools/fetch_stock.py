@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """Download the stock Olympus E-PM2 v1.6 firmware from the maker's update catalog and check it.
 
-    python3 tools/fetch_stock.py          -> firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN
+    uv run tools/fetch_stock.py           -> firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN
 
 It sends the request that the maker's own updater program sends (camera model code, a placeholder
 serial number and network address), reads the download address from the answer, downloads the file
 and compares its sha256 with the one this project is built on. It never talks to a camera.
-Python standard library only.
+Python standard library only; `uv run` gets a Python for you, or use `python3` in its place.
 """
 import datetime, hashlib, os, sys, urllib.request, xml.etree.ElementTree as ET
 
