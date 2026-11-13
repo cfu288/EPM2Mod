@@ -5,7 +5,7 @@ a firmware mod built with it: **seven film looks as in-camera art filters**.
 
 ![Six photos, each developed in the camera with stock Natural and the seven film looks](docs/images/film-sim-comparison.jpg)
 
-Each row is one RAW file developed in the camera; the first column is the stock Natural mode.
+Each row shows one RAW file. The camera developed the file with each look. The first column shows the standard Natural mode.
 Full-resolution sheet: [docs/film-sim-comparison.pdf](docs/film-sim-comparison.pdf).
 
 ## Film looks

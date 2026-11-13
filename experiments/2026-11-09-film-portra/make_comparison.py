@@ -4,7 +4,7 @@ Reads camera JPEGs from a folder, groups them by capture time (RAW Data Edit kee
 orders the columns by art filter (EXIF ArtFilter).   ../../.venv/bin/python -I make_comparison.py FOLDER [OUT.pdf]"""
 import collections, json, os, subprocess, sys
 from PIL import Image, ImageDraw, ImageFont, ImageOps
-LOOKS = [("Off", "Natural", "camera default"), ("Pop Art", "Portra 400", "Portra"), ("Soft Focus", "Ektachrome 100", "Ektachrome"), ("Pale & Light Color", "Fuji Pro 400H", "Pro 400H"),
+LOOKS = [("Off", "Natural", "Standard mode"), ("Pop Art", "Portra 400", "Portra"), ("Soft Focus", "Ektachrome 100", "Ektachrome"), ("Pale & Light Color", "Fuji Pro 400H", "Pro 400H"),
          ("Light Tone", "Kodachrome 64", "Kodachrome"), ("Pin Hole", "Vision3 250D", "Vis 250D"), ("Diorama", "Velvia 100", "Velvia"), ("Cross Process", "Superia X-tra 400", "Superia 400")]
 folder = sys.argv[1]; out = sys.argv[2] if len(sys.argv) > 2 else os.path.join(folder, "film-sim-comparison.pdf")
 meta = json.loads(subprocess.run(["exiftool", "-j", "-ArtFilter", "-DateTimeOriginal", "-ext", "JPG", folder], capture_output=True, text=True).stdout)
@@ -18,17 +18,17 @@ for t in sorted(scenes):
     h = max(round(W * im.height / im.width) for im in ims.values()); rows.append((t, ims, h))
 width = 2 * M + len(LOOKS) * W + (len(LOOKS) - 1) * GAP; height = 2 * M + HEAD + sum(h + CAP + GAP for _, _, h in rows)
 page = Image.new("RGB", (width, height), "white"); d = ImageDraw.Draw(page)
-d.text((M, M - 20), "Film looks on the Olympus E-PM2", font=font(64, True), fill="black")
-d.text((M, M + 62), "Each row is one RAW file developed in the camera with every look (seven-film firmware). Columns: the film, and its name in the camera's menu.", font=font(30), fill=(90, 90, 90))
+d.text((M, M - 20), "Film looks for the Olympus E-PM2", font=font(64, True), fill="black")
+d.text((M, M + 62), "Each row shows one RAW file. The camera developed the file with each look. Each column shows one look. The first column shows the standard Natural mode.", font=font(30), fill=(90, 90, 90))
 y = M + HEAD
 for c, (_, name, label) in enumerate(LOOKS):
-    x = M + c * (W + GAP); d.text((x + W / 2, y - 62), name, font=font(40, True), fill="black", anchor="mm"); d.text((x + W / 2, y - 22), f"menu: {label}" if c else label, font=font(26), fill=(110, 110, 110), anchor="mm")
+    x = M + c * (W + GAP); d.text((x + W / 2, y - 62), name, font=font(40, True), fill="black", anchor="mm"); d.text((x + W / 2, y - 22), f"Menu name: {label}" if c else label, font=font(26), fill=(110, 110, 110), anchor="mm")
 for r, (t, ims, h) in enumerate(rows):
     for c, (key, name, _) in enumerate(LOOKS):
         x = M + c * (W + GAP)
         if key in ims:
             im = ims[key]; th = im.resize((W, round(W * im.height / im.width)), Image.LANCZOS); page.paste(th, (x, y + (h - th.height) // 2))
-        else: d.rectangle([x, y, x + W, y + h], outline=(200, 200, 200)); d.text((x + W / 2, y + h / 2), "not developed", font=font(28), fill=(150, 150, 150), anchor="mm")
+        else: d.rectangle([x, y, x + W, y + h], outline=(200, 200, 200)); d.text((x + W / 2, y + h / 2), "No picture", font=font(28), fill=(150, 150, 150), anchor="mm")
         d.text((x + W / 2, y + h + CAP / 2 - 6), name, font=font(28), fill=(60, 60, 60), anchor="mm")
     y += h + CAP + GAP
 page.save(out, "PDF", resolution=300.0, quality=90)
