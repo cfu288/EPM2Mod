@@ -1,7 +1,7 @@
 {
  "name": "seven-movie-1",
  "description": "On top of remap7b-code + seven-fixes-1: in movie mode the Soft Focus, Pin Hole and Diorama entries give the colour-only movie codes 103 / 146 / 168 (they gave the stock effect codes 78 / 82 / 88 while art_GetFilterType gave 102 / 145 / 167, which froze the display); art code 168 gets the plain six-axis handler of 167. NOTES \u00a747.",
- "status": "built, NOT camera-tested",
+ "status": "camera-tested 2026-11-13 as part of build/seven-films-6.BIN (sha256 5badb0796731b40a27ef015e57da134d7d793486d4c6262a3f483c1aae60fd05); see docs/camera-log.md",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
  "ops": [

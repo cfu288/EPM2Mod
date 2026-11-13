@@ -22,13 +22,9 @@ look. Live view shows it too.
 | **Superia 400** | Cross Process | Fuji Superia X-tra 400 negative, printed on Fuji Crystal Archive paper |
 | Gentle Sepia, Dramatic Tone, Key Line, Watercolor | (unchanged) | |
 
-Current build on the camera: `build/seven-films-5.BIN`, built with
-
-```
-python3 tools/build.py patches/remap7b-code.json patches/seven-fixes-1.json \
-    patches/seven-structure-extra.json patches/seven-films-5.json \
-    patches/xp-adaptive-hue-off.json patches/seven-labels.json -o build/seven-films-5.BIN
-```
+Current build on the camera: `build/seven-films-6.BIN`. The top-level README has the build and
+flash steps. The patch list, in order: `remap7b-code`, `seven-fixes-1`, `seven-movie-1`,
+`seven-structure-extra`, `seven-films-5`, `xp-adaptive-hue-off`, `seven-labels`.
 
 Earlier and failed patch specs are kept in `patches/history/` as a record; do not build from them
 without reading the camera log.
@@ -233,8 +229,9 @@ Side effects on entries we did not turn into films: the second types (Pop Art II
 - No grain or halation.
 - All measurements use the camera's daylight colour matrix. Other white balance settings
   (tungsten, shade) use different matrices and are untested.
-- Live view works in all seven entries. **Movie mode is not converted**: in the Ektachrome,
-  Vis 250D and Velvia entries a movie still gets the old Soft Focus / Pin Hole / Diorama effect.
+- Live view and movie mode work in all seven entries. A movie gets only part of each look: the
+  film's matrix, saturation and per-hue values, but the film's brightness curves only in Kodachrome
+  and Superia 400. The other five have film curves for stills only (not enough table space).
 - **Open problem:** twice the camera froze and restarted at the moment RAW Data Edit was about to
   save. It is not known whether the modified firmware, or the hand-made test file, is involved; it
   has not been tried on stock firmware. See the camera log.

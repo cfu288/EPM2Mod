@@ -2004,3 +2004,9 @@ without an anchor measurement; `--edge-weight` adds the gamut-edge patches (GRKi
   codes share each film's matrix, saturation and six-axis records; chroma curves are straight
   (§43.2); the per-channel curves are the film's only in Kodachrome and Superia (their records have
   all 24 tables); the other five have film curves for stills only. So expect a partial look.
+
+### 47.1 `seven-films-6` on the camera (2026-11-13)
+User: "tested, works". The movie-mode freeze of the three remapped entries is gone, so the cause in
+§47 was right: the movie tables must agree with `art_GetFilterType`, as the stills tables must
+(§37.2). `seven-films-6` is the latest known-good build. The look of movies in the film entries is
+still not measured.

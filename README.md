@@ -29,47 +29,82 @@ simulations of each film and measured on the camera with a synthetic test RAW; a
 about 1.1 to 1.5 ΔE2000 on natural colours (stock Natural against the same targets: 4 to 6).
 How it works, how it was measured and what the limits are: **[docs/film-emulation.md](docs/film-emulation.md)**.
 
-## Latest known-good build
+## Build and flash the latest build
 
-**`seven-films-5`**, flashed and measured on a real E-PM2 on 2026-11-12 ([camera log](docs/camera-log.md)).
+The latest known-good build is **`seven-films-6`**. It was flashed and tested on a real E-PM2 on
+2026-11-13 ([camera log](docs/camera-log.md)). No firmware is distributed here. You build the image from
+Olympus's own v1.6 firmware file and the patch specs in this repository.
 
-No firmware is distributed here. You build the image from Olympus's own v1.6 firmware file plus the
-patch specs in this repository:
+**You need:** Python 3 (no extra packages), an SD card, a charged battery, and an E-PM2 with body
+firmware 1.6.
 
-```bash
-# 1. put the stock E-PM2 v1.6 firmware at firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN
-#    sha256 34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300   (sources: firmware/README.md)
-# 2. build
-python3 tools/build.py patches/remap7b-code.json patches/seven-fixes-1.json \
-    patches/seven-structure-extra.json patches/seven-films-5.json \
-    patches/xp-adaptive-hue-off.json patches/seven-labels.json -o build/seven-films-5.BIN
-# 3. check: sha256 of build/seven-films-5.BIN must be
-#    0443a38804061afaf17a12906a6969101d9f54ffe006e0aeca0d21d68f9b29ae
-```
+1. Get the repository.
 
-Flash it as `DCOLYMP/E1019999.BIN` on the SD card, hold OK and power on. Full steps, and how to go back
-to stock: [docs/flashing.md](docs/flashing.md).
+   ```bash
+   git clone https://github.com/cfu288/EPM2Mod.git
+   cd EPM2Mod
+   ```
 
-Known issues in this build:
+2. Put the stock E-PM2 v1.6 firmware file here: `firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN`.
+   Where to get it: [firmware/README.md](firmware/README.md). Check the file:
 
-- In **movie mode** the display freezes while Ektachrome, Vis 250D or Velvia is selected (leaving the entry
-  un-freezes it). Fixed in `seven-films-6` (the same list with `patches/seven-movie-1.json` after
-  `seven-fixes-1`), which is built but **not yet camera-tested**.
-- Movies get only part of each look. The second type (II) of Portra, Pro 400H and Superia is the same as type I.
+   ```bash
+   sha256sum firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN      # macOS: shasum -a 256 ...
+   # 34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300
+   ```
+
+3. Build.
+
+   ```bash
+   python3 tools/build.py \
+       patches/remap7b-code.json patches/seven-fixes-1.json patches/seven-movie-1.json \
+       patches/seven-structure-extra.json patches/seven-films-5.json \
+       patches/xp-adaptive-hue-off.json patches/seven-labels.json \
+       -o build/seven-films-6.BIN
+   ```
+
+   The order of the specs matters. The build tool refuses a wrong base file and checks every byte it
+   replaces.
+
+4. Check the result. The build is reproducible, so the hash must be the same as this one:
+
+   ```bash
+   sha256sum build/seven-films-6.BIN
+   # 5badb0796731b40a27ef015e57da134d7d793486d4c6262a3f483c1aae60fd05
+   ```
+
+5. Copy the file to the SD card as `DCOLYMP/E1019999.BIN`. It must be the only file in `DCOLYMP`.
+
+   ```bash
+   mkdir -p /Volumes/SDCARD/DCOLYMP            # macOS; on Linux use the card's mount point
+   rm -f /Volumes/SDCARD/DCOLYMP/*
+   cp build/seven-films-6.BIN /Volumes/SDCARD/DCOLYMP/E1019999.BIN
+   shasum -a 256 /Volumes/SDCARD/DCOLYMP/E1019999.BIN     # must be the hash of step 4
+   diskutil eject /Volumes/SDCARD
+   ```
+
+6. Flash. Put the card in the camera. With the camera off, hold **OK** and switch the camera on.
+   The lamp is solid orange for about one minute: do not touch the camera. When the lamp blinks, the
+   update is complete. Switch the camera off, then on.
+
+7. Check. The art filter list shows Portra, Ektachrome, Pro 400H, Kodachrome, Vis 250D, Velvia and
+   Superia 400.
+
+**To go back to the original firmware,** do steps 5 and 6 with the stock file of step 2.
+More detail on flashing: [docs/flashing.md](docs/flashing.md).
+
+Limits of this build:
+
+- Movies get only part of each look.
+- The second type (II) of Portra, Pro 400H and Superia is the same as type I.
+- Grain and halation are not simulated.
 
 **At your own risk.** This is unofficial, for the E-PM2 with body firmware 1.6 only, and not affiliated with
-Olympus or OM Digital Solutions. A wrong or interrupted flash can leave a camera unusable. The build tool
-refuses any other base file; never put a firmware file for another model on the card.
+Olympus or OM Digital Solutions. A wrong or interrupted flash can leave a camera unusable. Never put a
+firmware file for another model on the card.
 
-## Tooling quick start
-
-```bash
-python3 tools/build.py patches/pixel-hacking.json      # -> build/pixel-hacking.BIN (proof of concept: renames one menu label)
-python3 -m unittest discover -s tests                   # round-trip + reproducible builds
-```
-
-Modified firmware has flashed and run on a real E-PM2 through the SD-card updater since 2026-11-08; every
-flash is in [docs/camera-log.md](docs/camera-log.md).
+To run the project's own tests (they need the stock firmware file of step 2):
+`python3 -m unittest discover -s tests`.
 
 ## Layout
 
@@ -86,7 +121,7 @@ flash is in [docs/camera-log.md](docs/camera-log.md).
 
 ## Patches
 
-The current film build is described under *Latest known-good build* above. Every other film spec in the table below is in `patches/history/`; the table is the development history.
+The current film build is described under *Build and flash the latest build* above. Every other film spec in the table below is in `patches/history/`; the table is the development history.
 
 | Spec | Status |
 |---|---|
