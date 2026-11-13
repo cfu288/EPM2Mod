@@ -1,7 +1,6 @@
 # EPM2Mod
 
-Custom firmware tooling for the Olympus PEN **E-PM2** (model 1010, TruePic VI, body firmware 1.6), and
-a firmware mod built with it: **seven film looks as in-camera art filters**.
+Repository containing the current work for creating a custom firmaware mod for the Olympus PEN **E-PM2**. The goal is to unlock or add new features to this camera. Currently, we've implemented replacing the default art filters with film simulations like Portra, Ektachrome, etc. See below for an example:
 
 ![Six photos, each developed in the camera with stock Natural and the seven film looks](docs/images/film-sim-comparison.jpg)
 
