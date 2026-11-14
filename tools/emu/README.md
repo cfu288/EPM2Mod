@@ -115,6 +115,8 @@ cases above did not change.
 | `osmodel.py` | A Python model of the uITRON services behind the `Oly*` wrappers: event flags, queues, data queues, semaphores, sleep, software timers. `schedule()` runs the ready tasks until all wait. |
 | `liveview.py` | `LiveView`: a rig for the mov layer and the art tasks. It runs the static constructors, 12 module init functions and 10 task bodies from their real entries, sends "Through Start", and then steps frame events. It tracks the image-work heap (alloc, free, mode, re-partition), firmware error reports and addresses given to devices. |
 | `hookcheck.py` | S0, a static check with no emulator: lists every jump of a spec's hooks and new code with the load segment of its source and target. A jump from the kernel or segment 1 to segment 2 or 3 FAILS (that code is not in RAM yet when the boot task runs, and never on the update path). |
+| `opcheck.py` | Two static checks of a whole build: a byte that one spec covers and keeps and a later spec changes, and a call from the code that runs in SRAM into an op. |
+| `hookcheck-allow.tsv` | The hooks that `hookcheck.py` would fail and that are accepted, each with its evidence. |
 
 ### How to write a scenario
 
@@ -173,3 +175,7 @@ For code outside live view use `Scenario` directly:
 - **UDF.** om-emu's UDF semantics (`udfu01` as a multiply, the float stubs) were established on the OM-1. On the E-PM2 they are confirmed only where a case checks them: `rec_limit`'s `udfu01 30` and `udfu01 600` match the model, and fsub at 0x7E5018BC gave 3.0 − 1.0 = 2.0.
 - **Stray code.** Code outside a case's ranges is an error. Unmodelled MMIO faults (lab-stub deny). A misaligned access faults, as om-emu enforces.
 - **No proof of safety.** Passing these tests does not prove a patch is safe on the camera. They show only that the tested function, with these inputs and stubs, changes only the intended outputs. Caches, timing, other readers of the same bytes, and everything the stubs replace are not tested.
+
+`python3 tools/freespace.py check SPEC...` runs the load-order check and the SRAM-caller check too, and
+`epm2mod make` runs that command for every build that is not camera-tested. `epm2mod make` itself refuses a
+spec that changes a byte another spec covers and keeps.

@@ -1,0 +1,3 @@
+# Hooks that tools/emu/hookcheck.py would fail, and that are accepted. Columns (tab-separated): address of the
+# jump, date, reason. An entry needs evidence from the camera or a proof from the code. Keep this list short.
+7E56C6A5	2026-11-14	remap7b-code, segment 1 to segment 2. The host function is reached only through the image-job table 0x7E789604. It did not run before segment 2 was loaded on a normal start, a quick start and the update path (experiments/2026-11-14-emulator-audit/NOTES.md). On the camera since 2026-11-12: every start and every update worked.

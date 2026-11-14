@@ -14,7 +14,8 @@ and delete the item here.
 
 - A menu entry for focus peaking (On/Off, and the line colour), so it does not depend on MF Assist
   alone.
-- Make `tools/emu/hookcheck.py` and the emulator's boot test a step of `epm2mod make`.
+- Make the emulator's boot test a step for every candidate. It is run by hand now, because the
+  emulator is outside the repository.
 
 ## Film looks
 

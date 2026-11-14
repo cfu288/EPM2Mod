@@ -1091,6 +1091,22 @@ def check_sram_callers(specs, out=print):
     return fails
 
 
+def check_load_order(specs, out=print):
+    """FAIL for each jump or call from code that is loaded early (kernel, segment 1) to code that is loaded later.
+    The check is tools/emu/hookcheck.py; the accepted hooks are in tools/emu/hookcheck-allow.tsv."""
+    here = os.path.join(os.path.dirname(os.path.abspath(__file__)), "emu")
+    sys.path.insert(0, here)
+    import hookcheck
+    allow = {int(r[0], 16): "%s, %s" % (r[1], r[2]) for r in read_tsv(os.path.join(here, "hookcheck-allow.tsv"), 3)}
+    lines = []
+    ok = hookcheck.check([rel(s.path) for s in specs], allow, lines.append)
+    for line in lines[:-1]:
+        if not line.startswith("ok"):
+            out(line[:200])
+    out("%s  load order: %s" % ("PASS" if ok else "FAIL", lines[-1]))
+    return 0 if ok else 1
+
+
 # ----------------------------------------------------------------------------- map output
 
 CHECKS = ["loaded", "content", "pointers", "operands", "written", "predecessor"]
@@ -1395,6 +1411,7 @@ def main():
         specs.append(Spec(os.path.relpath(ap_, ROOT)))
     fails = check_specs(sp, specs, first_code=a.first_code)
     fails += check_sram_callers(specs)
+    fails += check_load_order(specs)
     print("check: %s (%d FAIL)" % ("FAIL" if fails else "PASS", fails))
     return 1 if fails else 0
 

@@ -132,6 +132,8 @@ def check_free_space(paths: RepoPaths, description: BuildDescription) -> str:
     not load the firmware, or a spec puts code in an area where no
     camera-tested build runs code yet. The last rule is waived for a
     description with ``first_code``: its flash is the test of that area.
+    It also fails if code that runs in SRAM calls into the bytes of a spec, or
+    if a hook in early-loaded code jumps to code that is loaded later.
 
     Returns:
         The last line of the check's output.
