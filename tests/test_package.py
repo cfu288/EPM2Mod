@@ -17,6 +17,7 @@ import http.client
 import io
 import json
 import os
+import runpy
 import shutil
 import signal
 import struct
@@ -619,6 +620,15 @@ class PathAndFileTests(unittest.TestCase):
             self.assertEqual(target.read_bytes(), b"new")
             self.assertEqual([p.name for p in target.parent.iterdir()], ["f.bin"])
 
+    def test_a_path_or_text_that_cannot_be_written_is_a_package_error(self) -> None:
+        for path in (Path(""), Path("/")):
+            with self.assertRaisesRegex(FileError, "not a file name"):
+                fileio.write_bytes(path, b"data")
+        with tempfile.TemporaryDirectory() as folder:
+            with self.assertRaisesRegex(FileError, "UTF-8"):
+                fileio.write_text(Path(folder) / "f.txt", "\ud800")
+            self.assertEqual(list(Path(folder).iterdir()), [])
+
     def test_a_write_is_flushed_to_the_device(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             with mock.patch("epm2mod.fileio.os.fsync", wraps=os.fsync) as flush:
@@ -791,12 +801,21 @@ class BuildDescriptionTests(unittest.TestCase):
                 builds.pin(paths, candidate)
             self.assertFalse(paths.pinned.exists())
             tested = candidate.as_tested("a" * 64, "2026-11-13")
-            builds.pin(paths, tested)
+            with mock.patch("epm2mod.builds.write_json", wraps=fileio.write_json) as w:
+                builds.pin(paths, tested)
+            written = [call.args[0].name for call in w.call_args_list]
+            self.assertEqual(written, ["b.json", "pinned-build.json"])
             self.assertEqual(
                 json.loads(paths.pinned.read_text()), {"build": "builds/b.json"}
             )
             self.assertEqual(builds.pinned_description(paths), tested)
             self.assertEqual(builds.all_descriptions(paths), [tested])
+            longer = builds.description_from_json("b-2", self.GOOD)
+            builds.save_description(paths, longer)
+            self.assertEqual(
+                [d.name for d in builds.all_descriptions(paths)], ["b", "b-2"]
+            )
+            builds.description_path(paths, "b-2").unlink()
             pointers: list[Any] = [
                 {"build": "../elsewhere.json"},
                 {"build": "builds/sub/b.json"},
@@ -968,6 +987,26 @@ class MakeTests(RepoCase):
         with self.assertRaises(BuildError):
             self.make(self.repo.candidate)
 
+    def test_make_downloads_the_stock_firmware_if_it_is_absent(self) -> None:
+        stock.stock_path(self.repo.paths, TINY_STOCK).unlink()
+        with answers(catalog_answer(), TINY):
+            result = self.make(self.repo.tested)
+        self.assertEqual(result.sha256, self.repo.sha256)
+        stock.stock_path(self.repo.paths, TINY_STOCK).unlink()
+        with answers(catalog_answer(), TINY[:-1]), self.assertRaises(StockError):
+            self.make(self.repo.tested)
+        self.assertEqual(self.repo.outputs(), [])
+
+    def test_a_card_folder_that_is_a_link_is_removed_not_followed(self) -> None:
+        elsewhere = self.card.parent / "elsewhere"
+        elsewhere.mkdir()
+        (elsewhere / "keep.txt").write_bytes(b"keep")
+        self.repo.paths.output.mkdir()
+        self.repo.paths.card.symlink_to(elsewhere, target_is_directory=True)
+        self.make(self.repo.tested)
+        self.assertFalse(self.repo.paths.card.is_symlink())
+        self.assertEqual([p.name for p in elsewhere.iterdir()], ["keep.txt"])
+
     def test_a_missing_spec_is_found_before_the_free_space_check(self) -> None:
         self.repo.free_space_tool(1)
         self.repo.paths.resolve("patches/a.json").unlink()
@@ -1036,7 +1075,7 @@ class MakeTests(RepoCase):
                 raise OSError(errno.EIO, "Input/output error")
             real_sync(folder)
 
-        with mock.patch("epm2mod.fileio.sync_folder", side_effect=fail_on_card):
+        with mock.patch("epm2mod.pipeline.sync_folder", side_effect=fail_on_card):
             with self.assertRaisesRegex(BuildError, "state is not certain") as raised:
                 self.make(self.repo.tested, card=self.card)
         self.assertNotIn("NOT on the card", str(raised.exception))
@@ -1078,8 +1117,10 @@ class MakeTests(RepoCase):
         folder.mkdir()
         (folder / "OTHER.BIN").write_bytes(b"x")
         for card in (self.card, self.card / "none", folder / "OTHER.BIN"):
-            with self.subTest(card=card.name), self.assertRaises(BuildError):
-                self.make(self.repo.tested, card=card)
+            with mock.patch("epm2mod.pipeline.obtain_stock") as obtain:
+                with self.subTest(card=card.name), self.assertRaises(BuildError):
+                    self.make(self.repo.tested, card=card)
+                obtain.assert_not_called()
             self.assertEqual(self.repo.outputs(), [])
         self.assertEqual((folder / "OTHER.BIN").read_bytes(), b"x")
 
@@ -1100,14 +1141,16 @@ class MakeTests(RepoCase):
             data: bytes,
             error: type[Epm2ModError] = FileError,
             read_back: bool = False,
+            flush_folder: bool = True,
         ) -> None:
             if self.card in path.parents:
                 raise error("card full")
-            real_write(path, data, error, read_back)
+            real_write(path, data, error, read_back, flush_folder)
 
         with mock.patch("epm2mod.pipeline.write_bytes", side_effect=fail_on_card):
-            with self.assertRaisesRegex(BuildError, "NOT on the card"):
+            with self.assertRaisesRegex(BuildError, "NOT on the card") as raised:
                 self.make(self.repo.tested, card=self.card)
+        self.assertNotIn("not certain", str(raised.exception))
         self.assertEqual(target.read_bytes(), b"older firmware")
         self.assertEqual(self.repo.outputs(), [])
 
@@ -1209,11 +1252,40 @@ class CommandLineTests(RepoCase):
         self.assertEqual(status, 1, text)
         self.assertEqual(self.repo.outputs(), [])
 
+    def test_a_failed_pinned_run_removes_the_image_of_the_earlier_run(self) -> None:
+        for damage in ("<<<<<<< HEAD\n", json.dumps(self.repo.candidate.to_json())):
+            self.assertEqual(self.run_cli("make")[0], 0)
+            good = Path(self.build_file("good"))
+            saved = good.read_text()
+            good.write_text(damage)  # not JSON; then: not a tested build
+            status, text = self.run_cli("make")
+            self.assertEqual(status, 1, text)
+            self.assertEqual(self.repo.outputs(), [])
+            good.write_text(saved)
+
+    def test_the_wrappers_in_tools_pass_their_arguments_on(self) -> None:
+        cases = {
+            "make_firmware.py": ["make", "builds/x.json", "--card", "/card"],
+            "fetch_stock.py": ["fetch-stock", "builds/x.json", "--card", "/card"],
+        }
+        for script, expected in cases.items():
+            argv = [script, *expected[1:]]
+            with mock.patch.object(cli, "main", return_value=7) as main:
+                with mock.patch.object(sys, "argv", argv):
+                    with self.assertRaises(SystemExit) as raised:
+                        runpy.run_path(
+                            str(ROOT / "tools" / script), run_name="__main__"
+                        )
+            self.assertEqual(raised.exception.code, 7)
+            main.assert_called_once_with(expected)
+
     def test_an_empty_argument_is_an_error(self) -> None:
         record = ("--date", "2026-11-10", "--sha256", self.repo.sha256)
         cases: list[tuple[str, ...]] = [
             ("make", ""),
             ("make", "--card", ""),
+            ("apply", str(self.repo.paths.resolve("patches/a.json")), "-o", ""),
+            ("apply", str(self.repo.paths.resolve("patches/a.json")), "-o", "/"),
             ("pin", "", *record),
         ]
         for argv in cases:
@@ -1308,13 +1380,16 @@ class CommandLineTests(RepoCase):
     @unittest.skipUnless(hasattr(signal, "SIGTERM"), "no SIGTERM here")
     def test_a_termination_signal_is_an_interrupt(self) -> None:
         before = signal.getsignal(signal.SIGTERM)
+        cleaned_up = []
         with self.assertRaises(KeyboardInterrupt):
             with cli.interruptible():
                 try:
                     signal.raise_signal(signal.SIGTERM)
-                finally:  # a second signal, during the clean-up, is ignored
+                finally:  # further signals, during the clean-up, are ignored
                     signal.raise_signal(signal.SIGTERM)
                     signal.raise_signal(signal.SIGINT)
+                    cleaned_up.append(True)
+        self.assertEqual(cleaned_up, [True])
         self.assertIs(signal.getsignal(signal.SIGTERM), before)
 
     def test_an_interrupted_command_leaves_no_output_and_says_so(self) -> None:

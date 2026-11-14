@@ -33,6 +33,7 @@ from .builds import (
     all_descriptions,
     load_description,
     pinned_description,
+    pinned_path,
 )
 from .container import describe, parse
 from .errors import BuildError, ContainerError, Epm2ModError
@@ -53,7 +54,10 @@ def _description(paths: RepoPaths, argument: str) -> BuildDescription:
     relative to the current folder or absolute. Symbolic links are followed
     before the comparison, so the file itself must be in that folder.
     """
-    path = Path(argument).resolve()
+    try:
+        path = Path(argument).resolve()
+    except (OSError, RuntimeError) as error:
+        raise BuildError(f"{argument}: cannot be used as a path: {error}") from None
     if not argument or path.parent != paths.builds.resolve():
         raise BuildError(
             f"{argument}: a build description must be a file in "
@@ -65,10 +69,13 @@ def _description(paths: RepoPaths, argument: str) -> BuildDescription:
 def _make(args: argparse.Namespace, paths: RepoPaths) -> int:
     """Run ``epm2mod make``.
 
-    What an earlier run left is removed before anything can fail: always the
-    card folder, and the image of the build if a build is named.
+    What an earlier run left is removed before a description is read: first
+    the card folder, then the image of the build. Its name comes from the
+    argument, or from the pointer to the pinned build.
     """
-    clear_outputs(paths, None if args.build is None else Path(args.build).stem)
+    clear_outputs(paths, None)
+    named = Path(args.build) if args.build is not None else pinned_path(paths)
+    clear_outputs(paths, named.stem)
     if args.card == "":
         raise BuildError("--card needs the place where the SD card is mounted")
     description = (
@@ -118,7 +125,11 @@ def _apply(args: argparse.Namespace, paths: RepoPaths) -> int:
             f"the spec expects {expected}; nothing was written"
         )
     out = Path(args.out)
-    if out.resolve() == stock_path(paths, EPM2_V16).resolve():
+    try:
+        is_stock = out.resolve() == stock_path(paths, EPM2_V16).resolve()
+    except (OSError, RuntimeError) as error:
+        raise BuildError(f"{out}: cannot be used as a path: {error}") from None
+    if is_stock:
         raise BuildError(f"{out} is the stock firmware file; give another name")
     write_bytes(out, applied.image, read_back=True)
     print(f"wrote {out} ({applied.changed_bytes} bytes differ from stock)")
@@ -305,5 +316,5 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"epm2mod: {error}", file=sys.stderr)
         return 1
     except KeyboardInterrupt:
-        print("epm2mod: interrupted; nothing was left half-written", file=sys.stderr)
+        print("epm2mod: interrupted; no file was left half-written", file=sys.stderr)
         return 130

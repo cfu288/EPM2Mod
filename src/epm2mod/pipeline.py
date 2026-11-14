@@ -17,9 +17,10 @@ What ``make`` guarantees about files:
 
 * The outputs of an earlier run for the same build, and the whole ``build/card``
   folder, are removed before anything else is done. After a failed run they are
-  absent; they never hold another build. (One limit: if no build is named and
+  absent; they never hold another build. Two limits: if no build is named and
   the pointer to the pinned build cannot be read, the name of the image is not
-  known, so only ``build/card`` is removed.)
+  known, so only ``build/card`` is removed; and a command line that is not
+  accepted (exit status 2) removes nothing.
 * A firmware file gets its final name only when all of it is written, flushed
   and read back (``fileio.write_bytes``). No final name ever holds part of a
   file.
@@ -51,7 +52,14 @@ from pathlib import Path
 
 from .builds import BuildDescription, check_test_date, pin
 from .errors import BuildError
-from .fileio import Log, describe_os_error, part_path, silent, write_bytes
+from .fileio import (
+    Log,
+    describe_os_error,
+    part_path,
+    silent,
+    sync_folder,
+    write_bytes,
+)
 from .hashing import sha256_bytes
 from .paths import RepoPaths
 from .spec import Applied, PatchSpec, apply_specs, load_spec
@@ -226,8 +234,7 @@ def copy_to_card(image: bytes, card: Path, stock: StockFirmware) -> Path:
     fails, the temporary file is removed and a firmware file that was on the
     card before is still there, unchanged. If the last step fails (the flush
     of the folder, after the rename), the card holds the new file but the
-    write is not confirmed. The error message says which of the two happened;
-    it is found by reading the card, not assumed.
+    write is not confirmed. The error message says which of the two happened.
 
     Args:
         image: the firmware file.
@@ -244,30 +251,22 @@ def copy_to_card(image: bytes, card: Path, stock: StockFirmware) -> Path:
     check_card(card, stock)
     target = card_target(card, stock)
     try:
-        write_bytes(target, image, BuildError, read_back=True)
+        write_bytes(target, image, BuildError, read_back=True, flush_folder=False)
     except BuildError as error:
-        raise BuildError(f"{error}\n{_card_state(target, image)}") from None
-    return target
-
-
-def _card_state(target: Path, image: bytes) -> str:
-    """Say what the card holds after a failed write, from what can be read there."""
+        raise BuildError(
+            f"{error}\nThe new firmware is NOT on the card. If the card holds "
+            f"a {target.name}, it is an older file: do not update the camera "
+            "from it unless you know that it is the build you want."
+        ) from None
     try:
-        found = target.read_bytes() if target.exists() else None
-    except OSError:
-        found = b""
-    if found == image:
-        return (
-            f"The card's state is not certain: {target.name} is the new firmware, "
-            "but the write was not confirmed. Do not use the card. Run this again."
-        )
-    if found is None:
-        return "The new firmware is NOT on the card."
-    return (
-        f"The new firmware is NOT on the card. {target} is another file (an "
-        "older firmware, or one that cannot be read). Do not update the camera "
-        "from this card."
-    )
+        sync_folder(target.parent)
+    except OSError as error:
+        raise BuildError(
+            f"{target}: is the new firmware, but the card did not confirm the "
+            f"write ({describe_os_error(error)}). The card's state is not "
+            "certain. Do not use the card. Run this again."
+        ) from None
+    return target
 
 
 def image_path(paths: RepoPaths, name: str) -> Path:

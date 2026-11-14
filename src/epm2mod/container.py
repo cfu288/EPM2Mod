@@ -181,7 +181,9 @@ def parse(data: bytes) -> Container:
     Returns:
         The blocks, with unscrambled payloads, and the tail.
 
-    The tail is everything after the last block. Its content is not checked:
+    A block is recognised by the two bytes ``OE`` at its start, so the tail is
+    everything from the first position after a block that does not start with
+    them. Its content is not checked:
     the container has no checksum for it, so only a SHA-256 of the whole file
     shows a damaged tail.
 

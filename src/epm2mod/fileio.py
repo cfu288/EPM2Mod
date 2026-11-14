@@ -129,6 +129,7 @@ def write_bytes(
     data: bytes,
     error: type[Epm2ModError] = FileError,
     read_back: bool = False,
+    flush_folder: bool = True,
 ) -> None:
     """Write a file, all or nothing, and flush it to the device.
 
@@ -145,6 +146,9 @@ def write_bytes(
             goes through the operating system, which may answer from its own
             memory: it shows that the device accepted the data, not that the
             device stores it without error.
+        flush_folder: if False, the folder is not flushed after the rename.
+            The caller then calls ``sync_folder`` itself, to report a failure
+            of that last step in its own words.
 
     Raises:
         Epm2ModError: of type ``error``, if the file cannot be written or the
@@ -153,6 +157,8 @@ def write_bytes(
             its name, the final name holds the new, complete data and the
             message says so.
     """
+    if not path.name:
+        raise error(f"{path}: is not a file name")
     temporary = part_path(path)
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -170,6 +176,8 @@ def write_bytes(
         raise error(f"{path}: cannot be written: {describe_os_error(reason)}") from None
     finally:
         remove(temporary)
+    if not flush_folder:
+        return
     try:
         sync_folder(path.parent)
     except OSError as reason:
@@ -180,8 +188,17 @@ def write_bytes(
 
 
 def write_text(path: Path, text: str, error: type[Epm2ModError] = FileError) -> None:
-    """Write a UTF-8 text file, all or nothing, with the line ends as given."""
-    write_bytes(path, text.encode("utf-8"), error)
+    """Write a UTF-8 text file, all or nothing, with the line ends as given.
+
+    Raises:
+        Epm2ModError: of type ``error``, as ``write_bytes``, and if the text
+            cannot be written as UTF-8.
+    """
+    try:
+        data = text.encode("utf-8")
+    except UnicodeEncodeError as reason:
+        raise error(f"{path}: the text cannot be written as UTF-8: {reason}") from None
+    write_bytes(path, data, error)
 
 
 def write_json(path: Path, raw: Any, error: type[Epm2ModError] = FileError) -> None:

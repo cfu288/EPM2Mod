@@ -230,15 +230,18 @@ def save_description(paths: RepoPaths, description: BuildDescription) -> Path:
 
 def all_descriptions(paths: RepoPaths) -> list[BuildDescription]:
     """Return every description in ``builds/``, sorted by name."""
-    return [load_description(path) for path in sorted(paths.builds.glob("*" + _SUFFIX))]
+    found = [load_description(path) for path in paths.builds.glob("*" + _SUFFIX)]
+    return sorted(found, key=lambda description: description.name)
 
 
-def pinned_description(paths: RepoPaths) -> BuildDescription:
-    """Return the description that ``pinned-build.json`` names.
+def pinned_path(paths: RepoPaths) -> Path:
+    """Return the path of the description that ``pinned-build.json`` names.
+
+    The description itself is not read.
 
     Raises:
-        BuildError: if the pointer file is malformed, does not name a file in
-            ``builds/``, or names a build that is not tested.
+        BuildError: if the pointer file is missing or malformed, or does not
+            name a file directly in ``builds/``.
     """
     raw = read_json(paths.pinned, BuildError)
     target = raw.get("build") if isinstance(raw, dict) and len(raw) == 1 else None
@@ -252,10 +255,22 @@ def pinned_description(paths: RepoPaths) -> BuildDescription:
         raise BuildError(
             f'{paths.pinned}: must be {{"build": "{prefix}NAME{_SUFFIX}"}}'
         )
-    description = load_description(paths.resolve(target))
+    return paths.resolve(target)
+
+
+def pinned_description(paths: RepoPaths) -> BuildDescription:
+    """Return the description that ``pinned-build.json`` names.
+
+    Raises:
+        BuildError: as ``pinned_path``, and if the description cannot be read
+            or is not a tested build.
+    """
+    path = pinned_path(paths)
+    description = load_description(path)
     if not description.tested:
         raise BuildError(
-            f"{paths.pinned}: {target} is not a camera-tested build (it has no sha256)"
+            f"{paths.pinned}: {paths.relative(path)} is not a camera-tested "
+            "build (it has no sha256)"
         )
     return description
 

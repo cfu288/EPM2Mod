@@ -299,7 +299,6 @@ def label_ops(text_block: bytes, films: Sequence[Film]) -> list[BytesOp]:
             BytesOp(TEXT_BLOCK, match.start(), old, new)
             for match in re.finditer(re.escape(old), text_block)
             if match.start() % 2 == 0
-            and match.start() >= 2
             and text_block[match.end() : match.end() + 2] == _STRING_END
             and text_block[match.start() - 2 : match.start()] in _STRING_STARTS
         ]
