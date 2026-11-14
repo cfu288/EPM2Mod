@@ -192,7 +192,8 @@ def specs_with_other_inputs(paths: RepoPaths) -> list[str]:
 
     A spec is listed if it is missing, or the ``inputs_sha256`` that it records
     is not ``inputs_digest`` of the film list and fit files as they are now.
-    This check needs neither the stock firmware nor numpy.
+    This check needs neither the stock firmware nor numpy, so the tests can
+    make it on a clean clone; ``generate.stale`` is the full check.
     """
     film_list = load_films(paths)
     digest = inputs_digest(paths, film_list)

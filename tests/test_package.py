@@ -258,9 +258,8 @@ class ContainerTests(unittest.TestCase):
         ):
             with self.assertRaises(ContainerError):
                 container.Block(0, header, trailer, payload, False)
-        longer = container.Block(0, good.header, good.trailer, bytes(48), False)
         with self.assertRaisesRegex(ContainerError, "header says 32"):
-            container.serialize(container.Container((longer,), b""))
+            container.Block(0, good.header, good.trailer, bytes(48), False)
 
     def test_describe(self) -> None:
         lines = container.describe(container.parse(make_container([bytes(32)])))
@@ -628,6 +627,29 @@ class PathAndFileTests(unittest.TestCase):
             with self.assertRaisesRegex(FileError, "UTF-8"):
                 fileio.write_text(Path(folder) / "f.txt", "\ud800")
             self.assertEqual(list(Path(folder).iterdir()), [])
+
+    def test_an_interrupted_write_leaves_the_old_file_and_no_temporary_file(
+        self,
+    ) -> None:
+        for step in ("fsync", "replace"):
+            with self.subTest(step=step), tempfile.TemporaryDirectory() as folder:
+                target = Path(folder) / "f.bin"
+                target.write_bytes(b"old")
+                with mock.patch(
+                    f"epm2mod.fileio.os.{step}", side_effect=KeyboardInterrupt
+                ):
+                    with self.assertRaises(KeyboardInterrupt):
+                        fileio.write_bytes(target, b"new", read_back=True)
+                self.assertEqual(target.read_bytes(), b"old")
+                self.assertEqual([p.name for p in Path(folder).iterdir()], ["f.bin"])
+
+    def test_the_folder_flush_can_be_left_to_the_caller(self) -> None:
+        with tempfile.TemporaryDirectory() as folder:
+            with mock.patch("epm2mod.fileio.sync_folder") as sync:
+                fileio.write_bytes(Path(folder) / "a", b"x", flush_folder=False)
+                sync.assert_not_called()
+                fileio.write_bytes(Path(folder) / "b", b"x")
+                sync.assert_called_once()
 
     def test_a_write_is_flushed_to_the_device(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
@@ -1021,12 +1043,13 @@ class MakeTests(RepoCase):
             path: Path,
             data: bytes,
             error: type[Epm2ModError] = FileError,
+            *,
             read_back: bool = False,
         ) -> None:
             if written:
                 raise KeyboardInterrupt
             written.append(path)
-            real_write(path, data, error, read_back)
+            real_write(path, data, error, read_back=read_back)
 
         with mock.patch(
             "epm2mod.pipeline.write_bytes", side_effect=interrupt_the_second_write
@@ -1035,6 +1058,35 @@ class MakeTests(RepoCase):
                 self.make(self.repo.tested)
         self.assertEqual(len(written), 1)
         self.assertEqual(self.repo.outputs(), [])
+
+    def test_an_interrupt_in_the_card_write_leaves_only_the_old_file_there(
+        self,
+    ) -> None:
+        target = pipeline.card_target(self.card, TINY_STOCK)
+        target.parent.mkdir()
+        target.write_bytes(b"older firmware")
+        real_replace = os.replace
+
+        def interrupt_on_card(source: Path, destination: Path) -> None:
+            if Path(destination) == target:
+                raise KeyboardInterrupt
+            real_replace(source, destination)
+
+        with mock.patch("epm2mod.fileio.os.replace", side_effect=interrupt_on_card):
+            with self.assertRaises(KeyboardInterrupt):
+                self.make(self.repo.tested, card=self.card)
+        self.assertEqual([p.name for p in target.parent.iterdir()], [target.name])
+        self.assertEqual(target.read_bytes(), b"older firmware")
+        self.assertEqual(self.repo.outputs(), [])
+
+    def test_a_card_that_cannot_be_examined_is_an_error(self) -> None:
+        denied = PermissionError(13, "Permission denied")
+        with mock.patch.object(Path, "is_dir", side_effect=denied):
+            with self.assertRaisesRegex(BuildError, "cannot be read"):
+                pipeline.check_card(self.card, TINY_STOCK)
+        with mock.patch.object(Path, "resolve", side_effect=RuntimeError("loop")):
+            with self.assertRaisesRegex(BuildError, "cannot be used as a path"):
+                self.make(self.repo.tested, card=self.card)
 
     def test_the_card(self) -> None:
         lines: list[str] = []
@@ -1111,6 +1163,12 @@ class MakeTests(RepoCase):
         self.assertEqual(write.call_count, 3)
         for call in write.call_args_list:
             self.assertIs(call.kwargs.get("read_back"), True, call)
+        # Only the card write leaves the folder flush to its caller, which
+        # reports a failure of that step in its own words.
+        self.assertEqual(
+            [call.kwargs.get("flush_folder", True) for call in write.call_args_list],
+            [True, True, False],
+        )
 
     def test_a_card_problem_is_found_before_any_work(self) -> None:
         folder = self.card / "DCOLYMP"
@@ -1140,12 +1198,15 @@ class MakeTests(RepoCase):
             path: Path,
             data: bytes,
             error: type[Epm2ModError] = FileError,
+            *,
             read_back: bool = False,
             flush_folder: bool = True,
         ) -> None:
             if self.card in path.parents:
                 raise error("card full")
-            real_write(path, data, error, read_back, flush_folder)
+            real_write(
+                path, data, error, read_back=read_back, flush_folder=flush_folder
+            )
 
         with mock.patch("epm2mod.pipeline.write_bytes", side_effect=fail_on_card):
             with self.assertRaisesRegex(BuildError, "NOT on the card") as raised:
@@ -1204,8 +1265,8 @@ class CommandLineTests(RepoCase):
         patcher.start()
         self.addCleanup(patcher.stop)
         # ``epm2mod pin`` asks the clock; give it a fixed day.
-        clock = mock.patch("epm2mod.pipeline.datetime.date", wraps=datetime.date)
-        clock.start().today.return_value = TODAY
+        clock = mock.patch.object(pipeline, "current_date", return_value=TODAY)
+        clock.start()
         self.addCleanup(clock.stop)
 
     def build_file(self, name: str) -> str:
@@ -1270,14 +1331,27 @@ class CommandLineTests(RepoCase):
         }
         for script, expected in cases.items():
             argv = [script, *expected[1:]]
+            # A script finds the modules beside it; give run_path the same view.
+            beside = [str(ROOT / "tools"), *sys.path]
             with mock.patch.object(cli, "main", return_value=7) as main:
-                with mock.patch.object(sys, "argv", argv):
+                with (
+                    mock.patch.object(sys, "argv", argv),
+                    mock.patch.object(sys, "path", beside),
+                    mock.patch.dict(sys.modules),
+                ):
                     with self.assertRaises(SystemExit) as raised:
                         runpy.run_path(
                             str(ROOT / "tools" / script), run_name="__main__"
                         )
             self.assertEqual(raised.exception.code, 7)
             main.assert_called_once_with(expected)
+
+    def test_a_pointer_that_cannot_be_read_still_removes_the_card_folder(self) -> None:
+        self.assertEqual(self.run_cli("make")[0], 0)
+        self.repo.paths.pinned.write_text("{broken")
+        status, text = self.run_cli("make")
+        self.assertEqual(status, 1, text)
+        self.assertEqual(self.repo.outputs(), ["good.BIN"])  # the documented limit
 
     def test_an_empty_argument_is_an_error(self) -> None:
         record = ("--date", "2026-11-10", "--sha256", self.repo.sha256)
@@ -1329,7 +1403,9 @@ class CommandLineTests(RepoCase):
     def test_apply(self) -> None:
         spec_file = str(self.repo.paths.resolve("patches/a.json"))
         out = self.repo.paths.root / "out" / "x.BIN"
-        status, text = self.run_cli("apply", spec_file, "-o", str(out), "-v")
+        with mock.patch("epm2mod.cli.write_bytes", wraps=fileio.write_bytes) as write:
+            status, text = self.run_cli("apply", spec_file, "-o", str(out), "-v")
+        self.assertIs(write.call_args.kwargs.get("read_back"), True)
         self.assertEqual(status, 0, text)
         self.assertEqual(out.read_bytes(), self.repo.image)
         self.assertIn("[a]", text)

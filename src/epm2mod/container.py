@@ -93,7 +93,8 @@ class Block:
 
         Raises:
             ContainerError: if the header or the trailer has the wrong size, or
-                the payload length is not a multiple of 16.
+                the payload length is not a multiple of 16 or is not the
+                length that the header states.
         """
         if len(self.header) != HEADER_SIZE or len(self.trailer) != TRAILER_SIZE:
             raise ContainerError(
@@ -104,6 +105,11 @@ class Block:
             raise ContainerError(
                 f"block at {self.offset:#x}: payload length {len(self.payload)} "
                 f"is not a multiple of {ROW}"
+            )
+        if self.declared_length != len(self.payload):
+            raise ContainerError(
+                f"block at {self.offset:#x}: header says {self.declared_length} "
+                f"bytes, payload has {len(self.payload)}"
             )
 
     @property
@@ -230,16 +236,9 @@ def serialize(container: Container) -> bytes:
     checksum was wrong gets a right one: check ``checksums_ok`` before you
     serialize if the input must be sound.
 
-    Raises:
-        ContainerError: if a payload's length differs from the length in its header.
     """
     out = bytearray()
     for block in container.blocks:
-        if block.declared_length != len(block.payload):
-            raise ContainerError(
-                f"block at {block.offset:#x}: header says {block.declared_length} "
-                f"bytes, payload has {len(block.payload)}"
-            )
         trailer = bytearray(block.trailer)
         trailer[28:32] = bytes(4)
         partial = (

@@ -113,8 +113,10 @@ def sync_folder(folder: Path) -> None:
         return
     try:
         handle = os.open(folder, os.O_RDONLY | os.O_DIRECTORY)
-    except OSError:
-        return
+    except OSError as reason:
+        if reason.errno in _NO_FOLDER_SYNC:
+            return
+        raise
     try:
         os.fsync(handle)
     except OSError as reason:
@@ -128,6 +130,7 @@ def write_bytes(
     path: Path,
     data: bytes,
     error: type[Epm2ModError] = FileError,
+    *,
     read_back: bool = False,
     flush_folder: bool = True,
 ) -> None:

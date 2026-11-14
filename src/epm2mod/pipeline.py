@@ -153,9 +153,11 @@ def check_free_space(paths: RepoPaths, description: BuildDescription) -> str:
                 "missing. A new build needs it: see tools/fwmap.py and "
                 "tools/freespace.py."
             )
+        shown = output[-_CHECK_OUTPUT_LIMIT:]
+        if len(output) > len(shown):  # start the cut text at a whole line
+            shown = shown.partition("\n")[2]
         raise BuildError(
-            f"{output[-_CHECK_OUTPUT_LIMIT:]}\n"
-            f"the free-space check failed: nothing was built{hint}"
+            f"{shown}\n" f"the free-space check failed: nothing was built{hint}"
         )
     return output.splitlines()[-1] if output else "ok"
 
@@ -194,7 +196,13 @@ def check_card(card: Path, stock: StockFirmware) -> list[str]:
         BuildError: if ``card`` is not the top folder of a mounted volume, or
             the firmware folder cannot be read or holds other files.
     """
-    if not card.is_dir():
+    try:
+        is_folder, exists = card.is_dir(), card_target(card, stock).parent.exists()
+    except OSError as error:
+        raise BuildError(
+            f"{card}: cannot be read: {describe_os_error(error)}"
+        ) from None
+    if not is_folder:
         raise BuildError(
             f"{card}: no such folder. Give the place where the SD card is mounted."
         )
@@ -207,7 +215,7 @@ def check_card(card: Path, stock: StockFirmware) -> list[str]:
         )
     target = card_target(card, stock)
     folder = target.parent
-    if not folder.exists():
+    if not exists:
         return []
     ours = {target.name, part_path(target).name}
     try:
@@ -339,8 +347,11 @@ def make(
     clear_outputs(paths, description.name)
     if card is not None:
         card = card.absolute()
-        root = paths.root.resolve()
-        if card.resolve() in (root, *root.parents):
+        try:
+            root, resolved = paths.root.resolve(), card.resolve()
+        except (OSError, RuntimeError) as error:
+            raise BuildError(f"{card}: cannot be used as a path: {error}") from None
+        if resolved in (root, *root.parents):
             raise BuildError(
                 f"{card}: holds this repository, so it is not the SD card. Give "
                 "the place where the card is mounted."
@@ -401,6 +412,11 @@ def make(
     return MakeResult(description, image, card_copy, on_card, digest)
 
 
+def current_date() -> datetime.date:
+    """Return today's date on this computer's clock."""
+    return datetime.date.today()
+
+
 def record_test(
     paths: RepoPaths,
     description: BuildDescription,
@@ -437,7 +453,7 @@ def record_test(
             record, or the build no longer gives that SHA-256.
         StockError: if the stock firmware is missing or wrong.
     """
-    check_test_date(date, today or datetime.date.today())
+    check_test_date(date, today or current_date())
     tested = description.as_tested(sha256, date)
     _, digest = build_image(tested, load_specs(paths, tested), read_stock(paths, stock))
     pin(paths, tested)

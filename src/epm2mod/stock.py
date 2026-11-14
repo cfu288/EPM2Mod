@@ -134,8 +134,8 @@ def download_url(answer: bytes, stock: StockFirmware) -> str:
         or offered != stock.file_name
     ):
         raise StockError(
-            f"the catalog does not offer {stock.file_name} "
-            f"(it offers {offered or 'nothing'})"
+            f"the catalog does not offer {stock.file_name} for model "
+            f"{stock.model_id} (it offers {offered or 'nothing'})"
         )
     url = info.findtext("url") or ""
     try:

@@ -340,7 +340,11 @@ def load_fit(path: Path) -> dict[str, NDArray[Any]]:
             if not isinstance(loaded, np.lib.npyio.NpzFile):
                 raise BuildError(f"{path}: is not a numpy .npz archive")
             with loaded as archive:
-                return {key: archive[key] for key in archive.files}
+                arrays = {key: archive[key] for key in archive.files}
+        for key, value in arrays.items():
+            if not isinstance(value, np.ndarray):
+                raise BuildError(f"{path}: '{key}' is not a numpy array")
+        return arrays
     except (
         OSError,
         ValueError,

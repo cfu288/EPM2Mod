@@ -19,6 +19,7 @@ import struct
 import sys
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 from typing import Any
 from unittest import mock
@@ -438,6 +439,10 @@ class GeneratorTests(SyntheticCase):
             path.write_bytes(content)
             with self.subTest(content=content[:8]), self.assertRaises(BuildError):
                 self.generate()
+        with zipfile.ZipFile(path, "w") as archive:
+            archive.writestr("Cb", b"not an array")
+        with self.assertRaisesRegex(BuildError, "not a numpy array"):
+            self.generate()
         path.unlink()
         with self.assertRaises(BuildError):
             self.generate()
