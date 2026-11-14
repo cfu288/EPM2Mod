@@ -1,0 +1,15 @@
+{
+ "what": "Probe: live view shows the Key Line drawing while Picture Mode is Muted (first step to focus peaking), on top of the pinned build",
+ "specs": [
+  "patches/remap7b-code.json",
+  "patches/seven-fixes-1.json",
+  "patches/seven-movie-1.json",
+  "patches/seven-structure-extra.json",
+  "patches/seven-films-5.json",
+  "patches/xp-adaptive-hue-off.json",
+  "patches/seven-labels.json",
+  "patches/interval-timelapse-v2.json",
+  "patches/interval-frames-240.json",
+  "patches/peaking-probe-a-keyline-lv.json"
+ ]
+}

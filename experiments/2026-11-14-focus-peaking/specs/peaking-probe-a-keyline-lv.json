@@ -1,0 +1,33 @@
+{
+ "name": "peaking-probe-a-keyline-lv",
+ "description": "DRAFT, not camera-tested. Probe A of the focus-peaking work: live view runs the Key Line effect while Picture Mode is Muted (low-level mode 3). Stills are not changed. See experiments/2026-11-14-focus-peaking/NOTES.md.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "draft; emulator-checked only",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x88fed0",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "af03c9048f77ba00c804f05edc3bb1a1ffa003c80ea064c20af8920ddc4752a1ffdc4852a1ff",
+   "_why": "new code: T1 (17 B) at 0x7ECB0EF0, T2 (21 B) at 0x7ECB0F01"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2ab011",
+   "expect": "ba00c804f05e",
+   "new": "dcbf4e5e00cb",
+   "_why": "H1: jmp T1; nop. Replaces cmp 0,a2 / beq / movbu d3,(a2); T1 returns to 0x7E6CC037"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2a512c",
+   "expect": "a064c20bf8920d",
+   "new": "dcb5ad5e00cbcb",
+   "_why": "H2: jmp T2; nop; nop. Replaces cmp 100,d0 / bge / movbu d0,(13,sp); T2 returns to 0x7E6C6153 or 0x7E6C6159"
+  }
+ ]
+}

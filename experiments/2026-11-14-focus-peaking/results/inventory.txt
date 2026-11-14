@@ -1,0 +1,66 @@
+7e219971 M      863 -> 7e555df4   863     +0  strict
+7e21b0c2 M      347 -> 7e5574f7   347     +0  strict
+7e22117a K      791 -> 7e55d5ab   791     +0  strict
+7e228aa4 K     1170 -> 7e564db8  1127    +43  calls?
+7e22e341 K      403 -> (no pair)
+7e22f339 A      104 -> 7e56b4f5   104     +0  strict
+7e2329fd K     1466 -> 7e56eb95  1343   +123  calls?
+7e23353d K     1152 -> 7e56f63c   990   +162  calls?
+7e2685e9 A       86 -> (no pair)
+7e2c1250 M     1646 -> 7e5f0d0a  1384   +262  strings
+7e30a462 A      470 -> 7e639343   469     +1  calls
+7e30a63a A      478 -> 7e63951a   477     +1  calls
+7e30a8ce A      539 -> 7e6397ad   539     +0  calls
+7e31ee64 A      584 -> 7e64d395   572    +12  calls?
+7e3246c1 A      758 -> 7e6526d2   758     +0  calls
+7e36afb9 A      258 -> 7e691fde   258     +0  strict
+7e382828 M       89 -> 7e6a9378    89     +0  strict
+7e38598f M      142 -> 7e6ac4df   142     +0  strict
+7e385a5b M      598 -> 7e6ac5ab   598     +0  strict
+7e385cb3 M      138 -> 7e6ac803   138     +0  strict
+7e397df2 M      336 -> (no pair)
+7e39f729 F      747 -> 7e6c365f   713    +34  strings
+7e3a1cbd F     1918 -> (no pair)
+7e3a243b AM     940 -> 7e6c610b   907    +33  strings
+7e3a390b F      463 -> 7e6c74be   406    +57  calls?
+7e3a3adc A      625 -> 7e6c7656   625     +0  calls
+7e3a4036 A     1311 -> 7e6c7bb0  1199   +112  strings
+7e3a888a F      435 -> 7e6cbfd3   382    +53  strings
+7e3a8a7a A      342 -> (no pair)
+7e3a92d4 M      114 -> 7e6cc9e8    78    +36  strings
+7e3a9367 F      106 -> 7e6cca57    96    +10  calls?
+7e3a94fb AF    1057 -> 7e6ccbe1  1007    +50  string1
+7e3aa1ea AF     351 -> 7e6cd892   305    +46  strings
+7e3aa34b AF     446 -> 7e6cd9c5   401    +45  strings
+7e3aa601 M       24 -> (no pair)
+7e3af511 S     4813 -> 7e6d2908  4782    +31  string1
+7e3b7b1c A      280 -> 7e6dae68   268    +12  strings
+7e3c36f0 A     2063 -> 7e6e639b  2063     +0  strict
+7e3ca4b5 F       58 -> (no pair)
+7e3e0fc4 AM     489 -> (no pair)
+7e3e388b AM     565 -> (no pair)
+7e3fcb10 AM     361 -> 7e71bd94   305    +56  strings
+7e3fd03f A      682 -> 7e71c28b   591    +91  strings
+7e3fef08 S      961 -> 7e71e0ee   945    +16  string1
+7e40684f A      485 -> 7e725a1b   440    +45  strings
+7e407152 A      588 -> 7e7262f1   438   +150  strings
+7e4073a0 A      698 -> 7e7264a9   558   +140  strings
+7e40765c A      351 -> 7e7266d9   254    +97  strings
+7e4077bd A      468 -> 7e7267d9   413    +55  strings
+7e408212 M      225 -> 7e7271f7   225     +0  strict
+7e40b584 A      332 -> 7e72a562   332     +0  strings
+7e421000 A    12288 -> (no pair)
+7e424000 A     9067 -> (no pair)
+7e42636b AM    3621 -> (no pair)
+7e427190 M     2754 -> 7e738ea8  2754     +0  strict
+7e4287c5 A     6203 -> (no pair)
+7e430000 M    12288 -> (no pair)
+7e67f1c1 S      316 -> (no pair)
+7e6ff6f4 S      651 -> 7ea18853   742    -91  string1
+7e78c673 S      269 -> 7ea8cc07   210    +59  string1
+7e7962a1 S      121 -> 7ea97f22    70    +51  string1
+7e796d0f S      145 -> (no pair)
+7e796da0 S      153 -> (no pair)
+7e796e39 S      135 -> (no pair)
+7e9f3271 S       42 -> (no pair)
+sum of positive size differences of paired functions: 1883
