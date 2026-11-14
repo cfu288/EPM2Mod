@@ -12,13 +12,9 @@ and delete the item here.
 
 ## Focus peaking
 
-- `peaking-direct-4` works on the camera (2026-11-14) and is the pinned build. Velvia in the
-  quick menu does not crash.
-- `peaking-gain-2x` is the pinned build (2026-11-14). Not yet tested: sleep and wake.
-- Done 2026-11-14: `epm2mod make` refuses a spec that changes a byte another spec covers and keeps,
-  and the free-space check fails an op that code in SRAM calls into. Still open: correct
-  `docs/space-candidates.tsv` row 10 (0x7E50A201 and 0x7E53A55C are the sleep routine) and the entry
-  0x7E880FE4 in the code-space map; make `tools/emu/hookcheck.py` and the boot test a step of `make`.
+- A menu entry for focus peaking (On/Off, and the line colour), so it does not depend on MF Assist
+  alone.
+- Make `tools/emu/hookcheck.py` and the emulator's boot test a step of `epm2mod make`.
 
 ## Film looks
 
@@ -55,11 +51,11 @@ and delete the item here.
   shows that the host function is reached only through the image-job table 0x7E789604, and it did
   not run before segment 2 was loaded on a normal start, a quick start and the update path. That is
   a test result, not a proof. A clean fix moves 219 bytes into a dead function of segment 1.
-- Make the load-order check and the emulator's boot test a step of `epm2mod make` for a candidate.
 - Emulator (outside the repository, `~/opt/om-emu-e101-boot-work/`), open points:
   - The row Time Lapse Settings is grey when the clock is not set. Start the emulator with
     `E101_RTC=2026-11-14T12:00:00`.
-  - Not reached: the screens of a viewfinder, the live control, the super control panel.
+  - Not reached: the screens of a viewfinder, the super control panel. The live control
+    (OK → Picture Mode strip) is reached: use it for the screenshot of the film-looks guide.
   - Power-off does not finish. Half-press and full press are not tried. A real JPEG in playback is
     not tried.
   - The background pictures of the menus are in a flash area that is not in the update file, so

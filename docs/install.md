@@ -1,7 +1,7 @@
 # Install
 
 <!-- BEGIN GENERATED: pinned-build -->
-The pinned build is **`peaking-gain-2x`**: the pinned build with focus peaking lines 2 times as strong. We tested this build on a real E-PM2 on 2026-11-14 ([camera log](camera-log.md)).
+The pinned build is **`peaking-gain-2x`**: seven film looks as art filters, interval shooting with up to 240 frames, the level gauge with Level Adjust, and focus peaking. We tested this build on a real E-PM2 on 2026-11-14 ([camera log](camera-log.md)).
 
 | | sha256 |
 |---|---|

@@ -574,7 +574,9 @@ class Spec:
         self.history = "/history/" in self.path
 
     def spans(self):
-        return [(o.clo, o.chi) for o in self.ops if o.clo is not None]
+        """The whole range of each op that changes a byte. A byte of the op that is equal to stock is still part of
+        the spec (the last byte of a jump displacement can be 0xFF): it is not free."""
+        return [(BASE + o.off, BASE + o.off + len(o.new)) for o in self.ops if o.clo is not None]
 
     def rel_targets(self):
         """Targets of relative jmp/call opcodes (dc, dd, cc, cd) that start a short changed run (<= 8 B): [(site, target)].
