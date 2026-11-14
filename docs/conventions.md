@@ -1,5 +1,10 @@
 # Conventions
 
+See also: [feasibility.md](feasibility.md) (what is possible, the emulator), [todo.md](todo.md) (open
+work), [camera-log.md](camera-log.md) (every update done on a camera),
+[../builds/README.md](../builds/README.md) (the tested builds), [../AGENTS.md](../AGENTS.md) (rules for AI
+agents), [../NOTICE.md](../NOTICE.md) (licences and credits).
+
 ## Commits: Conventional Commits
 
 `<type>(<scope>)?: <summary>`. The `.githooks/commit-msg` hook enforces it. Enable the hook once per clone:
