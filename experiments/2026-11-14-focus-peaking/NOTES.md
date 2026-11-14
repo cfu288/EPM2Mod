@@ -742,3 +742,112 @@ whether E-P5 setting 58065 is the peaking setting.
 | `scripts/mkspec_direct2.py` | generator: `python3 scripts/mkspec_direct2.py specs/peaking-direct-2.json /tmp/scratch/asm results/direct2-new-code.txt` |
 | `scripts/emu_direct2.py` | emulator check: `emu_direct2.py BASE_BLOCK0 PATCHED_BLOCK0 NAME` |
 | `results/direct2-*.txt`, `results/emu-direct2-*.txt` | listings, free-space check, RAM evidence, emulator output |
+
+## 13. Scenario tests
+
+Date: 2026-11-14. Status: `specs/peaking-direct-3.json` is a draft. Scenario-tested and boot-tested in emulation.
+Not flashed. `peaking-direct-2` is withdrawn (never flashed).
+Labels: **V** verified (ran in the emulator or read from the bytes), **I** inferred, **U** unknown.
+
+### 13.1 The method
+
+`tools/emu` can now run whole call chains (`tools/emu/README.md`, "Scenario runs"). The live-view rig
+`tools/emu/liveview.py` runs as real firmware code: the static constructors of segments 1 to 3, 12 module init
+functions, and the task bodies MOV_TASK, MOV_SUB_TASK, MOVART_TASK, ART, ART_IMG_CM, ART_IMG_CS, ART_IMG_CF,
+MOVDISP_TASK, MOVCOLOR, MOVCOLOR_SUB from their entries. RAM starts with the firmware's `.data`. One frame event
+runs the mov task loop 0x7E6C33B5 → struct refresh 0x7E6ECCAF → `mov_image_process` 0x7E6C6853 → expose setter →
+heap → frame builder → art request → ART task → Key Line passes 1, 7, 8, 9, 10 → combine job → display update. A
+Key Line frame is about 175,000 instructions and 4,500 device register writes.
+
+Replaced in every scenario (so not tested): device registers (writes dropped, reads 0), the uITRON kernel (a
+Python model without pre-emption), "the image processor finished" (met at once), the settings store (ids not set
+read 0), the white-balance module, the CPU cache control, the soft-float multiply. No pixel is computed. No
+live-view geometry is given, so the mov layer prints `[mov]img_ctrl_size err` in every frame on every image.
+Settings used: Picture Mode 38017 (2 Natural, 119 Key Line; 100, 103, 107 film entries; 104, 108, 113 effect
+filters) and the art filter type 17601 index 0 (1 = type I).
+
+Script: `scripts/scen_peaking.py`. Outputs: `results/scen-s1.txt` … `scen-s5.txt`. Images: pinned (ten specs),
+pinned + direct-1, pinned + direct-2, pinned + direct-3.
+
+### 13.2 Results
+
+| Scenario | pinned | direct-1 | direct-2 | direct-3 |
+|---|---|---|---|---|
+| **S0** boot order of the hooks (`tools/emu/hookcheck.py`, static) | 1 FAIL: `remap7b-code` hook 0x7E56C6A5 (segment 1) → 0x7ECB08CD (segment 2). Camera-tested and boots; the hooked code runs only when a picture is developed (**I**) | not run | **14 FAIL** of 47: every segment-1 hook jumps to segment 2, and T_G (segment 1) calls `getL` in segment 2 | **0 FAIL** of 47 |
+| **S1** request clear, Natural and Key Line, 3 frames each | reference | not run | same RAM writes (apart from L and L2, written 0), same device writes in the same order, no stock pc lost outside the hook sites, no stock pc gained | the same |
+| **S2** Natural, request set, art type 1 | picture in every frame | **no picture in any frame**: heap mode 0 → check 0x7E6CADD8 refuses → free all → `art_buff alloc error` → return 1; `mov_art_exec_init` and an ART round trip in every frame | picture in every frame: heap mode 1, 4 buffers granted, line job, passes 1, 7, 8, 9, 10; pass 9 `usGain2` 0x0100, pass 7 `ucExpose` 3 (pinned Key Line: 0xFF00 and 163) | as direct-2 |
+| **S2** the same with art type 0 | – | no picture (same fault) | **no picture in any frame** (new defect, §13.3) | picture in every frame |
+| **S3** Key Line with the request, 13 Picture Mode changes | no anomaly (stock frees the buffers, then re-partitions with 0 live blocks) | **heap re-partitioned under 4 live blocks** at each of the 5 changes to a film entry or to Natural; in that frame the line job and passes 1 and 7 still start on those blocks; then no picture and refused buffers until an effect filter is chosen (10 frames) | no anomaly: the heap stays in mode 1, lines stay | no anomaly |
+| **S4** R through the state functions | – | R is left 1 after the internal zoom-off handler 0x7EB7DEB9 | R written once per entry: 0, 1, 0, 1, then 0 by `entryMfAssistOff` | as direct-2 |
+| **S5** Through End with the request, then the chooser | mode 0 | as pinned | as pinned: mov state 0, 0 live blocks, chooser gives the stock mode, pass 9 gain for a still packet 0xFF00. L stays 1 until the next live-view refresh | as direct-2 |
+
+How much of the real path ran:
+
+- S1, S2, S3: everything in §13.1. The part under test (getter, setter, latch, heap chooser and heap, job setup, line job
+  parameters, art packet, Key Line passes, combine job set-up) is real code. Not real: what the image processor does
+  with the jobs.
+- S4: the two entry functions run whole, on stand-in objects (virtual calls return 0). The handler 0x7EB7DEB9 runs
+  with 12 direct callees stubbed. The state framework that decides which entry follows which event did **not** run.
+  That an internal zoom-off leads to the Off state, and so to `entryMfAssistOff`, is **I**.
+- S5: only the mov command Through End and the chooser. The TAKE_* and REC_* tasks, the sensor read-out and the art
+  passes of a still did **not** run. The count "new-code pcs" in `scen-s5.txt` uses direct-2's addresses.
+
+### 13.3 What the tests say about direct-1
+
+- **The delay and the missing picture are reproduced (V).** S2 gives the fault of §12.2 on direct-1 in every frame and
+  on no other image.
+- **The crash is not reproduced as a crash (U), but its candidate cause is shown (V).** The emulator has no image
+  processor, so a write into a wrong buffer cannot happen here. What S3 shows on direct-1 and on no other image: a
+  Picture Mode change away from a mode-1 filter while the request is set makes the chooser re-partition the heap
+  (0x7E5789ED) while the art picture buffer (4,147,200 B) and three 614,400 B buffers are still allocated, and the
+  same frame then starts the Key Line line job and art passes 1 and 7 on those buffers. Stock never does this
+  (pinned: 0 live blocks at every re-partition).
+
+### 13.4 Two defects of direct-2
+
+1. **Boot order (V, from the full-boot emulation of the main session; S0 finds it statically).** Hook M in the heap
+   mode chooser (segment 1) jumps to segment 2. The boot task runs the chooser before Usr1 copies segment 2. The
+   other segment-1 hooks have the same exposure.
+2. **Art filter type (V in the scenario; the value on the camera is U).** The forced picture mode 119 needs art type 1
+   or 2. `art_GetFilterType` 0x7E71BD94 returns 0xFFFF for (119, 0); `art_IsSupportType` 0x7E71BC93 then refuses the
+   request, the art init answers 0x9A04, and the frame ends with no picture. The type comes from setting 17601 index 0
+   through byte +5 of the live-view struct. What that setting holds while the Picture Mode is Natural is not known.
+   Indexes 1 to 8 of the same id are read as per-filter values, which suggests that index 0 is "the type of the
+   current filter" (**I**). With type 2 the art side would run Key Line II (169) against the forced art code 163.
+
+### 13.5 direct-3
+
+| Change | Bytes |
+|---|---|
+| Every routine that a segment-1 hook reaches is now in segment 1: `getL`, T_A, T_B, T_C, T_D1/T_D2, T_H, T_I at 0x7E50A201 (235 B); T_E1, T_E2, T_F, T_M, T_J, T_K at 0x7E53A55C (179 B); T_G stays at 0x7E880FE4 (26 B). Both new areas are reclaimed dead functions with verdict USABLE-DATA and all six static checks ok (`docs/code-space-map.md` §3.3). No code has run there | moved |
+| T_ON and T_OFF stay in segment 2 (0x7EBF1F00, 39 B): their hook sites are in segment 2 | – |
+| The latch T_A writes 1 to struct +5 (art type I) when it sets L | +4 B |
+| The areas 0x7ECB0EE3 and 0x7ECB0F16 are no longer used | – |
+
+479 bytes of new code, 16 hooks at the same sites as direct-2. Generator: `scripts/mkspec_direct3.py`.
+
+| Check | Result |
+|---|---|
+| `uv run epm2mod apply specs/peaking-direct-3.json -o /tmp/scratch/a.BIN` | applies on stock, 567 bytes differ, sha256 `689d8b1680c902eded99acd08e29a0a93f4a02979a2aa6bdabc7ff6717ef1d5b` |
+| the same after the ten pinned specs | applies, sha256 `5330c0b80149aabbaaf578dbed6cc6592929f4e2b2f914005593a30262c4c325` (the ten alone: `3e7f793e…`) |
+| `python3 tools/freespace.py check` (ten + this) `--first-code` | 24 PASS, 0 FAIL (`results/direct3-freespace-check.txt`); the three code areas are "first code" |
+| `python3 tools/emu/hookcheck.py specs/peaking-direct-3.json` | 47 transfers, 0 FAIL (`results/direct3-s0-hookcheck.txt`) |
+| Boot from reset in the other session's om-emu copy (`stage2-boot.mjs 2000`, used read-only) | pinned + direct-3: STAGE 2: PASS, the same summary as pinned |
+| S1 to S5 | table above |
+| `scripts/emu_direct2.py` single-function cases | not re-run on direct-3 (the routines are direct-2's text at new addresses; S1 and S2 run all of them but T_F's CLIP branch and T_H's a2 = 0 row) |
+
+### 13.6 What remains untested (camera)
+
+- Code running from 0x7E50A201 and 0x7E53A55C (first code in both areas).
+- The value of setting 17601 index 0 in Natural (direct-3 no longer depends on it).
+- The picture itself: lines, brightness, frame rate (85 ms frame time).
+- Fast filter flipping with real timing and pre-emption; a race between tasks cannot show in the model.
+- MF Assist through the real state framework: that R is cleared after a capture or a movie start.
+- A capture and a movie start while the lines show.
+- Dramatic Tone: the rig cannot finish its art passes even on pinned, so it was left out of S3.
+
+### 13.7 Notes on the tools
+
+- A stray `pkill` of this session ended every `debug.mjs --serve` process of the machine once (about 16:50). Another
+  session's emulator run may have stopped then.
+- om-emu was not changed. Requests for it are listed in `tools/emu/README.md`.

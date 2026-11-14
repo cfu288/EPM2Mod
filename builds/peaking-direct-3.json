@@ -1,0 +1,17 @@
+{
+ "what": "Focus peaking, third build: light edge lines in live view while MF Assist runs, on top of the pinned build",
+ "specs": [
+  "patches/remap7b-code.json",
+  "patches/seven-fixes-1.json",
+  "patches/seven-movie-1.json",
+  "patches/seven-structure-extra.json",
+  "patches/seven-films-5.json",
+  "patches/xp-adaptive-hue-off.json",
+  "patches/seven-labels.json",
+  "patches/interval-timelapse-v2.json",
+  "patches/interval-frames-240.json",
+  "patches/level-gauge-lvinfo-row.json",
+  "patches/peaking-direct-3.json"
+ ],
+ "first_code": true
+}

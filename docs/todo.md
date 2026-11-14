@@ -20,10 +20,11 @@ and delete the item here.
 
 ## Focus peaking
 
-- `peaking-direct-2` is withdrawn: it crashes at start-up in the emulator (see the camera log). The
-  next build must keep the code of each segment-1 hook in segment 1, and must pass the emulator's
-  boot test before a flash.
-- The two crashes of the first build have no proven cause yet.
+- Test the build `peaking-direct-3` on the camera (steps: the camera log and NOTES §12 and §13).
+  `peaking-direct-2` was withdrawn: it crashed at start-up in the emulator.
+- The two crashes of the first build: the scenario tests show a likely cause (the image memory is
+  re-divided under live buffers when a filter changes while lines are on). The camera test of
+  `peaking-direct-3` must confirm that they are gone.
 - If the lines are too coarse: use the E-P5's line settings. This needs a change in the image
   library.
 - A menu entry and a colour choice come last.
@@ -47,6 +48,15 @@ and delete the item here.
   (`experiments/2026-11-12-hardware/`), not built and not flashed.
 
 ## Foundations
+
+- The load-order check (`python3 tools/emu/hookcheck.py SPEC...`) reports one failure in the pinned
+  build: the hook at 0x7E56C6A5 (`remap7b-code`, segment 1) jumps to code in segment 2. The camera
+  has started and updated normally many times with this hook, and the emulator's boot test passes,
+  so the hooked function does not run before segment 2 is loaded. Prove that from the code, or move
+  the routine into segment 1.
+- Make the load-order check and the emulator's boot test a step of `epm2mod make` for a candidate.
+- The emulator boots the stock firmware to the application (work outside the repository, in
+  `~/opt/om-emu-e101-boot-work/`). In work: the shooting screen, key presses and menus.
 
 - The probes in [feasibility.md](feasibility.md), section "Unknowns": a file write for a log
   channel, a file read, tables at a RAM address, a longer load range.

@@ -37,6 +37,7 @@ om-emu refuses an unknown model. Its lab is written for the OM-1 (E143), so the 
 | `patchblock.py` | Builds a patched block 0 from `patches/*.json`-style specs, with the same base-hash and expected-byte checks as `tools/build.py` (it imports `build.apply_op` and `oetool.parse`). It prints the changed runtime ranges. Ops on other blocks are checked and reported as not emulated. |
 | `cases.py` | Named cases: entry, allowed code ranges, stubs, input rows, outputs, and a Python model of the expected outputs. |
 | `emurun.py` | CLI: `list`, `run CASE` (one image, checked against the model) and `diff CASE --patch SPEC…` or `--image BLOCK0` (stock against patched). Exits 1 on any mismatch, fault, stray code or unexpected change. |
+| `bootmem.py`, `scenario.py`, `osmodel.py`, `liveview.py`, `hookcheck.py` | Scenario runs; see "Scenario runs" below. |
 | `specs/rec-limit-3600.json` | Emulator test input only, not a camera patch: changes the recording-limit imm16 1740 to 3600 (2 bytes). |
 | `~/opt/om-emu-E101.patch` (outside the repo) | The om-emu changes above (`patch -p1` in the om-emu root). |
 
@@ -101,7 +102,70 @@ The two print helpers would also return at once natively, because their mask wor
 - With an unknown MOV quality, `rec_limit` takes the reserve from the caller's a2, because the code never sets it on that path. It also prints `[QT] Parameter Error quality` twice.
 - The `rec_limit` limit for MOV q4 on 64 GiB is 6202 s: the 4 GiB cap binds below 7200.
 
-## Limits
+## Scenario runs (2026-11-14)
+
+A scenario runs a top-level routine, or whole firmware tasks, and lets them call down through the real code.
+Only what the emulator cannot give is replaced. RAM is kept from one call to the next. The single-function
+cases above did not change.
+
+| File | What it does |
+|---|---|
+| `bootmem.py` | Gives RAM the content that the boot code gives it: the `.data` image (0x7E8DA000–0x7E8F3114 → 0x602A9B40) and the two reset word tables, and zero in the runtime ranges of block 0 that no boot copy loads. The ranges come from `tools/freespace.py`'s load model, not from typed numbers. om-emu maps 0x60… and 0xA0… to the same RAM, so one write serves both aliases. |
+| `scenario.py` | `Scenario`: calls (`call`, `call_site`, `piece`), tasks with their own stack (`task`, `run`), stubs, probes, the settings getter, device accesses, write watches, pc sets, call trees, backtraces. Helpers `diff_pcs`, `diff_writes`, `patch_ranges`, `print_calls`. |
+| `osmodel.py` | A Python model of the uITRON services behind the `Oly*` wrappers: event flags, queues, data queues, semaphores, sleep, software timers. `schedule()` runs the ready tasks until all wait. |
+| `liveview.py` | `LiveView`: a rig for the mov layer and the art tasks. It runs the static constructors, 12 module init functions and 10 task bodies from their real entries, sends "Through Start", and then steps frame events. It tracks the image-work heap (alloc, free, mode, re-partition), firmware error reports and addresses given to devices. |
+| `hookcheck.py` | S0, a static check with no emulator: lists every jump of a spec's hooks and new code with the load segment of its source and target. A jump from the kernel or segment 1 to segment 2 or 3 FAILS (that code is not in RAM yet when the boot task runs, and never on the update path). |
+
+### How to write a scenario
+
+```python
+import sys; sys.path.insert(0, "tools/emu")
+from liveview import LiveView
+from scenario import RAM_AND_IMAGE, diff_pcs, diff_writes, patch_ranges
+
+lv = LiveView("/tmp/scratch/pinned.block0.bin", log_writes=RAM_AND_IMAGE)
+lv.settings[38017] = 119          # Picture Mode: Key Line (the settings getter 0x7E457C75 answers from this)
+lv.settings[17601] = 1            # art filter type I
+lv.start()                        # constructors, inits, tasks to their first wait, Through Start
+f = lv.frame()                    # one frame event; every task runs until it waits
+print(f.summary()); print(f.path()); print(f.events); print(f.faults)
+```
+
+Run the same steps on a second image and compare: `diff_writes(a.writes, b.writes)` gives the bytes whose final
+value differs, and `diff_pcs(a.pcs, b.pcs, new_code, hook_sites)` gives the stock code that ran only in one image
+and the new code that ran (`patch_ranges(base_bytes, patched_bytes)` gives the two range lists).
+`experiments/2026-11-14-focus-peaking/scripts/scen_peaking.py` is a full example (S1 to S5).
+
+For code outside live view use `Scenario` directly:
+
+- `sc.call(entry, regs, frame=(regs_byte, imm))` calls a function; `sc.call_site(site)` takes the frame from a stock call instruction; `sc.piece(start, [stop])` runs a code piece.
+- `sc.stub(addr, fn, name)` replaces a function. `sc.stub_module(lo, hi, name)` stubs every entry of a module that outside code calls. `sc.probe(addr, fn)` reads registers at any instruction and lets the code run on.
+- `sc.settings[(id, index)] = value`. Ids that the scenario did not set read 0 and are listed in `sc.settings_missing`.
+- `log_writes=[(lo, hi)]` logs every CPU write in the ranges (om-emu watchpoints). `stop_writes` stops at the first write and reports the pc and a backtrace.
+- `calltrace=True` keeps the ordered list of functions entered; `print_calls` shows it.
+- A task is `t = sc.task(name, entry, stack_size=...)`. A stub that returns `BLOCK` parks the task; `osmodel` does this for every wait that cannot be met.
+- A fault, the instruction limit or a stuck wait ends the run. `Result.fault` has the reason and `Result.backtrace` the return addresses found on the stack.
+- `EMU_TMP` names the folder for the trace files (one JSON line per instruction; a 3 M instruction limit keeps them below about 400 MB).
+
+### What a scenario does not prove
+
+- **Devices are not modelled.** A write to a device register is dropped and logged. A read gives 0 unless the scenario sets `sc.mmio_values`. "The image processor finished the job" is a flag that the model sets at once. No pixel is computed; buffers hold zeros.
+- **The kernel is a model.** Tasks run one at a time until they wait. There is no pre-emption, no time-out that expires, no interrupt. A race between two tasks cannot show.
+- **Settings are what the scenario says.** The store that the camera fills from its EEPROM is not there. A wrong value gives a wrong path. In the live-view rig all ids but the ones set read 0, and the mov layer prints `[mov]img_ctrl_size err` in every frame because no geometry was given.
+- **Stubbed whole:** the white-balance module, the CPU cache control, the soft-float multiply 0x7E5018E8 (done in Python).
+- **Division by zero:** om-emu traps; the MN103 sets the V flag and goes on. The harness goes on and counts them (`Result.notes`).
+- **`hookcheck.py` sees only whole `jmp`/`call` instructions at the start of an op and the code they reach.** A patched displacement inside an instruction is not seen.
+- **Not started:** capture (TAKE_*, REC_* tasks), the GUI, the C++ state framework. `IMG0_LOCAL` spins on a hardware semaphore and is left out.
+
+### Requests for om-emu (not changed here)
+
+1. An option to map a device page as "write ignored, read 0" (now each access faults and the harness skips the instruction through the `disasm` op).
+2. An option for the MN103 divide-by-zero behaviour (V flag, no trap).
+3. A float unit that does not fault on zero, tiny or non-normal inputs for the E-PM2 soft-float helpers.
+4. A "set of executed pcs" trace, so that a long run does not need one line per instruction.
+5. `tools/mn10300-objdump` is missing in the shared copy; the harness sets `OM_OBJDUMP` to the mn10300 binutils objdump.
+
+## Limits of the single-function cases
 
 - **Function level only.** Nothing boots; there is no kernel, no tasks, no interrupts, no timers in use and no second core. The IMG engine, DMA, the display, the sensor and all other devices are not modelled. The cases are leaf functions or functions with stubbed callees, and a stub's answer is our assumption.
 - **RAM.** RAM starts at zero, and `.data` (0x7E8DA000 → 0x602A9B40) is not copied. A function that reads globals needs them written by its case.

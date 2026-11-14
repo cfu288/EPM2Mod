@@ -37,7 +37,7 @@ routines. This file records what the measurements show, so that nobody repeats t
 | No 3D lookup table; the hue stage has six axes | Image processor | Firmware search; measured stages |
 | A look is a set of ROM tables chosen by art-filter number | Firmware design | Read from the firmware. Tables at a RAM address are **untested**, not impossible |
 | 128 rows in one menu list | Firmware | Camera-tested |
-| No emulator boots this body; `tools/emu` runs single functions | Tooling | om-emu has no E101 model |
+| The emulator shows no picture and no screen yet | Tooling | Since 2026-11-14: `tools/emu` runs whole call chains with real initial memory (scenario tests), and a local om-emu copy boots the stock firmware from reset to the application. Screen and menus are in work |
 
 ## What the body has
 

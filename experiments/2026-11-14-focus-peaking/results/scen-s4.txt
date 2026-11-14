@@ -1,0 +1,32 @@
+S4. MF Assist start / stop through the state object. The functions entryMfAssistOff 0x7EB7D43B and
+    entryMfAssistOn 0x7EB7D46C run whole, on stand-in objects (virtual calls return 0; the debug print
+    0x7E9670E9 and 0x7EB8537D are stubbed). The internal zoom-off handler 0x7EB7DEB9 runs with its direct
+    callees stubbed except the stock word setter 0x7E96AFD9. Not run: the state framework that decides
+    which entry function follows which event. Writes to L, R, L2 are logged.
+  [pinned] object created: entryMfAssistOff                               ran 19 pcs; writes to the flag bytes: none; after: R=238 word=0
+  [pinned] ring turned: entryMfAssistOn                                   ran 18 pcs; writes to the flag bytes: none; after: R=238 word=0
+  [pinned] ring stops: entryMfAssistOff                                   ran 19 pcs; writes to the flag bytes: none; after: R=238 word=0
+  [pinned] ring turned again: entryMfAssistOn                             ran 18 pcs; writes to the flag bytes: none; after: R=238 word=0
+  [pinned] internal zoom-off handler 0x7EB7DEB9 (capture, movie start)    ran 5216 pcs; writes to the flag bytes: none; after: R=238 word=0
+  [pinned] the Off state that follows: entryMfAssistOff                   ran 19 pcs; writes to the flag bytes: none; after: R=238 word=0
+  S4 RESULT [pinned]: R at the end = 238
+  [direct-1] startMfAssist entry 0x7E9889EB (hook S; piece)                 ran 6 pcs; writes to the flag bytes: ['0x602BE8C5=1']; after: R=1 word=1
+  [direct-1] endMfAssist entry 0x7E9830E0 (hook N; piece)                   ran 5 pcs; writes to the flag bytes: ['0x602BE8C5=0']; after: R=0 word=1
+  [direct-1] startMfAssist entry again                                      ran 6 pcs; writes to the flag bytes: ['0x602BE8C5=1']; after: R=1 word=1
+  [direct-1] internal zoom-off handler 0x7EB7DEB9 (capture, movie start)    ran 5216 pcs; writes to the flag bytes: none; after: R=1 word=0
+  S4 RESULT [direct-1]: R at the end = 1 (LEFT SET after an internal zoom-off)
+  [direct-2] object created: entryMfAssistOff                               ran 23 pcs; writes to the flag bytes: ['0x602BE8C5=0']; after: R=0 word=0
+  [direct-2] ring turned: entryMfAssistOn                                   ran 22 pcs; writes to the flag bytes: ['0x602BE8C5=1']; after: R=1 word=0
+  [direct-2] ring stops: entryMfAssistOff                                   ran 23 pcs; writes to the flag bytes: ['0x602BE8C5=0']; after: R=0 word=0
+  [direct-2] ring turned again: entryMfAssistOn                             ran 22 pcs; writes to the flag bytes: ['0x602BE8C5=1']; after: R=1 word=0
+  [direct-2] internal zoom-off handler 0x7EB7DEB9 (capture, movie start)    ran 5216 pcs; writes to the flag bytes: none; after: R=1 word=0
+  [direct-2] the Off state that follows: entryMfAssistOff                   ran 23 pcs; writes to the flag bytes: ['0x602BE8C5=0']; after: R=0 word=0
+  S4 RESULT [direct-2]: R at the end = 0 (0 = not left set)
+  [direct-3] object created: entryMfAssistOff                               ran 23 pcs; writes to the flag bytes: ['0x602BE8C5=0']; after: R=0 word=0
+  [direct-3] ring turned: entryMfAssistOn                                   ran 22 pcs; writes to the flag bytes: ['0x602BE8C5=1']; after: R=1 word=0
+  [direct-3] ring stops: entryMfAssistOff                                   ran 23 pcs; writes to the flag bytes: ['0x602BE8C5=0']; after: R=0 word=0
+  [direct-3] ring turned again: entryMfAssistOn                             ran 22 pcs; writes to the flag bytes: ['0x602BE8C5=1']; after: R=1 word=0
+  [direct-3] internal zoom-off handler 0x7EB7DEB9 (capture, movie start)    ran 5216 pcs; writes to the flag bytes: none; after: R=1 word=0
+  [direct-3] the Off state that follows: entryMfAssistOff                   ran 23 pcs; writes to the flag bytes: ['0x602BE8C5=0']; after: R=0 word=0
+  S4 RESULT [direct-3]: R at the end = 0 (0 = not left set)
+
