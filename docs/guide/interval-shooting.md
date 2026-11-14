@@ -1,8 +1,9 @@
 # Interval shooting
 
-**MENU → Shooting Menu 2 → Time Lapse Settings → On.**
+Set the mode to P, A, S or M and set the clock. Then: **MENU → Shooting Menu 2 → Time Lapse Settings → On.**
 
 <img src="../images/ui/shooting-menu-2.png" width="320" alt="Shooting Menu 2 with Time Lapse Settings">
+<img src="../images/ui/time-lapse-settings.png" width="320" alt="The Time Lapse Settings screen">
 
 | Setting | Values |
 |---|---|
@@ -16,6 +17,7 @@ Press the shutter button to start the sequence. The camera stays on until the se
 **Limits**
 
 - Each frame uses the mechanical shutter.
+- The row is not available in iAUTO, ART and movie mode. For a film look, use **Picture Mode**.
 - Not yet tested: 240 frames in one sequence, stopping a sequence, intervals over 90 seconds.
 
 How it works: [../../experiments/2026-11-13-intervalometer/README.md](../../experiments/2026-11-13-intervalometer/README.md).
