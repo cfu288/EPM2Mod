@@ -1069,6 +1069,26 @@ def check_specs(sp, specs, out=print, first_code=False):
     return fails
 
 
+def check_sram_callers(specs, out=print):
+    """FAIL for each constant call or jump of the code that runs in SRAM whose target is inside an op that changes
+    bytes. The function map decodes that code at its flash address, so it does not see these callers, and a function
+    that only SRAM code calls looks dead (peaking-direct-3 put code over the sleep routine 0x7E53A55C this way).
+    The decode is in tools/emu/opcheck.py."""
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "emu"))
+    import opcheck
+    calls, _src, _dst = opcheck.sram_calls()
+    fails = 0
+    for ia, mn, tgt in calls:
+        for s in specs:
+            for o in s.ops:
+                if o.clo is not None and BASE + o.off <= tgt < BASE + o.off + len(o.new):
+                    fails += 1
+                    out("FAIL  %s op %d at %s: SRAM code %s does %s %s, a target inside this op. The bytes are live code"
+                        % (s.path, o.idx, h(BASE + o.off), h(ia), mn, h(tgt)))
+    out("%s  SRAM callers: %d constant calls and jumps of the SRAM code looked at" % ("FAIL" if fails else "PASS", len(calls)))
+    return fails
+
+
 # ----------------------------------------------------------------------------- map output
 
 CHECKS = ["loaded", "content", "pointers", "operands", "written", "predecessor"]
@@ -1307,7 +1327,7 @@ def selftest():
     t("0x7E881100 is 0xFF but not loaded (REJECT)", u.verdict == "REJECT" and u.failing == ["loaded"])
     t("a fake spec that writes there FAILs", check_specs(sp, [fake2], quiet) == 1)
     fake3 = Spec("selftest/free.json", dict(base, name="fake-free", ops=[
-        {"type": "bytes", "block": 0, "offset": hex(0x7E4C9200 - BASE), "expect": "ff" * 8, "new": "11" * 8}]))
+        {"type": "bytes", "block": 0, "offset": hex(0x7E4C9400 - BASE), "expect": "ff" * 8, "new": "11" * 8}]))
     t("a fake spec in free loaded padding passes when its area is usable",
       (check_specs(sp, [fake3], quiet) == 0) == (a.verdict in ("USABLE-DATA", "USABLE-CODE", "USED")))
     bad = dict(SITES)
@@ -1372,6 +1392,7 @@ def main():
         ap_ = os.path.abspath(p)
         specs.append(Spec(os.path.relpath(ap_, ROOT)))
     fails = check_specs(sp, specs, first_code=a.first_code)
+    fails += check_sram_callers(specs)
     print("check: %s (%d FAIL)" % ("FAIL" if fails else "PASS", fails))
     return 1 if fails else 0
 

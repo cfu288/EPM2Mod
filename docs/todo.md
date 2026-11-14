@@ -16,16 +16,10 @@ and delete the item here.
   the lines (Portra, Key Line) and crashed at ART 7 in the quick menu; the cause is found (NOTES §14).
 - Stronger lines: `experiments/2026-11-14-focus-peaking/specs/peaking-direct-4-gain2.json` (2 × gain,
   one byte), after direct-4 passes.
-- `tools/freespace.py` counts a byte as free when it is equal to stock, also inside the range of
-  another spec's op (this hid the direct-3 fault). Make it use the op ranges. Correct
+- Done 2026-11-14: `epm2mod make` refuses a spec that changes a byte another spec covers and keeps,
+  and the free-space check fails an op that code in SRAM calls into. Still open: correct
   `docs/space-candidates.tsv` row 10 (0x7E50A201 and 0x7E53A55C are the sleep routine) and the entry
-  0x7E880FE4 in the code-space map. Add `tools/emu/opcheck.py` to `tools/emu/README.md` and to `epm2mod make`.
-- The two crashes of the first build: the scenario tests show a likely cause (the image memory is
-  re-divided under live buffers when a filter changes while lines are on). The camera test of
-  `peaking-direct-3` must confirm that they are gone.
-- If the lines are too coarse: use the E-P5's line settings. This needs a change in the image
-  library.
-- A menu entry and a colour choice come last.
+  0x7E880FE4 in the code-space map; make `tools/emu/hookcheck.py` and the boot test a step of `make`.
 
 ## Film looks
 

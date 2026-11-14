@@ -415,11 +415,46 @@ def count_differences(first: bytes, second: bytes) -> int:
     return total
 
 
+def _check_kept_bytes(
+    kept: dict[tuple[int, int], str], name: str, index: int, op: Op
+) -> None:
+    """Refuse a change to a byte that an earlier spec covers and keeps.
+
+    Args:
+        kept: for each (block, offset) that a spec covered without a change,
+            the name of that spec. The call adds the bytes of ``op``.
+        name: the spec that ``op`` is part of.
+        index: the position of ``op`` in its spec.
+        op: the operation that is applied next.
+
+    Raises:
+        SpecError: if ``op`` changes a byte that another spec keeps.
+    """
+    if not isinstance(op, BytesOp):
+        return
+    for position, (old, new) in enumerate(zip(op.expect, op.new)):
+        place = (op.block, op.offset + position)
+        if old == new:
+            kept.setdefault(place, name)
+            continue
+        owner = kept.pop(place, name)
+        if owner != name:
+            raise SpecError(
+                f"{name} op {index}: changes block{op.block}+{place[1]:#x}, a "
+                f"byte that {owner} covers and keeps. The byte is part of "
+                f"{owner}, not free space."
+            )
+
+
 def apply_specs(stock: bytes, specs: Sequence[PatchSpec]) -> Applied:
     """Apply patch specs to a stock firmware file, in order.
 
     Each operation sees the result of the operations before it, so a later spec
     can change bytes that an earlier spec wrote, if its ``expect`` says so.
+
+    A later spec cannot change a byte that an earlier spec covers and keeps.
+    Such a byte is part of the earlier spec's code or data, but it is equal to
+    the stock byte, so the ``expect`` of the later spec matches by accident.
 
     Args:
         stock: the stock firmware file.
@@ -430,7 +465,8 @@ def apply_specs(stock: bytes, specs: Sequence[PatchSpec]) -> Applied:
 
     Raises:
         SpecError: if there is no spec, a spec is for another base, or an
-            operation does not fit.
+            operation does not fit, or a spec changes a byte that an earlier
+            spec covers and keeps.
         ContainerError: if ``stock`` is not a firmware container, or one of its
             checksums is wrong.
     """
@@ -448,9 +484,11 @@ def apply_specs(stock: bytes, specs: Sequence[PatchSpec]) -> Applied:
         raise ContainerError("the stock firmware has a block with a wrong checksum")
     payloads = [bytearray(block.payload) for block in container.blocks]
     log: list[str] = []
+    kept: dict[tuple[int, int], str] = {}
     for spec in specs:
         log.append(f"[{spec.name}]")
         for index, op in enumerate(spec.ops):
+            _check_kept_bytes(kept, spec.name, index, op)
             try:
                 log.append("  " + apply_op(payloads, op))
             except SpecError as error:

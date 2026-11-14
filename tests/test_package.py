@@ -316,6 +316,28 @@ class SpecTests(unittest.TestCase):
         with self.assertRaises(SpecError):
             spec.apply_specs(TINY, [second, first])
 
+    def test_a_later_spec_cannot_change_a_byte_an_earlier_one_keeps(self) -> None:
+        def one(name: str, expect: str, new: str, offset: int) -> spec.PatchSpec:
+            op = {
+                "type": "bytes",
+                "block": 0,
+                "offset": offset,
+                "expect": expect,
+                "new": new,
+            }
+            return spec.spec_from_json(spec_json(name, [op]))
+
+        # "a" writes two bytes; its second byte is equal to the stock byte.
+        first = one("a", "0001", "0701", 0)
+        second = one("b", "01", "09", 1)
+        with self.assertRaises(SpecError) as caught:
+            spec.apply_specs(TINY, [first, second])
+        self.assertIn("a covers and keeps", str(caught.exception))
+        spec.apply_specs(
+            TINY, [first]
+        )  # alone, and with its own later edit, it is fine
+        spec.apply_specs(TINY, [first, one("a", "01", "09", 1)])
+
     def test_text_copies_do_not_overlap(self) -> None:
         text = "AAAAAA".encode("utf-16-le").ljust(32, b"\0")
         data = make_container([text])
