@@ -2,14 +2,14 @@
 
 ![Olympus PEN E-PM2](docs/images/epm2.jpg)
 
-Repository containing the current work for creating a custom firmware mod for the Olympus PEN **E-PM2**. The goal is to unlock or add new features to this camera. Currently, we've implemented replacing the default art filters with film simulations like Portra, Ektachrome, etc., and enabled interval shooting (up to 99 shots), a feature of the E-PL6.
+Repository containing the current work for creating a custom firmware mod for the Olympus PEN **E-PM2**. The goal is to unlock or add new features to this camera. Currently, we've implemented replacing the default art filters with film simulations like Portra, Ektachrome, etc., enabled interval shooting (up to 240 shots), and added a level gauge.
 
 | Feature | What you get | Status |
 |---|---|---|
 | **Film looks** | Seven film emulations as art filters, for stills and live view | Tested on the camera |
-| **Interval shooting** | The Time Lapse Settings menu of the E-PL6: 1 to 240 frames, start delay, interval, optional time-lapse movie | Tested on the camera, with the time-lapse movie, to 125 frames. Long intervals are not yet reported |
-| **Level gauge** | Two tilt bars in live view, as on the E-PL6 | Tested on the camera |
-| Focus peaking | Light edge lines in live view while MF Assist runs | In work. The first build showed lines in Key Line only and was slow in other modes. A second build is not yet tested. See `experiments/2026-11-14-focus-peaking/` |
+| **Interval shooting** | A Time Lapse Settings menu: 1 to 240 frames, start delay, interval, optional time-lapse movie | Tested on the camera, with the time-lapse movie, to 125 frames. Long intervals are not yet reported |
+| **Level gauge** | Two tilt bars in live view | Tested on the camera |
+| Focus peaking | Light edge lines in live view while you focus by hand | In work, not in the tested build. See `experiments/2026-11-14-focus-peaking/` |
 | Video quality and recording limit | Research and patch specs | Not built. See `experiments/2026-11-12-hardware/` |
 
 See below for an example of the film looks:
@@ -50,8 +50,8 @@ and what their limits are.
 
 ## Interval shooting
 
-The E-PM2 firmware contains the interval-shooting code of the E-PL6, but no menu entry for it. The
-mod adds the entry: **Shooting Menu 2 → Time Lapse Settings**. In this menu you set:
+The stock firmware contains the code for interval shooting, but no menu entry for it. The mod adds
+the entry: **Shooting Menu 2 → Time Lapse Settings**. In this menu you set:
 
 - the number of frames
 - the waiting time before the first frame
@@ -60,8 +60,8 @@ mod adds the entry: **Shooting Menu 2 → Time Lapse Settings**. In this menu yo
 
 The camera stays on during a sequence. Each frame uses the mechanical shutter.
 
-The number of frames goes from 1 to 99 in steps of 1, then from 100 to 240 in steps of 5. The stock
-E-PL6 stops at 99. The steps of 5 are necessary because the menu list can hold only 128 values.
+The number of frames goes from 1 to 99 in steps of 1, then from 100 to 240 in steps of 5. The steps
+of 5 are necessary because the menu list can hold only 128 values.
 
 [experiments/2026-11-13-intervalometer/README.md](experiments/2026-11-13-intervalometer/README.md)
 tells you what was in the firmware, how the patch works, how we checked it and what is not yet
@@ -70,8 +70,8 @@ tested.
 ## Level gauge
 
 The level gauge shows two bars in live view: one for left-right tilt and one for forward-back tilt.
-The E-PM2 firmware contains the whole feature of the E-PL6, but no menu row to switch it on. The mod
-adds the row.
+The stock firmware contains the whole feature, but no menu row to switch it on. The mod adds the
+row.
 
 **To switch the level gauge on:**
 
@@ -183,8 +183,8 @@ More about the update procedure: [docs/flashing.md](docs/flashing.md).
 - Each interval frame uses the mechanical shutter.
 - Not yet tested: a full sequence of 240 frames, the cancellation of a sequence, and intervals
   longer than 90 seconds.
-- Level gauge: the accuracy on a level surface is not yet measured, and there is no Level Adjust
-  menu row to calibrate it. Not yet tested with an electronic viewfinder attached.
+- Level gauge: the accuracy on a level surface is not yet measured, and there is no menu row to
+  calibrate it. Not yet tested with an electronic viewfinder attached.
 
 ### Warning
 
@@ -232,6 +232,8 @@ Some tests need the maker's firmware file. Without the file, the test run skips 
 | The update procedure and recovery | [docs/flashing.md](docs/flashing.md) |
 | Each update that we did on a camera, with its result | [docs/camera-log.md](docs/camera-log.md) |
 | The open work | [docs/todo.md](docs/todo.md) |
+| What is possible on this camera and what the real limits are | [docs/feasibility.md](docs/feasibility.md) |
+| The working rules for AI agents | [AGENTS.md](AGENTS.md) |
 | How we check a patch before a camera test | [docs/verification.md](docs/verification.md) |
 | The patch specs that are not in the current build, and their history | [patches/history/README.md](patches/history/README.md) |
 
