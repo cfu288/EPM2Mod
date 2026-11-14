@@ -140,7 +140,12 @@ def check_free_space(paths: RepoPaths, description: BuildDescription) -> str:
     command = [sys.executable, str(paths.free_space_tool), "check", *description.specs]
     try:
         done = subprocess.run(
-            command, cwd=paths.root, capture_output=True, text=True, check=False
+            command,
+            cwd=paths.root,
+            capture_output=True,
+            text=True,
+            errors="backslashreplace",
+            check=False,
         )
     except OSError as error:
         raise BuildError(f"the free-space check cannot run: {error}") from None
