@@ -37,9 +37,6 @@ and remove an item when it is done.
    messages to the owner. Say each thing once. A menu path is one line (MENU → Custom Menu → D →
    Info Settings → LV-Info → Level Gauge), with a screenshot from the emulator beside it. No
    background, no history and no "how it works" in user instructions: link to the notes for that.
-   The pre-commit hook enforces this with `python3 tools/doclint.py`: Simplified Technical English
-   in the README, the install page and the guides. No punctuation in a heading. The root README is
-   an index of at most 20 lines. A guide has at most 40 lines and one or more screenshots.
    On 2026-11-14 the owner said of the README: "Very verbose instructions with no visible
    screenshots. You could cut user facing instructions and docs by 70% and lose nothing."
 7. **When a feature passes its camera test, update the user documents in the same piece of work:**
