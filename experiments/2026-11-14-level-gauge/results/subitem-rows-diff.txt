@@ -1,0 +1,10 @@
+1c1
+< ef4fc..7eff044c rows 196
+---
+> f0aa4..7eff1a08 rows 197
+117d116
+<  110   99   342  1 7 1  2074 | Dial Function / 
+144a144
+>  191  150   257  2 7 1   868 |  Info / Light Box
+147a148
+>  192 1646   273  2 7 1   866 | LV-Info / Level Gauge

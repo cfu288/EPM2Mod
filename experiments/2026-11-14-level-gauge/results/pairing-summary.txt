@@ -1,0 +1,7 @@
+calls? strict=0 179
+calls strict=0 171
+strict strict=1 39056
+calls strict=1 19586
+strings strict=0 290
+strings strict=1 875
+string1 strict=0 30

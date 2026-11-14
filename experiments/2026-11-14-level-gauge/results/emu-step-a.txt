@@ -1,0 +1,24 @@
+panel 191
+  stock          title  150 rows 4 texts [845, 926, 844, 842] settings read [253, 254, 255, 256] children [(194, 253), (195, 254), (196, 255), (197, 256)]
+  step-a         title  150 rows 4 texts [845, 926, 844, 842] settings read [253, 254, 255, 256] children [(194, 253), (195, 254), (196, 255), (197, 256)]
+  pinned+step-a  title  150 rows 4 texts [845, 926, 844, 842] settings read [253, 254, 255, 256] children [(194, 253), (195, 254), (196, 255), (197, 256)]
+  pl6            title  150 rows 5 texts [845, 926, 844, 842, 868] settings read [253, 254, 255, 256, 257] children [(194, 253), (195, 254), (196, 255), (197, 256), (198, 257)]
+panel 192
+  stock          title 1646 rows 3 texts [844, 842, 845] settings read [244, 245, 246] children [(200, 244), (201, 245), (204, 246)]
+  step-a         title 1646 rows 4 texts [844, 842, 845, 866] settings read [244, 245, 246, 273] children [(200, 244), (201, 245), (204, 246), (203, 273)]
+  pinned+step-a  title 1646 rows 4 texts [844, 842, 845, 866] settings read [244, 245, 246, 273] children [(200, 244), (201, 245), (204, 246), (203, 273)]
+  pl6            title 1646 rows 4 texts [844, 842, 845, 866] settings read [244, 245, 246, 273] children [(200, 244), (201, 245), (204, 246), (203, 273)]
+panel 193
+  stock          title  148 rows 5 texts [1638, 1639, 1640, 1641, 805] settings read [258, 259, 260, 261, 323] children [(206, 258), (207, 259), (208, 260), (209, 261), (210, 323)]
+  step-a         title  148 rows 5 texts [1638, 1639, 1640, 1641, 805] settings read [258, 259, 260, 261, 323] children [(206, 258), (207, 259), (208, 260), (209, 261), (210, 323)]
+  pinned+step-a  title  148 rows 5 texts [1638, 1639, 1640, 1641, 805] settings read [258, 259, 260, 261, 323] children [(206, 258), (207, 259), (208, 260), (209, 261), (210, 323)]
+  pl6            title  148 rows 5 texts [1638, 1639, 1640, 1641, 805] settings read [258, 259, 260, 261, 323] children [(206, 258), (207, 259), (208, 260), (209, 261), (210, 323)]
+panel 594
+  stock          title 1503 rows 4 texts [844, 842, 866, 845] settings read [446, 447, 448, 449] children [(607, 446), (608, 447), (609, 448), (610, 449)]
+  step-a         title 1503 rows 3 texts [844, 842, 845] settings read [446, 447, 449] children [(200, 244), (201, 245), (204, 246), (203, 273)]
+  pinned+step-a  title 1503 rows 3 texts [844, 842, 845] settings read [446, 447, 449] children [(200, 244), (201, 245), (204, 246), (203, 273)]
+  pl6            title 1503 rows 4 texts [844, 842, 866, 845] settings read [446, 447, 448, 449] children [(607, 446), (608, 447), (609, 448), (610, 449)]
+stock          panel 192 equals pl6: False
+step-a         panel 192 equals pl6: True
+pinned+step-a  panel 192 equals pl6: True
+pl6            panel 192 equals pl6: True

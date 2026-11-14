@@ -1,0 +1,35 @@
+{
+ "name": "level-gauge-lvinfo-row",
+ "description": "DRAFT, not camera-tested. Adds the E-PL6's 'Level Gauge' row to Custom Menu > Info Settings > LV-Info (panel 192, setting 273, text 866). Data only: 3 edits, 56 bytes replaced in place, no new bytes. It re-uses the row and the child list of panel 594 ('EVF Info Settings'), which no E-PM2 menu reaches. See experiments/2026-11-14-level-gauge/NOTES.md.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBCF404",
+   "expect": "5202df05c0010000020000000700010062030000",
+   "new": "c0006e0611010000020000000700010062030000",
+   "_addr": "0x7EFF0424",
+   "_note": "sub-item row: panel 594 'EVF Info Settings' / setting 448 / text 866 -> panel 192 'LV-Info' (title 1646) / setting 273 / text 866 'Level Gauge'. Equal to the E-PL6 row at 0x7EFF160C"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBD9224",
+   "expect": "5f020000be01000060020000bf01000061020000c001000062020000c1010000",
+   "new": "c8000000f4000000c9000000f5000000cc000000f6000000cb00000011010000",
+   "_addr": "0x7EFFA244",
+   "_note": "child list of the unreachable panel 594 -> the E-PL6's child list of panel 192 (0x7EFFA93C): Histogram, Highlight&Shadow, Image Only, Level Gauge. The zero terminator that follows stays"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBDA020",
+   "expect": "2492ff7e",
+   "new": "44a2ff7e",
+   "_addr": "0x7EFFB040",
+   "_note": "panel 192 record: child-list pointer 0x7EFF9224 (3 entries, no room for a 4th) -> 0x7EFFA244"
+  }
+ ]
+}
