@@ -20,8 +20,10 @@ and delete the item here.
 
 ## Focus peaking
 
-- Test the build `peaking-direct-2` on the camera. Steps: `experiments/2026-11-14-focus-peaking/NOTES.md`
-  §12. The two crashes of the first build have no proven cause yet.
+- `peaking-direct-2` is withdrawn: it crashes at start-up in the emulator (see the camera log). The
+  next build must keep the code of each segment-1 hook in segment 1, and must pass the emulator's
+  boot test before a flash.
+- The two crashes of the first build have no proven cause yet.
 - If the lines are too coarse: use the E-P5's line settings. This needs a change in the image
   library.
 - A menu entry and a colour choice come last.

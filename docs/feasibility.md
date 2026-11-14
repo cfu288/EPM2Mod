@@ -98,6 +98,19 @@ bracketing, zebra, silent shutter. These must be ported or written. They are not
 | Does the updater write the blank tails of blocks 1 to 3? | Write a marker there, read it back with 0x7E6756B5 |
 | Does this body recover from a boot loop by card update? | Owner's decision |
 
+## A real rule about where code may go (found 2026-11-14)
+
+The firmware loads in steps. The kernel and segment 1 are in RAM first. Segments 2 and 3 are copied
+later, by the task Usr1, and on the update path they are not copied at all.
+
+**A hook in the kernel or in segment 1 must jump only to code in the kernel or in segment 1**, unless
+you have proof that the hooked function runs only after Usr1. The build `peaking-direct-2` broke this
+rule: a hook in a segment-1 function that the boot task calls jumped into segment 2. The emulator
+showed a crash at start-up before anyone flashed it. On the camera that is a boot loop, and it could
+also break the update path, which is the only way back.
+
+Check every build that adds a hook with the boot test of the emulator before a flash.
+
 ## Order of work
 
 1. A half-press hook that does nothing.

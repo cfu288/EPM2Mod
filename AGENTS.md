@@ -49,7 +49,11 @@ and remove an item when it is done.
    hosts (`/path/to/...`, `USER@HOST`, `/tmp/scratch`). The pre-commit hook refuses real ones.
 11. **Code:** `src/epm2mod/` is production code (black, `mypy --strict`, docstrings, tests).
    `experiments/` is research code and may be rough. See [docs/conventions.md](docs/conventions.md).
-12. **Commit and push your work.** After a commit, push to `origin main` without asking the owner.
+12. **Before you offer a build that adds or moves a hook, check where its code is loaded.** A hook
+    in the kernel or in segment 1 must jump only to code in the kernel or segment 1 (see
+    `docs/feasibility.md`). Run the emulator's boot test on the build. A build that can crash at
+    start-up is the one kind of failure with no known way back.
+13. **Commit and push your work.** After a commit, push to `origin main` without asking the owner.
     Do not force-push and do not rewrite history unless the owner tells you to.
-13. Another session may work in this repository at the same time. Do not change or delete files
+14. Another session may work in this repository at the same time. Do not change or delete files
     that you did not make without a reason, and say so when you change a shared file.
