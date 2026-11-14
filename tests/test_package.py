@@ -1592,7 +1592,7 @@ class ReadmeTests(unittest.TestCase):
         self.assertTrue(readme.is_current(PATHS), "run: uv run epm2mod readme")
 
     def test_marker_problems(self) -> None:
-        text = fileio.read_text(PATHS.readme)
+        text = readme.generated_text(PATHS)
         begin, end = "<!-- BEGIN GENERATED: films -->", "<!-- END GENERATED: films -->"
         block = text[text.index(begin) : text.index(end) + len(end)]
         broken = {
@@ -1610,12 +1610,12 @@ class ReadmeTests(unittest.TestCase):
                 readme.update(bad, PATHS)
 
     def test_text_outside_the_markers_is_kept(self) -> None:
-        text = fileio.read_text(PATHS.readme)
+        text = readme.generated_text(PATHS)
         fresh = readme.update("BEFORE\n" + text + "\nAFTER", PATHS)
         self.assertTrue(fresh.startswith("BEFORE\n") and fresh.endswith("\nAFTER"))
 
     def test_windows_line_ends(self) -> None:
-        text = fileio.read_text(PATHS.readme).replace("\n", "\r\n")
+        text = readme.generated_text(PATHS).replace("\n", "\r\n")
         stale = text.replace(stock.EPM2_V16.sha256, "0" * 64)
         fresh = readme.update(stale, PATHS)
         self.assertIn(stock.EPM2_V16.sha256, fresh)
@@ -1640,7 +1640,9 @@ class ReadmeTests(unittest.TestCase):
         paths = RepoPaths(Path(folder))
         for name in ("builds", "looks"):
             shutil.copytree(
-                ROOT / name, paths.root / name, ignore=shutil.ignore_patterns("*.npz")
+                ROOT / name,
+                paths.root / name,
+                ignore=shutil.ignore_patterns("*.npz", "*.md"),
             )
         shutil.copy(PATHS.pinned, paths.pinned)
         stale = "".join(
@@ -1660,6 +1662,22 @@ class ReadmeTests(unittest.TestCase):
         self.assertNotIn("old", text)
         self.assertTrue(text.startswith("# Title\n"))
 
+    def test_blocks_can_be_in_several_documents(self) -> None:
+        paths = self.stale_copy()
+        text = fileio.read_text(paths.readme)
+        marker = "<!-- BEGIN GENERATED: builds -->"
+        cut = text.index(marker)
+        fileio.write_text(paths.readme, text[:cut])
+        fileio.write_text(paths.resolve("builds/README.md"), "# Builds\n" + text[cut:])
+        self.assertTrue(readme.rewrite(paths))
+        self.assertTrue(readme.is_current(paths))
+        self.assertNotIn("old", fileio.read_text(paths.resolve("builds/README.md")))
+        self.assertNotIn(marker, fileio.read_text(paths.readme))
+        # The same block in two documents is refused.
+        fileio.write_text(paths.resolve("docs/install.md"), text[cut:])
+        with self.assertRaisesRegex(BuildError, "found 2 times"):
+            readme.is_current(paths)
+
     def test_the_readme_command(self) -> None:
         paths = self.stale_copy()
 
@@ -1670,8 +1688,8 @@ class ReadmeTests(unittest.TestCase):
                 return cli.main(["readme", *argv]), out.getvalue()
 
         self.assertEqual(run("--check")[0], 1)
-        self.assertEqual(run(), (0, "README.md: updated\n"))
-        self.assertEqual(run(), (0, "README.md: no change\n"))
+        self.assertEqual(run(), (0, "documents: updated\n"))
+        self.assertEqual(run(), (0, "documents: no change\n"))
         self.assertEqual(run("--check")[0], 0)
 
 

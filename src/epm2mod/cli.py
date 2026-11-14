@@ -8,7 +8,7 @@
     epm2mod builds                                list the build descriptions
     epm2mod apply SPEC... -o OUT.BIN              apply patch specs (no build description)
     epm2mod info FIRMWARE.BIN                     describe a firmware file
-    epm2mod readme [--check]                      refresh the generated parts of README.md
+    epm2mod readme [--check]                      refresh the generated parts of the documents
     epm2mod looks [--check | --write]             check or write the film-look patch specs
 
 Exit status: 0 for success, 1 for an error that is reported as one message (or,
@@ -153,11 +153,11 @@ def _readme(args: argparse.Namespace, paths: RepoPaths) -> int:
     """Run ``epm2mod readme``."""
     if args.check:
         if readme.is_current(paths):
-            print("README.md: the generated parts are up to date")
+            print("the generated parts of the documents are up to date")
             return 0
-        print("README.md: the generated parts are out of date; run 'epm2mod readme'")
+        print("the generated parts are out of date; run 'epm2mod readme'")
         return 1
-    print("README.md: updated" if readme.rewrite(paths) else "README.md: no change")
+    print("documents: updated" if readme.rewrite(paths) else "documents: no change")
     return 0
 
 
@@ -251,7 +251,9 @@ def build_parser() -> argparse.ArgumentParser:
     info_cmd = command("info", _info, "Describe a firmware file.")
     info_cmd.add_argument("firmware", help="a firmware file")
 
-    readme_cmd = command("readme", _readme, "Refresh the generated parts of README.md.")
+    readme_cmd = command(
+        "readme", _readme, "Refresh the generated parts of the documents."
+    )
     readme_cmd.add_argument(
         "--check", action="store_true", help="only say if they are up to date"
     )

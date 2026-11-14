@@ -12,3 +12,14 @@ uv run epm2mod pin builds/NAME.json --date YYYY-MM-DD --sha256 HEX   # after a p
 
 All firmware that goes on a camera is made this way. The procedure for a new build is in
 [`docs/conventions.md`](../docs/conventions.md), "Making firmware".
+
+## Tested builds
+
+<!-- BEGIN GENERATED: builds -->
+| Build | What | Patch specs | Camera-tested | sha256 |
+|---|---|---|---|---|
+| `seven-films-6-interval-240-level` (pinned) | Seven film looks as art filters, interval shooting with up to 240 frames, and the level gauge | 10 | 2026-11-14 | `3e7f793ea74b21dab19c61eac33fe1f818d9c627e4fa522a2551ea62fc32c7f6` |
+| `seven-films-6` | Seven film looks as art filters | 7 | 2026-11-13 | `5badb0796731b40a27ef015e57da134d7d793486d4c6262a3f483c1aae60fd05` |
+| `seven-films-6-interval` | Seven film looks as art filters, and interval shooting with up to 99 frames | 8 | 2026-11-13 | `f52ea6976ac2e9c567b2c07d7556b96b6431c8fcd2d90de195abdb76059e0104` |
+| `seven-films-6-interval-240` | Seven film looks as art filters, and interval shooting with up to 240 frames | 9 | 2026-11-13 | `01837f962f8a8ca0d189d9cd65ad9b5b35402ca3f3ed54a3872af044e050de11` |
+<!-- END GENERATED: builds -->

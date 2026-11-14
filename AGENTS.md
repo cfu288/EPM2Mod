@@ -40,10 +40,11 @@ and remove an item when it is done.
    On 2026-11-14 the owner said of the README: "Very verbose instructions with no visible
    screenshots. You could cut user facing instructions and docs by 70% and lose nothing."
 7. **When a feature passes its camera test, update the user documents in the same piece of work:**
-   pin the build (`uv run epm2mod pin ...`), run `uv run epm2mod readme`, then update the parts of
-   `README.md` that are written by hand (the feature table, a section that says how to switch the
-   feature on and use it, install step 8, "Limits of this build"), the camera log and
-   `docs/feasibility.md`. A feature that works but is not in the README is not finished.
+   pin the build (`uv run epm2mod pin ...`), run `uv run epm2mod readme`, write or update the
+   feature's guide in `docs/guide/` (how to switch it on and use it, emulator screenshots, limits),
+   add one line with a link to the feature list in `README.md`, and update the camera log and
+   `docs/feasibility.md`. The root `README.md` is only an index: it does not explain how to use a
+   feature. A feature that works but has no guide is not finished.
 8. **Keep the real safety steps:** make firmware only with `tools/make_firmware.py` from a build
    description, log each flash in `docs/camera-log.md` before and after, keep the stock file at
    hand, change one thing per flash.

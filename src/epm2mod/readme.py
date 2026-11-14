@@ -1,22 +1,24 @@
-"""The generated parts of ``README.md``.
+"""The generated parts of the documents.
 
-Some facts in the README repeat data that the repository holds elsewhere: the
-pinned build and its SHA-256, the list of builds, the list of film looks. Those
-parts are generated, so they cannot go out of date. Each one sits between two
-marker comments::
+Some facts in the documents repeat data that the repository holds elsewhere:
+the pinned build and its SHA-256, the list of builds, the list of film looks.
+Those parts are generated, so they cannot go out of date. Each one sits between
+two marker comments, in one of the files listed in ``DOCUMENTS``::
 
     <!-- BEGIN GENERATED: name -->
     ...
     <!-- END GENERATED: name -->
 
 ``update`` replaces what is between the markers. Text outside them is never
-touched. A test fails if the README is not up to date.
+touched. Each block must be there once, in any one of the documents. A test
+fails if a document is not up to date.
 """
 
 from __future__ import annotations
 
 import re
 from collections.abc import Callable
+from pathlib import Path
 
 from .builds import all_descriptions, pinned_description
 from .errors import BuildError
@@ -50,7 +52,7 @@ def pinned_block(paths: RepoPaths) -> str:
     return (
         f"The pinned build is **`{pinned.name}`**: {what}. "
         f"We tested this build on a real E-PM2 on {pinned.camera_tested} "
-        "([camera log](docs/camera-log.md)).\n\n"
+        "([camera log](camera-log.md)).\n\n"
         "| | sha256 |\n|---|---|\n"
         f"| Stock firmware, `{EPM2_V16.file_name}` | `{EPM2_V16.sha256}` |\n"
         f"| Pinned build, `{pinned.name}` | `{pinned.sha256}` |\n"
@@ -85,6 +87,16 @@ def films_block(paths: RepoPaths) -> str:
     return "| Menu name | Film | Replaces |\n|---|---|---|\n" + "\n".join(rows) + "\n"
 
 
+#: The files that may hold generated blocks, relative to the repository root.
+DOCUMENTS = (
+    "README.md",
+    "docs/install.md",
+    "docs/guide/film-looks.md",
+    "builds/README.md",
+)
+#: Text that separates the documents when they are checked as one.
+_JOIN = "\n\x00next document\x00\n"
+
 #: The generated blocks, by marker name.
 BLOCKS: dict[str, Callable[[RepoPaths], str]] = {
     "pinned-build": pinned_block,
@@ -94,7 +106,7 @@ BLOCKS: dict[str, Callable[[RepoPaths], str]] = {
 
 
 def update(text: str, paths: RepoPaths) -> str:
-    """Return README text with every generated block made fresh.
+    """Return document text with every generated block made fresh.
 
     Raises:
         BuildError: if a marker names a block that does not exist, a block has
@@ -106,7 +118,7 @@ def update(text: str, paths: RepoPaths) -> str:
         """Return the block of one marker pair, made fresh."""
         name = match.group("name")
         if name not in BLOCKS:
-            raise BuildError(f"README: unknown generated block '{name}'")
+            raise BuildError(f"documents: unknown generated block '{name}'")
         seen.append(name)
         return match.group(1) + BLOCKS[name](paths) + match.group(4)
 
@@ -114,25 +126,46 @@ def update(text: str, paths: RepoPaths) -> str:
     for name in BLOCKS:
         if seen.count(name) != 1:
             raise BuildError(
-                f"README: the generated block '{name}' must be there once, "
+                f"documents: the generated block '{name}' must be there once, "
                 f"found {seen.count(name)} times"
             )
     if len(_MARKER.findall(text)) != 2 * len(seen):
-        raise BuildError("README: a GENERATED marker has no partner")
+        raise BuildError("documents: a GENERATED marker has no partner")
     return result
 
 
+def _files(paths: RepoPaths) -> list[Path]:
+    """Return the documents that hold generated blocks and are present."""
+    found = [paths.resolve(relative) for relative in DOCUMENTS]
+    return [path for path in found if path.exists()]
+
+
+def generated_text(paths: RepoPaths) -> str:
+    """Return the text of all documents with generated blocks, joined.
+
+    Raises:
+        BuildError: if none of the documents is there.
+    """
+    files = _files(paths)
+    if not files:
+        raise BuildError("none of the documents with generated parts was found")
+    return _JOIN.join(read_text(path) for path in files)
+
+
 def is_current(paths: RepoPaths) -> bool:
-    """Return True if the README's generated blocks are up to date."""
-    text = read_text(paths.readme)
+    """Return True if the generated blocks of all documents are up to date."""
+    text = generated_text(paths)
     return update(text, paths) == text
 
 
 def rewrite(paths: RepoPaths) -> bool:
-    """Bring the README up to date. Return True if the file changed."""
-    text = read_text(paths.readme)
-    fresh = update(text, paths)
-    if fresh == text:
-        return False
-    write_text(paths.readme, fresh)
-    return True
+    """Bring the documents up to date. Return True if a file changed."""
+    files = _files(paths)
+    before = generated_text(paths).split(_JOIN)
+    after = update(_JOIN.join(before), paths).split(_JOIN)
+    changed = False
+    for path, old, new in zip(files, before, after):
+        if old != new:
+            write_text(path, new)
+            changed = True
+    return changed

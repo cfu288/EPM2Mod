@@ -60,7 +60,7 @@ Examples: `feat(patch/movie-limit): raise 29-min cap to 9 h`, `docs(camera-log):
 - **`tools/`** holds stand-alone scripts. `make_firmware.py`, `fetch_stock.py`, `build.py` and
   `oetool.py` are thin commands over the package. The others (`freespace.py`, `fwmap.py`,
   `disasm.py`, `memmap_svg.py`, `emu/`) are analysis tools.
-- **Generated, not written by hand:** the README parts between `GENERATED` markers
+- **Generated, not written by hand:** the parts of the documents between `GENERATED` markers
   (`uv run epm2mod readme`), and the three film patch specs (`uv run epm2mod looks --write`, from
   `looks/films.json` and `looks/fits/`). A build's name is the file name of its description. Tests
   fail if a generated part is out of date.
@@ -98,9 +98,11 @@ build.
    The command makes the build again in memory and records the test only if the result has that
    sha256, so a spec that changed after the flash cannot be recorded as tested. It writes the sha256
    and the date into the description and makes it the pinned build. Then:
-   - run `uv run epm2mod readme`. It refreshes the generated parts of `README.md`.
-   - update the parts of `README.md` that are written by hand: the feature table at the top, step 8
-     of the install steps (what the user sees after the update), and "Limits of this build".
+   - run `uv run epm2mod readme`. It refreshes the generated parts of the documents
+     (`docs/install.md`, `docs/guide/film-looks.md`, `builds/README.md`).
+   - update what is written by hand: the feature list in `README.md` (one line and a link per
+     feature), the feature's guide in `docs/guide/` (how to switch it on and use it, with
+     screenshots from the emulator, and its limits).
    - write the result in the camera log, and commit.
 5. **If it fails:** write the result in the camera log. Keep or delete the description; never pin it.
 
