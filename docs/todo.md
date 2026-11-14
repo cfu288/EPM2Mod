@@ -5,11 +5,8 @@ and delete the item here.
 
 ## Level gauge
 
-- **Test the build `seven-films-6-interval-240-level-adjust` on the camera.** It adds the row
-  "Level Adjust" to Custom Menu J (Utility), as on the E-PL6: 33 data edits, no code. The emulator
-  checks pass. On the camera: Adjust on a flat surface, look at the gauge, power off and on, then
-  flash the pinned build and look again (does the calibration stay?). Notes:
-  `experiments/2026-11-14-level-gauge/NOTES.md` §12.
+- Level Adjust works (2026-11-14). Not yet reported: the calibration after power off and on, after
+  a flash of a different build, and Reset.
 - Not yet reported: the gauge in portrait orientation, and the info menu of an electronic
   viewfinder (the new row re-uses the unused panel 594, "EVF Info Settings").
 

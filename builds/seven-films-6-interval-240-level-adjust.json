@@ -12,5 +12,7 @@
   "patches/interval-frames-240.json",
   "patches/level-gauge-lvinfo-row.json",
   "patches/level-adjust-row.json"
- ]
+ ],
+ "sha256": "e93d1589b3406ec991e3f32225acf6e2c2074aa58fc5394ca06a93da83797b66",
+ "camera_tested": "2026-11-14"
 }

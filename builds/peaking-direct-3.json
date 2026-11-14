@@ -1,5 +1,5 @@
 {
- "what": "Focus peaking, third build: light edge lines in live view while MF Assist runs, on top of the pinned build",
+ "what": "Focus peaking, third build: light edge lines in live view while MF Assist runs, on top of the build seven-films-6-interval-240-level",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",
