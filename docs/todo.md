@@ -11,8 +11,8 @@ and delete the item here.
   calibration call (`api_adj_Set_Slope_Adjust` 0x7E676261: mode 0 resets, mode 1 sets zero at the
   current position). Only the menu row is missing: one item record, one child entry and shifted row
   constants in the custom-menu code, as the interval row was added.
-  - First: put the camera on a surface that is known to be level, and write down what the gauge
-    shows. If it shows level, the factory offsets are good and this item has low priority.
+  - The owner reports (2026-11-14): on a flat surface the gauge is slightly off. So this row is
+    needed. In work.
   - Before the work: decode fields 6 and 7 of the custom-menu item record.
   - Notes: `experiments/2026-11-14-level-gauge/NOTES.md` §5.2 and §8 (step B).
 - Not yet reported: the gauge in portrait orientation, and the info menu of an electronic
