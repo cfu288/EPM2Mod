@@ -5,16 +5,11 @@ and delete the item here.
 
 ## Level gauge
 
-- **A way to calibrate the level gauge.** The gauge works (2026-11-14), but the mod has no menu row
-  to set its zero. The E-PL6 has the row "Level Adjust" in Custom Menu K, with Reset and Adjust.
-  The E-PM2 firmware has the texts (160 "Level Adjust", 478, 847, 223, 749), the panel (173) and the
-  calibration call (`api_adj_Set_Slope_Adjust` 0x7E676261: mode 0 resets, mode 1 sets zero at the
-  current position). Only the menu row is missing: one item record, one child entry and shifted row
-  constants in the custom-menu code, as the interval row was added.
-  - The owner reports (2026-11-14): on a flat surface the gauge is slightly off. So this row is
-    needed. In work.
-  - Before the work: decode fields 6 and 7 of the custom-menu item record.
-  - Notes: `experiments/2026-11-14-level-gauge/NOTES.md` §5.2 and §8 (step B).
+- **Test the build `seven-films-6-interval-240-level-adjust` on the camera.** It adds the row
+  "Level Adjust" to Custom Menu J (Utility), as on the E-PL6: 33 data edits, no code. The emulator
+  checks pass. On the camera: Adjust on a flat surface, look at the gauge, power off and on, then
+  flash the pinned build and look again (does the calibration stay?). Notes:
+  `experiments/2026-11-14-level-gauge/NOTES.md` §12.
 - Not yet reported: the gauge in portrait orientation, and the info menu of an electronic
   viewfinder (the new row re-uses the unused panel 594, "EVF Info Settings").
 

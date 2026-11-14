@@ -316,3 +316,110 @@ Unknowns and the probe for each:
 Note for tool users: `tools/fwmap.py --fw X.BIN --out DIR build` rewrites `DIR/blocks/X.BIN.block0.bin`
 from `X.BIN` when `X.BIN` is newer. Give it the decoded block as `X.BIN` and copy the same file to the
 cache path afterwards. Nothing was written under `build/`.
+
+## 12. Step B result: Level Adjust (2026-11-14)
+
+Candidate build `builds/seven-films-6-interval-240-level-adjust.json` = the pinned build +
+`patches/level-adjust-row.json`. sha256
+`e93d1589b3406ec991e3f32225acf6e2c2074aa58fc5394ca06a93da83797b66`. Made with `epm2mod make`. Checked in
+the emulator. **Not flashed.** The pinned build still rebuilds to its recorded sha256.
+
+### 12.1 Desk findings (they correct §3.1, §4 and §5.2)
+
+| Fact | Label |
+|---|---|
+| The group is **J. Utility** on this body, not K: MENU → Custom Menu → J → Level Adjust | V (emulator screen) |
+| The item table starts at **0x7EFF7E80** and has **78** rows of 16 bytes: `{u16 group, u16 label text, u32 setting, u16 order, u16 help text, u16 value format, u16 flag}`. A group number 98 ends it. §4 read it two bytes late: its "field 7" is the group of the *next* row | V (the page code indexes `0x7EFF7E80 + 16 × row`) |
+| "Field 5" = value format: 0 means "look the setting up in the value table 0x7EFF8360; no record there, no value shown". Setting 2000 = no value at all | V (row builder 0x7EDE9F56) |
+| "Field 6" (the flag at +14) and the order at +8 are read by none of the 10 loads of the table address, and no other pointer to the table exists | V (scan of every byte offset) |
+| The child list 0x7EFF8E4C is parallel to the item table: entry *i* is the child of row *i*. The 11 page records 24–34 point to it | V |
+| The page code keeps one state word per row (0 normal, 1 grey, 2 hidden) in RAM 0x606A3118, 78 × 2 bytes, cleared by the constructor 0x7EDE9ACF. The rows per group are in `.data` (RAM 0x602BE390, image 0x7E8EE850): 10, 4, 6, 17, 13, 3, 8, 7, 5, 5 | V |
+| What the E-PL6 changed for its 4 more rows: both tables, the group sizes (B, C, D, J +1), and 9 constants in the page code (last index 77 → 81 at 5 sites, count 78 → 82 at 3 sites, array size 156 → 164). Nothing else in the page code differs but addresses | V (instruction diff of 0x7EDE9A4D–0x7EDEA503 against E-PL6 +0xE9A) |
+| **Reset is mode 2, not mode 0.** `OlyHfwOpeLevel::reset` 0x7E97858C calls `api_adj_Set_Slope_Adjust(2, rotate)`; `calibration` 0x7E9782AF calls it with 1. The API maps 0 → 0, 1 → 1, anything else → 2. Mode 0 is the factory measurement (it writes the factory values); no menu calls it | V (code and emulator trace) |
+| The calibration data are **accelerometer readings for six body orientations** (x, y, z, temperature; 1000 = 1 g), not angle offsets. Factory set: tags 0x4E7A, 0x4E8A, 0x4E9A, 0x4EAA. Working set: tags 0x4EBA, 0x4ECA, 0x4EDA, 0x4EEA. The driver's read 0x7E4583BF subtracts the working set (0x7E45870A: `(raw − reference) × 1000 / gain`) | V |
+| **Adjust** (driver mode 1, 0x7E45937A): 100 raw samples (0x7E459693, 1.7 s in the emulator), then in landscape: working[0] = the measurement, working[i] = factory[i] + (measurement − factory[0]). In another orientation only that orientation's entry is set. **Reset** (driver mode 2): working = factory (0x7E4599EA). Both then reload the driver tables (0x7E459A5F, 0x7E45A167) | V |
+| **Where it is stored:** the working set is in the EEROM settings bank: RAM image 0x603F4674, the four tags at 0x603F4C22–0x603F4C51 (48 bytes). The factory set is in another area (RAM 0x603B91C8). The write 0x7E457CED only changes the RAM image | V (tag table 0x603A0E38 read in the emulator) |
+| **Power-off:** the bank save writes the whole 64 KB image to flash 0x400E0000 (pair 0x40100000). The emulator shows this save at start-up; the power-off sequence does not finish there, so "saved at power-off" is not shown; the E-PL6 runs the same routines | I |
+| **Firmware update:** the updater handles the parts USR, OSD, ARTFIL, FRAME and BURE (emulator update path, audit notes §3). The settings banks are other flash sectors and the stock start-up code loads the working set on every build. So the adjustment should stay after a flash of the pinned build or of stock | I. Camera probe: adjust, note the gauge, flash the pinned build, look again |
+
+### 12.2 The patch: a real insert, no code
+
+33 edits, 2,031 bytes in the edited windows, 1,861 bytes changed. `scripts/mkspec_step_b.py` writes the spec from
+the stock bytes and asserts every new row and constant against the E-PL6 block.
+
+| Part | Edit |
+|---|---|
+| Item table | 79-row copy at **0x7EBF3000** (1,266 B): the stock table with `{9, 160, 2213, 3, 478, 0, 1}` at index 76, between Warning Level and Touch Screen Settings, as on the E-PL6. The 10 address loads (0x7EDE9B9D … 0x7EDEA3F5) point to it |
+| Child list | 79-entry copy at **0x7EBF3500** (640 B) with (panel 173, setting 2213) at index 76. The 11 page records 24–34 (0x7EFFA820 … 0x7EFFA9B0) point to it |
+| Row constants | 77 → 78 at 0x7EDE9B85, 0x7EDE9CBA, 0x7EDE9D10, 0x7EDE9D6B, 0x7EDE9DBF; 78 → 79 at 0x7EDE9B92, 0x7EDE9D26, 0x7EDE9DCC; 156 → 158 at 0x7EDE9AE5 |
+| Group size | `.data` image 0x7E8EE862 (RAM 0x602BE3A2): 5 → 6 |
+
+- Both copies are in the `sdk` name list 0x7EBF1090–0x7EBF3BAC, the area that holds the camera-tested 240-frame
+  rows. Data only, so no `first_code`. `tools/freespace.py check`: PASS; no overlap with
+  `patches/peaking-direct-3.json` (0x7EBF1F00–0x7EBF1F27) or `patches/interval-frames-240.json`.
+- The old tables stay in place without a reader.
+- **The one new use of RAM:** the state array is now 158 bytes, so row 78 uses 0x606A31B4–B5. No byte of block 0, at
+  any offset, holds an address from 0x606A31B4 to 0x606A32EF (the next addressed object is 0x606A32F0; the E-PL6 has
+  the same 316-byte gap after its 164-byte array). In the emulator these 316 bytes stay zero on the pinned image
+  through start-up, the menus, the INFO cycle and playback (`ramcheck.txt`). Static scan V; "nothing
+  ever uses them on the camera" I.
+- Not ported: the E-PL6's three other extra Custom Menu rows (groups B, C, D).
+
+### 12.3 Checks
+
+Emulator work folder `~/opt/om-emu-e101-boot-work/level-adjust/` (scripts, logs, screenshots; the scripts are also in
+`scripts/step-b-emu/`). The pinned side of each comparison is the audit's crawl of the same day.
+
+| Check | Result | Label |
+|---|---|---|
+| `tools/freespace.py check` (in `epm2mod make`) | PASS, 0 FAIL | V |
+| `tools/emu/hookcheck.py` on the 11 specs | the same 13 transfers and the same 1 known FAIL (0x7E56C6A5, remap7b-code) as the pinned build; this spec alone: 0 transfers | V |
+| (a) Boot, `stage2-boot.mjs 2000` | PASS; the report equals the pinned build's except the wall time | V |
+| (b) Menu crawl, P mode, card, clock set, every sub-screen: 4,250 screens | Outside the Custom Menu rows: 1,875 screens, all byte-equal. Custom Menu rows, compared as sets of screens (the insert shifts the crawl's row numbers): 1,498 in both; 8 pinned screens gone, and they are the J page with 5 rows (4 cursor positions, the Pixel Mapping pop-up, 3 Warning Level pop-ups); 11 new: the same 8 with 6 rows, the cursor on Level Adjust, Reset, Adjust. No row missing. Firmware error log: only the two start-up entries, as on pinned. Crawler notes equal | V |
+| (b) Shallow crawls: P without card, iAUTO, ART, movie | Only the J page differs (3 or 4 screens redrawn, 1 new cursor position: the row can be selected in every mode) | V |
+| (b) Not crawled on the new image | the audit's extra Setup units `setupB`, `setupC` (53 screens; no table of this spec is read there) | U |
+| (c) Screens | `screens/04-j-utility-level-adjust.png`, `05-level-adjust-reset.png`, `06-level-adjust-adjust.png`. The screen opens on **Reset**. There is no confirmation screen: OK runs the action and the menu closes to the shooting screen | V |
+| (d) Adjust, traced (`demo/trace-adjust.txt`) | OK → 0x7EE00535 → `calibration` → `api_adj_Set_Slope_Adjust(1, 11)` → 100 samples in 1.7 s → 24 writes to the working set → returns 0 | V |
+| (d) Reset, traced (`demo/trace-reset.txt`) | `reset` → `api_adj_Set_Slope_Adjust(2, 11)` → working set = factory set → returns 0. Mode 0 is never passed | V |
+| (d) Effect on the gauge | Sample (35, 999, 0) = 2° roll: 2 marks before; after Adjust and a restart the gauge is level and green at that sample, and a level sample shows 2 marks the other way; after Reset as before (`demo/d01`, `e01`, `e02`, `e08`) | V, with the stand-in below |
+| (e) Level Gauge row and INFO cycle | information → histogram → image only → gauge → information (`info/`) | V |
+| The values after a restart | kept (`demo/trace-reset.txt`, first dump). The emulator carries the bank's RAM image over, in place of the power-off save | V for the load, I for the save |
+
+Stand-ins. The emulator has no accelerometer. `trace-adjust.mjs` answers the driver's sample-ring read 0x7E4585DC with
+a fixed raw sample (1000 = 1 g), so the firmware's own correction, measurement and gauge code run on it. The older
+`tilt:` stand-in replaces the *corrected* output of 0x7E4583BF, so it hides the stored values and its numbers are 16
+times too large: the audit's "4 degrees" was a full-scale reading. No temperature sensor: the stored temperature is
+−273.1. The emulator's factory set is the default (0, 1000, 0 …), not a camera's.
+
+### 12.4 On the camera
+
+Before: Level Gauge must be On (MENU → Custom Menu → D → Info Settings → LV-Info → Level Gauge), and INFO shows the
+gauge.
+
+1. Put the camera on a surface that a real level shows to be flat, in the normal landscape position.
+2. MENU → Custom Menu → J → Level Adjust. New: the row **Level Adjust**, fourth of six, between Warning Level and
+   Touch Screen Settings.
+3. The screen shows **Reset** ("Reset to default."). Press DOWN once: **Adjust** ("It adjust the 0 level to the
+   current position.").
+4. Press OK and do not touch the camera for 3 seconds. The menu closes by itself. No message appears.
+5. Press INFO until the gauge shows. Expected: both bars green on the flat surface.
+6. Switch off, switch on: still green.
+7. Regression: every J row opens (Pixel Mapping, Exposure Shift, Warning Level, Touch Screen Settings); DOWN from
+   the last row goes to group A, UP from the first row of A comes back to J.
+
+| Result | Meaning | Next |
+|---|---|---|
+| Green on the flat surface, also after power-off | works | optional: flash the pinned build and look again (settles "survives an update") |
+| Nothing changes | the measurement was refused (the camera moved), or the write did not reach the driver | repeat on a tripod; then desk: 0x7E4598E6, the check that follows the 100 samples (I: a stability test) |
+| Level right after Adjust, old reading after power-off | the bank is not saved at power-off | desk: find the bank save in the power-off sequence |
+| Worse than before | Adjust was done on a surface that is not flat | Level Adjust → Reset → OK |
+| The J page or the row cursor is wrong, or the camera stops in the Custom Menu | an error in the insert | flash the pinned build |
+
+Reset is safe: it copies the factory values. To go back: flash the pinned build; the adjustment stays (I).
+
+### 12.5 Open
+
+- U: what the screen does when the measurement fails (the API returns 1; the panel code ignores the result).
+- U: the gauge in portrait after an Adjust in landscape (the other five orientations get the same shift).
+- I: the 2 bytes of RAM at 0x606A31B4 (§12.2).
+- §3.1 and §4 still say "mode 0 = reset" and "0x7EFF7E82, 77 rows"; this section corrects them.
