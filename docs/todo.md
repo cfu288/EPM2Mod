@@ -12,8 +12,8 @@ and delete the item here.
 
 ## Focus peaking
 
-- Test the build `peaking-direct-4` on the camera (steps: NOTES §14.7). `peaking-direct-3` showed
-  the lines (Portra, Key Line) and crashed at ART 7 in the quick menu; the cause is found (NOTES §14).
+- `peaking-direct-4` works on the camera (2026-11-14) and is the pinned build. Not yet reported:
+  Velvia in the quick menu, sleep and wake.
 - Stronger lines: `experiments/2026-11-14-focus-peaking/specs/peaking-direct-4-gain2.json` (2 × gain,
   one byte), after direct-4 passes.
 - Done 2026-11-14: `epm2mod make` refuses a spec that changes a byte another spec covers and keeps,

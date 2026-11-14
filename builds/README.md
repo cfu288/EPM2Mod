@@ -18,9 +18,10 @@ All firmware that goes on a camera is made this way. The procedure for a new bui
 <!-- BEGIN GENERATED: builds -->
 | Build | What | Patch specs | Camera-tested | sha256 |
 |---|---|---|---|---|
-| `seven-films-6-interval-240-level-adjust` (pinned) | Seven film looks as art filters, interval shooting with up to 240 frames, the level gauge, and Level Adjust (calibrate the level gauge) | 11 | 2026-11-14 | `e93d1589b3406ec991e3f32225acf6e2c2074aa58fc5394ca06a93da83797b66` |
+| `peaking-direct-4` (pinned) | Focus peaking, fourth build: light edge lines in live view while MF Assist runs, on top of the build seven-films-6-interval-240-level-adjust. Fixes the crash of peaking-direct-3 at the Velvia entry | 12 | 2026-11-14 | `eea187a958de410bca0448367408998099fde177548d0b9010baf510a3452482` |
 | `seven-films-6` | Seven film looks as art filters | 7 | 2026-11-13 | `5badb0796731b40a27ef015e57da134d7d793486d4c6262a3f483c1aae60fd05` |
 | `seven-films-6-interval` | Seven film looks as art filters, and interval shooting with up to 99 frames | 8 | 2026-11-13 | `f52ea6976ac2e9c567b2c07d7556b96b6431c8fcd2d90de195abdb76059e0104` |
 | `seven-films-6-interval-240` | Seven film looks as art filters, and interval shooting with up to 240 frames | 9 | 2026-11-13 | `01837f962f8a8ca0d189d9cd65ad9b5b35402ca3f3ed54a3872af044e050de11` |
 | `seven-films-6-interval-240-level` | Seven film looks as art filters, interval shooting with up to 240 frames, and the level gauge | 10 | 2026-11-14 | `3e7f793ea74b21dab19c61eac33fe1f818d9c627e4fa522a2551ea62fc32c7f6` |
+| `seven-films-6-interval-240-level-adjust` | Seven film looks as art filters, interval shooting with up to 240 frames, the level gauge, and Level Adjust (calibrate the level gauge) | 11 | 2026-11-14 | `e93d1589b3406ec991e3f32225acf6e2c2074aa58fc5394ca06a93da83797b66` |
 <!-- END GENERATED: builds -->
