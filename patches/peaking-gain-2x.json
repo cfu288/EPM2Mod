@@ -1,0 +1,16 @@
+{
+ "name": "peaking-gain-2x",
+ "description": "Focus peaking lines 2 times as strong: the gain of the line image (usGain2 of pass 9) is 512, not 256. One byte in the code of peaking-direct-4. See experiments/2026-11-14-focus-peaking/NOTES.md section 14.6.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xa8376",
+   "expect": "01",
+   "new": "02",
+   "_addr": "0x7E4C9396"
+  }
+ ]
+}

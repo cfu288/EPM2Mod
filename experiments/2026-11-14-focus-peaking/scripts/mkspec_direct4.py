@@ -309,9 +309,9 @@ def main():
     for a in sorted(set(re.findall(r"(?:jmp|call)\s+0x([0-9a-f]{8})", asm))):
         args.append("--defsym=s_%s=0x%s" % (a, a))
     asm = re.sub(r"((?:jmp|call)\s+)0x([0-9a-f]{8})", r"\1s_\2", asm)
-    for name, (site, n, _) in HOOKS.items():
-        asm += '\n.section .h%s,"ax"\n    jmp T_%s\n' % (name, name) + "    nop\n" * (n - 5)
-        args.append("--section-start=.h%s=%#x" % (name, site))
+    for hook, (site, n, _) in HOOKS.items():
+        asm += '\n.section .h%s,"ax"\n    jmp T_%s\n' % (hook, hook) + "    nop\n" * (n - 5)
+        args.append("--section-start=.h%s=%#x" % (hook, site))
     s, o, e = (os.path.join(work, "direct4." + x) for x in ("s", "o", "elf"))
     open(s, "w").write(asm)
     run(BIN + "/mn10300-elf-as", "-o", o, s)

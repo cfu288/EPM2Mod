@@ -12,10 +12,10 @@ and delete the item here.
 
 ## Focus peaking
 
-- `peaking-direct-4` works on the camera (2026-11-14) and is the pinned build. Not yet reported:
-  Velvia in the quick menu, sleep and wake.
-- Stronger lines: `experiments/2026-11-14-focus-peaking/specs/peaking-direct-4-gain2.json` (2 × gain,
-  one byte), after direct-4 passes.
+- `peaking-direct-4` works on the camera (2026-11-14) and is the pinned build. Velvia in the
+  quick menu does not crash.
+- Test `peaking-gain-2x` on the camera (lines 2 times as strong, one byte). Not yet tested on the
+  pinned build: sleep and wake.
 - Done 2026-11-14: `epm2mod make` refuses a spec that changes a byte another spec covers and keeps,
   and the free-space check fails an op that code in SRAM calls into. Still open: correct
   `docs/space-candidates.tsv` row 10 (0x7E50A201 and 0x7E53A55C are the sleep routine) and the entry
