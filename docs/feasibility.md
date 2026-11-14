@@ -46,7 +46,7 @@ routines. This file records what the measurements show, so that nobody repeats t
 | Processor | Two MN103 cores, uITRON; hardware face detector; GPU | Verified from the firmware |
 | RAM | 512 MiB | Inferred from address use |
 | Accelerometer | 3-axis, with a driver task and a roll/pitch interface | Verified |
-| Code space proven on the camera | 320 bytes | Verified |
+| Code space proven on the camera | 320 bytes, and since 2026-11-14 the area at 0x7EBF1F00 (the first area that had only passed the static checks: code ran there at the first attempt) | Verified |
 | Code space that passes every static check | 17,578 bytes, never executed | Verified by scan; needs a camera probe |
 | More candidates | 7.2 KB dead 3D helpers; 124 KB debug handlers; 579 KB 3D and slideshow stack; 1.59 MB of the main block that is never loaded | Static only |
 | Data space | Blank tails in blocks 1, 2 and 3: 11.1 MB, 130 KB, 677 KB (flash only) | Verified bytes; updater behaviour unknown |
@@ -78,6 +78,7 @@ routines. This file records what the measurements show, so that nobody repeats t
 **High effort: port or write**
 
 - Focus peaking, from the E-P5 (same processor generation; an art-engine live-view effect there).
+  In work since 2026-11-14: `experiments/2026-11-14-focus-peaking/NOTES.md`.
 - Zero-second anti-shock (electronic first curtain).
 - Colour grain, halation.
 - A custom editor screen.

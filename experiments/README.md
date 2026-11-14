@@ -6,3 +6,5 @@ Ad-hoc work lives here, one folder per experiment: `YYYY-MM-DD-short-slug/`.
 - Scripts are committed. Outputs go in `out/`, which is git-ignored.
 - When something proves out, promote it: code to `tools/`, mods to `patches/`, facts to `docs/`.
 - Commit with `exp(<slug>): ...`.
+- A draft patch spec stays in the experiment's `specs/` folder. When a build is offered for a
+  camera test, the spec is copied to `patches/` and gets a build description in `builds/`.

@@ -9,7 +9,7 @@ Repository containing the current work for creating a custom firmware mod for th
 | **Film looks** | Seven film emulations as art filters, for stills and live view | Tested on the camera |
 | **Interval shooting** | The Time Lapse Settings menu of the E-PL6: 1 to 240 frames, start delay, interval, optional time-lapse movie | Tested on the camera, with the time-lapse movie, to 125 frames. Long intervals are not yet reported |
 | **Level gauge** | Two tilt bars in live view, as on the E-PL6 | Tested on the camera |
-| Focus peaking | Research and a first build | Not yet tested. See `experiments/2026-11-14-focus-peaking/` |
+| Focus peaking | Light edge lines in live view while MF Assist runs | In work. The first build showed lines in Key Line only and was slow in other modes. A second build is not yet tested. See `experiments/2026-11-14-focus-peaking/` |
 | Video quality and recording limit | Research and patch specs | Not built. See `experiments/2026-11-12-hardware/` |
 
 See below for an example of the film looks:
