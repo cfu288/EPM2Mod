@@ -37,7 +37,7 @@ routines. This file records what the measurements show, so that nobody repeats t
 | No 3D lookup table; the hue stage has six axes | Image processor | Firmware search; measured stages |
 | A look is a set of ROM tables chosen by art-filter number | Firmware design | Read from the firmware. Tables at a RAM address are **untested**, not impossible |
 | 128 rows in one menu list | Firmware | Camera-tested |
-| The emulator shows no picture and no screen yet | Tooling | Since 2026-11-14: `tools/emu` runs whole call chains with real initial memory (scenario tests), and a local om-emu copy boots the stock firmware from reset to the application. Screen and menus are in work |
+| The emulator shows no camera picture | Tooling | It has no image processor, no sensor and no mechanism. Since 2026-11-14 it does boot the firmware from reset and draws the shooting screens and the whole menu system, with keys, saved settings and an SD card (see "The emulator" below) |
 
 ## What the body has
 
@@ -110,6 +110,31 @@ showed a crash at start-up before anyone flashed it. On the camera that is a boo
 also break the update path, which is the only way back.
 
 Check every build that adds a hook with the boot test of the emulator before a flash.
+
+## The emulator (since 2026-11-14)
+
+A local copy of om-emu boots the E-PM2 firmware, stock or patched, from its reset vector on both
+cores. om-emu has no licence, so the copy, our changes to it and all screenshots stay outside this
+repository, in `~/opt/om-emu-e101-boot` and `~/opt/om-emu-e101-boot-work/` (start with `NOTES.md`
+there). Upstream lists this camera generation as "no work planned"; the port took one day of agent
+work.
+
+| Check | Command (in the work folder, after `. ./env.sh`) | What it proves |
+|---|---|---|
+| Boot test | `BLOCKS=<unpacked image> $NODE stage2-boot.mjs 2000` | The image starts like stock: loader copies, both kernels, all tasks, the application. It caught a build that would have crashed at every start |
+| Menu walk | `./demo.sh stock` or `./demo.sh pinned` | The firmware's own menus, drawn by its own code, in English, as PNG files |
+| Screenshot comparison | `./shotdiff.sh stock pinned OUTDIR STEP...` | Which screens a patch changes |
+| Card | `./demo.sh card` | A FAT card from a host folder mounts; the stock file routines work |
+
+In this repository, `tools/emu/` has the scenario tests (whole call chains with real initial memory)
+and `tools/emu/hookcheck.py` (the load-order check).
+
+Trust it for: start-up, menus, lists, labels, the INFO screens, settings, card mount. Do not trust it
+for: live view, the picture, capture, movies, timing, anything the mechanism or the sensor does. A
+pass is evidence, not proof.
+
+**Use it before every flash that changes a hook or a menu.** It also gives exact menu paths and
+screen texts for the test instructions.
 
 ## Order of work
 

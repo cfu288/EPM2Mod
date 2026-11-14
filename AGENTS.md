@@ -51,7 +51,8 @@ and remove an item when it is done.
    `experiments/` is research code and may be rough. See [docs/conventions.md](docs/conventions.md).
 12. **Before you offer a build that adds or moves a hook, check where its code is loaded.** A hook
     in the kernel or in segment 1 must jump only to code in the kernel or segment 1 (see
-    `docs/feasibility.md`). Run the emulator's boot test on the build. A build that can crash at
+    `docs/feasibility.md`). Run `tools/emu/hookcheck.py` and the emulator's boot test on the build,
+    and for a menu change the emulator's menu walk (`docs/feasibility.md`, "The emulator"). A build that can crash at
     start-up is the one kind of failure with no known way back.
 13. **Commit and push your work.** After a commit, push to `origin main` without asking the owner.
     Do not force-push and do not rewrite history unless the owner tells you to.

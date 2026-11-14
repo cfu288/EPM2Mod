@@ -55,8 +55,14 @@ and delete the item here.
   so the hooked function does not run before segment 2 is loaded. Prove that from the code, or move
   the routine into segment 1.
 - Make the load-order check and the emulator's boot test a step of `epm2mod make` for a candidate.
-- The emulator boots the stock firmware to the application (work outside the repository, in
-  `~/opt/om-emu-e101-boot-work/`). In work: the shooting screen, key presses and menus.
+- Emulator (outside the repository, `~/opt/om-emu-e101-boot-work/`), open points:
+  - In the emulator the row Time Lapse Settings is grey and cannot be entered, like Bracketing and
+    Multiple Exposure beside it. Find the condition (the mode, or a stand-in). On the camera the
+    row works.
+  - Power-off does not finish. Half-press and full press are not tried. A real JPEG in playback is
+    not tried.
+  - The background pictures of the menus are in a flash area that is not in the update file, so
+    they are grey.
 
 - The probes in [feasibility.md](feasibility.md), section "Unknowns": a file write for a log
   channel, a file read, tables at a RAM address, a longer load range.
