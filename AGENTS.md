@@ -1,7 +1,7 @@
 # Working rules for AI agents on this repository
 
 These rules are for any coding agent (Claude Code, Codex, Cursor and others) and for people who
-direct one. `CLAUDE.md` only points here.
+direct one.
 
 Read [docs/feasibility.md](docs/feasibility.md) first. It lists the real limits of the camera and
 the resources the firmware has, with evidence.
