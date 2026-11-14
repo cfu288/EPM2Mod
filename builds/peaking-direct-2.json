@@ -1,5 +1,5 @@
 {
- "what": "Focus peaking, first build: white edge lines in live view while MF Assist runs, on top of the pinned build",
+ "what": "Focus peaking, second build: light edge lines in live view while MF Assist runs, on top of the pinned build",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",
@@ -11,7 +11,7 @@
   "patches/interval-timelapse-v2.json",
   "patches/interval-frames-240.json",
   "patches/level-gauge-lvinfo-row.json",
-  "patches/peaking-direct-1.json"
+  "patches/peaking-direct-2.json"
  ],
  "first_code": true
 }

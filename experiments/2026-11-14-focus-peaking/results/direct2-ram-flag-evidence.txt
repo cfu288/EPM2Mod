@@ -1,0 +1,14 @@
+image: pinned build (ten specs) + peaking-direct-2
+1. constants inside the table 0x602BE874-0x602BE908:
+   0x602BE874 (slot 0, byte 0) at 0x7EE01DE4, 0x7EE01E94
+   0x602BE878 (slot 1, byte 0) at 0x7ECB0E8B, 0x7ECB0EA2, 0x7ECB0EBA, 0x7ECB0ED1
+   0x602BE8C4 (slot 20, byte 0) at 0x7ECB0EE5, 0x7ECB0F51
+   0x602BE8C5 (slot 20, byte 1) at 0x7EBF1F52, 0x7EBF1F65, 0x7ECB0F33
+   0x602BE8C6 (slot 20, byte 2) at 0x7EBF1FA8, 0x7EBF1FC2, 0x7ECB0F7A
+   slot 20 constants: ['0x602BE8C4', '0x602BE8C5', '0x602BE8C6']; unexplained constants: none
+2. row index constants at the 24 formatter calls: [5, 34, 35]
+   switch tail 0x7EDEC437 receives rows [3, 5, 6, 7, 8, 10, 11, 12, 14, 33]
+   largest row index 35 -> slot address 0x602be900 (table 0x602BE874..0x602BE907, 37 slots; next variable 0x602BE908): IN BOUNDS
+   slot 20 is NOT indexed
+3. .data initial values: non-zero slots [3, 5, 6, 7, 10, 11, 12, 14, 33, 34, 35]; slot 20 = 0x00000000 (flash 0x7E8EED84)
+4. stock word 0x602B0DA8: constants at {'0x602B0DA8': ['0x7E96A492', '0x7E96AFDB']}

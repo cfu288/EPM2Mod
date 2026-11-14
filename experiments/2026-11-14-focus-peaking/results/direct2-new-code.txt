@@ -1,0 +1,413 @@
+Symbols
+00000000 T __bss_start
+00000000 T ___ctors
+00000000 T ___ctors_end
+00000000 T ___dtors
+00000000 T ___dtors_end
+00000000 T _edata
+00000000 T _end
+00080000 T _stack
+7e880fe4 t T_G
+7e880ff2 t .L16
+7ebf1f00 t T_E1
+7ebf1f10 t .L17
+7ebf1f15 t T_E2
+7ebf1f27 t .L18
+7ebf1f2e t T_F
+7ebf1f3d t .L19
+7ebf1f48 t .L24
+7ebf1f4d t T_ON
+7ebf1f61 t T_OFF
+7ebf1f74 t T_M
+7ebf1f8c t .L110
+7ebf1f97 t T_J
+7ebf1fb5 t .L111
+7ebf1fba t T_K
+7ebf1fcf t .L112
+7ebf1fd5 t .L25
+7ecb0ee3 t getL
+7ecb0f16 t T_A
+7ecb0f4f t .L11
+7ecb0f58 t T_B
+7ecb0f69 t .L12
+7ecb0f6b t .L21
+7ecb0f70 t T_C
+7ecb0f86 t .L22
+7ecb0f8b t .L13
+7ecb0f98 t T_D1
+7ecb0f9f t T_D2
+7ecb0fa6 t .L31
+7ecb0fc1 t .L41
+7ecb0fc4 t T_H
+7ecb0fcf t .L14
+7ecb0fd9 t T_I
+7ecb0fe8 t .L15
+7ecb0fed t .L23
+
+
+direct2.elf:     file format elf32-mn10300
+
+
+Disassembly of section .p0:
+
+7ecb0ee3 <getL>:
+7ecb0ee3:	fc a8 c4 e8 	movbu	(602be8c4 <LFLAG>),d0
+7ecb0ee7:	2b 60 
+7ecb0ee9:	a0 01       	cmp	1,d0
+7ecb0eeb:	de 00 00    	retf	[],0
+
+Disassembly of section .p1:
+
+7ecb0f16 <T_A>:
+7ecb0f16:	fc dd d0 1c 	mov	1616583888,a1
+7ecb0f1a:	5b 60 
+7ecb0f1c:	f8 11 24    	mov	d0,(36,a1)
+7ecb0f1f:	04          	clr	d1
+7ecb0f20:	f8 01 20    	mov	(32,a1),d0
+7ecb0f23:	a0 00       	cmp	0,d0
+7ecb0f25:	c9 2a       	bne	7ecb0f4f <.L1^B1>
+7ecb0f27:	fc a8 9c 03 	movbu	(605b039c <MOVST>),d0
+7ecb0f2b:	5b 60 
+7ecb0f2d:	a0 01       	cmp	1,d0
+7ecb0f2f:	c8 20       	beq	7ecb0f4f <.L1^B1>
+7ecb0f31:	fc a8 c5 e8 	movbu	(602be8c5 <RFLAG>),d0
+7ecb0f35:	2b 60 
+7ecb0f37:	a0 00       	cmp	0,d0
+7ecb0f39:	c8 16       	beq	7ecb0f4f <.L1^B1>
+7ecb0f3b:	dd e8 ef a1 	call	7e6cff23 <s_7e6cff23>,[],0
+7ecb0f3f:	ff 00 00 
+7ecb0f42:	a0 02       	cmp	2,d0
+7ecb0f44:	c8 0b       	beq	7ecb0f4f <.L1^B1>
+7ecb0f46:	a0 05       	cmp	5,d0
+7ecb0f48:	c8 07       	beq	7ecb0f4f <.L1^B1>
+7ecb0f4a:	44          	inc	d1
+7ecb0f4b:	00          	clr	d0
+7ecb0f4c:	f8 51 04    	movbu	d0,(4,a1)
+
+7ecb0f4f <.L1^B1>:
+7ecb0f4f:	fc 86 c4 e8 	movbu	d1,(602be8c4 <LFLAG>)
+7ecb0f53:	2b 60 
+7ecb0f55:	df 00 20    	ret	[],32
+
+7ecb0f58 <T_B>:
+7ecb0f58:	dd 8b ff ff 	call	7ecb0ee3 <getL>,[],0
+7ecb0f5c:	ff 00 00 
+7ecb0f5f:	c9 0c       	bne	7ecb0f6b <.L2^B1>
+7ecb0f61:	ba 00       	cmp	0,a2
+7ecb0f63:	c8 06       	beq	7ecb0f69 <.L1^B2>
+7ecb0f65:	80 77       	mov	119,d0
+7ecb0f67:	f0 52       	movbu	d0,(a2)
+
+7ecb0f69 <.L1^B2>:
+7ecb0f69:	8a 03       	mov	3,d2
+
+7ecb0f6b <.L2^B1>:
+7ecb0f6b:	88          	mov	d2,d0
+7ecb0f6c:	14          	extbu	d0
+7ecb0f6d:	df f0 14    	ret	[d2,d3,a2,a3],20
+
+7ecb0f70 <T_C>:
+7ecb0f70:	81          	mov	d0,d1
+7ecb0f71:	dd 72 ff ff 	call	7ecb0ee3 <getL>,[],0
+7ecb0f75:	ff 00 00 
+7ecb0f78:	fc 82 c6 e8 	movbu	d0,(602be8c6 <L2FLAG>)
+7ecb0f7c:	2b 60 
+7ecb0f7e:	c9 0d       	bne	7ecb0f8b <.L1^B3>
+7ecb0f80:	2c a3 00    	mov	163,d0
+7ecb0f83:	f8 92 0d    	movbu	d0,(13,sp)
+
+7ecb0f86 <.L2^B2>:
+7ecb0f86:	dc d3 51 a1 	jmp	7e6c6159 <s_7e6c6159>
+7ecb0f8a:	ff 
+
+7ecb0f8b <.L1^B3>:
+7ecb0f8b:	84          	mov	d1,d0
+7ecb0f8c:	a0 64       	cmp	100,d0
+7ecb0f8e:	c2 f8       	bge	7ecb0f86 <.L2^B2>
+7ecb0f90:	f8 92 0d    	movbu	d0,(13,sp)
+7ecb0f93:	dc c0 51 a1 	jmp	7e6c6153 <s_7e6c6153>
+7ecb0f97:	ff 
+
+7ecb0f98 <T_D1>:
+7ecb0f98:	c9 0e       	bne	7ecb0fa6 <.L3^B1>
+7ecb0f9a:	dc 01 66 a1 	jmp	7e6c759b <s_7e6c759b>
+7ecb0f9e:	ff 
+
+7ecb0f9f <T_D2>:
+7ecb0f9f:	dd 04 ce a1 	call	7e6cdda3 <s_7e6cdda3>,[d2,a2,a3],16
+7ecb0fa3:	ff b0 10 
+
+7ecb0fa6 <.L3^B1>:
+7ecb0fa6:	dd 3d ff ff 	call	7ecb0ee3 <getL>,[],0
+7ecb0faa:	ff 00 00 
+7ecb0fad:	c9 14       	bne	7ecb0fc1 <.L4^B1>
+7ecb0faf:	80 03       	mov	3,d0
+7ecb0fb1:	fc 82 cc 07 	movbu	d0,(a07507cc <EXPG+0x0>)
+7ecb0fb5:	75 a0 
+7ecb0fb7:	f0 03       	mov	(a3),a0
+7ecb0fb9:	f8 50 4f    	movbu	d0,(79,a0)
+7ecb0fbc:	80 02       	mov	2,d0
+7ecb0fbe:	f8 50 53    	movbu	d0,(83,a0)
+
+7ecb0fc1 <.L4^B1>:
+7ecb0fc1:	df f0 30    	ret	[d2,d3,a2,a3],48
+
+7ecb0fc4 <T_H>:
+7ecb0fc4:	dd 1f ff ff 	call	7ecb0ee3 <getL>,[],0
+7ecb0fc8:	ff 00 00 
+7ecb0fcb:	c9 04       	bne	7ecb0fcf <.L1^B4>
+7ecb0fcd:	8f 55       	mov	85,d3
+
+7ecb0fcf <.L1^B4>:
+7ecb0fcf:	f1 d8       	mov	a2,d0
+7ecb0fd1:	1c          	exthu	d0
+7ecb0fd2:	a0 01       	cmp	1,d0
+7ecb0fd4:	dc 99 28 a1 	jmp	7e6c386d <s_7e6c386d>
+7ecb0fd8:	ff 
+
+7ecb0fd9 <T_I>:
+7ecb0fd9:	fa c8 b8 00 	cmp	184,d0
+7ecb0fdd:	c8 0b       	beq	7ecb0fe8 <.L1^B5>
+7ecb0fdf:	dd 04 ff ff 	call	7ecb0ee3 <getL>,[],0
+7ecb0fe3:	ff 00 00 
+7ecb0fe6:	c9 07       	bne	7ecb0fed <.L2^B3>
+
+7ecb0fe8 <.L1^B5>:
+7ecb0fe8:	dc 55 9f a2 	jmp	7e6daf3d <s_7e6daf3d>
+7ecb0fec:	ff 
+
+7ecb0fed <.L2^B3>:
+7ecb0fed:	dc 6a 9f a2 	jmp	7e6daf57 <s_7e6daf57>
+7ecb0ff1:	ff 
+
+Disassembly of section .p2:
+
+7e880fe4 <T_G>:
+7e880fe4:	dd ff fe 42 	call	7ecb0ee3 <getL>,[],0
+7e880fe8:	00 00 00 
+7e880feb:	c9 07       	bne	7e880ff2 <.L1^B6>
+7e880fed:	dc c7 ba e4 	jmp	7e6ccab4 <s_7e6ccab4>
+7e880ff1:	ff 
+
+7e880ff2 <.L1^B6>:
+7e880ff2:	dd 31 ef e4 	call	7e6cff23 <s_7e6cff23>,[],0
+7e880ff6:	ff 00 00 
+7e880ff9:	dc 8d ba e4 	jmp	7e6cca86 <s_7e6cca86>
+7e880ffd:	ff 
+
+Disassembly of section .u:
+
+7ebf1f00 <T_E1>:
+7ebf1f00:	dd e3 ef 0b 	call	7ecb0ee3 <getL>,[],0
+7ebf1f04:	00 00 00 
+7ebf1f07:	c8 09       	beq	7ebf1f10 <.L1^B7>
+7ebf1f09:	f8 41 4f    	movbu	(79,a1),d0
+7ebf1f0c:	fa c8 a3 00 	cmp	163,d0
+
+7ebf1f10 <.L1^B7>:
+7ebf1f10:	dc c6 ba ad 	jmp	7e6cd9d6 <s_7e6cd9d6>
+7ebf1f14:	ff 
+
+7ebf1f15 <T_E2>:
+7ebf1f15:	f8 53 59    	movbu	d0,(89,a3)
+7ebf1f18:	dd cb ef 0b 	call	7ecb0ee3 <getL>,[],0
+7ebf1f1c:	00 00 00 
+7ebf1f1f:	c9 08       	bne	7ebf1f27 <.L1^B8>
+7ebf1f21:	2c a3 00    	mov	163,d0
+7ebf1f24:	f8 53 4f    	movbu	d0,(79,a3)
+
+7ebf1f27 <.L1^B8>:
+7ebf1f27:	80 03       	mov	3,d0
+7ebf1f29:	dc a2 bb ad 	jmp	7e6cdacb <s_7e6cdacb>
+7ebf1f2d:	ff 
+
+7ebf1f2e <T_F>:
+7ebf1f2e:	dd b5 ef 0b 	call	7ecb0ee3 <getL>,[],0
+7ebf1f32:	00 00 00 
+7ebf1f35:	c9 08       	bne	7ebf1f3d <.L1^B9>
+7ebf1f37:	00          	clr	d0
+7ebf1f38:	dc 61 af ad 	jmp	7e6cce99 <s_7e6cce99>
+7ebf1f3c:	ff 
+
+7ebf1f3d <.L1^B9>:
+7ebf1f3d:	58 10       	mov	(16,sp),d0
+7ebf1f3f:	a0 04       	cmp	4,d0
+7ebf1f41:	c8 07       	beq	7ebf1f48 <.L2^B4>
+7ebf1f43:	dc 3b af ad 	jmp	7e6cce7e <s_7e6cce7e>
+7ebf1f47:	ff 
+
+7ebf1f48 <.L2^B4>:
+7ebf1f48:	dc 2b af ad 	jmp	7e6cce73 <s_7e6cce73>
+7ebf1f4c:	ff 
+
+7ebf1f4d <T_ON>:
+7ebf1f4d:	92          	mov	a0,a2
+7ebf1f4e:	80 01       	mov	1,d0
+7ebf1f50:	fc 82 c5 e8 	movbu	d0,(602be8c5 <RFLAG>)
+7ebf1f54:	2b 60 
+7ebf1f56:	fc cc 5c a8 	mov	2127079516,d0
+7ebf1f5a:	c8 7e 
+7ebf1f5c:	dc 17 b5 f8 	jmp	7eb7d473 <s_7eb7d473>
+7ebf1f60:	ff 
+
+7ebf1f61 <T_OFF>:
+7ebf1f61:	92          	mov	a0,a2
+7ebf1f62:	00          	clr	d0
+7ebf1f63:	fc 82 c5 e8 	movbu	d0,(602be8c5 <RFLAG>)
+7ebf1f67:	2b 60 
+7ebf1f69:	fc cc 38 a8 	mov	2127079480,d0
+7ebf1f6d:	c8 7e 
+7ebf1f6f:	dc d3 b4 f8 	jmp	7eb7d442 <s_7eb7d442>
+7ebf1f73:	ff 
+
+7ebf1f74 <T_M>:
+7ebf1f74:	81          	mov	d0,d1
+7ebf1f75:	dd 6e ef 0b 	call	7ecb0ee3 <getL>,[],0
+7ebf1f79:	00 00 00 
+7ebf1f7c:	c9 10       	bne	7ebf1f8c <.L1^B10>
+7ebf1f7e:	fc a4 d0 03 	mov	(605b03d0 <MOVSM>),d0
+7ebf1f82:	5b 60 
+7ebf1f84:	28 ff       	add	-1,d0
+7ebf1f86:	a0 02       	cmp	2,d0
+7ebf1f88:	c5 04       	bhi	7ebf1f8c <.L1^B10>
+7ebf1f8a:	85 01       	mov	1,d1
+
+7ebf1f8c <.L1^B10>:
+7ebf1f8c:	84          	mov	d1,d0
+7ebf1f8d:	dd d3 6c 98 	call	7e578c60 <s_7e578c60>,[d2,d3],24
+7ebf1f91:	ff c0 18 
+7ebf1f94:	df f0 20    	ret	[d2,d3,a2,a3],32
+
+7ebf1f97 <T_J>:
+7ebf1f97:	f0 02       	mov	(a2),a0
+7ebf1f99:	80 02       	mov	2,d0
+7ebf1f9b:	f8 50 5a    	movbu	d0,(90,a0)
+7ebf1f9e:	5d 20       	mov	(32,sp),a1
+7ebf1fa0:	f0 61       	movhu	(a1),d0
+7ebf1fa2:	a0 02       	cmp	2,d0
+7ebf1fa4:	c9 11       	bne	7ebf1fb5 <.L1^B11>
+7ebf1fa6:	fc a8 c6 e8 	movbu	(602be8c6 <L2FLAG>),d0
+7ebf1faa:	2b 60 
+7ebf1fac:	a0 01       	cmp	1,d0
+7ebf1fae:	c9 07       	bne	7ebf1fb5 <.L1^B11>
+7ebf1fb0:	80 03       	mov	3,d0
+7ebf1fb2:	f8 50 4f    	movbu	d0,(79,a0)
+
+7ebf1fb5 <.L1^B11>:
+7ebf1fb5:	dc 73 44 b3 	jmp	7e726428 <s_7e726428>
+7ebf1fb9:	ff 
+
+7ebf1fba <T_K>:
+7ebf1fba:	f0 62       	movhu	(a2),d0
+7ebf1fbc:	a0 02       	cmp	2,d0
+7ebf1fbe:	c9 11       	bne	7ebf1fcf <.L1^B12>
+7ebf1fc0:	fc a8 c6 e8 	movbu	(602be8c6 <L2FLAG>),d0
+7ebf1fc4:	2b 60 
+7ebf1fc6:	a0 01       	cmp	1,d0
+7ebf1fc8:	c9 07       	bne	7ebf1fcf <.L1^B12>
+7ebf1fca:	2c 00 01    	mov	256,d0
+7ebf1fcd:	ca 08       	bra	7ebf1fd5 <.L2^B5>
+
+7ebf1fcf <.L1^B12>:
+7ebf1fcf:	fc cc 00 ff 	mov	65280,d0
+7ebf1fd3:	00 00 
+
+7ebf1fd5 <.L2^B5>:
+7ebf1fd5:	dc 98 47 b3 	jmp	7e72676d <s_7e72676d>
+7ebf1fd9:	ff 
+ .hA:
+
+7e6ecf91 <.hA>:
+7e6ecf91:	dc 85 3f 5c 	jmp	7ecb0f16 <T_A>
+7e6ecf95:	00 
+7e6ecf96:	cb          	nop	
+ .hB:
+
+7e6cc14e <.hB>:
+7e6cc14e:	dc 0a 4e 5e 	jmp	7ecb0f58 <T_B>
+7e6cc152:	00 
+ .hC:
+
+7e6c614c <.hC>:
+7e6c614c:	dc 24 ae 5e 	jmp	7ecb0f70 <T_C>
+7e6c6150:	00 
+7e6c6151:	cb          	nop	
+7e6c6152:	cb          	nop	
+ .hD1:
+
+7e6c7596 <.hD1>:
+7e6c7596:	dc 02 9a 5e 	jmp	7ecb0f98 <T_D1>
+7e6c759a:	00 
+ .hD2:
+
+7e6c764e <.hD2>:
+7e6c764e:	dc 51 99 5e 	jmp	7ecb0f9f <T_D2>
+7e6c7652:	00 
+ .hE1:
+
+7e6cd9cf <.hE1>:
+7e6cd9cf:	dc 31 45 52 	jmp	7ebf1f00 <T_E1>
+7e6cd9d3:	00 
+7e6cd9d4:	cb          	nop	
+7e6cd9d5:	cb          	nop	
+ .hE2:
+
+7e6cdac6 <.hE2>:
+7e6cdac6:	dc 4f 44 52 	jmp	7ebf1f15 <T_E2>
+7e6cdaca:	00 
+ .hG:
+
+7e6cca81 <.hG>:
+7e6cca81:	dc 63 45 1b 	jmp	7e880fe4 <T_G>
+7e6cca85:	00 
+ .hH:
+
+7e6c3868 <.hH>:
+7e6c3868:	dc 5c d7 5e 	jmp	7ecb0fc4 <T_H>
+7e6c386c:	00 
+ .hI:
+
+7e6daf37 <.hI>:
+7e6daf37:	dc a2 60 5d 	jmp	7ecb0fd9 <T_I>
+7e6daf3b:	00 
+7e6daf3c:	cb          	nop	
+ .hF:
+
+7e6cce6d <.hF>:
+7e6cce6d:	dc c1 50 52 	jmp	7ebf1f2e <T_F>
+7e6cce71:	00 
+7e6cce72:	cb          	nop	
+ .hJ:
+
+7e726421 <.hJ>:
+7e726421:	dc 76 bb 4c 	jmp	7ebf1f97 <T_J>
+7e726425:	00 
+7e726426:	cb          	nop	
+7e726427:	cb          	nop	
+ .hK:
+
+7e726767 <.hK>:
+7e726767:	dc 53 b8 4c 	jmp	7ebf1fba <T_K>
+7e72676b:	00 
+7e72676c:	cb          	nop	
+ .hON:
+
+7eb7d46c <.hON>:
+7eb7d46c:	dc e1 4a 07 	jmp	7ebf1f4d <T_ON>
+7eb7d470:	00 
+7eb7d471:	cb          	nop	
+7eb7d472:	cb          	nop	
+ .hOFF:
+
+7eb7d43b <.hOFF>:
+7eb7d43b:	dc 26 4b 07 	jmp	7ebf1f61 <T_OFF>
+7eb7d43f:	00 
+7eb7d440:	cb          	nop	
+7eb7d441:	cb          	nop	
+ .hM:
+
+7e7149b6 <.hM>:
+7e7149b6:	dc be d5 4d 	jmp	7ebf1f74 <T_M>
+7e7149ba:	00 
+7e7149bb:	cb          	nop	
+7e7149bc:	cb          	nop	

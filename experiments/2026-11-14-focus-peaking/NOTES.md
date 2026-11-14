@@ -498,3 +498,247 @@ with `ucExpose` 3; the frame rate.
 | `scripts/emu_direct.py` | emulator check: `emu_direct.py BASE_BLOCK0 PATCHED_BLOCK0 NAME` (blocks from `tools/emu/patchblock.py … -o /tmp/scratch/x.block0.bin`) |
 | `scripts/hooksites.py`, `scripts/ramflag_check.py` | hook listing before and after; RAM evidence |
 | `results/direct-*.txt`, `results/emu-direct-*.txt`, `results/ram-flag-evidence.txt` | outputs |
+
+## 12. Camera result of direct-1, diagnosis, direct-2
+
+Date: 2026-11-14. Status: `specs/peaking-direct-2.json` is a draft. Emulator-checked. Not flashed.
+Labels: **V** verified (read from the bytes or run in the emulator), **I** inferred, **U** unknown.
+
+### 12.1 What the camera did with direct-1 (owner's report)
+
+| Observation | Source |
+|---|---|
+| Normal shooting without manual focus works | owner |
+| ART Key Line live view works, so code runs from 0x7EBF1F00 | owner |
+| ART Key Line with the focus ring turned: "key line in this mode has sharper edges around the focus peaking areas" | owner |
+| Natural with the ring turned: long delay; the magnified view showed only when the ring stopped; no lines seen | owner |
+| Two crashes while flipping quickly through the filters in the menu, a different filter each time | owner |
+| The pinned build (reflashed for comparison) does not crash on fast flipping, and both filter switching and MF Assist are instant there | owner |
+
+So the delay and the crashes are caused by direct-1. The older camera-log rows about an occasional restart
+(2026-11-12) are all at the moment RAW Data Edit saves a file. None is about live view or the filter menu (**V**,
+`docs/camera-log.md`). They are a different matter.
+
+### 12.2 Part A: why Natural was slow and showed no lines
+
+**How the mov layer follows a mode change (V).** The mov task loop 0x7E6C33B5 runs one pass per frame event.
+Each pass calls the struct refresh 0x7E6ECCAF (it reads the settings again, and direct-1's latch is at its end),
+then the state function. In live view that is 0x7E6C48D0 → `mov_image_process` 0x7E6C6853. This function calls
+the expose setter 0x7E6C610B **in every frame**. So a new art code needs no live-view command and no restart:
+the setter sees that the code differs from the last one (0xA07507C9), frees the old work buffers
+(0x7E6C619C–0x7E6C61E3) and tells the art side (0x7E6C6498 → 0x7E6CD1F2 "mov_art_exec_init"). The mov commands
+"Through End / Start / ReStart" (1, 2, 3 at 0x7E6C3A0B) are not involved. The E-P5 functions are the same
+(0x7E3A2BC6, 0x7E3A243B; `fdiff.py` shows no peaking branch in this part).
+
+**The cause (V for the code, I that it is what the camera did).** The art path needs work buffers from the
+"image work" heap: 4,147,200 bytes for the art picture (0x7E6C6532), 2 × 614,400 bytes (0x7E6D4B22) and the Key
+Line line buffers (0x7E6CD4B7). Before each of these allocations the code asks 0x7E6CADD8 → 0x7E578D23 whether
+the heap is in **mode 1**. The heap mode is chosen by 0x7E714833. That function does not use the hooked getter.
+It reads the **settings** itself (picture mode 38017, and nine more) and picks:
+
+| Settings | Heap mode |
+|---|---|
+| picture mode of art class 2 or higher (0x7E70DBDE), or setting 25089 or 53649 set, or setting 34241 = 115 / 155 | 1 |
+| otherwise, by ISO-type limits | 0 or 2 |
+
+In Natural (and in every art entry of class 0 or 1) the mode is 0 or 2. Then, in every frame while L is 1:
+`0x7E6CADD8` returns "busy" → `0x7E6CADFE` frees every art buffer and sets 0x605B0609 → the text
+"[mov]art_buff alloc error!" → `mov_image_process` returns 1 without a picture → the next frame does the same.
+Live view stands still until L is 0 again. In direct-1 L went to 0 at the **entry** of `endMfAssist`, before the
+zoom-off update. That is why the magnified view "popped in" for a moment only when the ring had stopped, and why no
+lines were seen. In ART Key Line the heap is in mode 1 already and the buffers exist, so nothing fails there. This
+matches all three observations.
+
+**How often is `startMfAssist` called (V)?** `OlyHfwOpeShoot::startMfAssist` 0x7E9889EB has one caller, the API
+wrapper 0x7E9CB7CD (API 0x20131). The GUI calls it from two event handlers (0x7ECE362D, 0x7ECE36A3), once per
+focus-ring event (**I**: the handlers have no timer of their own). Each call sets the word 0x602B0DA8 to 1 before
+it sends the request (0x7E988AE7) and puts the old value back if the request fails with 0xF0000001 or 0xF0000058
+(0x7E988B33). The state object `CmpSts_MfAssist` then does the real work once: in state Off it runs
+"go MFAssist" and `updateThrough(true,false)` (0x7EB7DC93); in state On it only answers
+(`rcvStartMFAssistIn_MFAssistOn` 0x7EB7DE46). So the hypothesis "each ring pulse restarts the pipeline" is
+**not** what the code does: the repeated calls are harmless in the stock design. The word is cleared by
+`endMfAssist` and by the two internal "ZoomOff" handlers (0x7EB7DEB9, 0x7EB7DFB9).
+
+Two weaknesses of direct-1's trigger remain (**V**): (1) R and the word are set at the entry of the call, before
+the zoom request is accepted, and a failed first request puts the word back to 0: L can flip 1 → 0 within one
+call. (2) R is cleared only by `endMfAssist`. When MF Assist ends by an internal ZoomOff (capture, movie start,
+`stopMfAssist` 0x7EA983C2) R stays 1.
+
+**How the E-P5 avoids the stall (V).** It does not avoid the art switch. It makes the heap ready:
+
+| Piece | E-P5 | E-PM2 |
+|---|---|---|
+| Heap check before an art allocation | 0x7E23E082: any mode other than 0 passes (`cmp 0,d1 / beq`) | 0x7E578D23: only mode 1 passes (`cmp 1,d1 / bne`) |
+| Heap mode chooser | 0x7E3F41DD reads four more settings than the E-PM2 one (58161, 58209, 58065, 17665). Setting 58065 set → mode 1; one of the other three set → mode 2 | 0x7E714833 |
+| Request | arrives in the same live-view update as the zoom (record +136), so the art code and the live-view kind change in one frame | direct-1: before the zoom at the start, before the zoom-off at the end |
+
+So on the E-P5 the heap mode follows a setting and is in an art-capable mode before the lines are asked for
+(**V** for the code; that 58065 is the peaking setting is **I**). `startPeaking` / `stopPeaking` /
+`setPeakingInfo` only set and clear "restriction" bits (info 240) and then ask for a live-view update
+(virtual call +268); they do not start or stop anything in the mov layer (**V**).
+
+**Options, cheapest first:**
+
+| Option | Verdict |
+|---|---|
+| (a) Debounce at the trigger | Needed, but not enough: the stall is the heap mode, not the repeated calls. Done in direct-2 by taking R from the state object (set in `entryMfAssistOn`, cleared in `entryMfAssistOff`). A second start while On does not enter the state again, and setting R twice changes nothing |
+| (b) Keep the line path armed whenever the AF mode is MF | Not chosen. It costs Key Line's frame rate all the time in MF mode and needs a new read of the AF-mode setting |
+| (c) Switch only the overlay pass | Not possible alone: the line job needs the same buffers |
+| (d) Port the E-P5 way: heap mode follows the request | **Chosen**, in the small form: one hook at the end of the chooser. Mode 1 while L is 1 and live view runs |
+
+With hook M the switch Natural → lines takes the stock route of a Picture Mode change from Natural to an art
+filter in P mode (the manual: "When [Picture Mode] is set to [ART] …"): the setter sees the new code, the
+notifier calls 0x7E6CD1F2, this calls the chooser (0x7E6CD342), the heap goes to mode 1, the allocation in the
+same frame passes. Back to Natural: the setter frees the buffers first, then the chooser returns the stock mode.
+
+### 12.3 Part B: the crashes
+
+**(1) The three flag bytes in slot 20 of the table 0x602BE874: not the cause (V, static).** The table is read
+only. The two formatters 0x7EE01DDA and 0x7EE01E8C compute `base + 4 × row` and load a pointer; they never store.
+A scan of block 0 for every `call` to them (both encodings) finds 25 sites, the same 24 + 1 that
+`fmtindex.py` lists, each with a constant row; 20 is not among them. No pointer word to either formatter exists.
+No 4-byte constant in any of the address aliases points into the table except its base. The word before the table
+(0x602BE870) is a scalar (0x7EE01F5D, 0x7EE0203D). `results/direct2-ram-flag-evidence.txt`.
+
+**(2) Hook safety table (V).** "Target inside" = a branch of the function map or of the linear sweep, or a 4-byte
+word anywhere in block 0 (jump tables), that points into the replaced bytes after the first one. All hooked
+functions return with `ret`, none with `retf` (the helper `getL` is called with `call`, which changes MDR).
+
+| Hook | Site, bytes replaced | Target inside | Live after the site | What the routine keeps | Verdict |
+|---|---|---|---|---|---|
+| A | 0x7E6ECF91, 6: `mov d0,(0x605B1CF4)` | none | nothing (the `ret` follows; no caller uses d0) | the store | ok |
+| B | 0x7E6CC14E, 5: `mov d2,d0 / extbu d0 / ret` | none (the jump table of the function has no entry here) | d0 as result | d0 | ok |
+| C | 0x7E6C614C, 7: `cmp 100,d0 / bge / movbu d0,(13,sp)` | none | d0 at 0x7E6C6153; flags are set again at 0x7E6C615C; d1 is loaded again before use | d0, both branch outcomes | ok |
+| D1 | 0x7E6C7596, 5: `beq / ret` | none | flags of the instruction before (the `jmp` keeps them) | both outcomes | ok |
+| D2 | 0x7E6C764E, 5: `call 0x7E6CDDA3` | none | nothing (the callers ignore d0) | the call | ok |
+| E1 | 0x7E6CD9CF, 7: `movbu (79,a1),d0 / cmp 163,d0` | none | Z flag for the `beq` at 0x7E6CD9D6, d0, a1 | all three when L is not 1 | ok |
+| E2 | 0x7E6CDAC6, 5: `movbu d0,(89,a3) / mov 3,d0` | none | d0 = 3, a3 | both | ok |
+| G | 0x7E6CCA81, 5: `call 0x7E6CFF23` | none | d0 (result) | the call | ok |
+| H | 0x7E6C3868, 5: `mov a2,d0 / exthu d0 / cmp 1,d0` | none | flags for `bne` at 0x7E6C386D, d0, d3 | all | ok |
+| I | 0x7E6DAF37, 6: `cmp 184,d0 / bne` | none | none (d0 is loaded again at both targets) | both outcomes | ok |
+| F | 0x7E6CCE6D, 6: `mov (16,sp),d0 / cmp 4,d0 / bne` | none | none at the targets | both outcomes | ok |
+| J | 0x7E726421, 7: `mov (a2),a0 / mov 2,d0 / movbu d0,(90,a0)` | none | none (a0, a1, d0 are loaded again from 0x7E726428 on) | the store; a1 and d0 are changed but dead | ok |
+| K | 0x7E726767, 6: `mov 65280,d0` | none | d0 | d0; reads `(a2)`, which is the packet pointer on every path | ok |
+| S | 0x7E9889EB, 7: `mov a0,a2 / mov imm,d0` | none | a2, d0 | both | ok |
+| N | 0x7E9830E0, 6: `mov imm,d0` | none | d0 | d0 | ok |
+
+No row is violated. Together with the emulator result (flag clear = stock in 1,339 rows) this says: **with L and
+L2 not 1 the build behaves as the pinned build. The crashes need L = 1.**
+
+**(3) Ranked causes (I).**
+
+1. **L = 1 while the heap is not in mode 1** (§12.2). In a plain mode this is the loop "allocation refused →
+   free everything → error" in every frame, with the hooks E1/E2/F still asking for the line job. In ART mode it
+   is worse when the filter changes while MF Assist is on: the forced art code stays 163, so the setter sees no
+   change and frees nothing, but the chooser reads the new filter from the settings and, for a filter of class 0
+   or 1 (the film entries are of this kind), re-partitions the heap (0x7E578C60 → 0x7E5789ED) under the Key Line
+   buffers that the art task is using. Flipping quickly through the filters shortly after the ring was turned
+   gives exactly this. A different filter each time fits: the crash is in the step, not in one filter.
+2. **R left at 1 after an internal ZoomOff**, which lengthens the time in which cause 1 can happen (L then follows
+   the word alone).
+3. A cause with the flags clear that the table above and the emulator both miss. No evidence for it.
+
+direct-2 removes 1 and 2. **What the camera will tell:** if fast flipping still crashes in a session in which the
+focus ring was never turned since power-on, cause 3 exists, and the next step is to halve the op list (first the
+two art-task hooks J and K, the only hooks that run on the filter path of another task).
+
+**Does a direct-1 hook run on every filter change (V)?** Yes, all of the mov hooks run in every live-view frame
+(latch, getter, setter, job setup, frame time, `ucType`; the art-packet hooks and E1/E2 in every frame of an art
+filter). With L clear each one costs `getL` (3 instructions) and gives the stock values, so they do not make a
+filter change heavier. They cannot be entered twice: all are in the mov task except J and K (art task), and R is
+written by the task that runs the MF Assist state object. Each flag is one byte.
+
+### 12.4 Part C: what "focus peaking worked on Key Line" was
+
+With direct-1 in ART Key Line and the ring turned, L becomes 1 and (**V**, from the hooks):
+- the art code does not change (it is 163 already), so nothing is re-allocated and the view magnifies at once;
+- the picture below the lines is rendered as a plain picture (`ucExpose` 3, `ucColor` 2) in place of Key Line's
+  flat poster colours (job setup hook and pass 7);
+- pass 9 adds the line image in place of subtracting it: **light lines** on edges in place of dark outlines;
+- the line job also runs in the magnified view (stock Key Line shows no effect there).
+
+So the owner saw the feature itself, on the one mode in which the heap was ready. Question to ask: "In Key Line,
+while you turned the ring: was the view magnified, did the dark outlines turn into light lines, and did the flat
+colours turn into a normal picture?"
+
+### 12.5 direct-2: what changes
+
+| Change | Op | Bytes |
+|---|---|---|
+| New hook **M** at 0x7E7149B6 (7 bytes, the last call of the heap chooser) → `T_M`: when L = 1 and the mov state number 0x605B03D0 is 1, 2 or 3 (live view starting or running), the mode passed to 0x7E578C60 is 1. Otherwise the stock value. State 0 (after "Through End", so capture and playback) and the movie states keep stock | new | 35 B of code |
+| R comes from the state object: hook **ON** at 0x7EB7D46C (`entryMfAssistOn`, 7 bytes) sets R = 1, hook **OFF** at 0x7EB7D43B (`entryMfAssistOff`, 7 bytes) sets R = 0. `entryMfAssistOff` also runs when the object is created, so R cannot stay 1 | replace S, N | 2 × 20 B |
+| The hooks at `startMfAssist` 0x7E9889EB and `endMfAssist` 0x7E9830E0 are gone (stock bytes) | removed | – |
+| The latch no longer reads the word 0x602B0DA8: L = R and not movie and live-view kind not 2 and not 5 | T_A | −10 B |
+| Everything else (B, C, D1, D2, E1, E2, G, H, I, F, J, K, `getL`) is byte for byte direct-1's code at shifted addresses | – | – |
+
+Sum: 475 bytes of new code (11 + 220 + 26 + 218), 16 hooks, the same four areas, the same three RAM bytes.
+The generator now also refuses a hook when a 4-byte word anywhere in block 0 or a branch of the linear sweep
+points into the replaced bytes.
+
+Through End (0x7E6C4ADD) frees every art buffer and clears the last art code (**V**), so the heap is empty
+before the stock chooser picks the mode for a capture.
+
+### 12.6 Checks
+
+| Check | Result |
+|---|---|
+| `uv run epm2mod apply specs/peaking-direct-2.json -o /tmp/scratch/a.BIN` | applies on stock, 542 bytes differ, sha256 `8f219f0584c0f05bd3fb5186ba1e8085cfac0dabb5dd7776dfa94e433da0072a` |
+| the same after the ten pinned specs (`builds/seven-films-6-interval-240-level.json`) | applies, sha256 `b5493233ab4bef63fe5ca8f9a230e7f31a843221710ba9432f59da1be8929d78` (the ten alone give the pinned `3e7f793e…`) |
+| `python3 tools/freespace.py check` (ten + this) `--first-code` | as the tool is today: 18 PASS, **4 FAIL**, all four "overlaps ledgered spec patches/peaking-direct-1.json". direct-2 reuses direct-1's bytes, and `patches/peaking-direct-1.json` still counts as a current spec. With direct-1 listed as superseded (scratch copy of `docs/space-superseded.tsv`, the file itself was not changed): **22 PASS, 0 FAIL**; ops 0–2 USABLE-CODE, op 3 accepted by `--first-code` (the ledger does not know yet that code ran at 0x7EBF1F00). `results/direct2-freespace-check.txt` |
+| objdump | `results/direct2-new-code.txt`, `results/direct2-hook-sites.txt` (16 sites, before and after) |
+| emulator `scripts/emu_direct2.py`, stock pair and pinned pair | PASS on both, 14 cases, 1,531 rows. Flag clear: patched = base in every row. Flag set: the model's values. ON: R = 1 from R = 0, 1 and 0xEE with the same registers as the base and L, L2 untouched (a second start while set changes nothing). OFF: R = 0. A: the word 0x602B0DA8 has no effect. M (whole chooser, 192 rows): base modes 0, 1 and 2 all occur; flag set and state 1–3 → mode 1; every other row → the base's mode. `results/emu-direct2-*.txt` |
+| `build/blocks/` | unchanged (patched blocks were written to scratch with `tools/emu/patchblock.py`) |
+
+Before a build: move or list `patches/peaking-direct-1.json` as superseded (main session; `patches/` and `docs/`
+were not touched here), copy the spec to `patches/`, and use the ten pinned specs + this one.
+
+### 12.7 Camera test
+
+Setup, once. Screen names are from the manual.
+1. MENU → **d (Setup Menu)** tab → **c/# Menu Display** → **c Menu Display** → **On** → OK. (This shows the Custom Menu tab.)
+2. MENU → **c (Custom Menu)** tab → group **AF/MF** → **MF Assist** → **On** → OK.
+3. Leave the menu. Press OK for the live control → **AF mode** → **MF** → OK.
+
+Test, in this order, after switching the camera off and on:
+1. Do not touch the focus ring. Choose ART (MENU → shooting mode **ART** → OK: the filter menu shows). Flip up
+   and down through all the filters as fast as you can for 20 seconds. **Expected:** no crash.
+2. Choose **Key Line**, press OK, turn the focus ring. **Expected:** the view magnifies; light lines on sharp edges.
+3. While the view is still magnified or just after, open the filter menu again and flip fast through the filters
+   for 20 seconds. **Expected:** no crash.
+4. Set P mode, Picture Mode **Natural**. Turn the focus ring. **Expected:** the view magnifies within about half a
+   second and shows a normal picture with light lines on sharp edges while you turn.
+5. Stop turning. **Expected:** the normal view comes back and the lines go.
+6. Take a photo while the lines show. **Expected:** a normal photo.
+7. One film entry in ART mode: turn the ring. **Expected:** as step 4.
+
+| Result | Meaning |
+|---|---|
+| Step 1 crashes | a cause with the flags clear exists (cause 3). Card update; report. Next: a build without hooks J and K |
+| Step 1 fine, step 3 crashes | the heap fix does not cover a filter change while the lines are on. Next: clear L while the filter menu is open |
+| Step 4 instant, with lines | the heap mode was the cause; the feature works |
+| Step 4 instant, magnified, no lines | the line job does not run in the magnified kind for a plain mode. Next: log L, the live-view kind and 0xA07507E1 to the card |
+| Step 4 still slow or frozen | the heap went to mode 1 but an allocation still fails (heap too small with the magnified read-out), or the switch itself is slow. Next: log 0x605157CC, 0x605B0609 and 0xA07507E4 |
+| Lines only after the view has magnified, about half a second late | the one-time start of the art path (buffers, first frames). Acceptable, or arm earlier (option b) |
+| Step 5: lines stay after the view returns | `entryMfAssistOff` is not reached on this path. Report which action ended MF Assist |
+
+### 12.8 Labels
+
+**Verified:** the per-frame call chain; the heap check and the chooser on both bodies; the three stock routes that
+clear the MF Assist word; the single caller of `startMfAssist` and the On/Off handling of a repeated start; the
+table scan; the hook table; that Through End frees the art buffers; the emulator results; both sha256.
+
+**Inferred:** that the refused allocation is what stalled the camera; the crash mechanism; that `entryMfAssistOn`
+is entered once per MF Assist session; that a heap switch to mode 1 in a plain mode is as safe as the stock switch
+of the Picture Mode to an art filter; that no user of heap mode 0 or 2 holds a buffer during plain live view.
+
+**Unknown** (the test decides): whether the lines show in the magnified view of a plain mode; the frame rate;
+whether E-P5 setting 58065 is the peaking setting.
+
+### 12.9 Files added
+
+| Path | Contents |
+|---|---|
+| `specs/peaking-direct-2.json` | the spec |
+| `scripts/mkspec_direct2.py` | generator: `python3 scripts/mkspec_direct2.py specs/peaking-direct-2.json /tmp/scratch/asm results/direct2-new-code.txt` |
+| `scripts/emu_direct2.py` | emulator check: `emu_direct2.py BASE_BLOCK0 PATCHED_BLOCK0 NAME` |
+| `results/direct2-*.txt`, `results/emu-direct2-*.txt` | listings, free-space check, RAM evidence, emulator output |
