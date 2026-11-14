@@ -231,6 +231,7 @@ Some tests need the maker's firmware file. Without the file, the test run skips 
 | The firmware file format | [docs/firmware-format.md](docs/firmware-format.md) |
 | The update procedure and recovery | [docs/flashing.md](docs/flashing.md) |
 | Each update that we did on a camera, with its result | [docs/camera-log.md](docs/camera-log.md) |
+| The open work | [docs/todo.md](docs/todo.md) |
 | How we check a patch before a camera test | [docs/verification.md](docs/verification.md) |
 | The patch specs that are not in the current build, and their history | [patches/history/README.md](patches/history/README.md) |
 

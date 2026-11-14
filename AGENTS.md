@@ -6,6 +6,9 @@ direct one.
 Read [docs/feasibility.md](docs/feasibility.md) first. It lists the real limits of the camera and
 the resources the firmware has, with evidence.
 
+The open work is in [docs/todo.md](docs/todo.md). Add an item there when the owner asks for one,
+and remove an item when it is done.
+
 1. **Do not be more careful than the evidence requires.** This project lost about a week because an
    agent changed only data tables and described its own caution as a limit of the camera. The owner
    never asked for that. New code, new menu entries, hooks and files on the card are all in scope.
