@@ -1,5 +1,5 @@
 {
- "what": "Level gauge: the LV-Info menu gets its Level Gauge row, on top of the pinned build",
+ "what": "Seven film looks as art filters, interval shooting with up to 240 frames, and the level gauge",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",
@@ -11,5 +11,7 @@
   "patches/interval-timelapse-v2.json",
   "patches/interval-frames-240.json",
   "patches/level-gauge-lvinfo-row.json"
- ]
+ ],
+ "sha256": "3e7f793ea74b21dab19c61eac33fe1f818d9c627e4fa522a2551ea62fc32c7f6",
+ "camera_tested": "2026-11-14"
 }

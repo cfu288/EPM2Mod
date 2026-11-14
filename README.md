@@ -7,7 +7,9 @@ Repository containing the current work for creating a custom firmware mod for th
 | Feature | What you get | Status |
 |---|---|---|
 | **Film looks** | Seven film emulations as art filters, for stills and live view | Tested on the camera |
-| **Interval shooting** | The Time Lapse Settings menu of the E-PL6: 1 to 99 frames, start delay, interval, optional time-lapse movie | Interval shooting tested on the camera. The time-lapse movie and long intervals are not yet reported |
+| **Interval shooting** | The Time Lapse Settings menu of the E-PL6: 1 to 240 frames, start delay, interval, optional time-lapse movie | Tested on the camera, with the time-lapse movie, to 125 frames. Long intervals are not yet reported |
+| **Level gauge** | Two tilt bars in live view, as on the E-PL6 | Tested on the camera |
+| Focus peaking | Research and a first build | Not yet tested. See `experiments/2026-11-14-focus-peaking/` |
 | Video quality and recording limit | Research and patch specs | Not built. See `experiments/2026-11-12-hardware/` |
 
 See below for an example of the film looks:
@@ -65,15 +67,37 @@ E-PL6 stops at 99. The steps of 5 are necessary because the menu list can hold o
 tells you what was in the firmware, how the patch works, how we checked it and what is not yet
 tested.
 
+## Level gauge
+
+The level gauge shows two bars in live view: one for left-right tilt and one for forward-back tilt.
+The E-PM2 firmware contains the whole feature of the E-PL6, but no menu row to switch it on. The mod
+adds the row.
+
+**To switch the level gauge on:**
+
+1. Press **MENU**. Go to the Setup Menu (the wrench tab).
+2. Select **Menu Display** and set the Custom Menu (the gears symbol) to **On**. Do this step only
+   if the menu does not show the gears tab.
+3. Go to the Custom Menu (the gears tab). Select group **D** and press the right arrow.
+4. Select **Info Settings** (the fourth item) and press the right arrow.
+5. Select **LV-Info** and press the right arrow.
+6. Select **Level Gauge** and press **OK** to put a check mark on it. Press **MENU** to go back.
+
+**To use it:** in live view, push the **INFO** button again and again until the two bars show. The
+camera keeps the setting when you switch it off.
+
+How we found the feature and how the patch works:
+[experiments/2026-11-14-level-gauge/NOTES.md](experiments/2026-11-14-level-gauge/NOTES.md).
+
 ## Install the latest tested firmware
 
 <!-- BEGIN GENERATED: pinned-build -->
-The pinned build is **`seven-films-6-interval-240`**: seven film looks as art filters, and interval shooting with up to 240 frames. We tested this build on a real E-PM2 on 2026-11-13 ([camera log](docs/camera-log.md)).
+The pinned build is **`seven-films-6-interval-240-level`**: seven film looks as art filters, interval shooting with up to 240 frames, and the level gauge. We tested this build on a real E-PM2 on 2026-11-14 ([camera log](docs/camera-log.md)).
 
 | | sha256 |
 |---|---|
 | Stock firmware, `OLY_E_101_1600_0000_0000.BIN` | `34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300` |
-| Pinned build, `seven-films-6-interval-240` | `01837f962f8a8ca0d189d9cd65ad9b5b35402ca3f3ed54a3872af044e050de11` |
+| Pinned build, `seven-films-6-interval-240-level` | `3e7f793ea74b21dab19c61eac33fe1f818d9c627e4fa522a2551ea62fc32c7f6` |
 <!-- END GENERATED: pinned-build -->
 
 This repository does not contain firmware. The firmware is the maker's copyrighted software. One
@@ -130,8 +154,11 @@ that the result is the tested build.
 
 7. Push the **ON/OFF** button to stop the camera. Push it again to start the camera.
 
-8. Make sure that the update is correct. The art filter list shows Portra, Ektachrome, Pro 400H,
-   Kodachrome, Vis 250D, Velvia and Superia 400. Shooting Menu 2 shows Time Lapse Settings.
+8. Make sure that the update is correct:
+   - The art filter list shows Portra, Ektachrome, Pro 400H, Kodachrome, Vis 250D, Velvia and
+     Superia 400.
+   - Shooting Menu 2 shows Time Lapse Settings.
+   - Custom Menu D → Info Settings → LV-Info shows Level Gauge.
 
 ### If you do not give `--card`
 
@@ -156,6 +183,8 @@ More about the update procedure: [docs/flashing.md](docs/flashing.md).
 - Each interval frame uses the mechanical shutter.
 - Not yet tested: a full sequence of 240 frames, the cancellation of a sequence, and intervals
   longer than 90 seconds.
+- Level gauge: the accuracy on a level surface is not yet measured, and there is no Level Adjust
+  menu row to calibrate it. Not yet tested with an electronic viewfinder attached.
 
 ### Warning
 
@@ -172,9 +201,10 @@ specs in order. After a camera test it also holds the sha256 of the result and t
 <!-- BEGIN GENERATED: builds -->
 | Build | What | Patch specs | Camera-tested | sha256 |
 |---|---|---|---|---|
-| `seven-films-6-interval-240` (pinned) | Seven film looks as art filters, and interval shooting with up to 240 frames | 9 | 2026-11-13 | `01837f962f8a8ca0d189d9cd65ad9b5b35402ca3f3ed54a3872af044e050de11` |
+| `seven-films-6-interval-240-level` (pinned) | Seven film looks as art filters, interval shooting with up to 240 frames, and the level gauge | 10 | 2026-11-14 | `3e7f793ea74b21dab19c61eac33fe1f818d9c627e4fa522a2551ea62fc32c7f6` |
 | `seven-films-6` | Seven film looks as art filters | 7 | 2026-11-13 | `5badb0796731b40a27ef015e57da134d7d793486d4c6262a3f483c1aae60fd05` |
 | `seven-films-6-interval` | Seven film looks as art filters, and interval shooting with up to 99 frames | 8 | 2026-11-13 | `f52ea6976ac2e9c567b2c07d7556b96b6431c8fcd2d90de195abdb76059e0104` |
+| `seven-films-6-interval-240` | Seven film looks as art filters, and interval shooting with up to 240 frames | 9 | 2026-11-13 | `01837f962f8a8ca0d189d9cd65ad9b5b35402ca3f3ed54a3872af044e050de11` |
 <!-- END GENERATED: builds -->
 
 To make a different build, give its description to the script:

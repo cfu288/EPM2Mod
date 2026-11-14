@@ -69,7 +69,9 @@ routines. This file records what the measurements show, so that nobody repeats t
 **Medium effort: new code, method known**
 
 - Looks loaded from a file on the card.
-- Level gauge: accelerometer, driver and text are present. The screen is missing.
+- ~~Level gauge~~ **Done on 2026-11-14 with three data edits and no code.** The whole feature was in
+  the firmware; only a menu row was missing. Lesson: compare with the E-PL6 first. It shares 58,642
+  identical functions with this body (the E-P5: 21,940).
 - The other E-PL6 additions (small AF target, ISO LOW), ported as interval shooting was.
 - A simple on-camera editor made from existing menu lists.
 

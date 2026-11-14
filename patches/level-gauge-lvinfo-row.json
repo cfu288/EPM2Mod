@@ -1,6 +1,6 @@
 {
  "name": "level-gauge-lvinfo-row",
- "description": "DRAFT, not camera-tested. Adds the E-PL6's 'Level Gauge' row to Custom Menu > Info Settings > LV-Info (panel 192, setting 273, text 866). Data only: 3 edits, 56 bytes replaced in place, no new bytes. It re-uses the row and the child list of panel 594 ('EVF Info Settings'), which no E-PM2 menu reaches. See experiments/2026-11-14-level-gauge/NOTES.md.",
+ "description": "Adds the E-PL6's 'Level Gauge' row to Custom Menu > Info Settings > LV-Info (panel 192, setting 273, text 866). Data only: 3 edits, 56 bytes replaced in place, no new bytes. It re-uses the row and the child list of panel 594 ('EVF Info Settings'), which no E-PM2 menu reaches. See experiments/2026-11-14-level-gauge/NOTES.md.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
  "ops": [
@@ -31,5 +31,6 @@
    "_addr": "0x7EFFB040",
    "_note": "panel 192 record: child-list pointer 0x7EFF9224 (3 entries, no room for a 4th) -> 0x7EFFA244"
   }
- ]
+ ],
+ "status": "camera-tested 2026-11-14 (build seven-films-6-interval-240-level): the row shows, the gauge shows in live view and works"
 }
