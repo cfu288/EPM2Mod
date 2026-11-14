@@ -86,6 +86,11 @@ build.
    MN103 processor (`scripts/build-binutils-mn10300.sh`).
 
    A tested build does not need the map: its result is compared with the recorded sha256.
+
+   The check also refuses new code in an area where no camera-tested build runs code yet, because
+   only a flash can show that code runs there. When a build is meant to be that test, add
+   `"first_code": true` to its description. The script then accepts the area if it passes every
+   static check, and prints a FIRST CODE line. Say in the camera log which area is new.
 3. **Log it** in [camera-log.md](camera-log.md) with that sha256, then flash
    `build/card/DCOLYMP/E1019999.BIN` (or `build/NAME.BIN`).
 4. **If the camera test passes:**

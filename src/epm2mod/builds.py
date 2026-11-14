@@ -6,7 +6,8 @@ A build description is a JSON file in ``builds/``::
       "what": "Seven film looks as art filters",
       "specs": ["patches/a.json", "patches/b.json"],
       "sha256": "...",                 (only after a camera test)
-      "camera_tested": "2026-11-13"    (only after a camera test)
+      "camera_tested": "2026-11-13",   (only after a camera test)
+      "first_code": true               (optional; see below)
     }
 
 The name of a build is the name of its file without ``.json``; it is not
@@ -14,6 +15,11 @@ written inside the file. The specs are files in ``patches/``, written relative
 to the repository root, and are applied in the order given. ``sha256`` and
 ``camera_tested`` are either both present (a tested build) or both absent (a
 candidate).
+
+``first_code`` is for a build that runs new code in an area of the firmware
+where no camera-tested build runs code yet. The free-space check refuses such
+a build unless the description says so, because only the flash can show that
+code runs there. The key is either absent or ``true``.
 
 ``pinned-build.json`` at the top of the repository holds
 ``{"build": "builds/NAME.json"}``: the description of the last build that
@@ -34,7 +40,7 @@ from .hashing import is_sha256
 from .paths import SPEC_FOLDER, RepoPaths, is_repo_relative
 
 _NAME = re.compile(r"[a-z0-9][a-z0-9._-]*")
-_KEYS = {"what", "specs", "sha256", "camera_tested"}
+_KEYS = {"what", "specs", "sha256", "camera_tested", "first_code"}
 _SUFFIX = ".json"
 
 
@@ -92,6 +98,8 @@ class BuildDescription:
         specs: the patch specs, relative to the repository root, in order.
         sha256: SHA-256 of the firmware file, if the build passed a camera test.
         camera_tested: ISO date of that test; present exactly when ``sha256`` is.
+        first_code: True if the build runs code in an area where no
+            camera-tested build runs code yet.
     """
 
     name: str
@@ -99,6 +107,7 @@ class BuildDescription:
     specs: tuple[str, ...]
     sha256: str | None = None
     camera_tested: str | None = None
+    first_code: bool = False
 
     def __post_init__(self) -> None:
         """Check the description. Every instance is valid.
@@ -168,6 +177,8 @@ class BuildDescription:
         if self.sha256 is not None:
             raw["sha256"] = self.sha256
             raw["camera_tested"] = self.camera_tested
+        if self.first_code:
+            raw["first_code"] = True
         return raw
 
 
@@ -196,12 +207,15 @@ def description_from_json(name: str, raw: Any) -> BuildDescription:
     if not isinstance(specs, list):
         raise BuildError(f"{name}: 'specs' must be a list of paths")
     sha256, tested = raw.get("sha256"), raw.get("camera_tested")
+    if raw.get("first_code", True) is not True:
+        raise BuildError(f"{name}: 'first_code' must be true, or absent")
     return BuildDescription(
         name=name,
         what=what.strip(),
         specs=tuple(check_spec_path(spec, name) for spec in specs),
         sha256=None if sha256 is None else _check_sha256(sha256, name),
         camera_tested=None if tested is None else _check_date(tested, name),
+        first_code="first_code" in raw,
     )
 
 

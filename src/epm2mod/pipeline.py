@@ -129,7 +129,9 @@ def check_free_space(paths: RepoPaths, description: BuildDescription) -> str:
 
     The check is ``tools/freespace.py check SPEC...``. It fails if two specs
     put bytes in the same place, or a spec puts bytes where the camera does
-    not load the firmware.
+    not load the firmware, or a spec puts code in an area where no
+    camera-tested build runs code yet. The last rule is waived for a
+    description with ``first_code``: its flash is the test of that area.
 
     Returns:
         The last line of the check's output.
@@ -138,6 +140,8 @@ def check_free_space(paths: RepoPaths, description: BuildDescription) -> str:
         BuildError: if the check fails or cannot run.
     """
     command = [sys.executable, str(paths.free_space_tool), "check", *description.specs]
+    if description.first_code:
+        command.append("--first-code")
     try:
         done = subprocess.run(
             command,
@@ -374,6 +378,11 @@ def make(
         )
     else:
         log("2/5 free-space check: " + check_free_space(paths, description))
+        if description.first_code:
+            log(
+                "    FIRST CODE: this build runs code in an area that has never "
+                "run code on a camera. The flash is the test of that area."
+            )
 
     applied, digest = build_image(description, specs, stock_data)
     log(

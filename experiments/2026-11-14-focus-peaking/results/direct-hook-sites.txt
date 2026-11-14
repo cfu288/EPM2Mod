@@ -1,0 +1,169 @@
+0x7E6ECF91  (6 bytes)  hook A: jmp T_A + nop. latch: end of the live-view struct refresh 0x7E6ECCAF (E-P5 0x7E3CA361 calls 0x7E3CA4B5)
+  before
+    7e6ecf91:	fc 81 f4 1c 	mov	d0,(0x605b1cf4)
+    7e6ecf95:	5b 60
+    7e6ecf97:	df 00 20    	ret	[],32
+  after
+    7e6ecf91:	dc 85 3f 5c 	jmp	0x7ecb0f16
+    7e6ecf95:	00
+    7e6ecf96:	cb          	nop
+    7e6ecf97:	df 00 20    	ret	[],32
+
+0x7E6CC14E  (5 bytes)  hook B: jmp T_B. colour-tone getter 0x7E6CBFD3, exit (E-P5 0x7E3A8A26)
+  before
+    7e6cc14e:	88          	mov	d2,d0
+    7e6cc14f:	14          	extbu	d0
+    7e6cc150:	df f0 14    	ret	[d2,d3,a2,a3],20
+    7e6cc153:	9f 00       	mov	0,a3
+  after
+    7e6cc14e:	dc 14 4e 5e 	jmp	0x7ecb0f62
+    7e6cc152:	00
+    7e6cc153:	9f 00       	mov	0,a3
+
+0x7E6C614C  (7 bytes)  hook C: jmp T_C + nop + nop. expose setter 0x7E6C610B (E-P5 0x7E3A2482)
+  before
+    7e6c614c:	a0 64       	cmp	100,d0
+    7e6c614e:	c2 0b       	bge	0x7e6c6159
+    7e6c6150:	f8 92 0d    	movbu	d0,(13,sp)
+    7e6c6153:	fc 82 1c 09 	movbu	d0,(0x605b091c)
+  after
+    7e6c614c:	dc 2e ae 5e 	jmp	0x7ecb0f7a
+    7e6c6150:	00
+    7e6c6151:	cb          	nop
+    7e6c6152:	cb          	nop
+    7e6c6153:	fc 82 1c 09 	movbu	d0,(0x605b091c)
+
+0x7E6C7596  (5 bytes)  hook D1: jmp T_D1. job setup 0x7E6C74BE, early exit (E-P5 0x7E3A39F1 -> 0x7E3A3AA6)
+  before
+    7e6c7596:	c8 05       	beq	0x7e6c759b
+    7e6c7598:	df f0 30    	ret	[d2,d3,a2,a3],48
+    7e6c759b:	dd fd 8c 00 	call	0x7e6d0298,[],0
+  after
+    7e6c7596:	dc 0c 9a 5e 	jmp	0x7ecb0fa2
+    7e6c759a:	00
+    7e6c759b:	dd fd 8c 00 	call	0x7e6d0298,[],0
+
+0x7E6C764E  (5 bytes)  hook D2: jmp T_D2. job setup 0x7E6C74BE, normal exit (E-P5 0x7E3A3AA6)
+  before
+    7e6c764e:	cd 55 67 b0 	call	0x7e6cdda3,[d2,a2,a3],16
+    7e6c7652:	10
+    7e6c7653:	df f0 30    	ret	[d2,d3,a2,a3],48
+  after
+    7e6c764e:	dc 5b 99 5e 	jmp	0x7ecb0fa9
+    7e6c7652:	00
+    7e6c7653:	df f0 30    	ret	[d2,d3,a2,a3],48
+
+0x7E6CD9CF  (7 bytes)  hook E1: jmp T_E1 + nop + nop. mov_art_set_line_yc_param 0x7E6CD9C5, art code test (E-P5 0x7E3AA358)
+  before
+    7e6cd9cf:	f8 41 4f    	movbu	(79,a1),d0
+    7e6cd9d2:	fa c8 a3 00 	cmp	163,d0
+    7e6cd9d6:	c8 41       	beq	0x7e6cda17
+  after
+    7e6cd9cf:	dc 31 45 52 	jmp	0x7ebf1f00
+    7e6cd9d3:	00
+    7e6cd9d4:	cb          	nop
+    7e6cd9d5:	cb          	nop
+    7e6cd9d6:	c8 41       	beq	0x7e6cda17
+
+0x7E6CDAC6  (5 bytes)  hook E2: jmp T_E2. mov_art_set_line_yc_param, line-job parameters (E-P5 0x7E3AA403)
+  before
+    7e6cdac6:	f8 53 59    	movbu	d0,(89,a3)
+    7e6cdac9:	80 03       	mov	3,d0
+    7e6cdacb:	f8 53 5a    	movbu	d0,(90,a3)
+  after
+    7e6cdac6:	dc 4f 44 52 	jmp	0x7ebf1f15
+    7e6cdaca:	00
+    7e6cdacb:	f8 53 5a    	movbu	d0,(90,a3)
+
+0x7E6CCA81  (5 bytes)  hook G: jmp T_G. art packet proc kind 0x7E6CCA57 (E-P5 0x7E3A9391)
+  before
+    7e6cca81:	cd a2 34 00 	call	0x7e6cff23,[],0
+    7e6cca85:	00
+    7e6cca86:	8f 07       	mov	7,d3
+  after
+    7e6cca81:	dc 63 45 1b 	jmp	0x7e880fe4
+    7e6cca85:	00
+    7e6cca86:	8f 07       	mov	7,d3
+
+0x7E6C3868  (5 bytes)  hook H: jmp T_H. frame time 0x7E6C365F (E-P5 0x7E39F946)
+  before
+    7e6c3868:	f1 d8       	mov	a2,d0
+    7e6c386a:	1c          	exthu	d0
+    7e6c386b:	a0 01       	cmp	1,d0
+    7e6c386d:	c9 17       	bne	0x7e6c3884
+  after
+    7e6c3868:	dc 66 d7 5e 	jmp	0x7ecb0fce
+    7e6c386c:	00
+    7e6c386d:	c9 17       	bne	0x7e6c3884
+
+0x7E6DAF37  (6 bytes)  hook I: jmp T_I + nop. img_param_set_ucType 0x7E6DAE68 (E-P5 0x7E3B7BF1)
+  before
+    7e6daf37:	fa c8 b8 00 	cmp	184,d0
+    7e6daf3b:	c9 1c       	bne	0x7e6daf57
+    7e6daf3d:	58 10       	mov	(16,sp),d0
+  after
+    7e6daf37:	dc ac 60 5d 	jmp	0x7ecb0fe3
+    7e6daf3b:	00
+    7e6daf3c:	cb          	nop
+    7e6daf3d:	58 10       	mov	(16,sp),d0
+
+0x7E6CCE6D  (6 bytes)  hook F: jmp T_F + nop. mov_art_set_artpacket 0x7E6CCBE1, CLIP / SIMPLE skip (E-P5 0x7E3A979D)
+  before
+    7e6cce6d:	58 10       	mov	(16,sp),d0
+    7e6cce6f:	a0 04       	cmp	4,d0
+    7e6cce71:	c9 0d       	bne	0x7e6cce7e
+    7e6cce73:	2c 00 02    	mov	512,d0
+  after
+    7e6cce6d:	dc c1 50 52 	jmp	0x7ebf1f2e
+    7e6cce71:	00
+    7e6cce72:	cb          	nop
+    7e6cce73:	2c 00 02    	mov	512,d0
+
+0x7E726421  (7 bytes)  hook J: jmp T_J + nop + nop. Key Line art pass 7 0x7E7262F1 (E-P5 0x7E4072D0: ucExpose 3)
+  before
+    7e726421:	f0 02       	mov	(a2),a0
+    7e726423:	80 02       	mov	2,d0
+    7e726425:	f8 50 5a    	movbu	d0,(90,a0)
+    7e726428:	5c 20       	mov	(32,sp),a0
+  after
+    7e726421:	dc 52 bb 4c 	jmp	0x7ebf1f73
+    7e726425:	00
+    7e726426:	cb          	nop
+    7e726427:	cb          	nop
+    7e726428:	5c 20       	mov	(32,sp),a0
+
+0x7E726767  (6 bytes)  hook K: jmp T_K + nop. Key Line art pass 9 0x7E7266D9, gain of the line image (E-P5 0x7E407718)
+  before
+    7e726767:	fc cc 00 ff 	mov	65280,d0
+    7e72676b:	00 00
+    7e72676d:	f8 73 22    	movhu	d0,(34,a3)
+  after
+    7e726767:	dc 2f b8 4c 	jmp	0x7ebf1f96
+    7e72676b:	00
+    7e72676c:	cb          	nop
+    7e72676d:	f8 73 22    	movhu	d0,(34,a3)
+
+0x7E9889EB  (7 bytes)  hook S: jmp T_S + nop + nop. entry of OlyHfwOpeShoot::startMfAssist 0x7E9889EB (E-P5: colour argument of 0x7E64BFF2)
+  before
+    7e9889eb:	92          	mov	a0,a2
+    7e9889ec:	fc cc eb c0 	mov	2126430443,d0
+    7e9889f0:	be 7e
+    7e9889f2:	42 04       	mov	d0,(4,sp)
+  after
+    7e9889eb:	dc 62 95 26 	jmp	0x7ebf1f4d
+    7e9889ef:	00
+    7e9889f0:	cb          	nop
+    7e9889f1:	cb          	nop
+    7e9889f2:	42 04       	mov	d0,(4,sp)
+
+0x7E9830E0  (6 bytes)  hook N: jmp T_N + nop. entry of OlyHfwOpeShoot::endMfAssist 0x7E9830E0
+  before
+    7e9830e0:	fc cc 85 87 	mov	2126415749,d0
+    7e9830e4:	be 7e
+    7e9830e6:	42 04       	mov	d0,(4,sp)
+  after
+    7e9830e0:	dc 81 ee 26 	jmp	0x7ebf1f61
+    7e9830e4:	00
+    7e9830e5:	cb          	nop
+    7e9830e6:	42 04       	mov	d0,(4,sp)
+

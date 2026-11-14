@@ -1,0 +1,17 @@
+image pair: pinned and pinned + peaking-direct-1
+case                                rows  flag clear: patched = base   flag set: patched = model    base ignores the flag
+A latch 0x7E6ECCAF                   576  576 of 576                   576 of 576                   576 of 576 ok   (rows where the flag changes an output: 40)
+B getter 0x7E6CBFD3                  116  116 of 116                   116 of 116                   116 of 116 ok   (rows where the flag changes an output: 116)
+C setter piece 0x7E6C6148            145  145 of 145                   145 of 145                   145 of 145 ok   (rows where the flag changes an output: 124)
+D job setup 0x7E6C74BE               120  120 of 120                   120 of 120                   120 of 120 ok   (rows where the flag changes an output: 120)
+E set_line_yc_param 0x7E6CD9C5        24  24 of 24                     24 of 24                     24 of 24   ok   (rows where the flag changes an output: 11)
+G packet proc kind 0x7E6CCA57        288  288 of 288                   288 of 288                   288 of 288 ok   (rows where the flag changes an output: 120)
+H frame-time piece 0x7E6C3868         12  12 of 12                     12 of 12                     12 of 12   ok   (rows where the flag changes an output: 10)
+I ucType piece 0x7E6DAF1B             30  30 of 30                     30 of 30                     30 of 30   ok   (rows where the flag changes an output: 6)
+F artpacket piece 0x7E6CCE62          12  12 of 12                     12 of 12                     12 of 12   ok   (rows where the flag changes an output: 6)
+J pass-7 piece 0x7E726421              5  5 of 5                       5 of 5                       5 of 5     ok   (rows where the flag changes an output: 1)
+K pass-9 piece 0x7E726761              5  5 of 5                       5 of 5                       5 of 5     ok   (rows where the flag changes an output: 1)
+S startMfAssist entry 0x7E9889EB       3  3 of 3                       3 of 3                       3 of 3     ok   (rows where the flag changes an output: 2)
+N endMfAssist entry 0x7E9830E0         3  3 of 3                       3 of 3                       3 of 3     ok   (rows where the flag changes an output: 2)
+case C also writes byte L2 = flag: ok (290 runs, patched image)
+RESULT: PASS

@@ -996,7 +996,7 @@ def merge(segs):
 
 # ----------------------------------------------------------------------------- check
 
-def check_specs(sp, specs, out=print):
+def check_specs(sp, specs, out=print, first_code=False):
     """Verify the bytes that specs add in free areas. Returns the number of FAIL lines."""
     img = bytearray(sp.b)
     owner = []                                   # (lo, hi, spec) changed by the specs applied so far
@@ -1038,14 +1038,19 @@ def check_specs(sp, specs, out=print):
                 if verdict not in ("USABLE-DATA", "USABLE-CODE"):
                     problems.append("area verdict %s (%s)" % (verdict, ", ".join(
                         "%s: %s" % (k, a.checks[k][1]) for k in a.failing)))
-                elif kind == "code" and verdict != "USABLE-CODE":
-                    problems.append("a relative jump or call of the given specs targets these bytes, but the area allows data only")
+                first = kind == "code" and verdict == "USABLE-DATA"
+                if first and not first_code:
+                    problems.append("a relative jump or call of the given specs targets these bytes, but the area allows data only"
+                                    " (no camera-tested code runs here yet; --first-code accepts this for a build whose flash is that test)")
                 for path, cls, segs in a.ledger_rows:
                     if path in given or not any(x < hi and y > lo for x, y in segs):
                         continue
                     if cls == "current":
                         problems.append("overlaps ledgered spec %s" % path)
                 notes = []
+                if first and first_code:
+                    notes.append("FIRST CODE in this area: every static check passes, but no camera-tested code runs here yet;"
+                                 " the flash of this build is the test")
                 if ov and stacked:
                     notes.append("edits bytes of %s in place (expect matches its output)" % ", ".join(sorted({w.path for _, _, w in ov})))
                 old = sorted({path for path, cls, segs in a.ledger_rows if cls != "current" and path not in given
@@ -1340,6 +1345,8 @@ def main():
     sub.add_parser("map")
     c = sub.add_parser("check")
     c.add_argument("specs", nargs="+")
+    c.add_argument("--first-code", action="store_true",
+                   help="accept code in an area that passes every static check but has never run code (the flash is the test)")
     c = sub.add_parser("area")
     c.add_argument("addr")
     sub.add_parser("selftest")
@@ -1364,7 +1371,7 @@ def main():
     for p in a.specs:
         ap_ = os.path.abspath(p)
         specs.append(Spec(os.path.relpath(ap_, ROOT)))
-    fails = check_specs(sp, specs)
+    fails = check_specs(sp, specs, first_code=a.first_code)
     print("check: %s (%d FAIL)" % ("FAIL" if fails else "PASS", fails))
     return 1 if fails else 0
 

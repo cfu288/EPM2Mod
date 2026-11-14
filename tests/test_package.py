@@ -123,8 +123,14 @@ class TinyRepo:
         return self.write(relative, json.dumps(raw).encode())
 
     def free_space_tool(self, status: int) -> None:
-        """Install a stand-in for tools/freespace.py that exits with ``status``."""
-        script = f"import sys\nprint('check: stand-in')\nsys.exit({status})\n"
+        """Install a stand-in for tools/freespace.py that exits with ``status``.
+
+        Its last output line holds the arguments it was given.
+        """
+        script = (
+            "import sys\nprint('check: stand-in', *sys.argv[1:])\n"
+            f"sys.exit({status})\n"
+        )
         self.write("tools/freespace.py", script.encode())
 
     def outputs(self) -> list[str]:
@@ -736,6 +742,19 @@ class BuildDescriptionTests(unittest.TestCase):
             builds.description_from_json("my-build", tested.to_json()), tested
         )
 
+    def test_first_code_is_true_or_absent(self) -> None:
+        marked = builds.description_from_json("b", {**self.GOOD, "first_code": True})
+        self.assertTrue(marked.first_code)
+        self.assertEqual(marked.to_json(), {**self.GOOD, "first_code": True})
+        self.assertFalse(builds.description_from_json("b", self.GOOD).first_code)
+        self.assertTrue(marked.as_tested("a" * 64, "2026-11-13").first_code)
+        for bad in (False, "yes", 1, None):
+            with (
+                self.subTest(bad=bad),
+                self.assertRaisesRegex(BuildError, "first_code"),
+            ):
+                builds.description_from_json("b", {**self.GOOD, "first_code": bad})
+
     def test_a_test_record_is_never_rewritten(self) -> None:
         tested = builds.description_from_json("b", self.GOOD).as_tested(
             "a" * 64, "2026-11-13"
@@ -1028,6 +1047,20 @@ class MakeTests(RepoCase):
         self.make(self.repo.tested)
         self.assertFalse(self.repo.paths.card.is_symlink())
         self.assertEqual([p.name for p in elsewhere.iterdir()], ["keep.txt"])
+
+    def test_a_first_code_build_tells_the_free_space_check_so(self) -> None:
+        self.repo.free_space_tool(0)
+        lines: list[str] = []
+        self.make(self.repo.candidate, log=lines.append)
+        self.assertNotIn("--first-code", "\n".join(lines))
+        first = builds.BuildDescription(
+            "probe", "A probe", ("patches/a.json",), first_code=True
+        )
+        lines.clear()
+        self.make(first, log=lines.append)
+        text = "\n".join(lines)
+        self.assertIn("check patches/a.json --first-code", text)
+        self.assertIn("FIRST CODE", text)
 
     def test_a_missing_spec_is_found_before_the_free_space_check(self) -> None:
         self.repo.free_space_tool(1)

@@ -354,3 +354,147 @@ Unknowns and the probe for each:
 Note for tool users: `tools/disasm.py --fw FILE.BIN` writes a block cache under `build/blocks/`.
 During this work that made one stray file there, which was removed again. Use
 `tools/emu/patchblock.py … -o /tmp/scratch/x.block0.bin` for patched blocks instead.
+
+## 11. Direct build (asked for as "8. Direct build"; the number 8 is taken above)
+
+Date: 2026-11-14. Status: one draft spec, `specs/peaking-direct-1.json`. Emulator-checked. Not flashed.
+It replaces the step plan of §6: one flash for the whole feature. It does not use probe A's bytes or hooks
+together with probe A (both hook 0x7E6C614C; build one or the other).
+
+### 11.1 What the build does
+
+While MF Assist runs, live view shows a plain picture with **white lines on edges**. The lines are Key
+Line's own line image, added to the picture. Without MF Assist every hook gives the stock result.
+
+| Piece | How | Source |
+|---|---|---|
+| Request | Byte R is 1 from the entry of `startMfAssist` to the entry of `endMfAssist`. The stock word 0x602B0DA8 ("MF Assist is running", setter 0x7E96AFD9, getter 0x7E96A490) must also be set | E-P5: the colour argument of `startMfAssist` |
+| Latch | End of the per-frame struct refresh 0x7E6ECCAF: L = R and word and not movie (0x605B039C ≠ 1, struct +32 = 0) and live-view kind not 2 and not 5. When L is 1, struct +4 is cleared | E-P5 0x7E3CA4B5 + 0x7E3AD26C, same conditions. The E-P5 test of 0x605EAF3C has no E-PM2 counterpart and is left out |
+| Mode | Getter 0x7E6CBFD3: mode byte 119, return 3. Setter 0x7E6C610B: art code 163 | E-P5 201 / 3 and 188. The E-PM2 has no art record for 188; the E-P5 record for 188 equals Key Line's (§3.3) |
+| Plain picture | Job setup 0x7E6C74BE, both exits: `ucExpose` 3, `ucColor` 2, global 0xA07507CC = 3 | E-P5 0x7E3A3AB2, same values |
+| Line job | `mov_art_set_line_yc_param`: Key Line's branch is taken, and the copy gets `ucExpose` 163. So the line job is byte for byte a stock Key Line line job (`ucArtLpf` 8, `ucProcCount` 3) | E-P5 takes the same branch, then sets 15 / 11 (not possible here, §11.2) |
+| Magnified view ("CLIP") and first frames ("SIMPLE") | Art packet proc kind 0x7E6CCA57 returns 0; `mov_art_set_artpacket` does not skip the line job; `img_param_set_ucType` treats the job like codes 181–184 | E-P5 0x7E3A9391, 0x7E3A979D, 0x7E3B7BF1 |
+| Frame time | 0x7E6C365F: 85 | E-P5 0x7E39F946 |
+| Overlay | Key Line pass 9: `usGain2` = +256 in place of 0xFF00 (−256) | E-P5 white: gains 2048 / +2048 in mode 3 (§11.2) |
+| Colour input of the overlay | Key Line pass 7: `ucExpose` 3 in its image job | E-P5 0x7E407306 |
+
+### 11.2 What could not be ported, with the evidence
+
+1. **Combine mode 3 does not exist on the E-PM2 (V).** The dispatcher of the combine job ("IMGDMA", fields
+   `usGain1` +32, `usGain2` +34, `ucBit` +36, `ucMode` +37) is 0x7E707880: `cmp 3,d1 / blt / mov 1,d0`, table
+   0x7E84EE68 with three handlers. The E-P5 one (0x7E3E6064) has `cmp 4` and four handlers. On the E-PM2 mode 3
+   would run as mode 1. Mode 3 is mode 2 with 4 bytes per pixel in place of 3 (handlers 0x7E3E6281 ↔ 0x7E707A1B).
+   The gains mean the same in both: 0x7E70789B shifts the gains left by 3 unless job flag bit 2 is set, and the
+   E-P5 sets that flag for peaking. So Key Line's 256 / −256 is "picture − line", and E-P5 white 2048 / +2048 is
+   "picture + line". The build keeps mode 2 and changes only the sign: 256 / +256.
+2. **The E-P5 line parameters need the IMG library (V).** `ucProcCount` 11 is tested only in the E-P5 builder
+   0x7E23777D (three sites) and its curve chooser; the E-PM2 library has no read of `ucProcCount` 9–12. Art passes
+   7 and 8 of E-P5 peaking use `ucProcCount` 10 and 12 and 4-byte buffers. The build uses Key Line's passes
+   (`ucProcCount` 2 and 4) and Key Line's line job. Result: Key Line's edge threshold and line width.
+3. **Not ported, small:** the E-P5 takes the white-balance gains of the peaking job from another source and sets
+   `chTone` to 0 (0x7E3A1E4C, 0x7E3A2310; its E-PM2 counterpart was not paired). `ucPeak` and `ucProcCount` 9 of
+   the colour job (they only select IMG cache keys and a filter record that the E-PM2 does not have).
+4. **`CapThr::execUpdateThrough` is not hooked.** The E-P5 needs bit 0x8000 to carry the request into the mov
+   layer. Here the request is a RAM byte that the mov task reads itself in every loop pass (0x7E6C33B5 calls
+   0x7E6ECCAF before it dispatches the pending update, 0x7E6C3FD8). The update itself comes from the stock MF
+   Assist code: its state machine logs "rcvStartMFAssistIn_MFAssistOff() updateThrough" and
+   "rcvEndMFAssistIn_MFAssistOn() setZoomEnd" (**I**: that these reach the expose setter).
+
+### 11.3 Ops (`results/direct-new-code.txt`, `results/direct-hook-sites.txt`)
+
+| Op | Address | Bytes | Purpose |
+|---|---|---|---|
+| 0 | 0x7ECB0EE3 | 11 | `getL` (reads L) |
+| 1 | 0x7ECB0F16 | 230 | T_A latch, T_B getter, T_C setter, T_D1/T_D2 job setup, T_H frame time, T_I ucType |
+| 2 | 0x7E880FE4 | 26 | T_G packet proc kind |
+| 3 | 0x7EBF1F00 | 182 | T_E1/T_E2 line job, T_F artpacket, T_S/T_N MF Assist entries, T_J pass 7, T_K pass 9 |
+| 4–16 | 0x7E6ECF91, 0x7E6CC14E, 0x7E6C614C, 0x7E6C7596, 0x7E6C764E, 0x7E6CD9CF, 0x7E6CDAC6, 0x7E6CCA81, 0x7E6C3868, 0x7E6DAF37, 0x7E6CCE6D, 0x7E726421, 0x7E726767 | 5–7 each | `jmp` to the routine (+ `nop`) |
+| 17, 18 | 0x7E9889EB, 0x7E9830E0 | 7, 6 | `jmp` T_S, T_N |
+
+449 bytes of new code, 15 hooks. No branch of the function database enters a replaced range except at its first
+byte (checked by the generator).
+
+**Code space.** Ops 0–2 are in camera-proven padding (free-space verdict USABLE-CODE). They hold every routine
+that runs in ordinary live view. The 38 bytes of probe A (0x7ECB0EF0–0x7ECB0F16) are left alone because a copy of
+that spec is in `patches/`. Op 3 is in 0x7EBF1F00, inside the listed area 0x7EBF1090–0x7EBF3BAD (old `sdk` shell
+name text). It was chosen because: it is in segment 2, which the same boot copy loads as the proven padding
+(0x7E8F5800–0x7ECB1000); the 240-frame patch already keeps its rows in the same listed area (0x7EBF1100–0x7EBF1F00)
+and the camera reads them; every static check passes. No code has run there. The routines in op 3 run only when
+the live-view art path handles Key Line or Watercolor, or when MF Assist starts or ends. So Natural, the film
+slots and all other art modes do not execute op 3 until MF Assist starts.
+
+**RAM.** Three new bytes, 0x602BE8C4 (L), 0x602BE8C5 (R), 0x602BE8C6 (L2: L at the last live-view update, read by
+the art task). They are slot 20 of the 37-slot table of menu value-list pointers at 0x602BE874
+(`results/ram-flag-evidence.txt`): the only constant inside the table is its base, in the two formatters; the
+formatters get row constants 3, 5–8, 10, 11, 13, 32–34 (stock) or 3, 5–8, 10–12, 14, 33–35 (pinned), never 20;
+the `.data` value of slot 20 is 0. The interval patch uses slot 1 by the same argument. Limit: a static scan.
+
+### 11.4 Checks
+
+| Check | Result |
+|---|---|
+| `uv run epm2mod apply SPEC -o /tmp/scratch/a.BIN` | applies on stock, 510 bytes differ, sha256 `3a3715c604a292c1c7cf1033679c0bc75dafbcc9e6ea0843dd33fcd1df2900f8` |
+| the same after the nine pinned specs | applies, sha256 `55754796c090033a02191742f01af6643619946bd8a9441f95426dda4779c477` (the nine alone give the pinned `01837f96…`) |
+| `python3 tools/freespace.py check` (nine + this) | **20 PASS, 1 FAIL** (`results/direct-freespace-check.txt`). The FAIL is op 3: "the area allows data only". The tool gives that line for any jump into an area that has no camera-tested code. The two USABLE-CODE areas have 282 free bytes (320 without probe A); the build needs 449. A PASS is not possible for this feature |
+| emulator, `scripts/emu_direct.py`, stock pair and pinned pair (`results/emu-direct-*.txt`) | PASS on both. 13 cases, 1,339 input rows. Flag clear: the patched image equals the base image in every row (registers and all memory the case reads back). Flag set: every row gives the model's values |
+
+Emulator cases: A latch (whole function, 576 rows), B getter (whole function; picture modes 0–7 and 100–120,
+movie flag, null pointer), C setter piece (the same modes × 5 art codes; also writes L2), D job setup (whole
+function, 120 rows), E `set_line_yc_param` (whole function, 12 art codes × buffers present or not: with the flag
+the two copies equal the stock Key Line copies), G (whole function), H, I, F, J, K (code pieces), S, N (entries).
+The emulator holds the whole block, so it says nothing about op 3 being loaded on the camera.
+
+Stills (**V** by the call lists, **I** for the camera): every mov-layer hook is in a function whose callers are
+all in the live-view module (0x7E6C33B5 loop and its handlers). The two art-task hooks act only on packets
+with mode 2, which only the live-view packet builder writes (0x7E6CC9E8), and only while L2 is 1.
+
+### 11.5 Camera test
+
+Build: add the spec to the pinned list in a build description, `tools/make_firmware.py`, log the flash.
+Setup: Custom Menu A → MF Assist → On. A lens with a focus ring that the body reads. Focus mode MF or S-AF+MF.
+
+1. P mode, Picture Mode Natural, no ring movement: live view, a photo, a short movie. **Expected:** as before.
+2. A film slot in ART mode: live view and a photo. **Expected:** as before.
+3. ART Key Line: live view. **Expected:** as before (dark lines). This step is the first that runs code from
+   0x7EBF1F00.
+4. P mode, Natural, MF. Turn the focus ring. **Expected:** the view magnifies and shows white lines on sharp
+   edges, on a normal (perhaps flatter) picture. The lines move as focus moves.
+5. Stop turning (or half-press). **Expected:** the view returns and the lines go away.
+6. Take a photo while the lines show. **Expected:** a normal photo.
+7. The same in a film slot (ART mode).
+
+| Result | Meaning | Next |
+|---|---|---|
+| Freeze or black screen in step 1 or 2 | a routine in the proven padding is wrong (they ran in the emulator only) | card update; report the step |
+| Step 1, 2 fine; freeze in step 3 or at the first ring turn | code does not run from 0x7EBF1F00, or the Key Line path is broken by a hook | card update. Test: move op 3 to another area |
+| Ring turns, view magnifies, no lines, picture normal | L never became 1 (live-view kind of the magnified view is 2 or 5, or the MF Assist start does not send an update), or the art path does not run for a plain mode | log L, the kind and the art code to the card |
+| Lines appear only after a setting change while magnified, or stay after the view returns | the stock MF Assist update does not reach the expose setter | port the update request (E-P5 0x7E6FF72A) |
+| Picture under the lines is Key Line's flat colours | the colour job or pass 7 ignores `ucExpose` 3 | read 0x7E56D1C3 and the pass-7 stage list |
+| Picture white, grey or wrong colours with correct lines | the line image is not zero away from edges, or its chroma is not zero-based | change the gain (128 in place of 256) or keep −256 (dark lines) |
+| Dark lines in place of white | pass 9 hook did not see L2 or packet mode 2 | log both |
+| Live view slow | Key Line's two jobs per frame; frame time 85 as on the E-P5 | accept, or tune |
+
+### 11.6 Labels
+
+**Verified** (bytes or emulator): the E-P5 values and sites in §11.1; no mode 3 on the E-PM2; the gain
+arithmetic; the art jobs take `ucExpose` from the packet type (0x7E728CEA); the MF Assist word and its five
+writers; flag-clear behaviour equals stock for every hook; flag-set values; both images apply.
+
+**Inferred:** the mov task loop runs the latch before each update; MF Assist start and end each cause a live-view
+update that runs the expose setter; live-view kind 4 ("CLIP") is the magnified view; `ucExpose` 3 is Muted;
+zero curve parameters (0x7E56D1AD) leave the picture unchanged in pass 7; the line image is zero away from edges;
+code runs from 0x7EBF1F00.
+
+**Unknown** (the camera test decides): whether the live-view art path runs while the struct holds a plain picture
+mode (probe A's question); which live-view kind MF Assist uses; how the picture looks through Key Line's pass 7
+with `ucExpose` 3; the frame rate.
+
+### 11.7 Files added
+
+| Path | Contents |
+|---|---|
+| `specs/peaking-direct-1.json` | the spec |
+| `scripts/mkspec_direct.py` | writes the spec: `python3 scripts/mkspec_direct.py specs/peaking-direct-1.json /tmp/scratch/asm results/direct-new-code.txt` (needs the mn10300 `as` and `ld`) |
+| `scripts/emu_direct.py` | emulator check: `emu_direct.py BASE_BLOCK0 PATCHED_BLOCK0 NAME` (blocks from `tools/emu/patchblock.py … -o /tmp/scratch/x.block0.bin`) |
+| `scripts/hooksites.py`, `scripts/ramflag_check.py` | hook listing before and after; RAM evidence |
+| `results/direct-*.txt`, `results/emu-direct-*.txt`, `results/ram-flag-evidence.txt` | outputs |

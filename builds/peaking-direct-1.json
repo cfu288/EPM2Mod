@@ -1,5 +1,5 @@
 {
- "what": "Probe: live view shows the Key Line drawing while Picture Mode is Muted (first step to focus peaking), on top of the pinned build",
+ "what": "Focus peaking, first build: white edge lines in live view while MF Assist runs, on top of the pinned build",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",
@@ -10,6 +10,8 @@
   "patches/seven-labels.json",
   "patches/interval-timelapse-v2.json",
   "patches/interval-frames-240.json",
-  "patches/peaking-probe-a-keyline-lv.json"
- ]
+  "patches/level-gauge-lvinfo-row.json",
+  "patches/peaking-direct-1.json"
+ ],
+ "first_code": true
 }

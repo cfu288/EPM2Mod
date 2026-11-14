@@ -1,0 +1,181 @@
+{
+ "name": "peaking-direct-1",
+ "description": "DRAFT, not camera-tested. Focus peaking in live view while MF Assist is running: white edge lines (Key Line's line image, added) over a plain picture. Photos are not changed. See experiments/2026-11-14-focus-peaking/NOTES.md section 11.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "draft; emulator-checked only",
+ "_ram": "three new bytes 0x602BE8C4 (L), 0x602BE8C5 (R), 0x602BE8C6 (L2): slot 20 of the menu value-list table 0x602BE874, never indexed; reads stock word 0x602B0DA8 (MF Assist running)",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x88fec3",
+   "expect": "ffffffffffffffffffffff",
+   "new": "fca8c4e82b60a001de0000",
+   "_addr": "0x7ECB0EE3",
+   "_why": "new code, camera-proven padding, segment 2: getL (11 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x88fef6",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "fcddd01c5b60f8112404f80120a000c934fca89c035b60a001c82afca8c5e82b60a000c820fca4a80d2b60a000c816dddeefa1ff0000a002c80ba005c8074400f85104fc86c4e82b60df0020dd81ffffff0000c90cba00c8068077f0528a038814dff01481dd68ffffff0000fc82c6e82b60c90d2ca300f8920ddcc951a1ff84a064c2f8f8920ddcb651a1ffc90edcf765a1ffddfacda1ffb010dd33ffffff0000c9148003fc82cc0775a0f003f8504f8002f85053dff030dd15ffffff0000c9048f55f1d81ca001dc8f28a1fffac8b800c80bddfafeffff0000c907dc4b9fa2ffdc609fa2ff",
+   "_addr": "0x7ECB0F16",
+   "_why": "new code, camera-proven padding, segment 2: T_A, T_B, T_C, T_D1/T_D2, T_H, T_I (230 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x45ffc4",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "ddfffe42000000c907dcc7bae4ffdd31efe4ff0000dc8dbae4ff",
+   "_addr": "0x7E880FE4",
+   "_why": "new code, camera-proven padding, segment 1: T_G (26 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7d0ee0",
+   "expect": "6d4672616d65004d3231006d6f76655a6f6f6d4672616d65004d3232007a6f6f6d5468726f756768004d3233007363726f6c6c5468726f756768004d323400676574456e6c61726765496e666f004d3235007365744d756c74695468726f7567684d6f6465004d32360073746172744d756c74695468726f756768004d3237006765744d756c74695468726f756768437572736f72004d3238006170657274757265446f776e004d3239006368616e67654469726563",
+   "new": "dde3ef0b000000c809f8414ffac8a300dcc6baadfff85359ddcbef0b000000c9082ca300f8534f8003dca2bbadffddb5ef0b000000c90800dc61afadff5810a004c807dc3bafadffdc2bafadff928001fc82c5e82b60fcccebc0be7edc966ad9ff00fc82c5e82b60fccc8587be7edc7811d9fff0028002f8505a5d20f061a002c911fca8c6e82b60a001c9078003f8504fdc9744b3fff062a002c911fca8c6e82b60a001c9072c0001ca08fccc00ff0000dcbc47b3ff",
+   "_addr": "0x7EBF1F00",
+   "_why": "new code, statically verified free area, never ran code: T_E1, T_E2, T_F, T_S, T_N, T_J, T_K (182 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2cbf71",
+   "expect": "fc81f41c5b60",
+   "new": "dc853f5c00cb",
+   "_addr": "0x7E6ECF91",
+   "_why": "hook A: jmp T_A + nop. latch: end of the live-view struct refresh 0x7E6ECCAF (E-P5 0x7E3CA361 calls 0x7E3CA4B5)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2ab12e",
+   "expect": "8814dff014",
+   "new": "dc144e5e00",
+   "_addr": "0x7E6CC14E",
+   "_why": "hook B: jmp T_B. colour-tone getter 0x7E6CBFD3, exit (E-P5 0x7E3A8A26)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2a512c",
+   "expect": "a064c20bf8920d",
+   "new": "dc2eae5e00cbcb",
+   "_addr": "0x7E6C614C",
+   "_why": "hook C: jmp T_C + nop + nop. expose setter 0x7E6C610B (E-P5 0x7E3A2482)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2a6576",
+   "expect": "c805dff030",
+   "new": "dc0c9a5e00",
+   "_addr": "0x7E6C7596",
+   "_why": "hook D1: jmp T_D1. job setup 0x7E6C74BE, early exit (E-P5 0x7E3A39F1 -> 0x7E3A3AA6)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2a662e",
+   "expect": "cd5567b010",
+   "new": "dc5b995e00",
+   "_addr": "0x7E6C764E",
+   "_why": "hook D2: jmp T_D2. job setup 0x7E6C74BE, normal exit (E-P5 0x7E3A3AA6)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2ac9af",
+   "expect": "f8414ffac8a300",
+   "new": "dc31455200cbcb",
+   "_addr": "0x7E6CD9CF",
+   "_why": "hook E1: jmp T_E1 + nop + nop. mov_art_set_line_yc_param 0x7E6CD9C5, art code test (E-P5 0x7E3AA358)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2acaa6",
+   "expect": "f853598003",
+   "new": "dc4f445200",
+   "_addr": "0x7E6CDAC6",
+   "_why": "hook E2: jmp T_E2. mov_art_set_line_yc_param, line-job parameters (E-P5 0x7E3AA403)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2aba61",
+   "expect": "cda2340000",
+   "new": "dc63451b00",
+   "_addr": "0x7E6CCA81",
+   "_why": "hook G: jmp T_G. art packet proc kind 0x7E6CCA57 (E-P5 0x7E3A9391)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2a2848",
+   "expect": "f1d81ca001",
+   "new": "dc66d75e00",
+   "_addr": "0x7E6C3868",
+   "_why": "hook H: jmp T_H. frame time 0x7E6C365F (E-P5 0x7E39F946)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2b9f17",
+   "expect": "fac8b800c91c",
+   "new": "dcac605d00cb",
+   "_addr": "0x7E6DAF37",
+   "_why": "hook I: jmp T_I + nop. img_param_set_ucType 0x7E6DAE68 (E-P5 0x7E3B7BF1)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2abe4d",
+   "expect": "5810a004c90d",
+   "new": "dcc1505200cb",
+   "_addr": "0x7E6CCE6D",
+   "_why": "hook F: jmp T_F + nop. mov_art_set_artpacket 0x7E6CCBE1, CLIP / SIMPLE skip (E-P5 0x7E3A979D)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x305401",
+   "expect": "f0028002f8505a",
+   "new": "dc52bb4c00cbcb",
+   "_addr": "0x7E726421",
+   "_why": "hook J: jmp T_J + nop + nop. Key Line art pass 7 0x7E7262F1 (E-P5 0x7E4072D0: ucExpose 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x305747",
+   "expect": "fccc00ff0000",
+   "new": "dc2fb84c00cb",
+   "_addr": "0x7E726767",
+   "_why": "hook K: jmp T_K + nop. Key Line art pass 9 0x7E7266D9, gain of the line image (E-P5 0x7E407718)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x5679cb",
+   "expect": "92fcccebc0be7e",
+   "new": "dc62952600cbcb",
+   "_addr": "0x7E9889EB",
+   "_why": "hook S: jmp T_S + nop + nop. entry of OlyHfwOpeShoot::startMfAssist 0x7E9889EB (E-P5: colour argument of 0x7E64BFF2)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x5620c0",
+   "expect": "fccc8587be7e",
+   "new": "dc81ee2600cb",
+   "_addr": "0x7E9830E0",
+   "_why": "hook N: jmp T_N + nop. entry of OlyHfwOpeShoot::endMfAssist 0x7E9830E0"
+  }
+ ]
+}
