@@ -1,0 +1,27 @@
+S5. Capture while the request is set, as far as it runs here: Natural with lines on, then the mov command
+    Through End (what a capture sends first), then the heap mode chooser 0x7E714833 as the capture path calls
+    it. Not run: the TAKE_* and REC_* tasks, the sensor read-out, the art passes of a still.
+  [pinned] Through End: 3 task runs, 16551 insns, 0 device writes; state 0, expose 0, art record 0x0, heap mode 0, picture None, alloc error False | L=0 R=0 L2=0
+      path: mov_art_exec_init, heap mode chooser, heap set mode
+      heap set mode: 0 (was 0), 0 live blocks
+  [pinned] after Through End: mov state 0, live heap blocks 0, L=0 R=0 L2=0; chooser asks for heap mode [0] (ok, new-code pcs run: 0); pass 9 gain for a still packet with L2=0: 0xFF00
+  [direct-4] frame 4: 11 task runs, 163695 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] Through End: 3 task runs, 20857 insns, 0 device writes; state 0, expose 0, art record 0x2A3, heap mode 0, picture None, alloc error False | L=1 R=1 L2=1
+      path: mov_art_exec_init, heap mode chooser, heap set mode, heap re-partition, Key Line pass 1
+      heap free: 0xB5CDF880 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB5C1AE00 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB5B56380 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB5A91900 (heap mode 1, mode at the last alloc 1)
+      heap set mode: 0 (was 1), 0 live blocks
+      heap re-partition: 0 live blocks: 
+  [direct-4] after Through End: mov state 0, live heap blocks 0, L=1 R=1 L2=1; chooser asks for heap mode [0] (ok, new-code pcs run: 0); pass 9 gain for a still packet with L2=1: 0xFF00
+  S5 RESULT [direct-4]: same state, heap mode and still gain as pinned
+

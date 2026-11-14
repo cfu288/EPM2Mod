@@ -851,3 +851,140 @@ How much of the real path ran:
 - A stray `pkill` of this session ended every `debug.mjs --serve` process of the machine once (about 16:50). Another
   session's emulator run may have stopped then.
 - om-emu was not changed. Requests for it are listed in `tools/emu/README.md`.
+
+## 14. The crash at Velvia (ART 7) on direct-3, and direct-4
+
+Date: 2026-11-14. Status: `patches/peaking-direct-4.json`, build `builds/peaking-direct-4.json`. Checked in emulation.
+Not flashed. Labels: **V** verified (bytes, or ran in the emulator), **I** inferred, **U** unknown.
+
+### 14.1 Camera report (direct-3, sha256 `5330c0b8…c325`)
+
+- P mode, OK, Picture Mode strip: the camera crashed when the cursor came to ART 7 (Velvia), from ART 6 and from ART 8.
+- The peaking lines show in the magnified view with Portra (ART 1) and with Key Line. They are thin.
+
+### 14.2 Cause 1: one byte of another spec was overwritten (V)
+
+| Fact | Evidence |
+|---|---|
+| ART 7 is picture mode 106. Its art code is 167 in live view and 168 in a movie | `art_GetFilterType` table 0x7E854A24 and getter tables 0x7E7FF05C / 0x7E7FF008, entries 6 (set by `remap7b-code`, `seven-movie-1`). S6: the mov layer gives 167 after the change to 106 |
+| Codes 167 and 168 are the only users of the six-axis handler at 0x7E880FD4 | table 0x7E78C254, entries 158 and 159 (`seven-fixes-1`, `seven-movie-1`); no other word in block 0 holds 0x7E880FD4 |
+| That handler is 17 bytes, 0x7E880FD4–0x7E880FE4. Its last instruction is `jmp 0x7E56D8D8` = `dc f8 c8 ce ff`. The last byte, **0xFF at 0x7E880FE4**, is the top byte of the displacement | `seven-fixes-1` op 0 |
+| direct-1, -2 and -3 put T_G at 0x7E880FE4. Its first byte 0xDD replaced that 0xFF. The jump became `jmp 0x5C56D8D8` | disassembly of the direct-3 image |
+| 0x5C56D8D8 is not code. The stage runs when the colour parameters for code 167 are made (**I**: at the moment the look is chosen, and for a photo or a movie with Velvia) | S6: fault at pc 0x5C56D8D8 for 167 and 168 on direct-3 only |
+
+ART 6 (code 145), ART 8 (85) and all other codes use other handlers: S6 gives the same result as pinned for the other
+174 codes. So this fault is in the Velvia entry only, with or without MF Assist, in the quick menu and in ART mode.
+
+**The base build does not have this fault (V).** In `seven-films-6-interval-240-level-adjust` the byte is 0xFF and the
+jump is whole; S6 passes. No patch for the base is needed.
+
+**Why the checks missed it.** The generator makes `expect` from the stock file, where the byte is 0xFF, the same value
+that `seven-fixes-1` writes. `tools/freespace.py` counts only the bytes of an op that differ from stock, so its ledger
+ends `seven-fixes-1` at 0x7E880FE4 ("16 B") and `docs/code-space-map.md` lists 0x7E880FE4 as free. S1 to S5 give the
+IMG library no colour work, so the six-axis stage never ran. The full-boot emulator reaches the strip and shows
+"Velvia" on direct-3 without a fault: it runs neither the mov layer's expose setter nor the colour stage (0 hits).
+
+direct-1 had the same byte. Its two crashes "at a different filter each time" may be this one or the heap fault of
+§12.3 (**U**).
+
+### 14.3 Cause 2, found on the way: the sleep routine was overwritten (V static; the effect on the camera is I)
+
+`docs/space-candidates.tsv` row 10 lists 0x7E50A201 and 0x7E53A55C as "unreferenced function". They are not:
+
+- 0x7E53A55C is "[pwr_standby]:start" (it calls 0x7E50A201) and 0x7E53A60E is "[pwr_standby]:end" (it calls 0x7E50A2AB).
+- Their caller is the code that the reset copies from flash 0x7F14B000 to SRAM 0x47001000: `call 0x7E53A55C` at SRAM
+  0x470010F7 and `call 0x7E53A60E` at 0x4700114E. The calls are pc-relative to the SRAM address, so the function map,
+  decoded at the flash address, did not see them. The full-boot emulator has these bytes at 0x470010F7 (**V**).
+- The chain: `OlyHfwPower::sleepForSystem` 0x7E998910 → 0x7E68CB5E → queue "QPWRSTANDBY" → task BOOT_CPU0 0x7E53A4A4
+  → SRAM 0x470010DE.
+
+direct-3 put T_E1 … T_K over 0x7E53A55C–0x7E53A60E and `getL`, T_A … T_I over 0x7E50A201–0x7E50A2EB. S7: on direct-3
+the call of 0x7E53A55C runs T_E1 and jumps into the middle of `mov_art_set_line_yc_param`. So direct-3 should crash
+or hang when the camera goes to sleep (**I**: that `sleepForSystem` is the Sleep timer; not seen in a report).
+
+### 14.4 direct-4
+
+| Change | Bytes |
+|---|---|
+| `getL`, T_A, T_B, T_C, T_D1/T_D2, T_H, T_I, T_G, T_E1, T_E2, T_F, T_M, T_J, T_K are in the 0xFF run of the kernel range, 0x7E4C9200–0x7E4C93A3. The reset code loads this range with the kernel, before any task and also on the update path. `interval-frames-240` keeps data in the same run (0x7E4C9100) and the camera reads it. First code in this run | 420 |
+| T_ON, T_OFF at 0x7EBF1F28 (segment 2, as their hook sites; inside the range where direct-1's code ran on the camera) | 39 |
+| 0x7E880FE4, 0x7E50A201 and 0x7E53A55C are not touched | – |
+| The 16 hooks, the three RAM bytes and the text of every routine are direct-3's. Calls of `getL` are shorter because it is near | – |
+| Base: the pinned build with `level-adjust-row` | – |
+
+New static check `tools/emu/opcheck.py BUILD.json`: (1) a byte that an earlier spec covers and keeps, changed by a later
+spec; (2) a call from the SRAM code into an op. direct-3: 7 FAIL (the byte at 0x7E880FE4, four context bytes of
+`interval-frames-240` at 0x7EBF1F00, the two SRAM calls). Pinned and direct-4: 0 FAIL.
+
+### 14.5 Checks
+
+| Check | Result |
+|---|---|
+| `.venv/bin/epm2mod make builds/peaking-direct-4.json` | sha256 `eea187a958de410bca0448367408998099fde177548d0b9010baf510a3452482`; free-space check PASS (first code) |
+| `.venv/bin/epm2mod make` (pinned) | `e93d1589…7b66`, as tested |
+| `tools/freespace.py check` (12 specs) `--first-code` | PASS, 0 FAIL (`results/direct4-freespace-check.txt`) |
+| `tools/emu/hookcheck.py patches/peaking-direct-4.json` | 37 transfers, 0 FAIL (`results/direct4-s0-hookcheck.txt`) |
+| `tools/emu/opcheck.py` | direct-4 0 FAIL, direct-3 7 FAIL (`results/direct4-opcheck.txt`, `direct3-opcheck.txt`) |
+| Boot from reset, `stage2-boot.mjs 2000` | STAGE 2: PASS; the summary equals pinned line for line except wall time and idle counts. T_M and `getL` run at 0x7E4C9340 / 0x7E4C9200 at 16.4 ms (boot task, before segment 2 is loaded); the jump at 0x7E880FE0 reads `dc f8 c8 ce ff` |
+| Full-boot emulator, P mode, OK → Picture Mode strip → ART 6, 7, 8, 7, 6 | pinned, direct-3, direct-4: no fault, the strip shows "Velvia". Not a test of the fault (§14.2) |
+| S1 to S5 on direct-4 against the new pinned image | as direct-3 in §13.2: S1 same, S2 picture in every frame (art type 1 and 0), S3 no anomaly, S4 R = 0 at the end, S5 as pinned (`results/scen-direct4-s1.txt` … `s5.txt`) |
+| **S6** Picture Mode 105 → 106 → 107 → 106 → 105, then the six-axis dispatch for the frame's art code and its movie code, then for all codes 9–184 | pinned PASS; **direct-3 FAIL** (167, 168: pc 0x5C56D8D8); direct-4 PASS (`results/scen-s6.txt`) |
+| **S7** `pwr_standby start` called with the SRAM call's frame | pinned PASS; **direct-3 FAIL**; direct-4 PASS (`results/scen-s7.txt`) |
+
+S6 runs the dispatch as a code piece (from 0x7E56D2AB, d3 = the art code), not the whole colour job. Codes 85 and 87
+(Cross Process handler) need job data that a piece does not have; they are not judged, and are the same on all images.
+
+Not checked: the picture; code running from 0x7E4C9200 on the camera; sleep and wake on the camera; the Velvia
+photo and movie paths (the same handler, so the same byte); real timing.
+
+### 14.6 Lines that are easier to see
+
+| Fact | Label |
+|---|---|
+| The line image is added in pass 9 with `usGain2` 256. The dispatcher shifts it left by 3: 2048. The E-P5 uses 2048 with the no-shift flag. So the strength already equals the E-P5's white | V (§11.2) |
+| E-P5 black lines are −2048: the stock Key Line value 0xFF00. White lines on a bright edge have little contrast; dark lines there have more | V for the values, I for the look |
+| The E-P5 line job uses `ucArtLpf` 15 and `ucProcCount` 11. `ucProcCount` 11 needs IMG-library code that the E-PM2 does not have (§11.2). Key Line I uses `ucArtLpf` 8, Key Line II uses 9 (0x7E6CDA67, 0x7E6CDAC4), the only difference between their line jobs. What 8 and 9 select in the IMG library was not traced | V for the values, U for the look |
+
+Option, one byte: `specs/peaking-direct-4-gain2.json` = direct-4 with gain 512 (2 × the line image). S2 shows pass 9
+`usGain2` 0x0200. Whether the combine stage clips cleanly at 2 × is **U**. Generator: `mkspec_direct4.py … --gain 512
+--name peaking-direct-4-gain2`. It is not in `patches/`: test direct-4 first (one change per flash). Next options
+if 2 × is not enough: `ucArtLpf` 9 in T_E2 (one byte), or dark lines chosen by a setting.
+
+### 14.7 Camera test (direct-4)
+
+Setup as §12.7 steps 1 to 3 (MF Assist On, AF mode MF). Shooting mode P.
+
+1. Press OK. The live control shows at the right. Press UP or DOWN until the second icon from the top (Picture Mode)
+   is yellow; the strip at the bottom shows the looks and the name ("Natural"). (Screen names from the full-boot
+   emulator.)
+2. Press RIGHT, slowly, through Custom to ART 1 … ART 6 ("Vis 250D"), ART 7 ("Velvia"), ART 8. Then LEFT back over
+   ART 7 to ART 6. **Expected:** no crash; the name "Velvia" shows at ART 7.
+3. On ART 7 press OK. Take a photo. **Expected:** live view goes on; a Velvia photo.
+4. With Velvia chosen, turn the focus ring. **Expected:** the view magnifies and shows the light lines, as with Portra
+   on direct-3.
+5. Leave the camera untouched until the screen goes off (sleep). Press the shutter button halfway. **Expected:** live
+   view comes back.
+
+| Result | Meaning |
+|---|---|
+| Crash at ART 7 again | another cause exists. Report whether the focus ring was turned since power-on, then repeat step 2 with MF Assist Off |
+| Black screen or freeze from power-on | code does not run from 0x7E4C9200. Card update with the pinned build; report |
+| Step 5: no wake-up, or a restart | a sleep fault that is not the one of §14.3. The same check on the pinned build tells whether it is ours |
+| Lines too thin | the 2 × gain option of §14.6 is the next build |
+
+One question for direct-3, if it is still on the camera: does it freeze or restart when left untouched until it
+should sleep (§14.3)?
+
+Flash: `epm2flash peaking-direct-4 eea187a958de410bca0448367408998099fde177548d0b9010baf510a3452482`.
+Go back: `epm2flash seven-films-6-interval-240-level-adjust e93d1589b3406ec991e3f32225acf6e2c2074aa58fc5394ca06a93da83797b66`.
+
+### 14.8 Files added
+
+| Path | Contents |
+|---|---|
+| `patches/peaking-direct-4.json`, `builds/peaking-direct-4.json` | the spec and the build description |
+| `specs/peaking-direct-4-gain2.json` | the 2 × gain option |
+| `scripts/mkspec_direct4.py` | generator: `mkspec_direct4.py OUT.json /tmp/scratch/asm [LISTING.txt] [--gain N] [--name NAME]` |
+| `scripts/scen_direct4.py` | S6 and S7: `scen_direct4.py all PINNED_BLOCK0 direct-3=BLOCK0 direct-4=BLOCK0` |
+| `tools/emu/opcheck.py` | the two static checks of §14.4 |
+| `results/direct4-*.txt`, `results/direct3-opcheck.txt`, `results/scen-s6.txt`, `scen-s7.txt`, `scen-direct4-s*.txt` | outputs |

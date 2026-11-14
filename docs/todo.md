@@ -12,8 +12,14 @@ and delete the item here.
 
 ## Focus peaking
 
-- Test the build `peaking-direct-3` on the camera (steps: the camera log and NOTES §12 and §13).
-  `peaking-direct-2` was withdrawn: it crashed at start-up in the emulator.
+- Test the build `peaking-direct-4` on the camera (steps: NOTES §14.7). `peaking-direct-3` showed
+  the lines (Portra, Key Line) and crashed at ART 7 in the quick menu; the cause is found (NOTES §14).
+- Stronger lines: `experiments/2026-11-14-focus-peaking/specs/peaking-direct-4-gain2.json` (2 × gain,
+  one byte), after direct-4 passes.
+- `tools/freespace.py` counts a byte as free when it is equal to stock, also inside the range of
+  another spec's op (this hid the direct-3 fault). Make it use the op ranges. Correct
+  `docs/space-candidates.tsv` row 10 (0x7E50A201 and 0x7E53A55C are the sleep routine) and the entry
+  0x7E880FE4 in the code-space map. Add `tools/emu/opcheck.py` to `tools/emu/README.md` and to `epm2mod make`.
 - The two crashes of the first build: the scenario tests show a likely cause (the image memory is
   re-divided under live buffers when a filter changes while lines are on). The camera test of
   `peaking-direct-3` must confirm that they are gone.

@@ -1,0 +1,172 @@
+{
+ "name": "M",
+ "description": "DRAFT, not camera-tested. Replaces peaking-direct-3: the same routines at new addresses (direct-3 broke the six-axis handler of the Velvia entry and the sleep routine, NOTES section 14); line gain 512 in place of 256. Focus peaking in live view while the MF Assist state object is On: white edge lines (Key Line's line image, added) over a plain picture. The image-work heap is put in the art mode while the lines show. Photos are not changed. See experiments/2026-11-14-focus-peaking/NOTES.md sections 12 to 14.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "draft; emulator-checked (single functions and scenario tests)",
+ "_ram": "three new bytes 0x602BE8C4 (L), 0x602BE8C5 (R), 0x602BE8C6 (L2): slot 20 of the menu value-list table 0x602BE874, never indexed; reads the mov state number 0x605B03D0",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xa81e0",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "fca8c4e82b60a001de0000fcddd01c5b60f8112404f80120a000c92efca89c035b60a001c824fca8c5e82b60a000c81addf36c20000000a002c80fa005c80b4400f8510440f85105fc86c4e82b60df0020cdafff0000c90cba00c8068077f0528a038814dff01481cd98ff0000fc82c6e82b60c90d2ca300f8920ddcdece1f0084a064c2f8f8920ddccbce1f00c90edc0ce31f00dd0f4b2000b010cd65ff0000c9148003fc82cc0775a0f003f8504f8002f85053dff030cd49ff0000c9048f55f1d81ca001dca8a51f00fac8b800c809cd30ff0000c907dc661c2100dc7b1c2100cd1fff0000c907dccc372000dd366c20000000dc92372000cd07ff0000c809f8414ffac8a300dccf462000f85359cdf1fe0000c9082ca300f8534f8003dcad472000cdddfe0000c90800dc6e3b20005810a004c807dc483b2000dc383b200081cdbffe0000c910fca4d0035b6028ffa002c504850184dd09f90a00c018dff020f0028002f8505a5d20f061a002c911fca8c6e82b60a001c9078003f8504fdca9d02500f062a002c911fca8c6e82b60a001c9072c0002ca08fccc00ff0000dcced32500",
+   "_addr": "0x7E4C9200",
+   "_why": "new code, kernel range, 0xFF run: getL, T_A, T_B, T_C, T_D1/T_D2, T_H, T_I, T_G, T_E1, T_E2, T_F, T_M, T_J, T_K (420 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7d0f08",
+   "expect": "004d3233007363726f6c6c5468726f756768004d323400676574456e6c61726765496e666f004d",
+   "new": "928001fc82c5e82b60fccc5ca8c87edc3cb5f8ff9200fc82c5e82b60fccc38a8c87edcf8b4f8ff",
+   "_addr": "0x7EBF1F28",
+   "_why": "new code, free text area, segment 2, code ran here in the direct-1 flash: T_ON, T_OFF (39 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2cbf71",
+   "expect": "fc81f41c5b60",
+   "new": "dc7ac2ddffcb",
+   "_addr": "0x7E6ECF91",
+   "_why": "hook A: jmp T_A + nop. latch: end of the live-view struct refresh 0x7E6ECCAF (E-P5 0x7E3CA361 calls 0x7E3CA4B5)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2ab12e",
+   "expect": "8814dff014",
+   "new": "dc03d1dfff",
+   "_addr": "0x7E6CC14E",
+   "_why": "hook B: jmp T_B. colour-tone getter 0x7E6CBFD3, exit (E-P5 0x7E3A8A26)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2a512c",
+   "expect": "a064c20bf8920d",
+   "new": "dc1b31e0ffcbcb",
+   "_addr": "0x7E6C614C",
+   "_why": "hook C: jmp T_C + nop + nop. expose setter 0x7E6C610B (E-P5 0x7E3A2482)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2a6576",
+   "expect": "c805dff030",
+   "new": "dcf71ce0ff",
+   "_addr": "0x7E6C7596",
+   "_why": "hook D1: jmp T_D1. job setup 0x7E6C74BE, early exit (E-P5 0x7E3A39F1 -> 0x7E3A3AA6)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2a662e",
+   "expect": "cd5567b010",
+   "new": "dc461ce0ff",
+   "_addr": "0x7E6C764E",
+   "_why": "hook D2: jmp T_D2. job setup 0x7E6C74BE, normal exit (E-P5 0x7E3A3AA6)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2ac9af",
+   "expect": "f8414ffac8a300",
+   "new": "dc2ab9dfffcbcb",
+   "_addr": "0x7E6CD9CF",
+   "_why": "hook E1: jmp T_E1 + nop + nop. mov_art_set_line_yc_param 0x7E6CD9C5, art code test (E-P5 0x7E3AA358)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2acaa6",
+   "expect": "f853598003",
+   "new": "dc46b8dfff",
+   "_addr": "0x7E6CDAC6",
+   "_why": "hook E2: jmp T_E2. mov_art_set_line_yc_param, line-job parameters (E-P5 0x7E3AA403)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2aba61",
+   "expect": "cda2340000",
+   "new": "dc60c8dfff",
+   "_addr": "0x7E6CCA81",
+   "_why": "hook G: jmp T_G. art packet proc kind 0x7E6CCA57 (E-P5 0x7E3A9391)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2a2848",
+   "expect": "f1d81ca001",
+   "new": "dc4f5ae0ff",
+   "_addr": "0x7E6C3868",
+   "_why": "hook H: jmp T_H. frame time 0x7E6C365F (E-P5 0x7E39F946)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2b9f17",
+   "expect": "fac8b800c91c",
+   "new": "dc93e3deffcb",
+   "_addr": "0x7E6DAF37",
+   "_why": "hook I: jmp T_I + nop. img_param_set_ucType 0x7E6DAE68 (E-P5 0x7E3B7BF1)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2abe4d",
+   "expect": "5810a004c90d",
+   "new": "dcb6c4dfffcb",
+   "_addr": "0x7E6CCE6D",
+   "_why": "hook F: jmp T_F + nop. mov_art_set_artpacket 0x7E6CCBE1, CLIP / SIMPLE skip (E-P5 0x7E3A979D)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x305401",
+   "expect": "f0028002f8505a",
+   "new": "dc402fdaffcbcb",
+   "_addr": "0x7E726421",
+   "_why": "hook J: jmp T_J + nop + nop. Key Line art pass 7 0x7E7262F1 (E-P5 0x7E4072D0: ucExpose 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x305747",
+   "expect": "fccc00ff0000",
+   "new": "dc1d2cdaffcb",
+   "_addr": "0x7E726767",
+   "_why": "hook K: jmp T_K + nop. Key Line art pass 9 0x7E7266D9, gain of the line image (E-P5 0x7E407718)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x75c44c",
+   "expect": "92fccc5ca8c87e",
+   "new": "dcbc4a0700cbcb",
+   "_addr": "0x7EB7D46C",
+   "_why": "hook ON: jmp T_ON + nop + nop. CmpSts_MfAssist::entryMfAssistOn (common part after both entry forms): R = 1"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x75c41b",
+   "expect": "92fccc38a8c87e",
+   "new": "dc014b0700cbcb",
+   "_addr": "0x7EB7D43B",
+   "_why": "hook OFF: jmp T_OFF + nop + nop. CmpSts_MfAssist::entryMfAssistOff: R = 0"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2f3996",
+   "expect": "ddaa42e6ffc018",
+   "new": "dc8a49dbffcbcb",
+   "_addr": "0x7E7149B6",
+   "_why": "hook M: jmp T_M + nop + nop. image-work heap chooser 0x7E714833, its last call: mode 1 while the latch is set (E-P5 0x7E3F41DD chooses by setting)"
+  }
+ ]
+}

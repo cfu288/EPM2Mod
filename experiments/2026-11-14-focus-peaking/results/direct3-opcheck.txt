@@ -1,0 +1,8 @@
+FAIL  silent overlap at 0x7E880FE4: peaking-direct-3.json (op at offset 0x45FFC4, 26 B) changes a byte that seven-fixes-1.json covers and keeps (op at offset 0x45FFB4, 17 B)
+FAIL  silent overlap at 0x7EBF1F00: peaking-direct-3.json (op at offset 0x7D0EE0, 39 B) changes a byte that interval-frames-240.json covers and keeps (op at offset 0x7D00DC, 3592 B)
+FAIL  silent overlap at 0x7EBF1F01: peaking-direct-3.json (op at offset 0x7D0EE0, 39 B) changes a byte that interval-frames-240.json covers and keeps (op at offset 0x7D00DC, 3592 B)
+FAIL  silent overlap at 0x7EBF1F02: peaking-direct-3.json (op at offset 0x7D0EE0, 39 B) changes a byte that interval-frames-240.json covers and keeps (op at offset 0x7D00DC, 3592 B)
+FAIL  silent overlap at 0x7EBF1F03: peaking-direct-3.json (op at offset 0x7D0EE0, 39 B) changes a byte that interval-frames-240.json covers and keeps (op at offset 0x7D00DC, 3592 B)
+FAIL  SRAM code 0x470010F7 (flash 0x7F14B0F7): call 0x7E53A55C is inside the op of peaking-direct-3.json at 0x7E53A55C-0x7E53A60F
+FAIL  SRAM code 0x4700114E (flash 0x7F14B14E): call 0x7E53A60E is inside the op of peaking-direct-3.json at 0x7E53A55C-0x7E53A60F
+op check: 11 specs, 395 byte ops, 12 calls from SRAM code into block 0 looked at, 7 FAIL

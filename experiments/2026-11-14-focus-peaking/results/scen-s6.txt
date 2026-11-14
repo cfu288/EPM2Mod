@@ -1,0 +1,26 @@
+S6. Picture Mode 105 -> 106 -> 107 -> 106 -> 105 (ART 6, 7, 8, 7, 6), one frame each, request clear, art type 1.
+    After each frame: the six-axis dispatch for the art code of the frame and for its movie code.
+  [pinned] ART 6 (Vis 250D): frame picture True; live view code 145: ok, reaches 0x7E56D8D8 in 13 instructions; movie code 146: ok, reaches 0x7E56D8D8 in 13 instructions
+  [pinned] ART 7 (Velvia): frame picture True; live view code 167: ok, reaches 0x7E56D8D8 in 13 instructions; movie code 168: ok, reaches 0x7E56D8D8 in 13 instructions
+  [pinned] ART 8 (Superia 400): frame picture True; live view code 85: n/a, handler needs job data that the piece does not give (fault 3 at pc 0x7E545F2B (0x7E545E76+0xB5): om-emu: MN10300 ); movie code 87: n/a, handler needs job data that the piece does not give (fault 3 at pc 0x7E545F2B (0x7E545E76+0xB5): om-emu: MN10300 )
+  [pinned] ART 7 (Velvia): frame picture True; live view code 167: ok, reaches 0x7E56D8D8 in 13 instructions; movie code 168: ok, reaches 0x7E56D8D8 in 13 instructions
+  [pinned] ART 6 (Vis 250D): frame picture True; live view code 145: ok, reaches 0x7E56D8D8 in 13 instructions; movie code 146: ok, reaches 0x7E56D8D8 in 13 instructions
+  [pinned] all art codes 9-184: 0 FAULT ; not judged [85, 87]; codes whose result differs from pinned: none
+  S6 RESULT [pinned]: PASS
+  [direct-3] ART 6 (Vis 250D): frame picture True; live view code 145: ok, reaches 0x7E56D8D8 in 13 instructions; movie code 146: ok, reaches 0x7E56D8D8 in 13 instructions
+  [direct-3] ART 7 (Velvia): frame picture True; live view code 167: FAULT, fault 2 at pc 0x5C56D8D8: om-emu: MN10300 trap reason=2 pc=0x5c56d8d8 address=0x5c56d8d8; movie code 168: FAULT, fault 2 at pc 0x5C56D8D8: om-emu: MN10300 trap reason=2 pc=0x5c56d8d8 address=0x5c56d8d8
+  [direct-3] ART 8 (Superia 400): frame picture True; live view code 85: n/a, handler needs job data that the piece does not give (fault 3 at pc 0x7E545F2B (0x7E545E76+0xB5): om-emu: MN10300 ); movie code 87: n/a, handler needs job data that the piece does not give (fault 3 at pc 0x7E545F2B (0x7E545E76+0xB5): om-emu: MN10300 )
+  [direct-3] ART 7 (Velvia): frame picture True; live view code 167: FAULT, fault 2 at pc 0x5C56D8D8: om-emu: MN10300 trap reason=2 pc=0x5c56d8d8 address=0x5c56d8d8; movie code 168: FAULT, fault 2 at pc 0x5C56D8D8: om-emu: MN10300 trap reason=2 pc=0x5c56d8d8 address=0x5c56d8d8
+  [direct-3] ART 6 (Vis 250D): frame picture True; live view code 145: ok, reaches 0x7E56D8D8 in 13 instructions; movie code 146: ok, reaches 0x7E56D8D8 in 13 instructions
+  [direct-3] all art codes 9-184: 2 FAULT [167, 168]; not judged [85, 87]; codes whose result differs from pinned: [167, 168]
+      code 167: fault 2 at pc 0x5C56D8D8: om-emu: MN10300 trap reason=2 pc=0x5c56d8d8 address=0x5c56d8d8
+      code 168: fault 2 at pc 0x5C56D8D8: om-emu: MN10300 trap reason=2 pc=0x5c56d8d8 address=0x5c56d8d8
+  S6 RESULT [direct-3]: FAIL: ART 7 (Velvia) live view code 167, ART 7 (Velvia) movie code 168, ART 7 (Velvia) live view code 167, ART 7 (Velvia) movie code 168
+  [direct-4] ART 6 (Vis 250D): frame picture True; live view code 145: ok, reaches 0x7E56D8D8 in 13 instructions; movie code 146: ok, reaches 0x7E56D8D8 in 13 instructions
+  [direct-4] ART 7 (Velvia): frame picture True; live view code 167: ok, reaches 0x7E56D8D8 in 13 instructions; movie code 168: ok, reaches 0x7E56D8D8 in 13 instructions
+  [direct-4] ART 8 (Superia 400): frame picture True; live view code 85: n/a, handler needs job data that the piece does not give (fault 3 at pc 0x7E545F2B (0x7E545E76+0xB5): om-emu: MN10300 ); movie code 87: n/a, handler needs job data that the piece does not give (fault 3 at pc 0x7E545F2B (0x7E545E76+0xB5): om-emu: MN10300 )
+  [direct-4] ART 7 (Velvia): frame picture True; live view code 167: ok, reaches 0x7E56D8D8 in 13 instructions; movie code 168: ok, reaches 0x7E56D8D8 in 13 instructions
+  [direct-4] ART 6 (Vis 250D): frame picture True; live view code 145: ok, reaches 0x7E56D8D8 in 13 instructions; movie code 146: ok, reaches 0x7E56D8D8 in 13 instructions
+  [direct-4] all art codes 9-184: 0 FAULT ; not judged [85, 87]; codes whose result differs from pinned: none
+  S6 RESULT [direct-4]: PASS
+

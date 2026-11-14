@@ -1,0 +1,9 @@
+S7. pwr_standby start 0x7E53A55C, called with the frame of the SRAM code's call (flash 0x7F14B0F7), 400
+    instructions; callees run as far as they get (kernel services are not modelled here).
+  [pinned] bytes of 0x7E53A55C-0x7E53A700 and 0x7E50A201-0x7E50A3C2 equal to pinned: True; first three stock instructions ran: True; entered mov_art_set_line_yc_param at 0x7E6CD9D6: False; end: instruction limit (400) at pc 0x7E44AD79 (0x7E44AD26+0x53)
+  S7 RESULT [pinned]: PASS
+  [direct-3] bytes of 0x7E53A55C-0x7E53A700 and 0x7E50A201-0x7E50A3C2 equal to pinned: False; first three stock instructions ran: False; entered mov_art_set_line_yc_param at 0x7E6CD9D6: True; end: instruction limit (400) at pc 0x0000016E
+  S7 RESULT [direct-3]: FAIL: the sleep routine is overwritten
+  [direct-4] bytes of 0x7E53A55C-0x7E53A700 and 0x7E50A201-0x7E50A3C2 equal to pinned: True; first three stock instructions ran: True; entered mov_art_set_line_yc_param at 0x7E6CD9D6: False; end: instruction limit (400) at pc 0x7E44AD79 (0x7E44AD26+0x53)
+  S7 RESULT [direct-4]: PASS
+

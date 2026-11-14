@@ -1,0 +1,338 @@
+S3. ART Key Line with the request set, then the Picture Mode setting changes to film entries and effect
+    filters, two frames each, both orders. pinned runs the same changes without a request (control).
+  [pinned] frame 2: 12 task runs, 173905 insns, 4572 device writes; state 2, expose 163, art record 0x2A3, heap mode 1, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0xFF00']; pass 7 ucExpose = [163]
+      notes: 2 divisions by zero skipped, at 0x7E56A894, 0x7E56A89C; 2 divisions by zero skipped, at 0x7E57566A
+  real code ran: static constructors, 12 module inits, tasks MOV_TASK, MOV_SUB_TASK, ART_IMG_CM, ART_IMG_CS, MOVDISP_TASK, MOVCOLOR_SUB, MOVART_TASK, ART, ART_IMG_CF, MOVCOLOR.
+  stubbed: device registers (writes dropped, reads 0), uITRON services (tools/emu/osmodel.py), IMG job-done
+  waits (met at once), settings getter (ids not set read 0), white-balance module, CPU cache control, float multiply.
+  [pinned] frame 4: 12 task runs, 174651 insns, 4572 device writes; state 2, expose 163, art record 0x2A3, heap mode 1, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0xFF00']; pass 7 ucExpose = [163]
+      notes: 2 divisions by zero skipped, at 0x7E56A894, 0x7E56A89C; 2 divisions by zero skipped, at 0x7E57566A
+  [pinned] Picture Mode setting -> 107 film slot (Cross Process I entry, class 1)
+  [pinned] frame 5: 6 task runs, 75315 insns, 924 device writes; state 2, expose 85, art record 0x155, heap mode 0, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, mov_art_exec_init, heap mode chooser, heap set mode, heap re-partition, frame builder, job setup, set_out_area_param, img exec, display update, Key Line pass 1
+      heap set mode: 0 (was 1), 0 live blocks
+      heap re-partition: 0 live blocks: 
+      heap set mode: 0 (was 0), 0 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+  [pinned] frame 6: 2 task runs, 39007 insns, 924 device writes; state 2, expose 85, art record 0x155, heap mode 0, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, frame builder, job setup, set_out_area_param, img exec, display update
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+  [pinned] Picture Mode setting -> 113 Soft Focus (class 3)
+  [pinned] frame 7: 14 task runs, 146336 insns, 1382 device writes; state 2, expose 69, art record 0x245, heap mode 1, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, mov_art_exec_init, heap mode chooser, heap set mode, heap mode check, art picture alloc, 2 x 614400 alloc, frame builder, job setup, set_out_area_param, set_artpacket, display update, combine job
+      heap set mode: 1 (was 0), 0 live blocks
+      heap set mode: 1 (was 1), 0 live blocks
+      heap set mode: 1 (was 1), 0 live blocks
+      heap set mode: 1 (was 1), 3 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+  [pinned] frame 8: 10 task runs, 110903 insns, 1382 device writes; state 2, expose 69, art record 0x245, heap mode 1, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, art picture alloc, frame builder, job setup, set_out_area_param, set_artpacket, display update, combine job
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+  [pinned] Picture Mode setting -> 119 Key Line
+  [pinned] frame 9: 16 task runs, 214222 insns, 4572 device writes; state 2, expose 163, art record 0x2A3, heap mode 1, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, mov_art_exec_init, heap mode chooser, heap set mode, heap mode check, art picture alloc, 2 x 614400 alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 0 live blocks
+      heap set mode: 1 (was 1), 0 live blocks
+      heap set mode: 1 (was 1), 0 live blocks
+      heap set mode: 1 (was 1), 3 live blocks
+      heap set mode: 1 (was 1), 4 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0xFF00']; pass 7 ucExpose = [163]
+      notes: 2 divisions by zero skipped, at 0x7E56A894, 0x7E56A89C; 2 divisions by zero skipped, at 0x7E57566A
+  [pinned] frame 10: 12 task runs, 173905 insns, 4572 device writes; state 2, expose 163, art record 0x2A3, heap mode 1, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0xFF00']; pass 7 ucExpose = [163]
+      notes: 2 divisions by zero skipped, at 0x7E56A894, 0x7E56A89C; 2 divisions by zero skipped, at 0x7E57566A
+  [pinned] Picture Mode setting -> 113 Soft Focus (class 3)
+  [pinned] frame 11: 14 task runs, 150632 insns, 1382 device writes; state 2, expose 69, art record 0x245, heap mode 1, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, mov_art_exec_init, heap mode chooser, heap set mode, heap mode check, art picture alloc, 2 x 614400 alloc, frame builder, job setup, set_out_area_param, set_artpacket, display update, Key Line pass 1, combine job
+      heap set mode: 1 (was 1), 0 live blocks
+      heap set mode: 1 (was 1), 0 live blocks
+      heap set mode: 1 (was 1), 0 live blocks
+      heap set mode: 1 (was 1), 3 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+  [pinned] frame 12: 10 task runs, 110903 insns, 1382 device writes; state 2, expose 69, art record 0x245, heap mode 1, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, art picture alloc, frame builder, job setup, set_out_area_param, set_artpacket, display update, combine job
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+  [pinned] Picture Mode setting -> 107 film slot (Cross Process I entry, class 1)
+  [pinned] frame 13: 6 task runs, 74301 insns, 924 device writes; state 2, expose 85, art record 0x155, heap mode 0, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, mov_art_exec_init, heap mode chooser, heap set mode, heap re-partition, frame builder, job setup, set_out_area_param, img exec, display update
+      heap set mode: 0 (was 1), 0 live blocks
+      heap re-partition: 0 live blocks: 
+      heap set mode: 0 (was 0), 0 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+  [pinned] frame 14: 2 task runs, 39007 insns, 924 device writes; state 2, expose 85, art record 0x155, heap mode 0, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, frame builder, job setup, set_out_area_param, img exec, display update
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+  [pinned] Picture Mode setting -> 119 Key Line
+  [pinned] frame 15: 16 task runs, 211616 insns, 4572 device writes; state 2, expose 163, art record 0x2A3, heap mode 1, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, mov_art_exec_init, heap mode chooser, heap set mode, heap mode check, art picture alloc, 2 x 614400 alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 0), 0 live blocks
+      heap set mode: 1 (was 1), 0 live blocks
+      heap set mode: 1 (was 1), 0 live blocks
+      heap set mode: 1 (was 1), 3 live blocks
+      heap set mode: 1 (was 1), 4 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0xFF00']; pass 7 ucExpose = [163]
+      notes: 2 divisions by zero skipped, at 0x7E56A894, 0x7E56A89C; 2 divisions by zero skipped, at 0x7E57566A
+  [pinned] frame 16: 12 task runs, 174651 insns, 4572 device writes; state 2, expose 163, art record 0x2A3, heap mode 1, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0xFF00']; pass 7 ucExpose = [163]
+      notes: 2 divisions by zero skipped, at 0x7E56A894, 0x7E56A89C; 2 divisions by zero skipped, at 0x7E57566A
+  [pinned] Picture Mode setting -> 100 film slot (Pop Art I entry, class 1)
+  [pinned] frame 17: 6 task runs, 74790 insns, 924 device writes; state 2, expose 70, art record 0x46, heap mode 0, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, mov_art_exec_init, heap mode chooser, heap set mode, heap re-partition, frame builder, job setup, set_out_area_param, img exec, display update, Key Line pass 1
+      heap set mode: 0 (was 1), 0 live blocks
+      heap re-partition: 0 live blocks: 
+      heap set mode: 0 (was 0), 0 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+  [pinned] frame 18: 1 task runs, 38537 insns, 924 device writes; state 2, expose 70, art record 0x46, heap mode 0, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, frame builder, job setup, set_out_area_param, img exec, display update
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+  [pinned] Picture Mode setting -> 104 Grainy Film (class 4)
+  [pinned] frame 19: 5 task runs, 72390 insns, 924 device writes; state 2, expose 74, art record 0x14A, heap mode 1, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, mov_art_exec_init, heap mode chooser, heap set mode, frame builder, job setup, set_out_area_param, img exec, display update
+      heap set mode: 1 (was 0), 0 live blocks
+      heap set mode: 1 (was 1), 0 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+  [pinned] frame 20: 2 task runs, 38973 insns, 924 device writes; state 2, expose 74, art record 0x14A, heap mode 1, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, frame builder, job setup, set_out_area_param, img exec, display update
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+  [pinned] Picture Mode setting -> 108 Gentle Sepia (class 4)
+  [pinned] frame 21: 10 task runs, 98445 insns, 1718 device writes; state 2, expose 91, art record 0x25B, heap mode 1, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, mov_art_exec_init, heap mode chooser, heap set mode, heap mode check, art picture alloc, 2 x 614400 alloc, frame builder, job setup, set_out_area_param, set_artpacket, display update
+      heap set mode: 1 (was 1), 0 live blocks
+      heap set mode: 1 (was 1), 0 live blocks
+      heap set mode: 1 (was 1), 0 live blocks
+      heap set mode: 1 (was 1), 3 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      STALE ADDRESS to device 0x9C008CA8: value 0x358D6358 by pc 0x7E550358, in freed block 0xB5843980+921600
+      STALE ADDRESS to device 0x9C008EA8: value 0x15856158 by pc 0x7E550358, in freed block 0xB5843980+921600
+  [pinned] frame 22: 6 task runs, 61428 insns, 1718 device writes; state 2, expose 91, art record 0x25B, heap mode 1, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, art picture alloc, frame builder, job setup, set_out_area_param, set_artpacket, display update
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      STALE ADDRESS to device 0x9C008CA8: value 0x358D6358 by pc 0x7E550358, in freed block 0xB5843980+921600
+      STALE ADDRESS to device 0x9C008EA8: value 0x15856158 by pc 0x7E550358, in freed block 0xB5843980+921600
+  [pinned] Picture Mode setting -> 103 film slot (Light Tone entry, class 1)
+  [pinned] frame 23: 6 task runs, 73797 insns, 924 device writes; state 2, expose 72, art record 0x48, heap mode 0, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, mov_art_exec_init, heap mode chooser, heap set mode, heap re-partition, frame builder, job setup, set_out_area_param, img exec, display update
+      heap set mode: 0 (was 1), 0 live blocks
+      heap re-partition: 0 live blocks: 
+      heap set mode: 0 (was 0), 0 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+  [pinned] frame 24: 1 task runs, 38591 insns, 924 device writes; state 2, expose 72, art record 0x48, heap mode 0, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, frame builder, job setup, set_out_area_param, img exec, display update
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+  [pinned] Picture Mode setting -> 119 Key Line
+  [pinned] frame 25: 15 task runs, 211017 insns, 4572 device writes; state 2, expose 163, art record 0x2A3, heap mode 1, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, mov_art_exec_init, heap mode chooser, heap set mode, heap mode check, art picture alloc, 2 x 614400 alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 0), 0 live blocks
+      heap set mode: 1 (was 1), 0 live blocks
+      heap set mode: 1 (was 1), 0 live blocks
+      heap set mode: 1 (was 1), 3 live blocks
+      heap set mode: 1 (was 1), 4 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0xFF00']; pass 7 ucExpose = [163]
+      notes: 2 divisions by zero skipped, at 0x7E56A894, 0x7E56A89C; 2 divisions by zero skipped, at 0x7E57566A
+  [pinned] frame 26: 12 task runs, 173905 insns, 4572 device writes; state 2, expose 163, art record 0x2A3, heap mode 1, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0xFF00']; pass 7 ucExpose = [163]
+      notes: 2 divisions by zero skipped, at 0x7E56A894, 0x7E56A89C; 2 divisions by zero skipped, at 0x7E57566A
+  [pinned] Picture Mode setting -> 2 Natural
+  [pinned] frame 27: 6 task runs, 75034 insns, 924 device writes; state 2, expose 0, art record 0x0, heap mode 0, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, mov_art_exec_init, heap mode chooser, heap set mode, heap re-partition, frame builder, job setup, set_out_area_param, img exec, display update, Key Line pass 1
+      heap set mode: 0 (was 1), 0 live blocks
+      heap re-partition: 0 live blocks: 
+      heap set mode: 0 (was 0), 0 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+  [pinned] frame 28: 1 task runs, 38805 insns, 924 device writes; state 2, expose 0, art record 0x0, heap mode 0, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, frame builder, job setup, set_out_area_param, img exec, display update
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+  [pinned] Picture Mode setting -> 119 Key Line
+  [pinned] frame 29: 15 task runs, 211203 insns, 4572 device writes; state 2, expose 163, art record 0x2A3, heap mode 1, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, mov_art_exec_init, heap mode chooser, heap set mode, heap mode check, art picture alloc, 2 x 614400 alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 0), 0 live blocks
+      heap set mode: 1 (was 1), 0 live blocks
+      heap set mode: 1 (was 1), 0 live blocks
+      heap set mode: 1 (was 1), 3 live blocks
+      heap set mode: 1 (was 1), 4 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0xFF00']; pass 7 ucExpose = [163]
+      notes: 2 divisions by zero skipped, at 0x7E56A894, 0x7E56A89C; 2 divisions by zero skipped, at 0x7E57566A
+  [pinned] frame 30: 12 task runs, 173905 insns, 4572 device writes; state 2, expose 163, art record 0x2A3, heap mode 1, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0xFF00']; pass 7 ucExpose = [163]
+      notes: 2 divisions by zero skipped, at 0x7E56A894, 0x7E56A89C; 2 divisions by zero skipped, at 0x7E57566A
+  S3 RESULT [pinned]: 2 device writes of addresses in freed blocks: 2 frames (108/frame 21, 108/frame 22)
+  [direct-4] frame 2: 12 task runs, 174021 insns, 4572 device writes; state 2, expose 163, art record 0x2A3, heap mode 1, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0xFF00']; pass 7 ucExpose = [163]
+      notes: 2 divisions by zero skipped, at 0x7E56A894, 0x7E56A89C; 2 divisions by zero skipped, at 0x7E57566A
+  [direct-4] request on: R set by the hook at 0x7EB7D46C (ran 6 pcs, new code: 0x7EBE2000 (5))
+  [direct-4] frame 4: 11 task runs, 164420 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] Picture Mode setting -> 107 film slot (Cross Process I entry, class 1)
+  [direct-4] frame 5: 11 task runs, 164075 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] frame 6: 11 task runs, 163784 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] Picture Mode setting -> 113 Soft Focus (class 3)
+  [direct-4] frame 7: 11 task runs, 163752 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] frame 8: 11 task runs, 163674 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] Picture Mode setting -> 119 Key Line
+  [direct-4] frame 9: 11 task runs, 163674 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] frame 10: 11 task runs, 163960 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] Picture Mode setting -> 113 Soft Focus (class 3)
+  [direct-4] frame 11: 11 task runs, 164428 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] frame 12: 11 task runs, 163752 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] Picture Mode setting -> 107 film slot (Cross Process I entry, class 1)
+  [direct-4] frame 13: 11 task runs, 163789 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] frame 14: 11 task runs, 163914 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] Picture Mode setting -> 119 Key Line
+  [direct-4] frame 15: 11 task runs, 163908 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] frame 16: 11 task runs, 163856 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] Picture Mode setting -> 100 film slot (Pop Art I entry, class 1)
+  [direct-4] frame 17: 11 task runs, 163862 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] frame 18: 11 task runs, 163862 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] Picture Mode setting -> 104 Grainy Film (class 4)
+  [direct-4] frame 19: 11 task runs, 163752 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] frame 20: 11 task runs, 163752 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] Picture Mode setting -> 108 Gentle Sepia (class 4)
+  [direct-4] frame 21: 11 task runs, 164043 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] frame 22: 11 task runs, 163674 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] Picture Mode setting -> 103 film slot (Light Tone entry, class 1)
+  [direct-4] frame 23: 11 task runs, 163784 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] frame 24: 11 task runs, 163784 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] Picture Mode setting -> 119 Key Line
+  [direct-4] frame 25: 11 task runs, 163674 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] frame 26: 11 task runs, 163674 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] Picture Mode setting -> 2 Natural
+  [direct-4] frame 27: 11 task runs, 163695 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] frame 28: 11 task runs, 163695 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] Picture Mode setting -> 119 Key Line
+  [direct-4] frame 29: 11 task runs, 163679 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  [direct-4] frame 30: 11 task runs, 163674 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0100']; pass 7 ucExpose = [3]
+  S3 RESULT [direct-4]: no anomaly in 13 filter changes
+
