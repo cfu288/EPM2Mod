@@ -2,7 +2,7 @@
 
 ![Olympus PEN E-PM2](docs/images/epm2.jpg)
 
-Repository containing the current work for creating a custom firmware mod for the Olympus PEN **E-PM2**. The goal is to unlock or add new features to this camera. Currently, we've implemented replacing the default art filters with film simulations like Portra, Ektachrome, etc., enabled interval shooting (up to 240 shots), and added a level gauge.
+Repository containing the current work for creating a custom firmware mod for the Olympus PEN **E-PM2**. The goal is to unlock or add new features to this camera. Currently, we've implemented replacing the default art filters with film simulations like Portra, Ektachrome, etc. We also enabled interval shooting (up to 240 shots) and added a level gauge.
 
 | Feature | Guide | Status |
 |---|---|---|

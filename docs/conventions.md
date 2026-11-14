@@ -5,7 +5,7 @@ work), [camera-log.md](camera-log.md) (every update done on a camera),
 [../builds/README.md](../builds/README.md) (the tested builds), [../AGENTS.md](../AGENTS.md) (rules for AI
 agents), [../NOTICE.md](../NOTICE.md) (licences and credits).
 
-## Commits: Conventional Commits
+## Commit messages
 
 `<type>(<scope>)?: <summary>`. The `.githooks/commit-msg` hook enforces it. Enable the hook once per clone:
 
@@ -58,6 +58,11 @@ Examples: `feat(patch/movie-limit): raise 29-min cap to 9 h`, `docs(camera-log):
 
   The hook has one limit. `git commit PATH` and `git commit -a` do not commit the result of black.
   Run `git add` first, then `git commit` without paths.
+- **The documents that users read have rules too.** The pre-commit hook runs
+  `python3 tools/doclint.py` on staged Markdown files. It checks Simplified Technical English in the
+  README, the install page and the guides, refuses punctuation in headings, keeps the root README
+  an index of at most 20 lines, and keeps each guide to 40 lines with a screenshot.
+  `python3 tools/doclint.py --help` lists the rules. The notes in `experiments/` are exempt.
 - **`experiments/` is research code.** It may be rough. It may import the package; the package never
   imports from `experiments/`, and a build description may only name patch specs in `patches/`.
   When a result becomes part of how firmware is made, move the code into the package, the data into

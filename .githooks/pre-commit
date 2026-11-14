@@ -23,6 +23,16 @@ fi
 
 root=$(git rev-parse --show-toplevel) || exit 1
 cd "$root" || exit 1
+# 3. Documents that users read: Simplified Technical English and the project's own rules
+#    (python3 tools/doclint.py --help). Needs python3 only.
+docs=$(git diff --cached --name-only --no-renames --diff-filter=AM -- '*.md')
+if [ -n "$docs" ]; then
+  # shellcheck disable=SC2086
+  if ! python3 tools/doclint.py $docs >&2; then
+    echo "pre-commit: the documents break the writing rules above; commit refused" >&2
+    exit 1
+  fi
+fi
 production="src/epm2mod tests/support.py tests/test_package.py tests/test_looks.py"
 # shellcheck disable=SC2086
 if git diff --cached --quiet --no-renames --diff-filter=AMD -- $production; then

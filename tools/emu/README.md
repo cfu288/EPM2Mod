@@ -1,4 +1,4 @@
-# tools/emu: E-PM2 functions in om-emu, stock against patched
+# Emulator harness
 
 This harness runs single E-PM2 v1.6 block-0 functions in [om-emu](https://github.com/flatpanda/om-emu)'s MN10300 machine. It runs each input row on stock block 0 and on a patched block 0, then compares the outputs. It follows the caduceus-ep7 contract: run the real code, patched against stock, and check that only the intended outputs change.
 
@@ -67,7 +67,7 @@ cd ~/opt/om-emu && OM_EMU_MODEL=E101 ~/opt/node26/bin/node emu/bin/debug.mjs \
 
 The harness uses scratch RAM at 0x7D000000–0x7D2FFFFF: the trampoline, the return pads, the stack (sp 0x7D100000) and the data buffers. All other RAM starts at zero. `.data` is not preloaded.
 
-## Cases, results and stubs (2026-11-12)
+## Cases and results
 
 | Case | Entry | Rows | Stubs | Result |
 |---|---|---|---|---|
@@ -102,7 +102,7 @@ The two print helpers would also return at once natively, because their mask wor
 - With an unknown MOV quality, `rec_limit` takes the reserve from the caller's a2, because the code never sets it on that path. It also prints `[QT] Parameter Error quality` twice.
 - The `rec_limit` limit for MOV q4 on 64 GiB is 6202 s: the 4 GiB cap binds below 7200.
 
-## Scenario runs (2026-11-14)
+## Scenario runs
 
 A scenario runs a top-level routine, or whole firmware tasks, and lets them call down through the real code.
 Only what the emulator cannot give is replaced. RAM is kept from one call to the next. The single-function
@@ -157,7 +157,7 @@ For code outside live view use `Scenario` directly:
 - **`hookcheck.py` sees only whole `jmp`/`call` instructions at the start of an op and the code they reach.** A patched displacement inside an instruction is not seen.
 - **Not started:** capture (TAKE_*, REC_* tasks), the GUI, the C++ state framework. `IMG0_LOCAL` spins on a hardware semaphore and is left out.
 
-### Requests for om-emu (not changed here)
+### Requests for om-emu
 
 1. An option to map a device page as "write ignored, read 0" (now each access faults and the harness skips the instruction through the `disasm` op).
 2. An option for the MN103 divide-by-zero behaviour (V flag, no trap).

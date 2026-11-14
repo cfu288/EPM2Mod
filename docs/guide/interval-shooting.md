@@ -2,6 +2,8 @@
 
 **MENU → Shooting Menu 2 → Time Lapse Settings → On.**
 
+<img src="../images/ui/shooting-menu-2.png" width="320" alt="Shooting Menu 2 with Time Lapse Settings">
+
 | Setting | Values |
 |---|---|
 | Frame | 1 to 99, then 100 to 240 in steps of 5 |

@@ -1,4 +1,4 @@
-# Film looks: the data behind the patch specs
+# Film look data
 
 - `films.json`: which film goes in which art-filter menu entry, the name shown in the menu, and the
   fit file of the film. It also names the three patch specs that are generated from this data.

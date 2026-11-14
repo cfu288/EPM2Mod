@@ -1,4 +1,4 @@
-# What the licence covers, and what it does not
+# What the licence covers
 
 The [MIT licence](LICENSE) covers what the authors of this repository wrote: the tools, the
 scripts, the documentation and the lab notes. Some material here comes from, or is derived from,
@@ -15,7 +15,7 @@ other people's work. That material keeps its own terms.
 | **Synthetic test RAW files.** The raw data is ours. The file header (EXIF and maker notes) has the camera's own layout and contents. | `experiments/2026-11-09-film-portra/testraw/*.ORF` | Raw data: MIT. Header format and contents: the camera maker's. |
 | **Photographs** in the comparison sheet. | `docs/images/film-sim-comparison.jpg`, `docs/film-sim-comparison.pdf` | Copyright the repository author. You may redistribute them unchanged with this repository. |
 
-## Credits (compatible terms, code written here)
+## Credits for code written here
 
 - **dcraw** by Dave Coffin. `experiments/2026-11-09-film-portra/orfcodec.py` is a Python port of the
   Olympus raw decoder `olympus_load_raw`, with a matching encoder written here. dcraw's notice says
@@ -26,7 +26,12 @@ other people's work. That material keeps its own terms.
   (`bake_slide.py`, `spektrafilm-lut`). None of its code is in this repository. The LUTs it makes
   are not in the repository either.
 
-## Tools you install yourself (not included)
+## Included tool
+
+`tools/third_party/ste100/ste_lint.py` is the linter of https://github.com/danyuchn/asd-ste100-skill by
+Dustin Yuchen Teng, MIT licence (`tools/third_party/ste100/LICENSE`). It checks the documents.
+
+## Tools you install yourself
 
 GNU binutils for MN10300 (`scripts/build-binutils-mn10300.sh` downloads and builds it), om-emu,
 Node.js, ExifTool, and the Python packages numpy, scipy, numba, Pillow and rawpy.

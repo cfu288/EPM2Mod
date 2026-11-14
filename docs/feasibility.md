@@ -1,4 +1,4 @@
-# What is feasible on the E-PM2, and what the real limits are
+# Feasibility and real limits
 
 Date: 2026-11-14. Evidence: [experiments/2026-11-14-feasibility/](../experiments/2026-11-14-feasibility/).
 
@@ -87,7 +87,7 @@ routines. This file records what the measurements show, so that nobody repeats t
 Not in this firmware at all (no text, no code): focus peaking, Color Creator, keystone, focus
 bracketing, zebra, silent shutter. These must be ported or written. They are not hidden features.
 
-## Unknowns, and the probe that settles each
+## Unknowns and their probes
 
 | Unknown | Probe |
 |---|---|
@@ -98,7 +98,7 @@ bracketing, zebra, silent shutter. These must be ported or written. They are not
 | Does the updater write the blank tails of blocks 1 to 3? | Write a marker there, read it back with 0x7E6756B5 |
 | Does this body recover from a boot loop by card update? | Owner's decision |
 
-## A real rule about where code may go (found 2026-11-14)
+## Where code may go
 
 The firmware loads in steps. The kernel and segment 1 are in RAM first. Segments 2 and 3 are copied
 later, by the task Usr1, and on the update path they are not copied at all.
@@ -111,7 +111,7 @@ also break the update path, which is the only way back.
 
 Check every build that adds a hook with the boot test of the emulator before a flash.
 
-## The emulator (since 2026-11-14)
+## The emulator
 
 A local copy of om-emu boots the E-PM2 firmware, stock or patched, from its reset vector on both
 cores. om-emu has no licence, so the copy, our changes to it and all screenshots stay outside this
