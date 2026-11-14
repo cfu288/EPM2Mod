@@ -1,12 +1,12 @@
 # Install
 
 <!-- BEGIN GENERATED: pinned-build -->
-The pinned build is **`peaking-direct-4`**: focus peaking, fourth build: light edge lines in live view while MF Assist runs, on top of the build seven-films-6-interval-240-level-adjust. Fixes the crash of peaking-direct-3 at the Velvia entry. We tested this build on a real E-PM2 on 2026-11-14 ([camera log](camera-log.md)).
+The pinned build is **`peaking-gain-2x`**: the pinned build with focus peaking lines 2 times as strong. We tested this build on a real E-PM2 on 2026-11-14 ([camera log](camera-log.md)).
 
 | | sha256 |
 |---|---|
 | Stock firmware, `OLY_E_101_1600_0000_0000.BIN` | `34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300` |
-| Pinned build, `peaking-direct-4` | `eea187a958de410bca0448367408998099fde177548d0b9010baf510a3452482` |
+| Pinned build, `peaking-gain-2x` | `ce1037cda6c9ff87e600272383dfe97b649a5ef24d6928e319b581191b4ca2c8` |
 <!-- END GENERATED: pinned-build -->
 
 **Use this firmware at your own risk.** It is unofficial and only for the E-PM2 with firmware 1.6

@@ -14,8 +14,7 @@ and delete the item here.
 
 - `peaking-direct-4` works on the camera (2026-11-14) and is the pinned build. Velvia in the
   quick menu does not crash.
-- Test `peaking-gain-2x` on the camera (lines 2 times as strong, one byte). Not yet tested on the
-  pinned build: sleep and wake.
+- `peaking-gain-2x` is the pinned build (2026-11-14). Not yet tested: sleep and wake.
 - Done 2026-11-14: `epm2mod make` refuses a spec that changes a byte another spec covers and keeps,
   and the free-space check fails an op that code in SRAM calls into. Still open: correct
   `docs/space-candidates.tsv` row 10 (0x7E50A201 and 0x7E53A55C are the sleep routine) and the entry

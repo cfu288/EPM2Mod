@@ -14,5 +14,7 @@
   "patches/level-adjust-row.json",
   "patches/peaking-direct-4.json",
   "patches/peaking-gain-2x.json"
- ]
+ ],
+ "sha256": "ce1037cda6c9ff87e600272383dfe97b649a5ef24d6928e319b581191b4ca2c8",
+ "camera_tested": "2026-11-14"
 }
