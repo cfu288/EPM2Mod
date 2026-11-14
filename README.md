@@ -21,8 +21,8 @@ Full-resolution sheet: [docs/film-sim-comparison.pdf](docs/film-sim-comparison.p
 
 ## Film looks
 
-Select **ART** on the camera. Seven of the art filters are now film looks. They work for photos and
-live view.
+In P, A, S or M mode, press **OK**, select **Picture Mode**, and move right past Custom to the film
+look you want. The looks also show in the **ART** mode list. They work for photos and live view.
 
 <img src="docs/images/ui/art-portra.png" width="320" alt="The art filter list with Portra selected">
 
