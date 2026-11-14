@@ -248,6 +248,19 @@ class ContainerTests(unittest.TestCase):
         with self.assertRaises(ContainerError):
             container.word_sum(b"abc")
 
+    def test_a_block_that_cannot_be_written_cannot_be_made(self) -> None:
+        good = container.parse(make_container([bytes(32)])).blocks[0]
+        for header, trailer, payload in (
+            (good.header[:-1], good.trailer, good.payload),
+            (good.header, good.trailer + b"\0", good.payload),
+            (good.header, good.trailer, bytes(24)),
+        ):
+            with self.assertRaises(ContainerError):
+                container.Block(0, header, trailer, payload, False)
+        longer = container.Block(0, good.header, good.trailer, bytes(48), False)
+        with self.assertRaisesRegex(ContainerError, "header says 32"):
+            container.serialize(container.Container((longer,), b""))
+
     def test_describe(self) -> None:
         lines = container.describe(container.parse(make_container([bytes(32)])))
         self.assertIn("checksum=OK", lines[0])
@@ -594,6 +607,18 @@ class PathAndFileTests(unittest.TestCase):
             self.assertEqual(target.read_bytes(), b"old")
             self.assertEqual([p.name for p in target.parent.iterdir()], ["f.bin"])
 
+    def test_a_failed_folder_flush_says_that_the_new_file_is_in_place(self) -> None:
+        with tempfile.TemporaryDirectory() as folder:
+            target = Path(folder) / "f.bin"
+            target.write_bytes(b"old")
+            failing = OSError(errno.EIO, "Input/output error")
+            with mock.patch("epm2mod.fileio.sync_folder", side_effect=failing) as sync:
+                with self.assertRaisesRegex(FileError, "holds the new data"):
+                    fileio.write_bytes(target, b"new")
+            sync.assert_called_once_with(target.parent)
+            self.assertEqual(target.read_bytes(), b"new")
+            self.assertEqual([p.name for p in target.parent.iterdir()], ["f.bin"])
+
     def test_a_write_is_flushed_to_the_device(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             with mock.patch("epm2mod.fileio.os.fsync", wraps=os.fsync) as flush:
@@ -754,7 +779,7 @@ class BuildDescriptionTests(unittest.TestCase):
 
     def test_test_date(self) -> None:
         self.assertEqual(builds.check_test_date("2026-11-20", TODAY), "2026-11-20")
-        for bad in ("2026-11-21", "20/11/2026", "2026-11-2"):
+        for bad in ("2026-11-21", "20/11/2026", "2026-11-2", "20261120"):
             with self.subTest(bad=bad), self.assertRaises(BuildError):
                 builds.check_test_date(bad, TODAY)
 
@@ -775,11 +800,20 @@ class BuildDescriptionTests(unittest.TestCase):
             pointers: list[Any] = [
                 {"build": "../elsewhere.json"},
                 {"build": "builds/sub/b.json"},
+                {"build": "builds/../builds/b.json"},
+                {"build": "b.json"},
                 {"build": "patches/b.json"},
                 {"build": 5},
                 {"build": "builds/b.json", "other": 1},
                 [],
             ]
+            # Each of these would name a readable, tested description if the
+            # pointer were not held to "a file directly in builds/".
+            (paths.builds / "sub").mkdir()
+            for copy in (paths.builds / "sub" / "b.json", paths.root / "b.json"):
+                shutil.copy(paths.builds / "b.json", copy)
+            (paths.root / "patches").mkdir()
+            shutil.copy(paths.builds / "b.json", paths.root / "patches" / "b.json")
             for pointer in pointers:
                 paths.pinned.write_text(json.dumps(pointer))
                 with self.subTest(pointer=pointer), self.assertRaises(BuildError):
@@ -830,8 +864,12 @@ class StockTests(RepoCase):
         path.write_bytes(b"something else")
         with self.assertRaises(StockError):
             stock.read_stock(self.repo.paths, TINY_STOCK)
-        with self.assertRaises(StockError):
-            stock.fetch(self.repo.paths, TINY_STOCK)  # a wrong file in the way
+        with answers(catalog_answer(), TINY) as opened:
+            with self.assertRaises(StockError):
+                stock.fetch(self.repo.paths, TINY_STOCK)  # a wrong file in the way
+            with self.assertRaises(StockError):
+                stock.obtain_stock(self.repo.paths, TINY_STOCK)
+            opened.assert_not_called()
         self.assertEqual(path.read_bytes(), b"something else")
         path.unlink()
         with self.assertRaises(StockError):
@@ -980,6 +1018,61 @@ class MakeTests(RepoCase):
         self.assertEqual(list(plain.iterdir()), [])
         self.assertEqual(self.repo.outputs(), [])
 
+    def test_the_volume_that_holds_the_repository_is_not_a_card(self) -> None:
+        with mock.patch.object(pipeline, "is_volume", return_value=True):
+            for card in (self.repo.paths.root, self.repo.paths.root.parent):
+                with self.assertRaisesRegex(BuildError, "holds this repository"):
+                    self.make(self.repo.tested, card=card)
+        self.assertEqual(self.repo.outputs(), [])
+
+    def test_a_failed_folder_flush_on_the_card_is_reported_as_it_is(self) -> None:
+        target = pipeline.card_target(self.card, TINY_STOCK)
+        target.parent.mkdir()
+        target.write_bytes(b"older firmware")
+        real_sync = fileio.sync_folder
+
+        def fail_on_card(folder: Path) -> None:
+            if folder == target.parent:
+                raise OSError(errno.EIO, "Input/output error")
+            real_sync(folder)
+
+        with mock.patch("epm2mod.fileio.sync_folder", side_effect=fail_on_card):
+            with self.assertRaisesRegex(BuildError, "state is not certain") as raised:
+                self.make(self.repo.tested, card=self.card)
+        self.assertNotIn("NOT on the card", str(raised.exception))
+        self.assertEqual(target.read_bytes(), self.repo.image)
+        self.assertEqual(self.repo.outputs(), [])
+
+    def test_what_an_interrupted_run_left_is_ours_and_is_replaced(self) -> None:
+        target = pipeline.card_target(self.card, TINY_STOCK)
+        target.parent.mkdir()
+        fileio.part_path(target).write_bytes(b"half a file")
+        image = pipeline.image_path(self.repo.paths, "good")
+        image.parent.mkdir()
+        fileio.part_path(image).write_bytes(b"half a file")
+        self.make(self.repo.tested, card=self.card)
+        self.assertEqual([p.name for p in target.parent.iterdir()], [target.name])
+        self.assertEqual(self.repo.outputs(), ["card/DCOLYMP/E1019999.BIN", "good.BIN"])
+        fileio.part_path(image).write_bytes(b"half a file")
+        pipeline.clear_outputs(self.repo.paths, "good")
+        self.assertEqual(self.repo.outputs(), [])
+
+    def test_a_firmware_folder_that_cannot_be_read_is_an_error(self) -> None:
+        folder = pipeline.card_target(self.card, TINY_STOCK).parent
+        folder.mkdir()
+        with mock.patch.object(Path, "iterdir", side_effect=PermissionError(13, "no")):
+            with self.assertRaisesRegex(BuildError, "cannot be read"):
+                pipeline.check_card(self.card, TINY_STOCK)
+
+    def test_every_firmware_file_is_read_back(self) -> None:
+        with mock.patch(
+            "epm2mod.pipeline.write_bytes", wraps=fileio.write_bytes
+        ) as write:
+            self.make(self.repo.tested, card=self.card)
+        self.assertEqual(write.call_count, 3)
+        for call in write.call_args_list:
+            self.assertIs(call.kwargs.get("read_back"), True, call)
+
     def test_a_card_problem_is_found_before_any_work(self) -> None:
         folder = self.card / "DCOLYMP"
         folder.mkdir()
@@ -1067,6 +1160,10 @@ class CommandLineTests(RepoCase):
         patcher = mock.patch.object(cli, "EPM2_V16", TINY_STOCK)
         patcher.start()
         self.addCleanup(patcher.stop)
+        # ``epm2mod pin`` asks the clock; give it a fixed day.
+        clock = mock.patch("epm2mod.pipeline.datetime.date", wraps=datetime.date)
+        clock.start().today.return_value = TODAY
+        self.addCleanup(clock.stop)
 
     def build_file(self, name: str) -> str:
         """Return the absolute path of a build description of the tiny repository."""
@@ -1213,7 +1310,11 @@ class CommandLineTests(RepoCase):
         before = signal.getsignal(signal.SIGTERM)
         with self.assertRaises(KeyboardInterrupt):
             with cli.interruptible():
-                signal.raise_signal(signal.SIGTERM)
+                try:
+                    signal.raise_signal(signal.SIGTERM)
+                finally:  # a second signal, during the clean-up, is ignored
+                    signal.raise_signal(signal.SIGTERM)
+                    signal.raise_signal(signal.SIGINT)
         self.assertIs(signal.getsignal(signal.SIGTERM), before)
 
     def test_an_interrupted_command_leaves_no_output_and_says_so(self) -> None:

@@ -294,8 +294,7 @@ def label_ops(text_block: bytes, films: Sequence[Film]) -> list[BytesOp]:
     ops = []
     for film in films:
         old = film.entry.encode(UTF16)
-        padded = film.label + "\0" * (len(film.entry) - len(film.label))
-        new = padded.encode(UTF16)
+        new = film.label.encode(UTF16).ljust(len(old), b"\0")
         found = [
             BytesOp(TEXT_BLOCK, match.start(), old, new)
             for match in re.finditer(re.escape(old), text_block)

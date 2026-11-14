@@ -17,15 +17,18 @@ What ``make`` guarantees about files:
 
 * The outputs of an earlier run for the same build, and the whole ``build/card``
   folder, are removed before anything else is done. After a failed run they are
-  absent; they never hold another build.
+  absent; they never hold another build. (One limit: if no build is named and
+  the pointer to the pinned build cannot be read, the name of the image is not
+  known, so only ``build/card`` is removed.)
 * A firmware file gets its final name only when all of it is written, flushed
   and read back (``fileio.write_bytes``). No final name ever holds part of a
   file.
 * On the SD card the new file replaces an older one only when it is complete
   and was read back from the card. The card is never given a part of a file
   under the camera's file name.
-* ``--card`` takes only the top folder of a mounted volume, so a mistyped path
-  is not reported as a write to the card.
+* ``--card`` takes only the top folder of a mounted volume, and not the volume
+  that holds the repository, so a mistyped path is not reported as a write to
+  the card.
 
 These guarantees hold when a step fails and when the run is stopped by Ctrl-C
 or by a termination signal that the command line turns into an interrupt
@@ -219,9 +222,12 @@ def copy_to_card(image: bytes, card: Path, stock: StockFirmware) -> Path:
 
     The data goes to a temporary name in the firmware folder, is flushed to the
     card and read back, and only then takes the camera's file name
-    (``fileio.write_bytes`` with ``read_back``). If anything fails, the
-    temporary file is removed and a firmware file that was on the card before
-    is still there, unchanged.
+    (``fileio.write_bytes`` with ``read_back``). If a step before the rename
+    fails, the temporary file is removed and a firmware file that was on the
+    card before is still there, unchanged. If the last step fails (the flush
+    of the folder, after the rename), the card holds the new file but the
+    write is not confirmed. The error message says which of the two happened;
+    it is found by reading the card, not assumed.
 
     Args:
         image: the firmware file.
@@ -240,12 +246,28 @@ def copy_to_card(image: bytes, card: Path, stock: StockFirmware) -> Path:
     try:
         write_bytes(target, image, BuildError, read_back=True)
     except BuildError as error:
-        raise BuildError(
-            f"{error}\nThe new firmware is NOT on the card. Look in "
-            f"{target.parent} before you use the card: an older {target.name} "
-            "can still be there."
-        ) from None
+        raise BuildError(f"{error}\n{_card_state(target, image)}") from None
     return target
+
+
+def _card_state(target: Path, image: bytes) -> str:
+    """Say what the card holds after a failed write, from what can be read there."""
+    try:
+        found = target.read_bytes() if target.exists() else None
+    except OSError:
+        found = b""
+    if found == image:
+        return (
+            f"The card's state is not certain: {target.name} is the new firmware, "
+            "but the write was not confirmed. Do not use the card. Run this again."
+        )
+    if found is None:
+        return "The new firmware is NOT on the card."
+    return (
+        f"The new firmware is NOT on the card. {target} is another file (an "
+        "older firmware, or one that cannot be read). Do not update the camera "
+        "from this card."
+    )
 
 
 def image_path(paths: RepoPaths, name: str) -> Path:
@@ -318,6 +340,12 @@ def make(
     clear_outputs(paths, description.name)
     if card is not None:
         card = card.absolute()
+        root = paths.root.resolve()
+        if card.resolve() in (root, *root.parents):
+            raise BuildError(
+                f"{card}: holds this repository, so it is not the SD card. Give "
+                "the place where the card is mounted."
+            )
     hidden = check_card(card, stock) if card is not None else []
     specs = load_specs(paths, description)
 

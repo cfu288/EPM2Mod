@@ -24,6 +24,7 @@ import io
 import signal
 import sys
 from pathlib import Path
+from typing import Any
 from collections.abc import Callable, Iterator, Sequence
 
 from . import __version__, readme
@@ -259,20 +260,24 @@ def build_parser() -> argparse.ArgumentParser:
 
 @contextlib.contextmanager
 def interruptible() -> Iterator[None]:
-    """Turn termination signals into ``KeyboardInterrupt`` for a block.
+    """Turn termination signals into one ``KeyboardInterrupt`` for a block.
 
     Closing the terminal or stopping the process politely then runs the same
-    clean-up as Ctrl-C. The handlers that were there before are put back.
-    Outside the main thread, where handlers cannot be set, nothing is changed.
+    clean-up as Ctrl-C. After the first signal (Ctrl-C included) further ones
+    are ignored until the block ends, so the clean-up itself is not
+    interrupted. The handlers that were there before are put back. Outside the
+    main thread, where handlers cannot be set, nothing is changed.
     """
 
     def interrupt(number: int, frame: object) -> None:
-        """Raise the interrupt in the main thread."""
+        """Ignore further signals and raise the interrupt in the main thread."""
+        for other in before:
+            signal.signal(other, signal.SIG_IGN)
         raise KeyboardInterrupt
 
-    names = ("SIGTERM", "SIGHUP", "SIGBREAK")
+    names = ("SIGINT", "SIGTERM", "SIGHUP", "SIGBREAK")
     signals = [getattr(signal, name) for name in names if hasattr(signal, name)]
-    before = {}
+    before: dict[int, Any] = {}
     try:
         for number in signals:
             before[number] = signal.signal(number, interrupt)

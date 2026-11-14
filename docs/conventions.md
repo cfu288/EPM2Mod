@@ -26,7 +26,7 @@ Examples: `feat(patch/movie-limit): raise 29-min cap to 9 h`, `docs(camera-log):
 | Path | What |
 |---|---|
 | `src/epm2mod/` | The production package. It makes the firmware: container format, patch specs, stock download, build descriptions, build steps, film-spec generator. Command: `uv run epm2mod --help`. See *Production code and research code*. |
-| `tools/make_firmware.py`, `tools/fetch_stock.py` | The two main commands of the package as stand-alone scripts. |
+| `tools/make_firmware.py`, `tools/fetch_stock.py` | The two main commands of the package as stand-alone scripts. `tools/_package.py` lets them import the package without an install. |
 | `tools/build.py`, `tools/oetool.py` | Older command-line forms. They call the package. Older scripts in `tools/` and `experiments/` import them. Do not use them to make firmware for a camera. |
 | `tools/freespace.py`, `tools/fwmap.py`, `tools/disasm.py`, `tools/memmap_svg.py`, `tools/emu/` | Analysis tools: the free-space check, the function database of block 0, MN103 disassembly (GNU objdump from `scripts/build-binutils-mn10300.sh`), the memory map figure, the emulator harness. |
 | `builds/`, `pinned-build.json` | One description per firmware build, and the pointer to the last camera-tested build. See *Making firmware*. |

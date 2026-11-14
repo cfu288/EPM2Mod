@@ -106,6 +106,7 @@ that the result is the tested build.
    uv run tools/make_firmware.py --card /Volumes/NAME
    ```
 
+   If the location contains a space, put it in quotation marks: `--card "/Volumes/NO NAME"`.
    On macOS the location is `/Volumes/NAME`. On Windows it is a drive letter, for example `E:\`. On
    Linux it is the mount point of the card.
 

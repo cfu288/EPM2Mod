@@ -221,6 +221,10 @@ class UnitTests(unittest.TestCase):
         self.assertTrue(all(len(op.new) == len(op.expect) for op in ops))
         with self.assertRaises(BuildError):
             generate.label_ops(text("\0Nothing here\0"), [film])
+        wide = films.Film("Diorama", "x", "slide", "\U0001f39e", "x.npz")
+        self.assertEqual(
+            generate.label_ops(block, [wide])[0].new, text("\U0001f39e\0\0\0\0\0")
+        )
 
     def test_the_slots(self) -> None:
         self.assertEqual(slots.slot_for("Diorama").entry, "Diorama")
@@ -305,6 +309,7 @@ class FilmListTests(unittest.TestCase):
             changed(0, label="Por\0tra"),
             changed(0, label="\ud800"),
             changed(0, label="Portra\U0001f39e"),  # 7 characters, 8 UTF-16 units
+            changed(3, label="\U0001f39e" * 6),  # 6 characters, 12 units, entry 10
             changed(0, medium=5),
             changed(0, fit="../outside.npz"),
             changed(0, fit="/abs/fit.npz"),

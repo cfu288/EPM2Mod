@@ -5,7 +5,9 @@ Two rules hold for every file the package writes:
 * **All or nothing.** Data goes to a temporary file in the same folder, is
   flushed to the device, and only then takes the final name. A failure removes
   the temporary file. The final name therefore never holds a part of a file,
-  and a file that was there before stays until the new one is complete.
+  and a file that was there before stays until the new one is complete. The
+  last step, a flush of the folder, comes after the rename: if it fails, the
+  error says that the final name already holds the new data.
 * **No bare ``OSError``.** A failure is reported as a ``FileError`` (or the
   error type the caller asks for) with the path in the message.
 
@@ -146,7 +148,10 @@ def write_bytes(
 
     Raises:
         Epm2ModError: of type ``error``, if the file cannot be written or the
-            data read back differs. The final name is untouched then.
+            data read back differs. The final name is untouched then, with one
+            exception: if the flush of the folder fails after the new file took
+            its name, the final name holds the new, complete data and the
+            message says so.
     """
     temporary = part_path(path)
     try:
@@ -161,11 +166,17 @@ def write_bytes(
         if read_back and temporary.read_bytes() != data:
             raise error(f"{path}: the data read back differs from the data written")
         os.replace(temporary, path)
-        sync_folder(path.parent)
     except OSError as reason:
         raise error(f"{path}: cannot be written: {describe_os_error(reason)}") from None
     finally:
         remove(temporary)
+    try:
+        sync_folder(path.parent)
+    except OSError as reason:
+        raise error(
+            f"{path}: holds the new data, but the folder could not be flushed "
+            f"to the device: {describe_os_error(reason)}"
+        ) from None
 
 
 def write_text(path: Path, text: str, error: type[Epm2ModError] = FileError) -> None:
