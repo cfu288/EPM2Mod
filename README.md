@@ -7,10 +7,10 @@ Repository containing the current work for creating a custom firmware mod for th
 | Feature | What you get | Status |
 |---|---|---|
 | **Film looks** | Seven film emulations as art filters, for stills and live view | Tested on the camera |
-| **Interval shooting** | A Time Lapse Settings menu: 1 to 240 frames, start delay, interval, optional time-lapse movie | Tested on the camera, with the time-lapse movie, to 125 frames. Long intervals are not yet reported |
+| **Interval shooting** | 1 to 240 frames, start delay, interval, optional time-lapse movie | Tested on the camera |
 | **Level gauge** | Two tilt bars in live view | Tested on the camera |
-| Focus peaking | Light edge lines in live view while you focus by hand | In work, not in the tested build. See `experiments/2026-11-14-focus-peaking/` |
-| Video quality and recording limit | Research and patch specs | Not built. See `experiments/2026-11-12-hardware/` |
+| Focus peaking | Edge lines in live view while you focus by hand | In work |
+| Video bitrate and recording limit | | Research only |
 
 See below for an example of the film looks:
 
@@ -21,8 +21,10 @@ Full-resolution sheet: [docs/film-sim-comparison.pdf](docs/film-sim-comparison.p
 
 ## Film looks
 
-Film looks replace seven of the twelve art filters. They work for still pictures and for live view.
-The camera writes the look into the JPEG.
+Select **ART** on the camera. Seven of the art filters are now film looks. They work for photos and
+live view.
+
+<img src="docs/images/ui/art-portra.png" width="320" alt="The art filter list with Portra selected">
 
 <!-- BEGIN GENERATED: films -->
 | Menu name | Film | Replaces |
@@ -36,60 +38,23 @@ The camera writes the look into the JPEG.
 | Superia 400 | Fuji Superia X-tra 400 (negative, on Fuji Crystal Archive paper) | Cross Process |
 <!-- END GENERATED: films -->
 
-- Grainy Film, Gentle Sepia, Dramatic Tone, Key Line and Watercolor do not change.
-- A film look changes colour and tone only. It does not add grain or halation.
-- Each look is fitted to a [spektrafilm](https://github.com/andreavolpato/spektrafilm) simulation
-  of the film.
-- We measured each look on the camera with a synthetic test RAW file. The average colour error on
-  natural colours is 1.1 to 1.5 ΔE2000. ΔE2000 is a standard measure of colour difference: 1 is
-  about the smallest difference that you can see. The stock Natural mode is 4 to 6 from the same
-  targets.
-
-[docs/film-emulation.md](docs/film-emulation.md) tells you how the looks work, how we measured them
-and what their limits are.
+The other five art filters do not change. A look changes colour and tone only: no grain, no
+halation. Details: [docs/film-emulation.md](docs/film-emulation.md).
 
 ## Interval shooting
 
-The stock firmware contains the code for interval shooting, but no menu entry for it. The mod adds
-the entry: **Shooting Menu 2 → Time Lapse Settings**. In this menu you set:
-
-- the number of frames
-- the waiting time before the first frame
-- the interval between frames (1 second or more)
-- whether the camera makes a time-lapse movie at the end of the sequence
-
-The camera stays on during a sequence. Each frame uses the mechanical shutter.
-
-The number of frames goes from 1 to 99 in steps of 1, then from 100 to 240 in steps of 5. The steps
-of 5 are necessary because the menu list can hold only 128 values.
-
-[experiments/2026-11-13-intervalometer/README.md](experiments/2026-11-13-intervalometer/README.md)
-tells you what was in the firmware, how the patch works, how we checked it and what is not yet
-tested.
+**MENU → Shooting Menu 2 → Time Lapse Settings.** Set the number of frames (1 to 240), the start
+delay, the interval, and whether the camera makes a time-lapse movie at the end.
 
 ## Level gauge
 
-The level gauge shows two bars in live view: one for left-right tilt and one for forward-back tilt.
-The stock firmware contains the whole feature, but no menu row to switch it on. The mod adds the
-row.
+1. **MENU → Custom Menu (gears) → D → Info Settings → LV-Info → Level Gauge → OK.**
+   If the gears tab is not there: Setup Menu (wrench) → Menu Display → switch the Custom Menu on.
+2. In live view, press **INFO** until the two bars show.
 
-**To switch the level gauge on:**
+<img src="docs/images/ui/lv-info-level-gauge.png" width="320" alt="LV-Info with the Level Gauge row"> <img src="docs/images/ui/level-gauge.png" width="320" alt="The level gauge in live view">
 
-1. Press **MENU**. Go to the Setup Menu (the wrench tab).
-2. Select **Menu Display** and set the Custom Menu (the gears symbol) to **On**. Do this step only
-   if the menu does not show the gears tab.
-3. Go to the Custom Menu (the gears tab). Select group **D** and press the right arrow.
-4. Select **Info Settings** (the fourth item) and press the right arrow.
-5. Select **LV-Info** and press the right arrow.
-6. Select **Level Gauge** and press **OK** to put a check mark on it. Press **MENU** to go back.
-
-**To use it:** in live view, push the **INFO** button again and again until the two bars show. The
-camera keeps the setting when you switch it off.
-
-How we found the feature and how the patch works:
-[experiments/2026-11-14-level-gauge/NOTES.md](experiments/2026-11-14-level-gauge/NOTES.md).
-
-## Install the latest tested firmware
+## Install
 
 <!-- BEGIN GENERATED: pinned-build -->
 The pinned build is **`seven-films-6-interval-240-level`**: seven film looks as art filters, interval shooting with up to 240 frames, and the level gauge. We tested this build on a real E-PM2 on 2026-11-14 ([camera log](docs/camera-log.md)).
@@ -100,103 +65,45 @@ The pinned build is **`seven-films-6-interval-240-level`**: seven film looks as 
 | Pinned build, `seven-films-6-interval-240-level` | `3e7f793ea74b21dab19c61eac33fe1f818d9c627e4fa522a2551ea62fc32c7f6` |
 <!-- END GENERATED: pinned-build -->
 
-This repository does not contain firmware. The firmware is the maker's copyrighted software. One
-command downloads the maker's v1.6 firmware, applies the patches of this repository, and makes sure
-that the result is the tested build.
+You need [uv](https://docs.astral.sh/uv/getting-started/installation/), an SD card, a full battery,
+and an E-PM2 on firmware 1.6 (Setup Menu → Firmware).
 
-**You need:**
-
-- a computer with [uv](https://docs.astral.sh/uv/getting-started/installation/). uv gets the correct
-  Python for you.
-- an SD card
-- a fully charged battery
-- an E-PM2 with body firmware 1.6. To see the version, open Setup menu → Firmware.
-
-**Steps:**
-
-1. Get this repository. On GitHub, click **Code → Download ZIP**, then unzip the file. Open a
-   terminal in the unzipped folder. As an alternative, use git:
-
-   ```bash
-   git clone https://github.com/cfu288/EPM2Mod.git
-   cd EPM2Mod
-   ```
-
-2. Put the SD card in the computer.
-
-3. Run this command. Give the location of the card after `--card`.
+1. Get this repository (**Code → Download ZIP**, or `git clone`) and open a terminal in its folder.
+2. Put the SD card in the computer and run this command with the location of the card:
 
    ```bash
    uv run tools/make_firmware.py --card /Volumes/NAME
    ```
 
-   If the location contains a space, put it in quotation marks: `--card "/Volumes/NO NAME"`.
-   On macOS the location is `/Volumes/NAME`. On Windows it is a drive letter, for example `E:\`. On
-   Linux it is the mount point of the card.
+   The script downloads the maker's firmware, applies the patches, checks the result and writes it
+   to the card. It stops with a message if a step fails. This repository contains no firmware.
+3. Put the card in the camera. With the camera off, hold **OK** and switch the camera on.
+4. Wait about one minute while the lamp is orange. Do not touch the camera. When the lamp blinks,
+   switch the camera off and on.
 
-   The script does five steps. If a step fails, the script stops and tells you the cause. It does
-   not write an incorrect file.
+To go back to the original firmware: `uv run tools/fetch_stock.py`, copy the file it names to the
+card as `DCOLYMP/E1019999.BIN`, then do steps 3 and 4. More: [docs/flashing.md](docs/flashing.md).
 
-   | Step | What the script does |
-   |---|---|
-   | 1 | It downloads the maker's firmware file (43 MB), if the file is not there. It makes sure that the file is correct. |
-   | 2 | It makes sure that the patches do not use the same bytes. Only an untested build needs this step. |
-   | 3 | It applies the patches. |
-   | 4 | It makes sure that the result is the tested build. |
-   | 5 | It writes the firmware to the card as `DCOLYMP/E1019999.BIN`. It reads the file again to make sure that the copy is correct. |
+**Use this firmware at your own risk.** It is unofficial and only for the E-PM2 with firmware 1.6.
+An interrupted update can make a camera unusable. Never put a firmware file for another camera on
+the card.
 
-4. Eject the card. Put the card in the camera.
-
-5. Make sure that the camera is off. Hold the **OK** button and push the **ON/OFF** button.
-
-6. Wait. The lamp is orange for approximately one minute. Do not touch the camera during this time.
-   When the lamp blinks, the update is complete.
-
-7. Push the **ON/OFF** button to stop the camera. Push it again to start the camera.
-
-8. Make sure that the update is correct:
-   - The art filter list shows Portra, Ektachrome, Pro 400H, Kodachrome, Vis 250D, Velvia and
-     Superia 400.
-   - Shooting Menu 2 shows Time Lapse Settings.
-   - Custom Menu D → Info Settings → LV-Info shows Level Gauge.
-
-### If you do not give `--card`
-
-The script writes the firmware to `build/card/DCOLYMP/E1019999.BIN`. Copy the `DCOLYMP` folder to
-the card. The firmware must be the only file in `DCOLYMP`.
-
-### To go back to the original firmware
-
-1. Run `uv run tools/fetch_stock.py`. This command downloads the maker's firmware file, or makes
-   sure that the file you have is correct.
-2. Copy `firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN` to the card as `DCOLYMP/E1019999.BIN`.
-   It must be the only file in `DCOLYMP`.
-3. Do steps 4 to 7.
-
-More about the update procedure: [docs/flashing.md](docs/flashing.md).
-
-### Limits of this build
+## Limits
 
 - A movie gets only a part of each film look.
 - Type II of Portra, Pro 400H and Superia is the same as type I.
-- The film looks do not add grain or halation.
+- The level gauge has no calibration menu yet.
 - Each interval frame uses the mechanical shutter.
-- Not yet tested: a full sequence of 240 frames, the cancellation of a sequence, and intervals
-  longer than 90 seconds.
-- Level gauge: the accuracy on a level surface is not yet measured, and there is no menu row to
-  calibrate it. Not yet tested with an electronic viewfinder attached.
-
-### Warning
-
-**Use this firmware at your own risk.** It is unofficial. It is for the E-PM2 with body firmware 1.6
-only. Olympus and OM Digital Solutions have no part in it. An incorrect or interrupted update can
-make a camera unusable. Do not put a firmware file for a different camera model on the card.
 
 ## For developers
 
-Each firmware build has a description file in [`builds/`](builds/). The description names the patch
-specs in order. After a camera test it also holds the sha256 of the result and the date of the test.
-[`pinned-build.json`](pinned-build.json) names the description of the last tested build.
+Start with [docs/conventions.md](docs/conventions.md) (layout, builds, tests),
+[docs/feasibility.md](docs/feasibility.md) (what is possible, the emulator) and
+[docs/todo.md](docs/todo.md). Rules for AI agents: [AGENTS.md](AGENTS.md). Every camera update is in
+[docs/camera-log.md](docs/camera-log.md).
+
+<details>
+<summary>Tested builds</summary>
 
 <!-- BEGIN GENERATED: builds -->
 | Build | What | Patch specs | Camera-tested | sha256 |
@@ -207,43 +114,12 @@ specs in order. After a camera test it also holds the sha256 of the result and t
 | `seven-films-6-interval-240` | Seven film looks as art filters, and interval shooting with up to 240 frames | 9 | 2026-11-13 | `01837f962f8a8ca0d189d9cd65ad9b5b35402ca3f3ed54a3872af044e050de11` |
 <!-- END GENERATED: builds -->
 
-To make a different build, give its description to the script:
+Make one with `uv run tools/make_firmware.py builds/NAME.json`.
 
-```bash
-uv run tools/make_firmware.py builds/seven-films-6.json
-```
-
-The scripts in `tools/` that make firmware use only the Python standard library. If you have
-Python 3.10 or newer, you can use `python3` in place of `uv run`.
-
-To run the tests:
-
-```bash
-uv run python -m unittest discover -s tests
-```
-
-Some tests need the maker's firmware file. Without the file, the test run skips them.
-
-| To learn about | Read |
-|---|---|
-| Where each file goes, the code rules, the commit rules, and how to make and test a new build | [docs/conventions.md](docs/conventions.md) |
-| What the firmware contains and where | [docs/firmware-map.md](docs/firmware-map.md) |
-| The firmware file format | [docs/firmware-format.md](docs/firmware-format.md) |
-| The update procedure and recovery | [docs/flashing.md](docs/flashing.md) |
-| Each update that we did on a camera, with its result | [docs/camera-log.md](docs/camera-log.md) |
-| The open work | [docs/todo.md](docs/todo.md) |
-| What is possible on this camera and what the real limits are | [docs/feasibility.md](docs/feasibility.md) |
-| The working rules for AI agents | [AGENTS.md](AGENTS.md) |
-| How we check a patch before a camera test | [docs/verification.md](docs/verification.md) |
-| The patch specs that are not in the current build, and their history | [patches/history/README.md](patches/history/README.md) |
+</details>
 
 ## Licence
 
-Code, documentation and notes: [MIT](LICENSE). Some material has other terms:
-
-- The film look data is derived from [spektrafilm](https://github.com/andreavolpato/spektrafilm) by
-  Andrea Volpato (CC BY-SA 4.0).
-- Excerpts of the Olympus firmware remain the property of Olympus.
-
-This repository includes no firmware and no third-party tool. [NOTICE.md](NOTICE.md) gives the
-details and the credits.
+[MIT](LICENSE). The film look data is derived from
+[spektrafilm](https://github.com/andreavolpato/spektrafilm) (CC BY-SA 4.0). The firmware and the
+camera screens shown here belong to Olympus. Details: [NOTICE.md](NOTICE.md).
