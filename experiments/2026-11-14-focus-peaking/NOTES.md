@@ -988,3 +988,134 @@ Go back: `epm2flash seven-films-6-interval-240-level-adjust e93d1589b3406ec991e3
 | `scripts/scen_direct4.py` | S6 and S7: `scen_direct4.py all PINNED_BLOCK0 direct-3=BLOCK0 direct-4=BLOCK0` |
 | `tools/emu/opcheck.py` | the two static checks of §14.4 |
 | `results/direct4-*.txt`, `results/direct3-opcheck.txt`, `results/scen-s6.txt`, `scen-s7.txt`, `scen-direct4-s*.txt` | outputs |
+
+## 15. A menu setting for peaking: Off / White / Black (`peaking-menu`)
+
+Date: 2026-11-15. Status: `patches/peaking-menu.json`, build `builds/peaking-menu.json`, sha256
+`07f25fd8b7e2cce65a311a48c475c9d28558954f0c16ca18df771fc26221ce58`. Checked in emulation. **Not flashed.**
+The pinned build `peaking-gain-2x` still rebuilds to `ce1037cd…a2c8`. Labels: **V** verified (bytes, or ran in the
+emulator), **I** inferred, **U** unknown.
+
+### 15.1 Design
+
+MENU → Custom Menu → A → **Peaking** (the row after MF Assist): **Off / White / Black**.
+
+| Value | Live view while MF Assist magnifies |
+|---|---|
+| White | as the pinned build: light lines, gain 512 |
+| Black | dark lines: Key Line's own gain 0xFF00, which is the E-P5 value for black (−2048 after the shift by 3, §14.6). The picture below the lines stays plain |
+| Off | the latch L stays 0, so every hook gives the stock result: MF Assist magnifies as on the build without peaking |
+
+MF Assist must still be On: the lines show only while MF Assist magnifies.
+
+Why one row with three values, and not the E-P5's two rows (MF Assist → Magnify / Peaking): see §15.5.
+
+### 15.2 Where the value is kept
+
+| Fact | Label |
+|---|---|
+| The E-P5 peaking setting is info 567 → prm tag 0xE2D1. The E-PM2 info table ends at 700 with other tags from 533 on, and has no tag 0xE2D1. Ids 0–532 are the same on both bodies; the E-PL6 table equals the E-PM2 table | V (tables 0x7E4BDBA8 / 0x7E7C95B4 / 0x7E7CA014) |
+| The E-PM2 text table has no "Peaking", "White" or "Black" (1,970 English strings). "Magnify" is text 1102 | V |
+| **Setting 458** ("Built-in EVF Style", texts 1498–1502) is used: prm tag **0x8971**, MODE bank, one byte. Its value list in the mode controller is 1, 2, 3 (record 0x7E84C584), so three values need no change there | V |
+| Nothing reads it: no call of the prm getter or setter, of `Get/Set_CameraInfo` or of the GUI's `getSetting` with this id or tag as a constant; in the mode controller's tables the id is only in its own value-list record and in the full-reset list 0x7E84D850. It is in no bank list, no restore list, no conflict rule. Its only page (panel 593) is in no menu. The body has no built-in viewfinder | V for the scans, I for "no reader with a computed id" |
+| The value after a full reset is **3** (mode controller default table 0x7E84C82C). The prm default list says 1 (record 0x7E4C1114). The emulator's first-boot settings bank holds 3 | V |
+| So: **3 = White, 2 = Black, 1 = Off**, and the code takes every value but 1 and 2 as White. A camera that was never set shows White, as the pinned build does | V for the code, I for the value on the owner's camera |
+| Row-enable checks of setting 458 (table 0x7EC1E184): number 2 (the mode controller's lock test, 0x7E9E8DF7) and 84 (bit 4 of info 4013, 0x7E9E9C41). Wind Noise Reduction has both among its five. What sets that bit was not traced. MF Assist has no check at all. In the emulator the row is selectable in P, iAUTO, ART and movie mode (§15.4) | V |
+| Rejected: info 670 (tag 0x18B1, values 0–2): it is in every bank list and in the standard reset list, and its meaning is unknown. Infos 446–449 (EVF Info Settings, Off/On): two values only; a third needs a new value list in the mode controller | V for the tables |
+
+### 15.3 What the patch changes
+
+44 edits, 2,578 bytes in the edited windows, 2,180 bytes changed. A delta on the pinned build: every `expect` is a
+byte string of `peaking-gain-2x`. Generator: `scripts/mkspec_menu.py`.
+
+| Part | Edit |
+|---|---|
+| Item table | 80-row copy at **0x7EBF2000** (1,282 B): the 79-row table 0x7EBF3000 of `level-adjust-row` with `{group 0, text 1505, setting 458, order 7, help 1506, value list 607, 0}` at index 7. The 10 address loads point to it |
+| Child list | 80-entry copy at **0x7EBF2600** (648 B) with (panel 607, setting 458) at index 7. The 11 page records 24–34 point to it |
+| Row constants | last index 78 → 79 (5 sites), count 79 → 80 (3 sites), row-state array 158 → 160 bytes (0x7EDE9AE5); rows in group A in the `.data` image 0x7E8EE850: 10 → 11 |
+| The list | Panel 607 is a generic list page (factory 0x7EDC7ECB, as MF Assist's panel 107) of the dormant setting 446, in no menu. Its descriptor 0x7F00BFBC now says setting 458, 3 items at **0x7EBF2900** (84 B): Off (1), White (3), Black (2) |
+| The value shown in the row | The row's field +12 is a number in the table 0x7F014614 of value → text lists (660 pointers; **not** the panel number, though both are 107 for MF Assist). Entry 607 was null: the row builder 0x7EE01E1E read address 0 and the emulator stopped with a fault at the first try. Entry 607 now points to a new list at **0x7EBF2960** (96 B) |
+| Code | 76 B at **0x7E4C93A4** (kernel range, after T_K): `T_R`, `T_K2`. T_A: `movbu (R),d0` → `call T_R,[],4`. T_K: `mov 512,d0` → `jmp T_K2` |
+| Texts (block 1, English only) | 0x38872C (30 B) text 1505 "EVF Auto Switch" → "Peaking"; 0x38874C (180 B) text 1506 → "Show white or black lines / on sharp edges while / MF Assist magnifies."; 0x38862A (14 B) text 1500 "Style 1" → "White"; 0x38863A (14 B) text 1501 "Style 2" → "Black". "Off" is the stock text 1371 |
+
+- `T_R` runs in the mov task, at the end of the struct refresh 0x7E6ECCAF (hook A). When R is 1 it reads tag 0x8971
+  with the prm getter 0x7E457C75, as the same function does for five other tags (0x7E6ECDA1 …), keeps the value in
+  the RAM byte **C = 0x602BE8C7** and answers 0 for Off. It is not a leaf, so it returns with `ret`, not `retf`.
+- `T_K2` runs in the ART task (hook K). It reads only C: 2 → the stock `mov 65280,d0`, else `mov 512,d0`.
+- New RAM: C, the fourth byte of the unused slot 20 that holds L, R and L2 (§11.3). The row-state array of the Custom
+  Menu page grows into 0x606A31B6–B7 (same argument as level-gauge NOTES §12.2; zero through the emulator run).
+- The tables 0x7EBF3000 and 0x7EBF3500 of `level-adjust-row` stay in place without a reader (1.9 KB). They are not
+  edited in place because the 80-row table would run 2 bytes into the child list.
+- The old readers of the changed texts: panel 596 (EVF Auto Switch) and panel 593 (Built-in EVF Style). Both are in
+  no menu. Other languages keep their old strings for these four ids, so the row is labelled correctly only in
+  English.
+- `film-names-all-languages` (another spec of the same day) changes other block-1 offsets: no overlap.
+
+### 15.4 Checks
+
+| Check | Result | Label |
+|---|---|---|
+| `.venv/bin/epm2mod make builds/peaking-menu.json` | sha256 `07f25fd8…ce58`; free-space check PASS, 0 FAIL, no `first_code` (`results/menu-freespace-check.txt`) | V |
+| `tools/emu/hookcheck.py` | this spec: 5 transfers, 0 FAIL. All 14 specs: 55 transfers, the 1 known FAIL (0x7E56C6A5, remap7b-code) | V |
+| `tools/emu/opcheck.py builds/peaking-menu.json` | 0 FAIL | V |
+| Boot, `stage2-boot.mjs 2000` | PASS; the report equals the pinned build's except the wall time | V |
+| Menu crawl, P mode, card, clock set, every sub-screen (4,236 screens) against the crawl of `seven-films-6-interval-240-level-adjust` (the pinned build differs from it only in the peaking code; its block 1 is the same file) | outside the Custom Menu rows 1,875 screens, all byte-equal. Custom Menu rows as sets: 1,500 in both; 9 gone = page 2 of group A with 3 rows; 13 new = the same 9 with 4 rows, the cursor on Peaking, the list on Off, White, Black. Firmware error log and crawler notes equal (`results/menu-emu-crawl-p-card-full-vs-leveladj.txt`) | V |
+| The same full crawl of the pinned build itself | was still running when this section was written: `run-checks.sh b` compares it | U |
+| Shallow crawls of the pinned build and this build: P without card, iAUTO, ART, movie | only the pages of group A differ, one new cursor position in each mode; the row can be selected in every mode (`results/menu-emu-crawl-shallow.txt`) | V |
+| Screens | `~/opt/om-emu-e101-boot-work/peaking-menu/screens/04-a-peaking-white.png`, `05-peaking-list-white.png`, `06-peaking-list-black.png`, `07-peaking-list-off.png`, `09-a-peaking-off.png`, `10-a-peaking-black.png` | V |
+| The value over a restart | Black, Off and White each read back after a restart, in the row and in the tag (`results/menu-emu-persist.txt`); the value stays through P → iAUTO → P → ART (`results/menu-emu-modes.txt`). The emulator carries the bank's RAM image over in place of the power-off save | V for the load, I for the save |
+| Row-state array | zero after the 160 bytes through start-up, menus, INFO and playback (`results/menu-emu-ramcheck.txt`) | V |
+| S1 (request clear) | this build = the build without peaking in every frame | V |
+| **S8** Off with the request set, Natural and Key Line | same memory writes but the four flag bytes, same device accesses in the same order, no stock pc lost, L = 0: equal to the build without peaking | V |
+| **S9** White (value 3, and 0) | equal to the pinned build but the byte C; pass 9 gain 0x0200, pass 7 `ucExpose` 3 | V |
+| **S10** Black | a picture in every frame; pass 9 gain 0xFF00, pass 7 `ucExpose` 3 | V |
+| **S11** T_A and T_K alone with the firmware's own settings getter | 10 + 20 rows as the model; sp and d2, d3, a2, a3 kept | V |
+| S2 to S7 on this build | see `results/scen-menu-s*.txt`; a file that is missing was not finished when this section was written | U until read |
+
+Not checked: the picture (black lines on the camera); the help text on screen (the emulator did not show a help
+text for any row); the value 3 on the owner's camera; the row in languages other than English.
+
+### 15.5 Peaking without the zoom: not in this build
+
+| Fact | Label |
+|---|---|
+| The picture path does not need the magnified view. The latch asks for: R, no movie, live-view kind not 2 and not 5. Hooks F, G and I exist only to make the line job run in the magnified kind; the plain kind is Key Line's stock path (S2 runs it) | V |
+| The trigger does. R is set in `entryMfAssistOn` of the MF Assist state object. The GUI starts that object from the focus-ring events only when MF Assist is On, and its start handler 0x7EB7DC93 asks for the zoom through a chain of virtual calls | V for the code, I for which call is the zoom |
+| What a build needs: either a second trigger (the two focus-ring handlers 0x7ECE362D / 0x7ECE36A3 set R, and a timer clears it), or a skip of the zoom request and of its counterpart at the end when a setting says so. The E-P5's `startMfAssist` has a colour argument (§11.1); its state object was not paired | I |
+| The emulator cannot test either: the scenario rig does not run the state framework (§13.2, S4), and the full-boot emulator has no lens that sends focus-ring events | V |
+
+So the E-P5 layout (MF Assist → Magnify, Peaking) would show a "Magnify Off" that this build cannot honour. One row
+with three values says what the build does. Next step, if wanted: pair the E-P5 `CmpSts_MfAssist` start handler
+(strings "rcvStartMFAssistIn_MFAssistOff") with 0x7EB7DC93 and find the zoom call.
+
+### 15.6 Camera test
+
+Setup: MENU → Custom Menu → A → MF Assist → On. OK → AF mode → MF. A lens with a focus ring.
+
+1. MENU → Custom Menu → A → DOWN past MF Assist. New: the row **Peaking**, value **White**.
+2. Leave the menu, turn the focus ring. Expected: magnified view with light lines, as before.
+3. Peaking → **Black** → OK. Turn the ring. Expected: dark lines on sharp edges over a normal picture.
+4. Peaking → **Off** → OK. Turn the ring. Expected: magnified view at once, no lines.
+5. Power off, power on. Expected: the row still says Off. Set White again.
+6. OK → Picture Mode strip → RIGHT through all looks and back. Expected: no crash.
+7. Set Home, AF Illuminat. and Face Priority (the rows after Peaking) open; group J still has six rows.
+
+| Result | Meaning |
+|---|---|
+| The row shows Off or Black at step 1 | the stored value of setting 458 is not 3 on this camera. Report it; choose White |
+| The row shows no value | the stored value is outside 1 to 3; the lines are white. Choose a value once |
+| Black lines too thin | gain 0xFE00 in T_K2 is the next build |
+| The Custom Menu stops or a row opens the wrong screen | an error in the insert. Flash the pinned build |
+
+Flash: `epm2flash peaking-menu 07f25fd8b7e2cce65a311a48c475c9d28558954f0c16ca18df771fc26221ce58`.
+Go back: `epm2flash peaking-gain-2x ce1037cda6c9ff87e600272383dfe97b649a5ef24d6928e319b581191b4ca2c8`.
+
+### 15.7 Files added
+
+| Path | Contents |
+|---|---|
+| `patches/peaking-menu.json`, `builds/peaking-menu.json` | the spec and the build description |
+| `scripts/mkspec_menu.py` | generator: `mkspec_menu.py OUT.json PINNED_DIR /tmp/scratch/asm [LISTING.txt]` |
+| `scripts/scen_menu.py` | S8 to S11: `scen_menu.py all BASE_BLOCK0 PINNED_BLOCK0 MENU_BLOCK0` |
+| `scripts/menu-emu/` | drivers of the full-boot emulator checks (copies; see its README.txt) |
+| `results/menu-*.txt`, `results/scen-menu-*.txt` | listing, free-space check, hook check, op check, scenario outputs, emulator outputs |

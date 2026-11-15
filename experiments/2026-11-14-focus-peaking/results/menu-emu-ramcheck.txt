@@ -1,0 +1,18 @@
+## pinned2x
+boot: rows 70..79 state 0 0 0 0 0 0 0 0 0 0 | 0x606a31b6..0x606A32F0 all zero
+groups: rows 70..79 state 0 0 0 0 0 0 0 0 0 0 | 0x606a31b6..0x606A32F0 all zero
+group-a-rows: rows 70..79 state 0 0 0 0 0 0 0 0 0 0 | 0x606a31b6..0x606A32F0 all zero
+group-j-rows: rows 70..79 state 0 0 0 0 0 0 0 0 1 0 | 0x606a31b6..0x606A32F0 all zero
+after-7-down: rows 70..79 state 0 0 0 0 0 0 0 0 1 0 | 0x606a31b6..0x606A32F0 all zero
+after-3-up: rows 70..79 state 0 0 0 0 0 0 0 0 1 0 | 0x606a31b6..0x606A32F0 all zero
+after-info-and-play: rows 70..79 state 0 0 0 0 0 0 0 0 1 0 | 0x606a31b6..0x606A32F0 all zero
+firmware errors 2
+## peakmenu
+boot: rows 70..79 state 0 0 0 0 0 0 0 0 0 0 | 0x606a31b8..0x606A32F0 all zero
+groups: rows 70..79 state 0 0 0 0 0 0 0 0 0 0 | 0x606a31b8..0x606A32F0 all zero
+group-a-rows: rows 70..79 state 0 0 0 0 0 0 0 0 0 0 | 0x606a31b8..0x606A32F0 all zero
+group-j-rows: rows 70..79 state 0 0 0 0 0 0 0 0 0 1 | 0x606a31b8..0x606A32F0 all zero
+after-7-down: rows 70..79 state 0 0 0 0 0 0 0 0 0 1 | 0x606a31b8..0x606A32F0 all zero
+after-3-up: rows 70..79 state 0 0 0 0 0 0 0 0 0 1 | 0x606a31b8..0x606A32F0 all zero
+after-info-and-play: rows 70..79 state 0 0 0 0 0 0 0 0 0 1 | 0x606a31b8..0x606A32F0 all zero
+firmware errors 2

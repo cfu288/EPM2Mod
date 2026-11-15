@@ -1,0 +1,34 @@
+PASS  patches/remap7b-code.json op 0 at 0x7E880F5C: 120 B 0x7E880F5C-0x7E880FD4 in area 0x7E880F5C-0x7E881000 (segment-1), as data, verdict USABLE-CODE [12 history/superseded spec(s) used these bytes]
+PASS  patches/remap7b-code.json op 1 at 0x7ECB0888: 760 B 0x7ECB0888-0x7ECB0B80 in area 0x7ECB0888-0x7ECB1000 (segment-2), as code, verdict USABLE-CODE [11 history/superseded spec(s) used these bytes]
+PASS  patches/seven-fixes-1.json op 0 at 0x7E880FD4: 16 B 0x7E880FD4-0x7E880FE4 in area 0x7E880F5C-0x7E881000 (segment-1), as data, verdict USABLE-CODE
+PASS  patches/seven-movie-1.json op 0 at 0x7ECB0B80: 29 B 0x7ECB0B80-0x7ECB0B9D in area 0x7ECB0888-0x7ECB1000 (segment-2), as data, verdict USABLE-CODE [3 history/superseded spec(s) used these bytes]
+PASS  patches/seven-structure-extra.json: no byte added in a free area (5 block-0 byte ops, all edits of existing content; 0 other ops)
+PASS  patches/seven-films-5.json op 6 at 0x7E880FC2: 17 B 0x7E880FC2-0x7E880FD3 in area 0x7E880F5C-0x7E881000 (segment-1), as data, verdict USABLE-CODE [edits bytes of patches/remap7b-code.json in place (expect matches its output); 12 history/superseded spec(s) used these bytes]
+PASS  patches/seven-films-5.json op 14 at 0x7ECB099A: 18 B 0x7ECB099A-0x7ECB09AC in area 0x7ECB0888-0x7ECB1000 (segment-2), as data, verdict USABLE-CODE [edits bytes of patches/remap7b-code.json in place (expect matches its output); 8 history/superseded spec(s) used these bytes]
+PASS  patches/seven-films-5.json op 16 at 0x7F033B7C: 512 B 0x7F033B7C-0x7F033D7C in area 0x7F033B7C-0x7F034000 (segment-3), as data, verdict USABLE-DATA [12 history/superseded spec(s) used these bytes]
+PASS  patches/seven-films-5.json op 17 at 0x7F033D7C: 512 B 0x7F033D7C-0x7F033F7C in area 0x7F033B7C-0x7F034000 (segment-3), as data, verdict USABLE-DATA [11 history/superseded spec(s) used these bytes]
+PASS  patches/seven-films-5.json op 22 at 0x7ECB0988: 17 B 0x7ECB0988-0x7ECB0999 in area 0x7ECB0888-0x7ECB1000 (segment-2), as data, verdict USABLE-CODE [edits bytes of patches/remap7b-code.json in place (expect matches its output); 8 history/superseded spec(s) used these bytes]
+PASS  patches/seven-films-5.json op 59 at 0x7ECB09AC: 15 B 0x7ECB09AC-0x7ECB09BB in area 0x7ECB0888-0x7ECB1000 (segment-2), as data, verdict USABLE-CODE [edits bytes of patches/remap7b-code.json in place (expect matches its output); 8 history/superseded spec(s) used these bytes]
+PASS  patches/seven-films-5.json op 67 at 0x7ECB09BE: 18 B 0x7ECB09BE-0x7ECB09D0 in area 0x7ECB0888-0x7ECB1000 (segment-2), as data, verdict USABLE-CODE [edits bytes of patches/remap7b-code.json in place (expect matches its output); 8 history/superseded spec(s) used these bytes]
+PASS  patches/xp-adaptive-hue-off.json: no byte added in a free area (2 block-0 byte ops, all edits of existing content; 0 other ops)
+PASS  patches/seven-labels.json: no byte added in a free area (0 block-0 byte ops, all edits of existing content; 135 other ops)
+PASS  patches/interval-timelapse-v2.json op 6 at 0x7ECB0BA0: 831 B 0x7ECB0BA4-0x7ECB0EE3 in area 0x7ECB0888-0x7ECB1000 (segment-2), as code, verdict USABLE-CODE [3 history/superseded spec(s) used these bytes]
+PASS  patches/interval-frames-240.json op 0 at 0x7E4C90FC: 128 B 0x7E4C9100-0x7E4C9180 in area 0x7E4C90CA-0x7E4C9800 (kernel), as data, verdict USABLE-CODE
+PASS  patches/interval-frames-240.json op 2 at 0x7EBF10FC: 3584 B 0x7EBF1100-0x7EBF1F00 in area 0x7EBF1090-0x7EBF3BAD (segment-2), as data, verdict USABLE-CODE
+PASS  patches/level-gauge-lvinfo-row.json: no byte added in a free area (3 block-0 byte ops, all edits of existing content; 0 other ops)
+PASS  patches/level-adjust-row.json op 0 at 0x7EBF3000: 1266 B 0x7EBF3000-0x7EBF34F2 in area 0x7EBF1090-0x7EBF3BAD (segment-2), as data, verdict USABLE-CODE
+PASS  patches/level-adjust-row.json op 1 at 0x7EBF3500: 640 B 0x7EBF3500-0x7EBF3780 in area 0x7EBF1090-0x7EBF3BAD (segment-2), as data, verdict USABLE-CODE
+PASS  patches/peaking-direct-4.json op 0 at 0x7E4C9200: 420 B 0x7E4C9200-0x7E4C93A4 in area 0x7E4C90CA-0x7E4C9800 (kernel), as code, verdict USABLE-CODE
+PASS  patches/peaking-direct-4.json op 1 at 0x7EBF1F28: 39 B 0x7EBF1F28-0x7EBF1F4F in area 0x7EBF1090-0x7EBF3BAD (segment-2), as code, verdict USABLE-CODE
+PASS  patches/peaking-gain-2x.json op 0 at 0x7E4C9396: 1 B 0x7E4C9396-0x7E4C9397 in area 0x7E4C90CA-0x7E4C9800 (kernel), as data, verdict USABLE-CODE [edits bytes of patches/peaking-direct-4.json in place (expect matches its output)]
+PASS  patches/peaking-menu.json op 0 at 0x7EBF2000: 1282 B 0x7EBF2000-0x7EBF2502 in area 0x7EBF1090-0x7EBF3BAD (segment-2), as data, verdict USABLE-CODE
+PASS  patches/peaking-menu.json op 1 at 0x7EBF2600: 648 B 0x7EBF2600-0x7EBF2888 in area 0x7EBF1090-0x7EBF3BAD (segment-2), as data, verdict USABLE-CODE
+PASS  patches/peaking-menu.json op 33 at 0x7EBF2900: 84 B 0x7EBF2900-0x7EBF2954 in area 0x7EBF1090-0x7EBF3BAD (segment-2), as data, verdict USABLE-CODE
+PASS  patches/peaking-menu.json op 35 at 0x7EBF2960: 95 B 0x7EBF2960-0x7EBF29BF in area 0x7EBF1090-0x7EBF3BAD (segment-2), as data, verdict USABLE-CODE
+PASS  patches/peaking-menu.json op 37 at 0x7E4C93A4: 76 B 0x7E4C93A4-0x7E4C93F0 in area 0x7E4C90CA-0x7E4C9800 (kernel), as code, verdict USABLE-CODE
+PASS  patches/peaking-menu.json op 38 at 0x7E4C9226: 6 B 0x7E4C9226-0x7E4C922C in area 0x7E4C90CA-0x7E4C9800 (kernel), as data, verdict USABLE-CODE [edits bytes of patches/peaking-direct-4.json in place (expect matches its output)]
+PASS  patches/peaking-menu.json op 39 at 0x7E4C9394: 3 B 0x7E4C9394-0x7E4C9397 in area 0x7E4C90CA-0x7E4C9800 (kernel), as data, verdict USABLE-CODE [edits bytes of patches/peaking-direct-4.json, patches/peaking-gain-2x.json in place (expect matches its output)]
+PASS  SRAM callers: 42 constant calls and jumps of the SRAM code looked at
+ALLOWED hook 0x7E56C6A5 (segment-1) jmp -> 0x7ECB08CD (segment-2)  allowed: 2026-11-14, remap7b-code, segment 1 to segment 2. The host function is reached only through the image-job table 0x7E789604. 
+PASS  load order: S0 boot-order check: 55 transfers, 0 FAIL (every transfer from early-loaded code stays in early-loaded code)
+check: PASS (0 FAIL)

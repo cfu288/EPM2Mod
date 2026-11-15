@@ -12,8 +12,12 @@ and delete the item here.
 
 ## Focus peaking
 
-- A menu entry for focus peaking (On/Off, and the line colour), so it does not depend on MF Assist
-  alone.
+- Test the build `peaking-menu-names` on the camera (Peaking Off / White / Black, and the film names
+  in other languages). Steps: NOTES §15 of the focus-peaking experiment.
+- Peaking without the zoom: the trigger is the MF Assist state object, which also asks for the zoom.
+  It needs the E-P5 state object paired (NOTES §15.5).
+- The words Peaking, White and Black are English only: the other languages keep the old texts of
+  ids 1500, 1501, 1505, 1506.
 - Make the emulator's boot test a step for every candidate. It is run by hand now, because the
   emulator is outside the repository.
 

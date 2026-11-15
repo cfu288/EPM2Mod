@@ -1,0 +1,6 @@
+ok    hook 0x7E4C9226 (kernel) call -> 0x7E4C93A4 (kernel)  [peaking-menu.json]
+ok    hook 0x7E4C9394 (kernel) jmp -> 0x7E4C93D8 (kernel)  [peaking-menu.json]
+ok    code 0x7E4C93B7 (kernel) call -> 0x7E457C75 (kernel)  [peaking-menu.json]
+ok    code 0x7E4C93E2 (kernel) jmp -> 0x7E4C9399 (kernel)  [peaking-menu.json]
+ok    code 0x7E4C93EA (kernel) jmp -> 0x7E4C939F (kernel)  [peaking-menu.json]
+S0 boot-order check: 5 transfers, 0 FAIL (every transfer from early-loaded code stays in early-loaded code)

@@ -1,0 +1,19 @@
+## run 1: fresh state, then set Black
+tag before: index entry tag 0x8971 count 1, data at 0x60410f36, value 3 (White)
+tag after-black: index entry tag 0x8971 count 1, data at 0x60410f36, value 2 (Black)
+state saved to peaking-menu/state/d.json
+done at lab ms 14240 | firmware errors 2 36.9 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9 ; 38.5 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9
+## run 2: restart, then set Off
+tag after-restart: index entry tag 0x8971 count 1, data at 0x60410f36, value 2 (Black)
+tag after-off: index entry tag 0x8971 count 1, data at 0x60410f36, value 1 (Off)
+state saved to peaking-menu/state/d.json
+done at lab ms 14760 | firmware errors 2 36.9 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9 ; 38.5 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9
+## run 3: restart, then set White
+tag after-restart: index entry tag 0x8971 count 1, data at 0x60410f36, value 1 (Off)
+tag after-white: index entry tag 0x8971 count 1, data at 0x60410f36, value 3 (White)
+state saved to peaking-menu/state/d.json
+done at lab ms 14240 | firmware errors 2 36.9 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9 ; 38.5 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9
+## run 4: restart
+tag after-restart: index entry tag 0x8971 count 1, data at 0x60410f36, value 3 (White)
+state saved to peaking-menu/state/d.json
+done at lab ms 9800 | firmware errors 2 36.9 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9 ; 38.5 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9

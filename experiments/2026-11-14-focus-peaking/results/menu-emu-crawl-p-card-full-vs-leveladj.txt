@@ -1,0 +1,33 @@
+pinned level-adjust/crawl/p-card-full/leveladj: 4250 screens; new peaking-menu/crawl/p-card-full/peakmenu: 4236 screens
+1. units other than custrowsNN, by name: same 1875, differ 0, only pinned 0, only new 0
+2. custrowsNN units, by content: pinned 2375 screens / 1509 distinct, new 2361 / 1513 distinct; in both 1500, lost 9, new 13
+   lost (pinned only), by the top row of the first sighting: custrows00.07 5, custrows01.00 3, custrows01.01 1
+      custrows00.07.00.png (+1 more sightings)
+      custrows00.07.01.png (+1 more sightings)
+      custrows00.07.02.png (+1 more sightings)
+      custrows00.07.03.png (+1 more sightings)
+      custrows00.07.png (+1 more sightings)
+      custrows01.00.00.png (+1 more sightings)
+      custrows01.00.01.png (+1 more sightings)
+      custrows01.00.png (+1 more sightings)
+      custrows01.01.png (+1 more sightings)
+   new (new image only), by the top row of the first sighting: custrows00.07 4, custrows01.00 5, custrows01.01 3, custrows01.02 1
+      custrows00.07.00.png (+1 more sightings)
+      custrows00.07.01.png (+1 more sightings)
+      custrows00.07.02.png (+1 more sightings)
+      custrows00.07.png (+1 more sightings)
+      custrows01.00.00.png (+1 more sightings)
+      custrows01.00.01.png (+1 more sightings)
+      custrows01.00.02.png (+1 more sightings)
+      custrows01.00.03.png (+1 more sightings)
+      custrows01.00.png (+1 more sightings)
+      custrows01.01.00.png (+1 more sightings)
+      custrows01.01.01.png (+1 more sightings)
+      custrows01.01.png (+1 more sightings)
+      custrows01.02.png (+1 more sightings)
+3. logs pinned: distinct firmware errors {'0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e50': 92}
+   notes: {'custrows: BUDGET': 5, 'custrows: DOWN wraps to position 1': 2, 'custrows: continued here after the child left more than one ': 2, 'custrows: leaving this screen went up more than one level': 2, 'setup: BUDGET': 1, 'setup: DESYNC after BUDGET': 1, 'setup: UNIT ENDED EARLY': 1, 'sm2: BUDGET': 1}
+   stops: ['setup.00 DESYNC after BUDGET', 'setup UNIT ENDED EARLY']
+3. logs new: distinct firmware errors {'0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e50': 92}
+   notes: {'custrows: BUDGET': 5, 'custrows: DOWN wraps to position 1': 2, 'custrows: continued here after the child left more than one ': 2, 'custrows: leaving this screen went up more than one level': 2, 'setup: BUDGET': 1, 'setup: DESYNC after BUDGET': 1, 'setup: UNIT ENDED EARLY': 1, 'sm2: BUDGET': 1}
+   stops: ['setup.00 DESYNC after BUDGET', 'setup UNIT ENDED EARLY']

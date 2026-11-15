@@ -1,0 +1,6 @@
+tag set-black-in-P: index entry tag 0x8971 count 1, data at 0x60410f36, value 2 (Black)
+tag in-iAUTO: index entry tag 0x8971 count 1, data at 0x60410f36, value 2 (Black)
+tag back-in-P: index entry tag 0x8971 count 1, data at 0x60410f36, value 2 (Black)
+tag in-ART: index entry tag 0x8971 count 1, data at 0x60410f36, value 2 (Black)
+state saved to peaking-menu/state/m.json
+done at lab ms 32180 | firmware errors 2 36.9 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9 ; 38.5 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9

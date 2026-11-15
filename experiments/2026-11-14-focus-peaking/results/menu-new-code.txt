@@ -1,0 +1,46 @@
+
+menu.elf:     file format elf32-mn10300
+
+
+Disassembly of section .k2:
+
+7e4c93a4 <T_R>:
+7e4c93a4:	fc a8 c5 e8 	movbu	(602be8c5 <RFLAG>),d0
+7e4c93a8:	2b 60 
+7e4c93aa:	a0 00       	cmp	0,d0
+7e4c93ac:	c8 29       	beq	7e4c93d5 <.L2^B1>
+7e4c93ae:	fc cc 71 89 	mov	35185,d0
+7e4c93b2:	00 00 
+7e4c93b4:	90 00       	mov	0,a0
+7e4c93b6:	04          	clr	d1
+7e4c93b7:	dd be e8 f8 	call	7e457c75 <s_7e457c75>,[d2,d3],12
+7e4c93bb:	ff c0 0c 
+7e4c93be:	fc 82 c7 e8 	movbu	d0,(602be8c7 <CFLAG>)
+7e4c93c2:	2b 60 
+7e4c93c4:	fc dd d0 1c 	mov	1616583888,a1
+7e4c93c8:	5b 60 
+7e4c93ca:	04          	clr	d1
+7e4c93cb:	a0 01       	cmp	1,d0
+7e4c93cd:	c8 07       	beq	7e4c93d4 <.L1^B1>
+7e4c93cf:	80 01       	mov	1,d0
+7e4c93d1:	df 00 04    	ret	[],4
+
+7e4c93d4 <.L1^B1>:
+	...
+
+7e4c93d5 <.L2^B1>:
+7e4c93d5:	df 00 04    	ret	[],4
+
+7e4c93d8 <T_K2>:
+7e4c93d8:	fc a8 c7 e8 	movbu	(602be8c7 <CFLAG>),d0
+7e4c93dc:	2b 60 
+7e4c93de:	a0 02       	cmp	2,d0
+7e4c93e0:	c9 07       	bne	7e4c93e7 <.L1^B2>
+7e4c93e2:	dc b7 ff ff 	jmp	7e4c9399 <s_7e4c9399>
+7e4c93e6:	ff 
+
+7e4c93e7 <.L1^B2>:
+7e4c93e7:	2c 00 02    	mov	512,d0
+7e4c93ea:	dc b5 ff ff 	jmp	7e4c939f <s_7e4c939f>
+7e4c93ee:	ff 
+7e4c93ef:	cb          	nop	
