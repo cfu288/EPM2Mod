@@ -19,6 +19,7 @@ All firmware that goes on a camera is made this way. The procedure for a new bui
 | Build | What | Patch specs | Camera-tested | sha256 |
 |---|---|---|---|---|
 | `peaking-colours` (pinned) | Seven film looks named in all 34 languages, interval shooting with up to 240 frames, the level gauge with Level Adjust, and focus peaking with the setting Off / White / Red / Yellow / Blue | 16 | 2026-11-15 | `4d6b1f26ed92d66b62b4d7dc32d26168e33fd8b153a7655d6c0d9a58267456f8` |
+| `debug-log` | DEBUG build, not for normal use: the pinned build peaking-colours with the structured log (records to EPM2LOG.BIN on the card; decode with `epm2mod log`) | 18 | 2026-11-15 | `e74f1aece22a2846b79a3a8b858ade531d3f7a37ef8f25908c34ed52c87bbda8` |
 | `peaking-direct-4` | Focus peaking, fourth build: light edge lines in live view while MF Assist runs, on top of the build seven-films-6-interval-240-level-adjust. Fixes the crash of peaking-direct-3 at the Velvia entry | 12 | 2026-11-14 | `eea187a958de410bca0448367408998099fde177548d0b9010baf510a3452482` |
 | `peaking-gain-2x` | Seven film looks as art filters, interval shooting with up to 240 frames, the level gauge with Level Adjust, and focus peaking | 13 | 2026-11-14 | `ce1037cda6c9ff87e600272383dfe97b649a5ef24d6928e319b581191b4ca2c8` |
 | `peaking-menu-names` | Seven film looks named in all 34 languages, interval shooting with up to 240 frames, the level gauge with Level Adjust, and focus peaking with the setting Off / White / Black | 15 | 2026-11-15 | `4ea4ffd773d6f05d16867f55b9fef4bce5d53fc8659a9b16362f7ac771a6bc30` |
