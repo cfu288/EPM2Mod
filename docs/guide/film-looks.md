@@ -5,7 +5,7 @@ Seven art filters are replaced by film looks. They work for photos and live view
 **To use one:** in P, A, S or M mode, press **OK**, select **Picture Mode**, and move right past
 Custom to the look. The looks are also in the **ART** mode list.
 
-<img src="../images/ui/picture-mode-portra.png" width="320" alt="The Picture Mode list with Portra selected">
+<img src="../images/ui/quick-menu-portra.png" width="320" alt="The quick menu with Picture Mode on Portra">
 
 <!-- BEGIN GENERATED: films -->
 | Menu name | Film | Replaces |

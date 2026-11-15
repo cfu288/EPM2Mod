@@ -24,12 +24,10 @@ and delete the item here.
   camera.
 - Add Effects (glow, vignette, white edge, frame) on a film look: a data edit, not yet tried.
 - More film entries through the hidden art-filter numbers 110 to 118: not yet tried.
-- The film names are complete only in English. German and Spanish show two names, French three,
-  Greek three; Japanese, Chinese, Russian, Thai, Korean and Bulgarian show the old names. Rename the
-  entries of the other language tables.
-- Defect: in French, the label of the effect "Soft Focus" (Add Effects) reads "Ektachrome". Remove
-  the edit at block 1 offset 0x3D5550 from `patches/seven-labels.json` in the next build.
-  Both items: `experiments/2026-11-14-emulator-audit/NOTES.md` §5.
+- Test the build `film-names-all-languages` on the camera: set another language (Setup Menu) and
+  look at Picture Mode. Then remove the limit "only in English" from the film-looks guide.
+  Unknown: where the texts 1173 and 1186 show; the Picture Mode Settings list has no row for the
+  first look (Portra), not compared with stock yet.
 
 ## Interval shooting
 

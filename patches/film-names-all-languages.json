@@ -1,0 +1,3865 @@
+{
+ "name": "film-names-all-languages",
+ "description": "The seven film names in all 34 menu languages (string ids 60, 61, 65, 66, 67, 68, 69, 582, 597, 598, 599, 600, 602, 603, 1173, 1186), and the French label of the effect 'Add Soft Focus Effect' (id 764) back to its stock text. A delta on patches/seven-labels.json: apply after it. A name longer than its old string is moved inside the language's text pool and the pointer of its id is changed. Made by experiments/2026-11-14-emulator-audit/scripts/film_names_spec.py.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2f2878",
+   "expect": "1a0440043e04410420003f0440043e044604350441040000140438043e0440043004",
+   "new": "40004100300034003200400045006b00740061006300680072006f006d0065000000",
+   "_note": "bgr (language 1, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2f83c6",
+   "expect": "1a0440043e04410420003f0440043e04460435044104",
+   "new": "53007500700065007200690061002000340030003000",
+   "_note": "bgr (language 1, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2f8698",
+   "expect": "1f043e043404410438043b0435043d043804200046043204350442043e0432043504",
+   "new": "50006f00720074007200610000000000000000000000000000000000000000000000",
+   "_note": "bgr (language 1, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2f86e8",
+   "expect": "11043b04350434043804260041043204350442043b043804200046043204350442043e0432043504",
+   "new": "500072006f0020003400300030004800000000000000000000000000000000000000000000000000",
+   "_note": "bgr (language 1, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2f871e",
+   "expect": "1c0435043a04200041043204350442044a043b04200042043e043d04",
+   "new": "4b006f00640061006300680072006f006d0065000000000000000000",
+   "_note": "bgr (language 1, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2f8770",
+   "expect": "5000",
+   "new": "5600",
+   "_note": "bgr (language 1, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2f8774",
+   "expect": "6e00",
+   "new": "7300",
+   "_note": "bgr (language 1, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2f8778",
+   "expect": "48006f006c00650020003504440435043a044204",
+   "new": "3200350030004400000000000000000000000000",
+   "_note": "bgr (language 1, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2f879a",
+   "expect": "140438043e04400430043c043004",
+   "new": "560065006c007600690061000000",
+   "_note": "bgr (language 1, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2ff168",
+   "expect": "5000",
+   "new": "5600",
+   "_note": "bgr (language 1, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2ff16c",
+   "expect": "6e00",
+   "new": "7300",
+   "_note": "bgr (language 1, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2ff170",
+   "expect": "48006f006c00650020003504440435043a044204",
+   "new": "3200350030004400000000000000000000000000",
+   "_note": "bgr (language 1, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2ff516",
+   "expect": "140438043e04400430043c043004",
+   "new": "560065006c007600690061000000",
+   "_note": "bgr (language 1, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x306fd4",
+   "expect": "98d2f3bfb0d2f3bf",
+   "new": "e62df4bfba31f4bf",
+   "_note": "bgr (language 1, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x306fe8",
+   "expect": "16d3f3bf34d3f3bf5ed3f3bf82d3",
+   "new": "3e31f4bf0831f4bfb830f4bfa4d2",
+   "_note": "bgr (language 1, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x306ff8",
+   "expect": "96d3f3bf",
+   "new": "9031f4bf",
+   "_note": "bgr (language 1, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x30783c",
+   "expect": "dc30f4bf",
+   "new": "98d2f3bf",
+   "_note": "bgr (language 1, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x309190",
+   "expect": "1f8d4772b251705348659c670000cb7a534f48659c6700000f62675248659c67",
+   "new": "4000410030003400340040004b006f00640061006300680072006f006d006500",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3091b2",
+   "expect": "d4678c540060e7650000677147720060e7659798927c48659c670000d467495148659c670000e16d1653ca539e58ae4e7282038c48659c670000536d",
+   "new": "400041003000340036004000560069007300200032003500300044000000400041003000340033004000560069007300200032003500300044000000",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x30b68a",
+   "expect": "3800",
+   "new": "3700",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x30b68e",
+   "expect": "1f8d4772b251705348659c67",
+   "new": "560065006c00760069006100",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x30b832",
+   "expect": "536dc1907282038c48659c67",
+   "new": "50006f007200740072006100",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x30b840",
+   "expect": "400041003000340032004000d467267148659c67",
+   "new": "0f62675248659c670000d4678c540060e7650000",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x30b862",
+   "expect": "e16d1653ca539e58ae4e7282038c48659c67",
+   "new": "500072006f00200034003000300048000000",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x30b87e",
+   "expect": "3400",
+   "new": "3800",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x30b882",
+   "expect": "d467495148659c670000400041003000",
+   "new": "53007500700065007200690061002000",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x30b894",
+   "expect": "35004000677147720060e7659798927c48659c6700004000410030003400360040008894545bf8763a6748659c670000400041003000340037004000cb7a534f",
+   "new": "30003000000040004100300034003200400045006b00740061006300680072006f006d0065000000400041003000340035004000677147720060e7659798927c",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x30e84c",
+   "expect": "3300",
+   "new": "3400",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x30e850",
+   "expect": "8894545bf8763a6748659c67",
+   "new": "560065006c00760069006100",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x312714",
+   "expect": "b0d1",
+   "new": "a2f8",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x312718",
+   "expect": "bed1",
+   "new": "aef6",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31271c",
+   "expect": "c8d1",
+   "new": "60f8",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x312720",
+   "expect": "d2d1",
+   "new": "6af8",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x312724",
+   "expect": "dcd1",
+   "new": "e8f8",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x312728",
+   "expect": "eed1",
+   "new": "bcd1",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31272c",
+   "expect": "f8d1",
+   "new": "82f8",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x312730",
+   "expect": "0cd2",
+   "new": "52f8",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x312734",
+   "expect": "1ad2",
+   "new": "c6f8",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x312738",
+   "expect": "24d2",
+   "new": "ded1",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x312f3c",
+   "expect": "a2f6",
+   "new": "96f8",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x312f7c",
+   "expect": "60f8",
+   "new": "baf8",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x312f84",
+   "expect": "96f8",
+   "new": "b0d1",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x312f88",
+   "expect": "acf8",
+   "new": "dcf8",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x312f8c",
+   "expect": "caf8",
+   "new": "d2d1",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x312f90",
+   "expect": "e4f8",
+   "new": "a2f6",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x313878",
+   "expect": "6428f4bf",
+   "new": "f0d1f3bf",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3138ac",
+   "expect": "d829",
+   "new": "6428",
+   "_note": "chs (language 2, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31479a",
+   "expect": "a08c4772b251705348659c6700000f90968948659c67000032628752276084767282bf8a0000d4678c54f7610a820000f7610a82f8764772977c927c505b48659c670000d467495148659c670000e16d1653ca53a05249517282bf8a4865",
+   "new": "4000410030003400340040004b006f00640061006300680072006f006d0065000000400041003000340036004000560069007300200032003500300044000000400041003000340033004000560069007300200032003500300044000000",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x316cdc",
+   "expect": "3800",
+   "new": "3700",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x316ce0",
+   "expect": "a08c4772b251705348659c67",
+   "new": "560065006c00760069006100",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x316e80",
+   "expect": "c36f16537282bf8a48659c67",
+   "new": "50006f007200740072006100",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x316e8e",
+   "expect": "400041003000340032004000d467",
+   "new": "32628752276084767282bf8a0000",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x316eb0",
+   "expect": "e16d1653ca53a05249517282bf8a48659c67",
+   "new": "500072006f00200034003000300048000000",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x316ecc",
+   "expect": "3400",
+   "new": "3800",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x316ed0",
+   "expect": "d467495148659c670000400041003000",
+   "new": "53007500700065007200690061002000",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x316ee2",
+   "expect": "35004000f7610a82f8764772977c927c505b48659c670000400041003000340036004000dd91545bf8765f6a48659c670000",
+   "new": "30003000000040004100300034003200400045006b00740061006300680072006f006d006500000040004100300034003500",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x316f16",
+   "expect": "410030003400370040000f909689",
+   "new": "f7610a82f8764772977c927c505b",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x319e86",
+   "expect": "3300",
+   "new": "3400",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x319e8a",
+   "expect": "dd91545bf8765f6a48659c67",
+   "new": "560065006c00760069006100",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x319fe8",
+   "expect": "40004100300034003400",
+   "new": "d4678c54f7610a820000",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31dd54",
+   "expect": "bad1",
+   "new": "f0f8",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31dd58",
+   "expect": "c8d1",
+   "new": "00f7",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31dd5c",
+   "expect": "d2d1",
+   "new": "aef8",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31dd60",
+   "expect": "e0d1f3bfead1",
+   "new": "082af4bf36f9",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31dd68",
+   "expect": "fed1",
+   "new": "c6d1",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31dd6c",
+   "expect": "08d2",
+   "new": "d0f8",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31dd70",
+   "expect": "1cd2",
+   "new": "a0f8",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31dd74",
+   "expect": "2ad2",
+   "new": "14f9",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31dd78",
+   "expect": "34d2",
+   "new": "e8d1",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31e57c",
+   "expect": "f4f6",
+   "new": "e4f8",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31e5bc",
+   "expect": "aef8",
+   "new": "08f9",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31e5c4",
+   "expect": "e4f8",
+   "new": "bad1",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31e5c8",
+   "expect": "faf8",
+   "new": "2af9",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31e5cc",
+   "expect": "1af9",
+   "new": "dcd1",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31e5d0",
+   "expect": "34f9",
+   "new": "f4f6",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31eeb8",
+   "expect": "9e28f4bf",
+   "new": "fad1f3bf",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31eeec",
+   "expect": "082a",
+   "new": "9e28",
+   "_note": "cht (language 3, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31fe24",
+   "expect": "430072006f00730073002000500072006f00630065007300",
+   "new": "530075007000650072006900610020003400300030000000",
+   "_note": "csy (language 4, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31fea0",
+   "expect": "4a0065006d006e00e9002000530076001b0174006c006f00",
+   "new": "4b006f00640061006300680072006f006d00650000000000",
+   "_note": "csy (language 4, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31feba",
+   "expect": "42006c0065006400e900200026002000530076001b0174006c00e900200042006100720076007900",
+   "new": "500072006f0020003400300030004800000000000000000000000000000000000000000000000000",
+   "_note": "csy (language 4, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31fee8",
+   "expect": "70002d00410072007400",
+   "new": "72007400720061000000",
+   "_note": "csy (language 4, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31fef4",
+   "expect": "4a0065006d006e00e10020004b0072006500730062006100",
+   "new": "45006b00740061006300680072006f006d00650000000000",
+   "_note": "csy (language 4, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31ff0e",
+   "expect": "430061006d0065007200610020004f00620073006300750072006100",
+   "new": "56006900730020003200350030004400000000000000000000000000",
+   "_note": "csy (language 4, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x32550c",
+   "expect": "430072006f00730073002000500072006f00630065007300",
+   "new": "530075007000650072006900610020003400300030000000",
+   "_note": "csy (language 4, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3257c6",
+   "expect": "70002d00410072007400",
+   "new": "72007400720061000000",
+   "_note": "csy (language 4, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3257de",
+   "expect": "4a0065006d006e00e10020004b0072006500730062006100",
+   "new": "45006b00740061006300680072006f006d00650000000000",
+   "_note": "csy (language 4, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x325804",
+   "expect": "42006c0065006400e900200026002000530076001b0174006c00e900200042006100720076007900",
+   "new": "500072006f0020003400300030004800000000000000000000000000000000000000000000000000",
+   "_note": "csy (language 4, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x32583a",
+   "expect": "4a0065006d006e00e9002000530076001b0174006c006f00",
+   "new": "4b006f00640061006300680072006f006d00650000000000",
+   "_note": "csy (language 4, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x325884",
+   "expect": "430061006d0065007200610020004f00620073006300750072006100",
+   "new": "56006900730020003200350030004400000000000000000000000000",
+   "_note": "csy (language 4, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x32bd06",
+   "expect": "430061006d0065007200610020004f00620073006300750072006100",
+   "new": "56006900730020003200350030004400000000000000000000000000",
+   "_note": "csy (language 4, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3354a6",
+   "expect": "4c007900730074006f006e0065007400000042006c0065006700650026004c007900",
+   "new": "4000410030003400340040004b006f00640061006300680072006f006d0065000000",
+   "_note": "dan (language 5, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x33a9a0",
+   "expect": "70006b0075006e0073007400",
+   "new": "720074007200610000000000",
+   "_note": "dan (language 5, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x33a9ba",
+   "expect": "42006c00f80064007400650067006e0069006e006700",
+   "new": "45006b00740061006300680072006f006d0065000000",
+   "_note": "dan (language 5, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x33a9de",
+   "expect": "42006c0065006700650026004c007900730065002000460061007200760065007200",
+   "new": "500072006f0020003400300030004800000000000000000000000000000000000000",
+   "_note": "dan (language 5, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x33aa50",
+   "expect": "480075006c006b0061006d00650072006100",
+   "new": "560069007300200032003500300044000000",
+   "_note": "dan (language 5, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x340dd6",
+   "expect": "480075006c006b0061006d00650072006100",
+   "new": "560069007300200032003500300044000000",
+   "_note": "dan (language 5, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3484d0",
+   "expect": "c6d2",
+   "new": "d2d2",
+   "_note": "dan (language 5, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3484d4",
+   "expect": "d8d2f3bffcd2f3bf0ed3f3bf26d3f3bf",
+   "new": "fe27f4bfbc27f4bfda27f4bf7028f4bf",
+   "_note": "dan (language 5, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x348d2c",
+   "expect": "2228f4bf",
+   "new": "c6d2f3bf",
+   "_note": "dan (language 5, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x34a654",
+   "expect": "430072006f007300730065006e0074007700690063006b006c0075006e006700",
+   "new": "5300750070006500720069006100200034003000300000000000000000000000",
+   "_note": "deu (language 6, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x34a6e6",
+   "expect": "570065006900630068006500730020004c006900630068007400",
+   "new": "4b006f00640061006300680072006f006d006500000000000000",
+   "_note": "deu (language 6, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x34a702",
+   "expect": "42006c0061007300730065002000460061007200620065006e00",
+   "new": "500072006f002000340030003000480000000000000000000000",
+   "_note": "deu (language 6, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x34a72e",
+   "expect": "53006f0066007400200046006f006b0075007300",
+   "new": "45006b00740061006300680072006f006d006500",
+   "_note": "deu (language 6, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x34a744",
+   "expect": "4c006f00630068006b0061006d00650072006100",
+   "new": "5600690073002000320035003000440000000000",
+   "_note": "deu (language 6, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x350312",
+   "expect": "430072006f007300730065006e0074007700690063006b006c0075006e006700",
+   "new": "5300750070006500720069006100200034003000300000000000000000000000",
+   "_note": "deu (language 6, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x350618",
+   "expect": "53006f0066007400200046006f006b0075007300",
+   "new": "45006b00740061006300680072006f006d006500",
+   "_note": "deu (language 6, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x35063a",
+   "expect": "42006c0061007300730065002000460061007200620065006e00",
+   "new": "500072006f002000340030003000480000000000000000000000",
+   "_note": "deu (language 6, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x350662",
+   "expect": "570065006900630068006500730020004c006900630068007400",
+   "new": "4b006f00640061006300680072006f006d006500000000000000",
+   "_note": "deu (language 6, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3506b4",
+   "expect": "4c006f00630068006b0061006d00650072006100",
+   "new": "5600690073002000320035003000440000000000",
+   "_note": "deu (language 6, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x35719c",
+   "expect": "4c006f00630068006b0061006d00650072006100",
+   "new": "5600690073002000320035003000440000000000",
+   "_note": "deu (language 6, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x360e8e",
+   "expect": "9403b903cc03c103b103bc03b103",
+   "new": "560065006c007600690061000000",
+   "_note": "ell (language 7, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x360ef4",
+   "expect": "9103c003b103bb03ae032000a403bf03bd03b903ba03cc03c403b703c403b103",
+   "new": "4b006f00640061006300680072006f006d006500000000000000000000000000",
+   "_note": "ell (language 7, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x360f16",
+   "expect": "9103c003b103bb03cc032000a703c103ce03bc03b103",
+   "new": "500072006f0020003400300030004800000000000000",
+   "_note": "ell (language 7, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x360f3e",
+   "expect": "9103c003b103bb03ae0320009503c303c403af03b103c303b703",
+   "new": "45006b00740061006300680072006f006d006500000000000000",
+   "_note": "ell (language 7, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x367266",
+   "expect": "9103c003b103bb03ae0320009503c303c403af03b103c303b703",
+   "new": "45006b00740061006300680072006f006d006500000000000000",
+   "_note": "ell (language 7, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x36728e",
+   "expect": "9103c003b103bb03cc032000a703c103ce03bc03b103",
+   "new": "500072006f0020003400300030004800000000000000",
+   "_note": "ell (language 7, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3672b2",
+   "expect": "9103c003b103bb03ae032000a403bf03bd03b903ba03cc03c403b703c403b103",
+   "new": "4b006f00640061006300680072006f006d006500000000000000000000000000",
+   "_note": "ell (language 7, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x367326",
+   "expect": "9403b903cc03c103b103bc03b103",
+   "new": "560065006c007600690061000000",
+   "_note": "ell (language 7, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x36e68c",
+   "expect": "9403b903bf03c103b103bc03b103",
+   "new": "560065006c007600690061000000",
+   "_note": "ell (language 7, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x38da4e",
+   "expect": "500072006f006300650073006f00",
+   "new": "5300750070006500720069006100",
+   "_note": "esp (language 9, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x38da5e",
+   "expect": "4300720075007a00610064006f00",
+   "new": "3400300030000000000000000000",
+   "_note": "esp (language 9, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x38dac0",
+   "expect": "5400",
+   "new": "4b00",
+   "_note": "esp (language 9, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x38dac4",
+   "expect": "6e006f00200043006c00610072006f00",
+   "new": "640061006300680072006f006d006500",
+   "_note": "esp (language 9, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x38dad6",
+   "expect": "43006f006c006f00720020005000e1006c00690064006f00",
+   "new": "500072006f00200034003000300048000000000000000000",
+   "_note": "esp (language 9, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x38db02",
+   "expect": "6e0066006f00710075006500200053007500610076006500",
+   "new": "6b00740061006300680072006f006d006500000000000000",
+   "_note": "esp (language 9, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x38db1c",
+   "expect": "45007300740065006e006f0070006500690063006f00",
+   "new": "56006900730020003200350030004400000000000000",
+   "_note": "esp (language 9, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x39301a",
+   "expect": "500072006f006300650073006f00",
+   "new": "5300750070006500720069006100",
+   "_note": "esp (language 9, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x39302a",
+   "expect": "4300720075007a00610064006f00",
+   "new": "3400300030000000000000000000",
+   "_note": "esp (language 9, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3932ee",
+   "expect": "6e0066006f00710075006500200053007500610076006500",
+   "new": "6b00740061006300680072006f006d006500000000000000",
+   "_note": "esp (language 9, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x393314",
+   "expect": "43006f006c006f00720020005000e1006c00690064006f00",
+   "new": "500072006f00200034003000300048000000000000000000",
+   "_note": "esp (language 9, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x39333a",
+   "expect": "5400",
+   "new": "4b00",
+   "_note": "esp (language 9, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x39333e",
+   "expect": "6e006f00200043006c00610072006f00",
+   "new": "640061006300680072006f006d006500",
+   "_note": "esp (language 9, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x393380",
+   "expect": "45007300740065006e006f0070006500690063006f00",
+   "new": "56006900730020003200350030004400000000000000",
+   "_note": "esp (language 9, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x399b3a",
+   "expect": "45007300740065006e006f0070006500690063006f00",
+   "new": "56006900730020003200350030004400000000000000",
+   "_note": "esp (language 9, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3a343c",
+   "expect": "52006900730074007400f600f60074006c0075007300",
+   "new": "53007500700065007200690061002000340030003000",
+   "_note": "eti (language 10, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3a3454",
+   "expect": "440069006f0072006100",
+   "new": "560065006c0076006900",
+   "_note": "eti (language 10, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3a3460",
+   "expect": "6d00",
+   "new": "0000",
+   "_note": "eti (language 10, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3a34ba",
+   "expect": "5000650068006d0065002000560061006c00670075007300",
+   "new": "4b006f00640061006300680072006f006d00650000000000",
+   "_note": "eti (language 10, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3a34d4",
+   "expect": "4b00610068007600610074007500640020005600e4007200760069006400",
+   "new": "500072006f00200034003000300048000000000000000000000000000000",
+   "_note": "eti (language 10, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3a34f8",
+   "expect": "70006b0075006e0073007400",
+   "new": "720074007200610000000000",
+   "_note": "eti (language 10, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3a3506",
+   "expect": "5000650068006d00650020004600",
+   "new": "45006b0074006100630068007200",
+   "_note": "eti (language 10, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3a3516",
+   "expect": "6f006b0075007300",
+   "new": "6d00650000000000",
+   "_note": "eti (language 10, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3a3520",
+   "expect": "500075006e006b007400610076006100",
+   "new": "56006900730020003200350030004400",
+   "_note": "eti (language 10, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3a8846",
+   "expect": "52006900730074007400f600f60074006c0075007300",
+   "new": "53007500700065007200690061002000340030003000",
+   "_note": "eti (language 10, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3a8af6",
+   "expect": "70006b0075006e0073007400",
+   "new": "720074007200610000000000",
+   "_note": "eti (language 10, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3a8b10",
+   "expect": "5000650068006d00650020004600",
+   "new": "45006b0074006100630068007200",
+   "_note": "eti (language 10, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3a8b20",
+   "expect": "6f006b0075007300",
+   "new": "6d00650000000000",
+   "_note": "eti (language 10, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3a8b36",
+   "expect": "4b00610068007600610074007500640020005600e4007200760069006400",
+   "new": "500072006f00200034003000300048000000000000000000000000000000",
+   "_note": "eti (language 10, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3a8b62",
+   "expect": "5000650068006d0065002000560061006c00670075007300",
+   "new": "4b006f00640061006300680072006f006d00650000000000",
+   "_note": "eti (language 10, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3a8bb0",
+   "expect": "500075006e006b007400610076006100",
+   "new": "56006900730020003200350030004400",
+   "_note": "eti (language 10, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3a8bce",
+   "expect": "440069006f0072006100",
+   "new": "560065006c0076006900",
+   "_note": "eti (language 10, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3a8bda",
+   "expect": "6d00",
+   "new": "0000",
+   "_note": "eti (language 10, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3aee4e",
+   "expect": "500075006e006b007400610076006100",
+   "new": "56006900730020003200350030004400",
+   "_note": "eti (language 10, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3af1e0",
+   "expect": "440069006f0072006100",
+   "new": "560065006c0076006900",
+   "_note": "eti (language 10, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3af1ec",
+   "expect": "6d00",
+   "new": "0000",
+   "_note": "eti (language 10, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3b883e",
+   "expect": "430072006f00730073002d006b00650068006900740079007300",
+   "new": "5300750070006500720069006100200034003000300000000000",
+   "_note": "fin (language 11, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3b885a",
+   "expect": "440069006f0072006100",
+   "new": "560065006c0076006900",
+   "_note": "fin (language 11, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3b8866",
+   "expect": "6d006100",
+   "new": "00000000",
+   "_note": "fin (language 11, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3b88ce",
+   "expect": "650076007900740020007300e40076007900",
+   "new": "6f00640061006300680072006f006d006500",
+   "_note": "fin (language 11, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3b88e2",
+   "expect": "5600610061006c006500610026006b00650076007900740020007600e40072006900",
+   "new": "500072006f0020003400300030004800000000000000000000000000000000000000",
+   "_note": "fin (language 11, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3b890a",
+   "expect": "7000",
+   "new": "7200",
+   "_note": "fin (language 11, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3b890e",
+   "expect": "6100690064006500",
+   "new": "7200610000000000",
+   "_note": "fin (language 11, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3b8918",
+   "expect": "5000650068006d006500e40020007400610072006b0065006e006e0075007300",
+   "new": "45006b00740061006300680072006f006d006500000000000000000000000000",
+   "_note": "fin (language 11, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3b893a",
+   "expect": "4e00650075006c0061006e007200650069006b00e400",
+   "new": "56006900730020003200350030004400000000000000",
+   "_note": "fin (language 11, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3bdcac",
+   "expect": "430072006f00730073002d006b00650068006900740079007300",
+   "new": "5300750070006500720069006100200034003000300000000000",
+   "_note": "fin (language 11, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3bdf70",
+   "expect": "7000",
+   "new": "7200",
+   "_note": "fin (language 11, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3bdf74",
+   "expect": "6100690064006500",
+   "new": "7200610000000000",
+   "_note": "fin (language 11, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3bdf8a",
+   "expect": "5000650068006d006500e40020007400610072006b0065006e006e0075007300",
+   "new": "45006b00740061006300680072006f006d006500000000000000000000000000",
+   "_note": "fin (language 11, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3bdfb8",
+   "expect": "5600610061006c006500610026006b00650076007900740020007600e40072006900",
+   "new": "500072006f0020003400300030004800000000000000000000000000000000000000",
+   "_note": "fin (language 11, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3bdfea",
+   "expect": "650076007900740020007300e40076007900",
+   "new": "6f00640061006300680072006f006d006500",
+   "_note": "fin (language 11, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3be034",
+   "expect": "4e00650075006c0061006e007200650069006b00e400",
+   "new": "56006900730020003200350030004400000000000000",
+   "_note": "fin (language 11, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3be058",
+   "expect": "440069006f0072006100",
+   "new": "560065006c0076006900",
+   "_note": "fin (language 11, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3be064",
+   "expect": "6d006100",
+   "new": "00000000",
+   "_note": "fin (language 11, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3c480e",
+   "expect": "4e00650075006c0061006e007200650069006b00e400",
+   "new": "56006900730020003200350030004400000000000000",
+   "_note": "fin (language 11, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3c4bf0",
+   "expect": "440069006f0072006100",
+   "new": "560065006c0076006900",
+   "_note": "fin (language 11, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3c4bfc",
+   "expect": "6d006100",
+   "new": "00000000",
+   "_note": "fin (language 11, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3ce060",
+   "expect": "5400720061006900740065006d0065006e0074002000430072006f006900",
+   "new": "400041003000340036004000560069007300200032003500300044000000",
+   "_note": "fra (language 12, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3ce0e0",
+   "expect": "54006f006e0061006c0069007400e90020004c0075006d0069006e006500",
+   "new": "400041003000340033004000560069007300200032003500300044000000",
+   "_note": "fra (language 12, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3d39c8",
+   "expect": "5400720061006900740065006d0065006e0074002000430072006f0069007300e900",
+   "new": "53007500700065007200690061002000340030003000000000000000000000000000",
+   "_note": "fra (language 12, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3d3ca6",
+   "expect": "54006f006e00",
+   "new": "500072006f00",
+   "_note": "fra (language 12, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3d3cae",
+   "expect": "4e006500750074007200650026004c0075006d0069006e00650075007800",
+   "new": "340030003000480000000000000000000000000000000000000000000000",
+   "_note": "fra (language 12, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3d3cda",
+   "expect": "5400",
+   "new": "4b00",
+   "_note": "fra (language 12, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3d3cde",
+   "expect": "6e00",
+   "new": "6400",
+   "_note": "fra (language 12, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3d3ce2",
+   "expect": "6c0069007400650020004c0075006d0069006e006500750073006500",
+   "new": "6300680072006f006d00650000000000000000000000000000000000",
+   "_note": "fra (language 12, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3d5550",
+   "expect": "45006b00740061006300680072006f006d006500",
+   "new": "53006f0066007400200046006f00630075007300",
+   "_note": "fra (language 12, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3e26c0",
+   "expect": "80d2f3bf",
+   "new": "e82bf4bf",
+   "_note": "fra (language 12, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3e26d4",
+   "expect": "00d3f3bf26d3f3bf",
+   "new": "fa2ef4bfc62ef4bf",
+   "_note": "fra (language 12, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3e26e4",
+   "expect": "74d3",
+   "new": "8cd2",
+   "_note": "fra (language 12, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3e2f38",
+   "expect": "582ff4bf",
+   "new": "80d2f3bf",
+   "_note": "fra (language 12, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3e3824",
+   "expect": "d89bf4bf",
+   "new": "00d3f3bf",
+   "_note": "fra (language 12, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3e48c0",
+   "expect": "5300760069006a00650074006c006900200054006f006e00",
+   "new": "4b006f00640061006300680072006f006d00650000000000",
+   "_note": "hrv (language 13, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3e48da",
+   "expect": "42006c0069006a0065006400650026005300760069006a00650074006c006500200042006f006a006500",
+   "new": "500072006f00200034003000300048000000000000000000000000000000000000000000000000000000",
+   "_note": "hrv (language 13, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3e4916",
+   "expect": "4d0065006b00",
+   "new": "45006b007400",
+   "_note": "hrv (language 13, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3e491e",
+   "expect": "6e006900200046006f006b0075007300",
+   "new": "6300680072006f006d00650000000000",
+   "_note": "hrv (language 13, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3ea6a8",
+   "expect": "4d0065006b00",
+   "new": "45006b007400",
+   "_note": "hrv (language 13, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3ea6b0",
+   "expect": "6e006900200046006f006b0075007300",
+   "new": "6300680072006f006d00650000000000",
+   "_note": "hrv (language 13, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3ea6ce",
+   "expect": "42006c0069006a0065006400650026005300760069006a00650074006c006500200042006f006a006500",
+   "new": "500072006f00200034003000300048000000000000000000000000000000000000000000000000000000",
+   "_note": "hrv (language 13, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3ea706",
+   "expect": "5300760069006a00650074006c006900200054006f006e00",
+   "new": "4b006f00640061006300680072006f006d00650000000000",
+   "_note": "hrv (language 13, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3fb45a",
+   "expect": "4b0065007200",
+   "new": "530075007000",
+   "_note": "hun (language 14, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3fb462",
+   "expect": "73007a007400620065006800ed007600e1007300",
+   "new": "7200690061002000340030003000000000000000",
+   "_note": "hun (language 14, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3fb478",
+   "expect": "440069006f007200e1006d006100",
+   "new": "560065006c007600690061000000",
+   "_note": "hun (language 14, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3fb4da",
+   "expect": "560069006c00e10067006f00730020007400f3006e0075007300",
+   "new": "4b006f00640061006300680072006f006d006500000000000000",
+   "_note": "hun (language 14, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3fb4f6",
+   "expect": "480061006c0076002e002000c90073002000560069006c00e10067006f007300200053007a00ed006e00",
+   "new": "500072006f00200034003000300048000000000000000000000000000000000000000000000000000000",
+   "_note": "hun (language 14, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3fb532",
+   "expect": "4c00e1006700790020004600f3006b00750073007a00",
+   "new": "45006b00740061006300680072006f006d0065000000",
+   "_note": "hun (language 14, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x400f30",
+   "expect": "4b0065007200",
+   "new": "530075007000",
+   "_note": "hun (language 14, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x400f38",
+   "expect": "73007a007400620065006800ed007600e1007300",
+   "new": "7200690061002000340030003000000000000000",
+   "_note": "hun (language 14, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4011f0",
+   "expect": "4c00e1006700790020004600f3006b00750073007a00",
+   "new": "45006b00740061006300680072006f006d0065000000",
+   "_note": "hun (language 14, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x401214",
+   "expect": "480061006c0076002e002000c90073002000560069006c00e10067006f007300200053007a00ed006e00",
+   "new": "500072006f00200034003000300048000000000000000000000000000000000000000000000000000000",
+   "_note": "hun (language 14, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x40124c",
+   "expect": "560069006c00e10067006f00730020007400f3006e0075007300",
+   "new": "4b006f00640061006300680072006f006d006500000000000000",
+   "_note": "hun (language 14, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4012ba",
+   "expect": "440069006f007200e1006d006100",
+   "new": "560065006c007600690061000000",
+   "_note": "hun (language 14, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x40825a",
+   "expect": "440069006f007200e1006d006100",
+   "new": "560065006c007600690061000000",
+   "_note": "hun (language 14, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x411a58",
+   "expect": "500072006f007300650073002000530069006c0061006e006700",
+   "new": "5300750070006500720069006100200034003000300000000000",
+   "_note": "ind (language 15, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x411ada",
+   "expect": "4e006100",
+   "new": "4b006f00",
+   "_note": "ind (language 15, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x411ae2",
+   "expect": "200054006500720061006e006700",
+   "new": "6300680072006f006d0065000000",
+   "_note": "ind (language 15, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x411af2",
+   "expect": "5700610072006e006100200050007500630061007400260054006500720061006e006700",
+   "new": "500072006f00200034003000300048000000000000000000000000000000000000000000",
+   "_note": "ind (language 15, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x411b18",
+   "expect": "530065006e006900200050006f007000",
+   "new": "50006f00720074007200610000000000",
+   "_note": "ind (language 15, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x411b2a",
+   "expect": "46006f006b00750073002000480061006c0075007300",
+   "new": "45006b00740061006300680072006f006d0065000000",
+   "_note": "ind (language 15, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x411b42",
+   "expect": "4c007500620061006e00670020004a006100720075006d00",
+   "new": "560069007300200032003500300044000000000000000000",
+   "_note": "ind (language 15, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4172ac",
+   "expect": "500072006f007300650073002000530069006c0061006e006700",
+   "new": "5300750070006500720069006100200034003000300000000000",
+   "_note": "ind (language 15, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x417562",
+   "expect": "530065006e006900200050006f007000",
+   "new": "50006f00720074007200610000000000",
+   "_note": "ind (language 15, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x417580",
+   "expect": "46006f006b00750073002000480061006c0075007300",
+   "new": "45006b00740061006300680072006f006d0065000000",
+   "_note": "ind (language 15, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4175a4",
+   "expect": "5700610072006e006100200050007500630061007400260054006500720061006e006700",
+   "new": "500072006f00200034003000300048000000000000000000000000000000000000000000",
+   "_note": "ind (language 15, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4175d6",
+   "expect": "4e006100",
+   "new": "4b006f00",
+   "_note": "ind (language 15, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4175de",
+   "expect": "200054006500720061006e006700",
+   "new": "6300680072006f006d0065000000",
+   "_note": "ind (language 15, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x417622",
+   "expect": "4c007500620061006e00670020004a006100720075006d00",
+   "new": "560069007300200032003500300044000000000000000000",
+   "_note": "ind (language 15, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x41e004",
+   "expect": "4c007500620061006e00670020004a006100720075006d00",
+   "new": "560069007300200032003500300044000000000000000000",
+   "_note": "ind (language 15, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x427ccc",
+   "expect": "5400",
+   "new": "4b00",
+   "_note": "ita (language 16, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x427cd0",
+   "expect": "6e00690020004c00650067006700",
+   "new": "640061006300680072006f006d00",
+   "_note": "ita (language 16, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x427ce0",
+   "expect": "72006900",
+   "new": "00000000",
+   "_note": "ita (language 16, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x427ce6",
+   "expect": "43006f006c006f007200690020004300680069006100720069002000450020004c00650067006700650072006900",
+   "new": "500072006f0020003400300030004800000000000000000000000000000000000000000000000000000000000000",
+   "_note": "ita (language 16, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x427d3c",
+   "expect": "46006f0072006f0020005300740065006e006f0070006500690063006f00",
+   "new": "560069007300200032003500300044000000000000000000000000000000",
+   "_note": "ita (language 16, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x42da6e",
+   "expect": "43006f006c006f007200690020004300680069006100720069002000450020004c00650067006700650072006900",
+   "new": "500072006f0020003400300030004800000000000000000000000000000000000000000000000000000000000000",
+   "_note": "ita (language 16, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x42daaa",
+   "expect": "5400",
+   "new": "4b00",
+   "_note": "ita (language 16, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x42daae",
+   "expect": "6e00690020004c00650067006700",
+   "new": "640061006300680072006f006d00",
+   "_note": "ita (language 16, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x42dabe",
+   "expect": "72006900",
+   "new": "00000000",
+   "_note": "ita (language 16, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x42dafc",
+   "expect": "46006f0072006f0020005300740065006e006f0070006500690063006f00",
+   "new": "560069007300200032003500300044000000000000000000000000000000",
+   "_note": "ita (language 16, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x434584",
+   "expect": "46006f0072006f0020005300740065006e006f0070006500690063006f00",
+   "new": "560069007300200032003500300044000000000000000000000000000000",
+   "_note": "ita (language 16, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x43dfe6",
+   "expect": "af30ed30b930d730ed30bb30b9300000b830aa30e930de300000c930e930de30c130c330af30c830fc30f3300000b830a730f330c830eb30bb30d430a2300000e930d530e230ce30af30ed30fc30e0300000e930a430c830c830",
+   "new": "400041003000340035004000e930d530e230ce30af30ed30fc30e0300000400041003000340036004000560069007300200032003500300044000000400041003000340033004000560069007300200032003500300044000000",
+   "_note": "jpn (language 17, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4415e6",
+   "expect": "3800",
+   "new": "3700",
+   "_note": "jpn (language 17, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4415ea",
+   "expect": "af30ed30b930d730ed30bb30b930",
+   "new": "560065006c007600690061000000",
+   "_note": "jpn (language 17, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4417ca",
+   "expect": "dd30c330d730a230fc30c830",
+   "new": "50006f007200740072006100",
+   "_note": "jpn (language 17, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4417e4",
+   "expect": "d530a130f330bf30b830c330af30d530a930fc30ab30b930",
+   "new": "45006b00740061006300680072006f006d00650000000000",
+   "_note": "jpn (language 17, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x441806",
+   "expect": "3300",
+   "new": "3800",
+   "_note": "jpn (language 17, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x44180a",
+   "expect": "c730a430c930ea30fc30e030000040004100",
+   "new": "530075007000650072006900610020003400",
+   "_note": "jpn (language 17, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x44181e",
+   "expect": "34003400",
+   "new": "30000000",
+   "_note": "jpn (language 17, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x441824",
+   "expect": "e930a430c830c830fc30f3300000400041003000340035004000e930d530e230ce30af30ed30fc30e0300000400041003000340036004000c830a430d530a930c8300000400041003000340037004000b830aa30e930de30",
+   "new": "410030003400340040004b006f00640061006300680072006f006d0065000000400041003000340033004000500072006f00200034003000300048000000400041003000340034004000560065006c007600690061000000",
+   "_note": "jpn (language 17, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4459ae",
+   "expect": "400041003000340033004000c830a430d530",
+   "new": "b830a730f330c830eb30bb30d430a2300000",
+   "_note": "jpn (language 17, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x445d7a",
+   "expect": "400041003000340034004000b830aa30e930de30",
+   "new": "c930e930de30c130c330af30c830fc30f3300000",
+   "_note": "jpn (language 17, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x44b814",
+   "expect": "06d2f3bf16d2f3bf20d2f3bf34d2f3bf46d2",
+   "new": "2a0af4bf0a08f4bf9a4ff4bfce4bf4bf12d2",
+   "_note": "jpn (language 17, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x44b828",
+   "expect": "58d2f3bf66d2f3bf74d2f3bf82d2f3bf9cd2",
+   "new": "4e0af4bf700af4bfea09f4bf040af4bf30d2",
+   "_note": "jpn (language 17, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x44c03c",
+   "expect": "fe07",
+   "new": "1e0a",
+   "_note": "jpn (language 17, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x44c080",
+   "expect": "1e0a",
+   "new": "640a",
+   "_note": "jpn (language 17, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x44c084",
+   "expect": "380a",
+   "new": "420a",
+   "_note": "jpn (language 17, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x44c088",
+   "expect": "520af4bf700af4bf880a",
+   "new": "06d2f3bf24d2f3bffe07",
+   "_note": "jpn (language 17, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x44c978",
+   "expect": "ce4bf4bf",
+   "new": "42d2f3bf",
+   "_note": "jpn (language 17, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x44c9ac",
+   "expect": "9a4f",
+   "new": "820a",
+   "_note": "jpn (language 17, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x44d9c8",
+   "expect": "6cd05cb8a4c2200004d55cb838c1a4c2000014b524c67cb7c8b90000dcb47cb7c8b9f1d2000028c654d65cd5200038c13cd544c5000070ac5cce44d584b9a8d6fcac00007cb774c7b8d22000a4d10000f7c5e0ac200040c740c75cd52000ecceecb700001dd3200044c5b8d2",
+   "new": "40004100300034003300400056006900730020003200350030004400000040004100300034003500400070ac5cce44d584b9a8d6fcac0000400041003000340037004000560065006c007600690061000000400041003000340034004000560065006c007600690061000000",
+   "_note": "kor (language 18, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x450fbc",
+   "expect": "3800",
+   "new": "3600",
+   "_note": "kor (language 18, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x450fc0",
+   "expect": "6cd05cb8a4c2",
+   "new": "560069007300",
+   "_note": "kor (language 18, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x450fc8",
+   "expect": "04d55cb838c1a4c2",
+   "new": "3200350030004400",
+   "_note": "kor (language 18, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x45119e",
+   "expect": "3000",
+   "new": "3800",
+   "_note": "kor (language 18, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4511a2",
+   "expect": "1dd3200044c5b8d20000400041003000",
+   "new": "53007500700065007200690061002000",
+   "_note": "kor (language 18, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4511b4",
+   "expect": "320040008cc104d5b8d22000ecd3e4ce",
+   "new": "300030000000dcb47cb7c8b9f1d20000",
+   "_note": "kor (language 18, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4511d4",
+   "expect": "f7c5e0ac200040c740c75cd52000ecceecb7",
+   "new": "500072006f00200034003000300048000000",
+   "_note": "kor (language 18, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4511f0",
+   "expect": "3400",
+   "new": "3200",
+   "_note": "kor (language 18, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4511f4",
+   "expect": "7cb774c7b8d22000a4d1000040004100300034003500",
+   "new": "45006b00740061006300680072006f006d0065000000",
+   "_note": "kor (language 18, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x45120c",
+   "expect": "70ac5cce44d584b9a8d6fcac0000400041003000340036004000a0d174c72000ecd3a0d1000040004100300034003700400014b524c67cb7c8b9",
+   "new": "410030003400340040004b006f00640061006300680072006f006d006500000040004100300034003000400050006f0072007400720061000000",
+   "_note": "kor (language 18, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x455a4e",
+   "expect": "40004100300034003400400014b524c6",
+   "new": "28c654d65cd5200038c13cd544c50000",
+   "_note": "kor (language 18, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x45af94",
+   "expect": "e8d1f3bffad1",
+   "new": "c209f4bf2cd2",
+   "_note": "kor (language 18, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x45af9c",
+   "expect": "04d2f3bf0ed2f3bf1ed2",
+   "new": "da09f4bf6e52f4bf12d2",
+   "_note": "kor (language 18, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x45afa8",
+   "expect": "2cd2f3bf38d2f3bf4cd2f3bf56d2f3bf66d2f3bf",
+   "new": "360af4bff409f4bf580af4bf140af4bfe007f4bf",
+   "_note": "kor (language 18, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x45b7bc",
+   "expect": "d407",
+   "new": "b609",
+   "_note": "kor (language 18, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x45b7f8",
+   "expect": "b609",
+   "new": "4c0a",
+   "_note": "kor (language 18, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x45b7fc",
+   "expect": "cc09",
+   "new": "080a",
+   "_note": "kor (language 18, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x45b804",
+   "expect": "080a",
+   "new": "2a0a",
+   "_note": "kor (language 18, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x45b808",
+   "expect": "200af4bf3a0a",
+   "new": "06d2f3bfd407",
+   "_note": "kor (language 18, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x45b810",
+   "expect": "520af4bf",
+   "new": "20d2f3bf",
+   "_note": "kor (language 18, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x45c0f8",
+   "expect": "6c4ef4bf",
+   "new": "e8d1f3bf",
+   "_note": "kor (language 18, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x45c12c",
+   "expect": "6e52f4bf",
+   "new": "3ad2f3bf",
+   "_note": "kor (language 18, level 3)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x45d26c",
+   "expect": "430072006f00730073002000500072006f0063006500730061007300",
+   "new": "40004100300034003600400056006900730020003200350030004400",
+   "_note": "lth (language 19, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x45d302",
+   "expect": "6001760069006500730075007300200054006f006e006100730000004200",
+   "new": "400041003000340033004000560069007300200032003500300044000000",
+   "_note": "lth (language 19, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x462e5c",
+   "expect": "430072006f00730073002000500072006f0063006500730061007300",
+   "new": "53007500700065007200690061002000340030003000000000000000",
+   "_note": "lth (language 19, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x46311e",
+   "expect": "70006100",
+   "new": "72007400",
+   "_note": "lth (language 19, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x463124",
+   "expect": "740061007300",
+   "new": "610000000000",
+   "_note": "lth (language 19, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x463138",
+   "expect": "6001760065006c006e0075007300200046006f006b00750073006100760069006d0061007300",
+   "new": "45006b00740061006300680072006f006d006500000000000000000000000000000000000000",
+   "_note": "lth (language 19, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x46316c",
+   "expect": "42006c00790061016b0069002c00200060017600690065007300690020005300700061006c0076006100",
+   "new": "500072006f00200034003000300048000000000000000000000000000000000000000000000000000000",
+   "_note": "lth (language 19, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4631a4",
+   "expect": "6001760069006500730075007300200054006f006e0061007300",
+   "new": "4b006f00640061006300680072006f006d006500000000000000",
+   "_note": "lth (language 19, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x471af0",
+   "expect": "8cd2f3bf",
+   "new": "7c2ef4bf",
+   "_note": "lth (language 19, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x471b04",
+   "expect": "22d3f3bf3ed3f3bf6ad3f3bf7cd3f3bfa4d3",
+   "new": "c431f4bf8c31f4bf3a31f4bf5831f4bf98d2",
+   "_note": "lth (language 19, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x472368",
+   "expect": "1232f4bf",
+   "new": "8cd2f3bf",
+   "_note": "lth (language 19, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x472c54",
+   "expect": "609ff4bf",
+   "new": "22d3f3bf",
+   "_note": "lth (language 19, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x473c66",
+   "expect": "4b00720001017300750020004e006f0062002b0164006500",
+   "new": "530075007000650072006900610020003400300030000000",
+   "_note": "lvi (language 20, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x473c80",
+   "expect": "440069006f00720001016d006100",
+   "new": "560065006c007600690061000000",
+   "_note": "lvi (language 20, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x473cec",
+   "expect": "4700610069006101730020005400",
+   "new": "4b006f0064006100630068007200",
+   "_note": "lvi (language 20, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x473cfc",
+   "expect": "6e0069007300",
+   "new": "6d0065000000",
+   "_note": "lvi (language 20, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x473d04",
+   "expect": "42006c0001017600610026004700610069006101610020004b007200010173006100",
+   "new": "500072006f0020003400300030004800000000000000000000000000000000000000",
+   "_note": "lvi (language 20, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x473d2c",
+   "expect": "70006d0001016b0073006c006100",
+   "new": "7200740072006100000000000000",
+   "_note": "lvi (language 20, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x473d3c",
+   "expect": "4d002b016b007300740069006e00010174007300200046006f006b00750073007300",
+   "new": "45006b00740061006300680072006f006d0065000000000000000000000000000000",
+   "_note": "lvi (language 20, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x479808",
+   "expect": "4b00720001017300750020004e006f0062002b0164006500",
+   "new": "530075007000650072006900610020003400300030000000",
+   "_note": "lvi (language 20, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x479ad8",
+   "expect": "70000101",
+   "new": "72007400",
+   "_note": "lvi (language 20, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x479ade",
+   "expect": "74007300",
+   "new": "61000000",
+   "_note": "lvi (language 20, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x479af0",
+   "expect": "4d002b016b007300740069006e00010174007300200046006f006b00750073007300",
+   "new": "45006b00740061006300680072006f006d0065000000000000000000000000000000",
+   "_note": "lvi (language 20, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x479b20",
+   "expect": "42006c0001017600610026004700610069006101610020004b007200010173006100",
+   "new": "500072006f0020003400300030004800000000000000000000000000000000000000",
+   "_note": "lvi (language 20, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x479b50",
+   "expect": "4700610069006101730020005400",
+   "new": "4b006f0064006100630068007200",
+   "_note": "lvi (language 20, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x479b60",
+   "expect": "6e0069007300",
+   "new": "6d0065000000",
+   "_note": "lvi (language 20, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x479bbe",
+   "expect": "440069006f00720001016d006100",
+   "new": "560065006c007600690061000000",
+   "_note": "lvi (language 20, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x480d08",
+   "expect": "440069006f00720001016d006100",
+   "new": "560065006c007600690061000000",
+   "_note": "lvi (language 20, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x48a842",
+   "expect": "500072006f007300650073002000530069006c0061006e006700",
+   "new": "5300750070006500720069006100200034003000300000000000",
+   "_note": "msl (language 21, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x48a8b8",
+   "expect": "5700610072006e00610020004c006500",
+   "new": "4b006f00640061006300680072006f00",
+   "_note": "msl (language 21, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x48a8ca",
+   "expect": "620075007400",
+   "new": "650000000000",
+   "_note": "msl (language 21, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x48a8d2",
+   "expect": "5700610072006e006100200050007500640061007200260054006500720061006e006700",
+   "new": "500072006f00200034003000300048000000000000000000000000000000000000000000",
+   "_note": "msl (language 21, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x48a8f8",
+   "expect": "530065006e006900200050006f007000",
+   "new": "50006f00720074007200610000000000",
+   "_note": "msl (language 21, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x48a90a",
+   "expect": "46006f006b007500730020004c006500",
+   "new": "45006b00740061006300680072006f00",
+   "_note": "msl (language 21, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x48a91c",
+   "expect": "620075007400",
+   "new": "650000000000",
+   "_note": "msl (language 21, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x48fdec",
+   "expect": "500072006f007300650073002000530069006c0061006e006700",
+   "new": "5300750070006500720069006100200034003000300000000000",
+   "_note": "msl (language 21, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4900ae",
+   "expect": "530065006e006900200050006f007000",
+   "new": "50006f00720074007200610000000000",
+   "_note": "msl (language 21, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4900cc",
+   "expect": "46006f006b007500730020004c006500",
+   "new": "45006b00740061006300680072006f00",
+   "_note": "msl (language 21, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4900de",
+   "expect": "620075007400",
+   "new": "650000000000",
+   "_note": "msl (language 21, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4900f2",
+   "expect": "5700610072006e006100200050007500640061007200260054006500720061006e006700",
+   "new": "500072006f00200034003000300048000000000000000000000000000000000000000000",
+   "_note": "msl (language 21, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x490124",
+   "expect": "5700610072006e00610020004c006500",
+   "new": "4b006f00640061006300680072006f00",
+   "_note": "msl (language 21, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x490136",
+   "expect": "620075007400",
+   "new": "650000000000",
+   "_note": "msl (language 21, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x49fed4",
+   "expect": "4c0069006300680074006500200074006f006e0065006e00000042006c0065006b0065002f006c006900630068007400650020006b006c0065007500",
+   "new": "400041003000340036004000560069007300200032003500300044000000400041003000340033004000560069007300200032003500300044000000",
+   "_note": "nld (language 22, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4a5872",
+   "expect": "430072006f00730073002d00500072006f006300650073007300",
+   "new": "5300750070006500720069006100200034003000300000000000",
+   "_note": "nld (language 22, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4a5b46",
+   "expect": "70006100",
+   "new": "72007400",
+   "_note": "nld (language 22, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4a5b4c",
+   "expect": "7400",
+   "new": "6100",
+   "_note": "nld (language 22, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4a5b5c",
+   "expect": "53006f00660074002d0046006f00630075007300",
+   "new": "45006b00740061006300680072006f006d006500",
+   "_note": "nld (language 22, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4a5b7e",
+   "expect": "42006c0065006b0065002f004c006900630068007400650020004b006c00650075007200",
+   "new": "500072006f00200034003000300048000000000000000000000000000000000000000000",
+   "_note": "nld (language 22, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4a5bb0",
+   "expect": "4c0069006300680074006500200054006f006e0065006e00",
+   "new": "4b006f00640061006300680072006f006d00650000000000",
+   "_note": "nld (language 22, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4b435c",
+   "expect": "70d2f3bf",
+   "new": "922cf4bf",
+   "_note": "nld (language 22, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4b4370",
+   "expect": "f4d2f3bf0ed3f3bf34d3f3bf44d3f3bf5ad3",
+   "new": "d02ff4bf9e2ff4bf622ff4bf7c2ff4bf00d3",
+   "_note": "nld (language 22, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4b4bd4",
+   "expect": "1430f4bf",
+   "new": "f4d2f3bf",
+   "_note": "nld (language 22, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4b54c0",
+   "expect": "969bf4bf",
+   "new": "12d3f3bf",
+   "_note": "nld (language 22, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4b64b2",
+   "expect": "4c0079007300200054006f006e006500000042006c0065006b00650026004c007900730065002000460061007200670065007200000050006f0070006b0075006e007300",
+   "new": "40004100300034003200400045006b00740061006300680072006f006d00650000004000410030003400340040004b006f00640061006300680072006f006d0065000000",
+   "_note": "nor (language 23, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4bb6e2",
+   "expect": "70006b0075006e0073007400",
+   "new": "720074007200610000000000",
+   "_note": "nor (language 23, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4bb71c",
+   "expect": "42006c0065006b00650026004c007900730065002000460061007200670065007200",
+   "new": "500072006f0020003400300030004800000000000000000000000000000000000000",
+   "_note": "nor (language 23, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4bb78e",
+   "expect": "4e00f8006b006b0065006c00680075006c006c00",
+   "new": "5600690073002000320035003000440000000000",
+   "_note": "nor (language 23, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4c17da",
+   "expect": "4e00f8006b006b0065006c00680075006c006c00",
+   "new": "5600690073002000320035003000440000000000",
+   "_note": "nor (language 23, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4c8978",
+   "expect": "d2d2",
+   "new": "00d3",
+   "_note": "nor (language 23, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4c897c",
+   "expect": "e4d2f3bf08d3f3bf1ad3",
+   "new": "3c25f4bffe24f4bfded2",
+   "_note": "nor (language 23, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4c8988",
+   "expect": "30d3f3bf",
+   "new": "ae25f4bf",
+   "_note": "nor (language 23, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4c91cc",
+   "expect": "1025f4bf",
+   "new": "d2d2f3bf",
+   "_note": "nor (language 23, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4c91d4",
+   "expect": "6025f4bf",
+   "new": "f4d2f3bf",
+   "_note": "nor (language 23, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4caac2",
+   "expect": "5400",
+   "new": "4b00",
+   "_note": "plk (language 24, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4caac6",
+   "expect": "6e006f00770061006e006900650020005a01770069006100740042016100",
+   "new": "640061006300680072006f006d0065000000000000000000000000000000",
+   "_note": "plk (language 24, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4caae6",
+   "expect": "4a00610073006e0079002000490020004c0065006b006b00690020004b006f006c006f007200",
+   "new": "500072006f002000340030003000480000000000000000000000000000000000000000000000",
+   "_note": "plk (language 24, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4cab1e",
+   "expect": "5a006d00690019016b0063007a0065006e006900650020004f007300740072006f005b0163006900",
+   "new": "45006b00740061006300680072006f006d0065000000000000000000000000000000000000000000",
+   "_note": "plk (language 24, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4cab48",
+   "expect": "46006f0074006f0067007200610066006900610020004f00740077006f0072006b006f0077006100",
+   "new": "56006900730020003200350030004400000000000000000000000000000000000000000000000000",
+   "_note": "plk (language 24, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4d08cc",
+   "expect": "5a006d00690019016b0063007a0065006e006900650020004f007300740072006f005b0163006900",
+   "new": "45006b00740061006300680072006f006d0065000000000000000000000000000000000000000000",
+   "_note": "plk (language 24, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4d0902",
+   "expect": "4a00610073006e0079002000690020004c0065006b006b00690020004b006f006c006f007200",
+   "new": "500072006f002000340030003000480000000000000000000000000000000000000000000000",
+   "_note": "plk (language 24, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4d0936",
+   "expect": "5400",
+   "new": "4b00",
+   "_note": "plk (language 24, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4d093a",
+   "expect": "6e006f00770061006e006900650020005a01770069006100740042016100",
+   "new": "640061006300680072006f006d0065000000000000000000000000000000",
+   "_note": "plk (language 24, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4d0990",
+   "expect": "46006f0074006f0067007200610066006900610020004f00740077006f0072006b006f0077006100",
+   "new": "56006900730020003200350030004400000000000000000000000000000000000000000000000000",
+   "_note": "plk (language 24, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4d781c",
+   "expect": "46006f0074006f0067007200610066006900610020004f00740077006f0072006b006f0077006100",
+   "new": "56006900730020003200350030004400000000000000000000000000000000000000000000000000",
+   "_note": "plk (language 24, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4e1880",
+   "expect": "500072006f006300650073007300",
+   "new": "4000410030003400340040004b00",
+   "_note": "ptg (language 25, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4e1890",
+   "expect": "20004300720075007a00610064006f00",
+   "new": "640061006300680072006f006d006500",
+   "_note": "ptg (language 25, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4e7644",
+   "expect": "500072006f0063006500730073006f0020004300720075007a00610064006f00",
+   "new": "5300750070006500720069006100200034003000300000000000000000000000",
+   "_note": "ptg (language 25, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4e791c",
+   "expect": "4100720074006500200050006f007000",
+   "new": "50006f00720074007200610000000000",
+   "_note": "ptg (language 25, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4e793a",
+   "expect": "46006f0063006f0020005300750061007600",
+   "new": "45006b00740061006300680072006f006d00",
+   "_note": "ptg (language 25, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4e795c",
+   "expect": "43006f007200",
+   "new": "500072006f00",
+   "_note": "ptg (language 25, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4e7964",
+   "expect": "5300750061007600650020002600200043006c00610072006100",
+   "new": "3400300030004800000000000000000000000000000000000000",
+   "_note": "ptg (language 25, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4e79d8",
+   "expect": "4300e2006d006100720061002000500069006e0068006f006c006500",
+   "new": "56006900730020003200350030004400000000000000000000000000",
+   "_note": "ptg (language 25, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4ee9ee",
+   "expect": "4300e2006d006100720061002000500069006e0068006f006c006500",
+   "new": "56006900730020003200350030004400000000000000000000000000",
+   "_note": "ptg (language 25, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4f6d00",
+   "expect": "a0d2f3bf",
+   "new": "6430f4bf",
+   "_note": "ptg (language 25, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4f6d14",
+   "expect": "26d3",
+   "new": "acd2",
+   "_note": "ptg (language 25, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4f6d18",
+   "expect": "3ad3f3bf5ad3f3bf6cd3f3bf82d3f3bf",
+   "new": "7c33f4bf3c33f4bf5a33f4bff833f4bf",
+   "_note": "ptg (language 25, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4f7570",
+   "expect": "a033f4bf",
+   "new": "a0d2f3bf",
+   "_note": "ptg (language 25, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4f8ede",
+   "expect": "5400",
+   "new": "4b00",
+   "_note": "rom (language 26, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4f8ee2",
+   "expect": "6e00750072006900200044006500730063006800690073006500",
+   "new": "640061006300680072006f006d00650000000000000000000000",
+   "_note": "rom (language 26, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4f8efe",
+   "expect": "43006f006c006f007200690074002000500061007300740065006c00",
+   "new": "500072006f0020003400300030004800000000000000000000000000",
+   "_note": "rom (language 26, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4f8f2c",
+   "expect": "46006f006300",
+   "new": "45006b007400",
+   "_note": "rom (language 26, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4f8f34",
+   "expect": "6c0069007a0061007200",
+   "new": "6300680072006f006d00",
+   "_note": "rom (language 26, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4f8f40",
+   "expect": "2000460069006e006100",
+   "new": "00000000000000000000",
+   "_note": "rom (language 26, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4fee80",
+   "expect": "46006f006300",
+   "new": "45006b007400",
+   "_note": "rom (language 26, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4fee88",
+   "expect": "6c0069007a0061007200",
+   "new": "6300680072006f006d00",
+   "_note": "rom (language 26, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4fee94",
+   "expect": "2000460069006e006100",
+   "new": "00000000000000000000",
+   "_note": "rom (language 26, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4feeac",
+   "expect": "43006f006c006f007200690074002000500061007300740065006c00",
+   "new": "500072006f0020003400300030004800000000000000000000000000",
+   "_note": "rom (language 26, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4feed6",
+   "expect": "5400",
+   "new": "4b00",
+   "_note": "rom (language 26, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4feeda",
+   "expect": "6e00750072006900200044006500730063006800690073006500",
+   "new": "640061006300680072006f006d00650000000000000000000000",
+   "_note": "rom (language 26, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x50fa3e",
+   "expect": "1a0440043e044104410420001f0440043e04460435044104410400001404",
+   "new": "400041003000340036004000560069007300200032003500300044000000",
+   "_note": "rus (language 27, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x50fac4",
+   "expect": "21043204350442043b0430044f04200022043e043d0430043b044c043d04",
+   "new": "400041003000340033004000560069007300200032003500300044000000",
+   "_note": "rus (language 27, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x514a64",
+   "expect": "1a0440043e044104410420001f0440043e044604350441044104",
+   "new": "5300750070006500720069006100200034003000300000000000",
+   "_note": "rus (language 27, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x514cfc",
+   "expect": "1f043e043f042000100440044204",
+   "new": "50006f0072007400720061000000",
+   "_note": "rus (language 27, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x514d18",
+   "expect": "1c044f0433043a0438043904200024043e043a0443044104",
+   "new": "45006b00740061006300680072006f006d00650000000000",
+   "_note": "rus (language 27, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x514d3e",
+   "expect": "11043b04350434043d044b043504200026043204350442043004",
+   "new": "500072006f002000340030003000480000000000000000000000",
+   "_note": "rus (language 27, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x514d66",
+   "expect": "21043204350442043b0430044f04200022043e043d0430043b044c043d043e04410442044c04",
+   "new": "4b006f00640061006300680072006f006d006500000000000000000000000000000000000000",
+   "_note": "rus (language 27, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x514dd8",
+   "expect": "140438043e04400430043c043004",
+   "new": "560065006c007600690061000000",
+   "_note": "rus (language 27, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x51b134",
+   "expect": "140438043e04400430043c043004",
+   "new": "560065006c007600690061000000",
+   "_note": "rus (language 27, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x52208c",
+   "expect": "5ed2f3bf7ad2f3bf",
+   "new": "8422f4bff825f4bf",
+   "_note": "rus (language 27, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5220a0",
+   "expect": "e4d2f3bf0cd3f3bf28d3f3bf38d3f3bf52d3",
+   "new": "8625f4bf5e25f4bf1c25f4bf3825f4bf6ad2",
+   "_note": "rus (language 27, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x522904",
+   "expect": "d225f4bf",
+   "new": "5ed2f3bf",
+   "_note": "rus (language 27, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5231f0",
+   "expect": "3086f4bf",
+   "new": "e4d2f3bf",
+   "_note": "rus (language 27, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5242b2",
+   "expect": "53007600650074006c00e90020007400f3006e00790000005600790062006c006500",
+   "new": "40004100300034003200400045006b00740061006300680072006f006d0065000000",
+   "_note": "sky (language 28, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5292d0",
+   "expect": "430072006f00730073002000500072006f00630065007300",
+   "new": "530075007000650072006900610020003400300030000000",
+   "_note": "sky (language 28, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x52956e",
+   "expect": "410072007400200050006f007000",
+   "new": "50006f0072007400720061000000",
+   "_note": "sky (language 28, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5295aa",
+   "expect": "5600790062006c00650064006e0075007400e900200066006100720062007900",
+   "new": "500072006f002000340030003000480000000000000000000000000000000000",
+   "_note": "sky (language 28, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5295d8",
+   "expect": "53007600650074006c00e90020007400f3006e007900",
+   "new": "4b006f00640061006300680072006f006d0065000000",
+   "_note": "sky (language 28, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x529620",
+   "expect": "5000",
+   "new": "5600",
+   "_note": "sky (language 28, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x529624",
+   "expect": "6e00",
+   "new": "7300",
+   "_note": "sky (language 28, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x529628",
+   "expect": "48006f006c006500200046006f0074006f006100700061007200e1007400",
+   "new": "320035003000440000000000000000000000000000000000000000000000",
+   "_note": "sky (language 28, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x52faf2",
+   "expect": "5000",
+   "new": "5600",
+   "_note": "sky (language 28, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x52faf6",
+   "expect": "6e00",
+   "new": "7300",
+   "_note": "sky (language 28, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x52fafa",
+   "expect": "48006f006c006500200046006f0074006f006100700061007200e1007400",
+   "new": "320035003000440000000000000000000000000000000000000000000000",
+   "_note": "sky (language 28, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x537238",
+   "expect": "5ad2f3bf",
+   "new": "f022f4bf",
+   "_note": "sky (language 28, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x53724c",
+   "expect": "d2d2f3bfead2f3bf0cd3f3bf1cd3",
+   "new": "f825f4bfca25f4bf8e25f4bfded2",
+   "_note": "sky (language 28, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x53725c",
+   "expect": "30d3f3bf",
+   "new": "4026f4bf",
+   "_note": "sky (language 28, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x537aa0",
+   "expect": "9e25f4bf",
+   "new": "d2d2f3bf",
+   "_note": "sky (language 28, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x539474",
+   "expect": "4b00720069007e016e00",
+   "new": "53007500700065007200",
+   "_note": "slv (language 29, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x539480",
+   "expect": "200070006f00730074006f00700065006b00",
+   "new": "610020003400300030000000000000000000",
+   "_note": "slv (language 29, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5394f4",
+   "expect": "4d00650068006b006100200073007600650074006c006f0062006100",
+   "new": "4b006f00640061006300680072006f006d0065000000000000000000",
+   "_note": "slv (language 29, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x539512",
+   "expect": "42006c00650064006500260073007600650074006c006500200062006100720076006500",
+   "new": "500072006f00200034003000300048000000000000000000000000000000000000000000",
+   "_note": "slv (language 29, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x53953c",
+   "expect": "75006400610072006a0065006e006500200062006100720076006500",
+   "new": "72007400720061000000000000000000000000000000000000000000",
+   "_note": "slv (language 29, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x53955a",
+   "expect": "4d00650068006b00610020006f0073007400720069006e006100",
+   "new": "45006b00740061006300680072006f006d006500000000000000",
+   "_note": "slv (language 29, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x539576",
+   "expect": "530074006100720069006e0073006b006900200066006f0074006f00610070006100720061007400",
+   "new": "56006900730020003200350030004400000000000000000000000000000000000000000000000000",
+   "_note": "slv (language 29, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x53f214",
+   "expect": "4b00720069007e016e00",
+   "new": "53007500700065007200",
+   "_note": "slv (language 29, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x53f220",
+   "expect": "200070006f00730074006f00700065006b00",
+   "new": "610020003400300030000000000000000000",
+   "_note": "slv (language 29, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x53f4b0",
+   "expect": "75006400610072006a0065006e006500200062006100720076006500",
+   "new": "72007400720061000000000000000000000000000000000000000000",
+   "_note": "slv (language 29, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x53f4da",
+   "expect": "4d00650068006b00610020006f0073007400720069006e006100",
+   "new": "45006b00740061006300680072006f006d006500000000000000",
+   "_note": "slv (language 29, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x53f502",
+   "expect": "42006c00650064006500200069006e00200073007600650074006c006500200062006100720076006500",
+   "new": "500072006f00200034003000300048000000000000000000000000000000000000000000000000000000",
+   "_note": "slv (language 29, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x53f53a",
+   "expect": "4d00650068006b006100200073007600650074006c006f0062006100",
+   "new": "4b006f00640061006300680072006f006d0065000000000000000000",
+   "_note": "slv (language 29, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x53f58a",
+   "expect": "530074006100720069006e0073006b006900200066006f0074006f00610070006100720061007400",
+   "new": "56006900730020003200350030004400000000000000000000000000000000000000000000000000",
+   "_note": "slv (language 29, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5462d4",
+   "expect": "530074006100720069006e0073006b006900200066006f0074006f00610070006100720061007400",
+   "new": "56006900730020003200350030004400000000000000000000000000000000000000000000000000",
+   "_note": "slv (language 29, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x550e42",
+   "expect": "55006b0072006101740065006e0069002000500072006f00630065007300",
+   "new": "530075007000650072006900610020003400300030000000000000000000",
+   "_note": "srb (language 30, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x550ec0",
+   "expect": "4d0065006b006f00200053007600650074006c006f00",
+   "new": "4b006f00640061006300680072006f006d0065000000",
+   "_note": "srb (language 30, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x550edc",
+   "expect": "690067007500610165006e006500200042006f006a006500",
+   "new": "6f0020003400300030004800000000000000000000000000",
+   "_note": "srb (language 30, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x550ef6",
+   "expect": "4e00610067006c006100610165006e006500200042006f006a006500",
+   "new": "50006f00720074007200610000000000000000000000000000000000",
+   "_note": "srb (language 30, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x550f14",
+   "expect": "4d0065006b006900200046006f006b0075007300",
+   "new": "45006b00740061006300680072006f006d006500",
+   "_note": "srb (language 30, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x550f2a",
+   "expect": "4b0072006f007a0020004b006c006a0075000d0161006f006e00690063007500",
+   "new": "5600690073002000320035003000440000000000000000000000000000000000",
+   "_note": "srb (language 30, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x55674e",
+   "expect": "55006b0072006101740065006e0069002000500072006f00630065007300",
+   "new": "530075007000650072006900610020003400300030000000000000000000",
+   "_note": "srb (language 30, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x556a1c",
+   "expect": "4e00610067006c006100610165006e006500200042006f006a006500",
+   "new": "50006f00720074007200610000000000000000000000000000000000",
+   "_note": "srb (language 30, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x556a46",
+   "expect": "4d0065006b006900200046006f006b0075007300",
+   "new": "45006b00740061006300680072006f006d006500",
+   "_note": "srb (language 30, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x556a6c",
+   "expect": "690067007500610165006e006500200042006f006a006500",
+   "new": "6f0020003400300030004800000000000000000000000000",
+   "_note": "srb (language 30, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x556a92",
+   "expect": "4d0065006b006f00200053007600650074006c006f00",
+   "new": "4b006f00640061006300680072006f006d0065000000",
+   "_note": "srb (language 30, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x556ada",
+   "expect": "4b0072006f007a0020004b006c006a0075000d0161006f006e00690063007500",
+   "new": "5600690073002000320035003000440000000000000000000000000000000000",
+   "_note": "srb (language 30, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x55d6a6",
+   "expect": "4b0072006f007a0020004b006c006a0075000d0161006f006e00690063007500",
+   "new": "5600690073002000320035003000440000000000000000000000000000000000",
+   "_note": "srb (language 30, level 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5672c2",
+   "expect": "4d006a0075006b00200054006f006e00000042006c0065006b0026004c006a007500",
+   "new": "4000410030003400340040004b006f00640061006300680072006f006d0065000000",
+   "_note": "sve (language 31, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x56cb4a",
+   "expect": "4600e400",
+   "new": "50006f00",
+   "_note": "sve (language 31, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x56cb50",
+   "expect": "670073007400610072006b00",
+   "new": "740072006100000000000000",
+   "_note": "sve (language 31, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x56cb6a",
+   "expect": "53006f0066007400200046006f006b0075007300",
+   "new": "45006b00740061006300680072006f006d006500",
+   "_note": "sve (language 31, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x56cb8c",
+   "expect": "42006c0065006b0026004c006a007500730020004600e40072006700",
+   "new": "500072006f0020003400300030004800000000000000000000000000",
+   "_note": "sve (language 31, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x56cc00",
+   "expect": "4800e5006c006b0061006d00650072006100",
+   "new": "560069007300200032003500300044000000",
+   "_note": "sve (language 31, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x572fb2",
+   "expect": "4800e5006c006b0061006d00650072006100",
+   "new": "560069007300200032003500300044000000",
+   "_note": "sve (language 31, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x57a5a4",
+   "expect": "e2d2",
+   "new": "eed2",
+   "_note": "sve (language 31, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x57a5a8",
+   "expect": "f4d2f3bf12d3f3bf26d3f3bf3cd3f3bf",
+   "new": "ac2bf4bf6a2bf4bf8a2bf4bf202cf4bf",
+   "_note": "sve (language 31, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x57ae00",
+   "expect": "ca2bf4bf",
+   "new": "e2d2f3bf",
+   "_note": "sve (language 31, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x57c85e",
+   "expect": "040e230e2d0e2a0e420e1b0e230e400e0b0e2a0e0000440e140e420e2d0e230e320e210e",
+   "new": "400041003000340038004000530075007000650072006900610020003400300030000000",
+   "_note": "tha (language 32, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5811ae",
+   "expect": "3800",
+   "new": "3200",
+   "_note": "tha (language 32, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5811b2",
+   "expect": "040e230e2d0e2a0e420e1b0e230e400e0b0e2a0e",
+   "new": "45006b00740061006300680072006f006d006500",
+   "_note": "tha (language 32, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x58142c",
+   "expect": "1b0e470e2d0e1b0e2d0e320e230e4c0e150e",
+   "new": "50006f007200740072006100000000000000",
+   "_note": "tha (language 32, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x581468",
+   "expect": "2a0e350e0b0e350e140e080e320e070e",
+   "new": "500072006f0020003400300030004800",
+   "_note": "tha (language 32, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x581486",
+   "expect": "420e170e190e410e2a0e070e2d0e480e2d0e190e",
+   "new": "4b006f00640061006300680072006f006d006500",
+   "_note": "tha (language 32, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5814ca",
+   "expect": "010e250e490e2d0e070e230e390e400e020e470e210e",
+   "new": "56006900730020003200350030004400000000000000",
+   "_note": "tha (language 32, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5814ee",
+   "expect": "440e140e420e2d0e230e320e210e320e",
+   "new": "560065006c0076006900610000000000",
+   "_note": "tha (language 32, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x586bb8",
+   "expect": "010e250e490e2d0e070e230e390e400e020e470e210e",
+   "new": "56006900730020003200350030004400000000000000",
+   "_note": "tha (language 32, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x586e92",
+   "expect": "440e140e420e2d0e230e320e210e320e",
+   "new": "560065006c0076006900610000000000",
+   "_note": "tha (language 32, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x58d71c",
+   "expect": "7ed2",
+   "new": "8ad2",
+   "_note": "tha (language 32, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x58d720",
+   "expect": "94d2f3bf",
+   "new": "0e1ff4bf",
+   "_note": "tha (language 32, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x58d730",
+   "expect": "eed2f3bf04d3f3bf16d3f3bf2ad3f3bf3ad3f3bf",
+   "new": "a61ef4bf881ef4bf4c1ef4bfd21bf4bfea1ef4bf",
+   "_note": "tha (language 32, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x58df44",
+   "expect": "c61bf4bf",
+   "new": "7ed2f3bf",
+   "_note": "tha (language 32, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x58df84",
+   "expect": "601e",
+   "new": "c61b",
+   "_note": "tha (language 32, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x58f8aa",
+   "expect": "4100e70031016b00200054006f006e00000053006f006c0075006b0026004100e700",
+   "new": "4000410030003400340040004b006f00640061006300680072006f006d0065000000",
+   "_note": "trk (language 33, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x594d0a",
+   "expect": "700020005300",
+   "new": "720074007200",
+   "_note": "trk (language 33, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x594d12",
+   "expect": "6e0061007400",
+   "new": "000000000000",
+   "_note": "trk (language 33, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x594d26",
+   "expect": "590075006d0075005f0161006b0020004f00640061006b00",
+   "new": "45006b00740061006300680072006f006d00650000000000",
+   "_note": "trk (language 33, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x594d4c",
+   "expect": "53006f006c0075006b0026004100e70069006b002000520065006e006b00",
+   "new": "500072006f00200034003000300048000000000000000000000000000000",
+   "_note": "trk (language 33, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x594dba",
+   "expect": "30011f016e0065002000440065006c0069001f016900",
+   "new": "56006900730020003200350030004400000000000000",
+   "_note": "trk (language 33, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x59b2c8",
+   "expect": "30011f016e0065002000440065006c0069001f016900",
+   "new": "56006900730020003200350030004400000000000000",
+   "_note": "trk (language 33, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5a24e4",
+   "expect": "cad2",
+   "new": "d6d2",
+   "_note": "trk (language 33, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5a24e8",
+   "expect": "dcd2f3bffcd2f3bf10d3f3bf2ad3f3bf",
+   "new": "6c27f4bf2627f4bf4627f4bfda27f4bf",
+   "_note": "trk (language 33, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5a2d40",
+   "expect": "8c27f4bf",
+   "new": "cad2f3bf",
+   "_note": "trk (language 33, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5a4640",
+   "expect": "1a0440043e0441042d001f0440043e044604350441040000140456043e04",
+   "new": "400041003000340036004000560069007300200032003500300044000000",
+   "_note": "ukr (language 34, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5a46c0",
+   "expect": "21043204560442043b043004200022043e043d0430043b044c043d045604",
+   "new": "400041003000340033004000560069007300200032003500300044000000",
+   "_note": "ukr (language 34, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5a9ed4",
+   "expect": "1a0440043e0441042d001f0440043e04460435044104",
+   "new": "53007500700065007200690061002000340030003000",
+   "_note": "ukr (language 34, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5aa190",
+   "expect": "1f043e043f042000100440044204",
+   "new": "50006f0072007400720061000000",
+   "_note": "ukr (language 34, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5aa1ac",
+   "expect": "1c0427004f043a0438043904200024043e043a0443044104",
+   "new": "45006b00740061006300680072006f006d00650000000000",
+   "_note": "ukr (language 34, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5aa1d2",
+   "expect": "11043b0456043404560420001a043e043b044c043e0440043804",
+   "new": "500072006f002000340030003000480000000000000000000000",
+   "_note": "ukr (language 34, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5aa1fa",
+   "expect": "21043204560442043b043004200022043e043d0430043b044c043d045604410442044c04",
+   "new": "4b006f00640061006300680072006f006d00650000000000000000000000000000000000",
+   "_note": "ukr (language 34, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5aa26a",
+   "expect": "140456043e04400430043c043004",
+   "new": "560065006c007600690061000000",
+   "_note": "ukr (language 34, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5b1054",
+   "expect": "140456043e04400430043c043004",
+   "new": "560065006c007600690061000000",
+   "_note": "ukr (language 34, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5b87f8",
+   "expect": "60d2f3bf78d2f3bf",
+   "new": "f42af4bf8a2ef4bf",
+   "_note": "ukr (language 34, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5b880c",
+   "expect": "e0d2f3bf06d3f3bf22d3f3bf32d3f3bf4cd3",
+   "new": "1a2ef4bff22df4bfb02df4bfcc2df4bf6cd2",
+   "_note": "ukr (language 34, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5b9070",
+   "expect": "642ef4bf",
+   "new": "60d2f3bf",
+   "_note": "ukr (language 34, level 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5b995c",
+   "expect": "c898f4bf",
+   "new": "e0d2f3bf",
+   "_note": "ukr (language 34, level 2)"
+  }
+ ],
+ "status": "emulator-checked 2026-11-14 (all 34 languages), not camera-tested"
+}

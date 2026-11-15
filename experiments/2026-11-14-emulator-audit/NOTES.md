@@ -210,3 +210,86 @@ audit/info-cycle.sh
 The emulator has no sensor, live view, capture, lens or real card timing. Background pictures are
 missing. A pass here is not proof on the camera. Findings 4 and 5 may be emulator artefacts; each has
 a camera probe above.
+
+## Film names in all languages (2026-11-15)
+
+Answers findings 1 and 2. Candidate build `builds/film-names-all-languages.json` = the pinned build
+`peaking-gain-2x` + `patches/film-names-all-languages.json`. sha256
+`dc3d43c96a509686d12b3a41e7e23ae75e08599fcb454fc34c0896dc072cf65d`. **Not camera-tested.** Nothing was flashed.
+
+### Text table format (block 1)
+
+| Fact | Label |
+|---|---|
+| The block starts with a directory of 16-byte records {address, size, 0, 0}; entries 1 to 34 are the languages (block offset = address − 0x43C40000) | V static, all 34 |
+| A language blob starts 0x20 before its directory offset: {u32 pointer array, u32 array end}, the text pool, 1970 u32 pointers, then the name `OlympusLanguage_<code>tft` | V static, all 34 |
+| A pointer is a run-time address for a blob loaded at 0xBFF3D000. String id = index into the pointer array, the same in every language | V static |
+| Texts are UTF-16LE with a NUL end. No length is stored. On stock the pool is in id order with no gap, so a text has no spare room | V static, all 34 |
+| A pointer can go to any place in the pool: out of id order, or into the middle of another text. The firmware's loader and menus then show the right text | V in the emulator (34 languages; Japanese, Korean and both Chinese tables have 18 or 19 changed pointers each) |
+| There is no checksum over a blob that the camera checks | I (the pinned build's in-place edits run on the camera; pointer edits ran only in the emulator) |
+| The same on the camera | U until the camera test |
+
+The seven names use 16 string ids. Where each id shows was read from a test image whose English
+texts say `id<N>` (`scripts/id_tags.py`, sheet `id-tags.png`):
+
+| Ids | Text | Shown in | Label |
+|---|---|---|---|
+| 67, 68, 66, 65, 69, 61, 60 | plain name | ART list title, ART BKT list, Picture Mode Settings list, name bar of the live control | V |
+| 597, 598, 599, 600, 602, 603, 582 | icon + name (`@A040@Pop Art`) | Picture Mode list (Shooting Menu 1) | V |
+| 1173, 1186 | `@A043@Pin Hole`, `@A044@Diorama` | none of the screens above. Where they show: U. They are renamed too | U |
+| 764, 765 | Add Soft Focus Effect, Add Pin-Hole Effect | title of ART → Add Effects with the cursor on the effect. Not a filter name: left as stock | V |
+
+No help text contains a filter name in any language (static V: no other id contains the text of ids 60 to 69,
+except 764 / 765 in some languages).
+
+### What changed
+
+- 410 texts in 33 languages now read as the film name (English had all 16). Per language:
+  16: bgr chs cht eti fin jpn kor rus tha ukr · 13: csy ind lth lvi nld ptg sky slv srb · 11: dan deu esp hun nor sve trk ·
+  10: msl · 9: ell fra plk · 7: ita · 6: hrv rom · 0: enu.
+- French id 764 (block-1 offset 0x3D5550) is "Soft Focus" again.
+- No name was shortened. 257 texts fit their old place. 49 longer ones (with icon) moved into the old place of
+  a text that no id uses any more; 104 plain names point into the tail of the icon text (`@A047@Velvia` + 6
+  characters = `Velvia`). In chs, cht, jpn and kor the names fit only when the neighbours in the pool (ids 62,
+  63, 64, 601; text not changed) move too. Only pointers and bytes inside the old texts of these ids change:
+  482 `bytes` ops, 8462 bytes, block 1 only.
+- The spec is a delta: each `expect` is the pinned build's byte. `patches/seven-labels.json` is not changed, and
+  `epm2mod make` still gives ce1037cd…2c8 for the pinned build.
+
+### Checks (emulator, V unless marked)
+
+| Check | Result |
+|---|---|
+| `stage2-boot.mjs 2000`, candidate against pinned | PASS, the whole report is equal |
+| Picture Mode list, ART list (12 entries), ART BKT list, Picture Mode Settings, live control: all 34 languages, language set through the menu | all seven names whole in every language (contact sheets, looked at) |
+| The same 19 name strips per language against the English run, pixel by pixel | equal in 33 languages. Thai differs: it draws Latin text in its own, narrower font. The names are whole |
+| English, candidate against pinned: 38 screenshots (24 menu, 14 live control) | byte-equal |
+| French Add Effects, first effect | pinned: title "Ektachrome" (the defect, now V). Candidate: "Soft Focus" |
+| Ids 764 and 765 in all 34 languages on the candidate | the effect names (sheet `effects-1.png`) |
+| Every other id in all 34 languages reads as stock | static V (`film_names_spec.py` checks it) |
+
+Not checked: the camera. Playback info, SCN and movie mode, the super control panel. Where ids 1173 and 1186
+show. The Picture Mode Settings list has no row for the first look (Portra) on pinned and candidate alike;
+whether stock has a Pop Art row there was not looked at.
+
+Outputs (outside the repo): `~/opt/om-emu-e101-boot-work/lang-all/`. Contact sheets in `sheets/`:
+`picture-mode-1..3.png`, `art-list-1..3.png` (ART titles 1 to 8 and the ART BKT list), `live-control-1.png`,
+`effects-1.png`, `id-tags.png`, `pinned-before-fra-deu.png`, `names.txt`. Screenshots per language:
+`fnames/NN-code/`; boot reports: `boot/`.
+
+```sh
+# in the repo
+.venv/bin/python experiments/2026-11-14-emulator-audit/scripts/lang_tables.py build/peaking-gain-2x.BIN     # the tables and the 16 ids
+.venv/bin/python experiments/2026-11-14-emulator-audit/scripts/film_names_spec.py --pinned build/peaking-gain-2x.BIN   # writes the spec; --table lists every id
+.venv/bin/epm2mod make builds/film-names-all-languages.json && .venv/bin/epm2mod make      # candidate, then the pinned build again
+# in ~/opt/om-emu-e101-boot-work (copy scripts/lang-all.sh, live-control.sh, sheets.py to lang-all/; states: audit/state/pinned-{p,art}.json as lang-all/state/{p,art}.json)
+. ./env.sh; export E101_RTC=2026-11-14T12:00:00
+python3 $EPM2_REPO/tools/oetool.py unpack $EPM2_REPO/build/film-names-all-languages.BIN $SCRATCH/fnames    # and peaking-gain-2x.BIN as $SCRATCH/pg2x
+BLOCKS=$SCRATCH/fnames $NODE stage2-boot.mjs 2000
+lang-all/lang-all.sh fnames; lang-all/live-control.sh fnames all       # 34 languages, about 25 minutes on 8 cores
+lang-all/lang-all.sh pg2x enu fra deu; lang-all/live-control.sh pg2x lang-all/pg2x/01-enu
+python3 lang-all/sheets.py lang-all/fnames lang-all/sheets
+```
+
+The guide picture `docs/images/ui/quick-menu-portra.png` is `lc-05.png` of the pinned build in English: mode P,
+OK, UP (Picture Mode), five times RIGHT.
