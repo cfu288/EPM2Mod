@@ -117,7 +117,8 @@
   const ownVotes = () => store.votes.filter((v) => v.d === SCREEN.key);
 
   // ---- settings of this browser ------------------------------------------------------------
-  const settings = { target: 40, names: false };
+  // layout: "side" (two photos side by side), "flip" (one place, a tap switches), or null = by width
+  const settings = { target: 40, names: false, layout: null };
   const SETTINGS = "look-ab-settings";
   try {
     Object.assign(settings, JSON.parse(localStorage.getItem(SETTINGS)) || {});
@@ -135,6 +136,25 @@
   // ---- compare view ------------------------------------------------------------------------
   let pair = null; // the pair on screen: {s, a, b}
   let view = "compare";
+  let showing = "A"; // in the overlap layout: the photo that is visible
+
+  const narrow = () => typeof matchMedia === "function" && matchMedia("(max-width: 640px)").matches;
+  const layout = () => settings.layout || (narrow() ? "flip" : "side");
+  /** Apply the layout and, in the overlap layout, which photo is visible. */
+  function paintLayout() {
+    const flip = layout() === "flip";
+    $("pair").classList.toggle("flip", flip);
+    $("pickA").classList.toggle("off", flip && showing !== "A");
+    $("pickB").classList.toggle("off", flip && showing !== "B");
+    $("chooseA").classList.toggle("showing", flip && showing === "A");
+    $("chooseB").classList.toggle("showing", flip && showing === "B");
+    $("layout").textContent = flip ? "Side by side" : "Overlap";
+    $("how").textContent = flip ? "Tap the photo to switch between A and B, then choose below." : "Pick the one you like more.";
+  }
+  function switchPhoto() {
+    showing = showing === "A" ? "B" : "A";
+    paintLayout();
+  }
 
   function showPair() {
     // Each screen gets its own balanced run of pairs, so that two screens can be compared.
@@ -144,6 +164,8 @@
     $("sceneName").textContent = scene.name;
     $("imgA").src = image(pair.s, pair.a);
     $("imgB").src = image(pair.s, pair.b);
+    showing = "A";
+    paintLayout();
     paintNames();
   }
   function paintNames() {
@@ -318,8 +340,16 @@
   }
 
   // ---- controls ----------------------------------------------------------------------------
-  $("pickA").addEventListener("click", () => vote(1));
-  $("pickB").addEventListener("click", () => vote(0));
+  // A tap on a photo chooses it side by side, and switches photos in the overlap layout.
+  $("pickA").addEventListener("click", () => (layout() === "flip" ? switchPhoto() : vote(1)));
+  $("pickB").addEventListener("click", () => (layout() === "flip" ? switchPhoto() : vote(0)));
+  $("chooseA").addEventListener("click", () => vote(1));
+  $("chooseB").addEventListener("click", () => vote(0));
+  $("layout").addEventListener("click", () => {
+    settings.layout = layout() === "flip" ? "side" : "flip";
+    saveSettings();
+    paintLayout();
+  });
   $("tie").addEventListener("click", () => vote(0.5));
   $("undo").addEventListener("click", () => {
     if (!ownVotes().length) return;
@@ -386,6 +416,9 @@
     const choice = { ArrowLeft: 1, ArrowRight: 0, ArrowDown: 0.5 }[event.key];
     if (choice !== undefined) {
       vote(choice);
+      event.preventDefault();
+    } else if (event.key === " " && view === "compare" && layout() === "flip") {
+      switchPhoto();
       event.preventDefault();
     } else if (event.key === "z" || event.key === "Z") {
       $("undo").click();

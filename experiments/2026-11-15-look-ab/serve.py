@@ -161,6 +161,12 @@ class Handler(SimpleHTTPRequestHandler):
             return
         self._json(HTTPStatus.OK, self._store.state())
 
+    def guess_type(self, path: Any) -> str:
+        """Say that text files are UTF-8: the page and its scripts hold characters such as ×."""
+        kind = super().guess_type(path)
+        text = kind.startswith("text/") or kind in ("application/javascript", "application/json")
+        return f"{kind}; charset=utf-8" if text else kind
+
     def end_headers(self) -> None:
         """Tell the browser not to keep an old page or an old photo list."""
         self.send_header("Cache-Control", "no-cache")

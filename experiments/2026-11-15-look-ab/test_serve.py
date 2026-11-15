@@ -98,6 +98,10 @@ class ServerTests(unittest.TestCase):
             self.call("api/undo", {"d": "phone"})[1], {"votes": [], "screens": {"phone": "Phone"}}
         )
 
+    def test_text_files_are_served_as_utf_8(self) -> None:
+        with urllib.request.urlopen(self.base + "index.html") as answer:
+            self.assertEqual(answer.headers["Content-Type"], "text/html; charset=utf-8")
+
     def test_a_wrong_request_gets_an_error(self) -> None:
         self.assertEqual(self.call("api/vote", {"vote": vote(scene=7)})[0], 400)
         self.assertEqual(self.call("api/vote", [1])[0], 400)
