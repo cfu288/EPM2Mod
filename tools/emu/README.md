@@ -7,7 +7,7 @@ Labels: **V** = ran in the emulator and checked against an independent Python mo
 ## Setup
 
 - **Node 26:** `~/opt/node26/bin/node` (v26.13.1). The system node 22 is too old. Override it with `OM_EMU_NODE`.
-- **om-emu:** `~/opt/om-emu`, with the local E101 changes kept **outside the repo** at `~/opt/om-emu-E101.patch` (om-emu has no licence, so neither its source nor diffs of it are committed). Override the path with `OM_EMU_DIR`. To set up a fresh copy: `cd ~/opt/om-emu && patch -p1 < .../tools/emu/om-emu-E101.patch`.
+- **om-emu:** `~/opt/om-emu`, with the local E101 changes kept **outside the repo** at `~/opt/om-emu-E101.patch` (they were kept out while om-emu had no licence; it has the MIT licence since 2026-11-14, and the move into this repository is in `docs/todo.md`). Override the path with `OM_EMU_DIR`. To set up a fresh copy: `cd ~/opt/om-emu && patch -p1 < .../tools/emu/om-emu-E101.patch`.
 - **Stock block 0:** `build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin`. This is the descrambled OE payload, sha256 `1b7c4bb1…71468d`; the harness checks it.
 
 ### What the om-emu patch adds

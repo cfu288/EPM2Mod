@@ -65,6 +65,10 @@ and delete the item here.
   shows that the host function is reached only through the image-job table 0x7E789604, and it did
   not run before segment 2 was loaded on a normal start, a quick start and the update path. That is
   a test result, not a proof. A clean fix moves 219 bytes into a dead function of segment 1.
+- om-emu has the MIT licence since 2026-11-14 (commit 18a81625cd). Bring the emulator work into
+  this repository: move our copy (based on the older commit 96bf756) onto a commit that has the
+  LICENSE file, then commit our E101 drivers and patch with the MIT notice in `NOTICE.md`. After
+  that the boot test and the menu walk can be a step of `epm2mod make`.
 - Emulator (outside the repository, `~/opt/om-emu-e101-boot-work/`), open points:
   - The row Time Lapse Settings is grey when the clock is not set. Start the emulator with
     `E101_RTC=2026-11-14T12:00:00`.

@@ -113,9 +113,10 @@ Check every build that adds a hook with the boot test of the emulator before a f
 ## The emulator
 
 A local copy of om-emu boots the E-PM2 firmware, stock or patched, from its reset vector on both
-cores. om-emu has no licence, so the copy, our changes to it and all screenshots stay outside this
-repository, in `~/opt/om-emu-e101-boot` and `~/opt/om-emu-e101-boot-work/` (start with `NOTES.md`
-there). Upstream lists this camera generation as "no work planned"; the port took one day of agent
+cores. The copy and our changes to it are outside this repository, in `~/opt/om-emu-e101-boot` and
+`~/opt/om-emu-e101-boot-work/` (start with `NOTES.md` there). om-emu has the MIT licence since
+2026-11-14 (its commit 18a81625cd), so our changes can now come into this repository: see
+[todo.md](todo.md). Upstream lists this camera generation as "no work planned"; the port took one day of agent
 work.
 
 | Check | Command (in the work folder, after `. ./env.sh`) | What it proves |
