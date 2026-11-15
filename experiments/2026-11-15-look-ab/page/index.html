@@ -83,6 +83,13 @@ h2 { font-size: 12px; font-weight: 500; letter-spacing: .09em; text-transform: u
 .sit .fav { font-size: 15px; font-weight: 500; }
 .sit .more { font-size: 12px; color: var(--ink-2); }
 .weak { color: var(--ink-3); }
+.screens { display: grid; grid-template-columns: minmax(0, auto) auto minmax(0, 1fr); gap: 6px 14px; align-items: baseline; margin-top: 10px; max-width: 760px; }
+.screens .label { font-family: var(--mono); font-size: 12px; color: var(--ink); overflow-wrap: anywhere; }
+.screens .label .here { color: var(--mark); }
+.screens .n { font-family: var(--mono); font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.screens .top { font-size: 14px; }
+.screens .top.weak { color: var(--ink-3); }
+@media (max-width: 640px) { .screens { grid-template-columns: minmax(0, 1fr) auto; } .screens .top { grid-column: 1 / -1; margin-bottom: 6px; } }
 .grid-wrap { overflow-x: auto; }
 table.heat { border-collapse: separate; border-spacing: 2px; font-family: var(--mono); font-size: 11px; font-variant-numeric: tabular-nums; }
 table.heat th { font-weight: 400; color: var(--ink-2); text-align: left; padding: 3px 6px; white-space: nowrap; }
@@ -100,6 +107,7 @@ textarea.out { width: 100%; min-height: 150px; background: var(--mat); color: va
   <div class="bar">
     <h1 id="title">Film Look A/B</h1>
     <span class="count" id="count">0 / 40</span>
+    <span class="count" id="screenLabel" title="The screen type these choices are recorded for"></span>
     <span class="spacer"></span>
     <label class="opt">Session
       <select class="ghost" id="len">
@@ -111,7 +119,7 @@ textarea.out { width: 100%; min-height: 150px; background: var(--mat); color: va
     </label>
     <label class="opt"><input type="checkbox" id="names"> Show film names</label>
     <button class="ghost" id="undo" disabled>Undo</button>
-    <button class="ghost" id="toResults">Results</button>
+    <button class="ghost" id="toResults">Stop, show results</button>
     <button class="ghost" id="reset">Start over</button>
   </div>
   <div class="track"><i id="prog"></i></div>
@@ -148,6 +156,11 @@ textarea.out { width: 100%; min-height: 150px; background: var(--mat); color: va
       <div class="sit" id="sit"></div>
     </div>
     <div>
+      <h2>By screen</h2>
+      <p class="sub" id="screenNote"></p>
+      <div class="screens" id="screens"></div>
+    </div>
+    <div>
       <h2>Win rate by scene</h2>
       <div class="grid-wrap"><table class="heat" id="heat"></table></div>
     </div>
@@ -157,6 +170,7 @@ textarea.out { width: 100%; min-height: 150px; background: var(--mat); color: va
       <span class="note" id="copied"></span>
     </div>
     <textarea class="out" id="out" readonly hidden></textarea>
+    <p class="note" id="storeNote"></p>
     <p class="note">How the ranking works: each choice is one match between two looks. The strength is a Bradley–Terry score, the standard model for paired comparisons, shown as the chance that the look beats an average look. A small prior keeps a look with few matches near 50%. Situations with under 6 choices are marked as a weak signal.</p>
   </section>
 </div>

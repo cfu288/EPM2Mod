@@ -162,5 +162,97 @@
     return { kind, top, second, leads, solid: solid.length, differs, strengths };
   }
 
-  return { bradleyTerry, record, order, winRate, nextPair, situations, verdict, WEAK_BELOW };
+  /** Fewer votes than this on a screen is too few to compare that screen with another. */
+  const SCREEN_MIN = 12;
+
+  /** Spearman rank correlation of two strength lists: 1 = the same order, -1 = the reverse. */
+  function rankCorrelation(first, second) {
+    const ranks = (strengths) => {
+      const placed = new Array(strengths.length);
+      order(strengths).forEach((look, place) => (placed[look] = place));
+      return placed;
+    };
+    const a = ranks(first);
+    const b = ranks(second);
+    const n = a.length;
+    const sum = a.reduce((total, rank, i) => total + (rank - b[i]) ** 2, 0);
+    return 1 - (6 * sum) / (n * (n * n - 1));
+  }
+
+  /**
+   * The ranking on each screen, and how the screens differ. A vote carries its screen key in `d`.
+   * @param {Array} votes all votes
+   * @param {number} n number of looks
+   * @returns {{screens: Array<{key: string, votes: number, enough: boolean, strengths: number[], order: number[]}>,
+   *   compared: number, sameTop: (boolean|null), lowestCorrelation: (number|null)}} screens with
+   *   the most votes first; `sameTop` and `lowestCorrelation` are null with fewer than two
+   *   screens that have enough votes
+   */
+  function compareScreens(votes, n) {
+    const keys = [];
+    for (const v of votes) if (!keys.includes(v.d)) keys.push(v.d);
+    const screens = keys
+      .map((key) => {
+        const own = votes.filter((v) => v.d === key);
+        const strengths = bradleyTerry(own, n, 0.5);
+        return { key, votes: own.length, enough: own.length >= SCREEN_MIN, strengths, order: order(strengths) };
+      })
+      .sort((a, b) => b.votes - a.votes);
+    const solid = screens.filter((screen) => screen.enough);
+    let sameTop = null;
+    let lowestCorrelation = null;
+    if (solid.length >= 2) {
+      sameTop = solid.every((screen) => screen.order[0] === solid[0].order[0]);
+      for (let i = 0; i < solid.length; i++) {
+        for (let j = i + 1; j < solid.length; j++) {
+          const rho = rankCorrelation(solid[i].strengths, solid[j].strengths);
+          if (lowestCorrelation === null || rho < lowestCorrelation) lowestCorrelation = rho;
+        }
+      }
+    }
+    return { screens, compared: solid.length, sameTop, lowestCorrelation };
+  }
+
+  /** 64-bit FNV-1a hash of a text, as 16 hex digits. (crypto.subtle needs https; a LAN page has none.) */
+  function fnv1a64(text) {
+    let hash = 0xcbf29ce484222325n;
+    for (const byte of new TextEncoder().encode(text)) {
+      hash ^= BigInt(byte);
+      hash = (hash * 0x100000001b3n) & 0xffffffffffffffffn;
+    }
+    return hash.toString(16).padStart(16, "0");
+  }
+
+  /**
+   * The identity of a screen type. It is made from what changes how a photo looks: the size in
+   * CSS pixels, the pixel ratio, the colour gamut, high dynamic range and the bit depth. It has
+   * no device or browser name, so two devices with the same kind of screen are one screen type,
+   * and a laptop panel and a monitor on one computer are two.
+   * @param {{width: number, height: number, ratio: number, gamut: string, hdr: boolean, depth: number}} traits
+   * @returns {{key: string, label: string}} the key is a hash of the traits; turning the screen
+   *   does not change it
+   */
+  function screenIdentity(traits) {
+    const short = Math.min(traits.width, traits.height);
+    const long = Math.max(traits.width, traits.height);
+    const ratio = Math.round(traits.ratio * 100) / 100;
+    const canonical = JSON.stringify([short, long, ratio, traits.gamut, Boolean(traits.hdr), traits.depth]);
+    const label = `${short}×${long} @${ratio}x · ${traits.gamut}${traits.hdr ? " HDR" : ""} · ${traits.depth}-bit`;
+    return { key: "screen-" + fnv1a64(canonical), label };
+  }
+
+  return {
+    screenIdentity,
+    bradleyTerry,
+    record,
+    order,
+    winRate,
+    nextPair,
+    situations,
+    verdict,
+    rankCorrelation,
+    compareScreens,
+    WEAK_BELOW,
+    SCREEN_MIN,
+  };
 });

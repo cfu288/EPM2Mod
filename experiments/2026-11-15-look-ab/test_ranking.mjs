@@ -97,3 +97,44 @@ test("the verdict is situational when the favourite changes with the tag", () =>
   assert.equal(result.kind, "situational");
   assert.deepEqual(result.differs, [{ tag: "tag3", look: 1 }, { tag: "tag4", look: 1 }]);
 });
+
+test("the rank correlation is 1 for the same order and -1 for the reverse", () => {
+  assert.equal(R.rankCorrelation([0.9, 0.7, 0.4, 0.1], [0.8, 0.6, 0.5, 0.2]), 1);
+  assert.equal(R.rankCorrelation([0.9, 0.7, 0.4, 0.1], [0.1, 0.4, 0.7, 0.9]), -1);
+});
+
+test("screens are compared only when two have enough votes", () => {
+  const on = (screen, winner, times) => {
+    const votes = [];
+    for (let i = 0; i < times; i++) for (let other = 0; other < N; other++) if (other !== winner) votes.push({ ...vote(1, winner, other, 1), d: screen });
+    return votes;
+  };
+  const one = R.compareScreens(on("phone", 0, 4), N);
+  assert.equal(one.screens.length, 1);
+  assert.equal(one.sameTop, null);
+
+  const few = R.compareScreens([...on("phone", 0, 4), ...on("desk", 1, 1)], N);
+  assert.deepEqual(few.screens.map((s) => [s.key, s.votes, s.enough]), [["phone", 12, true], ["desk", 3, false]]);
+  assert.equal(few.sameTop, null);
+
+  const same = R.compareScreens([...on("phone", 0, 4), ...on("desk", 0, 4)], N);
+  assert.equal(same.sameTop, true);
+  assert.equal(same.lowestCorrelation, 1);
+
+  const differ = R.compareScreens([...on("phone", 0, 4), ...on("desk", 1, 4)], N);
+  assert.equal(differ.sameTop, false);
+  assert.equal(differ.compared, 2);
+  assert.ok(differ.lowestCorrelation < 1);
+});
+
+test("the screen identity is a hash of the screen traits, with no device name", () => {
+  const phone = { width: 390, height: 844, ratio: 3, gamut: "P3", hdr: true, depth: 24 };
+  const id = R.screenIdentity(phone);
+  assert.match(id.key, /^screen-[0-9a-f]{16}$/);
+  assert.equal(id.label, "390×844 @3x · P3 HDR · 24-bit");
+  assert.deepEqual(R.screenIdentity({ ...phone, width: 844, height: 390 }), id); // turned
+  assert.deepEqual(R.screenIdentity({ ...phone }), id); // a second device with the same screen
+  for (const change of [{ width: 393 }, { ratio: 2 }, { gamut: "sRGB" }, { hdr: false }, { depth: 30 }]) {
+    assert.notEqual(R.screenIdentity({ ...phone, ...change }).key, id.key);
+  }
+});
