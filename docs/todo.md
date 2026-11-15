@@ -12,9 +12,9 @@ and delete the item here.
 
 ## Focus peaking
 
-- Live view is slow while coloured peaking lines show: 3 to 7 frames per second in the first camera
-  log (median period 196 ms; the build asks for 85 ms). Find the share of the colour loop: one log
-  each with White, Red and stock Key Line on the debug build. Then make the loop faster.
+- Live view is slow while coloured peaking lines show (3 to 7 frames per second; the ceiling of
+  this pass list is 10). The colour loop is the likely cost. Test `debug-log-peaking-fast` on the
+  camera and read `pass 9 timing` in `epm2mod log --summary` (NOTES §17.5).
 - Peaking without the zoom: the trigger is the MF Assist state object, which also asks for the zoom.
   It needs the E-P5 state object paired (NOTES §15.5).
 - The words Peaking, White and Black are English only: the other languages keep the old texts of

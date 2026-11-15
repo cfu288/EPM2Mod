@@ -173,6 +173,57 @@ def check_free_space(paths: RepoPaths, description: BuildDescription) -> str:
     return output.splitlines()[-1] if output else "ok"
 
 
+_EMULATOR_NOT_SET_UP = 3
+
+
+def check_in_emulator(paths: RepoPaths, image: Path) -> list[str]:
+    """Start a firmware image in the emulator: the normal start and the update path.
+
+    The checks are ``tools/emu/boot-test IMAGE`` and
+    ``tools/emu/update-path-test IMAGE``. An image that does not start as the
+    stock firmware does, or does not find an update file with OK held, could
+    leave the camera with no way back.
+
+    Returns:
+        One line for each check: its result, or that it was skipped because
+        the emulator is not set up on this computer.
+
+    Raises:
+        BuildError: if a check fails.
+    """
+    lines = []
+    for tool in paths.emulator_checks:
+        skipped = (
+            f"{tool.name}: SKIPPED, the emulator is not set up (tools/emu/setup.sh). "
+            "Do not flash this build before the check has passed."
+        )
+        if not tool.exists():
+            lines.append(skipped)
+            continue
+        try:
+            done = subprocess.run(
+                [sys.executable, str(tool), str(image)],
+                cwd=paths.root,
+                capture_output=True,
+                text=True,
+                errors="backslashreplace",
+                check=False,
+            )
+        except OSError as error:
+            raise BuildError(f"{tool.name} cannot run: {error}") from None
+        output = (done.stdout + done.stderr).strip()
+        if done.returncode == _EMULATOR_NOT_SET_UP:
+            lines.append(skipped)
+        elif done.returncode != 0:
+            raise BuildError(
+                f"{output[-_CHECK_OUTPUT_LIMIT:]}\n"
+                f"{tool.name} failed: the build was removed. Do not flash it."
+            )
+        else:
+            lines.append(output.splitlines()[-1] if output else f"{tool.name}: PASS")
+    return lines
+
+
 def card_target(card: Path, stock: StockFirmware) -> Path:
     """Return where the firmware file goes on an SD card mounted at ``card``."""
     return card / CARD_FOLDER / stock.card_name
@@ -404,6 +455,9 @@ def make(
 
     try:
         write_bytes(image, applied.image, BuildError, read_back=True)
+        if not description.tested:
+            for line in check_in_emulator(paths, image):
+                log("    " + line)
         write_bytes(card_copy, applied.image, BuildError, read_back=True)
         on_card = copy_to_card(applied.image, card, stock) if card is not None else None
     except BaseException:

@@ -1070,6 +1070,39 @@ class MakeTests(RepoCase):
         self.assertFalse(self.repo.paths.card.is_symlink())
         self.assertEqual([p.name for p in elsewhere.iterdir()], ["keep.txt"])
 
+    def emulator_check(self, name: str, status: int) -> None:
+        """Install a stand-in for tools/emu/NAME that exits with ``status``."""
+        script = (
+            f"import sys\nprint('{name}: stand-in', sys.argv[1])\nsys.exit({status})\n"
+        )
+        self.repo.write(f"tools/emu/{name}", script.encode())
+
+    def test_a_candidate_is_started_in_the_emulator(self) -> None:
+        self.repo.free_space_tool(0)
+        lines: list[str] = []
+        self.make(self.repo.candidate, log=lines.append)
+        self.assertIn("boot-test: SKIPPED", "\n".join(lines))  # no emulator here
+        self.emulator_check("boot-test", 0)
+        self.emulator_check("update-path-test", 3)
+        lines.clear()
+        self.make(self.repo.candidate, log=lines.append)
+        text = "\n".join(lines)
+        self.assertIn("boot-test: stand-in", text)
+        self.assertIn("new.BIN", text)
+        self.assertIn("update-path-test: SKIPPED", text)
+
+    def test_a_candidate_that_fails_in_the_emulator_is_removed(self) -> None:
+        self.repo.free_space_tool(0)
+        self.emulator_check("boot-test", 1)
+        with self.assertRaises(BuildError) as caught:
+            self.make(self.repo.candidate)
+        self.assertIn("boot-test failed", str(caught.exception))
+        self.assertEqual(self.repo.outputs(), [])
+
+    def test_a_tested_build_is_not_started_in_the_emulator(self) -> None:
+        self.emulator_check("boot-test", 1)
+        self.make(self.repo.tested)  # no error: its sha256 is the check
+
     def test_a_first_code_build_tells_the_free_space_check_so(self) -> None:
         self.repo.free_space_tool(0)
         lines: list[str] = []

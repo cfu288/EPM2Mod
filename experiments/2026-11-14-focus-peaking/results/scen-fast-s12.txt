@@ -1,0 +1,20 @@
+S12. Red, Yellow, Blue on the synthetic frame: the pinned loop and the fast loop on the firmware's own buffers.
+  [Red] 640 x 480 (row length 640 pixels), picture 0xB596A940, line image 0xB5843980
+      pinned: pixels that differ from the pixel model: 0; coloured pixels 9360; 940432 instructions -> ok
+      fast:   pixels that differ from the block model: 0; coloured pixels 10800; 330173 instructions; usGain2 0x0000; line image unchanged True; sp, d2, d3, a2, a3 kept True; anomalies none; picture True -> ok
+      the stated difference: 1560 pixels differ between the two builds (60 coloured only by pinned, 1500 only by fast)
+  [Yellow] 640 x 480 (row length 640 pixels), picture 0xB596A940, line image 0xB5843980
+      pinned: pixels that differ from the pixel model: 0; coloured pixels 9360; 940434 instructions -> ok
+      fast:   pixels that differ from the block model: 0; coloured pixels 10800; 330175 instructions; usGain2 0x0000; line image unchanged True; sp, d2, d3, a2, a3 kept True; anomalies none; picture True -> ok
+      the stated difference: 1560 pixels differ between the two builds (60 coloured only by pinned, 1500 only by fast)
+  [Blue] 640 x 480 (row length 640 pixels), picture 0xB596A940, line image 0xB5843980
+      pinned: pixels that differ from the pixel model: 0; coloured pixels 9360; 940436 instructions -> ok
+      fast:   pixels that differ from the block model: 0; coloured pixels 10800; 330177 instructions; usGain2 0x0000; line image unchanged True; sp, d2, d3, a2, a3 kept True; anomalies none; picture True -> ok
+      the stated difference: 1560 pixels differ between the two builds (60 coloured only by pinned, 1500 only by fast)
+  [a frame without lines] pinned 849172 instructions, fast 309923 instructions; both leave the picture as it is: True
+  [White] pinned 19 instructions, fast 19 instructions; picture and line image untouched, usGain2 0x0200: True
+  wrote s12-fast-red.png
+  wrote s12-fast-yellow.png
+  wrote s12-fast-blue.png
+  wrote s12-fast-pinned-red.png
+  S12 RESULT: PASS

@@ -7,6 +7,10 @@ are in [experiments/2026-11-15-log/NOTES.md](../experiments/2026-11-15-log/NOTES
 The log is in the build `builds/debug-log.json` only: the pinned specs, then `patches/log-core.json` and
 `patches/log-probes.json`. The pinned build has no log code.
 
+A second debug build, `builds/debug-log-peaking-fast.json`, is the candidate `peaking-fast` with the same two
+specs and `patches/log-peaking-time.json` (event `pk_stats`: the time of the colour loop and the frame period
+of peaking; focus-peaking notes, section 17).
+
 ## The parts
 
 | Part | Where | What it does |
@@ -16,6 +20,7 @@ The log is in the build `builds/debug-log.json` only: the pinned specs, then `pa
 | Generator | `experiments/2026-11-15-log/scripts/mkspec_log.py` | Reads the dictionary and writes the two patch specs |
 | Log core | `patches/log-core.json` | `log_put`, `log_chg`, `log_cnt`, the flush task, and the events boot, firmware error and GUI state |
 | Probes | `patches/log-probes.json` | One hook and one small routine per event of a feature |
+| Timing probe of peaking | `patches/log-peaking-time.json` | Event `pk_stats`, one record per 8 runs of Key Line pass 9. Written by `mkspec_log.py --peaking-time`. It also puts the build id of `logs/events.json` into the block header |
 | Decoder | `src/epm2mod/eventlog.py`, `src/epm2mod/logsummary.py`, command `epm2mod log` | Reads the file and the dictionary, prints JSON lines or a summary |
 
 ## The record
@@ -132,9 +137,11 @@ dictionaries in `logs/`.
 
 State on 2026-11-15: `patches/log-core.json` and `patches/log-probes.json` are the flashed ones (build id
 `d1ddd46b4dac2414`, dictionary `logs/events-d1ddd46b4dac2414.json`). `logs/events.json` (build id
-`bd632fb32c6e7094`) renames three arguments: `boot.session` → `ring_found`, `iv_end.frames` → `iv_frames`,
-`film_matrix.d3` → `stack`. The generator gives the same code for it but the 8 bytes of the build id in the flush
-task (checked). The next generator run writes the specs with the new id.
+`fe2f543f94c74a91`) renames three arguments (`boot.session` → `ring_found`, `iv_end.frames` → `iv_frames`,
+`film_matrix.d3` → `stack`) and adds the event `pk_stats`. The generator gives the same code for it but the 8 bytes
+of the build id in the flush task (checked). The next full generator run writes the two specs with the new id.
+Until then `patches/log-peaking-time.json` changes these 8 bytes itself, so the build `debug-log-peaking-fast`
+writes blocks with the id `fe2f543f94c74a91`, and the build `debug-log` is still the flashed one.
 
 ## How to add an event and a probe
 

@@ -26,6 +26,8 @@ _CBS_SEQUENCE_END = 260
 _CBS_FRAME_TIMER = 261
 _CBS_CAPTURE = 136
 _CBS_HALF_PRESS = 210
+_STATS_PASSES = 8
+_STATS_LONGEST = 8.0
 
 
 def _seconds(line: Line) -> float:
@@ -209,6 +211,126 @@ def _peaking(records: list[Line]) -> list[str]:
             f"  colour pass: {len(passes)} records, gain "
             f"{', '.join(map(str, gains))}"
         )
+    return out + _peaking_runs(records) + _pass_timing(records)
+
+
+def _spread(values: list[float]) -> str:
+    """Return ``median M ms (A to B)`` for times in seconds."""
+    middle = statistics.median(values) * 1000
+    return (
+        f"median {middle:.0f} ms ({min(values) * 1000:.0f} to {max(values) * 1000:.0f})"
+    )
+
+
+def _peaking_runs(records: list[Line]) -> list[str]:
+    """Return one line per time span in which the peaking latch was set.
+
+    The frame periods come from the ``film_stage`` records of the plain
+    picture job. The time from that record to the ``pk_pass9`` record of the
+    same frame holds the line job, the passes 1, 7 and 8, and the colour loop.
+    """
+    out: list[str] = []
+    latches = [line for line in records if line["event"] == "pk_latch"]
+    for index, line in enumerate(latches):
+        if line["args"]["latch"].get("L") != 1:
+            continue
+        if index and latches[index - 1]["args"]["latch"].get("L") == 1:
+            continue
+        stop = next(
+            (
+                other["time_us"]
+                for other in latches[index + 1 :]
+                if other["session"] == line["session"]
+                and other["args"]["latch"].get("L") == 0
+            ),
+            None,
+        )
+        inside = [
+            other
+            for other in records
+            if other["session"] == line["session"]
+            and other["time_us"] > line["time_us"]
+            and (stop is None or other["time_us"] < stop)
+        ]
+        frames = [
+            _seconds(other)
+            for other in inside
+            if other["event"] == "film_stage"
+            and other["args"].get("art") == _NO_ART
+            and _raw(other, "flags") == 0
+        ]
+        periods = [b - a for a, b in zip(frames, frames[1:])]
+        text = f"  run at {_seconds(line):.1f} s, {_named(line, 'latch.C')}: "
+        text += f"{_count(len(periods), 'frame period')}"
+        if periods:
+            text += f", {_spread(periods)}"
+        waits = []
+        for other in inside:
+            before = [start for start in frames if start < _seconds(other)]
+            if other["event"] == "pk_pass9" and before:
+                waits.append(f"{(_seconds(other) - before[-1]) * 1000:.0f}")
+        if waits:
+            text += "; frame start to the end of the colour pass: "
+            text += f"{', '.join(waits)} ms"
+        out.append(text)
+    return out
+
+
+def _pass_timing(records: list[Line]) -> list[str]:
+    """Return the lines about the ``pk_stats`` records, one per kind of pass.
+
+    A record covers ``_STATS_PASSES`` runs of pass 9. Two records that follow
+    each other with no change of the peaking bytes between them give the frame
+    period, and the second one gives the time per frame from before the
+    peaking hook of pass 9 to after it. For a colour that is the colour loop.
+    """
+    stats = [line for line in records if line["event"] == "pk_stats"]
+    marks = [
+        line
+        for line in records
+        if line["event"] in ("pk_latch", "pk_mf_start", "pk_mf_end")
+    ]
+    groups: dict[str, tuple[list[float], list[float]]] = {}
+    for before, line in zip(stats, stats[1:]):
+        gap = (line["time_us"] - before["time_us"]) / 1e6
+        if before["session"] != line["session"] or not 0 < gap < _STATS_LONGEST:
+            continue
+        if _raw(before, "gain") != _raw(line, "gain") or any(
+            before["time_us"] < mark["time_us"] < line["time_us"]
+            and mark["session"] == line["session"]
+            for mark in marks
+        ):
+            continue
+        name = _named(line, "gain")
+        if _raw(line, "gain") == 0:
+            colour = [
+                _named(mark, "latch.C")
+                for mark in marks
+                if mark["event"] == "pk_latch"
+                and mark["session"] == line["session"]
+                and mark["time_us"] < line["time_us"]
+                and mark["args"]["latch"].get("L") == 1
+            ]
+            name = colour[-1] if colour else name
+        periods, loops = groups.setdefault(name, ([], []))
+        periods.append(gap / _STATS_PASSES)
+        loops.append(int(line["args"].get("loop_us", 0)) / 1e6 / _STATS_PASSES)
+    out = []
+    if stats:
+        out.append(
+            f"  pass 9 timing: {_count(len(stats), 'pk_stats record')} of "
+            f"{_STATS_PASSES} passes each"
+        )
+    for name, (periods, loops) in groups.items():
+        middle = statistics.median(periods)
+        text = f"    {name}: {_count(len(periods), 'pair')} of records, frame period "
+        text += f"{_spread(periods)}, {1 / middle:.1f} frames per second"
+        spent = [value * 1000 for value in loops]
+        share = statistics.median(loops) / middle
+        text += f"; peaking code of pass 9 per frame median "
+        text += f"{statistics.median(spent):.1f} ms ({min(spent):.1f} to "
+        text += f"{max(spent):.1f}), {share * 100:.0f} % of the frame period"
+        out.append(text)
     return out
 
 

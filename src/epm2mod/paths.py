@@ -68,6 +68,12 @@ class RepoPaths:
         return self.root / "tools" / "freespace.py"
 
     @property
+    def emulator_checks(self) -> tuple[Path, ...]:
+        """The scripts that start a firmware image in the emulator, in order."""
+        folder = self.root / "tools" / "emu"
+        return (folder / "boot-test", folder / "update-path-test")
+
+    @property
     def firmware_map(self) -> Path:
         """A file the free-space check needs; it is made by ``tools/fwmap.py``."""
         return self.output / "map" / "linear.txt"

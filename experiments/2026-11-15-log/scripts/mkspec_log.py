@@ -17,6 +17,13 @@ as bytes and must not be pc-relative.
 Usage: mkspec_log.py PINNED_DIR WORKDIR [LISTING.txt]
   PINNED_DIR  `python3 tools/oetool.py unpack build/peaking-colours.BIN PINNED_DIR`
   WORKDIR     scratch folder for the assembler files (outside the repository)
+
+       mkspec_log.py --peaking-time BASE_DIR WORKDIR [LISTING.txt]
+  Writes patches/log-peaking-time.json only: the timing probe of the build debug-log-peaking-fast (event pk_stats).
+  It is a delta on the specs of that build before it (the pinned specs, peaking-fast, log-core, log-probes), and
+  it does not write log-core or log-probes. It also puts the build id of logs/events.json into the flush task,
+  in place of the id that log-core carries.
+  BASE_DIR    unpacked image of builds/debug-log-peaking-fast.json without its last spec
 """
 import hashlib, json, os, re, struct, subprocess, sys
 
@@ -645,6 +652,153 @@ HOOKS = {
     "IVEND":   ("log-probes", 0x7E982E8E, 7, "iv_end", "endIntervalShooting 0x7E982DF3, last trace call"),
     "IVFRAME": ("log-probes", 0x7EA997E5, 7, "iv_frame", "recordingDone_interval 0x7EA997E5, entry"),
 }
+# The timing probe of peaking (focus-peaking NOTES section 17). Its own spec: log-core and log-probes stay the
+# flashed ones. Its two hooks are in stock bytes of Key Line pass 9 0x7E7266D9 (segment 1), before and after the
+# hooks K (peaking) and PK9 (log-probes), so it changes no byte of another spec's code.
+TIME_SPEC = "log-peaking-time"
+TIME_AREAS = {".tk": (0x7E4C97BD, 0x7E4C9800, "T_TICK"),      # free runs of the kernel range: the end of the area
+              ".t0": (0x7E4C90EA, 0x7E4C90FC, "T_TIME0"),     # of log-probes, after T_HIT of peaking-fast, and
+              ".t1": (0x7E4C9621, 0x7E4C9630, "T_TIME0B")}    # between log-core and log-probes
+TIME_SITES = {                # site: (bytes, routine, what)
+    0x7E72675C: (5, "T_TIME0", "Key Line pass 9, `mov 2,d0` / `movbu d0,(37,a3)` (ucMode), before hook K"),
+    0x7E726774: (5, "T_TICK", "Key Line pass 9, `mov 16,d0` / `movbu d0,(36,a3)` (ucBit), after the gain is stored"),
+}
+TIME_ASM = """
+.equ T_ST, PST+88            # {u32 timer value at T_TIME0, u32 sum, u8 passes}
+.section .t0,"ax"
+T_TIME0:                     # every Key Line pass 9 (the art filter, White, a colour), before the gain is chosen.
+                             # d0 is set by the replaced instruction; the flags are not in use
+    mov (TIMER),d0
+    mov d0,(T_ST)
+    jmp T_TIME0B
+.section .t1,"ax"
+T_TIME0B:
+%(displaced_a)s
+    jmp %(back_a)s
+
+.section .tk,"ax"
+T_TICK:                      # the same pass, after hook K (T_K, and the colour loop for Red, Yellow, Blue) and the
+                             # probe PK9. d1, a0, a1 are free here: the stock code loads them again before it
+                             # uses them (0x7E726779-0x7E726784), and d0 after the replaced instructions. MDR is
+                             # free: the function calls on and returns with ret
+%(displaced_b)s
+    mov T_ST,a1
+    mov (a1),d1
+    mov (TIMER),d0
+    sub d0,d1                # the timer counts down: microseconds from T_TIME0 to here
+    mov (4,a1),d0
+    add d0,d1
+    mov d1,(4,a1)            # sum over the passes
+    movbu (8,a1),d0
+    inc d0
+    movbu d0,(8,a1)
+    and %(every)d,d0
+    bne 2f                   # one record per %(n)d passes
+    mov d0,(4,a1)
+    movhu (34,a3),d0         # usGain2 of this pass
+    mov d0,a0
+    mov %(pk_stats)d,d0
+    call log_put,[],0
+2:  jmp %(back_b)s
+"""
+TIME_EVERY = 8
+
+
+def peaking_time():
+    """Write patches/log-peaking-time.json (see the usage text)."""
+    base, work = sys.argv[2:4]
+    listing = sys.argv[4] if len(sys.argv) > 4 else None
+    os.makedirs(work, exist_ok=True)
+    blk_path = os.path.join(base, "block0_0100.bin")
+    blk = open(blk_path, "rb").read()
+    get = lambda a, n: blk[a - BASE:a - BASE + n]
+    d = json.load(open(os.path.join(ROOT, "logs/events.json")))
+    mine = [e for e in d["events"] if e["spec"] == TIME_SPEC]
+    assert [e["name"] for e in mine] == ["pk_stats"]
+    bid = build_id(d["events"])
+    old = bytes.fromhex(json.load(open(os.path.join(ROOT, "patches/log-core.json")))["_build_id"])
+    # log_put: the third entry of the log core, found by its first instructions after log_chg and log_cnt
+    lo = AREAS[".kc"][0]
+    head = bytes.fromhex("cff0f2e6")                           # movm [d2,d3,a2,a3],(sp) / mov psw,d2
+    at = [lo + i for i in range(0x40) if get(lo + i, 4) == head]
+    assert len(at) == 3 and get(at[2] + 4, 4) == bytes.fromhex("fafcfff7"), at     # and 0xf7ff,psw
+    (site_a, (n_a, _, _)), (site_b, (n_b, _, _)) = TIME_SITES.items()
+    bad = branch_targets_inside([(site, n) for site, (n, _, _) in TIME_SITES.items()], blk, work)
+    assert not bad, bad
+    asm = SYMS + TIME_ASM % {
+        "every": TIME_EVERY - 1, "n": TIME_EVERY, "pk_stats": mine[0]["id"],
+        "displaced_a": displaced(blk_path, site_a, n_a), "back_a": "0x%08x" % (site_a + n_a),
+        "displaced_b": displaced(blk_path, site_b, n_b), "back_b": "0x%08x" % (site_b + n_b)}
+    args = ["--defsym=log_put=%#x" % at[2]]
+    args += ["--defsym=s_%s=0x%s" % (a, a) for a in sorted(set(re.findall(r"(?:jmp|call)\s+0x([0-9a-f]{8})", asm)))]
+    asm = re.sub(r"((?:jmp|call)\s+)0x([0-9a-f]{8})", r"\1s_\2", asm)
+    for site, (n, routine, _) in TIME_SITES.items():
+        asm += '\n.section .s%x,"ax"\n    jmp %s\n' % (site, routine) + "    nop\n" * (n - 5)
+        args.append("--section-start=.s%x=%#x" % (site, site))
+    args += ["--section-start=%s=%#x" % (n, a) for n, (a, _, _) in TIME_AREAS.items()]
+    s, o, e, sb = (os.path.join(work, "logtime." + x) for x in ("s", "o", "elf", "bin"))
+    open(s, "w").write(asm)
+    run(BIN + "/mn10300-elf-as", "-o", o, s)
+    run(BIN + "/mn10300-elf-ld", *args, "-e", "%#x" % TIME_AREAS[".tk"][0], "-o", e, o)
+
+    def sect(name):
+        run(BIN + "/mn10300-elf-objcopy", "-O", "binary", "-j", name, e, sb)
+        return open(sb, "rb").read()
+
+    ops = []
+
+    def op(addr, new, note):
+        expect = get(addr, len(new))
+        assert expect != new, note
+        ops.append({"type": "bytes", "block": 0, "offset": "0x%X" % (addr - BASE), "expect": expect.hex(),
+                    "new": new.hex(), "_addr": "0x%08X" % addr, "_note": note})
+
+    for name, (a, hi, what) in TIME_AREAS.items():
+        code = sect(name)
+        assert a + len(code) <= hi, "%s: %d bytes, %d free" % (name, len(code), hi - a)
+        assert get(a, len(code)) == b"\xff" * len(code) and code[-1] != 0xFF, name
+        op(a, code, "new code, kernel range, 0xFF run: %s (%d B)" % (what, len(code)))
+        print("%s: %d B at 0x%X-0x%X, %d B free after" % (what, len(code), a, a + len(code), hi - a - len(code)))
+    stock = open(os.path.join(ROOT, "build/blocks", os.path.basename(STOCK) + ".block0.bin"), "rb").read()
+    for site, (n, routine, what) in TIME_SITES.items():
+        h = sect(".s%x" % site)
+        assert len(h) == n and h[0] == 0xDC and get(site, n) == stock[site - BASE:site - BASE + n], hex(site)
+        op(site, h, "hook (pk_stats): jmp %s. %s" % (routine, what))
+    if bid != old:
+        for half in (0, 4):                  # the two `mov imm32,d0` of the flush task that hold the build id
+            word = b"\xfc\xcc" + old[half:half + 4]
+            i = blk.find(word)
+            assert i >= 0 and blk.find(word, i + 1) < 0 and AREAS[".uc"][0] <= BASE + i < AREAS[".uc"][1], half
+            new = bid[half:half + 4]
+            diff = [k for k in range(4) if new[k] != old[half + k]]
+            op(BASE + i + 2 + diff[0], new[diff[0]:diff[-1] + 1], "flush task, block header: build id bytes %d-%d %s -> %s "
+               "(logs/events.json)" % (half, half + 3, old[half:half + 4].hex(), new.hex()))
+    out = os.path.join(ROOT, "patches", TIME_SPEC + ".json")
+    json.dump({
+        "name": TIME_SPEC,
+        "description": "Structured log, timing probe of peaking: event pk_stats, one record per %d runs of Key Line "
+                       "pass 9 (the Key Line art filter, White peaking and colour peaking): the microseconds from "
+                       "before the peaking hook of the pass to after it, summed over these passes (for a colour that "
+                       "is the colour loop), and usGain2 of the last pass. The time between two records is %d frame "
+                       "periods. Two hooks in stock bytes of pass 9 and their routines in the kernel range; no byte "
+                       "of the peaking code changes. Needs log-core and log-probes before it: every expect is a byte "
+                       "string of that build. It puts the build id %s of logs/events.json into the block header. "
+                       "DEBUG builds only. See experiments/2026-11-14-focus-peaking/NOTES.md section 17 and "
+                       "docs/logging.md." % (TIME_EVERY, TIME_EVERY, bid.hex()),
+        "base": STOCK, "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
+        "status": "candidate: emulator-checked, not flashed",
+        "_delta_on": "builds/debug-log-peaking-fast.json without this spec",
+        "_build_id": bid.hex(),
+        "_ram": "9 bytes of the log's state block (PST+88)",
+        "ops": ops,
+    }, open(out, "w"), indent=1)
+    open(out, "a").write("\n")
+    print("wrote", os.path.relpath(out, ROOT), len(ops), "ops; build id", bid.hex())
+    if listing:
+        txt = run(BIN + "/mn10300-elf-objdump", "-d", *sum((["-j", n] for n in list(TIME_AREAS) + [".s%x" % x for x in TIME_SITES]), []), e)
+        open(listing, "w").write(re.sub(r"/[^\s:]*logtime\.elf", "logtime.elf", txt))
+
+
 PCREL = re.compile(r"^(b[a-z]{1,2}|jmp|calls|call|ret|retf|rets|rti|l[a-z]{2}|setlb|trap)$")
 
 
@@ -729,7 +883,8 @@ def main():
         for e in events.split():
             assert [x for x in d["events"] if x["name"] == e][0]["spec"] == spec, e
             used.add(e)
-    assert used | {"flush"} == set(ev), sorted(set(ev) - used)
+    other = {e["name"] for e in d["events"] if e["spec"] == TIME_SPEC}
+    assert used | {"flush"} | other == set(ev), sorted(set(ev) - used)
     asm = SYMS + (CORE_K + CORE_U + PROBES_K + PROBES_U) % val
     args = ["--defsym=s_%s=0x%s" % (a, a) for a in sorted(set(re.findall(r"(?:jmp|call)\s+0x([0-9a-f]{8})", asm)))]
     asm = re.sub(r"((?:jmp|call)\s+)0x([0-9a-f]{8})", r"\1s_\2", asm)
@@ -823,4 +978,7 @@ def main():
         open(listing, "w").write(re.sub(r"/[^\s:]*log\.elf", "log.elf", txt))
 
 
-main()
+if len(sys.argv) > 1 and sys.argv[1] == "--peaking-time":
+    peaking_time()
+else:
+    main()

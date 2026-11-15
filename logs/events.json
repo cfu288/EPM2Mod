@@ -123,6 +123,7 @@
   },
   "peaking_colour": {"0": "not read yet", "1": "Off", "2": "Red", "3": "White", "4": "Yellow", "5": "Blue"},
   "heap_mode": {"0": "0 (for 3 ms, when an effect filter ends)", "1": "1 (art work buffers: peaking, effect filters)", "2": "2 (live view without art buffers)"},
+  "pass9_gain": {"0": "a colour", "512": "White", "0xFF00": "Key Line art filter"},
   "lv_mode": {"0": "factory", "1": "Adjust", "2": "Reset"},
   "fw_error": {
    "0x19000C03": "DMA copy 0x7E426045: the destination address is a cached one (stock, every start)",
@@ -186,6 +187,10 @@
    "doc": "Key Line pass 9 (the colour pass of peaking). The first 3 passes after each MF Assist start. gain is usGain2: 512 for White, 0 for a colour (the colour loop wrote the lines). first_pixel is byte 1 of the line image",
    "args": [{"name": "picture", "format": "addr"},
             {"name": "line", "format": "hex", "fields": [{"name": "first_pixel", "shift": 0, "bits": 8}, {"name": "gain", "shift": 16, "bits": 16}]}]},
+  {"id": 261, "name": "pk_stats", "level": "debug", "spec": "log-peaking-time", "feature": "peaking",
+   "doc": "One record per 8 runs of Key Line pass 9 (the Key Line art filter, White peaking and colour peaking). loop_us: the microseconds from before the peaking hook of the pass to after it, summed over these 8 passes. For a colour that is the colour loop; for White and Key Line it is a few microseconds. gain: usGain2 of the last pass. The time between two records of one run is 8 frame periods. Only in the build debug-log-peaking-fast (spec log-peaking-time)",
+   "names": {"gain": "pass9_gain"},
+   "args": [{"name": "loop_us", "format": "dec"}, {"name": "gain", "format": "hex"}]},
 
   {"id": 512, "name": "art_sixaxis", "level": "info", "spec": "log-probes", "feature": "picture-mode",
    "doc": "Six-axis stage dispatch 0x7E56D2BF: a new art code, or the first pass after a shooting callback. The gate is one for both CPUs: when the two CPUs run jobs with different codes, each pass is logged",

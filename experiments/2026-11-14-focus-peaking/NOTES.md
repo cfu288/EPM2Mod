@@ -1243,3 +1243,155 @@ Go back: `epm2flash peaking-menu-names 4ea4ffd773d6f05d16867f55b9fef4bce5d53fc86
 | `scripts/scen_colours.py` | S12 to S14: `scen_colours.py all BASE_BLOCK0 PINNED_BLOCK0 COLOURS_BLOCK0 [PNG_DIR]` |
 | `scripts/colours-emu/` | drivers of the full-boot emulator checks (copies; see its README.txt) |
 | `results/colours-*.txt`, `results/scen-colours-*.txt` | listing, free-space check, hook check, op check, scenario and emulator outputs |
+
+## 17. Speed: where the time goes, and a faster colour loop (`peaking-fast`)
+
+Date: 2026-11-15. Status: `patches/peaking-fast.json`, build `builds/peaking-fast.json`, sha256
+`0e8a25b9578b8119b14b4895be7d2a0b70d7315e5e817758699777f0f31d917e`; measuring build `builds/debug-log-peaking-fast.json`,
+sha256 `21c811f733e132742f6f75e05282eafeba66c793d28e5a5e2293ea829bb3df49`. Checked in emulation. **Not flashed.** The pinned
+build `peaking-colours` still rebuilds to `4d6b1f26…56f8`. Labels: **V** verified (the log, the bytes, or ran in the
+emulator), **I** inferred, **U** unknown.
+
+Camera evidence (log evaluation 1, build `debug-log`): 3 to 7 frames per second while coloured lines show.
+
+### 17.1 The time budget
+
+| Fact | Label |
+|---|---|
+| 72 frame periods, 145 to 342 ms. In one run the period moves smoothly as the ring turns: 342 → 151 → 341 ms (Yellow), 145 → 203 ms (Red, after its first frames). It is not a step of a fixed clock | V (log) |
+| From the frame's first record (`film_stage`, plain job) to `pk_pass9`: 131 to 316 ms. `pk_pass9` is written after the colour loop. From `pk_pass9` to the next frame's first record: 22 to 27 ms in all 9 cases | V (log) |
+| These 22 to 27 ms hold the combine job (two inputs and one output of 921,600 bytes), pass 10, the display update and the start of the next frame. So one pass of the image processor over the frame takes about 10 ms or less | I |
+| The 131 to 316 ms hold the line job, the passes 1, 7 and 8, and the colour loop. If the three passes and the line job cost about 10 to 15 ms each, the pipeline needs 40 to 60 ms and the loop the rest: 70 to 250 ms | I |
+| The image processor does the same work for every picture. The colour loop does not: it does more for every line pixel (4 byte reads per group, 3 byte writes per pixel). So the part that moves with the focus, 145 → 342 ms, is the loop (it is slowest when the picture is sharp) | I, strong |
+| White has no loop. The owner did not report White as slow | I |
+| The firmware plans 85 ms for this frame. 0x7E6C365F estimates a frame time per art code (0x7E6CC18E: Key Line I 85 ms, or 50 ms with bits 0–1 of record +96; Key Line II 85, 150 or 310 ms), rounds it up to 30 / 50 / 85 / 150 / 180 / 310 / 485 / 985 ms, and 0x7E6C35F0 turns that into a rate of 30 / 15 / 10 / 6 / 5 / 3 / 2 / 1 frames per second (table 0x7E7FD9F0; 230 ms gives 4). Peaking asks for 85 ms = 10 per second, as the E-P5 does (hook H) | V |
+| What the rate drives (sensor, display, a time-out) | U |
+| So the stock Key Line filter is planned for 10 frames per second at most, and peaking cannot be faster than that with this pass list | V for the plan, U for what the camera reaches |
+| CPU work of one peaking frame in the scenario rig: 1,013,000 instructions, of which the loop is 849,000 (no line pixel) to 940,000 (the synthetic frame, 3 % line pixels): 84 % or more | V (emulator) |
+| Bus accesses of the pinned loop per frame: 230,400 word reads, and for each line pixel 1 byte read and 3 byte writes. All go to the 0xB5… addresses, the alias of the RAM without the CPU cache (§16.1) | V for the code, I for "no cache" |
+| What one such access costs. The CPU core clock (clock 0 is 162 MHz: hardware notes, I) | U |
+| A scale from the log: `log_put` (about 40 instructions, 8 accesses to uncached RAM, 1 timer read) ran between two records that are 1 to 2 µs apart. So this kind of code runs 20 instructions per µs or more, and 849,000 instructions without line pixels are about 40 ms or less | I |
+| The E-P5 has no CPU loop. White and black come from the combine job (mode 3, gains ± 2048), with its own line job (`ucProcCount` 11) and 4-byte passes. These need its IMG library (§11.2). Its picture size in peaking was not compared | V, size U |
+| The share of the magnified view, and the frame rate of MF Assist with Peaking Off | U (no record per frame in that state) |
+| The debug build's probes: 2 to 3 records per frame, about 150 instructions | V: not a cost |
+
+**What dominates:** with a sharp picture, the colour loop (**I**). At the floor of 145 ms the split between the loop
+and Key Line's own passes is **U**. Section 17.5 gives a measurement that needs no flash.
+
+### 17.2 Options
+
+| # | Option | Gain | Risk | Verdict |
+|---|---|---|---|---|
+| 1 | Loop: every second row; 2 word reads per group of 4 pixels; the colour over the whole group in both rows with 6 word writes | Instructions 849,172 → 309,923 (no lines), 940,434 → 330,175 (synthetic frame). Word reads 230,400 → 76,800. A group with line pixels: 12 to 24 byte writes and 8 byte reads → 6 word writes | The lines are drawn in blocks of 4 × 2 pixels of the 640 × 480 picture. How coarse that looks on the screen is U (S12 picture: a slanted line with small steps) | **built** |
+| 2 | As 1, but each pixel tested and written alone | The part without lines as 1. The part with lines stays as slow as pinned | none | not built. The next build if the blocks look coarse |
+| 3 | Read the line image through the cached alias | U. The image processor writes the buffer in every frame, so 28,800 cache lines must be invalidated per frame first. The rig has no cache | a stale picture or a fault; no emulator test | not now |
+| 4 | Half of the rows on CPU 1 | at most 2 × for the loop | needs a call between the CPUs and a wait in the ART task | only if 1 is not enough |
+| 5 | Colour in the image processor: two more combine passes with a constant-colour image | removes the loop, adds about 20 ms (I) | No threshold: the colour is added to the picture and blends with it, which is the fault that led to §16. The constant image needs a 921,600-byte buffer that survives the frames | rejected again |
+| 6 | A shorter pipeline: drop a pass, a smaller work image, the E-P5 pass list | U until the pipeline's share is measured | the E-P5 list is not portable (§11.2) | wait for 17.5 |
+| 7 | Frame time 50 ms in place of 85 | only if a frame then needs less than 66 ms | low | wait for 17.5 |
+
+### 17.3 What was built
+
+`patches/peaking-fast.json`, a delta on the pinned build, 3 edits (generator `scripts/mkspec_fast.py`):
+
+| Edit | Bytes |
+|---|---|
+| `T_FAST` at **0x7E4C9184** (117 B) and `T_HIT` at **0x7E4C90CA** (32 B): two 0xFF runs of the kernel range, on both sides of the 240-frame list | new |
+| `T_COL` of the pinned build, the first 5 bytes of its row loop at 0x7E4C9453 → `jmp T_FAST` | `expect` is the pinned code |
+
+- The pinned set-up (colour, buffers, sizes, checks) and its two exits stay in use. The old loop stays in place without a reader.
+- `T_FAST` tests bytes 0–3 and 8–11 of each group of 12 in every second row. The line image is grey (§16.1, **I**),
+  so this sees all four pixels. A byte of 64 or more: `T_HIT` writes the colour over the group in this row and the next.
+- With an odd number of rows the last row is left alone. One row, or a row length that is not a multiple of 4 bytes:
+  white lines, as for the other frames that the pinned loop cannot take.
+- White and Off do not reach the new code. No new RAM; 16 more bytes of the ART task's stack.
+
+The measuring build is `peaking-fast` + `log-core` + `log-probes` + `patches/log-peaking-time.json` (generator
+`mkspec_log.py --peaking-time`): event **`pk_stats`**, one record per 8 runs of Key Line pass 9. Two hooks in stock
+bytes of pass 9, 0x7E72675C (before hook K) and 0x7E726774 (after the gain is stored), read the microsecond timer. The
+record holds the sum of the 8 times and `usGain2`. For a colour the time is the loop. For White and for the Key Line
+art filter it is a few microseconds, and the record still gives the frame period: 8 periods between two records. The
+spec changes no byte of the peaking code. It puts the new build id `fe2f543f94c74a91` of `logs/events.json` into the
+block header; the log of the flashed `debug-log` still decodes with `logs/events-d1ddd46b4dac2414.json`.
+
+### 17.4 Checks
+
+| Check | Result | Label |
+|---|---|---|
+| `.venv/bin/epm2mod make` for both builds | the two sha256 above; free-space check PASS, 0 FAIL, load order 0 FAIL (`results/fast-freespace-check.txt`) | V |
+| `tools/emu/opcheck.py` | 17 and 20 specs, 0 FAIL (`results/fast-opcheck.txt`) | V |
+| `tools/emu/hookcheck.py` | `peaking-fast` 5 transfers, `log-peaking-time` 6 transfers, all between the kernel range and segment 1, 0 FAIL (`results/fast-s0-hookcheck.txt`) | V |
+| Boot, `stage2-boot.mjs 2000` | PASS. `peaking-fast` = pinned and `debug-log-peaking-fast` = `debug-log` but the wall time (`results/fast-emu-boot.txt`). The boot does not run pass 9 | V |
+| **S12** Red, Yellow, Blue on the synthetic frame (`scripts/scen_fast.py`) | every one of the 307,200 pixels equals the block model; the line image is not changed; `usGain2` 0; registers kept. Pinned colours 9,360 pixels, fast 10,800; 1,560 pixels differ (60 coloured only by pinned, 1,500 only by fast). Pictures: `~/opt/om-emu-e101-boot-work/peaking-fast/frames/` | V |
+| Instructions from hook K to the next stock instruction | no lines: 849,172 → 309,923. Synthetic frame: 940,434 → 330,175. White: 19 → 19 | V |
+| **S13** White (3, 0, 6) = pinned, Off = the build without peaking | 24 frame comparisons, all the same: memory writes, device accesses in order, no stock pc lost (`results/scen-fast-s13.txt`) | V |
+| **S14** `T_K` alone on small frames: 28 mode rows; 7 sizes × 3 colours × 6 line images (odd row counts, widths that are not a multiple of 4, 640 × 6); one row, 27-byte rows, unaligned buffers, no rows → white, nothing written | PASS; guard bytes round the picture untouched | V |
+| **S18** the timing probe: both routines alone for 20 passes; 18 frames each of Red, White and the Key Line art filter against `peaking-fast` | PASS. Alone: registers kept, the replaced instructions ran, records (180,419 µs, 0xFF00) and (120,419 µs, 0x0200) as the model. Frames: the same gains as `peaking-fast`, the same Red picture, two records each with the gain 0 / 0x0200 / 0xFF00. The emulator's timer goes down by 1 per read, so the frames do not test the times (`results/scen-fast-s18.txt`) | V |
+| S15 to S17 of the log (`scen_log.py`) with `peaking-fast` and `debug-log-peaking-fast` | S16 and S17 PASS. S15: in all 16 frame comparisons no byte differs outside the log's RAM and the device accesses are the same but the timer reads; the same gain and `ucExpose`. It prints FAIL for "3 stock pcs lost" in pass 9: they are the replaced instructions 0x7E726770, 0x7E726771 and 0x7E726776. The hook PK9 and the new hook at 0x7E726774 touch, so the rig takes the 12 changed bytes for new code and not for hook sites (`results/scen-fast-log-s15-s17.txt`) | V; which 3 pcs: I, from their number |
+| Unit tests, `mypy`, `black` | 168 tests pass | V |
+
+Not checked, the camera must show it: the time of the loop and of the pipeline; the look of the blocks; that the line
+image is grey enough for the two-word test (a line pixel whose middle byte alone is 64 or more would be missed in
+pixels 1 and 2 of a group).
+
+Side effect: `builds/debug-log.json` no longer passes the free-space check, because `peaking-fast` edits bytes of
+`peaking-colours` and `log-peaking-time` edits the build id in `log-core`. It is the same case as `builds/peaking-menu.json`
+after `peaking-colours`. `build/debug-log.BIN` is not changed. To build it again, record its sha256 with `epm2mod pin`.
+
+### 17.5 Camera test
+
+Setup for both parts: MENU → Custom Menu → A → MF Assist → On. OK → AF mode → MF. Camera on a table, a page of
+text about 1 m away, in focus. A card in the camera.
+
+**A. No flash**, if `debug-log` (`e74f1aec…`) is still on the camera. It tells the loop from the pipeline.
+
+1. MENU → Custom Menu → A → Peaking → **White** → OK. Leave the menu. Turn the focus ring a little to and fro for
+   10 s, so that the text stays nearly sharp. Wait until the zoom ends.
+2. Peaking → **Red** → OK. The same 10 s.
+3. Peaking → **Off** → OK. The same. By eye: is the zoomed view smoother than with White?
+4. OK → Picture Mode → **Key Line** → OK. Look at live view. By eye: as fast as White peaking? Then set the look back.
+5. MENU. Power off. `uv run epm2mod log /path/to/EPM2LOG.BIN --summary`.
+
+Read the two lines `run at … s, White [3]` and `run at … s, Red [2]`:
+
+| Result | Meaning |
+|---|---|
+| Red's median frame period is 40 ms or more above White's, and so is "frame start to the end of the colour pass" | the loop is the cost: flash part B |
+| Both about equal | the loop is not the cost. The time is Key Line's pipeline; `peaking-fast` will not help much. Options 6 and 7 |
+| White itself at 100 ms or less | the pipeline reaches the planned 10 frames per second |
+
+**B. Flash** `debug-log-peaking-fast` (it is `peaking-fast` with the log).
+
+1. Peaking → **Red**. Turn the ring to and fro for 10 s. Expected: red lines in small blocks, the view smoother than before.
+2. Peaking → **White**. The same 10 s. Expected: as before.
+3. OK → Picture Mode → **Key Line** → OK. Hold live view for 10 s without the ring. Set the look back.
+4. MENU. Power off. `uv run epm2mod log /path/to/EPM2LOG.BIN --summary`. Press MENU at least once per 40 s of
+   peaking: the log keeps 512 records per CPU between two menus, and each frame still gives one (`film_stage`).
+
+Read the lines under `pass 9 timing`: one for Red, one for White, one for the Key Line art filter, each with the
+frame period and the time of the peaking code per frame.
+
+| Result | Meaning | Next |
+|---|---|---|
+| Red: the code takes 10 ms or less and the period is near White's | the loop is solved | flash `peaking-fast` for use; pin it |
+| Red: the code still takes 30 ms or more | the bus accesses are slow even in the short loop | every fourth row, or option 3 |
+| White's period = the Key Line filter's period | peaking adds nothing to the stock filter; the rest is the pass list | options 6, 7 |
+| The blocks look coarse | | option 2 |
+| No coloured lines, or lines only on thick edges | the line image is not grey, or below 64 in the tested bytes | report; test all three words again |
+| Freeze when the ring turns with a colour | a fault in the new loop | card update with the pinned build |
+
+Flash: `epm2flash debug-log-peaking-fast 21c811f733e132742f6f75e05282eafeba66c793d28e5a5e2293ea829bb3df49`.
+For use, after B: `epm2flash peaking-fast 0e8a25b9578b8119b14b4895be7d2a0b70d7315e5e817758699777f0f31d917e`.
+Go back: `epm2flash peaking-colours 4d6b1f26ed92d66b62b4d7dc32d26168e33fd8b153a7655d6c0d9a58267456f8`.
+
+### 17.6 Files added
+
+| Path | Contents |
+|---|---|
+| `patches/peaking-fast.json`, `builds/peaking-fast.json` | the spec and the build description |
+| `patches/log-peaking-time.json`, `builds/debug-log-peaking-fast.json` | the timing probe and the measuring build |
+| `scripts/mkspec_fast.py` | generator: `mkspec_fast.py OUT.json PINNED_DIR /tmp/scratch/asm [LISTING.txt]` |
+| `experiments/2026-11-15-log/scripts/mkspec_log.py --peaking-time` | generator of the timing probe |
+| `scripts/scen_fast.py` | S12 to S14: `scen_fast.py all BASE_BLOCK0 PINNED_BLOCK0 FAST_BLOCK0 [PNG_DIR]`; S18: `scen_fast.py s18 FAST_BLOCK0 DEBUG_FAST_BLOCK0` |
+| `logs/events.json`, `src/epm2mod/logsummary.py` | event `pk_stats`; the summary prints one line per peaking run and the lines `pass 9 timing` |
+| `results/fast-*.txt` | listings, free-space check, hook check, op check, boot report, scenario outputs |

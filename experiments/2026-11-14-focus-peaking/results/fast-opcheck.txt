@@ -1,0 +1,2 @@
+op check: 17 specs, 1067 byte ops, 12 calls from SRAM code into block 0 looked at, 0 FAIL
+op check: 20 specs, 1099 byte ops, 12 calls from SRAM code into block 0 looked at, 0 FAIL

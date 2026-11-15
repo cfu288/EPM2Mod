@@ -797,6 +797,8 @@ class SummaryTests(unittest.TestCase):
             "peaking: 1 MF Assist run (1.0 s); colour when the latch is set: Red [2]",
             "2 frame periods, 200 to 300 ms, median 250 ms (4.0 frames per second)",
             "colour pass: 1 records, gain 0",
+            "  run at 3.0 s, Red [2]: 2 frame periods, median 250 ms (200 to 300); "
+            "frame start to the end of the colour pass: 50 ms",
             "[167]: 1",
             "[0x7ECB09BE]: 1",
             "shooting: 1 capture (callback 136), 1 time CBS_START_SHOOTING_PICTURE",
@@ -810,6 +812,48 @@ class SummaryTests(unittest.TestCase):
             with self.subTest(part=part):
                 self.assertIn(part, whole)
         self.assertNotIn("markers:", whole)
+
+    def test_the_timing_records_of_pass_9(self) -> None:
+        # Three pk_stats records of a Red run, 0.8 s apart: 8 frames of
+        # 100 ms, with 16 ms and 24 ms of colour loop per frame. Then a
+        # White run: its first record is not paired with the Red ones, and a
+        # record after the end of the run is not paired with it.
+        words, ids = repository_words()
+        rows = [
+            ("boot", 101_000, 1, 0),
+            ("pk_latch", 1_000_000, 0x02000101, 0x100),
+            ("pk_stats", 1_500_000, 64_000, 0),
+            ("pk_stats", 2_300_000, 128_000, 0),
+            ("pk_stats", 3_100_000, 192_000, 0),
+            ("pk_latch", 3_500_000, 0x02010000, 0x100),
+            ("pk_latch", 5_000_000, 0x03000101, 0x100),
+            ("pk_stats", 5_200_000, 40_000, 0x0200),
+            ("pk_stats", 6_000_000, 24, 0x0200),
+            ("pk_latch", 6_100_000, 0x03010000, 0x100),
+            ("pk_stats", 6_800_000, 0, 0x0200),
+        ]
+        made = [
+            record(ids[name], number, time, arg0, arg1)
+            for number, (name, time, arg0, arg1) in enumerate(rows)
+        ]
+        data = block(0, made, build=words.build_id, restarts=1)
+        text = logsummary.summarize(eventlog.decode(data, words))
+        self.assertIn("  pass 9 timing: 6 pk_stats records of 8 passes each", text)
+        self.assertIn(
+            "    Red [2]: 2 pairs of records, frame period "
+            "median 100 ms (100 to 100), 10.0 frames per second; peaking code "
+            "of pass 9 per frame median 20.0 ms (16.0 to 24.0), 20 % of the "
+            "frame period",
+            text,
+        )
+        self.assertIn(
+            "    White [0x00000200]: 1 pair of records, frame period "
+            "median 100 ms (100 to 100), 10.0 frames per second; peaking code "
+            "of pass 9 per frame median 0.0 ms (0.0 to 0.0), 0 % of the frame "
+            "period",
+            text,
+        )
+        self.assertIn("  run at 1.0 s, Red [2]: 0 frame periods", text)
 
     def test_gaps_markers_and_a_session_without_an_end(self) -> None:
         data = block(88, [record(3, n, n) for n in range(88, 90)], drops=88)

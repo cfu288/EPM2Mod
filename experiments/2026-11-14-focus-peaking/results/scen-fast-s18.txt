@@ -1,0 +1,6 @@
+S18. The timing probe (pk_stats) of debug-log-peaking-fast.
+  (a) T_TIME0 and T_TICK alone, 20 passes: the replaced instructions ran, the registers are kept, the timer value is stored: True; records (loop_us, gain) [(180419, 65280), (120419, 512)], expected [(180419, 65280), (120419, 512)] -> ok
+  (b) Red: 18 passes 9, gains fast ['0x0000'], debug ['0x0000']; picture of pass 17 equal: True; anomalies none; pk_stats (loop_us, gain): [(8, '0x0000'), (8, '0x0000')] -> ok
+  (b) White: 18 passes 9, gains fast ['0x0200'], debug ['0x0200']; picture of pass 17 equal: True; anomalies none; pk_stats (loop_us, gain): [(8, '0x0200'), (8, '0x0200')] -> ok
+  (b) Key Line art filter, no MF Assist: 18 passes 9, gains fast ['0xFF00'], debug ['0xFF00']; picture of pass 17 equal: True; anomalies none; pk_stats (loop_us, gain): [(8, '0xFF00'), (8, '0xFF00')] -> ok
+  S18 RESULT: PASS

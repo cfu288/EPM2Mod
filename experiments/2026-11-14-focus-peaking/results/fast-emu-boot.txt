@@ -1,0 +1,12 @@
+boot reports, stage2-boot.mjs 2000
+peaking-colours (pinned) against peaking-fast: lines that differ:
+< stop: {"why":"labtime","pc":2118424173} | lab ms 2000.1 | wall ms N | insns cpu0 30661113 cpu1 2765217
+> stop: {"why":"labtime","pc":2118424173} | lab ms 2000.1 | wall ms N | insns cpu0 30661113 cpu1 2765217
+debug-log against debug-log-peaking-fast: lines that differ:
+< stop: {"why":"labtime","pc":2118424173} | lab ms 2000.1 | wall ms N | insns cpu0 30661683 cpu1 2762235
+> stop: {"why":"labtime","pc":2118424173} | lab ms 2000.1 | wall ms N | insns cpu0 30661683 cpu1 2762235
+last lines of the report of peaking-fast:
+stand-ins and observers hit: gio-timer-set x3216, S-CONSOLE x389, boot-mark x173, S-OSDFILL x4, S-FLASHREAD0 x31, bank-save x2, S-FLASHWRITE x3, S-FLASHERASE x6, idle x275, idle x9103, S-GIOIN x3180, S-PWM x2, S-PWM-duty x2, S-BC x9, S-BATT x2, errlog x2, oxf-event x259, api_exec_start x8, api_exec_post x8, fileclbk-cmd x1, usrfast-log x18, S-DMA-reserve x246, S-DMA x246, S-DMA-finish x246, S-IIC-
+I2C transfers 81 | SIO client transfers 70 | BC transactions 9 | SD commands 0 | DMA 246 | divide relaxations 1
+cpu1: idle | problems: none
+STAGE 2: PASS (kernel on both cores, Usr0..Usr4 done, tasks scheduled, no fault)

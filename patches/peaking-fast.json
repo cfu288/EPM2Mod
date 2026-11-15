@@ -1,0 +1,43 @@
+{
+ "name": "peaking-fast",
+ "description": "Focus peaking in colour, a faster colour loop. The pinned loop looks at every row and writes each line pixel byte by byte. The new loop T_FAST looks at every second row with 2 word reads per group of 4 pixels, and writes the colour over the whole group in that row and the next one with 6 word writes: the lines are drawn in blocks of 4 x 2 pixels. About 3 times fewer instructions and bus reads for a frame without lines, and about 10 times fewer bus accesses for the lines. White and Off do not change. A delta on builds/peaking-colours.json: every expect is a byte string of that build. See experiments/2026-11-14-focus-peaking/NOTES.md section 17.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "candidate: emulator-checked, not flashed",
+ "_delta_on": "builds/peaking-colours.json (sha256 4d6b1f26ed92d66b62b4d7dc32d26168e33fd8b153a7655d6c0d9a58267456f8)",
+ "_ram": "no new RAM; 16 more bytes of the ART task's stack (40 in all)",
+ "_symbols": {
+  "T_FAST": "0x7E4C9184",
+  "T_FAST_END": "0x7E4C91EE",
+  "T_HIT": "0x7E4C90CA"
+ },
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA8164",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "5900e9f1dcf8c401c807f8ed03c807dcf6020000f8fef042004604f1d6f1d0f1028cf8c4088df8c110f21442088cf8c4108df8c108f214420c8cf8c018f213581092f16270f80408f214fce0c0c0c0c0c91f200cb8c9ef5814f1605804f160580028ff4200c9daf8fe10dc90020000dcd7feffffcb",
+   "_addr": "0x7E4C9184",
+   "_note": "new code, kernel range, 0xFF run: T_FAST (117 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA80AA",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "91f169580497f1636d6f5808f81104f81304580cf81108f81308dcf2000000cb",
+   "_addr": "0x7E4C90CA",
+   "_note": "new code, kernel range, 0xFF run: T_HIT (32 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA8433",
+   "expect": "580092f162",
+   "new": "dc31fdffff",
+   "_addr": "0x7E4C9453",
+   "_note": "T_COL of peaking-colours, the first instructions of its row loop (`mov (sp),d0` / `mov a0,a2` / `add d0,a2`) -> `jmp T_FAST`"
+  }
+ ]
+}

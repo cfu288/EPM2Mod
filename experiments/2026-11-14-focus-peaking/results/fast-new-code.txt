@@ -1,0 +1,103 @@
+
+fast.elf:     file format elf32-mn10300
+
+
+Disassembly of section .fa:
+
+7e4c9184 <T_FAST>:
+7e4c9184:	59 00       	mov	(sp),d1
+7e4c9186:	e9          	add	d2,d1
+7e4c9187:	f1 dc       	mov	a3,d0
+7e4c9189:	f8 c4 01    	lsr	1,d0
+7e4c918c:	c8 07       	beq	7e4c9193 <.L9^B1>
+7e4c918e:	f8 ed 03    	btst	3,d1
+7e4c9191:	c8 07       	beq	7e4c9198 <.L0^B1>
+
+7e4c9193 <.L9^B1>:
+7e4c9193:	dc f6 02 00 	jmp	7e4c9489 <s_7e4c9489>
+7e4c9197:	00 
+
+7e4c9198 <.L0^B1>:
+7e4c9198:	f8 fe f0    	add	-16,sp
+7e4c919b:	42 00       	mov	d0,(sp)
+7e4c919d:	46 04       	mov	d1,(4,sp)
+7e4c919f:	f1 d6       	mov	a1,d2
+7e4c91a1:	f1 d0       	mov	a0,d0
+7e4c91a3:	f1 02       	sub	d0,d2
+7e4c91a5:	8c          	mov	d3,d0
+7e4c91a6:	f8 c4 08    	lsr	8,d0
+7e4c91a9:	8d          	mov	d3,d1
+7e4c91aa:	f8 c1 10    	asl	16,d1
+7e4c91ad:	f2 14       	or	d1,d0
+7e4c91af:	42 08       	mov	d0,(8,sp)
+7e4c91b1:	8c          	mov	d3,d0
+7e4c91b2:	f8 c4 10    	lsr	16,d0
+7e4c91b5:	8d          	mov	d3,d1
+7e4c91b6:	f8 c1 08    	asl	8,d1
+7e4c91b9:	f2 14       	or	d1,d0
+7e4c91bb:	42 0c       	mov	d0,(12,sp)
+7e4c91bd:	8c          	mov	d3,d0
+7e4c91be:	f8 c0 18    	asl	24,d0
+7e4c91c1:	f2 13       	or	d0,d3
+
+7e4c91c3 <.L1^B1>:
+7e4c91c3:	58 10       	mov	(16,sp),d0
+7e4c91c5:	92          	mov	a0,a2
+7e4c91c6:	f1 62       	add	d0,a2
+
+7e4c91c8 <.L2^B1>:
+7e4c91c8:	70          	mov	(a0),d0
+7e4c91c9:	f8 04 08    	mov	(8,a0),d1
+7e4c91cc:	f2 14       	or	d1,d0
+7e4c91ce:	fc e0 c0 c0 	and	-1061109568,d0
+7e4c91d2:	c0 c0 
+7e4c91d4:	c9 1f       	bne	7e4c91f3 <.L4^B1>
+
+7e4c91d6 <.L3^B1>:
+7e4c91d6:	20 0c       	add	12,a0
+7e4c91d8:	b8          	cmp	a2,a0
+7e4c91d9:	c9 ef       	bne	7e4c91c8 <.L2^B1>
+7e4c91db:	58 14       	mov	(20,sp),d0
+7e4c91dd:	f1 60       	add	d0,a0
+7e4c91df:	58 04       	mov	(4,sp),d0
+7e4c91e1:	f1 60       	add	d0,a0
+7e4c91e3:	58 00       	mov	(sp),d0
+7e4c91e5:	28 ff       	add	-1,d0
+7e4c91e7:	42 00       	mov	d0,(sp)
+7e4c91e9:	c9 da       	bne	7e4c91c3 <.L1^B1>
+7e4c91eb:	f8 fe 10    	add	16,sp
+
+7e4c91ee <T_FAST_END>:
+7e4c91ee:	dc 90 02 00 	jmp	7e4c947e <s_7e4c947e>
+7e4c91f2:	00 
+
+7e4c91f3 <.L4^B1>:
+7e4c91f3:	dc d7 fe ff 	jmp	7e4c90ca <T_HIT>
+7e4c91f7:	ff 
+7e4c91f8:	cb          	nop	
+
+Disassembly of section .fb:
+
+7e4c90ca <T_HIT>:
+7e4c90ca:	91          	mov	a0,a1
+7e4c90cb:	f1 69       	add	d2,a1
+7e4c90cd:	58 04       	mov	(4,sp),d0
+7e4c90cf:	97          	mov	a1,a3
+7e4c90d0:	f1 63       	add	d0,a3
+7e4c90d2:	6d          	mov	d3,(a1)
+7e4c90d3:	6f          	mov	d3,(a3)
+7e4c90d4:	58 08       	mov	(8,sp),d0
+7e4c90d6:	f8 11 04    	mov	d0,(4,a1)
+7e4c90d9:	f8 13 04    	mov	d0,(4,a3)
+7e4c90dc:	58 0c       	mov	(12,sp),d0
+7e4c90de:	f8 11 08    	mov	d0,(8,a1)
+7e4c90e1:	f8 13 08    	mov	d0,(8,a3)
+7e4c90e4:	dc f2 00 00 	jmp	7e4c91d6 <.L3^B1>
+7e4c90e8:	00 
+7e4c90e9:	cb          	nop	
+
+Disassembly of section .hook:
+
+7e4c9453 <_stack+0x7e449453>:
+7e4c9453:	dc 31 fd ff 	jmp	7e4c9184 <T_FAST>
+7e4c9457:	ff 

@@ -1,0 +1,63 @@
+
+logtime.elf:     file format elf32-mn10300
+
+
+Disassembly of section .s7e72675c:
+
+7e72675c <.s7e72675c>:
+7e72675c:	dc 8e 29 da 	jmp	7e4c90ea <T_TIME0>
+7e726760:	ff 
+
+Disassembly of section .s7e726774:
+
+7e726774 <.s7e726774>:
+7e726774:	dc 49 30 da 	jmp	7e4c97bd <T_TICK>
+7e726778:	ff 
+
+Disassembly of section .tk:
+
+7e4c97bd <T_TICK>:
+7e4c97bd:	80 10       	mov	16,d0
+7e4c97bf:	f8 53 24    	movbu	d0,(36,a3)
+7e4c97c2:	fc dd 98 d0 	mov	-1102065512,a1
+7e4c97c6:	4f be 
+7e4c97c8:	75          	mov	(a1),d1
+7e4c97c9:	fc a4 74 00 	mov	(98900074 <BUF+0xda402fb4>),d0
+7e4c97cd:	90 98 
+7e4c97cf:	f1 01       	sub	d0,d1
+7e4c97d1:	f8 01 04    	mov	(4,a1),d0
+7e4c97d4:	e1          	add	d0,d1
+7e4c97d5:	f8 15 04    	mov	d1,(4,a1)
+7e4c97d8:	f8 41 08    	movbu	(8,a1),d0
+7e4c97db:	40          	inc	d0
+7e4c97dc:	f8 51 08    	movbu	d0,(8,a1)
+7e4c97df:	f8 e0 07    	and	7,d0
+7e4c97e2:	c9 14       	bne	7e4c97f6 <.L2^B1>
+7e4c97e4:	f8 11 04    	mov	d0,(4,a1)
+7e4c97e7:	f8 63 22    	movhu	(34,a3),d0
+7e4c97ea:	f1 e0       	mov	d0,a0
+7e4c97ec:	2c 05 01    	mov	261,d0
+7e4c97ef:	dd 42 fd ff 	call	7e4c9531 <log_put>,[],0
+7e4c97f3:	ff 00 00 
+
+7e4c97f6 <.L2^B1>:
+7e4c97f6:	dc 83 cf 25 	jmp	7e726779 <s_7e726779>
+7e4c97fa:	00 
+
+Disassembly of section .t0:
+
+7e4c90ea <T_TIME0>:
+7e4c90ea:	fc a4 74 00 	mov	(98900074 <BUF+0xda402fb4>),d0
+7e4c90ee:	90 98 
+7e4c90f0:	fc 81 98 d0 	mov	d0,(be4fd098 <BUF+0xffffffd8>)
+7e4c90f4:	4f be 
+7e4c90f6:	dc 2b 05 00 	jmp	7e4c9621 <T_TIME0B>
+7e4c90fa:	00 
+
+Disassembly of section .t1:
+
+7e4c9621 <T_TIME0B>:
+7e4c9621:	80 02       	mov	2,d0
+7e4c9623:	f8 53 25    	movbu	d0,(37,a3)
+7e4c9626:	dc 3b d1 25 	jmp	7e726761 <s_7e726761>
+7e4c962a:	00 
