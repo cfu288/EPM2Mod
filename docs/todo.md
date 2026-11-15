@@ -12,9 +12,8 @@ and delete the item here.
 
 ## Focus peaking
 
-- Peaking speed: `debug-log-peaking-fast` reaches 10 frames per second with a colour on the camera
-  (2026-11-15; before: about 6). Open: the owner's view of the 4×2 blocks; then pin `peaking-fast`.
-  More than 10 per second needs a shorter pass list or the 50 ms frame class (NOTES §17).
+- More than 10 frames per second of peaking needs a shorter pass list or the 50 ms frame class
+  (NOTES §17). `peaking-fast` is the pinned build (2026-11-15).
 - Peaking without the zoom: the trigger is the MF Assist state object, which also asks for the zoom.
   It needs the E-P5 state object paired (NOTES §15.5).
 - The words Peaking, White and Black are English only: the other languages keep the old texts of

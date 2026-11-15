@@ -18,5 +18,7 @@
   "patches/film-names-all-languages.json",
   "patches/peaking-colours.json",
   "patches/peaking-fast.json"
- ]
+ ],
+ "sha256": "0e8a25b9578b8119b14b4895be7d2a0b70d7315e5e817758699777f0f31d917e",
+ "camera_tested": "2026-11-15"
 }
