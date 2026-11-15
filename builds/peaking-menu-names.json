@@ -16,5 +16,7 @@
   "patches/peaking-gain-2x.json",
   "patches/peaking-menu.json",
   "patches/film-names-all-languages.json"
- ]
+ ],
+ "sha256": "4ea4ffd773d6f05d16867f55b9fef4bce5d53fc8659a9b16362f7ac771a6bc30",
+ "camera_tested": "2026-11-15"
 }

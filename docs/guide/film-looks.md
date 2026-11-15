@@ -25,7 +25,6 @@ Grainy Film, Gentle Sepia, Dramatic Tone, Key Line and Watercolor do not change.
 
 - Colour and tone only: no grain, no halation.
 - A movie gets only a part of each look.
-- The film names show only when the camera language is English.
 - Type II of Portra, Pro 400H and Superia is the same as type I.
 
 How the looks were made and measured: [../film-emulation.md](../film-emulation.md).

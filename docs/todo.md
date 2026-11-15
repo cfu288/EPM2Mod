@@ -12,8 +12,8 @@ and delete the item here.
 
 ## Focus peaking
 
-- Test the build `peaking-menu-names` on the camera (Peaking Off / White / Black, and the film names
-  in other languages). Steps: NOTES §15 of the focus-peaking experiment.
+- Peaking colours: white and black blend with the picture (owner, 2026-11-15). Add coloured lines
+  (red, yellow, blue, as other makers offer) and remove Black. In work.
 - Peaking without the zoom: the trigger is the MF Assist state object, which also asks for the zoom.
   It needs the E-P5 state object paired (NOTES §15.5).
 - The words Peaking, White and Black are English only: the other languages keep the old texts of
@@ -28,10 +28,8 @@ and delete the item here.
   camera.
 - Add Effects (glow, vignette, white edge, frame) on a film look: a data edit, not yet tried.
 - More film entries through the hidden art-filter numbers 110 to 118: not yet tried.
-- Test the build `film-names-all-languages` on the camera: set another language (Setup Menu) and
-  look at Picture Mode. Then remove the limit "only in English" from the film-looks guide.
-  Unknown: where the texts 1173 and 1186 show; the Picture Mode Settings list has no row for the
-  first look (Portra), not compared with stock yet.
+- The film names in the other 33 languages are in the pinned build; not tested on the camera (the
+  owner does not need them). Unknown: where the texts 1173 and 1186 show.
 
 ## Interval shooting
 
