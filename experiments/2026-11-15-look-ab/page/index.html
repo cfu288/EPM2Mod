@@ -1,0 +1,165 @@
+<title>Film Look A/B</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: a viewing table. Two prints on a colour-neutral grey surround, one slim bar of controls above,
+   the answer keys below. The greys have no hue on purpose: a tinted surround shifts how the photos read. */
+:root {
+  --table: #1b1b1b;      /* the surround */
+  --mat: #262626;        /* panels */
+  --rule: #3a3a3a;       /* hairlines, track */
+  --ink: #ececec;
+  --ink-2: #a6a6a6;
+  --ink-3: #7a7a7a;
+  --mark: #e8b23a;       /* grease-pencil amber: the only colour that is not a photo */
+  --mark-ink: #1b1b1b;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  background: var(--table); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 12px 20px; box-sizing: border-box;
+}
+*, *::before, *::after { box-sizing: inherit; }
+button, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--mark); outline-offset: 2px; }
+.wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; min-height: 100%; }
+
+/* top bar */
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.bar h1 { font-size: 15px; font-weight: 600; margin: 0; letter-spacing: .01em; }
+.bar .spacer { flex: 1 1 0; }
+.count { font-family: var(--mono); font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.track { height: 3px; background: var(--rule); border-radius: 2px; overflow: hidden; }
+.track i { display: block; height: 100%; width: 0; background: var(--mark); transition: width .2s; }
+.ghost { background: none; border: 1px solid var(--rule); border-radius: 6px; padding: 5px 10px; font-size: 13px; color: var(--ink-2); }
+.ghost:hover { color: var(--ink); border-color: var(--ink-3); }
+.ghost[disabled] { opacity: .4; cursor: default; }
+select.ghost { padding-right: 6px; }
+label.opt { font-size: 13px; color: var(--ink-2); display: inline-flex; align-items: center; gap: 6px; }
+label.opt input { accent-color: var(--mark); }
+
+/* compare */
+.prompt { margin: 0; font-size: 14px; color: var(--ink-2); }
+.prompt b { color: var(--ink); font-weight: 500; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: 1 1 auto; min-height: 0; }
+.pair.wide-photo { grid-template-columns: 1fr 1fr; }
+.pick { background: none; border: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; min-width: 0; text-align: left; }
+.pick .frame { background: var(--mat); border-radius: 3px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.pick img { display: block; width: 100%; height: auto; max-height: calc(100vh - 210px); object-fit: contain; }
+.pick .tag { display: flex; justify-content: space-between; gap: 8px; font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
+.pick .tag .letter { color: var(--ink); border: 1px solid var(--rule); border-radius: 4px; padding: 1px 7px; }
+.pick:hover .tag .letter, .pick:focus-visible .tag .letter { background: var(--mark); color: var(--mark-ink); border-color: var(--mark); }
+.pick.chosen .frame { outline: 3px solid var(--mark); }
+.keys { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; }
+.keys .hint { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
+@media (max-width: 640px) {
+  .pair.wide-photo { grid-template-columns: 1fr; }
+  .pick img { max-height: none; }
+  .keys .hint { display: none; }
+}
+
+/* results */
+.results { display: flex; flex-direction: column; gap: 22px; }
+.verdict { font-size: 22px; line-height: 1.25; font-weight: 500; margin: 0; text-wrap: balance; max-width: 30em; }
+.verdict em { font-style: normal; color: var(--mark); }
+.sub { margin: 0; color: var(--ink-2); max-width: 62ch; }
+h2 { font-size: 12px; font-weight: 500; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 10px; font-family: var(--mono); }
+.rank { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 7px 12px; align-items: center; }
+.rank .name { font-size: 14px; white-space: nowrap; }
+.rank .name small { color: var(--ink-3); font-family: var(--mono); font-size: 11px; margin-left: 6px; }
+.rank .barcell { background: none; height: 10px; position: relative; }
+.rank .barcell i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--ink-2); border-radius: 0 4px 4px 0; min-width: 2px; }
+.rank .row1 .barcell i, .rank .barcell i.top { background: var(--mark); }
+.rank .num { font-family: var(--mono); font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.sit { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.sit article { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 10px; align-items: center; }
+.sit img { width: 76px; height: 76px; object-fit: cover; border-radius: 3px; display: block; }
+.sit .where { font-family: var(--mono); font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .07em; }
+.sit .fav { font-size: 15px; font-weight: 500; }
+.sit .more { font-size: 12px; color: var(--ink-2); }
+.weak { color: var(--ink-3); }
+.grid-wrap { overflow-x: auto; }
+table.heat { border-collapse: separate; border-spacing: 2px; font-family: var(--mono); font-size: 11px; font-variant-numeric: tabular-nums; }
+table.heat th { font-weight: 400; color: var(--ink-2); text-align: left; padding: 3px 6px; white-space: nowrap; }
+table.heat thead th { text-align: center; }
+table.heat td { width: 62px; height: 26px; text-align: center; border-radius: 2px; color: var(--ink); }
+table.heat td.none { color: var(--ink-3); background: var(--mat); }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.solid { background: var(--mark); color: var(--mark-ink); border: 0; border-radius: 6px; padding: 8px 14px; font-weight: 600; font-size: 14px; }
+.note { font-size: 12px; color: var(--ink-3); max-width: 70ch; margin: 0; }
+textarea.out { width: 100%; min-height: 150px; background: var(--mat); color: var(--ink); border: 1px solid var(--rule); border-radius: 4px; font-family: var(--mono); font-size: 12px; padding: 8px; }
+@media (prefers-reduced-motion: reduce) { .track i { transition: none; } }
+</style>
+
+<div class="wrap">
+  <div class="bar">
+    <h1 id="title">Film Look A/B</h1>
+    <span class="count" id="count">0 / 40</span>
+    <span class="spacer"></span>
+    <label class="opt">Session
+      <select class="ghost" id="len">
+        <option value="24">24 pairs</option>
+        <option value="40" selected>40 pairs</option>
+        <option value="72">72 pairs</option>
+        <option value="120">120 pairs</option>
+      </select>
+    </label>
+    <label class="opt"><input type="checkbox" id="names"> Show film names</label>
+    <button class="ghost" id="undo" disabled>Undo</button>
+    <button class="ghost" id="toResults">Results</button>
+    <button class="ghost" id="reset">Start over</button>
+  </div>
+  <div class="track"><i id="prog"></i></div>
+
+  <section id="compare" style="display:flex;flex-direction:column;gap:10px;flex:1 1 auto;min-height:0">
+    <p class="prompt"><b id="sceneName">Scene</b> · the same photo in two looks. Pick the one you like more.</p>
+    <div class="pair" id="pair">
+      <button class="pick" id="pickA" aria-label="Choose photo A">
+        <span class="frame"><img id="imgA" alt="Photo A"></span>
+        <span class="tag"><span class="letter">A</span><span id="nameA"></span></span>
+      </button>
+      <button class="pick" id="pickB" aria-label="Choose photo B">
+        <span class="frame"><img id="imgB" alt="Photo B"></span>
+        <span class="tag"><span class="letter">B</span><span id="nameB"></span></span>
+      </button>
+    </div>
+    <div class="keys">
+      <button class="ghost" id="tie">No preference</button>
+      <span class="hint">keys: ← A · → B · ↓ no preference · Z undo</span>
+    </div>
+  </section>
+
+  <section id="results" class="results" hidden>
+    <div>
+      <p class="verdict" id="verdict"></p>
+      <p class="sub" id="verdictSub"></p>
+    </div>
+    <div>
+      <h2>Overall ranking</h2>
+      <div class="rank" id="rank"></div>
+    </div>
+    <div>
+      <h2>By situation</h2>
+      <div class="sit" id="sit"></div>
+    </div>
+    <div>
+      <h2>Win rate by scene</h2>
+      <div class="grid-wrap"><table class="heat" id="heat"></table></div>
+    </div>
+    <div class="actions">
+      <button class="solid" id="more">Rate 16 more pairs</button>
+      <button class="ghost" id="copy">Copy results as text</button>
+      <span class="note" id="copied"></span>
+    </div>
+    <textarea class="out" id="out" readonly hidden></textarea>
+    <p class="note">How the ranking works: each choice is one match between two looks. The strength is a Bradley–Terry score, the standard model for paired comparisons, shown as the chance that the look beats an average look. A small prior keeps a look with few matches near 50%. Situations with under 6 choices are marked as a weak signal.</p>
+  </section>
+</div>
+
+<script src="ranking.js"></script>
+<script src="app.js"></script>
