@@ -1119,3 +1119,127 @@ Go back: `epm2flash peaking-gain-2x ce1037cda6c9ff87e600272383dfe97b649a5ef24d69
 | `scripts/scen_menu.py` | S8 to S11: `scen_menu.py all BASE_BLOCK0 PINNED_BLOCK0 MENU_BLOCK0` |
 | `scripts/menu-emu/` | drivers of the full-boot emulator checks (copies; see its README.txt) |
 | `results/menu-*.txt`, `results/scen-menu-*.txt` | listing, free-space check, hook check, op check, scenario outputs, emulator outputs |
+
+## 16. Coloured lines: Off / White / Red / Yellow / Blue (`peaking-colours`)
+
+Date: 2026-11-15. Status: `patches/peaking-colours.json`, build `builds/peaking-colours.json`, sha256
+`4d6b1f26ed92d66b62b4d7dc32d26168e33fd8b153a7655d6c0d9a58267456f8`. Checked in emulation. **Not flashed.** The pinned build
+`peaking-menu-names` still rebuilds to `4ea4ffd7…bc30`. Labels: **V** verified (bytes, or ran in the emulator),
+**I** inferred, **U** unknown.
+
+Camera report on the pinned build (2026-11-15): the row works, but white and black lines blend with the picture.
+
+### 16.1 How the pass-9 combine handles colour
+
+| Fact | Label |
+|---|---|
+| The combine job has three modes. The firmware prints their names: 0 `IMGDMA_ADD_YC`, 1 `IMGDMA_ADD_BAYER`, 2 `IMGDMA_ADD_RGB` (0x7E6DADB9). Key Line pass 9 uses mode 2 | V |
+| Mode 2 (handler 0x7E707A1B) multiplies every width of the job by 3: the two inputs and the output are 3 bytes per pixel. In live view they are 640 × 480 × 3 = 921,600 bytes each | V (scenario) |
+| The job has **one gain per input** (`usGain1`, `usGain2`), written to one register word (0x7E561FEF: `usGain1` \| `usGain2` << 16). No gain or offset per plane. The five words beside it are set to 0 for every job | V |
+| So the job cannot give a colour: it adds the same share of the line image to all three bytes of a pixel | V |
+| Pass 7 makes the picture (IMG job, `ucType` 23, stages 1, 3, 16, 27) and pass 8 the line image (`ucType` 23, stages 8, 9, 23, 30) in this format. Pass 9 adds them in place. Pass 10 turns the result back into YC (`ucType` 15, stages 8, 24, 25, 30) | V (scenario) |
+| The three bytes are R, G, B. Basis: the name ADD_RGB against ADD_YC for the 2-byte format. The order of the three bytes was not found in the firmware | I for RGB, **U** for the order |
+| The line image is grey (three equal bytes), 0 away from edges. Basis: white lines on the camera with + 2 × line, clean dark lines in Key Line with − 1 × line | I |
+| The buffers have addresses 0xB5……: the image-work heap gives the 0xA0000000 alias of RAM. 0x7E45DB37 turns 0x6……… into 0xA……… before a record goes to the other CPU, so this alias is the one without the CPU cache | V for the alias, I for "no cache" |
+| The art task queues the job and the pass returns (0x7E722610). The next pass starts when the job's bit is set in the pass word. One pass = one job | V |
+
+Later bodies: the E-M1 4.6 and the E-M10 II 1.4 firmware (white, black, red, yellow) were unpacked. Both have
+`PEAKING_COLOR_RED :3` and `PEAKING_COLOR_YELLOW :4`, and no `ART_EXPOSE_PEAKING`, no `IMGDMA_ADD_*`, no
+`artclearline` text. Their peaking fields (`PeakingColor`, `PeakingLevel`, `PeakingHighlight`) are in a display
+status dump beside `VscUpdate`, and the image parameters are another structure (`IMGPRO_MDL_IMAGE_PARAM`). So they
+do not colour the lines in this art engine (**I**), and there is nothing to copy. The E-P5 1.8 has white and black
+only (§3.1).
+
+### 16.2 Design
+
+For Red, Yellow and Blue, new code in pass 9 (`T_COL`, 292 bytes with its table) writes the colour into the
+picture buffer where the line image is 64 or more. Then the combine job runs with `usGain2` = 0, so it writes
+the picture back as it is. White is the pinned build's pass (gain 512) and Off is as before.
+
+- The loop reads the line image 12 bytes (4 pixels) at a time. A group with no byte of 64 or more is skipped. In
+  the other groups the middle byte of each pixel decides. About 940,000 instructions for a 640 × 480 frame (**V**
+  in the scenario); the time on the camera is **U**.
+- A frame that the loop cannot take (no rows, or a buffer that does not start at a multiple of 4) gets white lines.
+- Rejected: two more combine passes (picture − line, line − a constant pattern image, then the add). They need a
+  third 921,600-byte buffer that the CPU fills in every frame, and two more jobs. A coloured line image that is only
+  added blends with a bright picture, which is the fault that the owner reported.
+
+| Value of setting 458 | Text | Bytes written | Y, Cb, Cr (BT.601 full range, if the bytes are R, G, B) |
+|---|---|---|---|
+| 1 | Off | – | – |
+| 3 (after a full reset) | White | none: picture + 2 × line | – |
+| 2 (was Black) | Red | 255, 0, 0 | 76, 85, 255 |
+| 4 | Yellow | 255, 255, 0 | 226, 1, 149 |
+| 5 | Blue | 0, 80, 255 | 76, 229, 74 |
+
+Blue has some green so that it is as bright as Red. Pass 10 makes the real YC values in the image processor; its
+matrix was not read (**U**). Black is gone. A camera that is set to Black shows Red.
+
+### 16.3 What the patch changes
+
+112 edits. A delta on the pinned build. Generator: `scripts/mkspec_colours.py`.
+
+| Part | Edit |
+|---|---|
+| Mode controller | Record 0x7E84C584 of setting 458: value list 0x7E849F25 (1, 2, 3) → 0x7E849F28, the first 5 bytes of the stock list 1 … 10; count 3 → 5. Two bytes |
+| List | Five items at **0x7EBF2A00** (140 B) and the value → text list at **0x7EBF2B00** (144 B); the descriptor 0x7F00BFBC and entry 607 of table 0x7F014614 point to them. The old lists at 0x7EBF2900 and 0x7EBF2960 stay without a reader |
+| Code | `T_K3`, `T_COL` and the colour table at **0x7E4C93F0** (kernel range, after `T_K2`). `T_K2` starts with `jmp T_K3`. No new RAM; 24 bytes of the art task's stack |
+| Texts, 34 languages | The pointers of the ids 1501, 1502 and 1499 go to the colour names inside the stock texts 122 "R:Red", 124 "Ye:Yellow", 117 "B:Blue" (the B&W filter list), after the colon. No string is changed |
+| English help 1506 | "Show lines in that color / on sharp edges while / MF Assist magnifies." |
+
+White (1500) and the row name (1505) are still English only.
+
+### 16.4 Checks
+
+| Check | Result | Label |
+|---|---|---|
+| `.venv/bin/epm2mod make builds/peaking-colours.json` | sha256 `4d6b1f26…56f8`; free-space check PASS, 0 FAIL, no `first_code` (`results/colours-freespace-check.txt`) | V |
+| `tools/emu/opcheck.py builds/peaking-colours.json` | 16 specs, 0 FAIL | V |
+| `tools/emu/hookcheck.py` | this spec: 4 transfers, all kernel → kernel, 0 FAIL | V |
+| Boot, `stage2-boot.mjs 2000` | PASS; the report equals the pinned build's except the wall time (`results/colours-emu-boot.txt`) | V |
+| The list | Off, White, Red, Yellow, Blue; screens `~/opt/om-emu-e101-boot-work/peaking-colours/screens/01` … `09` | V |
+| Each value over a restart | Red, Yellow, Blue, Off, White: each is stored (tag 0x8971 = 2, 4, 5, 1, 3) and read back after a restart, in the tag and in the row (`results/colours-emu-persist.txt`). The emulator carries the bank's RAM image over in place of the power-off save | V for the load, I for the save |
+| Shallow crawls of the pinned build and this build: P without card, iAUTO, ART with card, movie with card. One more unit, `custA`, opens the lists of group A | in each mode only the Peaking list differs: its 3 old positions, and 2 new ones. All other screens byte-equal (450, 248, 284, 277 screens); logs equal (`results/colours-emu-crawl-shallow.txt`) | V |
+| The colour names in the built file | read back for all 34 languages (the generator prints them) | V |
+| S1 to S8 on this build (`results/scen-colours-s1-s5.txt`, `-s6-s7.txt`, `-s8-s11.txt`) | pass, with the result lines of the earlier builds | V |
+| S9 to S11 of `scen_menu.py` | written for the pair `peaking-gain-2x` / `peaking-menu`. They report FAIL here for three reasons, none a fault: S9 counts the pinned build's own `T_K2` instructions as lost stock code (memory writes and device accesses are equal); S10 and one row of S11 expect black lines for value 2; one row of S11 expects a reference image without `T_R`. S12 to S14 replace them | V |
+| **S12** Red, Yellow, Blue on a synthetic frame. The test writes a picture and a line image with an edge into the two pass-9 buffers of a live-view frame; the firmware's code runs on them | every one of the 307,200 pixels equals the model: line byte ≥ 64 → the colour (9,360 pixels), else the old pixel. Line values 32 and 63 leave the pixel, 64, 128 and 255 colour it. `usGain2` 0, registers kept, a picture in every frame. White: both buffers untouched, `usGain2` 0x0200 (`results/scen-colours-s12.txt`) | V |
+| The pictures of S12 | `~/opt/om-emu-e101-boot-work/peaking-colours/frames/`: `s12-3-red.png`, `s12-4-yellow.png`, `s12-5-blue.png` (read from emulator memory), `s12-0-picture-before.png`, `s12-1-line-image.png`, `s12-2-white-model.png` (a model of picture + 2 × line: the emulator does not compute the image processor's add) | V, White I |
+| **S13** White (values 3, 0, 6) against the pinned build; Off against the build without peaking | 24 frame comparisons, all the same: memory writes, device accesses in order, no stock pc lost (`results/scen-colours-s13.txt`) | V |
+| **S14** `T_K` alone on an 8 × 2 frame, packet mode 2 / 0, L2, C = 0 … 6; odd buffer addresses; no rows | 31 rows as the model; sp, d2, d3, a2, a3 kept (`results/scen-colours-s14.txt`) | V |
+
+Not checked, the camera must show it: the colours on the screen (byte order, RGB or not); the speed of the loop;
+the line image values (the threshold 64); CPU access to the buffers through the 0xA… alias.
+
+### 16.5 Camera test
+
+Setup: MENU → Custom Menu → A → MF Assist → On. OK → AF mode → MF. A lens with a focus ring.
+
+1. MENU → Custom Menu → A → Peaking. New: the list is Off, White, Red, Yellow, Blue.
+2. Choose **Red** → OK. Leave the menu, turn the focus ring. Expected: magnified view, red lines on sharp edges.
+3. The same with **Yellow** and **Blue**.
+4. **White**: light lines as before. **Off**: no lines.
+5. Set Red. Power off, power on. Expected: the row says Red.
+6. OK → Picture Mode strip → a film look (for example Velvia) → OK. Turn the ring. Expected: no crash, red lines.
+
+| Result | Meaning | Next build |
+|---|---|---|
+| Red shows blue, Blue shows orange, Yellow shows cyan | the bytes are B, G, R | the table with the bytes swapped |
+| Other tints (green, pink), not the three names | the buffer is not RGB | report each colour seen; the table gets Y, Cb, Cr values |
+| The view is slower with a colour than with White | the loop takes too long | read through the cached alias, or every second row |
+| No lines with a colour, lines with White | the line image stays below 64 | threshold 32 |
+| Coloured dots all over the picture | the line image has noise above 64 | threshold 128 |
+| Freeze when the ring turns with a colour | the CPU cannot use the buffers this way | card update with the pinned build; report |
+
+Flash: `epm2flash peaking-colours 4d6b1f26ed92d66b62b4d7dc32d26168e33fd8b153a7655d6c0d9a58267456f8`.
+Go back: `epm2flash peaking-menu-names 4ea4ffd773d6f05d16867f55b9fef4bce5d53fc8659a9b16362f7ac771a6bc30`.
+
+### 16.6 Files added
+
+| Path | Contents |
+|---|---|
+| `patches/peaking-colours.json`, `builds/peaking-colours.json` | the spec and the build description |
+| `scripts/mkspec_colours.py` | generator: `mkspec_colours.py OUT.json PINNED_DIR /tmp/scratch/asm [LISTING.txt]` |
+| `scripts/scen_colours.py` | S12 to S14: `scen_colours.py all BASE_BLOCK0 PINNED_BLOCK0 COLOURS_BLOCK0 [PNG_DIR]` |
+| `scripts/colours-emu/` | drivers of the full-boot emulator checks (copies; see its README.txt) |
+| `results/colours-*.txt`, `results/scen-colours-*.txt` | listing, free-space check, hook check, op check, scenario and emulator outputs |

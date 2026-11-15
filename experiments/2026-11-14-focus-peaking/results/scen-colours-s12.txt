@@ -1,0 +1,71 @@
+S12. Red, Yellow, Blue on a synthetic frame: the new code of pass 9 runs on the firmware's own buffers.
+  [menu] frame 2: 11 task runs, 1104133 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = []; pass 7 ucExpose = [3]
+  [Red] 640 x 480, buffers 0xB596A940 (picture) 0xB5843980 (line image): 9360 line pixels (line byte >= 64); pixels that differ from the model: 0; usGain2 0x0000
+      the line pixels after the new code: red = bytes [(255, 0, 0)] -> Y 76 Cb 85 Cr 255 (BT.601 full range, if the bytes are R, G, B)
+      bar with line value  32: pixel before (240, 240, 240), after (240, 240, 240)
+      bar with line value  63: pixel before (240, 240, 240), after (240, 240, 240)
+      bar with line value  64: pixel before (240, 240, 240), after (255, 0, 0)
+      bar with line value 128: pixel before (240, 240, 240), after (255, 0, 0)
+      bar with line value 255: pixel before (240, 240, 240), after (255, 0, 0)
+      sp, d2, d3, a2, a3 kept: True; anomalies: none; picture: True; R set by the hook at 0x7EB7D46C (ran 6 pcs, new code: 0x7EBE2000 (5)) -> ok
+  [menu] frame 2: 11 task runs, 1104135 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = []; pass 7 ucExpose = [3]
+  [Yellow] 640 x 480, buffers 0xB596A940 (picture) 0xB5843980 (line image): 9360 line pixels (line byte >= 64); pixels that differ from the model: 0; usGain2 0x0000
+      the line pixels after the new code: yellow = bytes [(255, 255, 0)] -> Y 226 Cb 1 Cr 149 (BT.601 full range, if the bytes are R, G, B)
+      bar with line value  32: pixel before (240, 240, 240), after (240, 240, 240)
+      bar with line value  63: pixel before (240, 240, 240), after (240, 240, 240)
+      bar with line value  64: pixel before (240, 240, 240), after (255, 255, 0)
+      bar with line value 128: pixel before (240, 240, 240), after (255, 255, 0)
+      bar with line value 255: pixel before (240, 240, 240), after (255, 255, 0)
+      sp, d2, d3, a2, a3 kept: True; anomalies: none; picture: True; R set by the hook at 0x7EB7D46C (ran 6 pcs, new code: 0x7EBE2000 (5)) -> ok
+  [menu] frame 2: 11 task runs, 1104137 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = []; pass 7 ucExpose = [3]
+  [Blue] 640 x 480, buffers 0xB596A940 (picture) 0xB5843980 (line image): 9360 line pixels (line byte >= 64); pixels that differ from the model: 0; usGain2 0x0000
+      the line pixels after the new code: blue = bytes [(0, 80, 255)] -> Y 76 Cb 229 Cr 74 (BT.601 full range, if the bytes are R, G, B)
+      bar with line value  32: pixel before (240, 240, 240), after (240, 240, 240)
+      bar with line value  63: pixel before (240, 240, 240), after (240, 240, 240)
+      bar with line value  64: pixel before (240, 240, 240), after (0, 80, 255)
+      bar with line value 128: pixel before (240, 240, 240), after (0, 80, 255)
+      bar with line value 255: pixel before (240, 240, 240), after (0, 80, 255)
+      sp, d2, d3, a2, a3 kept: True; anomalies: none; picture: True; R set by the hook at 0x7EB7D46C (ran 6 pcs, new code: 0x7EBE2000 (5)) -> ok
+  [menu] frame 2: 11 task runs, 163720 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = []; pass 7 ucExpose = [3]
+  [White] the new code leaves the picture and the line image as they are: True; usGain1 256, usGain2 0x0200 (picture + 2 x line, done by the image processor)
+      sp, d2, d3, a2, a3 kept: True; anomalies: none; picture: True; R set by the hook at 0x7EB7D46C (ran 6 pcs, new code: 0x7EBE2000 (5)) -> ok
+  wrote s12-0-picture-before.png
+  wrote s12-1-line-image.png
+  wrote s12-2-white-model.png
+  wrote s12-3-red.png
+  wrote s12-4-yellow.png
+  wrote s12-5-blue.png
+  S12 RESULT: PASS
+

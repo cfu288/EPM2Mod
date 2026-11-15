@@ -1,0 +1,5 @@
+ok    hook 0x7E4C93D8 (kernel) jmp -> 0x7E4C93F0 (kernel)  [peaking-colours.json]
+ok    code 0x7E4C9405 (kernel) jmp -> 0x7E4C939F (kernel)  [peaking-colours.json]
+ok    code 0x7E4C9484 (kernel) jmp -> 0x7E4C939F (kernel)  [peaking-colours.json]
+ok    code 0x7E4C9491 (kernel) jmp -> 0x7E4C939F (kernel)  [peaking-colours.json]
+S0 boot-order check: 4 transfers, 0 FAIL (every transfer from early-loaded code stays in early-loaded code)

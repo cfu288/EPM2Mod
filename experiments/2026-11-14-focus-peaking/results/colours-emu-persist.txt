@@ -1,0 +1,29 @@
+## run 1: fresh state (White), then set Red
+tag before: index entry tag 0x8971 count 1, data at 0x60410f36, value 3 (White)
+tag after-red: index entry tag 0x8971 count 1, data at 0x60410f36, value 2 (Red)
+state saved to peaking-colours/state/d.json
+done at lab ms 14240 | firmware errors 2 36.9 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9 ; 38.5 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9
+## run 2: restart, then set Yellow
+tag after-restart: index entry tag 0x8971 count 1, data at 0x60410f36, value 2 (Red)
+tag after-yellow: index entry tag 0x8971 count 1, data at 0x60410f36, value 4 (Yellow)
+state saved to peaking-colours/state/d.json
+done at lab ms 14240 | firmware errors 2 36.9 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9 ; 38.5 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9
+## run 3: restart, then set Blue
+tag after-restart: index entry tag 0x8971 count 1, data at 0x60410f36, value 4 (Yellow)
+tag after-blue: index entry tag 0x8971 count 1, data at 0x60410f36, value 5 (Blue)
+state saved to peaking-colours/state/d.json
+done at lab ms 14240 | firmware errors 2 36.9 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9 ; 38.5 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9
+## run 4: restart, then set Off
+tag after-restart: index entry tag 0x8971 count 1, data at 0x60410f36, value 5 (Blue)
+tag after-off: index entry tag 0x8971 count 1, data at 0x60410f36, value 1 (Off)
+state saved to peaking-colours/state/d.json
+done at lab ms 15800 | firmware errors 2 36.9 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9 ; 38.5 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9
+## run 5: restart, then set White
+tag after-restart: index entry tag 0x8971 count 1, data at 0x60410f36, value 1 (Off)
+tag after-white: index entry tag 0x8971 count 1, data at 0x60410f36, value 3 (White)
+state saved to peaking-colours/state/d.json
+done at lab ms 14240 | firmware errors 2 36.9 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9 ; 38.5 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9
+## run 6: restart
+tag after-restart: index entry tag 0x8971 count 1, data at 0x60410f36, value 3 (White)
+state saved to peaking-colours/state/d.json
+done at lab ms 9800 | firmware errors 2 36.9 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9 ; 38.5 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9

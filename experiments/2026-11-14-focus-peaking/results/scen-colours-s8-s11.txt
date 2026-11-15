@@ -1,0 +1,228 @@
+S8. Peaking Off (setting 458 = 1), MF Assist request set: MENU against BASE (the build without peaking).
+  [Natural] base: frame 3: 1 task runs, 38805 insns, 924 device writes; state 2, expose 0, art record 0x0, heap mode 0, picture True, alloc error False
+  [Natural] menu: frame 3: 1 task runs, 38875 insns, 924 device writes; state 2, expose 0, art record 0x0, heap mode 0, picture True, alloc error False | L=0 R=1 L2=0 C=1 | R set by the hook at 0x7EB7D46C (ran 6 pcs, new code: 0x7EBE2000 (5))
+  Natural frame 1  SAME: 4750 writes (base 4747), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 936, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 62 in 0x7E4C9000 (62)
+  Natural frame 2  SAME: 3283 writes (base 3280), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 936, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 56 in 0x7E4C9000 (56)
+  Natural frame 3  SAME: 3277 writes (base 3274), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 936, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 56 in 0x7E4C9000 (56)
+  [Natural] pass 9 gain: base [], menu []; pass 7 ucExpose: base [], menu []
+  [Key Line] base: frame 3: 12 task runs, 174451 insns, 4572 device writes; state 2, expose 163, art record 0x2A3, heap mode 1, picture True, alloc error False
+  [Key Line] menu: frame 3: 12 task runs, 174583 insns, 4572 device writes; state 2, expose 163, art record 0x2A3, heap mode 1, picture True, alloc error False | L=0 R=1 L2=0 C=1 | R set by the hook at 0x7EB7D46C (ran 6 pcs, new code: 0x7EBE2000 (5))
+  Key Line frame 1  SAME: 11017 writes (base 11014), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 5074, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 107 in 0x7E4C9000 (107)
+  Key Line frame 2  SAME: 7215 writes (base 7212), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 4602, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 107 in 0x7E4C9000 (107)
+  Key Line frame 3  SAME: 7236 writes (base 7233), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 4602, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 107 in 0x7E4C9000 (107)
+  [Key Line] pass 9 gain: base ['0xFF00'], menu ['0xFF00']; pass 7 ucExpose: base [163], menu [163]
+  S8 RESULT: PASS: with Peaking Off and the request set, MENU = BASE
+
+S9. Peaking White: MENU against PINNED, request set in both.
+  [458=3 Natural] pinned: frame 3: 11 task runs, 164261 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1 C=3
+  [458=3 Natural] menu:   frame 3: 11 task runs, 164266 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1 C=3
+  [458=3 Natural] pass 9 gain: pinned ['0x0200'], menu ['0x0200']; pass 7 ucExpose: pinned [3], menu [3]; anomalies: none
+  458=3 Natural frame 1  DIFFERENT: 10185 writes (pinned 10185), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4884, same order, addresses and values: True; stock pcs lost outside hook sites: 2; stock pcs gained: 0; new-code pcs: 9 in 0x7E4C9000 (9)
+      lost: 0x7E4C9000 (2) | gained: 
+  458=3 Natural frame 2  DIFFERENT: 6679 writes (pinned 6679), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 2; stock pcs gained: 0; new-code pcs: 9 in 0x7E4C9000 (9)
+      lost: 0x7E4C9000 (2) | gained: 
+  458=3 Natural frame 3  DIFFERENT: 6700 writes (pinned 6700), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 2; stock pcs gained: 0; new-code pcs: 9 in 0x7E4C9000 (9)
+      lost: 0x7E4C9000 (2) | gained: 
+  [458=3 Key Line] pinned: frame 3: 11 task runs, 164240 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1 C=3
+  [458=3 Key Line] menu:   frame 3: 11 task runs, 164245 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1 C=3
+  [458=3 Key Line] pass 9 gain: pinned ['0x0200'], menu ['0x0200']; pass 7 ucExpose: pinned [3], menu [3]; anomalies: none
+  458=3 Key Line frame 1  DIFFERENT: 10183 writes (pinned 10183), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4884, same order, addresses and values: True; stock pcs lost outside hook sites: 2; stock pcs gained: 0; new-code pcs: 9 in 0x7E4C9000 (9)
+      lost: 0x7E4C9000 (2) | gained: 
+  458=3 Key Line frame 2  DIFFERENT: 6679 writes (pinned 6679), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 2; stock pcs gained: 0; new-code pcs: 9 in 0x7E4C9000 (9)
+      lost: 0x7E4C9000 (2) | gained: 
+  458=3 Key Line frame 3  DIFFERENT: 6700 writes (pinned 6700), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 2; stock pcs gained: 0; new-code pcs: 9 in 0x7E4C9000 (9)
+      lost: 0x7E4C9000 (2) | gained: 
+  [458=0 Natural] pinned: frame 3: 11 task runs, 164261 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1 C=0
+  [458=0 Natural] menu:   frame 3: 11 task runs, 164266 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1 C=0
+  [458=0 Natural] pass 9 gain: pinned ['0x0200'], menu ['0x0200']; pass 7 ucExpose: pinned [3], menu [3]; anomalies: none
+  458=0 Natural frame 1  DIFFERENT: 10185 writes (pinned 10185), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4884, same order, addresses and values: True; stock pcs lost outside hook sites: 2; stock pcs gained: 0; new-code pcs: 9 in 0x7E4C9000 (9)
+      lost: 0x7E4C9000 (2) | gained: 
+  458=0 Natural frame 2  DIFFERENT: 6679 writes (pinned 6679), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 2; stock pcs gained: 0; new-code pcs: 9 in 0x7E4C9000 (9)
+      lost: 0x7E4C9000 (2) | gained: 
+  458=0 Natural frame 3  DIFFERENT: 6700 writes (pinned 6700), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 2; stock pcs gained: 0; new-code pcs: 9 in 0x7E4C9000 (9)
+      lost: 0x7E4C9000 (2) | gained: 
+  [458=0 Key Line] pinned: frame 3: 11 task runs, 164240 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1 C=0
+  [458=0 Key Line] menu:   frame 3: 11 task runs, 164245 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1 C=0
+  [458=0 Key Line] pass 9 gain: pinned ['0x0200'], menu ['0x0200']; pass 7 ucExpose: pinned [3], menu [3]; anomalies: none
+  458=0 Key Line frame 1  DIFFERENT: 10183 writes (pinned 10183), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4884, same order, addresses and values: True; stock pcs lost outside hook sites: 2; stock pcs gained: 0; new-code pcs: 9 in 0x7E4C9000 (9)
+      lost: 0x7E4C9000 (2) | gained: 
+  458=0 Key Line frame 2  DIFFERENT: 6679 writes (pinned 6679), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 2; stock pcs gained: 0; new-code pcs: 9 in 0x7E4C9000 (9)
+      lost: 0x7E4C9000 (2) | gained: 
+  458=0 Key Line frame 3  DIFFERENT: 6700 writes (pinned 6700), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 2; stock pcs gained: 0; new-code pcs: 9 in 0x7E4C9000 (9)
+      lost: 0x7E4C9000 (2) | gained: 
+  S9 RESULT: FAIL
+
+S10. Peaking Black (setting 458 = 2): MENU. Natural, two frames, request set, four frames, request cleared, two.
+  [menu] frame 2: 1 task runs, 38879 insns, 924 device writes; state 2, expose 0, art record 0x0, heap mode 0, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, frame builder, job setup, set_out_area_param, img exec, display update
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+  [Natural] request on: R set by the hook at 0x7EB7D46C (ran 6 pcs, new code: 0x7EBE2000 (5))
+  [menu] frame 3: 14 task runs, 1050434 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, mov_art_exec_init, heap mode chooser, heap set mode, heap mode check, art picture alloc, 2 x 614400 alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 0), 0 live blocks
+      heap set mode: 1 (was 1), 0 live blocks
+      heap set mode: 1 (was 1), 0 live blocks
+      heap alloc: 4147200 bytes -> 0xB5CDF880 (heap mode 1)
+      heap alloc: 614400 bytes -> 0xB5C1AE00 (heap mode 1)
+      heap alloc: 614400 bytes -> 0xB5B56380 (heap mode 1)
+      heap set mode: 1 (was 1), 3 live blocks
+      heap alloc: 614400 bytes -> 0xB5A91900 (heap mode 1)
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0000']; pass 7 ucExpose = [3]
+      -> NOT OK: gain ['0x0000'], ucExpose [3], C=2, anomalies none
+  [menu] frame 4: 11 task runs, 1012873 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0000']; pass 7 ucExpose = [3]
+      -> NOT OK: gain ['0x0000'], ucExpose [3], C=2, anomalies none
+  [menu] frame 5: 11 task runs, 1013419 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0000']; pass 7 ucExpose = [3]
+      -> NOT OK: gain ['0x0000'], ucExpose [3], C=2, anomalies none
+  [menu] frame 6: 11 task runs, 1013619 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0000']; pass 7 ucExpose = [3]
+      -> NOT OK: gain ['0x0000'], ucExpose [3], C=2, anomalies none
+  [Natural] request off: R set by the hook at 0x7EB7D43B (ran 6 pcs, new code: 0x7EBE2000 (5))
+  [menu] frame 7: 6 task runs, 75115 insns, 924 device writes; state 2, expose 0, art record 0x0, heap mode 0, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, mov_art_exec_init, heap mode chooser, heap set mode, heap re-partition, frame builder, job setup, set_out_area_param, img exec, display update, Key Line pass 1
+      heap free: 0xB5CDF880 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB5C1AE00 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB5B56380 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB5A91900 (heap mode 1, mode at the last alloc 1)
+      heap set mode: 0 (was 1), 0 live blocks
+      heap re-partition: 0 live blocks: 
+      heap set mode: 0 (was 0), 0 live blocks
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+  [menu] frame 8: 1 task runs, 38864 insns, 924 device writes; state 2, expose 0, art record 0x0, heap mode 0, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, frame builder, job setup, set_out_area_param, img exec, display update
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+  [menu] frame 2: 12 task runs, 174026 insns, 4572 device writes; state 2, expose 163, art record 0x2A3, heap mode 1, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0xFF00']; pass 7 ucExpose = [163]
+      notes: 2 divisions by zero skipped, at 0x7E56A894, 0x7E56A89C; 2 divisions by zero skipped, at 0x7E57566A
+  [Key Line] request on: R set by the hook at 0x7EB7D46C (ran 6 pcs, new code: 0x7EBE2000 (5))
+  [menu] frame 3: 11 task runs, 1013398 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0000']; pass 7 ucExpose = [3]
+      -> NOT OK: gain ['0x0000'], ucExpose [3], C=2, anomalies none
+  [menu] frame 4: 11 task runs, 1013598 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0000']; pass 7 ucExpose = [3]
+      -> NOT OK: gain ['0x0000'], ucExpose [3], C=2, anomalies none
+  [menu] frame 5: 11 task runs, 1013143 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0000']; pass 7 ucExpose = [3]
+      -> NOT OK: gain ['0x0000'], ucExpose [3], C=2, anomalies none
+  [menu] frame 6: 11 task runs, 1012852 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0x0000']; pass 7 ucExpose = [3]
+      -> NOT OK: gain ['0x0000'], ucExpose [3], C=2, anomalies none
+  [Key Line] request off: R set by the hook at 0x7EB7D43B (ran 6 pcs, new code: 0x7EBE2000 (5))
+  [menu] frame 7: 12 task runs, 174104 insns, 4572 device writes; state 2, expose 163, art record 0x2A3, heap mode 1, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0xFF00']; pass 7 ucExpose = [163]
+      notes: 2 divisions by zero skipped, at 0x7E56A894, 0x7E56A89C; 2 divisions by zero skipped, at 0x7E57566A
+  [menu] frame 8: 12 task runs, 174026 insns, 4572 device writes; state 2, expose 163, art record 0x2A3, heap mode 1, picture True, alloc error False | L=0 R=0 L2=0
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = ['0xFF00']; pass 7 ucExpose = [163]
+      notes: 2 divisions by zero skipped, at 0x7E56A894, 0x7E56A89C; 2 divisions by zero skipped, at 0x7E57566A
+  S10 RESULT: FAIL
+
+S11. T_A and T_K alone, MENU against PINNED. The settings getter 0x7E457C75 is the firmware's own code.
+  T_A R=0 setting=0: menu L=0 C=0xEE struct+4=0x55 +5=0x66 +36=0x1234 sp+32 d2,d3,a2,a3 kept=True fault=None | pinned L=0  -> ok
+  T_A R=0 setting=1: menu L=0 C=0xEE struct+4=0x55 +5=0x66 +36=0x1234 sp+32 d2,d3,a2,a3 kept=True fault=None | pinned L=0  -> ok
+  T_A R=0 setting=2: menu L=0 C=0xEE struct+4=0x55 +5=0x66 +36=0x1234 sp+32 d2,d3,a2,a3 kept=True fault=None | pinned L=0  -> ok
+  T_A R=0 setting=3: menu L=0 C=0xEE struct+4=0x55 +5=0x66 +36=0x1234 sp+32 d2,d3,a2,a3 kept=True fault=None | pinned L=0  -> ok
+  T_A R=0 setting=4: menu L=0 C=0xEE struct+4=0x55 +5=0x66 +36=0x1234 sp+32 d2,d3,a2,a3 kept=True fault=None | pinned L=0  -> ok
+  T_A R=1 setting=0: menu L=1 C=0x00 struct+4=0x00 +5=0x01 +36=0x1234 sp+32 d2,d3,a2,a3 kept=True fault=None | pinned L=1  -> ok
+  T_A R=1 setting=1: menu L=0 C=0x01 struct+4=0x55 +5=0x66 +36=0x1234 sp+32 d2,d3,a2,a3 kept=True fault=None | pinned L=0  -> NOT OK
+  T_A R=1 setting=2: menu L=1 C=0x02 struct+4=0x00 +5=0x01 +36=0x1234 sp+32 d2,d3,a2,a3 kept=True fault=None | pinned L=1  -> ok
+  T_A R=1 setting=3: menu L=1 C=0x03 struct+4=0x00 +5=0x01 +36=0x1234 sp+32 d2,d3,a2,a3 kept=True fault=None | pinned L=1  -> ok
+  T_A R=1 setting=4: menu L=1 C=0x04 struct+4=0x00 +5=0x01 +36=0x1234 sp+32 d2,d3,a2,a3 kept=True fault=None | pinned L=1  -> ok
+  T_K packet mode 2 L2=0 C=0: menu gain 0xFF00, pinned 0xFF00 -> ok
+  T_K packet mode 2 L2=0 C=1: menu gain 0xFF00, pinned 0xFF00 -> ok
+  T_K packet mode 2 L2=0 C=2: menu gain 0xFF00, pinned 0xFF00 -> ok
+  T_K packet mode 2 L2=0 C=3: menu gain 0xFF00, pinned 0xFF00 -> ok
+  T_K packet mode 2 L2=0 C=4: menu gain 0xFF00, pinned 0xFF00 -> ok
+  T_K packet mode 2 L2=1 C=0: menu gain 0x0200, pinned 0x0200 -> ok
+  T_K packet mode 2 L2=1 C=1: menu gain 0x0200, pinned 0x0200 -> ok
+  T_K packet mode 2 L2=1 C=2: menu gain 0x0200, pinned 0xFF00 -> NOT OK None None
+  T_K packet mode 2 L2=1 C=3: menu gain 0x0200, pinned 0x0200 -> ok
+  T_K packet mode 2 L2=1 C=4: menu gain 0x0200, pinned 0x0200 -> ok
+  T_K packet mode 0 L2=0 C=0: menu gain 0xFF00, pinned 0xFF00 -> ok
+  T_K packet mode 0 L2=0 C=1: menu gain 0xFF00, pinned 0xFF00 -> ok
+  T_K packet mode 0 L2=0 C=2: menu gain 0xFF00, pinned 0xFF00 -> ok
+  T_K packet mode 0 L2=0 C=3: menu gain 0xFF00, pinned 0xFF00 -> ok
+  T_K packet mode 0 L2=0 C=4: menu gain 0xFF00, pinned 0xFF00 -> ok
+  T_K packet mode 0 L2=1 C=0: menu gain 0xFF00, pinned 0xFF00 -> ok
+  T_K packet mode 0 L2=1 C=1: menu gain 0xFF00, pinned 0xFF00 -> ok
+  T_K packet mode 0 L2=1 C=2: menu gain 0xFF00, pinned 0xFF00 -> ok
+  T_K packet mode 0 L2=1 C=3: menu gain 0xFF00, pinned 0xFF00 -> ok
+  T_K packet mode 0 L2=1 C=4: menu gain 0xFF00, pinned 0xFF00 -> ok
+  S11 RESULT: FAIL
+
