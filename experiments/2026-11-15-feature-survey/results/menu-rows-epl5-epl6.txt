@@ -1,0 +1,14 @@
+### E-PM2 1.6 (A) against 100_1600 (B)
+custom rows (text, setting, group): 77 79
+  only A: [('@Lock', 386, 2)]
+  only B: [('@ Close Up Mode', 321, 3), ('@Lock', 386, 1), ('Mode Dial Function', 2000, 2)]
+sub-item rows (panel, title, setting, text): 196 196
+  only A: [(110, 'Dial Function', 342, '2074')]
+  only B: [(191, '@ Info', 257, 'Light Box')]
+### E-PM2 1.6 (A) against 112_1400 (B)
+custom rows (text, setting, group): 77 81
+  only A: [('@Lock', 386, 2), ('Lens I.S. Priority', 494, 3)]
+  only B: [('@ Close Up Mode', 321, 3), ('@Lock', 386, 1), ('Lens I.S. Priority', 494, 2), ('Level Adjust', 2213, 9), ('Mode Dial Function', 2000, 2), ('Release Lag-Time', 521, 3)]
+sub-item rows (panel, title, setting, text): 196 197
+  only A: [(110, 'Dial Function', 342, '2074')]
+  only B: [(191, '@ Info', 257, 'Light Box'), (192, 'LV-Info', 273, 'Level Gauge')]
