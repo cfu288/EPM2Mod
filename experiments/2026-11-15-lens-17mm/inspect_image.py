@@ -21,7 +21,8 @@ def inspect(path):
     checksum = sum(struct.unpack(f"<{len(image) // 4}I", image)) & 0xFFFFFFFF
     assert checksum == 0
     base = struct.unpack_from("<I", header, 8)[0]
-    # These 15 aligned stubs contain JSR.A, RTS, then three NOPs.
+    # These 15 aligned patterns match JSR.A, RTS, then three NOPs if R32C.
+    # This hypothesis has not passed a continuous function decode.
     # The R32C manual defines the displacement relative to opcode address + 1.
     stubs = []
     for offset in range(4, 0x7C, 8):
@@ -60,10 +61,10 @@ def inspect(path):
         "payload_scrambled": False,
         "non_ff_bytes": sum(b != 0xFF for b in payload),
         "non_ff_pages": pages,
-        "r32c_call_stubs": stubs,
+        "candidate_r32c_call_stubs": stubs,
         "table_reference_candidates": references,
         "limits": [
-            "R32C instruction-set match; exact MCU part is unknown",
+            "R32C is a hypothesis; continuous instruction decoding is unresolved",
             "No full instruction decoder or runtime address map",
             "Table meanings and focus command handlers are unknown",
             "No measured speed or noise improvement; no patch produced",

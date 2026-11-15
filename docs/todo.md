@@ -45,6 +45,15 @@ and delete the item here.
 
 ## Foundations
 
+- **Structured log, in work (owner's priority, 2026-11-15).** The camera writes compact binary event
+  records to `EPM2LOG.BIN` on the card; `epm2mod log` decodes them to JSON lines with the dictionary
+  `logs/events.json`. A debug build only: the pinned build stays without it. Probes go into the old
+  features too (peaking, picture mode changes, level gauge, interval, film looks, firmware errors).
+  Next after it: read a file, looks from the card, code from the card.
+- Feature candidates from the survey of 22 other bodies and of other mods:
+  `experiments/2026-11-15-feature-survey/`. Cheap ones: video bitrate and time limit (patches
+  written), Light Box (hidden in this firmware), Add Effects on looks, more looks.
+
 - The load-order check (`python3 tools/emu/hookcheck.py SPEC...`) reports one failure in the pinned
   build: the hook at 0x7E56C6A5 (`remap7b-code`, segment 1) jumps to code in segment 2. The audit
   shows that the host function is reached only through the image-job table 0x7E789604, and it did

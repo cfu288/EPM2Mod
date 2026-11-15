@@ -1,11 +1,12 @@
 # Olympus M.ZUIKO DIGITAL 17mm F2.8
 
-Date: 2026-11-15. Status: initial static assessment. No patch or flash.
+Date: 2026-11-15. Status: file triage only. No patch or flash.
 
 ## Finding
 
-Firmware changes are worth investigating. A faster or quieter focus drive is
-**unknown**, not proven. The motor control routines have not been identified.
+This work does not yet establish whether a firmware change can improve focus.
+It verifies the download and package structure. It does not identify a focus
+command handler, motor routine, speed setting, or waveform setting.
 
 ## Stock image: verified
 
@@ -24,11 +25,20 @@ Firmware changes are worth investigating. A faster or quieter focus drive is
 
 ## Code and data
 
-**Inferred:** Renesas R32C instruction set. Fifteen aligned call stubs at payload
+**Hypothesis:** Renesas R32C instruction set. Fifteen aligned byte sequences at payload
 offsets `0x04` through `0x74` match `JSR.A; RTS; NOP; NOP; NOP`.
 Their relative targets are inside the image. The encodings and displacement rule
 match the [Renesas software manual](https://www.renesas.com/en/document/mas/r32c100-series-software-manual),
-printed pages 97, 234, 256 and 266. The exact MCU part is unknown.
+printed pages 97, 234, 256 and 266. This is not a continuous decode of a function.
+The exact MCU and instruction set remain unconfirmed.
+
+**Unresolved:** under that interpretation, the first stub targets `0x1E28`, whose
+first bytes `1B 0C` match `ENTER #12` (manual page 223). The next byte is `67`.
+Reading it as the manual's short AND format gives size bits `11`, which table 4.1
+calls reserved. The same problem occurs with `23` in that byte sequence if it is
+read as short MOV. Instruction boundaries, an instruction-set difference, or the
+architecture hypothesis must be resolved. No register or motor-control claim can
+be based on this fragment yet.
 
 **Verified bytes:** populated pages are near offsets `0x00000–0x093FF` and
 `0x28000–0x2AFFF`, plus a final non-FF byte at `0x2FFFF`. Much of the file is FF.
@@ -40,9 +50,10 @@ This is not proof of usable code space.
 `0x29800` under the header's address map. Their purpose is unknown. Do not treat
 them as motor tables without tracing their readers.
 
-**Unknown:** the execution map. Some apparent calls inside the code point outside
-the payload under the header's address map. Decode their callers and startup
-copies before choosing a hook. This assessment does not include a full disassembly.
+**Unknown:** the execution map. Some FB byte matches inside the code give targets
+outside the payload if read as R32C calls under the header's address map. Those
+matches have not been established as instructions. They do not prove external
+code calls, a ROM alias, or startup copies. This work has no full disassembly.
 
 ## Paths to test
 
