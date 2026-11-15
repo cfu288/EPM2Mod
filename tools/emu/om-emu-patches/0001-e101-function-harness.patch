@@ -1,0 +1,97 @@
+E-PM2 (model E101, firmware 1.6) as a function-only model of om-emu.
+
+For: om-emu, https://github.com/flatpanda/om-emu, commit 0819080133f6ca7edd455dfdfa209bd9eed291cc.
+Apply: tools/emu/setup.sh does it (git apply in a copy of third_party/om-emu; the submodule stays pristine).
+
+What it changes:
+  emu/src/fw/models.mjs  a new MODELS entry E101 (image base, block-0 digest, board facts on the E118 family,
+                         the VSC and OSD engine models parked on pages the E-PM2 does not use)
+  emu/src/fw/model.mjs   fact() gives a function-only model E143's import-time values
+  emu/src/lab/hle.mjs    the lab (HLE) refuses to start on a function-only model
+Used by: tools/emu/omemu.py, emurun.py, scenario.py (bin/debug.mjs --serve with OM_EMU_MODEL=E101).
+
+Licence: the context lines are om-emu's (MIT License, Copyright (c) 2026 om-emu contributors; see
+third_party/om-emu/LICENSE). The added lines are by the authors of epm2-tools, under the same MIT terms. See NOTICE.md.
+
+diff --git a/emu/src/fw/model.mjs b/emu/src/fw/model.mjs
+index ca087f3..c829b59 100644
+--- a/emu/src/fw/model.mjs
++++ b/emu/src/fw/model.mjs
+@@ -36,6 +36,10 @@ export function A(address) {
+ // model without the fact throws where the lab first needs it, and one with it both ways throws too.
+ export function fact(path, e143) {
+   if (ON_LAB_MODEL) return e143;
++  // LOCAL: a function-only model (MODELS function_only, E101) has no port and no lab; the lab modules still import
++  // (bin/debug.mjs reaches them through src/debug/debugger.mjs and checks/lib/env.mjs), so their import-time facts
++  // take E143's values here. No lab runs on such a model (src/lab/hle.mjs HLE refuses it), so nothing reads them.
++  if (MODEL_INFO.function_only) return e143;
+   const read = valueAt(FACTS[MODEL], path), hand = valueAt(MODEL_INFO, path);
+   if (read !== undefined && hand !== undefined) throw new Error(`${MODEL}: ${path} is both read from the firmware (src/fw/ports.mjs FACTS) and given by hand (src/fw/models.mjs)`);
+   if (read === undefined && hand === undefined) throw new Error(`${MODEL}: neither src/fw/ports.mjs FACTS nor src/fw/models.mjs gives ${path} (E143's is ${typeof e143 === 'object' ? JSON.stringify(e143) : e143})`);
+diff --git a/emu/src/fw/models.mjs b/emu/src/fw/models.mjs
+index cbdd07c..8d54325 100644
+--- a/emu/src/fw/models.mjs
++++ b/emu/src/fw/models.mjs
+@@ -1379,6 +1379,49 @@ export const MODELS = {
+       '0x5002e68f': { to: '0x5004c56a', why: 'LEVEL_HANDLERS[5]: the kernel\'s level-handler table kcb[88] after its init holds 0x5004c56a (X); the leg map put levels 2 and 3 on level 1\'s handler and levels 4 and 5 one handler late (irq)' },
+     },
+   },
++  // LOCAL (not upstream): E-PM2 v1.6 for function-level runs only (bin/debug.mjs --image <block 0> --entry ...). No
++  // port (no PORTS / FACTS entry), no lab bring-up: the play harness and every src/lab address are E143's and do not
++  // apply. Facts from the E-PM2 firmware map (epm2-tools docs/firmware-map.md, experiments/2026-11-11-caduceus-review/
++  // 03-emulator.md section 2.2), each checked in the block-0 bytes there.
++  E101: {
++    name: 'E-PM2', bin: 'OLY_E_101_1600_0000_0000.BIN', version: '1.6', res_block: null,
++    // function_only: src/fw/model.mjs fact() gives the lab's import-time facts E143's values, and src/lab/hle.mjs HLE
++    // refuses to start (LOCAL)
++    function_only: true,
++    // block 0 as unpacked (the OE payload, descrambled): 14,155,712 bytes
++    rom_len: 0xD7FFC0, rom_sha256: '1b7c4bb187e5e0b6e76ef362a4095a5b3fcf92917367999d32d6b6404b71468d',
++    // the reset head's jump at block 0xd2: mov 0x7e421115,a0; jmp (a0) -> base 0x7e421020 (map section 4)
++    image_base: 0x7E421020,
++    // the E-PM2 panel (3.0-inch 460k-dot TFT); only the VSC model reads it, which this entry parks
++    panels: { tft: [640, 480], evf: [800, 600] },
++    card_fs: { native: false, why: 'function-level runs only: no lab bring-up on E101' },
++    board: {
++      family: 'E118',
++      // hardware semaphores at 0x8fe00000: the lock helper 0x7e432851 (bset d0,(a0)) and its users load +0 and +4 only
++      isc: { base: 0x8FE00000, stride: 4, groups: 2 },
++      // two banks, picked by the CPU number (0x8050) in irq_register 0x7e44b57f; irq < 125; doorbell IRQ 123;
++      // 0x99b00000 is the AE statistics unit, not an INTC. irq_osd_engine / irq_vsc0: the E-PM2 OSD (IRQ 111) and
++      // display controller (IRQ 14) are not the om-emu engine / VSC; the numbers only keep the devices off real lines
++      intc: { banks: [0x99200000, 0x99300000], irqs: 125, irq_ipi: 123, irq_osd_engine: 111, irq_vsc0: 14 },
++      // 0x98900000: the E118 layout, channel 0 prescaler 161, the tick channel 1 on IRQ 69 (irq_base 68)
++      timer: { prescaler: 161, irq_base: 68 },
++      // PARKED: 0x9c000000 is the IMG library's per-CPU window on the E-PM2 (cmp (0x8050): 0x9c000000 / 0x9e000000),
++      // not a VSC, and 0x9c100000 holds no OSD engine. Both models are moved to pages no E-PM2 code loads (no
++      // fc-prefixed imm32 in 0x9f600000..0x9f61ffff), so those E-PM2 addresses fall to the lab stub (denied: fault 2)
++      vsc: { base: 0x9F600000, levels: false },
++      engine: { base: 0x9F610000 },
++      // the CPU number byte the E-PM2 reads (843 readers of (0x8050)); lab low RAM, 0 = CPU 0
++      core_byte: 0x8050,
++      // interrupt vectors: the vector init at 0x7e42109c loads 0x7e430020..0x7e430070
++      vector_page: 0x7E430000,
++      // the image ends at 0x7f1a0fe0 (0x7e421020 + 0xd7ffc0): 512 MiB of DRAM from 0x60000000 covers it
++      dram_size: 512 << 20,
++      library: null, preload: [],
++      // the E-PM2 does not use E143's scratch DRAM convention; the lab scratch region is not needed
++      scratch: null,
++      reset_head: null,
++    },
++  },
+ };
+ export const codeOf = (m) => 'E' + m.bin.slice(6, 9);
+ export const romPath = (m) => `unpacked/${codeOf(m)}/${m.bin}.blk00000000.OE.0100.bin`;
+diff --git a/emu/src/lab/hle.mjs b/emu/src/lab/hle.mjs
+index af1eb92..b4f4ff2 100644
+--- a/emu/src/lab/hle.mjs
++++ b/emu/src/lab/hle.mjs
+@@ -67,6 +67,8 @@ export class HLE {
+   // { stats, attach(hle), close(hle, closeSim) }: the per-session hooks around HLE construction and close (Stats per
+   // session, the tracer attached after init, devices read before close).
+   constructor(env) {
++    // LOCAL: a function-only model (src/fw/models.mjs function_only) has no lab: its facts are E143's placeholders
++    if (MODEL_INFO.function_only) throw new Error(`${MODEL_INFO.name}: function-only model (bin/debug.mjs --image/--entry runs only); the lab does not run on it`);
+     this.image = env.rom;
+     this.env = env;
+     this.session = env.beginSession ? env.beginSession(this) : null;     // the lab: a check tracer picks the format by its class

@@ -1,0 +1,12 @@
+mkstate: wrote /tmp/scratch/state/peaking-colours-p.json (English, Custom Menu and Accessory Port Menu shown, mode p); the last screen is /tmp/scratch/state/peaking-colours-p.json.shots/state.png
+menu sequence on builds/peaking-colours.json (MENU, Custom Menu, A, Peaking list), the same state file and steps in both trees
+steps: w:500 shot:01-shooting key:MENU shot:02-top-menu key:RIGHT key:OK shot:03-shooting-menu-1 key:DOWN key:DOWN key:DOWN shot:04-custom-menu-tab key:RIGHT shot:05-custom-menu-A key:RIGHT shot:06-A-rows key:DOWN key:DOWN key:DOWN key:DOWN key:DOWN key:DOWN key:DOWN shot:07-peaking-row key:RIGHT shot:08-peaking-list
+byte-equal  01-shooting.png  sha256 64a15e9bbbf6911d
+byte-equal  02-top-menu.png  sha256 006ae229913c847b
+byte-equal  03-shooting-menu-1.png  sha256 04a30d202628c21b
+byte-equal  04-custom-menu-tab.png  sha256 6c16dc467a7bb791
+byte-equal  05-custom-menu-A.png  sha256 148485ef573421d2
+byte-equal  06-A-rows.png  sha256 bb5e776f7ed7529c
+byte-equal  07-peaking-row.png  sha256 9b3b72258db7e6f1
+byte-equal  08-peaking-list.png  sha256 3b6754e08514b766
+state files after the run: byte-equal

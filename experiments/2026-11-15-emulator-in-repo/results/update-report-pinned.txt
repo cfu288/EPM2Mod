@@ -1,0 +1,68 @@
+t=5.647 ms first reach 7e54398b: FIRMUP_SRV task body
+t=10.525 ms first reach 7e5056ab: update flag byte cleared (OK held)
+t=16.449 ms first reach 7e54350e: FIRMUP_CLI task body
+t=40.857 ms first reach 7e5435bd: firmup: binary file found
+stop: {"why":"labtime","pc":2118424173} lab ms 3000.1
+console:
+  CPU0!
+  CPU1!
+  
+  prm
+  FlD.K.R.
+  10/23 17:15
+  BlD.ElD.!!
+  Usr0
+  MlD.proc
+  Ns
+  Nr
+  LOG
+  history initialize
+  ES.MS.[usr]firmup
+  Pr0
+  [firmup]file_mount/ start.
+  [firmup]mount_ok
+  [firmup]ld_img_st 00000E0C
+  [firmup]ld_img_st 00000E0C
+  [firmup]ld_img_st 00000E0C
+  [firmup]ld_img_st 00000E0C
+  [firmup]ld_img_st 00000E0C
+  [firmup]ld_img_st 00000E0C
+  [firmup]ld_img_st 00000000
+  [firmup]...Binary file Hakken !!!!!
+  [firmup]...read file_size = 02950040
+  [fupsrv]Get request.
+  [firmup]TYPE_FIRMUP_SYS_IGAI
+  [firmup]DeSecramble
+  [firmup]...USR Gets
+  [firmup]DeSecramble
+  [firmup]...OSD Gets
+  [firmup]DeSecramble
+  [firmup]...ARTFIL Gets
+  [firmup]DeSecramble
+  [firmup]...FRAME Gets
+  [firmup]DeSecramble
+  [firmup]...BURE Gets
+  [firmup]TYPE_FIRMUP_WRITE_BURE
+  [BC FUP]INIT.
+  bc 2D000819 0000000A
+  bc 2D000811 00000000
+  bc 2D000815 00008306
+  [BC FUP]END.
+  [BC FUP]INIT.
+  bc 2D000819 0000000A
+  bc 2D000811 00000000
+  bc 2D000815 00008306
+  [BC FUP]END.
+  [BC FUP]INIT.
+  bc 2D000819 0000000A
+  bc 2D000811 00000000
+  bc 2D000815 00008306
+  [BC FUP]END.
+  [BC FUP]INIT.
+  
+counts {"7e54398b":1,"7e5056ab":1,"7e54350e":1,"7e5435bd":1}
+cpu0 tasks {"WAI":60,"DMT":86,"RUN":1}
+cpu1 tasks {"DMT":24,"WAI":4,"RUN":1,"RDY":1}
+errors 9 1724.5 0x2d000819 from 7e5431fe(fn 7e5431c9) args 0x00000258 0x00000001 ; 1724.5 0x2d000811 from 7e542526(fn 7e5424cc) args 0x03030000 0x00002580 ; 1724.5 0x2d000815 from 7e542554(fn 7e5424cc) args 0x03030000 0x2d000811 ; 2325.5 0x2d000819 from 7e5431fe(fn 7e5431c9) args 0x00000258 0x00000001
+card: 84766 blocks read, 0 written
+problems: none

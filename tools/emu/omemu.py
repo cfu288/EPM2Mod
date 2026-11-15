@@ -7,17 +7,25 @@ decides the return registers, and the CPU returns through a `retf` with the regi
 call that reached it (read from the call instruction before MDR).
 
 Environment:
-    OM_EMU_DIR   om-emu checkout (default ~/opt/om-emu)
-    OM_EMU_NODE  Node >= 26 (default ~/opt/node26/bin/node)
+    OM_EMU_DIR   the patched om-emu working tree (default: build/om-emu, made by tools/emu/setup.sh;
+                 when that is missing, ~/opt/om-emu)
+    OM_EMU_NODE  Node >= 26 (default: `node` on PATH when it is new enough, else ~/opt/node26/bin/node)
+The defaults are in emuenv.py.
 """
-import json, os, struct, subprocess, tempfile
+import json, os, struct, subprocess, sys, tempfile
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import emuenv
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 BASE = 0x7E421020                      # block-0 runtime base (firmware-map.md section 4)
 STOCK_BLOCK0 = os.path.join(ROOT, "build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin")
 STOCK_SHA256 = "1b7c4bb187e5e0b6e76ef362a4095a5b3fcf92917367999d32d6b6404b71468d"
-OM_EMU_DIR = os.environ.get("OM_EMU_DIR", os.path.expanduser("~/opt/om-emu"))
-NODE = os.environ.get("OM_EMU_NODE", os.path.expanduser("~/opt/node26/bin/node"))
+OM_EMU_DIR = emuenv.om_emu_dir()
+try:
+    NODE = emuenv.node()
+except emuenv.EmuSetupError:
+    NODE = os.path.expanduser("~/opt/node26/bin/node")      # Emu() reports the missing Node
 
 # Scratch RAM for the harness (DRAM below the image; nothing else runs, so it is free in the emulator)
 TRAMP = 0x7D000000                     # the call instruction; the return lands at TRAMP + 7
@@ -54,6 +62,8 @@ class Emu:
     def __init__(self, insn_limit=5_000_000):
         if not os.path.exists(NODE):
             raise EmuError(f"no node at {NODE} (set OM_EMU_NODE)")
+        if not os.path.exists(os.path.join(OM_EMU_DIR, "emu", "bin", "debug.mjs")):
+            raise EmuError(f"no om-emu working tree at {OM_EMU_DIR}: run tools/emu/setup.sh (or set OM_EMU_DIR)")
         env = dict(os.environ, OM_EMU_MODEL="E101")
         self.p = subprocess.Popen([NODE, "emu/bin/debug.mjs", "--serve"], cwd=OM_EMU_DIR, env=env, text=True,
                                   stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

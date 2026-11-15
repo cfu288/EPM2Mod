@@ -1,0 +1,3 @@
+$ tools/emu/boot-test stock --out /tmp/scratch/boot-stock
+boot-test: PASS: stock boots as stock does (2000 ms of lab time; lines with allowed differences: line 1)
+exit status 0 (expected 0)

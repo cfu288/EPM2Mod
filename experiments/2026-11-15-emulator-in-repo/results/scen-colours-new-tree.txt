@@ -1,0 +1,5 @@
+scen_colours.py s12, s13, s14 on the new tree (build/om-emu, om-emu 0819080 + patches), images: seven-films-6-interval-240-level-adjust, peaking-menu-names, peaking-colours
+compared with the stored outputs experiments/2026-11-14-focus-peaking/results/scen-colours-sNN.txt (made on the old tree); the PNG folder name is replaced in both
+s12: s12 exit 0, 71 output lines, lines that differ from the stored output: 0
+s13: s13 exit 0, 35 output lines, lines that differ from the stored output: 0
+s14: s14 exit 0, 34 output lines, lines that differ from the stored output: 0

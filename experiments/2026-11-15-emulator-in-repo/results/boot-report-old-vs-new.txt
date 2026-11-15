@@ -1,0 +1,5 @@
+boot report of builds/peaking-colours.json: old tree (om-emu 96bf756, outside the repository) against new tree (build/om-emu-verify)
+diff after 'wall ms N' is taken out of both (no other part is taken out; carriage returns of the console text dropped):
+no line differs: the reports are equal, with the same instruction counts on both CPUs
+/tmp/scratch/old-boot.txt:stop: {"why":"labtime","pc":2118424173} | lab ms 2000.1 | wall ms 4189 | insns cpu0 30661113 cpu1 2765217
+/tmp/scratch/boot-pinned/boot-image.txt:stop: {"why":"labtime","pc":2118424173} | lab ms 2000.1 | wall ms 5353 | insns cpu0 30661113 cpu1 2765217

@@ -1,0 +1,3 @@
+$ tools/emu/update-path-test stock
+update-path-test: PASS: stock finds the update file as stock does (39 console lines equal up to the body-controller step, segment 2 not loaded, no fault)
+exit status 0 (expected 0)

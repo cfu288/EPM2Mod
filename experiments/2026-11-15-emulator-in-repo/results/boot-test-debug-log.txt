@@ -1,0 +1,3 @@
+$ tools/emu/boot-test builds/debug-log.json --out /tmp/scratch/boot-debug
+boot-test: PASS: builds/debug-log.json boots as stock does (2000 ms of lab time; lines with allowed differences: line 1, line 39, line 40)
+exit status 0 (expected 0)

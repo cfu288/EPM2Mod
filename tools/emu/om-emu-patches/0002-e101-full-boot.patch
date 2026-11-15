@@ -1,0 +1,195 @@
+E-PM2 (model E101): what the boot from the reset vector needs from om-emu's CPU, cores and interrupt controller.
+
+For: om-emu, https://github.com/flatpanda/om-emu, commit 0819080133f6ca7edd455dfdfa209bd9eed291cc.
+Apply after 0001-e101-function-harness.patch (tools/emu/setup.sh does both).
+
+What it changes:
+  emu/src/core/cores.mjs   an interrupt vector page per core (the E-PM2's CPU1 has its vectors in another page)
+  emu/src/core/cpu.mjs     S.relax: a read of undefined flags gives the PSW's bits; a divide by 0 or an overflowing
+  emu/src/core/interp.mjs  quotient gives a result with V set and counts in S.divz. Without S.relax nothing changes
+  emu/src/dev/intc.mjs     board facts irq_kick, kick_cross (a bank's kick word raises the kick IRQ on the other
+                           core) and lenient (unknown bank offsets are stored); a listener onMask(core, mask)
+  emu/src/fw/models.mjs    the E101 entry's intc facts: irq_kick 124, kick_cross, lenient, ctl 0x3fc, and the parked
+                           VSC and engine models on IRQ 50 and 54 (lines no E-PM2 device uses)
+Used by: tools/emu/e101/*.mjs and tools/emu/boot/ (see tools/emu/boot/README.md).
+
+Licence: the context lines are om-emu's (MIT License, Copyright (c) 2026 om-emu contributors; see
+third_party/om-emu/LICENSE). The added lines are by the authors of epm2-tools, under the same MIT terms. See NOTICE.md.
+
+diff --git a/emu/src/core/cores.mjs b/emu/src/core/cores.mjs
+index fddea80..bbc6188 100644
+--- a/emu/src/core/cores.mjs
++++ b/emu/src/core/cores.mjs
+@@ -26,14 +26,14 @@ import { R, S, PC, PSW, admits, execInterrupt, trapLines } from './cpu.mjs';
+ import { run, coreInterp, setCoreInterp, setLocalPage, stepAny, RUN_VISIT, RUN_LIMIT, RUN_FAULT, RUN_BP } from './interp.mjs';
+ import { Fault, K_RAM, U8, addRegion, allocWindow, markDirty, pageState, setPageState, IO, CST, dbgRead, dbgWrite } from './mem.mjs';
+ 
+-const CORE_S = ['insns', 'irqReq', 'irqWait', 'kick', 'exitReq', 'limit', 'fault'];
++const CORE_S = ['insns', 'irqReq', 'irqWait', 'kick', 'exitReq', 'limit', 'fault', 'vectorPage'];   // LOCAL: vectorPage per core (E101: CPU1's vectors are in page 0x7e44)
+ export const CORE_PAGE = 0x0000, LOCAL_PAGE = 0x5000, CORE_ID = 0x8050;
+ const h8 = (v) => '0x' + (v >>> 0).toString(16).padStart(8, '0');
+ 
+ class Ctx {
+   constructor(n) {
+     this.n = n; this.R = new Int32Array(R.length);
+-    this.S = { insns: 0, irqReq: false, irqWait: false, kick: false, exitReq: false, limit: 0, fault: null };
++    this.S = { insns: 0, irqReq: false, irqWait: false, kick: false, exitReq: false, limit: 0, fault: null, vectorPage: S.vectorPage };
+     this.interp = null; this.pages = new Map(); this.io = { n: -1, pc: 0 };
+     this.cst = { n: new Float64Array(32), o: new Int32Array(32), k: 0 };
+     this.started = false; this.halted = false; this.parked = null; this.resumable = false;
+@@ -43,7 +43,7 @@ class Ctx {
+ }
+ 
+ export class Cores {
+-  constructor(m, intc, { second = 2, quantum = 2000 } = {}) {
++  constructor(m, intc, { second = 2, quantum = 2000, vectorPage2 = null } = {}) {
+     if (!Number.isInteger(quantum) || quantum < 1) throw new RangeError(`cores: quantum ${quantum}: a positive instruction count`);
+     this.m = m; this.intc = intc; this.second = second; this.quantum = quantum;
+     this.cur = 0; this.q0 = 0; this.interleave = false;
+@@ -52,6 +52,7 @@ export class Cores {
+     this.stats = { turns: 0, insns: 0, switches: 0, halts: 0, wakes: 0, skipped: 0 };
+     this.problems = [];
+     const c0 = this.ctx[0], c2 = this.ctx[second];
++    if (vectorPage2 !== null) c2.S.vectorPage = vectorPage2;
+     for (const p of [CORE_PAGE, LOCAL_PAGE]) c0.pages.set(p, pageState(p));
+     // the second core's own pages: RAM, zero but for its core number (the hardware's register, which no code writes,
+     // cores spec 2; A-COREID)
+diff --git a/emu/src/core/cpu.mjs b/emu/src/core/cpu.mjs
+index fbeb57a..c16af8d 100644
+--- a/emu/src/core/cpu.mjs
++++ b/emu/src/core/cpu.mjs
+@@ -60,7 +60,8 @@ export function pswFlags(value, written, undef) {
+ }
+ export function nz(v) { return (v === 0 ? Z : 0) | (v < 0 ? N : 0); }
+ function flags(v, c, o) { R[PSW] = (R[PSW] & ~15) | (v === 0 ? Z : 0) | (v < 0 ? N : 0) | (c ? C : 0) | (o ? V : 0); R[UNDEF] &= ~15; }
+-function readFlags(bits, hazard, pc) { if (hazard || (R[UNDEF] & bits)) throw new Fault(6, pc); }
++// LOCAL (E101): S.relax = true lets an instruction read flags the model holds undefined (they read as the PSW has them)
++function readFlags(bits, hazard, pc) { if ((hazard || (R[UNDEF] & bits)) && !S.relax) throw new Fault(6, pc); }
+ function add(l, r) { const x = (l + r) | 0; flags(x, (l >>> 0) + (r >>> 0) > 0xffffffff, (~(l ^ r) & (l ^ x)) < 0); return x; }
+ function sub(l, r) { const x = (l - r) | 0; flags(x, (l >>> 0) < (r >>> 0), ((l ^ r) & (l ^ x)) < 0); return x; }
+ function logic(x) { flags(x, false, false); return x; }
+@@ -330,8 +331,12 @@ export function step(refetch = false) {
+         case 6: {
+           const dividend = (BigInt(R[MDR]) << 32n) | BigInt(R[D0 + dst] >>> 0);
+           const divisor = BigInt(R[D0 + src]);
++          // LOCAL (E101, S.relax): a divide by 0 or an overflowing quotient does not trap on the chip; the result is
++          // undefined there. Here: quotient -1 (all ones), MDR unchanged, V set
++          if (S.relax && (divisor === 0n || (dividend === -(1n << 63n) && divisor === -1n))) { R[D0 + dst] = -1; pswFlags(V | N, Z | N | V, C); S.divz = (S.divz | 0) + 1; break; }
+           if (divisor === 0n || (dividend === -(1n << 63n) && divisor === -1n)) throw new Fault(6, pc);
+           const q = dividend / divisor, r = dividend % divisor;
++          if (S.relax && (q < -(1n << 31n) || q > (1n << 31n) - 1n)) { R[D0 + dst] = Number(BigInt.asIntN(32, q)); R[MDR] = Number(BigInt.asIntN(32, r)); pswFlags(V | nz(R[D0 + dst]), Z | N | V, C); S.divz = (S.divz | 0) + 1; break; }
+           if (q < -(1n << 31n) || q > (1n << 31n) - 1n) throw new Fault(6, pc);
+           R[D0 + dst] = Number(q); R[MDR] = Number(BigInt.asIntN(32, r));
+           pswFlags(nz(R[D0 + dst]), Z | N | V, C); break;
+@@ -339,9 +344,10 @@ export function step(refetch = false) {
+         case 7: {
+           const dividend = (BigInt(R[MDR] >>> 0) << 32n) | BigInt(R[D0 + dst] >>> 0);
+           const divisor = BigInt(R[D0 + src] >>> 0);
++          if (S.relax && divisor === 0n) { R[D0 + dst] = -1; pswFlags(V | N, Z | N | V, C); S.divz = (S.divz | 0) + 1; break; }
+           if (divisor === 0n) throw new Fault(6, pc);
+           const q = dividend / divisor;
+-          if (q > 0xffffffffn) throw new Fault(6, pc);
++          if (q > 0xffffffffn && !S.relax) throw new Fault(6, pc);
+           R[D0 + dst] = Number(BigInt.asIntN(32, q)); R[MDR] = Number(BigInt.asIntN(32, dividend % divisor));
+           if (q <= 0x7fffffffn) pswFlags(nz(R[D0 + dst]), Z | N | V, C); else pswFlags(nz(R[D0 + dst]), Z | N, C | V);
+           break;
+diff --git a/emu/src/core/interp.mjs b/emu/src/core/interp.mjs
+index 5c258a1..8bf7bb6 100644
+--- a/emu/src/core/interp.mjs
++++ b/emu/src/core/interp.mjs
+@@ -304,7 +304,7 @@ const K = { FB: 0, CLR: 1, EXTB: 2, EXTBU: 3, EXTH: 4, EXTHU: 5, ADDI_A: 6, ADDI
+ function setFlags(x, c, v) { R[PSW] = (R[PSW] & ~15) | (x === 0 ? Z : 0) | (x < 0 ? N : 0) | (c ? C : 0) | (v ? V : 0); R[UNDEF] &= ~15; }
+ function addf(l, r) { const x = (l + r) | 0; setFlags(x, (l >>> 0) + (r >>> 0) > 0xffffffff, (~(l ^ r) & (l ^ x)) < 0); return x; }
+ function subf(l, r) { const x = (l - r) | 0; setFlags(x, MUT === 1 ? (l >>> 0) <= (r >>> 0) : (l >>> 0) < (r >>> 0), ((l ^ r) & (l ^ x)) < 0); return x; }
+-function cond(cc, pc) { if ((R[UNDEF] & CC_USES[cc]) && MUT !== 2) throw new Fault(6, pc); return ccEval(cc, R[PSW]); }
++function cond(cc, pc) { if ((R[UNDEF] & CC_USES[cc]) && MUT !== 2 && !S.relax) throw new Fault(6, pc); return ccEval(cc, R[PSW]); }
+ function markCode(pc, len) {
+   for (let i = 0; i < len; i++) { const o = codePhys(pc + i); if (o >= 0) { CODECH[o >>> CHUNK] = 1; CODEPG[o >>> 12] = 1; } }
+ }
+diff --git a/emu/src/dev/intc.mjs b/emu/src/dev/intc.mjs
+index d76d072..9765990 100644
+--- a/emu/src/dev/intc.mjs
++++ b/emu/src/dev/intc.mjs
+@@ -14,7 +14,10 @@ export const IRQ_OSD_ENGINE = B.irq_osd_engine, IRQ_IPI = B.irq_ipi;
+ // the kick's IRQ (A-KICK, a second core only): the one after IRQ_IPI; E143's 325, whose level register is a bank's
+ // +0x514 (the CPU entries write 0x40 there, the kernel's INTC inits 0, D) and whose handler 0x50003faf writes 1 to its
+ // +0x814
+-const IRQ_KICK = B.irq_ipi + 1;
++const IRQ_KICK = B.irq_kick ?? B.irq_ipi + 1;
++// LOCAL (E101): kick_cross: a bank's kick word raises the kick IRQ on the OTHER core (E-PM2: CPU0 writes 0x99200310 = 1,
++// CPU1's IRQ 124 handler 0x7e44efea acks with 0x99200314 = 1); lenient: unknown bank offsets are stored, not faulted
++const KX = !!B.kick_cross, LENIENT = !!B.lenient;
+ export const IRQ_VSC = (c) => B.irq_vsc0 + 2 * c, IRQ_TIMER = timerIrq;
+ const BANK_BASE = B.banks;
+ const PRESENTED = B.presented, IPI_SET = B.ipi_set, IPI_CLEAR = B.ipi_clear, KICK = B.kick, CTL = B.ctl, OFF = B.off ?? null;   // off: the E143 board's only
+@@ -45,6 +48,7 @@ export class Intc {
+     this.line = new Uint8Array(IRQS); this.test = new Uint8Array(IRQS); this.driven = new Uint8Array(IRQS);
+     this.presentedMask = 0;
+     this.setIrq = null;                      // the machine's set_irq callback
++    this.onMask = null; this.extra = BANK_BASE.map(() => new Map());   // LOCAL: a listener of each core's presented mask; lenient storage
+     // A second core (src/core/cores.mjs, createMachine's cores option; null, the default: bank 0 alone presents): its
+     // bank b2 presents to it as bank 0 to CPU 0, with IRQ 324's line its own pending bits and IRQ 325's line its own
+     // kick (A-KICK: +0x810 = 1 raises it, +0x814 = 1 clears it); cur names the core the CPU model runs (0 or b2),
+@@ -94,7 +98,7 @@ export class Intc {
+     const b = this.b2, want = 1 << level, lv = this.level[b];
+     for (let irq = 0; irq < IRQS; irq++) {
+       if (lv[irq] !== want) continue;
+-      if (irq === IRQ_IPI ? this.pending[b] !== 0 : irq === IRQ_KICK ? this.kick[b] !== 0 : (this.line[irq] !== 0 || this.test[irq] !== 0)) return irq;
++      if (irq === IRQ_IPI ? this.pending[b] !== 0 : irq === IRQ_KICK ? this.kick[KX ? 0 : b] !== 0 : (this.line[irq] !== 0 || this.test[irq] !== 0)) return irq;
+     }
+     return -1;
+   }
+@@ -102,11 +106,15 @@ export class Intc {
+     let mask = 0;
+     for (let l = 0; l < LEVELS; l++) if (this.presented2(l) >= 0) mask |= 1 << l;
+     this.mask2 = mask;
++    if (this.onMask) this.onMask(1, mask);
+     if (this.setIrq2) this.setIrq2(mask !== 0);
+   }
+   enableSecond(b, setIrq2) { this.b2 = b; this.setIrq2 = setIrq2; this.driven[IRQ_KICK] = 1; this.recompute2(); }
+   // A-KICK: bank 0's kick drives IRQ 325's line as bank 0's pending bits drive IRQ 324's; the second core's, its bank
+-  kickUpdate(b) { if (b === 0) this.setLine(IRQ_KICK, this.kick[0] !== 0); else if (b === this.b2) this.recompute2(); }
++  kickUpdate(b) {
++    if (KX) { if (b === 0) this.recompute2(); else if (b === this.b2) this.setLine(IRQ_KICK, this.kick[b] !== 0); return; }
++    if (b === 0) this.setLine(IRQ_KICK, this.kick[0] !== 0); else if (b === this.b2) this.recompute2();
++  }
+   recompute() {
+     let mask = 0;
+     for (let l = 0; l < LEVELS; l++) {
+@@ -118,6 +126,7 @@ export class Intc {
+       this.dbg[D.LINES + irq] = (this.line[irq] ? 1 : 0) | (this.test[irq] ? 2 : 0) | (this.driven[irq] ? 0x80 : 0);
+     }
+     this.presentedMask = mask;
++    if (this.onMask) this.onMask(0, mask);
+     this.dset(D.LEVEL_MASK, mask);
+     this.dset(D.REQUEST, mask !== 0 ? 1 : 0);
+     // every set_irq(true) is a CPU kick: the machine's callback sets S.kick.
+@@ -201,6 +210,7 @@ export class Intc {
+       if (off === OFF) return this.off[b];
+       if (off === KICK) return this.r810[b];
+       if (off === IPI_SET) return this.pending[b];
++      if (LENIENT) return this.extra[b].get(off) ?? 0;
+     }
+     if (!dbg) this.recordError(ERR_UNKNOWN, BANK_BASE[b] + off, 0, `UNKNOWN read size ${size}`);
+     throw BUS;
+@@ -228,6 +238,7 @@ export class Intc {
+       if (off === KICK + 4 && this.b2 !== null && value === 1) { this.kick[b] = 0; this.kickUpdate(b); return; }
+       if (off === IPI_SET) { this.ipiSet(b, value); return; }
+       if (off === IPI_CLEAR) { this.ipiClear(b, value); return; }
++      if (LENIENT) { this.extra[b].set(off, value); return; }
+     }
+     this.recordError(ERR_UNKNOWN, BANK_BASE[b] + off, value, `UNKNOWN write size ${size}`);
+     throw BUS;
+diff --git a/emu/src/fw/models.mjs b/emu/src/fw/models.mjs
+index 8d54325..e5af198 100644
+--- a/emu/src/fw/models.mjs
++++ b/emu/src/fw/models.mjs
+@@ -1402,7 +1402,7 @@ export const MODELS = {
+       // two banks, picked by the CPU number (0x8050) in irq_register 0x7e44b57f; irq < 125; doorbell IRQ 123;
+       // 0x99b00000 is the AE statistics unit, not an INTC. irq_osd_engine / irq_vsc0: the E-PM2 OSD (IRQ 111) and
+       // display controller (IRQ 14) are not the om-emu engine / VSC; the numbers only keep the devices off real lines
+-      intc: { banks: [0x99200000, 0x99300000], irqs: 125, irq_ipi: 123, irq_osd_engine: 111, irq_vsc0: 14 },
++      intc: { banks: [0x99200000, 0x99300000], irqs: 125, irq_ipi: 123, irq_kick: 124, kick_cross: true, lenient: true, ctl: 0x3fc, irq_osd_engine: 54, irq_vsc0: 50 },   // LOCAL: the parked om-emu engine and VSC models on lines no E-PM2 device uses (the real OSD IRQ 111 and display IRQ 14 are driven by the E101 driver)
+       // 0x98900000: the E118 layout, channel 0 prescaler 161, the tick channel 1 on IRQ 69 (irq_base 68)
+       timer: { prescaler: 161, irq_base: 68 },
+       // PARKED: 0x9c000000 is the IMG library's per-CPU window on the E-PM2 (cmp (0x8050): 0x9c000000 / 0x9e000000),

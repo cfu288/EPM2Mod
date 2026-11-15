@@ -1,0 +1,43 @@
+stop: {"why":"labtime","pc":2118424173} | lab ms 2000.1 | wall ms 5553 | insns cpu0 30661113 cpu1 2764094
+console (29 lines, prm tag messages left out):
+  CPU0!
+  CPU1!
+  
+  prm
+  FlD.K.R.
+  10/23 17:15
+  BlD.ElD.!!
+  Usr0
+  MlD.proc
+  Ns
+  Nr
+  LOG
+  history initialize
+  ES.MS.Pr0
+  Usr1
+  ACC: Who am I?: 00000000
+  ACC: Who am I?: 00000000
+  DCFNUM_MOUNT        0x1301 0x02 0x00000000 0x00000000 0x00000000 T(  0)0 / Q(  6)API_EVENT
+  [damage info]:Not SUCCESS : 1301
+  Usr2
+  Usr3
+  Pr2
+  Usr4
+  Pr4
+  Pr1
+  BS.wb 2A001001 00007102
+  wb 2A001001 00007102
+  :-) Pr3
+  
+boot marks: 173 last 1_? 1_* 3_*
+cpu0 tasks: {"WAI":122,"RUN":1,"DMT":24}
+cpu1 tasks: {"WAI":16,"RUN":1,"RDY":1,"DMT":12}
+quick start log: 10.5 SetPermit[1] | 10.6 MainStart | 10.6 Flg-LensSetupStart | 10.6 F1a | 10.6 PowerAC | 10.6 UiONFact:0xc | 10.6 ErrLeOK | 16.5 Flg-ThroughStart | 16.8 SetPermit[3] | 16.8 Flg-2ndChk | 16.8 2ndNoChk | 24.2 RhpSetCb | 24.3 RhpThrOverWait | 24.3 RhpThough[0][0x0] | 24.8 FastEndCb | 24.8 Flg-RhpTake | 24.9 RhpTake[0][0][0x0] | 30.5 MIE
+application events taken: 259 last: 11771 Tra (TraShareTakeStatus area); 12033 OlyHfwOpeCamCom (Ope layer); 11772 Tra (TraShareTakeStatus area); 11771 Tra (TraShareTakeStatus area)
+camera API async calls: 10.5 start fn=f ev=10 from 7e680711 ; 19.6 post d0=f0000000 d1=c from 7e67d039 ; 34.5 start fn=23 ev=10 from 7e678547 ; 34.5 start fn=23 ev=10 from 7e6786d5 ; 34.5 start fn=23 ev=10 from 7e679d2f ; 35.7 start fn=19 ev=10 from 7e6878d5 ; 186.8 post d0=f0000000 d1=c from 7e67d039 ; 186.8 post d0=f0000000 d1=c from 7e67d039 ; 200.2 post d0=f0000000 d1=c from 7e67d039 ; 209.7 post d0=f0000000 d1=c from 7e67d039 ; 215.0 start fn=22 ev=10 from 7e6896ca ; 215.1 post d0=f0000000 d1=c from 7e67d039 ; 215.7 start fn=19 ev=10 from 7e6878d5 ; 215.9 post d0=f0000000 d1=c from 7e67d039 ; 238.5 start fn=19 ev=10 from 7e68d462 ; 238.6 post d0=f0000000 d1=c from 7e67d039
+file task: 16.5 cmd 0x00000031 0x00000006 0xf0000000 0x60002740
+firmware error log entries: 2 36.1 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9 ; 37.6 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9
+stand-ins and observers hit: gio-timer-set x3216, S-CONSOLE x389, boot-mark x173, S-OSDFILL x4, S-FLASHREAD0 x31, bank-save x2, S-FLASHWRITE x3, S-FLASHERASE x6, idle x275, idle x9105, S-GIOIN x3180, S-PWM x2, S-PWM-duty x2, S-BC x9, S-BATT x2, errlog x2, oxf-event x259, api_exec_start x8, api_exec_post x8, fileclbk-cmd x1, usrfast-log x18, S-DMA-reserve x246, S-DMA x246, S-DMA-finish x246, S-IIC-write x31, S-IIC-read x50, S-SIO x70, S-SIORAW-tx x8, S-SIORAW-rx x7, S-CAM x2, S-TAKEAPI x8, S-ACC-out x20, S-OSDFILL(cpu1) x2
+I2C transfers 81 | SIO client transfers 70 | BC transactions 9 | SD commands 0 | DMA 246 | divide relaxations 1
+cpu1: idle | problems: none
+STAGE 2: PASS (kernel on both cores, Usr0..Usr4 done, tasks scheduled, no fault)

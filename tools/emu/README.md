@@ -1,18 +1,28 @@
 # Emulator harness
 
-This harness runs single E-PM2 v1.6 block-0 functions in [om-emu](https://github.com/flatpanda/om-emu)'s MN10300 machine. It runs each input row on stock block 0 and on a patched block 0, then compares the outputs. It follows the caduceus-ep7 contract: run the real code, patched against stock, and check that only the intended outputs change.
+Two things are here. The **function harness** (this file) runs single functions and call chains of block 0.
+The **full boot** ([boot/README.md](boot/README.md)) boots the whole firmware from reset, draws its menus, and has the
+two checks `boot-test` and `update-path-test`. Both use the same om-emu working tree.
+
+The function harness runs single E-PM2 v1.6 block-0 functions in [om-emu](https://github.com/flatpanda/om-emu)'s MN10300 machine. It runs each input row on stock block 0 and on a patched block 0, then compares the outputs. It follows the caduceus-ep7 contract: run the real code, patched against stock, and check that only the intended outputs change.
 
 Labels: **V** = ran in the emulator and checked against an independent Python model or the notes; **I** = inferred.
 
 ## Setup
 
-- **Node 26:** `~/opt/node26/bin/node` (v26.13.1). The system node 22 is too old. Override it with `OM_EMU_NODE`.
-- **om-emu:** `~/opt/om-emu`, with the local E101 changes kept **outside the repo** at `~/opt/om-emu-E101.patch` (they were kept out while om-emu had no licence; it has the MIT licence since 2026-11-14, and the move into this repository is in `docs/todo.md`). Override the path with `OM_EMU_DIR`. To set up a fresh copy: `cd ~/opt/om-emu && patch -p1 < .../tools/emu/om-emu-E101.patch`.
+```sh
+git submodule update --init third_party/om-emu
+tools/emu/setup.sh
+```
+
+- **om-emu** is the git submodule `third_party/om-emu`, pinned to upstream commit `0819080133f6` (MIT licence). The submodule is never edited. `tools/emu/setup.sh` exports the pinned commit to the working tree `build/om-emu/` (ignored by git) and applies our patches `tools/emu/om-emu-patches/*.patch`. A second run does nothing when the tree is up to date; `--force` makes it again; `--check` only reports.
+- **`OM_EMU_DIR`** overrides the working tree. Without it the tools use `build/om-emu`, and `~/opt/om-emu` when `build/om-emu` does not exist (the place used before 2026-11-15). The defaults are in `emuenv.py`.
+- **Node 26 or newer:** `node` on PATH when it is new enough, else `~/opt/node26/bin/node`. Override it with `OM_EMU_NODE`.
 - **Stock block 0:** `build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin`. This is the descrambled OE payload, sha256 `1b7c4bb1…71468d`; the harness checks it.
 
-### What the om-emu patch adds
+### What the first om-emu patch adds
 
-om-emu refuses an unknown model. Its lab is written for the OM-1 (E143), so the patch adds the E-PM2 as a **function-only** model.
+om-emu refuses an unknown model. Its lab is written for the OM-1 (E143), so `0001-e101-function-harness.patch` adds the E-PM2 as a **function-only** model. `0002-e101-full-boot.patch` is for the full boot ([boot/README.md](boot/README.md)); it changes the INTC facts of the entry and adds a relaxed CPU mode that the function harness does not switch on.
 
 - **`src/fw/models.mjs`: a new `E101` entry.**
   - Image base 0x7E421020, block length 0xD7FFC0 and the block-0 digest.
@@ -39,7 +49,9 @@ om-emu refuses an unknown model. Its lab is written for the OM-1 (E143), so the 
 | `emurun.py` | CLI: `list`, `run CASE` (one image, checked against the model) and `diff CASE --patch SPEC…` or `--image BLOCK0` (stock against patched). Exits 1 on any mismatch, fault, stray code or unexpected change. |
 | `bootmem.py`, `scenario.py`, `osmodel.py`, `liveview.py`, `hookcheck.py` | Scenario runs; see "Scenario runs" below. |
 | `specs/rec-limit-3600.json` | Emulator test input only, not a camera patch: changes the recording-limit imm16 1740 to 3600 (2 bytes). |
-| `~/opt/om-emu-E101.patch` (outside the repo) | The om-emu changes above (`patch -p1` in the om-emu root). |
+| `setup.sh`, `om-emu-patches/` | Make the om-emu working tree `build/om-emu/` from the submodule and our two patches. |
+| `emuenv.py` | Where om-emu, Node and the unpacked images are; used by every Python tool here. |
+| `boot-test`, `update-path-test`, `bootcheck.py`, `emu-run`, `mkstate`, `e101/`, `boot/` | The full boot: see [boot/README.md](boot/README.md). |
 
 ## Usage
 
@@ -57,8 +69,8 @@ python3 tools/emu/patchblock.py patches/film-portra-xp.json \
 Calling om-emu's debugger directly, for example memcpy through a hand-written `call 0x7E5081FA,[d2,a2],8` at 0x7D000000:
 
 ```sh
-cd ~/opt/om-emu && OM_EMU_MODEL=E101 ~/opt/node26/bin/node emu/bin/debug.mjs \
-  --image /path/to/EPM2Mod/build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin \
+cd build/om-emu && OM_EMU_MODEL=E101 node emu/bin/debug.mjs \
+  --image ../blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin \
   --entry 0x7D000000 --write 0x7D000000=ddfa815001a008 \
   --write 0x7D200000=000102030405060708090a0b0c0d0e0f \
   --reg a0=0x7D300000 --reg a1=0x7D200000 --reg d0=16 --reg sp=0x7D100000 \
@@ -165,11 +177,11 @@ For code outside live view use `Scenario` directly:
 2. An option for the MN103 divide-by-zero behaviour (V flag, no trap).
 3. A float unit that does not fault on zero, tiny or non-normal inputs for the E-PM2 soft-float helpers.
 4. A "set of executed pcs" trace, so that a long run does not need one line per instruction.
-5. `tools/mn10300-objdump` is missing in the shared copy; the harness sets `OM_OBJDUMP` to the mn10300 binutils objdump.
+5. `tools/mn10300-objdump` is not in om-emu's repository; the harness sets `OM_OBJDUMP` to the mn10300 binutils objdump.
 
 ## Limits of the single-function cases
 
-- **Function level only.** Nothing boots; there is no kernel, no tasks, no interrupts, no timers in use and no second core. The IMG engine, DMA, the display, the sensor and all other devices are not modelled. The cases are leaf functions or functions with stubbed callees, and a stub's answer is our assumption.
+- **Function level only.** Nothing boots here (the full boot is in `boot/`); there is no kernel, no tasks, no interrupts, no timers in use and no second core. The IMG engine, DMA, the display, the sensor and all other devices are not modelled. The cases are leaf functions or functions with stubbed callees, and a stub's answer is our assumption.
 - **RAM.** RAM starts at zero, and `.data` (0x7E8DA000 → 0x602A9B40) is not copied. A function that reads globals needs them written by its case.
 - **Memory map.** The whole block is mapped at 0x7E421020. On the camera the boot copies only up to 0x7E881000, and later parts load as overlays. A case that reads beyond 0x7E881000 sees bytes that may not be there at run time.
 - **UDF.** om-emu's UDF semantics (`udfu01` as a multiply, the float stubs) were established on the OM-1. On the E-PM2 they are confirmed only where a case checks them: `rec_limit`'s `udfu01 30` and `udfu01 600` match the model, and fsub at 0x7E5018BC gave 3.0 − 1.0 = 2.0.

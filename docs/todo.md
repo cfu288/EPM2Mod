@@ -19,8 +19,9 @@ and delete the item here.
   It needs the E-P5 state object paired (NOTES §15.5).
 - The words Peaking, White and Black are English only: the other languages keep the old texts of
   ids 1500, 1501, 1505, 1506.
-- Make the emulator's boot test a step for every candidate. It is run by hand now, because the
-  emulator is outside the repository.
+- Make the emulator's boot test a step of `epm2mod make` for every candidate. The commands exist
+  (`tools/emu/boot-test`, `tools/emu/update-path-test`, exit status 0 = pass); `make` does not call
+  them yet.
 
 ## Film looks
 
@@ -65,11 +66,7 @@ and delete the item here.
   shows that the host function is reached only through the image-job table 0x7E789604, and it did
   not run before segment 2 was loaded on a normal start, a quick start and the update path. That is
   a test result, not a proof. A clean fix moves 219 bytes into a dead function of segment 1.
-- om-emu has the MIT licence since 2026-11-14 (commit 18a81625cd). Bring the emulator work into
-  this repository: move our copy (based on the older commit 96bf756) onto a commit that has the
-  LICENSE file, then commit our E101 drivers and patch with the MIT notice in `NOTICE.md`. After
-  that the boot test and the menu walk can be a step of `epm2mod make`.
-- Emulator (outside the repository, `~/opt/om-emu-e101-boot-work/`), open points:
+- Emulator ([tools/emu/boot/README.md](../tools/emu/boot/README.md)), open points:
   - The row Time Lapse Settings is grey when the clock is not set. Start the emulator with
     `E101_RTC=2026-11-14T12:00:00`.
   - Not reached: the screens of a viewfinder, the super control panel. The live control

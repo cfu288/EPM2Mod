@@ -1,0 +1,9 @@
+Submodule path 'third_party/om-emu': checked out '0819080133f6ca7edd455dfdfa209bd9eed291cc'
+ 0819080133f6ca7edd455dfdfa209bd9eed291cc third_party/om-emu (heads/main)
+setup.sh: exported om-emu 0819080133f6ca7edd455dfdfa209bd9eed291cc to build/om-emu-verify
+setup.sh: applied 0001-e101-function-harness.patch
+setup.sh: applied 0002-e101-full-boot.patch
+setup.sh: done. The tools use build/om-emu-verify (override: OM_EMU_DIR).
+setup.sh: build/om-emu-verify is up to date (om-emu 0819080133f6ca7edd455dfdfa209bd9eed291cc, 2 patches)
+setup.sh: build/om-emu-verify is up to date (om-emu 0819080133f6ca7edd455dfdfa209bd9eed291cc, 2 patches)
+exit status 0

@@ -108,23 +108,29 @@ rule: a hook in a segment-1 function that the boot task calls jumped into segmen
 showed a crash at start-up before anyone flashed it. On the camera that is a boot loop, and it could
 also break the update path, which is the only way back.
 
-Check every build that adds a hook with the boot test of the emulator before a flash.
+Check every build that adds a hook with the boot test of the emulator before a flash:
+`tools/emu/boot-test builds/NAME.json` and `tools/emu/update-path-test builds/NAME.json`.
 
 ## The emulator
 
-A local copy of om-emu boots the E-PM2 firmware, stock or patched, from its reset vector on both
-cores. The copy and our changes to it are outside this repository, in `~/opt/om-emu-e101-boot` and
-`~/opt/om-emu-e101-boot-work/` (start with `NOTES.md` there). om-emu has the MIT licence since
-2026-11-14 (its commit 18a81625cd), so our changes can now come into this repository: see
-[todo.md](todo.md). Upstream lists this camera generation as "no work planned"; the port took one day of agent
-work.
+om-emu boots the E-PM2 firmware, stock or patched, from its reset vector on both cores. om-emu is
+the git submodule `third_party/om-emu` (MIT licence, pinned commit `0819080133f6`). Our patches to
+it are in `tools/emu/om-emu-patches/`, and our drivers and tools are in `tools/emu/e101/` and
+`tools/emu/boot/`. Set up once with `git submodule update --init third_party/om-emu` and
+`tools/emu/setup.sh`. How it works, the stand-ins and the limits are in
+[tools/emu/boot/README.md](../tools/emu/boot/README.md). Upstream lists this camera generation as
+"no work planned"; the port took one day of agent work.
 
-| Check | Command (in the work folder, after `. ./env.sh`) | What it proves |
+IMAGE is `stock`, `builds/NAME.json` or a `.BIN` file. No firmware is in the repository.
+
+| Check | Command (from the repository root) | What it proves |
 |---|---|---|
-| Boot test | `BLOCKS=<unpacked image> $NODE stage2-boot.mjs 2000` | The image starts like stock: loader copies, both kernels, all tasks, the application. It caught a build that would have crashed at every start |
-| Menu walk | `./demo.sh stock` or `./demo.sh pinned` | The firmware's own menus, drawn by its own code, in English, as PNG files |
-| Screenshot comparison | `./shotdiff.sh stock pinned OUTDIR STEP...` | Which screens a patch changes |
-| Card | `./demo.sh card` | A FAT card from a host folder mounts; the stock file routines work |
+| Boot test | `tools/emu/boot-test IMAGE` | The image starts like stock: loader copies, both kernels, all tasks, the application. Exit status 0 = pass. It caught a build that would have crashed at every start |
+| Update path | `tools/emu/update-path-test IMAGE` | With OK held and an update file on the card, the image finds the file as stock does |
+| Menu screenshots | `tools/emu/emu-run IMAGE play.mjs OUTDIR STEP...` | The firmware's own menus, drawn by its own code, in English, as PNG files |
+| Screenshot comparison | `tools/emu/boot/shotdiff.sh IMAGE_A IMAGE_B OUTDIR STEP...` | Which screens a patch changes |
+| Menu crawl | `tools/emu/boot/crawl-all.sh CONFIG IMAGE...`, then `crawldiff.py` or `crawlcmp.py` | Every menu screen of two images, compared |
+| Card | `E101_CARD=FOLDER tools/emu/emu-run IMAGE play.mjs ...` | A FAT card from a host folder mounts; the stock file routines work |
 
 In this repository, `tools/emu/` has the scenario tests (whole call chains with real initial memory)
 and `tools/emu/hookcheck.py` (the load-order check).
