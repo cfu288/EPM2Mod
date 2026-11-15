@@ -1,5 +1,5 @@
 {
- "what": "CANDIDATE, not camera-tested: the pinned build peaking-colours with a faster colour loop for Red / Yellow / Blue peaking (lines drawn in blocks of 4 x 2 pixels)",
+ "what": "Seven film looks named in all 34 languages, interval shooting with up to 240 frames, the level gauge with Level Adjust, and focus peaking with the setting Off / White / Red / Yellow / Blue at 10 frames per second",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",
