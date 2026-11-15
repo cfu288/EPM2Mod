@@ -12,9 +12,9 @@ and delete the item here.
 
 ## Focus peaking
 
-- Live view is slow while coloured peaking lines show (3 to 7 frames per second; the ceiling of
-  this pass list is 10). The colour loop is the likely cost. Test `debug-log-peaking-fast` on the
-  camera and read `pass 9 timing` in `epm2mod log --summary` (NOTES §17.5).
+- Peaking speed: `debug-log-peaking-fast` reaches 10 frames per second with a colour on the camera
+  (2026-11-15; before: about 6). Open: the owner's view of the 4×2 blocks; then pin `peaking-fast`.
+  More than 10 per second needs a shorter pass list or the 50 ms frame class (NOTES §17).
 - Peaking without the zoom: the trigger is the MF Assist state object, which also asks for the zoom.
   It needs the E-P5 state object paired (NOTES §15.5).
 - The words Peaking, White and Black are English only: the other languages keep the old texts of
@@ -49,6 +49,11 @@ and delete the item here.
 
 ## Foundations
 
+- Log defect (second camera log, 2026-11-15): the ring header is trusted when its magic word is
+  right. After a firmware update the RAM held old content with changed bits and a 0x5A5A5A5A
+  fill, the magic word matched, and the record numbers were garbage. Give the header a check
+  (index and its complement, bounds), start a new ring when it fails, and make the decoder drop
+  records that cannot be real.
 - Structured log: works on the camera (2026-11-15). Evaluation of the first log and the next
   probes (power-on factor, real restart count, per-CPU gates, peaking loop time, flush end):
   `experiments/2026-11-15-log/evaluation-1.md`. Unknown: if the ring RAM survives a crash restart.
