@@ -10,6 +10,7 @@
     epm2mod info FIRMWARE.BIN                     describe a firmware file
     epm2mod readme [--check]                      refresh the generated parts of the documents
     epm2mod looks [--check | --write]             check or write the film-look patch specs
+    epm2mod log FILE [--dict EVENTS.json]         decode a camera log file to JSON lines
 
 Exit status: 0 for success, 1 for an error that is reported as one message (or,
 for ``info``, ``readme --check`` and ``looks``, a check that failed), 2 for a
@@ -21,6 +22,7 @@ from __future__ import annotations
 import argparse
 import contextlib
 import io
+import json
 import signal
 import sys
 from pathlib import Path
@@ -37,7 +39,8 @@ from .builds import (
 )
 from .container import describe, parse
 from .errors import BuildError, ContainerError, Epm2ModError
-from .fileio import read_bytes, write_bytes
+from .eventlog import decode, load_dictionary
+from .fileio import read_bytes, read_json, write_bytes
 from .hashing import sha256_bytes
 from .paths import RepoPaths, repo_paths
 from .pipeline import clear_outputs, make, record_test
@@ -191,6 +194,15 @@ def _looks(args: argparse.Namespace, paths: RepoPaths) -> int:
     return 0
 
 
+def _log(args: argparse.Namespace, paths: RepoPaths) -> int:
+    """Run ``epm2mod log``: print one JSON object per record of a camera log."""
+    source = Path(args.dict) if args.dict else paths.root / "logs" / "events.json"
+    words = load_dictionary(read_json(source))
+    for line in decode(read_bytes(Path(args.file)), words):
+        print(json.dumps(line))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Return the argument parser of the ``epm2mod`` command."""
     parser = argparse.ArgumentParser(
@@ -267,6 +279,16 @@ def build_parser() -> argparse.ArgumentParser:
     )
     looks_mode.add_argument(
         "--write", action="store_true", help="write the generated specs to patches/"
+    )
+
+    log_cmd = command(
+        "log", _log, "Decode a camera log file (EPM2LOG.BIN) to JSON lines."
+    )
+    log_cmd.add_argument("file", help="the log file from the SD card")
+    log_cmd.add_argument(
+        "--dict",
+        metavar="EVENTS.json",
+        help="the event dictionary; default: logs/events.json of the repository",
     )
     return parser
 

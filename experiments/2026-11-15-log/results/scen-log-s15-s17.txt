@@ -1,0 +1,102 @@
+S15. Live view with the MF Assist request: DEBUG against PINNED, then the decoded ring.
+  [458=3 White, Natural] pinned: frame 4: 11 task runs, 164466 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1 C=3
+  [458=3 White, Natural] debug:  frame 4: 11 task runs, 164522 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1 C=3
+  the word 0x602A4954 in the pinned image's first frame: 0x7D0EFBD4 -> an address of the harness stack: the stock code copies an unset stack slot
+  458=3 White, Natural frame 1  SAME: 10212 writes (pinned 10185), bytes that differ outside the log's RAM: 0; device accesses 4884 + 3 timer reads, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 90
+  458=3 White, Natural frame 2  SAME: 6694 writes (pinned 6679), bytes that differ outside the log's RAM: 0; device accesses 4416 + 2 timer reads, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 90
+  458=3 White, Natural frame 3  SAME: 6709 writes (pinned 6700), bytes that differ outside the log's RAM: 0; device accesses 4416 + 1 timer reads, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 90
+  458=3 White, Natural frame 4  SAME: 6709 writes (pinned 6707), bytes that differ outside the log's RAM: 0; device accesses 4416 + 0 timer reads, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 47
+  [458=3 White, Natural] pass 9 gain ['0x0200'], pass 7 ucExpose [3]: as pinned; anomalies: none
+      log: seq 0 pk_mf_start {"latch":{"raw":"0x00000100","L":0,"R":1,"L2":0,"C":0},"object":"0x7D500000"}
+      log: seq 1 pk_heap_mode {"mode":1,"caller":"0x7E4C935E"}
+      log: seq 2 pk_latch {"latch":{"raw":"0x03000101","L":1,"R":1,"L2":0,"C":3},"lv":{"raw":"0x00000100","b4":0,"art_type":1}}
+      log: seq 3 pk_pass9 {"picture":"0xB596A940","line":{"raw":"0x02000000","first_pixel":0,"gain":512}}
+      log: seq 4 pk_latch {"latch":{"raw":"0x03010101","L":1,"R":1,"L2":1,"C":3},"lv":{"raw":"0x00000100","b4":0,"art_type":1}}
+      log: seq 5 pk_pass9 {"picture":"0xB596A940","line":{"raw":"0x02000000","first_pixel":0,"gain":512}}
+      log: seq 6 pk_pass9 {"picture":"0xB596A940","line":{"raw":"0x02000000","first_pixel":0,"gain":512}}
+  [458=3 White, Natural] events as expected: MF start, latch with L=1 R=1 C=3, heap mode, pass 9 with the picture buffer of the heap log and the gain
+  [458=3 White, Key Line] pinned: frame 4: 11 task runs, 164445 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1 C=3
+  [458=3 White, Key Line] debug:  frame 4: 11 task runs, 164501 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1 C=3
+  458=3 White, Key Line frame 1  SAME: 10204 writes (pinned 10183), bytes that differ outside the log's RAM: 0; device accesses 4884 + 2 timer reads, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 90
+  458=3 White, Key Line frame 2  SAME: 6694 writes (pinned 6679), bytes that differ outside the log's RAM: 0; device accesses 4416 + 2 timer reads, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 90
+  458=3 White, Key Line frame 3  SAME: 6709 writes (pinned 6700), bytes that differ outside the log's RAM: 0; device accesses 4416 + 1 timer reads, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 90
+  458=3 White, Key Line frame 4  SAME: 6709 writes (pinned 6707), bytes that differ outside the log's RAM: 0; device accesses 4416 + 0 timer reads, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 47
+  [458=3 White, Key Line] pass 9 gain ['0x0200'], pass 7 ucExpose [3]: as pinned; anomalies: none
+      log: seq 0 pk_heap_mode {"mode":1,"caller":"0x7E4C935E"}
+      log: seq 1 pk_mf_start {"latch":{"raw":"0x00000100","L":0,"R":1,"L2":0,"C":0},"object":"0x7D500000"}
+      log: seq 2 pk_latch {"latch":{"raw":"0x03000101","L":1,"R":1,"L2":0,"C":3},"lv":{"raw":"0x00000100","b4":0,"art_type":1}}
+      log: seq 3 pk_pass9 {"picture":"0xB596A940","line":{"raw":"0x02000000","first_pixel":0,"gain":512}}
+      log: seq 4 pk_latch {"latch":{"raw":"0x03010101","L":1,"R":1,"L2":1,"C":3},"lv":{"raw":"0x00000100","b4":0,"art_type":1}}
+      log: seq 5 pk_pass9 {"picture":"0xB596A940","line":{"raw":"0x02000000","first_pixel":0,"gain":512}}
+      log: seq 6 pk_pass9 {"picture":"0xB596A940","line":{"raw":"0x02000000","first_pixel":0,"gain":512}}
+  [458=3 White, Key Line] events as expected: MF start, latch with L=1 R=1 C=3, heap mode, pass 9 with the picture buffer of the heap log and the gain
+  [458=2 Red, Natural] pinned: frame 4: 11 task runs, 1013619 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1 C=2
+  [458=2 Red, Natural] debug:  frame 4: 11 task runs, 1013675 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1 C=2
+  458=2 Red, Natural frame 1  SAME: 10212 writes (pinned 10185), bytes that differ outside the log's RAM: 0; device accesses 4884 + 3 timer reads, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 90
+  458=2 Red, Natural frame 2  SAME: 6694 writes (pinned 6679), bytes that differ outside the log's RAM: 0; device accesses 4416 + 2 timer reads, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 90
+  458=2 Red, Natural frame 3  SAME: 6709 writes (pinned 6700), bytes that differ outside the log's RAM: 0; device accesses 4416 + 1 timer reads, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 90
+  458=2 Red, Natural frame 4  SAME: 6709 writes (pinned 6707), bytes that differ outside the log's RAM: 0; device accesses 4416 + 0 timer reads, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 47
+  [458=2 Red, Natural] pass 9 gain ['0x0000'], pass 7 ucExpose [3]: as pinned; anomalies: none
+      log: seq 0 pk_mf_start {"latch":{"raw":"0x00000100","L":0,"R":1,"L2":0,"C":0},"object":"0x7D500000"}
+      log: seq 1 pk_heap_mode {"mode":1,"caller":"0x7E4C935E"}
+      log: seq 2 pk_latch {"latch":{"raw":"0x02000101","L":1,"R":1,"L2":0,"C":2},"lv":{"raw":"0x00000100","b4":0,"art_type":1}}
+      log: seq 3 pk_pass9 {"picture":"0xB596A940","line":{"raw":"0x00000000","first_pixel":0,"gain":0}}
+      log: seq 4 pk_latch {"latch":{"raw":"0x02010101","L":1,"R":1,"L2":1,"C":2},"lv":{"raw":"0x00000100","b4":0,"art_type":1}}
+      log: seq 5 pk_pass9 {"picture":"0xB596A940","line":{"raw":"0x00000000","first_pixel":0,"gain":0}}
+      log: seq 6 pk_pass9 {"picture":"0xB596A940","line":{"raw":"0x00000000","first_pixel":0,"gain":0}}
+  [458=2 Red, Natural] events as expected: MF start, latch with L=1 R=1 C=2, heap mode, pass 9 with the picture buffer of the heap log and the gain
+  [458=2 Red, Key Line] pinned: frame 4: 11 task runs, 1013598 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1 C=2
+  [458=2 Red, Key Line] debug:  frame 4: 11 task runs, 1013654 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1 C=2
+  458=2 Red, Key Line frame 1  SAME: 10204 writes (pinned 10183), bytes that differ outside the log's RAM: 0; device accesses 4884 + 2 timer reads, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 90
+  458=2 Red, Key Line frame 2  SAME: 6694 writes (pinned 6679), bytes that differ outside the log's RAM: 0; device accesses 4416 + 2 timer reads, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 90
+  458=2 Red, Key Line frame 3  SAME: 6709 writes (pinned 6700), bytes that differ outside the log's RAM: 0; device accesses 4416 + 1 timer reads, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 90
+  458=2 Red, Key Line frame 4  SAME: 6709 writes (pinned 6707), bytes that differ outside the log's RAM: 0; device accesses 4416 + 0 timer reads, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 47
+  [458=2 Red, Key Line] pass 9 gain ['0x0000'], pass 7 ucExpose [3]: as pinned; anomalies: none
+      log: seq 0 pk_heap_mode {"mode":1,"caller":"0x7E4C935E"}
+      log: seq 1 pk_mf_start {"latch":{"raw":"0x00000100","L":0,"R":1,"L2":0,"C":0},"object":"0x7D500000"}
+      log: seq 2 pk_latch {"latch":{"raw":"0x02000101","L":1,"R":1,"L2":0,"C":2},"lv":{"raw":"0x00000100","b4":0,"art_type":1}}
+      log: seq 3 pk_pass9 {"picture":"0xB596A940","line":{"raw":"0x00000000","first_pixel":0,"gain":0}}
+      log: seq 4 pk_latch {"latch":{"raw":"0x02010101","L":1,"R":1,"L2":1,"C":2},"lv":{"raw":"0x00000100","b4":0,"art_type":1}}
+      log: seq 5 pk_pass9 {"picture":"0xB596A940","line":{"raw":"0x00000000","first_pixel":0,"gain":0}}
+      log: seq 6 pk_pass9 {"picture":"0xB596A940","line":{"raw":"0x00000000","first_pixel":0,"gain":0}}
+  [458=2 Red, Key Line] events as expected: MF start, latch with L=1 R=1 C=2, heap mode, pass 9 with the picture buffer of the heap log and the gain
+  S15 RESULT: PASS
+S16. log_put, log_chg, log_cnt alone.
+  log_put on a clear ring: header magic 0x314C5045 w 1; record id 0x1234 seq 0 args 0x11111111 0xA0A0A0A0; registers kept True (psw at the return: 0) -> ok
+  600 records: w 600, newest in slot 87 (seq 599), oldest kept seq 88, nothing written after the ring, CPU1 ring untouched -> ok
+  log_chg with arg0 5, 5, 6, 6, 5, then budget 2 and 5, 5, 5: records [1, 0, 1, 0, 1, 1, 1, 0] -> ok
+  log_cnt with budget 3, five calls: records [1, 1, 1, 0, 0] -> ok
+  log_put with CPU number 1: CPU0 ring unchanged (w 608), CPU1 ring magic 0x314C5045 w 1, record id 0x4321 seq 0 -> ok
+  S16 RESULT: PASS
+S17. Each hook from its site to the first stock instruction after it: DEBUG against PINNED, with the flags N Z C V set at the start.
+  ERR                        ok: registers and flags at the return as pinned True; stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['fw_error', 'fw_error_args']
+  BOOT                       ok: registers and flags at the return as pinned True; stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['boot']
+  GUI no trigger             ok: registers and flags at the return as pinned True (mdr left out: a call was replaced); stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['gui_state']
+  GUI menu                   ok: registers and flags at the return as pinned True (mdr left out: a call was replaced); stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['gui_state']
+  GUI same state             ok: registers and flags at the return as pinned True (mdr left out: a call was replaced); stock calls with the same arguments True; memory outside the log's RAM as pinned True; records none
+  GUI busy                   ok: registers and flags at the return as pinned True (mdr left out: a call was replaced); stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['gui_state']
+  GUI card busy              ok: registers and flags at the return as pinned True (mdr left out: a call was replaced); stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['gui_state']
+  LATCH                      ok: registers and flags at the return as pinned True; stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['pk_latch']
+  LATCH again                ok: registers and flags at the return as pinned True; stock calls with the same arguments True; memory outside the log's RAM as pinned True; records none
+  HEAP                       ok: registers and flags at the return as pinned True (mdr left out: a call was replaced); stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['pk_heap_mode']
+  PK9 not armed              ok: registers and flags at the return as pinned True; stock calls with the same arguments True; memory outside the log's RAM as pinned True; records none
+  MFON                       ok: registers and flags at the return as pinned True; stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['pk_mf_start']
+  PK9 armed                  ok: registers and flags at the return as pinned True; stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['pk_pass9']
+  MFOFF                      ok: registers and flags at the return as pinned True; stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['pk_mf_end']
+  ART 167                    ok: registers and flags at the return as pinned True; stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['art_sixaxis']
+  ART 167 again              ok: registers and flags at the return as pinned True; stock calls with the same arguments True; memory outside the log's RAM as pinned True; records none
+  STAGE                      ok: registers and flags at the return as pinned True; stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['film_stage']
+  MATRIX                     ok: registers and flags at the return as pinned True (mdr left out: a call was replaced); stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['film_matrix']
+  CURVE 85                   ok: registers and flags at the return as pinned True; stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['film_curve']
+  CBS                        ok: registers and flags at the return as pinned True; stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['shoot_cbs']
+  ART 167 after a callback   ok: registers and flags at the return as pinned True; stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['art_sixaxis']
+  ADJ                        ok: registers and flags at the return as pinned True; stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['lv_adjust']
+  LVV                        ok: registers and flags at the return as pinned True; stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['lv_values']
+  IVSTART                    ok: registers and flags at the return as pinned True (mdr left out: a call was replaced); stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['iv_start']
+  IVSET                      ok: registers and flags at the return as pinned True (mdr left out: a call was replaced); stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['iv_state_set']
+  IVFRAME 1                  ok: registers and flags at the return as pinned True; stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['iv_frame']
+  IVFRAME 2                  ok: registers and flags at the return as pinned True; stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['iv_frame']
+  IVCLR                      ok: registers and flags at the return as pinned True (mdr left out: a call was replaced); stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['iv_state_clear']
+  IVEND                      ok: registers and flags at the return as pinned True (mdr left out: a call was replaced); stock calls with the same arguments True; memory outside the log's RAM as pinned True; records ['iv_end']
+  the flush task is started (OlyTaSt with id 0x90) only at the entry to the menu state while no flush runs and the card is not written: ok
+  S17 RESULT: PASS

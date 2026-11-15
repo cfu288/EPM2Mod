@@ -1,0 +1,15 @@
+    cpu 0 seq  17 session 1   2011.7 ms gui_state      {"state":"0x00005700","previous":"0x00005100"}
+    cpu 0 seq  18 session 1   2012.1 ms gui_state      {"state":"0x00005701","previous":"0x00005700"}
+    cpu 0 seq  19 session 1   2013.4 ms flush          {"gui_state":"0x00005700","previous":{"raw":"0x00000000","result":"ok"}}
+    cpu 0 seq  20 session 1   2531.6 ms shoot_cbs      {"cbs":258,"result":"0x00000000"}  RECOVERED
+    cpu 0 seq  21 session 1   2533.0 ms gui_state      {"state":"0x00005000","previous":"0x00005701"}  RECOVERED
+    cpu 0 seq  22 session 1   2533.7 ms gui_state      {"state":"0x00005100","previous":"0x00005000"}  RECOVERED
+    cpu 0 seq  23 session 1   3040.4 ms unknown_0x7FFE {"arg0":"0x00000005","arg1":"0x00000005"}  RECOVERED
+    cpu 0 seq  24 session 1   3040.4 ms unknown_0x7FFE {"arg0":"0x00000004","arg1":"0x00000004"}  RECOVERED
+    cpu 0 seq  25 session 1   3040.4 ms unknown_0x7FFE {"arg0":"0x00000003","arg1":"0x00000003"}  RECOVERED
+    cpu 0 seq  26 session 1   3040.4 ms unknown_0x7FFE {"arg0":"0x00000002","arg1":"0x00000002"}  RECOVERED
+    cpu 0 seq  27 session 1   3040.4 ms unknown_0x7FFE {"arg0":"0x00000001","arg1":"0x00000001"}  RECOVERED
+    cpu 0 seq  28 session 2      3.7 ms boot           {"session":1,"poweron":{"raw":"0x00000000","factor":0,"wake":0}}
+    cpu 0 seq  29 session 2     17.5 ms lv_values      {"xy":{"raw":"0x03E80000","x":0,"y":1000},"zt":{"raw":"0x00FA0000","z":0,"temp":250}}
+    cpu 0 seq  30 session 2     32.0 ms gui_state      {"state":"0x00001001","previous":"0x00000000"}
+    cpu 0 seq  31 session 2     34.5 ms gui_state      {"state":"0x00001002","previous":"0x00001001"}

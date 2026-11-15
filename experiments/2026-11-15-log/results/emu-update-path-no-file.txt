@@ -1,0 +1,43 @@
+t=5.646 ms first reach 7e54398b: FIRMUP_SRV task body
+t=10.525 ms first reach 7e5056ab: update flag byte cleared (OK held)
+t=16.449 ms first reach 7e54350e: FIRMUP_CLI task body
+t=18.722 ms first reach 7e504c18: segment-2 load call
+stop: {"why":"labtime","pc":2118424173} lab ms 3000.1
+console:
+  CPU0!
+  CPU1!
+  
+  prm
+  FlD.K.R.
+  10/23 17:15
+  BlD.ElD.!!
+  Usr0
+  MlD.proc
+  Ns
+  Nr
+  LOG
+  history initialize
+  ES.MS.[usr]firmup
+  Pr0
+  [firmup]Mount Err: 00003304
+  exit
+  DCFNUM_MOUNT        0x1301 0x02 0x00000000 0x00000000 0x00000000 T(  0)0 / Q(  6)API_EVENT
+  Usr1
+  ACC: Who am I?: 00000000
+  ACC: Who am I?: 00000000
+  [damage info]:Not SUCCESS : 1301
+  Usr2
+  Usr3
+  Pr2
+  Usr4
+  Pr4
+  Pr1
+  BS.wb 2A001001 00007102
+  wb 2A001001 00007102
+  :-) Pr3
+  
+counts {"7e54398b":1,"7e5056ab":1,"7e54350e":1,"7e504c18":1}
+cpu0 tasks {"WAI":122,"RUN":1,"DMT":24}
+cpu1 tasks {"WAI":16,"RUN":1,"RDY":1,"DMT":12}
+errors 2 38.1 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9 ; 39.7 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9
+problems: none

@@ -37,6 +37,7 @@ Examples: `feat(patch/movie-limit): raise 29-min cap to 9 h`, `docs(camera-log):
 | `builds/`, `pinned-build.json` | One description per firmware build, and the pointer to the last camera-tested build. See *Making firmware*. |
 | `patches/` | One JSON spec per mod. Each operation states the bytes that it replaces. `patches/history/` holds superseded and failed specs as a record. |
 | `looks/` | The film list and the fitted values. The three film patch specs are generated from them. |
+| `logs/` | The event dictionary of the structured log of debug builds. The log's patch specs and the decoder (`epm2mod log`) read it. See [logging.md](logging.md). |
 | `docs/` | Knowledge that lasts. Each fact there must have a source or must be reproducible. |
 | `experiments/YYYY-MM-DD-slug/` | Ad-hoc scripts and `NOTES.md`. Put large files in the `out/` subfolder, which git ignores. When a result is reliable, move it into `docs/`, `tools/` or the package. |
 | `tests/` | The unittest suite. See *Tests*. |

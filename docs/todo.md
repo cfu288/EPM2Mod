@@ -45,7 +45,8 @@ and delete the item here.
 
 ## Foundations
 
-- **Structured log, in work (owner's priority, 2026-11-15).** The camera writes compact binary event
+- **Structured log: test on the camera** (`debug-log-core`, then `debug-log`; steps in
+  `experiments/2026-11-15-log/NOTES.md` §8, design in `docs/logging.md`). The camera writes compact binary event
   records to `EPM2LOG.BIN` on the card; `epm2mod log` decodes them to JSON lines with the dictionary
   `logs/events.json`. A debug build only: the pinned build stays without it. Probes go into the old
   features too (peaking, picture mode changes, level gauge, interval, film looks, firmware errors).

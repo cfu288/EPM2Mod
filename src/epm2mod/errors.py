@@ -39,3 +39,7 @@ class BuildError(Epm2ModError):
     an SD card that cannot take the firmware, and a README whose generated
     parts cannot be found.
     """
+
+
+class LogError(Epm2ModError):
+    """A camera log file or the event dictionary cannot be decoded."""

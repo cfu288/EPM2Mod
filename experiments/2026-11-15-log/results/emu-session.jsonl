@@ -1,0 +1,61 @@
+{"seq": 0, "cpu": 0, "session": 1, "time_us": 3747, "event": "boot", "level": "info", "args": {"session": 0, "poweron": {"raw": "0x00000000", "factor": 0, "wake": 0}}, "build": "d1ddd46b4dac2414"}
+{"seq": 1, "cpu": 0, "session": 1, "time_us": 17471, "event": "lv_values", "level": "info", "args": {"xy": {"raw": "0x03E80000", "x": 0, "y": 1000}, "zt": {"raw": "0x00FA0000", "z": 0, "temp": 250}}, "build": "d1ddd46b4dac2414"}
+{"seq": 2, "cpu": 0, "session": 1, "time_us": 31996, "event": "gui_state", "level": "info", "args": {"state": "0x00001001", "previous": "0x00000000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 3, "cpu": 0, "session": 1, "time_us": 34486, "event": "gui_state", "level": "info", "args": {"state": "0x00001002", "previous": "0x00001001"}, "build": "d1ddd46b4dac2414"}
+{"seq": 4, "cpu": 0, "session": 1, "time_us": 36207, "event": "gui_state", "level": "info", "args": {"state": "0x00001003", "previous": "0x00001002"}, "build": "d1ddd46b4dac2414"}
+{"seq": 5, "cpu": 0, "session": 1, "time_us": 41806, "event": "fw_error", "level": "error", "args": {"code": "0x2A001001", "caller": "0x7E579DCC"}, "build": "d1ddd46b4dac2414"}
+{"seq": 6, "cpu": 0, "session": 1, "time_us": 41807, "event": "fw_error_args", "level": "error", "args": {"count": 1, "arg": "0x00007102"}, "build": "d1ddd46b4dac2414"}
+{"seq": 7, "cpu": 0, "session": 1, "time_us": 43289, "event": "fw_error", "level": "error", "args": {"code": "0x2A001001", "caller": "0x7E579DCC"}, "build": "d1ddd46b4dac2414"}
+{"seq": 8, "cpu": 0, "session": 1, "time_us": 43290, "event": "fw_error_args", "level": "error", "args": {"count": 1, "arg": "0x00007102"}, "build": "d1ddd46b4dac2414"}
+{"seq": 9, "cpu": 0, "session": 1, "time_us": 222838, "event": "pk_mf_end", "level": "info", "args": {"latch": {"raw": "0x00000000", "L": 0, "R": 0, "L2": 0, "C": 0}, "object": "0x600AE804"}, "build": "d1ddd46b4dac2414"}
+{"seq": 10, "cpu": 0, "session": 1, "time_us": 235206, "event": "shoot_cbs", "level": "info", "args": {"cbs": 258, "result": "0x00000000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 11, "cpu": 0, "session": 1, "time_us": 289031, "event": "gui_state", "level": "info", "args": {"state": "0x00005000", "previous": "0x00001003"}, "build": "d1ddd46b4dac2414"}
+{"seq": 12, "cpu": 0, "session": 1, "time_us": 289726, "event": "gui_state", "level": "info", "args": {"state": "0x00005100", "previous": "0x00005000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 13, "cpu": 0, "session": 1, "time_us": 291684, "event": "gui_state", "level": "info", "args": {"state": "0x00005000", "previous": "0x00005100"}, "build": "d1ddd46b4dac2414"}
+{"seq": 14, "cpu": 0, "session": 1, "time_us": 292084, "event": "gui_state", "level": "info", "args": {"state": "0x00005100", "previous": "0x00005000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 15, "cpu": 0, "session": 1, "time_us": 2021232, "event": "shoot_cbs", "level": "info", "args": {"cbs": 167, "result": "0x00000000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 16, "cpu": 0, "session": 1, "time_us": 2021699, "event": "shoot_cbs", "level": "info", "args": {"cbs": 155, "result": "0x00000000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 17, "cpu": 0, "session": 1, "time_us": 2021779, "event": "gui_state", "level": "info", "args": {"state": "0x00005705", "previous": "0x00005100"}, "build": "d1ddd46b4dac2414"}
+{"seq": 18, "cpu": 0, "session": 1, "time_us": 2025358, "event": "flush", "level": "debug", "args": {"gui_state": "0x00005705", "previous": {"raw": "0x00000000", "result": "ok"}}, "build": "d1ddd46b4dac2414"}
+{"seq": 19, "cpu": 0, "session": 1, "time_us": 4672756, "event": "gui_state", "level": "info", "args": {"state": "0x00005000", "previous": "0x00005705"}, "build": "d1ddd46b4dac2414"}
+{"seq": 20, "cpu": 0, "session": 1, "time_us": 4673408, "event": "gui_state", "level": "info", "args": {"state": "0x00005100", "previous": "0x00005000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 21, "cpu": 0, "session": 1, "time_us": 5111162, "event": "shoot_cbs", "level": "info", "args": {"cbs": 167, "result": "0x00000000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 22, "cpu": 0, "session": 1, "time_us": 5111634, "event": "shoot_cbs", "level": "info", "args": {"cbs": 155, "result": "0x00000000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 23, "cpu": 0, "session": 1, "time_us": 5111723, "event": "gui_state", "level": "info", "args": {"state": "0x00005700", "previous": "0x00005100"}, "build": "d1ddd46b4dac2414"}
+{"seq": 24, "cpu": 0, "session": 1, "time_us": 5112123, "event": "gui_state", "level": "info", "args": {"state": "0x00005701", "previous": "0x00005700"}, "build": "d1ddd46b4dac2414"}
+{"seq": 25, "cpu": 0, "session": 1, "time_us": 5113609, "event": "flush", "level": "debug", "args": {"gui_state": "0x00005700", "previous": {"raw": "0x00000000", "result": "ok"}}, "build": "d1ddd46b4dac2414"}
+{"seq": 26, "cpu": 0, "session": 1, "time_us": 11884832, "event": "lv_adjust", "level": "info", "args": {"mode": 2, "rotate": 11}, "build": "d1ddd46b4dac2414"}
+{"seq": 27, "cpu": 0, "session": 1, "time_us": 11884833, "event": "lv_values", "level": "info", "args": {"xy": {"raw": "0x03E80000", "x": 0, "y": 1000}, "zt": {"raw": "0x00FA0000", "z": 0, "temp": 250}}, "build": "d1ddd46b4dac2414"}
+{"seq": 28, "cpu": 0, "session": 1, "time_us": 11885900, "event": "shoot_cbs", "level": "info", "args": {"cbs": 258, "result": "0x00000000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 29, "cpu": 0, "session": 1, "time_us": 11887272, "event": "gui_state", "level": "info", "args": {"state": "0x00005000", "previous": "0x00005701"}, "build": "d1ddd46b4dac2414"}
+{"seq": 30, "cpu": 0, "session": 1, "time_us": 11887984, "event": "gui_state", "level": "info", "args": {"state": "0x00005100", "previous": "0x00005000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 31, "cpu": 0, "session": 1, "time_us": 14891145, "event": "shoot_cbs", "level": "info", "args": {"cbs": 167, "result": "0x00000000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 32, "cpu": 0, "session": 1, "time_us": 14891617, "event": "shoot_cbs", "level": "info", "args": {"cbs": 155, "result": "0x00000000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 33, "cpu": 0, "session": 1, "time_us": 14891697, "event": "gui_state", "level": "info", "args": {"state": "0x00005700", "previous": "0x00005100"}, "build": "d1ddd46b4dac2414"}
+{"seq": 34, "cpu": 0, "session": 1, "time_us": 14892097, "event": "gui_state", "level": "info", "args": {"state": "0x00005701", "previous": "0x00005700"}, "build": "d1ddd46b4dac2414"}
+{"seq": 35, "cpu": 0, "session": 1, "time_us": 14893573, "event": "flush", "level": "debug", "args": {"gui_state": "0x00005700", "previous": {"raw": "0x00000000", "result": "ok"}}, "build": "d1ddd46b4dac2414"}
+{"seq": 36, "cpu": 0, "session": 1, "time_us": 15411565, "event": "shoot_cbs", "level": "info", "args": {"cbs": 258, "result": "0x00000000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 37, "cpu": 0, "session": 1, "time_us": 15412979, "event": "gui_state", "level": "info", "args": {"state": "0x00005000", "previous": "0x00005701"}, "build": "d1ddd46b4dac2414"}
+{"seq": 38, "cpu": 0, "session": 1, "time_us": 15413714, "event": "gui_state", "level": "info", "args": {"state": "0x00005100", "previous": "0x00005000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 39, "cpu": 0, "session": 1, "time_us": 15931091, "event": "gui_state", "level": "info", "args": {"state": "0x00005801", "previous": "0x00005100"}, "build": "d1ddd46b4dac2414"}
+{"seq": 40, "cpu": 0, "session": 1, "time_us": 21665750, "event": "gui_state", "level": "info", "args": {"state": "0x00005000", "previous": "0x00005801"}, "build": "d1ddd46b4dac2414"}
+{"seq": 41, "cpu": 0, "session": 1, "time_us": 21666501, "event": "gui_state", "level": "info", "args": {"state": "0x00005100", "previous": "0x00005000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 42, "cpu": 0, "session": 1, "time_us": 22171150, "event": "shoot_cbs", "level": "info", "args": {"cbs": 167, "result": "0x00000000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 43, "cpu": 0, "session": 1, "time_us": 22171623, "event": "shoot_cbs", "level": "info", "args": {"cbs": 155, "result": "0x00000000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 44, "cpu": 0, "session": 1, "time_us": 22171706, "event": "gui_state", "level": "info", "args": {"state": "0x00005700", "previous": "0x00005100"}, "build": "d1ddd46b4dac2414"}
+{"seq": 45, "cpu": 0, "session": 1, "time_us": 22172105, "event": "gui_state", "level": "info", "args": {"state": "0x00005701", "previous": "0x00005700"}, "build": "d1ddd46b4dac2414"}
+{"seq": 46, "cpu": 0, "session": 1, "time_us": 22173582, "event": "flush", "level": "debug", "args": {"gui_state": "0x00005700", "previous": {"raw": "0x00000000", "result": "ok"}}, "build": "d1ddd46b4dac2414"}
+{"seq": 47, "cpu": 0, "session": 1, "time_us": 22691544, "event": "shoot_cbs", "level": "info", "args": {"cbs": 258, "result": "0x00000000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 48, "cpu": 0, "session": 1, "time_us": 22692916, "event": "gui_state", "level": "info", "args": {"state": "0x00005000", "previous": "0x00005701"}, "build": "d1ddd46b4dac2414"}
+{"seq": 49, "cpu": 0, "session": 1, "time_us": 22693629, "event": "gui_state", "level": "info", "args": {"state": "0x00005100", "previous": "0x00005000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 50, "cpu": 0, "session": 1, "time_us": 23211150, "event": "shoot_cbs", "level": "info", "args": {"cbs": 167, "result": "0x00000000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 51, "cpu": 0, "session": 1, "time_us": 23211621, "event": "shoot_cbs", "level": "info", "args": {"cbs": 155, "result": "0x00000000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 52, "cpu": 0, "session": 1, "time_us": 23211701, "event": "gui_state", "level": "info", "args": {"state": "0x00005700", "previous": "0x00005100"}, "build": "d1ddd46b4dac2414"}
+{"seq": 53, "cpu": 0, "session": 1, "time_us": 23212101, "event": "gui_state", "level": "info", "args": {"state": "0x00005701", "previous": "0x00005700"}, "build": "d1ddd46b4dac2414"}
+{"seq": 54, "cpu": 0, "session": 1, "time_us": 23213590, "event": "flush", "level": "debug", "args": {"gui_state": "0x00005700", "previous": {"raw": "0x00000000", "result": "ok"}}, "build": "d1ddd46b4dac2414"}
+{"seq": 55, "cpu": 0, "session": 1, "time_us": 23731578, "event": "shoot_cbs", "level": "info", "args": {"cbs": 258, "result": "0x00000000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 56, "cpu": 0, "session": 1, "time_us": 23732990, "event": "gui_state", "level": "info", "args": {"state": "0x00005000", "previous": "0x00005701"}, "build": "d1ddd46b4dac2414"}
+{"seq": 57, "cpu": 0, "session": 1, "time_us": 23733716, "event": "gui_state", "level": "info", "args": {"state": "0x00005100", "previous": "0x00005000"}, "build": "d1ddd46b4dac2414"}
+{"seq": 58, "cpu": 0, "session": 1, "time_us": 24765857, "event": "gui_state", "level": "info", "args": {"state": "0x00000002", "previous": "0x00005100"}, "build": "d1ddd46b4dac2414"}
+{"seq": 59, "cpu": 0, "session": 1, "time_us": 24825479, "event": "gui_state", "level": "info", "args": {"state": "0x00003000", "previous": "0x00000002"}, "build": "d1ddd46b4dac2414"}
+{"seq": 60, "cpu": 0, "session": 1, "time_us": 24825957, "event": "flush", "level": "debug", "args": {"gui_state": "0x00003000", "previous": {"raw": "0x00000000", "result": "ok"}}, "build": "d1ddd46b4dac2414"}

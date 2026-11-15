@@ -52,5 +52,5 @@ target-version = ["py310"]
 [tool.mypy]
 python_version = "3.10"
 strict = true
-files = ["src/epm2mod", "tests/support.py", "tests/test_package.py", "tests/test_looks.py"]
+files = ["src/epm2mod", "tests/support.py", "tests/test_package.py", "tests/test_looks.py", "tests/test_eventlog.py"]
 mypy_path = ["src", "tests"]

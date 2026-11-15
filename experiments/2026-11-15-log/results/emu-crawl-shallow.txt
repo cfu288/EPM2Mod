@@ -1,0 +1,44 @@
+pinned log/crawl/p-nocard-shallow/log-pinned: 349 screens; new log/crawl/p-nocard-shallow/log-debug: 349 screens
+1. units other than custrowsNN, by name: same 269, differ 0, only pinned 0, only new 0
+2. custrowsNN units, by content: pinned 80 screens / 80 distinct, new 80 / 80 distinct; in both 80, lost 0, new 0
+   lost (pinned only), by the top row of the first sighting: 
+   new (new image only), by the top row of the first sighting: 
+3. logs pinned: distinct firmware errors {'0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e50': 36}
+   notes: {'setup: DOWN wraps to position 1': 1}
+   stops: []
+3. logs new: distinct firmware errors {'0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e50': 36}
+   notes: {'setup: DOWN wraps to position 1': 1}
+   stops: []
+pinned log/crawl/iauto-nocard-shallow/log-pinned: 283 screens; new log/crawl/iauto-nocard-shallow/log-debug: 283 screens
+1. units other than custrowsNN, by name: same 235, differ 0, only pinned 0, only new 0
+2. custrowsNN units, by content: pinned 48 screens / 48 distinct, new 48 / 48 distinct; in both 48, lost 0, new 0
+   lost (pinned only), by the top row of the first sighting: 
+   new (new image only), by the top row of the first sighting: 
+3. logs pinned: distinct firmware errors {'0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e50': 36}
+   notes: {'setup: DOWN wraps to position 1': 1}
+   stops: []
+3. logs new: distinct firmware errors {'0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e50': 36}
+   notes: {'setup: DOWN wraps to position 1': 1}
+   stops: []
+pinned log/crawl/art-card-shallow/log-pinned: 286 screens; new log/crawl/art-card-shallow/log-debug: 286 screens
+1. units other than custrowsNN, by name: same 214, differ 0, only pinned 0, only new 0
+2. custrowsNN units, by content: pinned 72 screens / 72 distinct, new 72 / 72 distinct; in both 72, lost 0, new 0
+   lost (pinned only), by the top row of the first sighting: 
+   new (new image only), by the top row of the first sighting: 
+3. logs pinned: distinct firmware errors {'0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e50': 36}
+   notes: {'setup: DESYNC': 1, 'setup: UNIT ENDED EARLY': 1}
+   stops: ['setup.00 DESYNC: cannot get back', 'setup UNIT ENDED EARLY']
+3. logs new: distinct firmware errors {'0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e50': 36}
+   notes: {'setup: DESYNC': 1, 'setup: UNIT ENDED EARLY': 1}
+   stops: ['setup.00 DESYNC: cannot get back', 'setup UNIT ENDED EARLY']
+pinned log/crawl/movie-card-shallow/log-pinned: 279 screens; new log/crawl/movie-card-shallow/log-debug: 279 screens
+1. units other than custrowsNN, by name: same 225, differ 0, only pinned 0, only new 0
+2. custrowsNN units, by content: pinned 54 screens / 54 distinct, new 54 / 54 distinct; in both 54, lost 0, new 0
+   lost (pinned only), by the top row of the first sighting: 
+   new (new image only), by the top row of the first sighting: 
+3. logs pinned: distinct firmware errors {'0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e50': 36}
+   notes: {'setup: DESYNC': 1, 'setup: UNIT ENDED EARLY': 1}
+   stops: ['setup.00 DESYNC: cannot get back', 'setup UNIT ENDED EARLY']
+3. logs new: distinct firmware errors {'0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e50': 36}
+   notes: {'setup: DESYNC': 1, 'setup: UNIT ENDED EARLY': 1}
+   stops: ['setup.00 DESYNC: cannot get back', 'setup UNIT ENDED EARLY']

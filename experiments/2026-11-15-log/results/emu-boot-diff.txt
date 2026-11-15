@@ -1,0 +1,10 @@
+1c1
+< stop: {"why":"labtime","pc":2118424173} | lab ms 2000.1 |  | insns cpu0 30661113 cpu1 2765217
+---
+> stop: {"why":"labtime","pc":2118424173} | lab ms 2000.1 |  | insns cpu0 30661683 cpu1 2762235
+39,40c39,40
+< firmware error log entries: 2 36.1 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9 ; 37.6 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9
+< stand-ins and observers hit: gio-timer-set x3216, S-CONSOLE x389, boot-mark x173, S-OSDFILL x4, S-FLASHREAD0 x31, bank-save x2, S-FLASHWRITE x3, S-FLASHERASE x6, idle x275, idle x9103, S-GIOIN x3180, S-PWM x2, S-PWM-duty x2, S-BC x9, S-BATT x2, errlog x2, oxf-event x259, api_exec_start x8, api_exec_post x8, fileclbk-cmd x1, usrfast-log x18, S-DMA-reserve x246, S-DMA x246, S-DMA-finish x246, S-IIC-write x31, S-IIC-read x50, S-SIO x70, S-SIORAW-tx x8, S-SIORAW-rx x7, S-CAM x2, S-TAKEAPI x8, S-ACC-out x20, S-OSDFILL(cpu1) x2
+---
+> firmware error log entries: 2 36.1 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9 ; 37.7 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9
+> stand-ins and observers hit: gio-timer-set x3216, S-CONSOLE x389, boot-mark x173, S-OSDFILL x4, S-FLASHREAD0 x31, bank-save x2, S-FLASHWRITE x3, S-FLASHERASE x6, idle x275, idle x9111, S-GIOIN x3180, S-PWM x2, S-PWM-duty x2, S-BC x9, S-BATT x2, errlog x2, oxf-event x259, api_exec_start x8, api_exec_post x8, fileclbk-cmd x1, usrfast-log x18, S-DMA-reserve x246, S-DMA x246, S-DMA-finish x246, S-IIC-write x31, S-IIC-read x50, S-SIO x70, S-SIORAW-tx x8, S-SIORAW-rx x7, S-CAM x2, S-TAKEAPI x8, S-ACC-out x20, S-OSDFILL(cpu1) x2

@@ -1,0 +1,283 @@
+S12. Red, Yellow, Blue on a synthetic frame: the new code of pass 9 runs on the firmware's own buffers.
+  [menu] frame 2: 11 task runs, 1104210 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = []; pass 7 ucExpose = [3]
+  [Red] 640 x 480, buffers 0xB596A940 (picture) 0xB5843980 (line image): 9360 line pixels (line byte >= 64); pixels that differ from the model: 0; usGain2 0x0000
+      the line pixels after the new code: red = bytes [(255, 0, 0)] -> Y 76 Cb 85 Cr 255 (BT.601 full range, if the bytes are R, G, B)
+      bar with line value  32: pixel before (240, 240, 240), after (240, 240, 240)
+      bar with line value  63: pixel before (240, 240, 240), after (240, 240, 240)
+      bar with line value  64: pixel before (240, 240, 240), after (255, 0, 0)
+      bar with line value 128: pixel before (240, 240, 240), after (255, 0, 0)
+      bar with line value 255: pixel before (240, 240, 240), after (255, 0, 0)
+      sp, d2, d3, a2, a3 kept: True; anomalies: none; picture: True; R set by the hook at 0x7EB7D46C (ran 6 pcs, new code: 0x7EBE2000 (5)) -> ok
+  [menu] frame 2: 11 task runs, 1104212 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = []; pass 7 ucExpose = [3]
+  [Yellow] 640 x 480, buffers 0xB596A940 (picture) 0xB5843980 (line image): 9360 line pixels (line byte >= 64); pixels that differ from the model: 0; usGain2 0x0000
+      the line pixels after the new code: yellow = bytes [(255, 255, 0)] -> Y 226 Cb 1 Cr 149 (BT.601 full range, if the bytes are R, G, B)
+      bar with line value  32: pixel before (240, 240, 240), after (240, 240, 240)
+      bar with line value  63: pixel before (240, 240, 240), after (240, 240, 240)
+      bar with line value  64: pixel before (240, 240, 240), after (255, 255, 0)
+      bar with line value 128: pixel before (240, 240, 240), after (255, 255, 0)
+      bar with line value 255: pixel before (240, 240, 240), after (255, 255, 0)
+      sp, d2, d3, a2, a3 kept: True; anomalies: none; picture: True; R set by the hook at 0x7EB7D46C (ran 6 pcs, new code: 0x7EBE2000 (5)) -> ok
+  [menu] frame 2: 11 task runs, 1104214 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = []; pass 7 ucExpose = [3]
+  [Blue] 640 x 480, buffers 0xB596A940 (picture) 0xB5843980 (line image): 9360 line pixels (line byte >= 64); pixels that differ from the model: 0; usGain2 0x0000
+      the line pixels after the new code: blue = bytes [(0, 80, 255)] -> Y 76 Cb 229 Cr 74 (BT.601 full range, if the bytes are R, G, B)
+      bar with line value  32: pixel before (240, 240, 240), after (240, 240, 240)
+      bar with line value  63: pixel before (240, 240, 240), after (240, 240, 240)
+      bar with line value  64: pixel before (240, 240, 240), after (0, 80, 255)
+      bar with line value 128: pixel before (240, 240, 240), after (0, 80, 255)
+      bar with line value 255: pixel before (240, 240, 240), after (0, 80, 255)
+      sp, d2, d3, a2, a3 kept: True; anomalies: none; picture: True; R set by the hook at 0x7EB7D46C (ran 6 pcs, new code: 0x7EBE2000 (5)) -> ok
+  [menu] frame 2: 11 task runs, 163797 insns, 4392 device writes; state 2, expose 3, art record 0x2A3, heap mode 1, picture True, alloc error False | L=1 R=1 L2=1
+      path: mov_image_process, expose setter, art change notifier, heap mode chooser, heap set mode, heap mode check, art picture alloc, line buffer alloc, frame builder, job setup, set_out_area_param, set_line_yc_param, set_color_yc_param, set_artpacket, img exec, display update, Key Line pass 1, Key Line pass 7, Key Line pass 8, Key Line pass 9 (overlay), Key Line pass 10, combine job
+      heap set mode: 1 (was 1), 4 live blocks
+      heap alloc: 921600 bytes -> 0xB596A940 (heap mode 1)
+      heap alloc: 921600 bytes -> 0xB5843980 (heap mode 1)
+      heap free: 0xB5843980 (heap mode 1, mode at the last alloc 1)
+      heap free: 0xB596A940 (heap mode 1, mode at the last alloc 1)
+      mov error prints: '[mov]img_ctrl_size err :' value 0
+      Key Line pass 9 usGain2 = []; pass 7 ucExpose = [3]
+  [White] the new code leaves the picture and the line image as they are: True; usGain1 256, usGain2 0x0200 (picture + 2 x line, done by the image processor)
+      sp, d2, d3, a2, a3 kept: True; anomalies: none; picture: True; R set by the hook at 0x7EB7D46C (ran 6 pcs, new code: 0x7EBE2000 (5)) -> ok
+  wrote s12-0-picture-before.png
+  wrote s12-1-line-image.png
+  wrote s12-2-white-model.png
+  wrote s12-3-red.png
+  wrote s12-4-yellow.png
+  wrote s12-5-blue.png
+  S12 RESULT: PASS
+
+S13. White = PINNED, Off = BASE.
+  [458=3 Natural] pass 9 gain: pinned ['0x0200'], colours ['0x0200']; pass 7 ucExpose: pinned [3], colours [3]; anomalies: none
+  458=3 Natural frame 1  DIFFERENT: 10210 writes (pinned 10185), bytes that differ outside 0x602BE8C7-0x602BE8C7: 60; device accesses 4886, same order, addresses and values: False; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 88 in 0x7E4C9000 (88)
+      differs 0x7E4F9000: pinned None, colours 69
+      differs 0x7E4F9001: pinned None, colours 80
+      differs 0x7E4F9002: pinned None, colours 76
+      differs 0x7E4F9003: pinned None, colours 49
+      differs 0x7E4F9004: pinned None, colours 2
+      differs 0x7E4F9005: pinned None, colours 0
+  458=3 Natural frame 2  DIFFERENT: 6687 writes (pinned 6679), bytes that differ outside 0x602BE8C7-0x602BE8C7: 32; device accesses 4417, same order, addresses and values: False; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 81 in 0x7E4C9000 (81)
+      differs 0x602A4954: pinned 0, colours 240
+      differs 0x602A4955: pinned 0, colours 28
+      differs 0x602A4956: pinned 0, colours 91
+      differs 0x602A4957: pinned 0, colours 96
+      differs 0x7E4F9004: pinned None, colours 3
+      differs 0x7E4F9005: pinned None, colours 0
+  458=3 Natural frame 3  DIFFERENT: 6702 writes (pinned 6700), bytes that differ outside 0x602BE8C7-0x602BE8C7: 12; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 56 in 0x7E4C9000 (56)
+      differs 0x602A4954: pinned 0, colours 240
+      differs 0x602A4955: pinned 0, colours 28
+      differs 0x602A4956: pinned 0, colours 91
+      differs 0x602A4957: pinned 0, colours 96
+      differs 0x7E4FD050: pinned None, colours 1
+      differs 0x7E4FD051: pinned None, colours 1
+  [458=3 Key Line] pass 9 gain: pinned ['0x0200'], colours ['0x0200']; pass 7 ucExpose: pinned [3], colours [3]; anomalies: none
+  458=3 Key Line frame 1  DIFFERENT: 10197 writes (pinned 10183), bytes that differ outside 0x602BE8C7-0x602BE8C7: 28; device accesses 4885, same order, addresses and values: False; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 81 in 0x7E4C9000 (81)
+      differs 0x7E4F9004: pinned None, colours 2
+      differs 0x7E4F9005: pinned None, colours 0
+      differs 0x7E4F9006: pinned None, colours 0
+      differs 0x7E4F9007: pinned None, colours 0
+      differs 0x7E4F9030: pinned None, colours 2
+      differs 0x7E4F9031: pinned None, colours 1
+  458=3 Key Line frame 2  DIFFERENT: 6687 writes (pinned 6679), bytes that differ outside 0x602BE8C7-0x602BE8C7: 32; device accesses 4417, same order, addresses and values: False; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 81 in 0x7E4C9000 (81)
+      differs 0x602A4954: pinned 0, colours 240
+      differs 0x602A4955: pinned 0, colours 28
+      differs 0x602A4956: pinned 0, colours 91
+      differs 0x602A4957: pinned 0, colours 96
+      differs 0x7E4F9004: pinned None, colours 3
+      differs 0x7E4F9005: pinned None, colours 0
+  458=3 Key Line frame 3  DIFFERENT: 6702 writes (pinned 6700), bytes that differ outside 0x602BE8C7-0x602BE8C7: 12; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 56 in 0x7E4C9000 (56)
+      differs 0x602A4954: pinned 0, colours 240
+      differs 0x602A4955: pinned 0, colours 28
+      differs 0x602A4956: pinned 0, colours 91
+      differs 0x602A4957: pinned 0, colours 96
+      differs 0x7E4FD050: pinned None, colours 1
+      differs 0x7E4FD051: pinned None, colours 1
+  [458=0 Natural] pass 9 gain: pinned ['0x0200'], colours ['0x0200']; pass 7 ucExpose: pinned [3], colours [3]; anomalies: none
+  458=0 Natural frame 1  DIFFERENT: 10210 writes (pinned 10185), bytes that differ outside 0x602BE8C7-0x602BE8C7: 60; device accesses 4886, same order, addresses and values: False; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 88 in 0x7E4C9000 (88)
+      differs 0x7E4F9000: pinned None, colours 69
+      differs 0x7E4F9001: pinned None, colours 80
+      differs 0x7E4F9002: pinned None, colours 76
+      differs 0x7E4F9003: pinned None, colours 49
+      differs 0x7E4F9004: pinned None, colours 2
+      differs 0x7E4F9005: pinned None, colours 0
+  458=0 Natural frame 2  DIFFERENT: 6687 writes (pinned 6679), bytes that differ outside 0x602BE8C7-0x602BE8C7: 32; device accesses 4417, same order, addresses and values: False; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 81 in 0x7E4C9000 (81)
+      differs 0x602A4954: pinned 0, colours 240
+      differs 0x602A4955: pinned 0, colours 28
+      differs 0x602A4956: pinned 0, colours 91
+      differs 0x602A4957: pinned 0, colours 96
+      differs 0x7E4F9004: pinned None, colours 3
+      differs 0x7E4F9005: pinned None, colours 0
+  458=0 Natural frame 3  DIFFERENT: 6702 writes (pinned 6700), bytes that differ outside 0x602BE8C7-0x602BE8C7: 12; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 56 in 0x7E4C9000 (56)
+      differs 0x602A4954: pinned 0, colours 240
+      differs 0x602A4955: pinned 0, colours 28
+      differs 0x602A4956: pinned 0, colours 91
+      differs 0x602A4957: pinned 0, colours 96
+      differs 0x7E4FD050: pinned None, colours 1
+      differs 0x7E4FD051: pinned None, colours 1
+  [458=0 Key Line] pass 9 gain: pinned ['0x0200'], colours ['0x0200']; pass 7 ucExpose: pinned [3], colours [3]; anomalies: none
+  458=0 Key Line frame 1  DIFFERENT: 10197 writes (pinned 10183), bytes that differ outside 0x602BE8C7-0x602BE8C7: 28; device accesses 4885, same order, addresses and values: False; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 81 in 0x7E4C9000 (81)
+      differs 0x7E4F9004: pinned None, colours 2
+      differs 0x7E4F9005: pinned None, colours 0
+      differs 0x7E4F9006: pinned None, colours 0
+      differs 0x7E4F9007: pinned None, colours 0
+      differs 0x7E4F9030: pinned None, colours 2
+      differs 0x7E4F9031: pinned None, colours 1
+  458=0 Key Line frame 2  DIFFERENT: 6687 writes (pinned 6679), bytes that differ outside 0x602BE8C7-0x602BE8C7: 32; device accesses 4417, same order, addresses and values: False; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 81 in 0x7E4C9000 (81)
+      differs 0x602A4954: pinned 0, colours 240
+      differs 0x602A4955: pinned 0, colours 28
+      differs 0x602A4956: pinned 0, colours 91
+      differs 0x602A4957: pinned 0, colours 96
+      differs 0x7E4F9004: pinned None, colours 3
+      differs 0x7E4F9005: pinned None, colours 0
+  458=0 Key Line frame 3  DIFFERENT: 6702 writes (pinned 6700), bytes that differ outside 0x602BE8C7-0x602BE8C7: 12; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 56 in 0x7E4C9000 (56)
+      differs 0x602A4954: pinned 0, colours 240
+      differs 0x602A4955: pinned 0, colours 28
+      differs 0x602A4956: pinned 0, colours 91
+      differs 0x602A4957: pinned 0, colours 96
+      differs 0x7E4FD050: pinned None, colours 1
+      differs 0x7E4FD051: pinned None, colours 1
+  [458=6 Natural] pass 9 gain: pinned ['0x0200'], colours ['0x0200']; pass 7 ucExpose: pinned [3], colours [3]; anomalies: none
+  458=6 Natural frame 1  DIFFERENT: 10210 writes (pinned 10185), bytes that differ outside 0x602BE8C7-0x602BE8C7: 60; device accesses 4886, same order, addresses and values: False; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 88 in 0x7E4C9000 (88)
+      differs 0x7E4F9000: pinned None, colours 69
+      differs 0x7E4F9001: pinned None, colours 80
+      differs 0x7E4F9002: pinned None, colours 76
+      differs 0x7E4F9003: pinned None, colours 49
+      differs 0x7E4F9004: pinned None, colours 2
+      differs 0x7E4F9005: pinned None, colours 0
+  458=6 Natural frame 2  DIFFERENT: 6687 writes (pinned 6679), bytes that differ outside 0x602BE8C7-0x602BE8C7: 32; device accesses 4417, same order, addresses and values: False; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 81 in 0x7E4C9000 (81)
+      differs 0x602A4954: pinned 0, colours 240
+      differs 0x602A4955: pinned 0, colours 28
+      differs 0x602A4956: pinned 0, colours 91
+      differs 0x602A4957: pinned 0, colours 96
+      differs 0x7E4F9004: pinned None, colours 3
+      differs 0x7E4F9005: pinned None, colours 0
+  458=6 Natural frame 3  DIFFERENT: 6702 writes (pinned 6700), bytes that differ outside 0x602BE8C7-0x602BE8C7: 12; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 56 in 0x7E4C9000 (56)
+      differs 0x602A4954: pinned 0, colours 240
+      differs 0x602A4955: pinned 0, colours 28
+      differs 0x602A4956: pinned 0, colours 91
+      differs 0x602A4957: pinned 0, colours 96
+      differs 0x7E4FD050: pinned None, colours 1
+      differs 0x7E4FD051: pinned None, colours 1
+  [458=6 Key Line] pass 9 gain: pinned ['0x0200'], colours ['0x0200']; pass 7 ucExpose: pinned [3], colours [3]; anomalies: none
+  458=6 Key Line frame 1  DIFFERENT: 10197 writes (pinned 10183), bytes that differ outside 0x602BE8C7-0x602BE8C7: 28; device accesses 4885, same order, addresses and values: False; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 81 in 0x7E4C9000 (81)
+      differs 0x7E4F9004: pinned None, colours 2
+      differs 0x7E4F9005: pinned None, colours 0
+      differs 0x7E4F9006: pinned None, colours 0
+      differs 0x7E4F9007: pinned None, colours 0
+      differs 0x7E4F9030: pinned None, colours 2
+      differs 0x7E4F9031: pinned None, colours 1
+  458=6 Key Line frame 2  DIFFERENT: 6687 writes (pinned 6679), bytes that differ outside 0x602BE8C7-0x602BE8C7: 32; device accesses 4417, same order, addresses and values: False; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 81 in 0x7E4C9000 (81)
+      differs 0x602A4954: pinned 0, colours 240
+      differs 0x602A4955: pinned 0, colours 28
+      differs 0x602A4956: pinned 0, colours 91
+      differs 0x602A4957: pinned 0, colours 96
+      differs 0x7E4F9004: pinned None, colours 3
+      differs 0x7E4F9005: pinned None, colours 0
+  458=6 Key Line frame 3  DIFFERENT: 6702 writes (pinned 6700), bytes that differ outside 0x602BE8C7-0x602BE8C7: 12; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 56 in 0x7E4C9000 (56)
+      differs 0x602A4954: pinned 0, colours 240
+      differs 0x602A4955: pinned 0, colours 28
+      differs 0x602A4956: pinned 0, colours 91
+      differs 0x602A4957: pinned 0, colours 96
+      differs 0x7E4FD050: pinned None, colours 1
+      differs 0x7E4FD051: pinned None, colours 1
+  Off Natural frame 1  DIFFERENT: 4766 writes (base 4747), bytes that differ outside 0x602BE8C4-0x602BE8C7: 44; device accesses 937, same order, addresses and values: False; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 132 in 0x7E4C9000 (132)
+      differs 0x7E4F9000: base None, colours 69
+      differs 0x7E4F9001: base None, colours 80
+      differs 0x7E4F9002: base None, colours 76
+      differs 0x7E4F9003: base None, colours 49
+      differs 0x7E4F9004: base None, colours 1
+      differs 0x7E4F9005: base None, colours 0
+  Off Natural frame 2  DIFFERENT: 3284 writes (base 3280), bytes that differ outside 0x602BE8C4-0x602BE8C7: 4; device accesses 936, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 83 in 0x7E4C9000 (83)
+      differs 0x7E4FD050: base None, colours 0
+      differs 0x7E4FD051: base None, colours 1
+      differs 0x7E4FD052: base None, colours 0
+      differs 0x7E4FD053: base None, colours 1
+  Off Natural frame 3  DIFFERENT: 3278 writes (base 3274), bytes that differ outside 0x602BE8C4-0x602BE8C7: 4; device accesses 936, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 83 in 0x7E4C9000 (83)
+      differs 0x7E4FD050: base None, colours 0
+      differs 0x7E4FD051: base None, colours 1
+      differs 0x7E4FD052: base None, colours 0
+      differs 0x7E4FD053: base None, colours 1
+  [Off Natural] pass 9 gain: base [], colours []; L=0
+  Off Key Line frame 1  DIFFERENT: 11038 writes (base 11014), bytes that differ outside 0x602BE8C4-0x602BE8C7: 48; device accesses 5076, same order, addresses and values: False; stock pcs lost outside hook sites: 2; stock pcs gained: 0; new-code pcs: 191 in 0x7E4C9000 (191)
+      differs 0x7E4F9004: base None, colours 3
+      differs 0x7E4F9005: base None, colours 0
+      differs 0x7E4F9006: base None, colours 0
+      differs 0x7E4F9007: base None, colours 0
+      differs 0x7E4F9030: base None, colours 2
+      differs 0x7E4F9031: base None, colours 1
+      lost: 0x7E7266D9 (2) | gained: 
+  Off Key Line frame 2  DIFFERENT: 7218 writes (base 7212), bytes that differ outside 0x602BE8C4-0x602BE8C7: 16; device accesses 4602, same order, addresses and values: True; stock pcs lost outside hook sites: 2; stock pcs gained: 0; new-code pcs: 166 in 0x7E4C9000 (166)
+      differs 0x602A4954: base 0, colours 240
+      differs 0x602A4955: base 0, colours 28
+      differs 0x602A4956: base 0, colours 91
+      differs 0x602A4957: base 0, colours 96
+      differs 0x7E4FD050: base None, colours 0
+      differs 0x7E4FD051: base None, colours 1
+      lost: 0x7E7266D9 (2) | gained: 
+  Off Key Line frame 3  DIFFERENT: 7239 writes (base 7233), bytes that differ outside 0x602BE8C4-0x602BE8C7: 16; device accesses 4602, same order, addresses and values: True; stock pcs lost outside hook sites: 2; stock pcs gained: 0; new-code pcs: 166 in 0x7E4C9000 (166)
+      differs 0x602A4954: base 0, colours 240
+      differs 0x602A4955: base 0, colours 28
+      differs 0x602A4956: base 0, colours 91
+      differs 0x602A4957: base 0, colours 96
+      differs 0x7E4FD050: base None, colours 0
+      differs 0x7E4FD051: base None, colours 1
+      lost: 0x7E7266D9 (2) | gained: 
+  [Off Key Line] pass 9 gain: base ['0xFF00'], colours ['0xFF00']; L=0
+  S13 RESULT: FAIL
+
+S14. T_K alone, from the hook site in pass 9 to the next stock instruction. A frame of 8 x 2 pixels in scratch RAM.
+  packet mode 2 L2=0 C=0: gain 0xFF00, pixels changed 0, registers kept True, 9 insns -> ok
+  packet mode 2 L2=0 C=1: gain 0xFF00, pixels changed 0, registers kept True, 9 insns -> ok
+  packet mode 2 L2=0 C=2: gain 0xFF00, pixels changed 0, registers kept True, 9 insns -> ok
+  packet mode 2 L2=0 C=3: gain 0xFF00, pixels changed 0, registers kept True, 9 insns -> ok
+  packet mode 2 L2=0 C=4: gain 0xFF00, pixels changed 0, registers kept True, 9 insns -> ok
+  packet mode 2 L2=0 C=5: gain 0xFF00, pixels changed 0, registers kept True, 9 insns -> ok
+  packet mode 2 L2=0 C=6: gain 0xFF00, pixels changed 0, registers kept True, 9 insns -> ok
+  packet mode 2 L2=1 C=0: gain 0x0200, pixels changed 0, registers kept True, 19 insns -> ok
+  packet mode 2 L2=1 C=1: gain 0x0200, pixels changed 0, registers kept True, 19 insns -> ok
+  packet mode 2 L2=1 C=2: gain 0x0000, pixels changed 6, registers kept True, 202 insns -> ok
+  packet mode 2 L2=1 C=3: gain 0x0200, pixels changed 0, registers kept True, 19 insns -> ok
+  packet mode 2 L2=1 C=4: gain 0x0000, pixels changed 6, registers kept True, 204 insns -> ok
+  packet mode 2 L2=1 C=5: gain 0x0000, pixels changed 6, registers kept True, 206 insns -> ok
+  packet mode 2 L2=1 C=6: gain 0x0200, pixels changed 0, registers kept True, 19 insns -> ok
+  packet mode 0 L2=0 C=0: gain 0xFF00, pixels changed 0, registers kept True, 6 insns -> ok
+  packet mode 0 L2=0 C=1: gain 0xFF00, pixels changed 0, registers kept True, 6 insns -> ok
+  packet mode 0 L2=0 C=2: gain 0xFF00, pixels changed 0, registers kept True, 6 insns -> ok
+  packet mode 0 L2=0 C=3: gain 0xFF00, pixels changed 0, registers kept True, 6 insns -> ok
+  packet mode 0 L2=0 C=4: gain 0xFF00, pixels changed 0, registers kept True, 6 insns -> ok
+  packet mode 0 L2=0 C=5: gain 0xFF00, pixels changed 0, registers kept True, 6 insns -> ok
+  packet mode 0 L2=0 C=6: gain 0xFF00, pixels changed 0, registers kept True, 6 insns -> ok
+  packet mode 0 L2=1 C=0: gain 0xFF00, pixels changed 0, registers kept True, 6 insns -> ok
+  packet mode 0 L2=1 C=1: gain 0xFF00, pixels changed 0, registers kept True, 6 insns -> ok
+  packet mode 0 L2=1 C=2: gain 0xFF00, pixels changed 0, registers kept True, 6 insns -> ok
+  packet mode 0 L2=1 C=3: gain 0xFF00, pixels changed 0, registers kept True, 6 insns -> ok
+  packet mode 0 L2=1 C=4: gain 0xFF00, pixels changed 0, registers kept True, 6 insns -> ok
+  packet mode 0 L2=1 C=5: gain 0xFF00, pixels changed 0, registers kept True, 6 insns -> ok
+  packet mode 0 L2=1 C=6: gain 0xFF00, pixels changed 0, registers kept True, 6 insns -> ok
+  Red, picture buffer at an odd address: gain 0x0200, pixels changed 0, registers kept True -> ok
+  Red, line buffer at address + 2: gain 0x0200, pixels changed 0, registers kept True -> ok
+  Red, no rows: gain 0x0200, pixels changed 0, registers kept True -> ok
+  S14 RESULT: PASS
+

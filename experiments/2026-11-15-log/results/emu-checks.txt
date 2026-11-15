@@ -1,0 +1,54 @@
+(a) boot log-pinned: exit 0
+(a) boot log-debug: exit 0
+(a) lines that differ: 6 (in log/boot-diff.txt)
+ring end cpu0: magic 0x314c5045 w 61 f 61 drops 0 session 0
+ring end cpu1: magic 0x00000000 w 0 f 0 drops 0 session 0
+ring end state: busy 0 result 0 trigger 0x00003000 gui 0x00003000
+card: 99 blocks read, 81 written
+card -> host: EPM2LOG.BIN (3072 bytes)
+done at lab ms 26060 | firmware errors 2 41.8 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9 ; 43.3 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9
+ring end cpu0: magic 0x314c5045 w 26 f 26 drops 0 session 0
+card -> host: EPM2LOG.BIN (4096 bytes)
+(c) records per session: {1: 61, 2: 26} markers: [{'marker': 'ring_restart', 'cpu': 0, 'seq': 0}]
+ring end cpu0: magic 0x314c5045 w 59 f 0 drops 0 session 0
+ring end cpu1: magic 0x00000000 w 0 f 0 drops 0 session 0
+ring end state: busy 0 result 1 trigger 0x00003002 gui 0x00003002
+done at lab ms 26060 | firmware errors 2 36.9 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9 ; 38.5 0x2a001001 from 7e579dcc(fn 7e579dbf) args
+(d) screens that differ from pinned: 0 of 12
+(d) with a card: screens that differ from pinned: 0 of 12
+ring burst cpu0: magic 0x314c5045 w 715 f 0 drops 0 session 0
+ring burst cpu1: magic 0x00000000 w 0 f 0 drops 0 session 0
+ring flushed cpu0: magic 0x314c5045 w 720 f 720 drops 208 session 0
+ring flushed cpu1: magic 0x314c5045 w 3 f 3 drops 0 session 0
+card -> host: EPM2LOG.BIN (9728 bytes)
+(e) markers: [{'marker': 'gap', 'cpu': 0, 'seq': 208, 'lost': 208}]
+(e) records: cpu0 512 (seq 208..719), cpu1 3
+ring A cpu0: magic 0x314c5045 w 28 f 20 drops 0 session 0
+card -> host: EPM2LOG.BIN (512 bytes)
+ring B cpu0: magic 0x314c5045 w 43 f 20 drops 0 session 1
+ring B-flushed cpu0: magic 0x314c5045 w 48 f 48 drops 0 session 1
+card -> host: EPM2LOG.BIN (1024 bytes)
+firmware error log entries: 2 36.1 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9 ; 37.7 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9
+gap boot: non-zero bytes in 0x7E4C9800-0x7E4FE000: 0; in 0x7E4F9000-0x7E4FE000: 0
+gap end: non-zero bytes in 0x7E4C9800-0x7E4FE000: 0; in 0x7E4F9000-0x7E4FE000: 0
+ring end cpu0: magic 0x314c5045 w 174 f 171 drops 0 session 0
+card -> host: EPM2LOG.BIN (8704 bytes)
+(h) records in the file: 171, in order from 0 with none missing or twice: True; markers: []
+(h) results of the flushes: {'ok': 16, 'not_saved': 1, 'no_file': 2}
+ring end cpu0: magic 0x314c5045 w 191 f 191 drops 0 session 0
+card -> host: EPM2LOG.BIN (10240 bytes)
+(h) records in the file: 191, in order from 0 with none missing or twice: True; markers: []
+(h) results of the flushes: {'ok': 19, 'not_saved': 1, 'no_file': 2}
+file limit: a file of 4 MiB on the card
+ring cap cpu0: magic 0x314c5045 w 20 f 0 drops 0 session 0
+ring cap state: busy 0 result 3 trigger 0x00005700 gui 0x00005701
+card: 79 blocks read, 0 written
+file size after: 4194304
+file limit: a file one block below 4 MiB
+ring below-cap cpu0: magic 0x314c5045 w 20 f 20 drops 0 session 0
+ring below-cap state: busy 0 result 0 trigger 0x00005700 gui 0x00005701
+ring at-cap cpu0: magic 0x314c5045 w 28 f 20 drops 0 session 0
+ring at-cap state: busy 0 result 3 trigger 0x00005700 gui 0x00005701
+card -> host: EPM2LOG.BIN (4194304 bytes)
+update path, nofile: same as pinned but the times (43 lines)
+update path, file: same as pinned but the times (68 lines)
