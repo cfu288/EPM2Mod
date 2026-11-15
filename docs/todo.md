@@ -12,8 +12,6 @@ and delete the item here.
 
 ## Focus peaking
 
-- Peaking colours: white and black blend with the picture (owner, 2026-11-15). Add coloured lines
-  (red, yellow, blue, as other makers offer) and remove Black. In work.
 - Peaking without the zoom: the trigger is the MF Assist state object, which also asks for the zoom.
   It needs the E-P5 state object paired (NOTES §15.5).
 - The words Peaking, White and Black are English only: the other languages keep the old texts of

@@ -1,12 +1,12 @@
 # Install
 
 <!-- BEGIN GENERATED: pinned-build -->
-The pinned build is **`peaking-menu-names`**: seven film looks named in all 34 languages, interval shooting with up to 240 frames, the level gauge with Level Adjust, and focus peaking with the setting Off / White / Black. We tested this build on a real E-PM2 on 2026-11-15 ([camera log](camera-log.md)).
+The pinned build is **`peaking-colours`**: seven film looks named in all 34 languages, interval shooting with up to 240 frames, the level gauge with Level Adjust, and focus peaking with the setting Off / White / Red / Yellow / Blue. We tested this build on a real E-PM2 on 2026-11-15 ([camera log](camera-log.md)).
 
 | | sha256 |
 |---|---|
 | Stock firmware, `OLY_E_101_1600_0000_0000.BIN` | `34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300` |
-| Pinned build, `peaking-menu-names` | `4ea4ffd773d6f05d16867f55b9fef4bce5d53fc8659a9b16362f7ac771a6bc30` |
+| Pinned build, `peaking-colours` | `4d6b1f26ed92d66b62b4d7dc32d26168e33fd8b153a7655d6c0d9a58267456f8` |
 <!-- END GENERATED: pinned-build -->
 
 **Use this firmware at your own risk.** It is unofficial and only for the E-PM2 with firmware 1.6
