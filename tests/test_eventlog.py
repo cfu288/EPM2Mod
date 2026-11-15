@@ -3,7 +3,9 @@
     uv run python -m unittest discover -s tests
 
 The log files are made here, byte by byte, as the firmware's flush task writes
-them. The last tests read the repository's own dictionary ``logs/events.json``.
+them. ``SessionTests`` has the patterns of the first log from a camera
+(``experiments/2026-11-15-log/evaluation-1.md``). The last tests read the
+repository's own dictionaries in ``logs/``.
 """
 
 from __future__ import annotations
@@ -11,19 +13,22 @@ from __future__ import annotations
 import contextlib
 import io
 import json
+import os
 import struct
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 from typing import Any
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from support import ROOT  # noqa: E402
 
-from epm2mod import cli, eventlog  # noqa: E402
+from epm2mod import cli, eventlog, logsummary  # noqa: E402
 from epm2mod.errors import LogError  # noqa: E402
+from epm2mod.paths import ROOT_ENV  # noqa: E402
 
 RAW: dict[str, Any] = {
     "format": 1,
@@ -56,6 +61,59 @@ RAW: dict[str, Any] = {
 }
 WORDS = eventlog.load_dictionary(RAW)
 TOP = eventlog.TIMER_MASK
+
+# A dictionary with the events of the camera's start-up pattern and name tables.
+CAMERA: dict[str, Any] = {
+    "format": 1,
+    "record_size": 16,
+    "tables": {
+        "screen": {"0x5100": "live view", "0x57xx": "menu", "0x5705": "live control"},
+        "art": {"3": "no art filter", "167": "Diorama entry", "70": "Pop Art I"},
+        "colour": {"2": "Red"},
+    },
+    "film_entries": {"table": "art", "codes": {"167": "Diorama", "70": "Pop Art"}},
+    "events": [
+        {
+            "id": 1,
+            "name": "boot",
+            "level": "info",
+            "args": [{"name": "ring_found", "format": "dec"}],
+        },
+        {
+            "id": 2,
+            "name": "flush",
+            "level": "debug",
+            "names": {"gui_state": "screen"},
+            "args": [{"name": "gui_state"}],
+        },
+        {"id": 3, "name": "fw_error", "level": "error", "args": [{"name": "code"}]},
+        {
+            "id": 5,
+            "name": "gui_state",
+            "level": "info",
+            "names": {"state": "screen", "previous": "screen"},
+            "args": [{"name": "state"}, {"name": "previous"}],
+        },
+        {
+            "id": 6,
+            "name": "stage",
+            "level": "info",
+            "names": {"art": "art", "latch.C": "colour"},
+            "args": [
+                {"name": "art", "format": "dec"},
+                {
+                    "name": "latch",
+                    "fields": [
+                        {"name": "L", "shift": 0, "bits": 8},
+                        {"name": "C", "shift": 24, "bits": 8},
+                    ],
+                },
+            ],
+        },
+    ],
+}
+CAMERA_WORDS = eventlog.load_dictionary(CAMERA)
+CAMERA_ID = CAMERA_WORDS.build_id
 
 
 def record(
@@ -95,6 +153,16 @@ def block(
 def lines(data: bytes) -> list[dict[str, Any]]:
     """Return everything that the decoder yields for a file."""
     return list(eventlog.decode(data, WORDS))
+
+
+def camera_lines(data: bytes) -> list[dict[str, Any]]:
+    """Return what the decoder yields with the dictionary ``CAMERA``."""
+    return list(eventlog.decode(data, CAMERA_WORDS))
+
+
+def records(got: list[dict[str, Any]], cpu: int = 0) -> list[dict[str, Any]]:
+    """Return the records of one CPU, without the markers."""
+    return [line for line in got if "marker" not in line and line["cpu"] == cpu]
 
 
 class DictionaryTests(unittest.TestCase):
@@ -404,6 +472,378 @@ class DecodeTests(unittest.TestCase):
                     lines(data)
 
 
+class SessionTests(unittest.TestCase):
+    """Sessions, recovered records and times: the patterns of a real camera."""
+
+    def start(self, first: int, found: int) -> list[bytes]:
+        """Return the CPU 0 records of a start: 4 error records, then boot."""
+        early = [record(3, first + n, 19497 + n, 0x19000C03) for n in range(4)]
+        return early + [record(1, first + 4, 101070, found)]
+
+    def test_records_before_boot_belong_to_the_start(self) -> None:
+        # The camera's file of 2026-11-15. The firmware records errors at
+        # 19 ms on CPU 0 and at 46 ms on CPU 1. The boot task runs at 101 ms.
+        # The error records start the ring, so the boot hook finds a ring and
+        # counts 1 at every power-on. Power off clears the RAM.
+        one = self.start(0, 1) + [
+            record(5, 5, 2_251_489, 0x5100),
+            record(2, 6, 9_000_000),
+        ]
+        other = [record(3, n, 45688 + n, 0x19000C03) for n in range(3)]
+        again = [record(3, n, 45666 + n, 0x19000C03) for n in range(3)]
+        two = self.start(0, 1) + [record(2, 5, 3_146_000, 0x5700)]
+        data = (
+            block(0, one, build=CAMERA_ID, restarts=1)
+            + block(0, other, cpu=1, build=CAMERA_ID)
+            + block(0, two, build=CAMERA_ID, restarts=1)
+            + block(0, again, cpu=1, build=CAMERA_ID)
+        )
+        got = camera_lines(data)
+        self.assertEqual(
+            [line.get("marker", line.get("session")) for line in got],
+            [1] * 7 + [1] * 3 + ["ring_restart"] + [2] * 6 + ["ring_restart"] + [2] * 3,
+        )
+        self.assertTrue(all("recovered" not in line for line in got))
+        # the time starts again with the session: no timer wrap is counted
+        second = [line for line in got if line.get("session") == 2]
+        self.assertEqual(second[0]["time_us"], 19497)
+        self.assertEqual(second[4]["time_us"], 101070)
+        self.assertEqual(second[-1]["time_us"], 45668)
+        self.assertEqual(second[4]["args"], {"ring_found": 1})
+
+    def test_a_restart_that_kept_the_ring(self) -> None:
+        # Session 1 flushed its records 0 to 6 (CPU 0) and 0 to 1 (CPU 1),
+        # logged two more records on CPU 0 and one on CPU 1, and crashed.
+        # The RAM was kept. The next start put its error records and its boot
+        # record behind them, and its first flush wrote all of them.
+        one = self.start(0, 1) + [
+            record(5, 5, 5_000_000, 0x5700),
+            record(2, 6, 6_000_000),
+        ]
+        lost = [record(5, 7, 8_000_000, 0x5100), record(6, 8, 9_000_000, 167)]
+        two = self.start(9, 2) + [record(2, 14, 4_000_000, 0x5705)]
+        other_one = [record(3, 0, 46000), record(6, 1, 3_000_000, 70)]
+        other_two = [
+            record(6, 2, 8_500_000, 70),
+            record(3, 3, 46001),
+            record(6, 4, 2_000_000),
+        ]
+        data = (
+            block(0, one, build=CAMERA_ID, restarts=1)
+            + block(0, other_one, cpu=1, build=CAMERA_ID)
+            + block(7, lost + two, build=CAMERA_ID, restarts=2)
+            + block(2, other_two, cpu=1, build=CAMERA_ID)
+        )
+        got = camera_lines(data)
+        self.assertTrue(all("marker" not in line for line in got))
+        main = records(got)
+        self.assertEqual([line["session"] for line in main], [1] * 9 + [2] * 6)
+        self.assertEqual(
+            [line["seq"] for line in main if line.get("recovered")], [7, 8]
+        )
+        self.assertEqual(main[9]["time_us"], 19497)
+        self.assertEqual(main[13]["args"], {"ring_found": 2})
+        other = records(got, cpu=1)
+        self.assertEqual([line["session"] for line in other], [1, 1, 1, 2, 2])
+        self.assertEqual(
+            [line.get("recovered") for line in other][2:], [True, None, None]
+        )
+        self.assertEqual(
+            [line["time_us"] for line in other][2:], [8_500_000, 46001, 2_000_000]
+        )
+
+    def test_recovered_records_in_more_than_one_block(self) -> None:
+        # 40 records were not flushed before the crash: the next session
+        # writes them as one full block and a part of the next block. The
+        # records that the old session flushed itself are not recovered.
+        old = [record(1, 0, 100), record(2, 1, 200, 0x5700)]
+        lost = [record(5, n, 1000 + n) for n in range(2, 42)]
+        new = [record(1, 42, 50, 1), record(5, 43, 60)]
+        data = (
+            block(0, old, build=CAMERA_ID)
+            + block(2, lost[:30], build=CAMERA_ID, restarts=1)
+            + block(32, lost[30:] + new, build=CAMERA_ID, restarts=1)
+        )
+        got = camera_lines(data)
+        self.assertEqual(
+            [line["seq"] for line in got if line.get("recovered")], list(range(2, 42))
+        )
+        self.assertEqual([line["session"] for line in got], [1] * 42 + [2] * 2)
+        # without a flush record the mark stops where the write run begins
+        old = [record(1, 0, 100), record(5, 1, 200)]
+        data = block(0, old, build=CAMERA_ID) + block(
+            2, lost[:5] + [record(1, 7, 50, 1)], build=CAMERA_ID, restarts=1
+        )
+        got = camera_lines(data)
+        self.assertEqual(
+            [line["seq"] for line in got if line.get("recovered")], [2, 3, 4, 5, 6]
+        )
+
+    def test_an_old_record_is_not_taken_for_one_of_the_start(self) -> None:
+        # a record of the session before has a later time than the boot
+        # record, or it is more than a second before it
+        late = [record(5, 0, 5_000_000), record(1, 1, 101070, 1)]
+        got = camera_lines(block(0, late, build=CAMERA_ID))
+        self.assertEqual([line["session"] for line in got], [0, 1])
+        self.assertIs(got[0]["recovered"], True)
+        long_before = [record(5, 0, 100), record(1, 1, 100 + eventlog.EARLY_US + 1)]
+        got = camera_lines(block(0, long_before, build=CAMERA_ID))
+        self.assertEqual([line["session"] for line in got], [0, 1])
+        near = [record(5, 0, 100), record(1, 1, 100 + eventlog.EARLY_US)]
+        got = camera_lines(block(0, near, build=CAMERA_ID))
+        self.assertEqual([line["session"] for line in got], [1, 1])
+        self.assertNotIn("recovered", got[0])
+
+
+class NameTests(unittest.TestCase):
+    def test_a_record_carries_the_names_of_its_values(self) -> None:
+        data = block(
+            0,
+            [
+                record(5, 0, 10, 0x5100, 0x5705),
+                record(5, 1, 20, 0x5701, 0x5200),
+                record(6, 2, 30, 167, 0x02000001),
+                record(6, 3, 40, 9, 0x03000001),
+                record(2, 4, 50, 0x5705),
+            ],
+            build=CAMERA_ID,
+        )
+        got = camera_lines(data)
+        self.assertEqual(
+            got[0]["names"], {"state": "live view", "previous": "live control"}
+        )
+        self.assertEqual(got[0]["args"]["state"], "0x00005100")
+        # 0x57xx names the group; 0x5200 has no name
+        self.assertEqual(got[1]["names"], {"state": "menu"})
+        self.assertEqual(got[2]["names"], {"art": "Diorama entry", "latch.C": "Red"})
+        self.assertNotIn("names", got[3])
+        self.assertEqual(got[4]["names"], {"gui_state": "live control"})
+        self.assertEqual(
+            list(got[2]),
+            [
+                "seq",
+                "cpu",
+                "session",
+                "time_us",
+                "event",
+                "level",
+                "args",
+                "names",
+                "build",
+            ],
+        )
+
+    def test_tables_and_names_are_not_part_of_the_build_id(self) -> None:
+        bare = json.loads(json.dumps(CAMERA))
+        del bare["tables"], bare["film_entries"]
+        for event in bare["events"]:
+            event.pop("names", None)
+        self.assertEqual(eventlog.load_dictionary(bare).build_id, CAMERA_ID)
+
+    def test_the_film_list_names_the_slots(self) -> None:
+        films = {"films": [{"entry": "Diorama", "label": "Velvia"}, {"entry": "X"}]}
+        words = eventlog.name_films(CAMERA_WORDS, films)
+        self.assertEqual(words.build_id, CAMERA_ID)
+        got = list(
+            eventlog.decode(
+                block(0, [record(6, 0, 1, 167), record(6, 1, 2, 70)], build=CAMERA_ID),
+                words,
+            )
+        )
+        self.assertEqual(got[0]["names"]["art"], "Velvia (Diorama)")
+        self.assertEqual(got[1]["names"]["art"], "Pop Art I")
+        with self.assertRaises(LogError):
+            eventlog.name_films(CAMERA_WORDS, [])
+        self.assertIs(eventlog.name_films(WORDS, films), WORDS)
+
+    def test_refusals(self) -> None:
+        def changed(**keys: Any) -> dict[str, Any]:
+            raw: dict[str, Any] = json.loads(json.dumps(CAMERA))
+            raw.update(keys)
+            return raw
+
+        def named(names: Any) -> dict[str, Any]:
+            raw = changed()
+            raw["events"][1]["names"] = names
+            return raw
+
+        cases = [
+            (changed(tables=[]), "'tables' must be an object"),
+            (changed(tables={"screen": []}), "a table must be an object"),
+            (changed(tables={"screen": {"five": "x"}}), "must be a number with a name"),
+            (changed(tables={"screen": {"5": ""}}), "must be a number with a name"),
+            (changed(tables={"screen": {"-5": "x"}}), "must be a number with a name"),
+            (changed(tables={}, film_entries={}), "names the table"),
+            (
+                changed(film_entries={"table": "none", "codes": {"1": "x"}}),
+                "names no table",
+            ),
+            (changed(film_entries=[]), "'film_entries' must be an object"),
+            (named({"state": "screen"}), "which is no argument"),
+            (named({"gui_state": 5}), "'names' must map"),
+            (named({"gui_state": "none"}), "names the table 'none'"),
+        ]
+        for raw, text in cases:
+            with self.subTest(text=text):
+                with self.assertRaises(LogError) as caught:
+                    eventlog.load_dictionary(raw)
+                self.assertIn(text, str(caught.exception))
+
+
+class OlderBuildTests(unittest.TestCase):
+    """A file from a build with another dictionary, which is kept."""
+
+    def older(self) -> eventlog.Dictionary:
+        """Return ``CAMERA`` with an old argument name and without tables."""
+        raw = json.loads(json.dumps(CAMERA))
+        raw["events"][0]["args"][0]["name"] = "session"
+        del raw["tables"], raw["film_entries"]
+        return eventlog.load_dictionary(raw, inherit=CAMERA_WORDS)
+
+    def test_a_block_is_decoded_with_the_dictionary_of_its_build(self) -> None:
+        older = self.older()
+        self.assertNotEqual(older.build_id, CAMERA_ID)
+        data = block(
+            0, [record(1, 0, 5, 1), record(5, 1, 6, 0x5100)], build=older.build_id
+        ) + block(0, [record(1, 0, 7, 1)], build=CAMERA_ID)
+        got = list(eventlog.decode(data, CAMERA_WORDS, {older.build_id: older}))
+        self.assertEqual(
+            [line.get("marker", line.get("args")) for line in got],
+            [
+                {"session": 1},
+                {"state": "0x00005100", "previous": "0x00000000"},
+                "ring_restart",
+                {"ring_found": 1},
+            ],
+        )
+        self.assertEqual(got[0]["build"], older.build_id.hex())
+        # the older dictionary takes the name tables of the newer one
+        self.assertEqual(got[1]["names"], {"state": "live view"})
+        # without the older dictionary the block is marked
+        got = camera_lines(data)
+        self.assertEqual(got[0]["marker"], "dictionary_mismatch")
+        self.assertEqual(got[1]["args"], {"ring_found": 1})
+
+    def test_a_dictionary_with_tables_does_not_inherit(self) -> None:
+        raw = json.loads(json.dumps(CAMERA))
+        raw["tables"]["screen"] = {"0x5100": "other"}
+        words = eventlog.load_dictionary(raw, inherit=CAMERA_WORDS)
+        self.assertEqual(words.tables["screen"].name(0x5100), "other")
+        self.assertIsNone(words.tables["screen"].name(0x5705))
+
+
+def repository_words() -> tuple[eventlog.Dictionary, dict[str, int]]:
+    """Return the repository's dictionary and its event ids by name."""
+    raw = json.loads((ROOT / "logs" / "events.json").read_text(encoding="utf-8"))
+    words = eventlog.load_dictionary(raw)
+    return words, {event.name: number for number, event in words.events.items()}
+
+
+class SummaryTests(unittest.TestCase):
+    def session(self) -> bytes:
+        """Return a file with one short session of every feature."""
+        words, ids = repository_words()
+        rows = [
+            ("fw_error", 19_000, 0x19000C03, 0x7E4261AF),
+            ("fw_error_args", 19_001, 1, 0x602A9B40),
+            ("boot", 101_000, 1, 0),
+            ("lv_values", 215_000, 0x03FCFFE6, 0x0131FFF7),
+            ("gui_state", 2_000_000, 0x5100, 0x5000),
+            ("pk_mf_start", 3_000_000, 0x00000100, 0),
+            ("pk_latch", 3_020_000, 0x02000101, 0x100),
+            ("film_stage", 3_100_000, 3, 0),
+            ("pk_pass9", 3_150_000, 0xB596A940, 0x00000001),
+            ("film_stage", 3_300_000, 3, 0),
+            ("film_stage", 3_600_000, 3, 0),
+            ("pk_mf_end", 4_000_000, 0x02010001, 0),
+            ("pk_latch", 4_100_000, 0x02010000, 0),
+            ("film_stage", 4_200_000, 167, 1),
+            ("film_matrix", 4_200_001, 0x7ECB09BE, 0x604E8984),
+            ("shoot_cbs", 5_000_000, 210, 0),
+            ("shoot_cbs", 5_500_000, 136, 0),
+            ("iv_start", 6_000_000, 0, 1),
+            ("shoot_cbs", 7_000_000, 259, 0),
+            ("shoot_cbs", 9_000_000, 261, 0),
+            ("iv_frame", 11_000_000, 1, 0),
+            ("shoot_cbs", 12_250_000, 261, 0),
+            ("shoot_cbs", 14_000_000, 260, 0),
+            ("iv_end", 14_500_000, 0, 1),
+            ("lv_adjust", 20_000_000, 1, 1),
+            ("gui_state", 30_000_000, 0x2000, 0x5100),
+            ("flush", 30_010_000, 0x2000, 0),
+        ]
+        made = [
+            record(ids[name], number, time, arg0, arg1)
+            for number, (name, time, arg0, arg1) in enumerate(rows)
+        ]
+        return block(0, made, build=words.build_id, restarts=1)
+
+    def test_the_report_of_a_session(self) -> None:
+        words, _ = repository_words()
+        text = logsummary.summarize(eventlog.decode(self.session(), words))
+        for line in text:
+            self.assertIsInstance(line, str)
+        whole = "\n".join(text)
+        for part in (
+            f"27 records, 1 session, build id {words.build_id.hex()}",
+            "session 1: 30.0 s, 27 records (CPU 0: 27); cold start (new ring); "
+            "2 records before boot; ends with the flush at power off",
+            "gaps: none",
+            "firmware errors: 1",
+            "[0x19000C03], caller 0x7E4261AF, at 0.019 to 0.019 s, sessions 1",
+            "flushes: 1;",
+            "[0x00002000]: 1",
+            "film_stage 4",
+            "peaking: 1 MF Assist run (1.0 s); colour when the latch is set: Red [2]",
+            "2 frame periods, 200 to 300 ms, median 250 ms (4.0 frames per second)",
+            "colour pass: 1 records, gain 0",
+            "[167]: 1",
+            "[0x7ECB09BE]: 1",
+            "shooting: 1 capture (callback 136), 1 time CBS_START_SHOOTING_PICTURE",
+            "interval: armed 1 time (iv_start), 1 sequence (callback 259)",
+            "sequence at 7.0 s: 2 frames (timer callbacks 261), 3.25 s between them; "
+            "1 iv_frame record",
+            "level gauge: working set x -26, y 1020, z -9 (length 1020; 1000 = 1 g) "
+            "at session 1, 0.2 s",
+            "level gauge: Adjust [1] at session 1, 20.0 s",
+        ):
+            with self.subTest(part=part):
+                self.assertIn(part, whole)
+        self.assertNotIn("markers:", whole)
+
+    def test_gaps_markers_and_a_session_without_an_end(self) -> None:
+        data = block(88, [record(3, n, n) for n in range(88, 90)], drops=88)
+        data += block(0, [record(1, 0, 5), record(3, 1, 6)])
+        text = logsummary.summarize(lines(data))
+        self.assertEqual(text[0][:21], "4 records, 1 session,")
+        self.assertIn("session 0: 0.0 s, 2 records (CPU 0: 2); no boot record", text)
+        self.assertIn(
+            "session 1: 0.0 s, 2 records (CPU 0: 2); cold start (new ring); "
+            "no flush at the end",
+            text,
+        )
+        self.assertIn("gaps: 1 (88 records lost)", text)
+        self.assertIn("markers: ring_restart 1", text)
+        self.assertIn("firmware errors: none", text)
+        self.assertIn("flushes: none", text)
+        self.assertFalse(any(line.startswith("peaking") for line in text))
+
+    def test_a_session_that_wrote_the_records_of_the_one_before(self) -> None:
+        old = [record(1, 0, 100), record(5, 1, 200)]
+        new = [record(5, 2, 300), record(1, 3, 50, 1)]
+        data = block(0, old, build=CAMERA_ID) + block(2, new, build=CAMERA_ID)
+        text = logsummary.summarize(camera_lines(data))
+        self.assertIn(
+            "session 1: 0.0 s, 3 records (CPU 0: 3); cold start (new ring); "
+            "1 record written by the next session; no flush at the end",
+            text,
+        )
+        self.assertIn(
+            "session 2: 0.0 s, 1 record (CPU 0: 1); RAM was kept; no flush at the end",
+            text,
+        )
+
+
 class CommandTests(unittest.TestCase):
     def run_cli(self, *argv: str) -> tuple[int, str, str]:
         out, err = io.StringIO(), io.StringIO()
@@ -430,23 +870,82 @@ class CommandTests(unittest.TestCase):
             )
             self.assertEqual(status, 1)
 
-    def test_the_repository_dictionary(self) -> None:
+    def test_log_prints_a_summary(self) -> None:
+        with tempfile.TemporaryDirectory() as folder:
+            words = Path(folder, "events.json")
+            words.write_text(json.dumps(RAW), encoding="utf-8")
+            log = Path(folder, "EPM2LOG.BIN")
+            log.write_bytes(block(0, [record(1, 0, 100), record(3, 1, 200)]))
+            status, out, err = self.run_cli(
+                "log", str(log), "--dict", str(words), "--summary"
+            )
+            self.assertEqual((status, err), (0, ""))
+            self.assertEqual(out.splitlines()[0][:22], "2 records, 1 session, ")
+            self.assertIn("events: boot 1, tick 1", out.splitlines())
+
+    def test_the_repository_dictionaries(self) -> None:
         raw = json.loads((ROOT / "logs" / "events.json").read_text(encoding="utf-8"))
         words = eventlog.load_dictionary(raw)
         names = {event.name for event in words.events.values()}
         self.assertIn(eventlog.BOOT_EVENT, names)
-        # the two patch specs were generated from this dictionary
+        self.assertIn(eventlog.FLUSH_EVENT, names)
+        # the dictionary of a build that was flashed is kept under its build id
+        known = {words.build_id.hex()}
+        for path in sorted((ROOT / "logs").glob("events-*.json")):
+            kept = eventlog.load_dictionary(
+                json.loads(path.read_text(encoding="utf-8")), inherit=words
+            )
+            self.assertEqual(path.name, f"events-{kept.build_id.hex()}.json")
+            known.add(kept.build_id.hex())
+        # the two patch specs were generated from one of these dictionaries
         for name in ("log-core", "log-probes"):
             spec = json.loads(
                 (ROOT / "patches" / f"{name}.json").read_text(encoding="utf-8")
             )
-            self.assertEqual(spec["_build_id"], words.build_id.hex(), name)
+            self.assertIn(spec["_build_id"], known, name)
         # each id range belongs to one feature
         for event in raw["events"]:
             if event["spec"] == "log-core":
                 self.assertLess(event["id"], 256, event["name"])
             else:
                 self.assertGreaterEqual(event["id"], 256, event["name"])
+        # the film slots of the dictionary are entries of the film list
+        films = json.loads((ROOT / "looks" / "films.json").read_text(encoding="utf-8"))
+        entries = {film["entry"] for film in films["films"]}
+        self.assertEqual(set(words.film_entries.values()), entries)
+        named = eventlog.name_films(words, films)
+        self.assertEqual(named.tables["art"].name(167), "Velvia (Diorama)")
+
+    def test_log_reads_a_file_of_the_flashed_build(self) -> None:
+        # The build that was on the camera on 2026-11-15 has the build id
+        # d1ddd46b4dac2414. Its boot argument has the old name. The command
+        # finds its dictionary in logs/ without an option.
+        flashed = bytes.fromhex("d1ddd46b4dac2414")
+        with tempfile.TemporaryDirectory() as folder:
+            log = Path(folder, "EPM2LOG.BIN")
+            log.write_bytes(
+                block(
+                    0,
+                    [record(1, 0, 101070, 1), record(1280, 1, 2_000_000, 167, 1)],
+                    build=flashed,
+                )
+            )
+            with mock.patch.dict(os.environ, {ROOT_ENV: str(ROOT)}):
+                status, out, err = self.run_cli("log", str(log))
+            self.assertEqual((status, err), (0, ""))
+            got = [json.loads(line) for line in out.splitlines()]
+            self.assertEqual([line.get("marker") for line in got], [None, None])
+            self.assertEqual(got[0]["args"]["session"], 1)
+            self.assertEqual(got[1]["event"], "film_stage")
+            self.assertEqual(got[1]["names"], {"art": "Velvia (Diorama)"})
+            # a block of the current dictionary in the same file
+            words, ids = repository_words()
+            log.write_bytes(
+                block(0, [record(ids["boot"], 0, 5, 1)], build=words.build_id)
+            )
+            with mock.patch.dict(os.environ, {ROOT_ENV: str(ROOT)}):
+                status, out, err = self.run_cli("log", str(log))
+            self.assertEqual(json.loads(out)["args"]["ring_found"], 1)
 
 
 if __name__ == "__main__":

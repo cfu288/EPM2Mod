@@ -247,7 +247,7 @@ def s17(pinned, debug):
         ("ERR", 0x7E426D4B, 0x7E426D53, {"d0": 0x2A001001, "mdr": 0x7E579DCC}, {}, [("sp+48", struct.pack("<II", 1, 0x7102))],
          [("fw_error", {"code": "0x2A001001", "caller": "0x7E579DCC"}), ("fw_error_args", {"count": 1, "arg": "0x00007102"})]),
         ("BOOT", 0x7E503DD4, 0x7E503DDA, {}, {}, [(0x604154E6, struct.pack("<H", 0x0102)), (0x604154E9, b"\x09")],
-         [("boot", {"session": 1, "poweron": {"raw": "0x00090102", "factor": 258, "wake": 9}})]),
+         [("boot", {"ring_found": 1, "poweron": {"raw": "0x00090102", "factor": 258, "wake": 9}})]),
         ("GUI no trigger", 0x7ECDF6E4, 0x7ECDF6E9, {"d0": 0x5100}, {0x7ECE6333: 0, 0x7ECD360A: 0, 0x7E449541: 0}, [],
          [("gui_state", {"state": "0x00005100", "previous": "0x00000000"})]),
         ("GUI menu", 0x7ECDF6E4, 0x7ECDF6E9, {"d0": 0x5700}, {0x7ECE6333: 0, 0x7ECD360A: 0, 0x7E449541: 0}, [],
@@ -277,7 +277,7 @@ def s17(pinned, debug):
         ("STAGE", 0x7E56C68B, 0x7E56C692, {"a3": SCR + 0x500}, {}, [(SCR + 0x500 + 79, bytes([167])), (SCR + 0x500 + 20, struct.pack("<I", 0x40000))],
          [("film_stage", {"art": 167, "flags": "0x00040000"})]),
         ("MATRIX", 0x7E56C764, 0x7E56C76A, {"a1": 0x7E768F46, "d2": 0x11, "d3": 0x22}, {0x7E56C263: 3}, [],
-         [("film_matrix", {"table": "0x7E768F46", "d3": "0x00000022"})]),
+         [("film_matrix", {"table": "0x7E768F46", "stack": "0x00000022"})]),
         ("CURVE 85", 0x7E56E860, 0x7E56E866, {"d1": 4 * (85 - 8)}, {}, [("sp+20", bytes([85]))],
          [("film_curve", {"art": 85, "handler": "0x%08X" % word(T8 + 4 * (85 - 8))})]),
         ("CBS", 0x7E995A0B, 0x7E995A13, {"a0": SCR + 0x600, "d0": 264, "d1": 0xF0000058}, {}, [],
@@ -296,7 +296,7 @@ def s17(pinned, debug):
         ("IVCLR", 0x7E9698FD, 0x7E969902, {"d2": 0x4, "d0": 0}, {0x7E9670E9: 0}, [],
          [("iv_state_clear", {"bits": "0x00000004", "state_before": "0x00000010"})]),
         ("IVEND", 0x7E982E8E, 0x7E982E95, {"d2": 0xF0000001, "d0": 0}, {0x7E9670E9: 0}, [],
-         [("iv_end", {"result": "0xF0000001", "frames": 2})]),
+         [("iv_end", {"result": "0xF0000001", "iv_frames": 2})]),
     ]
     runs = {}
     for name_, path in (("pinned", pinned), ("debug", debug)):

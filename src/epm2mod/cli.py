@@ -10,7 +10,8 @@
     epm2mod info FIRMWARE.BIN                     describe a firmware file
     epm2mod readme [--check]                      refresh the generated parts of the documents
     epm2mod looks [--check | --write]             check or write the film-look patch specs
-    epm2mod log FILE [--dict EVENTS.json]         decode a camera log file to JSON lines
+    epm2mod log FILE [--dict EVENTS.json] [--summary]
+                                                  decode a camera log file to JSON lines
 
 Exit status: 0 for success, 1 for an error that is reported as one message (or,
 for ``info``, ``readme --check`` and ``looks``, a check that failed), 2 for a
@@ -39,9 +40,10 @@ from .builds import (
 )
 from .container import describe, parse
 from .errors import BuildError, ContainerError, Epm2ModError
-from .eventlog import decode, load_dictionary
+from .eventlog import Dictionary, decode, load_dictionary, name_films
 from .fileio import read_bytes, read_json, write_bytes
 from .hashing import sha256_bytes
+from .logsummary import summarize
 from .paths import RepoPaths, repo_paths
 from .pipeline import clear_outputs, make, record_test
 from .spec import apply_specs, load_spec
@@ -194,11 +196,34 @@ def _looks(args: argparse.Namespace, paths: RepoPaths) -> int:
     return 0
 
 
-def _log(args: argparse.Namespace, paths: RepoPaths) -> int:
-    """Run ``epm2mod log``: print one JSON object per record of a camera log."""
-    source = Path(args.dict) if args.dict else paths.root / "logs" / "events.json"
+def _dictionaries(args: argparse.Namespace, paths: RepoPaths) -> list[Dictionary]:
+    """Return the dictionaries for ``epm2mod log``, the main one first.
+
+    Without ``--dict`` these are ``logs/events.json`` and, for the logs of
+    older builds, every ``logs/events-*.json``. The art codes of the film
+    slots get the film labels of ``looks/films.json``, if that file is there.
+    """
+    folder = paths.root / "logs"
+    source = Path(args.dict) if args.dict else folder / "events.json"
     words = load_dictionary(read_json(source))
-    for line in decode(read_bytes(Path(args.file)), words):
+    if paths.films.is_file():
+        words = name_films(words, read_json(paths.films))
+    found = [words]
+    if not args.dict:
+        for other in sorted(folder.glob("events-*.json")):
+            found.append(load_dictionary(read_json(other), inherit=words))
+    return found
+
+
+def _log(args: argparse.Namespace, paths: RepoPaths) -> int:
+    """Run ``epm2mod log``: print a camera log as JSON lines or as a summary."""
+    words, *older = _dictionaries(args, paths)
+    others = {other.build_id: other for other in older}
+    lines = decode(read_bytes(Path(args.file)), words, others)
+    if args.summary:
+        print("\n".join(summarize(lines)))
+        return 0
+    for line in lines:
         print(json.dumps(line))
     return 0
 
@@ -288,7 +313,13 @@ def build_parser() -> argparse.ArgumentParser:
     log_cmd.add_argument(
         "--dict",
         metavar="EVENTS.json",
-        help="the event dictionary; default: logs/events.json of the repository",
+        help="the event dictionary; default: logs/events.json of the repository, "
+        "and logs/events-BUILDID.json for a log of an older build",
+    )
+    log_cmd.add_argument(
+        "--summary",
+        action="store_true",
+        help="print a short report in place of the JSON lines",
     )
     return parser
 

@@ -31,6 +31,14 @@ raw value of a 30-bit timer that counts down once per microsecond.
 :func:`decode` turns the bytes into JSON-ready objects, one per record, and adds
 marker objects where records are missing. It reads a file that ends in the
 middle of a block, and it gives records with an unknown id as numbers.
+
+The dictionary can also hold *name tables* (``tables``: value to text) and say
+which argument or field of an event uses which table (``names`` of an event).
+These and the ``doc`` texts are notes for the reader: they are not part of the
+build id, so they can be corrected for a firmware that is already on a camera.
+A change of an id, a name, a level or an argument gives a new build id. The
+dictionary of a flashed build is then kept as ``logs/events-<build id>.json``,
+and :func:`decode` takes it for the blocks that carry its build id.
 """
 
 from __future__ import annotations
@@ -38,8 +46,8 @@ from __future__ import annotations
 import hashlib
 import json
 import struct
-from collections.abc import Iterator
-from dataclasses import dataclass, field
+from collections.abc import Iterator, Mapping
+from dataclasses import dataclass, field, replace
 from typing import Any
 
 from .errors import LogError
@@ -50,7 +58,10 @@ HEADER_SIZE = 32
 RECORD_SIZE = 16
 TIMER_MASK = 0x3FFFFFFF
 BOOT_EVENT = "boot"
+FLUSH_EVENT = "flush"
 SEEN_RECORDS = 1024
+BLOCK_RECORDS = 30
+EARLY_US = 1_000_000
 LEVELS = ("debug", "info", "warn", "error")
 FORMATS = ("hex", "dec", "sdec", "addr")
 
@@ -119,12 +130,35 @@ class Event:
         name: the event's name.
         level: one of ``LEVELS``.
         args: the arguments that the event uses, at most two.
+        names: the name table of an argument (key ``arg``) or of a field (key
+            ``arg.field``); may be empty.
     """
 
     number: int
     name: str
     level: str
     args: tuple[Argument, ...]
+    names: tuple[tuple[str, str], ...] = ()
+
+
+@dataclass(frozen=True)
+class Table:
+    """Names for the values of an argument or a field.
+
+    Attributes:
+        exact: the name of a value.
+        groups: the name of every value with the same bits above the low 8
+            (the key is the value shifted right by 8); used when ``exact`` has
+            no entry.
+    """
+
+    exact: dict[int, str]
+    groups: dict[int, str]
+
+    def name(self, value: int) -> str | None:
+        """Return the name of a value, or ``None``."""
+        found = self.exact.get(value)
+        return found if found is not None else self.groups.get(value >> 8)
 
 
 @dataclass(frozen=True)
@@ -135,10 +169,18 @@ class Dictionary:
         events: the entries by event id.
         build_id: the 8 bytes that a firmware built from this dictionary writes
             into each block header.
+        tables: the name tables by name.
+        film_table: the table whose keys are art codes of film-look slots, or
+            an empty text.
+        film_entries: art code to the menu entry of the slot, as the film list
+            ``looks/films.json`` names it.
     """
 
     events: dict[int, Event]
     build_id: bytes
+    tables: dict[str, Table] = field(default_factory=dict)
+    film_table: str = ""
+    film_entries: dict[int, str] = field(default_factory=dict)
 
 
 def _show(value: int, how: str, bits: int) -> Any:
@@ -216,12 +258,57 @@ def _argument(raw: Any, where: str) -> Argument:
     return Argument(name, _format(raw, where, "hex"), fields)
 
 
-def load_dictionary(raw: Any) -> Dictionary:
+def _table(raw: Any, where: str) -> Table:
+    """Return one name table from its dictionary object.
+
+    A key is a number as text: decimal (``"259"``), hexadecimal (``"0x5B00"``)
+    or hexadecimal with ``xx`` for the low byte (``"0x5Bxx"``: every value of
+    that group that has no entry of its own).
+    """
+    if not isinstance(raw, dict):
+        raise LogError(f"{where}: a table must be an object")
+    exact: dict[int, str] = {}
+    groups: dict[int, str] = {}
+    for key, text in raw.items():
+        group = key.lower().startswith("0x") and key.lower().endswith("xx")
+        digits = key[:-2] if group else key
+        try:
+            value = int(digits, 0)
+        except ValueError:
+            value = -1
+        if value < 0 or not isinstance(text, str) or not text:
+            raise LogError(f"{where}: {key!r} must be a number with a name")
+        (groups if group else exact)[value] = text
+    return Table(exact, groups)
+
+
+def _names(entry: Any, args: tuple[Argument, ...], where: str) -> dict[str, str]:
+    """Return the ``names`` of an event: argument or field to table name."""
+    raw = entry.get("names", {})
+    if not isinstance(raw, dict) or not all(isinstance(v, str) for v in raw.values()):
+        raise LogError(f"{where}: 'names' must map arguments to table names")
+    known = {arg.name for arg in args} | {
+        f"{arg.name}.{part.name}" for arg in args for part in arg.fields
+    }
+    for key in raw:
+        if key not in known:
+            raise LogError(f"{where}: 'names' has {key!r}, which is no argument")
+    return dict(raw)
+
+
+def load_dictionary(raw: Any, inherit: Dictionary | None = None) -> Dictionary:
     """Return the dictionary that a parsed ``logs/events.json`` describes.
+
+    Args:
+        raw: the parsed JSON object.
+        inherit: a dictionary whose name tables are taken when ``raw`` has no
+            ``tables`` of its own (the dictionary of an older build is kept as
+            its event list only).
 
     Raises:
         LogError: the object is not a dictionary of format 1, an entry is
-            malformed, or an id or a name is there twice.
+            malformed, an id or a name is there twice, or an event names a
+            table that does not exist.
     """
     if not isinstance(raw, dict) or raw.get("format") != 1:
         raise LogError("the event dictionary must be an object with 'format': 1")
@@ -230,6 +317,22 @@ def load_dictionary(raw: Any) -> Dictionary:
     entries = raw.get("events")
     if not isinstance(entries, list):
         raise LogError("the event dictionary has no 'events' list")
+    tables: dict[str, Table] = dict(inherit.tables) if inherit else {}
+    film_table = inherit.film_table if inherit else ""
+    film_entries = dict(inherit.film_entries) if inherit else {}
+    if "tables" in raw:
+        if not isinstance(raw["tables"], dict):
+            raise LogError("the event dictionary: 'tables' must be an object")
+        tables = {
+            name: _table(body, f"table {name}") for name, body in raw["tables"].items()
+        }
+        films = raw.get("film_entries", {})
+        if not isinstance(films, dict) or not isinstance(films.get("codes", {}), dict):
+            raise LogError("the event dictionary: 'film_entries' must be an object")
+        film_table = str(films.get("table", ""))
+        film_entries = _table(films.get("codes", {}), "film_entries").exact
+        if film_entries and film_table not in tables:
+            raise LogError("the event dictionary: 'film_entries' names no table")
     events: dict[int, Event] = {}
     names: set[str] = set()
     for entry in entries:
@@ -245,45 +348,103 @@ def load_dictionary(raw: Any) -> Dictionary:
         if number in events or name in names:
             raise LogError(f"{where}: the id {number} or the name is there twice")
         names.add(name)
-        events[number] = Event(
-            number, name, level, tuple(_argument(arg, where) for arg in args)
-        )
-    return Dictionary(events, build_id(entries))
+        parsed = tuple(_argument(arg, where) for arg in args)
+        named = _names(entry, parsed, where)
+        for key, table in named.items():
+            if table not in tables:
+                raise LogError(f"{where}: {key!r} names the table {table!r}: not there")
+        events[number] = Event(number, name, level, parsed, tuple(named.items()))
+    return Dictionary(events, build_id(entries), tables, film_table, film_entries)
+
+
+def name_films(words: Dictionary, films: Any) -> Dictionary:
+    """Return the dictionary with the film labels of ``looks/films.json``.
+
+    The dictionary knows which art code belongs to which menu entry. The film
+    list knows which film is in which menu entry. The names of these art codes
+    become ``label (entry)``, for example ``Velvia (Diorama)``. Entries that the
+    film list does not have keep their names.
+
+    Raises:
+        LogError: the film list is not an object with a ``films`` list.
+    """
+    rows = films.get("films") if isinstance(films, dict) else None
+    if not isinstance(rows, list):
+        raise LogError("the film list must be an object with a 'films' list")
+    labels = {
+        row.get("entry"): row.get("label") for row in rows if isinstance(row, dict)
+    }
+    table = words.tables.get(words.film_table)
+    if table is None:
+        return words
+    exact = dict(table.exact)
+    for code, entry in words.film_entries.items():
+        if isinstance(labels.get(entry), str):
+            exact[code] = f"{labels[entry]} ({entry})"
+    tables = dict(words.tables)
+    tables[words.film_table] = Table(exact, table.groups)
+    return replace(words, tables=tables)
 
 
 @dataclass
-class _Cpu:
-    """What the decoder remembers about one CPU's ring.
+class _Ring:
+    """What the reader remembers about one CPU's ring.
 
     Attributes:
         expected: the number of the record after the last one read, if any.
         drops: the drop count of the last block.
-        last_time: the time of the last record, in microseconds, if any.
-        wraps: how often the 30-bit timer has wrapped since the session began.
         seen: the bytes of the newest records by number, to find a block that
             the firmware wrote a second time.
+        generation: how often the ring began again at record 0.
     """
 
     expected: int | None = None
     drops: int = 0
-    last_time: int | None = None
-    wraps: int = 0
     seen: dict[int, bytes] = field(default_factory=dict)
+    generation: int = 0
 
 
 @dataclass
-class _State:
-    """The decoder's state across blocks.
+class _Entry:
+    """One record between the reading pass and the output.
 
     Attributes:
-        session: the number of ``boot`` events read so far.
-        cpus: the state of each CPU's ring.
-        warned: the build ids that already have a mismatch marker.
+        cpu: the CPU of the ring.
+        number: the record's number on its CPU.
+        ident: the event id.
+        sequence: the 16-bit sequence number in the record.
+        now: the time in microseconds, 30 bits (the timer value turned round).
+        arg0: the first argument.
+        arg1: the second argument.
+        build: the build id of the block, as hexadecimal text.
+        words: the dictionary of the block.
+        generation: the ring's generation (see ``_Ring``).
+        run: the number of the write run. A flush writes the new records of
+            one CPU as blocks that follow each other, all full but the last.
+        session: the session number, set by ``_sessions``.
+        recovered: the record was written by the session after its own.
+        time_us: the time with the timer wraps of its session added.
     """
 
+    cpu: int
+    number: int
+    ident: int
+    sequence: int
+    now: int
+    arg0: int
+    arg1: int
+    build: str
+    words: Dictionary
+    generation: int
+    run: int
     session: int = 0
-    cpus: dict[int, _Cpu] = field(default_factory=dict)
-    warned: set[bytes] = field(default_factory=set)
+    recovered: bool = False
+    time_us: int = 0
+
+    def named(self, name: str) -> bool:
+        """Say whether the record's event has this name in its dictionary."""
+        event = self.words.events.get(self.ident)
+        return event is not None and event.name == name
 
 
 def _is_header(data: bytes, offset: int) -> bool:
@@ -308,52 +469,314 @@ def _next_header(data: bytes, offset: int) -> int:
         offset += 1
 
 
-def _record(
-    raw: bytes, number: int, cpu: int, build: str, state: _State, words: Dictionary
-) -> dict[str, Any]:
-    """Return the output object of one record and update the session state."""
-    ident, sequence, timer, arg0, arg1 = _RECORD.unpack(raw)
-    ring = state.cpus[cpu]
-    event = words.events.get(ident)
-    if event is not None and event.name == BOOT_EVENT:
-        state.session += 1
-        for other in state.cpus.values():
-            other.last_time, other.wraps = None, 0
-    now = (TIMER_MASK - timer) & TIMER_MASK
-    if ring.last_time is not None and now < ring.last_time:
-        ring.wraps += 1
-    ring.last_time = now
+def _read(
+    data: bytes, words: Dictionary, others: Mapping[bytes, Dictionary]
+) -> list[_Entry | dict[str, Any]]:
+    """Return the records and the markers of a log file, in file order.
+
+    This pass reads the blocks. It finds repeats, gaps, ring restarts, cut
+    blocks and bytes that belong to no block. It does not know sessions.
+    """
+    items: list[_Entry | dict[str, Any]] = []
+    rings: dict[int, _Ring] = {}
+    warned: set[bytes] = set()
+    run = 0
+    joins: tuple[int, int] | None = None  # (cpu, next number) of a full block
+    offset = _next_header(data, 0)
+    if offset >= len(data):
+        raise LogError("no log block found (a block starts with 'EPLG')")
+    if offset:
+        items.append({"marker": "garbage", "offset": 0, "bytes": offset})
+    while offset < len(data):
+        if len(data) - offset < HEADER_SIZE:
+            items.append(
+                {"marker": "truncated", "offset": offset, "missing": "block header"}
+            )
+            break
+        _, _, _, cpu, _, ident, first, count, drops, _ = _HEADER.unpack_from(
+            data, offset
+        )
+        build = ident.hex()
+        chosen = words if ident == words.build_id else others.get(ident)
+        if chosen is None:
+            chosen = words
+            if ident not in warned:
+                warned.add(ident)
+                items.append(
+                    {
+                        "marker": "dictionary_mismatch",
+                        "build": build,
+                        "dictionary": words.build_id.hex(),
+                    }
+                )
+        ring = rings.setdefault(cpu, _Ring())
+        offset += HEADER_SIZE
+        repeated = 0
+        if ring.expected is not None and first < ring.expected:
+            overlap = min(count, ring.expected - first)
+            whole = data[offset : offset + RECORD_SIZE * overlap]
+            if whole == b"".join(
+                ring.seen.get(first + index, b"") for index in range(overlap)
+            ):
+                repeated = overlap
+        if repeated:
+            items.append(
+                {"marker": "repeat", "cpu": cpu, "seq": first, "records": repeated}
+            )
+            offset += RECORD_SIZE * repeated
+            first += repeated
+            count -= repeated
+        if ring.expected is not None and first < ring.expected:
+            items.append({"marker": "ring_restart", "cpu": cpu, "seq": first})
+            ring.drops = 0
+            ring.seen.clear()
+            ring.generation += 1
+        elif ring.expected is not None and first > ring.expected:
+            items.append(
+                {
+                    "marker": "gap",
+                    "cpu": cpu,
+                    "seq": first,
+                    "lost": first - ring.expected,
+                }
+            )
+        elif drops > ring.drops and ring.expected is None:
+            items.append(
+                {"marker": "gap", "cpu": cpu, "seq": first, "lost": drops - ring.drops}
+            )
+        ring.drops = drops
+        if joins != (cpu, first):
+            run += 1
+        done = 0
+        while done < count and len(data) - offset >= RECORD_SIZE:
+            if _is_header(data, offset):
+                break
+            raw = data[offset : offset + RECORD_SIZE]
+            ring.seen[first + done] = raw
+            ring.seen.pop(first + done - SEEN_RECORDS, None)
+            event, sequence, timer, arg0, arg1 = _RECORD.unpack(raw)
+            items.append(
+                _Entry(
+                    cpu,
+                    first + done,
+                    event,
+                    sequence,
+                    (TIMER_MASK - timer) & TIMER_MASK,
+                    arg0,
+                    arg1,
+                    build,
+                    chosen,
+                    ring.generation,
+                    run,
+                )
+            )
+            offset += RECORD_SIZE
+            done += 1
+        ring.expected = first + done
+        joins = (cpu, first + done) if done == count >= BLOCK_RECORDS else None
+        if done < count:
+            items.append(
+                {
+                    "marker": "truncated",
+                    "cpu": cpu,
+                    "seq": first + done,
+                    "missing": count - done,
+                }
+            )
+            ring.expected = None
+        following = _next_header(data, offset)
+        between = data[offset:following]
+        if any(between) and not (done < count and following == len(data)):
+            items.append({"marker": "garbage", "offset": offset, "bytes": len(between)})
+        offset = following
+    return items
+
+
+def _session_starts(ring: list[_Entry]) -> list[int]:
+    """Return the indexes in the CPU 0 records at which a session starts.
+
+    A session starts at its ``boot`` record, or at the records that the same
+    start put before it: the firmware's error recorder can run before the boot
+    task. Such a record is next to the ``boot`` record in the same ring, its
+    time is not later, and it is at most ``EARLY_US`` before the ``boot``
+    record. A record of the session before has a later time, because the
+    timer begins again at a start.
+    """
+    starts: list[int] = []
+    for index, entry in enumerate(ring):
+        if not entry.named(BOOT_EVENT):
+            continue
+        first = index
+        floor = starts[-1] if starts else -1
+        while first - 1 > floor:
+            before, after = ring[first - 1], ring[first]
+            if (
+                before.generation != entry.generation
+                or before.number != after.number - 1
+                or before.named(BOOT_EVENT)
+                or before.now > after.now
+                or entry.now - before.now > EARLY_US
+            ):
+                break
+            first -= 1
+        starts.append(first)
+    return starts
+
+
+def _recover_other(run: list[_Entry], before: _Entry, session: int) -> None:
+    """Mark the old records in the first write run of a CPU other than CPU 0.
+
+    The session that wrote the run kept the ring of the session before. The
+    old records are the ones before the last point at which the time goes
+    back. Without such a point nothing is marked.
+    """
+    split = 0
+    for index, entry in enumerate(run):
+        earlier = run[index - 1] if index else before
+        if entry.now < earlier.now:
+            split = index
+    for entry in run[:split]:
+        entry.session = session - 1
+        entry.recovered = True
+
+
+def _sessions(items: list[_Entry | dict[str, Any]]) -> None:
+    """Set the session, the recovered mark and the time of every record.
+
+    The sessions are counted on CPU 0, which has the ``boot`` records. A
+    record of CPU 0 is recovered when it is from the session before and the
+    new session wrote it: it is in the write run of the session's start, and
+    it is later than the last ``flush`` record of its own session. A record of
+    another CPU counts for the session that wrote it, but see
+    ``_recover_other``.
+    """
+    entries = [item for item in items if isinstance(item, _Entry)]
+    ring0 = [entry for entry in entries if entry.cpu == 0]
+    starts = _session_starts(ring0)
+    kept: dict[int, int] = {}  # id of a start record -> its session, ring kept
+    session = 0
+    for index, entry in enumerate(ring0):
+        if session < len(starts) and starts[session] == index:
+            session += 1
+            if index and ring0[index - 1].generation == entry.generation:
+                kept[id(entry)] = session
+                for old in reversed(ring0[:index]):
+                    if (
+                        old.run != entry.run
+                        or old.session != session - 1
+                        or old.named(FLUSH_EVENT)
+                    ):
+                        break
+                    old.recovered = True
+        entry.session = session
+    current = 0
+    last: dict[int, _Entry] = {}
+    pending: dict[int, int] = {}  # CPU -> session whose first run is to come
+    runs: list[tuple[int, list[_Entry], _Entry]] = []
+    open_runs: dict[int, list[_Entry]] = {}
+    for entry in entries:
+        if entry.cpu == 0:
+            current = max(current, entry.session)
+            if id(entry) in kept:
+                pending = {cpu: kept[id(entry)] for cpu in last if cpu}
+            continue
+        entry.session = current
+        before = last.get(entry.cpu)
+        last[entry.cpu] = entry
+        if entry.cpu in pending:
+            open_runs.pop(entry.cpu, None)
+            if before is not None and before.generation == entry.generation:
+                open_runs[entry.cpu] = [entry]
+                runs.append((pending[entry.cpu], open_runs[entry.cpu], before))
+            del pending[entry.cpu]
+        elif entry.cpu in open_runs and open_runs[entry.cpu][0].run == entry.run:
+            open_runs[entry.cpu].append(entry)
+    for number, run, before in runs:
+        _recover_other(run, before, number)
+    clocks: dict[int, tuple[int, int, int, int]] = {}
+    for entry in entries:
+        key = (entry.session, entry.generation)
+        session, generation, last_now, wraps = clocks.get(entry.cpu, (*key, 0, 0))
+        if (session, generation) != key:
+            last_now, wraps = 0, 0
+        if entry.now < last_now:
+            wraps += 1
+        clocks[entry.cpu] = (*key, entry.now, wraps)
+        entry.time_us = entry.now + wraps * (TIMER_MASK + 1)
+
+
+def _names_of(
+    event: Event, values: tuple[int, int], words: Dictionary
+) -> dict[str, str]:
+    """Return the names that the tables give for an event's values."""
+    found: dict[str, str] = {}
+    for key, table in event.names:
+        head, _, tail = key.partition(".")
+        for index, arg in enumerate(event.args):
+            if arg.name != head:
+                continue
+            value = values[index]
+            for part in arg.fields:
+                if part.name == tail:
+                    value = (value >> part.shift) & ((1 << part.bits) - 1)
+            name = words.tables[table].name(value)
+            if name is not None:
+                found[key] = name
+    return found
+
+
+def _line(entry: _Entry) -> dict[str, Any]:
+    """Return the output object of one record."""
     line: dict[str, Any] = {
-        "seq": number,
-        "cpu": cpu,
-        "session": state.session,
-        "time_us": now + ring.wraps * (TIMER_MASK + 1),
+        "seq": entry.number,
+        "cpu": entry.cpu,
+        "session": entry.session,
+        "time_us": entry.time_us,
     }
-    if sequence != number & 0xFFFF:
-        line["seq_in_record"] = sequence
+    if entry.sequence != entry.number & 0xFFFF:
+        line["seq_in_record"] = entry.sequence
+    event = entry.words.events.get(entry.ident)
+    values = (entry.arg0, entry.arg1)
     if event is None:
-        line.update(event=f"unknown_0x{ident:04X}", id=ident, unknown=True)
-        line["args"] = {"arg0": _show(arg0, "hex", 32), "arg1": _show(arg1, "hex", 32)}
+        line.update(event=f"unknown_0x{entry.ident:04X}", id=entry.ident, unknown=True)
+        line["args"] = {
+            name: _show(value, "hex", 32)
+            for name, value in zip(("arg0", "arg1"), values)
+        }
     else:
         line.update(event=event.name, level=event.level)
-        values = (arg0, arg1)
         line["args"] = {
             arg.name: arg.value(values[index]) for index, arg in enumerate(event.args)
         }
-    line["build"] = build
+        names = _names_of(event, values, entry.words)
+        if names:
+            line["names"] = names
+    line["build"] = entry.build
+    if entry.recovered:
+        line["recovered"] = True
     return line
 
 
-def decode(data: bytes, words: Dictionary) -> Iterator[dict[str, Any]]:
+def decode(
+    data: bytes, words: Dictionary, others: Mapping[bytes, Dictionary] | None = None
+) -> Iterator[dict[str, Any]]:
     """Yield one JSON-ready object per record of a log file, in file order.
 
     A record object has ``seq`` (the record's number on its CPU), ``cpu``,
-    ``session`` (the count of ``boot`` events read so far; 0 before the first
-    one), ``time_us`` (microseconds; it goes on across timer wraps inside a
-    session), ``event``, ``level``, ``args`` and ``build``. A record whose id
+    ``session``, ``time_us`` (microseconds since the start; it goes on across
+    timer wraps inside a session), ``event``, ``level``, ``args`` and
+    ``build``. ``names`` is there when a name table of the dictionary has a
+    name for a value: its keys are ``arg`` or ``arg.field``. A record whose id
     is not in the dictionary has ``unknown: true``, its ``id`` and the two raw
-    arguments. Records that were still in RAM after a restart and were written
-    by the next session have ``recovered: true``.
+    arguments.
+
+    ``session`` counts the starts of the camera in the file, from 1. A session
+    begins at its ``boot`` record, or at the records that the same start put
+    before it (errors that the firmware records before the boot task runs).
+    Records before the first start have session 0. Records that were still in
+    RAM after a restart and were written by the next session have their own
+    session's number and ``recovered: true``: they are the last events before
+    a crash.
 
     Marker objects have a ``marker`` key:
 
@@ -366,105 +789,19 @@ def decode(data: bytes, words: Dictionary) -> Iterator[dict[str, Any]]:
     - ``truncated``: a block ends before its last record (``missing``).
     - ``garbage``: bytes that are not part of a block were skipped (zero bytes
       after a block are padding and give no marker).
-    - ``dictionary_mismatch``: a block was written by a firmware with another
-      dictionary; its events may have the wrong names.
+    - ``dictionary_mismatch``: a block was written by a firmware with a
+      dictionary that is not given; its events may have the wrong names.
+
+    Args:
+        data: the bytes of the file.
+        words: the dictionary of the repository.
+        others: dictionaries of other builds by build id. A block is decoded
+            with the dictionary that has its build id.
 
     Raises:
         LogError: the data has no block at all.
     """
-    state = _State()
-    offset = _next_header(data, 0)
-    if offset >= len(data):
-        raise LogError("no log block found (a block starts with 'EPLG')")
-    if offset:
-        yield {"marker": "garbage", "offset": 0, "bytes": offset}
-    while offset < len(data):
-        if len(data) - offset < HEADER_SIZE:
-            yield {"marker": "truncated", "offset": offset, "missing": "block header"}
-            return
-        _, _, _, cpu, _, ident, first, count, drops, restarts = _HEADER.unpack_from(
-            data, offset
-        )
-        build = ident.hex()
-        if ident != words.build_id and ident not in state.warned:
-            state.warned.add(ident)
-            yield {
-                "marker": "dictionary_mismatch",
-                "build": build,
-                "dictionary": words.build_id.hex(),
-            }
-        ring = state.cpus.setdefault(cpu, _Cpu())
-        offset += HEADER_SIZE
-        repeated = 0
-        if ring.expected is not None and first < ring.expected:
-            overlap = min(count, ring.expected - first)
-            whole = data[offset : offset + RECORD_SIZE * overlap]
-            if whole == b"".join(
-                ring.seen.get(first + index, b"") for index in range(overlap)
-            ):
-                repeated = overlap
-        if repeated:
-            yield {"marker": "repeat", "cpu": cpu, "seq": first, "records": repeated}
-            offset += RECORD_SIZE * repeated
-            first += repeated
-            count -= repeated
-        if ring.expected is not None and first < ring.expected:
-            yield {"marker": "ring_restart", "cpu": cpu, "seq": first}
-            ring.drops = 0
-            ring.seen.clear()
-        elif ring.expected is not None and first > ring.expected:
-            yield {
-                "marker": "gap",
-                "cpu": cpu,
-                "seq": first,
-                "lost": first - ring.expected,
-            }
-        elif drops > ring.drops and ring.expected is None:
-            yield {
-                "marker": "gap",
-                "cpu": cpu,
-                "seq": first,
-                "lost": drops - ring.drops,
-            }
-        ring.drops = drops
-        lines: list[dict[str, Any]] = []
-        done = 0
-        while done < count and len(data) - offset >= RECORD_SIZE:
-            if _is_header(data, offset):
-                break
-            ring.seen[first + done] = data[offset : offset + RECORD_SIZE]
-            ring.seen.pop(first + done - SEEN_RECORDS, None)
-            lines.append(
-                _record(
-                    data[offset : offset + RECORD_SIZE],
-                    first + done,
-                    cpu,
-                    build,
-                    state,
-                    words,
-                )
-            )
-            offset += RECORD_SIZE
-            done += 1
-        boots = [
-            index
-            for index, line in enumerate(lines)
-            if line["event"] == BOOT_EVENT and restarts
-        ]
-        for line in lines[: boots[-1] if boots else 0]:
-            line["recovered"] = True
-        yield from lines
-        ring.expected = first + done
-        if done < count:
-            yield {
-                "marker": "truncated",
-                "cpu": cpu,
-                "seq": first + done,
-                "missing": count - done,
-            }
-            ring.expected = None
-        following = _next_header(data, offset)
-        between = data[offset:following]
-        if any(between) and not (done < count and following == len(data)):
-            yield {"marker": "garbage", "offset": offset, "bytes": len(between)}
-        offset = following
+    items = _read(data, words, others or {})
+    _sessions(items)
+    for item in items:
+        yield _line(item) if isinstance(item, _Entry) else item

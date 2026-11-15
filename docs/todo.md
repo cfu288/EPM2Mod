@@ -12,6 +12,9 @@ and delete the item here.
 
 ## Focus peaking
 
+- Live view is slow while coloured peaking lines show: 3 to 7 frames per second in the first camera
+  log (median period 196 ms; the build asks for 85 ms). Find the share of the colour loop: one log
+  each with White, Red and stock Key Line on the debug build. Then make the loop faster.
 - Peaking without the zoom: the trigger is the MF Assist state object, which also asks for the zoom.
   It needs the E-P5 state object paired (NOTES §15.5).
 - The words Peaking, White and Black are English only: the other languages keep the old texts of
@@ -45,8 +48,10 @@ and delete the item here.
 
 ## Foundations
 
-- **Structured log: test on the camera** (`debug-log-core`, then `debug-log`; steps in
-  `experiments/2026-11-15-log/NOTES.md` §8, design in `docs/logging.md`). The camera writes compact binary event
+- Structured log: works on the camera (2026-11-15). Evaluation of the first log and the next
+  probes (power-on factor, real restart count, per-CPU gates, peaking loop time, flush end):
+  `experiments/2026-11-15-log/evaluation-1.md`. Unknown: if the ring RAM survives a crash restart.
+  A ring overflows after about 100 s of peaking without a menu. The camera writes compact binary event
   records to `EPM2LOG.BIN` on the card; `epm2mod log` decodes them to JSON lines with the dictionary
   `logs/events.json`. A debug build only: the pinned build stays without it. Probes go into the old
   features too (peaking, picture mode changes, level gauge, interval, film looks, firmware errors).

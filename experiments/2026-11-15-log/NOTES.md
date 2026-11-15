@@ -243,8 +243,10 @@ card to the machine with the repository, then `uv run epm2mod log /path/to/EPM2L
 ## Camera result 1 (2026-11-15): the log works
 
 The owner flashed `debug-log` (sha256 `e74f1aec…bda8`), used the camera outdoors, and sent `EPM2LOG.BIN`
-(32,256 bytes, 63 blocks). `epm2mod log` decodes 1,280 records in 2 sessions, with no gap marker and 16
+(32,256 bytes, 63 blocks). `epm2mod log` decodes 1,278 records in 2 sessions, with no gap marker and 16
 flushes, each with the result ok.
+
+The full evaluation is in [evaluation-1.md](evaluation-1.md). It corrects two rows of this table (marked).
 
 | Finding | Evidence | Label |
 |---|---|---|
@@ -252,8 +254,8 @@ flushes, each with the result ok.
 | The start-up hooks and all 19 probes run on the camera | every event of the dictionary is in the file but `iv_*` of a long sequence | V |
 | The firmware records four pairs of its own errors at every start: `0x19000C03` (caller 0x7E4261AF) and `0x19000C02` (caller 0x7E4261D8), one pair on CPU 0 at 19 ms and three on CPU 1 at 46, 92 and 96 ms | both sessions, the same arguments each time (0x602A9B40 / 0x7E8DA000, 0x603B2E38 / 0x7E47D7C4, 0x603F4674 / 0x7FFEA000, 0x60404674 / 0x7FFDA000). The code at 0x7E426197 is stock: it tests bit 31 of a word and reports when the bit is clear | V that they occur. Meaning, from the code (I): the routine 0x7E426045 sets up a transfer for a channel of the table at 0x600012CC (source, destination, count). It tests bit 31 of the source and of the destination address. An address with bit 31 clear is a cached address: the routine records the code and then calls the cache routine 0x7E45DA9D before it starts the transfer. The arguments fit: 0x603F4674 is the RAM image of the settings bank and 0x7FFEA000 its flash copy. So these are four start-up copies with cached addresses, handled by the stock code. They are not from the stabiliser |
 | The emulator's two `0x2A001001` errors do not occur on the camera, and the camera's `0x19000C0x` errors do not occur in the emulator | this file against the emulator runs | V |
-| The ring RAM keeps its content over a restart without power-off, and loses it at power-off | in both sessions the first four CPU 0 records are `recovered` and `boot` has the count 1; session 2 starts with `ring_restart` | I (it also means that each power-on has two starts of CPU 0) |
+| **Corrected:** the ring RAM is clear at each power-on. The file does not show a restart that kept the RAM. Each power-on has one start of CPU 0 | Both rings begin at record 0 in session 2. The four CPU 0 records before `boot` are the error records at 19 ms of the same start: they make the ring, so the boot hook finds it and counts 1 (evaluation-1 §2.1). The first decode marked them `recovered`; the decoder is corrected | V. A restart after a crash is still U |
 | Peaking: Red, Yellow and Blue ran the colour pass (`pk_latch` C = 2, 4, 5; `pk_pass9` with the picture at 0xB596A940 and first line bytes 1 to 255) | session 1 | V |
 | Velvia (art 167) went through the six-axis handler 0x7E880FD4 47 times with no fault | `art_sixaxis` | V |
 | Level Adjust: the working set at start is x −26, y 1020, z −9 in both sessions, so the calibration stays over power-off. After Adjust in session 2: x −25, y 1018, z −5 | `lv_values`, `lv_adjust` mode 1 | V |
-| Interval: one sequence of 2 frames ran to its end (`iv_frame` 1 and 2, `iv_end` frames 2); four other starts ended with 0 frames | session 1 | V; why 0 frames is U (a cancel or the menu) |
+| **Corrected:** interval: one sequence of 3 frames ran to its end. `iv_frame` is not logged for the last frame. The four other `iv_start` records are the arming of the mode at the standby screen, and `iv_end` with 0 frames is the disarming for a menu | session 1; evaluation-1 §3.5 | V |

@@ -11,11 +11,12 @@ The log is in the build `builds/debug-log.json` only: the pinned specs, then `pa
 
 | Part | Where | What it does |
 |---|---|---|
-| Dictionary | `logs/events.json` | The id, name, level and argument formats of each event. The camera stores no text |
+| Dictionary | `logs/events.json` | The id, name, level and argument formats of each event, and name tables for values. The camera stores no text |
+| Dictionaries of flashed builds | `logs/events-BUILDID.json` | The event list of a build that was on a camera, kept when `events.json` changes |
 | Generator | `experiments/2026-11-15-log/scripts/mkspec_log.py` | Reads the dictionary and writes the two patch specs |
 | Log core | `patches/log-core.json` | `log_put`, `log_chg`, `log_cnt`, the flush task, and the events boot, firmware error and GUI state |
 | Probes | `patches/log-probes.json` | One hook and one small routine per event of a feature |
-| Decoder | `src/epm2mod/eventlog.py`, command `epm2mod log` | Reads the file and the dictionary, prints JSON lines |
+| Decoder | `src/epm2mod/eventlog.py`, `src/epm2mod/logsummary.py`, command `epm2mod log` | Reads the file and the dictionary, prints JSON lines or a summary |
 
 ## The record
 
@@ -48,7 +49,7 @@ writes as many blocks as it needs for each CPU that has new records. The header:
 | 16 | 4 | number of the first record |
 | 20 | 4 | number of records |
 | 24 | 4 | records lost on this CPU since the ring was started |
-| 28 | 4 | restarts that found the ring in RAM |
+| 28 | 4 | how often the boot hook found a ring in RAM (CPU 0; see `boot` below) |
 
 The flush runs when the GUI enters a menu, playback or the power-off state, and only if the GUI's
 `isMediaWriting` says that the card is idle. It stops when the file has 4 MiB: delete the file to go on.
@@ -63,26 +64,77 @@ not keep them (`flush` then shows `not_saved`).
 
 ```sh
 cp /path/to/card/EPM2LOG.BIN /tmp/scratch/
+uv run epm2mod log /tmp/scratch/EPM2LOG.BIN --summary
 uv run epm2mod log /tmp/scratch/EPM2LOG.BIN > /tmp/scratch/log.jsonl
 ```
 
-One line is one record:
+`--summary` prints a short report: the sessions, lost records, the firmware's error records, the flushes, the
+count of each event, the screens, and one or two lines for peaking, the film looks, shooting, interval shooting
+and the level gauge. Start with it. The evaluation of the first file from a camera is in
+[experiments/2026-11-15-log/evaluation-1.md](../experiments/2026-11-15-log/evaluation-1.md).
+
+Without the option, one line is one record:
 
 ```json
-{"seq": 5, "cpu": 0, "session": 1, "time_us": 41806, "event": "fw_error", "level": "error", "args": {"code": "0x2A001001", "caller": "0x7E579DCC"}, "build": "d1ddd46b4dac2414"}
+{"seq": 100, "cpu": 0, "session": 1, "time_us": 34432550, "event": "shoot_cbs", "level": "info", "args": {"cbs": 136, "result": "0x00000000"}, "names": {"cbs": "capture starts (inferred)"}, "build": "d1ddd46b4dac2414"}
 ```
 
-- `seq` is the record's number on its CPU. `session` counts the `boot` events in the file.
+- `seq` is the record's number on its CPU.
+- `session` counts the starts of the camera in the file, from 1. A session begins at its `boot` record, or at
+  the records that the same start put before it: the camera's firmware records errors 19 ms after power-on, and
+  the boot task runs at 101 ms.
 - `time_us` starts near 0 at power-on. Both CPUs read the same timer.
-- `recovered: true`: the record was still in RAM after a restart and the next session wrote it. These are
-  the last events before a crash.
+- `names` gives the name of a value where the dictionary has a table for it: GUI states, shooting callbacks,
+  art codes (with the film of `looks/films.json`), matrix tables, the peaking colour. The key is the argument, or
+  `argument.field`. `args` always holds the number.
+- `recovered: true`: the record was still in RAM after a restart and the next session wrote it. It has the
+  session number of the session that logged it. These are the last events before a crash. The decoder finds
+  them like this: they are in the same write as the new session's start, after the old session's last `flush`
+  record, and their time is later than the new `boot` record's time (or more than 1 s before it). For CPU 1 the
+  border is the record at which the time goes back.
 - A record with an id that is not in the dictionary has `unknown: true` and its two raw arguments.
 - A line with `marker` is not a record: `gap` (records were lost, with the count), `ring_restart` (RAM was
   clear at a start), `repeat` (records that are in the file twice; they are given once), `truncated`,
-  `garbage`, `dictionary_mismatch` (the file comes from a firmware with another dictionary: use the
+  `garbage`, `dictionary_mismatch` (the file comes from a firmware whose dictionary is not in `logs/`: use the
   `logs/events.json` of that commit, `--dict FILE`).
 
+`boot` has the argument `ring_found` (`session` in the build `d1ddd46b4dac2414`). It is not the session number.
+The boot hook adds 1 when it finds a ring in RAM. On the camera the error records of the same start have
+already made the ring, so a power-on gives 1. A restart that kept the RAM gives 2 or more. The camera clears
+this RAM at power-off (camera result 1).
+
 To filter, use `jq`: `jq -c 'select(.level == "error")' /tmp/scratch/log.jsonl`.
+
+## The dictionary, name tables and older builds
+
+`logs/events.json` has three kinds of content:
+
+| Key | Use | Part of the build id |
+|---|---|---|
+| `events[].id`, `name`, `level`, `args` | what the firmware writes and how the decoder shows it | yes |
+| `events[].doc`, `spec`, `feature` | notes | no |
+| `events[].names`, `tables`, `film_entries` | names for values | no |
+
+- `tables` maps a table name to `{value: text}`. A value is decimal (`"259"`), hexadecimal (`"0x5B00"`) or a
+  group of 256 values (`"0x5Bxx"`, used when the value has no entry of its own).
+- `names` of an event maps an argument (`"state"`) or a field (`"latch.C"`) to a table name.
+- `film_entries` says which art code belongs to which menu entry of `looks/films.json`. `epm2mod log` then shows
+  the film: `Velvia (Diorama)`.
+- A name that is inferred says so in its text. Correct a name, a `doc` text or a table at any time: the build
+  id stays, and old log files decode with the new names.
+
+**When an id, a name, a level or an argument changes, the build id changes.** A camera may still run the build
+with the old id. So, before the change, copy the event list to `logs/events-BUILDID.json` (the keys `format`,
+`record_size`, `events`; no `tables`: it takes those of `events.json`). `epm2mod log` reads every
+`logs/events-*.json` and decodes each block with the dictionary that has the block's build id. A test checks
+that the file name is the build id of its content, and that the two patch specs carry the build id of one of the
+dictionaries in `logs/`.
+
+State on 2026-11-15: `patches/log-core.json` and `patches/log-probes.json` are the flashed ones (build id
+`d1ddd46b4dac2414`, dictionary `logs/events-d1ddd46b4dac2414.json`). `logs/events.json` (build id
+`bd632fb32c6e7094`) renames three arguments: `boot.session` → `ring_found`, `iv_end.frames` → `iv_frames`,
+`film_matrix.d3` → `stack`. The generator gives the same code for it but the 8 bytes of the build id in the flush
+task (checked). The next generator run writes the specs with the new id.
 
 ## How to add an event and a probe
 
@@ -128,9 +180,10 @@ To filter, use `jq`: `jq -c 'select(.level == "error")' /tmp/scratch/log.jsonl`.
 
    Then run the emulator checks of the notes. The generator refuses a site that is not on an instruction
    boundary, a pc-relative instruction other than `call`, and a branch target inside the replaced bytes.
-5. A change of an id, name, level or argument gives a new build id, and the decoder marks a file from
-   another build id. The `doc` texts do not count. A test fails when the two specs were not generated from
-   the dictionary in the repository.
+5. A change of an id, name, level or argument gives a new build id. If the old build was flashed, keep its
+   event list first (section "The dictionary, name tables and older builds"). The `doc` texts, `names` and
+   `tables` do not count. A test fails when the two specs carry a build id that no dictionary in `logs/` has.
+6. Give the enumerated values of a new event a table, so that the JSON lines and the summary show names.
 
 A probe costs 31 to 66 bytes for its routine and 5 to 10 bytes at its site, and no RAM, or 8 bytes of RAM for
 a gate. One `log_put` call runs about
