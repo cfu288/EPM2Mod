@@ -56,6 +56,15 @@ and delete the item here.
 - Higher bitrate and no 29-minute limit: the patches are written
   (`experiments/2026-11-12-hardware/`), not built and not flashed.
 
+## Exposure
+
+- **Minimum shutter speed with Auto ISO: the stock firmware has it.** The program holds the shutter at
+  max(1/(2 × focal length), 1/30, Flash Slow Limit), also without a flash. Set MENU → Custom Menu →
+  F → Slow Limit to 1/250 (the default is 1/60). Verified in the function harness, not yet on the
+  camera. A row of its own up to 1/4000 is prototyped (50 bytes in place, about one day with its
+  menu row). Exposure compensation in M with Auto ISO: 2 bytes at 0x7E5878AF, not run.
+  Notes: `experiments/2026-11-17-auto-iso-min-shutter/NOTES.md`.
+
 ## Foundations
 
 - Log defect (second camera log, 2026-11-15): the ring header is trusted when its magic word is

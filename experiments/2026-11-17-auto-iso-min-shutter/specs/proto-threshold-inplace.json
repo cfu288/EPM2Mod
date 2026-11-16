@@ -1,0 +1,17 @@
+{
+ "name": "proto-threshold-inplace",
+ "description": "HARNESS PROTOTYPE, not a camera build. The tail of the tv_th function 0x7E694001 written again in place (50 bytes, no new code area): tv_th = max(1/(2 x focal length), Flash Slow Limit, 1/30 x 2^k), k = the byte of the dormant setting 447 at RAM 0x60413275; the X-Sync cap stays only when the flash is on. See experiments/2026-11-17-auto-iso-min-shutter/NOTES.md.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x272fec",
+   "expect": "8119fac90005c2052c00059510f179f065821a19a6c1172218f06619a6c211f065f0621918a1c306f062ca04f06118dfa00c",
+   "new": "f8661819a4c20384fca975324160f8e107f8c108fac10005a4c20384f84606a501c90af8661019a4c30384dfa00ccbcbcbcb",
+   "_addr": "0X7E69400C",
+   "_note": "50 B, 4 B of nop at the end"
+  }
+ ]
+}

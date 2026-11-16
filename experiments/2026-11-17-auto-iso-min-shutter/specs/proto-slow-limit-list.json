@@ -1,0 +1,9 @@
+{
+ "name": "proto-slow-limit-list",
+ "description": "EMULATOR PROTOTYPE, not a camera build. Mode-controller value-list record of setting 174 (Flash Slow Limit) at 0x7E84B5F8: the list 0x7E849B2E (40 values, 1/250 down to 30 s) -> the part 30 s to 1/4000 of the stock shutter-speed list at 0x7E84932A (52 values, rising). 6 bytes. See experiments/2026-11-17-auto-iso-min-shutter/NOTES.md.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {"type": "bytes", "block": 0, "offset": "0x42a5dc", "expect": "2e9b847e000000005000", "new": "2a93847e000000006800", "_addr": "0x7E84B5FC", "_note": "list pointer and byte count of record 174"}
+ ]
+}

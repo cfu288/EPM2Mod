@@ -1,0 +1,90 @@
+# P1. k = 0 (Auto): tv_th for focal lengths and Slow Limits, flash off and on
+flash=0 mode 3 feq= 18mm slow=  1.0s bv= 1.00 | tv_th=  1/32 | Tv 0528    1/36  Av 02d8  f/2.7  Sv 0700 ISO   400  over=0 dev=0
+flash=0 mode 3 feq= 18mm slow=  1/64 bv= 1.00 | tv_th=  1/64 | Tv 0628    1/71  Av 02d8  f/2.7  Sv 0800 ISO   800  over=0 dev=0
+flash=0 mode 3 feq= 18mm slow= 1/256 bv= 1.00 | tv_th= 1/256 | Tv 0750   1/159  Av 02b0  f/2.5  Sv 0900 ISO  1600  over=0 dev=0
+flash=0 mode 3 feq= 34mm slow=  1.0s bv= 1.00 | tv_th=  1/34 | Tv 0533    1/37  Av 02cd  f/2.6  Sv 0700 ISO   400  over=0 dev=0
+flash=0 mode 3 feq= 34mm slow=  1/64 bv= 1.00 | tv_th=  1/64 | Tv 0628    1/71  Av 02d8  f/2.7  Sv 0800 ISO   800  over=0 dev=0
+flash=0 mode 3 feq= 34mm slow= 1/256 bv= 1.00 | tv_th= 1/256 | Tv 0750   1/159  Av 02b0  f/2.5  Sv 0900 ISO  1600  over=0 dev=0
+flash=0 mode 3 feq= 90mm slow=  1.0s bv= 1.00 | tv_th=  1/90 | Tv 0691    1/95  Av 02c3  f/2.6  Sv 0854 ISO  1004  over=0 dev=0
+flash=0 mode 3 feq= 90mm slow=  1/64 bv= 1.00 | tv_th=  1/90 | Tv 0691    1/95  Av 02c3  f/2.6  Sv 0854 ISO  1004  over=0 dev=0
+flash=0 mode 3 feq= 90mm slow= 1/256 bv= 1.00 | tv_th= 1/256 | Tv 0750   1/159  Av 02b0  f/2.5  Sv 0900 ISO  1600  over=0 dev=0
+flash=0 mode 3 feq=300mm slow=  1.0s bv= 1.00 | tv_th= 1/300 | Tv 0750   1/159  Av 02b0  f/2.5  Sv 0900 ISO  1600  over=0 dev=0
+flash=0 mode 3 feq=300mm slow=  1/64 bv= 1.00 | tv_th= 1/300 | Tv 0750   1/159  Av 02b0  f/2.5  Sv 0900 ISO  1600  over=0 dev=0
+flash=0 mode 3 feq=300mm slow= 1/256 bv= 1.00 | tv_th= 1/300 | Tv 0750   1/159  Av 02b0  f/2.5  Sv 0900 ISO  1600  over=0 dev=0
+flash=0 mode 3 feq=600mm slow=  1.0s bv= 1.00 | tv_th= 1/601 | Tv 0750   1/159  Av 02b0  f/2.5  Sv 0900 ISO  1600  over=0 dev=0
+flash=0 mode 3 feq=600mm slow=  1/64 bv= 1.00 | tv_th= 1/601 | Tv 0750   1/159  Av 02b0  f/2.5  Sv 0900 ISO  1600  over=0 dev=0
+flash=0 mode 3 feq=600mm slow= 1/256 bv= 1.00 | tv_th= 1/601 | Tv 0750   1/159  Av 02b0  f/2.5  Sv 0900 ISO  1600  over=0 dev=0
+flash=1 mode 3 feq= 18mm slow=  1.0s bv= 1.00 | tv_th=  1/32 | Tv 0300     1/8  Av 0400  f/4.0  Sv 0600 ISO   200  over=0 dev=0
+flash=1 mode 3 feq= 18mm slow=  1/64 bv= 1.00 | tv_th=  1/64 | Tv 0600    1/64  Av 02b0  f/2.5  Sv 0600 ISO   200  over=0 dev=-432
+flash=1 mode 3 feq= 18mm slow= 1/256 bv= 1.00 | tv_th= 1/256 | Tv 0800   1/256  Av 02b0  f/2.5  Sv 0600 ISO   200  over=0 dev=-944
+flash=1 mode 3 feq= 34mm slow=  1.0s bv= 1.00 | tv_th=  1/34 | Tv 0300     1/8  Av 0400  f/4.0  Sv 0600 ISO   200  over=0 dev=0
+flash=1 mode 3 feq= 34mm slow=  1/64 bv= 1.00 | tv_th=  1/64 | Tv 0600    1/64  Av 02b0  f/2.5  Sv 0600 ISO   200  over=0 dev=-432
+flash=1 mode 3 feq= 34mm slow= 1/256 bv= 1.00 | tv_th= 1/256 | Tv 0800   1/256  Av 02b0  f/2.5  Sv 0600 ISO   200  over=0 dev=-944
+flash=1 mode 3 feq= 90mm slow=  1.0s bv= 1.00 | tv_th=  1/90 | Tv 0300     1/8  Av 0400  f/4.0  Sv 0600 ISO   200  over=0 dev=0
+flash=1 mode 3 feq= 90mm slow=  1/64 bv= 1.00 | tv_th=  1/90 | Tv 0600    1/64  Av 02b0  f/2.5  Sv 0600 ISO   200  over=0 dev=-432
+flash=1 mode 3 feq= 90mm slow= 1/256 bv= 1.00 | tv_th= 1/256 | Tv 0800   1/256  Av 02b0  f/2.5  Sv 0600 ISO   200  over=0 dev=-944
+flash=1 mode 3 feq=300mm slow=  1.0s bv= 1.00 | tv_th= 1/256 | Tv 0300     1/8  Av 0400  f/4.0  Sv 0600 ISO   200  over=0 dev=0
+flash=1 mode 3 feq=300mm slow=  1/64 bv= 1.00 | tv_th= 1/256 | Tv 0600    1/64  Av 02b0  f/2.5  Sv 0600 ISO   200  over=0 dev=-432
+flash=1 mode 3 feq=300mm slow= 1/256 bv= 1.00 | tv_th= 1/256 | Tv 0800   1/256  Av 02b0  f/2.5  Sv 0600 ISO   200  over=0 dev=-944
+flash=1 mode 3 feq=600mm slow=  1.0s bv= 1.00 | tv_th= 1/256 | Tv 0300     1/8  Av 0400  f/4.0  Sv 0600 ISO   200  over=0 dev=0
+flash=1 mode 3 feq=600mm slow=  1/64 bv= 1.00 | tv_th= 1/256 | Tv 0600    1/64  Av 02b0  f/2.5  Sv 0600 ISO   200  over=0 dev=-432
+flash=1 mode 3 feq=600mm slow= 1/256 bv= 1.00 | tv_th= 1/256 | Tv 0800   1/256  Av 02b0  f/2.5  Sv 0600 ISO   200  over=0 dev=-944
+# P2. k = 0..7, P, ISO limit 6400, 34 mm, Slow Limit 1/60, flash off
+k=0 mode 3 feq= 34mm slow=  1/64 bv= 9.00 | tv_th=  1/64 | Tv 0928   1/571  Av 05d8  f/7.6  Sv 0600 ISO   200  over=0 dev=0
+k=0 mode 3 feq= 34mm slow=  1/64 bv= 6.00 | tv_th=  1/64 | Tv 07a8   1/202  Av 0458  f/4.5  Sv 0600 ISO   200  over=0 dev=0
+k=0 mode 3 feq= 34mm slow=  1/64 bv= 4.00 | tv_th=  1/64 | Tv 06a8   1/101  Av 0358  f/3.2  Sv 0600 ISO   200  over=0 dev=0
+k=0 mode 3 feq= 34mm slow=  1/64 bv= 2.00 | tv_th=  1/64 | Tv 0628    1/71  Av 02d8  f/2.7  Sv 0700 ISO   400  over=0 dev=0
+k=0 mode 3 feq= 34mm slow=  1/64 bv= 0.00 | tv_th=  1/64 | Tv 0628    1/71  Av 02d8  f/2.7  Sv 0900 ISO  1600  over=0 dev=0
+k=0 mode 3 feq= 34mm slow=  1/64 bv=-2.00 | tv_th=  1/64 | Tv 0628    1/71  Av 02d8  f/2.7  Sv 0b00 ISO  6400  over=0 dev=0
+k=1 mode 3 feq= 34mm slow=  1/64 bv= 9.00 | tv_th=  1/64 | Tv 0928   1/571  Av 05d8  f/7.6  Sv 0600 ISO   200  over=0 dev=0
+k=1 mode 3 feq= 34mm slow=  1/64 bv= 6.00 | tv_th=  1/64 | Tv 07a8   1/202  Av 0458  f/4.5  Sv 0600 ISO   200  over=0 dev=0
+k=1 mode 3 feq= 34mm slow=  1/64 bv= 4.00 | tv_th=  1/64 | Tv 06a8   1/101  Av 0358  f/3.2  Sv 0600 ISO   200  over=0 dev=0
+k=1 mode 3 feq= 34mm slow=  1/64 bv= 2.00 | tv_th=  1/64 | Tv 0628    1/71  Av 02d8  f/2.7  Sv 0700 ISO   400  over=0 dev=0
+k=1 mode 3 feq= 34mm slow=  1/64 bv= 0.00 | tv_th=  1/64 | Tv 0628    1/71  Av 02d8  f/2.7  Sv 0900 ISO  1600  over=0 dev=0
+k=1 mode 3 feq= 34mm slow=  1/64 bv=-2.00 | tv_th=  1/64 | Tv 0628    1/71  Av 02d8  f/2.7  Sv 0b00 ISO  6400  over=0 dev=0
+k=2 mode 3 feq= 34mm slow=  1/64 bv= 9.00 | tv_th= 1/128 | Tv 09a8   1/807  Av 0558  f/6.4  Sv 0600 ISO   200  over=0 dev=0
+k=2 mode 3 feq= 34mm slow=  1/64 bv= 6.00 | tv_th= 1/128 | Tv 0828   1/285  Av 03d8  f/3.8  Sv 0600 ISO   200  over=0 dev=0
+k=2 mode 3 feq= 34mm slow=  1/64 bv= 4.00 | tv_th= 1/128 | Tv 0728   1/143  Av 02d8  f/2.7  Sv 0600 ISO   200  over=0 dev=0
+k=2 mode 3 feq= 34mm slow=  1/64 bv= 2.00 | tv_th= 1/128 | Tv 0728   1/143  Av 02d8  f/2.7  Sv 0800 ISO   800  over=0 dev=0
+k=2 mode 3 feq= 34mm slow=  1/64 bv= 0.00 | tv_th= 1/128 | Tv 0728   1/143  Av 02d8  f/2.7  Sv 0a00 ISO  3200  over=0 dev=0
+k=2 mode 3 feq= 34mm slow=  1/64 bv=-2.00 | tv_th= 1/128 | Tv 0650    1/79  Av 02b0  f/2.5  Sv 0b00 ISO  6400  over=0 dev=0
+k=3 mode 3 feq= 34mm slow=  1/64 bv= 9.00 | tv_th= 1/256 | Tv 0a28  1/1141  Av 04d8  f/5.4  Sv 0600 ISO   200  over=0 dev=0
+k=3 mode 3 feq= 34mm slow=  1/64 bv= 6.00 | tv_th= 1/256 | Tv 08a8   1/403  Av 0358  f/3.2  Sv 0600 ISO   200  over=0 dev=0
+k=3 mode 3 feq= 34mm slow=  1/64 bv= 4.00 | tv_th= 1/256 | Tv 0828   1/285  Av 02d8  f/2.7  Sv 0700 ISO   400  over=0 dev=0
+k=3 mode 3 feq= 34mm slow=  1/64 bv= 2.00 | tv_th= 1/256 | Tv 0828   1/285  Av 02d8  f/2.7  Sv 0900 ISO  1600  over=0 dev=0
+k=3 mode 3 feq= 34mm slow=  1/64 bv= 0.00 | tv_th= 1/256 | Tv 0828   1/285  Av 02d8  f/2.7  Sv 0b00 ISO  6400  over=0 dev=0
+k=3 mode 3 feq= 34mm slow=  1/64 bv=-2.00 | tv_th= 1/256 | Tv 0650    1/79  Av 02b0  f/2.5  Sv 0b00 ISO  6400  over=0 dev=0
+k=4 mode 3 feq= 34mm slow=  1/64 bv= 9.00 | tv_th= 1/512 | Tv 0aa8  1/1614  Av 0458  f/4.5  Sv 0600 ISO   200  over=0 dev=0
+k=4 mode 3 feq= 34mm slow=  1/64 bv= 6.00 | tv_th= 1/512 | Tv 0928   1/571  Av 02d8  f/2.7  Sv 0600 ISO   200  over=0 dev=0
+k=4 mode 3 feq= 34mm slow=  1/64 bv= 4.00 | tv_th= 1/512 | Tv 0928   1/571  Av 02d8  f/2.7  Sv 0800 ISO   800  over=0 dev=0
+k=4 mode 3 feq= 34mm slow=  1/64 bv= 2.00 | tv_th= 1/512 | Tv 0928   1/571  Av 02d8  f/2.7  Sv 0a00 ISO  3200  over=0 dev=0
+k=4 mode 3 feq= 34mm slow=  1/64 bv= 0.00 | tv_th= 1/512 | Tv 0850   1/318  Av 02b0  f/2.5  Sv 0b00 ISO  6400  over=0 dev=0
+k=4 mode 3 feq= 34mm slow=  1/64 bv=-2.00 | tv_th= 1/512 | Tv 0650    1/79  Av 02b0  f/2.5  Sv 0b00 ISO  6400  over=0 dev=0
+k=5 mode 3 feq= 34mm slow=  1/64 bv= 9.00 | tv_th=1/1024 | Tv 0b28  1/2282  Av 03d8  f/3.8  Sv 0600 ISO   200  over=0 dev=0
+k=5 mode 3 feq= 34mm slow=  1/64 bv= 6.00 | tv_th=1/1024 | Tv 0a28  1/1141  Av 02d8  f/2.7  Sv 0700 ISO   400  over=0 dev=0
+k=5 mode 3 feq= 34mm slow=  1/64 bv= 4.00 | tv_th=1/1024 | Tv 0a28  1/1141  Av 02d8  f/2.7  Sv 0900 ISO  1600  over=0 dev=0
+k=5 mode 3 feq= 34mm slow=  1/64 bv= 2.00 | tv_th=1/1024 | Tv 0a28  1/1141  Av 02d8  f/2.7  Sv 0b00 ISO  6400  over=0 dev=0
+k=5 mode 3 feq= 34mm slow=  1/64 bv= 0.00 | tv_th=1/1024 | Tv 0850   1/318  Av 02b0  f/2.5  Sv 0b00 ISO  6400  over=0 dev=0
+k=5 mode 3 feq= 34mm slow=  1/64 bv=-2.00 | tv_th=1/1024 | Tv 0650    1/79  Av 02b0  f/2.5  Sv 0b00 ISO  6400  over=0 dev=0
+k=6 mode 3 feq= 34mm slow=  1/64 bv= 9.00 | tv_th=1/2048 | Tv 0ba8  1/3228  Av 0358  f/3.2  Sv 0600 ISO   200  over=0 dev=0
+k=6 mode 3 feq= 34mm slow=  1/64 bv= 6.00 | tv_th=1/2048 | Tv 0b28  1/2282  Av 02d8  f/2.7  Sv 0800 ISO   800  over=0 dev=0
+k=6 mode 3 feq= 34mm slow=  1/64 bv= 4.00 | tv_th=1/2048 | Tv 0b28  1/2282  Av 02d8  f/2.7  Sv 0a00 ISO  3200  over=0 dev=0
+k=6 mode 3 feq= 34mm slow=  1/64 bv= 2.00 | tv_th=1/2048 | Tv 0a50  1/1272  Av 02b0  f/2.5  Sv 0b00 ISO  6400  over=0 dev=0
+k=6 mode 3 feq= 34mm slow=  1/64 bv= 0.00 | tv_th=1/2048 | Tv 0850   1/318  Av 02b0  f/2.5  Sv 0b00 ISO  6400  over=0 dev=0
+k=6 mode 3 feq= 34mm slow=  1/64 bv=-2.00 | tv_th=1/2048 | Tv 0650    1/79  Av 02b0  f/2.5  Sv 0b00 ISO  6400  over=0 dev=0
+k=7 mode 3 feq= 34mm slow=  1/64 bv= 9.00 | tv_th=1/4096 | Tv 0c00  1/4096  Av 0300  f/2.8  Sv 0600 ISO   200  over=0 dev=0
+k=7 mode 3 feq= 34mm slow=  1/64 bv= 6.00 | tv_th=1/4096 | Tv 0c00  1/4096  Av 0300  f/2.8  Sv 0900 ISO  1600  over=0 dev=0
+k=7 mode 3 feq= 34mm slow=  1/64 bv= 4.00 | tv_th=1/4096 | Tv 0c00  1/4096  Av 0300  f/2.8  Sv 0b00 ISO  6400  over=0 dev=0
+k=7 mode 3 feq= 34mm slow=  1/64 bv= 2.00 | tv_th=1/4096 | Tv 0a50  1/1272  Av 02b0  f/2.5  Sv 0b00 ISO  6400  over=0 dev=0
+k=7 mode 3 feq= 34mm slow=  1/64 bv= 0.00 | tv_th=1/4096 | Tv 0850   1/318  Av 02b0  f/2.5  Sv 0b00 ISO  6400  over=0 dev=0
+k=7 mode 3 feq= 34mm slow=  1/64 bv=-2.00 | tv_th=1/4096 | Tv 0650    1/79  Av 02b0  f/2.5  Sv 0b00 ISO  6400  over=0 dev=0
+# P3. k = 5 (1/1000) with the flash on: the X-Sync cap holds
+k=5 flash=1 mode 3 feq= 34mm slow=  1/64 bv= 9.00 | tv_th= 1/256 | Tv 0800   1/256  Av 0700 f/11.3  Sv 0600 ISO   200  over=0 dev=0
+k=5 flash=1 mode 3 feq= 34mm slow=  1/64 bv= 4.00 | tv_th= 1/256 | Tv 0600    1/64  Av 0400  f/4.0  Sv 0600 ISO   200  over=0 dev=0
+k=5 flash=1 mode 3 feq= 34mm slow=  1/64 bv= 0.00 | tv_th= 1/256 | Tv 0600    1/64  Av 02b0  f/2.5  Sv 0600 ISO   200  over=0 dev=-688
+# P4. A mode f/4, k = 4 (1/500)
+k=4 mode 4 feq= 34mm slow=  1/64 bv= 9.00 | tv_th= 1/512 | Tv 0b00  1/2048  Av 0400  f/4.0  Sv 0600 ISO   200  over=0 dev=0
+k=4 mode 4 feq= 34mm slow=  1/64 bv= 6.00 | tv_th= 1/512 | Tv 0900   1/512  Av 0400  f/4.0  Sv 0700 ISO   400  over=0 dev=0
+k=4 mode 4 feq= 34mm slow=  1/64 bv= 4.00 | tv_th= 1/512 | Tv 0900   1/512  Av 0400  f/4.0  Sv 0900 ISO  1600  over=0 dev=0
+k=4 mode 4 feq= 34mm slow=  1/64 bv= 2.00 | tv_th= 1/512 | Tv 0900   1/512  Av 0400  f/4.0  Sv 0b00 ISO  6400  over=0 dev=0
+k=4 mode 4 feq= 34mm slow=  1/64 bv= 0.00 | tv_th= 1/512 | Tv 0700   1/128  Av 0400  f/4.0  Sv 0b00 ISO  6400  over=0 dev=0
