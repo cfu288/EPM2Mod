@@ -6,7 +6,7 @@ after the last replaced byte, so the listing shows where the stock code continue
 """
 import json, os, re, subprocess, sys
 B = 0x7E421020
-OD = os.path.expanduser("~/opt/mn10300/bin/mn10300-elf-objdump")
+OD = os.path.join(os.path.abspath(__file__).split("/experiments/")[0], "build", "toolchain", "bin", "mn10300-elf-objdump")
 
 
 def dis(path, a, n):

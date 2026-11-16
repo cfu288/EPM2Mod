@@ -24,7 +24,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.a
 BASE = 0x7E421020
 STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
 PINNED_SHA = "4ea4ffd773d6f05d16867f55b9fef4bce5d53fc8659a9b16362f7ac771a6bc30"
-BIN = os.path.expanduser("~/opt/mn10300/bin")
+BIN = os.path.join(os.path.abspath(__file__).split("/experiments/")[0], "build", "toolchain", "bin")
 
 SETTING, PANEL = 458, 607
 MCON_REC, MCON_OLD, MCON_NEW = 0x7E84C584, 0x7E849F25, 0x7E849F28   # value-list record; lists 1,2,3 and 1..10

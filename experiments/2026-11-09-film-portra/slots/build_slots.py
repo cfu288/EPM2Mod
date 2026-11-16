@@ -5,7 +5,7 @@ Slots: Cross Process I, Light Tone, Pop Art I (as before) + Pale&Light I, Soft F
    python3 -I build_slots.py"""
 import json, os, struct, subprocess, sys
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.join(HERE, "..", "..", "..")
-BIN = os.path.expanduser("~/opt/mn10300/bin/mn10300-elf-"); B = 0x7E421020
+BIN = os.path.join(os.path.abspath(__file__).split("/experiments/")[0], "build", "toolchain", "bin", "mn10300-elf-"); B = 0x7E421020
 b0 = open(os.path.join(ROOT, "build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin"), "rb").read()
 u32 = lambda a: struct.unpack_from("<I", b0, a - B)[0]
 def op(addr, new): return {"type": "bytes", "block": 0, "offset": hex(addr - B), "expect": b0[addr - B:addr - B + len(new)].hex(), "new": bytes(new).hex()}

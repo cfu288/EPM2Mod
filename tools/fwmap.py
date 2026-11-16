@@ -40,7 +40,7 @@ import disasm  # noqa: E402  (objdump path, block cache, BASE)
 OUT = os.path.join(ROOT, "build", "map")
 FW = disasm.DEFAULT_FW   # --fw, --base and --out override these three for other bodies or versions
 BASE = disasm.BASE
-BIN = os.path.expanduser("~/opt/mn10300/bin")
+BIN = os.path.join(disasm.ROOT, "build", "toolchain", "bin")  # made by tools/setup.sh
 PAGE = 0x1000
 INSN = re.compile(r"^\s*([0-9a-f]+):\t(?:[0-9a-f ]+\t)?(\S+)\s*(.*)$")  # raw bytes column optional
 SYM = re.compile(r"^([0-9a-f]{8}) <(\w+)>:$")

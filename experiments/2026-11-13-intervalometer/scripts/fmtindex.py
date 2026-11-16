@@ -2,7 +2,7 @@
 # E-PM2 call sites (the last `mov imm,d0` before the call; the switch tail 0x7EDEC437 gets the switch's constants)
 import sys, struct, subprocess, os, re
 B=0x7E421020; D=open(sys.argv[1],'rb').read()
-od=os.path.expanduser('~/opt/mn10300/bin/mn10300-elf-objdump')
+od=os.path.join(os.path.abspath(__file__).split("/experiments/")[0], "build", "toolchain", "bin", "mn10300-elf-objdump")
 def dis(a,n):
     r=subprocess.run([od,'-D','-b','binary','-m','am33-2','-EL','--adjust-vma=%#x'%B,'--start-address=%#x'%a,'--stop-address=%#x'%(a+n),sys.argv[1]],capture_output=True,text=True).stdout
     return [l.split('\t') for l in r.splitlines() if re.match(r'^\s*[0-9a-f]+:\t',l)]

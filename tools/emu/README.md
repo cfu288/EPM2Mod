@@ -16,8 +16,8 @@ tools/emu/setup.sh
 ```
 
 - **om-emu** is the git submodule `third_party/om-emu`, pinned to upstream commit `0819080133f6` (MIT licence). The submodule is never edited. `tools/emu/setup.sh` exports the pinned commit to the working tree `build/om-emu/` (ignored by git) and applies our patches `tools/emu/om-emu-patches/*.patch`. A second run does nothing when the tree is up to date; `--force` makes it again; `--check` only reports.
-- **`OM_EMU_DIR`** overrides the working tree. Without it the tools use `build/om-emu`, and `~/opt/om-emu` when `build/om-emu` does not exist (the place used before 2026-11-15). The defaults are in `emuenv.py`.
-- **Node 26 or newer:** `node` on PATH when it is new enough, else `~/opt/node26/bin/node`. Override it with `OM_EMU_NODE`.
+- **`OM_EMU_DIR`** overrides the working tree. Without it the tools use `build/om-emu`. The defaults are in `emuenv.py`.
+- **Node 26 or newer:** `node` on PATH when it is new enough, else the newest Node that nvm has. `tools/setup.sh` gets one; the version is in `.nvmrc`. Override it with `OM_EMU_NODE`.
 - **Stock block 0:** `build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin`. This is the descrambled OE payload, sha256 `1b7c4bb1…71468d`; the harness checks it.
 
 ### What the first om-emu patch adds

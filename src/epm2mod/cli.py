@@ -2,7 +2,7 @@
 
 ::
 
-    epm2mod make [BUILD.json] [--card PATH]       make a firmware build
+    epm2mod make [BUILD.json] [--out DIR]         make a firmware build
     epm2mod pin BUILD.json --date D --sha256 H    record a passed camera test; pin the build
     epm2mod fetch-stock                           download and check the stock firmware
     epm2mod builds                                list the build descriptions
@@ -82,7 +82,7 @@ def _make(args: argparse.Namespace, paths: RepoPaths) -> int:
     named = Path(args.build) if args.build is not None else pinned_path(paths)
     clear_outputs(paths, named.stem)
     if args.card == "":
-        raise BuildError("--card needs the place where the SD card is mounted")
+        raise BuildError("--out needs a folder")
     description = (
         pinned_description(paths)
         if args.build is None
@@ -250,9 +250,13 @@ def build_parser() -> argparse.ArgumentParser:
         help="build description (builds/NAME.json); default: the pinned build",
     )
     make_cmd.add_argument(
+        "-o",
+        "--out",
         "--card",
-        metavar="PATH",
-        help="mount point of the SD card; the firmware is written to PATH/DCOLYMP/",
+        dest="card",
+        metavar="DIR",
+        help="also copy the firmware to DIR/DCOLYMP/E1019999.BIN: DIR is the top "
+        "folder of the SD card, or any folder that exists (--card is the same)",
     )
 
     pin_cmd = command(

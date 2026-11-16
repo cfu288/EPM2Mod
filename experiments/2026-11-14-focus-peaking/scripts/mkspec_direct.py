@@ -16,7 +16,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.a
 BASE = 0x7E421020
 STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
 BLOCK0 = os.path.join(ROOT, "build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin")
-BIN = os.path.expanduser("~/opt/mn10300/bin")
+BIN = os.path.join(os.path.abspath(__file__).split("/experiments/")[0], "build", "toolchain", "bin")
 FUNCS = os.path.join(ROOT, "build/map/functions.txt")
 
 # Camera-proven code space (freespace.py verdict USABLE-CODE). 0x7ECB0EF0-0x7ECB0F16 is left alone: the

@@ -5,7 +5,7 @@
    python3 -I build_slot3.py film-portra-xp10 film-ektachrome-lt3"""
 import json, os, struct, subprocess, sys
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.join(HERE, "..", "..", "..")
-BIN = os.path.expanduser("~/opt/mn10300/bin/mn10300-elf-"); B = 0x7E421020; CAVE = 0x7E880F5C; CAVE_LEN = 164
+BIN = os.path.join(os.path.abspath(__file__).split("/experiments/")[0], "build", "toolchain", "bin", "mn10300-elf-"); B = 0x7E421020; CAVE = 0x7E880F5C; CAVE_LEN = 164
 EXT = dict(PICK=0x7E56B732, GTAIL=0x7E56B852, M_T1=0x7E56C6B8, M_T2=0x7E56C6C3, M_APPLY=0x7E56C764, M_NONE=0x7E56C76B)
 b0 = open(os.path.join(ROOT, "build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin"), "rb").read()
 def op(addr, new):

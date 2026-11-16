@@ -28,7 +28,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.a
 BASE = 0x7E421020
 STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
 PINNED_SHA = "ce1037cda6c9ff87e600272383dfe97b649a5ef24d6928e319b581191b4ca2c8"
-BIN = os.path.expanduser("~/opt/mn10300/bin")
+BIN = os.path.join(os.path.abspath(__file__).split("/experiments/")[0], "build", "toolchain", "bin")
 
 OLD_ITEMS, OLD_KIDS, N = 0x7EBF3000, 0x7EBF3500, 79   # tables of level-adjust-row
 ITEMS, KIDS, ROWS = 0x7EBF2000, 0x7EBF2600, 0x7EBF2900  # new item table (1,282 B), child list (648 B), list items (84 B)

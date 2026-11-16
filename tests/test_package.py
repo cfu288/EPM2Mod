@@ -1172,9 +1172,6 @@ class MakeTests(RepoCase):
         with mock.patch.object(Path, "is_dir", side_effect=denied):
             with self.assertRaisesRegex(BuildError, "cannot be read"):
                 pipeline.check_card(self.card, TINY_STOCK)
-        with mock.patch.object(Path, "resolve", side_effect=RuntimeError("loop")):
-            with self.assertRaisesRegex(BuildError, "cannot be used as a path"):
-                self.make(self.repo.tested, card=self.card)
 
     def test_the_card(self) -> None:
         lines: list[str] = []
@@ -1187,21 +1184,24 @@ class MakeTests(RepoCase):
         self.make(self.repo.tested, card=self.card, log=lines.append)  # again: allowed
         self.assertTrue(any("._E1019999.BIN" in line for line in lines))
 
-    def test_a_folder_that_is_not_a_mounted_volume_is_not_a_card(self) -> None:
-        self.assertTrue(REAL_IS_VOLUME(Path(self.card.anchor)))
+    def test_the_firmware_can_go_to_any_folder(self) -> None:
         self.assertFalse(REAL_IS_VOLUME(self.card))
         plain = self.card.parent / "plain-folder"
         plain.mkdir()
-        with self.assertRaisesRegex(BuildError, "not the top of a mounted volume"):
-            self.make(self.repo.tested, card=plain)
-        self.assertEqual(list(plain.iterdir()), [])
-        self.assertEqual(self.repo.outputs(), [])
+        lines: list[str] = []
+        with mock.patch.object(pipeline, "is_volume", side_effect=REAL_IS_VOLUME):
+            result = self.make(self.repo.tested, card=plain, log=lines.append)
+        target = pipeline.card_target(plain, TINY_STOCK)
+        self.assertEqual(result.on_card, target)
+        self.assertEqual(target.read_bytes(), result.image.read_bytes())
+        text = "\n".join(lines)
+        self.assertIn("copied to:", text)
+        self.assertIn("Copy the folder DCOLYMP", text)  # not a card: no "Eject"
+        self.assertNotIn("Eject", text)
 
-    def test_the_volume_that_holds_the_repository_is_not_a_card(self) -> None:
-        with mock.patch.object(pipeline, "is_volume", return_value=True):
-            for card in (self.repo.paths.root, self.repo.paths.root.parent):
-                with self.assertRaisesRegex(BuildError, "holds this repository"):
-                    self.make(self.repo.tested, card=card)
+    def test_a_folder_that_does_not_exist_is_refused(self) -> None:
+        with self.assertRaisesRegex(BuildError, "no such folder"):
+            self.make(self.repo.tested, card=self.card.parent / "mistyped")
         self.assertEqual(self.repo.outputs(), [])
 
     def test_a_failed_folder_flush_on_the_card_is_reported_as_it_is(self) -> None:

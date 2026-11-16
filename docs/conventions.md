@@ -33,7 +33,7 @@ Examples: `feat(patch/movie-limit): raise 29-min cap to 9 h`, `docs(camera-log):
 | `src/epm2mod/` | The production package. It makes the firmware: container format, patch specs, stock download, build descriptions, build steps, film-spec generator. Command: `uv run epm2mod --help`. See *Production code and research code*. |
 | `tools/make_firmware.py`, `tools/fetch_stock.py` | The two main commands of the package as stand-alone scripts. `tools/_package.py` lets them import the package without an install. |
 | `tools/build.py`, `tools/oetool.py` | Older command-line forms. They call the package. Older scripts in `tools/` and `experiments/` import them. Do not use them to make firmware for a camera. |
-| `tools/freespace.py`, `tools/fwmap.py`, `tools/disasm.py`, `tools/memmap_svg.py`, `tools/emu/` | Analysis tools: the free-space check, the function database of block 0, MN103 disassembly (GNU objdump from `scripts/build-binutils-mn10300.sh`), the memory map figure, the emulator harness. |
+| `tools/freespace.py`, `tools/fwmap.py`, `tools/disasm.py`, `tools/memmap_svg.py`, `tools/emu/` | Analysis tools: the free-space check, the function database of block 0, MN103 disassembly (GNU objdump from `tools/setup.sh`, which builds it from the submodule `third_party/binutils-gdb` into `build/toolchain/`), the memory map figure, the emulator harness. |
 | `third_party/om-emu`, `tools/emu/om-emu-patches/`, `tools/emu/setup.sh` | The emulator om-emu as a git submodule (never edited), our patches to it, and the command that makes the patched working tree `build/om-emu/`. `tools/emu/boot-test` and `tools/emu/update-path-test` are the start-up checks of a build. |
 | `builds/`, `pinned-build.json` | One description per firmware build, and the pointer to the last camera-tested build. See *Making firmware*. |
 | `patches/` | One JSON spec per mod. Each operation states the bytes that it replaces. `patches/history/` holds superseded and failed specs as a record. |
@@ -90,7 +90,7 @@ build.
    sha256 the script runs `tools/freespace.py check` first, then prints the sha256 and says that the
    build is a candidate. The check needs the firmware map in `build/map/`, which a fresh clone
    does not have. To make the map: `python3 tools/fwmap.py build`. This needs GNU objdump for the
-   MN103 processor (`scripts/build-binutils-mn10300.sh`).
+   MN103 processor (`tools/setup.sh`, which builds it from the submodule `third_party/binutils-gdb` into `build/toolchain/`).
 
    A tested build does not need the map: its result is compared with the recorded sha256.
 

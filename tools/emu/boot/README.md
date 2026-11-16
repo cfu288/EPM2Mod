@@ -17,7 +17,8 @@ tools/emu/setup.sh                      # makes build/om-emu: the pinned om-emu 
 - **om-emu** is the submodule `third_party/om-emu`, pinned to commit `0819080133f6` (MIT licence). It is
   never edited. `setup.sh` exports it to `build/om-emu/` and applies `tools/emu/om-emu-patches/*.patch`.
   Run `setup.sh` again after a patch or the pin changes; it does nothing when the tree is up to date.
-- **Node 26 or newer.** The tools take `node` from PATH when it is new enough, else `~/opt/node26/bin/node`.
+- **Node 26 or newer.** The tools take `node` from PATH when it is new enough, else the newest Node that nvm has
+  (`tools/setup.sh`; the version is in `.nvmrc`).
   Override: `OM_EMU_NODE`.
 - **Firmware** is never in the repository. The tools unpack an image into `build/emu/NAME-SHA8/` when
   they need it. An IMAGE argument is `stock`, `builds/NAME.json` (its file is `build/NAME.BIN`), a `.BIN`

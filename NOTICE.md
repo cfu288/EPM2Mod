@@ -34,5 +34,5 @@ Dustin Yuchen Teng, MIT licence (`tools/third_party/ste100/LICENSE`). It checks 
 
 ## Tools you install yourself
 
-GNU binutils for MN10300 (`scripts/build-binutils-mn10300.sh` downloads and builds it), Node.js
+GNU binutils for MN10300 (the submodule `third_party/binutils-gdb`, release 2.43.1, GPL-3.0-or-later; `tools/setup.sh` builds it into `build/toolchain/`, and none of its code is copied into this repository's files), Node.js
 (version 26 or newer, for om-emu), ExifTool, and the Python packages numpy, scipy, numba, Pillow and rawpy.

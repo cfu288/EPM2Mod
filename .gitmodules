@@ -1,3 +1,7 @@
 [submodule "third_party/om-emu"]
 	path = third_party/om-emu
 	url = https://github.com/flatpanda/om-emu.git
+[submodule "third_party/binutils-gdb"]
+	path = third_party/binutils-gdb
+	url = https://sourceware.org/git/binutils-gdb.git
+	shallow = true

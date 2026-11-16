@@ -15,18 +15,15 @@ import argparse, os, shutil, subprocess, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import oetool  # noqa: E402
+import toolchain  # noqa: E402
 
 DEFAULT_FW = os.path.join(ROOT, "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN")
 BASE = 0x7E421020  # E-PM2 v1.6 block 0 runtime base (verified)
-OBJDUMP_CANDIDATES = [os.path.expanduser("~/opt/mn10300/bin/mn10300-elf-objdump"), "mn10300-elf-objdump"]
-
-
 def objdump_path():
-    for c in OBJDUMP_CANDIDATES:
-        p = shutil.which(c) or (c if os.path.exists(c) else None)
-        if p:
-            return p
-    sys.exit("mn10300 objdump not found; run scripts/build-binutils-mn10300.sh")
+    try:
+        return toolchain.binutils("objdump")
+    except toolchain.ToolchainError as error:
+        sys.exit(str(error))
 
 
 def block_file(fw, blk, cache_dir=None):

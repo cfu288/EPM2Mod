@@ -27,7 +27,7 @@ import bootmem  # noqa: E402
 
 BASE = 0x7E421020
 EARLY = ("pre-reset", "kernel", "data-image", "sram-image", "segment-1")
-OBJDUMP = os.environ.get("OM_OBJDUMP") or shutil.which("mn10300-elf-objdump") or os.path.expanduser("~/opt/mn10300/bin/mn10300-elf-objdump")
+OBJDUMP = os.environ.get("OM_OBJDUMP") or os.path.join(os.path.dirname(os.path.dirname(HERE)), "build", "toolchain", "bin", "mn10300-elf-objdump")
 XFER = re.compile(r"^\s*([0-9a-f]+):\s+(?:[0-9a-f]{2} )+\s*\t(jmp|call|b[a-z]{1,2}|l[a-z]{2})\t(?:0x)?([0-9a-f]{8})\b")
 
 

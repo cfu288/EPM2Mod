@@ -1,10 +1,8 @@
 """Paths and images for the emulator tools. Python standard library only.
 
-    OM_EMU_DIR    the patched om-emu working tree. Default: build/om-emu (made by tools/emu/setup.sh);
-                  when that is missing, ~/opt/om-emu (the place used before the emulator came into
-                  the repository).
+    OM_EMU_DIR    the patched om-emu working tree. Default: build/om-emu (made by tools/emu/setup.sh).
     OM_EMU_NODE   Node 26 or newer. Default: `node` on PATH when it is new enough, else
-                  ~/opt/node26/bin/node.
+                  the newest Node that nvm has (tools/setup.sh installs one).
     EMU_IMAGES    where unpacked images go. Default: build/emu (ignored by git).
 
 An IMAGE argument of the tools is one of:
@@ -15,6 +13,7 @@ An IMAGE argument of the tools is one of:
 No firmware is in the repository: the tools unpack an image into EMU_IMAGES/NAME-SHA8/ when needed.
 """
 
+import glob
 import hashlib
 import json
 import os
@@ -33,14 +32,11 @@ class EmuSetupError(Exception):
 
 
 def om_emu_dir():
-    """Return the om-emu working tree: OM_EMU_DIR, else build/om-emu, else ~/opt/om-emu."""
+    """Return the om-emu working tree: OM_EMU_DIR, else build/om-emu (made by tools/emu/setup.sh)."""
     env = os.environ.get("OM_EMU_DIR")
     if env:
         return env
-    built = os.path.join(REPO, "build", "om-emu")
-    if os.path.exists(os.path.join(built, ".epm2-setup")):
-        return built
-    return os.path.expanduser("~/opt/om-emu")
+    return os.path.join(REPO, "build", "om-emu")
 
 
 def require_om_emu():
@@ -64,11 +60,12 @@ def node():
     env = os.environ.get("OM_EMU_NODE")
     if env:
         return env
-    candidates = [shutil.which("node"), os.path.expanduser("~/opt/node26/bin/node")]
-    for exe in candidates:
+    nvm = os.environ.get("NVM_DIR") or os.path.expanduser("~/.nvm")
+    from_nvm = sorted(glob.glob(os.path.join(nvm, "versions", "node", "v*", "bin", "node")), key=_node_major, reverse=True)
+    for exe in [shutil.which("node")] + from_nvm:
         if exe and os.path.exists(exe) and _node_major(exe) >= NODE_MAJOR:
             return exe
-    raise EmuSetupError(f"no Node {NODE_MAJOR} or newer found (on PATH or at ~/opt/node26/bin/node): set OM_EMU_NODE")
+    raise EmuSetupError(f"no Node {NODE_MAJOR} or newer on PATH or in nvm: run tools/setup.sh, or set OM_EMU_NODE")
 
 
 def sha256(path):

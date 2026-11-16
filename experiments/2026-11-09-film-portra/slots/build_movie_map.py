@@ -12,7 +12,7 @@ reads statistics through a pointer that is only set for picture modes 104 and 10
 import json, os, struct, subprocess, sys, tempfile
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.join(HERE, "..", "..", ".."); B = 0x7E421020
 sys.path.insert(0, os.path.join(ROOT, "tools", "emu")); import patchblock
-BIN = os.path.expanduser("~/opt/mn10300/bin/mn10300-elf-")
+BIN = os.path.join(os.path.abspath(__file__).split("/experiments/")[0], "build", "toolchain", "bin", "mn10300-elf-")
 stock, cur, _ = patchblock.patched_block0([os.path.join(ROOT, "patches", n) for n in ("remap7b-code.json", "seven-fixes-1.json")])
 def op(a, new): return {"type": "bytes", "block": 0, "offset": hex(a - B), "expect": cur[a - B:a - B + len(new)].hex(), "new": bytes(new).hex()}
 u32 = lambda img, a: struct.unpack_from("<I", img, a - B)[0]

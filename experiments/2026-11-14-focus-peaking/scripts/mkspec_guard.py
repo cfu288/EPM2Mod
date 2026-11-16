@@ -30,7 +30,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.a
 BASE = 0x7E421020
 STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
 PINNED_SHA = "0e8a25b9578b8119b14b4895be7d2a0b70d7315e5e817758699777f0f31d917e"
-BIN = os.path.expanduser("~/opt/mn10300/bin")
+BIN = os.path.join(os.path.abspath(__file__).split("/experiments/")[0], "build", "toolchain", "bin")
 MAPS = [os.path.join(ROOT, "build/map", f) for f in ("functions.txt", "linear.txt")]
 
 DEAD = (0x7E4C9496, 0x7E4C94F8)      # peaking-colours: the per-pixel part of its row loop. Its one entry was the

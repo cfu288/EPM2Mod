@@ -8,8 +8,8 @@ call that reached it (read from the call instruction before MDR).
 
 Environment:
     OM_EMU_DIR   the patched om-emu working tree (default: build/om-emu, made by tools/emu/setup.sh;
-                 when that is missing, ~/opt/om-emu)
-    OM_EMU_NODE  Node >= 26 (default: `node` on PATH when it is new enough, else ~/opt/node26/bin/node)
+                 )
+    OM_EMU_NODE  Node >= 26 (default: `node` on PATH when it is new enough, else the newest Node of nvm)
 The defaults are in emuenv.py.
 """
 import json, os, struct, subprocess, sys, tempfile
@@ -25,7 +25,7 @@ OM_EMU_DIR = emuenv.om_emu_dir()
 try:
     NODE = emuenv.node()
 except emuenv.EmuSetupError:
-    NODE = os.path.expanduser("~/opt/node26/bin/node")      # Emu() reports the missing Node
+    NODE = "node"      # Emu() reports the missing Node
 
 # Scratch RAM for the harness (DRAM below the image; nothing else runs, so it is free in the emulator)
 TRAMP = 0x7D000000                     # the call instruction; the return lands at TRAMP + 7

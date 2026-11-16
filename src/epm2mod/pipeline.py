@@ -27,9 +27,9 @@ What ``make`` guarantees about files:
 * On the SD card the new file replaces an older one only when it is complete
   and was read back from the card. The card is never given a part of a file
   under the camera's file name.
-* ``--card`` takes only the top folder of a mounted volume, and not the volume
-  that holds the repository, so a mistyped path is not reported as a write to
-  the card.
+* ``--out`` takes any folder that exists (the top folder of the SD card, or
+  another folder). A path that does not exist is an error, so a mistyped path
+  is not reported as a copy.
 
 These guarantees hold when a step fails and when the run is stopped by Ctrl-C
 or by a termination signal that the command line turns into an interrupt
@@ -235,12 +235,11 @@ def is_volume(folder: Path) -> bool:
 
 
 def check_card(card: Path, stock: StockFirmware) -> list[str]:
-    """Check an SD card's mount point and firmware folder, before any work is done.
+    """Check the folder that the firmware goes to, before any work is done.
 
-    ``card`` must be the top folder of a mounted volume. A folder that is not
-    one (a mistyped path, a mount point with no card in it) is refused, so that
-    it is never reported as a write to the card. A card that is read-only or
-    full is found later, when the file is written.
+    ``card`` is the top folder of the SD card, or any folder that stands for
+    it: the firmware is written to ``card/DCOLYMP/``. The folder must exist. A
+    card that is read-only or full is found later, when the file is written.
 
     The camera's updater needs the firmware to be the only file in its folder.
     Other files there are an error; they are not deleted. Names that start with
@@ -248,15 +247,15 @@ def check_card(card: Path, stock: StockFirmware) -> list[str]:
     temporary file that an interrupted run left is ours and is ignored.
 
     Args:
-        card: the folder where the card is mounted.
+        card: the top folder of the card, or another folder.
         stock: the stock firmware, for the camera's file name.
 
     Returns:
         The names in the firmware folder that start with a dot.
 
     Raises:
-        BuildError: if ``card`` is not the top folder of a mounted volume, or
-            the firmware folder cannot be read or holds other files.
+        BuildError: if ``card`` is not a folder, or the firmware folder cannot
+            be read or holds other files.
     """
     try:
         is_folder, exists = card.is_dir(), card_target(card, stock).parent.exists()
@@ -265,16 +264,7 @@ def check_card(card: Path, stock: StockFirmware) -> list[str]:
             f"{card}: cannot be read: {describe_os_error(error)}"
         ) from None
     if not is_folder:
-        raise BuildError(
-            f"{card}: no such folder. Give the place where the SD card is mounted."
-        )
-    if not is_volume(card):
-        raise BuildError(
-            f"{card}: is a folder, but not the top of a mounted volume, so it "
-            "is not an SD card. Give the place where the card is mounted (for "
-            "example /Volumes/NAME or E:\\). To get the files in a folder, run "
-            f"the command without --card and copy build/card/{CARD_FOLDER}."
-        )
+        raise BuildError(f"{card}: no such folder")
     target = card_target(card, stock)
     folder = target.parent
     if not exists:
@@ -390,7 +380,8 @@ def make(
     Args:
         paths: the repository.
         description: the build to make.
-        card: mount point of an SD card to write the firmware to, or None.
+        card: a folder to copy the firmware to (the top folder of the SD card,
+            or another folder), or None.
         log: where progress lines go.
         stock: the stock firmware the build starts from.
 
@@ -409,15 +400,6 @@ def make(
     clear_outputs(paths, description.name)
     if card is not None:
         card = card.absolute()
-        try:
-            root, resolved = paths.root.resolve(), card.resolve()
-        except (OSError, RuntimeError) as error:
-            raise BuildError(f"{card}: cannot be used as a path: {error}") from None
-        if resolved in (root, *root.parents):
-            raise BuildError(
-                f"{card}: holds this repository, so it is not the SD card. Give "
-                "the place where the card is mounted."
-            )
     hidden = check_card(card, stock) if card is not None else []
     specs = load_specs(paths, description)
 
@@ -469,16 +451,22 @@ def make(
         f"for the card: {paths.relative(card_copy)}"
     )
     if on_card is not None:
-        log(f"on the card: {on_card}  (written, flushed and read back)")
+        log(f"copied to: {on_card}  (written, flushed and read back)")
         if hidden:
             log(
                 f"    note: {on_card.parent} also holds {', '.join(hidden[:4])}. "
                 "If the camera does not start the update, remove them."
             )
-        log(
-            "Eject the card. Then, with the camera off, hold OK and switch the "
-            "camera on."
-        )
+        if card is not None and is_volume(card):
+            log(
+                "Eject the card. Then, with the camera off, hold OK and switch the "
+                "camera on."
+            )
+        else:
+            log(
+                f"Copy the folder {CARD_FOLDER} to the top folder of the SD card. "
+                "Then, with the camera off, hold OK and switch the camera on."
+            )
     return MakeResult(description, image, card_copy, on_card, digest)
 
 

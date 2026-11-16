@@ -21,7 +21,7 @@ STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
 STOCK_SHA = "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300"
 PINNED = "builds/films-12d.json"
 PINNED_SHA = "2cdd18e7004821b2e443ec4f08db06ab9a0d4f0f700ab53db8c4bbc1dad93e32"
-BIN = os.path.expanduser("~/opt/mn10300/bin")
+BIN = os.path.join(os.path.abspath(__file__).split("/experiments/")[0], "build", "toolchain", "bin")
 
 CODE = (0x7EBF1F4F, 0x7EBF2000)      # free run of the segment-2 area 0x7EBF1090-0x7EBF3BAD (tools/freespace.py area)
 BATT = (0x7EBF2F6C, 0x7EBF3000)      # free run of the same area
