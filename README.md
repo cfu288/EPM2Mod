@@ -2,7 +2,7 @@
 
 ![Olympus PEN E-PM2](docs/images/epm2.jpg)
 
-Repository containing the current work for creating a custom firmware mod for the Olympus PEN **E-PM2**. The goal is to unlock or add new features to this camera. Currently, we've implemented replacing the default art filters with film simulations like Portra, Ektachrome, etc. We also enabled interval shooting (up to 240 shots) and added a level gauge and focus peaking.
+Repository containing the current work for creating a custom firmware mod for the Olympus PEN **E-PM2**. The goal is to unlock or add new features to this camera. Currently, we've implemented replacing the default art filters with film simulations like Portra, Ektachrome, etc. We also enabled interval shooting (up to 240 shots), added a level gauge, and added focus peaking.
 
 ## Added Features
 
@@ -15,11 +15,11 @@ Repository containing the current work for creating a custom firmware mod for th
 
 ## Dependencies
 
-The build script needs [uv](https://docs.astral.sh/uv/getting-started/installation/).
+- [uv](https://docs.astral.sh/uv/getting-started/installation/).
 
 ## Install
 
-This firmware is only for an E-PM2. The firmware is unofficial, and you use it at your own risk. Ensure your battery is full prior to flashing.
+This firmware is only for an E-PM2. The firmware is unofficial, use it at your own risk. Ensure your battery is full prior to flashing.
 
 1. To build a copy of the firmware, run
 
@@ -29,13 +29,11 @@ This firmware is only for an E-PM2. The firmware is unofficial, and you use it a
 
    This downloads the Olympus firmware, applies the patches and writes `build/card/DCOLYMP/E1019999.BIN`.
 
-   To put the file on an SD card in the same run, use
+   Alternatively, build and install the firmaware directly to the SD card (allowing you to skip step 2)
 
    ```sh
    uv run tools/make_firmware.py --card /path/to/card
    ```
-
-   Then skip step 2.
 2. Copy the folder `build/card/DCOLYMP` to the top folder of an SD card, beside `DCIM`. `E1019999.BIN` must be the only file in `DCOLYMP`.
 3. Put the card in the camera. With the camera off, hold **OK** and switch the camera on. An orange lamp shows the progress.
    - While the lamp is steady, the camera is writing the firmware. This takes 1 to 2 minutes. Do not switch the camera off.
