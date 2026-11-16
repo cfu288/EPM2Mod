@@ -27,7 +27,15 @@ This firmware is only for an E-PM2. The firmware is unofficial, and you use it a
    uv run tools/make_firmware.py
    ```
 
-   This downloads the Olympus firmware, applies the patches and writes `build/card/DCOLYMP/E1019999.BIN`. To put the file on an SD card in the same run, add `--card /path/to/card`. Then skip step 2.
+   This downloads the Olympus firmware, applies the patches and writes `build/card/DCOLYMP/E1019999.BIN`.
+
+   To put the file on an SD card in the same run, use
+
+   ```sh
+   uv run tools/make_firmware.py --card /path/to/card
+   ```
+
+   Then skip step 2.
 2. Copy the folder `build/card/DCOLYMP` to the top folder of an SD card, beside `DCIM`. `E1019999.BIN` must be the only file in `DCOLYMP`.
 3. Put the card in the camera. With the camera off, hold **OK** and switch the camera on. An orange lamp shows the progress.
    - While the lamp is steady, the camera is writing the firmware. This takes 1 to 2 minutes. Do not switch the camera off.
