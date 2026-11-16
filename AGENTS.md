@@ -1,6 +1,6 @@
 # Working rules for AI agents on this repository
 
-These rules are for any coding agent (Claude Code, Codex, Cursor and others) and for people who
+These rules are for any coding agent and for people who
 direct one.
 
 Read [docs/feasibility.md](docs/feasibility.md) first. It lists the real limits of the camera and

@@ -65,6 +65,12 @@ and delete the item here.
   menu row). Exposure compensation in M with Auto ISO: 2 bytes at 0x7E5878AF, not run.
   Notes: `experiments/2026-11-17-auto-iso-min-shutter/NOTES.md`.
 
+- **Anti-shock 0 s and a silent shutter: not settled.** The E-P5 is no donor: the bodies with 0 s
+  program the sensor with another register set. A route of our own: stock shutter order, sensor
+  start about 30 ms after the first curtain. First, without a build: two RAW pictures of a plain
+  wall, Live Time 0.5 s against a normal 0.5 s, to see the reset type and the read-out time.
+  Notes: `experiments/2026-11-17-anti-shock/NOTES.md`.
+
 ## Foundations
 
 - Log defect (second camera log, 2026-11-15): the ring header is trusted when its magic word is
