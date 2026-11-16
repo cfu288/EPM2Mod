@@ -1,0 +1,56 @@
+
+logguard.elf:     file format elf32-mn10300
+
+
+Disassembly of section .hs:
+
+7eb7de46 <.hs>:
+7eb7de46:	dc ca 46 07 	jmp	7ebf2510 <T_GRD>
+7eb7de4a:	00 
+7eb7de4b:	cb          	nop	
+7eb7de4c:	cb          	nop	
+
+Disassembly of section .gu:
+
+7ebf2510 <T_GRD>:
+7ebf2510:	cf 88       	movm	[d2,other],(sp)
+7ebf2512:	f2 e6       	mov	psw,d2
+7ebf2514:	fc a8 c4 e8 	movbu	(602be8c4 <PKW>),d0
+7ebf2518:	2b 60 
+7ebf251a:	a0 02       	cmp	2,d0
+7ebf251c:	c8 0b       	beq	7ebf2527 <.L1^B1>
+7ebf251e:	00          	clr	d0
+7ebf251f:	fc 82 a4 d0 	movbu	d0,(be4fd0a4 <BUF+0xffffffe4>)
+7ebf2523:	4f be 
+7ebf2525:	ca 34       	bra	7ebf2559 <.L9^B1>
+
+7ebf2527 <.L1^B1>:
+7ebf2527:	fc a8 a4 d0 	movbu	(be4fd0a4 <BUF+0xffffffe4>),d0
+7ebf252b:	4f be 
+7ebf252d:	a0 00       	cmp	0,d0
+7ebf252f:	c9 2a       	bne	7ebf2559 <.L9^B1>
+7ebf2531:	80 01       	mov	1,d0
+7ebf2533:	fc 82 a4 d0 	movbu	d0,(be4fd0a4 <BUF+0xffffffe4>)
+7ebf2537:	4f be 
+7ebf2539:	fc a0 5c c4 	mov	(602ac45c <POOL02>),a0
+7ebf253d:	2a 60 
+7ebf253f:	f8 60 10    	movhu	(16,a0),d0
+7ebf2542:	f8 64 4c    	movhu	(76,a0),d1
+7ebf2545:	f1 04       	sub	d1,d0
+7ebf2547:	f1 e0       	mov	d0,a0
+7ebf2549:	fc a5 cc 57 	mov	(605157cc <HMODE>),d1
+7ebf254d:	51 60 
+7ebf254f:	2c 06 01    	mov	262,d0
+7ebf2552:	dd df 6f 8d 	call	7e4c9531 <log_put>,[],0
+7ebf2556:	ff 00 00 
+
+7ebf2559 <.L9^B1>:
+7ebf2559:	f2 fb       	mov	d2,psw
+7ebf255b:	cb          	nop	
+7ebf255c:	cb          	nop	
+7ebf255d:	ce 88       	movm	(sp),[d2,other]
+7ebf255f:	93          	mov	a0,a3
+7ebf2560:	fc cc b1 ab 	mov	2127080369,d0
+7ebf2564:	c8 7e 
+7ebf2566:	dc e7 b8 f8 	jmp	7eb7de4d <s_7eb7de4d>
+7ebf256a:	ff 

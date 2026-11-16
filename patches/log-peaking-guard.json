@@ -1,0 +1,48 @@
+{
+ "name": "log-peaking-guard",
+ "description": "Structured log, probe of the save guard of peaking: event pk_guard. The guard of patches/peaking-save-guard.json writes 2 to the latch byte L while it holds the lines back. The probe reads L at each focus-ring event while MF Assist is on (the handler rcvStartMFAssistIn_MFAssistOn of the MF Assist state object) and writes one record per hold: the heap mode, and the units in use in the pool of the heap modes 0 and 2, which is the reason for the hold. A hold with no ring event after its start gives no pk_guard record; pk_latch shows every hold (L = 2). One hook in stock bytes of segment 2 and its routine in segment 2; no byte of the peaking code changes. Needs log-core, log-probes and log-peaking-time before it: every expect is a byte string of that build. It puts the build id da49b2f5e7e62ca7 of logs/events.json into the block header. DEBUG builds only. See experiments/2026-11-14-focus-peaking/NOTES.md section 18 and docs/logging.md.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "candidate: emulator-checked, not flashed",
+ "_delta_on": "builds/debug-log-peaking-fast-2.json without this spec",
+ "_build_id": "da49b2f5e7e62ca7",
+ "_ram": "1 byte of the log's state block (PST+100)",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D14F0",
+   "expect": "303300676574496d61676554797065004e3034006765745374696c6c496e666f004e3035006765744d6f766965496e666f004e3036006765744e756d626572004e303700676574486973746f6772616d004e30380073656c656374",
+   "new": "cf88f2e6fca8c4e82b60a002c80b00fc82a4d04fbeca34fca8a4d04fbea000c92a8001fc82a4d04fbefca05cc42a60f86010f8644cf104f1e0fca5cc5751602c0601dddf6f8dff0000f2fbcbcbce8893fcccb1abc87edce7b8f8ff",
+   "_addr": "0x7EBF2510",
+   "_note": "new code, segment 2: T_GRD (91 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x75CE26",
+   "expect": "93fcccb1abc87e",
+   "new": "dcca460700cbcb",
+   "_addr": "0x7EB7DE46",
+   "_note": "hook (pk_guard): jmp T_GRD + nop + nop. CmpSts_MfAssist::rcvStartMFAssistIn_MFAssistOn 0x7EB7DE46, entry: `mov a0,a3` / `mov imm32,d0` (a focus-ring event while MF Assist is on; GUI task, segment 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1D04",
+   "expect": "fe2f543f",
+   "new": "da49b2f5",
+   "_addr": "0x7EBF2D24",
+   "_note": "flush task, block header: build id bytes 0-3 fe2f543f -> da49b2f5 (logs/events.json)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1D0D",
+   "expect": "94c74a91",
+   "new": "e7e62ca7",
+   "_addr": "0x7EBF2D2D",
+   "_note": "flush task, block header: build id bytes 4-7 94c74a91 -> e7e62ca7 (logs/events.json)"
+  }
+ ]
+}

@@ -1,0 +1,614 @@
+{
+ "format": 1,
+ "record_size": 16,
+ "time": "raw value of timer channel 9 (0x98900074): a 30-bit counter that counts down, one step per microsecond",
+ "levels": [
+  "debug",
+  "info",
+  "warn",
+  "error"
+ ],
+ "note": "The event list of the debug builds debug-log-peaking-fast and debug-log-films-12 (build id fe2f543f94c74a91), flashed 2026-11-15 and 2026-11-16. Kept when events.json got the event pk_guard. The name tables come from events.json",
+ "events": [
+  {
+   "id": 1,
+   "name": "boot",
+   "level": "info",
+   "spec": "log-core",
+   "doc": "Usr0 starts (boot task). ring_found = how often the boot hook found a ring in RAM. The ring is also started by a record that is put before the boot task runs. On the camera the firmware records errors at 19 ms, so a cold start gives 1, and a restart that kept the RAM gives 2 or more. Without such records (emulator) a cold start gives 0. poweron is read before the firmware sets it (0x7E45D1F3, called later in Usr0): always 0",
+   "args": [
+    {
+     "name": "ring_found",
+     "format": "dec"
+    },
+    {
+     "name": "poweron",
+     "format": "hex",
+     "fields": [
+      {
+       "name": "factor",
+       "shift": 0,
+       "bits": 16
+      },
+      {
+       "name": "wake",
+       "shift": 16,
+       "bits": 8
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "name": "flush",
+   "level": "debug",
+   "spec": "log-core",
+   "doc": "The flush task starts. previous = result of the flush before this one (write_failed: fwrite gave less than a block three times; not_saved: the file did not keep the blocks, their records are written again; no_file: no card, or the file cannot be opened or its size cannot be read)",
+   "names": {
+    "gui_state": "gui_state"
+   },
+   "args": [
+    {
+     "name": "gui_state",
+     "format": "hex"
+    },
+    {
+     "name": "previous",
+     "format": "hex",
+     "fields": [
+      {
+       "name": "result",
+       "shift": 0,
+       "bits": 8,
+       "enum": {
+        "0": "ok",
+        "1": "no_file",
+        "2": "write_failed",
+        "3": "file_full",
+        "4": "not_saved"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "name": "fw_error",
+   "level": "error",
+   "spec": "log-core",
+   "doc": "The firmware's error recorder 0x7E426D4B was called",
+   "names": {
+    "code": "fw_error"
+   },
+   "args": [
+    {
+     "name": "code",
+     "format": "hex"
+    },
+    {
+     "name": "caller",
+     "format": "addr"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "name": "fw_error_args",
+   "level": "error",
+   "spec": "log-core",
+   "doc": "Follows fw_error: the number of extra arguments and the first one (not valid when count is 0)",
+   "names": {
+    "arg": "address"
+   },
+   "args": [
+    {
+     "name": "count",
+     "format": "dec"
+    },
+    {
+     "name": "arg",
+     "format": "hex"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "name": "gui_state",
+   "level": "info",
+   "spec": "log-core",
+   "doc": "The GUI sub-application state changed (0x57xx menu, 0x3xxx playback, 0x2xxx power off and sleep, 0x5xxx shooting)",
+   "names": {
+    "state": "gui_state",
+    "previous": "gui_state"
+   },
+   "args": [
+    {
+     "name": "state",
+     "format": "hex"
+    },
+    {
+     "name": "previous",
+     "format": "hex"
+    }
+   ]
+  },
+  {
+   "id": 256,
+   "name": "pk_mf_start",
+   "level": "info",
+   "spec": "log-probes",
+   "feature": "peaking",
+   "doc": "MF Assist starts (entryMfAssistOn). R is 1 already. C is still the colour of the MF Assist run before (0 after power-on): the mov task reads setting 458 into C in the next frame, in the call that sets L (see pk_latch)",
+   "names": {
+    "latch.C": "peaking_colour"
+   },
+   "args": [
+    {
+     "name": "latch",
+     "format": "hex",
+     "fields": [
+      {
+       "name": "L",
+       "shift": 0,
+       "bits": 8
+      },
+      {
+       "name": "R",
+       "shift": 8,
+       "bits": 8
+      },
+      {
+       "name": "L2",
+       "shift": 16,
+       "bits": 8
+      },
+      {
+       "name": "C",
+       "shift": 24,
+       "bits": 8
+      }
+     ]
+    },
+    {
+     "name": "object",
+     "format": "addr"
+    }
+   ]
+  },
+  {
+   "id": 257,
+   "name": "pk_mf_end",
+   "level": "info",
+   "spec": "log-probes",
+   "feature": "peaking",
+   "doc": "MF Assist ends (entryMfAssistOff). It also runs once at each start of the camera",
+   "names": {
+    "latch.C": "peaking_colour"
+   },
+   "args": [
+    {
+     "name": "latch",
+     "format": "hex",
+     "fields": [
+      {
+       "name": "L",
+       "shift": 0,
+       "bits": 8
+      },
+      {
+       "name": "R",
+       "shift": 8,
+       "bits": 8
+      },
+      {
+       "name": "L2",
+       "shift": 16,
+       "bits": 8
+      },
+      {
+       "name": "C",
+       "shift": 24,
+       "bits": 8
+      }
+     ]
+    },
+    {
+     "name": "object",
+     "format": "addr"
+    }
+   ]
+  },
+  {
+   "id": 258,
+   "name": "pk_latch",
+   "level": "info",
+   "spec": "log-probes",
+   "feature": "peaking",
+   "doc": "The peaking bytes changed, seen at the live-view expose setter: L latch, R request, L2 latch of the last update, C value of setting 458 (1 Off, 3 White, 2 Red, 4 Yellow, 5 Blue)",
+   "names": {
+    "latch.C": "peaking_colour"
+   },
+   "args": [
+    {
+     "name": "latch",
+     "format": "hex",
+     "fields": [
+      {
+       "name": "L",
+       "shift": 0,
+       "bits": 8
+      },
+      {
+       "name": "R",
+       "shift": 8,
+       "bits": 8
+      },
+      {
+       "name": "L2",
+       "shift": 16,
+       "bits": 8
+      },
+      {
+       "name": "C",
+       "shift": 24,
+       "bits": 8
+      }
+     ]
+    },
+    {
+     "name": "lv",
+     "format": "hex",
+     "fields": [
+      {
+       "name": "b4",
+       "shift": 0,
+       "bits": 8
+      },
+      {
+       "name": "art_type",
+       "shift": 8,
+       "bits": 8
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 259,
+   "name": "pk_heap_mode",
+   "level": "info",
+   "spec": "log-probes",
+   "feature": "peaking",
+   "doc": "The image-work heap mode setter 0x7E578C60 was called with a new mode. Every change is logged, not only those of peaking. caller is always 0x7E4C935E: the one stock call of the setter is replaced by the peaking code, which calls it from there",
+   "names": {
+    "mode": "heap_mode"
+   },
+   "args": [
+    {
+     "name": "mode",
+     "format": "dec"
+    },
+    {
+     "name": "caller",
+     "format": "addr"
+    }
+   ]
+  },
+  {
+   "id": 260,
+   "name": "pk_pass9",
+   "level": "debug",
+   "spec": "log-probes",
+   "feature": "peaking",
+   "doc": "Key Line pass 9 (the colour pass of peaking). The first 3 passes after each MF Assist start. gain is usGain2: 512 for White, 0 for a colour (the colour loop wrote the lines). first_pixel is byte 1 of the line image",
+   "args": [
+    {
+     "name": "picture",
+     "format": "addr"
+    },
+    {
+     "name": "line",
+     "format": "hex",
+     "fields": [
+      {
+       "name": "first_pixel",
+       "shift": 0,
+       "bits": 8
+      },
+      {
+       "name": "gain",
+       "shift": 16,
+       "bits": 16
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 261,
+   "name": "pk_stats",
+   "level": "debug",
+   "spec": "log-peaking-time",
+   "feature": "peaking",
+   "doc": "One record per 8 runs of Key Line pass 9 (the Key Line art filter, White peaking and colour peaking). loop_us: the microseconds from before the peaking hook of the pass to after it, summed over these 8 passes. For a colour that is the colour loop; for White and Key Line it is a few microseconds. gain: usGain2 of the last pass. The time between two records of one run is 8 frame periods. Only in the build debug-log-peaking-fast (spec log-peaking-time)",
+   "names": {
+    "gain": "pass9_gain"
+   },
+   "args": [
+    {
+     "name": "loop_us",
+     "format": "dec"
+    },
+    {
+     "name": "gain",
+     "format": "hex"
+    }
+   ]
+  },
+  {
+   "id": 512,
+   "name": "art_sixaxis",
+   "level": "info",
+   "spec": "log-probes",
+   "feature": "picture-mode",
+   "doc": "Six-axis stage dispatch 0x7E56D2BF: a new art code, or the first pass after a shooting callback. The gate is one for both CPUs: when the two CPUs run jobs with different codes, each pass is logged",
+   "names": {
+    "art": "art",
+    "handler": "handler"
+   },
+   "args": [
+    {
+     "name": "art",
+     "format": "dec"
+    },
+    {
+     "name": "handler",
+     "format": "addr"
+    }
+   ]
+  },
+  {
+   "id": 768,
+   "name": "lv_adjust",
+   "level": "info",
+   "spec": "log-probes",
+   "feature": "level-gauge",
+   "doc": "api_adj_Set_Slope_Adjust: mode 1 Adjust, 2 Reset, 0 factory",
+   "names": {
+    "mode": "lv_mode"
+   },
+   "args": [
+    {
+     "name": "mode",
+     "format": "dec"
+    },
+    {
+     "name": "rotate",
+     "format": "dec"
+    }
+   ]
+  },
+  {
+   "id": 769,
+   "name": "lv_values",
+   "level": "info",
+   "spec": "log-probes",
+   "feature": "level-gauge",
+   "doc": "The accelerometer driver reloads its tables (start-up, after Adjust and Reset): entry 0 of the working set (landscape). x, y, z: 1000 = 1 g. temp: the temperature reading that was stored with the entry",
+   "args": [
+    {
+     "name": "xy",
+     "format": "hex",
+     "fields": [
+      {
+       "name": "x",
+       "shift": 0,
+       "bits": 16,
+       "format": "sdec"
+      },
+      {
+       "name": "y",
+       "shift": 16,
+       "bits": 16,
+       "format": "sdec"
+      }
+     ]
+    },
+    {
+     "name": "zt",
+     "format": "hex",
+     "fields": [
+      {
+       "name": "z",
+       "shift": 0,
+       "bits": 16,
+       "format": "sdec"
+      },
+      {
+       "name": "temp",
+       "shift": 16,
+       "bits": 16,
+       "format": "sdec"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1024,
+   "name": "iv_start",
+   "level": "info",
+   "spec": "log-probes",
+   "feature": "interval",
+   "doc": "OlyHfwOpeShoot::startIntervalShooting returns. The GUI calls it each time it shows the interval standby screen (state 0x5B00): after a menu, and after a half-press is released. It arms the mode. It is not the start of a sequence: that is shoot_cbs 259",
+   "args": [
+    {
+     "name": "result",
+     "format": "hex"
+    },
+    {
+     "name": "state",
+     "format": "hex"
+    }
+   ]
+  },
+  {
+   "id": 1025,
+   "name": "iv_frame",
+   "level": "info",
+   "spec": "log-probes",
+   "feature": "interval",
+   "doc": "recordingDone_interval: frame n of this sequence is recorded and another frame follows; the timer for the next frame starts here. The last frame of a sequence does not come here (0x7EA8C4F7), so a sequence of N frames gives N - 1 records",
+   "args": [
+    {
+     "name": "n",
+     "format": "dec"
+    },
+    {
+     "name": "state",
+     "format": "hex"
+    }
+   ]
+  },
+  {
+   "id": 1026,
+   "name": "iv_end",
+   "level": "info",
+   "spec": "log-probes",
+   "feature": "interval",
+   "doc": "OlyHfwOpeShoot::endIntervalShooting returns: the mode is disarmed (a menu opens, or a sequence is complete). iv_frames = iv_frame records since the last iv_start: the frames of the sequence less 1, or 0 when no sequence ran",
+   "args": [
+    {
+     "name": "result",
+     "format": "hex"
+    },
+    {
+     "name": "iv_frames",
+     "format": "dec"
+    }
+   ]
+  },
+  {
+   "id": 1027,
+   "name": "iv_state_set",
+   "level": "debug",
+   "spec": "log-probes",
+   "feature": "interval",
+   "doc": "setIntervalShootingState. Bits as seen on the camera: 1 armed, 2 shutter button pressed in standby, 4 the timer before a frame runs",
+   "args": [
+    {
+     "name": "bits",
+     "format": "hex"
+    },
+    {
+     "name": "state_before",
+     "format": "hex"
+    }
+   ]
+  },
+  {
+   "id": 1028,
+   "name": "iv_state_clear",
+   "level": "debug",
+   "spec": "log-probes",
+   "feature": "interval",
+   "doc": "clearIntervalShootingState. bits 0xFFFFFFFF clears all",
+   "args": [
+    {
+     "name": "bits",
+     "format": "hex"
+    },
+    {
+     "name": "state_before",
+     "format": "hex"
+    }
+   ]
+  },
+  {
+   "id": 1280,
+   "name": "film_stage",
+   "level": "info",
+   "spec": "log-probes",
+   "feature": "film-looks",
+   "doc": "Colour-matrix stage 0x7E56C68B: a new art code (byte +79 of the job parameters), or the first pass after a shooting callback. Code 3 is a job without an art filter (the plain picture of peaking, and two jobs of each capture). flags: the job flags (+20); with bit 16 or 17 the stage takes code 3. The gate is one for both CPUs (see art_sixaxis)",
+   "names": {
+    "art": "art"
+   },
+   "args": [
+    {
+     "name": "art",
+     "format": "dec"
+    },
+    {
+     "name": "flags",
+     "format": "hex"
+    }
+   ]
+  },
+  {
+   "id": 1281,
+   "name": "film_matrix",
+   "level": "info",
+   "spec": "log-probes",
+   "feature": "film-looks",
+   "doc": "The art matrix that is applied (0x7E56C764). stack = address of the result matrix in the stack frame of the stage: it tells the tasks apart (one value for live view on CPU 1, two for stills on CPU 0)",
+   "names": {
+    "table": "matrix"
+   },
+   "args": [
+    {
+     "name": "table",
+     "format": "addr"
+    },
+    {
+     "name": "stack",
+     "format": "hex"
+    }
+   ]
+  },
+  {
+   "id": 1282,
+   "name": "film_curve",
+   "level": "info",
+   "spec": "log-probes",
+   "feature": "film-looks",
+   "doc": "Tone-curve selector dispatch 0x7E56E860: the handler chooses the curve set",
+   "names": {
+    "art": "art"
+   },
+   "args": [
+    {
+     "name": "art",
+     "format": "dec"
+    },
+    {
+     "name": "handler",
+     "format": "addr"
+    }
+   ]
+  },
+  {
+   "id": 1536,
+   "name": "shoot_cbs",
+   "level": "info",
+   "spec": "log-probes",
+   "feature": "shooting",
+   "doc": "Shooting callback 0x7E995A0B, sent by the dispatcher 0x7E995C0B (CBS_START_SHOOTING_PICTURE, CBS_END_INTERVAL_SHOOTING ...). It also arms the art and film probes for one record each",
+   "names": {
+    "cbs": "cbs"
+   },
+   "args": [
+    {
+     "name": "cbs",
+     "format": "dec"
+    },
+    {
+     "name": "result",
+     "format": "hex"
+    }
+   ]
+  }
+ ]
+}

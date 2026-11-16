@@ -12,9 +12,10 @@ and delete the item here.
 
 ## Focus peaking
 
-- **Crash: MF Assist starts while a photo is still developed** (2026-11-16, two cases in the log:
-  error 0x34000002 from the ART task right after peaking switches the art heap). The pinned build
-  very probably has it. Fix in work: the latch waits until the still pipeline is done.
+- **Crash at a focus-ring turn after a shot: the fix is built** (`patches/peaking-save-guard.json`).
+  The pinned build `peaking-fast` has the fault. Test `debug-log-films-12c` (or
+  `debug-log-peaking-fast-2`) on the camera, then pin a fixed build. Two small windows stay open
+  (NOTES §18.5). The proven kernel code area is full (18 bytes left with all specs counted).
 - More than 10 frames per second of peaking needs a shorter pass list or the 50 ms frame class
   (NOTES §17). `peaking-fast` is the pinned build (2026-11-15).
 - Peaking without the zoom: the trigger is the MF Assist state object, which also asks for the zoom.

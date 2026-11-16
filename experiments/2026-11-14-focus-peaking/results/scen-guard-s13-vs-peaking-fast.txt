@@ -1,0 +1,54 @@
+# scen_fast.py s13 BASE PINNED=peaking-fast FAST=peaking-fast-2 (the labels 'pinned' and 'colours' are the script's)
+S13. White = PINNED, Off = BASE.
+  [458=3 Natural] pass 9 gain: pinned ['0x0200'], colours ['0x0200']; pass 7 ucExpose: pinned [3], colours [3]; anomalies: none
+  458=3 Natural frame 1  DIFFERENT: 10185 writes (pinned 10185), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4884, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 18 in 0x7E4C9000 (18)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=3 Natural frame 2  DIFFERENT: 6679 writes (pinned 6679), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=3 Natural frame 3  DIFFERENT: 6700 writes (pinned 6700), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  [458=3 Key Line] pass 9 gain: pinned ['0x0200'], colours ['0x0200']; pass 7 ucExpose: pinned [3], colours [3]; anomalies: none
+  458=3 Key Line frame 1  DIFFERENT: 10183 writes (pinned 10183), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4884, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=3 Key Line frame 2  DIFFERENT: 6679 writes (pinned 6679), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=3 Key Line frame 3  DIFFERENT: 6700 writes (pinned 6700), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  [458=0 Natural] pass 9 gain: pinned ['0x0200'], colours ['0x0200']; pass 7 ucExpose: pinned [3], colours [3]; anomalies: none
+  458=0 Natural frame 1  DIFFERENT: 10185 writes (pinned 10185), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4884, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 18 in 0x7E4C9000 (18)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=0 Natural frame 2  DIFFERENT: 6679 writes (pinned 6679), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=0 Natural frame 3  DIFFERENT: 6700 writes (pinned 6700), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  [458=0 Key Line] pass 9 gain: pinned ['0x0200'], colours ['0x0200']; pass 7 ucExpose: pinned [3], colours [3]; anomalies: none
+  458=0 Key Line frame 1  DIFFERENT: 10183 writes (pinned 10183), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4884, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=0 Key Line frame 2  DIFFERENT: 6679 writes (pinned 6679), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=0 Key Line frame 3  DIFFERENT: 6700 writes (pinned 6700), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  [458=6 Natural] pass 9 gain: pinned ['0x0200'], colours ['0x0200']; pass 7 ucExpose: pinned [3], colours [3]; anomalies: none
+  458=6 Natural frame 1  DIFFERENT: 10185 writes (pinned 10185), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4884, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 18 in 0x7E4C9000 (18)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=6 Natural frame 2  DIFFERENT: 6679 writes (pinned 6679), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=6 Natural frame 3  DIFFERENT: 6700 writes (pinned 6700), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  [458=6 Key Line] pass 9 gain: pinned ['0x0200'], colours ['0x0200']; pass 7 ucExpose: pinned [3], colours [3]; anomalies: none
+  458=6 Key Line frame 1  DIFFERENT: 10183 writes (pinned 10183), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4884, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=6 Key Line frame 2  DIFFERENT: 6679 writes (pinned 6679), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=6 Key Line frame 3  DIFFERENT: 6700 writes (pinned 6700), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  Off Natural frame 1  SAME: 4750 writes (base 4747), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 936, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 69 in 0x7E4C9000 (69)
+  Off Natural frame 2  SAME: 3283 writes (base 3280), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 936, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 56 in 0x7E4C9000 (56)
+  Off Natural frame 3  SAME: 3277 writes (base 3274), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 936, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 56 in 0x7E4C9000 (56)
+  [Off Natural] pass 9 gain: base [], colours []; L=0
+  Off Key Line frame 1  SAME: 11017 writes (base 11014), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 5074, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 111 in 0x7E4C9000 (111)
+  Off Key Line frame 2  SAME: 7215 writes (base 7212), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 4602, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 111 in 0x7E4C9000 (111)
+  Off Key Line frame 3  SAME: 7236 writes (base 7233), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 4602, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 111 in 0x7E4C9000 (111)
+  [Off Key Line] pass 9 gain: base ['0xFF00'], colours ['0xFF00']; L=0
+  S13 RESULT: FAIL
+

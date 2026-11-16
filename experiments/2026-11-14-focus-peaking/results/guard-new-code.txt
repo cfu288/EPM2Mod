@@ -1,0 +1,50 @@
+T_GUARD 0x7E4C9497, T_M2 0x7E4C94BF, hook in T_A, hook in T_M
++0xa8477>:
+7e4c9497:	fc ac cc 57 	movhu	(0x605157cc),d0
+7e4c949b:	51 60 
+7e4c949d:	a0 01       	cmp	1,d0
+7e4c949f:	c8 17       	beq	0x7e4c94b6
+7e4c94a1:	fc a0 5c c4 	mov	(0x602ac45c),a0
+7e4c94a5:	2a 60 
+7e4c94a7:	f8 60 10    	movhu	(16,a0),d0
+7e4c94aa:	f8 64 4c    	movhu	(76,a0),d1
+7e4c94ad:	f1 04       	sub	d1,d0
+7e4c94af:	c8 07       	beq	0x7e4c94b6
+7e4c94b1:	85 02       	mov	2,d1
+7e4c94b3:	cc 95 fd    	jmp	0x7e4c9248
+7e4c94b6:	85 01       	mov	1,d1
+7e4c94b8:	00          	clr	d0
+7e4c94b9:	f8 51 04    	movbu	d0,(4,a1)
+7e4c94bc:	cc 88 fd    	jmp	0x7e4c9244
+7e4c94bf:	c9 11       	bne	0x7e4c94d0
+7e4c94c1:	fc a4 d0 03 	mov	(0x605b03d0),d0
+7e4c94c5:	5b 60 
+7e4c94c7:	28 ff       	add	-1,d0
+7e4c94c9:	a0 02       	cmp	2,d0
+7e4c94cb:	c5 05       	bhi	0x7e4c94d0
+7e4c94cd:	cc 87 fe    	jmp	0x7e4c9354
+7e4c94d0:	a5 01       	cmp	1,d1
+7e4c94d2:	c8 23       	beq	0x7e4c94f5
+7e4c94d4:	fc ac cc 57 	movhu	(0x605157cc),d0
+7e4c94d8:	51 60 
+7e4c94da:	a0 01       	cmp	1,d0
+7e4c94dc:	c9 19       	bne	0x7e4c94f5
+7e4c94de:	fc a0 58 c4 	mov	(0x602ac458),a0
+7e4c94e2:	2a 60 
+7e4c94e4:	f8 60 10    	movhu	(16,a0),d0
+7e4c94e7:	f1 e5       	mov	d1,a1
+7e4c94e9:	f8 64 4c    	movhu	(76,a0),d1
+7e4c94ec:	f1 04       	sub	d1,d0
+7e4c94ee:	f1 d5       	mov	a1,d1
+7e4c94f0:	c8 05       	beq	0x7e4c94f5
+7e4c94f2:	cc db ff    	jmp	0x7e4c94cd
+7e4c94f5:	cc 61 fe    	jmp	0x7e4c9356
++0xa821f>:
+7e4c923f:	dc 58 02 00 	jmp	0x7e4c9497
+7e4c9243:	00 
++0xa8326>:
+7e4c9346:	dc 79 01 00 	jmp	0x7e4c94bf
+7e4c934a:	00 
+7e4c934b:	cb          	nop	
+7e4c934c:	cb          	nop	
+7e4c934d:	cb          	nop	

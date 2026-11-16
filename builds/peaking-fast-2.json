@@ -1,0 +1,23 @@
+{
+ "what": "CANDIDATE, not camera-tested: the pinned build peaking-fast with the save guard of focus peaking. The lines wait while a photo is being developed and saved (the restart of 2026-11-16: turning the focus ring right after a shot)",
+ "specs": [
+  "patches/remap7b-code.json",
+  "patches/seven-fixes-1.json",
+  "patches/seven-movie-1.json",
+  "patches/seven-structure-extra.json",
+  "patches/seven-films-5.json",
+  "patches/xp-adaptive-hue-off.json",
+  "patches/seven-labels.json",
+  "patches/interval-timelapse-v2.json",
+  "patches/interval-frames-240.json",
+  "patches/level-gauge-lvinfo-row.json",
+  "patches/level-adjust-row.json",
+  "patches/peaking-direct-4.json",
+  "patches/peaking-gain-2x.json",
+  "patches/peaking-menu.json",
+  "patches/film-names-all-languages.json",
+  "patches/peaking-colours.json",
+  "patches/peaking-fast.json",
+  "patches/peaking-save-guard.json"
+ ]
+}

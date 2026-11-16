@@ -21,6 +21,7 @@ of peaking; focus-peaking notes, section 17).
 | Log core | `patches/log-core.json` | `log_put`, `log_chg`, `log_cnt`, the flush task, and the events boot, firmware error and GUI state |
 | Probes | `patches/log-probes.json` | One hook and one small routine per event of a feature |
 | Timing probe of peaking | `patches/log-peaking-time.json` | Event `pk_stats`, one record per 8 runs of Key Line pass 9. Written by `mkspec_log.py --peaking-time`. It also puts the build id of `logs/events.json` into the block header |
+| Probe of the save guard of peaking | `patches/log-peaking-guard.json` | Event `pk_guard`, one record per hold of the peaking latch after a shot. Written by `mkspec_log.py --peaking-guard`. It puts the build id of `logs/events.json` into the block header |
 | Decoder | `src/epm2mod/eventlog.py`, `src/epm2mod/logsummary.py`, command `epm2mod log` | Reads the file and the dictionary, prints JSON lines or a summary |
 
 ## The record
@@ -142,6 +143,11 @@ State on 2026-11-15: `patches/log-core.json` and `patches/log-probes.json` are t
 of the build id in the flush task (checked). The next full generator run writes the two specs with the new id.
 Until then `patches/log-peaking-time.json` changes these 8 bytes itself, so the build `debug-log-peaking-fast`
 writes blocks with the id `fe2f543f94c74a91`, and the build `debug-log` is still the flashed one.
+
+State on 2026-11-16: `debug-log-peaking-fast` and `debug-log-films-12` (id `fe2f543f94c74a91`) were flashed; their
+dictionary is kept as `logs/events-fe2f543f94c74a91.json`. `logs/events.json` (build id `da49b2f5e7e62ca7`) adds the
+event `pk_guard`. `patches/log-peaking-guard.json` puts that id into the flush task, in the builds
+`debug-log-peaking-fast-2` and `debug-log-films-12b`.
 
 ## How to add an event and a probe
 

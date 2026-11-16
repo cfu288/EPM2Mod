@@ -1,0 +1,484 @@
+# scen_guard.py all, one image per run: pinned-fast = peaking-fast (0e8a25b9...), peaking-fast-2 (8d036edb...), debug-log-peaking-fast-2 (b5186a78...)
+S19. MF Assist asked for while a photo is being developed. Film slot, Peaking White. Order of the camera log:
+     capture, live view back, the development still holds a block, the focus ring turns, the block is freed later.
+  [pinned-fast] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [pinned-fast] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [pinned-fast] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [pinned-fast] capture: Through End:                          L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [pinned-fast] the rec code calls the heap-mode chooser | L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [pinned-fast] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [pinned-fast] capture: Through Start:                        L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [pinned-fast] live view, development goes on:                L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands 3,4,3
+  [pinned-fast] ring turned, block in use, frame 1:            L=1 R=1 L2=1 | heap mode 1, flags 3, in use: pool of mode 1 0, pool of modes 0/2 10 | picture False, lines False, art commands 4,3,4
+        heap re-partition: 1 live blocks: 0xB2FEF240+3735552
+        ANOMALY: art buffers refused (alloc error)
+        ANOMALY: no picture
+        ANOMALY: heap re-partitioned under live blocks (1 live blocks)
+  [pinned-fast] ring turned, block in use, frame 2:            L=1 R=1 L2=1 | heap mode 1, flags 3, in use: pool of mode 1 0, pool of modes 0/2 10 | picture False, lines False, art commands 3,4
+        ANOMALY: art buffers refused (alloc error)
+        ANOMALY: no picture
+  [pinned-fast] ring turned, block in use, frame 3:            L=1 R=1 L2=1 | heap mode 1, flags 3, in use: pool of mode 1 0, pool of modes 0/2 10 | picture False, lines False, art commands 3,4
+        ANOMALY: art buffers refused (alloc error)
+        ANOMALY: no picture
+  [pinned-fast] the block is freed | L=1 R=1 L2=1 | heap mode 1, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [pinned-fast] block freed, frame 1:                          L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 3,2
+  [pinned-fast] block freed, frame 2:                          L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 2
+  [pinned-fast] ring stopped:                                  L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 4,3
+  [pinned-fast] ring stopped, frame 2:                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  S19 RESULT [pinned-fast]: FAIL: ring turned, block in use, frame 1: art buffers refused (alloc error); ring turned, block in use, frame 1: heap re-partitioned under live blocks (1 live blocks); ring turned, block in use, frame 1: no picture; ring turned, block in use, frame 2: art buffers refused (alloc error); ring turned, block in use, frame 2: no picture; ring turned, block in use, frame 3: art buffers refused (alloc error); ring turned, block in use, frame 3: no picture
+
+S20. A capture while the lines show. (a) MF Assist has ended when live view comes back; (b) the request is
+     still set (the state object did not clear it) and the development holds a block.
+  [pinned-fast] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [pinned-fast] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [pinned-fast] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [pinned-fast] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [pinned-fast] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 2
+  [pinned-fast] capture: Through End:                          L=1 R=0 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [pinned-fast] the rec code calls the heap-mode chooser | L=1 R=0 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [pinned-fast] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=1 R=0 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [pinned-fast] capture: Through Start:                        L=1 R=0 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [pinned-fast] (a) live view back, no request:                L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands 3,4,3
+  [pinned-fast] the block is freed | L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [pinned-fast] (a) block freed:                               L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [pinned-fast] lines on again:                                L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [pinned-fast] capture: Through End:                          L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [pinned-fast] the rec code calls the heap-mode chooser | L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [pinned-fast] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [pinned-fast] capture: Through Start:                        L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [pinned-fast] (b) live view back, request set, block in use: L=1 R=1 L2=1 | heap mode 1, flags 3, in use: pool of mode 1 0, pool of modes 0/2 10 | picture False, lines False, art commands 3,4,3,4
+        heap re-partition: 1 live blocks: 0xB2FEF240+3735552
+        ANOMALY: art buffers refused (alloc error)
+        ANOMALY: no picture
+        ANOMALY: heap re-partitioned under live blocks (1 live blocks)
+  [pinned-fast] (b) live view back, request set, block in use: L=1 R=1 L2=1 | heap mode 1, flags 3, in use: pool of mode 1 0, pool of modes 0/2 10 | picture False, lines False, art commands 3,4
+        ANOMALY: art buffers refused (alloc error)
+        ANOMALY: no picture
+  [pinned-fast] the block is freed | L=1 R=1 L2=1 | heap mode 1, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [pinned-fast] (b) block freed:                               L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 3,2
+  S20 RESULT [pinned-fast]: FAIL: (b) live view back, request set, block in use: art buffers refused (alloc error); (b) live view back, request set, block in use: heap re-partitioned under live blocks (1 live blocks); (b) live view back, request set, block in use: no picture
+
+S21. MF Assist ends while another owner has a block in the pool of mode 1 (it took it while the lines showed).
+  [pinned-fast] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [pinned-fast] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [pinned-fast] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [pinned-fast] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [pinned-fast] another owner takes a block while the lines show: 3735552 bytes -> 0xA9C71240 | L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 27, pool of modes 0/2 0
+  [pinned-fast] lines on, block in use:                        L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 27, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 2
+  [pinned-fast] ring stopped, block in use:                    L=0 R=0 L2=0 | heap mode 2, flags 3, in use: pool of mode 1 10, pool of modes 0/2 0 | picture True, lines False, art commands 4,3
+        heap re-partition: 1 live blocks: 0xA9C71240+3735552
+        ANOMALY: heap re-partitioned under live blocks (1 live blocks)
+  [pinned-fast] frame 2:                                       L=0 R=0 L2=0 | heap mode 2, flags 3, in use: pool of mode 1 10, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [pinned-fast] the owner takes a second block: 1000000 bytes -> 0x00000000 REFUSED, code 0x08020004 from 0x7E578D94 (0x7E578D43+0x51) | L=0 R=0 L2=0 | heap mode 2, flags 3, in use: pool of mode 1 10, pool of modes 0/2 0
+  [pinned-fast] frame 3:                                       L=0 R=0 L2=0 | heap mode 2, flags 3, in use: pool of mode 1 10, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [pinned-fast] the block is freed | L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [pinned-fast] blocks freed:                                  L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [pinned-fast] the next chooser call (a capture, a look change) | L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [pinned-fast] lines on again:                                L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  S21 RESULT [pinned-fast]: FAIL: ring stopped, block in use: heap re-partitioned under live blocks (1 live blocks); the owner takes a second block: the block was refused
+
+S22. Movie: the request is set while a movie records (flag 0x605B039C = 1: the latch refuses, as before), and
+     the movie stops while a block is in use.
+  [pinned-fast] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [pinned-fast] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [pinned-fast] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [pinned-fast] a block is taken during the movie: 3735552 bytes -> 0xB2FEF240 | L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [pinned-fast] movie records, request set:                    L=0 R=1 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [pinned-fast] movie stopped, block in use:                   L=1 R=1 L2=1 | heap mode 1, flags 3, in use: pool of mode 1 0, pool of modes 0/2 10 | picture False, lines False, art commands 4,3,4
+        heap re-partition: 1 live blocks: 0xB2FEF240+3735552
+        ANOMALY: art buffers refused (alloc error)
+        ANOMALY: no picture
+        ANOMALY: heap re-partitioned under live blocks (1 live blocks)
+  [pinned-fast] frame 2:                                       L=1 R=1 L2=1 | heap mode 1, flags 3, in use: pool of mode 1 0, pool of modes 0/2 10 | picture False, lines False, art commands 3,4
+        ANOMALY: art buffers refused (alloc error)
+        ANOMALY: no picture
+  [pinned-fast] the block is freed | L=1 R=1 L2=1 | heap mode 1, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [pinned-fast] block freed:                                   L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 3,2
+  S22 RESULT [pinned-fast]: FAIL: frame 2: art buffers refused (alloc error); frame 2: no picture; movie stopped, block in use: art buffers refused (alloc error); movie stopped, block in use: heap re-partitioned under live blocks (1 live blocks); movie stopped, block in use: no picture
+
+S23. Interval sequence: three captures, the request set all the time (the ring is turned between the frames).
+  [pinned-fast] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [pinned-fast] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [pinned-fast] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [pinned-fast] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [pinned-fast] capture: Through End:                          L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [pinned-fast] the rec code calls the heap-mode chooser | L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [pinned-fast] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [pinned-fast] capture: Through Start:                        L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [pinned-fast] frame 1 of the sequence: live view back, block in use: L=1 R=1 L2=1 | heap mode 1, flags 3, in use: pool of mode 1 0, pool of modes 0/2 10 | picture False, lines False, art commands 3,4,3,4
+        heap re-partition: 1 live blocks: 0xB2FEF240+3735552
+        ANOMALY: art buffers refused (alloc error)
+        ANOMALY: no picture
+        ANOMALY: heap re-partitioned under live blocks (1 live blocks)
+  [pinned-fast] block in use:                                  L=1 R=1 L2=1 | heap mode 1, flags 3, in use: pool of mode 1 0, pool of modes 0/2 10 | picture False, lines False, art commands 3,4
+        ANOMALY: art buffers refused (alloc error)
+        ANOMALY: no picture
+  [pinned-fast] the block is freed | L=1 R=1 L2=1 | heap mode 1, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [pinned-fast] block freed:                                   L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 3,2
+  [pinned-fast] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 2
+  [pinned-fast] capture: Through End:                          L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [pinned-fast] the rec code calls the heap-mode chooser | L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [pinned-fast] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [pinned-fast] capture: Through Start:                        L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [pinned-fast] frame 2 of the sequence: live view back, block in use: L=1 R=1 L2=1 | heap mode 1, flags 3, in use: pool of mode 1 0, pool of modes 0/2 10 | picture False, lines False, art commands 3,4,3,4
+        heap re-partition: 1 live blocks: 0xB2FEF240+3735552
+        ANOMALY: art buffers refused (alloc error)
+        ANOMALY: no picture
+        ANOMALY: heap re-partitioned under live blocks (1 live blocks)
+  [pinned-fast] block in use:                                  L=1 R=1 L2=1 | heap mode 1, flags 3, in use: pool of mode 1 0, pool of modes 0/2 10 | picture False, lines False, art commands 3,4
+        ANOMALY: art buffers refused (alloc error)
+        ANOMALY: no picture
+  [pinned-fast] the block is freed | L=1 R=1 L2=1 | heap mode 1, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [pinned-fast] block freed:                                   L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 3,2
+  [pinned-fast] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 2
+  [pinned-fast] capture: Through End:                          L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [pinned-fast] the rec code calls the heap-mode chooser | L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [pinned-fast] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [pinned-fast] capture: Through Start:                        L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [pinned-fast] frame 3 of the sequence: live view back, block in use: L=1 R=1 L2=1 | heap mode 1, flags 3, in use: pool of mode 1 0, pool of modes 0/2 10 | picture False, lines False, art commands 3,4,3,4
+        heap re-partition: 1 live blocks: 0xB2FEF240+3735552
+        ANOMALY: art buffers refused (alloc error)
+        ANOMALY: no picture
+        ANOMALY: heap re-partitioned under live blocks (1 live blocks)
+  [pinned-fast] block in use:                                  L=1 R=1 L2=1 | heap mode 1, flags 3, in use: pool of mode 1 0, pool of modes 0/2 10 | picture False, lines False, art commands 3,4
+        ANOMALY: art buffers refused (alloc error)
+        ANOMALY: no picture
+  [pinned-fast] the block is freed | L=1 R=1 L2=1 | heap mode 1, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [pinned-fast] block freed:                                   L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 3,2
+  [pinned-fast] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 2
+  S23 RESULT [pinned-fast]: FAIL: block in use: art buffers refused (alloc error); block in use: no picture; frame 1 of the sequence: live view back, block in use: art buffers refused (alloc error); frame 1 of the sequence: live view back, block in use: heap re-partitioned under live blocks (1 live blocks); frame 1 of the sequence: live view back, block in use: no picture; frame 2 of the sequence: live view back, block in use: art buffers refused (alloc error); frame 2 of the sequence: live view back, block in use: heap re-partitioned under live blocks (1 live blocks); frame 2 of the sequence: live view back, block in use: no picture; frame 3 of the sequence: live view back, block in use: art buffers refused (alloc error); f
+
+S24. Back from playback or RAW Data Edit: Through End, the heap mode set directly to 2 as play_rec_raw_edit does,
+     a block in use, Through Start, the ring turns at once.
+  [pinned-fast] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [pinned-fast] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [pinned-fast] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [pinned-fast] to playback: Through End:                      L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [pinned-fast] the edit code takes a block: 3735552 bytes -> 0xB2FEF240 | L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [pinned-fast] back: Through Start:                           L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [pinned-fast] ring turned, block in use:                     L=1 R=1 L2=1 | heap mode 1, flags 3, in use: pool of mode 1 0, pool of modes 0/2 10 | picture False, lines False, art commands 3,4,3,4
+        heap re-partition: 1 live blocks: 0xB2FEF240+3735552
+        ANOMALY: art buffers refused (alloc error)
+        ANOMALY: no picture
+        ANOMALY: heap re-partitioned under live blocks (1 live blocks)
+  [pinned-fast] frame 2:                                       L=1 R=1 L2=1 | heap mode 1, flags 3, in use: pool of mode 1 0, pool of modes 0/2 10 | picture False, lines False, art commands 3,4
+        ANOMALY: art buffers refused (alloc error)
+        ANOMALY: no picture
+  [pinned-fast] the block is freed | L=1 R=1 L2=1 | heap mode 1, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [pinned-fast] block freed:                                   L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 3,2
+  S24 RESULT [pinned-fast]: FAIL: frame 2: art buffers refused (alloc error); frame 2: no picture; ring turned, block in use: art buffers refused (alloc error); ring turned, block in use: heap re-partitioned under live blocks (1 live blocks); ring turned, block in use: no picture
+
+S25. Sleep and wake with the request set and no block in use: the guard is not in the way.
+  [pinned-fast] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [pinned-fast] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [pinned-fast] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [pinned-fast] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [pinned-fast] sleep: Through End:                            L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [pinned-fast] wake: Through Start:                           L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [pinned-fast] first frame after wake:                        L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 3,4,3,2
+  [pinned-fast] frame 2:                                       L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 2
+  [pinned-fast] ring stopped:                                  L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 4,3
+  S25 RESULT [pinned-fast]: PASS
+
+S26. Event pk_guard (id 262): (heap mode, mode at the last allocation, units in use) of each record.
+
+S19. MF Assist asked for while a photo is being developed. Film slot, Peaking White. Order of the camera log:
+     capture, live view back, the development still holds a block, the focus ring turns, the block is freed later.
+  [peaking-fast-2] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [peaking-fast-2] capture: Through End:                          L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [peaking-fast-2] the rec code calls the heap-mode chooser | L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [peaking-fast-2] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [peaking-fast-2] capture: Through Start:                        L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [peaking-fast-2] live view, development goes on:                L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands 3,4,3
+  [peaking-fast-2] ring turned, block in use, frame 1:            L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [peaking-fast-2] ring turned, block in use, frame 2:            L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [peaking-fast-2] ring turned, block in use, frame 3:            L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [peaking-fast-2] the block is freed | L=2 R=1 L2=2 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [peaking-fast-2] block freed, frame 1:                          L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [peaking-fast-2] block freed, frame 2:                          L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 2
+  [peaking-fast-2] ring stopped:                                  L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 4,3
+  [peaking-fast-2] ring stopped, frame 2:                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  S19 RESULT [peaking-fast-2]: PASS
+
+S20. A capture while the lines show. (a) MF Assist has ended when live view comes back; (b) the request is
+     still set (the state object did not clear it) and the development holds a block.
+  [peaking-fast-2] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [peaking-fast-2] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [peaking-fast-2] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 2
+  [peaking-fast-2] capture: Through End:                          L=1 R=0 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [peaking-fast-2] the rec code calls the heap-mode chooser | L=1 R=0 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [peaking-fast-2] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=1 R=0 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [peaking-fast-2] capture: Through Start:                        L=1 R=0 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [peaking-fast-2] (a) live view back, no request:                L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands 3,4,3
+  [peaking-fast-2] the block is freed | L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [peaking-fast-2] (a) block freed:                               L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [peaking-fast-2] lines on again:                                L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [peaking-fast-2] capture: Through End:                          L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [peaking-fast-2] the rec code calls the heap-mode chooser | L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [peaking-fast-2] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [peaking-fast-2] capture: Through Start:                        L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [peaking-fast-2] (b) live view back, request set, block in use: L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands 3,4,3
+  [peaking-fast-2] (b) live view back, request set, block in use: L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [peaking-fast-2] the block is freed | L=2 R=1 L2=2 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [peaking-fast-2] (b) block freed:                               L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  S20 RESULT [peaking-fast-2]: PASS
+
+S21. MF Assist ends while another owner has a block in the pool of mode 1 (it took it while the lines showed).
+  [peaking-fast-2] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [peaking-fast-2] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [peaking-fast-2] another owner takes a block while the lines show: 3735552 bytes -> 0xA9C71240 | L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 27, pool of modes 0/2 0
+  [peaking-fast-2] lines on, block in use:                        L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 27, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 2
+  [peaking-fast-2] ring stopped, block in use:                    L=0 R=0 L2=0 | heap mode 1, flags 1, in use: pool of mode 1 10, pool of modes 0/2 0 | picture True, lines False, art commands 4,3
+  [peaking-fast-2] frame 2:                                       L=0 R=0 L2=0 | heap mode 1, flags 1, in use: pool of mode 1 10, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [peaking-fast-2] the owner takes a second block: 1000000 bytes -> 0xAA0486C0 | L=0 R=0 L2=0 | heap mode 1, flags 1, in use: pool of mode 1 13, pool of modes 0/2 0
+  [peaking-fast-2] frame 3:                                       L=0 R=0 L2=0 | heap mode 1, flags 1, in use: pool of mode 1 13, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [peaking-fast-2] the block is freed | L=0 R=0 L2=0 | heap mode 1, flags 1, in use: pool of mode 1 10, pool of modes 0/2 0
+  [peaking-fast-2] the block is freed | L=0 R=0 L2=0 | heap mode 1, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [peaking-fast-2] blocks freed:                                  L=0 R=0 L2=0 | heap mode 1, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [peaking-fast-2] the next chooser call (a capture, a look change) | L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [peaking-fast-2] lines on again:                                L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  S21 RESULT [peaking-fast-2]: PASS
+
+S22. Movie: the request is set while a movie records (flag 0x605B039C = 1: the latch refuses, as before), and
+     the movie stops while a block is in use.
+  [peaking-fast-2] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [peaking-fast-2] a block is taken during the movie: 3735552 bytes -> 0xB2FEF240 | L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [peaking-fast-2] movie records, request set:                    L=0 R=1 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [peaking-fast-2] movie stopped, block in use:                   L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [peaking-fast-2] frame 2:                                       L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [peaking-fast-2] the block is freed | L=2 R=1 L2=2 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [peaking-fast-2] block freed:                                   L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  S22 RESULT [peaking-fast-2]: PASS
+
+S23. Interval sequence: three captures, the request set all the time (the ring is turned between the frames).
+  [peaking-fast-2] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [peaking-fast-2] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [peaking-fast-2] capture: Through End:                          L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [peaking-fast-2] the rec code calls the heap-mode chooser | L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [peaking-fast-2] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [peaking-fast-2] capture: Through Start:                        L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [peaking-fast-2] frame 1 of the sequence: live view back, block in use: L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands 3,4,3
+  [peaking-fast-2] block in use:                                  L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [peaking-fast-2] the block is freed | L=2 R=1 L2=2 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [peaking-fast-2] block freed:                                   L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [peaking-fast-2] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 2
+  [peaking-fast-2] capture: Through End:                          L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [peaking-fast-2] the rec code calls the heap-mode chooser | L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [peaking-fast-2] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [peaking-fast-2] capture: Through Start:                        L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [peaking-fast-2] frame 2 of the sequence: live view back, block in use: L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands 3,4,3
+  [peaking-fast-2] block in use:                                  L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [peaking-fast-2] the block is freed | L=2 R=1 L2=2 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [peaking-fast-2] block freed:                                   L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [peaking-fast-2] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 2
+  [peaking-fast-2] capture: Through End:                          L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [peaking-fast-2] the rec code calls the heap-mode chooser | L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [peaking-fast-2] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [peaking-fast-2] capture: Through Start:                        L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [peaking-fast-2] frame 3 of the sequence: live view back, block in use: L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands 3,4,3
+  [peaking-fast-2] block in use:                                  L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [peaking-fast-2] the block is freed | L=2 R=1 L2=2 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [peaking-fast-2] block freed:                                   L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [peaking-fast-2] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 2
+  S23 RESULT [peaking-fast-2]: PASS
+
+S24. Back from playback or RAW Data Edit: Through End, the heap mode set directly to 2 as play_rec_raw_edit does,
+     a block in use, Through Start, the ring turns at once.
+  [peaking-fast-2] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [peaking-fast-2] to playback: Through End:                      L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [peaking-fast-2] the edit code takes a block: 3735552 bytes -> 0xB2FEF240 | L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [peaking-fast-2] back: Through Start:                           L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [peaking-fast-2] ring turned, block in use:                     L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands 3,4,3
+  [peaking-fast-2] frame 2:                                       L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [peaking-fast-2] the block is freed | L=2 R=1 L2=2 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [peaking-fast-2] block freed:                                   L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  S24 RESULT [peaking-fast-2]: PASS
+
+S25. Sleep and wake with the request set and no block in use: the guard is not in the way.
+  [peaking-fast-2] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [peaking-fast-2] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [peaking-fast-2] sleep: Through End:                            L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [peaking-fast-2] wake: Through Start:                           L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [peaking-fast-2] first frame after wake:                        L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 3,4,3,2
+  [peaking-fast-2] frame 2:                                       L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 2
+  [peaking-fast-2] ring stopped:                                  L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 4,3
+  S25 RESULT [peaking-fast-2]: PASS
+
+S26. Event pk_guard (id 262): (heap mode, mode at the last allocation, units in use) of each record.
+
+S19. MF Assist asked for while a photo is being developed. Film slot, Peaking White. Order of the camera log:
+     capture, live view back, the development still holds a block, the focus ring turns, the block is freed later.
+  [debug-log-peaking-fast-2] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [debug-log-peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [debug-log-peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] capture: Through End:                          L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [debug-log-peaking-fast-2] the rec code calls the heap-mode chooser | L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-peaking-fast-2] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [debug-log-peaking-fast-2] capture: Through Start:                        L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [debug-log-peaking-fast-2] live view, development goes on:                L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands 3,4,3
+  [debug-log-peaking-fast-2] ring turned, block in use, frame 1:            L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] ring turned, block in use, frame 2:            L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] ring turned, block in use, frame 3:            L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] the block is freed | L=2 R=1 L2=2 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-peaking-fast-2] block freed, frame 1:                          L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [debug-log-peaking-fast-2] block freed, frame 2:                          L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 2
+  [debug-log-peaking-fast-2] ring stopped:                                  L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 4,3
+  [debug-log-peaking-fast-2] ring stopped, frame 2:                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  S19 RESULT [debug-log-peaking-fast-2]: PASS
+
+S20. A capture while the lines show. (a) MF Assist has ended when live view comes back; (b) the request is
+     still set (the state object did not clear it) and the development holds a block.
+  [debug-log-peaking-fast-2] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [debug-log-peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [debug-log-peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [debug-log-peaking-fast-2] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 2
+  [debug-log-peaking-fast-2] capture: Through End:                          L=1 R=0 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [debug-log-peaking-fast-2] the rec code calls the heap-mode chooser | L=1 R=0 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-peaking-fast-2] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=1 R=0 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [debug-log-peaking-fast-2] capture: Through Start:                        L=1 R=0 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [debug-log-peaking-fast-2] (a) live view back, no request:                L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands 3,4,3
+  [debug-log-peaking-fast-2] the block is freed | L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-peaking-fast-2] (a) block freed:                               L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] lines on again:                                L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [debug-log-peaking-fast-2] capture: Through End:                          L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [debug-log-peaking-fast-2] the rec code calls the heap-mode chooser | L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-peaking-fast-2] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [debug-log-peaking-fast-2] capture: Through Start:                        L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [debug-log-peaking-fast-2] (b) live view back, request set, block in use: L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands 3,4,3
+  [debug-log-peaking-fast-2] (b) live view back, request set, block in use: L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] the block is freed | L=2 R=1 L2=2 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-peaking-fast-2] (b) block freed:                               L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  S20 RESULT [debug-log-peaking-fast-2]: PASS
+
+S21. MF Assist ends while another owner has a block in the pool of mode 1 (it took it while the lines showed).
+  [debug-log-peaking-fast-2] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [debug-log-peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [debug-log-peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [debug-log-peaking-fast-2] another owner takes a block while the lines show: 3735552 bytes -> 0xA9C71240 | L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 27, pool of modes 0/2 0
+  [debug-log-peaking-fast-2] lines on, block in use:                        L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 27, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 2
+  [debug-log-peaking-fast-2] ring stopped, block in use:                    L=0 R=0 L2=0 | heap mode 1, flags 1, in use: pool of mode 1 10, pool of modes 0/2 0 | picture True, lines False, art commands 4,3
+  [debug-log-peaking-fast-2] frame 2:                                       L=0 R=0 L2=0 | heap mode 1, flags 1, in use: pool of mode 1 10, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] the owner takes a second block: 1000000 bytes -> 0xAA0486C0 | L=0 R=0 L2=0 | heap mode 1, flags 1, in use: pool of mode 1 13, pool of modes 0/2 0
+  [debug-log-peaking-fast-2] frame 3:                                       L=0 R=0 L2=0 | heap mode 1, flags 1, in use: pool of mode 1 13, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] the block is freed | L=0 R=0 L2=0 | heap mode 1, flags 1, in use: pool of mode 1 10, pool of modes 0/2 0
+  [debug-log-peaking-fast-2] the block is freed | L=0 R=0 L2=0 | heap mode 1, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-peaking-fast-2] blocks freed:                                  L=0 R=0 L2=0 | heap mode 1, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] the next chooser call (a capture, a look change) | L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-peaking-fast-2] lines on again:                                L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  S21 RESULT [debug-log-peaking-fast-2]: PASS
+
+S22. Movie: the request is set while a movie records (flag 0x605B039C = 1: the latch refuses, as before), and
+     the movie stops while a block is in use.
+  [debug-log-peaking-fast-2] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [debug-log-peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [debug-log-peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] a block is taken during the movie: 3735552 bytes -> 0xB2FEF240 | L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [debug-log-peaking-fast-2] movie records, request set:                    L=0 R=1 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] movie stopped, block in use:                   L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] frame 2:                                       L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] the block is freed | L=2 R=1 L2=2 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-peaking-fast-2] block freed:                                   L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  S22 RESULT [debug-log-peaking-fast-2]: PASS
+
+S23. Interval sequence: three captures, the request set all the time (the ring is turned between the frames).
+  [debug-log-peaking-fast-2] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [debug-log-peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [debug-log-peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [debug-log-peaking-fast-2] capture: Through End:                          L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [debug-log-peaking-fast-2] the rec code calls the heap-mode chooser | L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-peaking-fast-2] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [debug-log-peaking-fast-2] capture: Through Start:                        L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [debug-log-peaking-fast-2] frame 1 of the sequence: live view back, block in use: L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands 3,4,3
+  [debug-log-peaking-fast-2] block in use:                                  L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] the block is freed | L=2 R=1 L2=2 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-peaking-fast-2] block freed:                                   L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [debug-log-peaking-fast-2] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 2
+  [debug-log-peaking-fast-2] capture: Through End:                          L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [debug-log-peaking-fast-2] the rec code calls the heap-mode chooser | L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-peaking-fast-2] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [debug-log-peaking-fast-2] capture: Through Start:                        L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [debug-log-peaking-fast-2] frame 2 of the sequence: live view back, block in use: L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands 3,4,3
+  [debug-log-peaking-fast-2] block in use:                                  L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] the block is freed | L=2 R=1 L2=2 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-peaking-fast-2] block freed:                                   L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [debug-log-peaking-fast-2] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 2
+  [debug-log-peaking-fast-2] capture: Through End:                          L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [debug-log-peaking-fast-2] the rec code calls the heap-mode chooser | L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-peaking-fast-2] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [debug-log-peaking-fast-2] capture: Through Start:                        L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [debug-log-peaking-fast-2] frame 3 of the sequence: live view back, block in use: L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands 3,4,3
+  [debug-log-peaking-fast-2] block in use:                                  L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] the block is freed | L=2 R=1 L2=2 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-peaking-fast-2] block freed:                                   L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [debug-log-peaking-fast-2] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 2
+  S23 RESULT [debug-log-peaking-fast-2]: PASS
+
+S24. Back from playback or RAW Data Edit: Through End, the heap mode set directly to 2 as play_rec_raw_edit does,
+     a block in use, Through Start, the ring turns at once.
+  [debug-log-peaking-fast-2] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [debug-log-peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [debug-log-peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] to playback: Through End:                      L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [debug-log-peaking-fast-2] the edit code takes a block: 3735552 bytes -> 0xB2FEF240 | L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [debug-log-peaking-fast-2] back: Through Start:                           L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [debug-log-peaking-fast-2] ring turned, block in use:                     L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands 3,4,3
+  [debug-log-peaking-fast-2] frame 2:                                       L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] the block is freed | L=2 R=1 L2=2 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-peaking-fast-2] block freed:                                   L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  S24 RESULT [debug-log-peaking-fast-2]: PASS
+
+S25. Sleep and wake with the request set and no block in use: the guard is not in the way.
+  [debug-log-peaking-fast-2] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [debug-log-peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [debug-log-peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [debug-log-peaking-fast-2] sleep: Through End:                            L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [debug-log-peaking-fast-2] wake: Through Start:                           L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [debug-log-peaking-fast-2] first frame after wake:                        L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 3,4,3,2
+  [debug-log-peaking-fast-2] frame 2:                                       L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 2
+  [debug-log-peaking-fast-2] ring stopped:                                  L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 4,3
+  S25 RESULT [debug-log-peaking-fast-2]: PASS
+
+S26. Event pk_guard (id 262): (heap mode, mode at the last allocation, units in use) of each record.
+  [debug-log-peaking-fast-2] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [debug-log-peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [debug-log-peaking-fast-2] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [debug-log-peaking-fast-2] ring event while the lines show: records []
+  [debug-log-peaking-fast-2] capture: Through End:                          L=1 R=0 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [debug-log-peaking-fast-2] the rec code calls the heap-mode chooser | L=1 R=0 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-peaking-fast-2] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=1 R=0 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [debug-log-peaking-fast-2] capture: Through Start:                        L=1 R=0 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [debug-log-peaking-fast-2] live view, development goes on:                L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands 3,4,3
+  [debug-log-peaking-fast-2] ring turned, block in use, frame 1:            L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] frame 2:                                       L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [debug-log-peaking-fast-2] two ring events in the hold: records [(2, 2, 10)], then [(2, 2, 10)]
+  [debug-log-peaking-fast-2] the block is freed | L=2 R=1 L2=2 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-peaking-fast-2] block freed:                                   L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [debug-log-peaking-fast-2] capture: Through End:                          L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [debug-log-peaking-fast-2] the rec code calls the heap-mode chooser | L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-peaking-fast-2] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [debug-log-peaking-fast-2] capture: Through Start:                        L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [debug-log-peaking-fast-2] second capture, block in use:                  L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands 3,4,3
+  [debug-log-peaking-fast-2] ring event after the hold: 1 record(s); ring event in a second hold: 2 record(s)
+  [debug-log-peaking-fast-2] the block is freed | L=2 R=1 L2=2 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-peaking-fast-2] block freed:                                   L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  S26 RESULT [debug-log-peaking-fast-2]: PASS
+

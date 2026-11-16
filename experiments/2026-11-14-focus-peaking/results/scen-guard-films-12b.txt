@@ -1,0 +1,67 @@
+# scen_guard.py s19 and s26 on films-12b (bd919569...) and debug-log-films-12b (df315408...)
+S19. MF Assist asked for while a photo is being developed. Film slot, Peaking White. Order of the camera log:
+     capture, live view back, the development still holds a block, the focus ring turns, the block is freed later.
+  [films-12b] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [films-12b] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [films-12b] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [films-12b] capture: Through End:                          L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [films-12b] the rec code calls the heap-mode chooser | L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [films-12b] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [films-12b] capture: Through Start:                        L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [films-12b] live view, development goes on:                L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands 3,4,3
+  [films-12b] ring turned, block in use, frame 1:            L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [films-12b] ring turned, block in use, frame 2:            L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [films-12b] ring turned, block in use, frame 3:            L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [films-12b] the block is freed | L=2 R=1 L2=2 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [films-12b] block freed, frame 1:                          L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [films-12b] block freed, frame 2:                          L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 2
+  [films-12b] ring stopped:                                  L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 4,3
+  [films-12b] ring stopped, frame 2:                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  S19 RESULT [films-12b]: PASS
+
+S19. MF Assist asked for while a photo is being developed. Film slot, Peaking White. Order of the camera log:
+     capture, live view back, the development still holds a block, the focus ring turns, the block is freed later.
+  [debug-log-films-12b] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [debug-log-films-12b] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [debug-log-films-12b] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [debug-log-films-12b] capture: Through End:                          L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [debug-log-films-12b] the rec code calls the heap-mode chooser | L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-films-12b] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [debug-log-films-12b] capture: Through Start:                        L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [debug-log-films-12b] live view, development goes on:                L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands 3,4,3
+  [debug-log-films-12b] ring turned, block in use, frame 1:            L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [debug-log-films-12b] ring turned, block in use, frame 2:            L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [debug-log-films-12b] ring turned, block in use, frame 3:            L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [debug-log-films-12b] the block is freed | L=2 R=1 L2=2 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-films-12b] block freed, frame 1:                          L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [debug-log-films-12b] block freed, frame 2:                          L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 2
+  [debug-log-films-12b] ring stopped:                                  L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 4,3
+  [debug-log-films-12b] ring stopped, frame 2:                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  S19 RESULT [debug-log-films-12b]: PASS
+
+S26. Event pk_guard (id 262): (heap mode, mode at the last allocation, units in use) of each record.
+  [debug-log-films-12b] start:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands -
+  [debug-log-films-12b] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands 3,4,3
+  [debug-log-films-12b] frame:                                         L=0 R=0 L2=0 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture True, lines False, art commands -
+  [debug-log-films-12b] lines on:                                      L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [debug-log-films-12b] ring event while the lines show: records []
+  [debug-log-films-12b] capture: Through End:                          L=1 R=0 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [debug-log-films-12b] the rec code calls the heap-mode chooser | L=1 R=0 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-films-12b] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=1 R=0 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [debug-log-films-12b] capture: Through Start:                        L=1 R=0 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [debug-log-films-12b] live view, development goes on:                L=0 R=0 L2=0 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands 3,4,3
+  [debug-log-films-12b] ring turned, block in use, frame 1:            L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [debug-log-films-12b] frame 2:                                       L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands -
+  [debug-log-films-12b] two ring events in the hold: records [(2, 2, 10)], then [(2, 2, 10)]
+  [debug-log-films-12b] the block is freed | L=2 R=1 L2=2 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-films-12b] block freed:                                   L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  [debug-log-films-12b] capture: Through End:                          L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0 | picture None, lines False, art commands 4
+  [debug-log-films-12b] the rec code calls the heap-mode chooser | L=1 R=1 L2=1 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-films-12b] the still code takes a block: 3735552 bytes -> 0xB2FEF240 | L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10
+  [debug-log-films-12b] capture: Through Start:                        L=1 R=1 L2=1 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture None, lines False, art commands -
+  [debug-log-films-12b] second capture, block in use:                  L=2 R=1 L2=2 | heap mode 2, flags 1, in use: pool of mode 1 0, pool of modes 0/2 10 | picture True, lines False, art commands 3,4,3
+  [debug-log-films-12b] ring event after the hold: 1 record(s); ring event in a second hold: 2 record(s)
+  [debug-log-films-12b] the block is freed | L=2 R=1 L2=2 | heap mode 2, flags 0, in use: pool of mode 1 0, pool of modes 0/2 0
+  [debug-log-films-12b] block freed:                                   L=1 R=1 L2=1 | heap mode 1, flags 1, in use: pool of mode 1 17, pool of modes 0/2 0 | picture True, lines True (pass 9 gain 0x0200), art commands 4,3,2
+  S26 RESULT [debug-log-films-12b]: PASS
+

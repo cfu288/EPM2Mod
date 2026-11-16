@@ -1395,3 +1395,218 @@ Go back: `epm2flash peaking-colours 4d6b1f26ed92d66b62b4d7dc32d26168e33fd8b153a7
 | `scripts/scen_fast.py` | S12 to S14: `scen_fast.py all BASE_BLOCK0 PINNED_BLOCK0 FAST_BLOCK0 [PNG_DIR]`; S18: `scen_fast.py s18 FAST_BLOCK0 DEBUG_FAST_BLOCK0` |
 | `logs/events.json`, `src/epm2mod/logsummary.py` | event `pk_stats`; the summary prints one line per peaking run and the lines `pass 9 timing` |
 | `results/fast-*.txt` | listings, free-space check, hook check, op check, boot report, scenario outputs |
+
+## 18. The restart when the focus ring is turned right after a shot, and the save guard (`peaking-save-guard`)
+
+Date: 2026-11-16. Status: `patches/peaking-save-guard.json`; builds `peaking-fast-2`, `debug-log-peaking-fast-2`,
+`films-12b`, `debug-log-films-12b` (sha256 in §18.7). Checked in emulation. **Not flashed.** The pinned build
+`peaking-fast` still rebuilds to `0e8a25b9…917e`. Labels: **V** verified (the log, the bytes, or ran in the
+emulator), **I** inferred, **U** unknown.
+
+### 18.1 Camera report and log
+
+Owner, build `debug-log-films-12` (`5d0a7683…4d02f`): "able to replicate a few crashes when manual focusing after a
+shot while it was still saving". The log (`build/logs/EPM2LOG.BIN`, not in the repository) holds two of them. The
+ring RAM survived the restart, so the records are there (`recovered`).
+
+| Time after "record ends" (callback 27) | Session 2 (look: art 94, Provia) | Session 3 (look: art 85, Superia) |
+|---|---|---|
+| callback 258 `CBS_START_THROUGH_IMAGE_PROCESS` (live view starts again) | 0.5 ms | 1.9 ms |
+| `pk_mf_start` (R = 1), then `gui_state` 0x5A00 | 223 ms | 210 ms |
+| `pk_latch` L = 1, and `pk_heap_mode` **1** | 243 ms | 232 ms |
+| a second `pk_latch` (L2 = 1: the next frame) | none | 265 ms |
+| `fw_error` **0x34000002**, caller 0x7E72A277, 2 arguments, the first is 4 | 250 ms | 271 ms |
+| last record (`film_stage`, art 3, CPU 0) | 339 ms | 402 ms |
+
+In the same log, session 3 at 23.5 s: the ring is turned 632 ms after "record ends", and nothing fails. The seven
+MF Assist runs with no capture before them are also clean. So the window is short, and the look does not matter
+(a new one and an old one).
+
+### 18.2 What the error is
+
+| Fact | Label |
+|---|---|
+| 0x7E72A277 is in `art_analyze_cmd_art_exec` 0x7E72A14B of the ART task. It takes one command packet: 3 = start an art session, 2 = one frame, 4 = end the session | V (bytes, strings) |
+| For the packet types 7, 8 and 9 (`art_mov_check` 0x7E7295BE: the live-view and movie types) the task keeps **one** state byte, 0x605C1930: 0 = no session, 1 = starting, 2 = started. Command 3 needs 0, the commands 2 and 4 need 2. Anything else: error 0x34000002 with the arguments (command, state), and the answer 0x9A07 | V |
+| So the error says: **the mov layer sent "end the art session" (4) and the ART task had no started session** (state 0 or 1). The state is the second argument; the log keeps only the first | V for the meaning, U for the state |
+| The stills never reach this test: their packet types are 2, 3 and 5 (`rec_art_set_artmode` 0x7E70E222) | V |
+| The recorder 0x7E426D4B only stores the error and returns. The camera restarts 90 to 130 ms later. What stops it is not in the log | V, U |
+| Who sends command 4: `mov_art_exec_init` 0x7E6CD1F2 with d0 = 4 (wrapper 0x7E6CBF97). Callers: the art change notifier 0x7E6C6498 (before a new start), the expose setter, Through End, and **0x7E6CADFE "free all art buffers"**, which the mov layer runs when the heap refuses an art buffer | V |
+
+### 18.3 The cause
+
+The image-work heap has two pools over the same memory: one for mode 1 (art work buffers) and one for the modes 0
+and 2. The table of the two pool objects is at 0x602AC458.
+
+| Step | Label |
+|---|---|
+| The setter 0x7E578C60 changes the mode at once, also when the pool of the old mode has blocks in use. It then calls the re-divide routine 0x7E5789ED, and sets bit 1 of the flag word 0x605157D0 ("the old pool is not empty yet") when 0x7E578FC0 → 0x7E577016 gives a value other than 0. That value is u16 (pool + 16) − u16 (pool + 76): the units in use (10 for one block of 3.7 MB) | V |
+| While that bit is set: the check 0x7E578D23 refuses every art buffer, and the allocator 0x7E578D43 refuses **every** block, with error 0x08020004. The free routine 0x7E578EBC clears the bit when the old pool is empty | V |
+| Stock never gets there after a shot. The mode follows the Picture Mode setting (chooser 0x7E714833). With Key Line the heap is in mode 1 before, during and after the capture, and the still code takes its blocks from the pool of mode 1. With Natural or a film look it stays in mode 2. Nothing waits; nothing has to | V (code), I (that no other stock path switches in that window) |
+| Peaking changes the mode in the middle: the latch sets L, the hook T_M makes the chooser give mode 1, in the first frame after the ring moves | V |
+| When the still code still has a block in the pool of mode 2 at that moment, the pool is re-divided under it, the art buffers are refused in every frame, and each of those frames runs 0x7E6CADFE: free all, then command 4 to the ART task; the next frame starts the session again (command 3) | V in the emulator (S19 on the pinned build) |
+| That the still code holds a block 240 ms after "record ends" | I (the report "while it was still saving"; the window; not in the log) |
+| How command 4 meets a session that is not started. In the emulator every command 4 of this loop finds state 2, because the ART task answers at once. On the camera the tasks run at the same time, and the mov layer has paths that start or end the session without waiting (`mov_art_exec_init ASYNC`, wrappers 0x7E6CBFA7 / 0x7E6CBFB7) and one that skips the start (the notifier returns when the word 0x602ADFAC is 1) | I: the exact path is **U** |
+
+This is the fault class of §12.3 and scenario S3 (the heap re-divided under buffers in use). There the other owner
+was the art path itself; here it is the still pipeline.
+
+**The published build `peaking-fast` has the fault (V).** Its peaking code is the same: `debug-log-films-12` is
+`peaking-fast` + the films-12 specs + the log specs, and none of them changes T_A or T_M. S19 fails on the block
+of `peaking-fast` itself.
+
+### 18.4 Reproduction: S19
+
+`scripts/scen_guard.py`, output `results/scen-guard.txt`. Order of the camera log: capture (Through End, the rec
+code's chooser call, Through Start), a film look, the development keeps a block, the ring turns, the block is
+freed some frames later.
+
+Modelled, because the rig runs no capture: the still pipeline is one call of the real allocator 0x7E578D43 the way
+the still code calls it (3,735,552 bytes, the call at 0x7E70BE3B) and later the real free 0x7E578EBC; setting 10401
+= 1 gives heap mode 2 as on the camera; the ART task answers at once.
+
+| Image | S19 |
+|---|---|
+| `peaking-fast` (pinned) | **FAIL**: in the first frame with the ring the heap is re-divided under the block; in every frame until the block is freed: art buffers refused, no picture, art commands 4, 3, 4 (then 3, 4). Heap flag bit 1 set |
+| the four new builds | PASS: L = 2, heap mode 2, a normal picture and no art command while the block is in use; in the first frame after the free L = 1, mode 1, lines |
+
+**The error code itself is not reproduced (U).** The harness shows the refused allocation and the art end / start
+pair in every frame; the session state that the camera's ART task had is not modelled.
+
+One more fault of the pinned build showed on the way (S21, **V** in the emulator, modelled owner): when MF Assist
+ends while another owner has a block in the pool of mode 1, the heap goes back to mode 2 with the flag set, and
+the owner's **next allocation is refused** (0x08020004, a null pointer).
+
+### 18.5 The guard
+
+Rule: peaking does not change the heap mode while the pool that the change leaves has a block in use. Both parts
+read the counter that the stock setter itself tests (0x7E577016). It is the right test because it is the exact
+condition under which the stock code goes into its "not empty yet" state: when the counter is 0, the switch is
+the one that every working MF Assist start has made.
+
+| Part | Where | What |
+|---|---|---|
+| `T_GUARD` | the latch T_A, after every older condition for L = 1 | heap mode not 1 **and** the pool of the modes 0 and 2 in use → **L = 2** in place of 1. Every reader of L and of its copy L2 compares with 1 (`getL`, T_J, T_K: V), so 2 is "no peaking": no forced Key Line, no heap change, MF Assist magnifies at once as with Peaking Off. T_A runs in every frame, so L becomes 1 in the first frame with an empty pool |
+| `T_M2` | the heap-mode hook T_M, when peaking does not ask for mode 1 | the stock choice is not 1, the heap is in mode 1 and the pool of mode 1 is in use → the mode stays 1. The next chooser call with an empty pool gives the stock mode. The mov layer frees its own art buffers before it calls the chooser, so only another owner's block holds the mode |
+
+- The second part also acts when the Key Line or an effect filter is switched off while a still is in the pool of
+  mode 1, without peaking. Stock would set the flag there and refuse the still code's next block. The scenarios
+  with Peaking Off (S8, S13) have no such block and are unchanged.
+- A capture while the lines show needs no new code (S20, S5): Through End frees the art buffers, the mov state is
+  0, T_M gives the stock mode, and the pool of mode 1 is empty.
+- If the request is still set when live view comes back (S20 b), or an interval frame is taken with the ring
+  turning (S23), the latch is held in the same way.
+- Not closed: the time between the test in T_A and the mode change later in the same frame (the still code runs
+  on another task); and a chooser call by another task between Through Start and the first frame, while L is
+  still 1 from before the capture.
+
+**Bytes.** 97 B of new code at 0x7E4C9497–0x7E4C94F8, two hooks (5 B in T_A at 0x7E4C923F, 8 B in T_M at
+0x7E4C9346), no new RAM. The kernel range of the debug builds has no free run left (7 + 5 + 5 bytes). The code
+takes the place of the per-pixel part of the row loop of `peaking-colours`, which has had no reader since
+`peaking-fast` cut that loop off at 0x7E4C9453: its one entry was the `bne` at 0x7E4C9469 inside the loop (V: the
+listings `results/colours-new-code.txt`, `fast-new-code.txt`; S12 and S14 run every colour and row case on the new
+builds). One byte of the old loop equals the stock file (0xFF at 0x7E4C94F4); `epm2mod make` lets no later spec
+change such a byte, so the code ends on 0x7E4C94F8 and has a 0xFF of its own there. Listing:
+`results/guard-new-code.txt`. Generator: `scripts/mkspec_guard.py`.
+
+**Log.** `patches/log-peaking-guard.json` (debug builds), event **`pk_guard`** (id 262): the heap mode word and
+the units in use in the pool that is in the way. A hook inside the guard's bytes is not possible: the free-space
+check counts every spec in `patches/` against every build, so the two builds without the log would fail. The
+probe is in stock bytes of segment 2, in the handler that runs for each focus-ring event while MF Assist is on
+(`rcvStartMFAssistIn_MFAssistOn` 0x7EB7DE46). It reads L and writes one record per hold. A hold with no ring event
+after its start gives no `pk_guard`; `pk_latch` (older probe) shows every hold as L = 2 and its end as L = 1. The
+second part (T_M2) has no record. The dictionary has a new build id, `da49b2f5e7e62ca7`; the one of the flashed
+debug builds is kept as `logs/events-fe2f543f94c74a91.json`, and the log of 2026-11-16 decodes as before (V).
+Generator: `mkspec_log.py --peaking-guard`.
+
+### 18.6 Checks
+
+| Check | Result | Label |
+|---|---|---|
+| `epm2mod make` (see the note below the table) for the four builds | all five steps pass: free-space check 0 FAIL, boot-test PASS, update-path-test PASS. sha256: `peaking-fast-2` `8d036edbef0479141735e7e51f741a7a9bfdf3b50ab4d9fa9ea5dfd2dddb592e`, `debug-log-peaking-fast-2` `b5186a7862ecdc5800802a6f7f4c47a2352c1f7c1017c6bf3807c8ed352960e5`, `films-12b` `bd919569f905c24617413431c94e2c7d641ff3ae80ba2534328ec10648b55c56`, `debug-log-films-12b` `df315408eedfc082c72a24e2e3bc6132538fba9d8a6a4aae4cd143415cf1002c` | V |
+| `.venv/bin/epm2mod make` (pinned), run last | `0e8a25b9578b8119b14b4895be7d2a0b70d7315e5e817758699777f0f31d917e`, the tested build; `build/card` holds it | V |
+| `tools/emu/opcheck.py`, four builds | 18, 22, 25 and 29 specs, 0 FAIL | V |
+| `tools/emu/hookcheck.py` on the two new specs | 9 transfers, 0 FAIL: the guard kernel → kernel, the probe segment 2 → segment 2 and → kernel | V |
+| **S19** MF Assist during a development | `peaking-fast` FAIL; the four new builds PASS (§18.4) | V |
+| **S20** a capture while the lines show; then the request still set when live view is back | (a) passes on all images. (b) `peaking-fast` FAIL (as S19); new builds PASS | V |
+| **S21** MF Assist ends, another owner has a block in the pool of mode 1 | `peaking-fast` FAIL: re-divided under the block, the owner's next block refused. New builds PASS: mode 1 kept, the second block given, mode 2 at the next chooser call after the frees, lines again | V |
+| **S22** a movie stops while a block is in use (the latch refuses in a movie, as before) | `peaking-fast` FAIL; new builds PASS | V |
+| **S23** three frames of an interval sequence, the request set all the time | `peaking-fast` FAIL in each of the three; new builds PASS, lines after each free | V |
+| **S24** back from playback / RAW Data Edit (heap mode set directly, a block in use) | `peaking-fast` FAIL; new builds PASS | V |
+| **S25** sleep and wake with the request set, no block | PASS on all: lines in the first frame | V |
+| **S26** event `pk_guard` on the two debug builds | PASS: no record while the lines show; one record (mode 2, 2, 10 units) for two ring events in one hold; one more for a second hold; the registers of the hooked instructions as stock | V |
+| S19 to S25 were run on `peaking-fast-2` and `debug-log-peaking-fast-2`; S19 on `films-12b`; S19 and S26 on `debug-log-films-12b` | `results/scen-guard.txt`, `scen-guard-films-12b.txt` | V |
+| S1 to S5 on `peaking-fast-2` (`scen_peaking.py`, against the build without peaking) | the result lines of §13.2 / §16.4: S1 same with the request clear, S2 a picture in every frame, S3 no anomaly, S4 R = 0, S5 as the build without peaking (`results/scen-guard-s1-s5.txt`) | V |
+| S6, S7 | PASS (`results/scen-guard-s6-s7.txt`) | V |
+| S8 Peaking Off with the request set = the build without peaking | PASS (`results/scen-guard-s8.txt`) | V |
+| S12, S14 (the colour loop; they would hit the old loop's bytes if anything still read them), S18 | PASS (`results/scen-guard-s12-s14-s18.txt`) | V |
+| **S13**, White against `peaking-fast` itself and Off against the build without peaking (`results/scen-guard-s13-vs-peaking-fast.txt`) | Off: 6 frames SAME. White (values 3, 0, 6): in all 18 frames the same memory writes, the same device accesses in the same order, the same gain and `ucExpose`. The script prints FAIL because it counts one instruction of the pinned build's own T_A that the hook replaced as "stock code lost" (the case of S15 in §17.4) | V; which instruction: I |
+| S15 to S17 of the log with `peaking-fast-2` / `debug-log-peaking-fast-2` | S16, S17 PASS. S15 prints FAIL for the 3 replaced instructions of pass 9, as recorded for `debug-log-peaking-fast` in §17.4; no byte differs outside the log's RAM (`results/scen-guard-log-s15-s17.txt`) | V |
+| S9 to S11 | not run: they do not fit builds after `peaking-colours` (§16.4) | – |
+| The log of 2026-11-16 with the new dictionary | decodes as before: 1607 records, build id `fe2f543f94c74a91` | V |
+| Unit tests | 193 tests pass. `src/` was not changed, so black and mypy were not run | V |
+| RAM | no new byte | V |
+
+`epm2mod make` in the repository itself refuses all four descriptions at its free-space step, for a reason that
+is older than this work: `patches/films12-structure.json` edits bytes of `remap7b-code` (so every build without
+the films-12 specs fails), and a spec of another session, `patches/films12bw-doublex.json`, edits bytes of
+`films12-structure` (so every films-12 build without it fails). The four builds were made with the same
+`epm2mod make` and `EPM2MOD_ROOT` set to a folder of links to the repository in which `patches/` leaves those
+specs out (`films12*` for the two `peaking-fast-2` builds, `films12bw*` for the two `films-12b` builds). All five
+steps passed there. Also: `films-12`, `debug-log-films-12` and `debug-log-peaking-fast` now fail the same check
+because `peaking-save-guard` edits bytes of the peaking specs (the case of §17.4).
+
+Not checked, the camera must show it: that the fault is gone; how long the lines wait after a shot (the time the
+still code keeps its blocks); the frame in which they start; a sequence; a movie stop.
+
+### 18.7 Camera test
+
+Setup: MENU → Custom Menu → A → MF Assist → On. MENU → Custom Menu → A → Peaking → Red. OK → AF mode → MF.
+OK → Picture Mode → a film look. A card in the camera.
+
+Flash `debug-log-peaking-fast-2` (the pinned build with the guard and the log) or, to stay on twelve looks,
+`debug-log-films-12b`.
+
+1. Take a photo and turn the focus ring at once, while the card lamp is on. Ten times. **Expected:** no restart.
+   The view magnifies at once; the red lines come a moment later than usual.
+2. MENU → Shooting Menu 2 → Time Lapse Settings → On, Frame 5, Interval Time 1 sec. Start the sequence and keep
+   turning the ring to and fro until it ends. **Expected:** no restart; lines between the frames.
+3. Mode dial to movie (or the red button): record 3 seconds, stop, turn the ring at once. Three times.
+   **Expected:** no restart.
+4. Take a photo while the red lines show. **Expected:** a normal photo, live view comes back.
+5. Press MENU (it saves the log). Power off. `uv run epm2mod log /path/to/EPM2LOG.BIN --summary`, and without
+   `--summary` for the records.
+
+What the log should show for each photo of step 1: `shoot_cbs` 27, `pk_mf_start`, then `pk_latch` with **L = 2**,
+R = 1, then `pk_guard` (mode 2, units more than 0) at the next ring event, no `pk_heap_mode` while L is 2, then
+`pk_latch` L = 1 and `pk_heap_mode` 1. The time from `pk_latch` L = 2 to L = 1 is the wait.
+
+| Result | Meaning | Next |
+|---|---|---|
+| No restart; `pk_latch` L = 2 and `pk_guard` after the shots | the cause was the block of the still pipeline; the guard works | flash `peaking-fast-2` or `films-12b` for use |
+| No restart, and L is never 2 | the ring was not fast enough, or the still code holds no block there | repeat with RAW+JPEG (a longer save); if still never 2 and no restart, the cause is open |
+| Restart, the log shows L = 2 before it | another owner than the heap is in the way (the ART task itself is busy with the photo) | hold L while the art list of the ART task is in use; report the last 20 records |
+| Restart with `fw_error` 0x34000002 and L = 1 | the pool was empty at the test and the fault came after | report the records; next: also hold for some frames after "record ends" |
+| `fw_error` 0x08020004 | a block was refused while a switch was pending | report the records |
+| The lines never come back after a shot | the pool of the modes 0 and 2 is never empty in live view | report `pk_guard` (units); the test then needs another condition |
+
+Flash, one of:
+`epm2flash debug-log-peaking-fast-2 b5186a7862ecdc5800802a6f7f4c47a2352c1f7c1017c6bf3807c8ed352960e5`
+`epm2flash debug-log-films-12b df315408eedfc082c72a24e2e3bc6132538fba9d8a6a4aae4cd143415cf1002c`
+For use, after the test:
+`epm2flash peaking-fast-2 8d036edbef0479141735e7e51f741a7a9bfdf3b50ab4d9fa9ea5dfd2dddb592e`
+`epm2flash films-12b bd919569f905c24617413431c94e2c7d641ff3ae80ba2534328ec10648b55c56`
+Go back: `epm2flash peaking-fast 0e8a25b9578b8119b14b4895be7d2a0b70d7315e5e817758699777f0f31d917e`.
+Write the sha256 in `docs/camera-log.md` before the flash.
+
+### 18.8 Files added
+
+| Path | Contents |
+|---|---|
+| `patches/peaking-save-guard.json`, `patches/log-peaking-guard.json` | the guard; the probe `pk_guard` |
+| `builds/peaking-fast-2.json`, `debug-log-peaking-fast-2.json`, `films-12b.json`, `debug-log-films-12b.json` | the build descriptions |
+| `scripts/mkspec_guard.py` | generator: `mkspec_guard.py OUT.json PINNED_DIR /tmp/scratch/asm [LISTING.txt]` |
+| `experiments/2026-11-15-log/scripts/mkspec_log.py --peaking-guard` | generator of the probe |
+| `scripts/scen_guard.py` | S19 to S26: `scen_guard.py all NAME=BLOCK0 ...` |
+| `logs/events.json`, `logs/events-fe2f543f94c74a91.json` | event `pk_guard`; the dictionary of the flashed debug builds |
+| `results/guard-*.txt`, `results/scen-guard*.txt` | listings, check outputs, scenario outputs |

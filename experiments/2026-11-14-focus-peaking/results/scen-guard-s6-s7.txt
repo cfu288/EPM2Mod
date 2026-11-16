@@ -1,0 +1,24 @@
+S6. Picture Mode 105 -> 106 -> 107 -> 106 -> 105 (ART 6, 7, 8, 7, 6), one frame each, request clear, art type 1.
+    After each frame: the six-axis dispatch for the art code of the frame and for its movie code.
+  [pinned] ART 6 (Vis 250D): frame picture True; live view code 145: ok, reaches 0x7E56D8D8 in 13 instructions; movie code 146: ok, reaches 0x7E56D8D8 in 13 instructions
+  [pinned] ART 7 (Velvia): frame picture True; live view code 167: ok, reaches 0x7E56D8D8 in 13 instructions; movie code 168: ok, reaches 0x7E56D8D8 in 13 instructions
+  [pinned] ART 8 (Superia 400): frame picture True; live view code 85: n/a, handler needs job data that the piece does not give (fault 3 at pc 0x7E545F2B (0x7E545E76+0xB5): om-emu: MN10300 ); movie code 87: n/a, handler needs job data that the piece does not give (fault 3 at pc 0x7E545F2B (0x7E545E76+0xB5): om-emu: MN10300 )
+  [pinned] ART 7 (Velvia): frame picture True; live view code 167: ok, reaches 0x7E56D8D8 in 13 instructions; movie code 168: ok, reaches 0x7E56D8D8 in 13 instructions
+  [pinned] ART 6 (Vis 250D): frame picture True; live view code 145: ok, reaches 0x7E56D8D8 in 13 instructions; movie code 146: ok, reaches 0x7E56D8D8 in 13 instructions
+  [pinned] all art codes 9-184: 0 FAULT ; not judged [85, 87]; codes whose result differs from pinned: none
+  S6 RESULT [pinned]: PASS
+  [fast-2] ART 6 (Vis 250D): frame picture True; live view code 145: ok, reaches 0x7E56D8D8 in 13 instructions; movie code 146: ok, reaches 0x7E56D8D8 in 13 instructions
+  [fast-2] ART 7 (Velvia): frame picture True; live view code 167: ok, reaches 0x7E56D8D8 in 13 instructions; movie code 168: ok, reaches 0x7E56D8D8 in 13 instructions
+  [fast-2] ART 8 (Superia 400): frame picture True; live view code 85: n/a, handler needs job data that the piece does not give (fault 3 at pc 0x7E545F2B (0x7E545E76+0xB5): om-emu: MN10300 ); movie code 87: n/a, handler needs job data that the piece does not give (fault 3 at pc 0x7E545F2B (0x7E545E76+0xB5): om-emu: MN10300 )
+  [fast-2] ART 7 (Velvia): frame picture True; live view code 167: ok, reaches 0x7E56D8D8 in 13 instructions; movie code 168: ok, reaches 0x7E56D8D8 in 13 instructions
+  [fast-2] ART 6 (Vis 250D): frame picture True; live view code 145: ok, reaches 0x7E56D8D8 in 13 instructions; movie code 146: ok, reaches 0x7E56D8D8 in 13 instructions
+  [fast-2] all art codes 9-184: 0 FAULT ; not judged [85, 87]; codes whose result differs from pinned: none
+  S6 RESULT [fast-2]: PASS
+
+S7. pwr_standby start 0x7E53A55C, called with the frame of the SRAM code's call (flash 0x7F14B0F7), 400
+    instructions; callees run as far as they get (kernel services are not modelled here).
+  [pinned] bytes of 0x7E53A55C-0x7E53A700 and 0x7E50A201-0x7E50A3C2 equal to pinned: True; first three stock instructions ran: True; entered mov_art_set_line_yc_param at 0x7E6CD9D6: False; end: instruction limit (400) at pc 0x7E44AD79 (0x7E44AD26+0x53)
+  S7 RESULT [pinned]: PASS
+  [fast-2] bytes of 0x7E53A55C-0x7E53A700 and 0x7E50A201-0x7E50A3C2 equal to pinned: True; first three stock instructions ran: True; entered mov_art_set_line_yc_param at 0x7E6CD9D6: False; end: instruction limit (400) at pc 0x7E44AD79 (0x7E44AD26+0x53)
+  S7 RESULT [fast-2]: PASS
+

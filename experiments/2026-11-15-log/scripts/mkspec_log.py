@@ -24,6 +24,13 @@ Usage: mkspec_log.py PINNED_DIR WORKDIR [LISTING.txt]
   it does not write log-core or log-probes. It also puts the build id of logs/events.json into the flush task,
   in place of the id that log-core carries.
   BASE_DIR    unpacked image of builds/debug-log-peaking-fast.json without its last spec
+
+       mkspec_log.py --peaking-guard BASE_DIR WORKDIR [LISTING.txt]
+  Writes patches/log-peaking-guard.json only: event pk_guard of the build debug-log-peaking-fast-2. It is a delta
+  on the specs of that build before it (the pinned specs, peaking-save-guard, log-core, log-probes,
+  log-peaking-time). Its one hook is in stock bytes. It puts the build id of logs/events.json into the flush task, in place of the id that
+  log-peaking-time left there.
+  BASE_DIR    a folder with block0_0100.bin of that build without its last spec (tools/emu/patchblock.py -o)
 """
 import hashlib, json, os, re, struct, subprocess, sys
 
@@ -799,6 +806,142 @@ def peaking_time():
         open(listing, "w").write(re.sub(r"/[^\s:]*logtime\.elf", "logtime.elf", txt))
 
 
+# The probe of the save guard of peaking (focus-peaking NOTES section 18). Its own spec, as the timing probe.
+# The guard (patches/peaking-save-guard.json) writes 2 to the latch byte L while it holds the lines back. The
+# kernel range of the debug builds has no free run left, and a hook inside the guard's own bytes would make the
+# free-space check of every build without the log fail. So the probe is in stock bytes of segment 2: the handler
+# that the MF Assist state object runs for each focus-ring event while MF Assist is on. It reads L there.
+GUARD_SPEC = "log-peaking-guard"
+GUARD_AREA = (0x7EBF2510, 0x7EBF2600)        # segment 2, the listed area 0x7EBF1090-0x7EBF3BAD, used by no spec
+GUARD_SITE = (0x7EB7DE46, 7, "CmpSts_MfAssist::rcvStartMFAssistIn_MFAssistOn 0x7EB7DE46, entry: `mov a0,a3` / "
+                             "`mov imm32,d0` (a focus-ring event while MF Assist is on; GUI task, segment 2)")
+GUARD_ASM = """
+.equ HMODE,  0x605157cc      # u16 heap mode, u16 mode at the last allocation
+.equ POOL02, 0x602ac45c      # pointer to the pool of the heap modes 0 and 2
+.equ GRD_ST, PST+100         # u8: a record was written for this hold
+.section .gu,"ax"
+T_GRD:
+    movm [d2,other],(sp)
+    mov psw,d2
+    movbu (PKW),d0           # L: 2 = the guard holds the lines back
+    cmp 2,d0
+    beq 1f
+    clr d0
+    movbu d0,(GRD_ST)
+    bra 9f
+1:  movbu (GRD_ST),d0
+    cmp 0,d0
+    bne 9f                   # one record per hold
+    mov 1,d0
+    movbu d0,(GRD_ST)
+    mov (POOL02),a0
+    movhu (16,a0),d0
+    movhu (76,a0),d1
+    sub d1,d0
+    mov d0,a0                # arg1: units in use in the pool that is in the way
+    mov (HMODE),d1           # arg0
+    mov %(pk_guard)d,d0
+    call log_put,[],0
+9:  mov d2,psw
+    nop
+    nop
+    movm (sp),[d2,other]
+%(displaced)s
+    jmp %(back)s
+"""
+
+
+def peaking_guard():
+    """Write patches/log-peaking-guard.json (see the usage text)."""
+    base, work = sys.argv[2:4]
+    listing = sys.argv[4] if len(sys.argv) > 4 else None
+    os.makedirs(work, exist_ok=True)
+    blk_path = os.path.join(base, "block0_0100.bin")
+    blk = open(blk_path, "rb").read()
+    get = lambda a, n: blk[a - BASE:a - BASE + n]
+    d = json.load(open(os.path.join(ROOT, "logs/events.json")))
+    mine = [e for e in d["events"] if e["spec"] == GUARD_SPEC]
+    assert [e["name"] for e in mine] == ["pk_guard"]
+    bid = build_id(d["events"])
+    old = bytes.fromhex(json.load(open(os.path.join(ROOT, "patches", TIME_SPEC + ".json")))["_build_id"])
+    lo = AREAS[".kc"][0]
+    head = bytes.fromhex("cff0f2e6")                           # movm [d2,d3,a2,a3],(sp) / mov psw,d2
+    at = [lo + i for i in range(0x40) if get(lo + i, 4) == head]
+    assert len(at) == 3 and get(at[2] + 4, 4) == bytes.fromhex("fafcfff7"), at     # log_put: and 0xf7ff,psw
+    site, n, what = GUARD_SITE
+    stock = open(os.path.join(ROOT, "build/blocks", os.path.basename(STOCK) + ".block0.bin"), "rb").read()
+    assert get(site, n) == stock[site - BASE:site - BASE + n], hex(site)
+    bad = branch_targets_inside([(site, n)], blk, work)
+    assert not bad, bad
+    asm = SYMS + GUARD_ASM % {"pk_guard": mine[0]["id"], "displaced": displaced(blk_path, site, n),
+                              "back": "0x%08x" % (site + n)}
+    args = ["--defsym=log_put=%#x" % at[2]]
+    args += ["--defsym=s_%s=0x%s" % (x, x) for x in sorted(set(re.findall(r"(?:jmp|call)\s+0x([0-9a-f]{8})", asm)))]
+    asm = re.sub(r"((?:jmp|call)\s+)0x([0-9a-f]{8})", r"\1s_\2", asm)
+    asm += '\n.section .hs,"ax"\n    jmp T_GRD\n' + "    nop\n" * (n - 5)
+    args += ["--section-start=.hs=%#x" % site, "--section-start=.gu=%#x" % GUARD_AREA[0]]
+    s, o, e, sb = (os.path.join(work, "logguard." + x) for x in ("s", "o", "elf", "bin"))
+    open(s, "w").write(asm)
+    run(BIN + "/mn10300-elf-as", "-o", o, s)
+    run(BIN + "/mn10300-elf-ld", *args, "-e", "%#x" % GUARD_AREA[0], "-o", e, o)
+
+    def sect(name):
+        run(BIN + "/mn10300-elf-objcopy", "-O", "binary", "-j", name, e, sb)
+        return open(sb, "rb").read()
+
+    ops = []
+
+    def op(addr, new, note):
+        expect = get(addr, len(new))
+        assert expect != new, note
+        ops.append({"type": "bytes", "block": 0, "offset": "0x%X" % (addr - BASE), "expect": expect.hex(),
+                    "new": new.hex(), "_addr": "0x%08X" % addr, "_note": note})
+
+    code = sect(".gu")
+    a, hi = GUARD_AREA
+    assert a + len(code) <= hi and get(a, hi - a) == stock[a - BASE:hi - BASE], "the area is in use"
+    if code[-1] == get(a + len(code) - 1, 1)[0]:
+        code += b"\xcb"                      # the free-space ledger counts only changed bytes: end on a nop
+    op(a, code, "new code, segment 2: T_GRD (%d B)" % len(code))
+    print("T_GRD: %d B at 0x%X-0x%X, %d B free after" % (len(code), a, a + len(code), hi - a - len(code)))
+    h = sect(".hs")
+    assert len(h) == n and h[0] == 0xDC
+    op(site, h, "hook (pk_guard): jmp T_GRD%s. %s" % (" + nop" * (n - 5), what))
+    assert bid != old
+    for half in (0, 4):                      # the two `mov imm32,d0` of the flush task that hold the build id
+        word = b"\xfc\xcc" + old[half:half + 4]
+        i = blk.find(word)
+        assert i >= 0 and blk.find(word, i + 1) < 0 and AREAS[".uc"][0] <= BASE + i < AREAS[".uc"][1], half
+        op(BASE + i + 2, bid[half:half + 4], "flush task, block header: build id bytes %d-%d %s -> %s (logs/events.json)"
+           % (half, half + 3, old[half:half + 4].hex(), bid[half:half + 4].hex()))
+    out = os.path.join(ROOT, "patches", GUARD_SPEC + ".json")
+    json.dump({
+        "name": GUARD_SPEC,
+        "description": "Structured log, probe of the save guard of peaking: event pk_guard. The guard of "
+                       "patches/peaking-save-guard.json writes 2 to the latch byte L while it holds the lines back. "
+                       "The probe reads L at each focus-ring event while MF Assist is on (the handler "
+                       "rcvStartMFAssistIn_MFAssistOn of the MF Assist state object) and writes one record per hold: "
+                       "the heap mode, and the units in use in the pool of the heap modes 0 and 2, which is the "
+                       "reason for the hold. A hold with no ring event after its start gives no pk_guard record; "
+                       "pk_latch shows every hold (L = 2). One hook in stock bytes of segment 2 and its routine in "
+                       "segment 2; no byte of the peaking code changes. Needs log-core, log-probes and "
+                       "log-peaking-time before it: every expect is a byte string of that build. It puts the build "
+                       "id %s of logs/events.json into the block header. DEBUG builds only. See "
+                       "experiments/2026-11-14-focus-peaking/NOTES.md section 18 and docs/logging.md." % bid.hex(),
+        "base": STOCK, "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
+        "status": "candidate: emulator-checked, not flashed",
+        "_delta_on": "builds/debug-log-peaking-fast-2.json without this spec",
+        "_build_id": bid.hex(),
+        "_ram": "1 byte of the log's state block (PST+100)",
+        "ops": ops,
+    }, open(out, "w"), indent=1)
+    open(out, "a").write("\n")
+    print("wrote", os.path.relpath(out, ROOT), len(ops), "ops; build id", bid.hex())
+    if listing:
+        txt = run(BIN + "/mn10300-elf-objdump", "-d", "-j", ".gu", "-j", ".hs", e)
+        open(listing, "w").write(re.sub(r"/[^\s:]*logguard\.elf", "logguard.elf", txt))
+
+
 PCREL = re.compile(r"^(b[a-z]{1,2}|jmp|calls|call|ret|retf|rets|rti|l[a-z]{2}|setlb|trap)$")
 
 
@@ -883,7 +1026,7 @@ def main():
         for e in events.split():
             assert [x for x in d["events"] if x["name"] == e][0]["spec"] == spec, e
             used.add(e)
-    other = {e["name"] for e in d["events"] if e["spec"] == TIME_SPEC}
+    other = {e["name"] for e in d["events"] if e["spec"] in (TIME_SPEC, GUARD_SPEC)}
     assert used | {"flush"} | other == set(ev), sorted(set(ev) - used)
     asm = SYMS + (CORE_K + CORE_U + PROBES_K + PROBES_U) % val
     args = ["--defsym=s_%s=0x%s" % (a, a) for a in sorted(set(re.findall(r"(?:jmp|call)\s+0x([0-9a-f]{8})", asm)))]
@@ -980,5 +1123,7 @@ def main():
 
 if len(sys.argv) > 1 and sys.argv[1] == "--peaking-time":
     peaking_time()
+elif len(sys.argv) > 1 and sys.argv[1] == "--peaking-guard":
+    peaking_guard()
 else:
     main()

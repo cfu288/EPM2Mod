@@ -1,0 +1,135 @@
+S12. Red, Yellow, Blue on the synthetic frame: the pinned loop and the fast loop on the firmware's own buffers.
+  [Red] 640 x 480 (row length 640 pixels), picture 0xB596A940, line image 0xB5843980
+      pinned: pixels that differ from the pixel model: 0; coloured pixels 9360; 940432 instructions -> ok
+      fast:   pixels that differ from the block model: 0; coloured pixels 10800; 330173 instructions; usGain2 0x0000; line image unchanged True; sp, d2, d3, a2, a3 kept True; anomalies none; picture True -> ok
+      the stated difference: 1560 pixels differ between the two builds (60 coloured only by pinned, 1500 only by fast)
+  [Yellow] 640 x 480 (row length 640 pixels), picture 0xB596A940, line image 0xB5843980
+      pinned: pixels that differ from the pixel model: 0; coloured pixels 9360; 940434 instructions -> ok
+      fast:   pixels that differ from the block model: 0; coloured pixels 10800; 330175 instructions; usGain2 0x0000; line image unchanged True; sp, d2, d3, a2, a3 kept True; anomalies none; picture True -> ok
+      the stated difference: 1560 pixels differ between the two builds (60 coloured only by pinned, 1500 only by fast)
+  [Blue] 640 x 480 (row length 640 pixels), picture 0xB596A940, line image 0xB5843980
+      pinned: pixels that differ from the pixel model: 0; coloured pixels 9360; 940436 instructions -> ok
+      fast:   pixels that differ from the block model: 0; coloured pixels 10800; 330177 instructions; usGain2 0x0000; line image unchanged True; sp, d2, d3, a2, a3 kept True; anomalies none; picture True -> ok
+      the stated difference: 1560 pixels differ between the two builds (60 coloured only by pinned, 1500 only by fast)
+  [a frame without lines] pinned 849172 instructions, fast 309923 instructions; both leave the picture as it is: True
+  [White] pinned 19 instructions, fast 19 instructions; picture and line image untouched, usGain2 0x0200: True
+  S12 RESULT: PASS
+
+S13. White = PINNED, Off = BASE.
+  [458=3 Natural] pass 9 gain: pinned ['0x0200'], colours ['0x0200']; pass 7 ucExpose: pinned [3], colours [3]; anomalies: none
+  458=3 Natural frame 1  DIFFERENT: 10185 writes (pinned 10185), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4884, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 18 in 0x7E4C9000 (18)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=3 Natural frame 2  DIFFERENT: 6679 writes (pinned 6679), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=3 Natural frame 3  DIFFERENT: 6700 writes (pinned 6700), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  [458=3 Key Line] pass 9 gain: pinned ['0x0200'], colours ['0x0200']; pass 7 ucExpose: pinned [3], colours [3]; anomalies: none
+  458=3 Key Line frame 1  DIFFERENT: 10183 writes (pinned 10183), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4884, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=3 Key Line frame 2  DIFFERENT: 6679 writes (pinned 6679), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=3 Key Line frame 3  DIFFERENT: 6700 writes (pinned 6700), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  [458=0 Natural] pass 9 gain: pinned ['0x0200'], colours ['0x0200']; pass 7 ucExpose: pinned [3], colours [3]; anomalies: none
+  458=0 Natural frame 1  DIFFERENT: 10185 writes (pinned 10185), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4884, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 18 in 0x7E4C9000 (18)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=0 Natural frame 2  DIFFERENT: 6679 writes (pinned 6679), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=0 Natural frame 3  DIFFERENT: 6700 writes (pinned 6700), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  [458=0 Key Line] pass 9 gain: pinned ['0x0200'], colours ['0x0200']; pass 7 ucExpose: pinned [3], colours [3]; anomalies: none
+  458=0 Key Line frame 1  DIFFERENT: 10183 writes (pinned 10183), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4884, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=0 Key Line frame 2  DIFFERENT: 6679 writes (pinned 6679), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=0 Key Line frame 3  DIFFERENT: 6700 writes (pinned 6700), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  [458=6 Natural] pass 9 gain: pinned ['0x0200'], colours ['0x0200']; pass 7 ucExpose: pinned [3], colours [3]; anomalies: none
+  458=6 Natural frame 1  DIFFERENT: 10185 writes (pinned 10185), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4884, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 18 in 0x7E4C9000 (18)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=6 Natural frame 2  DIFFERENT: 6679 writes (pinned 6679), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=6 Natural frame 3  DIFFERENT: 6700 writes (pinned 6700), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  [458=6 Key Line] pass 9 gain: pinned ['0x0200'], colours ['0x0200']; pass 7 ucExpose: pinned [3], colours [3]; anomalies: none
+  458=6 Key Line frame 1  DIFFERENT: 10183 writes (pinned 10183), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4884, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=6 Key Line frame 2  DIFFERENT: 6679 writes (pinned 6679), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  458=6 Key Line frame 3  DIFFERENT: 6700 writes (pinned 6700), bytes that differ outside 0x602BE8C7-0x602BE8C7: 0; device accesses 4416, same order, addresses and values: True; stock pcs lost outside hook sites: 1; stock pcs gained: 0; new-code pcs: 13 in 0x7E4C9000 (13)
+      lost: 0x7E4C9000 (1) | gained: 
+  Off Natural frame 1  SAME: 4750 writes (base 4747), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 936, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 69 in 0x7E4C9000 (69)
+  Off Natural frame 2  SAME: 3283 writes (base 3280), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 936, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 56 in 0x7E4C9000 (56)
+  Off Natural frame 3  SAME: 3277 writes (base 3274), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 936, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 56 in 0x7E4C9000 (56)
+  [Off Natural] pass 9 gain: base [], colours []; L=0
+  Off Key Line frame 1  SAME: 11017 writes (base 11014), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 5074, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 111 in 0x7E4C9000 (111)
+  Off Key Line frame 2  SAME: 7215 writes (base 7212), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 4602, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 111 in 0x7E4C9000 (111)
+  Off Key Line frame 3  SAME: 7236 writes (base 7233), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 4602, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 111 in 0x7E4C9000 (111)
+  [Off Key Line] pass 9 gain: base ['0xFF00'], colours ['0xFF00']; L=0
+  S13 RESULT: FAIL
+
+S14. T_K alone, from the hook site in pass 9 to the next stock instruction. Small frames in scratch RAM.
+  packet mode 2 L2=0 C=0: gain 0xFF00, pixels changed 0, registers and guard bytes kept True, 9 insns -> ok
+  packet mode 2 L2=0 C=1: gain 0xFF00, pixels changed 0, registers and guard bytes kept True, 9 insns -> ok
+  packet mode 2 L2=0 C=2: gain 0xFF00, pixels changed 0, registers and guard bytes kept True, 9 insns -> ok
+  packet mode 2 L2=0 C=3: gain 0xFF00, pixels changed 0, registers and guard bytes kept True, 9 insns -> ok
+  packet mode 2 L2=0 C=4: gain 0xFF00, pixels changed 0, registers and guard bytes kept True, 9 insns -> ok
+  packet mode 2 L2=0 C=5: gain 0xFF00, pixels changed 0, registers and guard bytes kept True, 9 insns -> ok
+  packet mode 2 L2=0 C=6: gain 0xFF00, pixels changed 0, registers and guard bytes kept True, 9 insns -> ok
+  packet mode 2 L2=1 C=0: gain 0x0200, pixels changed 0, registers and guard bytes kept True, 19 insns -> ok
+  packet mode 2 L2=1 C=1: gain 0x0200, pixels changed 0, registers and guard bytes kept True, 19 insns -> ok
+  packet mode 2 L2=1 C=2: gain 0x0000, pixels changed 0, registers and guard bytes kept True, 110 insns -> ok
+  packet mode 2 L2=1 C=3: gain 0x0200, pixels changed 0, registers and guard bytes kept True, 19 insns -> ok
+  packet mode 2 L2=1 C=4: gain 0x0000, pixels changed 0, registers and guard bytes kept True, 112 insns -> ok
+  packet mode 2 L2=1 C=5: gain 0x0000, pixels changed 0, registers and guard bytes kept True, 114 insns -> ok
+  packet mode 2 L2=1 C=6: gain 0x0200, pixels changed 0, registers and guard bytes kept True, 19 insns -> ok
+  packet mode 0 L2=0 C=0: gain 0xFF00, pixels changed 0, registers and guard bytes kept True, 6 insns -> ok
+  packet mode 0 L2=0 C=1: gain 0xFF00, pixels changed 0, registers and guard bytes kept True, 6 insns -> ok
+  packet mode 0 L2=0 C=2: gain 0xFF00, pixels changed 0, registers and guard bytes kept True, 6 insns -> ok
+  packet mode 0 L2=0 C=3: gain 0xFF00, pixels changed 0, registers and guard bytes kept True, 6 insns -> ok
+  packet mode 0 L2=0 C=4: gain 0xFF00, pixels changed 0, registers and guard bytes kept True, 6 insns -> ok
+  packet mode 0 L2=0 C=5: gain 0xFF00, pixels changed 0, registers and guard bytes kept True, 6 insns -> ok
+  packet mode 0 L2=0 C=6: gain 0xFF00, pixels changed 0, registers and guard bytes kept True, 6 insns -> ok
+  packet mode 0 L2=1 C=0: gain 0xFF00, pixels changed 0, registers and guard bytes kept True, 6 insns -> ok
+  packet mode 0 L2=1 C=1: gain 0xFF00, pixels changed 0, registers and guard bytes kept True, 6 insns -> ok
+  packet mode 0 L2=1 C=2: gain 0xFF00, pixels changed 0, registers and guard bytes kept True, 6 insns -> ok
+  packet mode 0 L2=1 C=3: gain 0xFF00, pixels changed 0, registers and guard bytes kept True, 6 insns -> ok
+  packet mode 0 L2=1 C=4: gain 0xFF00, pixels changed 0, registers and guard bytes kept True, 6 insns -> ok
+  packet mode 0 L2=1 C=5: gain 0xFF00, pixels changed 0, registers and guard bytes kept True, 6 insns -> ok
+  packet mode 0 L2=1 C=6: gain 0xFF00, pixels changed 0, registers and guard bytes kept True, 6 insns -> ok
+  red, 8 x 2, row length 64: gain 0x0000, pixels changed 8, as the block model True, kept True -> ok
+  yellow, 8 x 2, row length 64: gain 0x0000, pixels changed 8, as the block model True, kept True -> ok
+  blue, 8 x 2, row length 64: gain 0x0000, pixels changed 8, as the block model True, kept True -> ok
+  red, 8 x 3, row length 64: gain 0x0000, pixels changed 8, as the block model True, kept True -> ok
+  yellow, 8 x 3, row length 64: gain 0x0000, pixels changed 8, as the block model True, kept True -> ok
+  blue, 8 x 3, row length 64: gain 0x0000, pixels changed 8, as the block model True, kept True -> ok
+  red, 8 x 4, row length 8: gain 0x0000, pixels changed 16, as the block model True, kept True -> ok
+  yellow, 8 x 4, row length 8: gain 0x0000, pixels changed 16, as the block model True, kept True -> ok
+  blue, 8 x 4, row length 8: gain 0x0000, pixels changed 16, as the block model True, kept True -> ok
+  red, 10 x 5, row length 12: gain 0x0000, pixels changed 8, as the block model True, kept True -> ok
+  yellow, 10 x 5, row length 12: gain 0x0000, pixels changed 8, as the block model True, kept True -> ok
+  blue, 10 x 5, row length 12: gain 0x0000, pixels changed 8, as the block model True, kept True -> ok
+  red, 16 x 4, row length 16: gain 0x0000, pixels changed 32, as the block model True, kept True -> ok
+  yellow, 16 x 4, row length 16: gain 0x0000, pixels changed 32, as the block model True, kept True -> ok
+  blue, 16 x 4, row length 16: gain 0x0000, pixels changed 32, as the block model True, kept True -> ok
+  red, 7 x 2, row length 8: gain 0x0000, pixels changed 0, as the block model True, kept True -> ok
+  yellow, 7 x 2, row length 8: gain 0x0000, pixels changed 0, as the block model True, kept True -> ok
+  blue, 7 x 2, row length 8: gain 0x0000, pixels changed 0, as the block model True, kept True -> ok
+  red, 640 x 6, row length 640: gain 0x0000, pixels changed 2576, as the block model True, kept True -> ok
+  yellow, 640 x 6, row length 640: gain 0x0000, pixels changed 2576, as the block model True, kept True -> ok
+  blue, 640 x 6, row length 640: gain 0x0000, pixels changed 2576, as the block model True, kept True -> ok
+  (the same seven sizes with five more line images each: all ok)
+  Red, one row: gain 0x0200 (white lines), pixels changed 0, kept True -> ok
+  Red, a row length of 9 pixels = 27 bytes: gain 0x0200 (white lines), pixels changed 0, kept True -> ok
+  Red, picture buffer at an odd address: gain 0x0200 (white lines), pixels changed 0, kept True -> ok
+  Red, line buffer at address + 2: gain 0x0200 (white lines), pixels changed 0, kept True -> ok
+  Red, no rows: gain 0x0200 (white lines), pixels changed 0, kept True -> ok
+  Red, a width of 3 pixels: gain 0x0200 (white lines), pixels changed 0, kept True -> ok
+  S14 RESULT: PASS
+
+S18. The timing probe (pk_stats) of debug-log-peaking-fast.
+  (a) T_TIME0 and T_TICK alone, 20 passes: the replaced instructions ran, the registers are kept, the timer value is stored: True; records (loop_us, gain) [(180419, 65280), (120419, 512)], expected [(180419, 65280), (120419, 512)] -> ok
+  (b) Red: 18 passes 9, gains fast ['0x0000'], debug ['0x0000']; picture of pass 17 equal: True; anomalies none; pk_stats (loop_us, gain): [(8, '0x0000'), (8, '0x0000')] -> ok
+  (b) White: 18 passes 9, gains fast ['0x0200'], debug ['0x0200']; picture of pass 17 equal: True; anomalies none; pk_stats (loop_us, gain): [(8, '0x0200'), (8, '0x0200')] -> ok
+  (b) Key Line art filter, no MF Assist: 18 passes 9, gains fast ['0xFF00'], debug ['0xFF00']; picture of pass 17 equal: True; anomalies none; pk_stats (loop_us, gain): [(8, '0xFF00'), (8, '0xFF00')] -> ok
+  S18 RESULT: PASS

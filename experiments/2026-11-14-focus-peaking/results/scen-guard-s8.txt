@@ -1,0 +1,15 @@
+S8. Peaking Off (setting 458 = 1), MF Assist request set: MENU against BASE (the build without peaking).
+  [Natural] base: frame 3: 1 task runs, 38805 insns, 924 device writes; state 2, expose 0, art record 0x0, heap mode 0, picture True, alloc error False
+  [Natural] menu: frame 3: 1 task runs, 38875 insns, 924 device writes; state 2, expose 0, art record 0x0, heap mode 0, picture True, alloc error False | L=0 R=1 L2=0 C=1 | R set by the hook at 0x7EB7D46C (ran 6 pcs, new code: 0x7EBE2000 (5))
+  Natural frame 1  SAME: 4750 writes (base 4747), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 936, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 69 in 0x7E4C9000 (69)
+  Natural frame 2  SAME: 3283 writes (base 3280), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 936, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 56 in 0x7E4C9000 (56)
+  Natural frame 3  SAME: 3277 writes (base 3274), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 936, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 56 in 0x7E4C9000 (56)
+  [Natural] pass 9 gain: base [], menu []; pass 7 ucExpose: base [], menu []
+  [Key Line] base: frame 3: 12 task runs, 174451 insns, 4572 device writes; state 2, expose 163, art record 0x2A3, heap mode 1, picture True, alloc error False
+  [Key Line] menu: frame 3: 12 task runs, 174587 insns, 4572 device writes; state 2, expose 163, art record 0x2A3, heap mode 1, picture True, alloc error False | L=0 R=1 L2=0 C=1 | R set by the hook at 0x7EB7D46C (ran 6 pcs, new code: 0x7EBE2000 (5))
+  Key Line frame 1  SAME: 11017 writes (base 11014), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 5074, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 111 in 0x7E4C9000 (111)
+  Key Line frame 2  SAME: 7215 writes (base 7212), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 4602, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 111 in 0x7E4C9000 (111)
+  Key Line frame 3  SAME: 7236 writes (base 7233), bytes that differ outside 0x602BE8C4-0x602BE8C7: 0; device accesses 4602, same order, addresses and values: True; stock pcs lost outside hook sites: 0; stock pcs gained: 0; new-code pcs: 111 in 0x7E4C9000 (111)
+  [Key Line] pass 9 gain: base ['0xFF00'], menu ['0xFF00']; pass 7 ucExpose: base [163], menu [163]
+  S8 RESULT: PASS: with Peaking Off and the request set, MENU = BASE
+
