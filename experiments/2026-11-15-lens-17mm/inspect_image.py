@@ -22,7 +22,7 @@ def inspect(path):
     assert checksum == 0
     base = struct.unpack_from("<I", header, 8)[0]
     # These 15 aligned patterns match JSR.A, RTS, then three NOPs if R32C.
-    # This hypothesis has not passed a continuous function decode.
+    # Continuous decoding is in r32c.py and flow.py.
     # The R32C manual defines the displacement relative to opcode address + 1.
     stubs = []
     for offset in range(4, 0x7C, 8):
@@ -64,9 +64,9 @@ def inspect(path):
         "candidate_r32c_call_stubs": stubs,
         "table_reference_candidates": references,
         "limits": [
-            "R32C is a hypothesis; continuous instruction decoding is unresolved",
-            "No full instruction decoder or runtime address map",
-            "Table meanings and focus command handlers are unknown",
+            "R32C decoder and focus path are in r32c.py and NOTES.md; exact MCU is unknown",
+            "Partial decoder: flow.py reports gaps; outside-image calls are unresolved",
+            "Driver field effects are modeled; chip bit meanings need verification",
             "No measured speed or noise improvement; no patch produced",
         ],
     }

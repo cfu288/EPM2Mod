@@ -94,8 +94,14 @@ class Decoder:
             # #IMMEX changes both operation size and immediate size.
             if src == 8 and not extension:
                 dw = (1, 2, 2)[w]
-            d = gen(dest, dw)
-            s = gen(src, sw)
+            # Source displacement, destination displacement, then immediate.
+            # An immediate source has no displacement, so its value comes last.
+            if src in (8,12):
+                d = gen(dest,dw)
+                s = gen(src,sw)
+            else:
+                s = gen(src,sw)
+                d = gen(dest,dw)
             suffix = ('BW', 'BL', 'WL')[w] if extension else ('B', 'W', 'L')[dw]
             return out(f'{mnemonic}.{suffix}', f'{s}, {d}')
 
@@ -163,6 +169,11 @@ class Decoder:
                 b = take(1)
                 return out('EMULU.' + ('B','W','L')[op2 & 3],
                            f'{gen(b & 31,op2 & 3)}, {REGS[op2 & 3][b >> 5]}')
+            if op2 & 0xF8 == 0x78 and op2 & 3 != 3:
+                b = take(1)
+                cond = ((op2 >> 2) & 1) * 8 + (b >> 5)
+                return out('SC' + COND[cond] + '.' + ('B','W','L')[op2 & 3],
+                           gen(b & 31,op2 & 3))
             raise Unknown(f'extended opcode 3f {op2:02x}')
         if op == 0x7F:
             a, b = take(1), take(1)
@@ -171,11 +182,17 @@ class Decoder:
                 return out(indirect + ('.W' if a == 0xA5 else '.L'),
                            gen(b & 31,1 if a == 0xA5 else 2),
                            'indirect_call' if indirect == 'JSRI' else 'indirect_jump')
+            if a == 0x70:
+                dst = gen(b & 31,0)
+                c = take(1)
+                return out('BM' + COND[c & 15], f'{b >> 5}, {dst}')
             raise Unknown(f'extended opcode 7f {a:02x} {b:02x}')
-        if op & 0xFC in (0xA4,0x94,0x84,0xC4,0xD4) and op & 3 != 3:
+        if op & 0xFC in (0xA4,0x94,0x84,0xB4,0xC4,0xD4) and op & 3 != 3:
             b = take(1)
             if b & 0xE0 == 0 and b & 31 != 8:
-                mn = {0xA4:'INDEX1',0x94:'INDEX2',0x84:'INDEXB',0xC4:'SHL',0xD4:'POP'}[op & 0xFC]
+                if op & 0xFC in (0xB4,0xD4):
+                    raise Unknown('unsupported unary instruction')
+                mn = {0xA4:'INDEX1',0x94:'INDEX2',0x84:'INDEXB',0xC4:'SHL'}[op & 0xFC]
                 d = gen(b & 31,op & 3)
                 return out(mn + '.' + ('B','W','L')[op & 3],
                            f'#{take(1,True)}, {d}' if mn == 'SHL' else d)
@@ -189,6 +206,8 @@ class Decoder:
             if b & 0xE0 == 0x80 and op & 0xFC == 0xC4:
                 d = gen(b & 31,op & 3)
                 return out('ROT.' + ('B','W','L')[op & 3], f'#{take(1,True)}, {d}')
+            if b & 0xE0 == 0x80 and op & 0xFC == 0xB4:
+                return out('POP.' + ('B','W','L')[op & 3], gen(b & 31,op & 3))
             p -= 1
         if op >> 4 in (8, 9, 10, 11, 12, 13) and op & 3 != 3:
             return pair(op, {8: 'ADD', 9: 'SUB', 10: 'CMP', 11: 'MOV',

@@ -5,6 +5,7 @@ import argparse
 from collections import Counter
 from dataclasses import asdict
 import json
+import re
 from pathlib import Path
 
 from r32c import Decoder, Unknown
@@ -18,7 +19,7 @@ def analyze(image):
         if data[p:p+3] == bytes.fromhex('5bfffb') and data[p+6:p+9] == bytes.fromhex('7bffcf'):
             seeds.append(p)
     pending = seeds[:]
-    insns, gaps, outside, clashes = {}, {}, [], []
+    insns, gaps, outside, clashes, switches = {}, {}, [], [], []
     owner = {}
     while pending:
         p = pending.pop()
@@ -42,6 +43,21 @@ def analyze(image):
                     pending.append(ins.target)
                 else:
                     outside.append({'caller': p, 'target': ins.target, 'kind': ins.kind})
+            if ins.mnemonic == 'JMPI.W' and data[p:p+3] == bytes.fromhex('7fa50b'):
+                # Recognize the compiler's bounded, INDEX1-based switch form.
+                previous = sorted((q for q in insns if p-24 <= q < p), reverse=True)
+                bounds = [(q, re.fullmatch(r'#(0x[0-9a-f]+), R0L', insns[q].args))
+                          for q in previous if insns[q].mnemonic == 'CMP.B']
+                if previous and insns[previous[0]].mnemonic == 'INDEX1.B' and bounds and bounds[0][1]:
+                    count = int(bounds[0][1][1],16)
+                    address = int.from_bytes(data[p+3:p+6],'little',signed=True) & 0xffffffff
+                    table = (address - 0xfffc0000) & 0xffffffff
+                    if 0 < count <= 128 and table+2*count <= len(data):
+                        targets = [p + int.from_bytes(data[table+2*i:table+2*i+2],
+                                   'little',signed=True) for i in range(count)]
+                        if all(0 <= q < 0x9400 for q in targets):
+                            switches.append({'pc':p,'table':table,'count':count,'targets':targets})
+                            pending.extend(targets)
             if ins.kind in ('return', 'jump', 'indirect_jump'):
                 break
             p += ins.size
@@ -52,6 +68,7 @@ def analyze(image):
         'gaps': {hex(p): gaps[p] for p in sorted(gaps)},
         'outside': outside,
         'clashes': clashes,
+        'switches': switches,
     }
 
 
