@@ -452,7 +452,8 @@ def generate_all(
 
     Returns:
         The three specs of the first seven films and, if the repository has
-        ``looks/more-films.json``, the specs of the films beyond them.
+        ``looks/more-films.json``, the specs of the films beyond them, and, if
+        it has ``looks/films-12-bw.json``, the specs of that list.
 
     Raises:
         BuildError: if a film list or a fit file is wrong.
@@ -463,6 +464,10 @@ def generate_all(
         from . import extra  # extra imports this module
 
         specs += extra.generate(paths, stock)
+    if paths.bw_films.exists():
+        from . import mono  # mono imports this module
+
+        specs += mono.generate(paths, stock)
     return specs
 
 

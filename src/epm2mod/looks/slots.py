@@ -474,3 +474,51 @@ EXTRA_SLOTS: tuple[ExtraSlot, ...] = (
         art_mode=(181, 0x7E82CB68),
     ),
 )
+
+
+# --------------------------------------------------------------------------
+# A black-and-white film in the Grainy Film entry.
+#
+# The entry keeps its stored value (104) and its art codes (74 for still
+# pictures and live view, 83 in the movie tables), so the firmware makes the
+# picture monochrome and runs the grain program as in the stock filter. A
+# look there is three things. The art matrix sets how colours turn into grey:
+# the picture is made monochrome after the tone curves, from the luma of the
+# coded picture. The grain program's contrast table carries the tone of
+# still pictures. The look table of the code carries the same tone where no
+# grain program runs (live view and movie variants of the look stage).
+# The tone curves per channel cannot be used: the key of code 74 in the
+# tone-curve hash meets the entry that code 70 uses before it meets a free one.
+# How this was found: experiments/2026-11-16-doublex/NOTES.md.
+
+
+@dataclass(frozen=True)
+class MonoSlot:
+    """Where a black-and-white film keeps its numbers in the Grainy Film entry.
+
+    Attributes:
+        entry: the stock name of the menu entry.
+        art_codes: the art code of still pictures and the code of the movie tables.
+        grain_table: address of the grain program's contrast table.
+        grain_load: address of the instruction that loads ``grain_table``.
+        live_look: address of the look table for live view and movies.
+        live_load: address of the instruction that loads ``live_look``.
+    """
+
+    entry: str
+    art_codes: tuple[int, int]
+    grain_table: int
+    grain_load: int
+    live_look: int
+    live_load: int
+
+
+#: The black-and-white slot. It has the entry of the first extra slot.
+MONO_SLOT = MonoSlot(
+    entry=EXTRA_SLOTS[0].entry,
+    art_codes=(74, 83),
+    grain_table=0x7E75EEF0,
+    grain_load=0x7E56EF83,
+    live_look=0x7E7620F0,
+    live_load=0x7E56E91F,
+)

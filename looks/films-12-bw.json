@@ -1,0 +1,14 @@
+{
+ "specs": {
+  "entry": "patches/films12bw-entry-gentle-sepia.json",
+  "mono": "patches/films12bw-doublex.json"
+ },
+ "mono": {
+  "entry": "Grainy Film",
+  "film": "Kodak Double-X 5222",
+  "medium": "black-and-white negative, on Kodak 2302 print film",
+  "label": "Double-X",
+  "fit": "looks/fits/doublex.npz"
+ },
+ "moved_to": "Gentle Sepia"
+}

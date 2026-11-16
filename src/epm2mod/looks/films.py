@@ -11,7 +11,7 @@ from ..fileio import read_bytes, read_json
 from ..hashing import sha256_bytes
 from ..paths import RepoPaths, is_repo_relative
 from ..spec import UTF16
-from .slots import EXTRA_SLOTS, SLOTS
+from .slots import EXTRA_SLOTS, MONO_SLOT, SLOTS
 
 
 @dataclass(frozen=True)
@@ -321,5 +321,103 @@ def more_inputs_digest(paths: RepoPaths, film_list: MoreFilmList) -> str:
     parts = [read_bytes(paths.more_films, BuildError)]
     parts += [
         read_bytes(paths.resolve(film.fit), BuildError) for film in film_list.films
+    ]
+    return sha256_bytes(b"".join(sha256_bytes(part).encode() for part in parts))
+
+
+@dataclass(frozen=True)
+class BwFilmList:
+    """The content of ``looks/films-12-bw.json``.
+
+    The list is a variant of ``MoreFilmList``. The entry of the
+    black-and-white slot holds a black-and-white film and keeps its stock
+    stored value. The colour film that ``MoreFilmList`` has in that entry
+    moves to another entry of the extra slots, and the film of that entry
+    leaves the list.
+
+    Attributes:
+        mono: the black-and-white film.
+        moved_to: the stock name of the entry that the colour film moves to.
+        entry_spec: path of the patch spec that gives ``moved_to`` the colour film.
+        mono_spec: path of the patch spec that holds the black-and-white look.
+    """
+
+    mono: Film
+    moved_to: str
+    entry_spec: str
+    mono_spec: str
+
+    def __post_init__(self) -> None:
+        """Check the list. Every instance is valid.
+
+        Raises:
+            BuildError: if the black-and-white film is not in the entry of the
+                black-and-white slot, ``moved_to`` is not another extra slot,
+                or the two specs are the same file.
+        """
+        if self.mono.entry != MONO_SLOT.entry:
+            raise BuildError(
+                f"the black-and-white film must be in the entry '{MONO_SLOT.entry}'"
+            )
+        others = [slot.entry for slot in EXTRA_SLOTS if slot.entry != MONO_SLOT.entry]
+        if self.moved_to not in others:
+            raise BuildError("'moved_to' must be one of: " + ", ".join(others))
+        if self.entry_spec == self.mono_spec:
+            raise BuildError("the generated specs must be different files")
+
+    @property
+    def spec_paths(self) -> tuple[str, str]:
+        """The paths of the entry spec and the black-and-white spec."""
+        return (self.entry_spec, self.mono_spec)
+
+
+_BW_TOP_KEYS = {"specs", "mono", "moved_to"}
+_BW_SPEC_KEYS = {"entry", "mono"}
+
+
+def load_bw_films(paths: RepoPaths) -> BwFilmList:
+    """Read and check the film list with a black-and-white film.
+
+    Raises:
+        BuildError: if the file is missing or malformed, has an unknown key, or
+            does not describe a valid ``BwFilmList``.
+    """
+    path = paths.bw_films
+    raw = read_json(path, BuildError)
+    if not isinstance(raw, dict):
+        raise BuildError(f"{path}: must be an object")
+    specs = raw.get("specs")
+    if not isinstance(specs, dict):
+        raise BuildError(f"{path}: must have a 'specs' object")
+    _closed(raw, _BW_TOP_KEYS, str(path))
+    _closed(specs, _BW_SPEC_KEYS, f"{path} specs")
+    where = f"{path} specs"
+    try:
+        return BwFilmList(
+            mono=_load_film(raw.get("mono"), f"{path} mono"),
+            moved_to=_text(raw, "moved_to", str(path)),
+            entry_spec=check_spec_path(specs.get("entry"), where),
+            mono_spec=check_spec_path(specs.get("mono"), where),
+        )
+    except BuildError as error:
+        text = str(error)
+        raise BuildError(
+            text if text.startswith(str(path)) else f"{path}: {text}"
+        ) from None
+
+
+def bw_inputs_digest(paths: RepoPaths, film_list: BwFilmList) -> str:
+    """Return one SHA-256 over the data of the list with a black-and-white film.
+
+    The data: ``looks/films-12-bw.json``, the fit of its film, and the list
+    of the films beyond the first seven (its labels name the film that moves).
+
+    Raises:
+        BuildError: if a file cannot be read.
+    """
+    parts = [
+        read_bytes(paths.bw_films, BuildError),
+        read_bytes(paths.resolve(film_list.mono.fit), BuildError),
+        read_bytes(paths.more_films, BuildError),
     ]
     return sha256_bytes(b"".join(sha256_bytes(part).encode() for part in parts))

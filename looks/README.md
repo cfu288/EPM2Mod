@@ -12,6 +12,16 @@
   stock art filter again. `fits/` also holds fits that no list uses yet (C200, Portra 800, UltraMax 400,
   Verita 200D, Vision3 50D and 200T).
 
+- `films-12-bw.json`: a variant of `more-films.json` with a black-and-white film (the candidate build
+  `films-12-bw`). The entry Grainy Film keeps its stored value, its art codes and its grain program and holds
+  Kodak Double-X 5222 on 2302 print film; the colour film of that entry in `more-films.json` moves to the entry
+  named in `moved_to`. It makes two specs, both deltas on the specs of `more-films.json`:
+  `films12bw-doublex` (the look) and `films12bw-entry-gentle-sepia`. `fits/doublex.npz` holds the art matrix
+  `A` (how colours turn into grey), the tone curve `D`, and the two tables made from it: `T` (the grain
+  program's contrast table) and `L` (the look table for live view and movies). Its names spec is
+  `patches/films12bw-names.json` (`experiments/2026-11-16-doublex/scripts/names_bw.py`); the notes in that
+  folder say how the camera makes the entry monochrome and how the fit was made.
+
 The menu names of `more-films.json` in all 34 languages are a spec of their own, `patches/films12-names.json`.
 `experiments/2026-11-16-films-max/scripts/names_spec.py` makes it; the notes in that folder say how the
 slots work and how the fits were made.
@@ -35,3 +45,5 @@ How the fits were made: `experiments/2026-11-09-film-portra/`.
 The fit data is derived from [spektrafilm](https://github.com/andreavolpato/spektrafilm) by Andrea
 Volpato, licensed CC BY-SA 4.0. We modified it: we fitted it to the stages of the Olympus E-PM2
 that can be adjusted. See `NOTICE.md`.
+`fits/doublex.npz` is derived from the profiles `kodak_doublex` and `kodak_2302` of spektrafilm's `dev` branch
+(commit `6cd00c8d4f30b5b550f50f4bbd3753c9f2a48507`, CC BY-SA 4.0). Modified: fitted to this camera.

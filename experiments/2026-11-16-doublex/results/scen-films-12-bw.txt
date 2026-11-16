@@ -1,0 +1,14 @@
+PASS value 100: code byte  70 (expected 70), picture in 3 of 3 frames, anomalies none | with the request: L=1 R=1 L2=1, code byte 3, picture in 3 of 3 frames, pass 9 gain ['0x0200'], pass 7 ucExpose [3], anomalies none
+PASS value 101: code byte   0 (expected 0), picture in 3 of 3 frames, anomalies none | with the request: L=1 R=1 L2=1, code byte 3, picture in 3 of 3 frames, pass 9 gain ['0x0200'], pass 7 ucExpose [3], anomalies none
+PASS value 102: code byte  71 (expected 71), picture in 3 of 3 frames, anomalies none | with the request: L=1 R=1 L2=1, code byte 3, picture in 3 of 3 frames, pass 9 gain ['0x0200'], pass 7 ucExpose [3], anomalies none
+PASS value 103: code byte  72 (expected 72), picture in 3 of 3 frames, anomalies none | with the request: L=1 R=1 L2=1, code byte 3, picture in 3 of 3 frames, pass 9 gain ['0x0200'], pass 7 ucExpose [3], anomalies none
+PASS value 104: code byte  74 (expected ?), picture in 3 of 3 frames, anomalies none | with the request: L=1 R=1 L2=1, code byte 3, picture in 3 of 3 frames, pass 9 gain ['0x0200'], pass 7 ucExpose [3], anomalies none
+PASS value 105: code byte 145 (expected 145), picture in 3 of 3 frames, anomalies none | with the request: L=1 R=1 L2=1, code byte 3, picture in 3 of 3 frames, pass 9 gain ['0x0200'], pass 7 ucExpose [3], anomalies none
+PASS value 106: code byte 167 (expected 167), picture in 3 of 3 frames, anomalies none | with the request: L=1 R=1 L2=1, code byte 3, picture in 3 of 3 frames, pass 9 gain ['0x0200'], pass 7 ucExpose [3], anomalies none
+PASS value 107: code byte  85 (expected 85), picture in 3 of 3 frames, anomalies none | with the request: L=1 R=1 L2=1, code byte 3, picture in 3 of 3 frames, pass 9 gain ['0x0200'], pass 7 ucExpose [3], anomalies none
+PASS value 111: code byte   0 (expected 0), picture in 3 of 3 frames, anomalies none | with the request: L=1 R=1 L2=1, code byte 3, picture in 3 of 3 frames, pass 9 gain ['0x0200'], pass 7 ucExpose [3], anomalies none
+PASS value 114: code byte   0 (expected 0), picture in 3 of 3 frames, anomalies none | with the request: L=1 R=1 L2=1, code byte 3, picture in 3 of 3 frames, pass 9 gain ['0x0200'], pass 7 ucExpose [3], anomalies none
+PASS value 115: code byte   0 (expected 0), picture in 3 of 3 frames, anomalies none | with the request: L=1 R=1 L2=1, code byte 3, picture in 3 of 3 frames, pass 9 gain ['0x0200'], pass 7 ucExpose [3], anomalies none
+PASS value 118: code byte   0 (expected 0), picture in 3 of 3 frames, anomalies none | with the request: L=1 R=1 L2=1, code byte 3, picture in 3 of 3 frames, pass 9 gain ['0x0200'], pass 7 ucExpose [3], anomalies none
+PASS value 119: code byte 163 (expected 163), picture in 3 of 3 frames, anomalies none | with the request: L=1 R=1 L2=1, code byte 3, picture in 3 of 3 frames, pass 9 gain ['0x0200'], pass 7 ucExpose [3], anomalies none
+live-view scenario: PASS (13 values, 0 failing)

@@ -1,0 +1,12 @@
+1. Monotone (chart shot M4) against the Natural shot B3 of the same chart, 182 patches, picture codes
+   Monotone has no colour: max |R - G| = 0.0
+   grey = luma of the tone-coded R, G, B (0.299, 0.587, 0.114): mean |difference| all 1.52, saturated patches 1.84
+   grey = tone curve of the linear luma: mean |difference| all 15.94, saturated patches 25.19
+   two Natural shots of the chart against each other: 1.35
+2. Natural rendering of the test RAW: camera luma - model luma (codes, mean |difference| / mean)
+   natural 0.50 / -0.06; skin 0.38 / -0.08; ColorChecker x5 EV 0.81 / +0.11; grays 0.48 / -0.30; hold-out 0.50 / -0.07; dense grays 0.38 / -0.11
+3. Stock Grainy Film I of the test RAW: camera - model T(g(Y_in)) (codes mean |difference|; mean |dL*|)
+   natural 1.84; 0.72; skin 2.26; 0.91; ColorChecker x5 EV 2.83; 1.12; grays 1.08; 0.41; hold-out 1.85; 0.72; dense grays 0.93; 0.35
+   g (Y_in -> x), every third knot: 25:58 37:69 49:80 61:92 73:105 85:119 97:131 109:143 121:154 133:166 145:176 157:187 169:196 181:205 193:218 205:224
+   spread inside a patch (codes) at those knots: 4 11 21 33 44 52 52 49 42 32 23 16 9 5 2 1; the noise that gives it has a spread of about 19.5 in x
+   stock table 0x7E75EEF0 (x -> picture value), every 16th: [0, 0, 0, 2, 6, 12, 30, 63, 107, 155, 197, 225, 241, 249, 252, 254]
