@@ -11,19 +11,28 @@ The pinned build is **`films-12d`**: twelve film looks in the art-filter entries
 
 The steps are in the [README](../README.md#install).
 
-**Checksums.** The build stops if its sha256 differs from the value above, so no manual
-check is needed. With `--out DIR` the script also reads the copy back from `DIR/DCOLYMP/`.
+## Checksums
 
-**The lamp.** Recorded on this camera: steady for 70 to 100 seconds, then blinking until power-off
-(more than 20 minutes when left alone). No update has failed so far, so there is no tested advice
-for a lamp that never blinks.
+The build stops if its sha256 differs from the value above, so you do not need to compare it by
+hand. With `--out DIR`, the script also reads the copy back from `DIR/DCOLYMP/`.
 
-**After the update.** The camera keeps its settings: the level calibration and the Peaking setting
-stayed over four updates (logs of 2026-11-15 and 2026-11-16). The file can stay on the card: the
-camera reads it only when **OK** is held at power-on.
+## The lamp
 
-**To go back to the original firmware.** Run `uv run tools/fetch_stock.py`. Copy
-`firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN` to the card as `DCOLYMP/E1019999.BIN`, then do steps 3 and 4 of the README. This way back was
-used on this camera on 2026-11-08.
+On this camera the lamp was steady for 70 to 100 seconds, and then it blinked until the camera was
+switched off. No update has failed so far, so there is no tested advice for a lamp that never
+blinks.
 
-Use only a file for the E-PM2. How the update works, and the sources: [flashing.md](flashing.md).
+## After the update
+
+The camera keeps its settings. The level calibration and the Peaking setting stayed the same over
+four updates. The file can stay on the card, because the camera reads it only when you hold **OK**
+at power-on.
+
+## Going back to the original firmware
+
+Run `uv run tools/fetch_stock.py`. Copy `firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN` to the
+card as `DCOLYMP/E1019999.BIN`. Then do steps 3 and 4 of the README. This way back was used on this
+camera on 2026-11-08.
+
+Use only a firmware file that is for the E-PM2. [flashing.md](flashing.md) explains how the update
+works and gives the sources.
