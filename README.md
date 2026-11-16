@@ -13,10 +13,12 @@ Repository containing the current work for creating a custom firmware mod for th
 
 ## Install
 
-```sh
-uv run tools/make_firmware.py --card /Volumes/NAME
-```
+For an E-PM2 with firmware 1.6 only. Use it at your own risk.
 
-This command makes the patched firmware from Olympus's own file and writes it to your SD card. Put the card in the camera, hold **OK**, and switch the camera on. For an E-PM2 with firmware 1.6, at your own risk. More: [docs/install.md](docs/install.md).
+1. Build the firmware: `uv run tools/make_firmware.py`. It downloads the Olympus firmware, applies the patches and writes `build/card/DCOLYMP/E1019999.BIN`.
+2. Copy that file to the SD card with the same folder and name: `DCOLYMP/E1019999.BIN`, with `DCOLYMP` in the top folder of the card. (`--card /path/to/card` on the command of step 1 does this copy.)
+3. With the camera off, hold **OK** and switch the camera on. The update takes about one minute.
+
+Checksums and how to go back to the original firmware: [docs/install.md](docs/install.md).
 
 ![Nine photos, each developed in the camera with stock Natural and the film looks](docs/images/film-sim-comparison.jpg)
