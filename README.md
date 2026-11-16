@@ -29,7 +29,7 @@ This firmware is only for an E-PM2. The firmware is unofficial, use it at your o
 
    This downloads the Olympus firmware, applies the patches and writes `build/card/DCOLYMP/E1019999.BIN`.
 
-   Alternatively, build and install the firmaware directly to the SD card (allowing you to skip step 2)
+   Alternatively, build and install the firmware directly to the SD card (allowing you to skip step 2)
 
    ```sh
    uv run tools/make_firmware.py --card /path/to/card
