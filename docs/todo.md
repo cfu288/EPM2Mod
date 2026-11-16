@@ -71,6 +71,12 @@ and delete the item here.
   wall, Live Time 0.5 s against a normal 0.5 s, to see the reset type and the read-out time.
   Notes: `experiments/2026-11-17-anti-shock/NOTES.md`.
 
+- **On-screen information.** `osd-battery` is a candidate: a battery percentage on the live-view
+  screen. Next in the same label: the lens's focus distance (about 90 bytes), the shutter count
+  (about 40 bytes), a calibration of the percentage scale, and a row in LV-Info to switch it. The
+  segment-2 code area has 722 bytes left, in runs of 120 bytes or less.
+  Notes: `experiments/2026-11-17-osd-info/NOTES.md`.
+
 ## Foundations
 
 - Log defect (second camera log, 2026-11-15): the ring header is trusted when its magic word is

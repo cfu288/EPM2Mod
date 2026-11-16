@@ -1,0 +1,191 @@
+kid 0 off=792 -
+kid 1 off=796 type=8003 id=93 xy=(300,180) wh=(120,120) status=50008
+kid 2 off=800 type=8003 id=94 xy=(690,249) wh=(67,75) status=50008
+kid 3 off=804 type=8003 id=95 xy=(0,402) wh=(640,78) status=50008
+kid 4 off=808 type=8003 id=96 xy=(-94,-79) wh=(734,558) status=50008
+kid 5 off=812 type=8003 id=97 xy=(0,0) wh=(720,480) status=50008
+kid 6 off=816 type=8003 id=111 xy=(16,153) wh=(56,44) status=50008
+kid 7 off=820 type=8003 id=114 xy=(10,253) wh=(68,44) status=50008
+kid 8 off=824 type=8003 id=119 xy=(648,303) wh=(55,43) status=50008
+kid 9 off=828 type=8003 id=127 xy=(133,423) wh=(92,45) status=50008
+kid 10 off=832 type=8003 id=129 xy=(245,423) wh=(83,45) status=50008
+kid 11 off=836 type=8003 id=131 xy=(348,423) wh=(83,45) status=50008
+kid 12 off=840 type=8003 id=142 xy=(585,389) wh=(38,30) status=50008
+kid 13 off=844 type=8003 id=145 xy=(515,389) wh=(38,30) status=50008
+kid 14 off=848 type=8003 id=146 xy=(56,435) wh=(232,38) status=40008
+kid 15 off=852 type=8003 id=19 xy=(145,8) wh=(429,40) status=50009
+kid 16 off=856 type=8003 id=147 xy=(492,427) wh=(216,38) status=50008
+kid 17 off=860 type=105 id=89 xy=(0,0) wh=(720,480) status=12
+kid 18 off=864 type=8003 id=90 xy=(0,411) wh=(93,69) status=50009
+kid 19 off=868 type=8003 id=91 xy=(272,7) wh=(39,38) status=50008
+kid 20 off=872 type=8003 id=92 xy=(233,7) wh=(39,38) status=50008
+kid 21 off=876 type=8003 id=98 xy=(77,7) wh=(39,38) status=50008
+kid 22 off=880 type=8003 id=99 xy=(116,7) wh=(39,38) status=50008
+kid 23 off=884 type=8003 id=100 xy=(155,7) wh=(39,38) status=50008
+kid 24 off=888 type=8003 id=101 xy=(194,7) wh=(39,38) status=50008
+kid 25 off=892 type=8003 id=102 xy=(273,7) wh=(38,37) status=50008
+kid 26 off=896 type=8003 id=103 xy=(350,7) wh=(48,38) status=50008
+kid 27 off=900 type=8003 id=104 xy=(398,7) wh=(22,38) status=50008
+kid 28 off=904 type=8003 id=105 xy=(420,7) wh=(58,38) status=50008
+kid 29 off=908 type=8003 id=106 xy=(420,7) wh=(53,38) status=50008
+kid 30 off=912 type=8003 id=109 xy=(19,56) wh=(50,38) status=50009
+kid 31 off=916 type=8003 id=110 xy=(19,107) wh=(50,38) status=50009
+kid 32 off=920 type=8003 id=112 xy=(19,156) wh=(50,38) status=50009
+kid 33 off=924 type=8003 id=113 xy=(19,206) wh=(50,38) status=50009
+kid 34 off=928 type=8003 id=115 xy=(13,256) wh=(62,38) status=50008
+kid 35 off=932 type=8003 id=116 xy=(651,56) wh=(50,38) status=50009
+kid 36 off=936 type=8003 id=117 xy=(651,106) wh=(50,38) status=50009
+kid 37 off=940 type=8003 id=83 xy=(651,156) wh=(50,38) status=50009
+kid 38 off=944 type=8003 id=118 xy=(651,256) wh=(50,38) status=50009
+kid 39 off=948 type=8003 id=120 xy=(651,306) wh=(50,38) status=50009
+kid 40 off=952 type=8003 id=121 xy=(651,356) wh=(50,38) status=50009
+kid 41 off=956 type=8003 id=122 xy=(13,376) wh=(50,38) status=50008
+kid 42 off=960 type=8003 id=123 xy=(66,376) wh=(50,38) status=50008
+kid 43 off=964 type=8003 id=124 xy=(119,376) wh=(35,38) status=50008
+kid 44 off=968 type=8003 id=33 xy=(11,418) wh=(54,54) status=50009
+kid 45 off=972 type=8003 id=34 xy=(66,448) wh=(19,23) status=50008
+kid 46 off=976 type=8003 id=125 xy=(66,428) wh=(19,11) status=50008
+kid 47 off=980 type=8003 id=126 xy=(66,416) wh=(19,11) status=50008
+kid 48 off=984 type=8003 id=128 xy=(169,413) wh=(20,12) status=50008
+kid 49 off=988 type=8003 id=130 xy=(276,413) wh=(20,12) status=50008
+kid 50 off=992 type=8013 id=40 xy=(354,428) wh=(71,35) status=1
+kid 51 off=996 type=8003 id=132 xy=(379,413) wh=(20,12) status=50009
+kid 52 off=1000 type=8013 id=86 xy=(621,419) wh=(90,20) status=1
+kid 53 off=1004 type=8013 id=87 xy=(643,443) wh=(68,28) status=1
+kid 54 off=1008 type=8003 id=133 xy=(553,388) wh=(32,32) status=50008
+kid 55 off=1012 type=8003 id=134 xy=(700,175) wh=(20,130) status=50008
+kid 56 off=1016 type=8003 id=135 xy=(7,301) wh=(87,65) status=50009
+kid 57 off=1020 type=8003 id=136 xy=(160,409) wh=(20,12) status=50008
+kid 58 off=1024 type=8003 id=137 xy=(179,409) wh=(20,12) status=50008
+kid 59 off=1028 type=8003 id=138 xy=(266,409) wh=(20,12) status=50008
+kid 60 off=1032 type=8003 id=139 xy=(286,409) wh=(20,12) status=50008
+kid 61 off=1036 type=8003 id=140 xy=(273,405) wh=(12,20) status=8
+kid 62 off=1040 type=8003 id=141 xy=(287,405) wh=(12,20) status=8
+kid 63 off=1044 type=8003 id=143 xy=(591,369) wh=(12,20) status=50008
+kid 64 off=1048 type=8003 id=144 xy=(605,369) wh=(12,20) status=50008
+kid 65 off=1052 type=8003 id=148 xy=(521,369) wh=(12,20) status=50008
+kid 66 off=1056 type=8003 id=149 xy=(535,369) wh=(12,20) status=50008
+kid 67 off=1060 type=8003 id=150 xy=(376,405) wh=(12,20) status=50008
+kid 68 off=1064 type=8003 id=151 xy=(390,405) wh=(12,20) status=50008
+kid 69 off=1068 type=8003 id=41 xy=(434,424) wh=(148,36) status=50008
+kid 70 off=1072 type=8003 id=152 xy=(651,6) wh=(50,38) status=50008
+kid 71 off=1076 type=8013 id=37 xy=(139,428) wh=(80,35) status=1
+kid 72 off=1080 type=8003 id=38 xy=(141,428) wh=(76,35) status=50008
+kid 73 off=1084 type=8013 id=39 xy=(251,428) wh=(71,35) status=1
+kid 74 off=1088 type=8013 id=153 xy=(517,390) wh=(33,28) status=0
+kid 75 off=1092 type=8013 id=154 xy=(587,390) wh=(33,28) status=0
+kid 76 off=1096 type=8013 id=155 xy=(565,15) wh=(52,22) status=0
+kid 77 off=1100 type=8013 id=156 xy=(617,15) wh=(27,22) status=0
+kid 78 off=1104 type=8003 id=53 xy=(450,457) wh=(8,9) status=50008
+kid 79 off=1108 type=8003 id=54 xy=(458,457) wh=(8,9) status=50008
+kid 80 off=1112 type=8003 id=55 xy=(466,457) wh=(8,9) status=50008
+kid 81 off=1116 type=8003 id=56 xy=(474,457) wh=(8,9) status=50008
+kid 82 off=1120 type=8003 id=57 xy=(482,457) wh=(8,9) status=50008
+kid 83 off=1124 type=8003 id=58 xy=(490,457) wh=(8,9) status=50008
+kid 84 off=1128 type=8003 id=59 xy=(498,457) wh=(8,9) status=50008
+kid 85 off=1132 type=8003 id=60 xy=(506,457) wh=(8,9) status=50008
+kid 86 off=1136 type=8003 id=61 xy=(514,457) wh=(8,9) status=50008
+kid 87 off=1140 type=8003 id=62 xy=(522,457) wh=(8,9) status=50008
+kid 88 off=1144 type=8003 id=43 xy=(450,439) wh=(8,9) status=50008
+kid 89 off=1148 type=8003 id=44 xy=(458,439) wh=(8,9) status=50008
+kid 90 off=1152 type=8003 id=45 xy=(466,439) wh=(8,9) status=50008
+kid 91 off=1156 type=8003 id=46 xy=(474,439) wh=(8,9) status=50008
+kid 92 off=1160 type=8003 id=47 xy=(482,439) wh=(8,9) status=50008
+kid 93 off=1164 type=8003 id=48 xy=(490,439) wh=(8,9) status=50008
+kid 94 off=1168 type=8003 id=49 xy=(498,439) wh=(8,9) status=50008
+kid 95 off=1172 type=8003 id=50 xy=(506,439) wh=(8,9) status=50008
+kid 96 off=1176 type=8003 id=51 xy=(514,439) wh=(8,9) status=50008
+kid 97 off=1180 type=8003 id=52 xy=(522,439) wh=(8,9) status=50008
+kid 98 off=1184 type=8003 id=157 xy=(40,506) wh=(67,75) status=50008
+kid 99 off=1188 type=8003 id=158 xy=(109,506) wh=(67,75) status=50008
+kid 100 off=1192 type=8003 id=159 xy=(179,506) wh=(67,75) status=50008
+kid 101 off=1196 type=8003 id=160 xy=(289,506) wh=(67,75) status=50008
+kid 102 off=1200 type=8003 id=161 xy=(358,506) wh=(67,75) status=50008
+kid 103 off=1204 type=8003 id=162 xy=(428,506) wh=(67,75) status=50008
+kid 104 off=1208 type=8003 id=163 xy=(538,506) wh=(67,75) status=50008
+kid 105 off=1212 type=8003 id=164 xy=(607,506) wh=(67,75) status=50008
+kid 106 off=1216 type=8003 id=165 xy=(677,506) wh=(67,75) status=50008
+kid 107 off=1220 type=8003 id=166 xy=(667,506) wh=(67,75) status=50008
+kid 108 off=1224 type=8003 id=167 xy=(737,506) wh=(67,75) status=50008
+kid 109 off=1228 type=8003 id=168 xy=(806,506) wh=(67,75) status=50008
+kid 110 off=1232 type=8003 id=169 xy=(876,506) wh=(67,75) status=50008
+kid 111 off=1236 type=8003 id=170 xy=(946,506) wh=(67,75) status=50008
+kid 112 off=1240 type=8003 id=171 xy=(1015,506) wh=(67,75) status=50008
+kid 113 off=1244 type=8003 id=172 xy=(1085,506) wh=(67,75) status=50008
+kid 114 off=1248 type=8003 id=173 xy=(1155,506) wh=(67,75) status=50008
+kid 115 off=1252 type=8003 id=174 xy=(1225,506) wh=(67,75) status=50008
+kid 116 off=1256 type=8003 id=175 xy=(37,587) wh=(67,75) status=50008
+kid 117 off=1260 type=8003 id=176 xy=(106,587) wh=(67,75) status=50008
+kid 118 off=1264 type=8003 id=177 xy=(176,587) wh=(67,75) status=50008
+kid 119 off=1268 type=8003 id=178 xy=(286,587) wh=(67,75) status=50008
+kid 120 off=1272 type=8003 id=179 xy=(356,587) wh=(67,75) status=50008
+kid 121 off=1276 type=8003 id=180 xy=(426,587) wh=(67,75) status=50008
+kid 122 off=1280 type=8003 id=181 xy=(536,587) wh=(67,75) status=50008
+kid 123 off=1284 type=8003 id=182 xy=(606,587) wh=(67,75) status=50008
+kid 124 off=1288 type=8003 id=183 xy=(676,587) wh=(67,75) status=50008
+kid 125 off=1292 type=8003 id=184 xy=(665,587) wh=(67,75) status=50008
+kid 126 off=1296 type=8003 id=185 xy=(735,587) wh=(67,75) status=50008
+kid 127 off=1300 type=8003 id=186 xy=(805,587) wh=(67,75) status=50008
+kid 128 off=1304 type=8003 id=187 xy=(875,587) wh=(67,75) status=50008
+kid 129 off=1308 type=8003 id=188 xy=(945,587) wh=(67,75) status=50008
+kid 130 off=1312 type=8003 id=189 xy=(1015,587) wh=(67,75) status=50008
+kid 131 off=1316 type=8003 id=190 xy=(1085,587) wh=(67,75) status=50008
+kid 132 off=1320 type=8003 id=191 xy=(1155,587) wh=(67,75) status=50008
+kid 133 off=1324 type=8003 id=192 xy=(57,426) wh=(105,54) status=50008
+kid 134 off=1328 type=8010 id=193 xy=(72,438) wh=(200,32) status=8
+kid 135 off=1332 type=8003 id=194 xy=(109,676) wh=(67,75) status=50008
+kid 136 off=1336 type=c001 id=195 xy=(648,148) wh=(93,70) status=0
+kid 137 off=1340 type=8003 id=197 xy=(651,206) wh=(50,38) status=50009
+kid 138 off=1344 type=8003 id=198 xy=(311,7) wh=(39,38) status=50008
+kid 139 off=1348 type=8013 id=199 xy=(324,25) wh=(13,22) status=0
+kid 140 off=1352 type=8013 id=200 xy=(337,25) wh=(13,22) status=0
+kid 141 off=1356 type=8010 id=201 xy=(500,430) wh=(200,32) status=8
+kid 142 off=1360 type=8003 id=202 xy=(619,426) wh=(101,54) status=50008
+kid 143 off=1364 type=c001 id=203 xy=(680,23) wh=(93,70) status=0
+kid 144 off=1368 type=8003 id=204 xy=(670,90) wh=(28,301) status=50008
+kid 145 off=1372 type=8003 id=205 xy=(659,343) wh=(50,27) status=50008
+kid 146 off=1376 type=8013 id=206 xy=(622,110) wh=(27,22) status=0
+kid 147 off=1380 type=8013 id=207 xy=(622,188) wh=(27,22) status=0
+kid 148 off=1384 type=8013 id=208 xy=(613,270) wh=(30,22) status=0
+kid 149 off=1388 type=8013 id=209 xy=(613,348) wh=(42,22) status=0
+kid 150 off=1392 type=105 id=1 xy=(0,0) wh=(720,480) status=3
+kid 151 off=1396 type=8003 id=210 xy=(200,12) wh=(27,32) status=50009
+kid 152 off=1400 type=8003 id=107 xy=(651,8) wh=(24,34) status=50008
+kid 153 off=1404 type=8003 id=108 xy=(677,13) wh=(24,24) status=50008
+kid 154 off=1408 type=8001 id=196 xy=(227,340) wh=(266,62) status=0
+kid 155 off=1412 -
+kid 156 off=1416 type=105 id=1 xy=(0,0) wh=(720,480) status=3
+kid 157 off=1420 -
+kid 158 off=1424 -
+kid 159 off=1428 -
+kid 160 off=1432 -
+kid 161 off=1436 -
+kid 162 off=1440 -
+kid 163 off=1444 -
+kid 164 off=1448 -
+kid 165 off=1452 -
+kid 166 off=1456 -
+kid 167 off=1460 -
+kid 168 off=1464 -
+kid 169 off=1468 -
+kid 170 off=1472 -
+kid 171 off=1476 -
+kid 172 off=1480 -
+kid 173 off=1484 -
+kid 174 off=1488 -
+kid 175 off=1492 -
+kid 176 off=1496 -
+kid 177 off=1500 -
+kid 178 off=1504 -
+kid 179 off=1508 -
+kid 180 off=1512 -
+kid 181 off=1516 -
+kid 182 off=1520 -
+kid 183 off=1524 -
+kid 184 off=1528 -
+kid 185 off=1532 -
+kid 186 off=1536 -
+kid 187 off=1540 -
+kid 188 off=1544 -
+kid 189 off=1548 -
+

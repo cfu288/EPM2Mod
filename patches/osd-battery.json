@@ -1,0 +1,91 @@
+{
+ "name": "osd-battery",
+ "description": "Battery charge as a percentage on the live-view information screen (top left). A new text label on the live-view panel, made by the panel's own builder from a new resource record, and one routine at the end of the panel's two refresh functions: it reads the battery voltage with the stock A/D routine under the stock semaphore, at most once in 2 s, and writes (count - 680) * 5 / 8 percent, 0 to 100, into the label. The scale is inferred from the E-PL3 and needs one camera check. A delta on builds/films-12d.json: every expect is a byte string of that build. See experiments/2026-11-17-osd-info/NOTES.md.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "candidate: emulator-checked, not flashed",
+ "_delta_on": "builds/films-12d.json (sha256 2cdd18e7004821b2e443ec4f08db06ab9a0d4f0f700ab53db8c4bbc1dad93e32)",
+ "_ram": "T_LAST 0x602BE8C8 (u32) and RAW 0x602BE8CC (u16): slots 21 and 22 of the 37-slot table 0x602BE874, free by the same static argument as slot 20 (focus-peaking NOTES 11.3). Child slot 0 of the live-view panel object (panel + 792) holds the label",
+ "_symbols": {
+  "FMT": "0x7EBF25E0",
+  "RECT": "0x7EBF25C8",
+  "RES": "0x7EBF256C",
+  "T_BATT": "0x7EBF2F6C",
+  "T_INIT": "0x7EBF1F4F",
+  "T_UPD": "0x7EBF1F51"
+ },
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D0F2F",
+   "expect": "3235007365744d756c74695468726f7567684d6f6465004d32360073746172744d756c74695468726f756768004d3237006765744d756c74695468726f756768437572736f72004d3238006170657274757265446f776e004d3239006368616e6765446972656374696f6e004d333000676574446972656374696f",
+   "new": "f1eaf8fedcdd20bf0f0000084220fa2e1803bf00c862fa223404f004f82550f0f1831baf00c848fcaccce82b60a000c914dd4d4383ff0000fcc8c0c62d00c6050cca2cddda0f0000000442088025420cfccce025bf7e42043c2010dd7f541400f0743d21109cdd5bb51300f0189c8cdd93f81c00e0105820df002c",
+   "_addr": "0x7EBF1F4F",
+   "_note": "new code in the segment-2 area: T_INIT, T_UPD (123 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1F4C",
+   "expect": "4d6f6465006a3033006765744c69666554657374436f756e74006a30340061626f72744c69666554657374006b3031007265676973746572436f6465006b3032006572617365436f6465006c30310067657441706956657273696f6e006c3032006765744e756d6265724f6653797374656d4e616d65006c30330067657453797374656d4e",
+   "new": "dd613383ff000082fcadcce82b60a500c818fca5c8e82b60f104fce0ffffff3ffcc880841e00c443fc89c8e82b60fcac96ea437e188514dd666485ffe010a000c929fca83e3a5060a000c8118004ddb06e94ff0004fc83cce82b60fcac96ea437e18ddd36485ffc00cfcaccce82b60fac058fdc203008155e4f8c403a064c3048064df0004",
+   "_addr": "0x7EBF2F6C",
+   "_note": "new code in the segment-2 area: T_BATT (133 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D154C",
+   "expect": "757272656e74004e30390067657453656c6563745069634e756d626572004e3130006572617365004e3131006368616e676550726f74656374004e31320063616e50726f74656374004e3133006368616e676550726f7465637453656c6563746564004e3134006973526573657276655072696e74004e31350069735072",
+   "new": "1080d300c825bf7e09000000d825bf7e0200000000000000160000000f0000000f00000002010000000000000000000001000000ffff0000070000000100000000000000000000000000000064000000010000000000000000000000080008004c002000080008004c002000000000000000000025006400250063000000",
+   "_addr": "0x7EBF256C",
+   "_note": "new data in the segment-2 area: label resource record RES (92 B), its two rectangles, 8 zero bytes, the format L\"%d%c\" (126 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x93FEFD",
+   "expect": "dd57cff8ff0008",
+   "new": "dd3210e9ff0008",
+   "_addr": "0x7ED60F1D",
+   "_note": "live-view panel (class 0x600A), end of the first refresh 0x7ED60A95: `call 0x7ecede74,[],8` -> `call T_INIT,[],8`"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x940357",
+   "expect": "ddfdcaf8ff0008",
+   "new": "ddda0be9ff0008",
+   "_addr": "0x7ED61377",
+   "_note": "live-view panel, end of the data-update refresh 0x7ED60F27: `call 0x7ecede74,[],8` -> `call T_UPD,[],8`"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x93FA25",
+   "expect": "8f01",
+   "new": "8f00",
+   "_addr": "0x7ED60A45",
+   "_note": "panel builder 0x7ED60A3E: `mov 1,d3` -> `mov 0,d3`: the child loop starts at index 0"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x93FA2F",
+   "expect": "8a04",
+   "new": "8a00",
+   "_addr": "0x7ED60A4F",
+   "_note": "panel builder: `mov 4,d2` -> `mov 0,d2`: table offset of index 0"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x4C7EB4",
+   "expect": "00000000",
+   "new": "6c25bf7e",
+   "_addr": "0x7E8E8ED4",
+   "_note": "initial value of the RAM word 0x602B8A14, index 0 of the panel's table of widget resources (a zero word, never read: the stock loop starts at index 1) -> the new record RES"
+  }
+ ]
+}

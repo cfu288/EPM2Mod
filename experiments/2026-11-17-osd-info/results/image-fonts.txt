@@ -1,0 +1,40 @@
+font 0 -
+font 1 table=7efb13c4 first image=104 chars=0123456789+-./:jx
+font 2 table=7efb17c4 first image=127 chars=0123456789"+-.Fx
+font 3 table=7efb1bc4 first image=138 chars=0123456789.x
+font 4 table=7efb1fc4 first image=667 chars=0123456789
+font 5 table=7efb23c4 first image=727 chars=0123456789.x
+font 6 table=7efb27c4 first image=639 chars=0123456789:
+font 7 table=7efb2bc4 first image=856 chars=0123456789:_m
+font 8 table=7efb2fc4 first image=698 chars=0123456789
+font 9 table=7efb33c4 first image=920 chars=0123456789-.:jx
+font 10 table=7efb37c4 first image=923 chars=0123456789"+-.:Fx
+font 11 table=7efb3bc4 first image=946 chars=0123456789-.:jx
+font 12 table=7efb3fc4 first image=991 chars=0123456789_m
+font 13 table=7efb43c4 first image=1013 chars=0123456789_m
+font 14 table=7efb47c4 first image=1130 chars=0123456789+-:_m
+font 15 table=7efb4bc4 first image=1111 chars=0123456789+-_m
+font 16 table=7efb4fc4 first image=1395 chars=0123456789a
+font 17 table=7efb53c4 first image=2311 chars=0123456789:ABCDEF
+font 18 table=7efb57c4 first image=1084 chars=0123456789_m
+font 19 table=7efb5bc4 first image=2632 chars=0123456789"+-.:F
+font 20 table=7efb5fc4 first image=1588 chars=0123456789"+-.:F
+font 21 table=7efb63c4 first image=1624 chars=0123456789"+-.:F
+font 22 table=7efb67c4 first image=2649 chars=0123456789+-:
+font 23 table=7efb6bc4 first image=1822 chars=0123456789+-:
+font 24 table=7efb6fc4 first image=1817 chars=0123456789+-:
+font 25 table=7efb73c4 first image=1898 chars=0123456789.x
+font 26 table=7efb77c4 first image=2107 chars=0123456789+-:_
+font 27 table=7efb7bc4 first image=2143 chars=0123456789+-_m
+font 28 table=7efb7fc4 first image=1297 chars=0123456789
+font 29 table=7efb83c4 first image=2226 chars=0123456789"+-.:F
+font 30 table=7efb87c4 first image=2744 chars=0123456789+-:
+font 31 table=6069fac8 first image=17 chars=[801][8bcc][ffff]
+font 32 -
+font 33 -
+font 34 -
+font 35 -
+font 36 table=7efb8c40 first image=0 chars=
+font 37 table=7efb8c40 first image=0 chars=
+font 38 table=7efb8c40 first image=0 chars=
+font 39 table=7efb8c40 first image=0 chars=
