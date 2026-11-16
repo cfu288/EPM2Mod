@@ -1,0 +1,10 @@
+reading F12c_doublex: 6578 patches; white balance applied R, B = [ 2.03125    1.         1.8359375]
+colour in the picture: max |R - G| = 0.0 codes
+camera - model   natural 1.68/1.20  skin 1.68/1.23  ColorChecker x5 EV 1.58/1.12  grays 1.57/1.07  hold-out 1.65/1.18  dense grays 1.52/1.04
+camera - target  natural 1.72/1.23  skin 1.73/1.28  ColorChecker x5 EV 1.63/1.16  grays 1.60/1.08  hold-out 1.69/1.21  dense grays 1.54/1.05
+model - target   natural 0.10/0.08  skin 0.12/0.09  ColorChecker x5 EV 0.15/0.12  grays 0.07/0.05  hold-out 0.10/0.08  dense grays 0.07/0.05
+camera - model in picture codes: mean +1.91, mean |.| 4.31, 95th percentile |.| 11.94
+  model value   0- 40:  693 patches, camera - model mean -5.75, spread in a patch 21.0 codes
+  model value  40-100: 1907 patches, camera - model mean -1.32, spread in a patch 19.3 codes
+  model value 100-180: 1991 patches, camera - model mean +1.93, spread in a patch 19.5 codes
+  model value 180-256: 1987 patches, camera - model mean +7.65, spread in a patch 12.7 codes

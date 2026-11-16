@@ -172,3 +172,21 @@ experiments/2026-11-16-films-max/scripts/screens.sh builds/films-12-bw.json
 
 `scripts/monolib.py` is the model; `results/grain-transfer.json` holds the measured g; `scripts/apply_only.py`
 applies a build's specs to a scratch file for emulator runs (no checks; not for a camera).
+
+## Camera result 1 (2026-11-16): the fit holds, with too much contrast at the ends
+
+The owner developed the test RAW in the Double-X entry of `debug-log-films-12c` (RAW Data Edit). Reading:
+`results/camera-measure-1.txt` (`scripts/measure_camera.py`).
+
+| | natural | skin | ColorChecker ×5 | grays |
+|---|---|---|---|---|
+| camera against the target, mean \|ΔL*\| / ΔE2000 | 1.72 / 1.23 | 1.73 / 1.28 | 1.63 / 1.16 | 1.60 / 1.08 |
+| camera against the model | 1.68 / 1.20 | 1.68 / 1.23 | 1.58 / 1.12 | 1.57 / 1.07 |
+| model against the target | 0.10 / 0.08 | 0.12 / 0.09 | 0.15 / 0.12 | 0.07 / 0.05 |
+
+- The picture has no colour (R = G in every patch) and normal mid tones: the grain program uses the table as
+  read from the code (V).
+- The error is systematic: against the model the camera is 5.8 codes darker below value 40 and 7.7 codes lighter
+  above value 180, and within 2 codes between. These are the ends where the transfer g of the grain program was
+  not measured. A second fit with g taken from this reading should remove most of it.
+- Grain: the spread inside a mid-grey patch is 19 to 21 codes; the prediction was about 20 (V).
