@@ -18,7 +18,7 @@ All firmware that goes on a camera is made this way. The procedure for a new bui
 <!-- BEGIN GENERATED: builds -->
 | Build | What | Patch specs | Camera-tested | sha256 |
 |---|---|---|---|---|
-| `films-12d` (pinned) | Twelve film looks in the art-filter entries (eleven colour films and Kodak Double-X in black-and-white), named in all 34 languages; interval shooting with up to 240 frames; the level gauge with Level Adjust; focus peaking with the setting Off / White / Red / Yellow / Blue | 26 | 2026-11-16 | `2cdd18e7004821b2e443ec4f08db06ab9a0d4f0f700ab53db8c4bbc1dad93e32` |
+| `films-12d` (pinned) | Film simulations in the twelve art filter entries (eleven colour films and Kodak Double-X in black-and-white), interval shooting with up to 240 frames, a level gauge with calibration, and focus peaking | 26 | 2026-11-16 | `2cdd18e7004821b2e443ec4f08db06ab9a0d4f0f700ab53db8c4bbc1dad93e32` |
 | `debug-log` | DEBUG build, not for normal use: the pinned build peaking-colours with the structured log (records to EPM2LOG.BIN on the card; decode with `epm2mod log`) | 18 | 2026-11-15 | `e74f1aece22a2846b79a3a8b858ade531d3f7a37ef8f25908c34ed52c87bbda8` |
 | `peaking-colours` | Seven film looks named in all 34 languages, interval shooting with up to 240 frames, the level gauge with Level Adjust, and focus peaking with the setting Off / White / Red / Yellow / Blue | 16 | 2026-11-15 | `4d6b1f26ed92d66b62b4d7dc32d26168e33fd8b153a7655d6c0d9a58267456f8` |
 | `peaking-direct-4` | Focus peaking, fourth build: light edge lines in live view while MF Assist runs, on top of the build seven-films-6-interval-240-level-adjust. Fixes the crash of peaking-direct-3 at the Velvia entry | 12 | 2026-11-14 | `eea187a958de410bca0448367408998099fde177548d0b9010baf510a3452482` |

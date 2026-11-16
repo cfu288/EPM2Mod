@@ -1,11 +1,14 @@
-# Film looks
+# Film Simulations
 
-The twelve art filters are replaced by film looks. They work for photos and live view.
+The twelve art filters are replaced with film simulations. They work for photos and live view.
 
-**To use one:** in P, A, S or M mode, press **OK**, select **Picture Mode**, and move right past
-Custom to the look. The looks are also in the **ART** mode list.
+## Usage
+
+In P, A, S or M mode, press **OK**, select **Picture Mode**, and scroll right past Custom. The film simulations are also in the **ART** mode list.
 
 <img src="../images/ui/quick-menu-portra.png" width="320" alt="The quick menu with Picture Mode on Portra 400">
+
+## Available Films
 
 <!-- BEGIN GENERATED: films -->
 | Menu name | Film | Replaces |
@@ -24,11 +27,11 @@ Custom to the look. The looks are also in the **ART** mode list.
 | Vis 500T | Kodak Vision3 500T (cinema negative, on Kodak 2383 print film) | Watercolor |
 <!-- END GENERATED: films -->
 
-**Limits**
+## Limits
 
-- Colour and tone only: no halation. Only **Double-X** has grain.
-- A movie gets only a part of each look.
+- The simulations change colour and tone only. There is no halation, and only **Double-X** has grain.
+- Movies only get part of each simulation.
 - Filter Type and Add Effects do nothing in Double-X, Provia, Portra 160, Gold 200 and Vis 500T.
-- The stock art filters are not in this build.
+- The original art filters are not available in this build.
 
-How the looks were made and measured: [../film-emulation.md](../film-emulation.md).
+For how the simulations were made and measured, see [film emulation](../film-emulation.md).

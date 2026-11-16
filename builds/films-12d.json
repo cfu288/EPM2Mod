@@ -1,5 +1,5 @@
 {
- "what": "Twelve film looks in the art-filter entries (eleven colour films and Kodak Double-X in black-and-white), named in all 34 languages; interval shooting with up to 240 frames; the level gauge with Level Adjust; focus peaking with the setting Off / White / Red / Yellow / Blue",
+ "what": "Film simulations in the twelve art filter entries (eleven colour films and Kodak Double-X in black-and-white), interval shooting with up to 240 frames, a level gauge with calibration, and focus peaking",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",

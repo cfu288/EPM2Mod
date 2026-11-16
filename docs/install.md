@@ -1,7 +1,7 @@
 # Install
 
 <!-- BEGIN GENERATED: pinned-build -->
-The pinned build is **`films-12d`**: twelve film looks in the art-filter entries (eleven colour films and Kodak Double-X in black-and-white), named in all 34 languages; interval shooting with up to 240 frames; the level gauge with Level Adjust; focus peaking with the setting Off / White / Red / Yellow / Blue. We tested this build on a real E-PM2 on 2026-11-16 ([camera log](camera-log.md)).
+The pinned build is **`films-12d`**: film simulations in the twelve art filter entries (eleven colour films and Kodak Double-X in black-and-white), interval shooting with up to 240 frames, a level gauge with calibration, and focus peaking. We tested this build on a real E-PM2 on 2026-11-16 ([camera log](camera-log.md)).
 
 | | sha256 |
 |---|---|
@@ -9,30 +9,28 @@ The pinned build is **`films-12d`**: twelve film looks in the art-filter entries
 | Pinned build, `films-12d` | `2cdd18e7004821b2e443ec4f08db06ab9a0d4f0f700ab53db8c4bbc1dad93e32` |
 <!-- END GENERATED: pinned-build -->
 
-The steps are in the [README](../README.md#install).
+The install steps are in the [README](../README.md#install).
 
 ## Checksums
 
-The build stops if its sha256 differs from the value above, so you do not need to compare it by
-hand. With `--card DIR`, the script also reads the copy back from `DIR/DCOLYMP/`.
+The build script verifies the checksum itself and stops if it does not match. With `--card`, it also verifies the copy on the SD card.
 
-## The lamp
+## Restore Original Firmware
 
-On this camera the lamp was steady for 70 to 100 seconds, and then it blinked until the camera was
-switched off. No update has failed so far, so there is no tested advice for a lamp that never
-blinks.
+1. To download the original Olympus firmware, run
 
-## After the update
+   ```sh
+   uv run tools/fetch_stock.py
+   ```
 
-The camera keeps its settings. The level calibration and the Peaking setting stayed the same over
-four updates. The file can stay on the card, because the camera reads it only when you hold **OK**
-at power-on.
+   This writes `firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN`.
+2. Copy that file to the SD card as `DCOLYMP/E1019999.BIN`.
+3. Flash it the same way as the mod (step 3 of the [README](../README.md#install)).
 
-## Going back to the original firmware
+## Notes
 
-Run `uv run tools/fetch_stock.py`. Copy `firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN` to the
-card as `DCOLYMP/E1019999.BIN`. Then do steps 3 and 4 of the README. This way back was used on this
-camera on 2026-11-08.
+- Your camera settings are kept when you flash.
+- You can leave the firmware file on the card. The camera only reads it when you hold **OK** while switching on.
+- Only use firmware built for the E-PM2.
 
-Use only a firmware file that is for the E-PM2. [flashing.md](flashing.md) explains how the update
-works and gives the sources.
+For how the update process works, see [flashing](flashing.md).
