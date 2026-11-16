@@ -807,6 +807,27 @@ class Space:
             free.append((p, a.hi))
         return rows, cur, merge(hist), free
 
+    def is_overlay(self, path, op, lo, hi):
+        """True if the ledgered spec `path` is an edit of this op's bytes in lo..hi: where its ops meet the range,
+        their `expect` is what `op` writes there. Such a spec is made to go on top of the op's spec (a later
+        change of the same routine or table). A build without it does not collide with it."""
+        other = next((s for s in self.specs if s.path == path), None)
+        if other is None:
+            return False
+        met = False
+        for q in other.ops:
+            if q.clo is None:
+                continue
+            qlo, qhi = BASE + q.off, BASE + q.off + len(q.new)
+            x, y = max(lo, qlo), min(hi, qhi)
+            if x >= y:
+                continue
+            met = True
+            a0 = BASE + op.off
+            if q.expect[x - qlo:y - qlo] != op.new[x - a0:y - a0]:
+                return False
+        return met
+
     # ---- code evidence
     def code_evidence(self, a):
         """Camera-tested specs with a relative jmp/call from outside the area into it."""
@@ -1047,7 +1068,7 @@ def check_specs(sp, specs, out=print, first_code=False):
                 for path, cls, segs in a.ledger_rows:
                     if path in given or not any(x < hi and y > lo for x, y in segs):
                         continue
-                    if cls == "current":
+                    if cls == "current" and not sp.is_overlay(path, o, lo, hi):
                         problems.append("overlaps ledgered spec %s" % path)
                 notes = []
                 if first and first_code:
@@ -1344,8 +1365,10 @@ def selftest():
     u = sp.analyse(sp.area_at(0x7E881100))
     t("0x7E881100 is 0xFF but not loaded (REJECT)", u.verdict == "REJECT" and u.failing == ["loaded"])
     t("a fake spec that writes there FAILs", check_specs(sp, [fake2], quiet) == 1)
+    # bytes that no spec uses today, in the first area that still has some
+    a, spot = next((x, lo) for x in map(sp.analyse, sp.areas) for lo, hi in x.free_runs if hi - lo >= 8)
     fake3 = Spec("selftest/free.json", dict(base, name="fake-free", ops=[
-        {"type": "bytes", "block": 0, "offset": hex(0x7E4C9400 - BASE), "expect": "ff" * 8, "new": "11" * 8}]))
+        {"type": "bytes", "block": 0, "offset": hex(spot - BASE), "expect": "ff" * 8, "new": "11" * 8}]))
     t("a fake spec in free loaded padding passes when its area is usable",
       (check_specs(sp, [fake3], quiet) == 0) == (a.verdict in ("USABLE-DATA", "USABLE-CODE", "USED")))
     bad = dict(SITES)
