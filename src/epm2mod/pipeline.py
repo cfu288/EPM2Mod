@@ -27,9 +27,9 @@ What ``make`` guarantees about files:
 * On the SD card the new file replaces an older one only when it is complete
   and was read back from the card. The card is never given a part of a file
   under the camera's file name.
-* ``--out`` takes any folder that exists (the top folder of the SD card, or
-  another folder). A path that does not exist is an error, so a mistyped path
-  is not reported as a copy.
+* ``--card`` takes any folder that exists (the top folder of the SD card, or
+  a folder that stands for it). A path that does not exist is an error, so a
+  mistyped path is not reported as a copy. ``--out`` writes one file.
 
 These guarantees hold when a step fails and when the run is stopped by Ctrl-C
 or by a termination signal that the command line turns into an interrupt
@@ -374,16 +374,21 @@ def make(
     card: Path | None = None,
     log: Log = silent,
     stock: StockFirmware = EPM2_V16,
+    output: Path | None = None,
 ) -> MakeResult:
     """Make a firmware build.
 
     Args:
         paths: the repository.
         description: the build to make.
-        card: a folder to copy the firmware to (the top folder of the SD card,
-            or another folder), or None.
+        card: the top folder of an SD card (or a folder that stands for it):
+            the firmware is also written to ``card/DCOLYMP/`` under the
+            camera's file name. None for no such copy.
         log: where progress lines go.
         stock: the stock firmware the build starts from.
+        output: a path for one more copy of the firmware file, or None. If it
+            is a folder that exists, the file goes into it under the camera's
+            file name.
 
     Returns:
         The paths of what was written, and the SHA-256.
@@ -442,6 +447,10 @@ def make(
                 log("    " + line)
         write_bytes(card_copy, applied.image, BuildError, read_back=True)
         on_card = copy_to_card(applied.image, card, stock) if card is not None else None
+        extra = None
+        if output is not None:
+            extra = output / card_copy.name if output.is_dir() else output
+            write_bytes(extra, applied.image, BuildError, read_back=True)
     except BaseException:
         clear_outputs(paths, description.name)
         raise
@@ -450,8 +459,10 @@ def make(
         f"    firmware: {paths.relative(image)}    "
         f"for the card: {paths.relative(card_copy)}"
     )
+    if extra is not None:
+        log(f"    also written: {extra}")
     if on_card is not None:
-        log(f"copied to: {on_card}  (written, flushed and read back)")
+        log(f"on the card: {on_card}  (written, flushed and read back)")
         if hidden:
             log(
                 f"    note: {on_card.parent} also holds {', '.join(hidden[:4])}. "

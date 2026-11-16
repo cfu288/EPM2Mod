@@ -1195,9 +1195,21 @@ class MakeTests(RepoCase):
         self.assertEqual(result.on_card, target)
         self.assertEqual(target.read_bytes(), result.image.read_bytes())
         text = "\n".join(lines)
-        self.assertIn("copied to:", text)
+        self.assertIn("on the card:", text)
         self.assertIn("Copy the folder DCOLYMP", text)  # not a card: no "Eject"
         self.assertNotIn("Eject", text)
+
+    def test_out_writes_one_file(self) -> None:
+        folder = self.card.parent / "elsewhere"
+        folder.mkdir()
+        named = folder / "mod.bin"
+        result = self.make(self.repo.tested, output=named)
+        self.assertEqual(named.read_bytes(), result.image.read_bytes())
+        self.assertEqual([p.name for p in folder.iterdir()], ["mod.bin"])
+        self.make(self.repo.tested, output=folder)  # a folder: the camera's file name
+        self.assertEqual(
+            sorted(p.name for p in folder.iterdir()), ["E1019999.BIN", "mod.bin"]
+        )
 
     def test_a_folder_that_does_not_exist_is_refused(self) -> None:
         with self.assertRaisesRegex(BuildError, "no such folder"):

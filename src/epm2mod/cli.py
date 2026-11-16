@@ -2,7 +2,7 @@
 
 ::
 
-    epm2mod make [BUILD.json] [--out DIR]         make a firmware build
+    epm2mod make [BUILD.json] [--out FILE] [--card DIR]   make a firmware build
     epm2mod pin BUILD.json --date D --sha256 H    record a passed camera test; pin the build
     epm2mod fetch-stock                           download and check the stock firmware
     epm2mod builds                                list the build descriptions
@@ -82,14 +82,17 @@ def _make(args: argparse.Namespace, paths: RepoPaths) -> int:
     named = Path(args.build) if args.build is not None else pinned_path(paths)
     clear_outputs(paths, named.stem)
     if args.card == "":
-        raise BuildError("--out needs a folder")
+        raise BuildError("--card needs the top folder of the SD card")
+    if args.out == "":
+        raise BuildError("--out needs a path")
     description = (
         pinned_description(paths)
         if args.build is None
         else _description(paths, args.build)
     )
     card = None if args.card is None else Path(args.card)
-    make(paths, description, card=card, log=print, stock=EPM2_V16)
+    output = None if args.out is None else Path(args.out)
+    make(paths, description, card=card, log=print, stock=EPM2_V16, output=output)
     return 0
 
 
@@ -252,11 +255,15 @@ def build_parser() -> argparse.ArgumentParser:
     make_cmd.add_argument(
         "-o",
         "--out",
+        metavar="FILE",
+        help="also write the firmware file to FILE (in a folder: under the "
+        "camera's file name, E1019999.BIN)",
+    )
+    make_cmd.add_argument(
         "--card",
-        dest="card",
         metavar="DIR",
-        help="also copy the firmware to DIR/DCOLYMP/E1019999.BIN: DIR is the top "
-        "folder of the SD card, or any folder that exists (--card is the same)",
+        help="also put the firmware on an SD card: DIR is the top folder of the "
+        "card (any folder works); the file is written to DIR/DCOLYMP/E1019999.BIN",
     )
 
     pin_cmd = command(

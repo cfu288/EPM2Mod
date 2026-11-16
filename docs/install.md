@@ -14,7 +14,7 @@ The steps are in the [README](../README.md#install).
 ## Checksums
 
 The build stops if its sha256 differs from the value above, so you do not need to compare it by
-hand. With `--out DIR`, the script also reads the copy back from `DIR/DCOLYMP/`.
+hand. With `--card DIR`, the script also reads the copy back from `DIR/DCOLYMP/`.
 
 ## The lamp
 
