@@ -1,5 +1,5 @@
 {
- "what": "CANDIDATE, not camera-tested: the candidate films-12c (twelve looks with Double-X in the Grainy Film entry, and the save guard of focus peaking) with the second fit of Double-X: patches/films12bw-doublex2.json after patches/films12bw-doublex.json (a new grain table, made after the first camera measurement)",
+ "what": "Twelve film looks in the art-filter entries (eleven colour films and Kodak Double-X in black-and-white), named in all 34 languages; interval shooting with up to 240 frames; the level gauge with Level Adjust; focus peaking with the setting Off / White / Red / Yellow / Blue",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",
@@ -27,5 +27,7 @@
   "patches/films12-entry-key-line.json",
   "patches/films12-entry-watercolor.json",
   "patches/peaking-save-guard.json"
- ]
+ ],
+ "sha256": "2cdd18e7004821b2e443ec4f08db06ab9a0d4f0f700ab53db8c4bbc1dad93e32",
+ "camera_tested": "2026-11-16"
 }

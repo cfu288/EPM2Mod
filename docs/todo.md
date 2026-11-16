@@ -12,10 +12,10 @@ and delete the item here.
 
 ## Focus peaking
 
-- **Crash at a focus-ring turn after a shot: the fix is built** (`patches/peaking-save-guard.json`).
-  The pinned build `peaking-fast` has the fault. Test `debug-log-films-12c` (or
-  `debug-log-peaking-fast-2`) on the camera, then pin a fixed build. Two small windows stay open
-  (NOTES §18.5). The proven kernel code area is full (18 bytes left with all specs counted).
+- The crash at a focus-ring turn after a shot is fixed in the pinned build (save guard; five clean
+  tries on the camera, 2026-11-16). Two small windows stay open (NOTES §18.5). The proven kernel
+  code area is full (18 bytes left with all specs counted): the next early-loaded code needs a new
+  area. The log's build id names the dictionary, not the firmware: put a firmware id in `boot`.
 - More than 10 frames per second of peaking needs a shorter pass list or the 50 ms frame class
   (NOTES §17). `peaking-fast` is the pinned build (2026-11-15).
 - Peaking without the zoom: the trigger is the MF Assist state object, which also asks for the zoom.
@@ -28,11 +28,12 @@ and delete the item here.
 
 ## Film looks
 
-- Test `debug-log-films-12` on the camera (twelve films; steps in
-  `experiments/2026-11-16-films-max/NOTES.md` §7). Open before it can be the pinned build: a stored selection of one of
-  the five old filters keeps the old filter until a Picture Mode is chosen once; Filter Type and
-  Add Effects do nothing in the five entries; the guide's film table must take the twelve names. Twelve is the limit without more code: all five free art
-  codes are used. Storage is not the limit.
+- `films-12d` is the pinned build (2026-11-16): twelve films with Double-X, and the peaking save
+  guard. Not yet reported from the camera: movie mode and ART shooting mode in the five new entries,
+  an interval sequence with the ring turning, a flash of the log-free bytes. Open: a selection of an
+  old filter stored before the flash keeps that filter until a Picture Mode is chosen; Filter Type
+  and Add Effects do nothing in the five entries; Double-X is fifth in the list, not last; the
+  second Double-X fit has no chart measurement; stock-strength grain needs about 40 bytes of code.
 - Type II of Portra, Pro 400H and Superia is the same as type I, and is not tested on the camera.
 - The published test RAW files (owner name and serial numbers blanked) are not yet developed on the
   camera.

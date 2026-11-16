@@ -13,4 +13,4 @@ Repository containing the current work for creating a custom firmware mod for th
 
 **Install:** [docs/install.md](docs/install.md) · **Developers:** [docs/conventions.md](docs/conventions.md)
 
-![Eight photos, each developed in the camera with stock Natural and the seven film looks](docs/images/film-sim-comparison.jpg)
+![One photo developed in the camera with stock Natural and the twelve film looks](docs/images/film-sim-comparison.jpg)

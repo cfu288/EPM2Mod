@@ -1,12 +1,12 @@
 # Install
 
 <!-- BEGIN GENERATED: pinned-build -->
-The pinned build is **`peaking-fast`**: seven film looks named in all 34 languages, interval shooting with up to 240 frames, the level gauge with Level Adjust, and focus peaking with the setting Off / White / Red / Yellow / Blue at 10 frames per second. We tested this build on a real E-PM2 on 2026-11-15 ([camera log](camera-log.md)).
+The pinned build is **`films-12d`**: twelve film looks in the art-filter entries (eleven colour films and Kodak Double-X in black-and-white), named in all 34 languages; interval shooting with up to 240 frames; the level gauge with Level Adjust; focus peaking with the setting Off / White / Red / Yellow / Blue. We tested this build on a real E-PM2 on 2026-11-16 ([camera log](camera-log.md)).
 
 | | sha256 |
 |---|---|
 | Stock firmware, `OLY_E_101_1600_0000_0000.BIN` | `34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300` |
-| Pinned build, `peaking-fast` | `0e8a25b9578b8119b14b4895be7d2a0b70d7315e5e817758699777f0f31d917e` |
+| Pinned build, `films-12d` | `2cdd18e7004821b2e443ec4f08db06ab9a0d4f0f700ab53db8c4bbc1dad93e32` |
 <!-- END GENERATED: pinned-build -->
 
 **Use this firmware at your own risk.** It is unofficial and only for the E-PM2 with firmware 1.6

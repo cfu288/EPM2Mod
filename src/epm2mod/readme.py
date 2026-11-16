@@ -16,6 +16,7 @@ fails if a document is not up to date.
 
 from __future__ import annotations
 
+import dataclasses
 import re
 from collections.abc import Callable
 from pathlib import Path
@@ -23,7 +24,7 @@ from pathlib import Path
 from .builds import all_descriptions, pinned_description
 from .errors import BuildError
 from .fileio import read_text, write_text
-from .looks.films import load_films
+from .looks.films import Film, load_bw_films, load_films, load_more_films
 from .paths import RepoPaths
 from .stock import EPM2_V16
 
@@ -77,12 +78,60 @@ def builds_block(paths: RepoPaths) -> str:
     return head + "\n".join(rows) + "\n"
 
 
+#: The art-filter entries in the order of the stock menu.
+_STOCK_ORDER = (
+    "Pop Art",
+    "Soft Focus",
+    "Pale&Light Color",
+    "Light Tone",
+    "Grainy Film",
+    "Pin Hole",
+    "Diorama",
+    "Cross Process",
+    "Gentle Sepia",
+    "Dramatic Tone",
+    "Key Line",
+    "Watercolor",
+)
+#: The spec that names the first Portra entry "Portra 400" (the twelve-film builds).
+_TWELVE_NAMES = "patches/films12bw-names.json"
+
+
+def pinned_films(paths: RepoPaths) -> list[tuple[str, Film]]:
+    """Return the film looks of the pinned build: (menu name, film), in menu order.
+
+    A build with the first seven films takes them from ``looks/films.json``.
+    A twelve-film build adds the films of ``looks/more-films.json`` as
+    ``looks/films-12-bw.json`` arranges them: the black-and-white film is in
+    its entry, the colour film of that entry is in ``moved_to``, and the film
+    that ``moved_to`` had is not in the build.
+    """
+    seven = load_films(paths).films
+    if _TWELVE_NAMES not in pinned_description(paths).specs:
+        return [(film.label, film) for film in seven]
+    more = {film.entry: film for film in load_more_films(paths).films}
+    black_and_white = load_bw_films(paths)
+    by_entry = {film.entry: film for film in seven}
+    displaced = more.pop(black_and_white.mono.entry)
+    more[black_and_white.moved_to] = dataclasses.replace(
+        displaced, entry=black_and_white.moved_to
+    )
+    by_entry.update(more)
+    by_entry[black_and_white.mono.entry] = black_and_white.mono
+    rows = []
+    for entry in _STOCK_ORDER:
+        film = by_entry[entry]
+        label = "Portra 400" if film.label == "Portra" else film.label
+        rows.append((label, film))
+    return rows
+
+
 def films_block(paths: RepoPaths) -> str:
     """Return the table of film looks: menu name, film, the entry it replaces."""
     rows = [
-        f"| {cell(film.label)} | {cell(film.film)} ({cell(film.medium)}) "
+        f"| {cell(label)} | {cell(film.film)} ({cell(film.medium)}) "
         f"| {cell(film.entry)} |"
-        for film in load_films(paths).films
+        for label, film in pinned_films(paths)
     ]
     return "| Menu name | Film | Replaces |\n|---|---|---|\n" + "\n".join(rows) + "\n"
 
