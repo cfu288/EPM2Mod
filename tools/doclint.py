@@ -12,7 +12,8 @@ Rules, and the files each one covers:
 2. A heading has no punctuation (: ; , ! ? ( ) and dashes) and no full stop at its end:
    the files of rule 1, every other README.md outside experiments/, AGENTS.md, NOTICE.md,
    docs/conventions.md, docs/feasibility.md, docs/todo.md.
-3. The root README.md is an index: at most 20 lines and no heading below the title.
+3. The root README.md is an index with the short install steps: at most 35 lines, and the only
+   heading below the title is "## Install".
 4. A guide is short and shows the screen: docs/guide/*.md has at most 40 lines and one or more
    pictures. docs/install.md has at most 45 lines.
 
@@ -31,7 +32,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STE = os.path.join(ROOT, "tools", "third_party", "ste100", "ste_lint.py")
 PROSE = ["README.md", "docs/install.md", "docs/guide/*.md"]
 HEADINGS = PROSE + ["AGENTS.md", "NOTICE.md", "docs/conventions.md", "docs/feasibility.md", "docs/todo.md"]
-ROOT_README_LINES = 20
+ROOT_README_LINES = 35
+ROOT_README_SECTIONS = {"## Install"}
 MAX_LINES = {"docs/guide/*.md": 40, "docs/install.md": 45}
 HEADING_PUNCTUATION = re.compile(r"[:;,!?()—–]|\.\s*$")
 
@@ -93,8 +95,9 @@ def check(path, text):
         if count > ROOT_README_LINES:
             problems.append("README.md: %d lines. The root README is an index: at most %d lines. "
                             "Put the text in docs/guide/ or docs/." % (count, ROOT_README_LINES))
-        if any(re.match(r"#{2,6} ", line) for line in lines):
-            problems.append("README.md: the root README has no sections below the title")
+        if any(re.match(r"#{2,6} ", line) and line.strip() not in ROOT_README_SECTIONS for line in lines):
+            problems.append("README.md: the root README has no sections below the title but: %s"
+                            % ", ".join(sorted(ROOT_README_SECTIONS)))
     for pattern, limit in MAX_LINES.items():
         if fnmatch.fnmatch(path, pattern) and count > limit:
             problems.append("%s: %d lines, at most %d. Cut it." % (path, count, limit))
@@ -110,8 +113,9 @@ def selftest():
     found = "\n".join(check("docs/guide/x.md", bad))
     for word in ("heading with punctuation", "semicolon", "screenshots"):
         assert word in found, (word, found)
-    assert "at most" in "\n".join(check("README.md", "# T\n" + "x\n" * 30))
+    assert "at most" in "\n".join(check("README.md", "# T\n" + "x\n" * 40))
     assert "no sections" in "\n".join(check("README.md", "# T\n\n## More\n"))
+    assert check("README.md", "# T\n\n## Install\n") == []
     table = "# T\n\n| a; b | c |\n\n<!-- BEGIN GENERATED: films -->\nx; y\n<!-- END GENERATED: films -->\n\n![p](q.png)\n"
     assert check("docs/guide/x.md", table) == [], check("docs/guide/x.md", table)
     assert check("experiments/x/README.md", bad) == [] and not in_scope("experiments/x/README.md")

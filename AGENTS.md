@@ -43,7 +43,7 @@ and remove an item when it is done.
    pin the build (`uv run epm2mod pin ...`), run `uv run epm2mod readme`, write or update the
    feature's guide in `docs/guide/` (how to switch it on and use it, emulator screenshots, limits),
    add one line with a link to the feature list in `README.md`, and update the camera log and
-   `docs/feasibility.md`. The root `README.md` is only an index: it does not explain how to use a
+   `docs/feasibility.md`. The root `README.md` is an index with the short install steps: it does not explain how to use a
    feature. A feature that works but has no guide is not finished.
 8. **Keep the real safety steps:** make firmware only with `tools/make_firmware.py` from a build
    description, log each flash in `docs/camera-log.md` before and after, keep the stock file at
