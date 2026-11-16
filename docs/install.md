@@ -16,7 +16,7 @@ for another camera on the card.
 You need [uv](https://docs.astral.sh/uv/getting-started/installation/), an SD card and a full
 battery.
 
-1. Get this repository (**Code → Download ZIP**, or `git clone`) and open a terminal in its folder.
+1. Open a terminal in the folder of this repository.
 2. Put the SD card in the computer. Run this command with the location of the card:
 
    ```bash

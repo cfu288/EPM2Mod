@@ -13,13 +13,10 @@ Repository containing the current work for creating a custom firmware mod for th
 
 ## Install
 
-For an E-PM2 with firmware 1.6. You need [uv](https://docs.astral.sh/uv/getting-started/installation/), an SD card and a full battery. Use this firmware at your own risk.
+```sh
+uv run tools/make_firmware.py --card /Volumes/NAME
+```
 
-1. Get this repository (**Code → Download ZIP**, or `git clone`) and open a terminal in its folder.
-2. Put the SD card in the computer. Run `uv run tools/make_firmware.py --card /Volumes/NAME` with the location of the card. The script downloads the maker's firmware, applies the patches, checks the result and writes it to the card.
-3. Put the card in the camera. With the camera off, hold **OK** and switch the camera on.
-4. The lamp is orange for about one minute. When it blinks, switch the camera off and on.
-
-Checksums, how to go back to the original firmware, and recovery: [docs/install.md](docs/install.md). For developers: [docs/conventions.md](docs/conventions.md).
+This command makes the patched firmware from Olympus's own file and writes it to your SD card. Put the card in the camera, hold **OK**, and switch the camera on. For an E-PM2 with firmware 1.6, at your own risk. More: [docs/install.md](docs/install.md).
 
 ![Nine photos, each developed in the camera with stock Natural and the film looks](docs/images/film-sim-comparison.jpg)
