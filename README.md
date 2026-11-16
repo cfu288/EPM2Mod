@@ -6,12 +6,12 @@ Repository containing the current work for creating a custom firmware mod for th
 
 ## Added Features
 
-| Feature | Guide | Status |
-|---|---|---|
-| Film simulations | [docs/guide/film-looks.md](docs/guide/film-looks.md) | Tested on the camera |
-| Interval shooting | [docs/guide/interval-shooting.md](docs/guide/interval-shooting.md) | Tested on the camera |
-| Level gauge | [docs/guide/level-gauge.md](docs/guide/level-gauge.md) | Tested on the camera |
-| Focus peaking | [docs/guide/focus-peaking.md](docs/guide/focus-peaking.md) | Tested on the camera |
+| Feature | 
+|---|
+|  [Film simulations](docs/guide/film-looks.md) |
+|  [Interval shooting](docs/guide/interval-shooting.md) | 
+|  [Level gauge](docs/guide/level-gauge.md) | 
+|  [Focus peaking ](docs/guide/focus-peaking.md) | 
 
 ## Dependencies
 
@@ -27,8 +27,8 @@ This firmware is only for an E-PM2. The firmware is unofficial, and you use it a
    uv run tools/make_firmware.py
    ```
 
-   This downloads the Olympus firmware, applies the patches and writes `build/card/DCOLYMP/E1019999.BIN`.
-2. Copy the folder `build/card/DCOLYMP` to the top folder of an SD card, beside `DCIM`. `E1019999.BIN` must be the only file in `DCOLYMP`. If you add `--card /path/to/card` to the command in step 1, the script puts the file on the card for you.
+   This downloads the Olympus firmware, applies the patches and writes `build/card/DCOLYMP/E1019999.BIN`. To put the file on an SD card in the same run, add `--card /path/to/card`. Then skip step 2.
+2. Copy the folder `build/card/DCOLYMP` to the top folder of an SD card, beside `DCIM`. `E1019999.BIN` must be the only file in `DCOLYMP`.
 3. Put the card in the camera. With the camera off, hold **OK** and switch the camera on. An orange lamp shows the progress.
    - While the lamp is steady, the camera is writing the firmware. This takes 1 to 2 minutes. Do not switch the camera off.
    - When the lamp blinks, the update is done. Switch the camera off and on again.
