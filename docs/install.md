@@ -16,20 +16,18 @@ for another camera on the card.
 You need [uv](https://docs.astral.sh/uv/getting-started/installation/), an SD card and a full
 battery.
 
-1. Open a terminal in the folder of this repository.
-2. Put the SD card in the computer. Run this command with the location of the card:
+1. With the SD card in the computer, run:
 
    ```bash
    uv run tools/make_firmware.py --card /Volumes/NAME
    ```
 
    The script downloads the maker's firmware, applies the patches, checks the result and writes it
-   to the card. If a step fails, it stops with a message. This repository contains no firmware.
-3. Put the card in the camera. With the camera off, hold **OK** and switch the camera on.
-4. The lamp is orange for about one minute. Do not touch the camera. When the lamp blinks, switch
-   the camera off and on.
+   to the card. This repository contains no firmware.
+2. Put the card in the camera. With the camera off, hold **OK** and switch the camera on.
+3. The lamp is orange for about one minute. When it blinks, switch the camera off and on.
 
 **To go back to the original firmware:** run `uv run tools/fetch_stock.py`, copy the file that it
-names to the card as `DCOLYMP/E1019999.BIN`, then do steps 3 and 4.
+names to the card as `DCOLYMP/E1019999.BIN`, then do steps 2 and 3.
 
 More about the update and recovery: [flashing.md](flashing.md).
