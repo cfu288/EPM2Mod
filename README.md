@@ -11,14 +11,29 @@ Repository containing the current work for creating a custom firmware mod for th
 | Level gauge | [docs/guide/level-gauge.md](docs/guide/level-gauge.md) | Tested on the camera |
 | Focus peaking | [docs/guide/focus-peaking.md](docs/guide/focus-peaking.md) | Tested on the camera |
 
+## Dependencies
+
+[uv](https://docs.astral.sh/uv/getting-started/installation/), to run the build script. It gets Python for you.
+
 ## Install
 
-For an E-PM2 with firmware 1.6 only. Use it at your own risk.
+For an E-PM2 with firmware 1.6 (**Setup Menu → Firmware**). Unofficial, at your own risk. Use a full battery: an update that stops part-way can leave the camera unusable.
 
-1. Build the firmware: `uv run tools/make_firmware.py`. It downloads the Olympus firmware, applies the patches and writes `build/card/DCOLYMP/E1019999.BIN`.
-2. Copy that file to the SD card with the same folder and name: `DCOLYMP/E1019999.BIN`, with `DCOLYMP` in the top folder of the card. (`--card /path/to/card` on the command of step 1 does this copy.)
-3. With the camera off, hold **OK** and switch the camera on. The update takes about one minute.
+1. To build a copy of the firmware, run
 
-Checksums and how to go back to the original firmware: [docs/install.md](docs/install.md).
+   ```sh
+   uv run tools/make_firmware.py
+   ```
+
+   This downloads the Olympus firmware, applies the patches and writes `build/card/DCOLYMP/E1019999.BIN`.
+2. Copy the folder `build/card/DCOLYMP` to the top folder of an SD card, beside `DCIM`. `E1019999.BIN` must be the only file in `DCOLYMP`. With `--out /path/to/card`, the command of step 1 makes this copy: then eject the card.
+3. Card in, camera off. Hold **OK** and switch the camera on. An orange lamp lights:
+   - **Steady, 1 to 2 minutes:** the camera writes the firmware. Do not switch it off or open the battery door.
+   - **Blinking:** done. It blinks until you switch the camera off. Switch it off, then on.
+4. Check, in P, A, S or M mode: **OK → Picture Mode**, right past Custom, shows **Portra 400**.
+
+If the camera starts as usual in step 3, it wrote nothing. Check that `DCOLYMP` is in the top folder of the card and holds only `E1019999.BIN`, and that **OK** was held before you switched on.
+
+To go back to the original firmware: [docs/install.md](docs/install.md).
 
 ![Nine photos, each developed in the camera with stock Natural and the film looks](docs/images/film-sim-comparison.jpg)

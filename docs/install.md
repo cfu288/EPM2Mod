@@ -9,28 +9,21 @@ The pinned build is **`films-12d`**: twelve film looks in the art-filter entries
 | Pinned build, `films-12d` | `2cdd18e7004821b2e443ec4f08db06ab9a0d4f0f700ab53db8c4bbc1dad93e32` |
 <!-- END GENERATED: pinned-build -->
 
-**Use this firmware at your own risk.** It is unofficial and only for the E-PM2 with firmware 1.6
-(Setup Menu → Firmware). An interrupted update can make a camera unusable. Never put a firmware file
-for another camera on the card.
+The steps are in the [README](../README.md#install).
 
-You need [uv](https://docs.astral.sh/uv/getting-started/installation/), an SD card and a full
-battery.
+**Checksums.** The build stops if its sha256 differs from the value above, so no manual
+check is needed. With `--out DIR` the script also reads the copy back from `DIR/DCOLYMP/`.
 
-1. Build the firmware:
+**The lamp.** Recorded on this camera: steady for 70 to 100 seconds, then blinking until power-off
+(more than 20 minutes when left alone). No update has failed so far, so there is no tested advice
+for a lamp that never blinks.
 
-   ```bash
-   uv run tools/make_firmware.py
-   ```
+**After the update.** The camera keeps its settings: the level calibration and the Peaking setting
+stayed over four updates (logs of 2026-11-15 and 2026-11-16). The file can stay on the card: the
+camera reads it only when **OK** is held at power-on.
 
-   The script downloads the maker's firmware, applies the patches, checks the result and writes
-   `build/card/DCOLYMP/E1019999.BIN`. This repository contains no firmware.
-2. Copy that file to the SD card with the same folder and name: `DCOLYMP/E1019999.BIN`, with
-   `DCOLYMP` in the top folder of the card. With `--card /path/to/card`, the script of step 1 makes
-   this copy and checks it.
-3. Put the card in the camera. With the camera off, hold **OK** and switch the camera on.
-4. The lamp is orange for about one minute. When it blinks, switch the camera off and on.
+**To go back to the original firmware.** Run `uv run tools/fetch_stock.py`. Copy
+`firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN` to the card as `DCOLYMP/E1019999.BIN`, then do steps 3 and 4 of the README. This way back was
+used on this camera on 2026-11-08.
 
-**To go back to the original firmware:** run `uv run tools/fetch_stock.py`, copy the file that it
-names to the card as `DCOLYMP/E1019999.BIN`, then do steps 3 and 4.
-
-More about the update and recovery: [flashing.md](flashing.md).
+Use only a file for the E-PM2. How the update works, and the sources: [flashing.md](flashing.md).

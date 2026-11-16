@@ -12,8 +12,8 @@ Rules, and the files each one covers:
 2. A heading has no punctuation (: ; , ! ? ( ) and dashes) and no full stop at its end:
    the files of rule 1, every other README.md outside experiments/, AGENTS.md, NOTICE.md,
    docs/conventions.md, docs/feasibility.md, docs/todo.md.
-3. The root README.md is an index with the short install steps: at most 35 lines, and the only
-   heading below the title is "## Install".
+3. The root README.md is an index with the short install steps: at most 45 lines, and the only
+   headings below the title are "## Dependencies" and "## Install".
 4. A guide is short and shows the screen: docs/guide/*.md has at most 40 lines and one or more
    pictures. docs/install.md has at most 45 lines.
 
@@ -32,8 +32,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STE = os.path.join(ROOT, "tools", "third_party", "ste100", "ste_lint.py")
 PROSE = ["README.md", "docs/install.md", "docs/guide/*.md"]
 HEADINGS = PROSE + ["AGENTS.md", "NOTICE.md", "docs/conventions.md", "docs/feasibility.md", "docs/todo.md"]
-ROOT_README_LINES = 35
-ROOT_README_SECTIONS = {"## Install"}
+ROOT_README_LINES = 45
+ROOT_README_SECTIONS = {"## Dependencies", "## Install"}
 MAX_LINES = {"docs/guide/*.md": 40, "docs/install.md": 45}
 HEADING_PUNCTUATION = re.compile(r"[:;,!?()—–]|\.\s*$")
 
@@ -113,7 +113,7 @@ def selftest():
     found = "\n".join(check("docs/guide/x.md", bad))
     for word in ("heading with punctuation", "semicolon", "screenshots"):
         assert word in found, (word, found)
-    assert "at most" in "\n".join(check("README.md", "# T\n" + "x\n" * 40))
+    assert "at most" in "\n".join(check("README.md", "# T\n" + "x\n" * 50))
     assert "no sections" in "\n".join(check("README.md", "# T\n\n## More\n"))
     assert check("README.md", "# T\n\n## Install\n") == []
     table = "# T\n\n| a; b | c |\n\n<!-- BEGIN GENERATED: films -->\nx; y\n<!-- END GENERATED: films -->\n\n![p](q.png)\n"
