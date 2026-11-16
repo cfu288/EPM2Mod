@@ -63,6 +63,11 @@ class RepoPaths:
         return self.root / "looks" / "films.json"
 
     @property
+    def more_films(self) -> Path:
+        """The list of the film looks beyond the first seven."""
+        return self.root / "looks" / "more-films.json"
+
+    @property
     def free_space_tool(self) -> Path:
         """The script that checks where patch specs put new bytes."""
         return self.root / "tools" / "freespace.py"

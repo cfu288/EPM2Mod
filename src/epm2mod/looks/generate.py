@@ -222,14 +222,24 @@ def chroma_record(fit: Fit, where: str) -> bytes:
     return bytes(parts)
 
 
-def film_ops(program: Program, film: Film, fit: Fit) -> list[BytesOp]:
+def film_ops(
+    program: Program, film: Film, fit: Fit, slot: slots.Slot | None = None
+) -> list[BytesOp]:
     """Return the operations that write one film into its slot.
+
+    Args:
+        program: block 0 of the stock firmware.
+        film: the film.
+        fit: the arrays of the film's fit file.
+        slot: where the numbers go. The default is the slot of the film's
+            menu entry among the first seven.
 
     Raises:
         BuildError: if the fit lacks an array or holds values that do not fit.
     """
     where = film.fit
-    slot = slots.slot_for(film.entry)
+    if slot is None:
+        slot = slots.slot_for(film.entry)
     try:
         curves = np.asarray(_array(fit, "G", where), dtype=np.float64)
     except (TypeError, ValueError):
@@ -435,11 +445,32 @@ def _is_current(on_disk: dict[str, Any] | None, fields: dict[str, Any]) -> bool:
     }
 
 
+def generate_all(
+    paths: RepoPaths, stock: StockFirmware = EPM2_V16
+) -> list[GeneratedSpec]:
+    """Generate every film-look patch spec.
+
+    Returns:
+        The three specs of the first seven films and, if the repository has
+        ``looks/more-films.json``, the specs of the films beyond them.
+
+    Raises:
+        BuildError: if a film list or a fit file is wrong.
+        StockError: if the stock firmware is missing or is another file.
+    """
+    specs = generate(paths, stock)
+    if paths.more_films.exists():
+        from . import extra  # extra imports this module
+
+        specs += extra.generate(paths, stock)
+    return specs
+
+
 def stale(paths: RepoPaths, stock: StockFirmware = EPM2_V16) -> list[str]:
     """Return the paths of the spec files whose generated fields are out of date."""
     return [
         spec.path
-        for spec in generate(paths, stock)
+        for spec in generate_all(paths, stock)
         if not _is_current(_on_disk(paths, spec), spec.generated_fields(stock))
     ]
 
@@ -452,7 +483,7 @@ def write(paths: RepoPaths, stock: StockFirmware = EPM2_V16) -> list[str]:
     ``expected_sha256`` is removed: they described other bytes.
     """
     changed = []
-    for spec in generate(paths, stock):
+    for spec in generate_all(paths, stock):
         fields = spec.generated_fields(stock)
         on_disk = _on_disk(paths, spec)
         if _is_current(on_disk, fields):

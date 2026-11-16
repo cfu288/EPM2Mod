@@ -5,13 +5,24 @@
 - `fits/*.npz`: the fitted values of each look. One file holds three tone curves of 1,024 points, a
   saturation gain, six saturation values and six hue values, a 3 × 3 matrix, and two chroma curves.
 
-Do not edit the three film patch specs in `patches/` by hand. Change the data here, then run:
+- `more-films.json`: the films beyond the first seven (the candidate build `films-12`): which film goes in
+  which of the five other art-filter entries, its menu name and its fit file, and the names of the specs
+  that are generated from it: `films12-structure` (code and table entries), `films12-looks` (the looks)
+  and one `films12-entry-*` spec per menu entry. Leave an entry spec out of a build and that entry is the
+  stock art filter again. `fits/` also holds fits that no list uses yet (C200, Portra 800, UltraMax 400,
+  Verita 200D, Vision3 50D and 200T).
+
+The menu names of `more-films.json` in all 34 languages are a spec of their own, `patches/films12-names.json`.
+`experiments/2026-11-16-films-max/scripts/names_spec.py` makes it; the notes in that folder say how the
+slots work and how the fits were made.
+
+Do not edit the generated film patch specs in `patches/` by hand. Change the data here, then run:
 
 ```bash
 uv run epm2mod looks --write
 ```
 
-The command makes the three specs again from the data and the stock firmware. It needs numpy
+The command makes the specs of both lists again from the data and the stock firmware. It needs numpy
 (`uv run` installs it) and the stock firmware file (`uv run tools/fetch_stock.py`).
 `uv run epm2mod looks --check` only compares and changes nothing.
 

@@ -11,7 +11,7 @@ from ..fileio import read_bytes, read_json
 from ..hashing import sha256_bytes
 from ..paths import RepoPaths, is_repo_relative
 from ..spec import UTF16
-from .slots import SLOTS
+from .slots import EXTRA_SLOTS, SLOTS
 
 
 @dataclass(frozen=True)
@@ -23,7 +23,8 @@ class Film:
         film: the name of the film.
         medium: how the film was simulated (slide, or negative and print material).
         label: the name shown in the camera's menu. In UTF-16 it is not longer
-            than ``entry``, because it is written over that text in place.
+            than ``entry``: for the first seven films it is written over that
+            text in place.
         fit: path of the fit file, relative to the repository root.
     """
 
@@ -41,7 +42,8 @@ class Film:
                 cannot be written as UTF-16 or is longer than the entry, or
                 the fit path is not a plain path in the repository.
         """
-        if self.entry not in {slot.entry for slot in SLOTS}:
+        entries = {slot.entry for slot in SLOTS} | {slot.entry for slot in EXTRA_SLOTS}
+        if self.entry not in entries:
             raise BuildError(f"'{self.entry}' is not a film slot")
         try:
             label, entry = self.label.encode(UTF16), self.entry.encode(UTF16)
@@ -204,3 +206,120 @@ def specs_with_other_inputs(paths: RepoPaths) -> list[str]:
         if not isinstance(raw, dict) or raw.get("inputs_sha256") != digest:
             other.append(spec_path)
     return other
+
+
+@dataclass(frozen=True)
+class MoreFilmList:
+    """The content of ``looks/more-films.json``: the films beyond the first seven.
+
+    Attributes:
+        films: the films: one per extra slot, in menu order.
+        structure_spec: path of the patch spec with the code and table entries
+            that make the extra slots.
+        looks_spec: path of the patch spec that holds the looks.
+        entry_specs: one path per film: the patch spec that gives the film's
+            menu entry its hidden stored value. Without that spec the entry is
+            the stock art filter.
+    """
+
+    films: tuple[Film, ...]
+    structure_spec: str
+    looks_spec: str
+    entry_specs: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        """Check the list. Every instance is valid.
+
+        Raises:
+            BuildError: if the films are not one per extra slot in menu order,
+                there is not one entry spec per film, or two specs are the
+                same file.
+        """
+        expected = [slot.entry for slot in EXTRA_SLOTS]
+        if [film.entry for film in self.films] != expected:
+            raise BuildError(
+                "the films must be one per extra film slot, in menu order: "
+                + ", ".join(expected)
+            )
+        if len(self.entry_specs) != len(self.films):
+            raise BuildError("there must be one entry spec per film")
+        if len(set(self.spec_paths)) != len(self.spec_paths):
+            raise BuildError("the generated specs must be different files")
+
+    @property
+    def spec_paths(self) -> tuple[str, ...]:
+        """The paths of the structure spec, the looks spec and the entry specs."""
+        return (self.structure_spec, self.looks_spec, *self.entry_specs)
+
+
+_MORE_SPEC_KEYS = {"structure", "looks", "entries"}
+
+
+def _load_film(item: Any, where: str) -> Film:
+    """Return one film of a film list file."""
+    if not isinstance(item, dict):
+        raise BuildError(f"{where}: must be an object")
+    _closed(item, _FILM_KEYS, where)
+    try:
+        return Film(
+            entry=_text(item, "entry", where),
+            film=_text(item, "film", where),
+            medium=_text(item, "medium", where),
+            label=_text(item, "label", where),
+            fit=_text(item, "fit", where),
+        )
+    except BuildError as error:
+        text = str(error)
+        raise BuildError(
+            text if text.startswith(where) else f"{where}: {text}"
+        ) from None
+
+
+def load_more_films(paths: RepoPaths) -> MoreFilmList:
+    """Read and check the list of the films beyond the first seven.
+
+    Raises:
+        BuildError: if the file is missing or malformed, has an unknown key, or
+            does not describe a valid ``MoreFilmList``.
+    """
+    path = paths.more_films
+    raw = read_json(path, BuildError)
+    if not isinstance(raw, dict) or not isinstance(raw.get("films"), list):
+        raise BuildError(f"{path}: must be an object with a 'films' list")
+    specs = raw.get("specs")
+    if not isinstance(specs, dict) or not isinstance(specs.get("entries"), list):
+        raise BuildError(f"{path}: must have a 'specs' object with an 'entries' list")
+    _closed(raw, _TOP_KEYS, str(path))
+    _closed(specs, _MORE_SPEC_KEYS, f"{path} specs")
+    films = [
+        _load_film(item, f"{path} film {index}")
+        for index, item in enumerate(raw["films"])
+    ]
+    where = f"{path} specs"
+    try:
+        return MoreFilmList(
+            films=tuple(films),
+            structure_spec=check_spec_path(specs.get("structure"), where),
+            looks_spec=check_spec_path(specs.get("looks"), where),
+            entry_specs=tuple(
+                check_spec_path(entry, where) for entry in specs["entries"]
+            ),
+        )
+    except BuildError as error:
+        text = str(error)
+        raise BuildError(
+            text if text.startswith(str(path)) else f"{path}: {text}"
+        ) from None
+
+
+def more_inputs_digest(paths: RepoPaths, film_list: MoreFilmList) -> str:
+    """Return one SHA-256 over ``looks/more-films.json`` and its fit files.
+
+    Raises:
+        BuildError: if a fit file cannot be read.
+    """
+    parts = [read_bytes(paths.more_films, BuildError)]
+    parts += [
+        read_bytes(paths.resolve(film.fit), BuildError) for film in film_list.films
+    ]
+    return sha256_bytes(b"".join(sha256_bytes(part).encode() for part in parts))

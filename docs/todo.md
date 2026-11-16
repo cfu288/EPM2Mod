@@ -24,6 +24,11 @@ and delete the item here.
 
 ## Film looks
 
+- Test `debug-log-films-12` on the camera (twelve films; steps in
+  `experiments/2026-11-16-films-max/NOTES.md` §7). Open before it can be the pinned build: in ART
+  shooting mode the five new entries are still the stock filters under film names; the Korean and
+  Chinese names of the five have no room. Twelve is the limit without more code: all five free art
+  codes are used. Storage is not the limit.
 - Type II of Portra, Pro 400H and Superia is the same as type I, and is not tested on the camera.
 - The published test RAW files (owner name and serial numbers blanked) are not yet developed on the
   camera.
