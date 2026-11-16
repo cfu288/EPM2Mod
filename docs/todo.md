@@ -58,6 +58,9 @@ and delete the item here.
 
 ## Exposure
 
+Deferred by the owner on 2026-11-17: the items of this section (minimum shutter speed, anti-shock 0 s,
+silent shutter, on-screen information). The notes and the candidate `osd-battery` are kept.
+
 - **Minimum shutter speed with Auto ISO: the stock firmware has it.** The program holds the shutter at
   max(1/(2 × focal length), 1/30, Flash Slow Limit), also without a flash. Set MENU → Custom Menu →
   F → Slow Limit to 1/250 (the default is 1/60). Verified in the function harness, not yet on the
