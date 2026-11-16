@@ -17,7 +17,7 @@ The build script needs [uv](https://docs.astral.sh/uv/getting-started/installati
 
 ## Install
 
-This firmware is only for an E-PM2 that runs firmware 1.6. You can check the version in **Setup Menu → Firmware**. The firmware is unofficial, and you use it at your own risk. Start with a full battery, because an update that stops part-way can leave the camera unusable.
+This firmware is only for an E-PM2. The firmware is unofficial, and you use it at your own risk. Start with a full battery, because an update that stops part-way can leave the camera unusable.
 
 1. To build a copy of the firmware, run
 
