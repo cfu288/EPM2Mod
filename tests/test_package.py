@@ -1701,7 +1701,7 @@ class ReadmeTests(unittest.TestCase):
             )
         shutil.copy(PATHS.pinned, paths.pinned)
         stale = "".join(
-            f"<!-- BEGIN GENERATED: {name} -->\nold\n<!-- END GENERATED: {name} -->\n"
+            f"<!-- BEGIN GENERATED: {name} -->\nSTALE TEXT\n<!-- END GENERATED: {name} -->\n"
             for name in readme.BLOCKS
         )
         fileio.write_text(paths.readme, "# Title\n" + stale)
@@ -1714,7 +1714,7 @@ class ReadmeTests(unittest.TestCase):
         self.assertTrue(readme.is_current(paths))
         self.assertFalse(readme.rewrite(paths))
         text = fileio.read_text(paths.readme)
-        self.assertNotIn("old", text)
+        self.assertNotIn("STALE TEXT", text)
         self.assertTrue(text.startswith("# Title\n"))
 
     def test_blocks_can_be_in_several_documents(self) -> None:
@@ -1726,7 +1726,9 @@ class ReadmeTests(unittest.TestCase):
         fileio.write_text(paths.resolve("builds/README.md"), "# Builds\n" + text[cut:])
         self.assertTrue(readme.rewrite(paths))
         self.assertTrue(readme.is_current(paths))
-        self.assertNotIn("old", fileio.read_text(paths.resolve("builds/README.md")))
+        self.assertNotIn(
+            "STALE TEXT", fileio.read_text(paths.resolve("builds/README.md"))
+        )
         self.assertNotIn(marker, fileio.read_text(paths.readme))
         # The same block in two documents is refused.
         fileio.write_text(paths.resolve("docs/install.md"), text[cut:])
