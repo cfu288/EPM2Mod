@@ -1,0 +1,12 @@
+Target lut_dev6cd00c8_doublex_2302.cube (input gain 0.2500 undone); model only
+Mean |dL*| / mean dE2000 against the target, per patch set (natural, skin, ColorChecker x5 EV, grays, hold-out, dense grays):
+  this fit           0.07/0.06  0.08/0.06  0.15/0.12  0.05/0.03  0.07/0.06  0.05/0.04
+  stock Grainy Film  19.76/13.86  20.23/14.55  18.67/13.30  14.70/10.02  20.16/14.18  16.29/10.79
+  stock Monotone     3.01/2.27  3.75/2.88  5.54/4.39  2.85/1.95  3.05/2.30  5.79/3.75
+  weighted dE2000 of the fit 0.051; natural p95 0.16
+  art table x256 [[49, 103, 104], [50, 119, 87], [39, 86, 131]]; camera matrix (EXIF, 5300 K) [[64, 64, 128], [60, 96, 100], [52, 32, 172]]; stock [[418, -140, -22], [-56, 360, -48], [14, -132, 374]]
+  grey mix: weights of scene R, G, B (linear sRGB) in the luma, for a mid grey [0.189, 0.432, 0.378]; stock [0.299, 0.587, 0.114]
+  Y_in of the samples: 0 to 256; inside the measured range of g (6 to 241): 93.2 %
+  tone D at Y_in 0, 32, ... 255: [8, 33, 69, 98, 125, 152, 178, 200] 220
+  grain table slope between picture values 40 and 215: mean 0.97, max 3.12 (stock table: mean 2.59, max 3.00); predicted spread inside a mid-grey patch 19 codes (stock, measured: up to 52)
+  target: 18 % grey -> 117.7; fit 117.8

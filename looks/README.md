@@ -21,6 +21,8 @@
   program's contrast table) and `L` (the look table for live view and movies). Its names spec is
   `patches/films12bw-names.json` (`experiments/2026-11-16-doublex/scripts/names_bw.py`); the notes in that
   folder say how the camera makes the entry monochrome and how the fit was made.
+  `refits` lists later fits of the film, made after a camera measurement (`fits/doublex2.npz`): each makes a
+  spec (`films12bw-doublex2`) that goes after `films12bw-doublex` in a build and changes the grain table only.
 
 The menu names of `more-films.json` in all 34 languages are a spec of their own, `patches/films12-names.json`.
 `experiments/2026-11-16-films-max/scripts/names_spec.py` makes it; the notes in that folder say how the
@@ -45,5 +47,5 @@ How the fits were made: `experiments/2026-11-09-film-portra/`.
 The fit data is derived from [spektrafilm](https://github.com/andreavolpato/spektrafilm) by Andrea
 Volpato, licensed CC BY-SA 4.0. We modified it: we fitted it to the stages of the Olympus E-PM2
 that can be adjusted. See `NOTICE.md`.
-`fits/doublex.npz` is derived from the profiles `kodak_doublex` and `kodak_2302` of spektrafilm's `dev` branch
+`fits/doublex.npz` and `fits/doublex2.npz` are derived from the profiles `kodak_doublex` and `kodak_2302` of spektrafilm's `dev` branch
 (commit `6cd00c8d4f30b5b550f50f4bbd3753c9f2a48507`, CC BY-SA 4.0). Modified: fitted to this camera.

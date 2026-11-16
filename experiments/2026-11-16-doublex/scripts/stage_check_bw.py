@@ -1,6 +1,8 @@
 """Stage check of a build with the black-and-white film in the Grainy Film entry. Uses tools/emu (function harness).
 
-    .venv/bin/python experiments/2026-11-16-doublex/scripts/stage_check_bw.py IMAGE.BIN [--films12 build/films-12.BIN]
+    .venv/bin/python experiments/2026-11-16-doublex/scripts/stage_check_bw.py IMAGE.BIN [--films12 build/films-12.BIN] [--refit N]
+
+--refit N: the image has the Nth later fit of looks/films-12-bw.json (its grain table, in a spare table).
 
 1. Runs experiments/2026-11-16-films-max/scripts/stage_check.py on IMAGE (with --base, the twelve-film image). That
    check knows no black-and-white film: it must report one failure only, "value 104: a stock filter that differs
@@ -62,13 +64,18 @@ def matrix_function(image, code, mono):
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(); ap.add_argument("image"); ap.add_argument("--films12", default=str(ROOT / "build/films-12.BIN"))
+    ap = argparse.ArgumentParser(); ap.add_argument("image"); ap.add_argument("--films12", default=str(ROOT / "build/films-12.BIN")); ap.add_argument("--refit", type=int, default=0)
     ap.add_argument("--stock", default=str(ROOT / "build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin"))
     a = ap.parse_args(); fails = []
     paths = RepoPaths(ROOT); fit = generate.load_fit(paths.resolve(load_bw_films(paths).mono.fit))
     A = struct.pack("<9h", *[int(v) for v in np.asarray(fit["A"]).ravel()])
     P128 = [int(round(v * 128)) for v in np.asarray(fit["P"]).ravel()]
     T, L = (struct.pack("<256H", *[int(v) for v in fit[k]]) for k in ("T", "L"))
+    grain_at = slots.MONO_SLOT.grain_table
+    if a.refit:
+        refit = generate.load_fit(paths.resolve(load_bw_films(paths).refits[a.refit - 1][0]))
+        T = struct.pack("<256H", *[int(v) for v in refit["T"]]); grain_at = slots.MONO_SLOT.spare_tables[a.refit - 1][0]
+        print(f"refit {a.refit}: the grain table is expected at {grain_at:#x}")
 
     print("1. stage_check.py of the twelve-film work on this image")
     done = subprocess.run([sys.executable, str(Path(sc.__file__)), a.image, "--base", a.films12], capture_output=True, text=True)
@@ -107,7 +114,7 @@ def main() -> int:
                 if d3: print(f"   code {code}: look, variant {variant:#04x}: {got:#x} {'(live view / movie) ' if live else ''}{'ok' if good else 'WRONG'}{': the fit L' if live and code in (74, 83) and good else ''}")
         got, ref = grain_look(image, code), grain_look(stock, code)
         want = T if code in (74, 83) else stock.read(ref, 512)
-        good = got == ref and image.read(got, 512) == want
+        good = got == (grain_at if code in (74, 83) else ref) and image.read(got, 512) == want
         print(f"   code {code}: look table of the grain program's jobs {got:#x}: {'ok' if good else 'WRONG'}{', the fit T' if code in (74, 83) and good else ', as stock'}")
         if not good: fails.append(f"code {code} grain table")
     print(f"   the fit's matrix after the firmware's row step (model, x128): {P128}")

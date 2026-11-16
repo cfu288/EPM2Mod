@@ -74,6 +74,16 @@ def load_transfer():
 _BX, _BY = load_transfer()
 _LO, _HI = np.polyfit(_BX[:5], _BY[:5], 1), np.polyfit(_BX[-5:], _BY[-5:], 1)
 MEASURED_RANGE = (float(_BX[0]), float(_BX[-1]))
+TRANSFER_2 = RESULTS / "grain-transfer-2.json"
+
+
+def use_transfer(path):
+    """Take g from another file (measure_transfer2.py writes grain-transfer-2.json). The default is the first one."""
+    global _BX, _BY, _LO, _HI, MEASURED_RANGE
+    t = json.loads(Path(path).read_text()); _BX, _BY = np.array(t["y_in"]), np.array(t["x"])
+    _LO, _HI = np.polyfit(_BX[:3], _BY[:3], 1), np.polyfit(_BX[-3:], _BY[-3:], 1)
+    _LO[0], _HI[0] = max(_LO[0], 0.05), max(_HI[0], 0.05)
+    MEASURED_RANGE = (float(_BX[0]), float(_BX[-1]))
 
 
 def g_of(y):
@@ -99,7 +109,14 @@ _YG = np.linspace(0, 255, 1021)
 
 def g_inverse(x):
     """Y_in for a value x of the grain program (g rises everywhere)."""
-    return np.interp(x, g_of(_YG), _YG)
+    return np.interp(x, np.maximum.accumulate(g_of(_YG)), _YG)
+
+
+def x_of_reading(d, table):
+    """Per patch of a camera reading developed through a grain table: x = table^-1(picture value), and where it is usable."""
+    yj = d["jpg"] @ LUMA; t = np.asarray(table, float) / 4.0; keep = np.r_[True, np.diff(t) > 0]
+    ok = np.isfinite(yj) & (yj > t.min() + 2) & (yj < t.max() - 2)
+    return np.interp(yj, t[keep], X[keep].astype(float)), ok
 
 
 def tone_of_knots(q):

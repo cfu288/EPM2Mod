@@ -340,12 +340,16 @@ class BwFilmList:
         moved_to: the stock name of the entry that the colour film moves to.
         entry_spec: path of the patch spec that gives ``moved_to`` the colour film.
         mono_spec: path of the patch spec that holds the black-and-white look.
+        refits: later fits of the black-and-white film, in order: (path of
+            the fit file, path of its patch spec). A build takes the spec of
+            one refit after ``mono_spec``.
     """
 
     mono: Film
     moved_to: str
     entry_spec: str
     mono_spec: str
+    refits: tuple[tuple[str, str], ...] = ()
 
     def __post_init__(self) -> None:
         """Check the list. Every instance is valid.
@@ -362,16 +366,24 @@ class BwFilmList:
         others = [slot.entry for slot in EXTRA_SLOTS if slot.entry != MONO_SLOT.entry]
         if self.moved_to not in others:
             raise BuildError("'moved_to' must be one of: " + ", ".join(others))
-        if self.entry_spec == self.mono_spec:
+        if len(set(self.spec_paths)) != len(self.spec_paths):
             raise BuildError("the generated specs must be different files")
+        if len(self.refits) > len(MONO_SLOT.spare_tables):
+            raise BuildError(
+                f"the slot has a table for {len(MONO_SLOT.spare_tables)} refit(s) only"
+            )
+        for fit, _ in self.refits:
+            if not is_repo_relative(fit):
+                raise BuildError("the fit of a refit must be a path in the repository")
 
     @property
-    def spec_paths(self) -> tuple[str, str]:
-        """The paths of the entry spec and the black-and-white spec."""
-        return (self.entry_spec, self.mono_spec)
+    def spec_paths(self) -> tuple[str, ...]:
+        """The paths of the entry spec, the black-and-white spec and the refit specs."""
+        return (self.entry_spec, self.mono_spec, *(spec for _, spec in self.refits))
 
 
-_BW_TOP_KEYS = {"specs", "mono", "moved_to"}
+_BW_TOP_KEYS = {"specs", "mono", "moved_to", "refits"}
+_REFIT_KEYS = {"fit", "spec"}
 _BW_SPEC_KEYS = {"entry", "mono"}
 
 
@@ -392,12 +404,25 @@ def load_bw_films(paths: RepoPaths) -> BwFilmList:
     _closed(raw, _BW_TOP_KEYS, str(path))
     _closed(specs, _BW_SPEC_KEYS, f"{path} specs")
     where = f"{path} specs"
+    listed = raw.get("refits", [])
+    if not isinstance(listed, list):
+        raise BuildError(f"{path}: 'refits' must be a list")
+    refits = []
+    for index, item in enumerate(listed):
+        here = f"{path} refit {index}"
+        if not isinstance(item, dict):
+            raise BuildError(f"{here}: must be an object")
+        _closed(item, _REFIT_KEYS, here)
+        refits.append(
+            (_text(item, "fit", here), check_spec_path(item.get("spec"), here))
+        )
     try:
         return BwFilmList(
             mono=_load_film(raw.get("mono"), f"{path} mono"),
             moved_to=_text(raw, "moved_to", str(path)),
             entry_spec=check_spec_path(specs.get("entry"), where),
             mono_spec=check_spec_path(specs.get("mono"), where),
+            refits=tuple(refits),
         )
     except BuildError as error:
         text = str(error)
@@ -409,8 +434,9 @@ def load_bw_films(paths: RepoPaths) -> BwFilmList:
 def bw_inputs_digest(paths: RepoPaths, film_list: BwFilmList) -> str:
     """Return one SHA-256 over the data of the list with a black-and-white film.
 
-    The data: ``looks/films-12-bw.json``, the fit of its film, and the list
-    of the films beyond the first seven (its labels name the film that moves).
+    The data: ``looks/films-12-bw.json``, the fit of its film, the list of the
+    films beyond the first seven (its labels name the film that moves), and
+    the fits of the refits.
 
     Raises:
         BuildError: if a file cannot be read.
@@ -420,4 +446,5 @@ def bw_inputs_digest(paths: RepoPaths, film_list: BwFilmList) -> str:
         read_bytes(paths.resolve(film_list.mono.fit), BuildError),
         read_bytes(paths.more_films, BuildError),
     ]
+    parts += [read_bytes(paths.resolve(fit), BuildError) for fit, _ in film_list.refits]
     return sha256_bytes(b"".join(sha256_bytes(part).encode() for part in parts))

@@ -1,0 +1,11 @@
+reading F12c_doublex (table of doublex) replayed through the table of doublex2: 6079 of 6578 patches give x
+predicted camera - target    natural 0.51/0.40  skin 0.53/0.44  ColorChecker x5 EV 0.51/0.40  grays 0.46/0.33  hold-out 0.52/0.41  dense grays 0.32/0.24
+model - target               natural 0.07/0.06  skin 0.08/0.06  ColorChecker x5 EV 0.15/0.12  grays 0.05/0.03  hold-out 0.07/0.06  dense grays 0.05/0.04
+first camera result - target natural 1.72/1.23  skin 1.73/1.28  ColorChecker x5 EV 1.63/1.16  grays 1.60/1.08  hold-out 1.69/1.21  dense grays 1.54/1.05
+predicted camera - target in picture codes, by target value:
+  target   0- 20:  177 patches, mean -0.21, mean |.| 1.37; first result: mean -2.23
+  target  20- 40:  514 patches, mean -0.04, mean |.| 1.35; first result: mean -7.03
+  target  40-100: 1910 patches, mean +0.00, mean |.| 1.27; first result: mean -1.35
+  target 100-180: 2025 patches, mean -0.15, mean |.| 1.35; first result: mean +1.85
+  target 180-205:  986 patches, mean -0.60, mean |.| 1.87; first result: mean +9.89
+  target 205-256:  966 patches, mean -1.32, mean |.| 1.72; first result: mean +4.01

@@ -1,0 +1,156 @@
+refit 1: the grain table is expected at 0x7e75ecf0
+1. stage_check.py of the twelve-film work on this image
+   | image build/films-12d.BIN
+   | 1. Picture Mode value lists (111, 509, 510): [7, 1, 2, 3, 4, 5, 6, 100, 101, 102, 103, 104, 105, 106, 107, 111, 114, 115, 118]
+   |    effect codes of art_chk_type: [67, 69, 73, 74, 86, 91, 96, 104, 106, 108, 118, 151, 153, 163, 165, 169, 181, 182]; effect programs: [73, 74, 86, 91, 96, 104, 106, 108, 118, 151, 153, 163, 165, 169, 181, 182]
+   |    codes with an entry of their own in the movie-art tables (type II / III lookups; not a class): [69, 70, 71, 72, 73, 74, 75, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 91, 93, 96, 97, 117, 118, 119, 120, 121, 122, 123, 124, 125, 145, 146, 151, 152, 153, 154, 163, 164, 165, 166, 167, 168, 169, 170, 181, 182, 183, 184]
+   |    value 100 (Pop Art = Kodak Portra 400): art_GetFilterType types 1-3 [70, 70, 65535]; live view A/B still 70/70, movie 79/79; class by value 1
+   |    value 101 (Soft Focus = Kodak Ektachrome 100): art_GetFilterType types 1-3 [102, 102, 102]; live view A/B still 102/102, movie 103/103; class by value 1
+   |    value 102 (Pale&Light Color = Fuji Pro 400H): art_GetFilterType types 1-3 [71, 71, 65535]; live view A/B still 71/71, movie 80/80; class by value 1
+   |    value 103 (Light Tone = Kodak Kodachrome 64): art_GetFilterType types 1-3 [72, 72, 72]; live view A/B still 72/72, movie 81/81; class by value 1
+   |    value 104 (Grainy Film, stock filter): art_GetFilterType types 1-3 [74, 104, 65535]; live view A/B still 74/74, movie 83/83; class by value 4
+   |    value 105 (Pin Hole = Kodak Vision3 250D): art_GetFilterType types 1-3 [145, 145, 145]; live view A/B still 145/145, movie 146/146; class by value 1
+   |    value 106 (Diorama = Fuji Velvia 100): art_GetFilterType types 1-3 [167, 167, 167]; live view A/B still 167/167, movie 168/168; class by value 1
+   |    value 107 (Cross Process = Fuji Superia X-tra 400): art_GetFilterType types 1-3 [85, 85, 65535]; live view A/B still 85/85, movie 87/87; class by value 1
+   |    value 111 (Grainy Film = Fujifilm Provia 100F): art_GetFilterType types 1-3 [94, 94, 94]; live view A/B still 94/94, movie 94/94; class by value 1
+   |    value 114 (Dramatic Tone = Kodak Portra 160): art_GetFilterType types 1-3 [144, 144, 144]; live view A/B still 144/144, movie 144/144; class by value 1
+   |    value 115 (Key Line = Kodak Gold 200): art_GetFilterType types 1-3 [156, 156, 156]; live view A/B still 156/156, movie 156/156; class by value 1
+   |    value 118 (Watercolor = Kodak Vision3 500T): art_GetFilterType types 1-3 [159, 159, 159]; live view A/B still 159/159, movie 159/159; class by value 1
+   | 2. Stages per art code (address of the table each stage ends with; tone = stills variant R, G, B)
+   |    code  70: tone ['0x7e74f1bc', '0x7e74f5bc', '0x7e7505bc']; look 0x7e75e6f0; saturation 0x7e7696a0; six-axis ['0x7e769486', '0x7e769492']; matrix 0x7e880fc2; chroma 0x7e74b8ba; class by code (1, 1)
+   |    code  71: tone ['0x7f033b7c', '0x7f033d7c', '0x7e75e8f0']; look 0x7e75f2f0; saturation 0x7e7696a4; six-axis ['0x7e76949e', '0x7e7694aa']; matrix 0x7ecb0988; chroma 0x7e74b91c; class by code (1, 1)
+   |    code  72: tone ['0x7e750dbc', '0x7e750fbc', '0x7e7511bc']; look 0x7e75eaf0; saturation 0x7e7696a8; six-axis ['0x7e7694b6', '0x7e7694c2']; matrix 0x7e768f58; chroma 0x7e74b97e; class by code (1, 1)
+   |    code  74: tone ['0x7e74e9bc', '0x7e74e9bc', '0x7e74e9bc']; look 0x7e75b6f0; saturation -1; six-axis default; matrix 0x7ebf2f5a; chroma default; class by code (3, 3)
+   |    code  79: tone ['0x7e74f1bc', '0x7e74f5bc', '0x7e7505bc']; look 0x7e75e6f0; saturation 0x7e7696a0; six-axis ['0x7e769486', '0x7e769492']; matrix 0x7e880fc2; chroma 0x7e74b858; class by code (1, 1)
+   |    code  80: tone ['0x7f033b7c', '0x7f033d7c', '0x7e75e8f0']; look 0x7e75f2f0; saturation 0x7e7696a4; six-axis ['0x7e76949e', '0x7e7694aa']; matrix 0x7ecb0988; chroma 0x7e74b858; class by code (1, 1)
+   |    code  81: tone ['0x7e750dbc', '0x7e750fbc', '0x7e7511bc']; look 0x7e75eaf0; saturation 0x7e7696a8; six-axis ['0x7e7694b6', '0x7e7694c2']; matrix 0x7e768f58; chroma 0x7e74b858; class by code (1, 1)
+   |    code  83: tone ['0x7e74e9bc', '0x7e74e9bc', '0x7e74e9bc']; look 0x7e75b6f0; saturation -1; six-axis default; matrix 0x7ebf2f5a; chroma default; class by code (3, 3)
+   |    code  85: tone ['0x7e74fdbc', '0x7e74ffbc', '0x7e7501bc']; look 0x7e75f2f0; saturation 0x7e7696b4; six-axis ['statistics', '0x7e7694fe', '0x7e76950a']; matrix 0x7e768f46; chroma 0x7e74baa4; class by code (1, 1)
+   |    code  87: tone ['0x7e74fdbc', '0x7e74ffbc', '0x7e7501bc']; look 0x7e75f2f0; saturation 0x7e7696b4; six-axis ['statistics', '0x7e7694fe', '0x7e76950a']; matrix 0x7e768f46; chroma 0x7e74b858; class by code (1, 1)
+   |    code  94: tone ['0x7e74f3bc', '0x7e7503bc', '0x7e7523bc']; look 0x7e75f2f0; saturation 0x7e7696ac; six-axis ['0x7e7694ce', '0x7e7694da']; matrix 0x7ebf3b52; chroma 0x7e74b9e0; class by code (0, 0)
+   |    code 102: tone ['0x7e75faf0', '0x7e75f8f0', '0x7e7616f0']; look 0x7e75f2f0; saturation 0x7e7696bc; six-axis ['0x7e76952e', '0x7e76953a']; matrix 0x7ecb099a; chroma 0x7e74bbca; class by code (0, 0)
+   |    code 103: tone ['0x7e75faf0', '0x7e75f8f0', '0x7e7616f0']; look 0x7e75f2f0; saturation 0x7e7696bc; six-axis ['0x7e76952e', '0x7e76953a']; matrix 0x7ecb099a; chroma 0x7e74b858; class by code (0, 0)
+   |    code 104: tone ['0x7e74e9bc', '0x7e74e9bc', '0x7e74e9bc']; look 0x7e75b6f0; saturation -1; six-axis default; matrix none; chroma default; class by code (0, 0)
+   |    code 144: tone ['0x7e7553bc', '0x7e7555bc', '0x7e7563bc']; look 0x7e75f2f0; saturation 0x7e7696c0; six-axis ['0x7e769546', '0x7e769552']; matrix 0x7ebf3b76; chroma 0x7e74bc2c; class by code (0, 0)
+   |    code 145: tone ['0x7e74efbc', '0x7e751fbc', '0x7e7521bc']; look 0x7e75f2f0; saturation 0x7e7696b8; six-axis ['0x7e769516', '0x7e769522']; matrix 0x7ecb09ac; chroma 0x7e74bb68; class by code (1, 1)
+   |    code 146: tone ['0x7e74efbc', '0x7e751fbc', '0x7e7521bc']; look 0x7e75f2f0; saturation 0x7e7696b8; six-axis ['0x7e769516', '0x7e769522']; matrix 0x7ecb09ac; chroma 0x7e74b858; class by code (1, 1)
+   |    code 156: tone ['0x7e7565bc', '0x7e7581bc', '0x7e7583bc']; look 0x7e75f2f0; saturation 0x7e7696c4; six-axis ['0x7e76955e', '0x7e76956a']; matrix 0x7ebf3b88; chroma 0x7e74bc8e; class by code (0, 0)
+   |    code 159: tone ['0x7e7585bc', '0x7e7593bc', '0x7e7595bc']; look 0x7e75f2f0; saturation 0x7e7696e8; six-axis ['0x7e76960a', '0x7e769616']; matrix 0x7ebf3b9a; chroma 0x7e74bdb4; class by code (0, 0)
+   |    code 167: tone ['0x7e754fbc', '0x7e7551bc', '0x7e757fbc']; look 0x7e75f2f0; saturation 0x7e7696ec; six-axis ['0x7e769622', '0x7e76962e']; matrix 0x7ecb09be; chroma 0x7e74be16; class by code (0, 0)
+   |    code 168: tone ['0x7e754fbc', '0x7e7551bc', '0x7e757fbc']; look 0x7e75f2f0; saturation 0x7e7696ec; six-axis ['0x7e769622', '0x7e76962e']; matrix 0x7ecb09be; chroma 0x7e74b858; class by code (0, 0)
+   | 3. Intended looks
+   |    value 100 (Pop Art = Kodak Portra 400), still code 70: all tables are the film
+   |    value 100 (Pop Art = Kodak Portra 400), movie code 79: all tables are the film (movie: tone tables the films; chroma straight; look identity)
+   |    value 101 (Soft Focus = Kodak Ektachrome 100), still code 102: all tables are the film
+   |    value 101 (Soft Focus = Kodak Ektachrome 100), movie code 103: all tables are the film (movie: tone tables the films; chroma straight; look identity)
+   |    value 102 (Pale&Light Color = Fuji Pro 400H), still code 71: all tables are the film
+   |    value 102 (Pale&Light Color = Fuji Pro 400H), movie code 80: all tables are the film (movie: tone tables the films; chroma straight; look identity)
+   |    value 103 (Light Tone = Kodak Kodachrome 64), still code 72: all tables are the film
+   |    value 103 (Light Tone = Kodak Kodachrome 64), movie code 81: all tables are the film (movie: tone tables the films; chroma straight; look identity)
+   |    value 104 (Grainy Film): stock filter, DIFFERS from the stock firmware (code 74: matrix, matrix content)
+   |    value 105 (Pin Hole = Kodak Vision3 250D), still code 145: all tables are the film
+   |    value 105 (Pin Hole = Kodak Vision3 250D), movie code 146: all tables are the film (movie: tone tables the films; chroma straight; look identity)
+   |    value 106 (Diorama = Fuji Velvia 100), still code 167: all tables are the film
+   |    value 106 (Diorama = Fuji Velvia 100), movie code 168: all tables are the film (movie: tone tables the films; chroma straight; look identity)
+   |    value 107 (Cross Process = Fuji Superia X-tra 400), still code 85: all tables are the film
+   |    value 107 (Cross Process = Fuji Superia X-tra 400), movie code 87: all tables are the film (movie: tone tables the films; chroma straight; look identity)
+   |    value 111 (Grainy Film = Fujifilm Provia 100F), still code 94: all tables are the film
+   |    value 111 (Grainy Film = Fujifilm Provia 100F), movie code 94: all tables are the film (movie: tone tables the films; chroma the film; look identity)
+   |    value 114 (Dramatic Tone = Kodak Portra 160), still code 144: all tables are the film
+   |    value 114 (Dramatic Tone = Kodak Portra 160), movie code 144: all tables are the film (movie: tone tables the films; chroma the film; look identity)
+   |    value 115 (Key Line = Kodak Gold 200), still code 156: all tables are the film
+   |    value 115 (Key Line = Kodak Gold 200), movie code 156: all tables are the film (movie: tone tables the films; chroma the film; look identity)
+   |    value 118 (Watercolor = Kodak Vision3 500T), still code 159: all tables are the film
+   |    value 118 (Watercolor = Kodak Vision3 500T), movie code 159: all tables are the film (movie: tone tables the films; chroma the film; look identity)
+   | 6. ART shooting mode: the preset of each ART filter (table 0x7E834794, kind 1) sets setting 111
+   |    ART list place 1 (mode code 70): stores 100; the Picture Mode list has 100 there; art code 70 = Kodak Portra 400
+   |    ART list place 2 (mode code 69): stores 101; the Picture Mode list has 101 there; art code 102 = Kodak Ektachrome 100
+   |    ART list place 3 (mode code 71): stores 102; the Picture Mode list has 102 there; art code 71 = Fuji Pro 400H
+   |    ART list place 4 (mode code 72): stores 103; the Picture Mode list has 103 there; art code 72 = Kodak Kodachrome 64
+   |    ART list place 5 (mode code 74): stores 104; the Picture Mode list has 104 there; art code 74
+   |    ART list place 6 (mode code 73): stores 105; the Picture Mode list has 105 there; art code 145 = Kodak Vision3 250D
+   |    ART list place 7 (mode code 86): stores 106; the Picture Mode list has 106 there; art code 167 = Fuji Velvia 100
+   |    ART list place 8 (mode code 85): stores 107; the Picture Mode list has 107 there; art code 85 = Fuji Superia X-tra 400
+   |    ART list place 9 (mode code 91): stores 111; the Picture Mode list has 111 there; art code 94 = Fujifilm Provia 100F
+   |    ART list place 10 (mode code 96): stores 114; the Picture Mode list has 114 there; art code 144 = Kodak Portra 160
+   |    ART list place 11 (mode code 163): stores 115; the Picture Mode list has 115 there; art code 156 = Kodak Gold 200
+   |    ART list place 12 (mode code 181): stores 118; the Picture Mode list has 118 there; art code 159 = Kodak Vision3 500T
+   | 5. Against build/films-12.BIN
+   |    value 100 (Pop Art): same codes, tables and contents
+   |    value 101 (Soft Focus): same codes, tables and contents
+   |    value 102 (Pale&Light Color): same codes, tables and contents
+   |    value 103 (Light Tone): same codes, tables and contents
+   |    value 104: not in the base image's list
+   |    value 105 (Pin Hole): same codes, tables and contents
+   |    value 106 (Diorama): same codes, tables and contents
+   |    value 107 (Cross Process): same codes, tables and contents
+   |    value 111 (Grainy Film): same codes, tables and contents
+   |    value 114 (Dramatic Tone): same codes, tables and contents
+   |    value 115 (Key Line): same codes, tables and contents
+   |    value 118 (Watercolor): same codes, tables and contents
+   |    stored values of the base list that the image's list no longer has: [112]
+   | 
+   | FAIL  value 104: a stock filter that differs from stock
+   | stage check: FAIL (12 stored values, 21 art codes, 1 failures)
+   expected there: one failure, value 104 differs from stock in the matrix -> as expected
+2. the entry, against stock
+   art_GetFilterType types 1-3: [74, 104, 65535] -> as stock
+   live-view tables: {'A still': 74, 'A movie': 83, 'B still': 74, 'B movie': 83} -> as stock
+   class by value: 4 -> as stock
+   class by code 74, 83, 104, 105: [(3, 3), (3, 3), (0, 0), (0, 0)] -> as stock
+   effect lists: 18 codes -> as stock
+   effect program entries: {104: 2121442845, 74: 2121442845} -> as stock
+   movie-art table entries: 49 codes -> as stock
+   stored value at place 11 of the three lists: [104, 104, 104] -> as stock
+3. stages
+   code 74: gamma, look, saturation, six_axis, chroma: as stock
+   code 74: art matrix at 0x7ebf2f5a = the fit (stock: none)
+   code 74: look, variant 0x00: 0x7e75b8f0 ok
+   code 74: look, variant 0x01: 0x7e75b8f0 ok
+   code 74: look, variant 0x03: 0x7e7620f0 (live view / movie) ok: the fit L
+   code 74: look, variant 0x05: 0x7e7620f0 (live view / movie) ok: the fit L
+   code 74: look, variant 0x07: 0x7e7620f0 (live view / movie) ok: the fit L
+   code 74: look, variant 0x04: 0x7e7620f0 (live view / movie) ok: the fit L
+   code 74: look, variant 0x24: 0x7e7620f0 (live view / movie) ok: the fit L
+   code 74: look, variant 0x84: 0x7e75b8f0 ok
+   code 74: look table of the grain program's jobs 0x7e75ecf0: ok, the fit T
+   code 83: gamma, look, saturation, six_axis, chroma: as stock
+   code 83: art matrix at 0x7ebf2f5a = the fit (stock: none)
+   code 83: look, variant 0x00: 0x7e75b8f0 ok
+   code 83: look, variant 0x01: 0x7e75b8f0 ok
+   code 83: look, variant 0x03: 0x7e7620f0 (live view / movie) ok: the fit L
+   code 83: look, variant 0x05: 0x7e7620f0 (live view / movie) ok: the fit L
+   code 83: look, variant 0x07: 0x7e7620f0 (live view / movie) ok: the fit L
+   code 83: look, variant 0x04: 0x7e7620f0 (live view / movie) ok: the fit L
+   code 83: look, variant 0x24: 0x7e7620f0 (live view / movie) ok: the fit L
+   code 83: look, variant 0x84: 0x7e75b8f0 ok
+   code 83: look table of the grain program's jobs 0x7e75ecf0: ok, the fit T
+   code 104: gamma, look, saturation, six_axis, matrix, chroma: as stock
+   code 104: look, variant 0x00: 0x7e75b8f0 ok
+   code 104: look, variant 0x01: 0x7e75b8f0 ok
+   code 104: look, variant 0x03: 0x7e7622f0 (live view / movie) ok
+   code 104: look, variant 0x05: 0x7e7622f0 (live view / movie) ok
+   code 104: look, variant 0x07: 0x7e7622f0 (live view / movie) ok
+   code 104: look, variant 0x04: 0x7e7622f0 (live view / movie) ok
+   code 104: look, variant 0x24: 0x7e7622f0 (live view / movie) ok
+   code 104: look, variant 0x84: 0x7e75b8f0 ok
+   code 104: look table of the grain program's jobs 0x7e7600f0: ok, as stock
+   code 105: gamma, look, saturation, six_axis, matrix, chroma: as stock
+   code 105: look, variant 0x00: 0x7e75b8f0 ok
+   code 105: look, variant 0x01: 0x7e75b8f0 ok
+   code 105: look, variant 0x03: 0x7e7622f0 (live view / movie) ok
+   code 105: look, variant 0x05: 0x7e7622f0 (live view / movie) ok
+   code 105: look, variant 0x07: 0x7e7622f0 (live view / movie) ok
+   code 105: look, variant 0x04: 0x7e7622f0 (live view / movie) ok
+   code 105: look, variant 0x24: 0x7e7622f0 (live view / movie) ok
+   code 105: look, variant 0x84: 0x7e75b8f0 ok
+   code 105: look table of the grain program's jobs 0x7e7600f0: ok, as stock
+   the fit's matrix after the firmware's row step (model, x128): [32, 32, 64, 30, 48, 50, 26, 16, 86]
+4. the colour-matrix function 0x7E56C603, whole, job of op class 0, camera matrix 5300 K; values x128 written for the hardware
+   art code 74, monochrome flag 1: stock [209, -70, -11, -28, 180, -24, 7, -66, 187]; this image [32, 32, 64, 30, 48, 50, 26, 16, 86]
+   art code 74, monochrome flag 0: stock [209, -70, -11, -28, 180, -24, 7, -66, 187]; this image [32, 32, 64, 30, 48, 50, 26, 16, 86]
+   art code 83, monochrome flag 1: stock [209, -70, -11, -28, 180, -24, 7, -66, 187]; this image [32, 32, 64, 30, 48, 50, 26, 16, 86]
+   art code 104, monochrome flag 1: stock [209, -70, -11, -28, 180, -24, 7, -66, 187]; this image [209, -70, -11, -28, 180, -24, 7, -66, 187] (same)
+   art code 0, monochrome flag 1: stock [209, -70, -11, -28, 180, -24, 7, -66, 187]; this image [209, -70, -11, -28, 180, -24, 7, -66, 187] (same)
+
+stage check, black-and-white entry: PASS (0 failures)

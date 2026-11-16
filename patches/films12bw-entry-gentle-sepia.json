@@ -103,6 +103,6 @@
  ],
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "inputs_sha256": "a824685720249c91d3393dbba3db4e3705430b85679f76d46b3ab527e284746d",
+ "inputs_sha256": "a1ecba12c6c31d1a72b001422f191f8c9774fc15998ff685e5b44f7d878521b3",
  "status": "built, NOT camera-tested"
 }

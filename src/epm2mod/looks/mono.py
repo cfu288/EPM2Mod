@@ -16,6 +16,12 @@ except the entry specs of the two entries:
   contrast table (the tone of still pictures) and the look table for live
   view and movies.
 
+A later fit of the film (a refit, made after a camera measurement) gets a
+spec of its own, a delta on the black-and-white look: its grain table goes
+into a spare table and the grain program's load instruction is pointed at it.
+The spec of the first fit stays in the build and is not changed, so the
+builds that were tested with it stay as they are.
+
 This module needs numpy.
 """
 
@@ -150,6 +156,46 @@ def mono_ops(program: Program, layout: Layout, fit: Fit, where: str) -> list[Byt
     ]
 
 
+def refit_ops(
+    program: Program, first: Fit, fit: Fit, where: str, spare: tuple[int, int]
+) -> list[BytesOp]:
+    """Return the operations of a later fit of the black-and-white film.
+
+    The grain table of the fit is written into a spare table, and the
+    instruction that loads the grain table gets the address of that table.
+
+    Args:
+        program: block 0 of the stock firmware.
+        first: the arrays of the first fit, whose spec comes before this one.
+        fit: the arrays of the later fit.
+        where: the name of the later fit file, for messages.
+        spare: the address of the spare table and of the stock instruction
+            that loads it.
+
+    Raises:
+        BuildError: if the later fit has another matrix or live-view table
+            than the first one (only the grain table can change), or the
+            firmware does not load the tables where the slot says.
+    """
+    slot = slots.MONO_SLOT
+    table, loader = spare
+    for key in ("A", "L"):
+        if not np.array_equal(_array(first, key, where), _array(fit, key, where)):
+            raise BuildError(
+                f"{where}: '{key}' differs from the first fit; a refit changes "
+                "the grain table only"
+            )
+    old = struct.pack("<I", slot.grain_table)
+    if program.read(slot.grain_load, 6) != b"\xfc\xcd" + old:
+        raise BuildError(f"{slot.grain_load:#x} does not load the grain table")
+    if program.read(loader, 6) != b"\xfc\xdc" + struct.pack("<I", table):
+        raise BuildError(f"{loader:#x} does not load the table {table:#x}")
+    return [
+        program.op(slot.grain_load + 2, struct.pack("<I", table), old),
+        program.op(table, pack_tone(fit, "T", where)),
+    ]
+
+
 def moved_entry_ops(
     program: Program, source: slots.ExtraSlot, target: slots.ExtraSlot
 ) -> list[BytesOp]:
@@ -184,7 +230,7 @@ def generate(paths: RepoPaths, stock: StockFirmware = EPM2_V16) -> list[Generate
         stock: the stock firmware.
 
     Returns:
-        The entry spec and the black-and-white spec.
+        The entry spec, the black-and-white spec and one spec per refit.
 
     Raises:
         BuildError: if a film list or the fit file is wrong, or the slots do
@@ -202,6 +248,32 @@ def generate(paths: RepoPaths, stock: StockFirmware = EPM2_V16) -> list[Generate
     moved, gone = colour[source.entry], colour[target.entry]
     mono = film_list.mono
     still, movie = slots.MONO_SLOT.art_codes
+    first = load_fit(paths.resolve(mono.fit))
+    refits = [
+        GeneratedSpec(
+            path=spec,
+            description=(
+                f"Fit {number} of the black-and-white film {mono.film} in the "
+                f"menu entry {mono.entry} ({fit}): its grain table, the tone of "
+                f"still pictures, in the stock table {table:#x} (the look table "
+                "of an art code that no menu entry reaches), and the address in "
+                "the instruction that loads the grain program's table "
+                f"({slots.MONO_SLOT.grain_load:#x}, 4 bytes). The matrix and the "
+                "look table for live view are those of the first fit. A delta "
+                f"on {film_list.mono_spec}: put it after that spec."
+            ),
+            ops=_changing(
+                refit_ops(
+                    program, first, load_fit(paths.resolve(fit)), fit, (table, loader)
+                )
+            ),
+            inputs_sha256=digest,
+            attribution=ATTRIBUTION,
+        )
+        for number, ((fit, spec), (table, loader)) in enumerate(
+            zip(film_list.refits, slots.MONO_SLOT.spare_tables), start=2
+        )
+    ]
     return [
         GeneratedSpec(
             path=film_list.entry_spec,
@@ -235,10 +307,9 @@ def generate(paths: RepoPaths, stock: StockFirmware = EPM2_V16) -> list[Generate
                 f"the entry spec of {mono.entry} out of the build. Grainy Film "
                 "II is not changed."
             ),
-            ops=_changing(
-                mono_ops(program, layout, load_fit(paths.resolve(mono.fit)), mono.fit)
-            ),
+            ops=_changing(mono_ops(program, layout, first, mono.fit)),
             inputs_sha256=digest,
             attribution=ATTRIBUTION,
         ),
+        *refits,
     ]

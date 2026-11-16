@@ -10,5 +10,11 @@
   "label": "Double-X",
   "fit": "looks/fits/doublex.npz"
  },
- "moved_to": "Gentle Sepia"
+ "moved_to": "Gentle Sepia",
+ "refits": [
+  {
+   "fit": "looks/fits/doublex2.npz",
+   "spec": "patches/films12bw-doublex2.json"
+  }
+ ]
 }

@@ -1,0 +1,4 @@
+PASS value 104: code byte  74 (expected ?), picture in 3 of 3 frames, anomalies none | with the request: L=1 R=1 L2=1, code byte 3, picture in 3 of 3 frames, pass 9 gain ['0x0200'], pass 7 ucExpose [3], anomalies none
+PASS value 111: code byte   0 (expected 0), picture in 3 of 3 frames, anomalies none | with the request: L=1 R=1 L2=1, code byte 3, picture in 3 of 3 frames, pass 9 gain ['0x0200'], pass 7 ucExpose [3], anomalies none
+PASS value 119: code byte 163 (expected 163), picture in 3 of 3 frames, anomalies none | with the request: L=1 R=1 L2=1, code byte 3, picture in 3 of 3 frames, pass 9 gain ['0x0200'], pass 7 ucExpose [3], anomalies none
+live-view scenario: PASS (3 values, 0 failing)

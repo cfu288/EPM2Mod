@@ -64,17 +64,19 @@ class ListTests(unittest.TestCase):
     def test_the_film_list(self) -> None:
         film_list = films.load_bw_films(PATHS)
         self.assertEqual(film_list.mono.entry, slots.MONO_SLOT.entry)
-        self.assertEqual(len(set(film_list.spec_paths)), 2)
+        self.assertEqual(len(set(film_list.spec_paths)), 2 + len(film_list.refits))
         for change in (
             {"moved_to": film_list.mono.entry},
             {"moved_to": "Pop Art"},
             {"mono_spec": film_list.entry_spec},
+            {"refits": film_list.refits * 2},
         ):
             fields = {
                 "mono": film_list.mono,
                 "moved_to": film_list.moved_to,
                 "entry_spec": film_list.entry_spec,
                 "mono_spec": film_list.mono_spec,
+                "refits": film_list.refits,
                 **change,
             }
             with self.assertRaises(BuildError):
@@ -138,6 +140,32 @@ class RealFirmwareMonoTests(unittest.TestCase):
         own = extra.hash_ops(self.program, slots.COLOUR_TONE_HASH, [(112, 108)])[0]
         self.assertEqual(ops[13].new, own.new[4:])
         self.assertNotEqual(ops[13].expect, ops[13].new)
+
+    def test_a_refit_moves_the_grain_table_and_nothing_else(self) -> None:
+        film_list = films.load_bw_films(PATHS)
+        first = generate.load_fit(PATHS.resolve(film_list.mono.fit))
+        spare = slots.MONO_SLOT.spare_tables[0]
+        later = dict(first, T=np.minimum(first["T"] + 1, 1023))
+        load, table = mono.refit_ops(self.program, first, later, "x", spare)
+        self.assertEqual(
+            slots.BLOCK0_BASE + load.offset, slots.MONO_SLOT.grain_load + 2
+        )
+        self.assertEqual(load.expect, struct.pack("<I", slots.MONO_SLOT.grain_table))
+        self.assertEqual(load.new, struct.pack("<I", spare[0]))
+        self.assertEqual(slots.BLOCK0_BASE + table.offset, spare[0])
+        self.assertEqual(table.new, mono.pack_tone(later, "T", "x"))
+        # the spare table is loaded at one place, by a look handler that no
+        # art code of the film slots uses
+        image = self.program.read(slots.BLOCK0_BASE, 0xD00000)
+        self.assertEqual(image.count(struct.pack("<I", spare[0])), 1)
+        with self.assertRaises(BuildError):
+            mono.refit_ops(
+                self.program, first, dict(later, A=first["A"] + 1), "x", spare
+            )
+        with self.assertRaises(BuildError):
+            mono.refit_ops(
+                self.program, first, dict(later, L=first["L"][::-1]), "x", spare
+            )
 
     def test_the_committed_specs_are_the_generated_ones(self) -> None:
         paths = [spec.path for spec in mono.generate(PATHS)]

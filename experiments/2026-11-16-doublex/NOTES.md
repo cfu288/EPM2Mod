@@ -190,3 +190,86 @@ The owner developed the test RAW in the Double-X entry of `debug-log-films-12c` 
   above value 180, and within 2 codes between. These are the ends where the transfer g of the grain program was
   not measured. A second fit with g taken from this reading should remove most of it.
 - Grain: the spread inside a mid-grey patch is 19 to 21 codes; the prediction was about 20 (V).
+
+## Second fit (2026-11-16): g measured over the whole range, new grain table
+
+Builds `films-12d` and `debug-log-films-12d` = the films-12c pair with `patches/films12bw-doublex2.json` after
+`films12bw-doublex.json`. **Not camera-tested. Nothing was flashed.**
+
+**g, second measurement** (`scripts/measure_transfer2.py`, `results/grain-transfer-2.txt` and `-2.json`). The
+first camera development went through a table of ours with a slope near 1, so x = table⁻¹(picture value) is
+known for 6,079 patches, luma 3 to 243 (the stock table gave it for luma 62 to 148 only, where it is steep).
+
+| Y_in | 6 | 17 | 31 | 42 | 54 | 78 | 102 | 126 | 150 | 174 | 186 | 198 | 210 | 222 | 234 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| g, second | 43 | 46 | 56 | 70 | 83 | 111 | 136 | 159 | 182 | 204 | 216 | 226 | 234 | 240 | 244 |
+| g, first | 42 | 51 | 63 | 73 | 85 | 110 | 135 | 159 | 182 | 201 | 209 | 220 | 226 | 232 | 238 |
+
+- g is an S: nearly flat below luma 17 (the first g went on straight there, 5 to 7 too high at luma 17 to 31)
+  and above luma 220, and 3 to 8 higher than the first g from luma 174 to 234 (the first g was a straight
+  guess above 208). In the middle (luma 54 to 160) the two agree within 1.
+- One smooth g explains the Double-X reading to 1.2 picture codes (mean |ΔL*| 0.50), with no mean error in any
+  tone range (V). Where the stock reading gives x too (19 bins, luma 70 to 142), the two readings differ by
+  0.9 in x, the Double-X one higher (V). Through the steep stock table that is 2.7 picture codes (ΔL* 1.0) for
+  the stock reading: one g describes both within the accuracy that the stock table allows. g2 is taken from the
+  Double-X reading alone: it has the matrix and the kind of table of the next build.
+- **Per colour** (residual of x against g2, by largest scene channel and saturation): red +0.2 to +0.3, green
+  +0.1 to +0.2, blue 0.0, all below 0.3 of 1.6 rms. No colour-dependent error: **the matrix stays** (V).
+
+**The fit** (`fit_mono.py --name doublex2 --transfer 2 --matrix-from looks/fits/doublex.npz`): the tone D comes
+out the same (8, 33, 69, 98, 125, 152, 178, 200, 220); the grain table changes, because T(x) = D(g⁻¹(x)). The
+live-view table is D and does not change. `looks/fits/doublex2.npz`.
+
+Mean |ΔL*| / mean ΔE2000 against the target (`results/fit-doublex2.txt`, `results/predict-doublex2.txt`):
+
+| | natural | skin | ColorChecker ×5 | grays |
+|---|---|---|---|---|
+| first camera result | 1.72 / 1.23 | 1.73 / 1.28 | 1.63 / 1.16 | 1.60 / 1.08 |
+| **second fit, predicted camera** | 0.51 / 0.40 | 0.53 / 0.44 | 0.51 / 0.40 | 0.46 / 0.33 |
+| second fit, model | 0.07 / 0.06 | 0.08 / 0.06 | 0.15 / 0.12 | 0.05 / 0.03 |
+
+"Predicted camera" = the first reading replayed (`scripts/predict_camera.py`): per patch, the x that the camera
+had, sent through the new table. It holds if the camera repeats itself. Predicted mean error at the ends, in
+picture codes: target below 20: −0.2 (first result −2.2); 20 to 40: 0.0 (−7.0); 180 to 205: −0.6 (+9.9); above
+205: −1.3 (+4.0). The scatter per patch stays near 1.3 codes; that is the floor of this method.
+
+Grain: mean table slope 0.97 between picture values 40 and 215 (spread about 19 codes, as measured). New: the
+table is steep where g is flat, up to 3.2 above picture value 205, so bright areas near white get more grain
+than in the first build (I).
+
+**How it is built.** A second spec at the same addresses would fail the free-space check against the first
+(two current specs, one place), and a delta on the first spec's table meets ten bytes that the first spec
+keeps. So the second fit's table goes into a spare table, 0x7E75ECF0 (the look table of Pin Hole I, codes 73 and
+82, which no menu entry reaches since the seven-film builds; one reference in the image), and the grain
+program's load instruction 0x7E56EF83 gets that address (4 bytes of an immediate in the image library).
+`films12bw-doublex.json` and `looks/fits/doublex.npz` are unchanged in their bytes that matter: `films-12-bw`
+and `films-12c` still give 938ac846…f044 and 71cad9d3…4421 (their `inputs_sha256` field changed, because the
+list file now names the refit). Generator: `refits` in `looks/films-12-bw.json`, `mono.refit_ops`.
+
+| Check | Result |
+|---|---|
+| `epm2mod make` for both builds: free-space check, boot test, update-path test | PASS, PASS, PASS |
+| `tools/emu/opcheck.py`, both | 0 FAIL |
+| `scripts/stage_check_bw.py build/films-12d.BIN --refit 1` (`results/stage-check-films-12d.txt`) | PASS: for 74 and 83 the grain program's look stage gives 0x7E75ECF0 = the second fit's T; matrix, live-view table and every other stage as in the first build; 104 / 105 stock |
+| `films-max/scripts/scen_films.py` for 104, 111, 119 (`results/scen-films-12d.txt`) | 3 of 3: a picture in every frame, no anomaly, lines with the MF Assist request; value 104 gives code byte 74 |
+| `black`, `mypy --strict`, unit tests | clean; 194 OK |
+| Lists, names, stored selections, crawl, peaking scenarios | not run again: the spec changes one table and one data address of the image library, nothing a menu or live view reads |
+
+| Build | sha256 |
+|---|---|
+| `films-12d` | `2cdd18e7004821b2e443ec4f08db06ab9a0d4f0f700ab53db8c4bbc1dad93e32` |
+| `debug-log-films-12d` | `cbf54889f44aef44a5abf2a8a04035b3328b3659b20d312428188c711b0e3d22` |
+
+**On the camera.**
+
+```sh
+.venv/bin/epm2mod make builds/debug-log-films-12d.json --card /path/to/card   # or builds/films-12d.json
+sha256sum /path/to/card/DCOLYMP/*.BIN && sync && umount /path/to/card
+```
+
+1. With Double-X selected: PLAY → show the test RAW `PB130001.ORF` → OK → RAW Data Edit. Send the new JPEG.
+2. One photo of a scene with deep shadow and a bright sky in Double-X. **Expected:** shadows a little lighter and
+   highlights a little darker than with films-12c; grain visible up to near white. Pure white with no grain,
+   or a picture in colour = send it.
+
+Measurement: `read_mock.py` on the JPEG, then `scripts/measure_camera.py NAME doublex2 2` and `scripts/predict_camera.py` for a third table if the ends still miss.

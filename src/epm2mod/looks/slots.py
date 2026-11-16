@@ -503,6 +503,10 @@ class MonoSlot:
         grain_load: address of the instruction that loads ``grain_table``.
         live_look: address of the look table for live view and movies.
         live_load: address of the instruction that loads ``live_look``.
+        spare_tables: per later fit of the film, (address of a table for its
+            grain table, address of the stock instruction that loads that
+            table). The tables are stock look tables of art codes that no
+            menu entry reaches since the first seven film slots.
     """
 
     entry: str
@@ -511,6 +515,7 @@ class MonoSlot:
     grain_load: int
     live_look: int
     live_load: int
+    spare_tables: tuple[tuple[int, int], ...]
 
 
 #: The black-and-white slot. It has the entry of the first extra slot.
@@ -521,4 +526,6 @@ MONO_SLOT = MonoSlot(
     grain_load=0x7E56EF83,
     live_look=0x7E7620F0,
     live_load=0x7E56E91F,
+    # the look table of Pin Hole I (codes 73 and 82)
+    spare_tables=((0x7E75ECF0, 0x7E56E90E),),
 )
