@@ -135,7 +135,7 @@ class RealFirmwareExtraTests(unittest.TestCase):
 
     def test_the_stock_firmware_has_what_the_slots_name(self) -> None:
         for slot in slots.EXTRA_SLOTS:
-            self.assertEqual(len(extra.entry_ops(self.program, slot)), 12)
+            self.assertEqual(len(extra.entry_ops(self.program, slot)), 13)
             # the hash entry is empty, the handlers load the slot's tables
             entry = self.program.read(slots.GAMMA_HASH + 8 * slot.gamma_entry, 8)
             self.assertEqual(

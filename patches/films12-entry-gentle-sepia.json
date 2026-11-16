@@ -1,6 +1,6 @@
 {
  "name": "films12-entry-gentle-sepia",
- "description": "The menu entry Gentle Sepia stores the hidden Picture Mode value 112 in place of 108, so it selects the film look Kodak Ektar 100 (art code 98): one byte in each Picture Mode value list and in each constant of the ART bracket routines. Needs the structure spec and the looks spec. Leave this spec out and the entry is the stock filter Gentle Sepia again.",
+ "description": "The menu entry Gentle Sepia stores the hidden Picture Mode value 112 in place of 108, so it selects the film look Kodak Ektar 100 (art code 98): one byte in each Picture Mode value list, in each constant of the ART bracket routines and in the preset of the filter in ART shooting mode. Needs the structure spec and the looks spec. Leave this spec out and the entry is the stock filter Gentle Sepia again.",
  "ops": [
   {
    "type": "bytes",
@@ -83,6 +83,13 @@
    "type": "bytes",
    "block": 0,
    "offset": "0x186adb",
+   "expect": "6c",
+   "new": "70"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x40b1a0",
    "expect": "6c",
    "new": "70"
   }

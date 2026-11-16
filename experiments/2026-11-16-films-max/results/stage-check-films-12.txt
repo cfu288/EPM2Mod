@@ -59,6 +59,19 @@ image build/films-12.BIN
    value 115 (Key Line = Kodak Gold 200), movie code 156: all tables are the film (movie: tone tables the films; chroma the film; look identity)
    value 118 (Watercolor = Kodak Vision3 500T), still code 159: all tables are the film
    value 118 (Watercolor = Kodak Vision3 500T), movie code 159: all tables are the film (movie: tone tables the films; chroma the film; look identity)
+6. ART shooting mode: the preset of each ART filter (table 0x7E834794, kind 1) sets setting 111
+   ART list place 1 (mode code 70): stores 100; the Picture Mode list has 100 there; art code 70 = Kodak Portra 400
+   ART list place 2 (mode code 69): stores 101; the Picture Mode list has 101 there; art code 102 = Kodak Ektachrome 100
+   ART list place 3 (mode code 71): stores 102; the Picture Mode list has 102 there; art code 71 = Fuji Pro 400H
+   ART list place 4 (mode code 72): stores 103; the Picture Mode list has 103 there; art code 72 = Kodak Kodachrome 64
+   ART list place 5 (mode code 74): stores 111; the Picture Mode list has 111 there; art code 94 = Fujifilm Provia 100F
+   ART list place 6 (mode code 73): stores 105; the Picture Mode list has 105 there; art code 145 = Kodak Vision3 250D
+   ART list place 7 (mode code 86): stores 106; the Picture Mode list has 106 there; art code 167 = Fuji Velvia 100
+   ART list place 8 (mode code 85): stores 107; the Picture Mode list has 107 there; art code 85 = Fuji Superia X-tra 400
+   ART list place 9 (mode code 91): stores 112; the Picture Mode list has 112 there; art code 98 = Kodak Ektar 100
+   ART list place 10 (mode code 96): stores 114; the Picture Mode list has 114 there; art code 144 = Kodak Portra 160
+   ART list place 11 (mode code 163): stores 115; the Picture Mode list has 115 there; art code 156 = Kodak Gold 200
+   ART list place 12 (mode code 181): stores 118; the Picture Mode list has 118 there; art code 159 = Kodak Vision3 500T
 5. Against build/peaking-fast.BIN
    value 100 (Pop Art): same codes, tables and contents
    value 101 (Soft Focus): same codes, tables and contents

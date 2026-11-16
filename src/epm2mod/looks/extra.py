@@ -15,8 +15,9 @@ a new art code. Three kinds of spec come out:
 * the looks: for every extra slot its tone tables, saturation gains, six-axis
   values, matrix and chroma curves;
 * one entry spec per slot: the menu entry stores the hidden value. It changes
-  one byte in each Picture Mode value list and in each constant of the ART
-  bracket routines. Without its entry spec a menu entry is the stock filter.
+  one byte in each Picture Mode value list, in each constant of the ART
+  bracket routines and in the preset of the entry's filter in ART shooting
+  mode. Without its entry spec a menu entry is the stock filter.
 
 The specs are deltas on the specs of the first seven films: the structure
 changes one jump that ``remap7b-code`` wrote.
@@ -312,6 +313,12 @@ def entry_ops(program: Program, slot: slots.ExtraSlot) -> list[BytesOp]:
         table + slots.ART_VALUE_LIST_STEP * row for table in slots.ART_VALUE_LISTS
     ]
     addresses += list(slot.bracket.addresses)
+    addresses.append(slot.preset_value)
+    setting = program.read(slot.preset_value - 4, 4)
+    if setting != struct.pack("<I", slots.PICTURE_MODE_SETTING):
+        raise BuildError(
+            f"{slot.entry}: {slot.preset_value:#x} is not the Picture Mode of a preset"
+        )
     old, new = bytes((slot.stock_value,)), bytes((slot.value,))
     for address in addresses:
         if program.read(address, 1) != old:
@@ -394,8 +401,9 @@ def generate(paths: RepoPaths, stock: StockFirmware = EPM2_V16) -> list[Generate
                     f"The menu entry {slot.entry} stores the hidden Picture Mode "
                     f"value {slot.value} in place of {slot.stock_value}, so it "
                     f"selects the film look {film.film} (art code "
-                    f"{slot.art_code}): one byte in each Picture Mode value list "
-                    "and in each constant of the ART bracket routines. Needs the "
+                    f"{slot.art_code}): one byte in each Picture Mode value list, "
+                    "in each constant of the ART bracket routines and in the "
+                    "preset of the filter in ART shooting mode. Needs the "
                     "structure spec and the looks spec. Leave this spec out and "
                     f"the entry is the stock filter {slot.entry} again."
                 ),

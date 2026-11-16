@@ -1,0 +1,133 @@
+A settings getter call sites: 108: hidden 3, none 97, range 6, stock 2
+     13 Add Effects (prm 0x44D1) through 0x7e457c75
+     20 Filter Type (prm 0x44C1) through 0x7e457c75
+     10 Picture Mode (prm 0x9481) through 0x7e457c75
+      1 setting 111 through 0x7e67f822
+      1 setting 111 through 0x7e6fcc91
+     23 setting 111 through 0x7e6fea5f
+     23 setting 111 through 0x7e704b75
+      4 setting 111 through 0x7ee01d38
+      1 setting 281 (ART mode code) through 0x7e67f822
+      3 setting 281 (ART mode code) through 0x7ee01d38
+      1 setting 509 through 0x7e67f822
+      2 setting 509 through 0x7e6fea5f
+      1 setting 509 through 0x7e704b75
+      1 setting 510 through 0x7e67f822
+      2 setting 510 through 0x7e6fea5f
+      1 setting 510 through 0x7e704b75
+      1 settings 509/510 (prm 0xDF31) through 0x7e457c75
+    stock  0x7e5a75b7 Picture Mode (prm 0x9481) through 0x7e457c75: compares 100 101 102
+    stock  0x7e6dc840 Filter Type (prm 0x44C1) through 0x7e457c75: compares 104 109
+    hidden 0x7e703fe1 setting 111 through 0x7e6fea5f: compares 115
+    hidden 0x7e703fec setting 111 through 0x7e6fea5f: compares 115
+    hidden 0x7e70507e setting 111 through 0x7e704b75: compares 115
+B art code byte reads (image library): 56: none 19, stock 37
+    stock  0x7e54a1b5 job block: art code (+79): compares 96 97 165 166
+    stock  0x7e54a3fa job block: art code (+79): compares 96 97 165 166
+    stock  0x7e54a710 job block: art code (+79): compares 96 97 165 166
+    stock  0x7e54b52e job block: art code (+79): compares 75 125
+    stock  0x7e54b5f3 job block: art code (+79): compares 75 125
+    stock  0x7e54bf5c job block: art code (+79): compares 75 125
+    stock  0x7e54bf67 job block: art code (+79): compares 125
+    stock  0x7e54c5eb job block: art code (+79): compares 151 152
+    stock  0x7e560bc2 job block: art code (+79): compares 96 97 165 166
+    stock  0x7e560bcd job block: art code (+79): compares 97 165 166
+    stock  0x7e560bd8 job block: art code (+79): compares 165 166
+    stock  0x7e560be5 job block: art code (+79): compares 166 117
+    stock  0x7e560c48 job block: art code (+79): compares 117 121
+    stock  0x7e560c53 job block: art code (+79): compares 121
+    stock  0x7e560e06 job block: art code (+79): compares 96 97 165 166 117
+    stock  0x7e560e6c job block: art code (+79): compares 117 121
+    stock  0x7e561157 job block: art code (+79): compares 96 97 165 166 117
+    stock  0x7e5611bb job block: art code (+79): compares 117 121
+    stock  0x7e564f3f job block: art code (+79): compares 127
+    stock  0x7e565366 job block: art code (+79): compares 155
+    stock  0x7e566cbd job block: art code (+79): compares 74 170
+    stock  0x7e56a9b5 job block: art code (+79): compares 96 97 165 166
+    stock  0x7e56ab83 job block: art code (+79): compares 74 184
+    stock  0x7e56ac38 job block: art code (+79): compares 91 93
+    stock  0x7e56acc6 job block: art code (+79): compares 91 93
+    stock  0x7e56ad35 job block: art code (+79): compares 96 97 165 166
+    stock  0x7e56ae97 job block: art code (+79): compares 74 83 104 105
+    stock  0x7e56c6a2 job block: art code (+79): compares 70 79 102 103
+    stock  0x7e56cb8d job block: art code (+79): compares 155 163 164 169 170
+    stock  0x7e56cbb2 job block: art code (+79): compares 155 163 164 169 170
+    stock  0x7e56ce52 job block: art code (+79): compares 96 97 165 166
+    stock  0x7e56cf11 job block: art code (+79): compares 96 97 165 166
+    stock  0x7e56db85 job block: art code (+79): compares 169 170 169 170
+    stock  0x7e56dbd8 job block: art code (+79): compares 169 170
+    stock  0x7e5732fa job block: art code (+79): compares 151 152
+    stock  0x7e5734b7 job block: art code (+79): compares 151 152
+    stock  0x7e573737 job block: art code (+79): compares 151 152
+C mov-layer and record-context reads: 87: hidden 1, none 74, range 3, stock 9
+    hidden 0x7e6c6914 mov layer: expose code: compares 115
+    stock  0x7e6c69bb mov layer: expose code: compares 73 82
+    stock  0x7e6c6a8d mov layer: expose code: compares 73 82 73 82
+    stock  0x7e6c6aeb mov layer: expose code: compares 73 82
+    stock  0x7e6ecd2d mov layer: Picture Mode byte: compares 104 109
+    stock  0x7e70d390 record context: Picture Mode: compares 116
+    stock  0x7e70e581 record context: art code: compares 104 108
+    stock  0x7e716c59 record context: Picture Mode: compares 104 107
+    stock  0x7e71aeba record context: Picture Mode: compares 116
+    stock  0x7e71b20a record context: Picture Mode: compares 116
+D table entries (per value / code): 140: as Pop Art 8, default 60, own 72
+    default 0x7ebbaae4 hash by stored value: settings loader (art = cleared), value 111 
+    default 0x7ebbaae4 hash by stored value: settings loader (art = cleared), value 112 
+    default 0x7ebbaae4 hash by stored value: settings loader (art = cleared), value 114 
+    default 0x7ebbaae4 hash by stored value: settings loader (art = cleared), value 115 
+    default 0x7ebbaae4 hash by stored value: settings loader (art = cleared), value 118 
+    default 0x7ebbabe4 hash by stored value: B&W settings, value 111 
+    default 0x7ebbabe4 hash by stored value: B&W settings, value 112 
+    default 0x7ebbabe4 hash by stored value: B&W settings, value 114 
+    default 0x7ebbabe4 hash by stored value: B&W settings, value 115 
+    default 0x7ebbabe4 hash by stored value: B&W settings, value 118 
+    default 0x7ebbace4 hash by stored value: Filter Type / Add Effects, value 111 
+    default 0x7ebbace4 hash by stored value: Filter Type / Add Effects, value 112 
+    default 0x7ebbace4 hash by stored value: Filter Type / Add Effects, value 114 
+    default 0x7ebbace4 hash by stored value: Filter Type / Add Effects, value 115 
+    default 0x7ebbace4 hash by stored value: Filter Type / Add Effects, value 118 
+    default 0x7e8520e0 jump table by art code (first 69), code 94 0x7e70dbd9
+    default 0x7e8520e0 jump table by art code (first 69), code 98 0x7e70dbd9
+    default 0x7e8520e0 jump table by art code (first 69), code 144 0x7e70dbd9
+    default 0x7e8520e0 jump table by art code (first 69), code 156 0x7e70dbd9
+    default 0x7e8520e0 jump table by art code (first 69), code 159 0x7e70dbd9
+    default 0x7e74a568 hash by art code (key = code - 73), code 94 
+    default 0x7e74a568 hash by art code (key = code - 73), code 98 
+    default 0x7e74a568 hash by art code (key = code - 73), code 144 
+    default 0x7e74a568 hash by art code (key = code - 73), code 156 
+    default 0x7e74a568 hash by art code (key = code - 73), code 159 
+    default 0x7e78b29c hash by art code (key = code - 73), code 94 
+    default 0x7e78b29c hash by art code (key = code - 73), code 98 
+    default 0x7e78b29c hash by art code (key = code - 73), code 144 
+    default 0x7e78b29c hash by art code (key = code - 73), code 156 
+    default 0x7e78b29c hash by art code (key = code - 73), code 159 
+    default 0x7e78cba8 hash by art code (key = code - 66), code 94 
+    default 0x7e78cba8 hash by art code (key = code - 66), code 98 
+    default 0x7e78cba8 hash by art code (key = code - 66), code 144 
+    default 0x7e78cba8 hash by art code (key = code - 66), code 156 
+    default 0x7e78cba8 hash by art code (key = code - 66), code 159 
+    default 0x7e7ff668 hash by art code (key = code - 68), code 94 
+    default 0x7e7ff668 hash by art code (key = code - 68), code 98 
+    default 0x7e7ff668 hash by art code (key = code - 68), code 144 
+    default 0x7e7ff668 hash by art code (key = code - 68), code 156 
+    default 0x7e7ff668 hash by art code (key = code - 68), code 159 
+    default 0x7e7ff568 hash by art code (key = code - 68), code 94 
+    default 0x7e7ff568 hash by art code (key = code - 68), code 98 
+    default 0x7e7ff568 hash by art code (key = code - 68), code 144 
+    default 0x7e7ff568 hash by art code (key = code - 68), code 156 
+    default 0x7e7ff568 hash by art code (key = code - 68), code 159 
+    default 0x7e818cc8 hash by art code (key = code - 68), code 94 
+    default 0x7e818cc8 hash by art code (key = code - 68), code 98 
+    default 0x7e818cc8 hash by art code (key = code - 68), code 144 
+    default 0x7e818cc8 hash by art code (key = code - 68), code 156 
+    default 0x7e818cc8 hash by art code (key = code - 68), code 159 
+    default 0x7e852354 hash by art code (key = code - 68), code 94 
+    default 0x7e852354 hash by art code (key = code - 68), code 98 
+    default 0x7e852354 hash by art code (key = code - 68), code 144 
+    default 0x7e852354 hash by art code (key = code - 68), code 156 
+    default 0x7e852354 hash by art code (key = code - 68), code 159 
+    default 0x7e85c45c hash by art code (key = code - 72), code 94 
+    default 0x7e85c45c hash by art code (key = code - 72), code 98 
+    default 0x7e85c45c hash by art code (key = code - 72), code 144 
+    default 0x7e85c45c hash by art code (key = code - 72), code 156 
+    default 0x7e85c45c hash by art code (key = code - 72), code 159 

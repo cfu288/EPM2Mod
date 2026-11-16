@@ -36,7 +36,12 @@ from epm2mod.container import parse  # noqa: E402
 from epm2mod.hashing import sha256_bytes  # noqa: E402
 
 # string id -> (English stock text, id of the same name with an icon or None)
+# a name of the first seven films that changes in this build (name in the base build -> new name): with
+# Portra 160 in the list, the first Portra entry says which Portra it is
+RENAMED = {"Portra": "Portra 400"}
 IDS: dict[int, tuple[str, int | None]] = {
+    67: ("Portra", 597),
+    597: ("@A040@Portra", None),
     62: ("Dramatic Tone", 583),
     63: ("Gentle Sepia", 650),
     64: ("Grainy Film", 601),
@@ -56,7 +61,7 @@ IDS: dict[int, tuple[str, int | None]] = {
 SPARE_IDS = (1163, 1194)
 # ids next to the names in the text pool: some of them can move (text not changed), so that free strings join
 #: how many neighbours one language may move (the search stays short)
-MOST_MOVED = 12
+MOST_MOVED = 3
 NEIGHBOURS = (582, 584, 649, 651, 1162, 1164, 1193, 1195, 1451, 1454, 1716, 1719)
 
 
@@ -118,6 +123,39 @@ def place(
     return None
 
 
+def doubles(
+    now: names.Blob,
+    busy: set[int],
+    keeps: Callable[[bytes, int], bool],
+    pointer: Callable[[int, int], tuple[int, bytes]],
+) -> list[tuple[int, int]]:
+    """Return (id, id with the same text) for strings that can go, the longest first.
+
+    A string can go if another id holds the same text in another string, no other id points into it, the id
+    is not one of `busy`, and its pointer may change.
+    """
+    offsets = [now.offset(i) for i in range(names.N_IDS)]
+    texts = [now.text(i) for i in range(names.N_IDS)]
+    first: dict[str, int] = {}
+    out = []
+    for string_id, text in enumerate(texts):
+        if string_id in busy or len(text) < 3:
+            continue
+        if text not in first:
+            first[text] = string_id
+            continue
+        keep = first[text]
+        start, end = offsets[string_id], offsets[string_id] + 2 * (len(text) + 1)
+        if offsets[keep] == start or keep in busy:
+            continue
+        if sum(start <= offset < end for offset in offsets) != 1:
+            continue
+        if not keeps(*reversed(pointer(string_id, offsets[keep]))):
+            continue
+        out.append((string_id, keep))
+    return sorted(out, key=lambda pair: -len(texts[pair[0]]))
+
+
 def plan(
     now: names.Blob,
     base: bytes,
@@ -125,6 +163,7 @@ def plan(
     moved: tuple[int, ...],
     kept: set[int],
     apart: bool = False,
+    twice: int = 0,
 ) -> tuple[list[tuple[int, bytes]], list[str]]:
     """Plan one language. Return the writes (block offset, bytes) and one table line per id. Raises names.NoRoom.
 
@@ -132,6 +171,8 @@ def plan(
     name with an icon and the text of a moved neighbour go into the free strings; a plain name points into
     the name with its icon. With no neighbour moved, a name that fits its own old string stays there.
     No byte of `kept` gets another value. With `apart`, a plain name gets a string of its own.
+    With `twice` = n, up to n texts that the pool holds twice (two ids, the same text, two strings) give up
+    their second string: that id points at the first string, and the second string is free room.
     """
     writes: list[tuple[int, bytes]] = []
     want = {i: names.target(english) for i, (english, _) in ids.items()}
@@ -171,6 +212,11 @@ def plan(
                 lines.append(f"{now.code}\t{string_id}\t{now.text(string_id)}\t{want[string_id]}\tin place")
             return writes, lines
     free = sorted((now.offset(i), now.offset(i) + 2 * (len(now.text(i)) + 1)) for i in want)
+    for string_id, first in doubles(now, set(want), keeps, pointer)[:twice]:
+        free.append((now.offset(string_id), now.offset(string_id) + 2 * (len(now.text(string_id)) + 1)))
+        writes.append(pointer(string_id, now.offset(first)))
+        lines.append(f"{now.code}\t{string_id}\t{now.text(string_id)}\t{now.text(string_id)}\tshares the string of id {first}")
+    free.sort()
     joined: list[tuple[int, int]] = []
     for start, end in free:  # a plain name can lie inside the name with its icon already: take the union
         if joined and joined[-1][1] >= start:
@@ -238,6 +284,7 @@ def main() -> None:
     parser.add_argument("--table", action="store_true", help="print one line per language and id, write nothing")
     args = parser.parse_args()
     films = {film["entry"]: film["label"] for film in json.loads(Path(args.films).read_text())["films"]}
+    films.update(RENAMED)
     names.FILMS = films
     stock_file = Path(args.stock).read_bytes()
     base = parse(Path(args.base).read_bytes()).blocks[1].payload
@@ -260,18 +307,23 @@ def main() -> None:
     table: list[str] = []
     short: list[str] = []
     no_space: list[str] = []
+    shared: list[str] = []
     for entry in range(1, 35):
         now = names.Blob(base, entry)
         choices = [
-            (spare, tight, apart) for apart in (False, True) for tight in (False, True) for spare in (True, False)
+            (spare, tight, apart, twice)
+            for tight in (False, True)
+            for twice in (0, 4, 12)
+            for spare in (True, False)
+            for apart in (False, True)
         ]
         found = None
-        for moved in attempts(now):  # few neighbours first; for each set, the full names first
-            for spare, tight, apart in choices:
-                ids = IDS if spare else {i: v for i, v in IDS.items() if i not in SPARE_IDS}
-                names.FILMS = {entry: label.replace(" ", "") for entry, label in films.items()} if tight else films
+        for spare, tight, apart, twice in choices:  # the full names first; for each choice, few neighbours first
+            ids = IDS if spare else {i: v for i, v in IDS.items() if i not in SPARE_IDS}
+            names.FILMS = {entry: label.replace(" ", "") for entry, label in films.items()} if tight else films
+            for moved in attempts(now):
                 try:
-                    found = plan(now, base, ids, moved, kept, apart)
+                    found = plan(now, base, ids, moved, kept, apart, twice)
                     break
                 except names.NoRoom:
                     continue
@@ -282,6 +334,8 @@ def main() -> None:
         writes, lines = found
         if tight:
             no_space.append(now.code)
+        if twice:
+            shared.append(now.code)
         if len(ids) != len(IDS):
             short.append(now.code)
         out = bytearray(base)
@@ -303,7 +357,7 @@ def main() -> None:
     spec = {
         "name": Path(args.out).stem,
         "description": (
-            "The names of the films beyond the first seven in all 34 menu languages ("
+            "The names of the films beyond the first seven in all 34 menu languages, and Portra renamed to Portra 400 ("
             + ", ".join(f"{entry} -> {label}" for entry, label in films.items())
             + "; string ids "
             + ", ".join(str(i) for i in sorted(IDS))
@@ -317,6 +371,11 @@ def main() -> None:
                 f"; the names have no space character in {', '.join(no_space)}, where the text pool has no "
                 "room for it"
                 if no_space
+                else ""
+            )
+            + (
+                f"; in {', '.join(shared)} some ids that show the same text share one string, which gives the room"
+                if shared
                 else ""
             )
             + "). The spec also holds what patches/film-names-all-languages.json does (the names of the first seven "

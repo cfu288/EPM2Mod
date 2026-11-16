@@ -251,6 +251,14 @@ VALUE_LIST_STEP = 64
 #: bytes per entry, the stored value in the first byte; the first entry is value 100.
 ART_VALUE_LISTS = (0x7E818EFA, 0x7E82405E, 0x7E82417E)
 ART_VALUE_LIST_STEP = 8
+#: The presets of the shooting modes: 12-byte rows of (mode code, kind, list
+#: address, count) up to a row with code 0; a list holds (setting, value)
+#: pairs of 32-bit words. The preset of an ART filter (kind 1) sets setting
+#: 111, the Picture Mode, to the stored value of the filter's menu entry.
+MODE_PRESETS = 0x7E834794
+MODE_PRESET_ROW = 12
+ART_PRESET_KIND = 1
+PICTURE_MODE_SETTING = 111
 #: Place of the first art entry (Pop Art) in a Picture Mode value list.
 FIRST_ART_PLACE = 7
 
@@ -294,6 +302,9 @@ class ExtraSlot:
         six_axis_handler: the stock handler that loads ``look.six_axis``.
         chroma_handler: the stock handler that loads ``look.chroma``.
         bracket: the constants of the ART bracket routines for the entry.
+        art_mode_code: the code of the entry in ART shooting mode (setting 281).
+        preset_value: address of the stored value in the preset of that ART
+            filter: what the camera stores when the entry is chosen in ART mode.
     """
 
     look: Slot
@@ -306,6 +317,8 @@ class ExtraSlot:
     six_axis_handler: int
     chroma_handler: int
     bracket: BracketSites
+    art_mode_code: int
+    preset_value: int
 
     @property
     def entry(self) -> str:
@@ -324,6 +337,7 @@ def _extra(
     chroma: tuple[int, int],
     matrix: int,
     bracket: tuple[int, int, int, int, int, int],
+    art_mode: tuple[int, int],
 ) -> ExtraSlot:
     """Return an extra slot from its numbers (handler first, then its tables)."""
     return ExtraSlot(
@@ -345,6 +359,8 @@ def _extra(
         six_axis_handler=six_axis[0],
         chroma_handler=chroma[0],
         bracket=BracketSites(bracket),
+        art_mode_code=art_mode[0],
+        preset_value=art_mode[1],
     )
 
 
@@ -375,6 +391,7 @@ EXTRA_SLOTS: tuple[ExtraSlot, ...] = (
             0x7E5A7665,
             0x7E5A7A2E,
         ),
+        art_mode=(74, 0x7E82B810),
     ),
     _extra(
         "Gentle Sepia",
@@ -394,6 +411,7 @@ EXTRA_SLOTS: tuple[ExtraSlot, ...] = (
             0x7E5A76FE,
             0x7E5A7AFB,
         ),
+        art_mode=(91, 0x7E82C1C0),
     ),
     _extra(
         "Dramatic Tone",
@@ -413,6 +431,7 @@ EXTRA_SLOTS: tuple[ExtraSlot, ...] = (
             0x7E5A7725,
             0x7E5A7B18,
         ),
+        art_mode=(96, 0x7E82C4F8),
     ),
     _extra(
         "Key Line",
@@ -432,6 +451,7 @@ EXTRA_SLOTS: tuple[ExtraSlot, ...] = (
             0x7E5A774C,
             0x7E5A7B6E,
         ),
+        art_mode=(163, 0x7E82C830),
     ),
     _extra(
         "Watercolor",
@@ -451,5 +471,6 @@ EXTRA_SLOTS: tuple[ExtraSlot, ...] = (
             0x7E5A776F,
             0x7E5A7B9C,
         ),
+        art_mode=(181, 0x7E82CB68),
     ),
 )

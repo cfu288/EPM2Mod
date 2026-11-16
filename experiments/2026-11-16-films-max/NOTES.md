@@ -13,7 +13,7 @@ Labels: **V** = ran in the emulator or read in the firmware bytes. **I** = infer
 
 | Place | Menu entry (stock) | Film | Fit: natural / skin / ColorChecker (ΔE2000, model) | Stored value | Art code |
 |---|---|---|---|---|---|
-| 1 to 4 | Pop Art, Soft Focus, Pale&Light, Light Tone | Portra, Ektachrome, Pro 400H, Kodachrome | as pinned | 100 to 103 | as pinned |
+| 1 to 4 | Pop Art, Soft Focus, Pale&Light, Light Tone | **Portra 400** (was named Portra), Ektachrome, Pro 400H, Kodachrome | as pinned | 100 to 103 | as pinned |
 | 5 | Grainy Film | **Provia 100F** (slide) | 0.71 / 0.87 / 1.63 | 111 (was 104) | 94 |
 | 6 to 8 | Pin Hole, Diorama, Cross Process | Vis 250D, Velvia, Superia 400 | as pinned | 105 to 107 | as pinned |
 | 9 | Gentle Sepia | **Ektar 100** (Endura paper) | 0.85 / 1.21 / 1.75 | 112 (was 108) | 98 |
@@ -63,7 +63,8 @@ construction; the stock filter comes back when one spec is left out).
 | Saturation, six-axis, chroma | The stock handlers and tables of art codes that no menu entry reaches: Pin Hole I (73), Diorama (86), Pin Hole II (106), Pin Hole III (108), code 153. Jump-table entries only, no new code | V: handlers decoded; test `test_the_stock_firmware_has_what_the_slots_name` |
 | New code and data | 887 bytes in the segment-2 area 0x7EBF1090–0x7EBF3BAD: tone stubs, record triples and records at 0x7EBF38BC (595 B), the second part of the matrix compare chain and 15 stubs at 0x7EBF2E80 (202 B), five matrices at 0x7EBF3B52 (90 B) | V: `tools/freespace.py check` PASS |
 | Tables keyed by the stored value | Hash tables 0x7EC4A864 (colour-tone name), 0x7E810200 (movie file tag), 0x7E851A94 (record class): keys 111 … 118 added | V |
-| The menu entry | One byte in each value list (settings 111, 509, 510), in each "is an art filter" list (0x7E818EFA, 0x7E82405E, 0x7E82417E) and in six constants of the ART bracket routines (0x7EA7633A, 0x7EA9528D, 0x7E5A75AE) | V |
+| The menu entry | One byte in each value list (settings 111, 509, 510), in each "is an art filter" list (0x7E818EFA, 0x7E82405E, 0x7E82417E), in six constants of the ART bracket routines (0x7EA7633A, 0x7EA9528D, 0x7E5A75AE), and in the **preset of the entry's ART filter** | V |
+| ART shooting mode | The mode controller applies a preset when the shooting mode changes: table 0x7E834794 (57 rows of mode code, kind, list, count), each list holds (setting, value) pairs. The preset of an ART filter (kind 1) sets setting 111 to the entry's stored value (0x7E706EAA applies it). Five values changed: 0x7E82B810, C1C0, C4F8, C830, CB68 | V: found with a read of the stored byte in the emulator; `screens.sh` step 3 and `stage_check.py` step 6 |
 
 Not connected for the five entries: **Filter Type and Add Effects**. The shooting application looks them up by
 stored value (hash 0x7EBBACE4); the hidden values have no key there, so the type is 0 and no effect is added,
@@ -137,8 +138,8 @@ need no further change of stock code. Storage is not the limit at twelve and wou
 |---|---|---|
 | `patches/films12-structure.json` | `epm2mod looks --write` (`src/epm2mod/looks/extra.py`) | code, records, table and hash entries. Nothing of it runs while no entry stores a hidden value |
 | `patches/films12-looks.json` | same | the five looks (40 ops, 8.4 KB) |
-| `patches/films12-entry-NAME.json` × 5 | same | 12 single bytes: the entry stores the hidden value |
-| `patches/films12-names.json` | `scripts/names_spec.py` | the five names in 34 languages. It also holds what `film-names-all-languages` does and takes its place |
+| `patches/films12-entry-NAME.json` × 5 | same | 13 single bytes: the entry stores the hidden value, also in ART shooting mode |
+| `patches/films12-names.json` | `scripts/names_spec.py` | the five names and "Portra 400" for the first entry, in 34 languages. It also holds what `film-names-all-languages` does and takes its place |
 
 | Build | sha256 | Content |
 |---|---|---|
@@ -164,35 +165,82 @@ names too, put `film-names-all-languages` back in place of `films12-names`.
 | `tools/emu/opcheck.py` both builds | 0 FAIL |
 | `tools/emu/hookcheck.py patches/films12-structure.json` | 18 transfers, 0 FAIL (no new hook; one changed jump inside segment 2) |
 | `black`, `mypy --strict`, `python -m unittest discover -s tests` | clean; 185 tests OK (11 new in `tests/test_looks_extra.py`) |
-| **`scripts/stage_check.py`** (new): for every stored value of the lists, `art_GetFilterType` (types 1 to 3) and the four live-view tables run in the emulator; for every code they give, all six stages' dispatch; the tables each stage ends with compared byte for byte with what the generator makes from the fit | pinned PASS (12 values, 28 codes). films-12 **PASS** (12 values, 19 codes): every entry gives one code in all still paths and one in both movie tables, class 1, no code in an effect list; all 12 looks are their films; the seven old entries give the same codes, tables and contents as pinned (`results/stage-check-films-12.txt`) |
+| **`scripts/stage_check.py`** (new): for every stored value of the lists, `art_GetFilterType` (types 1 to 3) and the four live-view tables run in the emulator; for every code they give, all six stages' dispatch; the tables each stage ends with compared byte for byte with what the generator makes from the fit | pinned PASS (12 values, 28 codes). films-12 **PASS** (12 values, 19 codes): every entry gives one code in all still paths and one in both movie tables, class 1, no code in an effect list; all 12 looks are their films; the seven old entries give the same codes, tables and contents as pinned; the 12 ART presets store the list's values (`results/stage-check-films-12.txt`) |
 | Peaking S6 (six-axis dispatch for codes 9–184), S7 (`scen_direct4.py`) | 0 FAULT. S6 prints FAIL for films-12 because it lists codes whose result differs from pinned: 94, 98, 144, 156, 159, the five new codes, as intended. S7 PASS (`results/scen-s6-s7-films-12.txt`) |
 | Peaking S1 to S5 (`scen_peaking.py`), films-12 against pinned | as pinned in all five (section 6) |
 | `scripts/scen_films.py` (new): live-view rig, each of the 12 stored values and 119, three frames without and three with the MF Assist request | 13 of 13: picture in every frame, no anomaly, lines with the request (section 6) |
 | Emulator screens, English (`scripts/screens.sh`): quick menu in P and movie mode, Picture Mode list, Picture Mode Settings, ART list, ART BKT | twelve films in order, ART 1 to 12 (pictures above and in `results/`) |
-| English, German, Japanese, French: Picture Mode and ART lists (`lang-all.sh`) | all name strips equal to English. All 34 languages: static, `names_spec.py` checks each name and that every other id reads as before. Korean and Chinese (simplified): the five names have no space ("Ektar100"), the text pool has no room |
-| Each entry chosen in the quick menu, state saved | stored values 100, 101, 102, 103, **111**, 105, 106, 107, **112, 114, 115, 118** |
+| English, German, Japanese, French: Picture Mode and ART lists (`lang-all.sh`) | plus Korean and Chinese (simplified): all name strips equal to English. All 34 languages: static, `names_spec.py` checks each name and that every other id reads as before. Korean and Chinese pools are full: there some ids that show the same text now share one string, which gives the room for the full names |
+| Each entry chosen in the quick menu, and on the ART mode screen, state saved | both: stored values 100, 101, 102, 103, **111**, 105, 106, 107, **112, 114, 115, 118** |
 | A selection made on the pinned build, state loaded by films-12 | the seven films: same name and number. Stored 104, 108, 109, 119, 120 (a stock filter that is gone from the list): the screen shows the last entry, Vis 500T / ART 12, **and the camera still renders the old stock filter** until a Picture Mode is chosen once (I for the rendering: the pipeline of those values is untouched) |
 | Shallow menu crawl, films-12 against pinned | mode P: 372 screens by name, 12 differ, all Shooting Menu 1 → Picture Mode; 80 Custom Menu screens equal. Movie: the same 12. ART: 0 of 211 |
 
-**Found by the emulator, open: ART shooting mode.** With the mode screen set to ART, choosing entry 5, 9, 10,
-11 or 12 stores Picture Mode 104, 108, 109, 119, 120, not the hidden value (V: `screens.sh` step 3). The value
-does not come from the lists: the mode controller reads it back with the settings of that ART filter
-(0x7E6800D7 restores setting 111 = 104; no `Set_CameraInfo` or mode-controller setter call with 111 comes
-before, traced with hooks in the emulator). Where that per-filter value is kept was not found. So **in ART
-mode those five entries are still the stock filters, under film names**. In P, A, S, M and movie mode (quick
-menu or Shooting Menu 1 → Picture Mode) they are the films. Probe: the debug log on the camera (`art_sixaxis`
-shows 74 or 94).
+**ART shooting mode (found by the emulator, closed).** The first candidate stored 104, 108, 109, 119, 120
+when one of the five entries was chosen on the ART mode screen: the value comes from the preset of the ART
+filter (section 2), not from the lists. With the preset values in the entry specs, each of the twelve ART
+entries stores the value of its film (V: `screens.sh` step 3: 100, 101, 102, 103, 111, 105, 106, 107, 112, 114,
+115, 118) and gives its art code (V: `stage_check.py` step 6). The ART mode code of the entry (setting 281 /
+24: 74, 91, 96, 163, 181) stays; what the camera does with that code in ART mode is for the camera test, as
+it is for Soft Focus, Pin Hole and Diorama in the pinned build (I).
+
+**A stock filter selected before the flash (defined, not fixed).** A camera that has Picture Mode 104, 108,
+109, 119 or 120 stored (in P, A, S, M or movie mode, or in a Myset) shows the last entry, Vis 500T / ART 12,
+and renders the old stock filter until a Picture Mode is chosen once; the stored value is then a list value.
+Why not fixed: the stored value itself is the trouble (the firmware tests it in code), and a list cannot map
+two stored values to one entry (19 entries, the 19th is the fallback). A fix is new code that rewrites the
+stored byte when the settings load, in the settings path at start-up; not built. In ART mode the case does
+not arise: the preset sets the value each time the mode is entered. Camera step: choose Natural before the
+flash, and choose the Picture Mode again in each Myset that used one of the five filters.
 
 Not checkable off the camera: the picture; live view and movie with the five new entries; an ART bracket;
-whether a stored value 111–118 meets a test in code that the scans did not see (capture layer 0x7E58–0x7E5B and
-the GUI were not scanned site by site); EXIF (the five entries write Pop Art's tags).
+whether a stored value 111–118 meets a test in code that the scans did not see (section 5a); EXIF (the five
+entries write Pop Art's tags).
+
+## 5a. Was everything found that reacts to the old filters? (inventory of readers)
+
+No tool here can prove it: there is no source, a scan of constants misses computed uses, and the emulators run
+only part of the firmware. This is the evidence, and its limits.
+
+**(a) Static, `scripts/readers.py`** (re-run: `.venv/bin/python …/readers.py`; lists in `results/readers.tsv`,
+summary in `results/readers-static.txt`). It scans the linear disassembly for reads with a constant id and
+classes the 40 instructions after each read by the constants they compare with.
+
+| Kind | Count | What the new values meet |
+|---|---|---|
+| A. Call sites of a settings getter with the id of Picture Mode, settings 509 / 510, the ART mode code, Filter Type or Add Effects | 108 | 97 no compare (value stored, passed on or a table index); 6 a range test 100..120; 2 compare stock values only (0x7E5A75B7: the ART bracket composer, patched; 0x7E6DC840: 104 / 109 for the B&W settings, the hidden values take "neither"); 3 marked "hidden" are the range test 3..115 of setting 24 next to the read, not of the Picture Mode (read by hand) |
+| B. Reads of the art code byte (+79) in the image library | 56 | 19 no compare (table index: the six stages and three more hashes); 37 compare codes of stock filters only (Dramatic Tone 96/97/165/166, Key Line, Sepia 91/93, Grainy 74/83/104/105, codes 75/125, 117/121, 151/152 …): a new code takes "none of these" in all 37 |
+| C. Reads of the mov layer's mode and code bytes and of the record context's Picture Mode and art codes | 87 | 74 no compare; 3 range tests; 9 compare stock values only (104/109 at 0x7E6ECD2D, 104/107 at 0x7E716C59, 116 at three sites, codes 73/82 at three sites, 104/108 at 0x7E70E581); 1 "hidden" is scene code 115 on the code byte (0x7E6C6914), not a stored value |
+| D. Table entries: 9 jump tables by (value − 100), 6 hashes by stored value, 6 jump tables and 11 hashes by art code; one row per hidden value / new code | 140 | 72 set by films-12; 8 the stock entry of Pop Art (art packet mode 0x7E7FF400); **60 default** = 12 tables × 5 |
+
+The 12 default branches, read one by one: settings loader 0x7EBBAAE4 (no key: the same branch as an art
+filter, fields cleared); B&W settings 0x7EBBABE4 (no key: nothing loaded, as for Pop Art); Filter Type / Add
+Effects 0x7EBBACE4 (no key: type 0, no effect, the gap named in section 2); record class by code 0x7E8520E0
+and 0x7E852354 (0, as the camera-tested codes 102 and 167); image-library hashes 0x7E74A568, 0x7E78B29C,
+0x7E78CBA8 (not monochrome, no line or watercolor path, no own curve: the plain colour path); movie-art
+hashes 0x7E7FF668, 0x7E7FF568 (no type II / III code); ART show flag 0x7E818CC8 (not reached: it takes the
+ART mode code); effect program 0x7E85C45C (none).
+
+**(b) Dynamic, `scripts/readers_dynamic.py` with `watch_reads.mjs`** (`results/readers-dynamic.txt`).
+
+| Run | Seen | Against the static list |
+|---|---|---|
+| Full boot, 7 sessions (quick menu over all 19 values in P and movie mode with OK on a new entry, Picture Mode list, Picture Mode Settings, INFO, PLAY, ART list with OK on a new entry, ART BKT list): read watchpoints on the stored Picture Mode byte and its copy | 4 distinct readers. Three are loops over all settings (0x7E67FFFB, 0x7E680290, 0x7E6803C5: the mode controller's snapshot and restore) | 2 of 108 static call sites executed; 106 never. 3 dynamic readers have no static site (the loops: no constant id). **The GUI does not read the stored byte per use**: it reads the mode controller's own copy, which the watchpoints do not cover |
+| Live-view rig, 13 stored values × (3 frames + 3 frames with the peaking request): read watchpoints on the mov layer's mode and code bytes | 22 distinct reading instructions | 10 of the 30 static reads (absolute address) executed, 20 never; **12 dynamic reads are not in the static list** (they read through a pointer to the struct, 0x7E6C367F … 0x7E6ECFA9): a gap of the static method. None of the 12 lies in new code; with the new values every frame gave a picture and no anomaly (`scen_films.py`) |
+| Colour stages (`stage_check.py`) | all six dispatches for every code, from the instruction after the read of +79 | the 56 reads of kind B themselves are not executed by the pieces; the 37 with compares were read statically only |
+
+**(c) Covered by neither method** (the camera test must touch each once with a new entry): a real capture
+(the capture layer 0x7E58–0x7E5B reads the Picture Mode at five sites, never executed here) and its JPEG and
+EXIF; RAW Data Edit; movie record and the movie file's tag; an ART bracket (the composer 0x7E5A75AE);
+playback info and the index view of a picture taken with a new entry; print order / PictBridge and the
+share / slideshow menus (colour-tone name in rec view: hash 0x7EC4A864); Mysets (save and recall); the super
+control panel; the Photo Story and e-Portrait paths; sleep and wake with a new entry selected; HDMI output.
 
 ## 6. Hashes and the last results
 
 | Build | sha256 |
 |---|---|
-| `films-12` | `a87d253f9e90a5b6815c190344fcb8e2fe4e256ec9dec07a62aee5c0daddf5c1` |
-| `debug-log-films-12` | `b1276dee06d777af5419a4a2c9c8f0eb48bc19449dd660b85c35f1af409cd4ad` |
+| `films-12` | `837786534ec6fdada46d052480672930419ca838e760dd790794b9e6b3ef8913` |
+| `debug-log-films-12` | `5d0a7683e4d8da90226163eeeaaf44dfa31250704b7c5e512bd59a5c3a34d02f` |
 | pinned `peaking-fast` (made last, in `build/card`) | `0e8a25b9578b8119b14b4895be7d2a0b70d7315e5e817758699777f0f31d917e`, as recorded |
 
 - Peaking S1 to S5, films-12 against pinned (`results/scen-s1-s5-films-12.txt`): S1 the same writes and code
@@ -204,6 +252,20 @@ the GUI were not scanned site by site); EXIF (the five entries write Pop Art's t
   entry (art code 102).
 - Shallow crawl: mode P 12 of 372 screens differ, movie 12 of 222, ART 0 of 211; every difference is a screen
   of Shooting Menu 1 → Picture Mode. Custom Menu screens equal. Firmware error entries equal.
+
+## 6a. When films-12 becomes the pinned build: the documents
+
+The guide's film table (`docs/guide/film-looks.md`, made by `epm2mod readme` from `looks/films.json`) names the
+first entry "Portra". `looks/films.json` was not changed, because its label makes `patches/seven-labels.json`
+and the pinned build must keep its bytes. With films-12 pinned: let the readme generator take the menu name of
+the first entry from the names spec's rename ("Portra 400") and add the five rows of `looks/more-films.json`;
+replace the screenshot `docs/images/ui/quick-menu-portra.png`; say in the guide that Filter Type and Add
+Effects do nothing in the five new entries; list the build without `film-names-all-languages`.
+
+Names: twelve entries read Portra 400, Ektachrome, Pro 400H, Kodachrome, Provia, Vis 250D, Velvia, Superia 400,
+Ektar 100, Portra 160, Gold 200, Vis 500T, the same text in all 34 languages. A number is there where the
+stock has one in its usual name or where two of a family are in the list (Portra, Vision3); Ektachrome,
+Kodachrome, Velvia and Provia are each the only one of their family. No other name is ambiguous.
 
 ## 7. On the camera
 
@@ -224,7 +286,15 @@ Before the flash: choose Natural (MENU → Shooting Menu 1 → Picture Mode → 
 3. Movie mode: select Provia, Ektar 100 and Vis 500T in turn. **Expected:** no freeze. Record 3 seconds in one.
 4. Focus peaking: with Peaking on (White), turn the focus ring in Portra and in Gold 200.
    **Expected:** white lines in the magnified view, as before.
-5. MENU (opens the log flush), then power off.
+5. ART mode (MENU → ART): choose 5 Provia, then 11 Gold 200. **Expected:** the same film picture as in mode P
+   (no black-and-white, no outline); one photo each.
+6. One pass with **Ektar 100** selected in mode P over the paths that no emulator check runs (section 5a c):
+   one RAW+JPEG photo; PLAY → INFO until the detailed view shows; a 3-second movie; MENU → ART → 13 ART BKT → ▶, only
+   Ektar 100 and Portra 400 On, OK, one photo (**expected:** two JPEGs with the two film looks), then back to P;
+   MENU → Shooting Menu 1 → Reset/Myset → Myset1 (store), change to Natural, Reset/Myset → Myset1 (recall;
+   **expected:** Ektar 100 again; the two Myset sub-screens were not opened in the emulator); let the
+   camera go to sleep and wake it. A freeze, an error message or a wrong look in one step = write down which.
+7. MENU (opens the log flush), then power off.
 
 Send back: the 12 photos, the 12 RAW Data Edit JPEGs and `EPM2LOG.BIN` from the card.
 

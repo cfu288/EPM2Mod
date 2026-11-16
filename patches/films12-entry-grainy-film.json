@@ -1,6 +1,6 @@
 {
  "name": "films12-entry-grainy-film",
- "description": "The menu entry Grainy Film stores the hidden Picture Mode value 111 in place of 104, so it selects the film look Fujifilm Provia 100F (art code 94): one byte in each Picture Mode value list and in each constant of the ART bracket routines. Needs the structure spec and the looks spec. Leave this spec out and the entry is the stock filter Grainy Film again.",
+ "description": "The menu entry Grainy Film stores the hidden Picture Mode value 111 in place of 104, so it selects the film look Fujifilm Provia 100F (art code 94): one byte in each Picture Mode value list, in each constant of the ART bracket routines and in the preset of the filter in ART shooting mode. Needs the structure spec and the looks spec. Leave this spec out and the entry is the stock filter Grainy Film again.",
  "ops": [
   {
    "type": "bytes",
@@ -83,6 +83,13 @@
    "type": "bytes",
    "block": 0,
    "offset": "0x186a0e",
+   "expect": "68",
+   "new": "6f"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x40a7f0",
    "expect": "68",
    "new": "6f"
   }

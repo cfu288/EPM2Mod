@@ -27,6 +27,9 @@ alone). For the image NAME it does, with the firmware's own code in the emulator
    class in the two by-code tables (0x7E70DBB6, 0x7E70E298). Static reads of the image: the code is in no
    effect list of art_chk_type (0x7E71C0E1, 0x7E71C28B), has no effect program (hash 0x7E85C45C), and is in none
    of the movie-art tables (jump table 0x7E7FF0B0, hashes 0x7E7FF668 and 0x7E7FF568).
+6. ART shooting mode (static read of the image): the preset of each ART filter sets setting 111 to a stored
+   value; it must be the value that the Picture Mode list has at the same place, so the entry gives the same
+   film in ART mode. (That the camera applies the preset: emulator, screens.sh step 3.)
 5. With --base: the same run on the base image; every stored value that both images have must give the same
    codes, tables and table contents (a film that was there before is not changed).
 
@@ -281,6 +284,21 @@ class Image:
                 keys.add(key + first)
         return keys
 
+    def art_presets(self) -> dict[int, int]:
+        """{ART mode code: the stored Picture Mode value that the code's preset sets}."""
+        out = {}
+        row = slots.MODE_PRESETS
+        while True:
+            code, kind, address, count = struct.unpack("<HHIH", self.read(row, 10))
+            if code == 0:
+                return out
+            if kind == slots.ART_PRESET_KIND:
+                for index in range(count):
+                    setting, value = struct.unpack("<2I", self.read(address + 8 * index, 8))
+                    if setting == slots.PICTURE_MODE_SETTING:
+                        out[code] = value
+            row += slots.MODE_PRESET_ROW
+
     def movie_art_special(self) -> set[int]:
         table, first, last = MOVIE_ART_JUMP
         entries = {code: self.u32(table + 4 * (code - first)) for code in range(first, last + 1)}
@@ -449,6 +467,22 @@ def main() -> int:
             OUT(f"   value {value} ({names.get(value)} = {film['film']}), {what} code {code}: {'all tables are the film' if not bad else 'NOT the film: ' + ', '.join(bad)}{extra}")
             if bad:
                 fails.append(f"value {value} {what} code {code}: {', '.join(bad)} not the film {film['film']}")
+
+    OUT("6. ART shooting mode: the preset of each ART filter (table 0x7E834794, kind 1) sets setting 111")
+    art_codes = list(image.read(0x7E849784, 12))  # the value list of setting 281, in list order
+    presets = image.art_presets()
+    for place, art_code in enumerate(art_codes):
+        value = presets.get(art_code)
+        listed = mine["values"][place]
+        entry = mine["entries"].get(value) if value is not None else None
+        film = wanted.get(value) if value is not None else None
+        code = entry["types"][0] if entry else None
+        OUT(f"   ART list place {place + 1} (mode code {art_code}): stores {value}; the Picture Mode list has {listed} there; "
+            f"art code {code}{' = ' + str(film['film']) if film else ''}")
+        if value != listed:
+            fails.append(f"ART mode place {place + 1}: the preset stores {value}, the Picture Mode list {listed}")
+        if entry is None:
+            fails.append(f"ART mode place {place + 1}: the preset's value {value} is not in the Picture Mode list")
 
     if args.base:
         base = Image(args.base)

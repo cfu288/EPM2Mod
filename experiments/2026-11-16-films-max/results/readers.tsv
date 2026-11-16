@@ -1,0 +1,392 @@
+kind	address	what	class	compares or entry
+B	0x7e5476bb	job block: art code (+79)	none	
+B	0x7e54a1b5	job block: art code (+79)	stock	96 97 165 166
+B	0x7e54a3fa	job block: art code (+79)	stock	96 97 165 166
+B	0x7e54a710	job block: art code (+79)	stock	96 97 165 166
+B	0x7e54b52e	job block: art code (+79)	stock	75 125
+B	0x7e54b5f3	job block: art code (+79)	stock	75 125
+B	0x7e54bf5c	job block: art code (+79)	stock	75 125
+B	0x7e54bf67	job block: art code (+79)	stock	125
+B	0x7e54c5eb	job block: art code (+79)	stock	151 152
+C	0x7e55fc43	record context: art code	none	
+C	0x7e55feb8	record context: art code	none	
+B	0x7e560bc2	job block: art code (+79)	stock	96 97 165 166
+B	0x7e560bcd	job block: art code (+79)	stock	97 165 166
+B	0x7e560bd8	job block: art code (+79)	stock	165 166
+B	0x7e560be5	job block: art code (+79)	stock	166 117
+B	0x7e560c48	job block: art code (+79)	stock	117 121
+B	0x7e560c53	job block: art code (+79)	stock	121
+B	0x7e560e06	job block: art code (+79)	stock	96 97 165 166 117
+B	0x7e560e6c	job block: art code (+79)	stock	117 121
+B	0x7e561157	job block: art code (+79)	stock	96 97 165 166 117
+B	0x7e5611bb	job block: art code (+79)	stock	117 121
+B	0x7e561ba8	job block: art code (+79)	none	
+B	0x7e562292	job block: art code (+79)	none	
+B	0x7e562442	job block: art code (+79)	none	
+B	0x7e564f3f	job block: art code (+79)	stock	127
+B	0x7e565366	job block: art code (+79)	stock	155
+B	0x7e566cbd	job block: art code (+79)	stock	74 170
+B	0x7e56817e	job block: art code (+79)	none	
+B	0x7e569354	job block: art code (+79)	none	
+B	0x7e56a105	job block: art code (+79)	none	
+B	0x7e56a686	job block: art code (+79)	none	
+B	0x7e56a9b5	job block: art code (+79)	stock	96 97 165 166
+B	0x7e56ab83	job block: art code (+79)	stock	74 184
+B	0x7e56ac38	job block: art code (+79)	stock	91 93
+B	0x7e56acc6	job block: art code (+79)	stock	91 93
+B	0x7e56ad35	job block: art code (+79)	stock	96 97 165 166
+B	0x7e56ae97	job block: art code (+79)	stock	74 83 104 105
+B	0x7e56af25	job block: art code (+79)	none	
+B	0x7e56bee3	job block: art code (+79)	none	
+B	0x7e56c6a2	job block: art code (+79)	stock	70 79 102 103
+B	0x7e56cb8d	job block: art code (+79)	stock	155 163 164 169 170
+B	0x7e56cbb2	job block: art code (+79)	stock	155 163 164 169 170
+B	0x7e56ce52	job block: art code (+79)	stock	96 97 165 166
+B	0x7e56cf11	job block: art code (+79)	stock	96 97 165 166
+B	0x7e56d1f1	job block: art code (+79)	none	
+B	0x7e56db85	job block: art code (+79)	stock	169 170 169 170
+B	0x7e56dbd8	job block: art code (+79)	stock	169 170
+B	0x7e56ddce	job block: art code (+79)	none	
+B	0x7e56e68d	job block: art code (+79)	none	
+B	0x7e56ebcd	job block: art code (+79)	none	
+B	0x7e56f672	job block: art code (+79)	none	
+B	0x7e56fa4f	job block: art code (+79)	none	
+B	0x7e570000	job block: art code (+79)	none	
+B	0x7e570296	job block: art code (+79)	none	
+B	0x7e5732fa	job block: art code (+79)	stock	151 152
+B	0x7e5734b7	job block: art code (+79)	stock	151 152
+B	0x7e573737	job block: art code (+79)	stock	151 152
+B	0x7e574737	job block: art code (+79)	none	
+A	0x7e58767d	Picture Mode (prm 0x9481) through 0x7e457c75	none	
+A	0x7e59b939	Picture Mode (prm 0x9481) through 0x7e457c75	range	100
+A	0x7e5a5b11	Picture Mode (prm 0x9481) through 0x7e457c75	range	100
+A	0x7e5a65a5	Picture Mode (prm 0x9481) through 0x7e457c75	none	
+A	0x7e5a6925	Filter Type (prm 0x44C1) through 0x7e457c75	none	
+A	0x7e5a75b7	Picture Mode (prm 0x9481) through 0x7e457c75	stock	100 101 102
+A	0x7e5a79a3	Filter Type (prm 0x44C1) through 0x7e457c75	none	
+A	0x7e5a79b3	Add Effects (prm 0x44D1) through 0x7e457c75	none	
+A	0x7e5a79d0	Add Effects (prm 0x44D1) through 0x7e457c75	none	
+A	0x7e5a79ed	Filter Type (prm 0x44C1) through 0x7e457c75	none	
+A	0x7e5a79fe	Add Effects (prm 0x44D1) through 0x7e457c75	none	
+A	0x7e5a7a1b	Add Effects (prm 0x44D1) through 0x7e457c75	none	
+A	0x7e5a7a5e	Filter Type (prm 0x44C1) through 0x7e457c75	none	
+A	0x7e5a7a6f	Add Effects (prm 0x44D1) through 0x7e457c75	none	
+A	0x7e5a7a8c	Filter Type (prm 0x44C1) through 0x7e457c75	none	
+A	0x7e5a7a9d	Add Effects (prm 0x44D1) through 0x7e457c75	none	
+A	0x7e5a7aba	Add Effects (prm 0x44D1) through 0x7e457c75	none	
+A	0x7e5a7ad7	Filter Type (prm 0x44C1) through 0x7e457c75	none	
+A	0x7e5a7ae8	Add Effects (prm 0x44D1) through 0x7e457c75	none	
+A	0x7e5a7b05	Add Effects (prm 0x44D1) through 0x7e457c75	none	
+A	0x7e5a7b4a	Filter Type (prm 0x44C1) through 0x7e457c75	none	
+A	0x7e5a7b5b	Add Effects (prm 0x44D1) through 0x7e457c75	none	
+A	0x7e5a7b78	Filter Type (prm 0x44C1) through 0x7e457c75	none	
+A	0x7e5a7b89	Add Effects (prm 0x44D1) through 0x7e457c75	none	
+A	0x7e5a7ba6	Filter Type (prm 0x44C1) through 0x7e457c75	none	
+A	0x7e5a7bb7	Add Effects (prm 0x44D1) through 0x7e457c75	none	
+C	0x7e689575	record context: Picture Mode	none	
+C	0x7e6c35b4	mov layer: expose code	none	
+C	0x7e6c4730	mov layer: mode byte of the frame	none	
+C	0x7e6c4b94	mov layer: mode byte of the frame	none	
+C	0x7e6c4d0a	mov layer: mode byte of the frame	none	
+C	0x7e6c4d17	mov layer: mode byte of the frame	none	
+C	0x7e6c56de	mov layer: mode byte of the frame	none	
+C	0x7e6c57d4	mov layer: mode byte of the frame	none	
+C	0x7e6c6121	mov layer: mode byte of the frame	range	100
+C	0x7e6c6300	mov layer: expose code	none	
+C	0x7e6c6310	mov layer: expose code	none	
+C	0x7e6c644e	mov layer: mode byte of the frame	none	
+C	0x7e6c646f	mov layer: mode byte of the frame	none	
+C	0x7e6c64d5	mov layer: mode byte of the frame	none	
+C	0x7e6c651d	mov layer: mode byte of the frame	none	
+C	0x7e6c6914	mov layer: expose code	hidden	115
+C	0x7e6c69bb	mov layer: expose code	stock	73 82
+C	0x7e6c6a8d	mov layer: expose code	stock	73 82 73 82
+C	0x7e6c6aeb	mov layer: expose code	stock	73 82
+C	0x7e6c6f0c	mov layer: expose code	none	
+C	0x7e6c7575	mov layer: expose code	none	
+C	0x7e6c75aa	mov layer: expose code	none	
+C	0x7e6c80ae	mov layer: expose code	none	
+C	0x7e6c80fe	mov layer: expose code	none	
+C	0x7e6c84bb	mov layer: expose code	none	
+C	0x7e6c84d1	mov layer: mode byte of the frame	none	
+C	0x7e6c86e9	mov layer: expose code	none	
+C	0x7e6ca3fb	mov layer: expose code	none	
+C	0x7e6cae74	mov layer: mode byte of the frame	none	
+A	0x7e6cc013	Picture Mode (prm 0x9481) through 0x7e457c75	range	100 100 120
+A	0x7e6dc7c2	Picture Mode (prm 0x9481) through 0x7e457c75	none	
+A	0x7e6dc840	Filter Type (prm 0x44C1) through 0x7e457c75	stock	104 109
+C	0x7e6ecd2d	mov layer: Picture Mode byte	stock	104 109
+C	0x7e6ecd6d	mov layer: Picture Mode byte	none	
+A	0x7e6ecdb7	Picture Mode (prm 0x9481) through 0x7e457c75	none	
+A	0x7e6ecddd	Filter Type (prm 0x44C1) through 0x7e457c75	none	
+A	0x7e702d56	setting 111 through 0x7e67f822	range	100
+A	0x7e703014	setting 111 through 0x7e6fea5f	none	
+A	0x7e70302e	setting 111 through 0x7e6fea5f	none	
+A	0x7e703045	setting 111 through 0x7e6fea5f	none	
+A	0x7e70305c	setting 111 through 0x7e6fea5f	none	
+A	0x7e703073	setting 111 through 0x7e6fea5f	none	
+A	0x7e70308a	setting 111 through 0x7e6fea5f	none	
+A	0x7e7030a1	setting 111 through 0x7e6fea5f	none	
+A	0x7e7030ba	setting 111 through 0x7e6fea5f	none	
+A	0x7e703120	setting 111 through 0x7e6fea5f	none	
+A	0x7e703fe1	setting 111 through 0x7e6fea5f	hidden	115
+A	0x7e703fec	setting 111 through 0x7e6fea5f	hidden	115
+A	0x7e704042	setting 509 through 0x7e6fea5f	none	
+A	0x7e70404d	setting 509 through 0x7e6fea5f	none	
+A	0x7e704063	setting 510 through 0x7e6fea5f	none	
+A	0x7e70406e	setting 510 through 0x7e6fea5f	none	
+A	0x7e7043ac	setting 111 through 0x7e6fea5f	none	
+A	0x7e7043c3	setting 111 through 0x7e6fea5f	none	
+A	0x7e7043da	setting 111 through 0x7e6fea5f	none	
+A	0x7e7043f1	setting 111 through 0x7e6fea5f	none	
+A	0x7e704408	setting 111 through 0x7e6fea5f	none	
+A	0x7e70441f	setting 111 through 0x7e6fea5f	none	
+A	0x7e704436	setting 111 through 0x7e6fea5f	none	
+A	0x7e70444d	setting 111 through 0x7e6fea5f	none	
+A	0x7e704464	setting 111 through 0x7e6fea5f	none	
+A	0x7e70447b	setting 111 through 0x7e6fea5f	none	
+A	0x7e704492	setting 111 through 0x7e6fea5f	none	
+A	0x7e7044a9	setting 111 through 0x7e6fea5f	none	
+A	0x7e70507e	setting 111 through 0x7e704b75	hidden	115
+A	0x7e7050ea	setting 509 through 0x7e704b75	none	
+A	0x7e705117	setting 510 through 0x7e704b75	none	
+A	0x7e7051e9	setting 111 through 0x7e704b75	none	
+A	0x7e705203	setting 111 through 0x7e704b75	none	
+A	0x7e705221	setting 111 through 0x7e704b75	none	
+A	0x7e70523f	setting 111 through 0x7e704b75	none	
+A	0x7e70525d	setting 111 through 0x7e704b75	none	
+A	0x7e70527b	setting 111 through 0x7e704b75	none	
+A	0x7e705299	setting 111 through 0x7e704b75	none	
+A	0x7e7052b5	setting 111 through 0x7e704b75	none	
+A	0x7e705331	setting 111 through 0x7e704b75	none	
+A	0x7e70634d	setting 111 through 0x7e704b75	range	100
+A	0x7e7064f3	setting 111 through 0x7e704b75	none	
+A	0x7e706511	setting 111 through 0x7e704b75	none	
+A	0x7e70652f	setting 111 through 0x7e704b75	none	
+A	0x7e70654d	setting 111 through 0x7e704b75	none	
+A	0x7e70656b	setting 111 through 0x7e704b75	none	
+A	0x7e706589	setting 111 through 0x7e704b75	none	
+A	0x7e7065a7	setting 111 through 0x7e704b75	none	
+A	0x7e7065c5	setting 111 through 0x7e704b75	none	
+A	0x7e7065e3	setting 111 through 0x7e704b75	none	
+A	0x7e706601	setting 111 through 0x7e704b75	none	
+A	0x7e70661f	setting 111 through 0x7e704b75	none	
+A	0x7e70663d	setting 111 through 0x7e704b75	none	
+C	0x7e70bd90	record context: Picture Mode	none	
+C	0x7e70c4ca	record context: Picture Mode	none	
+C	0x7e70d390	record context: Picture Mode	stock	116
+C	0x7e70d426	record context: Picture Mode	none	
+C	0x7e70d58d	record context: Picture Mode	none	
+C	0x7e70d8ee	record context: art code	none	
+C	0x7e70daec	record context: Picture Mode	none	
+C	0x7e70dbb6	record context: art code	range	69 183
+C	0x7e70dc05	record context: Picture Mode	none	
+C	0x7e70e24e	record context: Picture Mode	none	
+C	0x7e70e298	record context: art code (2)	range	69 183
+C	0x7e70e581	record context: art code	stock	104 108
+C	0x7e70fdac	record context: Picture Mode	none	
+C	0x7e710266	record context: Picture Mode	none	
+C	0x7e710285	record context: art code	none	
+C	0x7e7102ce	record context: art code	none	
+C	0x7e7102ff	record context: Picture Mode	none	
+C	0x7e710382	record context: Picture Mode	none	
+C	0x7e7104c3	record context: art code	none	
+C	0x7e7104cc	record context: Picture Mode	none	
+C	0x7e710926	record context: art code	none	
+C	0x7e712c12	record context: Picture Mode	none	
+C	0x7e712d74	record context: Picture Mode	none	
+A	0x7e714899	Picture Mode (prm 0x9481) through 0x7e457c75	none	
+C	0x7e714b01	record context: Picture Mode	none	
+C	0x7e714eb0	record context: Picture Mode	none	
+C	0x7e71513b	record context: Picture Mode	none	
+C	0x7e715a78	record context: Picture Mode	none	
+C	0x7e715e42	record context: art code	none	
+C	0x7e715e4a	record context: Picture Mode	none	
+C	0x7e715e8f	record context: art code	none	
+C	0x7e715eb9	record context: Picture Mode	none	
+C	0x7e715f29	record context: art code	none	
+C	0x7e715f53	record context: Picture Mode	none	
+C	0x7e715fd9	record context: art code	none	
+C	0x7e716003	record context: Picture Mode	none	
+C	0x7e716c59	record context: Picture Mode	stock	104 107
+C	0x7e71871e	record context: Picture Mode	none	
+C	0x7e718c78	record context: Picture Mode	none	
+C	0x7e718ea9	record context: art code	none	
+C	0x7e719101	record context: art code	none	
+C	0x7e71910a	record context: Picture Mode	none	
+C	0x7e719e40	record context: Picture Mode	none	
+C	0x7e71a122	record context: Picture Mode	none	
+C	0x7e71a2bc	record context: Picture Mode	none	
+C	0x7e71a4ec	record context: Picture Mode	none	
+C	0x7e71aeba	record context: Picture Mode	stock	116
+C	0x7e71af89	record context: Picture Mode	none	
+C	0x7e71b20a	record context: Picture Mode	stock	116
+C	0x7e71b2bf	record context: Picture Mode	none	
+C	0x7e71b493	record context: art code	none	
+C	0x7e71b49a	record context: Picture Mode	none	
+C	0x7e71b5da	record context: Picture Mode	none	
+C	0x7e9411af	record context: Picture Mode	none	
+A	0x7e941c59	Picture Mode (prm 0x9481) through 0x7e457c75	none	
+A	0x7e941e5f	Filter Type (prm 0x44C1) through 0x7e457c75	none	
+C	0x7e942097	record context: art code	none	
+A	0x7e9421e2	settings 509/510 (prm 0xDF31) through 0x7e457c75	none	
+A	0x7e9427c9	Filter Type (prm 0x44C1) through 0x7e457c75	none	
+A	0x7e9427ef	Filter Type (prm 0x44C1) through 0x7e457c75	none	
+A	0x7e942816	Filter Type (prm 0x44C1) through 0x7e457c75	none	
+A	0x7e942830	Filter Type (prm 0x44C1) through 0x7e457c75	none	
+A	0x7e942855	Filter Type (prm 0x44C1) through 0x7e457c75	none	
+A	0x7e94287a	Filter Type (prm 0x44C1) through 0x7e457c75	none	
+A	0x7e942893	Filter Type (prm 0x44C1) through 0x7e457c75	none	
+A	0x7e9428ac	Filter Type (prm 0x44C1) through 0x7e457c75	none	
+A	0x7e9428bc	Add Effects (prm 0x44D1) through 0x7e457c75	range	120
+A	0x7e9e8f1f	setting 111 through 0x7e6fcc91	none	
+A	0x7ea9520c	setting 281 (ART mode code) through 0x7e67f822	none	
+A	0x7eacf68e	setting 509 through 0x7e67f822	none	
+A	0x7eacf789	setting 510 through 0x7e67f822	none	
+A	0x7ed1201f	setting 281 (ART mode code) through 0x7ee01d38	none	
+A	0x7ed12083	setting 111 through 0x7ee01d38	none	
+A	0x7ed122d0	setting 281 (ART mode code) through 0x7ee01d38	none	
+A	0x7ede1f04	setting 111 through 0x7ee01d38	none	
+A	0x7edec2d5	setting 111 through 0x7ee01d38	none	
+A	0x7ee00e5f	setting 111 through 0x7ee01d38	none	
+A	0x7ee00e82	setting 281 (ART mode code) through 0x7ee01d38	none	
+D	0x7e854a24	table by stored value: art_GetFilterType, value 111	own	0x7ebf2ece
+D	0x7e854a24	table by stored value: art_GetFilterType, value 112	own	0x7ebf2ee3
+D	0x7e854a24	table by stored value: art_GetFilterType, value 114	own	0x7ebf2ef8
+D	0x7e854a24	table by stored value: art_GetFilterType, value 115	own	0x7ebf2f10
+D	0x7e854a24	table by stored value: art_GetFilterType, value 118	own	0x7ebf2f28
+D	0x7e7ff05c	table by stored value: live view still A, value 111	own	0x7ebf2ed5
+D	0x7e7ff05c	table by stored value: live view still A, value 112	own	0x7ebf2eea
+D	0x7e7ff05c	table by stored value: live view still A, value 114	own	0x7ebf2f00
+D	0x7e7ff05c	table by stored value: live view still A, value 115	own	0x7ebf2f18
+D	0x7e7ff05c	table by stored value: live view still A, value 118	own	0x7ebf2f30
+D	0x7e7ff008	table by stored value: live view movie A, value 111	own	0x7ebf2ed5
+D	0x7e7ff008	table by stored value: live view movie A, value 112	own	0x7ebf2eea
+D	0x7e7ff008	table by stored value: live view movie A, value 114	own	0x7ebf2f00
+D	0x7e7ff008	table by stored value: live view movie A, value 115	own	0x7ebf2f18
+D	0x7e7ff008	table by stored value: live view movie A, value 118	own	0x7ebf2f30
+D	0x7e807880	table by stored value: live view still B, value 111	own	0x7ebf2edc
+D	0x7e807880	table by stored value: live view still B, value 112	own	0x7ebf2ef1
+D	0x7e807880	table by stored value: live view still B, value 114	own	0x7ebf2f08
+D	0x7e807880	table by stored value: live view still B, value 115	own	0x7ebf2f20
+D	0x7e807880	table by stored value: live view still B, value 118	own	0x7ebf2f38
+D	0x7e80782c	table by stored value: live view movie B, value 111	own	0x7ebf2edc
+D	0x7e80782c	table by stored value: live view movie B, value 112	own	0x7ebf2ef1
+D	0x7e80782c	table by stored value: live view movie B, value 114	own	0x7ebf2f08
+D	0x7e80782c	table by stored value: live view movie B, value 115	own	0x7ebf2f20
+D	0x7e80782c	table by stored value: live view movie B, value 118	own	0x7ebf2f38
+D	0x7e8522ac	table by stored value: record class by value, value 111	as Pop Art	0x7e70dbf4
+D	0x7e8522ac	table by stored value: record class by value, value 112	as Pop Art	0x7e70dbf4
+D	0x7e8522ac	table by stored value: record class by value, value 114	as Pop Art	0x7e70dbf4
+D	0x7e8522ac	table by stored value: record class by value, value 115	own	0x7e70dbf4
+D	0x7e8522ac	table by stored value: record class by value, value 118	own	0x7e70dbf4
+D	0x7e852300	table by stored value: EXIF case, value 111	own	0x7e70dc9f
+D	0x7e852300	table by stored value: EXIF case, value 112	own	0x7e70dc9f
+D	0x7e852300	table by stored value: EXIF case, value 114	own	0x7e70dc9f
+D	0x7e852300	table by stored value: EXIF case, value 115	own	0x7e70dc9f
+D	0x7e852300	table by stored value: EXIF case, value 118	own	0x7e70dc9f
+D	0x7ebbaa10	table by stored value: is art filter (application), value 111	own	0x7e9416f4
+D	0x7ebbaa10	table by stored value: is art filter (application), value 112	own	0x7e9416f4
+D	0x7ebbaa10	table by stored value: is art filter (application), value 114	own	0x7e9416f4
+D	0x7ebbaa10	table by stored value: is art filter (application), value 115	own	0x7e9416f4
+D	0x7ebbaa10	table by stored value: is art filter (application), value 118	own	0x7e9416f4
+D	0x7e7ff400	table by stored value: art packet mode 0x7E6CC9E8, value 111	as Pop Art	0x7e6cca1d
+D	0x7e7ff400	table by stored value: art packet mode 0x7E6CC9E8, value 112	as Pop Art	0x7e6cca1d
+D	0x7e7ff400	table by stored value: art packet mode 0x7E6CC9E8, value 114	as Pop Art	0x7e6cca1d
+D	0x7e7ff400	table by stored value: art packet mode 0x7E6CC9E8, value 115	as Pop Art	0x7e6cca1d
+D	0x7e7ff400	table by stored value: art packet mode 0x7E6CC9E8, value 118	as Pop Art	0x7e6cca1d
+D	0x7ec4a864	hash by stored value: colour-tone name, value 111	own	
+D	0x7ec4a864	hash by stored value: colour-tone name, value 112	own	
+D	0x7ec4a864	hash by stored value: colour-tone name, value 114	own	
+D	0x7ec4a864	hash by stored value: colour-tone name, value 115	own	
+D	0x7ec4a864	hash by stored value: colour-tone name, value 118	own	
+D	0x7e810200	hash by stored value: movie file tag, value 111	own	
+D	0x7e810200	hash by stored value: movie file tag, value 112	own	
+D	0x7e810200	hash by stored value: movie file tag, value 114	own	
+D	0x7e810200	hash by stored value: movie file tag, value 115	own	
+D	0x7e810200	hash by stored value: movie file tag, value 118	own	
+D	0x7e851a94	hash by stored value: record class, value 111	own	
+D	0x7e851a94	hash by stored value: record class, value 112	own	
+D	0x7e851a94	hash by stored value: record class, value 114	own	
+D	0x7e851a94	hash by stored value: record class, value 115	own	
+D	0x7e851a94	hash by stored value: record class, value 118	own	
+D	0x7ebbaae4	hash by stored value: settings loader (art = cleared), value 111	default	
+D	0x7ebbaae4	hash by stored value: settings loader (art = cleared), value 112	default	
+D	0x7ebbaae4	hash by stored value: settings loader (art = cleared), value 114	default	
+D	0x7ebbaae4	hash by stored value: settings loader (art = cleared), value 115	default	
+D	0x7ebbaae4	hash by stored value: settings loader (art = cleared), value 118	default	
+D	0x7ebbabe4	hash by stored value: B&W settings, value 111	default	
+D	0x7ebbabe4	hash by stored value: B&W settings, value 112	default	
+D	0x7ebbabe4	hash by stored value: B&W settings, value 114	default	
+D	0x7ebbabe4	hash by stored value: B&W settings, value 115	default	
+D	0x7ebbabe4	hash by stored value: B&W settings, value 118	default	
+D	0x7ebbace4	hash by stored value: Filter Type / Add Effects, value 111	default	
+D	0x7ebbace4	hash by stored value: Filter Type / Add Effects, value 112	default	
+D	0x7ebbace4	hash by stored value: Filter Type / Add Effects, value 114	default	
+D	0x7ebbace4	hash by stored value: Filter Type / Add Effects, value 115	default	
+D	0x7ebbace4	hash by stored value: Filter Type / Add Effects, value 118	default	
+D	0x7e78aea4	jump table by art code (first 69), code 94	own	0x7e566418
+D	0x7e78aea4	jump table by art code (first 69), code 98	own	0x7e56645c
+D	0x7e78aea4	jump table by art code (first 69), code 144	own	0x7e5665b0
+D	0x7e78aea4	jump table by art code (first 69), code 156	own	0x7e5665f4
+D	0x7e78aea4	jump table by art code (first 69), code 159	own	0x7e5666c0
+D	0x7e78c514	jump table by art code (first 69), code 94	own	0x7e56dcb9
+D	0x7e78c514	jump table by art code (first 69), code 98	own	0x7e56dcc2
+D	0x7e78c514	jump table by art code (first 69), code 144	own	0x7e56dce6
+D	0x7e78c514	jump table by art code (first 69), code 156	own	0x7e56dcef
+D	0x7e78c514	jump table by art code (first 69), code 159	own	0x7e56dd08
+D	0x7e78c8e4	jump table by art code (first 8), code 94	own	0x7e56e94a
+D	0x7e78c8e4	jump table by art code (first 8), code 98	own	0x7e56e94a
+D	0x7e78c8e4	jump table by art code (first 8), code 144	own	0x7e56e94a
+D	0x7e78c8e4	jump table by art code (first 8), code 156	own	0x7e56e94a
+D	0x7e78c8e4	jump table by art code (first 8), code 159	own	0x7e56e94a
+D	0x7e8520e0	jump table by art code (first 69), code 94	default	0x7e70dbd9
+D	0x7e8520e0	jump table by art code (first 69), code 98	default	0x7e70dbd9
+D	0x7e8520e0	jump table by art code (first 69), code 144	default	0x7e70dbd9
+D	0x7e8520e0	jump table by art code (first 69), code 156	default	0x7e70dbd9
+D	0x7e8520e0	jump table by art code (first 69), code 159	default	0x7e70dbd9
+D	0x7e74a568	hash by art code (key = code - 73), code 94	default	
+D	0x7e74a568	hash by art code (key = code - 73), code 98	default	
+D	0x7e74a568	hash by art code (key = code - 73), code 144	default	
+D	0x7e74a568	hash by art code (key = code - 73), code 156	default	
+D	0x7e74a568	hash by art code (key = code - 73), code 159	default	
+D	0x7e78b29c	hash by art code (key = code - 73), code 94	default	
+D	0x7e78b29c	hash by art code (key = code - 73), code 98	default	
+D	0x7e78b29c	hash by art code (key = code - 73), code 144	default	
+D	0x7e78b29c	hash by art code (key = code - 73), code 156	default	
+D	0x7e78b29c	hash by art code (key = code - 73), code 159	default	
+D	0x7e78c154	hash by art code (key = code - 70), code 94	own	
+D	0x7e78c154	hash by art code (key = code - 70), code 98	own	
+D	0x7e78c154	hash by art code (key = code - 70), code 144	own	
+D	0x7e78c154	hash by art code (key = code - 70), code 156	own	
+D	0x7e78c154	hash by art code (key = code - 70), code 159	own	
+D	0x7e78cba8	hash by art code (key = code - 66), code 94	default	
+D	0x7e78cba8	hash by art code (key = code - 66), code 98	default	
+D	0x7e78cba8	hash by art code (key = code - 66), code 144	default	
+D	0x7e78cba8	hash by art code (key = code - 66), code 156	default	
+D	0x7e78cba8	hash by art code (key = code - 66), code 159	default	
+D	0x7e7ff668	hash by art code (key = code - 68), code 94	default	
+D	0x7e7ff668	hash by art code (key = code - 68), code 98	default	
+D	0x7e7ff668	hash by art code (key = code - 68), code 144	default	
+D	0x7e7ff668	hash by art code (key = code - 68), code 156	default	
+D	0x7e7ff668	hash by art code (key = code - 68), code 159	default	
+D	0x7e7ff568	hash by art code (key = code - 68), code 94	default	
+D	0x7e7ff568	hash by art code (key = code - 68), code 98	default	
+D	0x7e7ff568	hash by art code (key = code - 68), code 144	default	
+D	0x7e7ff568	hash by art code (key = code - 68), code 156	default	
+D	0x7e7ff568	hash by art code (key = code - 68), code 159	default	
+D	0x7e818cc8	hash by art code (key = code - 68), code 94	default	
+D	0x7e818cc8	hash by art code (key = code - 68), code 98	default	
+D	0x7e818cc8	hash by art code (key = code - 68), code 144	default	
+D	0x7e818cc8	hash by art code (key = code - 68), code 156	default	
+D	0x7e818cc8	hash by art code (key = code - 68), code 159	default	
+D	0x7e852354	hash by art code (key = code - 68), code 94	default	
+D	0x7e852354	hash by art code (key = code - 68), code 98	default	
+D	0x7e852354	hash by art code (key = code - 68), code 144	default	
+D	0x7e852354	hash by art code (key = code - 68), code 156	default	
+D	0x7e852354	hash by art code (key = code - 68), code 159	default	
+D	0x7e85c45c	hash by art code (key = code - 72), code 94	default	
+D	0x7e85c45c	hash by art code (key = code - 72), code 98	default	
+D	0x7e85c45c	hash by art code (key = code - 72), code 144	default	
+D	0x7e85c45c	hash by art code (key = code - 72), code 156	default	
+D	0x7e85c45c	hash by art code (key = code - 72), code 159	default	
