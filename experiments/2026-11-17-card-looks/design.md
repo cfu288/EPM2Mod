@@ -265,3 +265,30 @@ record appeared. Every open question of sections 1-4 is now answered on the came
 5. **Names** stay the slots' names until a probe shows that the menu strings can be written at run time (section 7).
 
 Agent reports behind sections 3 and 4: the session of 2026-11-17 (scratch files were not kept in the repository).
+
+### 9.4 The feature build (2026-11-17, desk and emulator)
+
+- **Step 1 done:** `docs/look-file-format.md`, `src/epm2mod/looks/lookfile.py` and `lookpack.py`, `epm2mod looks pack`
+  and `show`, `tests/test_lookfile.py`. The 4-bit curves of all 17 colour fits give exactly the tables of the
+  built-in looks, for each of the eight default tables (V). `looks/card-looks.json` lists the looks of films-12d.
+- **The firmware:** `builds/card-looks.json` = films-12d + `patches/card-looks.json` (`scripts/mkspec_looks.py`;
+  sha256 `889dbcaf49b3ee0a00266ac6420d87f3f47031d0f9e81e3af9b99640ebe35949`). It is a normal build: no debug log. It
+  takes over the log's camera-tested pieces: the hook on the GUI state setter's trace call 0x7ECDF6E4 (T_GUI) and the
+  dormant task USRTEST_A (T_TASK). At the first GUI state the task applies the stored looks; at the first menu or
+  playback screen of a session it loads C:\EPM2LOOK.BIN (scratch 0x603FD040 in the bank tail), checks it, copies it
+  to the store 0x603F8000 and calls the bank save API when a byte changed, then applies. The trigger is the first
+  menu, as in the probes; the menu row (section 2.1) is the next step, one change per flash. 734 B of code in seven
+  runs of segment 2 (the persistence probe's runs, superseded, and the free end of 0x7ECB0888-0x7ECB1000); the slot
+  table (1,936 B: 12 kinds and operation lists, the CRC-32 nibble table) in two data areas of segment 3. Section 6's
+  code-space question is answered: the probes' code (452 + 185 B) was mostly the debug log's, and a build without
+  the log has the room.
+- **Checks (V emulator):** a Python model of VERIFY and APPLY in the generator: the built-in looks as a file leave
+  every byte of films-12d as it is; C200 in 11 slots changes only slot tables. Free space PASS, op check 0 FAIL,
+  hookcheck only the allowed remap7b-code entry, boot-test PASS, update-path-test PASS. `scripts/emu_looks.py`, five
+  sessions on one flash state: (1) TEST on the card: flashed looks at start, TEST after MENU (verify, bank save,
+  apply in 16 ms of lab time); (2) no file, RAM banks dropped from the state: TEST applied at 36 ms, before any key;
+  (3) BAD: refused, TEST stays, no save; (4) no card: TEST; (5) DEFAULT: the flashed looks again. No new firmware
+  error entry.
+- **Camera test (step 4):** `scripts/mktests.py` writes GREY (Pro 400H with saturation gain 0), SWAP (Pro 400H with
+  red and blue swapped by the matrix), BAD (GREY with one byte damaged) and DEFAULT into `build/card-looks/test/`.
+

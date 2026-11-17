@@ -1,0 +1,32 @@
+{
+ "what": "films-12d with film looks loaded from the SD card: put EPM2LOOK.BIN on the card, open the menu once; the looks stay after power-off and without the card (docs/look-file-format.md)",
+ "specs": [
+  "patches/remap7b-code.json",
+  "patches/seven-fixes-1.json",
+  "patches/seven-movie-1.json",
+  "patches/seven-structure-extra.json",
+  "patches/seven-films-5.json",
+  "patches/xp-adaptive-hue-off.json",
+  "patches/seven-labels.json",
+  "patches/interval-timelapse-v2.json",
+  "patches/interval-frames-240.json",
+  "patches/level-gauge-lvinfo-row.json",
+  "patches/level-adjust-row.json",
+  "patches/peaking-direct-4.json",
+  "patches/peaking-gain-2x.json",
+  "patches/peaking-menu.json",
+  "patches/peaking-colours.json",
+  "patches/peaking-fast.json",
+  "patches/films12-structure.json",
+  "patches/films12-looks.json",
+  "patches/films12bw-doublex.json",
+  "patches/films12bw-doublex2.json",
+  "patches/films12bw-names.json",
+  "patches/films12bw-entry-gentle-sepia.json",
+  "patches/films12-entry-dramatic-tone.json",
+  "patches/films12-entry-key-line.json",
+  "patches/films12-entry-watercolor.json",
+  "patches/peaking-save-guard.json",
+  "patches/card-looks.json"
+ ]
+}
