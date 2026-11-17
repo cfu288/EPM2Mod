@@ -7,6 +7,7 @@
     epm2mod fetch-stock                           download and check the stock firmware
     epm2mod builds                                list the build descriptions
     epm2mod cards                                 list the SD cards plugged into this computer
+    epm2mod serve [--port N] [--no-browser]       open the local app page
     epm2mod apply SPEC... -o OUT.BIN              apply patch specs (no build description)
     epm2mod info FIRMWARE.BIN                     describe a firmware file
     epm2mod readme [--check]                      refresh the generated parts of the documents
@@ -316,6 +317,14 @@ def _cards(args: argparse.Namespace, paths: RepoPaths) -> int:
     return 0
 
 
+def _serve(args: argparse.Namespace, paths: RepoPaths) -> int:
+    """Run ``epm2mod serve``: the local app, until the process is stopped."""
+    from .serve import serve
+
+    serve(paths, port=args.port, browser=not args.no_browser)
+    return 0
+
+
 def _log(args: argparse.Namespace, paths: RepoPaths) -> int:
     """Run ``epm2mod log``: print a camera log as JSON lines or as a summary."""
     words, *older = _dictionaries(args, paths)
@@ -381,6 +390,15 @@ def build_parser() -> argparse.ArgumentParser:
     command("fetch-stock", _fetch_stock, "Download and check the stock firmware.")
     command("builds", _builds, "List the build descriptions.")
     command("cards", _cards, "List the SD cards plugged into this computer.")
+    serve_cmd = command(
+        "serve", _serve, "Open the local app: make the firmware and the look file."
+    )
+    serve_cmd.add_argument(
+        "--port", type=int, default=0, help="port on 127.0.0.1; default: a free one"
+    )
+    serve_cmd.add_argument(
+        "--no-browser", action="store_true", help="print the address only"
+    )
 
     apply_cmd = command(
         "apply", _apply, "Apply patch specs to the stock firmware (for experiments)."

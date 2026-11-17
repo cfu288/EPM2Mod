@@ -1,0 +1,388 @@
+"""The local app (``epm2mod serve``): a page on this computer that makes the firmware and the look file.
+
+The page calls the same functions as the command line, so it makes the same files: ``pipeline.make`` for the
+firmware (``epm2mod make``) and ``records.looks_of_choices`` with ``lookfile.pack`` for the look file
+(``epm2mod looks pack ART2=velvia ...``). The result goes to an SD card from ``cards.cards`` or into a zip laid out
+as on the card.
+
+Who can use it: the server listens on 127.0.0.1 only. Each API call needs the random token of the page's URL in the
+header ``X-EPM2-Token``, and a Host header of ``127.0.0.1:PORT`` or ``localhost:PORT``. Another website can't send
+that header without a CORS preflight, which this server never allows, and a DNS-rebinding page sends another Host.
+A card path that ``cards.cards`` does not list is refused, so the page can't write to a fixed disk.
+
+API (JSON):
+
+- ``GET /api/build``: the pinned build (name, what, sha256).
+- ``GET /api/cards``: the cards plugged in.
+- ``POST /api/make`` with ``{"choices": ["ART2=velvia", ...], "card": PATH or null}``: start a job. No choices: no
+  look file. One job at a time; a wrong request, or one while a job runs, gets 400 and the reason.
+- ``GET /api/job``: the last job: its progress lines, and when it is done, the error or the result.
+- ``GET /api/zip``: the files of the last finished job, as a zip.
+
+Every other path is a file of the built app page (``web/``, ``npm run build:app``).
+"""
+
+from __future__ import annotations
+
+import hmac
+import io
+import json
+import mimetypes
+import secrets
+import threading
+import webbrowser
+import zipfile
+from collections.abc import Callable
+from dataclasses import dataclass, field
+from http import HTTPStatus
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+from typing import Any
+from urllib.parse import urlsplit
+
+from . import cards as card_list
+from .builds import BuildDescription, pinned_description
+from .errors import BuildError, Epm2ModError
+from .fileio import Log, write_bytes
+from .looks import lookfile, records
+from .paths import RepoPaths
+from .pipeline import make
+from .stock import CARD_FOLDER, EPM2_V16
+
+#: The built app page, part of the package.
+STATIC = Path(__file__).resolve().parent / "app"
+
+#: The largest request body: a list of twelve choices and a path.
+_MAX_BODY = 16 * 1024
+
+
+@dataclass
+class Job:
+    """One run of ``make`` and the look file.
+
+    Attributes:
+        number: counts the jobs of this server, from 1.
+        lines: the progress lines so far.
+        done: True when the job has ended.
+        error: the message of the error that ended it, or None.
+        sha256: the firmware's SHA-256, when it is made.
+        card: the card the files went to, or None.
+        files: the files for the card, by their path on the card.
+    """
+
+    number: int
+    lines: list[str] = field(default_factory=list)
+    done: bool = False
+    error: str | None = None
+    sha256: str | None = None
+    card: str | None = None
+    files: dict[str, bytes] = field(default_factory=dict)
+
+    def state(self) -> dict[str, Any]:
+        """Return what the page shows of the job."""
+        return {
+            "job": self.number,
+            "lines": list(self.lines),
+            "done": self.done,
+            "error": self.error,
+            "sha256": self.sha256,
+            "card": self.card,
+            "files": sorted(self.files),
+        }
+
+
+def run_job(
+    paths: RepoPaths,
+    description: BuildDescription,
+    choices: list[str],
+    card: Path | None,
+    log: Log,
+) -> tuple[str, dict[str, bytes]]:
+    """Make the firmware and the look file, and write them to a card if one is given.
+
+    Args:
+        paths: the repository (or the unpacked release).
+        description: the build to make.
+        choices: choices like ``ART2=velvia``; none for no look file.
+        card: the top folder of the SD card, or None.
+        log: where progress lines go.
+
+    Returns:
+        The firmware's SHA-256, and the files by their path on the card.
+
+    Raises:
+        Epm2ModError: if a step fails (the message is for the user).
+    """
+    looks = b""
+    if choices:
+        looks = lookfile.pack(records.looks_of_choices(records.load(paths), choices))
+    result = make(paths, description, card=card, log=log, stock=EPM2_V16)
+    files = {f"{CARD_FOLDER}/{result.card_copy.name}": result.card_copy.read_bytes()}
+    if looks:
+        files[lookfile.CARD_NAME] = looks
+        if card is not None:
+            write_bytes(card / lookfile.CARD_NAME, looks, BuildError, read_back=True)
+            log(f"on the card: {card / lookfile.CARD_NAME}  (written and read back)")
+    return result.sha256, files
+
+
+def zip_files(files: dict[str, bytes]) -> bytes:
+    """Return a zip of the files, by their path on the card."""
+    out = io.BytesIO()
+    with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as archive:
+        for name, data in sorted(files.items()):
+            archive.writestr(name, data)
+    return out.getvalue()
+
+
+class App:
+    """The state of the local app: the token, the build and the last job."""
+
+    def __init__(
+        self,
+        paths: RepoPaths,
+        static: Path = STATIC,
+        list_cards: Callable[[], list[card_list.Card]] = card_list.cards,
+        job_runner: Callable[..., tuple[str, dict[str, bytes]]] = run_job,
+    ) -> None:
+        """Make the app for a repository; the token is new and random."""
+        self.paths = paths
+        self.static = static
+        self.list_cards = list_cards
+        self.run = job_runner
+        self.token = secrets.token_urlsafe(24)
+        self.description = pinned_description(paths)
+        self.job: Job | None = None
+        self.lock = threading.Lock()
+
+    def build(self) -> dict[str, Any]:
+        """Return the pinned build."""
+        return {
+            "name": self.description.name,
+            "what": self.description.what,
+            "sha256": self.description.sha256,
+        }
+
+    def cards(self) -> list[dict[str, Any]]:
+        """Return the cards plugged in."""
+        return [
+            {
+                "path": str(card.path),
+                "name": card.name,
+                "size": card.size,
+                "free": card.free,
+                "label": card_list.describe(card),
+            }
+            for card in self.list_cards()
+        ]
+
+    def start(self, body: Any) -> Job:
+        """Start a job from the body of ``POST /api/make``.
+
+        Raises:
+            BuildError: if the body is wrong, the card is not listed, or a job runs.
+        """
+        if not isinstance(body, dict) or set(body) != {"choices", "card"}:
+            raise BuildError("the request needs exactly 'choices' and 'card'")
+        choices, card = body["choices"], body["card"]
+        if not isinstance(choices, list) or not all(
+            isinstance(choice, str) and records.is_choice(choice) for choice in choices
+        ):
+            raise BuildError("'choices' is a list like ['ART2=velvia']")
+        target = None
+        if card is not None:
+            listed = {str(found.path): found.path for found in self.list_cards()}
+            if not isinstance(card, str) or card not in listed:
+                raise BuildError("that SD card is no longer plugged in")
+            target = listed[card]
+        if choices:
+            records.looks_of_choices(records.load(self.paths), choices)
+        with self.lock:
+            if self.job is not None and not self.job.done:
+                raise BuildError("the firmware is being made; wait for it to end")
+            job = Job((self.job.number + 1) if self.job else 1, card=card)
+            self.job = job
+        threading.Thread(
+            target=self._work, args=(job, choices, target), daemon=True
+        ).start()
+        return job
+
+    def _work(self, job: Job, choices: list[str], card: Path | None) -> None:
+        """Run a job and record its end; its lines also go to the terminal."""
+
+        def log(line: str) -> None:
+            """Keep a progress line for the page and print it."""
+            job.lines.append(line)
+            print(line, flush=True)
+
+        try:
+            job.sha256, job.files = self.run(
+                self.paths, self.description, choices, card, log
+            )
+        except Epm2ModError as error:
+            job.error = str(error)
+            print(f"error: {error}", flush=True)
+        except Exception as error:  # the page must learn that the job ended
+            job.error = f"an unexpected error: {error!r}"
+            print(job.error, flush=True)
+        finally:
+            job.done = True
+
+
+class Handler(BaseHTTPRequestHandler):
+    """The requests of the page."""
+
+    app: App
+    port: int
+    server_version = "epm2mod"
+
+    def log_message(self, format: str, *args: Any) -> None:
+        """Keep the terminal for the progress lines: requests are not logged."""
+
+    def _send(
+        self, status: int, data: bytes, kind: str, extra: dict[str, str] | None = None
+    ) -> None:
+        """Send a response."""
+        self.send_response(status)
+        self.send_header("Content-Type", kind)
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Referrer-Policy", "no-referrer")
+        for key, value in (extra or {}).items():
+            self.send_header(key, value)
+        self.end_headers()
+        self.wfile.write(data)
+
+    def _json(self, status: int, value: Any) -> None:
+        """Send a JSON response."""
+        self._send(status, json.dumps(value).encode(), "application/json")
+
+    def _host_ok(self) -> bool:
+        """Return True if the Host (and an Origin, if sent) is this server."""
+        hosts = {f"127.0.0.1:{self.port}", f"localhost:{self.port}"}
+        origin = self.headers.get("Origin")
+        if origin is not None and urlsplit(origin).netloc not in hosts:
+            return False
+        return self.headers.get("Host") in hosts
+
+    def _api_ok(self) -> bool:
+        """Return True if the request carries the token."""
+        sent = self.headers.get("X-EPM2-Token", "")
+        return hmac.compare_digest(sent.encode(), self.app.token.encode())
+
+    def _refused(self) -> bool:
+        """Answer a request from elsewhere with 403 and return True."""
+        path = urlsplit(self.path).path
+        if self._host_ok() and (not path.startswith("/api/") or self._api_ok()):
+            return False
+        self._json(HTTPStatus.FORBIDDEN, {"error": "forbidden"})
+        return True
+
+    def do_OPTIONS(self) -> None:
+        """Refuse every CORS preflight."""
+        self._json(HTTPStatus.FORBIDDEN, {"error": "forbidden"})
+
+    def do_GET(self) -> None:
+        """Answer the API's GET requests and the files of the page."""
+        if self._refused():
+            return
+        path = urlsplit(self.path).path
+        app = self.app
+        if path == "/api/build":
+            self._json(HTTPStatus.OK, app.build())
+        elif path == "/api/cards":
+            self._json(HTTPStatus.OK, app.cards())
+        elif path == "/api/job":
+            self._json(HTTPStatus.OK, app.job.state() if app.job else None)
+        elif path == "/api/zip":
+            job = app.job
+            if job is None or not job.done or job.error is not None:
+                self._json(HTTPStatus.NOT_FOUND, {"error": "no files made yet"})
+                return
+            self._send(
+                HTTPStatus.OK,
+                zip_files(job.files),
+                "application/zip",
+                {"Content-Disposition": 'attachment; filename="EPM2Mod-card.zip"'},
+            )
+        elif path.startswith("/api/"):
+            self._json(HTTPStatus.NOT_FOUND, {"error": "no such call"})
+        else:
+            self._file(path)
+
+    def do_POST(self) -> None:
+        """Answer ``POST /api/make``."""
+        if self._refused():
+            return
+        if urlsplit(self.path).path != "/api/make":
+            self._json(HTTPStatus.NOT_FOUND, {"error": "no such call"})
+            return
+        if self.headers.get_content_type() != "application/json":
+            self._json(HTTPStatus.UNSUPPORTED_MEDIA_TYPE, {"error": "send JSON"})
+            return
+        try:
+            length = int(self.headers.get("Content-Length", "0"))
+        except ValueError:
+            length = -1
+        if not 0 < length <= _MAX_BODY:
+            self._json(HTTPStatus.BAD_REQUEST, {"error": "a body of 1 to 16 KB"})
+            return
+        try:
+            body = json.loads(self.rfile.read(length))
+            job = self.app.start(body)
+        except (ValueError, Epm2ModError) as error:
+            self._json(HTTPStatus.BAD_REQUEST, {"error": str(error)})
+            return
+        self._json(HTTPStatus.ACCEPTED, job.state())
+
+    def _file(self, path: str) -> None:
+        """Send a file of the page; ``/`` is ``index.html``."""
+        root = self.app.static.resolve()
+        name = "index.html" if path in ("", "/") else path.lstrip("/")
+        target = (root / name).resolve()
+        if not target.is_relative_to(root) or not target.is_file():
+            self._json(HTTPStatus.NOT_FOUND, {"error": "no such file"})
+            return
+        kind = mimetypes.guess_type(target.name)[0] or "application/octet-stream"
+        self._send(HTTPStatus.OK, target.read_bytes(), kind)
+
+
+def server(app: App, port: int = 0) -> ThreadingHTTPServer:
+    """Return the server of an app on 127.0.0.1 (a free port if ``port`` is 0)."""
+
+    class Bound(Handler):
+        """The handler of this app's server."""
+
+    Bound.app = app
+    httpd = ThreadingHTTPServer(("127.0.0.1", port), Bound)
+    Bound.port = httpd.server_port
+    return httpd
+
+
+def page_url(app: App, httpd: ThreadingHTTPServer) -> str:
+    """Return the address of the page, with its token."""
+    return f"http://127.0.0.1:{httpd.server_port}/#token={app.token}"
+
+
+def serve(paths: RepoPaths, port: int = 0, browser: bool = True) -> None:
+    """Run the local app until the process is stopped.
+
+    Raises:
+        BuildError: if the app page is not built.
+    """
+    if not (STATIC / "index.html").is_file():
+        raise BuildError(
+            f"{STATIC}: the app page is not built. In web/: npm ci && npm run build:app"
+        )
+    app = App(paths)
+    httpd = server(app, port)
+    url = page_url(app, httpd)
+    print(f"EPM2Mod is open in your browser: {url}")
+    print("Keep this window open while you use the page. Close it to stop.")
+    if browser:
+        webbrowser.open(url)
+    try:
+        httpd.serve_forever()
+    finally:
+        httpd.server_close()

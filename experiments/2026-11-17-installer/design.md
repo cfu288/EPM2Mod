@@ -61,7 +61,10 @@ Its criteria (agreed earlier):
    exFAT volumes count. The Linux rule is tested on this computer; the macOS and Windows rules are tested with sample
    data only, so the release CI of step 5 runs on macOS and Windows runners too.
 3. `epm2mod serve`: stdlib `http.server` on 127.0.0.1, a random token in the URL, Host check. Endpoints: build
-   (progress), cards, write, zip.
+   (progress), cards, write, zip. Done 2026-11-17 (`epm2mod.serve`): the token is in the URL's fragment (`#token=`)
+   and goes in the header `X-EPM2-Token`; a write goes only to a card that `cards()` lists; a test makes the pinned
+   build with looks through the app and through the CLI and compares the card files byte for byte. The page is
+   served from `src/epm2mod/app/` (git-ignored, built by step 4).
 4. The app page: a second Vite entry in `web/` that reuses the components, built into the package's static folder.
 5. Release zip from CI: launchers (pinned uv version, sha256-checked), package, pinned build's specs, built app
    page; a CI test that unpacks the zip and makes the pinned build from it.
