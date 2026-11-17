@@ -343,8 +343,8 @@ looks, and no criteria had been set before the build. A build is pinned only whe
 | 6 | After Load the camera says what happened | emulator, camera | **fail** | pass: the row reads Loading, then Loaded / No file / Bad file / Built-in |
 | 7 | The built-in looks come back from the camera, without a file | camera | **fail** | pass: Load Looks -> Built-in |
 | 8 | Live view shows the loaded look as the photo will be (tone included) | camera | **fail** | built: member-0 tables for the 10 three-table slots; camera only |
-| 9 | A photo records the loaded look's name where it records the film today | camera | not checked | today no film name is recorded (EXIF ArtFilter is the stock number); question for the owner |
-| 10 | The row and its messages are readable in the user's menu language | emulator | English only | English texts in every language (Japanese checked) |
+| 9 | A photo records the loaded look's name where it records the film today | camera | not checked | pass by parity: the built-in films are recorded only as the art-filter number too; no new EXIF field |
+| 10 | The row and its messages are readable in the user's menu language | emulator | English only | pass: English in every language, as the built-in film names are |
 | 11 | A bad or missing file never stops a start or a flash | emulator, camera | pass | pass (boot-test, update-path-test, sessions 3 and 7) |
 | 12 | Movies show the loaded look as far as they show the built-in looks | camera | not checked | the same tables as the built-in looks (model); camera |
 | 13 | No existing menu row is removed or changed (owner, 2026-11-17) | emulator crawl | **fail** (Touch Screen Settings replaced) | card-looks-3 **fail**; card-looks-4 pass (section 10.2) |
@@ -398,4 +398,8 @@ looks, and no criteria had been set before the build. A build is pinned only whe
 - Checks (V emulator): free space PASS, op check 0 FAIL, hookcheck only remap7b-code, boot-test PASS,
   update-path-test PASS, `emu_looks3.py --v4` seven sessions PASS, crawls P and ART against the pinned card-looks:
   378 / 214 units equal, only the J page differs (6 rows -> 7, Touch Screen Settings kept).
+- Before the card-looks-4 flash (emulator, card-looks-4 itself): J page with all stock rows and Load Looks; Loading
+  then Loaded; "Cyan Test" in the Picture Mode strip; Peaking in A after MF Assist with Off / White / Red / Yellow /
+  Blue. Camera test sheet: the card's photo folder is emptied in the first card trip, so the upload holds only the
+  test's photo.
 
