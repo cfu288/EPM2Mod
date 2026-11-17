@@ -8,7 +8,7 @@ and drop, and download `EPM2LOOK.BIN`, without the command line. It is published
   pages: black and white, square buttons that invert on hover, sections under a thick black rule. Fonts: Sora
   (headings) and Arimo (text), the free fonts nearest to that site's Neue Machina and Helvetica Neue (glyph overlap);
   computers with Helvetica Neue use it.
-- `src/data/films.json`: the films and their look records, made by `uv run python web/scripts/export_films.py`
+- `../looks/film-records.json`: the films and their look records, shared with `epm2mod looks pack`, made by `uv run python web/scripts/export_films.py`
   from `looks/catalogue.json` (a test of the Python suite fails when it is out of date).
 - `public/previews/`: the camera's Picture Mode strip, drawn by the emulator, in two layers: `menu/art<N>.png` (the
   strip at ART N, name box empty) and `name/<film>.png` (the film's name). The app stacks the name of a row's film on

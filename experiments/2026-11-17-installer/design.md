@@ -26,7 +26,7 @@ Films replace them only when the user chooses. The CLI stays the default way to 
 ## Separate project: Olympus's art filters by default
 
 The owner split this out on 2026-11-17: the installer doesn't wait for it. When its firmware is pinned, regenerate
-`films.json` and the previews, and the installer and the site show Olympus's filters by default with no code change.
+`looks/film-records.json` and the previews, and the installer and the site show Olympus's filters by default with no code change.
 Its criteria (agreed earlier):
 
 - F1. After the flash, all 12 entries are Olympus's art filters.
@@ -42,7 +42,7 @@ Its criteria (agreed earlier):
 | Firmware | `epm2mod make` (pipeline.make) | the same `make`, called by `epm2mod serve` | none |
 | Stock download | `stock.fetch` | the same | none |
 | Card checks and write | `pipeline.check_card`, `copy_to_card` | the same | none |
-| Look file | `looks pack`, from the film records in `looks/films.json` | the same Python function | TypeScript packer from the same records (byte-equal test) |
+| Look file | `looks pack`, from the film records in `looks/film-records.json` | the same Python function | TypeScript packer from the same records (byte-equal test) |
 | Film list and UI | none | shared React components (SlotList, FilmLibrary, StripPreview) | the same components |
 
 - No projection or flat patch file. The zip carries the package, `pinned-build.json`, the pinned build description
@@ -55,8 +55,8 @@ Its criteria (agreed earlier):
 
 ## Steps
 
-1. Look records as the single source: move `web/src/data/films.json` to `looks/films.json`; `looks pack` packs from
-   it without numpy.
+1. Look records as the single source: `web/src/data/films.json` moved to `looks/film-records.json`; `looks pack`
+   packs from it without numpy (`epm2mod.looks.records`). Done 2026-11-17.
 2. `epm2mod cards` (removable volumes on macOS, Windows, Linux).
 3. `epm2mod serve`: stdlib `http.server` on 127.0.0.1, a random token in the URL, Host check. Endpoints: build
    (progress), cards, write, zip.
@@ -76,12 +76,11 @@ Its criteria (agreed earlier):
   specs. Study in the emulator first: which stock tables and effect settings must stay, and whether Built-in
   (`card-looks-4` mode 2, a RAM snapshot taken at start) can snapshot the stock tables instead. Card-looks design and
   addresses: `experiments/2026-11-17-card-looks/design.md`. After it is pinned: the site's and app's default rows
-  become "Olympus <filter>" (`slots[i].entry` in films.json is the Olympus name), and the preview needs name images
+  become "Olympus <filter>" (`slots[i].entry` in `looks/film-records.json` is the Olympus name), and the preview needs name images
   for the 12 Olympus names (`web/scripts/render_previews.py`, name box NAME = (160, 12, 560, 44) of the strip).
-- **`looks pack` without numpy:** today `lookpack.looks_of_choices` loads fits (numpy). Change it to decode the
-  records of `looks/films.json` (`lookfile.decode_record`, set slot and name) and keep the fit path only in
-  `export_films.py`. Keep the Python test that fails when films.json is stale, and the TS byte-equal vectors in
-  `web/src/lib/lookfile.test.ts`.
+- **`looks pack` without numpy (done):** `records.looks_of_choices` decodes the records of `looks/film-records.json`
+  and sets the slot. `looks pack` with choices or no argument, and `looks list`, need no numpy; only a look list
+  (`looks pack LIST.json`) reads fits. `looks/films.json` is another file: the firmware's seven-film list.
 - **Cards:** macOS `/Volumes/*` checked with `diskutil info -plist` (Removable/Ejectable or Internal false);
   Windows drive letters with `GetDriveTypeW == DRIVE_REMOVABLE` (ctypes); Linux `lsblk -J -o NAME,RM,HOTPLUG,
   MOUNTPOINT` with RM or HOTPLUG = 1. Show the volume name and size. `pipeline.check_card` already warns about other

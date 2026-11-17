@@ -2,7 +2,7 @@
  * The look file EPM2LOOK.BIN, version 1 (docs/look-file-format.md in the repository).
  *
  * A 32-byte header, then one 1,708-byte record per look. The records come ready-made from the repository's tools
- * (films.json); this module sets each record's slot and name and writes the header with its CRC-32.
+ * (looks/film-records.json); this module sets each record's slot and name and writes the header with its CRC-32.
  */
 
 export const CARD_NAME = 'EPM2LOOK.BIN'

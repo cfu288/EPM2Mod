@@ -12,5 +12,7 @@ Modules:
     extra, mono: the specs of the film lists beyond the first seven.
     lookfile: the look file that the camera loads from the SD card
         (``docs/look-file-format.md``). It does not need numpy.
-    lookpack: look files made from the fit files. It needs numpy.
+    records: the film records that look files are packed from. It does not
+        need numpy.
+    lookpack: look records made from the fit files. It needs numpy.
 """

@@ -30,7 +30,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 from PIL import Image, ImageChops  # noqa: E402
 
-from epm2mod.looks import lookfile, lookpack  # noqa: E402
+from epm2mod.looks import lookfile, records  # noqa: E402
 from epm2mod.paths import RepoPaths  # noqa: E402
 
 BUILD = "builds/card-looks-4.json"
@@ -51,7 +51,7 @@ for n in range(2, 13):
 
 def render(film_id):
     paths = RepoPaths(ROOT)
-    looks = lookpack.looks_of_choices(paths, ["ART%d=%s" % (n, film_id) for n in range(1, 13)])
+    looks = records.looks_of_choices(records.load(paths), ["ART%d=%s" % (n, film_id) for n in range(1, 13)])
     with tempfile.TemporaryDirectory() as tmp:
         card = Path(tmp, "card")
         (card / "DCIM" / "100OLYMP").mkdir(parents=True)
@@ -80,7 +80,7 @@ def save(image, path):
 
 
 if __name__ == "__main__":
-    ids = list(lookpack.load_catalogue(RepoPaths(ROOT)))
+    ids = list(records.load(RepoPaths(ROOT)).films)
     with ThreadPoolExecutor(max_workers=4) as pool:
         strips = dict(zip(ids, pool.map(render, ids)))
     first = strips[ids[0]]

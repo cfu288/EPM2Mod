@@ -1,4 +1,4 @@
-"""Tests of the look file for the SD card, ``epm2mod.looks.lookfile`` and ``lookpack``.
+"""Tests of the look file for the SD card: ``epm2mod.looks.lookfile``, ``records`` and ``lookpack``.
 
     uv run python -m unittest discover -s tests
 
@@ -11,7 +11,9 @@ from __future__ import annotations
 import dataclasses
 import io
 import json
+import os
 import struct
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -26,7 +28,7 @@ from support import ROOT  # noqa: E402
 from epm2mod import cli, stock  # noqa: E402
 from epm2mod.errors import BuildError, LookFileError  # noqa: E402
 from epm2mod.hashing import sha256_bytes  # noqa: E402
-from epm2mod.looks import lookfile  # noqa: E402
+from epm2mod.looks import lookfile, records  # noqa: E402
 from epm2mod.looks.lookfile import ColourLook, MonoLook  # noqa: E402
 from epm2mod.paths import RepoPaths  # noqa: E402
 
@@ -216,6 +218,13 @@ class PackTests(unittest.TestCase):
         self.assertEqual(sha256_bytes(data), CARD_LOOKS_SHA256)
         self.assertEqual(lookfile.unpack(data), looks)
 
+    def test_the_film_records_are_current(self) -> None:
+        self.assertEqual(
+            json.loads(PATHS.film_records.read_text()),
+            lookpack.web_data(PATHS),
+            "run: uv run python web/scripts/export_films.py",
+        )
+
     def test_a_fit_with_a_matrix_and_two_tables_gives_a_black_and_white_look(
         self,
     ) -> None:
@@ -263,25 +272,27 @@ class PackTests(unittest.TestCase):
             self.assertEqual(cli.main(["looks", "show", str(path)]), 1)
 
 
-@unittest.skipUnless(HAVE_NUMPY, "numpy is not installed")
 class ChoiceTests(unittest.TestCase):
-    def test_every_film_of_the_catalogue_makes_a_look(self) -> None:
-        catalogue = lookpack.load_catalogue(PATHS)
-        self.assertEqual(len(catalogue), 19)
-        choices = [f"ART{n % 12 + 1}={film}" for n, film in enumerate(catalogue)]
+    """Look files from the film records: no numpy."""
+
+    def test_every_film_of_the_records_makes_a_look(self) -> None:
+        films = records.load(PATHS)
+        self.assertEqual(len(films.films), 19)
+        choices = [f"ART{n % 12 + 1}={film}" for n, film in enumerate(films.films)]
         for start in (0, 12):
-            looks = lookpack.looks_of_choices(PATHS, choices[start : start + 12])
+            looks = records.looks_of_choices(films, choices[start : start + 12])
             self.assertTrue(all(isinstance(look, ColourLook) for look in looks))
             lookfile.unpack(lookfile.pack(looks))
 
     def test_a_choice_names_an_art_number_and_a_film(self) -> None:
-        looks = lookpack.looks_of_choices(PATHS, ["ART2=velvia", "art12=vision3-500t"])
+        films = records.load(PATHS)
+        looks = records.looks_of_choices(films, ["ART2=velvia", "art12=vision3-500t"])
         self.assertEqual(
             [(look.slot, look.name) for look in looks],
             [(1, "Velvia"), (11, "Vis 500T")],
         )
-        same = lookpack.load_list(PATHS, PATHS.card_looks)[6]
-        assert isinstance(same, ColourLook)
+        self.assertEqual(films.slots[6].built_in, "velvia")
+        same = records.looks_of_choices(films, records.built_in_choices(films))[6]
         self.assertEqual(dataclasses.replace(looks[0], slot=6), same)
         for bad in (
             ["ART0=velvia"],
@@ -292,15 +303,52 @@ class ChoiceTests(unittest.TestCase):
             ["Velvia"],
         ):
             with self.assertRaises((BuildError, LookFileError), msg=str(bad)):
-                lookpack.looks_of_choices(PATHS, bad)
+                records.looks_of_choices(films, bad)
 
-    def test_the_web_app_data_is_current(self) -> None:
-        on_disk = json.loads((ROOT / "web" / "src" / "data" / "films.json").read_text())
-        self.assertEqual(
-            on_disk,
-            lookpack.web_data(PATHS),
-            "run: uv run python web/scripts/export_films.py",
+    def test_the_built_in_look_file_is_the_test_vector(self) -> None:
+        films = records.load(PATHS)
+        looks = records.looks_of_choices(films, records.built_in_choices(films))
+        self.assertEqual(sha256_bytes(lookfile.pack(looks)), CARD_LOOKS_SHA256)
+
+    def test_pack_and_list_work_without_numpy(self) -> None:
+        program = (
+            "import sys; sys.modules['numpy'] = None\n"
+            "from epm2mod import cli\n"
+            "assert cli.main(['looks', 'list']) == 0\n"
+            "assert cli.main(['looks', 'pack', 'ART2=velvia', '-o', sys.argv[1]]) == 0\n"
+            "assert cli.main(['looks', 'pack', '-o', sys.argv[1]]) == 0\n"
+            "assert 'numpy' not in [name for name in sys.modules if sys.modules[name]]\n"
         )
+        with tempfile.TemporaryDirectory() as folder:
+            done = subprocess.run(
+                [sys.executable, "-c", program, folder],
+                env={**os.environ, "PYTHONPATH": str(ROOT / "src")},
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(done.returncode, 0, done.stderr)
+            data = (Path(folder) / lookfile.CARD_NAME).read_bytes()
+            self.assertEqual(sha256_bytes(data), CARD_LOOKS_SHA256)
+
+    def test_a_bad_records_file_is_refused(self) -> None:
+        raw = json.loads(PATHS.film_records.read_text())
+        broken_record = json.loads(json.dumps(raw))
+        broken_record["films"][0]["record"] = "AAAA"
+        wrong_name = json.loads(json.dumps(raw))
+        wrong_name["films"][0]["name"] = "Other"
+        unknown_film = json.loads(json.dumps(raw))
+        unknown_film["slots"][0]["builtIn"] = "nofilm"
+        eleven = json.loads(json.dumps(raw))
+        del eleven["slots"][11]
+        with tempfile.TemporaryDirectory() as folder:
+            (Path(folder) / "looks").mkdir()
+            paths = RepoPaths(Path(folder))
+            for bad in (broken_record, wrong_name, unknown_film, eleven, []):
+                paths.film_records.write_text(json.dumps(bad))
+                with self.assertRaises(BuildError, msg=str(bad)[:60]):
+                    records.load(paths)
 
     def test_pack_to_a_card_and_list(self) -> None:
         with tempfile.TemporaryDirectory() as folder:

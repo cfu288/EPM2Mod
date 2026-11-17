@@ -184,18 +184,25 @@ def _numpy_needed(error: ModuleNotFoundError) -> BuildError:
 
 
 def _looks_pack(args: argparse.Namespace, paths: RepoPaths) -> int:
-    """Run ``epm2mod looks pack``: write a look file from a look list."""
-    from .looks import lookfile
+    """Run ``epm2mod looks pack``: write a look file from choices or a look list.
 
-    try:
-        from .looks import lookpack
-    except ModuleNotFoundError as error:
-        raise _numpy_needed(error) from None
+    Choices, and no argument (each slot's built-in film), pack the film records; a look list packs fit files and
+    needs numpy.
+    """
+    from .looks import lookfile, records
+
     items = list(args.items)
-    if items and all(lookpack.is_choice(item) for item in items):
-        looks = lookpack.looks_of_choices(paths, items)
-    elif len(items) <= 1:
-        looks = lookpack.load_list(paths, Path(items[0]) if items else paths.card_looks)
+    if all(records.is_choice(item) for item in items):
+        films = records.load(paths)
+        looks = records.looks_of_choices(
+            films, items or records.built_in_choices(films)
+        )
+    elif len(items) == 1:
+        try:
+            from .looks import lookpack
+        except ModuleNotFoundError as error:
+            raise _numpy_needed(error) from None
+        looks = lookpack.load_list(paths, Path(items[0]))
     else:
         raise BuildError("give choices like ART2=velvia, or one look list")
     data = lookfile.pack(looks)
@@ -220,11 +227,9 @@ def _looks_pack(args: argparse.Namespace, paths: RepoPaths) -> int:
 
 def _looks_list(args: argparse.Namespace, paths: RepoPaths) -> int:
     """Run ``epm2mod looks list``: the films a look file can hold."""
-    try:
-        from .looks import lookpack
-    except ModuleNotFoundError as error:
-        raise _numpy_needed(error) from None
-    for film in lookpack.load_catalogue(paths).values():
+    from .looks import records
+
+    for film in records.load(paths).films.values():
         note = f"  ({film.note})" if film.note else ""
         print(f"{film.id:<14} {film.name:<13} {film.film}, {film.medium}{note}")
     return 0

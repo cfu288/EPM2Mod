@@ -18,9 +18,7 @@ This module needs numpy.
 from __future__ import annotations
 
 import base64
-import re
 import struct
-from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -184,62 +182,16 @@ def load_catalogue(paths: RepoPaths) -> dict[str, CatalogueFilm]:
     return out
 
 
-#: A choice on the command line: ART<n>=<film id>.
-_CHOICE = re.compile(r"^ART(\d{1,2})=([a-z0-9-]+)$", re.IGNORECASE)
-
-
-def is_choice(text: str) -> bool:
-    """Return True if a command-line argument is a choice like ``ART2=velvia``."""
-    return _CHOICE.match(text) is not None
-
-
-def looks_of_choices(paths: RepoPaths, choices: Sequence[str]) -> list[Look]:
-    """Return the looks of choices like ``ART2=velvia``.
-
-    ART<n> is the art filter's number in the camera's menus (1 to 12); the film is an id of the catalogue. The
-    camera shows the film's own name.
-
-    Raises:
-        BuildError: if a choice is malformed, names an unknown film or an ART number twice.
-        LookFileError: if a name does not fit the file format.
-    """
-    catalogue = load_catalogue(paths)
-    looks: list[Look] = []
-    seen: set[int] = set()
-    for text in choices:
-        match = _CHOICE.match(text)
-        if match is None:
-            raise BuildError(
-                f"'{text}': write ART<1-12>=<film>, for example ART2=velvia"
-            )
-        number, film_id = int(match.group(1)), match.group(2).lower()
-        if not 1 <= number <= len(MENU_ENTRIES) or number in seen:
-            raise BuildError(f"'{text}': ART 1 to {len(MENU_ENTRIES)}, each once")
-        if film_id not in catalogue:
-            raise BuildError(
-                f"'{text}': no film '{film_id}'; 'epm2mod looks list' shows them"
-            )
-        seen.add(number)
-        film = catalogue[film_id]
-        fit = load_fit(paths.resolve(film.fit))
-        try:
-            looks.append(
-                look_of_fit(fit, MENU_ENTRIES[number - 1], film.name, film.fit)
-            )
-        except LookFileError as error:
-            raise LookFileError(f"'{text}': {error}") from None
-    return looks
-
-
 def web_data(paths: RepoPaths) -> dict[str, Any]:
-    """Return the data of the web app (``web/src/data/films.json``).
+    """Return the film records (``looks/film-records.json``, read by ``records.load``).
 
-    ``films``: the catalogue, each film with its look record (1,708 bytes, base64) for slot 0 under the film's name;
-    the app sets the slot byte and the name and packs the records as ``lookfile.pack`` does. ``slots``: the twelve
-    ART entries in menu order, with the id of the film each holds when no look is loaded.
+    ``films``: the catalogue, each film with its look record (1,708 bytes, base64) for slot 0 under the film's name.
+    ``slots``: the twelve ART entries in menu order, with the id of the film each holds when no look is loaded (the
+    look list ``looks/card-looks.json``).
 
     Raises:
-        BuildError: if the catalogue or the look list is wrong, or a built-in look is not in the catalogue.
+        BuildError: if the catalogue or the look list is wrong, or a built-in look is not in the catalogue under the
+            same name.
     """
     catalogue = load_catalogue(paths)
     films = []
@@ -254,6 +206,7 @@ def web_data(paths: RepoPaths) -> dict[str, Any]:
                 "name": film.name,
                 "film": film.film,
                 "kind": film.kind,
+                "medium": film.medium,
                 "note": film.note,
                 "record": base64.b64encode(record).decode("ascii"),
             }
@@ -262,11 +215,12 @@ def web_data(paths: RepoPaths) -> dict[str, Any]:
     raw: Any = read_json(paths.card_looks, BuildError)
     slots = []
     for number, item in enumerate(raw["looks"], start=1):
-        if item["fit"] not in by_fit:
-            raise BuildError(f"{item['fit']}: a built-in look that the catalogue lacks")
-        slots.append(
-            {"art": number, "entry": item["entry"], "builtIn": by_fit[item["fit"]]}
-        )
+        film_id = by_fit.get(item["fit"])
+        if film_id is None or catalogue[film_id].name != item["name"]:
+            raise BuildError(
+                f"{item['fit']}: a built-in look that the catalogue lacks under '{item['name']}'"
+            )
+        slots.append({"art": number, "entry": item["entry"], "builtIn": film_id})
     return {"films": films, "slots": slots}
 
 
