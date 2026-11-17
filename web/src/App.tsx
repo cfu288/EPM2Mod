@@ -42,7 +42,7 @@ export default function App() {
                 className="size-5 shrink-0 text-yellow-400 dark:text-yellow-300"
               />
               <p className="ml-3 text-sm text-yellow-800 dark:text-yellow-200">
-                The camera must run the EPM2Mod firmware first. Without it, the file does nothing.{' '}
+                The camera must run the EPM2Mod firmware first.{' '}
                 <a className="font-medium underline hover:text-yellow-700 dark:hover:text-yellow-100" href={INSTALL}>
                   How to install EPM2Mod
                 </a>
@@ -107,21 +107,16 @@ export default function App() {
               <StripPreview art={selected + 1} filmId={items[selected]?.filmId ?? null} />
             </div>
             <div className="space-y-6">
-              <div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    download(lookFile(items))
-                  }}
-                  className="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:shadow-none dark:hover:bg-indigo-400"
-                >
-                  <ArrowDownTrayIcon aria-hidden="true" className="-ml-0.5 size-5" />
-                  Download {CARD_NAME}
-                </button>
-                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                  The file holds only the film looks. It is not a firmware update.
-                </p>
-              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  download(lookFile(items))
+                }}
+                className="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:shadow-none dark:hover:bg-indigo-400"
+              >
+                <ArrowDownTrayIcon aria-hidden="true" className="-ml-0.5 size-5" />
+                Download {CARD_NAME}
+              </button>
               <section aria-labelledby="load-heading">
                 <h2 id="load-heading" className="text-base font-semibold text-gray-900 dark:text-white">
                   Load it on the camera
@@ -148,7 +143,7 @@ export default function App() {
         <a className="underline" href="https://github.com/andreavolpato/spektrafilm">
           spektrafilm
         </a>{' '}
-        by Andrea Volpato (CC BY-SA 4.0). The looks imitate these films; they are not products of Kodak or Fujifilm.
+        by Andrea Volpato (CC BY-SA 4.0).
       </footer>
     </div>
   )
