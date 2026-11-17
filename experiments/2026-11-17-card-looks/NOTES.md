@@ -105,8 +105,10 @@ Go back: `epm2flash films-12d 2cdd18e7004821b2e443ec4f08db06ab9a0d4f0f700ab53db8
 ## 4. Open (each needs a camera probe)
 
 1. ~~The read on the camera~~: passed (section 3).
-2. ~~A look table changed in RAM at run time takes effect~~: passed, at once, in photos and live view (section 5) (I: the tables are at fixed
-   RAM addresses in segment 1, `docs/art-filter-slots.md`; U: whether a store into loaded section RAM is
-   safe here, it crashed on the E-P7). The emulator does not model the picture, so only a shot can tell.
-3. Code space for a loader (today 320 B of code space; the 7.2 KB dead 3D-engine area needs its own
-   camera test, `experiments/2026-11-13-code-space-research/` recommendation 1).
+2. ~~A look table changed in RAM at run time takes effect~~: passed, at once, in photos and live view (section
+   5). The E-P7's crash on a store into loaded section RAM did not happen here (V: one table, 9 values).
+3. Code space for a real loader. Probe 2's read and copy of one table took 199 B in two free runs of segment 2.
+   A loader for whole looks (the matrix, the three gamma records, the curves, the six-axis records of each film,
+   with checks of the file) needs more than the free runs left (the largest is 120 B, `docs/code-space-map.md`).
+   Candidates: the 7.2 KB dead 3D-engine area, which needs its own camera test
+   (`experiments/2026-11-13-code-space-research/` recommendation 1), or code loaded from the card itself.
