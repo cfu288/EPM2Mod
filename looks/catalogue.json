@@ -1,0 +1,156 @@
+{
+ "films": [
+  {
+   "id": "portra-400",
+   "name": "Portra 400",
+   "film": "Kodak Portra 400",
+   "medium": "negative, on Kodak Portra Endura paper",
+   "fit": "looks/fits/portra.npz",
+   "note": "built in (ART 1); camera-corrected"
+  },
+  {
+   "id": "ektachrome",
+   "name": "Ektachrome",
+   "film": "Kodak Ektachrome 100",
+   "medium": "slide",
+   "fit": "looks/fits/ektachrome.npz",
+   "note": "built in (ART 2); camera-corrected"
+  },
+  {
+   "id": "pro-400h",
+   "name": "Pro 400H",
+   "film": "Fuji Pro 400H",
+   "medium": "negative, on Fuji Crystal Archive paper",
+   "fit": "looks/fits/pro400h.npz",
+   "note": "built in (ART 3); camera-corrected"
+  },
+  {
+   "id": "kodachrome",
+   "name": "Kodachrome",
+   "film": "Kodak Kodachrome 64",
+   "medium": "slide",
+   "fit": "looks/fits/kodachrome64.npz",
+   "note": "built in (ART 4); camera-corrected"
+  },
+  {
+   "id": "double-x",
+   "name": "Double-X",
+   "film": "Kodak Double-X 5222",
+   "medium": "black-and-white negative, on Kodak 2302 print film",
+   "fit": "looks/fits/doublex3.npz",
+   "note": "built in (ART 5); no grain"
+  },
+  {
+   "id": "vision3-250d",
+   "name": "Vis 250D",
+   "film": "Kodak Vision3 250D",
+   "medium": "cinema negative, on Kodak 2383 print film",
+   "fit": "looks/fits/vision3250d.npz",
+   "note": "built in (ART 6); camera-corrected"
+  },
+  {
+   "id": "velvia",
+   "name": "Velvia",
+   "film": "Fuji Velvia 100",
+   "medium": "slide",
+   "fit": "looks/fits/velvia100.npz",
+   "note": "built in (ART 7); camera-corrected"
+  },
+  {
+   "id": "superia-400",
+   "name": "Superia 400",
+   "film": "Fuji Superia X-tra 400",
+   "medium": "negative, on Fuji Crystal Archive paper",
+   "fit": "looks/fits/superia400.npz",
+   "note": "built in (ART 8); camera-corrected"
+  },
+  {
+   "id": "provia",
+   "name": "Provia",
+   "film": "Fujifilm Provia 100F",
+   "medium": "slide",
+   "fit": "looks/fits/provia100f.npz",
+   "note": "built in (ART 9)"
+  },
+  {
+   "id": "portra-160",
+   "name": "Portra 160",
+   "film": "Kodak Portra 160",
+   "medium": "negative, on Kodak Portra Endura paper",
+   "fit": "looks/fits/portra160.npz",
+   "note": "built in (ART 10)"
+  },
+  {
+   "id": "gold-200",
+   "name": "Gold 200",
+   "film": "Kodak Gold 200",
+   "medium": "negative, on Fuji Crystal Archive paper",
+   "fit": "looks/fits/gold200.npz",
+   "note": "built in (ART 11)"
+  },
+  {
+   "id": "vision3-500t",
+   "name": "Vis 500T",
+   "film": "Kodak Vision3 500T",
+   "medium": "cinema negative, on Kodak 2383 print film",
+   "fit": "looks/fits/vision3500t.npz",
+   "note": "built in (ART 12)"
+  },
+  {
+   "id": "ektar-100",
+   "name": "Ektar 100",
+   "film": "Kodak Ektar 100",
+   "medium": "negative, on Kodak Portra Endura paper",
+   "fit": "looks/fits/ektar100.npz",
+   "note": ""
+  },
+  {
+   "id": "portra-800",
+   "name": "Portra 800",
+   "film": "Kodak Portra 800",
+   "medium": "negative, on Kodak Portra Endura paper",
+   "fit": "looks/fits/portra800.npz",
+   "note": "less accurate than the others"
+  },
+  {
+   "id": "c200",
+   "name": "C200",
+   "film": "Fujifilm C200",
+   "medium": "negative, on Fuji Crystal Archive paper",
+   "fit": "looks/fits/c200.npz",
+   "note": ""
+  },
+  {
+   "id": "ultramax-400",
+   "name": "UltraMax 400",
+   "film": "Kodak UltraMax 400",
+   "medium": "negative, on Kodak Portra Endura paper",
+   "fit": "looks/fits/ultramax400.npz",
+   "note": ""
+  },
+  {
+   "id": "verita-200d",
+   "name": "Verita 200D",
+   "film": "Kodak Verita 200D",
+   "medium": "cinema negative, on Kodak 2383 print film",
+   "fit": "looks/fits/verita200d.npz",
+   "note": ""
+  },
+  {
+   "id": "vision3-50d",
+   "name": "Vis 50D",
+   "film": "Kodak Vision3 50D",
+   "medium": "cinema negative, on Kodak 2383 print film",
+   "fit": "looks/fits/vision350d.npz",
+   "note": ""
+  },
+  {
+   "id": "vision3-200t",
+   "name": "Vis 200T",
+   "film": "Kodak Vision3 200T",
+   "medium": "cinema negative, on Kodak 2383 print film",
+   "fit": "looks/fits/vision3200t.npz",
+   "note": ""
+  }
+ ]
+}

@@ -10,7 +10,9 @@
     epm2mod info FIRMWARE.BIN                     describe a firmware file
     epm2mod readme [--check]                      refresh the generated parts of the documents
     epm2mod looks [--check | --write]             check or write the film-look patch specs
-    epm2mod looks pack [LIST.json] [-o FILE]      write a look file for the SD card
+    epm2mod looks list                            the films a look file can hold
+    epm2mod looks pack [ART2=velvia ... | LIST.json] [-o FILE | --card DIR]
+                                                  write a look file for the SD card
     epm2mod looks show FILE [--json]              check a look file and describe it
     epm2mod log FILE [--dict EVENTS.json] [--summary]
                                                   decode a camera log file to JSON lines
@@ -189,14 +191,42 @@ def _looks_pack(args: argparse.Namespace, paths: RepoPaths) -> int:
         from .looks import lookpack
     except ModuleNotFoundError as error:
         raise _numpy_needed(error) from None
-    source = Path(args.list) if args.list else paths.card_looks
-    data = lookfile.pack(lookpack.load_list(paths, source))
-    out = Path(args.out) if args.out else paths.output / lookfile.CARD_NAME
-    if out.is_dir():
-        out = out / lookfile.CARD_NAME
+    items = list(args.items)
+    if items and all(lookpack.is_choice(item) for item in items):
+        looks = lookpack.looks_of_choices(paths, items)
+    elif len(items) <= 1:
+        looks = lookpack.load_list(paths, Path(items[0]) if items else paths.card_looks)
+    else:
+        raise BuildError("give choices like ART2=velvia, or one look list")
+    data = lookfile.pack(looks)
+    if args.card:
+        card = Path(args.card)
+        if not card.is_dir():
+            raise BuildError(f"{card}: not a folder (the top folder of the SD card)")
+        out = card / lookfile.CARD_NAME
+    else:
+        out = Path(args.out) if args.out else paths.output / lookfile.CARD_NAME
+        if out.is_dir():
+            out = out / lookfile.CARD_NAME
     write_bytes(out, data)
     print(f"wrote {out}: {len(data)} bytes, sha256 {sha256_bytes(data)}")
-    print(f"copy it to the top folder of the SD card as {lookfile.CARD_NAME}")
+    for look in looks:
+        print(f"  ART {look.slot + 1:2}  {look.name}")
+    if not args.card:
+        print(f"copy it to the top folder of the SD card as {lookfile.CARD_NAME}")
+    print("on the camera: MENU -> Custom Menu -> J -> Load Looks -> Load")
+    return 0
+
+
+def _looks_list(args: argparse.Namespace, paths: RepoPaths) -> int:
+    """Run ``epm2mod looks list``: the films a look file can hold."""
+    try:
+        from .looks import lookpack
+    except ModuleNotFoundError as error:
+        raise _numpy_needed(error) from None
+    for film in lookpack.load_catalogue(paths).values():
+        note = f"  ({film.note})" if film.note else ""
+        print(f"{film.id:<14} {film.name:<13} {film.film}, {film.medium}{note}")
     return 0
 
 
@@ -212,7 +242,9 @@ def _looks_show(args: argparse.Namespace, paths: RepoPaths) -> int:
     for look in looks:
         kind = "colour" if isinstance(look, lookfile.ColourLook) else "black-and-white"
         entry = lookfile.MENU_ENTRIES[look.slot]
-        print(f"  {look.slot:2} {entry:<17} {look.name:<17} {kind}")
+        print(
+            f"  ART {look.slot + 1:2}  {look.name:<17} {kind:<15} (stock entry {entry})"
+        )
     return 0
 
 
@@ -220,6 +252,8 @@ def _looks(args: argparse.Namespace, paths: RepoPaths) -> int:
     """Run ``epm2mod looks``."""
     if args.action == "pack":
         return _looks_pack(args, paths)
+    if args.action == "list":
+        return _looks_list(args, paths)
     if args.action == "show":
         return _looks_show(args, paths)
     try:
@@ -363,20 +397,37 @@ def build_parser() -> argparse.ArgumentParser:
         "--write", action="store_true", help="write the generated specs to patches/"
     )
     looks_actions = looks_cmd.add_subparsers(dest="action")
+    looks_actions.add_parser(
+        "list",
+        help="the films a look file can hold",
+        description="List the fitted films that a look file can hold, with their ids.",
+    )
     pack_cmd = looks_actions.add_parser(
         "pack",
         help="write a look file for the SD card",
-        description="Write a look file (EPM2LOOK.BIN) for the SD card from a look list.",
+        description="Write a look file (EPM2LOOK.BIN) for the SD card: from choices "
+        "like ART2=velvia ART6=double-x:My B&W (the ART number the camera shows, a "
+        "film of 'epm2mod looks list', an optional name), or from a look list. "
+        "The ART entries not chosen keep their built-in look.",
     )
     pack_cmd.add_argument(
-        "list", nargs="?", help="the look list; default: looks/card-looks.json"
+        "items",
+        nargs="*",
+        help="ART<n>=<film>[:<name>] choices, or one look list; default: "
+        "looks/card-looks.json (the built-in looks)",
     )
-    pack_cmd.add_argument(
+    where = pack_cmd.add_mutually_exclusive_group()
+    where.add_argument(
         "-o",
         "--out",
         metavar="FILE",
         help="where to write it (a folder: under the name EPM2LOOK.BIN); "
         "default: build/EPM2LOOK.BIN",
+    )
+    where.add_argument(
+        "--card",
+        metavar="DIR",
+        help="write it straight to the top folder DIR of the SD card",
     )
     show_cmd = looks_actions.add_parser(
         "show",

@@ -5,21 +5,19 @@ with their names, after power-off and without the card.
 
 ## Make a file
 
-List one look per entry (`entry` is the stock name in [Film Simulations](film-looks.md), column "Replaces"):
+`uv run epm2mod looks list` shows the 19 films you can choose. Pick a film for any ART number the camera shows, with
+the card in the computer:
 
-```json
-{"looks": [
-  {"entry": "Pale&Light Color", "name": "Portra 800", "fit": "looks/fits/portra800.npz"}
-]}
+```sh
+uv run epm2mod looks pack ART2=velvia ART6=double-x "ART12=vision3-500t:Cinestill 800T" --card /path/to/card
 ```
 
-Then run `uv run epm2mod looks pack MYLOOKS.json -o EPM2LOOK.BIN`. A name has up to 16 letters. Entries the file does
-not list keep their built-in look.
+The text after `:` is the name the camera shows (up to 16 letters). ART numbers you do not list keep their built-in
+look. Without `--card` the file goes to `build/EPM2LOOK.BIN`. Copy it to the top folder of the card.
 
 ## Load
 
-1. Copy the file to the top folder of the card as **EPM2LOOK.BIN**.
-2. MENU → Custom Menu → J → **Load Looks** → **Load** → OK. The row reads Loading, then **Loaded** at the next key.
+MENU → Custom Menu → J → **Load Looks** → **Load** → OK. The row reads Loading, then **Loaded** at the next key.
 
 <img src="../images/ui/load-looks-list.png" width="320" alt="Load Looks with Off, Load and Built-in">
 <img src="../images/ui/load-looks-loaded.png" width="320" alt="Load Looks reads Loaded">

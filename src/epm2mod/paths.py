@@ -78,6 +78,11 @@ class RepoPaths:
         return self.root / "looks" / "card-looks.json"
 
     @property
+    def catalogue(self) -> Path:
+        """The fitted films that a look file can hold."""
+        return self.root / "looks" / "catalogue.json"
+
+    @property
     def free_space_tool(self) -> Path:
         """The script that checks where patch specs put new bytes."""
         return self.root / "tools" / "freespace.py"

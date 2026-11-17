@@ -17,7 +17,10 @@ This module needs numpy.
 
 from __future__ import annotations
 
+import re
 import struct
+from collections.abc import Sequence
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -130,6 +133,102 @@ def load_list(paths: RepoPaths, path: Path) -> list[Look]:
         except LookFileError as error:
             raise LookFileError(f"{where}: {error}") from None
     return result
+
+
+@dataclass(frozen=True)
+class CatalogueFilm:
+    """A fitted film that a look file can hold (``looks/catalogue.json``).
+
+    Attributes:
+        id: the short name used on the command line, for example ``velvia``.
+        name: the name the camera shows, at most 16 characters.
+        film: the film's full name.
+        medium: how the film was simulated.
+        fit: path of the fit file, relative to the repository root.
+        note: a remark for the list (where it is built in, its accuracy), or "".
+    """
+
+    id: str
+    name: str
+    film: str
+    medium: str
+    fit: str
+    note: str
+
+
+def load_catalogue(paths: RepoPaths) -> dict[str, CatalogueFilm]:
+    """Return the fitted films of ``looks/catalogue.json`` by id, in file order.
+
+    Raises:
+        BuildError: if the catalogue is missing or malformed.
+    """
+    raw: Any = read_json(paths.catalogue, BuildError)
+    films = raw.get("films") if isinstance(raw, dict) else None
+    if not isinstance(films, list):
+        raise BuildError(f"{paths.catalogue}: an object with a list 'films'")
+    out: dict[str, CatalogueFilm] = {}
+    keys = {"id", "name", "film", "medium", "fit", "note"}
+    for item in films:
+        if not isinstance(item, dict) or set(item) != keys:
+            raise BuildError(f"{paths.catalogue}: each film has exactly {sorted(keys)}")
+        if not all(isinstance(item[k], str) for k in keys):
+            raise BuildError(f"{paths.catalogue}: every field is a text")
+        film = CatalogueFilm(**item)
+        if film.id in out or not is_repo_relative(film.fit):
+            raise BuildError(f"{paths.catalogue}: '{film.id}' twice, or a bad fit path")
+        out[film.id] = film
+    return out
+
+
+#: A choice on the command line: ART<n>=<film id>[:<name>].
+_CHOICE = re.compile(r"^ART(\d{1,2})=([a-z0-9-]+)(?::(.+))?$", re.IGNORECASE)
+
+
+def is_choice(text: str) -> bool:
+    """Return True if a command-line argument is a choice like ``ART2=velvia``."""
+    return _CHOICE.match(text) is not None
+
+
+def looks_of_choices(paths: RepoPaths, choices: Sequence[str]) -> list[Look]:
+    """Return the looks of choices like ``ART2=velvia`` or ``ART6=double-x:My B&W``.
+
+    ART<n> is the art filter's number in the camera's menus (1 to 12); the film is an id of the catalogue; the
+    optional name replaces the film's name.
+
+    Raises:
+        BuildError: if a choice is malformed, names an unknown film or an ART number twice.
+        LookFileError: if a name does not fit the file format.
+    """
+    catalogue = load_catalogue(paths)
+    looks: list[Look] = []
+    seen: set[int] = set()
+    for text in choices:
+        match = _CHOICE.match(text)
+        if match is None:
+            raise BuildError(
+                f"'{text}': write ART<1-12>=<film>, for example ART2=velvia"
+            )
+        number, film_id, name = (
+            int(match.group(1)),
+            match.group(2).lower(),
+            match.group(3),
+        )
+        if not 1 <= number <= len(MENU_ENTRIES) or number in seen:
+            raise BuildError(f"'{text}': ART 1 to {len(MENU_ENTRIES)}, each once")
+        if film_id not in catalogue:
+            raise BuildError(
+                f"'{text}': no film '{film_id}'; 'epm2mod looks list' shows them"
+            )
+        seen.add(number)
+        film = catalogue[film_id]
+        fit = load_fit(paths.resolve(film.fit))
+        try:
+            looks.append(
+                look_of_fit(fit, MENU_ENTRIES[number - 1], name or film.name, film.fit)
+            )
+        except LookFileError as error:
+            raise LookFileError(f"'{text}': {error}") from None
+    return looks
 
 
 def camera_table(curve: tuple[int, ...], default: bytes) -> bytes:

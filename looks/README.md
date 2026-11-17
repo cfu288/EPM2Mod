@@ -2,6 +2,9 @@
 
 - `films.json`: which film goes in which art-filter menu entry, the name shown in the menu, and the
   fit file of the film. It also names the three patch specs that are generated from this data.
+- `catalogue.json`: every fitted film that a look file for the SD card can hold, with the short id that
+  `epm2mod looks pack ART2=velvia` uses and the name the camera shows (`epm2mod looks list`).
+- `card-looks.json`: the twelve built-in looks as a look list (the default of `epm2mod looks pack`).
 - `fits/*.npz`: the fitted values of each look. One file holds three tone curves of 1,024 points, a
   saturation gain, six saturation values and six hue values, a 3 × 3 matrix, and two chroma curves.
 

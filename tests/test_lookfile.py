@@ -263,6 +263,74 @@ class PackTests(unittest.TestCase):
             self.assertEqual(cli.main(["looks", "show", str(path)]), 1)
 
 
+@unittest.skipUnless(HAVE_NUMPY, "numpy is not installed")
+class ChoiceTests(unittest.TestCase):
+    def test_every_film_of_the_catalogue_makes_a_look(self) -> None:
+        catalogue = lookpack.load_catalogue(PATHS)
+        self.assertEqual(len(catalogue), 19)
+        choices = [f"ART{n % 12 + 1}={film}" for n, film in enumerate(catalogue)]
+        for start in (0, 12):
+            looks = lookpack.looks_of_choices(PATHS, choices[start : start + 12])
+            self.assertTrue(all(isinstance(look, ColourLook) for look in looks))
+            lookfile.unpack(lookfile.pack(looks))
+
+    def test_a_choice_names_an_art_number_a_film_and_maybe_a_name(self) -> None:
+        looks = lookpack.looks_of_choices(
+            PATHS, ["ART2=velvia", "art12=vision3-500t:Cinestill 800T"]
+        )
+        self.assertEqual(
+            [(look.slot, look.name) for look in looks],
+            [(1, "Velvia"), (11, "Cinestill 800T")],
+        )
+        same = lookpack.load_list(PATHS, PATHS.card_looks)[6]
+        assert isinstance(same, ColourLook)
+        self.assertEqual(dataclasses.replace(looks[0], slot=6), same)
+        for bad in (
+            ["ART0=velvia"],
+            ["ART13=velvia"],
+            ["ART2=velvia", "ART2=c200"],
+            ["ART2=nofilm"],
+            ["ART2=velvia:" + "x" * 17],
+            ["Velvia"],
+        ):
+            with self.assertRaises((BuildError, LookFileError), msg=str(bad)):
+                lookpack.looks_of_choices(PATHS, bad)
+
+    def test_pack_to_a_card_and_list(self) -> None:
+        with tempfile.TemporaryDirectory() as folder:
+            out = io.StringIO()
+            with redirect_stdout(out):
+                self.assertEqual(
+                    cli.main(
+                        [
+                            "looks",
+                            "pack",
+                            "ART2=velvia",
+                            "ART6=double-x",
+                            "--card",
+                            folder,
+                        ]
+                    ),
+                    0,
+                )
+                self.assertEqual(cli.main(["looks", "list"]), 0)
+            looks = lookfile.unpack((Path(folder) / lookfile.CARD_NAME).read_bytes())
+            self.assertEqual([look.slot for look in looks], [1, 5])
+            self.assertIn("vision3-500t", out.getvalue())
+            self.assertEqual(
+                cli.main(
+                    [
+                        "looks",
+                        "pack",
+                        "ART2=velvia",
+                        "--card",
+                        str(Path(folder) / "missing"),
+                    ]
+                ),
+                1,
+            )
+
+
 @unittest.skipUnless(HAVE_NUMPY and HAVE_STOCK, "needs numpy and the stock firmware")
 class RealFirmwareLookTests(unittest.TestCase):
     def test_the_camera_makes_the_tables_of_the_built_in_looks(self) -> None:
