@@ -3,6 +3,12 @@
 Open work, most recent first. When an item is done, move its result to the camera log or the README
 and delete the item here.
 
+## One-click installer
+
+- A zip for any platform: double-click, a local page makes the firmware, adds film looks (optional), and writes to
+  an SD card or gives a zip. Olympus's art filters stay the default. Plan and criteria:
+  [installer design](../experiments/2026-11-17-installer/design.md).
+
 ## Level gauge
 
 - Level Adjust works (2026-11-14). Not yet reported: the calibration after power off and on, after
