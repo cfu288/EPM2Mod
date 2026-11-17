@@ -239,6 +239,10 @@
   {"id": 1536, "name": "shoot_cbs", "level": "info", "spec": "log-probes", "feature": "shooting",
    "doc": "Shooting callback 0x7E995A0B, sent by the dispatcher 0x7E995C0B (CBS_START_SHOOTING_PICTURE, CBS_END_INTERVAL_SHOOTING ...). It also arms the art and film probes for one record each",
    "names": {"cbs": "cbs"},
-   "args": [{"name": "cbs", "format": "dec"}, {"name": "result", "format": "hex"}]}
+   "args": [{"name": "cbs", "format": "dec"}, {"name": "result", "format": "hex"}]},
+
+  {"id": 1792, "name": "card_read", "level": "info", "spec": "log-card-read", "feature": "card-looks",
+   "doc": "The card-read probe at the first flush of a session: fileif_fopen(C:\\EPM2LOOK.BIN, \"r\"), fileif_fread of 16 bytes (0x7E5C536F), fileif_fclose. bytes = -1: the file did not open (first4 is then not the file's). first4: bytes 0-3 of the file as a little-endian word",
+   "args": [{"name": "bytes", "format": "sdec"}, {"name": "first4", "format": "hex"}]}
  ]
 }

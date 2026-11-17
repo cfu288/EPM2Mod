@@ -28,9 +28,31 @@ after it; the card is unchanged.
 (probe.bin: `mn10300-elf-as probe.s`, `ld -Ttext=0x13000 --defsym FOPEN=0x7e5c52dc --defsym
 FCLOSE=0x7e5c5308 --defsym FREAD=0x7e5c536f`, `objcopy -O binary`.)
 
-## 3. Open (each needs a camera probe)
+## 3. Probe 1 on the camera: the build (V in the emulator; camera pending)
 
-1. The read on the camera: a debug build that reads a small file at a key press and logs the bytes.
+`builds/debug-log-card-read.json` = `debug-log-films-12d` (flashed 2026-11-16) + `patches/log-card-read.json`
+(`mkspec_log.py --card-read`; event `card_read`, id 1792, dictionary build id `3cc5e33e95b6de52`; the flashed
+dictionary is kept as `logs/events-da49b2f5e7e62ca7.json`). The hook is the log's flush task entry
+(0x7EBF2C00, log-core's code, not stock); its routine (116 B at 0x7EBF2888, a run no spec ledgers) runs the two
+replaced instructions, then once per session (flag PST+104) `fileif_fopen(C:\EPM2LOOK.BIN, "r")`,
+`fileif_fread` of 16 bytes into the flush buffer, `fileif_fclose`, and logs `card_read` (bytes read, -1 when the
+file did not open; bytes 0-3). The flush then runs as before. It runs in the flush task (USRTEST_A, its own task,
+the camera-tested home of the log's file writes), when the GUI enters a menu, playback or the power-off state.
+
+sha256 `1297f288a69138d7b10fab1f37553a65fea82d2013ecc141445e194528689cab`. Checks: free space PASS, op check 0
+FAIL, load order: the one allowed failure of the base build only, boot-test PASS, update-path-test PASS.
+Emulator (`tools/emu/emu-run builds/debug-log-card-read.json logplay.mjs ...`, MENU, MENU, PLAY), decoded with
+`epm2mod log`:
+
+| Card | card_read | After it |
+|---|---|---|
+| `EPM2LOOK.BIN` = `LOOK0001xxx...` | bytes 16, first4 0x4B4F4F4C ("LOOK") | flush ok; later flushes ok, no second read |
+| no such file | bytes -1 | flush ok |
+| no card | (no log file) | no fault; only the two error entries every start has |
+
+## 4. Open (each needs a camera probe)
+
+1. The read on the camera: the build of section 3.
 2. A look table changed in RAM at run time takes effect at the next shot (I: the tables are at fixed
    RAM addresses in segment 1, `docs/art-filter-slots.md`; U: whether a store into loaded section RAM is
    safe here, it crashed on the E-P7). The emulator does not model the picture, so only a shot can tell.

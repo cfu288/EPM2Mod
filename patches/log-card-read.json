@@ -1,0 +1,48 @@
+{
+ "name": "log-card-read",
+ "description": "Structured log, the card-read probe: at the first flush of a session (the GUI enters a menu, playback or the power-off state) the flush task opens C:\\EPM2LOOK.BIN with mode r, reads its first 16 bytes with fileif_fread (0x7E5C536F), closes it, and writes the event card_read (bytes read, -1 when the file did not open; bytes 0-3 of the file). Then the flush runs as before. One hook at the flush task's entry (log-core's code, not stock) and its routine after the flush task. Needs the specs of builds/debug-log-films-12d.json before it: every expect is a byte string of that build. It puts the build id 3cc5e33e95b6de52 of logs/events.json into the block header. DEBUG builds only. See experiments/2026-11-17-card-looks/NOTES.md and docs/logging.md.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "candidate: emulator-checked, not flashed",
+ "_delta_on": "builds/debug-log-films-12d.json",
+ "_build_id": "3cc5e33e95b6de52",
+ "_ram": "1 byte of the log's state block (PST+104); the flush task's block buffer for the read",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1868",
+   "expect": "650050313400676574496e646578496e666f00513031007374617274005130320073696e676c654d6f64650051303300696e6465784d6f6465005130340051303500513036005130370051303800657870616e64416e696d6174696f6e00513042005230310073746172744d6f76696553657276",
+   "new": "cff0f8fec0fca8a8d04fbea000c9508001fc82a8d04fbefcdcea28bf7efcddfa28bf7edd312a9dff0014938affbf00c81dfcdcc0d04fbe800185109dddab2a9dff0018829cdd3b2a9dff000c89fca0c0d04fbe2c0007dd536c8dff0000dc20030000433a5c45504d324c4f4f4b2e42494e007200",
+   "_addr": "0x7EBF2888",
+   "_note": "new code, segment 2: T_CRD (116 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1BE0",
+   "expect": "cff0f8fec0",
+   "new": "dc88fcffff",
+   "_addr": "0x7EBF2C00",
+   "_note": "hook (card_read): jmp T_CRD. the flush task's entry (log-core): `movm [d2,d3,a2,a3],(sp)` / `add -64,sp`; task USRTEST_A, started by T_GUI when the GUI enters a menu, playback or the power-off state"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1D04",
+   "expect": "da49b2f5",
+   "new": "3cc5e33e",
+   "_addr": "0x7EBF2D24",
+   "_note": "flush task, block header: build id bytes 0-3 da49b2f5 -> 3cc5e33e (logs/events.json)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1D0D",
+   "expect": "e7e62ca7",
+   "new": "95b6de52",
+   "_addr": "0x7EBF2D2D",
+   "_note": "flush task, block header: build id bytes 4-7 e7e62ca7 -> 95b6de52 (logs/events.json)"
+  }
+ ]
+}
