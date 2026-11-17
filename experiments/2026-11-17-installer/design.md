@@ -11,8 +11,8 @@ Films replace them only when the user chooses. The CLI stays the default way to 
    Nothing else is installed by hand.
 2. "Make firmware" downloads OM's file, patches it and checks it, and shows each step. The result's sha256 is the
    pinned build's.
-3. With no films chosen, the camera keeps Olympus's art filters, effects included (needs the firmware of criterion
-   F1 below).
+3. With no films chosen, the camera keeps what the pinned firmware has in each slot, and the page says what that
+   is (from the data, not hard-coded). Olympus's art filters as that default belong to a separate project, below.
 4. "Add film looks" (off by default) shows the public site's list: up to 12 films, in ART slots the user orders. The
    preview follows the order.
 5. Output: a plugged-in SD card picked from a list, or "Download zip" with the same files, laid out as on the card.
@@ -23,7 +23,11 @@ Films replace them only when the user chooses. The CLI stays the default way to 
 8. The local page can't be reached from other computers or driven by other websites.
 9. Nothing that works today breaks: the CLI, the public site, every camera feature of the pinned build.
 
-Firmware criteria (point 2, agreed earlier):
+## Separate project: Olympus's art filters by default
+
+The owner split this out on 2026-11-17: the installer doesn't wait for it. When its firmware is pinned, regenerate
+`films.json` and the previews, and the installer and the site show Olympus's filters by default with no code change.
+Its criteria (agreed earlier):
 
 - F1. After the flash, all 12 entries are Olympus's art filters.
 - F2. Loading a film changes only that slot.
@@ -57,9 +61,7 @@ Firmware criteria (point 2, agreed earlier):
 3. `epm2mod serve`: stdlib `http.server` on 127.0.0.1, a random token in the URL, Host check. Endpoints: build
    (progress), cards, write, zip.
 4. The app page: a second Vite entry in `web/` that reuses the components, built into the package's static folder.
-5. Firmware point 2 (F1-F5): emulator study, one camera run, pin. Then the site and app default to Olympus's
-   filters, with name previews for them.
-6. Release zip from CI: launchers (pinned uv version, sha256-checked), package, pinned build's specs, built app
+5. Release zip from CI: launchers (pinned uv version, sha256-checked), package, pinned build's specs, built app
    page; a CI test that unpacks the zip and makes the pinned build from it.
 
 ## Notes for whoever implements this
@@ -69,7 +71,7 @@ Firmware criteria (point 2, agreed earlier):
   reviewer agent. No text that says what something is *not*. Questions to the owner go on their own line at the
   end. A camera run costs about 1000: use the emulator for everything it can settle, and plan one run for all open
   items.
-- **Firmware point 2 (F1-F5):** the pinned `card-looks-4` flashes films over the stock art filters. Slots 1-7 are
+- **Separate project, Olympus's filters by default (F1-F5):** the pinned `card-looks-4` flashes films over the stock art filters. Slots 1-7 are
   the hard part: `remap7b-code` and `seven-films-5` overwrite the stock tables; slots 8-12 come from `films12-*`
   specs. Study in the emulator first: which stock tables and effect settings must stay, and whether Built-in
   (`card-looks-4` mode 2, a RAM snapshot taken at start) can snapshot the stock tables instead. Card-looks design and

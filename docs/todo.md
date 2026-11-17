@@ -8,6 +8,8 @@ and delete the item here.
 - A zip for any platform: double-click, a local page makes the firmware, adds film looks (optional), and writes to
   an SD card or gives a zip. Olympus's art filters stay the default. Plan and criteria:
   [installer design](../experiments/2026-11-17-installer/design.md).
+- Separate project: Olympus's art filters by default, films only in the slots where a user loads one (criteria F1-F5
+  in the same design). The installer doesn't wait for it.
 
 ## Level gauge
 
