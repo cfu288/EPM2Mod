@@ -48,30 +48,31 @@ async function fakeServer(page: Page) {
   return made
 }
 
-test('writes the firmware to the card and shows the progress', async ({ page }) => {
+test('keeps the default films, writes to the card and shows the progress', async ({ page }) => {
   const made = await fakeServer(page)
   await page.goto('/#token=t0k3n')
+  await page.getByRole('button', { name: 'Keep default films' }).click()
   await expect(page.getByRole('combobox', { name: 'Write to' })).toHaveValue(CARD.path)
   await page.getByRole('button', { name: 'Build custom firmware' }).click()
-  await expect(page.getByRole('button', { name: 'Building…' })).toBeDisabled()
-  await expect(page.getByRole('region', { name: 'Update the camera' })).toBeVisible()
-  const progress = page.getByRole('region', { name: 'Progress' })
-  await expect(progress.getByRole('listitem').filter({ hasText: 'Write to the SD card' })).toHaveText(
-    '✓ Write to the SD card',
-  )
+  await expect(page.getByRole('heading', { name: 'Building' })).toBeVisible()
+  await expect(page.getByRole('list', { name: 'Progress' })).toContainText("✓ Download Olympus's firmware")
+  await expect(page.getByRole('heading', { name: 'Install on the camera' })).toBeVisible()
   expect(made).toEqual([{ choices: [], card: CARD.path }])
 })
 
-test('adds film looks and downloads the zip', async ({ page }) => {
+test('customizes the films and downloads the zip', async ({ page }) => {
   const made = await fakeServer(page)
   await page.goto('/#token=t0k3n')
-  await page.getByRole('combobox', { name: 'Write to' }).selectOption({ label: 'Download a zip' })
-  await page.getByRole('checkbox', { name: 'Customize the films in the ART menu' }).check()
-  await expect(page.getByRole('img', { name: /ART 1, Portra 400, selected/ })).toBeVisible()
+  await page.getByRole('button', { name: /^Remove Kodak Ektachrome 100/ }).click()
+  await page.getByRole('button', { name: 'Add Fujifilm C200' }).click()
+  await expect(page.getByRole('img', { name: /ART 2, C200, selected/ })).toBeVisible()
+  await page.getByRole('button', { name: 'Next' }).click()
+  await page.getByRole('combobox', { name: 'Write to' }).selectOption({ label: 'Download a zip instead' })
   await page.getByRole('button', { name: 'Build custom firmware' }).click()
   const download = page.waitForEvent('download')
   await page.getByRole('button', { name: 'Download EPM2Mod-card.zip' }).click()
   expect((await download).suggestedFilename()).toBe('EPM2Mod-card.zip')
-  expect(made[0]?.choices).toHaveLength(12)
-  await expect(page.getByRole('region', { name: 'Update the camera' })).toContainText('Load Looks → Load.')
+  expect(made[0]?.choices).toContain('ART2=c200')
+  await expect(page.getByRole('list', { name: 'Install steps' })).toContainText('Load Looks → Load.')
+  await page.getByRole('navigation', { name: 'Steps' }).getByRole('listitem').first().waitFor()
 })
