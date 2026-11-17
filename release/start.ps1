@@ -2,7 +2,7 @@
 #   start.ps1           open the installer page in the browser
 #   start.ps1 make      make the firmware on the command line (any epm2mod command works)
 $ErrorActionPreference = 'Stop'
-$ProgressPreference = 'SilentlyContinue'
+
 # Windows PowerShell 5.1 may offer only old TLS versions, which GitHub refuses
 [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 Set-Location -LiteralPath $PSScriptRoot
@@ -25,12 +25,18 @@ if ($Have -ne $UvVersion) {
   Write-Host "Getting uv $UvVersion (once)..."
   New-Item -ItemType Directory -Force -Path $Bin | Out-Null
   $Archive = Join-Path $PSScriptRoot ".uv\$Asset.zip"
-  Invoke-WebRequest -UseBasicParsing -Uri "https://github.com/astral-sh/uv/releases/download/$UvVersion/$Asset.zip" -OutFile $Archive
-  if ((Get-FileHash -Algorithm SHA256 -LiteralPath $Archive).Hash.ToLower() -ne $Sha) {
+  (New-Object System.Net.WebClient).DownloadFile("https://github.com/astral-sh/uv/releases/download/$UvVersion/$Asset.zip", $Archive)
+  # .NET for the checksum and the unzip: they work in every PowerShell, whatever its module path
+  $Hasher = [System.Security.Cryptography.SHA256]::Create()
+  $Stream = [System.IO.File]::OpenRead($Archive)
+  try { $Got = -join ($Hasher.ComputeHash($Stream) | ForEach-Object { $_.ToString('x2') }) } finally { $Stream.Dispose() }
+  if ($Got -ne $Sha) {
     Remove-Item -LiteralPath $Archive
     throw 'The uv download has the wrong checksum. Nothing was installed. Try again later.'
   }
-  Expand-Archive -LiteralPath $Archive -DestinationPath $Bin -Force
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  Get-ChildItem -LiteralPath $Bin -Filter 'uv*.exe' | Remove-Item
+  [System.IO.Compression.ZipFile]::ExtractToDirectory($Archive, $Bin)
   Remove-Item -LiteralPath $Archive
 }
 
