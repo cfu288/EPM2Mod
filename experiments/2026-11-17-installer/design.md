@@ -61,3 +61,36 @@ Firmware criteria (point 2, agreed earlier):
    filters, with name previews for them.
 6. Release zip from CI: launchers (pinned uv version, sha256-checked), package, pinned build's specs, built app
    page; a CI test that unpacks the zip and makes the pinned build from it.
+
+## Notes for whoever implements this
+
+- **Owner's rules for this work:** agree criteria before building (done: the owner said "Yes" on 2026-11-17).
+  Every UI sentence must answer "what am I telling the user?" and "is it helpful?", and new text gets a blind
+  reviewer agent. No text that says what something is *not*. Questions to the owner go on their own line at the
+  end. A camera run costs about 1000: use the emulator for everything it can settle, and plan one run for all open
+  items.
+- **Firmware point 2 (F1-F5):** the pinned `card-looks-4` flashes films over the stock art filters. Slots 1-7 are
+  the hard part: `remap7b-code` and `seven-films-5` overwrite the stock tables; slots 8-12 come from `films12-*`
+  specs. Study in the emulator first: which stock tables and effect settings must stay, and whether Built-in
+  (`card-looks-4` mode 2, a RAM snapshot taken at start) can snapshot the stock tables instead. Card-looks design and
+  addresses: `experiments/2026-11-17-card-looks/design.md`. After it is pinned: the site's and app's default rows
+  become "Olympus <filter>" (`slots[i].entry` in films.json is the Olympus name), and the preview needs name images
+  for the 12 Olympus names (`web/scripts/render_previews.py`, name box NAME = (160, 12, 560, 44) of the strip).
+- **`looks pack` without numpy:** today `lookpack.looks_of_choices` loads fits (numpy). Change it to decode the
+  records of `looks/films.json` (`lookfile.decode_record`, set slot and name) and keep the fit path only in
+  `export_films.py`. Keep the Python test that fails when films.json is stale, and the TS byte-equal vectors in
+  `web/src/lib/lookfile.test.ts`.
+- **Cards:** macOS `/Volumes/*` checked with `diskutil info -plist` (Removable/Ejectable or Internal false);
+  Windows drive letters with `GetDriveTypeW == DRIVE_REMOVABLE` (ctypes); Linux `lsblk -J -o NAME,RM,HOTPLUG,
+  MOUNTPOINT` with RM or HOTPLUG = 1. Show the volume name and size. `pipeline.check_card` already warns about other
+  files in `DCOLYMP`.
+- **serve:** stdlib `http.server.ThreadingHTTPServer` bound to 127.0.0.1 on a free port. A random token in the
+  opened URL and on every API call; reject a Host header that is not `127.0.0.1:PORT` or `localhost:PORT` (DNS
+  rebinding). Open the browser with `webbrowser.open`. Progress via polling or server-sent events from `make`'s
+  `log` callback.
+- **Launchers:** `Start (Mac).command`, `Start (Windows).bat`, `start.sh`. Download a pinned uv release from
+  GitHub, check its sha256, keep it in the folder, then `uv run --python 3.12 epm2mod serve` (pin Python; lock
+  with `uv.lock`). Expect the first-run warnings: macOS right-click → Open, Windows SmartScreen.
+- **Web build:** Node 26 (`web/.nvmrc`); `npm run check` and `npm run e2e` in
+  `web/`. dnd-kit tests need waits on its announcements. Style: OM SYSTEM gallery look, fonts Sora and Arimo
+  (`web/README.md`).
