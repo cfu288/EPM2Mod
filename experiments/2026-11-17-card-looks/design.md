@@ -223,6 +223,20 @@ Outcomes and what follows:
 - 3 does not work: the tone tables are read elsewhere (U); trace the look curve's pointer reader before the loader.
 - 4: `bank_tail` nonzero on the first session means the tail is in use on the camera: stop and find another place.
 
+### 9.2.1 Results of steps 2 and 3 (camera, 2026-11-17)
+
+- **Step 2 passed (V):** with the refresh, the saturation stage, which keeps a per-job cache (section 4), took the
+  write at once: photo PB170146 exactly grey (mean colour 0.0 against 28.0 before), live view black and white (owner).
+  The refresh stores caused no error. Step 1 (the same without the refresh) was not run: the loader runs the refresh
+  in any case.
+- **Step 3 passed for stills (V):** the red tone table 0x7F033B7C written with the refresh: PB170148 R/G/B 5/47/45
+  against 51/50/46 before. Live view looked normal and greener only with the shutter half pressed: live view reads
+  other tables, and at S1 its preview uses the stills tables (I). The flashed films write only the stills tables of
+  this slot (`generate.py`, `Tables` slots), so live view behaves today as it did here; the loader keeps that parity.
+  A live-view table for each look is a later improvement (which table live view reads for each slot: U).
+- So the loader writes every table and then runs the refresh, and a load takes effect at once. Step 4 (persistence)
+  is next.
+
 ### 9.3 After the probes: the feature
 
 1. **Code space** (section 6), measured this time: the harness's read, checks, record walk and refresh are 452 B; the
