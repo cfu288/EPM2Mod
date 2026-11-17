@@ -73,6 +73,11 @@ class RepoPaths:
         return self.root / "looks" / "films-12-bw.json"
 
     @property
+    def card_looks(self) -> Path:
+        """The look list of the default look file for the SD card."""
+        return self.root / "looks" / "card-looks.json"
+
+    @property
     def free_space_tool(self) -> Path:
         """The script that checks where patch specs put new bytes."""
         return self.root / "tools" / "freespace.py"

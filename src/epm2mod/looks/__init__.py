@@ -8,6 +8,9 @@ firmware builds use.
 Modules:
     slots: where each menu entry keeps its numbers in the firmware.
     films: the film list.
-    generate: the patch specs. Only this module needs numpy
-        (``pip install epm2mod[looks]``).
+    generate: the patch specs. It needs numpy (``pip install epm2mod[looks]``).
+    extra, mono: the specs of the film lists beyond the first seven.
+    lookfile: the look file that the camera loads from the SD card
+        (``docs/look-file-format.md``). It does not need numpy.
+    lookpack: look files made from the fit files. It needs numpy.
 """

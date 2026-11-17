@@ -1,0 +1,64 @@
+{
+ "looks": [
+  {
+   "entry": "Pop Art",
+   "name": "Portra",
+   "fit": "looks/fits/portra.npz"
+  },
+  {
+   "entry": "Soft Focus",
+   "name": "Ektachrome",
+   "fit": "looks/fits/ektachrome.npz"
+  },
+  {
+   "entry": "Pale&Light Color",
+   "name": "Pro 400H",
+   "fit": "looks/fits/pro400h.npz"
+  },
+  {
+   "entry": "Light Tone",
+   "name": "Kodachrome",
+   "fit": "looks/fits/kodachrome64.npz"
+  },
+  {
+   "entry": "Grainy Film",
+   "name": "Double-X",
+   "fit": "looks/fits/doublex2.npz"
+  },
+  {
+   "entry": "Pin Hole",
+   "name": "Vis 250D",
+   "fit": "looks/fits/vision3250d.npz"
+  },
+  {
+   "entry": "Diorama",
+   "name": "Velvia",
+   "fit": "looks/fits/velvia100.npz"
+  },
+  {
+   "entry": "Cross Process",
+   "name": "Superia 400",
+   "fit": "looks/fits/superia400.npz"
+  },
+  {
+   "entry": "Gentle Sepia",
+   "name": "Provia",
+   "fit": "looks/fits/provia100f.npz"
+  },
+  {
+   "entry": "Dramatic Tone",
+   "name": "Portra 160",
+   "fit": "looks/fits/portra160.npz"
+  },
+  {
+   "entry": "Key Line",
+   "name": "Gold 200",
+   "fit": "looks/fits/gold200.npz"
+  },
+  {
+   "entry": "Watercolor",
+   "name": "Vis 500T",
+   "fit": "looks/fits/vision3500t.npz"
+  }
+ ]
+}

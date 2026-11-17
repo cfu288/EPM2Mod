@@ -10,6 +10,8 @@
     epm2mod info FIRMWARE.BIN                     describe a firmware file
     epm2mod readme [--check]                      refresh the generated parts of the documents
     epm2mod looks [--check | --write]             check or write the film-look patch specs
+    epm2mod looks pack [LIST.json] [-o FILE]      write a look file for the SD card
+    epm2mod looks show FILE [--json]              check a look file and describe it
     epm2mod log FILE [--dict EVENTS.json] [--summary]
                                                   decode a camera log file to JSON lines
 
@@ -169,17 +171,61 @@ def _readme(args: argparse.Namespace, paths: RepoPaths) -> int:
     return 0
 
 
+def _numpy_needed(error: ModuleNotFoundError) -> BuildError:
+    """Return the error to report when numpy is missing, or raise ``error``."""
+    if error.name != "numpy":
+        raise error
+    return BuildError(
+        "numpy is needed for the film looks. In a checkout, 'uv run epm2mod "
+        "looks' installs it."
+    )
+
+
+def _looks_pack(args: argparse.Namespace, paths: RepoPaths) -> int:
+    """Run ``epm2mod looks pack``: write a look file from a look list."""
+    from .looks import lookfile
+
+    try:
+        from .looks import lookpack
+    except ModuleNotFoundError as error:
+        raise _numpy_needed(error) from None
+    source = Path(args.list) if args.list else paths.card_looks
+    data = lookfile.pack(lookpack.load_list(paths, source))
+    out = Path(args.out) if args.out else paths.output / lookfile.CARD_NAME
+    if out.is_dir():
+        out = out / lookfile.CARD_NAME
+    write_bytes(out, data)
+    print(f"wrote {out}: {len(data)} bytes, sha256 {sha256_bytes(data)}")
+    print(f"copy it to the top folder of the SD card as {lookfile.CARD_NAME}")
+    return 0
+
+
+def _looks_show(args: argparse.Namespace, paths: RepoPaths) -> int:
+    """Run ``epm2mod looks show``: check a look file and describe it."""
+    from .looks import lookfile
+
+    looks = lookfile.unpack(read_bytes(Path(args.file)))
+    if args.json:
+        print(json.dumps([lookfile.look_to_json(look) for look in looks], indent=1))
+        return 0
+    print(f"{args.file}: a valid look file with {len(looks)} looks")
+    for look in looks:
+        kind = "colour" if isinstance(look, lookfile.ColourLook) else "black-and-white"
+        entry = lookfile.MENU_ENTRIES[look.slot]
+        print(f"  {look.slot:2} {entry:<17} {look.name:<17} {kind}")
+    return 0
+
+
 def _looks(args: argparse.Namespace, paths: RepoPaths) -> int:
     """Run ``epm2mod looks``."""
+    if args.action == "pack":
+        return _looks_pack(args, paths)
+    if args.action == "show":
+        return _looks_show(args, paths)
     try:
         from .looks import generate
     except ModuleNotFoundError as error:
-        if error.name != "numpy":
-            raise
-        raise BuildError(
-            "numpy is needed for the film specs. In a checkout, 'uv run epm2mod "
-            "looks' installs it."
-        ) from None
+        raise _numpy_needed(error) from None
     if args.write:
         changed = generate.write(paths, EPM2_V16)
         print("\n".join(f"wrote {path}" for path in changed) or "no spec changed")
@@ -315,6 +361,31 @@ def build_parser() -> argparse.ArgumentParser:
     )
     looks_mode.add_argument(
         "--write", action="store_true", help="write the generated specs to patches/"
+    )
+    looks_actions = looks_cmd.add_subparsers(dest="action")
+    pack_cmd = looks_actions.add_parser(
+        "pack",
+        help="write a look file for the SD card",
+        description="Write a look file (EPM2LOOK.BIN) for the SD card from a look list.",
+    )
+    pack_cmd.add_argument(
+        "list", nargs="?", help="the look list; default: looks/card-looks.json"
+    )
+    pack_cmd.add_argument(
+        "-o",
+        "--out",
+        metavar="FILE",
+        help="where to write it (a folder: under the name EPM2LOOK.BIN); "
+        "default: build/EPM2LOOK.BIN",
+    )
+    show_cmd = looks_actions.add_parser(
+        "show",
+        help="check a look file and describe it",
+        description="Check a look file as the camera does and list its looks.",
+    )
+    show_cmd.add_argument("file", help="the look file")
+    show_cmd.add_argument(
+        "--json", action="store_true", help="print the looks in their JSON form"
     )
 
     log_cmd = command(

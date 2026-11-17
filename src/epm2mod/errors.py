@@ -43,3 +43,7 @@ class BuildError(Epm2ModError):
 
 class LogError(Epm2ModError):
     """A camera log file or the event dictionary cannot be decoded."""
+
+
+class LookFileError(Epm2ModError):
+    """A look file for the SD card, or a look in it, is not valid."""
