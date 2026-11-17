@@ -1,4 +1,4 @@
-import data from '../../../looks/film-records.json'
+import data from '../../../../../looks/film-records.json'
 
 /** A fitted film the look file can hold (looks/film-records.json in the repository, made from looks/catalogue.json). */
 export interface Film {

@@ -193,13 +193,15 @@ class App:
         if card is not None:
             listed = {str(found.path): found.path for found in self.list_cards()}
             if not isinstance(card, str) or card not in listed:
-                raise BuildError("that SD card is no longer plugged in")
+                raise BuildError(
+                    "Put the SD card back in this computer, then select Refresh."
+                )
             target = listed[card]
         if choices:
             records.looks_of_choices(records.load(self.paths), choices)
         with self.lock:
             if self.job is not None and not self.job.done:
-                raise BuildError("the firmware is being made; wait for it to end")
+                raise BuildError("The firmware is being made. Wait for it to end.")
             job = Job((self.job.number + 1) if self.job else 1, card=card)
             self.job = job
         threading.Thread(
@@ -378,8 +380,8 @@ def serve(paths: RepoPaths, port: int = 0, browser: bool = True) -> None:
     app = App(paths)
     httpd = server(app, port)
     url = page_url(app, httpd)
-    print(f"EPM2Mod is open in your browser: {url}")
-    print("Keep this window open while you use the page. Close it to stop.")
+    print(f"EPM2Mod is open in your browser: {url}", flush=True)
+    print("Keep this window open while you use the page. Close it to stop.", flush=True)
     if browser:
         webbrowser.open(url)
     try:

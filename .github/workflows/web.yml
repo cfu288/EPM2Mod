@@ -36,7 +36,7 @@ jobs:
       - uses: actions/upload-pages-artifact@v5
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         with:
-          path: web/dist
+          path: web/apps/site/dist
 
   deploy:
     needs: check

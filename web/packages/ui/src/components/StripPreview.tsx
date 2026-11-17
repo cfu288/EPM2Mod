@@ -1,4 +1,5 @@
 import { filmById, slots } from '../lib/films'
+import { previewUrl } from '../lib/previews'
 
 interface Props {
   art: number
@@ -17,7 +18,6 @@ const percent = (part: number, whole: number) => `${String((100 * part) / whole)
  */
 export function StripPreview({ art, filmId }: Props) {
   const shown = filmById(filmId ?? slots[art - 1]?.builtIn ?? '')
-  const base = `${import.meta.env.BASE_URL}previews`
   return (
     <figure>
       <div
@@ -26,14 +26,14 @@ export function StripPreview({ art, filmId }: Props) {
         className="relative overflow-hidden bg-black"
       >
         <img
-          src={`${base}/menu/art${String(art)}.png`}
+          src={previewUrl(`menu/art${String(art)}`)}
           alt=""
           width={STRIP.width}
           height={STRIP.height}
           className="block w-full [image-rendering:pixelated]"
         />
         <img
-          src={`${base}/name/${shown.id}.png`}
+          src={previewUrl(`name/${shown.id}`)}
           alt=""
           width={NAME.width}
           height={NAME.height}

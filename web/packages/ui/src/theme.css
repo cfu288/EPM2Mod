@@ -3,6 +3,9 @@
 @import '@fontsource/arimo/latin-400.css';
 @import '@fontsource/arimo/latin-700.css';
 
+/* The classes of the shared components; each app's own files are found from its folder. */
+@source '.';
+
 /* Fonts: Sora (headings) and Arimo (text), the free fonts closest to the OM SYSTEM site's Neue Machina and
    Helvetica Neue; a computer that has Helvetica Neue uses it. */
 /* Black and white, square corners, thin black rules: the look of the OM SYSTEM gallery pages. */

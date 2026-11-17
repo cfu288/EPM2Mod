@@ -66,6 +66,9 @@ Its criteria (agreed earlier):
    build with looks through the app and through the CLI and compares the card files byte for byte. The page is
    served from `src/epm2mod/app/` (git-ignored, built by step 4).
 4. The app page: a second Vite entry in `web/` that reuses the components, built into the package's static folder.
+   Done 2026-11-17: `web/` is an npm workspace, `packages/ui` (shared: `MenuEditor`, `useLooks`, `StripPreview`,
+   `PageFrame`, `LoadSteps`, film data, packer), `apps/site` (public) and `apps/local` (this page, built into
+   `src/epm2mod/app/` by `npm run build:app`). Lint rules keep the apps from importing each other.
 5. Release zip from CI: launchers (pinned uv version, sha256-checked), package, pinned build's specs, built app
    page; a CI test that unpacks the zip and makes the pinned build from it.
 

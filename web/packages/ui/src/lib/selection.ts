@@ -56,3 +56,8 @@ export function lookFile(items: readonly SlotItem[]): Uint8Array {
     }),
   )
 }
+
+/** The command-line choices of the filled slots, for example `ART2=velvia` (`epm2mod looks pack`, `epm2mod serve`). */
+export function choicesOf(items: readonly SlotItem[]): string[] {
+  return items.flatMap((item, index) => (item.filmId ? [`ART${String(index + 1)}=${item.filmId}`] : []))
+}

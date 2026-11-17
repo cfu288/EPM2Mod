@@ -9,8 +9,9 @@ const row = (page: Page, art: number) =>
 /** The preview shows the strip of ART `art` with the name of `film`, and both images loaded. */
 async function expectPreview(page: Page, art: number, film: string) {
   const layers = page.getByRole('img').locator('img')
-  await expect(layers.nth(0)).toHaveAttribute('src', new RegExp(`previews/menu/art${String(art)}\\.png$`))
-  await expect(layers.nth(1)).toHaveAttribute('src', new RegExp(`previews/name/${film}\\.png$`))
+  // the build names a picture NAME-HASH.png (8 characters of hash)
+  await expect(layers.nth(0)).toHaveAttribute('src', new RegExp(`/art${String(art)}-[\\w-]{8}\\.png$`))
+  await expect(layers.nth(1)).toHaveAttribute('src', new RegExp(`/${film}-[\\w-]{8}\\.png$`))
   for (const layer of await layers.all()) {
     await expect(layer).toHaveJSProperty('complete', true)
     await expect(layer).not.toHaveJSProperty('naturalWidth', 0)

@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "target": "ES2023",
     "lib": ["ES2023"],
     "module": "ESNext",
@@ -11,6 +10,5 @@
     "noEmit": true,
     "strict": true,
     "skipLibCheck": true
-  },
-  "include": ["vite.config.ts", "eslint.config.js", "playwright.config.ts", "e2e"]
+  }
 }

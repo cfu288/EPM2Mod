@@ -1,0 +1,20 @@
+{
+  "name": "@epm2mod/site",
+  "private": true,
+  "version": "1.0.0",
+  "description": "The public film-looks site on GitHub Pages: choose films for the ART menu and download EPM2LOOK.BIN",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "e2e": "playwright test"
+  },
+  "dependencies": {
+    "@epm2mod/ui": "1.0.0",
+    "@heroicons/react": "2.2.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  }
+}

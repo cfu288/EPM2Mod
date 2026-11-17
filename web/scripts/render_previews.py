@@ -8,8 +8,8 @@ the Picture Mode strip (OK, UP) and takes a screenshot at ART 1 to ART 12 (the s
 
 The film's name and the ART position are drawn in separate parts of the strip, so they are saved separately:
 
-- web/public/previews/name/<film>.png: the inside of the name box (NAME), with the film's name;
-- web/public/previews/menu/art<N>.png: the strip at ART N with the name box empty.
+- web/packages/ui/src/previews/name/<film>.png: the inside of the name box (NAME), with the film's name;
+- web/packages/ui/src/previews/menu/art<N>.png: the strip at ART N with the name box empty.
 
 The web app puts the name of the film in a row over the strip of that row's position, so the preview follows the
 order the user sets. The script checks that the films' strips differ only inside NAME and that a film's name does
@@ -35,7 +35,7 @@ from epm2mod.paths import RepoPaths  # noqa: E402
 
 BUILD = "builds/card-looks-4.json"
 STATE = ROOT / "build/emu/state/card-looks-4-p.json"
-OUT = ROOT / "web/public/previews"
+OUT = ROOT / "web/packages/ui/src/previews"
 CROP = (0, 356, 720, 480)
 #: the inside of the name box in the strip (the box is x 155-564, y 7-45; the names fall in x 274-445, y 17-41)
 NAME = (160, 12, 560, 44)

@@ -31,3 +31,6 @@ src/epm2mod/app/
 # Old diffs made before om-emu had a licence stay out:
 **/om-emu-E101.patch
 **/om-emu-changes.diff
+
+# Third-party reference documents (manuals, parts lists). Not redistributable; never commit.
+/references/
