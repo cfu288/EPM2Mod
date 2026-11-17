@@ -1,6 +1,11 @@
 """The card-looks build in the emulator: five sessions that share the camera's flash.
 
-    uv run python experiments/2026-11-17-card-looks/scripts/emu_looks.py
+    uv run python experiments/2026-11-17-card-looks/scripts/emu_looks.py [--v2]
+
+--v2: builds/card-looks-2.json (twelve colour slots, the menu row Load Looks). TEST has C200 in all 12 slots, and a
+load is MENU -> Custom Menu -> J -> Load Looks -> Load, then out of the menu. Its sessions start from the settings
+state build/emu/state/card-looks-2-p.json (tools/emu/mkstate builds/card-looks-2.json ... p); screenshots go to
+build/card-looks/emu/shots-2/.
 
 Needs build/card-looks.BIN (uv run epm2mod make builds/card-looks.json) and the files that mkspec_looks.py writes
 into build/card-looks/ (syms.json, spans.json, films-12d.block0.bin). Each session boots the build, and each dump
@@ -35,15 +40,29 @@ EMU = os.path.join(WORK, "emu")
 RTC = "2026-11-17T12:00:00"
 
 
+V2 = "--v2" in sys.argv
+SUF = "-2" if V2 else ""
+BUILD = "builds/card-looks%s.json" % SUF
+NAV = ("key:MENU key:RIGHT key:OK key:DOWN key:DOWN key:DOWN key:RIGHT " + "key:DOWN " * 9 + "key:RIGHT " +
+       "key:DOWN " * 4).split()
+LOAD = NAV + ["shot:row", "key:RIGHT", "key:DOWN", "key:OK", "shot:load", "key:MENU", "key:MENU", "w:2000"]
+
+
 def files():
     """The three look files."""
     paths = RepoPaths(Path(ROOT))
-    default = lookpack.load_list(paths, paths.card_looks)
+    if V2:
+        items = json.load(open(paths.card_looks))["looks"]
+        default = lookpack.load_list(paths, paths.card_looks)
+    else:           # films-12d's looks: Double-X in its black-and-white slot
+        lst = os.path.join(WORK, "list-card-looks.json")
+        default = lookpack.load_list(paths, Path(lst))
     fit = lookpack.load_fit(paths.resolve("looks/fits/c200.npz"))
-    test = [lookpack.look_of_fit(fit, e, "C200", "c200") for e in lookfile.MENU_ENTRIES if e != "Grainy Film"]
-    mono = default[4]
-    test.append(lookfile.MonoLook(4, "Mono+40", mono.matrix, tuple(min(v + 40, 1023) for v in mono.grain),
-                                  mono.live))
+    test = [lookpack.look_of_fit(fit, e, "C200", "c200") for e in lookfile.MENU_ENTRIES if V2 or e != "Grainy Film"]
+    if not V2:
+        mono = default[4]
+        test.append(lookfile.MonoLook(4, "Mono+40", mono.matrix, tuple(min(v + 40, 1023) for v in mono.grain),
+                                      mono.live))
     t = lookfile.pack(test)
     bad = bytearray(t)
     bad[5000] ^= 0x01
@@ -60,8 +79,8 @@ def expected(b, data, table, spans):
 
 def session(n, card, state, steps, drop_ram=False):
     """Run one session; return its dump lines by name."""
-    env = dict(os.environ, E101_STATE=state, E101_RTC=RTC, SPANS=os.path.join(WORK, "spans.json"),
-               SYMS=os.path.join(WORK, "syms.json"))
+    env = dict(os.environ, E101_STATE=state, E101_RTC=RTC, SPANS=os.path.join(WORK, "spans%s.json" % SUF),
+               SYMS=os.path.join(WORK, "syms%s.json" % SUF), SHOTS=os.path.join(EMU, "shots%s" % SUF, "s%d" % n))
     if drop_ram and os.path.exists(state):
         doc = json.load(open(state))
         doc.pop("ram", None)
@@ -75,7 +94,7 @@ def session(n, card, state, steps, drop_ram=False):
         env["E101_CARD"] = folder
     else:
         env.pop("E101_CARD", None)
-    out = subprocess.run([os.path.join(ROOT, "tools/emu/emu-run"), "builds/card-looks.json",
+    out = subprocess.run([os.path.join(ROOT, "tools/emu/emu-run"), BUILD,
                           os.path.join(HERE, "emu_looks.mjs"), *steps], cwd=ROOT, env=env, capture_output=True,
                          text=True)
     lines = [json.loads(l) for l in out.stdout.splitlines() if l.startswith("{")]
@@ -86,17 +105,19 @@ def session(n, card, state, steps, drop_ram=False):
 
 
 def main():
-    b = bytes(open(os.path.join(WORK, "films-12d.block0.bin"), "rb").read())
+    b = bytes(open(os.path.join(WORK, "base-2.block0.bin" if V2 else "films-12d.block0.bin"), "rb").read())
     blk = bytearray(b)
-    table = mk.slot_ops(blk)
-    spans = json.load(open(os.path.join(WORK, "spans.json")))
+    table = mk.slot_ops(blk, V2)
+    spans = json.load(open(os.path.join(WORK, "spans%s.json" % SUF)))
     f = files()
     want = {"flashed": expected(b, None, table, spans), "TEST": expected(b, f["TEST"], table, spans)}
     assert want["flashed"] == expected(b, f["DEFAULT"], table, spans)
     os.makedirs(EMU, exist_ok=True)
-    state = os.path.join(EMU, "state.json")
+    state = os.path.join(EMU, "state%s.json" % SUF)
     if os.path.exists(state):
         os.remove(state)
+    if V2:
+        shutil.copy(os.path.join(ROOT, "build/emu/state/card-looks-2-p.json"), state)
     plan = [
         (1, {"EPM2LOOK.BIN": f["TEST"]}, False, ["dump:start", "key:MENU", "w:2000", "dump:menu", "key:MENU", "w:500"],
          {"start": "flashed", "menu": "TEST"}),
@@ -107,6 +128,17 @@ def main():
         (5, {"EPM2LOOK.BIN": f["DEFAULT"]}, True, ["dump:start", "key:MENU", "w:2000", "dump:menu"],
          {"start": "TEST", "menu": "flashed"}),
     ]
+    if V2:
+        plan = [
+            (1, {"EPM2LOOK.BIN": f["TEST"]}, False,
+             ["dump:start", "key:MENU", "key:RIGHT", "key:OK", "key:MENU", "w:1500", "dump:menu"] + LOAD + ["dump:load"],
+             {"start": "flashed", "menu": "flashed", "load": "TEST"}),
+            (2, {}, True, ["dump:start"] + NAV + ["shot:row-off"], {"start": "TEST"}),
+            (3, {"EPM2LOOK.BIN": f["BAD"]}, True, ["dump:start"] + LOAD + ["dump:load"], {"start": "TEST", "load": "TEST"}),
+            (4, None, True, ["dump:start"] + LOAD + ["dump:load"], {"start": "TEST", "load": "TEST"}),
+            (5, {"EPM2LOOK.BIN": f["DEFAULT"]}, True, ["dump:start"] + LOAD + ["dump:load"],
+             {"start": "TEST", "load": "flashed"}),
+        ]
     ok = True
     for n, card, drop, steps, checks in plan:
         dumps, last = session(n, card, state, steps, drop)

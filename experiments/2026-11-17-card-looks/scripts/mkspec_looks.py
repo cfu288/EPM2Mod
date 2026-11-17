@@ -1,6 +1,12 @@
 """Write patches/card-looks.json and builds/card-looks.json: film looks loaded from the SD card and kept in the camera.
 
-    uv run python experiments/2026-11-17-card-looks/scripts/mkspec_looks.py [LISTING.txt]
+    uv run python experiments/2026-11-17-card-looks/scripts/mkspec_looks.py [--v2] [LISTING.txt]
+
+--v2 writes patches/card-looks-2.json and builds/card-looks-2.json instead: the same loader for twelve colour slots
+(mkspec_slots.LAYOUT, Grainy Film a colour slot) with the menu row of patches/looks-menu.json as its trigger: when the
+GUI leaves the menu (not to power-off) with setting 449 at Load (0), T_GUI sets it back to Off (1) with the GUI's
+setSetting, as the menu does, and starts the task in mode 1. The firmware writes 1 into the setting at every start, so
+a camera shows Off. There is no load at the first menu.
 
 Needs build/films-12d.BIN (uv run epm2mod make builds/films-12d.json) and the toolchain (tools/setup.sh).
 The design is design.md sections 2-5 and 9.3; the file format is docs/look-file-format.md.
@@ -85,51 +91,10 @@ ASM = r"""
 .equ MODE,     FLAGS_U + 3       # 0: apply the stored looks; 1: load the card file first
 
 .section .tk,"ax"
-T_GUI:                           # the "state =" trace call of the GUI state setter, d0 = new state (task CA_MAIN)
-    movm [d2,other],(sp)
-    mov psw,d2                   # this routine changes the flags: keep them
-    mov d0,d1
-    movbu (BUSY),d0
-    cmp 0,d0
-    bne 9f
-    movbu (APPLIED),d0
-    cmp 0,d0
-    bne 1f
-    mov 1,d0
-    movbu d0,(APPLIED)
-    clr d0                       # mode 0, at the first GUI state of the session
-    bra 5f
-1:  movbu (CARDDONE),d0
-    cmp 0,d0
-    bne 9f
-    mov d1,d0
-    lsr 8,d0
-    cmp 0x57,d0                  # 0x57xx: the menus
-    beq 2f
-    lsr 4,d0
-    cmp 3,d0                     # 0x3xxx: playback
-    bne 9f
-2:  call 0x7ecd360a,[d2],8       # the GUI's isMediaWriting(): 1 while the card is written
-    cmp 0,d0
-    bne 9f
-    mov 1,d0
-    movbu d0,(CARDDONE)          # mode 1, once per session
-5:  movbu d0,(MODE)
-    mov 1,d0
-    movbu d0,(BUSY)
-    mov 0x90,d0
-    call 0x7e449541,[d2,d3],12   # OlyTaSt(USRTEST_A)
-9:  mov d2,psw
-    nop
-    nop
-    movm (sp),[d2,other]
-%(displaced)s
-    jmp %(back)#x
-
-T_TASK:                          # task USRTEST_A (id 0x90), started by T_GUI; it ends when it returns
+%(gui)sT_TASK:                          # task USRTEST_A (id 0x90), started by T_GUI; it ends when it returns
     movm [d2,d3,a2,a3],(sp)
     add -32,sp                   # (0,sp) is the return slot of every call: no locals here
-    movbu (MODE),d0
+%(reset)s    movbu (MODE),d0
     cmp 0,d0
     beq 6f
     mov PATH,a0
@@ -379,6 +344,99 @@ A_NEXT:
     jmp A_K
 """
 
+GUI_V1 = r"""
+T_GUI:                           # the "state =" trace call of the GUI state setter, d0 = new state (task CA_MAIN)
+    movm [d2,other],(sp)
+    mov psw,d2                   # this routine changes the flags: keep them
+    mov d0,d1
+    movbu (BUSY),d0
+    cmp 0,d0
+    bne 9f
+    movbu (APPLIED),d0
+    cmp 0,d0
+    bne 1f
+    mov 1,d0
+    movbu d0,(APPLIED)
+    clr d0                       # mode 0, at the first GUI state of the session
+    bra 5f
+1:  movbu (CARDDONE),d0
+    cmp 0,d0
+    bne 9f
+    mov d1,d0
+    lsr 8,d0
+    cmp 0x57,d0                  # 0x57xx: the menus
+    beq 2f
+    lsr 4,d0
+    cmp 3,d0                     # 0x3xxx: playback
+    bne 9f
+2:  call 0x7ecd360a,[d2],8       # the GUI's isMediaWriting(): 1 while the card is written
+    cmp 0,d0
+    bne 9f
+    mov 1,d0
+    movbu d0,(CARDDONE)          # mode 1, once per session
+5:  movbu d0,(MODE)
+    mov 1,d0
+    movbu d0,(BUSY)
+    mov 0x90,d0
+    call 0x7e449541,[d2,d3],12   # OlyTaSt(USRTEST_A)
+9:  mov d2,psw
+    nop
+    nop
+    movm (sp),[d2,other]
+%(displaced)s
+    jmp %(back)#x
+
+"""
+
+GUI_V2 = r"""
+T_GUI:                           # the "state =" trace call of the GUI state setter, d0 = new state (task CA_MAIN)
+    movm [d2,d3,other],(sp)
+    mov psw,d2                   # this routine changes the flags: keep them
+    mov d0,d3                    # the new state
+    movbu (BUSY),d0
+    cmp 0,d0
+    bne 9f
+    movbu (APPLIED),d0
+    cmp 0,d0
+    bne 1f
+    mov 1,d0
+    movbu d0,(APPLIED)
+    clr d0                       # mode 0, at the first GUI state of the session
+    bra 5f
+1:  mov d3,d0
+    lsr 8,d0
+    cmp 0x57,d0                  # 0x57xx: still in the menus
+    beq 9f
+    lsr 4,d0
+    cmp 2,d0                     # 0x2xxx: power off, sleep
+    beq 9f
+    mov 0xd7b1,d0                # setting 449, the row "Load Looks" (patches/looks-menu.json): 0 = Load, 1 = Off
+    mov 0,a0
+    clr d1
+    call 0x7e457c75,[d2,d3],12   # prm_get(tag, 0, 0)
+    cmp 0,d0
+    bne 9f
+    call 0x7ecd360a,[d2],8       # the GUI's isMediaWriting(): 1 while the card is written (then: at a later state)
+    cmp 0,d0
+    bne 9f
+    mov 449,d0                   # the row back to Off, as the menu sets a value: the GUI's setSetting(449, 1)
+    mov 1,d1
+    call 0x7ee01d4e,[d2,d3,a2],32
+    mov 1,d0                     # mode 1: load the card file
+5:  movbu d0,(MODE)
+    mov 1,d0
+    movbu d0,(BUSY)
+    mov 0x90,d0
+    call 0x7e449541,[d2,d3],12   # OlyTaSt(USRTEST_A)
+9:  mov d2,psw
+    nop
+    nop
+    movm (sp),[d2,d3,other]
+%(displaced)s
+    jmp %(back)#x
+
+"""
+
 STRINGS = r"""
 .section .tk,"ax"
     .balign 4
@@ -402,8 +460,10 @@ def word(b, a):
     return struct.unpack_from("<I", b, a - BASE)[0]
 
 
-def slot_ops(b):
-    """The operation list of each menu entry in films-12d: (kind, [(offset, count, address, default)])."""
+def slot_ops(b, v2=False):
+    """The operation list of each menu entry: (kind, [(offset, count, address, default)]).
+
+    films-12d (v2 False): Grainy Film is the black-and-white slot. v2: twelve colour slots (mkspec_slots.LAYOUT)."""
     defaults = [word(b, slots.DEFAULT_RECORD + 4 * i) for i in range(slots.RECORD_TABLES)]
     colour = {s.entry: s for s in slots.SLOTS}
     extra = {s.entry: s.look for s in slots.EXTRA_SLOTS}
@@ -411,9 +471,11 @@ def slot_ops(b):
     # colour film uses the tables of the first extra slot (looks/films-12-bw.json, "moved_to")
     where = {**colour, "Gentle Sepia": extra["Grainy Film"], "Dramatic Tone": extra["Dramatic Tone"],
              "Key Line": extra["Key Line"], "Watercolor": extra["Watercolor"]}
+    if v2:
+        where.update({"Grainy Film": extra["Grainy Film"], "Gentle Sepia": extra["Gentle Sepia"]})
     out = []
     for entry in lookfile.MENU_ENTRIES:
-        if entry == slots.MONO_SLOT.entry:
+        if entry == slots.MONO_SLOT.entry and not v2:
             grain = slots.MONO_SLOT.spare_tables[0][0]         # films12bw-doublex2 points the grain load at it
             assert word(b, slots.MONO_SLOT.grain_load + 2) == grain
             out.append((lookfile.KIND_MONO, [(46, 18, MONO_MATRIX, 0), (164, 512, grain, 0),
@@ -520,27 +582,47 @@ def displaced(blk_path, site, n):
 
 
 def main():
+    global SPEC
+    v2 = "--v2" in sys.argv
+    argv = [a for a in sys.argv[1:] if a != "--v2"]
     paths = RepoPaths(Path(ROOT))
-    build = json.load(open(os.path.join(ROOT, BASE_BUILD)))
-    fw = os.path.join(ROOT, "build", "films-12d.BIN")
-    assert hashlib.sha256(open(fw, "rb").read()).hexdigest() == build["sha256"], "make builds/films-12d.json first"
-    b = block0(fw)
     work = os.path.join(ROOT, "build", "card-looks")
     os.makedirs(work, exist_ok=True)
-    blk_path = os.path.join(work, "films-12d.block0.bin")
+    if v2:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import mkspec_slots
+        SPEC = "card-looks-2"
+        base_specs = mkspec_slots.LAYOUT + ["patches/looks-menu.json"]
+        fw = os.path.join(work, "base-2.BIN")
+        subprocess.run(["uv", "run", "epm2mod", "apply", *base_specs, "-o", fw], cwd=ROOT, check=True,
+                       capture_output=True)
+        blk_name, delta_on = "base-2.block0.bin", "the specs of builds/card-looks-2.json before it"
+    else:
+        build = json.load(open(os.path.join(ROOT, BASE_BUILD)))
+        base_specs = build["specs"]
+        fw = os.path.join(ROOT, "build", "films-12d.BIN")
+        assert hashlib.sha256(open(fw, "rb").read()).hexdigest() == build["sha256"], "make builds/films-12d.json first"
+        blk_name, delta_on = "films-12d.block0.bin", BASE_BUILD
+    b = block0(fw)
+    blk_path = os.path.join(work, blk_name)
     open(blk_path, "wb").write(b)
-    table = slot_ops(b)
+    table = slot_ops(b, v2)
     kinds = [k for k, _ in table]
 
-    # the model: the built-in looks give the bytes films-12d has; a file with other looks changes only slot tables
-    looks = lookpack.load_list(paths, paths.card_looks)
+    # the model: the built-in looks give the bytes of the base; a file with other looks changes only slot tables
+    items = json.load(open(paths.card_looks))["looks"]
+    if not v2:      # films-12d: Double-X in its black-and-white slot (the fit with A, T, L)
+        items = [dict(i, fit="looks/fits/doublex2.npz") if i["entry"] == "Grainy Film" else i for i in items]
+    listing_json = os.path.join(work, "list-%s.json" % SPEC)
+    json.dump({"looks": items}, open(listing_json, "w"))
+    looks = lookpack.load_list(paths, Path(listing_json))
     data = lookfile.pack(looks)
     assert model_verify(data, kinds)
     same = bytearray(b)
     model_apply(same, data, table)
-    assert same == b, "the look file of looks/card-looks.json does not give films-12d's bytes"
+    assert same == b, "the built-in looks as a look file do not give the base's bytes"
     other = lookfile.pack([lookpack.look_of_fit(lookpack.load_fit(paths.resolve("looks/fits/c200.npz")), e, "C200",
-                                                "c200") for e in lookfile.MENU_ENTRIES if e != "Grainy Film"])
+                                                "c200") for e in lookfile.MENU_ENTRIES if v2 or e != "Grainy Film"])
     assert model_verify(other, kinds)
     changed = bytearray(b)
     model_apply(changed, other, table)
@@ -549,14 +631,14 @@ def main():
     assert diff and all(any(lo <= a < hi for lo, hi in spans) for a in diff)
     for bad in (data[:-1], data[:12] + b"\0" + data[13:], data[:32] + b"\x04" + data[33:]):
         assert not model_verify(bad, kinds)
-    print("model: the built-in looks give films-12d's bytes; C200 in 11 slots changes %d bytes, all in slot tables"
-          % len(diff))
+    print("model: the built-in looks give the base's bytes; C200 in %d slots changes %d bytes, all in slot tables"
+          % (len(other) // 1708, len(diff)))
 
     areas, slottab, crct = data_area(table)
     subs = {"store": STORE, "scratch": SCRATCH, "maxread": MAXREAD, "slottab": slottab, "crct": crct,
             "rw0": REFRESH_WORDS[0], "rw1": REFRESH_WORDS[1], "rb0": REFRESH_BYTES[0], "rb1": REFRESH_BYTES[1],
             "displaced": displaced(blk_path, HOOK[0], HOOK[1]), "back": HOOK[0] + HOOK[1]}
-    asm = ASM % subs + STRINGS
+    asm = ASM.replace("%(gui)s", GUI_V2 if v2 else GUI_V1).replace("%(reset)s", "") % subs + STRINGS
     args = ["--defsym=s_%s=0x%s" % (x, x) for x in sorted(set(re.findall(r"(?:jmp|call)\s+0x([0-9a-f]{8})", asm)))]
     asm = re.sub(r"((?:jmp|call)\s+)0x([0-9a-f]{8})", r"\1s_\2", asm)
     asm += '\n.section .hs,"ax"\n    jmp T_GUI\n'
@@ -606,53 +688,60 @@ def main():
        "CPU0 task table, row of id 0x90 (USRTEST_A, dormant in stock): entry 0x7E501C5B -> T_TASK")
     print("code %d B; T_TASK %#x, T_GUI %#x" % (total, syms["T_TASK"], syms["T_GUI"]))
     keep = {k: syms[k] for k in ("T_TASK", "T_GUI", "T_STORED", "T_END", "SAVE", "V_OK", "V_BAD", "APPLY", "FLAGS")}
-    json.dump({**keep, "STORE": STORE, "SCRATCH": SCRATCH}, open(os.path.join(work, "syms.json"), "w"))
+    json.dump({**keep, "STORE": STORE, "SCRATCH": SCRATCH}, open(os.path.join(work, "syms%s.json" % ("-2" if v2 else "")), "w"))
     json.dump([[a, 2 * n if d else n] for _, ops in table for _, n, a, d in ops],
-              open(os.path.join(work, "spans.json"), "w"))
+              open(os.path.join(work, "spans%s.json" % ("-2" if v2 else "")), "w"))
 
-    spec = {
-        "name": SPEC,
-        "description": (
-            "Film looks loaded from the SD card and kept in the camera. A look file C:\\EPM2LOOK.BIN "
-            "(docs/look-file-format.md) holds up to 12 looks, one per art-filter menu entry. At the first menu or "
-            "playback screen of a session, when the card is not being written, the dormant task USRTEST_A reads "
-            "the file into the EEROM settings bank's unused tail (0x%08X), checks it (magic, version, lengths, "
-            "CRC-32, camera and firmware, slots and kinds), copies it into the store at 0x%08X and, when a byte "
-            "changed, calls the bank save API 0x7E680272. At every start (the first GUI state) and after a load the "
-            "task checks the store and writes its looks into the slots' tables (both aliases): saturation pair, "
-            "six-axis values, art matrix, chroma record, and each tone table made from the look's curve and the "
-            "stock default table, as the film generator does; the black-and-white slot (Grainy Film) takes its "
-            "matrix and two tables. Then the look stages recompute (the boot init's refresh stores). A bad file "
-            "changes nothing; without a file the stored looks stay. A hook on the GUI state setter's trace call "
-            "0x7ECDF6E4 starts the task (the site and task of the camera-tested debug log, which this build does "
-            "not have), code in free runs of segment 2, the slot table in two data areas of segment 3. A delta on "
-            "%s: every expect is a byte string of that build. See experiments/2026-11-17-card-looks/design.md "
-            "section 9.3." % (SCRATCH, STORE, BASE_BUILD)),
-        "base": STOCK,
-        "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
-        "status": "candidate: emulator-checked, not flashed",
-        "_delta_on": BASE_BUILD,
-        "_ram": "the EEROM bank's unused tail: store 0x%08X-0x%08X, scratch 0x%08X-0x%08X (design.md section 3); "
-                "4 flag bytes in the spec's own code run (segment 2 is loaded again at every start)"
-                % (STORE, STORE + lookfile.MAX_FILE_BYTES, SCRATCH, SCRATCH + MAXREAD),
-        "ops": ops,
-    }
     out = os.path.join(ROOT, "patches", SPEC + ".json")
-    with open(out, "w") as f:
-        json.dump(spec, f, indent=1)
-        f.write("\n")
-    desc = {
-        "what": "films-12d with film looks loaded from the SD card: put EPM2LOOK.BIN on the card, open the menu "
-                "once; the looks stay after power-off and without the card (docs/look-file-format.md)",
-        "specs": build["specs"] + ["patches/%s.json" % SPEC],
-    }
-    with open(os.path.join(ROOT, "builds", SPEC + ".json"), "w") as f:
-        json.dump(desc, f, indent=1)
-        f.write("\n")
-    print("wrote patches/%s.json (%d ops) and builds/%s.json" % (SPEC, len(ops), SPEC))
-    if len(sys.argv) > 1:
+    if not v2:      # the pinned spec: check that it is what this script makes; its notes (status) stay
+        have = json.load(open(out))["ops"]
+        assert have == ops, "patches/card-looks.json differs from what this script makes"
+        print("patches/card-looks.json: unchanged (%d ops)" % len(ops))
+    else:
+        spec = {
+            "name": SPEC,
+            "description": (
+                "Film looks loaded from the SD card with the menu row 'Load Looks', kept in the camera, for twelve "
+                "colour slots (every art-filter entry takes any look). A look file C:\\EPM2LOOK.BIN "
+                "(docs/look-file-format.md) holds up to 12 looks. When the GUI leaves the menu (not to power-off) "
+                "with setting 449 (prm tag 0xD7B1, the row of patches/looks-menu.json) at Load (0) and the card is not "
+                "being written, the dormant task USRTEST_A reads the file into the "
+                "EEROM settings bank's unused tail (0x%08X), checks it (magic, version, lengths, CRC-32, camera and "
+                "firmware, slots and kinds), copies it into the store at 0x%08X and, when a byte changed, calls the "
+                "bank save API 0x7E680272. At every start (the first GUI state) and after a load the task checks the "
+                "store and writes its looks into the slots' tables (both aliases): saturation pair, six-axis values, "
+                "art matrix, chroma record, and each tone table made from the look's curve and the stock default "
+                "table, as the film generator does. Then the look stages recompute (the boot init's refresh stores). "
+                "Before the load, T_GUI sets setting 449 back to Off (1) with the GUI's setSetting 0x7EE01D4E, as the "
+                "menu does; the firmware writes 1 into it at every start, so a camera shows Off. "
+                "A bad file changes nothing; without a file the stored looks stay. The hook on the GUI state "
+                "setter's trace call 0x7ECDF6E4, the task, the code runs and the data areas of "
+                "patches/card-looks.json (camera-tested 2026-11-17), whose place it takes. Every expect is a byte "
+                "string of %s. See experiments/2026-11-17-card-looks/design.md section 9.5." % (SCRATCH, STORE, delta_on)),
+            "base": STOCK,
+            "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
+            "status": "candidate: emulator-checked, not flashed",
+            "_ram": "the EEROM bank's unused tail: store 0x%08X-0x%08X, scratch 0x%08X-0x%08X (design.md section 3); "
+                    "4 flag bytes in the spec's own code run (segment 2 is loaded again at every start)"
+                    % (STORE, STORE + lookfile.MAX_FILE_BYTES, SCRATCH, SCRATCH + MAXREAD),
+            "ops": ops,
+        }
+        with open(out, "w") as f:
+            json.dump(spec, f, indent=1)
+            f.write("\n")
+        desc = {
+            "what": "Film simulations in the twelve art filter entries, each of which takes any look; film looks "
+                    "loaded from the SD card with the menu row Load Looks and kept in the camera; interval shooting "
+                    "with up to 240 frames, a level gauge with calibration, and focus peaking",
+            "specs": base_specs + ["patches/%s.json" % SPEC],
+        }
+        with open(os.path.join(ROOT, "builds", SPEC + ".json"), "w") as f:
+            json.dump(desc, f, indent=1)
+            f.write("\n")
+        print("wrote patches/%s.json (%d ops) and builds/%s.json" % (SPEC, len(ops), SPEC))
+    if argv:
         txt = run(BIN + "/mn10300-elf-objdump", "-d", *sum((["-j", k] for k in RUNS), []), "-j", ".hs", e)
-        open(sys.argv[1], "w").write(re.sub(r"/[^\s:]*looks\.elf", "looks.elf", txt))
+        open(argv[0], "w").write(re.sub(r"/[^\s:]*looks\.elf", "looks.elf", txt))
 
 
 if __name__ == "__main__":

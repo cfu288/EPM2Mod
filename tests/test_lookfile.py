@@ -42,9 +42,9 @@ try:
 except ImportError:  # pragma: no cover
     HAVE_NUMPY = False
 
-#: The look file of ``looks/card-looks.json`` (the twelve looks of build
-#: films-12d): the test vector of docs/look-file-format.md.
-CARD_LOOKS_SHA256 = "84c61fc1ff4ae32b114548f6528a50e21a49a5ac0bbf4136b882f194b3975f1f"
+#: The look file of ``looks/card-looks.json`` (the twelve looks of the pinned
+#: films, all colour looks): the test vector of docs/look-file-format.md.
+CARD_LOOKS_SHA256 = "6191ce540e4118c939ce379f0d01ef872abd2f89975d8bbe2871bb06953cc32a"
 
 CURVE = tuple(min(1023, k + k // 2) for k in range(1024))
 GREY = (77, 150, 29) * 3
@@ -206,11 +206,24 @@ class PackTests(unittest.TestCase):
     def test_the_look_list_of_the_pinned_build(self) -> None:
         looks = lookpack.load_list(PATHS, PATHS.card_looks)
         self.assertEqual([look.slot for look in looks], list(range(12)))
-        self.assertIsInstance(looks[4], MonoLook)
+        self.assertTrue(all(isinstance(look, ColourLook) for look in looks))
+        double_x = looks[4]
+        assert isinstance(double_x, ColourLook)
+        self.assertEqual(double_x.gain, 0)  # black and white
+        self.assertEqual(double_x.curves[0], double_x.curves[2])
         data = lookfile.pack(looks)
         self.assertEqual(len(data), lookfile.MAX_FILE_BYTES)
         self.assertEqual(sha256_bytes(data), CARD_LOOKS_SHA256)
         self.assertEqual(lookfile.unpack(data), looks)
+
+    def test_a_fit_with_a_matrix_and_two_tables_gives_a_black_and_white_look(
+        self,
+    ) -> None:
+        fit = lookpack.load_fit(PATHS.resolve("looks/fits/doublex2.npz"))
+        look = lookpack.look_of_fit(fit, "Grainy Film", "Double-X", "doublex2")
+        self.assertIsInstance(look, MonoLook)
+        assert isinstance(look, MonoLook)
+        self.assertEqual(list(look.grain), fit["T"].tolist())
 
     def test_a_list_with_a_bad_entry_is_refused(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
@@ -263,9 +276,7 @@ class RealFirmwareLookTests(unittest.TestCase):
         items = json.loads(PATHS.card_looks.read_text())["looks"]
         for item, look in zip(items, lookpack.load_list(PATHS, PATHS.card_looks)):
             fit = generate.load_fit(PATHS.resolve(item["fit"]))
-            if isinstance(look, MonoLook):
-                self.assertEqual(list(look.grain), fit["T"].tolist())
-                continue
+            assert isinstance(look, ColourLook)
             for channel, curve in enumerate(look.curves):
                 for default in defaults:
                     values = np.frombuffer(default, "<u2").astype(np.float64)

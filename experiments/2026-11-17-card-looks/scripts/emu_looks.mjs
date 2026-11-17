@@ -1,11 +1,12 @@
 // emu_looks.mjs STEP...: the card-looks build in the boot lab (run by emu_looks.py through tools/emu/emu-run).
-// Steps: w:MS, key:NAME[:MS], dump:NAME. A dump prints one JSON line: the bytes of every span of $SPANS (the slot
+// Steps: w:MS, key:NAME[:MS], dump:NAME, shot:NAME (a screenshot into $SHOTS). A dump prints one JSON line: the bytes of every span of $SPANS (the slot
 // tables, in order), the store's first 32 bytes, the flags, and what the task did so far.
 // Env: as play.mjs (E101_STATE, E101_CARD, E101_RTC); SPANS = a JSON file [[address, length], ...]; SYMS = a JSON
 // file of the build's labels (T_TASK, T_STORED, V_BAD, T_END, SAVE, FLAGS, STORE).
 import fs from 'node:fs';
 import { createBoot } from '../../../tools/emu/e101/boot.mjs';
 import { KEYS, press, release } from '../../../tools/emu/e101/keys.mjs';
+import { screenshot } from '../../../tools/emu/e101/screen.mjs';
 import { R, PC, SP, PSW, D0, h8 } from '../../../tools/emu/e101/machine.mjs';
 
 const spans = JSON.parse(fs.readFileSync(process.env.SPANS, 'utf8'));
@@ -35,7 +36,8 @@ for (const step of process.argv.slice(2)) {
     console.log(JSON.stringify({ dump: f[1], ms: ms(), tables: hex, store: Buffer.from(e.rd(sym.STORE, 32)).toString('hex'),
       flags: Buffer.from(e.rd(sym.FLAGS + 0x40000000, 4)).toString('hex'), events: events.splice(0),
       flash: e.flashLog.splice(0).filter((l) => / (write|erase) /.test(l)).length, errors: e.errLog.length }));
-  } else { console.log('unknown step', step); process.exit(2); }
+  } else if (f[0] === 'shot') { fs.mkdirSync(process.env.SHOTS, { recursive: true }); screenshot(e, `${process.env.SHOTS}/${f[1]}.png`); }
+  else { console.log('unknown step', step); process.exit(2); }
 }
 if (e.saveState()) console.log(JSON.stringify({ state: 'saved' }));
 console.log(JSON.stringify({ done: ms(), errors: e.errLog, problems: e.m.cores.problem()?.message ?? 'none' }));

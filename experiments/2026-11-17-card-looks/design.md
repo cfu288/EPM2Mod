@@ -296,3 +296,35 @@ Agent reports behind sections 3 and 4: the session of 2026-11-17 (scratch files 
   (red and blue swapped); BAD refused (still swapped); DEFAULT brought back the built-in Pro 400H. Pinned; guide
   `docs/guide/card-looks.md`. Next: the menu row (section 2.1), then a web page that writes the file.
 
+### 9.5 Twelve slots alike, and the menu row (2026-11-17, desk and emulator)
+
+The owner's goal is twelve interchangeable slots loaded through a menu option; grain may go. Flashes only where a test
+needs one, so both changes are one candidate, `builds/card-looks-2.json`.
+
+- **Twelve colour slots.** Grainy Film gets the colour slot of the films-12 layout again
+  (`films12-entry-grainy-film`, value 111, art code 94; camera-used in `debug-log-films-12` on 2026-11-16) and Gentle
+  Sepia its own (`films12-entry-gentle-sepia`, value 112). `patches/films12cl-looks.json` (`scripts/mkspec_slots.py`)
+  takes the place of `films12-looks`: Double-X and Provia in the first two extra slots, the other three as before (24 of
+  40 ops equal), so the menu keeps the films and names of the pinned build (`films12bw-names`). The grain program
+  (stock art code 74) is no longer used.
+- **Double-X as a colour look** (`looks/fits/doublex3.npz`, `scripts/fit_bw_colour.py`; results/fit-doublex3.txt):
+  saturation gain 0, the art matrix sets the grey mix, one tone curve for the three channels. Model error against the
+  Double-X target equal to the grain-slot fit (natural 0.07 / 0.06 mean |dL*| / dE2000 against 0.10 / 0.08; 18 % grey
+  117.8 against 117.7). Black and white from gain 0 is V on the camera (GREY test, colour spread 0.32). Grain: none.
+- **The menu row** `patches/looks-menu.json` (`scripts/mkspec_lmenu.py`): **Load Looks** (Off / Load) in Custom Menu J,
+  in the place of Touch Screen Settings (the E-PM2 has no touch screen). An added row is not possible without moving
+  the item table or the child list of `peaking-menu`, and every place has bytes that an earlier spec covers and keeps
+  (`src/epm2mod/spec.py` refuses those changes). The value is the dormant setting 449 (picker panel 610). The firmware
+  writes 1 into setting 449 at every start (emulator: at 11 and 227 ms), so Off is 1 and Load is 0; a low-level prm
+  write back to Off was undone by that start write, so T_GUI sets it with the GUI's own setSetting 0x7EE01D4E (d0 =
+  setting, d1 = value), as the menu does.
+- **The trigger** (`patches/card-looks-2.json`, `mkspec_looks.py --v2`): when the GUI enters a state that is not a menu
+  (0x57xx) and not power-off (0x2xxx), T_GUI reads setting 449; at Load (0), and when the card is not being written, it
+  sets it to Off and starts the task in mode 1. The load at the first menu is gone. The start-up apply is unchanged.
+  750 B of code.
+- **Checks (V emulator):** model: the built-in looks give the base's bytes, C200 in all 12 slots changes only slot
+  tables; free space PASS, op check 0 FAIL, hookcheck only remap7b-code, boot-test PASS (it failed first: the start
+  write of setting 449 made a load at start, which led to Off = 1), update-path-test PASS. `scripts/emu_looks.py
+  --v2`, five sessions: menu in and out without Load: no load; Load: C200 in all 12 slots, saved; restart without the
+  file: applied at start, the row reads Off; BAD refused; no card; DEFAULT back.
+

@@ -1,0 +1,9 @@
+Double-X as a colour look, target lut_dev6cd00c8_doublex_2302.cube; model only
+Mean |dL*| / mean dE2000 against the target, per patch set (natural, skin, ColorChecker x5 EV, grays, hold-out, dense grays):
+  this fit (colour slot)   0.07/0.06  0.13/0.10  0.15/0.12  0.09/0.06  0.08/0.06  0.14/0.09
+  Double-X in Grainy Film  0.10/0.08  0.12/0.09  0.15/0.12  0.07/0.05  0.11/0.08  0.07/0.05
+  stock Monotone           3.01/2.27  3.75/2.88  5.54/4.39  2.85/1.95  3.05/2.30  5.79/3.75
+  art table x256 [[47, 105, 104], [52, 118, 86], [44, 81, 131]] (rows [256, 256, 256])
+  grey weights of scene R, G, B: [0.192, 0.432, 0.376]
+  curve at base 0, 128, ... 1023: [0, 131, 277, 394, 500, 610, 712, 801] 907; largest step 2
+  18 % grey: target 117.7, fit 117.8

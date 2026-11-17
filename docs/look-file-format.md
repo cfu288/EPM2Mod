@@ -5,7 +5,7 @@ it from the top folder of the SD card, checks it, writes the looks into the slot
 memory. The looks then stay after a restart and without the card, until another file is loaded.
 
 Make one with `uv run epm2mod looks pack [LIST.json] [-o FILE]` (default list: `looks/card-looks.json`, the twelve
-looks of build `films-12d`). Check one with `uv run epm2mod looks show FILE [--json]`. Code:
+films of the pinned build). Check one with `uv run epm2mod looks show FILE [--json]`. Code:
 `src/epm2mod/looks/lookfile.py` (the format), `src/epm2mod/looks/lookpack.py` (from the fit files). Why the format
 is this way: `experiments/2026-11-17-card-looks/design.md` section 5.
 
@@ -56,7 +56,7 @@ then the 1,023 steps between neighbouring points, 4 bits each (0 to 15), low nib
 The camera makes each tone table of the slot from the curve: entry k of a table is the curve at entry k of the
 stock default table, kept rising (as the film generator does; the built-in looks give the same bytes).
 
-Kind 2, black-and-white:
+Kind 2, black-and-white (only build `card-looks`, slot 4; in `card-looks-2` a black-and-white film is a colour look):
 
 | Offset | Size | Field |
 |---|---|---|
@@ -68,32 +68,35 @@ Kind 2, black-and-white:
 
 ## Slots
 
-The slot is the place of the entry in the art-filter menu. Each slot takes one kind of look, the kind it has in the
-build.
+The slot is the place of the entry in the art-filter menu. Each slot takes the kind of look it has in the build: in
+`card-looks-2` every slot takes a colour look (a black-and-white film is a colour look with saturation gain 0); in
+`card-looks` slot 4 (Grainy Film) takes only a black-and-white look (kind 2) and the others only colour looks.
 
-| Slot | Menu entry | Kind | Look in `looks/card-looks.json` |
-|---|---|---|---|
-| 0 | Pop Art | colour | Portra |
-| 1 | Soft Focus | colour | Ektachrome |
-| 2 | Pale&Light Color | colour | Pro 400H |
-| 3 | Light Tone | colour | Kodachrome |
-| 4 | Grainy Film | black-and-white | Double-X |
-| 5 | Pin Hole | colour | Vis 250D |
-| 6 | Diorama | colour | Velvia |
-| 7 | Cross Process | colour | Superia 400 |
-| 8 | Gentle Sepia | colour | Provia |
-| 9 | Dramatic Tone | colour | Portra 160 |
-| 10 | Key Line | colour | Gold 200 |
-| 11 | Watercolor | colour | Vis 500T |
+| Slot | Menu entry | Look in `looks/card-looks.json` |
+|---|---|---|
+| 0 | Pop Art | Portra |
+| 1 | Soft Focus | Ektachrome |
+| 2 | Pale&Light Color | Pro 400H |
+| 3 | Light Tone | Kodachrome |
+| 4 | Grainy Film | Double-X (a colour look with saturation 0, `looks/fits/doublex3.npz`) |
+| 5 | Pin Hole | Vis 250D |
+| 6 | Diorama | Velvia |
+| 7 | Cross Process | Superia 400 |
+| 8 | Gentle Sepia | Provia |
+| 9 | Dramatic Tone | Portra 160 |
+| 10 | Key Line | Gold 200 |
+| 11 | Watercolor | Vis 500T |
 
-A file may hold fewer looks: the other slots keep what they have.
+A file may hold fewer looks: the other slots keep what they have until the next start, and then have their built-in
+look.
 
 ## Checks
 
 A file that fails a check is refused whole: nothing is written or kept.
 
 - The camera checks: magic, version 1, record size 1,708, number 0 to 12, file length, the CRC-32, model and
-  firmware, every slot 0 to 11 and none twice, the kind of each slot, every curve and table value 1,023 or less.
+  firmware, every slot 0 to 11 and none twice, the kind of each slot. Curve values above 1,023 are cut to 1,023;
+  the tables of kind 2 are copied as they are.
 - The tools check also: the name is printable ASCII, the gain and the six-axis values fit their types, each matrix
   row sums to 256 +/- 8, the chroma x values do not fall, every curve step is 0 to 15.
 
@@ -116,10 +119,10 @@ function crc32(bytes) {
 ## Test vector
 
 `uv run epm2mod looks pack` with `looks/card-looks.json` gives 20,528 bytes with sha256
-`84c61fc1ff4ae32b114548f6528a50e21a49a5ac0bbf4136b882f194b3975f1f`. Its first 32 bytes:
+`6191ce540e4118c939ce379f0d01ef872abd2f89975d8bbe2871bb06953cc32a`. Its first 32 bytes:
 
 ```
-00000000: 45 50 4c 4b 01 0c ac 06 30 50 00 00 9b be 9a 2d 
+00000000: 45 50 4c 4b 01 0c ac 06 30 50 00 00 49 f0 fe bc 
 00000010: 01 01 60 01 00 00 00 00 00 00 00 00 00 00 00 00
 ```
 
