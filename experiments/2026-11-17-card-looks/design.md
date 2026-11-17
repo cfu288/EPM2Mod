@@ -403,3 +403,10 @@ looks, and no criteria had been set before the build. A build is pinned only whe
   Blue. Camera test sheet: the card's photo folder is emptied in the first card trip, so the upload holds only the
   test's photo.
 
+### 10.3 Camera result of card-looks-4: pinned (2026-11-17)
+
+Owner: load from J -> Load Looks (Loading, Loaded), the name Cyan Test in the menus, live view cyan without half-press,
+the photo cyan (PB170001, mean red 0.4), kept after a restart, Built-in back to Pro 400H. Step 2 (the J and A pages)
+was not watched; the row worked in steps 3 and 6 and the emulator crawls show both pages (criterion 13). Playback's
+film name not reported (criterion 5 for playback stays open, in docs/todo.md). Pinned; guide docs/guide/card-looks.md.
+

@@ -3,7 +3,7 @@
  "description": "The Custom Menu with two added rows: Peaking in A after MF Assist (Off / White / Black; everything of patches/peaking-menu.json, whose place this spec takes: its list, texts and code unchanged) and Load Looks in J after Eye-Fi (setting 449, list panel 610: patches/looks-menu-3.json). No stock row is changed. An 81-row copy of the item table at 0x7EBF1FF0 (10 address loads re-pointed), an 81-entry child list at 0x7EBF2600 (11 page records re-pointed), 9 row constants (last index 80, count 81, row-state array 162 B) and the group sizes of A (11) and J (7) in the .data image. Every expect is a byte string of the specs before peaking-menu in builds/card-looks-3.json. See experiments/2026-11-17-card-looks/design.md section 10.2.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
+ "status": "camera-tested 2026-11-17 (builds/card-looks-4.json, pinned)",
  "_ram": "the row-state array of the Custom Menu page grows by 4 bytes (158 -> 162) into 0x606A31B6-B9 (the next addressed object is 0x606A32F0)",
  "ops": [
   {

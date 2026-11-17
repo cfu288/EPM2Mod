@@ -1,38 +1,40 @@
 # Looks from the SD Card
 
-Load your own film looks from a file on the SD card. The camera keeps them after power-off and without the card,
-until you load another file.
+Load your own film looks into any of the twelve film entries from a file on the SD card. The camera keeps them,
+with their names, after power-off and without the card.
 
 ## Make a file
 
-List one look per menu entry (`entry` is the stock name in [Film Simulations](film-looks.md), column "Replaces"):
+List one look per entry (`entry` is the stock name in [Film Simulations](film-looks.md), column "Replaces"):
 
 ```json
 {"looks": [
-  {"entry": "Pale&Light Color", "name": "Portra 800", "fit": "looks/fits/portra800.npz"},
-  {"entry": "Diorama", "name": "Ektar 100", "fit": "looks/fits/ektar100.npz"}
+  {"entry": "Pale&Light Color", "name": "Portra 800", "fit": "looks/fits/portra800.npz"}
 ]}
 ```
 
-Then run `uv run epm2mod looks pack MYLOOKS.json -o EPM2LOOK.BIN`. Entries that the file does not list have their
-built-in look from the next power-on. Without a list, the command writes the built-in looks.
+Then run `uv run epm2mod looks pack MYLOOKS.json -o EPM2LOOK.BIN`. A name has up to 16 letters. Entries the file does
+not list keep their built-in look.
 
 ## Load
 
 1. Copy the file to the top folder of the card as **EPM2LOOK.BIN**.
-2. Turn the camera on, press **MENU**, then **MENU** again. The looks change at once.
-3. You can delete the file. The looks stay.
+2. MENU → Custom Menu → J → **Load Looks** → **Load** → OK. The row reads Loading, then **Loaded** at the next key.
 
-Check it in **OK → Picture Mode** (scroll right past Custom).
+<img src="../images/ui/load-looks-list.png" width="320" alt="Load Looks with Off, Load and Built-in">
+<img src="../images/ui/load-looks-loaded.png" width="320" alt="Load Looks reads Loaded">
 
-<img src="../images/ui/quick-menu-portra.png" width="320" alt="The quick menu with Picture Mode on a film look">
+The entry shows the look's name everywhere the camera shows a film name.
+
+<img src="../images/ui/picture-mode-loaded.png" width="320" alt="The Picture Mode strip with Portra 800">
+
+You can delete the file. **Built-in** in the same row brings back the built-in looks. **No file** or **Bad file**
+means nothing changed. No Custom Menu tab (gears icon): enable it in **Setup Menu → Menu Display**.
 
 ## Limits
 
-- The menu keeps each entry's own name (for example "Pro 400H"), whatever look you load there.
-- Grainy Film (Double-X) takes only a black-and-white look. The other eleven entries take colour looks.
-- While EPM2LOOK.BIN is on the card, the camera reads it at the first menu or playback screen after power-on.
-- A damaged file, or a file for another camera or firmware, changes nothing.
-- As with the built-in looks, live view shows the tone curve only with the shutter half pressed.
+- The row's texts are English in every menu language.
+- No look has grain. Double-X has had none since this build.
 
-File format: [look-file-format.md](../look-file-format.md). Design and tests: [card-looks design](../../experiments/2026-11-17-card-looks/design.md).
+File format, for a program that writes looks: [look-file-format.md](../look-file-format.md). Design and tests:
+[card-looks design](../../experiments/2026-11-17-card-looks/design.md).

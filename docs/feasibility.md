@@ -54,6 +54,8 @@ routines. This file records what the measurements show, so that nobody repeats t
 | File routines | open 0x7E5C52DC, write 0x7E5C5339, seek 0x7E5C53A5, close 0x7E5C5308, read 0x7E5C536F | Verified from a stock caller (read: argument order inferred) |
 | Load a card file by name pattern | 0x7E5437F0, used by the lens update for `DCOLYMP/L???????BIN` on a normally booted camera | Verified |
 | Menus | Data tables (list table 0x7F00D710); value records can be re-pointed | Camera-tested for one setting |
+| Menu texts at run time | The loaded language's text table is in RAM (blob 0xBFF3D000, its pointer array at the address in its first word); re-pointing a string id changes the text on screen, also after a language change when written again | Camera-tested 2026-11-17 (`card-looks-4`: loaded looks show their own names) |
+| Settings memory for own data | The EEROM settings bank's unused tail, 53,680 bytes, saved by the firmware and by the bank save API 0x7E680272 | Camera-tested 2026-11-17 (looks kept after power-off without the card) |
 | Hidden art-filter numbers | 110 to 118 exist in the pipeline switches, with no menu value | Verified in code; untested on the camera |
 | Add Effects (Soft Focus, Pin-Hole, White Edge, Frame, Star Light) | Per-filter data lists at 0x7E849E2B to 0x7E849E5A | Verified; on a film slot untested |
 

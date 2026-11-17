@@ -29,5 +29,7 @@
   "patches/looks-menu-3.json",
   "patches/card-looks-4.json"
  ],
+ "sha256": "4829e8fa1e3b264647e4f97d82578de2d5f71481484a7d63f0cd87b96cd32431",
+ "camera_tested": "2026-11-17",
  "first_code": true
 }

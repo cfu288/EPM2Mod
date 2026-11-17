@@ -69,7 +69,7 @@ Kind 2, black-and-white (only build `card-looks`, slot 4; in `card-looks-2` a bl
 ## Slots
 
 The slot is the place of the entry in the art-filter menu. Each slot takes the kind of look it has in the build: in
-`card-looks-2` every slot takes a colour look (a black-and-white film is a colour look with saturation gain 0); in
+`card-looks-4` (pinned) every slot takes a colour look (a black-and-white film is a colour look with saturation gain 0); in
 `card-looks` slot 4 (Grainy Film) takes only a black-and-white look (kind 2) and the others only colour looks.
 
 | Slot | Menu entry | Look in `looks/card-looks.json` |
