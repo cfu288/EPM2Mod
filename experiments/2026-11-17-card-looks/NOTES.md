@@ -92,13 +92,20 @@ anyway. New finding (V): the still's colour stage ran on CPU 0 (stack 0x6047D2E4
 (the start after the flash) has garbage records: the known ring-header defect (`docs/todo.md`), not the probe.
 Retake: a colourful scene in good light, photo A before any OK, MENU or PLAY, then MENU, MENU, photo B.
 
+**Retake: probe 2 passed (V, 2026-11-17).** A striped colour picture on a screen, Pro 400H: photo A before
+any menu has mean colour 75.7 and a colour spread of 53.9 at equal brightness; photo B after MENU, MENU has
+4.9 and 1.0, black and white as the grey matrix gives. The owner saw live view turn black and white right
+after the menu: live view's colour stage on CPU 1 took the values CPU 0 wrote at once (no cache step needed in
+this test). Log session 19: `card_read` 26 bytes, `card_look` written 9, read back 0x0096004D. Session 18 (a
+start that went to power-off in 0.5 s) has records with flipped bits: the RAM defect of `docs/todo.md`.
+
 Flash: `epm2flash debug-log-card-look d6955aac7bd33660f37ebe39d259b6282edb6da99bcc8707c3c00dba9df27f73`.
 Go back: `epm2flash films-12d 2cdd18e7004821b2e443ec4f08db06ab9a0d4f0f700ab53db8c4bbc1dad93e32`.
 
 ## 4. Open (each needs a camera probe)
 
 1. ~~The read on the camera~~: passed (section 3).
-2. A look table changed in RAM at run time takes effect at the next shot (probe 2, section 5) (I: the tables are at fixed
+2. ~~A look table changed in RAM at run time takes effect~~: passed, at once, in photos and live view (section 5) (I: the tables are at fixed
    RAM addresses in segment 1, `docs/art-filter-slots.md`; U: whether a store into loaded section RAM is
    safe here, it crashed on the E-P7). The emulator does not model the picture, so only a shot can tell.
 3. Code space for a loader (today 320 B of code space; the 7.2 KB dead 3D-engine area needs its own
