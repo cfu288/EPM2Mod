@@ -14,8 +14,9 @@ API (JSON):
 
 - ``GET /api/build``: the pinned build (name, what, sha256).
 - ``GET /api/cards``: the cards plugged in.
-- ``POST /api/make`` with ``{"choices": ["ART2=velvia", ...], "card": PATH or null}``: start a job. No choices: no
-  look file. One job at a time; a wrong request, or one while a job runs, gets 400 and the reason.
+- ``POST /api/make`` with ``{"firmware": "epm2mod" or "original", "choices": ["ART2=velvia", ...], "card": PATH or
+  null}``: start a job. No choices: no look file. ``original`` is Olympus's own firmware (``pipeline.restore``), with no
+  choices. One job at a time; a wrong request, or one while a job runs, gets 400 and the reason.
 - ``GET /api/job``: the last job: its progress lines, and when it is done, the error or the result.
 - ``GET /api/zip``: the files of the last finished job, as a zip.
 
@@ -42,11 +43,11 @@ from urllib.parse import urlsplit
 
 from . import cards as card_list
 from .builds import BuildDescription, pinned_description
-from .errors import BuildError, Epm2ModError
+from .errors import BuildError, Epm2ModError, StockError
 from .fileio import Log
 from .looks import lookfile, records
 from .paths import RepoPaths
-from .pipeline import STEPS, make
+from .pipeline import STEPS, make, restore
 from .stock import CARD_FOLDER, EPM2_V16
 
 #: The built app page, part of the package.
@@ -62,6 +63,8 @@ class Job:
 
     Attributes:
         number: counts the jobs of this server, from 1.
+        firmware: ``epm2mod`` or ``original``.
+        steps: the number of steps of the job.
         lines: the progress lines so far.
         step: the last step of ``make`` that ended, 0 to ``pipeline.STEPS``.
         done: True when the job has ended.
@@ -72,6 +75,8 @@ class Job:
     """
 
     number: int
+    firmware: str = "epm2mod"
+    steps: int = STEPS
     lines: list[str] = field(default_factory=list)
     step: int = 0
     done: bool = False
@@ -84,9 +89,10 @@ class Job:
         """Return what the page shows of the job."""
         return {
             "job": self.number,
+            "firmware": self.firmware,
             "lines": list(self.lines),
             "step": self.step,
-            "steps": STEPS,
+            "steps": self.steps,
             "done": self.done,
             "error": self.error,
             "sha256": self.sha256,
@@ -130,6 +136,44 @@ def run_job(
     return result.sha256, files
 
 
+def plain_message(error: Epm2ModError) -> str:
+    """Return what a user who doesn't code should do about an error of a job.
+
+    The common causes get a sentence with the next step; any other error keeps the build tool's message.
+    """
+    text = str(error)
+    if "Permission denied" in text or "Read-only file system" in text:
+        return (
+            "The card is locked. Take it out, slide the switch on its side toward the metal contacts, "
+            "put it back, then select Try again."
+        )
+    if "No space left" in text:
+        return "The card is full. Make room on it, then select Try again."
+    if "holds other files" in text:
+        return "The card's DCOLYMP folder holds other files. Delete them, then select Try again."
+    if isinstance(error, StockError):
+        return "Olympus's firmware could not be downloaded. Check the internet connection, then select Try again."
+    return text
+
+
+def run_restore(
+    paths: RepoPaths,
+    card: Path | None,
+    log: Log,
+    step: Callable[[int], None],
+) -> tuple[str, dict[str, bytes]]:
+    """Get Olympus's original firmware, and write it to a card if one is given (``epm2mod restore``).
+
+    Returns:
+        The firmware's SHA-256, and the file by its path on the card.
+
+    Raises:
+        Epm2ModError: if a step fails (the message is for the user).
+    """
+    data = restore(paths, card, log=log, stock=EPM2_V16, step=step)
+    return EPM2_V16.sha256, {f"{CARD_FOLDER}/E1019999.BIN": data}
+
+
 def zip_files(files: dict[str, bytes]) -> bytes:
     """Return a zip of the files, by their path on the card."""
     out = io.BytesIO()
@@ -148,12 +192,14 @@ class App:
         static: Path = STATIC,
         list_cards: Callable[[], list[card_list.Card]] = card_list.cards,
         job_runner: Callable[..., tuple[str, dict[str, bytes]]] = run_job,
+        restore_runner: Callable[..., tuple[str, dict[str, bytes]]] = run_restore,
     ) -> None:
         """Make the app for a repository; the token is new and random."""
         self.paths = paths
         self.static = static
         self.list_cards = list_cards
         self.run = job_runner
+        self.run_restore = restore_runner
         self.token = secrets.token_urlsafe(24)
         self.description = pinned_description(paths)
         self.job: Job | None = None
@@ -186,9 +232,15 @@ class App:
         Raises:
             BuildError: if the body is wrong, the card is not listed, or a job runs.
         """
-        if not isinstance(body, dict) or set(body) != {"choices", "card"}:
-            raise BuildError("the request needs exactly 'choices' and 'card'")
-        choices, card = body["choices"], body["card"]
+        if not isinstance(body, dict) or set(body) != {"firmware", "choices", "card"}:
+            raise BuildError(
+                "the request needs exactly 'firmware', 'choices' and 'card'"
+            )
+        firmware, choices, card = body["firmware"], body["choices"], body["card"]
+        if firmware not in ("epm2mod", "original"):
+            raise BuildError("'firmware' is 'epm2mod' or 'original'")
+        if firmware == "original" and choices:
+            raise BuildError("Olympus's original firmware takes no film looks")
         if not isinstance(choices, list) or not all(
             isinstance(choice, str) and records.is_choice(choice) for choice in choices
         ):
@@ -206,7 +258,12 @@ class App:
         with self.lock:
             if self.job is not None and not self.job.done:
                 raise BuildError("The firmware is being made. Wait for it to end.")
-            job = Job((self.job.number + 1) if self.job else 1, card=card)
+            job = Job(
+                (self.job.number + 1) if self.job else 1,
+                firmware=firmware,
+                steps=STEPS if firmware == "epm2mod" else 2,
+                card=card,
+            )
             self.job = job
         threading.Thread(
             target=self._work, args=(job, choices, target), daemon=True
@@ -226,11 +283,14 @@ class App:
             print(line, flush=True)
 
         try:
-            job.sha256, job.files = self.run(
-                self.paths, self.description, choices, card, log, step
-            )
+            if job.firmware == "original":
+                job.sha256, job.files = self.run_restore(self.paths, card, log, step)
+            else:
+                job.sha256, job.files = self.run(
+                    self.paths, self.description, choices, card, log, step
+                )
         except Epm2ModError as error:
-            job.error = str(error)
+            job.error = plain_message(error)
             print(f"error: {error}", flush=True)
         except Exception as error:  # the page must learn that the job ended
             job.error = f"an unexpected error: {error!r}"

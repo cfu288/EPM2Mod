@@ -2,8 +2,16 @@ import type { ReactNode } from 'react'
 
 export const REPO = 'https://github.com/cfu288/EPM2Mod'
 
-/** The header, the page's own content and the footer with the credit for the film fits. */
-export function PageFrame({ subtitle, children }: { subtitle: string; children: ReactNode }) {
+/** The header and the page's own content; `footer` goes under a rule at the bottom. */
+export function PageFrame({
+  subtitle,
+  children,
+  footer,
+}: {
+  subtitle: string
+  children: ReactNode
+  footer?: ReactNode
+}) {
   return (
     <div className="min-h-full">
       <header className="border-rule border-b bg-white">
@@ -15,15 +23,11 @@ export function PageFrame({ subtitle, children }: { subtitle: string; children: 
         </div>
       </header>
       {children}
-      <footer className="border-rule border-t">
-        <p className="text-muted mx-auto max-w-7xl px-4 py-6 text-xs sm:px-6 lg:px-8">
-          The film looks are fitted from{' '}
-          <a className="hover:text-ink underline" href="https://github.com/andreavolpato/spektrafilm">
-            spektrafilm
-          </a>{' '}
-          by Andrea Volpato (CC BY-SA 4.0).
-        </p>
-      </footer>
+      {footer && (
+        <footer className="border-rule border-t">
+          <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">{footer}</div>
+        </footer>
+      )}
     </div>
   )
 }

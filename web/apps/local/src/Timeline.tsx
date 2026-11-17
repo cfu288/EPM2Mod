@@ -24,7 +24,7 @@ export function Timeline({ steps, current, onBack }: Props) {
               >
                 {done ? <CheckIcon aria-hidden="true" className="size-4" /> : index + 1}
               </span>
-              <span className={`hidden text-sm sm:inline ${index === current ? 'font-bold' : 'text-muted'}`}>
+              <span className={`text-sm ${index === current ? 'font-bold' : 'text-muted hidden sm:inline'}`}>
                 {label}
               </span>
             </>

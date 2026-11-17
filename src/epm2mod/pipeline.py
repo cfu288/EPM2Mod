@@ -499,6 +499,35 @@ def make(
     return MakeResult(description, image, card_copy, on_card, digest)
 
 
+def restore(
+    paths: RepoPaths,
+    card: Path | None = None,
+    log: Log = silent,
+    stock: StockFirmware = EPM2_V16,
+    step: Callable[[int], None] = no_step,
+) -> bytes:
+    """Return Olympus's original firmware for the card, and write it there if a card is given.
+
+    The way back from EPM2Mod (``epm2mod restore``): the stock file, downloaded if absent and checked by its
+    SHA-256 (``obtain_stock``), goes to ``card/DCOLYMP/`` under the camera's file name with the same checks as a
+    build (``copy_to_card``). ``step`` is called with 1 when the file is checked and 2 when it is written.
+
+    Raises:
+        Epm2ModError: with a message for the user, if a step fails.
+    """
+    if card is not None:
+        card = card.absolute()
+        check_card(card, stock)
+    data = obtain_stock(paths, stock, log)
+    log("1/2 original firmware: ok")
+    step(1)
+    if card is not None:
+        on_card = copy_to_card(data, card, stock)
+        log(f"2/2 on the card: {on_card}  (written, flushed and read back)")
+    step(2)
+    return data
+
+
 def current_date() -> datetime.date:
     """Return today's date on this computer's clock."""
     return datetime.date.today()

@@ -30,7 +30,7 @@ body {
 
 /* A square button with a 1px border that inverts on hover. */
 @utility btn {
-  @apply border-ink text-ink hover:bg-ink focus-visible:outline-ink disabled:border-rule disabled:text-muted disabled:hover:text-muted inline-flex items-center gap-x-2 border px-4 py-2 text-sm transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:hover:bg-transparent;
+  @apply border-ink text-ink hover:bg-ink focus-visible:outline-ink disabled:border-rule disabled:text-muted disabled:hover:text-muted inline-flex items-center gap-x-2 border px-4 py-2 text-sm transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent;
 }
 
 /* A section title under a thick black rule. */

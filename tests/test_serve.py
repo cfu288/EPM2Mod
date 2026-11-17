@@ -169,7 +169,9 @@ class ServerTests(unittest.TestCase):
         status, data = self.server.request("GET", "/api/zip")
         self.assertEqual(status, 404)
         status, data = self.server.request(
-            "POST", "/api/make", {"choices": ["ART2=velvia"], "card": None}
+            "POST",
+            "/api/make",
+            {"firmware": "epm2mod", "choices": ["ART2=velvia"], "card": None},
         )
         self.assertEqual(status, 202, data)
         state = self.server.wait()
@@ -190,23 +192,52 @@ class ServerTests(unittest.TestCase):
         self.assertEqual(json.loads(data)[0]["path"], str(self.card.path))
         for card in ("/", str(Path(self.folder.name)), 3):
             status, data = self.server.request(
-                "POST", "/api/make", {"choices": [], "card": card}
+                "POST",
+                "/api/make",
+                {"firmware": "epm2mod", "choices": [], "card": card},
             )
             self.assertEqual(status, 400, card)
         self.assertEqual(self.runner.calls, [])
         status, _ = self.server.request(
-            "POST", "/api/make", {"choices": [], "card": str(self.card.path)}
+            "POST",
+            "/api/make",
+            {"firmware": "epm2mod", "choices": [], "card": str(self.card.path)},
         )
         self.assertEqual(status, 202)
         self.server.wait()
         self.assertEqual(self.runner.calls, [([], self.card.path)])
 
+    def test_the_original_firmware_runs_the_restore(self) -> None:
+        calls: list[Path | None] = []
+
+        def restore(paths, card, log, step):  # type: ignore[no-untyped-def]
+            calls.append(card)
+            step(1)
+            step(2)
+            return "cd" * 32, {"DCOLYMP/E1019999.BIN": b"stock"}
+
+        self.server.app.run_restore = restore
+        status, _ = self.server.request(
+            "POST", "/api/make", {"firmware": "original", "choices": [], "card": None}
+        )
+        self.assertEqual(status, 202)
+        state = self.server.wait()
+        self.assertEqual(
+            (state["firmware"], state["step"], state["steps"], state["files"]),
+            ("original", 2, 2, ["DCOLYMP/E1019999.BIN"]),
+        )
+        self.assertEqual((calls, self.runner.calls), ([None], []))
+
     def test_wrong_requests_are_refused(self) -> None:
         for body in (
-            {"choices": ["ART2=velvia"]},
-            {"choices": ["ART2=nofilm"], "card": None},
-            {"choices": ["ART2=velvia", "ART2=c200"], "card": None},
-            {"choices": "ART2=velvia", "card": None},
+            {"firmware": "epm2mod", "choices": ["ART2=velvia"]},
+            {"firmware": "epm2mod", "choices": ["ART2=nofilm"], "card": None},
+            {
+                "firmware": "epm2mod",
+                "choices": ["ART2=velvia", "ART2=c200"],
+                "card": None,
+            },
+            {"firmware": "epm2mod", "choices": "ART2=velvia", "card": None},
             [],
         ):
             status, _ = self.server.request("POST", "/api/make", body)
@@ -219,7 +250,7 @@ class ServerTests(unittest.TestCase):
 
     def test_one_job_at_a_time_and_errors_are_reported(self) -> None:
         self.runner.release.clear()
-        body = {"choices": ["ART3=c200"], "card": None}
+        body = {"firmware": "epm2mod", "choices": ["ART3=c200"], "card": None}
         status, _ = self.server.request("POST", "/api/make", body)
         self.assertEqual(status, 202)
         status, data = self.server.request("POST", "/api/make", body)
@@ -230,6 +261,35 @@ class ServerTests(unittest.TestCase):
         self.assertEqual(state["error"], "the card is full")
         status, _ = self.server.request("GET", "/api/zip")
         self.assertEqual(status, 404)
+
+
+class MessageTests(unittest.TestCase):
+    def test_common_errors_say_what_to_do(self) -> None:
+        from epm2mod.errors import StockError
+
+        cases = [
+            (
+                BuildError(
+                    "/Volumes/X/DCOLYMP/E1019999.BIN: cannot be written: Permission denied"
+                ),
+                "card is locked",
+            ),
+            (
+                BuildError("E1019999.BIN: cannot be written: No space left on device"),
+                "card is full",
+            ),
+            (
+                BuildError("/Volumes/X/DCOLYMP holds other files: A.BIN"),
+                "holds other files",
+            ),
+            (StockError("download failed: timed out"), "internet connection"),
+        ]
+        for error, words in cases:
+            self.assertIn(words, serve.plain_message(error))
+            self.assertIn("Try again", serve.plain_message(error))
+        self.assertEqual(
+            serve.plain_message(BuildError("something else")), "something else"
+        )
 
 
 class CommandTests(unittest.TestCase):
@@ -255,6 +315,25 @@ def sandbox(folder: Path) -> RepoPaths:
 
 @unittest.skipUnless(HAVE_STOCK, "needs the stock firmware")
 class EndToEndTests(unittest.TestCase):
+    def test_restore_writes_the_original_firmware(self) -> None:
+        with tempfile.TemporaryDirectory() as folder:
+            (Path(folder) / "repo").mkdir()
+            paths = sandbox(Path(folder) / "repo")
+            card = Path(folder) / "card"
+            (card / "DCOLYMP").mkdir(parents=True)
+            (card / "DCOLYMP" / "E1019999.BIN").write_bytes(b"old build")
+            steps: list[int] = []
+            sha, files = serve.run_restore(paths, card, lambda line: None, steps.append)
+            self.assertEqual((sha, steps), (stock.EPM2_V16.sha256, [1, 2]))
+            on_card = (card / "DCOLYMP" / "E1019999.BIN").read_bytes()
+            self.assertEqual(on_card, stock.read_stock(PATHS, stock.EPM2_V16))
+            self.assertEqual(files["DCOLYMP/E1019999.BIN"], on_card)
+            env = {"EPM2MOD_ROOT": str(paths.root)}
+            with redirect_stdout(io.StringIO()), mock.patch.dict(os.environ, env):
+                self.assertEqual(cli.main(["restore", "-o", folder]), 0)
+                self.assertEqual(cli.main(["restore"]), 1)
+            self.assertEqual((Path(folder) / "E1019999.BIN").read_bytes(), on_card)
+
     def test_the_app_writes_what_the_command_line_writes(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             (Path(folder) / "repo").mkdir()

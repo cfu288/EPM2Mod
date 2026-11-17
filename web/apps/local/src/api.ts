@@ -15,8 +15,12 @@ export interface Card {
   label: string
 }
 
+/** EPM2Mod, or Olympus's original firmware (the way back). */
+export type Firmware = 'epm2mod' | 'original'
+
 export interface Job {
   job: number
+  firmware: Firmware
   lines: string[]
   /** The last step of the build that ended, 0 to `steps`. */
   step: number
@@ -51,8 +55,8 @@ async function json<T>(path: string, init?: RequestInit): Promise<T> {
 export const api = {
   build: () => json<Build>('/api/build'),
   cards: () => json<Card[]>('/api/cards'),
-  make: (choices: string[], card: string | null) =>
-    json<Job>('/api/make', { method: 'POST', body: JSON.stringify({ choices, card }) }),
+  make: (firmware: Firmware, choices: string[], card: string | null) =>
+    json<Job>('/api/make', { method: 'POST', body: JSON.stringify({ firmware, choices, card }) }),
   job: () => json<Job | null>('/api/job'),
   zip: async () => (await call('/api/zip')).blob(),
 }

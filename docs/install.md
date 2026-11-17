@@ -17,7 +17,7 @@ The build script verifies the checksum itself and stops if it does not match. Wi
 
 ## Restore Original Firmware
 
-1. To download the original Olympus firmware, run
+1. To put the original Olympus firmware on the card, run `uv run epm2mod restore --card /path/to/card` and go to step 3. Or, to download it only, run
 
    ```sh
    uv run tools/fetch_stock.py

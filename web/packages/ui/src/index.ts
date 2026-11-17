@@ -1,6 +1,7 @@
 // The public entry of @epm2mod/ui: what the public site (apps/site) and the local app (apps/local) share. An app
 // imports only from here and from '@epm2mod/ui/theme.css'; the lint rules refuse paths into this package's files.
 export { Chevron } from './components/Chevron'
+export { FilmCredit } from './components/FilmCredit'
 export { FilmLibrary } from './components/FilmLibrary'
 export { LoadSteps } from './components/LoadSteps'
 export { MenuEditor } from './components/MenuEditor'

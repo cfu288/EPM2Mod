@@ -1,16 +1,21 @@
 import type { Looks } from '../lib/useLooks'
+import { SLOT_COUNT } from '../lib/selection'
 import { FilmLibrary } from './FilmLibrary'
 import { SlotList } from './SlotList'
 
 /** The two sections that choose the films of the ART menu: the twelve rows in order, and the films to add. */
 export function MenuEditor({ looks }: { looks: Looks }) {
+  const filled = looks.items.filter((item) => item.filmId !== null).length
   return (
     <div className="space-y-14">
       <section aria-labelledby="menu-heading">
-        <h2 id="menu-heading" className="section-title">
-          Your camera's ART menu
-        </h2>
-        <p className="text-ink-soft mt-2 text-sm">Drag ☰ to reorder. Select a row to preview it.</p>
+        <div className="section-title flex items-baseline justify-between gap-x-4">
+          <h2 id="menu-heading">Your camera&apos;s ART menu</h2>
+          <span className="text-muted font-sans text-sm font-normal tracking-normal">
+            {filled} of {SLOT_COUNT} films
+          </span>
+        </div>
+        <p className="text-ink-soft mt-2 text-sm">Drag ☰ to reorder. Select a row to see its name on the camera.</p>
         <div className="mt-4">
           <SlotList
             items={looks.items}
@@ -26,7 +31,7 @@ export function MenuEditor({ looks }: { looks: Looks }) {
         <h2 id="more-heading" className="section-title">
           More films
         </h2>
-        {looks.empty < 0 && <p className="text-ink-soft mt-2 text-sm">Remove a film (×) to add one.</p>}
+        {looks.empty < 0 && <p className="mt-2 text-sm font-bold">The menu is full. Remove a film (×) to add one.</p>}
         <div className="mt-4">
           <FilmLibrary films={looks.unused} canAdd={looks.empty >= 0} onAdd={looks.add} />
         </div>

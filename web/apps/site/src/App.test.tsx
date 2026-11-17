@@ -23,7 +23,8 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: 'Move ART 3, Fujifilm Pro 400H' })).toBeInTheDocument()
     expect(within(more()).getAllByRole('listitem')).toHaveLength(7)
     expect(within(more()).getByRole('button', { name: 'Add Kodak Ektar 100' })).toBeDisabled()
-    expect(more()).toHaveTextContent('Remove a film (×) to add one.')
+    expect(more()).toHaveTextContent('The menu is full. Remove a film (×) to add one.')
+    expect(menu()).toHaveTextContent('12 of 12 films')
   })
 
   it('removes a film, adds another into the empty place and previews it', async () => {

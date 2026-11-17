@@ -7,6 +7,7 @@
     epm2mod fetch-stock                           download and check the stock firmware
     epm2mod builds                                list the build descriptions
     epm2mod cards                                 list the SD cards plugged into this computer
+    epm2mod restore [--card DIR] [-o FILE]        Olympus's original firmware, to go back from EPM2Mod
     epm2mod serve [--port N] [--no-browser]       open the local app page
     epm2mod release [-o DIR]                      write the release zip (launchers, package, pinned build)
     epm2mod apply SPEC... -o OUT.BIN              apply patch specs (no build description)
@@ -301,6 +302,23 @@ def _dictionaries(args: argparse.Namespace, paths: RepoPaths) -> list[Dictionary
     return found
 
 
+def _restore(args: argparse.Namespace, paths: RepoPaths) -> int:
+    """Run ``epm2mod restore``: Olympus's original firmware to the card or a file."""
+    from .pipeline import restore
+
+    if args.card is None and args.out is None:
+        raise BuildError("give --card DIR (the SD card) or -o FILE")
+    data = restore(paths, None if args.card is None else Path(args.card), log=print)
+    if args.out is not None:
+        out = Path(args.out)
+        if out.is_dir():
+            out = out / "E1019999.BIN"
+        write_bytes(out, data)
+        print(f"wrote {out}: copy it to the card as DCOLYMP/E1019999.BIN")
+    print("Then, with the camera off, hold OK and switch the camera on.")
+    return 0
+
+
 def _cards(args: argparse.Namespace, paths: RepoPaths) -> int:
     """Run ``epm2mod cards``: the SD cards plugged into this computer."""
     from .cards import cards, describe
@@ -397,6 +415,13 @@ def build_parser() -> argparse.ArgumentParser:
     command("fetch-stock", _fetch_stock, "Download and check the stock firmware.")
     command("builds", _builds, "List the build descriptions.")
     command("cards", _cards, "List the SD cards plugged into this computer.")
+    restore_cmd = command(
+        "restore", _restore, "Put Olympus's original firmware on the SD card."
+    )
+    restore_cmd.add_argument(
+        "--card", metavar="DIR", help="the top folder of the SD card"
+    )
+    restore_cmd.add_argument("-o", "--out", metavar="FILE", help="write the file here")
     serve_cmd = command(
         "serve", _serve, "Open the local app: make the firmware and the look file."
     )

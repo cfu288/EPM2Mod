@@ -25,14 +25,15 @@ function server(cards = [CARD]) {
       if (path === '/api/cards') return reply(cards)
       if (path === '/api/job') return reply(job)
       if (path === '/api/make') {
-        const body = JSON.parse(init?.body as string) as { choices: string[]; card: string | null }
+        const body = JSON.parse(init?.body as string) as { firmware: string; choices: string[]; card: string | null }
         made.push(body)
         const files = ['DCOLYMP/E1019999.BIN', ...(body.choices.length ? ['EPM2LOOK.BIN'] : [])]
         job = {
           job: made.length,
+          firmware: body.firmware as 'epm2mod',
           lines: ['1/5 stock firmware: ok'],
-          step: 5,
-          steps: 5,
+          step: body.firmware === 'original' ? 2 : 5,
+          steps: body.firmware === 'original' ? 2 : 5,
           done: true,
           error: null,
           sha256: BUILD.sha256,
@@ -54,32 +55,55 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
+async function next(user: ReturnType<typeof userEvent.setup>) {
+  await waitFor(() => {
+    expect(screen.getByRole('button', { name: 'Next' })).toBeEnabled()
+  })
+  await user.click(screen.getByRole('button', { name: 'Next' }))
+}
+
 describe('the local app', () => {
-  it('writes the firmware with the default films to the card', async () => {
+  it('writes EPM2Mod with the default films to the card', async () => {
     const made = server()
     const user = userEvent.setup()
     render(<App />)
-    expect(screen.getByRole('heading', { name: 'Install EPM2Mod' })).toBeInTheDocument()
-    expect(screen.getByRole('radio', { name: /Write to an SD card/ })).toBeChecked()
+    expect(screen.getByRole('heading', { name: 'Install firmware on your PEN E-PM2' })).toBeInTheDocument()
     await waitFor(() => {
       expect(screen.getByRole('combobox', { name: 'SD card' })).toHaveValue(CARD.path)
     })
-    await user.click(screen.getByRole('button', { name: 'Next' }))
+    await next(user)
+    expect(screen.getByRole('radio', { name: 'EPM2Mod' })).toBeChecked()
+    await next(user)
     expect(screen.getByRole('heading', { name: 'Film looks' })).toBeInTheDocument()
+    expect(screen.getByText(/derived from/)).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Build with the default films' }))
-    expect(made).toEqual([{ choices: [], card: CARD.path }])
+    expect(made).toEqual([{ firmware: 'epm2mod', choices: [], card: CARD.path }])
     expect(await screen.findByRole('heading', { name: 'Install on the camera' })).toBeInTheDocument()
     const steps = screen.getByRole('list', { name: 'Install steps' })
-    expect(steps).toHaveTextContent('Camera off: hold OK and switch it on.')
+    expect(steps).toHaveTextContent('Press and hold the OK button')
+    expect(steps).toHaveTextContent('such as Portra 400')
     expect(steps).not.toHaveTextContent('Load Looks')
     expect(steps).not.toHaveTextContent('zip')
-    expect(screen.queryByRole('button', { name: /Download/ })).toBeNull()
+    expect(screen.queryByText(/derived from/)).toBeNull()
+  })
+
+  it('restores the original firmware without the film step', async () => {
+    const made = server()
+    const user = userEvent.setup()
+    render(<App />)
+    await next(user)
+    await user.click(screen.getByRole('radio', { name: 'Olympus original' }))
+    expect(screen.getByRole('navigation', { name: 'Steps' })).not.toHaveTextContent('Film looks')
+    await user.click(screen.getByRole('button', { name: 'Next' }))
+    expect(made).toEqual([{ firmware: 'original', choices: [], card: CARD.path }])
+    expect(await screen.findByRole('heading', { name: 'Install on the camera' })).toBeInTheDocument()
+    expect(screen.getByRole('list', { name: 'Install steps' })).toHaveTextContent('such as Pop Art')
   })
 
   it('asks for a card when none is plugged in', async () => {
     server([])
     render(<App />)
-    expect(await screen.findByText("Insert the camera's SD card, then select Refresh.")).toBeInTheDocument()
+    expect(await screen.findByText("Insert the camera's SD card. It shows here when found.")).toBeInTheDocument()
     await waitFor(() => {
       expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled()
     })
@@ -89,14 +113,14 @@ describe('the local app', () => {
     const made = server()
     const user = userEvent.setup()
     render(<App />)
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Next' })).toBeEnabled()
-    })
-    await user.click(screen.getByRole('button', { name: 'Next' }))
+    await next(user)
+    await next(user)
     await user.click(screen.getByRole('button', { name: 'Customize' }))
+    expect(screen.getByText('12 of 12 films')).toBeInTheDocument()
+    expect(screen.getByText('The menu is full. Remove a film (×) to add one.')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Build custom firmware' }))
     await waitFor(() => {
-      expect(made).toEqual([{ choices: [], card: CARD.path }])
+      expect(made).toEqual([{ firmware: 'epm2mod', choices: [], card: CARD.path }])
     })
   })
 
@@ -105,12 +129,11 @@ describe('the local app', () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByRole('radio', { name: /Download a zip/ }))
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Next' })).toBeEnabled()
-    })
-    await user.click(screen.getByRole('button', { name: 'Next' }))
+    await next(user)
+    await next(user)
     await user.click(screen.getByRole('button', { name: 'Customize' }))
     await user.click(screen.getByRole('button', { name: 'Remove Kodak Ektachrome 100 from ART 2' }))
+    expect(screen.getByText('11 of 12 films')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Add Fujifilm C200' }))
     await user.click(screen.getByRole('button', { name: 'Build custom firmware' }))
     await waitFor(() => {
@@ -121,7 +144,7 @@ describe('the local app', () => {
     expect(first?.choices.slice(0, 3)).toEqual(['ART1=portra-400', 'ART2=c200', 'ART3=pro-400h'])
     expect(await screen.findByRole('button', { name: 'Download EPM2Mod-card.zip' })).toBeInTheDocument()
     const steps = screen.getByRole('list', { name: 'Install steps' })
-    expect(steps).toHaveTextContent('Copy DCOLYMP and EPM2LOOK.BIN from the zip to the card.')
-    expect(steps).toHaveTextContent('MENU → Custom Menu → J → Load Looks → Load.')
+    expect(steps).toHaveTextContent('Copy the DCOLYMP folder and EPM2LOOK.BIN to the top of the SD card')
+    expect(steps).toHaveTextContent('Gears tab → J → Load Looks → Load → OK.')
   })
 })

@@ -2,6 +2,7 @@ import { ArrowDownTrayIcon } from '@heroicons/react/20/solid'
 import {
   CARD_NAME,
   Chevron,
+  FilmCredit,
   LoadSteps,
   lookFile,
   MenuEditor,
@@ -26,7 +27,7 @@ export default function App() {
   const looks = useLooks()
 
   return (
-    <PageFrame subtitle="Film looks">
+    <PageFrame subtitle="Film looks" footer={<FilmCredit />}>
       <div className="bg-ink text-white">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
           <h1 className="font-display max-w-4xl text-4xl font-extrabold tracking-tight sm:text-5xl">

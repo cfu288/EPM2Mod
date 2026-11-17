@@ -10,12 +10,13 @@ const CARD = {
 
 /** Answer the calls of `epm2mod serve`; a job ends at its second poll. Returns the bodies of /api/make. */
 async function fakeServer(page: Page) {
-  const made: { choices: string[]; card: string | null }[] = []
+  const made: { firmware: string; choices: string[]; card: string | null }[] = []
   let polls = 0
   const job = (done: boolean) => {
     const body = made.at(-1)
     return {
       job: made.length,
+      firmware: body?.firmware ?? 'epm2mod',
       lines: done ? ['1/5 stock firmware: ok', '5/5 card-looks-4'] : ['1/5 stock firmware: ok'],
       step: done ? 5 : 1,
       steps: 5,
@@ -34,7 +35,7 @@ async function fakeServer(page: Page) {
       return route.fulfill({ json: { name: 'card-looks-4', what: 'Film simulations', sha256: null } })
     if (path === '/api/cards') return route.fulfill({ json: [CARD] })
     if (path === '/api/make') {
-      made.push(request.postDataJSON() as { choices: string[]; card: string | null })
+      made.push(request.postDataJSON() as { firmware: string; choices: string[]; card: string | null })
       polls = 0
       return route.fulfill({ status: 202, json: job(false) })
     }
@@ -48,22 +49,24 @@ async function fakeServer(page: Page) {
   return made
 }
 
-test('writes the default films to the card and shows the progress', async ({ page }) => {
+test('writes EPM2Mod with the default films to the card and shows the progress', async ({ page }) => {
   const made = await fakeServer(page)
   await page.goto('/#token=t0k3n')
   await expect(page.getByRole('combobox', { name: 'SD card' })).toHaveValue(CARD.path)
+  await page.getByRole('button', { name: 'Next' }).click()
   await page.getByRole('button', { name: 'Next' }).click()
   await page.getByRole('button', { name: 'Build with the default films' }).click()
   await expect(page.getByRole('heading', { name: 'Building' })).toBeVisible()
   await expect(page.getByRole('list', { name: 'Progress' })).toContainText("✓ Download Olympus's firmware")
   await expect(page.getByRole('heading', { name: 'Install on the camera' })).toBeVisible()
-  expect(made).toEqual([{ choices: [], card: CARD.path }])
+  expect(made).toEqual([{ firmware: 'epm2mod', choices: [], card: CARD.path }])
 })
 
 test('customizes the films and downloads the zip', async ({ page }) => {
   const made = await fakeServer(page)
   await page.goto('/#token=t0k3n')
   await page.getByRole('radio', { name: /Download a zip/ }).check()
+  await page.getByRole('button', { name: 'Next' }).click()
   await page.getByRole('button', { name: 'Next' }).click()
   await page.getByRole('button', { name: 'Customize' }).click()
   await page.getByRole('button', { name: /^Remove Kodak Ektachrome 100/ }).click()
@@ -75,5 +78,5 @@ test('customizes the films and downloads the zip', async ({ page }) => {
   expect((await download).suggestedFilename()).toBe('EPM2Mod-card.zip')
   expect(made[0]?.choices).toContain('ART2=c200')
   expect(made[0]?.card).toBeNull()
-  await expect(page.getByRole('list', { name: 'Install steps' })).toContainText('Load Looks → Load.')
+  await expect(page.getByRole('list', { name: 'Install steps' })).toContainText('Load Looks → Load → OK.')
 })
