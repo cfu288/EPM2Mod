@@ -10,6 +10,8 @@ and delete the item here.
   [installer design](../experiments/2026-11-17-installer/design.md).
 - Separate project: Olympus's art filters by default, films only in the slots where a user loads one (criteria F1-F5
   in the same design). The installer doesn't wait for it.
+- Not published (owner, 2026-11-17): first a camera test of the firmware with and without film looks, and of every
+  feature, with a build that writes the log. Later (deferred): the log as a menu setting instead of a separate build.
 
 ## Level gauge
 
