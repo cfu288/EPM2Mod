@@ -328,3 +328,23 @@ needs one, so both changes are one candidate, `builds/card-looks-2.json`.
   --v2`, five sessions: menu in and out without Load: no load; Load: C200 in all 12 slots, saved; restart without the
   file: applied at start, the row reads Off; BAD refused; no card; DEFAULT back.
 
+## 10. Acceptance criteria (draft, 2026-11-17, for the owner to confirm)
+
+Written after `card-looks-2` worked on the camera and was not accepted: the menu names did not follow the loaded
+looks, and no criteria had been set before the build. A build is pinned only when every agreed criterion passes.
+
+| # | Criterion (what the user does and sees) | Check | card-looks-2 |
+|---|---|---|---|
+| 1 | MENU -> Custom Menu -> J -> Load Looks -> Load: on leaving the menu the looks of EPM2LOOK.BIN replace the current ones | camera | pass |
+| 2 | Nothing loads unless the user chooses Load | camera | pass |
+| 3 | The looks stay after power-off and without the card, until the next load | camera | pass |
+| 4 | Any look goes into any of the 12 entries | emulator (12), camera (2) | pass |
+| 5 | Every place that shows a film name shows the loaded look's name: Picture Mode strip, ART list, shooting menu, live-view and playback info | emulator, camera | **fail** |
+| 6 | After Load the camera says what happened: loaded, no file, or damaged file | emulator, camera | **fail** (silent) |
+| 7 | The built-in looks can be brought back from the camera, without a file | camera | **fail** |
+| 8 | Live view shows the loaded look as the photo will be (tone included) | camera | **fail** (tone only at half-press, as the built-in looks) |
+| 9 | A photo records the loaded look's name where it records the film today | camera (EXIF) | not checked |
+| 10 | The Load Looks row and its messages are readable in the user's menu language | emulator | English only |
+| 11 | A bad or missing file never stops a start or a flash; boot-test and update-path-test pass | emulator, camera | pass |
+| 12 | Movies show the loaded look as far as they show the built-in looks | camera | not checked |
+
