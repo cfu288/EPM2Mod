@@ -17,15 +17,16 @@ The build script verifies the checksum itself and stops if it does not match. Wi
 
 ## Restore Original Firmware
 
-1. To put the original Olympus firmware on the card, run `uv run epm2mod restore --card /path/to/card` and go to step 3. Or, to download it only, run
+1. Put Olympus's original firmware on the card (it is downloaded from OM Digital Solutions and checked):
 
    ```sh
-   uv run tools/fetch_stock.py
+   uv run epm2mod restore --card /path/to/card
    ```
 
-   This writes `firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN`.
-2. Copy that file to the SD card as `DCOLYMP/E1019999.BIN`.
-3. Flash it the same way as the mod (step 3 of the [README](../README.md#install)).
+   Without a card: `uv run epm2mod restore -o FILE`, then copy the file to the card as `DCOLYMP/E1019999.BIN`.
+2. Flash it the same way as the mod (step 3 of the [README](../README.md#install)).
+
+The installer does the same: choose **Olympus original** at the Firmware step.
 
 ## Notes
 
