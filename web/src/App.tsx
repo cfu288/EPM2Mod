@@ -7,7 +7,8 @@ import { films } from './lib/films'
 import { CARD_NAME } from './lib/lookfile'
 import { addFilm, builtInSlots, firstEmpty, lookFile, moveSlot, removeFilm, type SlotItem } from './lib/selection'
 
-const INSTALL = 'https://github.com/cfu288/EPM2Mod#install'
+const REPO = 'https://github.com/cfu288/EPM2Mod'
+const INSTALL = `${REPO}#install`
 
 function download(bytes: Uint8Array) {
   const url = URL.createObjectURL(new Blob([bytes as BlobPart], { type: 'application/octet-stream' }))
@@ -32,8 +33,15 @@ export default function App() {
             Film looks for the Olympus PEN E-PM2
           </h1>
           <p className="mt-2 max-w-3xl text-gray-700 dark:text-gray-300">
-            Choose which film looks appear in the camera's ART menu (the art filters, ART 1 to 12) and in which order.
-            Then download one file and load it on the camera.
+            <a className="font-medium text-indigo-600 underline hover:text-indigo-500 dark:text-indigo-400" href={REPO}>
+              EPM2Mod
+            </a>{' '}
+            is an unofficial firmware for the Olympus PEN E-PM2. It puts film looks, such as Kodak Portra and Fujifilm
+            Velvia, into the camera's ART menu (the art filters, ART 1 to 12).
+          </p>
+          <p className="mt-2 max-w-3xl text-gray-700 dark:text-gray-300">
+            Here you choose which films are in that menu and in which order. Then you download one file and load it on
+            the camera.
           </p>
           <div className="mt-4 max-w-3xl rounded-md bg-yellow-50 p-4 dark:bg-yellow-500/10 dark:outline dark:outline-yellow-500/15">
             <div className="flex">
