@@ -52,12 +52,17 @@ async function fakeServer(page: Page) {
 test('writes EPM2Mod with the default films to the card and shows the progress', async ({ page }) => {
   const made = await fakeServer(page)
   await page.goto('/#token=t0k3n')
-  await expect(page.getByRole('combobox', { name: 'SD card' })).toHaveValue(CARD.path)
+  await expect(page.getByRole('combobox', { name: 'Card' })).toHaveValue(CARD.path)
   await page.getByRole('button', { name: 'Next' }).click()
   await page.getByRole('button', { name: 'Next' }).click()
   await page.getByRole('button', { name: 'Build with the default films' }).click()
   await expect(page.getByRole('heading', { name: 'Building' })).toBeVisible()
-  await expect(page.getByRole('list', { name: 'Progress' })).toContainText("✓ Download Olympus's firmware")
+  await expect(
+    page
+      .getByRole('list', { name: 'Progress' })
+      .getByRole('listitem')
+      .filter({ hasText: "Download Olympus's firmware" }),
+  ).toContainText('✓')
   await expect(page.getByRole('heading', { name: 'Install on the camera' })).toBeVisible()
   expect(made).toEqual([{ firmware: 'epm2mod', choices: [], card: CARD.path }])
 })

@@ -12,6 +12,8 @@ export interface Looks {
   remove: (index: number) => void
   /** Put a film into the first empty row. */
   add: (film: Film) => void
+  /** Go back to the films built into the firmware, in their order. */
+  reset: () => void
   /** The first empty row, or -1. */
   empty: number
   /** The films that are in no row. */
@@ -39,6 +41,10 @@ export function useLooks(): Looks {
       if (empty < 0) return
       setItems((all) => addFilm(all, empty, film.id))
       setSelected(empty)
+    },
+    reset: () => {
+      setItems(builtInSlots())
+      setSelected(0)
     },
     empty,
     unused: films.filter((film) => !items.some((item) => item.filmId === film.id)),

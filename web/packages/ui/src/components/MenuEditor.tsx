@@ -9,10 +9,12 @@ export function MenuEditor({ looks }: { looks: Looks }) {
   return (
     <div className="space-y-14">
       <section aria-labelledby="menu-heading">
-        <div className="section-title flex items-baseline justify-between gap-x-4">
+        <div className="section-title flex flex-wrap items-baseline justify-between gap-x-4">
           <h2 id="menu-heading">Your camera&apos;s ART menu</h2>
           <span className="text-muted font-sans text-sm font-normal tracking-normal">
             {filled} of {SLOT_COUNT} films
+            {filled === SLOT_COUNT - 1 && ' · 1 slot keeps its default'}
+            {filled < SLOT_COUNT - 1 && ` · ${String(SLOT_COUNT - filled)} slots keep their default`}
           </span>
         </div>
         <p className="text-ink-soft mt-2 text-sm">Drag ☰ to reorder. Select a row to see its name on the camera.</p>
@@ -31,7 +33,11 @@ export function MenuEditor({ looks }: { looks: Looks }) {
         <h2 id="more-heading" className="section-title">
           More films
         </h2>
-        {looks.empty < 0 && <p className="mt-2 text-sm font-bold">The menu is full. Remove a film (×) to add one.</p>}
+        {looks.empty < 0 ? (
+          <p className="mt-2 text-sm font-bold">The menu is full. Remove a film (×) to add one.</p>
+        ) : (
+          <p className="text-ink-soft mt-2 text-sm">Add puts a film into ART {looks.empty + 1}.</p>
+        )}
         <div className="mt-4">
           <FilmLibrary films={looks.unused} canAdd={looks.empty >= 0} onAdd={looks.add} />
         </div>

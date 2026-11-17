@@ -12,6 +12,9 @@ interface Props {
 export function Timeline({ steps, current, onBack }: Props) {
   return (
     <nav aria-label="Steps">
+      <p className="mb-3 text-sm font-bold sm:hidden">
+        Step {current + 1} of {steps.length}: {steps[current]}
+      </p>
       <ol className="flex items-center">
         {steps.map((label, index) => {
           const done = index < current
@@ -24,7 +27,7 @@ export function Timeline({ steps, current, onBack }: Props) {
               >
                 {done ? <CheckIcon aria-hidden="true" className="size-4" /> : index + 1}
               </span>
-              <span className={`text-sm ${index === current ? 'font-bold' : 'text-muted hidden sm:inline'}`}>
+              <span className={`hidden text-sm sm:inline ${index === current ? 'font-bold' : 'text-muted'}`}>
                 {label}
               </span>
             </>

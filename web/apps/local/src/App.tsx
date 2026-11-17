@@ -4,9 +4,11 @@ import {
   builtInSlots,
   CARD_NAME,
   choicesOf,
+  filmById,
   FilmCredit,
   MenuEditor,
   PageFrame,
+  slots,
   StripPreview,
   useLooks,
   type Looks,
@@ -28,6 +30,10 @@ const FLOWS: Record<Firmware, StepId[]> = {
   original: ['start', 'firmware', 'build', 'install'],
 }
 const ZIP_NAME = 'EPM2Mod-card.zip'
+const HELP = 'https://github.com/cfu288/EPM2Mod/blob/main/docs/install.md'
+
+/** A card in the list: its name, size and where it is mounted. */
+const cardLabel = (c: Card) => `${c.name || 'SD card'} · ${String(Math.round(c.size / 1e9))} GB · ${c.path}`
 const DEFAULT_CHOICES = choicesOf(builtInSlots()).join()
 
 /** What the user sees while the job runs, and the step of the job (`steps` of `epm2mod serve`) that ends each one. */
@@ -124,7 +130,6 @@ function StartStep(props: {
   cards: Card[]
   card: string
   onCard: (card: string) => void
-  onRefresh: () => void
   onNext: () => void
   ready: boolean
 }) {
@@ -147,29 +152,42 @@ function StartStep(props: {
             props.onZip(false)
           }}
         >
-          <div className="mt-4 flex items-center gap-x-2 pl-7">
+          <div className="mt-4 space-y-2 pl-7 text-sm">
             {props.cards.length > 0 ? (
-              <select
-                aria-label="SD card"
-                value={props.card}
-                onChange={(event) => {
-                  props.onCard(event.target.value)
-                }}
-                className="border-ink min-w-0 flex-1 border bg-white px-2 py-2 text-sm"
-              >
-                {props.cards.map((c) => (
-                  <option key={c.path} value={c.path}>
-                    {c.label}
-                  </option>
-                ))}
-              </select>
+              <>
+                <label htmlFor="card" className="block font-bold">
+                  Card
+                </label>
+                <select
+                  id="card"
+                  value={props.card}
+                  onChange={(event) => {
+                    props.onCard(event.target.value)
+                  }}
+                  className="border-ink w-full border bg-white px-2 py-2"
+                >
+                  {props.cards.map((c) => (
+                    <option key={c.path} value={c.path}>
+                      {cardLabel(c)}
+                    </option>
+                  ))}
+                </select>
+                {props.cards.length > 1 && (
+                  <p className="text-ink-soft">Not sure which? Take the camera&apos;s card out: its entry goes away.</p>
+                )}
+              </>
             ) : (
-              <span className="flex-1 text-sm">Insert the camera&apos;s SD card. It shows here when found.</span>
+              <>
+                <p className="flex items-center gap-x-2">
+                  <ArrowPathIcon aria-hidden="true" className="size-4 animate-spin" />
+                  Insert the camera&apos;s SD card. It shows here when found.
+                </p>
+                <p className="text-ink-soft">
+                  No card slot? Connect the camera to this computer with its USB cable, turn the camera on, and choose
+                  Storage on its screen.
+                </p>
+              </>
             )}
-            <button type="button" onClick={props.onRefresh} className="btn">
-              <ArrowPathIcon aria-hidden="true" className="size-4" />
-              Refresh
-            </button>
           </div>
         </Choice>
         <Choice
@@ -208,7 +226,7 @@ function FirmwareStep(props: {
         <Choice
           group="firmware"
           title="EPM2Mod"
-          line="Film looks, interval shooting, a level gauge and focus peaking."
+          line="Unofficial. Adds film looks, interval shooting, a level gauge and focus peaking. You can put the Olympus original back here at any time."
           checked={props.firmware === 'epm2mod'}
           onChoose={() => {
             props.onFirmware('epm2mod')
@@ -267,6 +285,9 @@ function FilmsStep(props: {
           EPM2Mod replaces the 12 art filters in the ART menu with film looks. Customize picks the films and their
           order.
         </p>
+        <p className="text-ink-soft text-sm">
+          The default films: {slots.map((slot) => filmById(slot.builtIn).name).join(', ')}.
+        </p>
         <FilmCredit />
       </Step>
     )
@@ -281,6 +302,9 @@ function FilmsStep(props: {
               props.onCustomize(false)
             }}
           />
+          <button type="button" onClick={looks.reset} className={secondary}>
+            Reset to the default films
+          </button>
           <button
             type="button"
             onClick={() => {
@@ -312,9 +336,17 @@ function BuildStep(props: { job: Job | null; firmware: Firmware; onRetry: () => 
     (stage) => job !== null && job.step >= stage.step && (stage.step < job.steps || (job.done && !failed)),
   ).length
   const title = props.firmware === 'original' ? 'Getting the original firmware' : 'Building'
+  const failedTitle =
+    doneCount === 0
+      ? 'Could not download the firmware'
+      : doneCount === list.length - 1
+        ? job?.card == null
+          ? 'Could not make the zip'
+          : 'Could not write to the card'
+        : 'The build stopped'
   return (
     <Step
-      title={failed ? 'It stopped' : title}
+      title={failed ? failedTitle : title}
       actions={
         failed && (
           <>
@@ -329,11 +361,17 @@ function BuildStep(props: { job: Job | null; firmware: Firmware; onRetry: () => 
       <ol aria-label="Progress" aria-live="polite" className="space-y-2">
         {list.map((stage, index) => {
           const state = index < doneCount ? 'done' : index === doneCount ? (failed ? 'failed' : 'now') : 'later'
-          const mark = { done: '✓', now: '…', failed: '✗', later: '·' }[state]
           const style = { done: '', now: 'font-bold', failed: 'font-bold', later: 'text-muted' }[state]
           return (
-            <li key={stage.step} className={style}>
-              {mark} {stage.label}
+            <li key={stage.step} className={`flex items-center gap-x-2 ${style}`}>
+              <span aria-hidden="true" className="inline-flex w-4 justify-center">
+                {state === 'now' ? (
+                  <ArrowPathIcon className="size-4 animate-spin" />
+                ) : (
+                  { done: '✓', failed: '✗', later: '·' }[state]
+                )}
+              </span>
+              {stage.label}
             </li>
           )
         })}
@@ -343,69 +381,91 @@ function BuildStep(props: { job: Job | null; firmware: Firmware; onRetry: () => 
           {job.error}
         </p>
       ) : (
-        job?.card != null && (
-          <p className="text-ink-soft text-sm">Keep the card in this computer until this finishes.</p>
-        )
+        <p className="text-ink-soft text-sm">
+          Takes about a minute and needs the internet.
+          {job?.card != null && ' Keep the card in this computer until it finishes.'}
+        </p>
       )}
     </Step>
   )
 }
 
-function InstallStep({ job, onZip, onRestart }: { job: Job; onZip: () => void; onRestart: () => void }) {
+function InstallStep(props: {
+  job: Job
+  cardName: string
+  firstFilm: string
+  onZip: () => void
+  onRestart: () => void
+}) {
+  const { job } = props
   const zip = job.card === null
   const looks = job.files.includes(CARD_NAME)
   const original = job.firmware === 'original'
+  const what = original ? "Olympus's original firmware" : 'EPM2Mod'
   return (
     <Step
       title="Install on the camera"
       actions={
-        <button type="button" onClick={onRestart} className={secondary}>
+        <button type="button" onClick={props.onRestart} className={secondary}>
           Start over
         </button>
       }
     >
+      <p className="font-bold">
+        {zip ? 'Done. Your zip is ready.' : `Done. ${what} is on the card ${props.cardName}.`}
+      </p>
       {zip && (
-        <button type="button" onClick={onZip} className={`${primary} w-full`}>
+        <button type="button" onClick={props.onZip} className={`${primary} w-full`}>
           <ArrowDownTrayIcon aria-hidden="true" className="size-5" />
           Download {ZIP_NAME}
         </button>
       )}
       <ol aria-label="Install steps" className="list-decimal space-y-2 pl-5">
-        {zip && (
-          <li>
-            Open {ZIP_NAME}. Copy the DCOLYMP folder{looks ? ` and ${CARD_NAME}` : ''} to the top of the SD card, next
-            to the DCIM folder.
-          </li>
-        )}
-        <li>Eject the SD card from this computer and take it out.</li>
-        <li>Charge the camera&apos;s battery fully.</li>
+        {zip && <li>Open {ZIP_NAME} and copy everything inside it straight onto the SD card.</li>}
         <li>
-          With the camera off, open the battery/card cover on the bottom. Push the card in until it clicks. Close the
-          cover.
+          Eject the SD card and take it out. Mac: in Finder, select ⏏ next to the card. Windows: in File Explorer,
+          right-click the card and select Eject.
+        </li>
+        <li>
+          Charge the camera&apos;s battery fully. With the camera off, open the battery/card cover on the bottom, put
+          the battery in, and push the card in until it clicks. Close the cover.
         </li>
         <li>Press and hold the OK button (the middle of the arrow pad). While you hold it, press the ON/OFF button.</li>
         <li>
-          When an orange lamp lights, let go of OK. The lamp stays on for 1 to 2 minutes while the camera updates. Leave
-          the camera alone.
+          When an orange lamp lights, let go of OK. The lamp stays on for 1 to 2 minutes while the camera updates. Until
+          it blinks, keep the cover closed, the battery in, and the buttons untouched.
         </li>
         <li>
           When the lamp blinks, the update is done. Press ON/OFF to turn the camera off, then again to turn it on.
         </li>
-        <li>
-          {original
-            ? 'To check: press MENU and select ART. The list shows the art filters, such as Pop Art.'
-            : 'To check: press MENU and select ART. The list shows film names, such as Portra 400.'}
-        </li>
-        {looks && (
+        {looks ? (
           <>
             <li>
-              Press MENU and select SETUP. If there is no gears tab (Custom Menu), turn it on: wrench tab (Setup Menu) →
-              c/# Menu Display → c Menu Display → On.
+              Press MENU and select SETUP. If you see no gears tab on the left: open the wrench tab → Menu Display → set
+              Custom Menu (the gears) to On.
             </li>
-            <li>Gears tab → J → Load Looks → Load → OK. The row shows Loaded, and the ART list shows your films.</li>
+            <li>Open the gears tab → group J → Load Looks → Load → OK. The row shows Loaded.</li>
+            <li>To check: press MENU and select ART. The list shows your films, such as {props.firstFilm}.</li>
           </>
+        ) : (
+          <li>
+            {original
+              ? 'To check: press MENU and select ART. The list shows the art filters, such as Pop Art.'
+              : 'To check: press MENU and select ART. The list shows film names, such as Portra 400.'}
+          </li>
         )}
       </ol>
+      <p className="text-ink-soft text-sm">
+        The camera starts as usual instead? Turn it off and repeat from the step with OK, holding OK first. Something
+        else?{' '}
+        <a className="hover:text-ink underline" href={HELP}>
+          Get help
+        </a>
+        .
+      </p>
+      <p className="text-ink-soft text-sm">
+        When the camera is updated, close this page and the EPM2Mod window that opened with it.
+      </p>
     </Step>
   )
 }
@@ -444,8 +504,8 @@ export default function App() {
     refreshCards()
   }, [])
 
-  // on the first screen, look for a card every 2 seconds until one is found
-  const searching = step === 'start' && !zip && cards.length === 0
+  // on the first screen, look for cards every 2 seconds
+  const searching = step === 'start' && !zip
   useEffect(() => {
     if (!searching) return
     const timer = window.setInterval(refreshCards, 2000)
@@ -533,7 +593,6 @@ export default function App() {
             cards={cards}
             card={card}
             onCard={setCard}
-            onRefresh={refreshCards}
             onNext={() => {
               setStep('firmware')
             }}
@@ -579,6 +638,8 @@ export default function App() {
         {step === 'install' && job && (
           <InstallStep
             job={job}
+            cardName={cards.find((c) => c.path === job.card && c.name !== '')?.name ?? 'SD card'}
+            firstFilm={filmById(looks.items.find((item) => item.filmId)?.filmId ?? slots[0]?.builtIn ?? '').name}
             onZip={downloadZip}
             onRestart={() => {
               setJob(null)
