@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useId, useState, type ReactNode } from 'react'
 import { ArrowDownTrayIcon, ArrowPathIcon } from '@heroicons/react/20/solid'
 import {
   builtInSlots,
@@ -14,7 +14,7 @@ import {
 import { api, type Build, type Card, type Job } from './api'
 import { Timeline } from './Timeline'
 
-const STEPS = ['Films', 'SD card', 'Build', 'Install'] as const
+const STEPS = ['Start', 'Film looks', 'Build', 'Install'] as const
 const ZIP_NAME = 'EPM2Mod-card.zip'
 const RESTORE = `${REPO}/blob/main/docs/install.md#restore-original-firmware`
 const DEFAULT_CHOICES = choicesOf(builtInSlots()).join()
@@ -55,17 +55,65 @@ function Step({ title, children, actions }: { title: string; children: ReactNode
   )
 }
 
-function FilmsStep({ looks, onSkip, onNext }: { looks: Looks; onSkip: () => void; onNext: () => void }) {
+function FilmsStep(props: {
+  looks: Looks
+  customizing: boolean
+  onCustomize: (on: boolean) => void
+  onBuild: (custom: boolean) => void
+}) {
+  if (!props.customizing)
+    return (
+      <Step
+        title="Film looks"
+        actions={
+          <>
+            <button
+              type="button"
+              onClick={() => {
+                props.onCustomize(true)
+              }}
+              className={secondary}
+            >
+              Customize
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                props.onBuild(false)
+              }}
+              className={primary}
+            >
+              Build with the default films
+            </button>
+          </>
+        }
+      >
+        <p>EPM2Mod puts 12 film looks in the camera's ART menu. You can change which films and their order.</p>
+      </Step>
+    )
+  const { looks } = props
   return (
     <Step
-      title="Customize the ART menu"
+      title="Customize the film looks"
       actions={
         <>
-          <button type="button" onClick={onSkip} className={secondary}>
-            Keep default films
+          <button
+            type="button"
+            onClick={() => {
+              props.onCustomize(false)
+            }}
+            className={secondary}
+          >
+            Back
           </button>
-          <button type="button" onClick={onNext} className={primary}>
-            Next
+          <button
+            type="button"
+            onClick={() => {
+              props.onBuild(true)
+            }}
+            className={primary}
+          >
+            Build custom firmware
           </button>
         </>
       }
@@ -78,48 +126,96 @@ function FilmsStep({ looks, onSkip, onNext }: { looks: Looks; onSkip: () => void
   )
 }
 
-function CardStep(props: {
+/** One choice of the first screen: a large radio with a title and one line under it. */
+function Choice(props: { title: string; line: string; checked: boolean; onChoose: () => void; children?: ReactNode }) {
+  const id = useId()
+  return (
+    <div className={`border p-4 ${props.checked ? 'border-ink' : 'border-rule'}`}>
+      <div className="flex items-start gap-x-3">
+        <input
+          id={id}
+          type="radio"
+          name="output"
+          aria-describedby={`${id}-line`}
+          checked={props.checked}
+          onChange={props.onChoose}
+          className="accent-ink mt-1 size-4"
+        />
+        <div>
+          <label htmlFor={id} className="block cursor-pointer font-bold">
+            {props.title}
+          </label>
+          <p id={`${id}-line`} className="text-ink-soft text-sm">
+            {props.line}
+          </p>
+        </div>
+      </div>
+      {props.checked && props.children}
+    </div>
+  )
+}
+
+function StartStep(props: {
+  zip: boolean
+  onZip: (zip: boolean) => void
   cards: Card[]
-  target: string
-  onTarget: (target: string) => void
+  card: string
+  onCard: (card: string) => void
   onRefresh: () => void
-  onBack: () => void
-  onBuild: () => void
+  onNext: () => void
   ready: boolean
 }) {
   return (
     <Step
-      title="Choose the SD card"
+      title="Install EPM2Mod"
       actions={
-        <>
-          <button type="button" onClick={props.onBack} className={secondary}>
-            Back
-          </button>
-          <button type="button" disabled={!props.ready} onClick={props.onBuild} className={primary}>
-            Build custom firmware
-          </button>
-        </>
+        <button type="button" disabled={!props.ready} onClick={props.onNext} className={primary}>
+          Next
+        </button>
       }
     >
-      <div className="flex items-center gap-x-2">
-        <select
-          aria-label="Write to"
-          value={props.target}
-          onChange={(event) => {
-            props.onTarget(event.target.value)
+      <div className="space-y-3">
+        <Choice
+          title="Write to an SD card"
+          line="The camera's card, in this computer."
+          checked={!props.zip}
+          onChoose={() => {
+            props.onZip(false)
           }}
-          className="border-ink min-w-0 flex-1 border bg-white px-2 py-2 text-sm"
         >
-          {props.cards.map((c) => (
-            <option key={c.path} value={c.path}>
-              {c.label}
-            </option>
-          ))}
-          <option value="">Download a zip instead</option>
-        </select>
-        <button type="button" aria-label="Find SD cards" onClick={props.onRefresh} className="btn px-2.5">
-          <ArrowPathIcon aria-hidden="true" className="size-4" />
-        </button>
+          <div className="mt-4 flex items-center gap-x-2 pl-7">
+            {props.cards.length > 0 ? (
+              <select
+                aria-label="SD card"
+                value={props.card}
+                onChange={(event) => {
+                  props.onCard(event.target.value)
+                }}
+                className="border-ink min-w-0 flex-1 border bg-white px-2 py-2 text-sm"
+              >
+                {props.cards.map((c) => (
+                  <option key={c.path} value={c.path}>
+                    {c.label}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <span className="flex-1 text-sm">Insert the camera's SD card, then select Refresh.</span>
+            )}
+            <button type="button" onClick={props.onRefresh} className="btn">
+              <ArrowPathIcon aria-hidden="true" className="size-4" />
+              Refresh
+            </button>
+          </div>
+        </Choice>
+        <Choice
+          title="Download a zip"
+          line="Copy the files to the card yourself."
+          checked={props.zip}
+          onChoose={() => {
+            props.onZip(true)
+          }}
+        />
       </div>
     </Step>
   )
@@ -189,10 +285,11 @@ function InstallStep({ job, onZip, onRestart }: { job: Job; onZip: () => void; o
 export default function App() {
   const looks = useLooks()
   const [step, setStep] = useState(0)
-  const [customize, setCustomize] = useState(false)
+  const [customizing, setCustomizing] = useState(false)
   const [build, setBuild] = useState<Build | null>(null)
   const [cards, setCards] = useState<Card[]>([])
-  const [target, setTarget] = useState('') // a card's path, or '' for the zip
+  const [zip, setZip] = useState(false)
+  const [card, setCard] = useState('')
   const [job, setJob] = useState<Job | null>(null)
   const [problem, setProblem] = useState<string | null>(null)
   const running = job !== null && !job.done
@@ -201,7 +298,7 @@ export default function App() {
     api.cards().then(
       (found) => {
         setCards(found)
-        setTarget((current) => (found.some((c) => c.path === current) ? current : (found[0]?.path ?? '')))
+        setCard((current) => (found.some((c) => c.path === current) ? current : (found[0]?.path ?? '')))
       },
       (error: unknown) => {
         setProblem(message(error))
@@ -234,14 +331,14 @@ export default function App() {
     }
   }, [running])
 
-  const startBuild = () => {
+  const startBuild = (custom: boolean) => {
     setProblem(null)
     const choices = choicesOf(looks.items)
     // films left as they are need no look file: the firmware has them built in
-    const wanted = customize && choices.join() !== DEFAULT_CHOICES ? choices : []
+    const wanted = custom && choices.join() !== DEFAULT_CHOICES ? choices : []
     setJob(null)
     setStep(2)
-    api.make(wanted, target || null).then(
+    api.make(wanted, zip ? null : card).then(
       (started) => {
         setJob(started)
         if (started.done && started.error === null) setStep(3)
@@ -276,30 +373,21 @@ export default function App() {
         )}
 
         {step === 0 && (
-          <FilmsStep
-            looks={looks}
-            onSkip={() => {
-              setCustomize(false)
-              setStep(1)
-            }}
+          <StartStep
+            zip={zip}
+            onZip={setZip}
+            cards={cards}
+            card={card}
+            onCard={setCard}
+            onRefresh={refreshCards}
             onNext={() => {
-              setCustomize(true)
               setStep(1)
             }}
+            ready={build !== null && (zip || card !== '')}
           />
         )}
         {step === 1 && (
-          <CardStep
-            cards={cards}
-            target={target}
-            onTarget={setTarget}
-            onRefresh={refreshCards}
-            onBack={() => {
-              setStep(0)
-            }}
-            onBuild={startBuild}
-            ready={build !== null}
-          />
+          <FilmsStep looks={looks} customizing={customizing} onCustomize={setCustomizing} onBuild={startBuild} />
         )}
         {step === 2 && (
           <BuildStep
@@ -315,6 +403,7 @@ export default function App() {
             onZip={downloadZip}
             onRestart={() => {
               setJob(null)
+              setCustomizing(false)
               setStep(0)
             }}
           />
