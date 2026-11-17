@@ -6,6 +6,7 @@
     epm2mod pin BUILD.json --date D --sha256 H    record a passed camera test; pin the build
     epm2mod fetch-stock                           download and check the stock firmware
     epm2mod builds                                list the build descriptions
+    epm2mod cards                                 list the SD cards plugged into this computer
     epm2mod apply SPEC... -o OUT.BIN              apply patch specs (no build description)
     epm2mod info FIRMWARE.BIN                     describe a firmware file
     epm2mod readme [--check]                      refresh the generated parts of the documents
@@ -303,6 +304,18 @@ def _dictionaries(args: argparse.Namespace, paths: RepoPaths) -> list[Dictionary
     return found
 
 
+def _cards(args: argparse.Namespace, paths: RepoPaths) -> int:
+    """Run ``epm2mod cards``: the SD cards plugged into this computer."""
+    from .cards import cards, describe
+
+    found = cards()
+    for card in found:
+        print(describe(card))
+    if not found:
+        print("no SD card found: plug one in, or give its folder to --card")
+    return 0
+
+
 def _log(args: argparse.Namespace, paths: RepoPaths) -> int:
     """Run ``epm2mod log``: print a camera log as JSON lines or as a summary."""
     words, *older = _dictionaries(args, paths)
@@ -367,6 +380,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     command("fetch-stock", _fetch_stock, "Download and check the stock firmware.")
     command("builds", _builds, "List the build descriptions.")
+    command("cards", _cards, "List the SD cards plugged into this computer.")
 
     apply_cmd = command(
         "apply", _apply, "Apply patch specs to the stock firmware (for experiments)."

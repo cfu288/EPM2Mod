@@ -57,7 +57,9 @@ Its criteria (agreed earlier):
 
 1. Look records as the single source: `web/src/data/films.json` moved to `looks/film-records.json`; `looks pack`
    packs from it without numpy (`epm2mod.looks.records`). Done 2026-11-17.
-2. `epm2mod cards` (removable volumes on macOS, Windows, Linux).
+2. `epm2mod cards` (removable volumes on macOS, Windows, Linux): `epm2mod.cards`, done 2026-11-17. Only FAT and
+   exFAT volumes count. The Linux rule is tested on this computer; the macOS and Windows rules are tested with sample
+   data only, so the release CI of step 5 runs on macOS and Windows runners too.
 3. `epm2mod serve`: stdlib `http.server` on 127.0.0.1, a random token in the URL, Host check. Endpoints: build
    (progress), cards, write, zip.
 4. The app page: a second Vite entry in `web/` that reuses the components, built into the package's static folder.
