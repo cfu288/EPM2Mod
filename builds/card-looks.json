@@ -1,5 +1,5 @@
 {
- "what": "films-12d with film looks loaded from the SD card: put EPM2LOOK.BIN on the card, open the menu once; the looks stay after power-off and without the card (docs/look-file-format.md)",
+ "what": "Film simulations in the twelve art filter entries (eleven colour films and Kodak Double-X in black-and-white), film looks loaded from the SD card and kept in the camera, interval shooting with up to 240 frames, a level gauge with calibration, and focus peaking",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",
@@ -28,5 +28,7 @@
   "patches/films12-entry-watercolor.json",
   "patches/peaking-save-guard.json",
   "patches/card-looks.json"
- ]
+ ],
+ "sha256": "889dbcaf49b3ee0a00266ac6420d87f3f47031d0f9e81e3af9b99640ebe35949",
+ "camera_tested": "2026-11-17"
 }

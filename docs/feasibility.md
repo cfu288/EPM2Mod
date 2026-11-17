@@ -68,7 +68,9 @@ routines. This file records what the measurements show, so that nobody repeats t
 
 **Medium effort: new code, method known**
 
-- Looks loaded from a file on the card.
+- ~~Looks loaded from a file on the card~~ **Done on 2026-11-17** (`docs/guide/card-looks.md`): our own task
+  reads the file at the first menu, the looks are kept in the EEROM settings bank's unused tail (53,680 bytes,
+  empty on this camera, saved by the firmware) and written into the slot tables in RAM at every start.
 - ~~Level gauge~~ **Done on 2026-11-14 with three data edits and no code.** The whole feature was in
   the firmware; only a menu row was missing. Lesson: compare with the E-PL6 first. It shares 58,642
   identical functions with this body (the E-P5: 21,940).
@@ -91,8 +93,8 @@ bracketing, zebra, silent shutter. These must be ported or written. They are not
 | Unknown | Probe |
 |---|---|
 | Does code run from the statically checked free areas, and from RAM? | A small routine there that writes a marker to a card file |
-| Which task and moment are safe for file reads? | Start with the half-press event, as Caduceus does. Never at start-up, never during capture |
-| Does the image engine accept tables at a RAM address? | Point one film slot at a RAM copy of its own table |
+| ~~Which task and moment are safe for file reads?~~ | **Answered 2026-11-17 (camera):** the dormant task USRTEST_A, started from the GUI state hook at the first menu or playback screen, reads a 20 KB file (`builds/card-looks.json`) |
+| ~~Does the image engine accept tables at a RAM address?~~ | **Answered 2026-11-17 (camera):** tables written in RAM at run time take effect in the next photo and in live view, after the boot init's cache refresh (`experiments/2026-11-17-card-looks/design.md` section 9.2) |
 | Can the load range be made longer to reach the unloaded 1.59 MB? | The Caduceus method: move the end word in steps, with a pattern and a checksum reported to a card file |
 | Does the updater write the blank tails of blocks 1 to 3? | Write a marker there, read it back with 0x7E6756B5 |
 | Does this body recover from a boot loop by card update? | Owner's decision |

@@ -34,10 +34,9 @@ and delete the item here.
   old filter stored before the flash keeps that filter until a Picture Mode is chosen; Filter Type
   and Add Effects do nothing in the five entries; Double-X is fifth in the list, not last; the
   second Double-X fit has no chart measurement; stock-strength grain needs about 40 bytes of code.
-- Looks from the SD card (`builds/card-looks.json`, `docs/look-file-format.md`): the camera test of
-  the candidate (GREY, restart without the file, SWAP, BAD, DEFAULT; design in
-  `experiments/2026-11-17-card-looks/design.md` section 9.3). Then: pin, guide, README line; the
-  menu row "Load Looks" in place of the load at the first menu; a web page that writes the file.
+- Looks from the SD card (`card-looks`, pinned 2026-11-17): a menu row "Load Looks" in place of the
+  load at the first menu (design.md section 2.1); a web page that writes the file; menu names from
+  the file (unknown: can the menu strings be written at run time); live-view tone tables per look.
 - Type II of Portra, Pro 400H and Superia is the same as type I, and is not tested on the camera.
 - The published test RAW files (owner name and serial numbers blanked) are not yet developed on the
   camera.

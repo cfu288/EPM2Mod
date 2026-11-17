@@ -2,13 +2,14 @@
 
 ![Olympus PEN E-PM2](docs/images/epm2.jpg)
 
-Repository containing the current work for creating a custom firmware mod for the Olympus PEN **E-PM2**. We've implemented replacing the default art filters with film simulations like Portra, Ektachrome, etc. We also enabled interval shooting (up to 240 shots), added a level gauge, and added focus peaking.
+Repository containing the current work for creating a custom firmware mod for the Olympus PEN **E-PM2**. We've implemented replacing the default art filters with film simulations like Portra, Ektachrome, etc. You can load your own looks from the SD card. We also enabled interval shooting (up to 240 shots), added a level gauge, and added focus peaking.
 
 ## Added Features
 
 | Feature | 
 |---|
 | [Film simulations](docs/guide/film-looks.md) |
+| [Looks from the SD card](docs/guide/card-looks.md) |
 | [Interval shooting](docs/guide/interval-shooting.md) | 
 | [Level gauge](docs/guide/level-gauge.md) | 
 | [Focus peaking](docs/guide/focus-peaking.md) | 

@@ -291,4 +291,8 @@ Agent reports behind sections 3 and 4: the session of 2026-11-17 (scratch files 
   error entry.
 - **Camera test (step 4):** `scripts/mktests.py` writes GREY (Pro 400H with saturation gain 0), SWAP (Pro 400H with
   red and blue swapped by the matrix), BAD (GREY with one byte damaged) and DEFAULT into `build/card-looks/test/`.
+- **Camera test passed (V, 2026-11-17, `docs/camera-log.md`):** GREY loaded at the first menu (photo grey, live view
+  black and white at once); after a power-off with the file deleted the photo before any key was grey; SWAP loaded
+  (red and blue swapped); BAD refused (still swapped); DEFAULT brought back the built-in Pro 400H. Pinned; guide
+  `docs/guide/card-looks.md`. Next: the menu row (section 2.1), then a web page that writes the file.
 

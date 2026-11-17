@@ -1,12 +1,12 @@
 # Install
 
 <!-- BEGIN GENERATED: pinned-build -->
-The pinned build is **`films-12d`**: film simulations in the twelve art filter entries (eleven colour films and Kodak Double-X in black-and-white), interval shooting with up to 240 frames, a level gauge with calibration, and focus peaking. We tested this build on a real E-PM2 on 2026-11-16 ([camera log](camera-log.md)).
+The pinned build is **`card-looks`**: film simulations in the twelve art filter entries (eleven colour films and Kodak Double-X in black-and-white), film looks loaded from the SD card and kept in the camera, interval shooting with up to 240 frames, a level gauge with calibration, and focus peaking. We tested this build on a real E-PM2 on 2026-11-17 ([camera log](camera-log.md)).
 
 | | sha256 |
 |---|---|
 | Stock firmware, `OLY_E_101_1600_0000_0000.BIN` | `34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300` |
-| Pinned build, `films-12d` | `2cdd18e7004821b2e443ec4f08db06ab9a0d4f0f700ab53db8c4bbc1dad93e32` |
+| Pinned build, `card-looks` | `889dbcaf49b3ee0a00266ac6420d87f3f47031d0f9e81e3af9b99640ebe35949` |
 <!-- END GENERATED: pinned-build -->
 
 The install steps are in the [README](../README.md#install).
