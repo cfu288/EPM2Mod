@@ -53,9 +53,15 @@ Emulator (`tools/emu/emu-run builds/debug-log-card-read.json logplay.mjs ...`, M
 Flash: `epm2flash debug-log-card-read 1297f288a69138d7b10fab1f37553a65fea82d2013ecc141445e194528689cab`.
 Go back: `epm2flash films-12d 2cdd18e7004821b2e443ec4f08db06ab9a0d4f0f700ab53db8c4bbc1dad93e32`.
 
+Camera result (2026-11-17, V, `docs/camera-log.md`): log session 15 has `card_read` bytes 16, first4
+`0x4B4F4F4C` ("LOOK") at 2.48 s, 30 ms after MENU, then flush ok; a shot, a second menu and the power-off
+followed with every flush ok and no new error record. **Probe 1 passed.** The same log shows where probe 2
+must write: the colour stage of the film in use (Pro 400H, art 71) runs on CPU 1, for live view and for the
+shot, and reads its art matrix from 0x7ECB0988 (codes 71 and 80; segment 2, plain RAM) in every pass.
+
 ## 4. Open (each needs a camera probe)
 
-1. The read on the camera: the build of section 3.
+1. ~~The read on the camera~~: passed (section 3).
 2. A look table changed in RAM at run time takes effect at the next shot (I: the tables are at fixed
    RAM addresses in segment 1, `docs/art-filter-slots.md`; U: whether a store into loaded section RAM is
    safe here, it crashed on the E-P7). The emulator does not model the picture, so only a shot can tell.
