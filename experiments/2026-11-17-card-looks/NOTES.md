@@ -59,10 +59,36 @@ followed with every flush ok and no new error record. **Probe 1 passed.** The sa
 must write: the colour stage of the film in use (Pro 400H, art 71) runs on CPU 1, for live view and for the
 shot, and reads its art matrix from 0x7ECB0988 (codes 71 and 80; segment 2, plain RAM) in every pass.
 
+## 5. Probe 2: a look value written in RAM at run time (V in the emulator; camera pending)
+
+`builds/debug-log-card-look.json` = `debug-log-films-12d` + `patches/log-card-look.json` (`mkspec_log.py
+--card-look`, in place of log-card-read; `docs/space-superseded.tsv`). The same hook; T_CRD (104 B at
+0x7EBF2888) reads 32 bytes, T_APL (95 B at 0x7EBF2B90) logs `card_read` and, for a file of 26 bytes or more
+that starts with "LOOK", writes its bytes 8-25 (9 x s16) into the art matrix of codes 71 and 80 (Pro 400H,
+0x7ECB0988) through the cached address and the uncached alias, then logs `card_look` (values written; values
+0 and 1 read back from RAM). Event `card_look` id 1794, dictionary build id `f412b3f66f1c1b6b`; the flashed
+`3cc5e33e95b6de52` is kept in `logs/`. sha256 `d6955aac7bd33660f37ebe39d259b6282edb6da99bcc8707c3c00dba9df27f73`.
+
+The test file (`build/EPM2LOOK-grey.BIN`, 26 B): "LOOK0002" and the matrix [77 150 29] in all three rows
+(every output channel the same luma: a black-and-white picture). Stock Pro 400H in films-12d is
+[202 68 -14; -5 254 7; -8 7 257].
+
+| Card file | Emulator log |
+|---|---|
+| the grey look file | card_read bytes 26, LOOK; card_look written 9, first2 0x0096004D (77, 150) |
+| probe 1's 16-byte file | card_read bytes 16; card_look written 0, first2 0x004400CA (202, 68: the table unchanged) |
+
+The emulator has no caches and makes no picture, so it cannot answer the question of this probe: the colour
+stage runs on CPU 1 and reads the table in every pass (the probe-1 log), and the write comes from CPU 0. A
+photo before MENU and photos after it tell whether CPU 1 uses the new values at once, later, or never.
+
+Flash: `epm2flash debug-log-card-look d6955aac7bd33660f37ebe39d259b6282edb6da99bcc8707c3c00dba9df27f73`.
+Go back: `epm2flash films-12d 2cdd18e7004821b2e443ec4f08db06ab9a0d4f0f700ab53db8c4bbc1dad93e32`.
+
 ## 4. Open (each needs a camera probe)
 
 1. ~~The read on the camera~~: passed (section 3).
-2. A look table changed in RAM at run time takes effect at the next shot (I: the tables are at fixed
+2. A look table changed in RAM at run time takes effect at the next shot (probe 2, section 5) (I: the tables are at fixed
    RAM addresses in segment 1, `docs/art-filter-slots.md`; U: whether a store into loaded section RAM is
    safe here, it crashed on the E-P7). The emulator does not model the picture, so only a shot can tell.
 3. Code space for a loader (today 320 B of code space; the 7.2 KB dead 3D-engine area needs its own

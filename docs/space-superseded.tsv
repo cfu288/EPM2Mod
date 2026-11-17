@@ -3,3 +3,4 @@
 # Columns (tab-separated): spec (path from the repo root), superseded by, evidence.
 experiments/2026-11-13-intervalometer/patches/interval-timelapse-insert-awake.json	patches/interval-timelapse-v2.json	description of v2: "v2 of interval-timelapse-insert-awake.json after two reviews"; v2 moved the code from the segment-3 tail to the segment-2 tail
 experiments/2026-11-13-intervalometer/patches/interval-timelapse-insert.json	experiments/2026-11-13-intervalometer/patches/interval-timelapse-insert-awake.json	insert-awake is the same spec plus the keep-awake hold (same segment-3 tail bytes)
+patches/log-card-read.json	patches/log-card-look.json	log-card-look is probe 2 in place of probe 1 (log-card-read, camera-tested 2026-11-17): the same hook at the flush task entry, the same base, its T_CRD in the same run 0x7EBF2888 (experiments/2026-11-17-card-looks/NOTES.md)

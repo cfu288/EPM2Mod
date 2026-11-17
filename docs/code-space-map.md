@@ -195,19 +195,20 @@ Ledger (bytes that specs change inside an area; `history` and `superseded` do no
 | Range | Size | Source | Verdict | Use | Used | Free | L | C | P | O | W | B | Failing check: evidence |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 0x7EBB1F4C-0x7EBB304C | 4352 | listed: reclaim-space row 2 (text, checked) | NEEDS-DECISION | data | 0 | 4352 | ok | ok | FAIL | ok | ok | ? | **pointers**: 2 hit(s): 0x7EBB2010 at 0x7E86D81A via flash [unaligned data word: 1021c08a1010a54000604014]; 0x7EBB2A12 at 0x7E864E1F via flash [unaligned data word: 44f00120121aa5403a14cb40]; explained noise: 17 code-nonoperand; windows in the other blocks (reported, not counted: resource blocks, not classified): block 1 0, block 2 0, block 3 2, tail 0; **predecessor**: data before (6c6c6261636b0a00); bound not proven: nothing shows where the reader of the object before stops; nearest referenced address before: 0x7EBB1F08 (from 0x7E92352B); after: 0x7EBB30A1 (from 0x7E9238F8) |
-| 0x7EBF1090-0x7EBF3BAD | 11037 | listed: reclaim-space row 1 (text, checked) | USABLE-CODE | code | 10431 | 606 | ok | ok | ok | ok | ok | ok | code evidence: patches/log-core.json (camera log 2026-11-15): jump at 0x7ECDF6E4 to 0x7EBF2E0F |
+| 0x7EBF1090-0x7EBF3BAD | 11037 | listed: reclaim-space row 1 (text, checked) | USABLE-CODE | code | 10514 | 523 | ok | ok | ok | ok | ok | ok | code evidence: patches/log-core.json (camera log 2026-11-15): jump at 0x7ECDF6E4 to 0x7EBF2E0F |
 | 0x7ECAFE3A-0x7ECAFE7C | 66 | 0xFF run | NEEDS-DECISION | data | 0 | 66 | ok | ok | FAIL | ok | ok | ? | **pointers**: 1 hit(s): 0x7ECAFE3B at 0x7EBA8F45 via runtime [mov 2127232571,a3 at 0x7EBA8F43]; explained noise: none; windows in the other blocks (reported, not counted: resource blocks, not classified): block 1 0, block 2 0, block 3 0, tail 0; **predecessor**: data before (fefefefefefefefe); bound not proven: nothing shows where the reader of the object before stops; nearest referenced address before: 0x7ECAFD3B (from 0x7EBA9CDE); after: 0x7ECAFF3C (from 0x7EBA9FDA) |
 | 0x7ECB0888-0x7ECB1000 | 1912 | 0xFF run | USABLE-CODE | code | 1629 | 283 | ok | ok | ok | ok | ok | ok | code evidence: patches/interval-timelapse-v2.json (camera log 2026-11-13): jump at 0x7E98855F to 0x7ECB0DB0 |
 
 Ledger (bytes that specs change inside an area; `history` and `superseded` do not reduce the free count):
 
-- 0x7EBF1090-0x7EBF3BAD: free 0x7EBF1090-0x7EBF10FC (108), 0x7EBF1F27-0x7EBF1F28 (1), 0x7EBF1FCA-0x7EBF2000 (54), 0x7EBF2502-0x7EBF2510 (14), 0x7EBF256B-0x7EBF256C (1), 0x7EBF25EA-0x7EBF2600 (22), 0x7EBF28FC-0x7EBF2900 (4), 0x7EBF2954-0x7EBF2960 (12), 0x7EBF29C0-0x7EBF2A00 (64), 0x7EBF2A8C-0x7EBF2B00 (116), 0x7EBF2B90-0x7EBF2C00 (112), 0x7EBF2FF1-0x7EBF3000 (15), 0x7EBF34F2-0x7EBF3500 (14), 0x7EBF38BA-0x7EBF38BC (2), 0x7EBF3B10-0x7EBF3B52 (66), 0x7EBF3BAC-0x7EBF3BAD (1)
+- 0x7EBF1090-0x7EBF3BAD: free 0x7EBF1090-0x7EBF10FC (108), 0x7EBF1F27-0x7EBF1F28 (1), 0x7EBF1FCA-0x7EBF2000 (54), 0x7EBF2502-0x7EBF2510 (14), 0x7EBF256B-0x7EBF256C (1), 0x7EBF25EA-0x7EBF2600 (22), 0x7EBF28F0-0x7EBF2900 (16), 0x7EBF2954-0x7EBF2960 (12), 0x7EBF29C0-0x7EBF2A00 (64), 0x7EBF2A8C-0x7EBF2B00 (116), 0x7EBF2BEF-0x7EBF2C00 (17), 0x7EBF2FF1-0x7EBF3000 (15), 0x7EBF34F2-0x7EBF3500 (14), 0x7EBF38BA-0x7EBF38BC (2), 0x7EBF3B10-0x7EBF3B52 (66), 0x7EBF3BAC-0x7EBF3BAD (1)
   - `patches/films12-looks.json` (current): 90 B in 0x7EBF3B52-0x7EBF3BAC
   - `patches/films12-structure.json` (current): 788 B in 0x7EBF2E80-0x7EBF2F40, 0x7EBF38BC-0x7EBF3B10
   - `patches/films12bw-doublex.json` (current): 49 B in 0x7EBF2E9A-0x7EBF2E9F, 0x7EBF2F40-0x7EBF2F6C
   - `patches/interval-frames-240.json` (current): 3592 B in 0x7EBF10FC-0x7EBF1F04
   - `patches/level-adjust-row.json` (current): 1906 B in 0x7EBF3000-0x7EBF34F2, 0x7EBF3500-0x7EBF3780
-  - `patches/log-card-read.json` (current): 129 B in 0x7EBF2888-0x7EBF28FC, 0x7EBF2C00-0x7EBF2C05, 0x7EBF2D24-0x7EBF2D28, 0x7EBF2D2D-0x7EBF2D31
+  - `patches/log-card-look.json` (current): 212 B in 0x7EBF2888-0x7EBF28F0, 0x7EBF2B90-0x7EBF2BEF, 0x7EBF2C00-0x7EBF2C05, 0x7EBF2D24-0x7EBF2D28, 0x7EBF2D2D-0x7EBF2D31
+  - `patches/log-card-read.json` (superseded): 129 B in 0x7EBF2888-0x7EBF28FC, 0x7EBF2C00-0x7EBF2C05, 0x7EBF2D24-0x7EBF2D28, 0x7EBF2D2D-0x7EBF2D31
   - `patches/log-core.json` (current): 640 B in 0x7EBF2C00-0x7EBF2E80
   - `patches/log-peaking-guard.json` (current): 99 B in 0x7EBF2510-0x7EBF256B, 0x7EBF2D24-0x7EBF2D28, 0x7EBF2D2D-0x7EBF2D31
   - `patches/log-peaking-time.json` (current): 8 B in 0x7EBF2D24-0x7EBF2D28, 0x7EBF2D2D-0x7EBF2D31
@@ -317,14 +318,14 @@ USABLE columns count free bytes only. USED counts bytes of current specs in area
 | kernel | 0 | 18 | 1828 | 40190 | 0 |
 | segment-1 | 0 | 2 | 162 | 13266 | 0 |
 | data-image | 0 | 0 | 0 | 0 | 222 |
-| segment-2 | 0 | 889 | 12060 | 4418 | 0 |
+| segment-2 | 0 | 806 | 12143 | 4418 | 0 |
 | segment-3 | 7369 | 0 | 1024 | 96 | 0 |
 | overlay-A | 0 | 0 | 0 | 574 | 0 |
 | overlay-B | 0 | 0 | 0 | 892 | 0 |
 | usr1-third | 0 | 0 | 0 | 156 | 0 |
 | sram-image | 0 | 0 | 0 | 32 | 663 |
 | not loaded | 0 | 0 | 0 | 0 | 1586842 |
-| **all** | 7369 | 909 | 15074 | 95106 | 1587847 |
+| **all** | 7369 | 826 | 15157 | 95106 | 1587847 |
 
 ## 5. Hand files
 
@@ -333,6 +334,6 @@ USABLE columns count free bytes only. USED counts bytes of current specs in area
 | `docs/space-candidates.tsv` | 14 | start, end (exclusive), kind, status (`checked` or `auto`), source, note |
 | `docs/space-bounds.tsv` | 6 | object, bound (exclusive), reader site, expected bytes at the site, evidence |
 | `docs/space-pointer-waivers.tsv` | 2 | first site, end (exclusive), expected bytes at the first site, evidence |
-| `docs/space-superseded.tsv` | 2 | spec, superseded by, evidence |
+| `docs/space-superseded.tsv` | 3 | spec, superseded by, evidence |
 
 The full evidence text of every check is in `docs/code-space-map.tsv`.

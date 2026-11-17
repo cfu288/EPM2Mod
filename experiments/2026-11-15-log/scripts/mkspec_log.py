@@ -38,6 +38,11 @@ Usage: mkspec_log.py PINNED_DIR WORKDIR [LISTING.txt]
   is the flush task's entry (log-core's code), its routine in a free run of segment 2's listed area. It puts the build
   id of logs/events.json into the flush task, in place of the id that log-peaking-guard left there.
   BASE_DIR    unpacked image of builds/debug-log-films-12d.json (block0_0100.bin)
+
+       mkspec_log.py --card-look BASE_DIR WORKDIR [LISTING.txt]
+  Writes patches/log-card-look.json only: probe 2 of the build debug-log-card-look (events card_read, card_look):
+  the card-read probe that also copies an art matrix from the file into the table of codes 71 and 80 (Pro 400H)
+  in RAM. It takes the place of log-card-read (the same base, BASE_DIR as for --card-read).
 """
 import hashlib, json, os, re, struct, subprocess, sys
 
@@ -1165,10 +1170,88 @@ T_CRD:                       # the flush task's entry: once per session, read th
 CRPATH: .asciz "C:\\\\EPM2LOOK.BIN"
 CRMODE: .asciz "r"
 """
+LOOK_AREAS = {".cr": (0x7EBF2888, 0x7EBF2900), ".ca": (0x7EBF2B90, 0x7EBF2C00)}   # segment 2, runs no spec ledgers
+LOOK_TABLE = 0x7ECB0988      # the art matrix of codes 71 and 80 (Pro 400H in films-12d), 9 x s16 (rows sum to 256)
+LOOK_ASM = """
+.equ CRDONE, PST+104         # u8: the card file was read in this session (T_BOOT clears PST at every start)
+.equ LOOKMAGIC, 0x4b4f4f4c   # "LOOK", bytes 0-3 of the file
+.equ TABLE,  %(table)s       # the art matrix in RAM (cached address); +0x40000000 its uncached alias
+.section .cr,"ax"
+T_CRD:                       # the flush task's entry: once per session, read the first 32 bytes of C:\\\\EPM2LOOK.BIN
+%(displaced)s
+    movbu (CRDONE),d0
+    cmp 0,d0
+    bne 9f
+    mov 1,d0
+    movbu d0,(CRDONE)
+    mov CRPATH,a0
+    mov CRMODE,a1
+    call 0x7e5c52dc,[],20    # fileif_fopen(path, "r") -> a0 = handle or 0
+    mov a0,a3
+    mov -1,d2                # bytes read; -1: the file did not open
+    cmp 0,a3
+    beq 8f
+    mov BUF,a0
+    mov 1,d0
+    mov 32,d1
+    mov a3,a1
+    call 0x7e5c536f,[],24    # fileif_fread(a0 = buffer, d0 = 1, d1 = bytes, a1 = handle) -> bytes read
+    mov d0,d2
+    mov a3,a0
+    call 0x7e5c5308,[],12    # fileif_fclose(a0 = handle)
+8:  jmp T_APL                # d2 = bytes read
+9:  jmp %(back)s             # the flush task goes on (BUF is its block buffer: it fills it again)
+CRPATH: .asciz "C:\\\\EPM2LOOK.BIN"
+CRMODE: .asciz "r"
+.section .ca,"ax"
+T_APL:                       # log the read; a file of 26 bytes or more that starts with "LOOK": its bytes 8-25 are
+    mov d2,d1                # the 9 matrix values. arg0: bytes read
+    mov (BUF),a0             # arg1: bytes 0-3 of the file (not the file's when it did not open)
+    mov %(card_read)d,d0
+    call log_put,[],0
+    clr d3                   # values written
+    cmp 26,d2
+    blt 7f
+    mov (BUF),d0
+    cmp LOOKMAGIC,d0
+    bne 7f
+    mov BUF+8,a0
+    mov TABLE,a1
+    mov 9,d3
+1:  movhu (a0),d0
+    movhu d0,(a1)            # the cached address: what this CPU's cache holds
+    mov a1,a2
+    add 0x40000000,a2
+    movhu d0,(a2)            # the uncached alias: what is in RAM
+    add 2,a0
+    add 2,a1
+    add -1,d3
+    bne 1b
+    mov 9,d3
+7:  mov d3,d1                # arg0: values written (0: the file is not a look)
+    mov (TABLE+0x40000000),a0    # arg1: values 0 and 1 of the table, read back through the uncached alias
+    mov %(card_look)d,d0
+    call log_put,[],0
+    jmp %(back)s
+"""
 
 
-def card_read():
-    """Write patches/log-card-read.json (see the usage text)."""
+LOOK_SPEC = "log-card-look"
+LOOK_DESCRIPTION = ("Structured log, probe 2 of looks loaded from the card: at the first flush of a session (the GUI "
+                    "enters a menu, playback or the power-off state) the flush task reads the first 32 bytes of "
+                    "C:\\EPM2LOOK.BIN and writes card_read (bytes read, -1 when the file did not open; bytes 0-3). "
+                    "When the file has 26 bytes or more and starts with LOOK, its bytes 8-25 (9 x s16) are written "
+                    "into the art matrix of codes 71 and 80 (Pro 400H) at 0x7ECB0988, through the cached address and "
+                    "its uncached alias, and card_look gives the number of values written and values 0 and 1 read "
+                    "back from RAM. The colour stage that reads the table runs on CPU 1. Then the flush runs as "
+                    "before. One hook at the flush task's entry (log-core's code) and two routines in free runs of "
+                    "segment 2. In place of log-card-read, on the specs of builds/debug-log-films-12d.json. It puts "
+                    "the build id %s of logs/events.json into the block header. DEBUG builds only. See "
+                    "experiments/2026-11-17-card-looks/NOTES.md.")
+
+
+def card_read(spec=CARD_SPEC, asm_text=CARD_ASM, areas={".cr": CARD_AREA}, events=("card_read",), extra=None):
+    """Write patches/log-card-read.json, or with the other arguments patches/log-card-look.json (see the usage text)."""
     base, work = sys.argv[2:4]
     listing = sys.argv[4] if len(sys.argv) > 4 else None
     os.makedirs(work, exist_ok=True)
@@ -1176,8 +1259,8 @@ def card_read():
     blk = open(blk_path, "rb").read()
     get = lambda a, n: blk[a - BASE:a - BASE + n]
     d = json.load(open(os.path.join(ROOT, "logs/events.json")))
-    mine = {e["name"]: e["id"] for e in d["events"] if e["spec"] == CARD_SPEC}
-    assert sorted(mine) == ["card_read"], mine
+    mine = {e["name"]: e["id"] for e in d["events"] if e["name"] in events}
+    assert sorted(mine) == sorted(events), mine
     bid = build_id(d["events"])
     old = bytes.fromhex(json.load(open(os.path.join(ROOT, "patches", GUARD_SPEC + ".json")))["_build_id"])
     lo = AREAS[".kc"][0]
@@ -1189,16 +1272,16 @@ def card_read():
     assert struct.unpack("<I", get(TASK_ENTRY, 4))[0] == site                        # USRTEST_A's entry word
     bad = branch_targets_inside([(site, n)], blk, work)
     assert not bad, bad
-    asm = SYMS + CARD_ASM % {**mine, "displaced": displaced(blk_path, site, n), "back": "0x%08x" % (site + n)}
+    asm = SYMS + asm_text % {**mine, **(extra or {}), "displaced": displaced(blk_path, site, n), "back": "0x%08x" % (site + n)}
     args = ["--defsym=log_put=%#x" % at[2]]
     args += ["--defsym=s_%s=0x%s" % (x, x) for x in sorted(set(re.findall(r"(?:jmp|call)\s+0x([0-9a-f]{8})", asm)))]
     asm = re.sub(r"((?:jmp|call)\s+)0x([0-9a-f]{8})", r"\1s_\2", asm)
     asm += '\n.section .hs,"ax"\n    jmp T_CRD\n' + "    nop\n" * (n - 5)
-    args += ["--section-start=.hs=%#x" % site, "--section-start=.cr=%#x" % CARD_AREA[0]]
+    args += ["--section-start=.hs=%#x" % site] + ["--section-start=%s=%#x" % (k, a) for k, (a, _) in areas.items()]
     s, o, e, sb = (os.path.join(work, "logcard." + x) for x in ("s", "o", "elf", "bin"))
     open(s, "w").write(asm)
     run(BIN + "/mn10300-elf-as", "-o", o, s)
-    run(BIN + "/mn10300-elf-ld", *args, "-e", "%#x" % CARD_AREA[0], "-o", e, o)
+    run(BIN + "/mn10300-elf-ld", *args, "-e", "%#x" % areas[".cr"][0], "-o", e, o)
 
     def sect(name):
         run(BIN + "/mn10300-elf-objcopy", "-O", "binary", "-j", name, e, sb)
@@ -1213,13 +1296,14 @@ def card_read():
                     "new": new.hex(), "_addr": "0x%08X" % addr, "_note": note})
 
     stock = open(os.path.join(ROOT, "build/blocks", os.path.basename(STOCK) + ".block0.bin"), "rb").read()
-    code = sect(".cr")
-    a, hi = CARD_AREA
-    assert a + len(code) <= hi and get(a, hi - a) == stock[a - BASE:hi - BASE], "the area is in use"
-    if code[-1] == get(a + len(code) - 1, 1)[0]:
-        code += b"\xcb"                      # the free-space ledger counts only changed bytes: end on a nop
-    op(a, code, "new code, segment 2: T_CRD (%d B)" % len(code))
-    print("T_CRD: %d B at 0x%X-0x%X, %d B free after" % (len(code), a, a + len(code), hi - a - len(code)))
+    for name, (a, hi) in areas.items():
+        code = sect(name)
+        label = {".cr": "T_CRD", ".ca": "T_APL"}[name]
+        assert a + len(code) <= hi and get(a, hi - a) == stock[a - BASE:hi - BASE], "the area is in use"
+        if code[-1] == get(a + len(code) - 1, 1)[0]:
+            code += b"\xcb"                  # the free-space ledger counts only changed bytes: end on a nop
+        op(a, code, "new code, segment 2: %s (%d B)" % (label, len(code)))
+        print("%s: %d B at 0x%X-0x%X, %d B free after" % (label, len(code), a, a + len(code), hi - a - len(code)))
     h = sect(".hs")
     assert len(h) == n and h[0] == 0xDC
     op(site, h, "hook (card_read): jmp T_CRD. %s" % what)
@@ -1230,17 +1314,17 @@ def card_read():
         assert i >= 0 and blk.find(word, i + 1) < 0 and AREAS[".uc"][0] <= BASE + i < AREAS[".uc"][1], half
         op(BASE + i + 2, bid[half:half + 4], "flush task, block header: build id bytes %d-%d %s -> %s (logs/events.json)"
            % (half, half + 3, old[half:half + 4].hex(), bid[half:half + 4].hex()))
-    out = os.path.join(ROOT, "patches", CARD_SPEC + ".json")
+    out = os.path.join(ROOT, "patches", spec + ".json")
     json.dump({
-        "name": CARD_SPEC,
-        "description": "Structured log, the card-read probe: at the first flush of a session (the GUI enters a menu, "
+        "name": spec,
+        "description": (LOOK_DESCRIPTION % bid.hex()) if spec == LOOK_SPEC else ("Structured log, the card-read probe: at the first flush of a session (the GUI enters a menu, "
                        "playback or the power-off state) the flush task opens C:\\EPM2LOOK.BIN with mode r, reads its "
                        "first 16 bytes with fileif_fread (0x7E5C536F), closes it, and writes the event card_read "
                        "(bytes read, -1 when the file did not open; bytes 0-3 of the file). Then the flush runs as before. One hook at the flush task's entry (log-core's "
                        "code, not stock) and its routine after the flush task. Needs the specs of "
                        "builds/debug-log-films-12d.json before it: every expect is a byte string of that build. It "
                        "puts the build id %s of logs/events.json into the block header. DEBUG builds only. See "
-                       "experiments/2026-11-17-card-looks/NOTES.md and docs/logging.md." % bid.hex(),
+                       "experiments/2026-11-17-card-looks/NOTES.md and docs/logging.md." % bid.hex()),
         "base": STOCK, "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
         "status": "candidate: emulator-checked, not flashed",
         "_delta_on": "builds/debug-log-films-12d.json",
@@ -1251,7 +1335,7 @@ def card_read():
     open(out, "a").write("\n")
     print("wrote", os.path.relpath(out, ROOT), len(ops), "ops; build id", bid.hex())
     if listing:
-        txt = run(BIN + "/mn10300-elf-objdump", "-d", "-j", ".cr", "-j", ".hs", e)
+        txt = run(BIN + "/mn10300-elf-objdump", "-d", *sum((["-j", k] for k in areas), []), "-j", ".hs", e)
         open(listing, "w").write(re.sub(r"/[^\s:]*logcard\.elf", "logcard.elf", txt))
 
 
@@ -1259,6 +1343,8 @@ if len(sys.argv) > 1 and sys.argv[1] == "--peaking-time":
     peaking_time()
 elif len(sys.argv) > 1 and sys.argv[1] == "--card-read":
     card_read()
+elif len(sys.argv) > 1 and sys.argv[1] == "--card-look":
+    card_read(LOOK_SPEC, LOOK_ASM, LOOK_AREAS, ("card_read", "card_look"), {"table": "%#x" % LOOK_TABLE})
 elif len(sys.argv) > 1 and sys.argv[1] == "--peaking-guard":
     peaking_guard()
 else:
