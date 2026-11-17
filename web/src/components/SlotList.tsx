@@ -34,13 +34,16 @@ function SlotRow({ item, index, selected, onSelect, onRemove }: RowProps) {
   })
   const art = index + 1
   const film = item.filmId ? filmById(item.filmId) : null
+  // The selected row is filled like the active tab of the OM SYSTEM gallery; its secondary texts turn light.
+  const sub = selected ? 'text-rule' : 'text-muted'
+  const icon = `p-1 focus-visible:outline-2 ${selected ? 'text-rule hover:text-white focus-visible:outline-white' : 'text-muted hover:text-ink focus-visible:outline-ink'}`
   return (
     <li
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       onFocusCapture={onSelect}
       onPointerDown={onSelect}
-      className={`flex items-center gap-x-3 py-3 pr-3 ${selected ? 'bg-indigo-50 dark:bg-indigo-500/10' : 'bg-white dark:bg-gray-900'} ${isDragging ? 'relative z-10 shadow-lg' : ''}`}
+      className={`flex items-center gap-x-3 py-3 pr-2 pl-1 ${selected ? 'bg-ink-soft text-white' : 'bg-white'} ${isDragging ? 'outline-ink relative z-10 outline' : ''}`}
     >
       <button
         type="button"
@@ -48,31 +51,31 @@ function SlotRow({ item, index, selected, onSelect, onRemove }: RowProps) {
         {...attributes}
         {...listeners}
         aria-label={`Move ART ${String(art)}${film ? `, ${film.film}` : ', empty'}`}
-        className="cursor-grab touch-none rounded-md p-1 text-gray-400 hover:text-gray-600 focus-visible:outline-2 focus-visible:outline-indigo-600 dark:hover:text-gray-200"
+        className={`cursor-grab touch-none ${icon}`}
       >
         <Bars3Icon aria-hidden="true" className="size-5" />
       </button>
-      <span className="w-14 shrink-0 text-sm font-semibold text-gray-900 dark:text-white">ART {art}</span>
+      <span className="w-14 shrink-0 text-sm font-bold">ART {art}</span>
       {film ? (
         <>
           <span className="min-w-0 flex-auto">
-            <span className="block truncate text-sm text-gray-900 dark:text-white">{film.film}</span>
-            <span className="block truncate text-xs text-gray-500 dark:text-gray-400">{film.kind}</span>
+            <span className="block truncate">{film.film}</span>
+            <span className={`block truncate text-xs ${sub}`}>{film.kind}</span>
           </span>
           <button
             type="button"
             onClick={onRemove}
             aria-label={`Remove ${film.film} from ART ${String(art)}`}
             title="Remove"
-            className="rounded-md p-1 text-gray-400 hover:text-gray-600 focus-visible:outline-2 focus-visible:outline-indigo-600 dark:hover:text-gray-200"
+            className={icon}
           >
             <XMarkIcon aria-hidden="true" className="size-5" />
           </button>
         </>
       ) : (
         <span className="min-w-0 flex-auto">
-          <span className="block truncate text-sm text-gray-500 dark:text-gray-400">Empty</span>
-          <span className="block truncate text-xs text-gray-500 dark:text-gray-400">
+          <span className={`block truncate ${sub}`}>Empty</span>
+          <span className={`block truncate text-xs ${sub}`}>
             Built-in look stays: {filmById(slots[index]?.builtIn ?? '').film}
           </span>
         </span>
@@ -122,7 +125,7 @@ export function SlotList({ items, selected, onMove, onRemove, onSelect }: Props)
       onDragEnd={onDragEnd}
     >
       <SortableContext items={items.map((item) => item.key)} strategy={verticalListSortingStrategy}>
-        <ul className="divide-y divide-gray-200 dark:divide-white/10">
+        <ul className="divide-rule border-rule divide-y border-y">
           {items.map((item, index) => (
             <SlotRow
               key={item.key}

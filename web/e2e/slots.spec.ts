@@ -35,10 +35,10 @@ test('moves a film with the keyboard', async ({ page }) => {
 })
 
 test('moves a film with the mouse', async ({ page }) => {
-  await page.setViewportSize({ width: 1280, height: 1400 })
   await page.goto('./')
   const handle = page.getByRole('button', { name: 'Move ART 12, Kodak Vision3 500T' })
   const target = row(page, 10)
+  await handle.scrollIntoViewIfNeeded()
   const from = await handle.boundingBox()
   const to = await target.boundingBox()
   if (!from || !to) throw new Error('no layout')

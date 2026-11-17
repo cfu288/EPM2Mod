@@ -1,4 +1,19 @@
 @import 'tailwindcss';
+@import '@fontsource/sora/latin-800.css';
+@import '@fontsource/arimo/latin-400.css';
+@import '@fontsource/arimo/latin-700.css';
+
+/* Fonts: Sora (headings) and Arimo (text), the free fonts closest to the OM SYSTEM site's Neue Machina and
+   Helvetica Neue; a computer that has Helvetica Neue uses it. */
+/* Black and white, square corners, thin black rules: the look of the OM SYSTEM gallery pages. */
+@theme {
+  --font-sans: 'Helvetica Neue', Arimo, Helvetica, Arial, sans-serif;
+  --font-display: Sora, 'Helvetica Neue', Arimo, sans-serif;
+  --color-ink: #000;
+  --color-ink-soft: #444;
+  --color-muted: #787878;
+  --color-rule: #ccc;
+}
 
 html,
 body,
@@ -7,5 +22,15 @@ body,
 }
 
 body {
-  @apply bg-white dark:bg-gray-900;
+  @apply text-ink bg-white font-sans antialiased;
+}
+
+/* A square button with a 1px border that inverts on hover. */
+@utility btn {
+  @apply border-ink text-ink hover:bg-ink focus-visible:outline-ink disabled:border-rule disabled:text-muted disabled:hover:text-muted inline-flex items-center gap-x-2 border px-4 py-2 text-sm transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:hover:bg-transparent;
+}
+
+/* A section title under a thick black rule. */
+@utility section-title {
+  @apply border-ink font-display border-t-[12px] pt-5 text-2xl font-extrabold tracking-tight;
 }

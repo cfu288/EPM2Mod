@@ -4,8 +4,10 @@ A static page where users choose which films are in the camera's ART menu (ART 1
 and drop, and download `EPM2LOOK.BIN`, without the command line. It is published at https://cfu288.github.io/EPM2Mod/ by
 `.github/workflows/web.yml` on every change to `main`.
 
-- React, Vite, Tailwind CSS, Headless UI, dnd-kit (drag and drop, with the keyboard too); components adapted from
-  Tailwind UI.
+- React, Vite, Tailwind CSS, dnd-kit (drag and drop, with the keyboard too). The look follows the OM SYSTEM gallery
+  pages: black and white, square buttons that invert on hover, sections under a thick black rule. Fonts: Sora
+  (headings) and Arimo (text), the free fonts nearest to that site's Neue Machina and Helvetica Neue (glyph overlap);
+  computers with Helvetica Neue use it.
 - `src/data/films.json`: the films and their look records, made by `uv run python web/scripts/export_films.py`
   from `looks/catalogue.json` (a test of the Python suite fails when it is out of date).
 - `public/previews/`: the camera's Picture Mode strip, drawn by the emulator, in two layers: `menu/art<N>.png` (the

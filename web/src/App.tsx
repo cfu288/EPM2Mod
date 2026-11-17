@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { ArrowDownTrayIcon, ExclamationTriangleIcon } from '@heroicons/react/20/solid'
+import { ArrowDownTrayIcon } from '@heroicons/react/20/solid'
+import { Chevron } from './components/Chevron'
 import { FilmLibrary } from './components/FilmLibrary'
 import { SlotList } from './components/SlotList'
 import { StripPreview } from './components/StripPreview'
@@ -27,50 +28,50 @@ export default function App() {
 
   return (
     <div className="min-h-full">
-      <header className="border-b border-gray-200 bg-white dark:border-white/10 dark:bg-gray-900">
-        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-            Film looks for the Olympus PEN E-PM2
-          </h1>
-          <p className="mt-2 max-w-3xl text-gray-700 dark:text-gray-300">
-            <a className="font-medium text-indigo-600 underline hover:text-indigo-500 dark:text-indigo-400" href={REPO}>
-              EPM2Mod
-            </a>{' '}
-            is an unofficial firmware for the Olympus PEN E-PM2. It puts film looks, such as Kodak Portra and Fujifilm
-            Velvia, into the camera's ART menu (the art filters, ART 1 to 12).
-          </p>
-          <p className="mt-2 max-w-3xl text-gray-700 dark:text-gray-300">
-            Here you choose which films are in that menu and in which order. Then you download one file and load it on
-            the camera.
-          </p>
-          <div className="mt-4 max-w-3xl rounded-md bg-yellow-50 p-4 dark:bg-yellow-500/10 dark:outline dark:outline-yellow-500/15">
-            <div className="flex">
-              <ExclamationTriangleIcon
-                aria-hidden="true"
-                className="size-5 shrink-0 text-yellow-400 dark:text-yellow-300"
-              />
-              <p className="ml-3 text-sm text-yellow-800 dark:text-yellow-200">
-                The camera must run the EPM2Mod firmware first.{' '}
-                <a className="font-medium underline hover:text-yellow-700 dark:hover:text-yellow-100" href={INSTALL}>
-                  How to install EPM2Mod
-                </a>
-              </p>
-            </div>
-          </div>
+      <header className="border-rule border-b bg-white">
+        <div className="mx-auto flex h-14 max-w-7xl items-center gap-x-4 px-4 sm:px-6 lg:px-8">
+          <a href={REPO} className="font-display text-xl font-extrabold tracking-tight">
+            EPM2Mod
+          </a>
+          <span className="text-muted text-sm font-light tracking-wider">Film looks</span>
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-          <div className="space-y-10 lg:col-span-2">
+      <div className="bg-ink text-white">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+          <h1 className="font-display max-w-4xl text-4xl font-extrabold tracking-tight sm:text-5xl">
+            Film looks for the Olympus <span className="whitespace-nowrap">PEN E-PM2</span>
+          </h1>
+          <p className="text-rule mt-6 max-w-3xl text-lg">
+            EPM2Mod is an unofficial firmware for the Olympus PEN E-PM2. It puts film looks, such as Kodak Portra and
+            Fujifilm Velvia, into the camera's ART menu (the art filters, ART 1 to 12).
+          </p>
+          <p className="text-rule mt-3 max-w-3xl text-lg">
+            Here you choose which films are in that menu and in which order. Then you download one file and load it on
+            the camera.
+          </p>
+          <p className="text-rule mt-8 text-sm">The camera must run the EPM2Mod firmware first.</p>
+          <a
+            href={INSTALL}
+            className="hover:text-ink mt-3 inline-flex items-center gap-x-3 border border-white bg-black/20 px-4 py-2 text-white transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          >
+            How to install EPM2Mod
+            <Chevron />
+          </a>
+        </div>
+      </div>
+
+      <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
+          <div className="space-y-14 lg:col-span-2">
             <section aria-labelledby="menu-heading">
-              <h2 id="menu-heading" className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 id="menu-heading" className="section-title">
                 Your camera's ART menu
               </h2>
-              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-ink-soft mt-2 text-sm">
                 Drag a row by its handle (☰) to change the order. Select a row to preview it on the camera screen.
               </p>
-              <div className="mt-3">
+              <div className="mt-4">
                 <SlotList
                   items={items}
                   selected={selected}
@@ -88,15 +89,15 @@ export default function App() {
             </section>
 
             <section aria-labelledby="more-heading">
-              <h2 id="more-heading" className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 id="more-heading" className="section-title">
                 More films
               </h2>
-              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-ink-soft mt-2 text-sm">
                 {empty >= 0
                   ? `Add puts a film into ART ${String(empty + 1)}, the first empty row.`
                   : 'The menu holds 12 films. Remove one (×) to add another.'}
               </p>
-              <div className="mt-3">
+              <div className="mt-4">
                 <FilmLibrary
                   films={unused}
                   canAdd={empty >= 0}
@@ -110,26 +111,26 @@ export default function App() {
           </div>
 
           {/* On a phone the preview comes first and the download after the lists. */}
-          <aside className="contents lg:sticky lg:top-8 lg:block lg:space-y-6 lg:self-start">
+          <aside className="contents lg:sticky lg:top-8 lg:block lg:space-y-8 lg:self-start">
             <div className="order-first lg:order-none">
               <StripPreview art={selected + 1} filmId={items[selected]?.filmId ?? null} />
             </div>
-            <div className="space-y-6">
+            <div className="space-y-8">
               <button
                 type="button"
                 onClick={() => {
                   download(lookFile(items))
                 }}
-                className="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:shadow-none dark:hover:bg-indigo-400"
+                className="btn bg-ink hover:text-ink w-full justify-between py-3 text-base text-white hover:bg-white"
               >
-                <ArrowDownTrayIcon aria-hidden="true" className="-ml-0.5 size-5" />
                 Download {CARD_NAME}
+                <ArrowDownTrayIcon aria-hidden="true" className="size-5" />
               </button>
               <section aria-labelledby="load-heading">
-                <h2 id="load-heading" className="text-base font-semibold text-gray-900 dark:text-white">
+                <h2 id="load-heading" className="section-title border-t-[6px] pt-4 text-lg">
                   Load it on the camera
                 </h2>
-                <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm text-gray-700 dark:text-gray-300">
+                <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm">
                   <li>Copy {CARD_NAME} to the top folder of the SD card.</li>
                   <li>
                     On the camera: MENU → Custom Menu (gears tab) → group J → Load Looks → Load → OK. No gears tab? Turn
@@ -139,19 +140,21 @@ export default function App() {
                     Load Looks reads Loaded, and the ART menu shows your films. The camera keeps them after power-off.
                   </li>
                 </ol>
-                <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">To undo: Load Looks → Built-in → OK.</p>
+                <p className="text-ink-soft mt-3 text-sm">To undo: Load Looks → Built-in → OK.</p>
               </section>
             </div>
           </aside>
         </div>
       </main>
 
-      <footer className="mx-auto max-w-7xl px-4 pb-8 text-xs text-gray-500 sm:px-6 lg:px-8">
-        The film looks are fitted from{' '}
-        <a className="underline" href="https://github.com/andreavolpato/spektrafilm">
-          spektrafilm
-        </a>{' '}
-        by Andrea Volpato (CC BY-SA 4.0).
+      <footer className="border-rule border-t">
+        <p className="text-muted mx-auto max-w-7xl px-4 py-6 text-xs sm:px-6 lg:px-8">
+          The film looks are fitted from{' '}
+          <a className="hover:text-ink underline" href="https://github.com/andreavolpato/spektrafilm">
+            spektrafilm
+          </a>{' '}
+          by Andrea Volpato (CC BY-SA 4.0).
+        </p>
       </footer>
     </div>
   )
