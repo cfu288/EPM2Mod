@@ -55,7 +55,7 @@ test('writes EPM2Mod with the default films to the card and shows the progress',
   await expect(page.getByRole('combobox', { name: 'Card' })).toHaveValue(CARD.path)
   await page.getByRole('button', { name: 'Next' }).click()
   await page.getByRole('button', { name: 'Next' }).click()
-  await page.getByRole('button', { name: 'Build with the default films' }).click()
+  await page.getByRole('button', { name: 'Use the default films' }).click()
   await expect(page.getByRole('heading', { name: 'Building' })).toBeVisible()
   await expect(
     page
@@ -77,7 +77,7 @@ test('customizes the films and downloads the zip', async ({ page }) => {
   await page.getByRole('button', { name: /^Remove Kodak Ektachrome 100/ }).click()
   await page.getByRole('button', { name: 'Add Fujifilm C200' }).click()
   await expect(page.getByRole('img', { name: /ART 2, C200, selected/ })).toBeVisible()
-  await page.getByRole('button', { name: 'Build custom firmware' }).click()
+  await page.getByRole('button', { name: 'Make the zip' }).click()
   const download = page.waitForEvent('download')
   await page.getByRole('button', { name: 'Download EPM2Mod-card.zip' }).click()
   expect((await download).suggestedFilename()).toBe('EPM2Mod-card.zip')

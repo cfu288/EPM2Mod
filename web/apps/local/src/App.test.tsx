@@ -76,7 +76,7 @@ describe('the local app', () => {
     await next(user)
     expect(screen.getByRole('heading', { name: 'Film looks' })).toBeInTheDocument()
     expect(screen.getByText(/derived from/)).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Build with the default films' }))
+    await user.click(screen.getByRole('button', { name: 'Use the default films' }))
     expect(made).toEqual([{ firmware: 'epm2mod', choices: [], card: CARD.path }])
     expect(await screen.findByRole('heading', { name: 'Install on the camera' })).toBeInTheDocument()
     const steps = screen.getByRole('list', { name: 'Install steps' })
@@ -118,7 +118,7 @@ describe('the local app', () => {
     await user.click(screen.getByRole('button', { name: 'Customize' }))
     expect(screen.getByText(/12 of 12 films/)).toBeInTheDocument()
     expect(screen.getByText('The menu is full. Remove a film (×) to add one.')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Build custom firmware' }))
+    await user.click(screen.getByRole('button', { name: 'Write to the card' }))
     await waitFor(() => {
       expect(made).toEqual([{ firmware: 'epm2mod', choices: [], card: CARD.path }])
     })
@@ -135,7 +135,7 @@ describe('the local app', () => {
     await user.click(screen.getByRole('button', { name: 'Remove Kodak Ektachrome 100 from ART 2' }))
     expect(screen.getByText(/11 of 12 films · 1 slot keeps its default/)).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Add Fujifilm C200' }))
-    await user.click(screen.getByRole('button', { name: 'Build custom firmware' }))
+    await user.click(screen.getByRole('button', { name: 'Make the zip' }))
     await waitFor(() => {
       expect(made).toHaveLength(1)
     })
@@ -144,8 +144,10 @@ describe('the local app', () => {
     expect(first?.choices.slice(0, 3)).toEqual(['ART1=portra-400', 'ART2=c200', 'ART3=pro-400h'])
     expect(await screen.findByRole('button', { name: 'Download EPM2Mod-card.zip' })).toBeInTheDocument()
     const steps = screen.getByRole('list', { name: 'Install steps' })
-    expect(steps).toHaveTextContent('copy everything inside it straight onto the SD card')
-    expect(steps).toHaveTextContent('The list shows your films, such as Portra 400.')
+    expect(steps).toHaveTextContent(
+      'Copy the DCOLYMP folder and the file EPM2LOOK.BIN from it to the top level of the SD card.',
+    )
+    expect(steps).toHaveTextContent('ART 2 shows C200.')
     expect(steps).toHaveTextContent('Open the gears tab → group J → Load Looks → Load → OK.')
   })
 })

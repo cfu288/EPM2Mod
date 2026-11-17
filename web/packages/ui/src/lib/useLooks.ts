@@ -10,11 +10,11 @@ export interface Looks {
   select: (index: number) => void
   move: (from: number, to: number) => void
   remove: (index: number) => void
-  /** Put a film into the first empty row. */
+  /** Put a film into the selected row if it is empty, else into the first empty row. */
   add: (film: Film) => void
   /** Go back to the films built into the firmware, in their order. */
   reset: () => void
-  /** The first empty row, or -1. */
+  /** The row that Add fills: the selected row if it is empty, else the first empty row, or -1. */
   empty: number
   /** The films that are in no row. */
   unused: readonly Film[]
@@ -24,7 +24,7 @@ export interface Looks {
 export function useLooks(): Looks {
   const [items, setItems] = useState<SlotItem[]>(builtInSlots)
   const [selected, setSelected] = useState(0)
-  const empty = firstEmpty(items)
+  const empty = items[selected]?.filmId === null ? selected : firstEmpty(items)
   return {
     items,
     selected,
