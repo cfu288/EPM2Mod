@@ -17,6 +17,8 @@ Each review checks the external claims against our E-PM2 bytes. Labels: **[V]** 
 | [02-features-portability.md](02-features-portability.md) | Each Caduceus feature and its E-PM2 counterpart |
 | [03-emulator.md](03-emulator.md) | om-emu and testing E-PM2 code |
 | [04-oly-fw-analysis-crosscheck.md](04-oly-fw-analysis-crosscheck.md) | PEN-F research compared with our map |
+| [05-imaging-pipeline-and-limits.md](05-imaging-pipeline-and-limits.md) | What of the Caduceus imaging pipeline is impossible on the E-PM2 (2026-11-17): the 12-region stage exists |
+| [06-corrections-and-probes.md](06-corrections-and-probes.md) | Doc corrections, per-film table edit for code 85, recovery experiment, ordered probes |
 
 ## 1. The main point
 
