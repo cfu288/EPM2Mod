@@ -108,7 +108,9 @@ Go back: `epm2flash films-12d 2cdd18e7004821b2e443ec4f08db06ab9a0d4f0f700ab53db8
 2. ~~A look table changed in RAM at run time takes effect~~: passed, at once, in photos and live view (section
    5). The E-P7's crash on a store into loaded section RAM did not happen here (V: one table, 9 values).
 3. Code space for a real loader. Probe 2's read and copy of one table took 199 B in two free runs of segment 2.
-   A loader for whole looks (the matrix, the three gamma records, the curves, the six-axis records of each film,
-   with checks of the file) needs more than the free runs left (the largest is 120 B, `docs/code-space-map.md`).
-   Candidates: the 7.2 KB dead 3D-engine area, which needs its own camera test
-   (`experiments/2026-11-13-code-space-research/` recommendation 1), or code loaded from the card itself.
+   The look data itself needs no new space: a loaded look replaces the values in its slot's existing tables. The
+   code for the whole feature (checks, curve decode, all slots, menu and start hooks) is about 1 KB (I,
+   `design.md` section 6), more than the free runs hold. The 3D-engine area is a candidate whose "dead" status is
+   static evidence only (`experiments/2026-11-13-reclaim-space/review-3d-cluster.md` section 6), not proven.
+
+The full design (menu row, the EEROM-tail store, the stage caches, the file format, the probes): `design.md`.
