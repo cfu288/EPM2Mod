@@ -8,8 +8,9 @@ and drop, and download `EPM2LOOK.BIN`, without the command line. It is published
   Tailwind UI.
 - `src/data/films.json`: the films and their look records, made by `uv run python web/scripts/export_films.py`
   from `looks/catalogue.json` (a test of the Python suite fails when it is out of date).
-- `public/previews/`: the camera's Picture Mode strip for each film in each slot, drawn by the emulator
-  (`uv run python web/scripts/render_previews.py`).
+- `public/previews/`: the camera's Picture Mode strip, drawn by the emulator, in two layers: `menu/art<N>.png` (the
+  strip at ART N, name box empty) and `name/<film>.png` (the film's name). The app stacks the name of a row's film on
+  the strip of the row's position. Made by `uv run python web/scripts/render_previews.py`, which checks the split.
 - `public/404.html` and the script in `index.html`: the GitHub Pages redirect back to the app for any path.
 
 Work on it with Node 26 (`.nvmrc`):

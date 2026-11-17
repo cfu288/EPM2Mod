@@ -6,6 +6,17 @@ const row = (page: Page, art: number) =>
     .getByRole('listitem')
     .nth(art - 1)
 
+/** The preview shows the strip of ART `art` with the name of `film`, and both images loaded. */
+async function expectPreview(page: Page, art: number, film: string) {
+  const layers = page.getByRole('img').locator('img')
+  await expect(layers.nth(0)).toHaveAttribute('src', new RegExp(`previews/menu/art${String(art)}\\.png$`))
+  await expect(layers.nth(1)).toHaveAttribute('src', new RegExp(`previews/name/${film}\\.png$`))
+  for (const layer of await layers.all()) {
+    await expect(layer).toHaveJSProperty('complete', true)
+    await expect(layer).not.toHaveJSProperty('naturalWidth', 0)
+  }
+}
+
 test('moves a film with the keyboard', async ({ page }) => {
   await page.goto('./')
   await page.getByRole('button', { name: 'Move ART 1, Kodak Portra 400' }).focus()
@@ -20,6 +31,7 @@ test('moves a film with the keyboard', async ({ page }) => {
   await page.keyboard.press('Space')
   await expect(row(page, 1)).toContainText('Kodak Ektachrome 100')
   await expect(row(page, 3)).toContainText('Kodak Portra 400')
+  await expectPreview(page, 3, 'portra-400')
 })
 
 test('moves a film with the mouse', async ({ page }) => {
@@ -45,7 +57,7 @@ test('adds a film into the place of a removed one', async ({ page }) => {
   await page.getByRole('button', { name: 'Remove Kodak Gold 200 from ART 11' }).click()
   await page.getByRole('button', { name: 'Add Kodak Ektar 100' }).click()
   await expect(row(page, 11)).toContainText('Kodak Ektar 100')
-  await expect(page.getByRole('img')).toHaveAttribute('src', /previews\/ektar-100\/art11\.png$/)
+  await expectPreview(page, 11, 'ektar-100')
 })
 
 test('downloads the look file of the slots', async ({ page }) => {

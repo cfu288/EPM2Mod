@@ -4,6 +4,11 @@ import App from './App'
 
 const menu = () => screen.getByRole('region', { name: "Your camera's ART menu" })
 const more = () => screen.getByRole('region', { name: 'More films' })
+/** The preview's two layers: the strip of the ART position and the film's name over it. */
+const layers = () =>
+  [...screen.getByRole('img').querySelectorAll('img')].map((img) =>
+    img.getAttribute('src')?.replace(`${import.meta.env.BASE_URL}previews/`, ''),
+  )
 const rows = () => within(menu()).getAllByRole('listitem')
 
 describe('App', () => {
@@ -29,13 +34,14 @@ describe('App', () => {
     await user.click(within(more()).getByRole('button', { name: 'Add Fujifilm C200' }))
     expect(rows()[1]).toHaveTextContent('ART 2Fujifilm C200')
     expect(within(more()).queryByRole('button', { name: 'Add Fujifilm C200' })).toBeNull()
-    expect(screen.getByRole('img')).toHaveAttribute('src', `${import.meta.env.BASE_URL}previews/c200/art2.png`)
+    expect(layers()).toEqual(['menu/art2.png', 'name/c200.png'])
+    expect(screen.getByRole('img')).toHaveAccessibleName("The camera's ART menu with ART 2, C200, selected")
   })
 
   it('previews the selected row', async () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByRole('button', { name: 'Move ART 7, Fujifilm Velvia 100' }))
-    expect(screen.getByRole('img')).toHaveAttribute('src', `${import.meta.env.BASE_URL}previews/velvia/art7.png`)
+    expect(layers()).toEqual(['menu/art7.png', 'name/velvia.png'])
   })
 })
