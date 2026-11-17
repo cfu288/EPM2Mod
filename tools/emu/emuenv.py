@@ -1,6 +1,7 @@
 """Paths and images for the emulator tools. Python standard library only.
 
-    OM_EMU_DIR    the patched om-emu working tree. Default: build/om-emu (made by tools/emu/setup.sh).
+    OM_EMU_DIR    the om-emu checkout: the fork with the E-PM2's boot lab. Default: the submodule
+                  third_party/om-emu (tools/emu/setup.sh initialises it).
     OM_EMU_NODE   Node 26 or newer. Default: `node` on PATH when it is new enough, else
                   the newest Node that nvm has (tools/setup.sh installs one).
     EMU_IMAGES    where unpacked images go. Default: build/emu (ignored by git).
@@ -32,18 +33,18 @@ class EmuSetupError(Exception):
 
 
 def om_emu_dir():
-    """Return the om-emu working tree: OM_EMU_DIR, else build/om-emu (made by tools/emu/setup.sh)."""
+    """Return the om-emu checkout: OM_EMU_DIR, else the submodule third_party/om-emu."""
     env = os.environ.get("OM_EMU_DIR")
     if env:
         return env
-    return os.path.join(REPO, "build", "om-emu")
+    return os.path.join(REPO, "third_party", "om-emu")
 
 
 def require_om_emu():
-    """Return om_emu_dir(), or raise EmuSetupError when there is no om-emu at that place."""
+    """Return om_emu_dir(), or raise EmuSetupError when there is no om-emu with the boot lab at that place."""
     d = om_emu_dir()
-    if not os.path.exists(os.path.join(d, "emu", "bin", "debug.mjs")):
-        raise EmuSetupError(f"no om-emu working tree at {d}: run tools/emu/setup.sh (or set OM_EMU_DIR)")
+    if not os.path.exists(os.path.join(d, "emu", "bin", "boot.mjs")):
+        raise EmuSetupError(f"no om-emu with the boot lab at {d}: run tools/emu/setup.sh (or set OM_EMU_DIR)")
     return d
 
 
@@ -129,9 +130,12 @@ def tool_command(tool, args=()):
 
 
 def tool_env(image, extra=None):
-    """Return the environment for a tool run on IMAGE: BLOCKS, OM_EMU_DIR and EPM2_REPO are set."""
+    """Return the environment for a tool run on IMAGE: BLOCKS, EMU_BIN (the .BIN, when IMAGE names one), OM_EMU_DIR and
+    EPM2_REPO are set."""
     env = dict(os.environ)
     env["BLOCKS"] = blocks(image)
+    if not os.path.isdir(image):
+        env["EMU_BIN"] = os.path.abspath(image_bin(image)[1])
     env["OM_EMU_DIR"] = require_om_emu()
     env.setdefault("EPM2_REPO", REPO)
     if extra:

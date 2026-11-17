@@ -1,10 +1,12 @@
 """The two start-up checks of a firmware image in the emulator. Python standard library only.
 
 boot_test(image)         boots IMAGE and a reference image (the stock firmware) from the reset vector
-                         for 2000 ms of lab time (tools/emu/boot/stage2-boot.mjs) and compares the
+                         for 2000 ms of lab time (tools/emu/boot/stage2-boot.mjs: the om-emu fork's
+                         bin/boot.mjs report) and compares the
                          two reports under the rule below.
 update_path_test(image)  boots both with OK held and an update file on the card
-                         (tools/emu/boot/update-boot.mjs): the image must find the file as stock does.
+                         (tools/emu/boot/update-boot.mjs: bin/boot.mjs update): the image must find
+                         the file as stock does.
 
 The comparison rule of the boot test (RULE below is printed with --rule):
 
@@ -21,7 +23,7 @@ The comparison rule of the boot test (RULE below is printed with --rule):
   Everything else must be equal: the stop reason and pc, the console text, the boot marks, the task
   counts per state on both CPUs, the events, the API calls, the file task's commands, the firmware
   error entries (codes, callers, arguments), every other stand-in's hit count, the transfer counts,
-  the divide relaxations, CPU1's state and the problems line.
+  S-DIV0's count and the refused MMIO accesses, CPU1's state and the problems line.
   A patch that makes the start-up do something else on purpose (one more console line, one more
   flash write) fails this rule. Read the printed lines, then decide by hand; do not widen the rule.
 """

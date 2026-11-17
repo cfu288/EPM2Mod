@@ -114,12 +114,13 @@ Check every build that adds a hook with the boot test of the emulator before a f
 ## The emulator
 
 om-emu boots the E-PM2 firmware, stock or patched, from its reset vector on both cores. om-emu is
-the git submodule `third_party/om-emu` (MIT licence, pinned commit `0819080133f6`). Our patches to
-it are in `tools/emu/om-emu-patches/`, and our drivers and tools are in `tools/emu/e101/` and
-`tools/emu/boot/`. Set up once with `git submodule update --init third_party/om-emu` and
-`tools/emu/setup.sh`. How it works, the stand-ins and the limits are in
-[tools/emu/boot/README.md](../tools/emu/boot/README.md). Upstream lists this camera generation as
-"no work planned"; the port took one day of agent work.
+the git submodule `third_party/om-emu`: our fork ([github.com/cfu288/om-emu](https://github.com/cfu288/om-emu),
+branch `e101`, MIT licence) of upstream om-emu, with the E-PM2's boot lab added in upstream's layout
+(`emu/src/boot/`, `emu/bin/boot.mjs`). Set up once with `tools/emu/setup.sh`. How it works, the
+stand-ins and the limits are in
+[third_party/om-emu/docs/e101-boot-spec.md](../third_party/om-emu/docs/e101-boot-spec.md); our checks
+and scripts in [tools/emu/boot/README.md](../tools/emu/boot/README.md). Upstream lists this camera
+generation as "no work planned".
 
 IMAGE is `stock`, `builds/NAME.json` or a `.BIN` file. No firmware is in the repository.
 

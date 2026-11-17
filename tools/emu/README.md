@@ -2,42 +2,25 @@
 
 Two things are here. The **function harness** (this file) runs single functions and call chains of block 0.
 The **full boot** ([boot/README.md](boot/README.md)) boots the whole firmware from reset, draws its menus, and has the
-two checks `boot-test` and `update-path-test`. Both use the same om-emu working tree.
+two checks `boot-test` and `update-path-test`. Both run our om-emu fork, the submodule `third_party/om-emu`
+([github.com/cfu288/om-emu](https://github.com/cfu288/om-emu), branch `e101`).
 
-The function harness runs single E-PM2 v1.6 block-0 functions in [om-emu](https://github.com/flatpanda/om-emu)'s MN10300 machine. It runs each input row on stock block 0 and on a patched block 0, then compares the outputs. It follows the caduceus-ep7 contract: run the real code, patched against stock, and check that only the intended outputs change.
+The function harness runs single E-PM2 v1.6 block-0 functions in om-emu's MN10300 machine. It runs each input row on stock block 0 and on a patched block 0, then compares the outputs. It follows the caduceus-ep7 contract: run the real code, patched against stock, and check that only the intended outputs change.
 
 Labels: **V** = ran in the emulator and checked against an independent Python model or the notes; **I** = inferred.
 
 ## Setup
 
 ```sh
-git submodule update --init third_party/om-emu
-tools/emu/setup.sh
+tools/emu/setup.sh          # initialises third_party/om-emu at the pinned commit
 ```
 
-- **om-emu** is the git submodule `third_party/om-emu`, pinned to upstream commit `0819080133f6` (MIT licence). The submodule is never edited. `tools/emu/setup.sh` exports the pinned commit to the working tree `build/om-emu/` (ignored by git) and applies our patches `tools/emu/om-emu-patches/*.patch`. A second run does nothing when the tree is up to date; `--force` makes it again; `--check` only reports.
-- **`OM_EMU_DIR`** overrides the working tree. Without it the tools use `build/om-emu`. The defaults are in `emuenv.py`.
+- **om-emu** is the git submodule `third_party/om-emu`, our fork. The tools run its files as they are: nothing is copied or patched. E-PM2 support belongs in the fork, in upstream's layout; the fork's `docs/e101-boot-spec.md` says what it has.
+- **`OM_EMU_DIR`** overrides the checkout. The defaults are in `emuenv.py`.
 - **Node 26 or newer:** `node` on PATH when it is new enough, else the newest Node that nvm has. `tools/setup.sh` gets one; the version is in `.nvmrc`. Override it with `OM_EMU_NODE`.
 - **Stock block 0:** `build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin`. This is the descrambled OE payload, sha256 `1b7c4bb1…71468d`; the harness checks it.
 
-### What the first om-emu patch adds
-
-om-emu refuses an unknown model. Its lab is written for the OM-1 (E143), so `0001-e101-function-harness.patch` adds the E-PM2 as a **function-only** model. `0002-e101-full-boot.patch` is for the full boot ([boot/README.md](boot/README.md)); it changes the INTC facts of the entry and adds a relaxed CPU mode that the function harness does not switch on.
-
-- **`src/fw/models.mjs`: a new `E101` entry.**
-  - Image base 0x7E421020, block length 0xD7FFC0 and the block-0 digest.
-  - `function_only: true`.
-  - A board on om-emu's E118 family. That family's INTC and timer layout matches the E-PM2's (caduceus review 03 §2.2). The entry gives these values by hand:
-    - hardware semaphores at 0x8FE00000, 2 groups, stride 4;
-    - 2 INTC banks (0x99200000, 0x99300000), 125 IRQs, IPI 123;
-    - timer prescaler 161, IRQ base 68;
-    - CPU-number byte 0x8050 (low lab RAM, so CPU 0);
-    - vector page 0x7E430000;
-    - **512 MiB DRAM**, so that 0x7E421020 + block fits under 0x80000000. This is om-emu's `DRAM_MAX`. Its ROM view (`ROM_SIZE` 32 MiB) already fits the 13.5 MiB block;
-    - no scratch region and no reset-head rule.
-  - om-emu's VSC model normally sits at 0x9C000000. On the E-PM2 that address is the IMG library's per-CPU window, so the patch **parks** the VSC and the OSD engine at 0x9F600000 and 0x9F610000, pages no E-PM2 code loads. E-PM2 accesses to 0x9C000000 then reach om-emu's default-deny stub: a CPU read there faults with reason 2 (**V**).
-- **`src/fw/model.mjs`:** on a function-only model, `fact()` returns E143's value. The lab modules still load when `bin/debug.mjs` starts, and some read facts at load time; nothing in a debug run reads them.
-- **`src/lab/hle.mjs`:** the lab (`HLE`) refuses to start on a function-only model. This keeps the E143 placeholder facts from being used.
+The fork has a port of om-emu's lab to the E-PM2 (`MODELS.E101`, `src/fw/ports.mjs`), so its debug API (`emu/bin/debug.mjs`) runs E-PM2 functions with `OM_EMU_MODEL=E101`. No lab session runs on the E-PM2. A read of a device page om-emu does not model faults with reason 2 (**V**); `scenario.py` handles it.
 
 ## Files
 
@@ -49,7 +32,7 @@ om-emu refuses an unknown model. Its lab is written for the OM-1 (E143), so `000
 | `emurun.py` | CLI: `list`, `run CASE` (one image, checked against the model) and `diff CASE --patch SPEC…` or `--image BLOCK0` (stock against patched). Exits 1 on any mismatch, fault, stray code or unexpected change. |
 | `bootmem.py`, `scenario.py`, `osmodel.py`, `liveview.py`, `hookcheck.py` | Scenario runs; see "Scenario runs" below. |
 | `specs/rec-limit-3600.json` | Emulator test input only, not a camera patch: changes the recording-limit imm16 1740 to 3600 (2 bytes). |
-| `setup.sh`, `om-emu-patches/` | Make the om-emu working tree `build/om-emu/` from the submodule and our two patches. |
+| `setup.sh` | Initialises the submodule `third_party/om-emu` at the pinned commit; `--check` only reports. |
 | `emuenv.py` | Where om-emu, Node and the unpacked images are; used by every Python tool here. |
 | `boot-test`, `update-path-test`, `bootcheck.py`, `emu-run`, `mkstate`, `e101/`, `boot/` | The full boot: see [boot/README.md](boot/README.md). |
 
@@ -69,8 +52,8 @@ python3 tools/emu/patchblock.py patches/film-portra-xp.json \
 Calling om-emu's debugger directly, for example memcpy through a hand-written `call 0x7E5081FA,[d2,a2],8` at 0x7D000000:
 
 ```sh
-cd build/om-emu && OM_EMU_MODEL=E101 node emu/bin/debug.mjs \
-  --image ../blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin \
+cd third_party/om-emu && OM_EMU_MODEL=E101 node emu/bin/debug.mjs \
+  --image ../../build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin \
   --entry 0x7D000000 --write 0x7D000000=ddfa815001a008 \
   --write 0x7D200000=000102030405060708090a0b0c0d0e0f \
   --reg a0=0x7D300000 --reg a1=0x7D200000 --reg d0=16 --reg sp=0x7D100000 \

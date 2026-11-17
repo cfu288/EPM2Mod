@@ -7,8 +7,8 @@ decides the return registers, and the CPU returns through a `retf` with the regi
 call that reached it (read from the call instruction before MDR).
 
 Environment:
-    OM_EMU_DIR   the patched om-emu working tree (default: build/om-emu, made by tools/emu/setup.sh;
-                 )
+    OM_EMU_DIR   the om-emu checkout (default: the submodule third_party/om-emu, our fork with the E101 port;
+                 tools/emu/setup.sh initialises it)
     OM_EMU_NODE  Node >= 26 (default: `node` on PATH when it is new enough, else the newest Node of nvm)
 The defaults are in emuenv.py.
 """
@@ -63,7 +63,7 @@ class Emu:
         if not os.path.exists(NODE):
             raise EmuError(f"no node at {NODE} (set OM_EMU_NODE)")
         if not os.path.exists(os.path.join(OM_EMU_DIR, "emu", "bin", "debug.mjs")):
-            raise EmuError(f"no om-emu working tree at {OM_EMU_DIR}: run tools/emu/setup.sh (or set OM_EMU_DIR)")
+            raise EmuError(f"no om-emu checkout at {OM_EMU_DIR}: run tools/emu/setup.sh (or set OM_EMU_DIR)")
         env = dict(os.environ, OM_EMU_MODEL="E101")
         self.p = subprocess.Popen([NODE, "emu/bin/debug.mjs", "--serve"], cwd=OM_EMU_DIR, env=env, text=True,
                                   stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

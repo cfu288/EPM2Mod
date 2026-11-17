@@ -23,8 +23,8 @@ __pycache__/
 .venv/
 .DS_Store
 
-# om-emu is the submodule third_party/om-emu; our patches are tools/emu/om-emu-patches/*.patch.
-# The patched working tree (build/om-emu) and unpacked images (build/emu) are under build/, ignored above.
+# om-emu is the submodule third_party/om-emu, our fork (branch e101) with the E-PM2's boot lab.
+# Unpacked images (build/emu) are under build/, ignored above.
 # Old diffs made before om-emu had a licence stay out:
 **/om-emu-E101.patch
 **/om-emu-changes.diff

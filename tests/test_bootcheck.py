@@ -15,7 +15,7 @@ cpu0 tasks: {"WAI":122,"RUN":1,"DMT":24}
 quick start log: 10.5 SetPermit[1] | 10.6 MainStart
 firmware error log entries: 2 36.1 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9 ; 37.6 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9
 stand-ins and observers hit: gio-timer-set x3216, idle x275, idle x9105, S-GIOIN x3180
-I2C transfers 81 | SIO client transfers 70 | divide relaxations 1
+I2C transfers 81 | SIO client transfers 70 | S-DIV0 1
 cpu1: idle | problems: none
 STAGE 2: PASS (kernel on both cores, Usr0..Usr4 done, tasks scheduled, no fault)
 """
@@ -48,7 +48,7 @@ class CompareReports(unittest.TestCase):
             ("entries: 2 36.1", "entries: 3 36.1"),
             ("S-GIOIN x3180", "S-GIOIN x3181"),
             ("gio-timer-set x3216", "gio-timer-set x3217"),
-            ("divide relaxations 1", "divide relaxations 2"),
+            ("S-DIV0 1", "S-DIV0 2"),
             ("problems: none", "problems: core 1 fault 3"),
             ("10.6 MainStart", "10.6 MainStop"),
         ]:
