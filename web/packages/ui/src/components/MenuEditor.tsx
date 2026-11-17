@@ -10,9 +10,7 @@ export function MenuEditor({ looks }: { looks: Looks }) {
         <h2 id="menu-heading" className="section-title">
           Your camera's ART menu
         </h2>
-        <p className="text-ink-soft mt-2 text-sm">
-          Drag a row by its handle (☰) to change the order. Select a row to preview it on the camera screen.
-        </p>
+        <p className="text-ink-soft mt-2 text-sm">Drag ☰ to reorder. Select a row to preview it.</p>
         <div className="mt-4">
           <SlotList
             items={looks.items}
@@ -28,11 +26,7 @@ export function MenuEditor({ looks }: { looks: Looks }) {
         <h2 id="more-heading" className="section-title">
           More films
         </h2>
-        <p className="text-ink-soft mt-2 text-sm">
-          {looks.empty >= 0
-            ? `Select Add to put a film into ART ${String(looks.empty + 1)}, the first empty row.`
-            : 'The menu holds 12 films. Remove one (×) to add another.'}
-        </p>
+        {looks.empty < 0 && <p className="text-ink-soft mt-2 text-sm">Remove a film (×) to add one.</p>}
         <div className="mt-4">
           <FilmLibrary films={looks.unused} canAdd={looks.empty >= 0} onAdd={looks.add} />
         </div>
