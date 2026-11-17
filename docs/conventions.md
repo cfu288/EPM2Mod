@@ -37,6 +37,7 @@ Examples: `feat(patch/movie-limit): raise 29-min cap to 9 h`, `docs(camera-log):
 | `third_party/om-emu`, `tools/emu/setup.sh` | The emulator: our om-emu fork (branch `e101`, with the E-PM2's boot lab) as a git submodule, and the command that initialises it. Emulator code goes into the fork, not into this repository. `tools/emu/boot-test` and `tools/emu/update-path-test` are the start-up checks of a build. |
 | `builds/`, `pinned-build.json` | One description per firmware build, and the pointer to the last camera-tested build. See *Making firmware*. |
 | `patches/` | One JSON spec per mod. Each operation states the bytes that it replaces. `patches/history/` holds superseded and failed specs as a record. |
+| `web/` | The film-looks web app (React, Vite): users choose films for the ART slots and download `EPM2LOOK.BIN`. Published to GitHub Pages by `.github/workflows/web.yml`. See [../web/README.md](../web/README.md). |
 | `looks/` | The film list and the fitted values. The three film patch specs are generated from them. |
 | `logs/` | The event dictionary of the structured log of debug builds. The log's patch specs and the decoder (`epm2mod log`) read it. See [logging.md](logging.md). |
 | `docs/` | Knowledge that lasts. Each fact there must have a source or must be reproducible. |

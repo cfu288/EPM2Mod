@@ -17,6 +17,7 @@ This module needs numpy.
 
 from __future__ import annotations
 
+import base64
 import re
 import struct
 from collections.abc import Sequence
@@ -32,6 +33,7 @@ from ..paths import RepoPaths, is_repo_relative
 from .generate import Fit, _array, chroma_record, load_fit, whole_numbers
 from .lookfile import (
     CURVE_MAX,
+    encode_record,
     CURVE_POINTS,
     MENU_ENTRIES,
     TABLE_ENTRIES,
@@ -229,6 +231,45 @@ def looks_of_choices(paths: RepoPaths, choices: Sequence[str]) -> list[Look]:
         except LookFileError as error:
             raise LookFileError(f"'{text}': {error}") from None
     return looks
+
+
+def web_data(paths: RepoPaths) -> dict[str, Any]:
+    """Return the data of the web app (``web/src/data/films.json``).
+
+    ``films``: the catalogue, each film with its look record (1,708 bytes, base64) for slot 0 under the film's name;
+    the app sets the slot byte and the name and packs the records as ``lookfile.pack`` does. ``slots``: the twelve
+    ART entries in menu order, with the id of the film each holds when no look is loaded.
+
+    Raises:
+        BuildError: if the catalogue or the look list is wrong, or a built-in look is not in the catalogue.
+    """
+    catalogue = load_catalogue(paths)
+    films = []
+    for film in catalogue.values():
+        look = look_of_fit(
+            load_fit(paths.resolve(film.fit)), MENU_ENTRIES[0], film.name, film.fit
+        )
+        record = encode_record(look)
+        films.append(
+            {
+                "id": film.id,
+                "name": film.name,
+                "film": film.film,
+                "medium": film.medium,
+                "note": film.note,
+                "record": base64.b64encode(record).decode("ascii"),
+            }
+        )
+    by_fit = {film.fit: film.id for film in catalogue.values()}
+    raw: Any = read_json(paths.card_looks, BuildError)
+    slots = []
+    for number, item in enumerate(raw["looks"], start=1):
+        if item["fit"] not in by_fit:
+            raise BuildError(f"{item['fit']}: a built-in look that the catalogue lacks")
+        slots.append(
+            {"art": number, "entry": item["entry"], "builtIn": by_fit[item["fit"]]}
+        )
+    return {"films": films, "slots": slots}
 
 
 def camera_table(curve: tuple[int, ...], default: bytes) -> bytes:

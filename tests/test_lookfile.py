@@ -296,6 +296,14 @@ class ChoiceTests(unittest.TestCase):
             with self.assertRaises((BuildError, LookFileError), msg=str(bad)):
                 lookpack.looks_of_choices(PATHS, bad)
 
+    def test_the_web_app_data_is_current(self) -> None:
+        on_disk = json.loads((ROOT / "web" / "src" / "data" / "films.json").read_text())
+        self.assertEqual(
+            on_disk,
+            lookpack.web_data(PATHS),
+            "run: uv run python web/scripts/export_films.py",
+        )
+
     def test_pack_to_a_card_and_list(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             out = io.StringIO()

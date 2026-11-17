@@ -1,0 +1,4 @@
+dist
+node_modules
+src/data/films.json
+public/previews

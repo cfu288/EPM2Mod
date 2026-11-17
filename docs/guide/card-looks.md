@@ -5,6 +5,9 @@ with their names, after power-off and without the card.
 
 ## Make a file
 
+On the web, without the command line: [the film looks page](https://cfu288.github.io/EPM2Mod/). Choose a film for
+each ART number and download the file. Or with the repository:
+
 `uv run epm2mod looks list` shows the 19 films you can choose. Pick a film for any ART number the camera shows, with
 the card in the computer:
 
@@ -12,8 +15,7 @@ the card in the computer:
 uv run epm2mod looks pack ART2=velvia ART6=double-x "ART12=vision3-500t:Cinestill 800T" --card /path/to/card
 ```
 
-The text after `:` is the name the camera shows (up to 16 letters). ART numbers you do not list keep their built-in
-look. Without `--card` the file goes to `build/EPM2LOOK.BIN`. Copy it to the top folder of the card.
+After `:` comes the name the camera shows (up to 16 letters). Unlisted ART numbers keep their built-in look.
 
 ## Load
 
