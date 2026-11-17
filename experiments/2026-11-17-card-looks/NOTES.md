@@ -82,6 +82,16 @@ The emulator has no caches and makes no picture, so it cannot answer the questio
 stage runs on CPU 1 and reads the table in every pass (the probe-1 log), and the write comes from CPU 0. A
 photo before MENU and photos after it tell whether CPU 1 uses the new values at once, later, or never.
 
+Camera, first try (2026-11-17, `docs/camera-log.md`): the write works (V: `card_look` written 9, read back
+0x0096004D), but the photos cannot tell its effect. (1) The load ran at 3.34 s, when the GUI entered live
+control (state 0x5705: OK, which is a 0x57xx state and starts the flush), before the first photo, so there
+is no photo before it. (2) The scene was a dim room with white walls and black-and-white prints: colour spread
+at equal brightness 0.5 levels in all three photos, which a grey matrix gives, but which this scene may give
+anyway. New finding (V): the still's colour stage ran on CPU 0 (stack 0x6047D2E4, at 12.2 s, art 71, table
+0x7ECB0988); only live view's runs on CPU 1. So for stills the writer and the reader are the same CPU. Session 16
+(the start after the flash) has garbage records: the known ring-header defect (`docs/todo.md`), not the probe.
+Retake: a colourful scene in good light, photo A before any OK, MENU or PLAY, then MENU, MENU, photo B.
+
 Flash: `epm2flash debug-log-card-look d6955aac7bd33660f37ebe39d259b6282edb6da99bcc8707c3c00dba9df27f73`.
 Go back: `epm2flash films-12d 2cdd18e7004821b2e443ec4f08db06ab9a0d4f0f700ab53db8c4bbc1dad93e32`.
 
