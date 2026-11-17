@@ -50,6 +50,9 @@ Emulator (`tools/emu/emu-run builds/debug-log-card-read.json logplay.mjs ...`, M
 | no such file | bytes -1 | flush ok |
 | no card | (no log file) | no fault; only the two error entries every start has |
 
+Flash: `epm2flash debug-log-card-read 1297f288a69138d7b10fab1f37553a65fea82d2013ecc141445e194528689cab`.
+Go back: `epm2flash films-12d 2cdd18e7004821b2e443ec4f08db06ab9a0d4f0f700ab53db8c4bbc1dad93e32`.
+
 ## 4. Open (each needs a camera probe)
 
 1. The read on the camera: the build of section 3.
