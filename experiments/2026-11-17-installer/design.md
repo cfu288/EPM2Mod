@@ -91,6 +91,6 @@ Firmware criteria (point 2, agreed earlier):
 - **Launchers:** `Start (Mac).command`, `Start (Windows).bat`, `start.sh`. Download a pinned uv release from
   GitHub, check its sha256, keep it in the folder, then `uv run --python 3.12 epm2mod serve` (pin Python; lock
   with `uv.lock`). Expect the first-run warnings: macOS right-click → Open, Windows SmartScreen.
-- **Web build:** Node 26 (`web/.nvmrc`); `npm run check` and `npm run e2e` in
+- **Web build:** Node 26 (`.nvmrc`); `npm run check` and `npm run e2e` in
   `web/`. dnd-kit tests need waits on its announcements. Style: OM SYSTEM gallery look, fonts Sora and Arimo
   (`web/README.md`).
