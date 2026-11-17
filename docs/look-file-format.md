@@ -74,7 +74,7 @@ The slot is the place of the entry in the art-filter menu. Each slot takes the k
 
 | Slot | Menu entry | Look in `looks/card-looks.json` |
 |---|---|---|
-| 0 | Pop Art | Portra |
+| 0 | Pop Art | Portra 400 |
 | 1 | Soft Focus | Ektachrome |
 | 2 | Pale&Light Color | Pro 400H |
 | 3 | Light Tone | Kodachrome |
@@ -119,10 +119,10 @@ function crc32(bytes) {
 ## Test vector
 
 `uv run epm2mod looks pack` with `looks/card-looks.json` gives 20,528 bytes with sha256
-`6191ce540e4118c939ce379f0d01ef872abd2f89975d8bbe2871bb06953cc32a`. Its first 32 bytes:
+`5d5df335dc14100a3fb7c90265ca07470419f12f52f806cc6b80f1bc09cae7ad`. Its first 32 bytes:
 
 ```
-00000000: 45 50 4c 4b 01 0c ac 06 30 50 00 00 49 f0 fe bc 
+00000000: 45 50 4c 4b 01 0c ac 06 30 50 00 00 92 4c 77 d2 
 00000010: 01 01 60 01 00 00 00 00 00 00 00 00 00 00 00 00
 ```
 

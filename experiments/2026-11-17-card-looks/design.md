@@ -333,18 +333,52 @@ needs one, so both changes are one candidate, `builds/card-looks-2.json`.
 Written after `card-looks-2` worked on the camera and was not accepted: the menu names did not follow the loaded
 looks, and no criteria had been set before the build. A build is pinned only when every agreed criterion passes.
 
-| # | Criterion (what the user does and sees) | Check | card-looks-2 |
-|---|---|---|---|
-| 1 | MENU -> Custom Menu -> J -> Load Looks -> Load: on leaving the menu the looks of EPM2LOOK.BIN replace the current ones | camera | pass |
-| 2 | Nothing loads unless the user chooses Load | camera | pass |
-| 3 | The looks stay after power-off and without the card, until the next load | camera | pass |
-| 4 | Any look goes into any of the 12 entries | emulator (12), camera (2) | pass |
-| 5 | Every place that shows a film name shows the loaded look's name: Picture Mode strip, ART list, shooting menu, live-view and playback info | emulator, camera | **fail** |
-| 6 | After Load the camera says what happened: loaded, no file, or damaged file | emulator, camera | **fail** (silent) |
-| 7 | The built-in looks can be brought back from the camera, without a file | camera | **fail** |
-| 8 | Live view shows the loaded look as the photo will be (tone included) | camera | **fail** (tone only at half-press, as the built-in looks) |
-| 9 | A photo records the loaded look's name where it records the film today | camera (EXIF) | not checked |
-| 10 | The Load Looks row and its messages are readable in the user's menu language | emulator | English only |
-| 11 | A bad or missing file never stops a start or a flash; boot-test and update-path-test pass | emulator, camera | pass |
-| 12 | Movies show the loaded look as far as they show the built-in looks | camera | not checked |
+| # | Criterion (what the user does and sees) | Check | card-looks-2 | card-looks-3 (emulator) |
+|---|---|---|---|---|
+| 1 | MENU -> Custom Menu -> J -> Load Looks -> Load: the looks of EPM2LOOK.BIN replace the current ones | camera | pass | pass (loads at OK, in the menu) |
+| 2 | Nothing loads unless the user chooses Load | camera | pass | pass |
+| 3 | The looks stay after power-off and without the card, until the next load | camera | pass | pass |
+| 4 | Any look goes into any of the 12 entries | emulator, camera | pass | pass (all 12) |
+| 5 | Every place that shows a film name shows the loaded look's name | emulator, camera | **fail** | pass: Picture Mode strip, Shooting Menu Picture Mode list, ART list, all 30 string ids, in English and Japanese; playback info: camera |
+| 6 | After Load the camera says what happened | emulator, camera | **fail** | pass: the row reads Loading, then Loaded / No file / Bad file / Built-in |
+| 7 | The built-in looks come back from the camera, without a file | camera | **fail** | pass: Load Looks -> Built-in |
+| 8 | Live view shows the loaded look as the photo will be (tone included) | camera | **fail** | built: member-0 tables for the 10 three-table slots; camera only |
+| 9 | A photo records the loaded look's name where it records the film today | camera | not checked | today no film name is recorded (EXIF ArtFilter is the stock number); question for the owner |
+| 10 | The row and its messages are readable in the user's menu language | emulator | English only | English texts in every language (Japanese checked) |
+| 11 | A bad or missing file never stops a start or a flash | emulator, camera | pass | pass (boot-test, update-path-test, sessions 3 and 7) |
+| 12 | Movies show the loaded look as far as they show the built-in looks | camera | not checked | the same tables as the built-in looks (model); camera |
+
+### 10.1 card-looks-3 (2026-11-17, desk and emulator)
+
+`builds/card-looks-3.json` = the twelve-slot layout + `patches/looks-menu-2.json` (Off / Load / Built-in, status text
+1495; `scripts/mkspec_lmenu.py --v3`) + `patches/card-looks-3.json` (`scripts/mkspec_looks3.py`), sha256
+`0ca95da065aefa1cced5cdb30368924a5d133a79e08ae1144ead236f856438f2`, `first_code` (930 B in the reclaimed code area
+0x7EE53830 of segment 3).
+
+- Names: the loaded language's text table is in RAM (blob 0xBFF3D000; its first word is the address of the pointer
+  array). 30 string ids show the 12 entries' names (the stock English text of each is the entry's name, with or
+  without an icon tag). The loader points each at a copy of the language's string with the look's name after the
+  tag; empty names keep the language's string. A language change loads the table again: T_GUI sees that id 1498 is
+  not our "Load Looks" and runs mode 3.
+- Status: id 1495 (the row's text for Off) points at the language's "Off" or at Loading / Loaded / No file / Bad
+  file / Built-in. The trigger now runs at every GUI state call (the GUI calls the setter at every key, also in the
+  menu), so the load runs at OK and the row shows the result at the next key.
+- Built-in: mode 0 copies every table that a look writes (41,652 B) to RAM 0x7E4D0800 before it applies the store;
+  Built-in (value 2) empties the store, saves the bank and copies them back; a load starts from them, so the entries
+  a file does not list are built-in again.
+- Live view: live view reads member 0 of the tone records, the stills member 1 (half-press, photos). The ten
+  three-table slots shared the stock member-0 tables; each now gets its own, made from its stills table by linear
+  interpolation (exact within 6 of 1023 for all fits; built-in looks too), in RAM 0x7E4DB000-0x7E4ED000, and its
+  records point at them. Light Tone and Cross Process have all eight tables of their records written already.
+- Start-up: the task's priority is 13 (was 11): the snapshot and the live tables (about 15 ms of work) wait for the
+  firmware's tasks; with 11 boot-test failed (time stamps 5.5 ms late).
+- RAM gap 0x7E4C9800-0x7E4FE000: zero through start, menus, playback, half-press in the emulator (stock-built code
+  never writes it; the debug log's ring at 0x7E4F9000 is camera-tested RAM there).
+- Checks (V emulator): free space PASS (first code), op check 0 FAIL, hookcheck only remap7b-code, boot-test PASS,
+  update-path-test PASS; `scripts/emu_looks3.py` seven sessions PASS against the model (tables, live tables, records,
+  names, row texts, status); shallow crawls P and ART: all screens equal to card-looks-2 (no look stored); screens:
+  the row (Loading, Loaded, Bad file, No file, Built-in), the Picture Mode strip and list and the ART list with
+  loaded names (16 characters fit), Japanese. Not in the emulator: the picture (live view, photos, movies),
+  playback of a photo (stock faults there too).
+
 

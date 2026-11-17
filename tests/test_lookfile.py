@@ -44,7 +44,7 @@ except ImportError:  # pragma: no cover
 
 #: The look file of ``looks/card-looks.json`` (the twelve looks of the pinned
 #: films, all colour looks): the test vector of docs/look-file-format.md.
-CARD_LOOKS_SHA256 = "6191ce540e4118c939ce379f0d01ef872abd2f89975d8bbe2871bb06953cc32a"
+CARD_LOOKS_SHA256 = "5d5df335dc14100a3fb7c90265ca07470419f12f52f806cc6b80f1bc09cae7ad"
 
 CURVE = tuple(min(1023, k + k // 2) for k in range(1024))
 GREY = (77, 150, 29) * 3
@@ -258,7 +258,7 @@ class PackTests(unittest.TestCase):
             out = io.StringIO()
             with redirect_stdout(out):
                 self.assertEqual(cli.main(["looks", "show", "--json", str(path)]), 0)
-            self.assertEqual(json.loads(out.getvalue())[0]["name"], "Portra")
+            self.assertEqual(json.loads(out.getvalue())[0]["name"], "Portra 400")
             path.write_bytes(path.read_bytes()[:-1])
             self.assertEqual(cli.main(["looks", "show", str(path)]), 1)
 

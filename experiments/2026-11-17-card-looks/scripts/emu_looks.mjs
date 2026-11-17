@@ -4,6 +4,7 @@
 // Env: as play.mjs (E101_STATE, E101_CARD, E101_RTC); SPANS = a JSON file [[address, length], ...]; SYMS = a JSON
 // file of the build's labels (T_TASK, T_STORED, V_BAD, T_END, SAVE, FLAGS, STORE).
 import fs from 'node:fs';
+import { createHash } from 'node:crypto';
 import { createBoot } from '../../../tools/emu/e101/boot.mjs';
 import { KEYS, press, release } from '../../../tools/emu/e101/keys.mjs';
 import { screenshot } from '../../../tools/emu/e101/screen.mjs';
@@ -22,6 +23,24 @@ at('verify-ok', sym.V_OK);
 at('save', sym.SAVE);
 at('apply', sym.APPLY);
 at('task-end', sym.T_END);
+// TEXTS=id,id,...: the strings those ids show in the loaded language (its pointer array: the word at 0xBFF3D000)
+const texts = () => {
+  const out = {}; const arr = e.r32(0xBFF3D000) >>> 0;
+  for (const id of (process.env.TEXTS || '').split(',').filter(Boolean)) {
+    const p = e.r32(arr + 4 * Number(id)) >>> 0; let str = '';
+    for (let i = 0; i < 80; i++) { const c = e.r16(p + 2 * i); if (!c) break; str += String.fromCharCode(c); }
+    out[id] = str;
+  }
+  return out;
+};
+// HASH=name:addr:len,...: sha256 of RAM ranges (read through the uncached alias)
+const hashes = () => {
+  const out = {};
+  for (const h of (process.env.HASH || '').split(',').filter(Boolean)) {
+    const [n, a, l] = h.split(':'); out[n] = createHash('sha256').update(e.rd(Number(a), Number(l))).digest('hex');
+  }
+  return out;
+};
 const run = (t) => {
   const r = e.run({ maxLabMs: t, maxMs: 900000 });
   if (r.why !== 'labtime') { console.log(JSON.stringify({ stop: r, errors: e.errLog.slice(-5) })); process.exit(2); }
@@ -35,7 +54,8 @@ for (const step of process.argv.slice(2)) {
     const hex = spans.map(([a, n]) => Buffer.from(e.rd(a, n)).toString('hex')).join('');
     console.log(JSON.stringify({ dump: f[1], ms: ms(), tables: hex, store: Buffer.from(e.rd(sym.STORE, 32)).toString('hex'),
       flags: Buffer.from(e.rd(sym.FLAGS + 0x40000000, 4)).toString('hex'), events: events.splice(0),
-      flash: e.flashLog.splice(0).filter((l) => / (write|erase) /.test(l)).length, errors: e.errLog.length }));
+      flash: e.flashLog.splice(0).filter((l) => / (write|erase) /.test(l)).length, errors: e.errLog.length,
+      texts: texts(), hashes: hashes() }));
   } else if (f[0] === 'shot') { fs.mkdirSync(process.env.SHOTS, { recursive: true }); screenshot(e, `${process.env.SHOTS}/${f[1]}.png`); }
   else { console.log('unknown step', step); process.exit(2); }
 }

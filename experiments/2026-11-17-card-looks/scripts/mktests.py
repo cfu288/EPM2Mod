@@ -29,7 +29,19 @@ from epm2mod.paths import RepoPaths  # noqa: E402
 
 paths = RepoPaths(Path(ROOT))
 V2 = "--v2" in sys.argv
-args = [a for a in sys.argv[1:] if a != "--v2"]
+V3 = "--v3" in sys.argv
+args = [a for a in sys.argv[1:] if a not in ("--v2", "--v3")]
+if V3:      # builds/card-looks-3.json: CYAN.BIN = the built-in looks, Pro 400H (slot 2) named "Cyan Test" with a red
+            # tone curve of 0 (photo and live view cyan, without half-press if the live tables work)
+    default = lookpack.load_list(paths, paths.card_looks)
+    looks = list(default)
+    looks[2] = dataclasses.replace(default[2], name="Cyan Test", curves=((0,) * 1024,) + default[2].curves[1:])
+    out = args[0] if args else os.path.join(ROOT, "build", "card-looks", "test-3")
+    os.makedirs(out, exist_ok=True)
+    for name, data in {"CYAN.BIN": lookfile.pack(looks)}.items():
+        open(os.path.join(out, name), "wb").write(data)
+        print(name, len(data), sha256_bytes(data))
+    sys.exit(0)
 if V2:
     default = lookpack.load_list(paths, paths.card_looks)
     swap = list(default)
