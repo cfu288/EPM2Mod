@@ -237,6 +237,15 @@ Outcomes and what follows:
 - So the loader writes every table and then runs the refresh, and a load takes effect at once. Step 4 (persistence)
   is next.
 
+### 9.2.2 Result of step 4 (camera, 2026-11-17)
+
+**Passed (V).** The EEROM bank's unused tail was empty on this camera (0 nonzero words of 13,420). A look loaded
+once from the card was stored there, saved at once by the bank save API (result 0), and applied at the first GUI
+state of every later start, also with the file removed from the card: the photo before any menu was black and white
+(colour spread 1.33 at equal brightness). Two starts that went straight to power-off applied it too, and no error
+record appeared. Every open question of sections 1-4 is now answered on the camera, except the code space (section
+6) and the names (section 7).
+
 ### 9.3 After the probes: the feature
 
 1. **Code space** (section 6), measured this time: the harness's read, checks, record walk and refresh are 452 B; the

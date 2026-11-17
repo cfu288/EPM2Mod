@@ -114,5 +114,5 @@ Go back: `epm2flash films-12d 2cdd18e7004821b2e443ec4f08db06ab9a0d4f0f700ab53db8
    static evidence only (`experiments/2026-11-13-reclaim-space/review-3d-cluster.md` section 6), not proven.
 
 The full design (menu row, the EEROM-tail store, the stage caches, the file format, the probes) and the final plan:
-`design.md` (section 9: the probe harness and the persistence probe, built and checked in the emulator, and the
-camera sessions they need).
+`design.md` (section 9: the probe harness and the persistence probe; both passed on the camera on 2026-11-17:
+a loaded look takes effect at once with the refresh, and stays in the camera without the card).
