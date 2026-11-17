@@ -43,10 +43,10 @@ from urllib.parse import urlsplit
 from . import cards as card_list
 from .builds import BuildDescription, pinned_description
 from .errors import BuildError, Epm2ModError
-from .fileio import Log, write_bytes
+from .fileio import Log
 from .looks import lookfile, records
 from .paths import RepoPaths
-from .pipeline import make
+from .pipeline import STEPS, make
 from .stock import CARD_FOLDER, EPM2_V16
 
 #: The built app page, part of the package.
@@ -63,6 +63,7 @@ class Job:
     Attributes:
         number: counts the jobs of this server, from 1.
         lines: the progress lines so far.
+        step: the last step of ``make`` that ended, 0 to ``pipeline.STEPS``.
         done: True when the job has ended.
         error: the message of the error that ended it, or None.
         sha256: the firmware's SHA-256, when it is made.
@@ -72,6 +73,7 @@ class Job:
 
     number: int
     lines: list[str] = field(default_factory=list)
+    step: int = 0
     done: bool = False
     error: str | None = None
     sha256: str | None = None
@@ -83,6 +85,8 @@ class Job:
         return {
             "job": self.number,
             "lines": list(self.lines),
+            "step": self.step,
+            "steps": STEPS,
             "done": self.done,
             "error": self.error,
             "sha256": self.sha256,
@@ -97,6 +101,7 @@ def run_job(
     choices: list[str],
     card: Path | None,
     log: Log,
+    step: Callable[[int], None],
 ) -> tuple[str, dict[str, bytes]]:
     """Make the firmware and the look file, and write them to a card if one is given.
 
@@ -106,6 +111,7 @@ def run_job(
         choices: choices like ``ART2=velvia``; none for no look file.
         card: the top folder of the SD card, or None.
         log: where progress lines go.
+        step: called with each step of ``make`` as it ends (``pipeline.STEPS``).
 
     Returns:
         The firmware's SHA-256, and the files by their path on the card.
@@ -113,16 +119,14 @@ def run_job(
     Raises:
         Epm2ModError: if a step fails (the message is for the user).
     """
-    looks = b""
-    if choices:
-        looks = lookfile.pack(records.looks_of_choices(records.load(paths), choices))
-    result = make(paths, description, card=card, log=log, stock=EPM2_V16)
+    looks = records.pack_choices(paths, choices)[0] if choices else b""
+    result = make(paths, description, card=card, log=log, stock=EPM2_V16, step=step)
     files = {f"{CARD_FOLDER}/{result.card_copy.name}": result.card_copy.read_bytes()}
     if looks:
         files[lookfile.CARD_NAME] = looks
         if card is not None:
-            write_bytes(card / lookfile.CARD_NAME, looks, BuildError, read_back=True)
-            log(f"on the card: {card / lookfile.CARD_NAME}  (written and read back)")
+            on_card = records.write_to_card(card, looks)
+            log(f"on the card: {on_card}  (written and read back)")
     return result.sha256, files
 
 
@@ -212,6 +216,10 @@ class App:
     def _work(self, job: Job, choices: list[str], card: Path | None) -> None:
         """Run a job and record its end; its lines also go to the terminal."""
 
+        def step(number: int) -> None:
+            """Record the end of a step of ``make``."""
+            job.step = number
+
         def log(line: str) -> None:
             """Keep a progress line for the page and print it."""
             job.lines.append(line)
@@ -219,7 +227,7 @@ class App:
 
         try:
             job.sha256, job.files = self.run(
-                self.paths, self.description, choices, card, log
+                self.paths, self.description, choices, card, log, step
             )
         except Epm2ModError as error:
             job.error = str(error)

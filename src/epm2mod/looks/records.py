@@ -17,12 +17,13 @@ import dataclasses
 import re
 from collections.abc import Sequence
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from ..errors import BuildError, LookFileError
-from ..fileio import read_json
+from ..fileio import read_json, write_bytes
 from ..paths import RepoPaths
-from .lookfile import MENU_ENTRIES, Look, decode_record
+from .lookfile import CARD_NAME, MENU_ENTRIES, Look, decode_record, pack
 
 
 @dataclass(frozen=True)
@@ -173,3 +174,32 @@ def looks_of_choices(records: Records, choices: Sequence[str]) -> list[Look]:
 def built_in_choices(records: Records) -> list[str]:
     """Return the choices of the look file that holds each slot's built-in film."""
     return [f"ART{slot.art}={slot.built_in}" for slot in records.slots]
+
+
+def pack_choices(paths: RepoPaths, choices: Sequence[str]) -> tuple[bytes, list[Look]]:
+    """Return the look file of choices like ``ART2=velvia``, and its looks.
+
+    The one way the command line (``epm2mod looks pack``) and the local app (``epm2mod serve``) pack a look file
+    from choices.
+
+    Raises:
+        BuildError: if the records or a choice are wrong.
+    """
+    looks = looks_of_choices(load(paths), choices)
+    return pack(looks), looks
+
+
+def write_to_card(card: Path, data: bytes) -> Path:
+    """Write a look file to the top folder of an SD card and read it back.
+
+    Returns:
+        The path of the file on the card.
+
+    Raises:
+        BuildError: if ``card`` is not a folder or the write fails.
+    """
+    if not card.is_dir():
+        raise BuildError(f"{card}: not a folder (the top folder of the SD card)")
+    target = card / CARD_NAME
+    write_bytes(target, data, BuildError, read_back=True)
+    return target

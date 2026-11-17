@@ -47,6 +47,7 @@ import os
 import shutil
 import subprocess
 import sys
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -368,6 +369,14 @@ def clear_outputs(paths: RepoPaths, name: str | None) -> None:
         ) from None
 
 
+#: The number of steps of ``make``; ``step`` reports each one when it ends.
+STEPS = 5
+
+
+def no_step(number: int) -> None:
+    """Ignore the end of a step of ``make``."""
+
+
 def make(
     paths: RepoPaths,
     description: BuildDescription,
@@ -375,6 +384,7 @@ def make(
     log: Log = silent,
     stock: StockFirmware = EPM2_V16,
     output: Path | None = None,
+    step: Callable[[int], None] = no_step,
 ) -> MakeResult:
     """Make a firmware build.
 
@@ -389,6 +399,8 @@ def make(
         output: a path for one more copy of the firmware file, or None. If it
             is a folder that exists, the file goes into it under the camera's
             file name.
+        step: called with 1 to ``STEPS`` as each step ends, for a progress
+            display that does not read the log text.
 
     Returns:
         The paths of what was written, and the SHA-256.
@@ -410,6 +422,7 @@ def make(
 
     stock_data = obtain_stock(paths, stock, log)
     log("1/5 stock firmware: ok")
+    step(1)
 
     if description.tested:
         log(
@@ -424,11 +437,14 @@ def make(
                 "run code on a camera. The flash is the test of that area."
             )
 
+    step(2)
+
     applied, digest = build_image(description, specs, stock_data)
     log(
         f"3/5 applied {len(description.specs)} patch specs "
         f"({applied.changed_bytes} bytes changed)"
     )
+    step(3)
     if description.tested:
         log(
             f"4/5 sha256 {digest}: this is the build that was tested on "
@@ -439,6 +455,7 @@ def make(
             f"4/5 sha256 {digest}\n    CANDIDATE: this build is NOT camera-tested. "
             "Write the sha256 in docs/camera-log.md before you flash it."
         )
+    step(4)
 
     try:
         write_bytes(image, applied.image, BuildError, read_back=True)
@@ -478,6 +495,7 @@ def make(
                 f"Copy the folder {CARD_FOLDER} to the top folder of the SD card. "
                 "Then, with the camera off, hold OK and switch the camera on."
             )
+    step(5)
     return MakeResult(description, image, card_copy, on_card, digest)
 
 

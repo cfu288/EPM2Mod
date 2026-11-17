@@ -18,6 +18,9 @@ export interface Card {
 export interface Job {
   job: number
   lines: string[]
+  /** The last step of the build that ended, 0 to `steps`. */
+  step: number
+  steps: number
   done: boolean
   error: string | null
   sha256: string | null

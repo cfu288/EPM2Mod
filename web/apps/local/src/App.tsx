@@ -18,18 +18,13 @@ const ZIP_NAME = 'EPM2Mod-card.zip'
 const RESTORE = `${REPO}/blob/main/docs/install.md#restore-original-firmware`
 const FEATURES = `${REPO}#added-features`
 
-/** The stages a user sees, and the step of `epm2mod make` ("N/5 ...") that ends each one. */
+/** The stages a user sees, and the step of the build (`epm2mod make`, steps 1 to 5) that ends each one. */
 const STAGES = [
   { label: "Download Olympus's firmware and check it", step: 1 },
   { label: 'Add the EPM2Mod changes', step: 3 },
   { label: 'Check the result against the tested build', step: 4 },
   { label: 'Write the files', step: 5 },
 ]
-
-/** The last step of `epm2mod make` that a job's lines report, 0 before the first. */
-function lastStep(lines: readonly string[]): number {
-  return Math.max(0, ...lines.map((line) => Number(/^(\d)\/5 /.exec(line)?.[1] ?? 0)))
-}
 
 function save(blob: Blob, name: string) {
   const url = URL.createObjectURL(blob)
@@ -69,8 +64,13 @@ function UpdateSteps({ zip, looks }: { zip: boolean; looks: boolean }) {
       <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm">
         {zip ? (
           <>
-            <li>Unzip {ZIP_NAME} into the top folder of the SD card, beside DCIM.</li>
-            <li>Open the folder DCOLYMP on the card. Delete every file in it except E1019999.BIN.</li>
+            <li>
+              Open {ZIP_NAME}. It holds the folder DCOLYMP{looks ? ` and the file ${CARD_NAME}` : ''}.
+            </li>
+            <li>
+              Copy {looks ? 'both' : 'the folder'} to the top folder of the SD card, beside DCIM. Replace the DCOLYMP
+              folder if the card has one.
+            </li>
           </>
         ) : (
           <li>Eject the SD card from this computer and take it out.</li>
@@ -101,7 +101,6 @@ function UpdateSteps({ zip, looks }: { zip: boolean; looks: boolean }) {
 
 /** The job's stages with a mark for each one that is done, and the full lines of the build tool under Details. */
 function Progress({ job }: { job: Job }) {
-  const step = lastStep(job.lines)
   return (
     <section aria-labelledby="progress-heading">
       <h2 id="progress-heading" className="section-title border-t-[6px] pt-4 text-lg">
@@ -109,7 +108,7 @@ function Progress({ job }: { job: Job }) {
       </h2>
       <ol aria-live="polite" className="mt-3 space-y-1 text-sm">
         {STAGES.map((stage) => {
-          const done = step >= stage.step && (stage.step < 5 || (job.done && job.error === null))
+          const done = job.step >= stage.step && (stage.step < job.steps || (job.done && job.error === null))
           return (
             <li key={stage.step} className={done ? '' : 'text-muted'}>
               {done ? '✓' : '·'} {stage.label}

@@ -195,29 +195,24 @@ def _looks_pack(args: argparse.Namespace, paths: RepoPaths) -> int:
 
     items = list(args.items)
     if all(records.is_choice(item) for item in items):
-        films = records.load(paths)
-        looks = records.looks_of_choices(
-            films, items or records.built_in_choices(films)
-        )
+        choices = items or records.built_in_choices(records.load(paths))
+        data, looks = records.pack_choices(paths, choices)
     elif len(items) == 1:
         try:
             from .looks import lookpack
         except ModuleNotFoundError as error:
             raise _numpy_needed(error) from None
         looks = lookpack.load_list(paths, Path(items[0]))
+        data = lookfile.pack(looks)
     else:
         raise BuildError("give choices like ART2=velvia, or one look list")
-    data = lookfile.pack(looks)
     if args.card:
-        card = Path(args.card)
-        if not card.is_dir():
-            raise BuildError(f"{card}: not a folder (the top folder of the SD card)")
-        out = card / lookfile.CARD_NAME
+        out = records.write_to_card(Path(args.card), data)
     else:
         out = Path(args.out) if args.out else paths.output / lookfile.CARD_NAME
         if out.is_dir():
             out = out / lookfile.CARD_NAME
-    write_bytes(out, data)
+        write_bytes(out, data)
     print(f"wrote {out}: {len(data)} bytes, sha256 {sha256_bytes(data)}")
     for look in looks:
         print(f"  ART {look.slot + 1:2}  {look.name}")

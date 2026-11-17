@@ -31,6 +31,8 @@ function server(cards = [CARD]) {
         job = {
           job: made.length,
           lines: ['1/5 stock firmware: ok'],
+          step: 5,
+          steps: 5,
           done: true,
           error: null,
           sha256: BUILD.sha256,
@@ -89,7 +91,8 @@ describe('the local app', () => {
     expect(first?.choices).toHaveLength(12)
     expect(await screen.findByRole('button', { name: 'Download EPM2Mod-card.zip' })).toBeInTheDocument()
     const steps = screen.getByRole('region', { name: 'Update the camera' })
-    expect(steps).toHaveTextContent('Unzip EPM2Mod-card.zip into the top folder of the SD card')
+    expect(steps).toHaveTextContent('It holds the folder DCOLYMP and the file EPM2LOOK.BIN.')
+    expect(steps).toHaveTextContent('Copy both to the top folder of the SD card, beside DCIM.')
     expect(within(steps).getByText('Then load your films')).toBeInTheDocument()
   })
 })

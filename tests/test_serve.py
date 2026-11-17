@@ -95,9 +95,10 @@ class FakeRunner:
         self.release = threading.Event()
         self.release.set()
 
-    def __call__(self, paths, description, choices, card, log):  # type: ignore[no-untyped-def]
+    def __call__(self, paths, description, choices, card, log, step):  # type: ignore[no-untyped-def]
         self.calls.append((choices, card))
         log("1/5 stock firmware: ok")
+        step(1)
         self.release.wait(10)
         if choices == ["ART3=c200"]:
             raise BuildError("the card is full")
@@ -174,6 +175,7 @@ class ServerTests(unittest.TestCase):
         state = self.server.wait()
         self.assertEqual((state["error"], state["sha256"]), (None, "ab" * 32))
         self.assertEqual(state["lines"], ["1/5 stock firmware: ok"])
+        self.assertEqual((state["step"], state["steps"]), (1, 5))
         self.assertEqual(self.runner.calls, [(["ART2=velvia"], None)])
         status, data = self.server.request("GET", "/api/zip")
         self.assertEqual(status, 200)
@@ -264,9 +266,11 @@ class EndToEndTests(unittest.TestCase):
             choices = ["ART2=velvia", "ART6=double-x", "ART12=vision3-500t"]
             lines: list[str] = []
             description = pinned_description(paths)
+            steps: list[int] = []
             sha, files = serve.run_job(
-                paths, description, choices, app_card, lines.append
+                paths, description, choices, app_card, lines.append, steps.append
             )
+            self.assertEqual(steps, [1, 2, 3, 4, 5])
             self.assertEqual(sha, description.sha256)
             env = {"EPM2MOD_ROOT": str(paths.root)}
             with redirect_stdout(io.StringIO()), mock.patch.dict(os.environ, env):

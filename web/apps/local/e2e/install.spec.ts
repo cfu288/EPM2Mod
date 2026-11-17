@@ -17,6 +17,8 @@ async function fakeServer(page: Page) {
     return {
       job: made.length,
       lines: done ? ['1/5 stock firmware: ok', '5/5 card-looks-4'] : ['1/5 stock firmware: ok'],
+      step: done ? 5 : 1,
+      steps: 5,
       done,
       error: null,
       sha256: 'ab'.repeat(32),
