@@ -1,0 +1,95 @@
+# The release zip for users who don't code (epm2mod release): built once, then unpacked and started with each
+# system's launcher on Linux, macOS and Windows, which makes the pinned build from OM's firmware. A tag v* also
+# publishes the zip as a GitHub release.
+name: release
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+    paths: ['src/**', 'release/**', 'web/**', 'builds/**', 'patches/**', 'pinned-build.json', 'looks/film-records.json', '.github/workflows/release.yml', '.github/scripts/release_smoke.py']
+  pull_request:
+    paths: ['src/**', 'release/**', 'web/**', 'builds/**', 'patches/**', 'pinned-build.json', 'looks/film-records.json', '.github/workflows/release.yml', '.github/scripts/release_smoke.py']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      name: ${{ steps.zip.outputs.name }}
+      sha256: ${{ steps.zip.outputs.sha256 }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - run: npm ci && npm run build:app
+        working-directory: web
+      - id: zip
+        env:
+          PYTHONPATH: src
+        run: |
+          python -m epm2mod release -o dist
+          name=$(basename dist/*.zip .zip)
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "sha256=$(python -c 'from epm2mod.builds import pinned_description; from epm2mod.paths import repo_paths; print(pinned_description(repo_paths()).sha256)')" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-zip
+          path: dist/*.zip
+          if-no-files-found: error
+
+  smoke:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: .github/scripts
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-zip
+          path: zip
+      # unpack as each system's own tool does
+      - if: runner.os == 'Linux'
+        run: unzip -q "zip/${{ needs.build.outputs.name }}.zip" -d unpacked
+      - if: runner.os == 'macOS'
+        run: ditto -x -k "zip/${{ needs.build.outputs.name }}.zip" unpacked
+      - if: runner.os == 'Windows'
+        shell: pwsh
+        run: Expand-Archive -LiteralPath "zip/${{ needs.build.outputs.name }}.zip" -DestinationPath unpacked
+      - run: python .github/scripts/release_smoke.py "unpacked/${{ needs.build.outputs.name }}" "${{ needs.build.outputs.sha256 }}"
+
+  publish:
+    needs: [build, smoke]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-zip
+          path: zip
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ github.ref_name }}" zip/*.zip --repo "${{ github.repository }}" --title "EPM2Mod ${{ github.ref_name }}" --notes "Download the zip, unzip it and open README.txt. Firmware build ${{ needs.build.outputs.name }}, sha256 ${{ needs.build.outputs.sha256 }}."

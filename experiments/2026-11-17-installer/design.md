@@ -71,6 +71,14 @@ Its criteria (agreed earlier):
    `src/epm2mod/app/` by `npm run build:app`). Lint rules keep the apps from importing each other.
 5. Release zip from CI: launchers (pinned uv version, sha256-checked), package, pinned build's specs, built app
    page; a CI test that unpacks the zip and makes the pinned build from it.
+   Built 2026-11-17: `epm2mod release` (`src/epm2mod/release.py`) writes `EPM2Mod-<build>.zip` from the pinned
+   build description; launchers in `release/` (uv 0.13.6, sha256 per system; uv's Python 3.12 and its cache stay in
+   the folder's `.uv`). The package needs only the standard library, so the launchers run it from `src` with
+   `uv run --no-project`: no install step, no `uv.lock` needed. `.github/workflows/release.yml` unpacks the zip with
+   each system's own tool on Linux, macOS and Windows and runs `.github/scripts/release_smoke.py` (make with the
+   pinned sha, cards, serve); a tag `v*` publishes the zip. The README links the zip once a release exists.
+   Checked in the emulator: a Mac hidden file (short name `_E101~1.BIN`) beside the firmware in `DCOLYMP` leaves the
+   update path as stock (update-path-test PASS); the long-name entry and the hidden attribute are not emulated.
 
 ## Notes for whoever implements this
 

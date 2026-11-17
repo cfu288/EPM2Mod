@@ -8,6 +8,7 @@
     epm2mod builds                                list the build descriptions
     epm2mod cards                                 list the SD cards plugged into this computer
     epm2mod serve [--port N] [--no-browser]       open the local app page
+    epm2mod release [-o DIR]                      write the release zip (launchers, package, pinned build)
     epm2mod apply SPEC... -o OUT.BIN              apply patch specs (no build description)
     epm2mod info FIRMWARE.BIN                     describe a firmware file
     epm2mod readme [--check]                      refresh the generated parts of the documents
@@ -320,6 +321,17 @@ def _serve(args: argparse.Namespace, paths: RepoPaths) -> int:
     return 0
 
 
+def _release(args: argparse.Namespace, paths: RepoPaths) -> int:
+    """Run ``epm2mod release``: write the release zip."""
+    from .release import make_release
+
+    out = make_release(paths, Path(args.out) if args.out else paths.output)
+    print(
+        f"wrote {out}: {out.stat().st_size} bytes, sha256 {sha256_bytes(out.read_bytes())}"
+    )
+    return 0
+
+
 def _log(args: argparse.Namespace, paths: RepoPaths) -> int:
     """Run ``epm2mod log``: print a camera log as JSON lines or as a summary."""
     words, *older = _dictionaries(args, paths)
@@ -393,6 +405,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
     serve_cmd.add_argument(
         "--no-browser", action="store_true", help="print the address only"
+    )
+    release_cmd = command(
+        "release", _release, "Write the release zip for users who don't code."
+    )
+    release_cmd.add_argument(
+        "-o", "--out", metavar="DIR", help="the folder of the zip; default: build/"
     )
 
     apply_cmd = command(
