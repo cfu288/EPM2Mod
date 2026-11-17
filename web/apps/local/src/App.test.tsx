@@ -63,7 +63,7 @@ describe('the local app', () => {
     await waitFor(() => {
       expect(screen.getByRole('combobox', { name: 'Write to' })).toHaveValue(CARD.path)
     })
-    await user.click(screen.getByRole('button', { name: 'Make firmware' }))
+    await user.click(screen.getByRole('button', { name: 'Build custom firmware' }))
     expect(made).toEqual([{ choices: [], card: CARD.path }])
     const steps = await screen.findByRole('region', { name: 'Update the camera' })
     expect(steps).toHaveTextContent('Camera off: hold OK and switch it on.')
@@ -76,10 +76,10 @@ describe('the local app', () => {
     const user = userEvent.setup()
     render(<App />)
     expect(await screen.findByRole('combobox', { name: 'Write to' })).toHaveValue('')
-    await user.click(screen.getByRole('checkbox', { name: 'Choose the films in the ART menu' }))
+    await user.click(screen.getByRole('checkbox', { name: 'Customize the films in the ART menu' }))
     await user.click(screen.getByRole('button', { name: 'Remove Kodak Ektachrome 100 from ART 2' }))
     await user.click(screen.getByRole('button', { name: 'Add Fujifilm C200' }))
-    await user.click(screen.getByRole('button', { name: 'Make firmware' }))
+    await user.click(screen.getByRole('button', { name: 'Build custom firmware' }))
     await waitFor(() => {
       expect(made).toHaveLength(1)
     })

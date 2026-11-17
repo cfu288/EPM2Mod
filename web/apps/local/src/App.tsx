@@ -7,11 +7,11 @@ const ZIP_NAME = 'EPM2Mod-card.zip'
 const RESTORE = `${REPO}/blob/main/docs/install.md#restore-original-firmware`
 
 /** The stages shown while the firmware is made, and the step of `epm2mod make` (1 to 5) that ends each one. */
-const STAGES = [
+const stages = (zip: boolean) => [
   { label: "Download Olympus's firmware", step: 1 },
   { label: 'Add EPM2Mod', step: 3 },
-  { label: 'Check it', step: 4 },
-  { label: 'Write the files', step: 5 },
+  { label: 'Check the result', step: 4 },
+  { label: zip ? 'Prepare the zip' : 'Write to the SD card', step: 5 },
 ]
 
 function save(blob: Blob, name: string) {
@@ -29,7 +29,7 @@ function Progress({ job }: { job: Job }) {
   return (
     <section aria-label="Progress">
       <ol aria-live="polite" className="space-y-1 text-sm">
-        {STAGES.map((stage) => {
+        {stages(job.card === null).map((stage) => {
           const done = job.step >= stage.step && (stage.step < job.steps || (job.done && job.error === null))
           return (
             <li key={stage.step} className={done ? '' : 'text-muted'}>
@@ -43,14 +43,6 @@ function Progress({ job }: { job: Job }) {
           {job.error}
         </p>
       )}
-      <details className="mt-2 text-xs">
-        <summary className="text-muted cursor-pointer">Details</summary>
-        <ol className="mt-2 space-y-1 font-mono break-words whitespace-pre-wrap">
-          {job.lines.map((line, index) => (
-            <li key={index}>{line}</li>
-          ))}
-        </ol>
-      </details>
     </section>
   )
 }
@@ -155,7 +147,7 @@ export default function App() {
               }}
               className="accent-ink size-4"
             />
-            Choose the films in the ART menu
+            Customize the films in the ART menu
           </label>
           {withLooks && (
             <div className="mt-6 space-y-8">
@@ -171,7 +163,7 @@ export default function App() {
           onClick={start}
           className="btn bg-ink hover:text-ink disabled:bg-rule w-full justify-center py-3 text-base text-white hover:bg-white"
         >
-          {running ? 'Making…' : 'Make firmware'}
+          {running ? 'Building…' : 'Build custom firmware'}
         </button>
 
         {problem && (
