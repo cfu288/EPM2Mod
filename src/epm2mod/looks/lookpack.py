@@ -145,6 +145,7 @@ class CatalogueFilm:
         id: the short name used on the command line, for example ``velvia``.
         name: the name the camera shows, at most 16 characters.
         film: the film's full name.
+        kind: what kind of film it is, in a few words (for example "Slide").
         medium: how the film was simulated.
         fit: path of the fit file, relative to the repository root.
         note: a remark for the list (where it is built in, its accuracy), or "".
@@ -153,6 +154,7 @@ class CatalogueFilm:
     id: str
     name: str
     film: str
+    kind: str
     medium: str
     fit: str
     note: str
@@ -169,7 +171,7 @@ def load_catalogue(paths: RepoPaths) -> dict[str, CatalogueFilm]:
     if not isinstance(films, list):
         raise BuildError(f"{paths.catalogue}: an object with a list 'films'")
     out: dict[str, CatalogueFilm] = {}
-    keys = {"id", "name", "film", "medium", "fit", "note"}
+    keys = {"id", "name", "film", "kind", "medium", "fit", "note"}
     for item in films:
         if not isinstance(item, dict) or set(item) != keys:
             raise BuildError(f"{paths.catalogue}: each film has exactly {sorted(keys)}")
@@ -182,8 +184,8 @@ def load_catalogue(paths: RepoPaths) -> dict[str, CatalogueFilm]:
     return out
 
 
-#: A choice on the command line: ART<n>=<film id>[:<name>].
-_CHOICE = re.compile(r"^ART(\d{1,2})=([a-z0-9-]+)(?::(.+))?$", re.IGNORECASE)
+#: A choice on the command line: ART<n>=<film id>.
+_CHOICE = re.compile(r"^ART(\d{1,2})=([a-z0-9-]+)$", re.IGNORECASE)
 
 
 def is_choice(text: str) -> bool:
@@ -192,10 +194,10 @@ def is_choice(text: str) -> bool:
 
 
 def looks_of_choices(paths: RepoPaths, choices: Sequence[str]) -> list[Look]:
-    """Return the looks of choices like ``ART2=velvia`` or ``ART6=double-x:My B&W``.
+    """Return the looks of choices like ``ART2=velvia``.
 
-    ART<n> is the art filter's number in the camera's menus (1 to 12); the film is an id of the catalogue; the
-    optional name replaces the film's name.
+    ART<n> is the art filter's number in the camera's menus (1 to 12); the film is an id of the catalogue. The
+    camera shows the film's own name.
 
     Raises:
         BuildError: if a choice is malformed, names an unknown film or an ART number twice.
@@ -210,11 +212,7 @@ def looks_of_choices(paths: RepoPaths, choices: Sequence[str]) -> list[Look]:
             raise BuildError(
                 f"'{text}': write ART<1-12>=<film>, for example ART2=velvia"
             )
-        number, film_id, name = (
-            int(match.group(1)),
-            match.group(2).lower(),
-            match.group(3),
-        )
+        number, film_id = int(match.group(1)), match.group(2).lower()
         if not 1 <= number <= len(MENU_ENTRIES) or number in seen:
             raise BuildError(f"'{text}': ART 1 to {len(MENU_ENTRIES)}, each once")
         if film_id not in catalogue:
@@ -226,7 +224,7 @@ def looks_of_choices(paths: RepoPaths, choices: Sequence[str]) -> list[Look]:
         fit = load_fit(paths.resolve(film.fit))
         try:
             looks.append(
-                look_of_fit(fit, MENU_ENTRIES[number - 1], name or film.name, film.fit)
+                look_of_fit(fit, MENU_ENTRIES[number - 1], film.name, film.fit)
             )
         except LookFileError as error:
             raise LookFileError(f"'{text}': {error}") from None
@@ -255,7 +253,7 @@ def web_data(paths: RepoPaths) -> dict[str, Any]:
                 "id": film.id,
                 "name": film.name,
                 "film": film.film,
-                "medium": film.medium,
+                "kind": film.kind,
                 "note": film.note,
                 "record": base64.b64encode(record).decode("ascii"),
             }

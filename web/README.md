@@ -1,10 +1,11 @@
 # Film looks web app
 
-A static page where users choose a film for each art filter (ART 1 to 12) of the E-PM2 mod and download
-`EPM2LOOK.BIN`, without the command line. It is published at https://cfu288.github.io/EPM2Mod/ by
+A static page where users choose which films are in the camera's ART menu (ART 1 to 12) and in which order, by drag
+and drop, and download `EPM2LOOK.BIN`, without the command line. It is published at https://cfu288.github.io/EPM2Mod/ by
 `.github/workflows/web.yml` on every change to `main`.
 
-- React, Vite, Tailwind CSS, Headless UI; components adapted from Tailwind UI.
+- React, Vite, Tailwind CSS, Headless UI, dnd-kit (drag and drop, with the keyboard too); components adapted from
+  Tailwind UI.
 - `src/data/films.json`: the films and their look records, made by `uv run python web/scripts/export_films.py`
   from `looks/catalogue.json` (a test of the Python suite fails when it is out of date).
 - `public/previews/`: the camera's Picture Mode strip for each film in each slot, drawn by the emulator
@@ -17,7 +18,10 @@ Work on it with Node 26 (`.nvmrc`):
 cd web
 npm ci
 npm run dev      # local server
-npm run check    # format, lint, type check, tests, build: what CI runs
+npm run check    # format, lint, type check, unit tests, build
+npm run e2e      # browser tests of drag and drop and the download (Playwright; once: npx playwright install chromium)
 ```
+
+CI runs both.
 
 The packed file is byte-equal to `uv run epm2mod looks pack` (`src/lib/lookfile.test.ts`).

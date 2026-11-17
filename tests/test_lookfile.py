@@ -274,13 +274,11 @@ class ChoiceTests(unittest.TestCase):
             self.assertTrue(all(isinstance(look, ColourLook) for look in looks))
             lookfile.unpack(lookfile.pack(looks))
 
-    def test_a_choice_names_an_art_number_a_film_and_maybe_a_name(self) -> None:
-        looks = lookpack.looks_of_choices(
-            PATHS, ["ART2=velvia", "art12=vision3-500t:Cinestill 800T"]
-        )
+    def test_a_choice_names_an_art_number_and_a_film(self) -> None:
+        looks = lookpack.looks_of_choices(PATHS, ["ART2=velvia", "art12=vision3-500t"])
         self.assertEqual(
             [(look.slot, look.name) for look in looks],
-            [(1, "Velvia"), (11, "Cinestill 800T")],
+            [(1, "Velvia"), (11, "Vis 500T")],
         )
         same = lookpack.load_list(PATHS, PATHS.card_looks)[6]
         assert isinstance(same, ColourLook)
@@ -290,7 +288,7 @@ class ChoiceTests(unittest.TestCase):
             ["ART13=velvia"],
             ["ART2=velvia", "ART2=c200"],
             ["ART2=nofilm"],
-            ["ART2=velvia:" + "x" * 17],
+            ["ART2=velvia:My Velvia"],
             ["Velvia"],
         ):
             with self.assertRaises((BuildError, LookFileError), msg=str(bad)):

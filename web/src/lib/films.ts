@@ -6,7 +6,8 @@ export interface Film {
   /** The name the camera shows, at most 16 characters. */
   name: string
   film: string
-  medium: string
+  /** What kind of film it is, in a few words, for example "Slide". */
+  kind: string
   note: string
   /** The 1,708-byte look record for slot 0 under `name`, base64. */
   record: string
@@ -31,8 +32,4 @@ export function filmById(id: string): Film {
   const film = byId.get(id)
   if (!film) throw new Error(`no film '${id}'`)
   return film
-}
-
-export function isFilmId(id: string): boolean {
-  return byId.has(id)
 }

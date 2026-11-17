@@ -1,21 +1,13 @@
-import { useEffect, useState } from 'react'
-import { ArrowDownTrayIcon, ArrowUturnLeftIcon } from '@heroicons/react/20/solid'
-import { InformationCircleIcon } from '@heroicons/react/20/solid'
-import { FilmSelect } from './components/FilmSelect'
-import { NameField } from './components/NameField'
+import { useState } from 'react'
+import { ArrowDownTrayIcon, ExclamationTriangleIcon } from '@heroicons/react/20/solid'
+import { FilmLibrary } from './components/FilmLibrary'
+import { SlotList } from './components/SlotList'
 import { StripPreview } from './components/StripPreview'
-import { slots } from './lib/films'
+import { films } from './lib/films'
 import { CARD_NAME } from './lib/lookfile'
-import {
-  builtInChoices,
-  choicesValid,
-  fromSearch,
-  isChanged,
-  lookFile,
-  toSearch,
-  withFilm,
-  type SlotChoice,
-} from './lib/selection'
+import { addFilm, builtInSlots, firstEmpty, lookFile, moveSlot, removeFilm, type SlotItem } from './lib/selection'
+
+const INSTALL = 'https://github.com/cfu288/EPM2Mod#install'
 
 function download(bytes: Uint8Array) {
   const url = URL.createObjectURL(new Blob([bytes as BlobPart], { type: 'application/octet-stream' }))
@@ -27,138 +19,136 @@ function download(bytes: Uint8Array) {
 }
 
 export default function App() {
-  const [choices, setChoices] = useState<SlotChoice[]>(() => fromSearch(window.location.search))
-  const [focus, setFocus] = useState(() => choices.find(isChanged)?.art ?? 1)
-
-  // the URL holds the changes, so a choice can be shared or bookmarked
-  useEffect(() => {
-    window.history.replaceState(null, '', `${window.location.pathname}${toSearch(choices)}`)
-  }, [choices])
-
-  const update = (art: number, change: (choice: SlotChoice) => SlotChoice) => {
-    setChoices((all) => all.map((choice) => (choice.art === art ? change(choice) : choice)))
-    setFocus(art)
-  }
-  const changed = choices.filter(isChanged).length
-  const valid = choicesValid(choices)
-  const focused = choices.find((choice) => choice.art === focus) ?? choices[0]
+  const [items, setItems] = useState<SlotItem[]>(builtInSlots)
+  const [selected, setSelected] = useState(0)
+  const empty = firstEmpty(items)
+  const unused = films.filter((film) => !items.some((item) => item.filmId === film.id))
 
   return (
     <div className="min-h-full">
       <header className="border-b border-gray-200 bg-white dark:border-white/10 dark:bg-gray-900">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">E-PM2 film looks</h1>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            Choose a film for each art filter (ART 1 to 12) and download {CARD_NAME} for the camera.
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
+            Film looks for the Olympus PEN E-PM2
+          </h1>
+          <p className="mt-2 max-w-3xl text-gray-700 dark:text-gray-300">
+            Choose which film looks appear in the camera's ART menu (the art filters, ART 1 to 12) and in which order.
+            Then download one file and load it on the camera.
           </p>
+          <div className="mt-4 max-w-3xl rounded-md bg-yellow-50 p-4 dark:bg-yellow-500/10 dark:outline dark:outline-yellow-500/15">
+            <div className="flex">
+              <ExclamationTriangleIcon
+                aria-hidden="true"
+                className="size-5 shrink-0 text-yellow-400 dark:text-yellow-300"
+              />
+              <p className="ml-3 text-sm text-yellow-800 dark:text-yellow-200">
+                The camera must run the EPM2Mod firmware first. Without it, the file does nothing.{' '}
+                <a className="font-medium underline hover:text-yellow-700 dark:hover:text-yellow-100" href={INSTALL}>
+                  How to install EPM2Mod
+                </a>
+              </p>
+            </div>
+          </div>
         </div>
       </header>
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-          <section aria-labelledby="slots-heading" className="lg:col-span-2">
-            <h2 id="slots-heading" className="sr-only">
-              Art filters
-            </h2>
-            <ul className="divide-y divide-gray-200 dark:divide-white/10">
-              {choices.map((choice) => {
-                const slot = slots[choice.art - 1]
-                if (!slot) return null
-                return (
-                  <li
-                    key={choice.art}
-                    className="grid grid-cols-1 gap-4 py-5 sm:grid-cols-[5rem_1fr_1fr]"
-                    onFocusCapture={() => {
-                      setFocus(choice.art)
-                    }}
-                  >
-                    <div>
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white">ART {choice.art}</p>
-                      {isChanged(choice) && (
-                        <span className="mt-1 inline-flex items-center rounded-md bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700 inset-ring inset-ring-indigo-700/10 dark:bg-indigo-400/10 dark:text-indigo-400 dark:inset-ring-indigo-400/30">
-                          Changed
-                        </span>
-                      )}
-                    </div>
-                    <FilmSelect
-                      art={choice.art}
-                      value={choice.filmId}
-                      builtIn={slot.builtIn}
-                      onChange={(film) => {
-                        update(choice.art, (c) => withFilm(c, film))
-                      }}
-                    />
-                    <NameField
-                      art={choice.art}
-                      value={choice.name}
-                      onChange={(name) => {
-                        update(choice.art, (c) => ({ ...c, name }))
-                      }}
-                    />
-                  </li>
-                )
-              })}
-            </ul>
-          </section>
-
-          <aside className="order-first space-y-6 lg:sticky lg:top-8 lg:order-none lg:self-start">
-            {focused && <StripPreview choice={focused} />}
-
-            <div className="flex flex-wrap gap-3">
-              <button
-                type="button"
-                disabled={changed === 0 || !valid}
-                onClick={() => {
-                  download(lookFile(choices))
-                }}
-                className="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-indigo-500 dark:shadow-none dark:hover:bg-indigo-400"
-              >
-                <ArrowDownTrayIcon aria-hidden="true" className="-ml-0.5 size-5" />
-                Download {CARD_NAME}
-              </button>
-              <button
-                type="button"
-                disabled={changed === 0}
-                onClick={() => {
-                  setChoices(builtInChoices())
-                }}
-                className="inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs inset-ring inset-ring-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white/10 dark:text-white dark:shadow-none dark:inset-ring-white/5 dark:hover:bg-white/20"
-              >
-                <ArrowUturnLeftIcon aria-hidden="true" className="-ml-0.5 size-5" />
-                Built-in looks
-              </button>
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {changed === 0
-                ? 'Every art filter holds its built-in film. Choose a film to change one.'
-                : `${String(changed)} of 12 art filters change. The others keep their built-in film.`}
-            </p>
-
-            <div className="rounded-md bg-blue-50 p-4 dark:bg-blue-500/10 dark:outline dark:outline-blue-500/20">
-              <div className="flex">
-                <div className="shrink-0">
-                  <InformationCircleIcon aria-hidden="true" className="size-5 text-blue-400" />
-                </div>
-                <div className="ml-3 text-sm text-blue-700 dark:text-blue-300">
-                  <h3 className="font-medium text-blue-800 dark:text-blue-200">On the camera</h3>
-                  <ol className="mt-2 list-decimal space-y-1 pl-5">
-                    <li>Copy {CARD_NAME} to the top folder of the SD card.</li>
-                    <li>MENU → Custom Menu → J → Load Looks → Load → OK.</li>
-                    <li>The row reads Loaded. Built-in in the same row brings the built-in films back.</li>
-                  </ol>
-                </div>
+          <div className="space-y-10 lg:col-span-2">
+            <section aria-labelledby="menu-heading">
+              <h2 id="menu-heading" className="text-lg font-semibold text-gray-900 dark:text-white">
+                Your camera's ART menu
+              </h2>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                Drag a row by its handle (☰) to change the order. Select a row to preview it on the camera screen.
+              </p>
+              <div className="mt-3">
+                <SlotList
+                  items={items}
+                  selected={selected}
+                  onMove={(from, to) => {
+                    setItems((all) => moveSlot(all, from, to))
+                    setSelected(to)
+                  }}
+                  onRemove={(index) => {
+                    setItems((all) => removeFilm(all, index))
+                    setSelected(index)
+                  }}
+                  onSelect={setSelected}
+                />
               </div>
+            </section>
+
+            <section aria-labelledby="more-heading">
+              <h2 id="more-heading" className="text-lg font-semibold text-gray-900 dark:text-white">
+                More films
+              </h2>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                {empty >= 0
+                  ? `Add puts a film into ART ${String(empty + 1)}, the first empty row.`
+                  : 'The menu holds 12 films. Remove one (×) to add another.'}
+              </p>
+              <div className="mt-3">
+                <FilmLibrary
+                  films={unused}
+                  canAdd={empty >= 0}
+                  onAdd={(film) => {
+                    setItems((all) => addFilm(all, empty, film.id))
+                    setSelected(empty)
+                  }}
+                />
+              </div>
+            </section>
+          </div>
+
+          {/* On a phone the preview comes first and the download after the lists. */}
+          <aside className="contents lg:sticky lg:top-8 lg:block lg:space-y-6 lg:self-start">
+            <div className="order-first lg:order-none">
+              <StripPreview art={selected + 1} filmId={items[selected]?.filmId ?? null} />
+            </div>
+            <div className="space-y-6">
+              <div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    download(lookFile(items))
+                  }}
+                  className="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:shadow-none dark:hover:bg-indigo-400"
+                >
+                  <ArrowDownTrayIcon aria-hidden="true" className="-ml-0.5 size-5" />
+                  Download {CARD_NAME}
+                </button>
+                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                  The file holds only the film looks. It is not a firmware update.
+                </p>
+              </div>
+              <section aria-labelledby="load-heading">
+                <h2 id="load-heading" className="text-base font-semibold text-gray-900 dark:text-white">
+                  Load it on the camera
+                </h2>
+                <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm text-gray-700 dark:text-gray-300">
+                  <li>Copy {CARD_NAME} to the top folder of the SD card.</li>
+                  <li>
+                    On the camera: MENU → Custom Menu (gears tab) → group J → Load Looks → Load → OK. No gears tab? Turn
+                    it on in Setup Menu → Menu Display.
+                  </li>
+                  <li>
+                    Load Looks reads Loaded, and the ART menu shows your films. The camera keeps them after power-off.
+                  </li>
+                </ol>
+                <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">To undo: Load Looks → Built-in → OK.</p>
+              </section>
             </div>
           </aside>
         </div>
       </main>
 
       <footer className="mx-auto max-w-7xl px-4 pb-8 text-xs text-gray-500 sm:px-6 lg:px-8">
-        For the E-PM2 with the EPM2Mod firmware (build card-looks-4 or later). Film look data derived from{' '}
+        The film looks are fitted from{' '}
         <a className="underline" href="https://github.com/andreavolpato/spektrafilm">
           spektrafilm
         </a>{' '}
-        by Andrea Volpato, CC BY-SA 4.0, fitted to the camera.
+        by Andrea Volpato (CC BY-SA 4.0). The looks imitate these films; they are not products of Kodak or Fujifilm.
       </footer>
     </div>
   )

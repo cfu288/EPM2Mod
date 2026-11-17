@@ -1,6 +1,6 @@
 import { filmById, slots } from './films'
 import { crc32, decodeBase64, nameProblem, packLooks, RECORD_BYTES } from './lookfile'
-import { builtInChoices, fromSearch, isChanged, lookFile, toSearch, withFilm } from './selection'
+import { builtInSlots, lookFile } from './selection'
 
 async function sha256(bytes: Uint8Array): Promise<string> {
   const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', bytes as BufferSource))
@@ -8,34 +8,27 @@ async function sha256(bytes: Uint8Array): Promise<string> {
 }
 
 describe('the look file', () => {
-  it('packs the twelve built-in looks to the bytes of the repository tool (docs/look-file-format.md)', async () => {
-    const all = builtInChoices().map((c) => ({
-      record: decodeBase64(filmById(c.filmId).record),
-      art: c.art,
-      name: c.name,
-    }))
-    expect(await sha256(packLooks(all))).toBe('5d5df335dc14100a3fb7c90265ca07470419f12f52f806cc6b80f1bc09cae7ad')
+  it('packs the twelve built-in films to the bytes of the repository tool (docs/look-file-format.md)', async () => {
+    expect(await sha256(lookFile(builtInSlots()))).toBe(
+      '5d5df335dc14100a3fb7c90265ca07470419f12f52f806cc6b80f1bc09cae7ad',
+    )
   })
 
-  it('packs a mix as `epm2mod looks pack ART2=velvia ART6=double-x "ART12=vision3-500t:Cinestill 800T"` does', async () => {
-    let choices = builtInChoices()
-    choices = choices.map((c) => (c.art === 2 ? withFilm(c, filmById('velvia')) : c))
-    choices = choices.map((c) => (c.art === 6 ? withFilm(c, filmById('double-x')) : c))
-    choices = choices.map((c) =>
-      c.art === 12 ? { ...withFilm(c, filmById('vision3-500t')), name: 'Cinestill 800T' } : c,
-    )
-    expect(await sha256(lookFile(choices))).toBe('823dba8d60cb3d9c93c0c292cb4bab584d522a6fe0b1a60f798c7f12c50e1bad')
+  it('packs twelve slots as `epm2mod looks pack` does with the same choices', async () => {
+    const mix: Record<number, string> = { 1: 'velvia', 5: 'double-x', 11: 'vision3-500t' }
+    const items = builtInSlots().map((item, i) => ({ ...item, filmId: mix[i] ?? item.filmId }))
+    expect(await sha256(lookFile(items))).toBe('13599e2d1ad67ee54bf591473199f5a1af18be55661c7a20fb4698855ed4ef1a')
   })
 
   it('writes the header fields and a CRC-32 of bytes 16 to the end', () => {
     const film = filmById('c200')
-    const file = packLooks([{ record: decodeBase64(film.record), art: 3, name: 'Test' }])
+    const file = packLooks([{ record: decodeBase64(film.record), art: 3, name: film.name }])
     const view = new DataView(file.buffer)
     expect(file.length).toBe(32 + RECORD_BYTES)
     expect(String.fromCharCode(...file.subarray(0, 4))).toBe('EPLK')
     expect(view.getUint32(12, true)).toBe(crc32(file.subarray(16)))
     expect(file[32]).toBe(2)
-    expect(String.fromCharCode(...file.subarray(36, 40))).toBe('Test')
+    expect(String.fromCharCode(...file.subarray(36, 40))).toBe('C200')
     expect(file[40]).toBe(0)
   })
 
@@ -43,7 +36,6 @@ describe('the look file', () => {
     expect(nameProblem('')).not.toBeNull()
     expect(nameProblem('x'.repeat(17))).not.toBeNull()
     expect(nameProblem('Portra é')).not.toBeNull()
-    expect(nameProblem('Kodak Portra 160')).toBeNull()
     const record = decodeBase64(filmById('c200').record)
     expect(() =>
       packLooks([
@@ -52,19 +44,12 @@ describe('the look file', () => {
       ]),
     ).toThrow()
   })
-})
 
-describe('the choices', () => {
-  it('starts with the built-in films, and a URL holds only the changes', () => {
-    const choices = builtInChoices()
-    expect(choices).toHaveLength(12)
-    expect(choices.some(isChanged)).toBe(false)
-    expect(toSearch(choices)).toBe('')
-    const changed = choices.map((c) => (c.art === 5 ? { ...withFilm(c, filmById('ektar-100')), name: 'My Ektar' } : c))
-    const search = toSearch(changed)
-    expect(search).toBe('?art5=ektar-100&name5=My+Ektar')
-    expect(fromSearch(search)).toEqual(changed)
-    expect(fromSearch('?art3=nofilm&art99=c200')).toEqual(choices)
+  it('packs only the filled slots', () => {
+    const items = builtInSlots().map((item, i) => (i === 0 ? { ...item, filmId: null } : item))
+    const file = lookFile(items)
+    expect(file[5]).toBe(11)
+    expect(file[32]).toBe(1)
   })
 
   it('every slot names a known film', () => {

@@ -12,10 +12,10 @@ each ART number and download the file. Or with the repository:
 the card in the computer:
 
 ```sh
-uv run epm2mod looks pack ART2=velvia ART6=double-x "ART12=vision3-500t:Cinestill 800T" --card /path/to/card
+uv run epm2mod looks pack ART2=velvia ART6=double-x ART12=vision3-500t --card /path/to/card
 ```
 
-After `:` comes the name the camera shows (up to 16 letters). Unlisted ART numbers keep their built-in look.
+The camera shows each film's own name. Unlisted ART numbers keep their built-in look.
 
 ## Load
 

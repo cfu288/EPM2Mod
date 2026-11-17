@@ -2,42 +2,40 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from './App'
 
+const menu = () => screen.getByRole('region', { name: "Your camera's ART menu" })
+const more = () => screen.getByRole('region', { name: 'More films' })
+const rows = () => within(menu()).getAllByRole('listitem')
+
 describe('App', () => {
-  beforeEach(() => {
-    window.history.replaceState(null, '', '/EPM2Mod/')
-  })
-
-  it('lists the twelve art filters with their built-in films and no download yet', () => {
+  it('shows the twelve ART places with the built-in films, in order', () => {
     render(<App />)
-    expect(within(screen.getByRole('region', { name: 'Art filters' })).getAllByRole('listitem')).toHaveLength(12)
-    expect(screen.getByRole('button', { name: /^Film of ART 3\b/ })).toHaveTextContent('Fuji Pro 400H')
-    expect(screen.getByRole('button', { name: /Download EPM2LOOK.BIN/ })).toBeDisabled()
+    expect(rows()).toHaveLength(12)
+    expect(rows()[2]).toHaveTextContent('ART 3Fujifilm Pro 400H')
+    expect(screen.getByRole('button', { name: 'Move ART 3, Fujifilm Pro 400H' })).toBeInTheDocument()
+    expect(within(more()).getAllByRole('listitem')).toHaveLength(7)
+    expect(within(more()).getByRole('button', { name: 'Add Kodak Ektar 100' })).toBeDisabled()
+    expect(more()).toHaveTextContent('The menu holds 12 films.')
   })
 
-  it('changes a film, previews it, keeps it in the URL and allows the download', async () => {
+  it('removes a film, adds another into the empty place and previews it', async () => {
     const user = userEvent.setup()
     render(<App />)
-    await user.click(screen.getByRole('button', { name: /^Film of ART 2\b/ }))
-    await user.click(within(screen.getByRole('listbox')).getByText(/Fuji Velvia 100/))
-    expect(screen.getByLabelText('Name on the camera', { selector: '#name-2' })).toHaveValue('Velvia')
-    expect(window.location.search).toBe('?art2=velvia')
-    expect(screen.getByRole('img')).toHaveAttribute('src', `${import.meta.env.BASE_URL}previews/velvia/art2.png`)
-    expect(screen.getByRole('button', { name: /Download EPM2LOOK.BIN/ })).toBeEnabled()
+    await user.click(screen.getByRole('button', { name: 'Remove Kodak Ektachrome 100 from ART 2' }))
+    expect(rows()[1]).toHaveTextContent('Empty')
+    expect(rows()[1]).toHaveTextContent('Kodak Ektachrome 100')
+    expect(more()).toHaveTextContent('Add puts a film into ART 2')
+    expect(within(more()).getByRole('button', { name: 'Add Kodak Ektachrome 100' })).toBeEnabled()
+
+    await user.click(within(more()).getByRole('button', { name: 'Add Fujifilm C200' }))
+    expect(rows()[1]).toHaveTextContent('ART 2Fujifilm C200')
+    expect(within(more()).queryByRole('button', { name: 'Add Fujifilm C200' })).toBeNull()
+    expect(screen.getByRole('img')).toHaveAttribute('src', `${import.meta.env.BASE_URL}previews/c200/art2.png`)
   })
 
-  it('refuses a name the camera cannot show', async () => {
+  it('previews the selected row', async () => {
     const user = userEvent.setup()
     render(<App />)
-    const name = screen.getByLabelText('Name on the camera', { selector: '#name-1' })
-    await user.clear(name)
-    expect(name).toHaveAttribute('aria-invalid', 'true')
-    expect(screen.getByRole('button', { name: /Download EPM2LOOK.BIN/ })).toBeDisabled()
-  })
-
-  it('reads choices from the URL', () => {
-    window.history.replaceState(null, '', '/EPM2Mod/?art12=c200&name12=Fuji+C200')
-    render(<App />)
-    expect(screen.getByRole('button', { name: /^Film of ART 12\b/ })).toHaveTextContent('Fujifilm C200')
-    expect(screen.getByLabelText('Name on the camera', { selector: '#name-12' })).toHaveValue('Fuji C200')
+    await user.click(screen.getByRole('button', { name: 'Move ART 7, Fujifilm Velvia 100' }))
+    expect(screen.getByRole('img')).toHaveAttribute('src', `${import.meta.env.BASE_URL}previews/velvia/art7.png`)
   })
 })

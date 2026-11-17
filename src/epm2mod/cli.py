@@ -406,14 +406,14 @@ def build_parser() -> argparse.ArgumentParser:
         "pack",
         help="write a look file for the SD card",
         description="Write a look file (EPM2LOOK.BIN) for the SD card: from choices "
-        "like ART2=velvia ART6=double-x:My B&W (the ART number the camera shows, a "
-        "film of 'epm2mod looks list', an optional name), or from a look list. "
+        "like ART2=velvia ART6=double-x (the ART number the camera shows and a "
+        "film of 'epm2mod looks list'), or from a look list. "
         "The ART entries not chosen keep their built-in look.",
     )
     pack_cmd.add_argument(
         "items",
         nargs="*",
-        help="ART<n>=<film>[:<name>] choices, or one look list; default: "
+        help="ART<n>=<film> choices, or one look list; default: "
         "looks/card-looks.json (the built-in looks)",
     )
     where = pack_cmd.add_mutually_exclusive_group()
