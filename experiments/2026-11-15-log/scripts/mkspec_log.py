@@ -43,6 +43,17 @@ Usage: mkspec_log.py PINNED_DIR WORKDIR [LISTING.txt]
   Writes patches/log-card-look.json only: probe 2 of the build debug-log-card-look (events card_read, card_look):
   the card-read probe that also copies an art matrix from the file into the table of codes 71 and 80 (Pro 400H)
   in RAM. It takes the place of log-card-read (the same base, BASE_DIR as for --card-read).
+
+       mkspec_log.py --card-probe BASE_DIR WORKDIR [LISTING.txt]
+  Writes patches/log-card-probe.json only: the probe harness of the build debug-log-card-probe (events card_read,
+  card_rec, card_done): the card file holds records {address, length, bytes}, each written only when it lies inside
+  one of the tables of the Pro 400H slot, and a flag that forces the look stages to recompute. It takes the place
+  of log-card-look (the same base, BASE_DIR as for --card-read).
+
+       mkspec_log.py --card-keep BASE_DIR WORKDIR [LISTING.txt]
+  Writes patches/log-card-keep.json only: the persistence probe of the build debug-log-card-keep (events card_read,
+  card_keep, bank_tail, bank_look): a look file sets the Pro 400H matrix and is kept in the EEROM bank's tail, and
+  every start applies the kept matrix at its first GUI state. In place of log-card-look (BASE_DIR as for --card-read).
 """
 import hashlib, json, os, re, struct, subprocess, sys
 
@@ -1250,7 +1261,377 @@ LOOK_DESCRIPTION = ("Structured log, probe 2 of looks loaded from the card: at t
                     "experiments/2026-11-17-card-looks/NOTES.md.")
 
 
-def card_read(spec=CARD_SPEC, asm_text=CARD_ASM, areas={".cr": CARD_AREA}, events=("card_read",), extra=None):
+PROBE_SPEC = "log-card-probe"
+PROBE_DESCRIPTION = ("Structured log, the probe harness of looks loaded from the card: at the first flush of a session "
+                     "(the GUI enters a menu, playback or the power-off state) the flush task reads up to 2 KB of "
+                     "C:\\EPM2LOOK.BIN (card_read). A file that starts with LKP1 holds a count, flags and records "
+                     "{u32 address, u16 length, u16 0, bytes, padded to 4}; a record is written (cached address and "
+                     "uncached alias) only when it lies inside one of the tables of the Pale&Light Color slot (Pro "
+                     "400H: three tone tables, saturation pair, six-axis records, art matrix, chroma record), and "
+                     "card_rec logs each record (address, length | status << 16: 0 written, 1 refused). Flag bit 0 "
+                     "stores 0 into the IMG library's builder words 0xA07500B4 / 0xA07500B8 and 0xFF into the "
+                     "gamma states' art-code bytes, as the boot init does, so the look stages recompute. card_done "
+                     "gives the records written and the flags. Then the flush runs as before. In place of "
+                     "log-card-look, on the specs of builds/debug-log-films-12d.json. It puts the build id %s of "
+                     "logs/events.json into the block header. DEBUG builds only. See "
+                     "experiments/2026-11-17-card-looks/design.md section 8.")
+# runs of segment 2 that no spec ledgers (docs/code-space-map.md; the segment-3 tail is for data only)
+PROBE_AREAS = {".cr": (0x7EBF2888, 0x7EBF2900), ".ca": (0x7EBF2B90, 0x7EBF2C00), ".p3": (0x7EBF2A8C, 0x7EBF2B00),
+               ".p4": (0x7EBF3B10, 0x7EBF3B52), ".p5": (0x7EBF1090, 0x7EBF10FC)}   # segment 2 only: code space
+# the tables of the Pale&Light Color slot (Pro 400H, codes 71 and 80; src/epm2mod/looks/slots.py): start, length
+PROBE_ALLOW = [(0x7F033B7C, 512), (0x7F033D7C, 512), (0x7E75E8F0, 512), (0x7E7696A4, 4), (0x7E76949E, 24),
+               (0x7ECB0988, 18), (0x7E74B91C, 97)]
+PROBE_ASM = """
+.equ CRDONE, PST+104         # u8: the card file was read in this session (T_BOOT clears PST at every start)
+.equ PBUF,   0xbe4fd400      # 2 KB read buffer: the end of the RAM gap 0x7E4C9800-0x7E4FE000 that the log uses
+.equ PBUFN,  2048
+.equ PMAGIC, 0x31504b4c      # "LKP1"
+.equ BUILDER_STILL, 0xa07500b4   # the IMG library's builder words: 0 makes the next job clear the stage cache
+.equ BUILDER_LV,    0xa07500b8   # (the boot init 0x7E560AC0 writes 0 into both)
+.equ GAMMA_STILL,   0x60510cd5   # the art-code byte of the two gamma states (0x605106A8 + 1581, 0x60510CD8 + 1581):
+.equ GAMMA_LV,      0x60511305   # 0xFF makes the next job rebuild the gamma copy
+# Frame slots (the flush task's 64-byte frame, which it fills itself after this code; not (0,sp), which every `call`
+# overwrites with its return address): (16,sp) end of the data read, (20,sp) records left while a record is copied,
+# (24,sp) the file's flags
+.section .cr,"ax"
+T_CRD:                       # the flush task's entry: once per session, read up to 2 KB of C:\\\\EPM2LOOK.BIN
+%(displaced)s
+    movbu (CRDONE),d0
+    cmp 0,d0
+    bne 9f
+    mov 1,d0
+    movbu d0,(CRDONE)
+    mov CRPATH,a0
+    mov CRMODE,a1
+    call 0x7e5c52dc,[],20    # fileif_fopen(path, "r") -> a0 = handle or 0
+    mov a0,a3
+    mov -1,d2                # bytes read; -1: the file did not open
+    cmp 0,a3
+    beq 8f
+    mov PBUF,a0
+    mov 1,d0
+    mov PBUFN,d1
+    mov a3,a1
+    call 0x7e5c536f,[],24    # fileif_fread(a0 = buffer, d0 = 1, d1 = bytes, a1 = handle) -> bytes read
+    mov d0,d2
+    mov a3,a0
+    call 0x7e5c5308,[],12    # fileif_fclose(a0 = handle)
+8:  jmp T_HDR
+9:  jmp %(back)s
+CRPATH: .asciz "C:\\\\EPM2LOOK.BIN"
+CRMODE: .asciz "r"
+
+.section .ca,"ax"
+T_HDR:                       # log the read; check the header: "LKP1", u16 count, u16 flags (bit 0: force a refresh)
+    mov d2,d1
+    mov (PBUF),a0
+    mov %(card_read)d,d0
+    call log_put,[],0
+    clr d3                   # records written
+    clr d0
+    mov d0,(24,sp)
+    cmp 8,d2
+    blt 7f
+    mov (PBUF),d0
+    cmp PMAGIC,d0
+    bne 7f
+    movhu (PBUF+6),d0
+    mov d0,(24,sp)
+    mov PBUF,d0
+    add d2,d0
+    mov d0,(16,sp)
+    movhu (PBUF+4),d0
+    mov d0,a3
+    mov PBUF+8,a2
+T_NEXT:                      # a record: u32 address, u16 length, u16 0, the bytes, padded to 4
+    cmp 0,a3
+    beq 7f
+    mov a2,d0
+    add 8,d0
+    mov (16,sp),d1
+    cmp d1,d0
+    bhi 7f                   # its head runs past the data read: stop
+    movhu (4,a2),d1
+    add d1,d0
+    mov (16,sp),d2
+    cmp d2,d0
+    bhi 7f                   # its bytes run past the data read: stop
+    jmp T_CHK
+7:  jmp T_FIN
+
+.section .p3,"ax"
+T_CHK:                       # inside one allowed table? length <= L and (address - start) <= L - length, unsigned
+    mov ALLOW,a1
+1:  mov (4,a1),d2            # L; 0 ends the list
+    cmp 0,d2
+    beq T_BAD
+    cmp d1,d2
+    bcs 2f                   # L < length
+    sub d1,d2                # L - length
+    mov (a2),d0
+    mov (a1),a0
+    sub a0,d0                # address - start (a huge value when the address is below the table)
+    cmp d2,d0
+    bls 6f
+2:  add 8,a1
+    bra 1b
+6:  jmp T_OK
+T_BAD:
+    mov 1,d2                 # status 1: outside every allowed table, not written
+    jmp T_LOG
+    .balign 4                # word loads must be aligned
+ALLOW:
+%(allow)s
+    .long 0, 0
+
+.section .p4,"ax"
+T_OK:                        # write the bytes through the cached address and its uncached alias
+    mov a3,(20,sp)
+    mov (a2),a0
+    mov a0,a3
+    add 0x40000000,a3
+    mov a2,a1
+    add 8,a1
+3:  cmp 0,d1
+    beq 4f
+    movbu (a1),d0
+    movbu d0,(a0)
+    movbu d0,(a3)
+    inc a0
+    inc a1
+    inc a3
+    add -1,d1
+    bra 3b
+4:  mov (20,sp),a3
+    inc d3
+    clr d2                   # status 0: written
+    jmp T_LOG
+
+.section .p5,"ax"
+T_LOG:                       # card_rec(address, length | status << 16); then the next record
+    movhu (4,a2),d1
+    mov d2,d0
+    asl 16,d0
+    or d1,d0
+    mov d0,a0
+    mov (a2),d1
+    mov %(card_rec)d,d0
+    call log_put,[],0
+    movhu (4,a2),d0
+    add 11,d0
+    and 0xfffffffc,d0
+    add d0,a2
+    add -1,a3
+    jmp T_NEXT
+T_FIN:                       # flag bit 0: make the look stages recompute, as the boot init does
+    mov (24,sp),d0
+    and 1,d0
+    beq 5f
+    clr d0
+    mov d0,(BUILDER_STILL)
+    mov d0,(BUILDER_LV)
+    mov 0xff,d0
+    movbu d0,(GAMMA_STILL)
+    movbu d0,(GAMMA_LV)
+5:  mov d3,d1                # card_done(records written, the file's flags)
+    mov (24,sp),a0
+    mov %(card_done)d,d0
+    call log_put,[],0
+    jmp %(back)s
+"""
+
+
+KEEP_SPEC = "log-card-keep"
+KEEP_AREAS = {".cr": (0x7EBF2888, 0x7EBF2900), ".ca": (0x7EBF2B90, 0x7EBF2C00), ".p3": (0x7EBF2A8C, 0x7EBF2B00),
+              ".p4": (0x7EBF1090, 0x7EBF10FC), ".p5": (0x7EBF3B10, 0x7EBF3B52), ".p6": (0x7EBF29C0, 0x7EBF2A00)}
+KEEP_LABELS = {".cr": "T_CRD", ".ca": "T_APL", ".p3": "T_KEEP", ".p4": "T_BANK", ".p5": "T_BSUM", ".p6": "T_BAPPLY"}
+# the second hook: the entry of log-core's T_GUI (`movm [d2,other],(sp)` / `mov psw,d2` / `mov d0,d1`), which the GUI
+# state setter's last trace call 0x7ECDF6E4 reaches (task CA_MAIN) at every GUI state
+KEEP_HOOK2 = (0x7EBF2E0F, 5, "T_BANK", "log-core's T_GUI entry: at every GUI state (task CA_MAIN)")
+KEEP_DESCRIPTION = ("Structured log, the persistence probe of looks loaded from the card. (1) At the first flush of a "
+                    "session the flush task reads C:\\EPM2LOOK.BIN; a file that starts with LOOK (26 bytes or more) "
+                    "sets the art matrix of Pro 400H (0x7ECB0988) as probe 2 did, stores a record LKB1 {u16 18, u16 sum "
+                    "of the 18 bytes, the matrix} at 0x603FC000 in the unused tail of the EEROM settings bank, and calls "
+                    "the bank save API 0x7E680272 (card_keep: its result, the sum). (2) At the first GUI state of every "
+                    "session (log-core's T_GUI, task CA_MAIN), when the tail holds a valid LKB1 record, it writes its "
+                    "matrix into the table (bank_look: status 0 applied, 1 no record, 2 bad length or sum; the table's "
+                    "first two values). At the first flush, before the card file, it logs bank_tail (the number of nonzero "
+                    "words in the unused tail 0x603F74B8-0x60404668, the first word of the record). The firmware saves the bank to flash itself (power-off, sleep, every start). In "
+                    "place of log-card-look, on the specs of builds/debug-log-films-12d.json. It puts the build id %s "
+                    "of logs/events.json into the block header. DEBUG builds only. See "
+                    "experiments/2026-11-17-card-looks/design.md section 8 (P4, P5).")
+KEEP_ASM = """
+.equ CRDONE, PST+104         # u8: the card file was read in this session (T_BOOT clears PST at every start)
+.equ BANKDONE, PST+105       # u8: the stored look was looked at in this session
+.equ LOOKMAGIC, 0x4b4f4f4c   # "LOOK"
+.equ KEEPMAGIC, 0x31424b4c   # "LKB1"
+.equ TABLE,  0x7ecb0988      # the art matrix of codes 71 and 80 (Pro 400H), 9 x s16; +0x40000000 its uncached alias
+.equ TAIL,   0x603fc000      # the record in the EEROM bank's tail (RAM image 0x603F4674-0x60404674)
+.equ TAIL0,  0x603f74b8      # the unused tail: 0x603F74B8-0x60404668 (53,680 bytes)
+.equ TAILN,  13420           # its words
+.section .cr,"ax"
+T_CRD:                       # the flush task's entry: once per session, read the first 32 bytes of C:\\\\EPM2LOOK.BIN
+%(displaced)s
+    movbu (CRDONE),d0
+    cmp 0,d0
+    bne 9f
+    mov 1,d0
+    movbu d0,(CRDONE)
+    mov CRPATH,a0
+    mov CRMODE,a1
+    call 0x7e5c52dc,[],20    # fileif_fopen(path, "r") -> a0 = handle or 0
+    mov a0,a3
+    mov -1,d2                # bytes read; -1: the file did not open
+    cmp 0,a3
+    beq 8f
+    mov BUF,a0
+    mov 1,d0
+    mov 32,d1
+    mov a3,a1
+    call 0x7e5c536f,[],24    # fileif_fread(a0 = buffer, d0 = 1, d1 = bytes, a1 = handle) -> bytes read
+    mov d0,d2
+    mov a3,a0
+    call 0x7e5c5308,[],12    # fileif_fclose(a0 = handle)
+8:  jmp T_SCAN
+9:  jmp %(back)s
+CRPATH: .asciz "C:\\\\EPM2LOOK.BIN"
+CRMODE: .asciz "r"
+
+.section .ca,"ax"
+T_APL:                       # log the read; a look file: write the matrix (cached and uncached), then keep it
+    mov d2,d1
+    mov (BUF),a0
+    mov %(card_read)d,d0
+    call log_put,[],0
+    cmp 26,d2
+    blt 7f
+    mov (BUF),d0
+    cmp LOOKMAGIC,d0
+    bne 7f
+    mov BUF+8,a0
+    mov TABLE,a1
+    mov 9,d3
+1:  movhu (a0),d0
+    movhu d0,(a1)
+    mov a1,a2
+    add 0x40000000,a2
+    movhu d0,(a2)
+    add 2,a0
+    add 2,a1
+    add -1,d3
+    bne 1b
+    jmp T_KEEP
+7:  jmp %(back)s
+
+.section .p3,"ax"
+T_KEEP:                      # the record LKB1 {u16 18, u16 sum, 18 bytes} into the tail, then the bank save
+    mov BUF+8,a0
+    mov TAIL+8,a1
+    clr d2                   # the sum of the 18 bytes, 16 bits
+    mov 18,d3
+1:  movbu (a0),d0
+    movbu d0,(a1)
+    add d0,d2
+    inc a0
+    inc a1
+    add -1,d3
+    bne 1b
+    mov 18,d0
+    movhu d0,(TAIL+4)
+    movhu d2,(TAIL+6)
+    mov KEEPMAGIC,d0
+    mov d0,(TAIL)            # the magic last: a record without it is never applied
+    call 0x7e680272,[],48    # the bank save API (EEROM and MODE): the firmware writes the changed bank to flash
+    mov d0,d1                # card_keep(the save's result, the sum)
+    mov d2,a0
+    mov %(card_keep)d,d0
+    call log_put,[],0
+    jmp %(back)s
+T_BLOG:
+    mov (TABLE+0x40000000),a0
+    mov %(bank_look)d,d0
+    call log_put,[],0        # bank_look(status, the table's first two values from RAM)
+T_BEND:
+    mov d2,psw
+    nop
+    nop
+    movm (sp),[d2,d3,a2,a3,other]
+%(displaced2)s
+    jmp %(back2)s
+
+.section .p4,"ax"
+T_BANK:                      # at the first GUI state of a session: apply a stored look (RAM only: no file, no scan)
+    movm [d2,d3,a2,a3,other],(sp)
+    mov psw,d2
+    movbu (BANKDONE),d0
+    cmp 0,d0
+    bne 9f
+    mov 1,d0
+    movbu d0,(BANKDONE)
+    mov 1,d1                 # status 1: no record
+    mov (TAIL),d0
+    cmp KEEPMAGIC,d0
+    bne 8f
+    mov 2,d1                 # status 2: bad length or sum
+    movhu (TAIL+4),d0
+    cmp 18,d0
+    bne 8f
+    jmp T_BSUM
+8:  jmp T_BLOG
+9:  jmp T_BEND
+T_SCAN:                      # the flush task, first flush of a session, before the card file is looked at: the tail
+    mov TAIL0,a0             # nonzero words in the tail (d2, the bytes read, is kept)
+    mov TAILN,d3
+    clr d1
+1:  mov (a0),d0
+    cmp 0,d0
+    beq 2f
+    inc d1
+2:  inc4 a0
+    add -1,d3
+    bne 1b
+    mov (TAIL),a0
+    mov %(bank_tail)d,d0
+    call log_put,[],0        # bank_tail(nonzero words, the record's first word)
+    jmp T_APL
+
+.section .p5,"ax"
+T_BSUM:
+    mov TAIL+8,a0
+    clr d3
+    mov 18,a3
+3:  movbu (a0),d0
+    add d0,d3
+    inc a0
+    add -1,a3
+    bne 3b
+    movhu (TAIL+6),d0
+    exthu d3
+    cmp d0,d3
+    bne 8f
+    jmp T_BAPPLY
+8:  jmp T_BLOG
+
+.section .p6,"ax"
+T_BAPPLY:
+    mov TAIL+8,a0            # apply: the 9 values into the table, cached and uncached
+    mov TABLE,a1
+    mov 9,d3
+4:  movhu (a0),d0
+    movhu d0,(a1)
+    mov a1,a2
+    add 0x40000000,a2
+    movhu d0,(a2)
+    add 2,a0
+    add 2,a1
+    add -1,d3
+    bne 4b
+    clr d1                   # status 0: applied
+    jmp T_BLOG
+"""
+
+
+def card_read(spec=CARD_SPEC, asm_text=CARD_ASM, areas={".cr": CARD_AREA}, events=("card_read",), extra=None, hook2=None):
     """Write patches/log-card-read.json, or with the other arguments patches/log-card-look.json (see the usage text)."""
     base, work = sys.argv[2:4]
     listing = sys.argv[4] if len(sys.argv) > 4 else None
@@ -1270,14 +1651,21 @@ def card_read(spec=CARD_SPEC, asm_text=CARD_ASM, areas={".cr": CARD_AREA}, event
     site, n, what = CARD_SITE
     assert get(site, n) == bytes.fromhex("cff0f8fec0"), get(site, n).hex()           # log-core's flush entry
     assert struct.unpack("<I", get(TASK_ENTRY, 4))[0] == site                        # USRTEST_A's entry word
-    bad = branch_targets_inside([(site, n)], blk, work)
+    sites = [(site, n)] + ([hook2[:2]] if hook2 else [])
+    bad = branch_targets_inside(sites, blk, work)
     assert not bad, bad
-    asm = SYMS + asm_text % {**mine, **(extra or {}), "displaced": displaced(blk_path, site, n), "back": "0x%08x" % (site + n)}
+    subs = {**mine, **(extra or {}), "displaced": displaced(blk_path, site, n), "back": "0x%08x" % (site + n)}
+    if hook2:                                # (site, bytes, routine, what): the second hook's displaced code and return
+        subs.update(displaced2=displaced(blk_path, hook2[0], hook2[1]), back2="0x%08x" % (hook2[0] + hook2[1]))
+    asm = SYMS + asm_text % subs
     args = ["--defsym=log_put=%#x" % at[2]]
     args += ["--defsym=s_%s=0x%s" % (x, x) for x in sorted(set(re.findall(r"(?:jmp|call)\s+0x([0-9a-f]{8})", asm)))]
     asm = re.sub(r"((?:jmp|call)\s+)0x([0-9a-f]{8})", r"\1s_\2", asm)
     asm += '\n.section .hs,"ax"\n    jmp T_CRD\n' + "    nop\n" * (n - 5)
     args += ["--section-start=.hs=%#x" % site] + ["--section-start=%s=%#x" % (k, a) for k, (a, _) in areas.items()]
+    if hook2:
+        asm += '\n.section .h2,"ax"\n    jmp %s\n' % hook2[2] + "    nop\n" * (hook2[1] - 5)
+        args += ["--section-start=.h2=%#x" % hook2[0]]
     s, o, e, sb = (os.path.join(work, "logcard." + x) for x in ("s", "o", "elf", "bin"))
     open(s, "w").write(asm)
     run(BIN + "/mn10300-elf-as", "-o", o, s)
@@ -1298,7 +1686,9 @@ def card_read(spec=CARD_SPEC, asm_text=CARD_ASM, areas={".cr": CARD_AREA}, event
     stock = open(os.path.join(ROOT, "build/blocks", os.path.basename(STOCK) + ".block0.bin"), "rb").read()
     for name, (a, hi) in areas.items():
         code = sect(name)
-        label = {".cr": "T_CRD", ".ca": "T_APL"}[name]
+        label = (KEEP_LABELS if spec == KEEP_SPEC else
+                 {".cr": "T_CRD", ".ca": "T_HDR" if spec == PROBE_SPEC else "T_APL", ".p3": "T_CHK", ".p4": "T_OK",
+                  ".p5": "T_LOG"})[name]
         assert a + len(code) <= hi and get(a, hi - a) == stock[a - BASE:hi - BASE], "the area is in use"
         if code[-1] == get(a + len(code) - 1, 1)[0]:
             code += b"\xcb"                  # the free-space ledger counts only changed bytes: end on a nop
@@ -1307,6 +1697,10 @@ def card_read(spec=CARD_SPEC, asm_text=CARD_ASM, areas={".cr": CARD_AREA}, event
     h = sect(".hs")
     assert len(h) == n and h[0] == 0xDC
     op(site, h, "hook (card_read): jmp T_CRD. %s" % what)
+    if hook2:
+        h2 = sect(".h2")
+        assert len(h2) == hook2[1] and h2[0] == 0xDC
+        op(hook2[0], h2, "hook: jmp %s. %s" % (hook2[2], hook2[3]))
     assert bid != old
     for half in (0, 4):                      # the two `mov imm32,d0` of the flush task that hold the build id
         word = b"\xfc\xcc" + old[half:half + 4]
@@ -1317,7 +1711,7 @@ def card_read(spec=CARD_SPEC, asm_text=CARD_ASM, areas={".cr": CARD_AREA}, event
     out = os.path.join(ROOT, "patches", spec + ".json")
     json.dump({
         "name": spec,
-        "description": (LOOK_DESCRIPTION % bid.hex()) if spec == LOOK_SPEC else ("Structured log, the card-read probe: at the first flush of a session (the GUI enters a menu, "
+        "description": (LOOK_DESCRIPTION % bid.hex()) if spec == LOOK_SPEC else (PROBE_DESCRIPTION % bid.hex()) if spec == PROBE_SPEC else (KEEP_DESCRIPTION % bid.hex()) if spec == KEEP_SPEC else ("Structured log, the card-read probe: at the first flush of a session (the GUI enters a menu, "
                        "playback or the power-off state) the flush task opens C:\\EPM2LOOK.BIN with mode r, reads its "
                        "first 16 bytes with fileif_fread (0x7E5C536F), closes it, and writes the event card_read "
                        "(bytes read, -1 when the file did not open; bytes 0-3 of the file). Then the flush runs as before. One hook at the flush task's entry (log-core's "
@@ -1335,7 +1729,7 @@ def card_read(spec=CARD_SPEC, asm_text=CARD_ASM, areas={".cr": CARD_AREA}, event
     open(out, "a").write("\n")
     print("wrote", os.path.relpath(out, ROOT), len(ops), "ops; build id", bid.hex())
     if listing:
-        txt = run(BIN + "/mn10300-elf-objdump", "-d", *sum((["-j", k] for k in areas), []), "-j", ".hs", e)
+        txt = run(BIN + "/mn10300-elf-objdump", "-d", *sum((["-j", k] for k in areas), []), "-j", ".hs", *(["-j", ".h2"] if hook2 else []), e)
         open(listing, "w").write(re.sub(r"/[^\s:]*logcard\.elf", "logcard.elf", txt))
 
 
@@ -1343,6 +1737,11 @@ if len(sys.argv) > 1 and sys.argv[1] == "--peaking-time":
     peaking_time()
 elif len(sys.argv) > 1 and sys.argv[1] == "--card-read":
     card_read()
+elif len(sys.argv) > 1 and sys.argv[1] == "--card-probe":
+    card_read(PROBE_SPEC, PROBE_ASM, PROBE_AREAS, ("card_read", "card_rec", "card_done"),
+              {"allow": "\n".join("    .long %#x, %d" % a for a in PROBE_ALLOW)})
+elif len(sys.argv) > 1 and sys.argv[1] == "--card-keep":
+    card_read(KEEP_SPEC, KEEP_ASM, KEEP_AREAS, ("card_read", "card_keep", "bank_tail", "bank_look"), None, KEEP_HOOK2)
 elif len(sys.argv) > 1 and sys.argv[1] == "--card-look":
     card_read(LOOK_SPEC, LOOK_ASM, LOOK_AREAS, ("card_read", "card_look"), {"table": "%#x" % LOOK_TABLE})
 elif len(sys.argv) > 1 and sys.argv[1] == "--peaking-guard":

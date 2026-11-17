@@ -180,4 +180,65 @@ its name for the future.
 | P7 | emulator | The menu row: setting 446 with picker 608 or 610 in Custom Menu J; hookcheck, boot-test, update-path-test |
 | P8 | static, then camera | Room for 1 KB of code (section 6) |
 
+## 9. Final plan
+
+### 9.1 Done at the desk (2026-11-17)
+
+- **The probe harness** `builds/debug-log-card-probe.json` (`patches/log-card-probe.json`, `mkspec_log.py
+  --card-probe`; sha256 `9005cfcb70c8927348d183c14a46a95b99e1f03b597f0267a1eea3d2e01b4014`). One flash for every
+  stage probe: an LKP1 card file (`scripts/mkprobe.py`; `build/card-probe/`) holds records {u32 address, u16 length,
+  u16 0, bytes}, each written only inside one of the seven tables of the Pro 400H slot, and a flag that runs the
+  boot's cache reset (section 4). Emulator (V): a record is written or refused as it should be; a record at code and
+  one that runs 2 bytes past its table are refused; the walk stops at a count larger than the file; the refresh stores
+  run without a fault. 452 B of code in five runs of segment 2. Two bugs the emulator caught and the build no longer
+  has: a word table at an odd address (a fault on the camera), and a bound kept at (0,sp), which every `call`
+  overwrites with its return address.
+- **The persistence probe** `builds/debug-log-card-keep.json` (`patches/log-card-keep.json`, `--card-keep`; sha256
+  `2771357d4f7debe57fe106209fa65cfeec6d4b8b4cec444d5a36869cb125cefa`). A LOOK file sets the Pro 400H matrix and stores
+  a record LKB1 {length, 16-bit sum, the 18 bytes} at 0x603FC000 in the EEROM bank's tail, then calls the bank save
+  API; at every start the record is checked and applied at the first GUI state (log-core's T_GUI). Emulator (V),
+  two sessions: session 1 found the tail empty (0 nonzero words), stored the look and saved the bank (`card_keep`
+  result 0); session 2, with no look file and the RAM images taken out of the state, so that only the firmware's own
+  bank load from flash could bring it back, applied it before the first menu (`bank_look` applied, the table grey).
+- **Saving at once** (P5, V emulator): the save API 0x7E680272 called from our task erased and rewrote the other
+  EEROM copy (counter 3) with the tail's content in 4.4 ms of lab time, result 0, no error entry.
+- Both builds: free-space check PASS (code only in segment 2: the segment-3 tail is for data), op check 0 FAIL,
+  hookcheck only the allowed remap7b-code entry, boot-test and update-path-test PASS. The persistence probe first
+  failed boot-test (time stamps 0.2-0.4 ms late: its 53 KB scan at the first GUI state); the scan moved to the first
+  flush, and the start-up hook does only the 18-byte check and copy.
+
+### 9.2 The blocker: three camera sessions on two flashes
+
+| Step | Build, card file | What is read | Decides |
+|---|---|---|---|
+| 1 | harness, `sat0.bin` | photo A before any menu; MENU, MENU; live view; photo B; another film and back; photo C | is the saturation stage cached for stills (B colour, C grey) or not (B grey) |
+| 2 | harness, `sat0-force.bin` | photo A; MENU, MENU; live view; photo B | does the refresh make a cached stage take a write at once, without a crash |
+| 3 | harness, `toner0-force.bin` | photo A; MENU, MENU; photo B (cyan if the red table took effect) | do the tone tables take a write (the stage that matters most for a look) |
+| 4 | persistence, `grey-look.bin` | MENU, MENU (the look is stored and saved); power off; take EPM2LOOK.BIN off the card; power on; photo before any menu | the tail is free on the camera (`bank_tail`), the look survives without the file (photo grey, `bank_look` applied) |
+
+Outcomes and what follows:
+- 2 and 3 work (B changes at once): the loader writes all tables and runs the refresh; no stage needs special handling.
+- 1 shows the cache and 2 does not fix it: the loader cannot rely on the refresh; a load then takes effect after a
+  film change, which the menu row can do itself (I), or after a restart (the apply at start runs before any job).
+- 3 does not work: the tone tables are read elsewhere (U); trace the look curve's pointer reader before the loader.
+- 4: `bank_tail` nonzero on the first session means the tail is in use on the camera: stop and find another place.
+
+### 9.3 After the probes: the feature
+
+1. **Code space** (section 6), measured this time: the harness's read, checks, record walk and refresh are 452 B; the
+   start-up check and apply are 185 B. The full loader adds the curve decode and table fill and the slot addresses.
+   The slot address table is data (~500 B) and can sit in the data-only areas (17.5 KB usable, `docs/code-space-map.md`).
+   The code (estimate ~700-800 B without the debug log calls) needs the segment-2 runs the probes use (~690 B with the
+   small runs) and a little more: the next step is to write it and measure, then claim the few hundred bytes still
+   missing (the `sdk api` shell's area, or a dynamic check of the 3D-engine area in the emulator first).
+2. **The format in production code:** `docs/look-file-format.md` (section 5 made a spec with test vectors);
+   `epm2mod looks pack` writes LOOKS.BIN from `looks/` (unit tests: the bytes of the twelve pinned looks, the CRC, the
+   refusals); the web app writes the same bytes.
+3. **The firmware specs:** the loader (section 2.2), the start-up apply (section 2.4), the menu row (section 2.1;
+   setting 446, picker, label string), generated as the probes are and checked the same way (free space, op check,
+   hookcheck, boot-test, update-path-test, the two-session persistence test, the menu screenshots).
+4. **One camera flash for the feature:** load a file; restart without the card; load another; a bad file is refused
+   whole; no card. Then pin, the guide in `docs/guide/`, the README line (AGENTS.md rule 7).
+5. **Names** stay the slots' names until a probe shows that the menu strings can be written at run time (section 7).
+
 Agent reports behind sections 3 and 4: the session of 2026-11-17 (scratch files were not kept in the repository).

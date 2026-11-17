@@ -5,6 +5,7 @@
  "levels": ["debug", "info", "warn", "error"],
  "note": "The dictionary of the next debug build. tables, names and doc are notes: they are not part of the build id. The dictionary of a flashed build is kept as events-<build id>.json (docs/logging.md)",
  "tables": {
+  "bank_status": {"0": "applied", "1": "no record", "2": "bad length or sum"},
   "gui_state": {
    "0x0002": "leaves shooting for power off",
    "0x10xx": "Boot",
@@ -246,6 +247,22 @@
    "args": [{"name": "bytes", "format": "sdec"}, {"name": "first4", "format": "hex"}]},
   {"id": 1794, "name": "card_look", "level": "info", "spec": "log-card-look", "feature": "card-looks",
    "doc": "Probe 2: a file that starts with LOOK (26 bytes or more) has its bytes 8-25 written into the art matrix of codes 71 and 80 (Pro 400H, 0x7ECB0988, read by the colour stage on CPU 1). written = values written (9, or 0: not a look file); first2 = values 0 and 1 of the table read back from RAM (low half value 0, high half value 1)",
-   "args": [{"name": "written", "format": "dec"}, {"name": "first2", "format": "hex"}]}
+   "args": [{"name": "written", "format": "dec"}, {"name": "first2", "format": "hex"}]},
+  {"id": 1795, "name": "card_rec", "level": "info", "spec": "log-card-probe", "feature": "card-looks",
+   "doc": "The probe harness: one record of an LKP1 card file. status 0 = written (cached address and uncached alias), 1 = outside every allowed table of the Pro 400H slot, not written",
+   "args": [{"name": "address", "format": "addr"}, {"name": "len_status", "format": "hex", "fields": [{"name": "length", "shift": 0, "bits": 16}, {"name": "status", "shift": 16, "bits": 16, "enum": {"0": "written", "1": "refused"}}]}]},
+  {"id": 1796, "name": "card_done", "level": "info", "spec": "log-card-probe", "feature": "card-looks",
+   "doc": "The probe harness has finished the file: records written, and the file's flags (bit 0: the look stages were made to recompute)",
+   "args": [{"name": "written", "format": "dec"}, {"name": "flags", "format": "hex"}]},
+  {"id": 1797, "name": "card_keep", "level": "info", "spec": "log-card-keep", "feature": "card-looks",
+   "doc": "The persistence probe: a loaded look was stored as a record LKB1 in the EEROM bank's tail (0x603FC000) and the bank save API 0x7E680272 was called. result = its d0 (0 in the emulator); sum = the record's 16-bit sum",
+   "args": [{"name": "result", "format": "hex"}, {"name": "sum", "format": "hex"}]},
+  {"id": 1798, "name": "bank_tail", "level": "info", "spec": "log-card-keep", "feature": "card-looks",
+   "doc": "At the first GUI state of a session: the number of nonzero words in the EEROM bank's unused tail 0x603F74B8-0x60404668 (0 = empty), and the first word at 0x603FC000 (0x31424B4C = a stored record LKB1)",
+   "args": [{"name": "nonzero_words", "format": "dec"}, {"name": "first_word", "format": "hex"}]},
+  {"id": 1799, "name": "bank_look", "level": "info", "spec": "log-card-keep", "feature": "card-looks",
+   "doc": "At the first GUI state of a session: the stored look. status 0 = applied to the Pro 400H matrix, 1 = no record, 2 = bad length or sum; first2 = the table's values 0 and 1 read back from RAM (low half value 0)",
+   "names": {"status": "bank_status"},
+   "args": [{"name": "status", "format": "dec"}, {"name": "first2", "format": "hex"}]}
  ]
 }
