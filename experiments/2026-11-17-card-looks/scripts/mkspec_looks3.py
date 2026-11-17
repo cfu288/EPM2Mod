@@ -45,12 +45,15 @@ from epm2mod.container import parse  # noqa: E402
 from epm2mod.looks import lookfile, lookpack, slots  # noqa: E402
 from epm2mod.paths import RepoPaths  # noqa: E402
 
-SPEC = "card-looks-3"
-MENU_SPEC = "patches/looks-menu-2.json"
+V4 = "--v4" in sys.argv          # card-looks-4: the Custom Menu of patches/custom-menu-rows.json (an added row)
+SPEC = "card-looks-4" if V4 else "card-looks-3"
+MENU_SPEC = "patches/looks-menu-3.json" if V4 else "patches/looks-menu-2.json"
 BASE = mk.BASE
 BIN = mk.BIN
 RUNS = dict(mk.RUNS)
 RUNS[".x1"] = (0x7EE53830, 0x7EE53D6A)       # segment 3, reclaim-space row 5 (code, checked): first code
+if V4:
+    RUNS[".tb"] = (0x7EBF2890, 0x7EBF2900)   # the child list of custom-menu-rows ends at 0x7EBF2890
 DATA = [mk.DATA[0], (mk.DATA[1][0], mk.DATA[1][1])]
 LANG = 0xBFF3D000           # the loaded language's blob; its first word: the address of its pointer array
 LANG_SPAN = 0x43000
@@ -620,12 +623,12 @@ def main():
     paths = RepoPaths(Path(ROOT))
     work = os.path.join(ROOT, "build", "card-looks")
     os.makedirs(work, exist_ok=True)
-    base_specs = mkspec_slots.LAYOUT + [MENU_SPEC]
-    fw = os.path.join(work, "base-3.BIN")
+    base_specs = (mkspec_slots.LAYOUT4 if V4 else mkspec_slots.LAYOUT) + [MENU_SPEC]
+    fw = os.path.join(work, "base-%s.BIN" % ("4" if V4 else "3"))
     subprocess.run(["uv", "run", "epm2mod", "apply", *base_specs, "-o", fw], cwd=ROOT, check=True,
                    capture_output=True)
     b = mk.block0(fw)
-    blk_path = os.path.join(work, "base-3.block0.bin")
+    blk_path = os.path.join(work, "base-%s.block0.bin" % ("4" if V4 else "3"))
     open(blk_path, "wb").write(b)
     table = mk.slot_ops(b, True)
     kinds = [k for k, _ in table]
@@ -760,8 +763,8 @@ def main():
     keep = {k: syms[k] for k in ("T_TASK", "T_GUI", "T_STORED", "T_END", "SAVE", "V_OK", "V_BAD", "APPLY", "FLAGS",
                                  "NAMES", "LIVE", "COPYALL")}
     json.dump({**keep, "STORE": mk.STORE, "SCRATCH": mk.SCRATCH, "RAM": RAM, "RLIVE": rlive, "SNAPN": snapn,
-               "IDS": ids, "RECS": recs, "STRINGS": strings}, open(os.path.join(work, "syms-3.json"), "w"))
-    json.dump([[a, n] for a, n in spans], open(os.path.join(work, "spans-3.json"), "w"))
+               "IDS": ids, "RECS": recs, "STRINGS": strings}, open(os.path.join(work, "syms-%s.json" % ("4" if V4 else "3")), "w"))
+    json.dump([[a, n] for a, n in spans], open(os.path.join(work, "spans-%s.json" % ("4" if V4 else "3")), "w"))
 
     spec = {
         "name": SPEC,
@@ -778,7 +781,8 @@ def main():
             "the stored looks. The hook on the GUI state setter's trace call 0x7ECDF6E4, the task USRTEST_A, the "
             "code runs of card-looks-2 and new code in the reclaimed code area 0x7EE53830 of segment 3. Every "
             "expect is a byte string of the specs of builds/card-looks-3.json before it. See "
-            "experiments/2026-11-17-card-looks/design.md section 10." % mk.STORE),
+            "experiments/2026-11-17-card-looks/design.md section 10." % mk.STORE).replace(
+            "patches/looks-menu-2.json", MENU_SPEC).replace("builds/card-looks-3.json", "builds/%s.json" % SPEC),
         "base": STOCK,
         "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
         "status": "candidate: emulator-checked, not flashed",
@@ -803,9 +807,10 @@ def main():
         json.dump(desc, f, indent=1)
         f.write("\n")
     print("wrote patches/%s.json (%d ops) and builds/%s.json" % (SPEC, len(ops), SPEC))
-    if len(sys.argv) > 1:
+    argv = [a for a in sys.argv[1:] if a != "--v4"]
+    if argv:
         txt = mk.run(BIN + "/mn10300-elf-objdump", "-d", *sum((["-j", k] for k in RUNS), []), "-j", ".hs", e)
-        open(sys.argv[1], "w").write(re.sub(r"/[^\s:]*looks3\.elf", "looks3.elf", txt))
+        open(argv[0], "w").write(re.sub(r"/[^\s:]*looks3\.elf", "looks3.elf", txt))
 
 
 if __name__ == "__main__":

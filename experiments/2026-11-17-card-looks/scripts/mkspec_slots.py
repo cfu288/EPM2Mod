@@ -29,6 +29,9 @@ LAYOUT = [s for s in json.load(open(os.path.join(ROOT, "builds/card-looks.json")
 LAYOUT.insert(LAYOUT.index("patches/films12bw-names.json") + 1, "patches/films12-entry-grainy-film.json")
 LAYOUT.insert(LAYOUT.index("patches/films12-entry-grainy-film.json") + 1, "patches/films12-entry-gentle-sepia.json")
 LAYOUT[LAYOUT.index("patches/films12-looks.json")] = "patches/%s.json" % SPEC
+# the layout with the Custom Menu of patches/custom-menu-rows.json (Peaking and Load Looks added) in place of
+# peaking-menu (card-looks-4)
+LAYOUT4 = [("patches/custom-menu-rows.json" if x == "patches/peaking-menu.json" else x) for x in LAYOUT]
 FILMS = [
     (Film("Grainy Film", "Kodak Double-X 5222", "black-and-white negative, on Kodak 2302 print film", "Double-X",
           "looks/fits/doublex3.npz"), slots.EXTRA_SLOTS[0].look),

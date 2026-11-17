@@ -32,8 +32,9 @@ sys.path.insert(0, os.path.join(ROOT, "src"))
 from epm2mod.container import parse  # noqa: E402
 import mkspec_slots  # noqa: E402
 
-V3 = "--v3" in sys.argv
-SPEC = "looks-menu-2" if V3 else "looks-menu"
+V4 = "--v4" in sys.argv      # the row itself is in patches/custom-menu-rows.json: no row edit here
+V3 = "--v3" in sys.argv or V4
+SPEC = "looks-menu-3" if V4 else "looks-menu-2" if V3 else "looks-menu"
 BASE = 0x7E421020
 STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
 ITEMS, KIDS, AT = 0x7EBF2000, 0x7EBF2600, 78               # the tables of peaking-menu; the row Touch Screen Settings
@@ -67,7 +68,7 @@ OLD_DESCRIPTION = "The menu row 'Load Looks' (Off / Load) in Custom Menu J, in t
 def main():
     work = os.path.join(ROOT, "build", "card-looks")
     os.makedirs(work, exist_ok=True)
-    before = mkspec_slots.LAYOUT
+    before = mkspec_slots.LAYOUT4 if V4 else mkspec_slots.LAYOUT
     out = os.path.join(work, "before-menu.BIN")
     subprocess.run(["uv", "run", "epm2mod", "apply", *before, "-o", out], cwd=ROOT, check=True, capture_output=True)
     c = parse(open(out, "rb").read())
@@ -85,13 +86,15 @@ def main():
         o["_note"] = note
         ops.append(o)
 
-    # (a) the row, (b) its child entry
-    assert struct.unpack("<HHIHHHH", get(ITEMS + 16 * AT, 16)) == (9, 544, 427, 4, 1132, 0, 1)   # Touch Screen Settings
-    assert struct.unpack("<II", get(KIDS + 8 * AT, 8)) == (174, 427)
-    op(ITEMS + 16 * AT, ROW, "Custom Menu item table of peaking-menu, row 78 (J, Touch Screen Settings: text 544, "
+    # (a) the row, (b) its child entry (v4: an added row, patches/custom-menu-rows.json)
+    assert V4 or struct.unpack("<HHIHHHH", get(ITEMS + 16 * AT, 16)) == (9, 544, 427, 4, 1132, 0, 1)   # Touch Screen Settings
+    assert V4 or struct.unpack("<II", get(KIDS + 8 * AT, 8)) == (174, 427)
+    if not V4:
+        op(ITEMS + 16 * AT, ROW, "Custom Menu item table of peaking-menu, row 78 (J, Touch Screen Settings: text 544, "
        "setting 427, help 1132, value list 0) -> {group 9, text 1498 'Load Looks', setting 449, order 4, help 1497, "
        "value list 610, 0}")
-    op(KIDS + 8 * AT, KID, "Custom Menu child list of peaking-menu, entry 78: (panel 174, setting 427) -> (panel 610, "
+    if not V4:
+        op(KIDS + 8 * AT, KID, "Custom Menu child list of peaking-menu, entry 78: (panel 174, setting 427) -> (panel 610, "
        "setting 449)")
     # (c) panel 610: its second item shows "Load"; the row's value -> text list
     d = struct.unpack("<HHIII", get(DESC, 16))
@@ -137,7 +140,15 @@ def main():
             "Built-in). The loader starts at Load or Built-in and sets the row back to Off. An edit of one row and "
             "one child entry of the tables of patches/peaking-menu.json, the list of panel 610, and English texts of "
             "built-in EVF panels (block 1). See experiments/2026-11-17-card-looks/design.md section 10."
-            if V3 else OLD_DESCRIPTION),
+            if V3 and not V4 else
+            "The list, texts and status of the menu row 'Load Looks', which patches/custom-menu-rows.json adds at the "
+            "end of Custom Menu J. Its value is the dormant setting 449 (prm tag 0xD7B1, MODE bank, one byte, read by "
+            "no stock code; the firmware writes 1 into it at every start); its list is the stock Off / On panel 610, "
+            "with three items: Off (1), Load (0), Built-in (2). When it is Off the row shows text 1495, which the "
+            "loader of patches/card-looks-4.json points at the result of the last action (Off, Loaded, No file, Bad "
+            "file, Built-in). English texts of built-in EVF panels (block 1); the loader writes the row's texts into "
+            "every language at run time. See experiments/2026-11-17-card-looks/design.md section 10.2."
+            if V4 else OLD_DESCRIPTION),
         "base": STOCK,
         "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
         "status": "candidate: emulator-checked, not flashed",

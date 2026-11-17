@@ -39,10 +39,12 @@ from epm2mod.paths import RepoPaths  # noqa: E402
 
 WORK = os.path.join(ROOT, "build", "card-looks")
 EMU = os.path.join(WORK, "emu")
-BUILD = "builds/card-looks-3.json"
+V4 = "--v4" in sys.argv    # builds/card-looks-4.json: Load Looks is an added row, after Eye-Fi
+N = "4" if V4 else "3"
+BUILD = "builds/card-looks-%s.json" % N
 RTC = "2026-11-17T12:00:00"
 NAV = ("key:MENU key:RIGHT key:OK key:DOWN key:DOWN key:DOWN key:RIGHT " + "key:DOWN " * 9 + "key:RIGHT " +
-       "key:DOWN " * 4).split()
+       "key:DOWN " * (5 if V4 else 4)).split()
 LOAD = NAV + ["key:RIGHT", "key:DOWN", "key:OK", "shot:row-ok", "w:1000", "key:UP", "key:DOWN", "shot:row", "key:MENU",
               "key:MENU", "w:1500"]
 BUILTIN = NAV + ["key:RIGHT", "key:DOWN", "key:DOWN", "key:OK", "shot:row-ok", "w:1000", "key:UP", "key:DOWN",
@@ -65,11 +67,11 @@ def texts_of(path):
 
 
 def main():
-    syms = json.load(open(os.path.join(WORK, "syms-3.json")))
-    spans = json.load(open(os.path.join(WORK, "spans-3.json")))
-    b = bytes(open(os.path.join(WORK, "base-3.block0.bin"), "rb").read())
+    syms = json.load(open(os.path.join(WORK, "syms-%s.json" % N)))
+    spans = json.load(open(os.path.join(WORK, "spans-%s.json" % N)))
+    b = bytes(open(os.path.join(WORK, "base-%s.block0.bin" % N), "rb").read())
     table = mk.slot_ops(bytearray(b), True)
-    eng = texts_of(os.path.join(ROOT, "build", "card-looks-3.BIN"))
+    eng = texts_of(os.path.join(ROOT, "build", "card-looks-%s.BIN" % N))
     ids, recs, rlive = syms["IDS"], syms["RECS"], syms["RLIVE"]
     paths = RepoPaths(Path(ROOT))
     default = lookpack.load_list(paths, paths.card_looks)
@@ -128,12 +130,12 @@ def main():
              "1503": "Built-in"}
 
     os.makedirs(EMU, exist_ok=True)
-    state = os.path.join(EMU, "state-3.json")
-    shutil.copy(os.path.join(ROOT, "build/emu/state/card-looks-3-p.json"), state)
+    state = os.path.join(EMU, "state-%s.json" % N)
+    shutil.copy(os.path.join(ROOT, "build/emu/state/card-looks-%s-p.json" % N), state)
 
     def session(n, card, steps, drop_ram):
-        env = dict(os.environ, E101_STATE=state, E101_RTC=RTC, SPANS=os.path.join(WORK, "spans-3.json"),
-                   SYMS=os.path.join(WORK, "syms-3.json"), SHOTS=os.path.join(EMU, "shots-3", "s%d" % n),
+        env = dict(os.environ, E101_STATE=state, E101_RTC=RTC, SPANS=os.path.join(WORK, "spans-%s.json" % N),
+                   SYMS=os.path.join(WORK, "syms-%s.json" % N), SHOTS=os.path.join(EMU, "shots-%s" % N, "s%d" % n),
                    TEXTS=",".join(map(str, text_ids)), HASH=hash_env)
         if drop_ram:
             doc = json.load(open(state))

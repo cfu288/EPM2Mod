@@ -347,6 +347,7 @@ looks, and no criteria had been set before the build. A build is pinned only whe
 | 10 | The row and its messages are readable in the user's menu language | emulator | English only | English texts in every language (Japanese checked) |
 | 11 | A bad or missing file never stops a start or a flash | emulator, camera | pass | pass (boot-test, update-path-test, sessions 3 and 7) |
 | 12 | Movies show the loaded look as far as they show the built-in looks | camera | not checked | the same tables as the built-in looks (model); camera |
+| 13 | No existing menu row is removed or changed (owner, 2026-11-17) | emulator crawl | **fail** (Touch Screen Settings replaced) | card-looks-3 **fail**; card-looks-4 pass (section 10.2) |
 
 ### 10.1 card-looks-3 (2026-11-17, desk and emulator)
 
@@ -381,4 +382,20 @@ looks, and no criteria had been set before the build. A build is pinned only whe
   loaded names (16 characters fit), Japanese. Not in the emulator: the picture (live view, photos, movies),
   playback of a photo (stock faults there too).
 
+### 10.2 Camera result of card-looks-3, and card-looks-4 (2026-11-17)
+
+- card-looks-3 on the camera (owner): criteria 3, 4, 5 (menus), 6, 7, 8, 12 pass. The first start applied the look
+  file left in the store from the card-looks-2 test (SWAP), with its names (ART 3 "Double-X in 2", ART 5 "Pro 400H in
+  4"): the names follow a stored look on the camera. Not accepted: it replaced Touch Screen Settings (criterion 13).
+  Open from that test: the playback info name (step 7); the uploaded photos were not the test's.
+- card-looks-4 (sha256 `4829e8fa1e3b264647e4f97d82578de2d5f71481484a7d63f0cd87b96cd32431`): `patches/custom-menu-rows.json`
+  (`scripts/mkspec_rows.py`) takes the place of `peaking-menu`: all its operations unchanged (the Peaking list, texts
+  and code: camera-tested bytes) except the two tables, now 81 rows at 0x7EBF1FF0 (0x7EBF1FF0-0x7EBF2000 is free; the
+  table ends where peaking-menu's ended) and 81 entries at 0x7EBF2600, with Load Looks at the end of J; row constants
+  from level-adjust-row's 78 / 79 / 158 B to 80 / 81 / 162 B; group sizes A 11 and J 7. A replacement and not a
+  delta, so no byte that peaking-menu keeps is changed (src/epm2mod/spec.py). `looks-menu-3` = `looks-menu-2` without
+  the row edit; `card-looks-4` = `card-looks-3` with its first run at 0x7EBF2890 (the child list ends there).
+- Checks (V emulator): free space PASS, op check 0 FAIL, hookcheck only remap7b-code, boot-test PASS,
+  update-path-test PASS, `emu_looks3.py --v4` seven sessions PASS, crawls P and ART against the pinned card-looks:
+  378 / 214 units equal, only the J page differs (6 rows -> 7, Touch Screen Settings kept).
 
