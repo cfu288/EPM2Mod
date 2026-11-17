@@ -13,8 +13,6 @@ export function MenuEditor({ looks }: { looks: Looks }) {
           <h2 id="menu-heading">Your camera&apos;s ART menu</h2>
           <span className="text-muted font-sans text-sm font-normal tracking-normal">
             {filled} of {SLOT_COUNT} films
-            {filled === SLOT_COUNT - 1 && ' · 1 slot keeps its default'}
-            {filled < SLOT_COUNT - 1 && ` · ${String(SLOT_COUNT - filled)} slots keep their default`}
           </span>
         </div>
         <p className="text-ink-soft mt-2 text-sm">Drag ☰ to reorder. Select a row to see its name on the camera.</p>

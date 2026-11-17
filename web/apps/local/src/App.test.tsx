@@ -133,7 +133,7 @@ describe('the local app', () => {
     await next(user)
     await user.click(screen.getByRole('button', { name: 'Customize' }))
     await user.click(screen.getByRole('button', { name: 'Remove Kodak Ektachrome 100 from ART 2' }))
-    expect(screen.getByText(/11 of 12 films · 1 slot keeps its default/)).toBeInTheDocument()
+    expect(screen.getByText(/11 of 12 films/)).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Add Fujifilm C200' }))
     await user.click(screen.getByRole('button', { name: 'Make the zip' }))
     await waitFor(() => {

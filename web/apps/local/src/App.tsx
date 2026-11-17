@@ -243,7 +243,7 @@ function FirmwareStep(props: {
         <Choice
           group="firmware"
           title="Olympus original"
-          line="Olympus's own firmware, version 1.6. It removes EPM2Mod."
+          line="Olympus's own firmware. It removes EPM2Mod."
           checked={props.firmware === 'original'}
           onChoose={() => {
             props.onFirmware('original')
@@ -460,8 +460,8 @@ function InstallStep(props: {
         {looks ? (
           <>
             <li>
-              Press MENU and select SETUP: a menu with tabs on the left opens. If it has no gears tab: open the wrench
-              tab → Menu Display → set Custom Menu (the gears) to On.
+              Press MENU and select SETUP (use the arrow pad to move and OK to select): a menu with tabs on the left
+              opens. If it has no gears tab: open the wrench tab → Menu Display → set Custom Menu (the gears) to On.
             </li>
             <li>Open the gears tab → group J → Load Looks → Load → OK. The row shows Loaded.</li>
             <li>To check: press MENU and select ART. {props.changed}</li>
