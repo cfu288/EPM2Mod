@@ -161,7 +161,7 @@ the next session went on in that ring, and its flush wrote 512 stale slots.
 - Emulator (V): `run_logmenu.sh` sessions 1-5 as before (the ring goes on: w 25, 42); a ring saved at the end of an
   On session and put back before the next start: kept, its 6 unflushed records come out as `recovered`; the same
   ring with bits 0x48104000 set in the count: a new ring, no stale record; the same ring without the check word (an
-  older build's ring): a new ring. boot-test PASS, update-path-test PASS, hookcheck only remap7b-code.
+  older build's ring): a new ring. boot-test PASS, update-path-test PASS, hookcheck only remap7b-code; crawls P and ART: 378 / 214 screens equal to card-looks-4, only the J page differs.
 - sha256 `83e7c3d6d4f92c6e10f713e992b41078b8b6da382cecb0dd3e5b0e3817ff12ec`.
 
 ## Next
