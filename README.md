@@ -57,3 +57,5 @@ Download the zip from [Releases](https://github.com/cfu288/EPM2Mod/releases), un
 To go back to the original firmware, see [docs/install.md](docs/install.md).
 
 ![Nine photos, each developed in the camera with stock Natural and the film looks](docs/images/film-sim-comparison.jpg)
+
+> This project was created with heavy use of AI assistance.
