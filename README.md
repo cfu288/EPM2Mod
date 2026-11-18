@@ -42,8 +42,8 @@ On a Mac, the first start is blocked: allow it in System Settings → Privacy & 
    uv run tools/make_firmware.py --card /path/to/card
    ```
 
-   Or add your own film looks to the card too: pick a film for any ART number (`uv run epm2mod looks list` shows the
-   films)
+   Or also choose which films are in the ART menu: pick a film for any ART number (`uv run epm2mod looks list` shows
+   the films)
 
    ```sh
    uv run tools/make_firmware.py --card /path/to/card
@@ -53,7 +53,7 @@ On a Mac, the first start is blocked: allow it in System Settings → Privacy & 
 3. Put the card in the camera. With the camera off, hold **OK** and the **ON/OFF** button together. When the orange lamp on the front of the camera (the AF illuminator) lights steadily, let go of both.
    - While the lamp is steady, the camera is writing the firmware. This takes 1 to 2 minutes. Do not switch the camera off.
    - When the lamp blinks, the update is done. Switch the camera off and on again.
-4. If you added film looks: MENU → Custom Menu → J → **Load Looks** → **Load** → OK. See [Looks from the SD card](docs/guide/card-looks.md).
+4. If you chose films: MENU → Custom Menu → J → **Load Looks** → **Load** → OK. See [Looks from the SD card](docs/guide/card-looks.md).
 
 To go back to the original firmware, choose **Olympus original** in the installer, or see [docs/install.md](docs/install.md).
 
