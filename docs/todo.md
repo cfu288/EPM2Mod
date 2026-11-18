@@ -52,6 +52,8 @@ and delete the item here.
 - The published test RAW files (owner name and serial numbers blanked) are not yet developed on the
   camera.
 - Add Effects (glow, vignette, white edge, frame) on a film look: a data edit, not yet tried.
+- A look editor with a preview and `.cube` / `.xmp` import in the installer, then maybe on the camera: plan in
+  `experiments/2026-11-18-look-editor/NOTES.md`. Next: the desk steps A1 to A4.
 - More film entries through the hidden art-filter numbers 110 to 118: not yet tried.
 - The film names in the other 33 languages are in the pinned build; not tested on the camera (the
   owner does not need them). Unknown: where the texts 1173 and 1186 show.
