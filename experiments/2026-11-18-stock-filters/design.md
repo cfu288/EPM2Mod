@@ -262,6 +262,13 @@ a flashed entry with the stock default handler as target is added; the loader sw
   effects"); OK opens the ART list (1 "Portra 400"); entry 13 is ART BKT; RIGHT shows the 12 films On, the other
   Picture Modes Off.
 
+- 2026-11-18, camera run 2 (ART BKT, `build/fw-test/stock-films-bkt`): ART list -> 13 ART BKT -> OK, one shot: the
+  Natural frame and 12 JPEGs, one per entry in menu order, each the film (Double-X black and white, no Soft Focus,
+  Pin Hole or Diorama effect). The log: codes 79, 75, 71, 72, 94, 92, 125, 85, 98, 144, 156, 159 in that order. One
+  finding: at power-on, 1.7 s, before the loader (2.2 s), the stage ran once with code 88, Olympus's Diorama code of
+  the movie path, for the stored entry 106 (Velvia). After the loader every frame used 125; nothing was seen on the
+  screen. Pinned 2026-11-18; the installer now writes the 12 default films to every EPM2Mod card.
+
 ## Open questions (settle in code and the emulator before any camera run)
 
 - U0. Three more colour-only art codes for Soft Focus, Pin Hole and Diorama (above).

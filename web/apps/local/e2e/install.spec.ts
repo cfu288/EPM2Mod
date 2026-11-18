@@ -64,7 +64,8 @@ test('writes EPM2Mod with the default films to the card and shows the progress',
       .filter({ hasText: "Download Olympus's firmware" }),
   ).toContainText('✓')
   await expect(page.getByRole('heading', { name: 'Install on the camera' })).toBeVisible()
-  expect(made).toEqual([{ firmware: 'epm2mod', choices: [], card: CARD.path }])
+  expect(made[0]?.choices).toHaveLength(12)
+  await expect(page.getByRole('list', { name: 'Install steps' })).toContainText('Load Looks → Load → OK.')
 })
 
 test('customizes the films and downloads the zip', async ({ page }) => {

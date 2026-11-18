@@ -521,10 +521,11 @@ class RealFirmwareLooksTests(unittest.TestCase):
         self.assertEqual(labels["status"], committed["status"])
         self.assertEqual(generate.stale(paths), [])
 
-        pinned = builds.pinned_description(paths)
-        specs = pipeline.load_specs(paths, pinned)
+        # log-menu: the last tested build with the films in the firmware (the pinned one loads them from the card)
+        tested = builds.load_description(builds.description_path(paths, "log-menu"))
+        specs = pipeline.load_specs(paths, tested)
         with self.assertRaises(BuildError):  # the recorded sha256 no longer fits
-            pipeline.build_image(pinned, specs, stock.read_stock(paths))
+            pipeline.build_image(tested, specs, stock.read_stock(paths))
 
 
 if __name__ == "__main__":

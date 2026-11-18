@@ -36,13 +36,13 @@ const ZIP_NAME = 'EPM2Mod-card.zip'
 function changedSlot(items: readonly SlotItem[]): string {
   const index = items.findIndex((item, i) => item.filmId !== null && item.filmId !== slots[i]?.builtIn)
   const id = items[index]?.filmId
-  return id ? `${filmById(id).name} in ART ${String(index + 1)}.` : 'your films.'
+  return id ? `${filmById(id).name} in ART ${String(index + 1)}.` : 'film names, such as Portra 400.'
 }
 const HELP = 'https://github.com/cfu288/EPM2Mod/blob/main/docs/install.md'
 
 /** A card in the list: its name, size and where it is mounted. */
 const cardLabel = (c: Card) => `${c.name || 'SD card'} · ${String(Math.round(c.size / 1e9))} GB · ${c.path}`
-const DEFAULT_CHOICES = choicesOf(builtInSlots()).join()
+const DEFAULT_CHOICES = choicesOf(builtInSlots())
 
 /** What the user sees while the job runs, and the step of the job (`steps` of `epm2mod serve`) that ends each one. */
 function stages(job: Job | null, firmware: Firmware) {
@@ -538,9 +538,8 @@ export default function App() {
   const startBuild = (custom: boolean) => {
     setProblem(null)
     setLastCustom(custom)
-    const choices = choicesOf(looks.items)
-    // films left as they are need no look file: the firmware has them built in
-    const wanted = firmware === 'epm2mod' && custom && choices.join() !== DEFAULT_CHOICES ? choices : []
+    // the firmware has Olympus's art filters: every EPM2Mod install gets a look file, loaded with Load Looks
+    const wanted = firmware === 'epm2mod' ? (custom ? choicesOf(looks.items) : DEFAULT_CHOICES) : []
     setJob(null)
     setStep('build')
     api.make(firmware, wanted, zip ? null : card).then(

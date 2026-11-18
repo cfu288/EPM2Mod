@@ -93,8 +93,9 @@ _STOCK_ORDER = (
     "Key Line",
     "Watercolor",
 )
-#: The spec that names the first Portra entry "Portra 400" (the twelve-film builds).
-_TWELVE_NAMES = "patches/films12bw-names.json"
+#: Specs of the twelve-film builds: the one that names the first Portra entry "Portra 400", and the loader of
+#: the build with Olympus's filters, whose default look file holds the same twelve films.
+_TWELVE_SPECS = ("patches/films12bw-names.json", "patches/card-looks-5.json")
 
 
 def pinned_films(paths: RepoPaths) -> list[tuple[str, Film]]:
@@ -107,7 +108,7 @@ def pinned_films(paths: RepoPaths) -> list[tuple[str, Film]]:
     that ``moved_to`` had is not in the build.
     """
     seven = load_films(paths).films
-    if _TWELVE_NAMES not in pinned_description(paths).specs:
+    if not set(_TWELVE_SPECS) & set(pinned_description(paths).specs):
         return [(film.label, film) for film in seven]
     more = {film.entry: film for film in load_more_films(paths).films}
     black_and_white = load_bw_films(paths)

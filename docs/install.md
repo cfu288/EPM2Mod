@@ -1,12 +1,12 @@
 # Install
 
 <!-- BEGIN GENERATED: pinned-build -->
-The pinned build is **`log-menu`**: film simulations in the twelve art filter entries, each of which takes any look; film looks loaded from the SD card with the menu row Load Looks in Custom Menu J, shown under their own names and kept in the camera; interval shooting with up to 240 frames, a level gauge with calibration, and focus peaking; a Debug Log row in Custom Menu J (Off by default) that writes EPM2LOG.BIN to the card for bug reports. We tested this build on a real E-PM2 on 2026-11-18 ([camera log](camera-log.md)).
+The pinned build is **`stock-films`**: the twelve Olympus art filters unchanged; film looks loaded from the SD card with Custom Menu J, Load Looks, overwrite the entries the file lists; interval shooting with up to 240 frames, a level gauge with calibration, and focus peaking; a Debug Log row in Custom Menu J (Off by default) that writes EPM2LOG.BIN to the card for bug reports. We tested this build on a real E-PM2 on 2026-11-18 ([camera log](camera-log.md)).
 
 | | sha256 |
 |---|---|
 | Stock firmware, `OLY_E_101_1600_0000_0000.BIN` | `34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300` |
-| Pinned build, `log-menu` | `83e7c3d6d4f92c6e10f713e992b41078b8b6da382cecb0dd3e5b0e3817ff12ec` |
+| Pinned build, `stock-films` | `2859767da0014bcb637ca3016898c940f7678d244794d3d5bb231c7e8c0ba8cd` |
 <!-- END GENERATED: pinned-build -->
 
 The install steps are in the [README](../README.md#install).

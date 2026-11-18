@@ -15,7 +15,11 @@ export const features: Feature[] = [
     id: 'film-looks',
     name: 'Film simulations',
     summary: 'Film colours straight out of the camera.',
-    steps: ['Set the mode dial to P, A, S or M.', 'Press OK, select Picture Mode, and scroll right past Custom.'],
+    steps: [
+      'Install EPM2Mod with the installer. It puts the film simulations on the SD card.',
+      'MENU → Custom Menu → J → Load Looks → Load. Until then the camera has the Olympus art filters.',
+      'Press OK, select Picture Mode, and scroll right past Custom.',
+    ],
     screens: [{ src: 'ui/quick-menu-portra.png', alt: 'The quick menu with Picture Mode on Portra 400' }],
   },
   {
@@ -25,7 +29,7 @@ export const features: Feature[] = [
     steps: [
       'Choose film simulations in the installer and write them to the SD card.',
       'MENU → Custom Menu → J → Load Looks → Load.',
-      'To undo, select Built-in instead of Load.',
+      'An art filter that the file leaves out goes back to the Olympus filter.',
     ],
     screens: [
       { src: 'ui/load-looks-loaded.png', alt: 'Load Looks reads Loaded' },

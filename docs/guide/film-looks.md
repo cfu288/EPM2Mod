@@ -1,8 +1,12 @@
 # Film Simulations
 
-The twelve art filters are replaced with film simulations. They work for photos and live view.
+The camera comes with the Olympus art filters. Load Looks puts the film simulations in their place. They work for
+photos and live view.
 
 ## Usage
+
+Install with the installer, which puts the films on the SD card. Then MENU → Custom Menu → J → **Load Looks** →
+**Load** → OK ([more](card-looks.md)).
 
 In P, A, S or M mode, press **OK**, select **Picture Mode**, and scroll right past Custom. The film simulations are also in the **ART** mode list.
 

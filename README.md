@@ -43,7 +43,7 @@ Download the zip from [Releases](https://github.com/cfu288/EPM2Mod/releases), un
    uv run epm2mod make --card /path/to/card
    ```
 
-   Or build and install the firmware with its 12 film simulations to the SD card, as the installer does. Change any film simulation name to choose another (`uv run epm2mod looks list` shows all 19):
+   The firmware has the Olympus art filters. To add the 12 film simulations, also write the look file, as the installer does. Change any film simulation name to choose another (`uv run epm2mod looks list` shows all 19):
 
    ```sh
    uv run epm2mod make --card /path/to/card
@@ -53,7 +53,7 @@ Download the zip from [Releases](https://github.com/cfu288/EPM2Mod/releases), un
 3. Put the card in the camera. With the camera off, hold **OK** and the **ON/OFF** button together. When the orange lamp on the front of the camera (the AF illuminator) lights steadily, let go of both.
    - While the lamp is steady, the camera is writing the firmware. This takes 1 to 2 minutes. Do not switch the camera off.
    - When the lamp blinks, the update is done. Switch the camera off and on again.
-4. If you used `looks pack`: MENU → Custom Menu → J → **Load Looks** → **Load** → OK ([more](docs/guide/card-looks.md)).
+4. To load the film simulations: MENU → Custom Menu → J → **Load Looks** → **Load** → OK ([more](docs/guide/card-looks.md)).
 
 To go back to the original firmware, see [docs/install.md](docs/install.md).
 

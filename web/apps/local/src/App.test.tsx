@@ -1,9 +1,11 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { builtInSlots, choicesOf } from '@epm2mod/ui'
 import App from './App'
 import type { Job } from './api'
 
 const BUILD = { name: 'card-looks-4', what: 'Film simulations', sha256: 'ab'.repeat(32) }
+const DEFAULT = choicesOf(builtInSlots())
 const CARD = {
   path: '/media/u/CARD',
   name: 'CARD',
@@ -78,14 +80,14 @@ describe('the local app', () => {
     expect(screen.getByRole('heading', { name: 'Film simulations' })).toBeInTheDocument()
     expect(screen.getByText(/derived from/)).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Use the default film simulations' }))
-    expect(made).toEqual([{ firmware: 'epm2mod', choices: [], card: CARD.path }])
+    expect(made).toEqual([{ firmware: 'epm2mod', choices: DEFAULT, card: CARD.path }])
     expect(await screen.findByRole('heading', { name: 'Install on the camera' })).toBeInTheDocument()
     const steps = screen.getByRole('list', { name: 'Install steps' })
     expect(steps).toHaveTextContent(
       'Hold OK (middle of the arrow pad) and ON/OFF together until the orange lamp on the front stays lit, then let go.',
     )
+    expect(steps).toHaveTextContent('MENU → SETUP → gears tab → J → Load Looks → Load → OK.')
     expect(steps).toHaveTextContent('Check: MENU → ART shows film names, such as Portra 400.')
-    expect(steps).not.toHaveTextContent('Load Looks')
     expect(steps).not.toHaveTextContent('zip')
     expect(screen.queryByText(/derived from/)).toBeNull()
     await user.click(screen.getByRole('button', { name: 'Finish' }))
@@ -114,7 +116,7 @@ describe('the local app', () => {
     })
   })
 
-  it('writes no look file when the customized films are left as they are', async () => {
+  it('writes the default films when the customized films are left as they are', async () => {
     const made = server()
     const user = userEvent.setup()
     render(<App />)
@@ -125,7 +127,7 @@ describe('the local app', () => {
     expect(screen.getByText('The menu is full. Remove a film simulation (×) to add one.')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Write to the card' }))
     await waitFor(() => {
-      expect(made).toEqual([{ firmware: 'epm2mod', choices: [], card: CARD.path }])
+      expect(made).toEqual([{ firmware: 'epm2mod', choices: DEFAULT, card: CARD.path }])
     })
   })
 

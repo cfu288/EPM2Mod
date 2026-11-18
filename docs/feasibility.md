@@ -59,7 +59,8 @@ routines. This file records what the measurements show, so that nobody repeats t
 | A dormant setting as an own menu row, kept after power-off | Setting 447 with the stock Off / On panel 608 (Custom Menu J, Debug Log); the firmware never writes it at start | Camera-tested 2026-11-18 (`log-menu`: On kept after power-off and after a flash) |
 | RAM kept across power-off | The log's ring RAM 0x7E4F9000 keeps its content; bits can turn from 0 to 1 while the camera is off (seen twice, both before a start from USB) | Camera-tested 2026-11-18; the ring has a check word since `log-menu` |
 | Settings memory for own data | The EEROM settings bank's unused tail, 53,680 bytes, saved by the firmware and by the bank save API 0x7E680272 | Camera-tested 2026-11-17 (looks kept after power-off without the card) |
-| Hidden art-filter numbers | 110 to 118 exist in the pipeline switches, with no menu value | Verified in code; untested on the camera |
+| Hidden art-filter numbers | 110 to 118 exist in the pipeline switches, with no menu value | Camera-tested 2026-11-18 (`stock-films`: 111, 112, 114, 115, 118 carry films in stills, live view, movie and ART BKT) |
+| Art filters switched at run time | Olympus's 12 filters stay in flash; a Load writes each entry's routing words and its RAM tables (0x7E4D1000, 0x3200 per entry); 30 hooks make ART BKT follow | Camera-tested 2026-11-18 (`stock-films`). For about 0.5 s at power-on, before the loader runs, the selected entry uses its Olympus code (code 88 seen once) |
 | Add Effects (Soft Focus, Pin-Hole, White Edge, Frame, Star Light) | Per-filter data lists at 0x7E849E2B to 0x7E849E5A | Verified; on a film slot untested |
 
 ## What is feasible

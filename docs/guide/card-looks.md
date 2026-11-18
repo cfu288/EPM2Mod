@@ -1,12 +1,12 @@
 # Looks from the SD Card
 
-Choose which film is in each of the twelve ART entries, with a file on the SD card. The camera keeps them,
-with their names, after power-off and without the card.
+The camera comes with the Olympus art filters. A file on the SD card puts a film in each ART entry it lists. The
+camera keeps them, with their names, after power-off and without the card.
 
 ## Make a file
 
-On the web, [the film looks page](https://cfu288.github.io/EPM2Mod/) makes the file. The installer makes it when you
-select Customize. On the command line, change any film in this command (`uv run epm2mod looks list` shows all 19, and
+On the web, [the film looks page](https://cfu288.github.io/EPM2Mod/) makes the file. The installer always writes it,
+with the 12 default films or your choice. On the command line, change any film in this command (`uv run epm2mod looks list` shows all 19, and
 `uv run epm2mod cards` shows the card's folder):
 
 ```sh
@@ -19,15 +19,15 @@ It writes `EPM2LOOK.BIN` to the top folder of the card. Without the card, use `-
 
 MENU → Custom Menu → J → **Load Looks** → **Load** → OK. The row reads Loading, then **Loaded** at the next key.
 
-<img src="../images/ui/load-looks-list.png" width="320" alt="Load Looks with Off, Load and Built-in">
+<img src="../images/ui/load-looks-list.png" width="320" alt="Load Looks with Off and Load">
 <img src="../images/ui/load-looks-loaded.png" width="320" alt="Load Looks reads Loaded">
 
 The entry shows the look's name everywhere the camera shows a film name.
 
 <img src="../images/ui/picture-mode-loaded.png" width="320" alt="The Picture Mode strip with Portra 800">
 
-You can delete the file. **Built-in** in the same row brings back the built-in looks. **No file** or **Bad file**
-means nothing changed. No Custom Menu tab (gears icon): enable it in **Setup Menu → Menu Display**.
+Each Load replaces the last one: an entry the file leaves out goes back to its Olympus art filter. You can delete
+the file. **No file** or **Bad file** means nothing changed. No Custom Menu tab (gears icon): enable it in **Setup Menu → Menu Display**.
 
 ## Limits
 
