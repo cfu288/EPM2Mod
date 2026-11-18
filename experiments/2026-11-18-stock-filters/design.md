@@ -246,8 +246,15 @@ a flashed entry with the stock default handler as target is added; the loader sw
   - nothing loaded, the stock values: equal to the reference build with the mod's features and no film part
     (`nofilm`): Soft Focus 69, Pin Hole and Dramatic Tone no picture, Diorama an error report and no picture,
     Watercolor a write to a freed block, in both: limits of the rig with the stock effect filters, not changes.
+- 2026-11-18, the other features and the unloaded bytes (same sha256):
+  - `scripts/features_same.py`: interval (guard, selector, start, movie guard, frames step and editor, shot done) and
+    the menu-row cases (help, child, value) give the same results on `log-menu` (pinned) and `stock-films`: ALL SAME.
+  - The Debug Log sessions of `log-menu` (`run_logmenu.sh`) on `stock-films`: the same results.
+  - `scripts/unloaded_vs_stock.py`: every byte the film part changes in the image, with nothing loaded, is free space,
+    a switched word that holds its stock bytes, a film-code or hidden-value table entry, a new tone-hash key, a hook
+    or the task entry, the 75/125 compares, the Load Looks row list or a block-1 text: ALL BYTES EXPLAINED.
 - The emulator gate is complete: build checks, six sessions, Picture Mode remap, stock-vs-build crawls, the stage
-  cases, the tables against the film firmware, live view. Next: the camera run (`docs/camera-log.md`).
+  cases, the tables against the film firmware, live view, the other features, the unloaded bytes. Next: the camera run (`docs/camera-log.md`).
 
 ## Open questions (settle in code and the emulator before any camera run)
 
