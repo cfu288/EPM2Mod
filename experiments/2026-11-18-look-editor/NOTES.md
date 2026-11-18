@@ -79,10 +79,13 @@ about 15 values; a proven code area of 2 KB or more; live-view lag after an edit
 | Step | Settles | Where | Status |
 |---|---|---|---|
 | 1 | The editor's controls (provisional below; the owner may change them) | owner | provisional |
-| 2 | Settings for the rows to show values: about 15 that no stock code uses. They are scratch values only; the edit is stored in the look store, which already persists | emulator and code reading, `settings.md` | running |
-| 3 | Rows with numbers (for example -7 to +7), reusing stock value lists if possible; acting on a change; live view behind the menu | emulator and code reading, `rows.md` | running |
-| 4 | Code size of a minimal editor against free space; more space from the PENPAL (PP-1 Bluetooth) code if needed (owner's idea) | code reading, `space-penpal.md` | running |
+| 2 | Settings for the rows to show values: about 15 that no stock code uses. They are scratch values only; the edit is stored in the look store, which already persists | emulator and code reading, `settings.md` | done: 23 free settings (R, E). The limit is picker panels: each row needs its own, and only 3 free setting/panel pairs exist (448/609, 442 and one more; `settings.md`) |
+| 3 | Rows with numbers (for example -7 to +7), reusing stock value lists if possible; acting on a change; live view behind the menu | emulator and code reading, `rows.md` | done: a -7..+7 row with stock glyphs works (E). The menu covers live view: the edit shows after leaving the menu (E). Recommended: two rows, "Look Edit" (which control) and "Value" (-7..+7) |
+| 4 | Code size of a minimal editor against free space; more space from the PENPAL (PP-1 Bluetooth) code if needed (owner's idea) | code reading, `space-penpal.md` | done: editor about 450-600 B code and 2.7 KB data (I), fits proven space tightly. PENPAL: a 57,523 B chunk (the PP-1 radio's patch code) frees with 3 small patches (R); no loss without a PP-1 attached |
 | 5 | One probe flash: code from a new area, live view after a row change and its lag, the edit after a restart | camera, after 2 to 4 | not started |
+
+Decision for the owner: two rows (works with the free pairs found; one control at a time) or a row per control
+(needs about 18 new picker panels, which means moving the 312-entry panel table: cost U).
 
 Provisional controls (step 1): edits apply to the film simulation in use. Hue and saturation for each of the 6
 colours (12 rows), contrast, Blacks, Whites, warmth, tint and saturation (6 rows). Each about -7 to +7.
