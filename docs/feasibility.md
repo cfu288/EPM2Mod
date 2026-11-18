@@ -122,8 +122,8 @@ Color Creator either (manual, verified in the 2026-11-15 survey).
 - A Color Creator-like control (one hue turn and one saturation for the whole picture) through the 3x3 colour
   matrix, which every film simulation already sets.
 - Lightness per colour is not possible with the known stages.
-- An editor like theirs on the stages we have, and `.cube` import fitted to those stages: research plan with
-  probes in `experiments/2026-11-18-look-editor/NOTES.md`.
+- In-camera edits on the stages we have, and look import fitted to those stages: requirements and limits in
+  `experiments/2026-11-18-look-editor/NOTES.md`.
 - A 12-colour editor needs a 12-colour stage in TruePic VI. It is not known whether the hardware has one. The
   probe is in the table below. Until a probe finds one, a 12-colour editor is not possible on this body.
 
