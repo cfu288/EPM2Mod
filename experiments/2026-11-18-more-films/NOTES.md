@@ -16,6 +16,8 @@ spektrafilm `main` (3bb2c2d, 0.3.4) has 21 film profiles; `dev` and `experimenta
 
 Not done: other print papers for stocks we have (for example Portra 400 on 2383, a LUT that exists in `out/lut`,
 or on Supra, Ultra or Ektacolor Edge paper). They are variants of a stock, not new stocks.
+**Owner's decision (2026-11-18): skip print-paper variants; they are duplicates of stocks we have.** With this,
+every spektrafilm film stock (main and dev) is in the catalogue.
 
 ## 2. A wrong film under the name Portra 800 (found and fixed)
 
