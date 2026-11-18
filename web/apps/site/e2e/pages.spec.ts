@@ -14,7 +14,7 @@ test('every page loads from its own URL', async ({ page }) => {
 
 test('the film carousel shows a loaded photo and follows the arrow keys', async ({ page }) => {
   await page.goto('./films')
-  const carousel = page.getByRole('region', { name: 'Film comparison' })
+  const carousel = page.getByRole('region', { name: 'Film simulation comparison' })
   const photo = carousel.getByRole('img', { name: 'Scene 1 in Portra 400' })
   await expect(photo).toHaveJSProperty('complete', true)
   await expect(photo).not.toHaveJSProperty('naturalWidth', 0)

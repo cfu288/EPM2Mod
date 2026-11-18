@@ -11,7 +11,7 @@ export function Features() {
           key={feature.id}
           id={feature.id}
           aria-labelledby={`${feature.id}-heading`}
-          className="mt-16 scroll-mt-20"
+          className="mt-16 scroll-mt-28 sm:scroll-mt-20"
         >
           <h2 id={`${feature.id}-heading`} className="section-title">
             {feature.name}

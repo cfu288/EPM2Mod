@@ -6,7 +6,7 @@ import { href, type Page } from './router'
 
 const NAV: { page: Page; label: string }[] = [
   { page: 'features', label: 'Features' },
-  { page: 'films', label: 'Films' },
+  { page: 'films', label: 'Film Simulations' },
   { page: 'install', label: 'Install' },
 ]
 
@@ -14,12 +14,12 @@ export function Layout({ page, children }: { page: Page; children: ReactNode }) 
   return (
     <div className="flex min-h-full flex-col">
       <header className="border-rule sticky top-0 z-20 border-b bg-white/95 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-x-4 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2 sm:h-14 sm:flex-nowrap sm:px-6 sm:py-0 lg:px-8">
           <Link href={href('home')} className="font-display text-lg font-extrabold tracking-tight sm:text-xl">
             EPM2Mod
           </Link>
           <nav aria-label="Main">
-            <ul className="flex items-center gap-x-4 text-sm sm:gap-x-8">
+            <ul className="flex flex-wrap items-center gap-x-4 text-sm sm:gap-x-8">
               {NAV.map((item) => (
                 <li key={item.page}>
                   <Link

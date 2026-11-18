@@ -104,14 +104,14 @@ function CliSteps() {
       <Step n={2} title="Make the firmware">
         <Code>{'uv run epm2mod make --card /path/to/card'}</Code>
         <p>
-          To add films, list them with <code>uv run epm2mod looks list</code>, then put them in ART slots:
+          To add film simulations, list them with <code>uv run epm2mod looks list</code>, then put them in ART slots:
         </p>
         <Code>{'uv run epm2mod looks pack ART1=portra-400 ART2=velvia --card /path/to/card'}</Code>
       </Step>
       <Flash n={3} />
       <CustomMenu n={4} />
-      <Step n={5} title="Load the films">
-        <p>If you added films: MENU → Custom Menu → J → Load Looks → Load.</p>
+      <Step n={5} title="Load the film simulations">
+        <p>If you added film simulations: MENU → Custom Menu → J → Load Looks → Load.</p>
       </Step>
     </ol>
   )

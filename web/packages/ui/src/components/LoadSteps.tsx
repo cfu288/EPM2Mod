@@ -16,7 +16,7 @@ export function LoadSteps({ copied = false }: { copied?: boolean }) {
         </li>
       </ol>
       <p className="text-ink-soft mt-3 text-sm">
-        To go back to the films built into the firmware: MENU → Custom Menu → J → Load Looks → Built-in → OK.
+        To go back to the film simulations built into the firmware: MENU → Custom Menu → J → Load Looks → Built-in → OK.
       </p>
     </>
   )

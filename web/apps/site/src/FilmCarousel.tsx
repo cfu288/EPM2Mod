@@ -102,7 +102,7 @@ export function FilmCarousel() {
   return (
     <div
       role="region"
-      aria-label="Film comparison"
+      aria-label="Film simulation comparison"
       aria-roledescription="carousel"
       ref={root}
       className="grid gap-4 lg:grid-cols-[1fr_7rem]"
@@ -131,7 +131,7 @@ export function FilmCarousel() {
           />
           <button
             type="button"
-            aria-label="Previous film"
+            aria-label="Previous film simulation"
             onClick={() => {
               moveLook(-1)
             }}
@@ -141,7 +141,7 @@ export function FilmCarousel() {
           </button>
           <button
             type="button"
-            aria-label="Next film"
+            aria-label="Next film simulation"
             onClick={() => {
               moveLook(1)
             }}
@@ -155,10 +155,10 @@ export function FilmCarousel() {
           <p>
             <span className="font-display text-2xl font-extrabold">{lookFilm(look)}</span>
           </p>
-          <p className="text-muted hidden text-sm sm:block">← → film · ↑ ↓ scene</p>
+          <p className="text-muted hidden text-sm sm:block">← → film simulation · ↑ ↓ scene</p>
         </div>
 
-        <div role="group" aria-label="Film" className="mt-4 flex flex-wrap gap-1">
+        <div role="group" aria-label="Film simulation" className="mt-4 flex flex-wrap gap-1">
           {looks.map((id) => (
             <button
               key={id}

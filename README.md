@@ -2,7 +2,7 @@
 
 ![Olympus PEN E-PM2](docs/images/epm2.jpg)
 
-Repository containing the current work for creating a custom firmware mod for the Olympus PEN **E-PM2**. We've implemented the ability to swap the default art filters with film simulations like Portra, Ektachrome, etc. You can choose which ones you want to load via our [ film looks page](https://cfu288.github.io/EPM2Mod/) to download the looks you want. We also enabled interval shooting (up to 240 shots), added a level gauge, and added focus peaking.
+Repository containing the current work for creating a custom firmware mod for the Olympus PEN **E-PM2**. We've implemented the ability to swap the default art filters with film simulations like Portra, Ektachrome, etc. You can choose which ones to load with the installer. See them compared on [our site](https://cfu288.github.io/EPM2Mod/films). We also enabled interval shooting (up to 240 shots), added a level gauge, and added focus peaking.
 
 ## Added Features
 
@@ -42,7 +42,7 @@ Download the zip from [Releases](https://github.com/cfu288/EPM2Mod/releases), un
    uv run epm2mod make --card /path/to/card
    ```
 
-   Or build and install the firmware with its 12 films to the SD card, as the installer does. Change any film name to choose another (`uv run epm2mod looks list` shows all 19):
+   Or build and install the firmware with its 12 film simulations to the SD card, as the installer does. Change any film simulation name to choose another (`uv run epm2mod looks list` shows all 19):
 
    ```sh
    uv run epm2mod make --card /path/to/card
@@ -56,6 +56,6 @@ Download the zip from [Releases](https://github.com/cfu288/EPM2Mod/releases), un
 
 To go back to the original firmware, see [docs/install.md](docs/install.md).
 
-![Nine photos, each developed in the camera with stock Natural and the film looks](docs/images/film-sim-comparison.jpg)
+![Nine photos, each developed in the camera with stock Natural and the film simulations](docs/images/film-sim-comparison.jpg)
 
 > This project was created with heavy use of AI assistance.

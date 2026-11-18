@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import App from './App'
 
 const nav = () => screen.getByRole('navigation', { name: 'Main' })
-const carousel = () => screen.getByRole('region', { name: 'Film comparison' })
+const carousel = () => screen.getByRole('region', { name: 'Film simulation comparison' })
 const pressed = (group: string) =>
   within(within(carousel()).getByRole('group', { name: group })).getByRole('button', { pressed: true })
 
@@ -26,15 +26,15 @@ describe('App', () => {
   it('goes to each page from the menu', async () => {
     const user = userEvent.setup()
     render(<App />)
-    for (const [name, heading] of [
-      ['Features', 'Features'],
-      ['Films', 'Film Simulations'],
-      ['Install', 'Install'],
+    for (const [name, path] of [
+      ['Features', 'features'],
+      ['Film Simulations', 'films'],
+      ['Install', 'install'],
     ] as const) {
       await user.click(within(nav()).getByRole('link', { name }))
-      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(heading)
+      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(name)
       expect(within(nav()).getByRole('link', { name })).toHaveAttribute('aria-current', 'page')
-      expect(window.location.pathname).toBe(`${import.meta.env.BASE_URL}${name.toLowerCase()}`)
+      expect(window.location.pathname).toBe(`${import.meta.env.BASE_URL}${path}`)
     }
   })
 
@@ -52,14 +52,14 @@ describe('Films', () => {
   it('changes the film with left and right, the scene with up and down', async () => {
     const user = userEvent.setup()
     render(<App />)
-    expect(pressed('Film')).toHaveTextContent('Portra 400')
+    expect(pressed('Film simulation')).toHaveTextContent('Portra 400')
     expect(pressed('Scene')).toHaveAccessibleName('Scene 1')
 
-    pressed('Film').focus()
+    pressed('Film simulation').focus()
     await user.keyboard('{ArrowRight}')
-    expect(pressed('Film')).toHaveTextContent('Ektachrome')
+    expect(pressed('Film simulation')).toHaveTextContent('Ektachrome')
     await user.keyboard('{ArrowLeft}{ArrowLeft}')
-    expect(pressed('Film')).toHaveTextContent('Natural')
+    expect(pressed('Film simulation')).toHaveTextContent('Natural')
     await user.keyboard('{ArrowDown}')
     expect(pressed('Scene')).toHaveAccessibleName('Scene 2')
     await user.keyboard('{ArrowUp}{ArrowUp}')
@@ -71,7 +71,7 @@ describe('Films', () => {
     render(<App />)
     await user.click(screen.getByRole('button', { name: 'Gold 200' }))
     await user.click(screen.getByRole('button', { name: 'Scene 2' }))
-    expect(pressed('Film')).toHaveTextContent('Natural')
+    expect(pressed('Film simulation')).toHaveTextContent('Natural')
     expect(within(carousel()).getByRole('img', { name: 'Scene 2 in Natural' })).toBeInTheDocument()
   })
 

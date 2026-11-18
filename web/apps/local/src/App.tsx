@@ -21,7 +21,7 @@ type StepId = 'start' | 'firmware' | 'films' | 'build' | 'install'
 const LABELS: Record<StepId, string> = {
   start: 'Start',
   firmware: 'Firmware',
-  films: 'Film looks',
+  films: 'Film simulations',
   build: 'Build',
   install: 'Install',
 }
@@ -231,7 +231,7 @@ function FirmwareStep(props: {
         <Choice
           group="firmware"
           title="EPM2Mod"
-          line="Film looks, interval shooting, level gauge, focus peaking."
+          line="Film simulations, interval shooting, level gauge, focus peaking."
           checked={props.firmware === 'epm2mod'}
           onChoose={() => {
             props.onFirmware('epm2mod')
@@ -262,7 +262,7 @@ function FilmsStep(props: {
   if (!props.customizing)
     return (
       <Step
-        title="Film looks"
+        title="Film simulations"
         actions={
           <>
             <BackButton onClick={props.onBack} />
@@ -282,19 +282,19 @@ function FilmsStep(props: {
               }}
               className={primary}
             >
-              Use the default films
+              Use the default film simulations
             </button>
           </>
         }
       >
-        <p>EPM2Mod replaces the 12 art filters with film looks.</p>
+        <p>EPM2Mod replaces the 12 art filters with film simulations.</p>
         <FilmCredit />
       </Step>
     )
   const { looks } = props
   return (
     <Step
-      title="Customize the film looks"
+      title="Customize the film simulations"
       actions={
         <>
           <BackButton
@@ -305,11 +305,11 @@ function FilmsStep(props: {
           <button
             type="button"
             onClick={() => {
-              if (window.confirm('Discard your changes and use the default films?')) looks.reset()
+              if (window.confirm('Discard your changes and use the default film simulations?')) looks.reset()
             }}
             className={secondary}
           >
-            Reset to the default films
+            Reset to the default film simulations
           </button>
           <button
             type="button"

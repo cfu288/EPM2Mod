@@ -55,7 +55,7 @@ test('writes EPM2Mod with the default films to the card and shows the progress',
   await expect(page.getByRole('combobox', { name: 'Card' })).toHaveValue(CARD.path)
   await page.getByRole('button', { name: 'Next' }).click()
   await page.getByRole('button', { name: 'Next' }).click()
-  await page.getByRole('button', { name: 'Use the default films' }).click()
+  await page.getByRole('button', { name: 'Use the default film simulations' }).click()
   await expect(page.getByRole('heading', { name: 'Building' })).toBeVisible()
   await expect(
     page
