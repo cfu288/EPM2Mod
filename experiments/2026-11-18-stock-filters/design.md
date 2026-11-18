@@ -64,8 +64,45 @@ time by the loader today (camera-tested, card-looks-4).
   view do; an entry without a film is the stock filter everywhere.
 - `log-menu` pinned meanwhile; this project starts from it.
 
+## Finding: art codes (2026-11-18, emulator, `tools/emu/emurun.py run filter_type` on stock)
+
+`art_GetFilterType` on stock firmware, stored value -> art code for Filter Type I / II / III:
+
+| Value | Entry | I | II | III |
+|---|---|---|---|---|
+| 100 | Pop Art | 70 | 102 | - |
+| 101 | Soft Focus | 69 | 69 | 69 |
+| 102 | Pale&Light Color | 71 | 145 | - |
+| 103 | Light Tone | 72 | 72 | 72 |
+| 104 | Grainy Film | 74 | 104 | - |
+| 105 | Pin Hole | 73 | 106 | 108 |
+| 106 | Diorama | 86 | 86 | 86 |
+| 107 | Cross Process | 85 | 167 | - |
+| 108 | Gentle Sepia | 91 | 91 | 91 |
+| 109 | Dramatic Tone | 96 | 165 | - |
+| 119 | Key Line | 163 | 169 | - |
+| 120 | Watercolor | 181 | 182 | - |
+| 110-118 (hidden) | none | 145, 75, 84, 69, 117, 118, 119, 151, 153 | | |
+
+- The film firmware sends Soft Focus, Pin Hole and Diorama to the codes 102, 145 and 167, and makes Pop Art II,
+  Pale&Light II and Cross Process II select their type I code (`seven-fixes-1`) so that those codes are free. With
+  the stock filters kept, Filter Type II of these three filters must work: **102, 145 and 167 are not free.**
+- Free colour-only codes that no stock entry or type reaches: 94, 98, 144, 156, 159 (films-max section 3.2), which
+  the five hidden-value entries use. **Soft Focus, Pin Hole and Diorama need three more**, for F2 (each entry
+  switches alone).
+- Pop Art, Pale&Light, Light Tone and Cross Process are colour-only filters: a film goes into their own codes' tables
+  (as today) and Built-in puts the stock tables back. With a film in such an entry, its type II / III must give the
+  film too (the entry shows one film), so the loader also routes II / III to the type I code, and Built-in puts the
+  stock route back.
+
+Candidates for the three codes (films-max section 3.3): code 92 (8 compare sites not read yet), or codes above 184,
+which miss every stage table: each of the five table stages (gamma 0x7E56B7A6, look 0x7E56E84D, saturation
+0x7E56DC78, six-axis 0x7E56D2AB, chroma 0x7E5662E2) needs a hook with a table of its own (about 150 B), and the
+record and movie-art range tests (69-183) must accept the code (U).
+
 ## Open questions (settle in code and the emulator before any camera run)
 
+- U0. Three more colour-only art codes for Soft Focus, Pin Hole and Diorama (above).
 - U1. Which shared bytes are transparent for the stock codes (point 4).
 - U2. Every code site of the hidden entries (5 x about 6) and of xp-adaptive-hue / seven-fixes: hook or leave stock,
   and what a stock ART bracket gives for a film entry (F5).
