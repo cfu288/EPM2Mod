@@ -151,6 +151,34 @@ and stubs or handlers in free space that point at them.
 Hooks from the image library into segment 2 follow the allowed remap7b-code case (`tools/emu/hookcheck-allow.tsv`):
 code that only image jobs reach runs after segment 2 is loaded. Each new hook needs that evidence.
 
+### One mechanism for all 12 entries (2026-11-18, replaces the three rows above)
+
+Each entry has one film code. Its film tables are in RAM (a block of 0x2000 bytes per entry at 0x7E4D8000: stills
+tone tables, live-view tone tables, saturation, six-axis, chroma record, matrix), written by the loader from the look
+file. The flashed structure gives every film code a tone stub with its own three records, and saturation, six-axis and
+chroma stubs that point at its RAM block. **A film never writes over a stock table, so nothing has to be restored.**
+Loading an entry = writing a list of words (address, film word); an entry without a film gets the list's stock words
+(known at build time). The lists are generated from the stock image.
+
+| Entry | Value | Film code | Switched words besides the stored value |
+|---|---|---|---|
+| Pop Art | 100 | 79 (its stock movie code: key 9 in the tone hash, no range-test change) | stage entries of 79; value 100's routes (all types and movie to 79) |
+| Soft Focus | 101 | 75 | value 101's routes |
+| Pale&Light Color | 102 | 71 | stage entries of 71; value 102's routes; WB pair of 71 -> 1.0 |
+| Light Tone | 103 | 72 | stage entries of 72; value 103's routes |
+| Grainy Film | 104 -> 111 | 94 | the stored value (lists, preset, ART bracket hook, current setting) |
+| Pin Hole | 105 | 92 | value 105's routes |
+| Diorama | 106 | 125 | value 106's routes |
+| Cross Process | 107 | 85 | stage entries of 85; value 107's routes; the adaptive-hue flag |
+| Gentle Sepia | 108 -> 112 | 98 | the stored value |
+| Dramatic Tone | 109 -> 114 | 144 | the stored value |
+| Key Line | 119 -> 115 | 156 | the stored value |
+| Watercolor | 120 -> 118 | 159 | the stored value |
+
+The matrix chain (hook 0x7E56C6A5) reads a matrix pointer per in-place code from RAM (0 = the stock path); the film
+codes 75, 92, 125, 94, 98, 144, 156, 159 always use their RAM matrix. For a code that has no tone-hash entry in stock,
+a flashed entry with the stock default handler as target is added; the loader switches only the target word.
+
 ## Open questions (settle in code and the emulator before any camera run)
 
 - U0. Three more colour-only art codes for Soft Focus, Pin Hole and Diorama (above).
