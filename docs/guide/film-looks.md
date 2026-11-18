@@ -12,23 +12,33 @@ In P, A, S or M mode, press **OK**, select **Picture Mode**, and scroll right pa
 
 <img src="../images/ui/quick-menu-portra.png" width="320" alt="The quick menu with Picture Mode on Portra 400">
 
-## Available Films
+## Available Film Simulations
 
 <!-- BEGIN GENERATED: films -->
-| Menu name | Film | Replaces |
-|---|---|---|
-| Portra 400 | Kodak Portra 400 (negative, on Kodak Portra Endura paper) | Pop Art |
-| Ektachrome | Kodak Ektachrome 100 (slide) | Soft Focus |
-| Pro 400H | Fuji Pro 400H (negative, on Fuji Crystal Archive paper) | Pale&amp;Light Color |
-| Kodachrome | Kodak Kodachrome 64 (slide) | Light Tone |
-| Double-X | Kodak Double-X 5222 (black-and-white negative, on Kodak 2302 print film) | Grainy Film |
-| Vis 250D | Kodak Vision3 250D (cinema negative, on Kodak 2383 print film) | Pin Hole |
-| Velvia | Fuji Velvia 100 (slide) | Diorama |
-| Superia 400 | Fuji Superia X-tra 400 (negative, on Fuji Crystal Archive paper) | Cross Process |
-| Provia | Fujifilm Provia 100F (slide) | Gentle Sepia |
-| Portra 160 | Kodak Portra 160 (negative, on Kodak Portra Endura paper) | Dramatic Tone |
-| Gold 200 | Kodak Gold 200 (negative, on Fuji Crystal Archive paper) | Key Line |
-| Vis 500T | Kodak Vision3 500T (cinema negative, on Kodak 2383 print film) | Watercolor |
+| Menu name | Film | Type | Loaded by default |
+|---|---|---|---|
+| Portra 400 | Kodak Portra 400 (negative, on Kodak Portra Endura paper) | Colour negative | ART 1 (Pop Art) |
+| Ektachrome | Kodak Ektachrome 100 (slide) | Slide | ART 2 (Soft Focus) |
+| Pro 400H | Fujifilm Pro 400H (negative, on Fuji Crystal Archive paper) | Colour negative | ART 3 (Pale&amp;Light Color) |
+| Kodachrome | Kodak Kodachrome 64 (slide) | Slide | ART 4 (Light Tone) |
+| Double-X | Kodak Double-X 5222 (black-and-white negative, on Kodak 2302 print film) | Black and white | ART 5 (Grainy Film) |
+| Vis 250D | Kodak Vision3 250D (cinema negative, on Kodak 2383 print film) | Cinema, daylight | ART 6 (Pin Hole) |
+| Velvia | Fujifilm Velvia 100 (slide) | Slide | ART 7 (Diorama) |
+| Superia 400 | Fujifilm Superia X-tra 400 (negative, on Fuji Crystal Archive paper) | Colour negative | ART 8 (Cross Process) |
+| Provia | Fujifilm Provia 100F (slide) | Slide | ART 9 (Gentle Sepia) |
+| Portra 160 | Kodak Portra 160 (negative, on Kodak Portra Endura paper) | Colour negative | ART 10 (Dramatic Tone) |
+| Gold 200 | Kodak Gold 200 (negative, on Fuji Crystal Archive paper) | Colour negative | ART 11 (Key Line) |
+| Vis 500T | Kodak Vision3 500T (cinema negative, on Kodak 2383 print film) | Cinema, tungsten light | ART 12 (Watercolor) |
+| Ektar 100 | Kodak Ektar 100 (negative, on Kodak Portra Endura paper) | Colour negative |  |
+| Portra 800 | Kodak Portra 800 (negative, on Kodak Portra Endura paper) | Colour negative |  |
+| Portra 800 +1 | Kodak Portra 800, pushed 1 stop (negative, on Kodak Portra Endura paper) | Colour negative, approximate colours |  |
+| Portra 800 +2 | Kodak Portra 800, pushed 2 stops (negative, on Kodak Portra Endura paper) | Colour negative, approximate colours |  |
+| Tri-X | Kodak Tri-X Reversal 7266 (black-and-white reversal film) | Black and white |  |
+| C200 | Fujifilm C200 (negative, on Fuji Crystal Archive paper) | Colour negative |  |
+| UltraMax 400 | Kodak UltraMax 400 (negative, on Kodak Portra Endura paper) | Colour negative |  |
+| Verita 200D | Kodak Verita 200D (cinema negative, on Kodak 2383 print film) | Cinema, daylight |  |
+| Vis 50D | Kodak Vision3 50D (cinema negative, on Kodak 2383 print film) | Cinema, daylight |  |
+| Vis 200T | Kodak Vision3 200T (cinema negative, on Kodak 2383 print film) | Cinema, tungsten light |  |
 <!-- END GENERATED: films -->
 
 ## Limits
