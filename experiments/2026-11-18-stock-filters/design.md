@@ -100,6 +100,25 @@ which miss every stage table: each of the five table stages (gamma 0x7E56B7A6, l
 0x7E56DC78, six-axis 0x7E56D2AB, chroma 0x7E5662E2) needs a hook with a table of its own (about 150 B), and the
 record and movie-art range tests (69-183) must accept the code (U).
 
+### Code 92 and codes outside the tables (2026-11-18)
+
+- Code 92: the stock image has 59 `cmp 92` instructions (`build/map/linear.txt`). The 9 in the image library and the
+  movie / record code (0x7E5C8138, 0x7E5C8940: path characters; 0x7E66B7CC / 80A / 826: coordinate ranges;
+  0x7E700859 / 8C7 / 953: loop counts) do not test an art code. films-max named "8 compare sites" without a list; no
+  site that reads the art code byte compares 92 (films-max 5a, kind B: the 37 compares are of stock codes). So 92 is
+  a candidate (I), not verified: the dynamic reads through pointers (films-max 5a b) are the gap.
+- Codes 75, 84, 117, 119: compared in the image library (films-max 3.1): not clean.
+- Codes above 184 (films-max 3.3): no table has an entry, so each of the five table stages needs a hook that loads
+  the slot's own handler (about 150 B). The hooks are in the image library (segment 1). Code reached only through
+  the image-job table may jump to segment 2 (the allowed remap7b-code hook, `tools/emu/hookcheck-allow.tsv`); the
+  same argument for the five stage selectors is I and must be checked. The record and movie-art code tests the
+  range 69-183 (U how a code outside it is treated: as "no art", the plain path, would be right for a colour-only
+  film). Probe: one hidden-value entry with code 200 in the live-view rig (`experiments/2026-11-16-films-max/scripts/
+  scen_films.py`), then on the camera with the Debug Log (capture, movie, ART bracket: films-max 5a c).
+
+Plan for the three entries: code 92 for one if the dynamic reads show nothing, codes above 184 for the others; or
+all three above 184 with one mechanism.
+
 ## Open questions (settle in code and the emulator before any camera run)
 
 - U0. Three more colour-only art codes for Soft Focus, Pin Hole and Diorama (above).
