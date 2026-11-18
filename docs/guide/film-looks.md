@@ -30,7 +30,7 @@ In P, A, S or M mode, press **OK**, select **Picture Mode**, and scroll right pa
 ## Limits
 
 - The simulations change colour and tone only. There is no halation and no grain.
-- You can replace any of them with your own looks: [Looks from the SD card](card-looks.md).
+- You can choose another film for any of them: [Looks from the SD card](card-looks.md).
 - Movies only get part of each simulation.
 - Filter Type and Add Effects do nothing in Double-X, Provia, Portra 160, Gold 200 and Vis 500T.
 - The original art filters are not available in this build.

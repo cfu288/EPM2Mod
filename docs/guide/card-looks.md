@@ -1,6 +1,6 @@
 # Looks from the SD Card
 
-Load your own film looks into any of the twelve film entries from a file on the SD card. The camera keeps them,
+Choose which film is in each of the twelve ART entries, with a file on the SD card. The camera keeps them,
 with their names, after power-off and without the card.
 
 ## Make a file
