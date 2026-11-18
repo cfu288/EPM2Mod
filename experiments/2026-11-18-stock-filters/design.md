@@ -2,9 +2,9 @@
 
 The owner's requirement (asked several times; not built until now): the firmware carries Olympus's 12 art filters
 unchanged. Films reach the camera only through the looks flow (installer or `looks pack` -> `EPM2LOOK.BIN` -> Custom
-Menu J -> Load Looks -> Load). **Built-in** brings back the 12 stock filters, effects included, with no file and no
-flash. The test is that exact workflow: flash -> the 12 stock filters -> load films -> Built-in -> the 12 stock
-filters again.
+Menu J -> Load Looks -> Load), which overwrites the entries the file lists. There is no Built-in (owner, 2026-11-18:
+"The original requirement is the firmware comes with default Olympus filters, and we can overwrite them with looks.
+I'd drop this feature entirely"). The test is that exact workflow: flash -> the 12 stock filters -> load films.
 
 Labels: V verified, I inferred, U unknown.
 
@@ -12,7 +12,7 @@ Labels: V verified, I inferred, U unknown.
 
 - F1. After the flash, all 12 entries are Olympus's art filters.
 - F2. Loading a film changes only that slot.
-- F3. Built-in brings back the stock filters, effects included.
+- ~~F3. Built-in brings back the stock filters~~: dropped by the owner, 2026-11-18. The Load Looks row is Off / Load.
 - F4. Every existing criterion holds (card-looks criteria 1-13, the Debug Log, peaking, interval, level gauge).
 - F5. Movies and ART bracket behave as stock, or as the loaded film, slot by slot.
 
@@ -44,9 +44,9 @@ time by the loader today (camera-tested, card-looks-4).
    stock values and codes; menu crawls equal to the stock-filter build).
 2. **Switched at run time, per entry, by the loader:** every stock data byte that the film firmware changes for that
    entry (routing words, WB pair, tables). The loader keeps the stock bytes (the snapshot of card-looks) and writes
-   the film bytes for the entries the file lists. **Built-in writes the stock bytes back: after it, the RAM of every
-   switched region equals the stock firmware, so the stock filters come back by construction (F3).** With all 12
-   entries loaded the RAM equals the camera-tested film firmware.
+   the film bytes for the entries the file lists. A load is the whole state: an entry the file does not list gets its
+   stock bytes back (the installer always writes the user's whole choice). With all 12 entries loaded the RAM equals
+   the camera-tested film firmware; with none, it equals the stock firmware.
 3. **No code is changed at run time.** CPU 0 and CPU 1 cache code, and the cache has no ranged flush (CHCTR 0x8070,
    caduceus review 06). A code site whose immediate the film firmware changes gets a flash-time hook that reads the
    entry's current value from a RAM table; with the stock value in the table it does what stock does.
@@ -91,8 +91,8 @@ time by the loader today (camera-tested, card-looks-4).
   the five hidden-value entries use. **Soft Focus, Pin Hole and Diorama need three more**, for F2 (each entry
   switches alone).
 - Pop Art, Pale&Light, Light Tone and Cross Process are colour-only filters: a film goes into their own codes' tables
-  (as today) and Built-in puts the stock tables back. With a film in such an entry, its type II / III must give the
-  film too (the entry shows one film), so the loader also routes II / III to the type I code, and Built-in puts the
+  (as today); a later load without that entry puts the stock tables back. With a film in such an entry, its type II / III must give the
+  film too (the entry shows one film), so the loader also routes II / III to the type I code, and a later load without the entry puts the
   stock route back.
 
 Candidates for the three codes (films-max section 3.3): code 92 (8 compare sites not read yet), or codes above 184,
@@ -135,6 +135,6 @@ all three above 184 with one mechanism.
 1. Inventory per entry (which bytes belong to which of the 12 entries, which are shared): `scripts/inventory.py`.
 2. The stock-base build: the mod features with the film parts of point 1 only. Emulator: F1 (all stock rows equal).
 3. The loader's slot table extended with the routing bytes per entry; the hooks of point 3; the setting mapping.
-4. Emulator: load each film into each entry alone (F2), all 12 (RAM equal to the film firmware), Built-in (RAM equal to
-   stock in every switched region: F3), crawls P and ART, boot-test, update-path-test, hookcheck.
+4. Emulator: load each film into each entry alone (F2), all 12 (RAM equal to the film firmware), a file with no film
+   (RAM equal to stock in every switched region), crawls P and ART, boot-test, update-path-test, hookcheck.
 5. One camera run of the exact workflow, with the Debug Log On.
