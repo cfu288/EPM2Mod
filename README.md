@@ -20,7 +20,7 @@ Repository containing the current work for creating a custom firmware mod for th
 
 ## Install
 
-This firmware is only for an E-PM2. The firmware is unofficial, use it at your own risk. Ensure your battery is full prior to flashing.
+This firmware is only for an E-PM2. The firmware is unofficial, use it at your own risk. Ensure your battery is full prior to flashing. You can either use the installer or the CLI/command line. CLI is preferred.
 
 ### Installer
 
