@@ -3,7 +3,8 @@ EPM2Mod: unofficial firmware for the Olympus PEN E-PM2
 
 Start
   Mac:      double-click "Start (Mac).command".
-            The first time, macOS blocks it: right-click the file, choose Open, then Open.
+            The first time, macOS blocks it. Open System Settings -> Privacy & Security,
+            scroll down, select Open Anyway next to "Start (Mac).command", then Open.
   Windows:  double-click "Start (Windows).bat".
             If Windows protects your PC: More info, then Run anyway.
   Linux:    run ./start.sh in a terminal.
