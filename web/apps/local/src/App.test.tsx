@@ -67,7 +67,7 @@ describe('the local app', () => {
     const made = server()
     const user = userEvent.setup()
     render(<App />)
-    expect(screen.getByRole('heading', { name: 'Install firmware on your PEN E-PM2' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Install firmware' })).toBeInTheDocument()
     await waitFor(() => {
       expect(screen.getByRole('combobox', { name: 'Card' })).toHaveValue(CARD.path)
     })
@@ -81,9 +81,9 @@ describe('the local app', () => {
     expect(await screen.findByRole('heading', { name: 'Install on the camera' })).toBeInTheDocument()
     const steps = screen.getByRole('list', { name: 'Install steps' })
     expect(steps).toHaveTextContent(
-      'Press and hold the OK button (the middle of the arrow pad) and the ON/OFF button together.',
+      'Hold OK (middle of the arrow pad) and ON/OFF together until the orange lamp on the front stays lit, then let go.',
     )
-    expect(steps).toHaveTextContent('such as Portra 400')
+    expect(steps).toHaveTextContent('Check: MENU → ART shows film names, such as Portra 400.')
     expect(steps).not.toHaveTextContent('Load Looks')
     expect(steps).not.toHaveTextContent('zip')
     expect(screen.queryByText(/derived from/)).toBeNull()
@@ -105,7 +105,7 @@ describe('the local app', () => {
   it('asks for a card when none is plugged in', async () => {
     server([])
     render(<App />)
-    expect(await screen.findByText(/It shows here when found./)).toBeInTheDocument()
+    expect(await screen.findByText(/Insert the camera's SD card./)).toBeInTheDocument()
     await waitFor(() => {
       expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled()
     })
@@ -146,10 +146,8 @@ describe('the local app', () => {
     expect(first?.choices.slice(0, 3)).toEqual(['ART1=portra-400', 'ART2=c200', 'ART3=pro-400h'])
     expect(await screen.findByRole('button', { name: 'Download EPM2Mod-card.zip' })).toBeInTheDocument()
     const steps = screen.getByRole('list', { name: 'Install steps' })
-    expect(steps).toHaveTextContent(
-      'Copy the DCOLYMP folder and the file EPM2LOOK.BIN from it to the top level of the SD card.',
-    )
-    expect(steps).toHaveTextContent('ART 2 shows C200.')
-    expect(steps).toHaveTextContent('Open the gears tab → group J → Load Looks → Load → OK.')
+    expect(steps).toHaveTextContent('Copy DCOLYMP and EPM2LOOK.BIN from the zip to the top of the SD card.')
+    expect(steps).toHaveTextContent('Check: MENU → ART shows C200 in ART 2.')
+    expect(steps).toHaveTextContent('MENU → SETUP → gears tab → J → Load Looks → Load → OK.')
   })
 })

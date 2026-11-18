@@ -32,11 +32,11 @@ const FLOWS: Record<Firmware, StepId[]> = {
 }
 const ZIP_NAME = 'EPM2Mod-card.zip'
 
-/** A sentence that names the first slot whose film differs from the default, for the check after Load Looks. */
+/** Names the first slot whose film differs from the default, for the check after Load Looks: "C200 in ART 2." */
 function changedSlot(items: readonly SlotItem[]): string {
   const index = items.findIndex((item, i) => item.filmId !== null && item.filmId !== slots[i]?.builtIn)
   const id = items[index]?.filmId
-  return id ? `ART ${String(index + 1)} shows ${filmById(id).name}.` : 'The list shows your films.'
+  return id ? `${filmById(id).name} in ART ${String(index + 1)}.` : 'your films.'
 }
 const HELP = 'https://github.com/cfu288/EPM2Mod/blob/main/docs/install.md'
 
@@ -143,7 +143,7 @@ function StartStep(props: {
 }) {
   return (
     <Step
-      title="Install firmware on your PEN E-PM2"
+      title="Install firmware"
       actions={
         <button type="button" disabled={!props.ready} onClick={props.onNext} className={primary}>
           Next
@@ -154,7 +154,7 @@ function StartStep(props: {
         <Choice
           group="output"
           title="Write to an SD card"
-          line="Put the camera's SD card in this computer. Your photos stay on it."
+          line="Your photos stay on it."
           checked={!props.zip}
           onChoose={() => {
             props.onZip(false)
@@ -188,12 +188,9 @@ function StartStep(props: {
               <>
                 <p className="flex items-center gap-x-2">
                   <ArrowPathIcon aria-hidden="true" className="size-4 animate-spin" />
-                  Insert the camera&apos;s SD card. It shows here when found.
+                  Insert the camera&apos;s SD card.
                 </p>
-                <p className="text-ink-soft">
-                  No card slot? Connect the camera to this computer with its USB cable, turn the camera on, and choose
-                  Storage on its screen.
-                </p>
+                <p className="text-ink-soft">No card slot? Connect the camera by USB and choose Storage on it.</p>
               </>
             )}
           </div>
@@ -201,7 +198,7 @@ function StartStep(props: {
         <Choice
           group="output"
           title="Download a zip"
-          line="Copy the files to the card yourself."
+          line="Copy it to the card yourself."
           checked={props.zip}
           onChoose={() => {
             props.onZip(true)
@@ -234,7 +231,7 @@ function FirmwareStep(props: {
         <Choice
           group="firmware"
           title="EPM2Mod"
-          line="Unofficial, made by independent developers. Adds film looks, interval shooting, a level gauge and focus peaking. You can put the Olympus original back here at any time."
+          line="Film looks, interval shooting, level gauge, focus peaking."
           checked={props.firmware === 'epm2mod'}
           onChoose={() => {
             props.onFirmware('epm2mod')
@@ -243,7 +240,7 @@ function FirmwareStep(props: {
         <Choice
           group="firmware"
           title="Olympus original"
-          line="Olympus's own firmware. It removes EPM2Mod."
+          line="Removes EPM2Mod."
           checked={props.firmware === 'original'}
           onChoose={() => {
             props.onFirmware('original')
@@ -290,10 +287,7 @@ function FilmsStep(props: {
           </>
         }
       >
-        <p>
-          EPM2Mod replaces the 12 art filters in the ART menu with film looks. Customize picks the films and their
-          order.
-        </p>
+        <p>EPM2Mod replaces the 12 art filters with film looks.</p>
         <FilmCredit />
       </Step>
     )
@@ -394,8 +388,8 @@ function BuildStep(props: { job: Job | null; firmware: Firmware; onRetry: () => 
         </p>
       ) : (
         <p className="text-ink-soft text-sm">
-          Takes about a minute and needs the internet.
-          {job?.card != null && ' Keep the card in this computer until it finishes.'}
+          About a minute.
+          {job?.card != null && ' Keep the card in.'}
         </p>
       )}
     </Step>
@@ -424,9 +418,7 @@ function InstallStep(props: {
         </button>
       }
     >
-      <p className="font-bold">
-        {zip ? 'Done. Your zip is ready.' : `Done. ${what} is on the card ${props.cardName}.`}
-      </p>
+      <p className="font-bold">{zip ? 'Done.' : `Done: ${what} is on ${props.cardName}.`}</p>
       {zip && (
         <button type="button" onClick={props.onZip} className={`${primary} w-full`}>
           <ArrowDownTrayIcon aria-hidden="true" className="size-5" />
@@ -434,56 +426,32 @@ function InstallStep(props: {
         </button>
       )}
       <ol aria-label="Install steps" className="list-decimal space-y-2 pl-5">
-        {zip && (
+        {zip && <li>Copy DCOLYMP{looks ? ` and ${CARD_NAME}` : ''} from the zip to the top of the SD card.</li>}
+        <li>Eject the card (Mac: ⏏ in Finder. Windows: right-click → Eject) and take it out.</li>
+        <li>Put a charged battery and the card in the camera (cover on the bottom).</li>
+        <li>
+          Hold OK (middle of the arrow pad) and ON/OFF together until the orange lamp on the front stays lit, then let
+          go.
+        </li>
+        <li>Leave the camera alone until the lamp blinks (1 to 2 minutes).</li>
+        <li>Turn the camera off and on.</li>
+        {looks && (
           <li>
-            Open {ZIP_NAME}. Copy the DCOLYMP folder{looks ? ` and the file ${CARD_NAME}` : ''} from it to the top level
-            of the SD card.
+            MENU → SETUP → gears tab → J → Load Looks → Load → OK. No gears tab? Wrench tab → Menu Display → Custom Menu
+            → On.
           </li>
         )}
         <li>
-          Eject the SD card and take it out (or unplug the camera&apos;s USB cable). Mac: in Finder, select ⏏ next to
-          the card. Windows: in File Explorer, right-click the card and select Eject.
+          Check: MENU → ART shows{' '}
+          {looks ? props.changed : original ? 'the art filters, such as Pop Art.' : 'film names, such as Portra 400.'}
         </li>
-        <li>
-          Charge the camera&apos;s battery fully. With the camera off, open the battery/card cover on the bottom, put
-          the battery in, and push the card in until it clicks. Close the cover.
-        </li>
-        <li>
-          Press and hold the OK button (the middle of the arrow pad) and the ON/OFF button together. When the orange
-          lamp on the front of the camera lights steadily, let go of both.
-        </li>
-        <li>
-          The lamp stays on for 1 to 2 minutes while the camera updates. Until it blinks, keep the cover closed, the
-          battery in, and the buttons untouched. Still on after 10 minutes? Get help (link below).
-        </li>
-        <li>
-          When the lamp blinks, the update is done. Press ON/OFF to turn the camera off, then again to turn it on.
-        </li>
-        {looks ? (
-          <>
-            <li>
-              Press MENU and select SETUP (use the arrow pad to move and OK to select): a menu with tabs on the left
-              opens. If it has no gears tab: open the wrench tab → Menu Display → set Custom Menu (the gears) to On.
-            </li>
-            <li>Open the gears tab → group J → Load Looks → Load → OK. The row shows Loaded.</li>
-            <li>To check: press MENU and select ART. {props.changed}</li>
-          </>
-        ) : (
-          <li>
-            {original
-              ? 'To check: press MENU and select ART. The list shows the art filters, such as Pop Art.'
-              : 'To check: press MENU and select ART. The list shows film names, such as Portra 400.'}
-          </li>
-        )}
       </ol>
       <p className="text-ink-soft text-sm">
-        The camera starts as usual instead? Turn it off and repeat step {zip ? 4 : 3}. Something else?{' '}
+        Camera started normally? Turn it off and repeat step {zip ? 4 : 3}.{' '}
         <a className="hover:text-ink underline" href={HELP}>
-          Get help
+          Other problem?
         </a>
-        .
       </p>
-      <p className="text-ink-soft text-sm">When the camera is updated, close this page and the EPM2Mod text window.</p>
     </Step>
   )
 }
