@@ -43,7 +43,7 @@ Download the zip from [Releases](https://github.com/cfu288/EPM2Mod/releases), un
    uv run epm2mod make --card /path/to/card
    ```
 
-   Both also write `EPM2LOOK.BIN` with the 12 default film simulations, as the installer does. To choose others, write the look file again after `make`. Change any film simulation name (`uv run epm2mod looks list` shows all 19):
+   Both also write `EPM2LOOK.BIN` with the 12 default film simulations, as the installer does. To choose others, write the look file again after `make`. Change any film simulation name (`uv run epm2mod looks list` shows all 22):
 
    ```sh
    uv run epm2mod looks pack ART1=portra-400 ART2=ektachrome ART3=pro-400h ART4=kodachrome ART5=double-x ART6=vision3-250d ART7=velvia ART8=superia-400 ART9=provia ART10=portra-160 ART11=gold-200 ART12=vision3-500t --card /path/to/card

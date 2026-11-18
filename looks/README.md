@@ -16,7 +16,7 @@
   that are generated from it: `films12-structure` (code and table entries), `films12-looks` (the looks)
   and one `films12-entry-*` spec per menu entry. Leave an entry spec out of a build and that entry is the
   stock art filter again. `fits/` also holds fits that no list uses yet (C200, Portra 800, UltraMax 400,
-  Verita 200D, Vision3 50D and 200T).
+  Verita 200D, Vision3 50D and 200T; from 2026-11-18 also Portra 800 pushed 1 and 2 stops and Tri-X).
 
 - `films-12-bw.json`: a variant of `more-films.json` with a black-and-white film (the candidate build
   `films-12-bw`). The entry Grainy Film keeps its stored value, its art codes and its grain program and holds
@@ -55,3 +55,5 @@ Volpato, licensed CC BY-SA 4.0. We modified it: we fitted it to the stages of th
 that can be adjusted. See `NOTICE.md`.
 `fits/doublex.npz` and `fits/doublex2.npz` are derived from the profiles `kodak_doublex` and `kodak_2302` of spektrafilm's `dev` branch
 (commit `6cd00c8d4f30b5b550f50f4bbd3753c9f2a48507`, CC BY-SA 4.0). Modified: fitted to this camera.
+`fits/trix.npz` is derived from the profile `kodak_trix` (Tri-X Reversal 7266) of the same commit, rendered as a
+reversal film with no print (`experiments/2026-11-18-more-films/NOTES.md`). Modified: fitted to this camera.

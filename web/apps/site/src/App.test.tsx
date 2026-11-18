@@ -87,8 +87,8 @@ describe('Films', () => {
     expect(window.location.hash).toBe('#command-line')
   })
 
-  it('lists all 19 films', () => {
+  it('lists all 22 film simulations', () => {
     render(<App />)
-    expect(within(screen.getByRole('table')).getAllByRole('row')).toHaveLength(20)
+    expect(within(screen.getByRole('table')).getAllByRole('row')).toHaveLength(23)
   })
 })

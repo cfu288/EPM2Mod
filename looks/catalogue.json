@@ -121,10 +121,37 @@
    "id": "portra-800",
    "name": "Portra 800",
    "film": "Kodak Portra 800",
-   "kind": "Colour negative, approximate colours",
+   "kind": "Colour negative",
    "medium": "negative, on Kodak Portra Endura paper",
    "fit": "looks/fits/portra800.npz",
+   "note": ""
+  },
+  {
+   "id": "portra-800-push1",
+   "name": "Portra 800 +1",
+   "film": "Kodak Portra 800, pushed 1 stop",
+   "kind": "Colour negative, approximate colours",
+   "medium": "negative, on Kodak Portra Endura paper",
+   "fit": "looks/fits/portra800push1.npz",
    "note": "less accurate than the others"
+  },
+  {
+   "id": "portra-800-push2",
+   "name": "Portra 800 +2",
+   "film": "Kodak Portra 800, pushed 2 stops",
+   "kind": "Colour negative, approximate colours",
+   "medium": "negative, on Kodak Portra Endura paper",
+   "fit": "looks/fits/portra800push2.npz",
+   "note": "less accurate than the others; before 2026-11-18 this fit was listed as Portra 800"
+  },
+  {
+   "id": "tri-x",
+   "name": "Tri-X",
+   "film": "Kodak Tri-X Reversal 7266",
+   "kind": "Black and white",
+   "medium": "black-and-white reversal film",
+   "fit": "looks/fits/trix.npz",
+   "note": ""
   },
   {
    "id": "c200",
