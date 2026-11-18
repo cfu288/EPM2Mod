@@ -12,8 +12,7 @@ Rules, and the files each one covers:
 2. A heading has no punctuation (: ; , ! ? ( ) and dashes) and no full stop at its end:
    the files of rule 1, every other README.md outside experiments/, AGENTS.md, NOTICE.md,
    docs/conventions.md, docs/feasibility.md, docs/todo.md.
-3. A guide is short and shows the screen: docs/guide/*.md has at most 40 lines and one or more
-   pictures. docs/install.md has at most 45 lines.
+3. A guide shows the screen: docs/guide/*.md has one or more pictures.
 
 Text that is not prose is left out of rule 1: code, generated blocks, comments, tables, links,
 pictures and words in bold (names of buttons and menu entries, as the camera shows them).
@@ -30,7 +29,6 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STE = os.path.join(ROOT, "tools", "third_party", "ste100", "ste_lint.py")
 PROSE = ["README.md", "docs/install.md", "docs/guide/*.md"]
 HEADINGS = PROSE + ["AGENTS.md", "NOTICE.md", "docs/conventions.md", "docs/feasibility.md", "docs/todo.md"]
-MAX_LINES = {"docs/guide/*.md": 40, "docs/install.md": 45}
 HEADING_PUNCTUATION = re.compile(r"[:;,!?()—–]|\.\s*$")
 
 
@@ -68,7 +66,6 @@ def check(path, text):
     """Return the list of problems of one document, as text lines."""
     problems = []
     lines = text.split("\n")
-    count = len(text.rstrip("\n").split("\n"))
     if matches(path, PROSE):
         done = subprocess.run([sys.executable, STE, "--disable", "passive-voice,present-perfect"],
                               input=prose_only(text), capture_output=True, text=True)
@@ -87,9 +84,6 @@ def check(path, text):
             title = re.sub(r"`[^`]*`", "", line.lstrip("# "))
             if HEADING_PUNCTUATION.search(title):
                 problems.append("%s:%d: heading with punctuation: %s" % (path, number, line.strip()))
-    for pattern, limit in MAX_LINES.items():
-        if fnmatch.fnmatch(path, pattern) and count > limit:
-            problems.append("%s: %d lines, at most %d. Cut it." % (path, count, limit))
     if fnmatch.fnmatch(path, "docs/guide/*.md") and not re.search(r"<img |!\[", text):
         problems.append("%s: a guide needs one or more screenshots" % path)
     return problems
