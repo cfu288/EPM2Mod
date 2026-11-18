@@ -37,7 +37,7 @@ In P, A, S or M mode, press **OK**, select **Picture Mode**, and scroll right pa
 - The E-PM2 has no colour wheel. Newer Olympus cameras have a table for 12 colours in the image processor. Mods for those cameras let you change each of the 12 colours. The E-PM2 has a table for 6 colours only ([more](../feasibility.md#colour-wheel-and-twelve-colour-editors)).
 - You can choose another film for any of them: [Looks from the SD card](card-looks.md).
 - Movies only get part of each simulation.
-- Filter Type and Add Effects do nothing in Double-X, Provia, Portra 160, Gold 200 and Vis 500T.
-- The original art filters are not available in this build.
+- Filter Type and Add Effects are not tested with the film simulations.
+- An ART entry that has a film simulation does not have its Olympus art filter. To get the art filter back, load a file that does not list that entry ([more](card-looks.md)).
 
 For how the simulations were made and measured, see [film emulation](../film-emulation.md).

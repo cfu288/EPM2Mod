@@ -1,6 +1,9 @@
 # Film looks on the Olympus E-PM2: what we built, how we measured it, what we learned
 
-Plain-language summary, written 2026-11-12. The detailed lab notes are in
+Plain-language summary, written 2026-11-12. **Since 2026-11-18 the firmware keeps Olympus's 12 art filters and the
+films are loaded from the SD card** ([`guide/card-looks.md`](guide/card-looks.md), [`install.md`](install.md)). The build
+names and the seven-entry layout below are the history of how the looks were made and measured. The catalogue now
+has 22 films (`looks/catalogue.json`). The detailed lab notes are in
 `experiments/2026-11-09-film-portra/NOTES.md`; the technical slot reference is
 [`art-filter-slots.md`](art-filter-slots.md); every flash is logged in [`camera-log.md`](camera-log.md).
 
