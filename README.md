@@ -18,18 +18,17 @@ Repository containing the current work for creating a custom firmware mod for th
 
 This firmware is only for an E-PM2. The firmware is unofficial, use it at your own risk. Ensure your battery is full prior to flashing.
 
-### With the installer
+There are two ways to install. Both make the same firmware.
 
-1. Download the zip of the newest release from [Releases](https://github.com/cfu288/EPM2Mod/releases) and unzip it.
-2. Start the installer in the unzipped folder:
-   - Mac: double-click **Start (Mac).command**. The first time, macOS blocks it: System Settings → Privacy & Security → **Open Anyway** → **Open**.
-   - Windows: double-click **Start (Windows).bat**. If Windows protects your PC: **More info** → **Run anyway**.
-   - Linux: run `./start.sh`.
-3. A page opens in your browser. Follow it: it writes to your SD card (or gives a zip) and ends with the steps for the camera.
+### Installer
 
-### With the command line
+Download the zip from [Releases](https://github.com/cfu288/EPM2Mod/releases), unzip it, and double-click **Start (Mac).command** or **Start (Windows).bat** (Linux: `./start.sh`). Follow the page that opens.
 
-Needs [uv](https://docs.astral.sh/uv/getting-started/installation/).
+On a Mac, the first start is blocked: allow it in System Settings → Privacy & Security → **Open Anyway**.
+
+### Command line
+
+For developers. Needs [uv](https://docs.astral.sh/uv/getting-started/installation/).
 
 1. To build a copy of the firmware, run
 
@@ -49,6 +48,6 @@ Needs [uv](https://docs.astral.sh/uv/getting-started/installation/).
    - While the lamp is steady, the camera is writing the firmware. This takes 1 to 2 minutes. Do not switch the camera off.
    - When the lamp blinks, the update is done. Switch the camera off and on again.
 
-To go back to the original firmware, see [docs/install.md](docs/install.md).
+To go back to the original firmware, choose **Olympus original** in the installer, or see [docs/install.md](docs/install.md).
 
 ![Nine photos, each developed in the camera with stock Natural and the film looks](docs/images/film-sim-comparison.jpg)
