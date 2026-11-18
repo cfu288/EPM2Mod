@@ -230,6 +230,13 @@ a flashed entry with the stock default handler as target is added; the loader sw
     equal (ART list, Picture Mode lists, quick menu); only the mod's rows differ (Custom Menu A and J, Shooting Menu
     2's Time Lapse Settings).
 
+- 2026-11-18, tables against the film firmware (`scripts/equal_tables.py`, `scripts/loaded_image.py`): after a Load of
+  the 12 default films (the file of `looks pack` with no choice, sha256 `5d5df335…`), every entry's saturation,
+  six-axis, matrix and chroma values and its stills tone tables (all 8 per channel for Light Tone and Cross Process)
+  are byte-equal to the tables of the camera-tested film firmware `log-menu`: 12 of 12 entries. Live view: the film
+  firmware's member-0 tables of the ten three-table slots were interpolated (within 8 codes); here each is the curve
+  read at its stock default, as the record slots always did.
+
 ## Open questions (settle in code and the emulator before any camera run)
 
 - U0. Three more colour-only art codes for Soft Focus, Pin Hole and Diorama (above).
