@@ -179,6 +179,20 @@ The matrix chain (hook 0x7E56C6A5) reads a matrix pointer per in-place code from
 codes 75, 92, 125, 94, 98, 144, 156, 159 always use their RAM matrix. For a code that has no tone-hash entry in stock,
 a flashed entry with the stock default handler as target is added; the loader switches only the target word.
 
+## Build log
+
+- 2026-11-18, item 1 (`scripts/mkspec_structure.py` -> `patches/stock-films-structure.json`, 103 operations; the
+  loader's switch lists in `build/stock-films/layout.json`): stubs 861 B at 0x7EE53830 (segment 3, where card-looks-4's
+  code ran), the shared tone part, the chroma helper and the matrix chain at 0x7ECB0888, records 1,296 B at 0x7EE541B4.
+  Switch lists: Pop Art 11 words, Soft Focus 6, Pale&Light 13, Light Tone 11, Pin Hole 6, Diorama 6, Cross Process 11,
+  each hidden entry 7 bytes (the value lists, the "is art" lists, the ART-mode preset).
+  F1 in the emulator, stock against stock + the structure (`tools/emu/emurun.py diff`): `filter_type` changes only the
+  hidden values 111, 112, 114, 115, 118; `art_kind` only 115, 118; `gamma_select` and `curve_select` only the film
+  codes 75, 92, 125, 94, 98, 144, 156, 159; `six_handler` nothing; the matrix chain (all 256 codes, stock against
+  patched without the case's model) only the eight film codes. The in-place codes 71, 72, 79, 85 are stock until the
+  loader switches them; their RAM matrix pointer counts only when it holds the exact film address (RAM in the gap
+  is not reliably zero at a start: the log ring survived power-offs).
+
 ## Open questions (settle in code and the emulator before any camera run)
 
 - U0. Three more colour-only art codes for Soft Focus, Pin Hole and Diorama (above).

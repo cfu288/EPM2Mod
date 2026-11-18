@@ -1,0 +1,936 @@
+{
+ "name": "stock-films-structure",
+ "description": "Film looks on the stock filters, the flashed part (experiments/2026-11-18-stock-filters/design.md): one film code per art-filter entry (Pop Art 79, Soft Focus 75, Pale&Light 71, Light Tone 72, Grainy Film 94, Pin Hole 92, Diorama 125, Cross Process 85, Gentle Sepia 98, Dramatic Tone 144, Key Line 156, Watercolor 159) with tone, saturation, six-axis, chroma and matrix in the entry's RAM block at 0x7E4D8000 + 0x2000 x entry; the stage entries of the codes that no stock entry reaches, the art-matrix chain, the hidden stored values 111, 112, 114, 115, 118 and their hash keys, and the four job-block compares of 75 / 125. Nothing here is reached while no entry has a film: the loader switches the entry's words. Every expect is a stock byte.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "candidate: emulator-checked, not flashed",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA32810",
+   "expect": "10ff42344338f1e0f800105c38421cf860305c34424cf80008964224f8000cba004218c9153c205043285c34f824045c28cd8a160000ca153c205043285c34f1d8f824045c28cd5f17f07c3cfad0940043445c3495ac705c44f1615828cd1b24f0a8004230584ca000c105cc080258383c28344248fad0d80043403cfad0e400433c0042105c485810f0005f44f380f804205c38a507f8283cc911985d28cd1c90f0945c349fac70f1635c485810f004593cf30199f1e05840dd0df9fefff01c58e459d8ddc8df6aff000081fccc00000040dde6df6affc008421458e859dcddaddf6aff000081fccc00000040ddcbdf6affc008422c58ec59e0dd92df6aff000081fccc00000040ddb0df6affc00842205cec58e459e843045a249c4a085a184a0c5d1ccd5701a018a000c805cc470158e45914dd58df6aff00005cec59e843045a249c4a085a184a0c5d1ccd2f01a018a000c805cc1f0158e45914dd30df6aff00005be859208258ecdd22df6aff0000420458249c420858188d420c5d1c88cdfb00a018a000c805cceb005ae45be858ec5920ddf8de6aff0000420458249c420858188d420c5d1c88cdd100a018a000c805ccc10058e8592cddd2de6aff00008146e85cec58e443045a249c4a085a184a0c5d1ccda600a018a000c805cc960058e45914dda7de6aff00005cec59e843045a249c4a085a184a0c5d1ccd7e00a018a000c97058e45914dd82de6aff00005ae859208358ecdd74de6aff0000420458249c4208581889420c5d1c8ccd4d00a018a000c93f5ae45be858ec5920dd4dde6aff0000420458248d420858189c420c5d1c88cd2600a018a000c9185830594c4042305810280442105830a4c205cc15fe00fafef000dff01042044608581c963df1d62a04420cf1e988cdbc33f028a000c96058045920dd1fde6affc008815820ddf0dd6aff0000dd86dd6aff0000825824ddf9dd6aff0000815808ddfadd6affc008815824ddcbdd6aff0000dd61dd6aff000076a9c3036a985074a1c303609008f17874a9c20368220c76a1c2036200dfa0184210472c4324f860309f00423058102850423cf1e0f008f1d4a000c9113c204443085d1051cda0130000ca0f3c204443085d1051cd7b14f07c581028544234f1e070f8ec08c8075c24f82c5cbf00c8769c5d08ddb5e8feffb0103cf1d2fac28800f1e9f1d02840",
+   "new": "fcdd3446e57edc52d0e5fffcdf009e4d7edc38a571fffcdf109e4d7efcde1c9e4d7edc86a071fffccd309e4d7edc52d0e5ff8a4fdc3f868cff8a4fdce38887ff8a4fdc528388fffcdd4046e57edc0bd0e5fffcdf00be4d7edcf1a471fffcdf10be4d7efcde1cbe4d7edc3fa071fffccd30be4d7edc0bd0e5ff8a4bdcf8858cff8a4bdc9c8887ff8a4bdc0b8388fffcdd4c46e57edcc4cfe5fffcdf00de4d7edcaaa471fffcdf10de4d7efcde1cde4d7edcf89f71fffccd30de4d7edcc4cfe5ff8a47dcb1858cff8a47dc558887ff8a47dcc48288fffcdd5846e57edc7dcfe5fffcdf00fe4d7edc63a471fffcdf10fe4d7efcde1cfe4d7edcb19f71fffccd30fe4d7edc7dcfe5ff8a48dc6a858cff8a48dc0e8887ff8a48dc7d8288fffcdd6446e57edc36cfe5fffcdf001e4e7edc1ca471fffcdf101e4e7efcde1c1e4e7edc6a9f71fffccd301e4e7edc36cfe5ff8a5edc23858cff8a5edcc78787ff8a5edc368288fffcdd7046e57edcefcee5fffcdf003e4e7edcd5a371fffcdf103e4e7efcde1c3e4e7edc239f71fffccd303e4e7edcefcee5ff8a5cdcdc848cff8a5cdc808787ff8a5cdcef8188fffcdd7c46e57edca8cee5fffcdf005e4e7edc8ea371fffcdf105e4e7efcde1c5e4e7edcdc9e71fffccd305e4e7edca8cee5ff8a7ddc95848cff8a7ddc398787ff8a7ddca88188fffcdd8846e57edc61cee5fffcdf007e4e7edc47a371fffcdf107e4e7efcde1c7e4e7edc959e71fffccd307e4e7edc61cee5ff8a55dc4e848cff8a55dcf28687ff8a55dc618188fffcdd9446e57edc1acee5fffcdf009e4e7edc00a371fffcdf109e4e7efcde1c9e4e7edc4e9e71fffccd309e4e7edc1acee5ff8a62dc07848cff8a62dcab8687ff8a62dc1a8188fffcdda046e57edcd3cde5fffcdf00be4e7edcb9a271fffcdf10be4e7efcde1cbe4e7edc079e71fffccd30be4e7edcd3cde5ff2e9000dcbf838cff2e9000dc628687ff2e9000dcd08088fffcddac46e57edc89cde5fffcdf00de4e7edc6fa271fffcdf10de4e7efcde1cde4e7edcbd9d71fffccd30de4e7edc89cde5ff2e9c00dc75838cff2e9c00dc188687ff2e9c00dc868088fffcddb846e57edc3fcde5fffcdf00fe4e7edc25a271fffcdf10fe4e7efcde1cfe4e7edc739d71fffccd30fe4e7edc3fcde5ff2e9f00dc2b838cff2e9f00dcce8587ff2e9f00dc3c8088ff",
+   "_addr": "0x7EE53830",
+   "_note": "new code, segment 3: tone, saturation, six-axis, chroma and value stubs of the 12 film codes (861 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x88F868",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "16f8bb1c888df001dda2ae8bffc008f012888df82104dd94ae8bffc008f013f82108dca8af8bff5c0464842810f810042810f810082811f8100c2810f8101028102014dc455f8bffa04fc868a04bc874a047c878a048c905cc8200a05ec905cc8b00a05cc905cc8c00a07dc905cc8d00a055c905cc8e00a062c905cc9700fac89000c905cc9600fac89c00c905cc9500fac89f00c905cc9400a046c80ba04fc807dc84bd8bffdc8abd8bfff1ecdc2fbe8bfffca1c0074dbefcd9a09e4d7ec9dbcaebfcdda0be4d7ecae3fca1c4074dbefcd9a0de4d7ec9c3cad3fca1c8074dbefcd9a0fe4d7ec9b3cac3fcdda01e4e7ecabbfcdda03e4e7ecab3fcdda05e4e7ecaabfca1cc074dbefcd9a07e4e7ec98bca9bfcdda09e4e7eca93fcdda0be4e7eca8bfcdda0de4e7eca83fcdda0fe4e7ecc7bff",
+   "_addr": "0x7ECB0888",
+   "_note": "new code, segment 2: the shared tone part, the chroma helper, the art-matrix chain (307 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA33194",
+   "expect": "470c4208f1e73c201043047277ddfbd66aff000083f80204f80704ddedd66aff000082f80208f80708dddfd66aff0000f1e15c04898ccdc97000005c0491cdcb70f01882580881ddedd66affc0088188ddb8d66aff000083ddc3d66aff0000c3345c045d0ccda470f018820089dda9d66aff0000c01c8881ddbcd66affc0088ddd88d66aff0000dd94d66aff0000c20500ca048001dff02c974608420c923cf1d32b1400f892107277dd5fd66aff00004204f80204f80704dd50d66aff000082f80208f80708dd42d66aff0000f1e1f1ec580489cd2b700000f1ec91cd2d70f018590882580cdd29d66aff000081dd46d66affc0085e3481ba00c80500f05288dd16d66aff0000c12d8001f89210ba00c824580c5908ddf2d56aff000081dd16d66affc0088188ddefd56aff0000c2068001f052f8b810dff030463047209381ddf4d56affc008424c9c5da0cd4c05f028a002c9235c205da0584ccd3d05f028a002c9145c305da0584ccd2e05f028a002c905cc1d053c2050433c3c205c430c5c207770dd84d56aff00008358202804f1e04238709c50433474dd6ed56aff00008258203e28084240f1e0709008f17c434874dd55d56aff0000f1e15c0c898ccd3f6f00003c206843105c307770dd3ad56aff00008358302274280442445c3474f1e070dd24d56aff00008258302808422c5c4874f1e070dd10d56aff0000f1e15c10898ccdfa6e00005ca07770ddfad46aff00008358a0280442085c3474f1e070dde6d46aff00008258a0280842285c4874f1e070ddd2d46aff0000f1e198898ccdbd6e00005c0c99cdbf6ef01842045c1099cdb56ef01842185804ddbed46aff0000c1165818ddb3d46aff0000c10b5c3473745c48cc63015ca0705c2074dd88d46aff00005c0883705c3874dd7ad46aff00005c2882705c4074dd6cd46aff0000f1e198898ccd576e00005c0c99cd596ef01842145c1099cd4f6ef018421c591400dd52d46aff0000c11a581c5914dd45d46aff0000c10d5c20705c38745c40ccf8005804591cdd4bd46affc0088258145918dd3fd46affc0088188dd0ad46aff00004224dd14d46aff0000c164005904dd03d46aff0000c1585814ddfdd36aff0000c14d58045914ddddd36aff0000815804ddedd36aff00007b595c83ddf4d36affc0088188ddc6d36aff000042085c345960788cdddcd36affc0088188ddaed36aff000042045c48596478ccfc005ca0705c3074dd90d36aff00005c0883705c4474dd82d36aff00005c2882705c2c74dd74d36aff0000f1e198898ccd5f6d00005c0c99cd616df018420c5c1099cd576df0184208590800dd5ad36aff0000c11e580c5908dd4dd36aff0000c1115c30705c44745c2cf0045c3ccc6202580c5918dd4fd36affc0088258045908dd43d36affc0088188dd0ed36aff00004210dd18d36aff0000c17d005918dd07d36aff0000c1715808dd01d36aff0000c16658185908dde1d26aff0000815818ddf1d26aff00007b596883ddf8d26affc0088188ddcad26aff000042085c34596c788cdde0d26affc0088188ddb2d26aff000042045c485970788cddc8d26affc0088188dd9ad26aff0000f1e15c3c58085904ccbc0158145908dda9d26affc00882580c591cdd9dd26affc0088188dd68d26aff00004204dd72d26aff0000c305ccc100581c5914dd4fd26aff000083008ddd53d26aff0000c305cca700580c5908dd35d26aff0000820089dd39d26aff0000c305cc8d008c89dd24d26aff0000818cdd2ed26aff000042045c20785c30705c2074dd02d26aff0000815804",
+   "new": "00864d7e00804d7e00884d7e00804d7e008a4d7e00804d7e008c4d7e00804d7e008e4d7e00824d7e00904d7e00824d7e00924d7e00824d7e00944d7e00824d7e00964d7e00844d7e00984d7e00844d7e009a4d7e00844d7e009c4d7e00844d7e00a64d7e00a04d7e00a84d7e00a04d7e00aa4d7e00a04d7e00ac4d7e00a04d7e00ae4d7e00a24d7e00b04d7e00a24d7e00b24d7e00a24d7e00b44d7e00a24d7e00b64d7e00a44d7e00b84d7e00a44d7e00ba4d7e00a44d7e00bc4d7e00a44d7e00c64d7e00c04d7e00c84d7e00c04d7e00ca4d7e00c04d7e00cc4d7e00c04d7e00ce4d7e00c24d7e00d04d7e00c24d7e00d24d7e00c24d7e00d44d7e00c24d7e00d64d7e00c44d7e00d84d7e00c44d7e00da4d7e00c44d7e00dc4d7e00c44d7e00e64d7e00e04d7e00e84d7e00e04d7e00ea4d7e00e04d7e00ec4d7e00e04d7e00ee4d7e00e24d7e00f04d7e00e24d7e00f24d7e00e24d7e00f44d7e00e24d7e00f64d7e00e44d7e00f84d7e00e44d7e00fa4d7e00e44d7e00fc4d7e00e44d7e00064e7e00004e7e00084e7e00004e7e000a4e7e00004e7e000c4e7e00004e7e000e4e7e00024e7e00104e7e00024e7e00124e7e00024e7e00144e7e00024e7e00164e7e00044e7e00184e7e00044e7e001a4e7e00044e7e001c4e7e00044e7e00264e7e00204e7e00284e7e00204e7e002a4e7e00204e7e002c4e7e00204e7e002e4e7e00224e7e00304e7e00224e7e00324e7e00224e7e00344e7e00224e7e00364e7e00244e7e00384e7e00244e7e003a4e7e00244e7e003c4e7e00244e7e00464e7e00404e7e00484e7e00404e7e004a4e7e00404e7e004c4e7e00404e7e004e4e7e00424e7e00504e7e00424e7e00524e7e00424e7e00544e7e00424e7e00564e7e00444e7e00584e7e00444e7e005a4e7e00444e7e005c4e7e00444e7e00664e7e00604e7e00684e7e00604e7e006a4e7e00604e7e006c4e7e00604e7e006e4e7e00624e7e00704e7e00624e7e00724e7e00624e7e00744e7e00624e7e00764e7e00644e7e00784e7e00644e7e007a4e7e00644e7e007c4e7e00644e7e00864e7e00804e7e00884e7e00804e7e008a4e7e00804e7e008c4e7e00804e7e008e4e7e00824e7e00904e7e00824e7e00924e7e00824e7e00944e7e00824e7e00964e7e00844e7e00984e7e00844e7e009a4e7e00844e7e009c4e7e00844e7e00a64e7e00a04e7e00a84e7e00a04e7e00aa4e7e00a04e7e00ac4e7e00a04e7e00ae4e7e00a24e7e00b04e7e00a24e7e00b24e7e00a24e7e00b44e7e00a24e7e00b64e7e00a44e7e00b84e7e00a44e7e00ba4e7e00a44e7e00bc4e7e00a44e7e00c64e7e00c04e7e00c84e7e00c04e7e00ca4e7e00c04e7e00cc4e7e00c04e7e00ce4e7e00c24e7e00d04e7e00c24e7e00d24e7e00c24e7e00d44e7e00c24e7e00d64e7e00c44e7e00d84e7e00c44e7e00da4e7e00c44e7e00dc4e7e00c44e7e00e64e7e00e04e7e00e84e7e00e04e7e00ea4e7e00e04e7e00ec4e7e00e04e7e00ee4e7e00e24e7e00f04e7e00e24e7e00f24e7e00e24e7e00f44e7e00e24e7e00f64e7e00e44e7e00f84e7e00e44e7e00fa4e7e00e44e7e00fc4e7e00e44e7eb441e57ed441e57ef441e57e1442e57e3442e57e5442e57e7442e57e9442e57eb442e57ed442e57ef442e57e1443e57e3443e57e5443e57e7443e57e9443e57eb443e57ed443e57ef443e57e1444e57e3444e57e5444e57e7444e57e9444e57eb444e57ed444e57ef444e57e1445e57e3445e57e5445e57e7445e57e9445e57eb445e57ed445e57ef445e57e1446e57e",
+   "_addr": "0x7EE541B4",
+   "_note": "data, segment 3: three tone records per film code (member 1 the stills table, member 0 the live-view table of the column, both in the entry's RAM block) and the record triples (1296 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x14B685",
+   "expect": "a046c811a04f",
+   "new": "dc2b427400cb",
+   "_addr": "0x7E56C6A5",
+   "_note": "hook: the stock art-matrix compare chain jumps to CHAIN (film codes first, then the stock compares of 70 / 79 / 102 / 103 unchanged)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B17C",
+   "expect": "0000000061b8567e",
+   "new": "0900000061b8567e",
+   "_addr": "0x7E78C19C",
+   "_note": "tone hash: code 79 (key 9) -> the stock default (the loader switches it)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B174",
+   "expect": "0000000061b8567e",
+   "new": "050000007738e57e",
+   "_addr": "0x7E78C194",
+   "_note": "tone hash: code 75 (key 5) -> its tone stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B1F4",
+   "expect": "0000000061b8567e",
+   "new": "180000004c39e57e",
+   "_addr": "0x7E78C214",
+   "_note": "tone hash: code 94 (key 24) -> its tone stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B1E4",
+   "expect": "0000000061b8567e",
+   "new": "160000009339e57e",
+   "_addr": "0x7E78C204",
+   "_note": "tone hash: code 92 (key 22) -> its tone stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B1EC",
+   "expect": "0000000061b8567e",
+   "new": "37000000da39e57e",
+   "_addr": "0x7E78C20C",
+   "_note": "tone hash: code 125 (key 55) -> its tone stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B214",
+   "expect": "0000000061b8567e",
+   "new": "1c000000683ae57e",
+   "_addr": "0x7E78C234",
+   "_note": "tone hash: code 98 (key 28) -> its tone stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B194",
+   "expect": "0000000061b8567e",
+   "new": "4a000000af3ae57e",
+   "_addr": "0x7E78C1B4",
+   "_note": "tone hash: code 144 (key 74) -> its tone stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B1FC",
+   "expect": "0000000061b8567e",
+   "new": "56000000f93ae57e",
+   "_addr": "0x7E78C21C",
+   "_note": "tone hash: code 156 (key 86) -> its tone stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B204",
+   "expect": "0000000061b8567e",
+   "new": "59000000433be57e",
+   "_addr": "0x7E78C224",
+   "_note": "tone hash: code 159 (key 89) -> its tone stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B9D0",
+   "expect": "f4e9567e",
+   "new": "4ae9567e",
+   "_addr": "0x7E78C9F0",
+   "_note": "look entry of code 75 -> the identity look"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B50C",
+   "expect": "28dd567e",
+   "new": "8238e57e",
+   "_addr": "0x7E78C52C",
+   "_note": "saturation entry of code 75 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B33C",
+   "expect": "6ad7567e",
+   "new": "8d38e57e",
+   "_addr": "0x7E78C35C",
+   "_note": "six-axis entry of code 75 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369E9C",
+   "expect": "7a67567e",
+   "new": "9e38e57e",
+   "_addr": "0x7E78AEBC",
+   "_note": "chroma entry of code 75 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36BA1C",
+   "expect": "f4e9567e",
+   "new": "4ae9567e",
+   "_addr": "0x7E78CA3C",
+   "_note": "look entry of code 94 -> the identity look"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B558",
+   "expect": "28dd567e",
+   "new": "5739e57e",
+   "_addr": "0x7E78C578",
+   "_note": "saturation entry of code 94 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B388",
+   "expect": "6ad7567e",
+   "new": "6239e57e",
+   "_addr": "0x7E78C3A8",
+   "_note": "six-axis entry of code 94 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369EE8",
+   "expect": "7a67567e",
+   "new": "7339e57e",
+   "_addr": "0x7E78AF08",
+   "_note": "chroma entry of code 94 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36BA14",
+   "expect": "f4e9567e",
+   "new": "4ae9567e",
+   "_addr": "0x7E78CA34",
+   "_note": "look entry of code 92 -> the identity look"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B550",
+   "expect": "28dd567e",
+   "new": "9e39e57e",
+   "_addr": "0x7E78C570",
+   "_note": "saturation entry of code 92 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B380",
+   "expect": "6ad7567e",
+   "new": "a939e57e",
+   "_addr": "0x7E78C3A0",
+   "_note": "six-axis entry of code 92 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369EE0",
+   "expect": "7a67567e",
+   "new": "ba39e57e",
+   "_addr": "0x7E78AF00",
+   "_note": "chroma entry of code 92 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36BA98",
+   "expect": "f4e9567e",
+   "new": "4ae9567e",
+   "_addr": "0x7E78CAB8",
+   "_note": "look entry of code 125 -> the identity look"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B5D4",
+   "expect": "28dd567e",
+   "new": "e539e57e",
+   "_addr": "0x7E78C5F4",
+   "_note": "saturation entry of code 125 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B404",
+   "expect": "6ad7567e",
+   "new": "f039e57e",
+   "_addr": "0x7E78C424",
+   "_note": "six-axis entry of code 125 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369F64",
+   "expect": "7a67567e",
+   "new": "013ae57e",
+   "_addr": "0x7E78AF84",
+   "_note": "chroma entry of code 125 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36BA2C",
+   "expect": "f4e9567e",
+   "new": "4ae9567e",
+   "_addr": "0x7E78CA4C",
+   "_note": "look entry of code 98 -> the identity look"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B568",
+   "expect": "28dd567e",
+   "new": "733ae57e",
+   "_addr": "0x7E78C588",
+   "_note": "saturation entry of code 98 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B398",
+   "expect": "6ad7567e",
+   "new": "7e3ae57e",
+   "_addr": "0x7E78C3B8",
+   "_note": "six-axis entry of code 98 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369EF8",
+   "expect": "7a67567e",
+   "new": "8f3ae57e",
+   "_addr": "0x7E78AF18",
+   "_note": "chroma entry of code 98 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36BAE4",
+   "expect": "f4e9567e",
+   "new": "4ae9567e",
+   "_addr": "0x7E78CB04",
+   "_note": "look entry of code 144 -> the identity look"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B620",
+   "expect": "28dd567e",
+   "new": "ba3ae57e",
+   "_addr": "0x7E78C640",
+   "_note": "saturation entry of code 144 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B450",
+   "expect": "6ad7567e",
+   "new": "c53ae57e",
+   "_addr": "0x7E78C470",
+   "_note": "six-axis entry of code 144 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369FB0",
+   "expect": "7a67567e",
+   "new": "d63ae57e",
+   "_addr": "0x7E78AFD0",
+   "_note": "chroma entry of code 144 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36BB14",
+   "expect": "f4e9567e",
+   "new": "4ae9567e",
+   "_addr": "0x7E78CB34",
+   "_note": "look entry of code 156 -> the identity look"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B650",
+   "expect": "28dd567e",
+   "new": "043be57e",
+   "_addr": "0x7E78C670",
+   "_note": "saturation entry of code 156 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B480",
+   "expect": "6ad7567e",
+   "new": "0f3be57e",
+   "_addr": "0x7E78C4A0",
+   "_note": "six-axis entry of code 156 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369FE0",
+   "expect": "7a67567e",
+   "new": "203be57e",
+   "_addr": "0x7E78B000",
+   "_note": "chroma entry of code 156 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36BB20",
+   "expect": "f4e9567e",
+   "new": "4ae9567e",
+   "_addr": "0x7E78CB40",
+   "_note": "look entry of code 159 -> the identity look"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B65C",
+   "expect": "28dd567e",
+   "new": "4e3be57e",
+   "_addr": "0x7E78C67C",
+   "_note": "saturation entry of code 159 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36B48C",
+   "expect": "6ad7567e",
+   "new": "593be57e",
+   "_addr": "0x7E78C4AC",
+   "_note": "six-axis entry of code 159 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x369FEC",
+   "expect": "7a67567e",
+   "new": "6a3be57e",
+   "_addr": "0x7E78B00C",
+   "_note": "chroma entry of code 159 -> its stub"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x433A30",
+   "expect": "6dbe717e",
+   "new": "7e39e57e",
+   "_addr": "0x7E854A50",
+   "_note": "art_GetFilterType row of value 111 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3DE068",
+   "expect": "9fc06c7e",
+   "new": "8539e57e",
+   "_addr": "0x7E7FF088",
+   "_note": "live-view still row of value 111 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3DE014",
+   "expect": "15c16c7e",
+   "new": "8539e57e",
+   "_addr": "0x7E7FF034",
+   "_note": "live-view movie row of value 111 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3E688C",
+   "expect": "00bb6d7e",
+   "new": "8c39e57e",
+   "_addr": "0x7E8078AC",
+   "_note": "live-view still row of value 111 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3E6838",
+   "expect": "76bb6d7e",
+   "new": "8c39e57e",
+   "_addr": "0x7E807858",
+   "_note": "live-view movie row of value 111 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x43130C",
+   "expect": "1bdf707e",
+   "new": "9fdc707e",
+   "_addr": "0x7E85232C",
+   "_note": "EXIF case of value 111 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x799A1C",
+   "expect": "f816947e",
+   "new": "f416947e",
+   "_addr": "0x7EBBAA3C",
+   "_note": "'is art' of value 111 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x433A34",
+   "expect": "71be717e",
+   "new": "9a3ae57e",
+   "_addr": "0x7E854A54",
+   "_note": "art_GetFilterType row of value 112 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3DE06C",
+   "expect": "a4c06c7e",
+   "new": "a13ae57e",
+   "_addr": "0x7E7FF08C",
+   "_note": "live-view still row of value 112 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3DE018",
+   "expect": "19c16c7e",
+   "new": "a13ae57e",
+   "_addr": "0x7E7FF038",
+   "_note": "live-view movie row of value 112 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3E6890",
+   "expect": "05bb6d7e",
+   "new": "a83ae57e",
+   "_addr": "0x7E8078B0",
+   "_note": "live-view still row of value 112 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3E683C",
+   "expect": "7abb6d7e",
+   "new": "a83ae57e",
+   "_addr": "0x7E80785C",
+   "_note": "live-view movie row of value 112 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x431310",
+   "expect": "1bdf707e",
+   "new": "9fdc707e",
+   "_addr": "0x7E852330",
+   "_note": "EXIF case of value 112 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x799A20",
+   "expect": "f816947e",
+   "new": "f416947e",
+   "_addr": "0x7EBBAA40",
+   "_note": "'is art' of value 112 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x433A3C",
+   "expect": "75be717e",
+   "new": "e13ae57e",
+   "_addr": "0x7E854A5C",
+   "_note": "art_GetFilterType row of value 114 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3DE074",
+   "expect": "a9c06c7e",
+   "new": "e93ae57e",
+   "_addr": "0x7E7FF094",
+   "_note": "live-view still row of value 114 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3DE020",
+   "expect": "1dc16c7e",
+   "new": "e93ae57e",
+   "_addr": "0x7E7FF040",
+   "_note": "live-view movie row of value 114 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3E6898",
+   "expect": "0abb6d7e",
+   "new": "f13ae57e",
+   "_addr": "0x7E8078B8",
+   "_note": "live-view still row of value 114 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3E6844",
+   "expect": "7ebb6d7e",
+   "new": "f13ae57e",
+   "_addr": "0x7E807864",
+   "_note": "live-view movie row of value 114 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x431318",
+   "expect": "1bdf707e",
+   "new": "9fdc707e",
+   "_addr": "0x7E852338",
+   "_note": "EXIF case of value 114 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x799A28",
+   "expect": "f816947e",
+   "new": "f416947e",
+   "_addr": "0x7EBBAA48",
+   "_note": "'is art' of value 114 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x433A40",
+   "expect": "5fbe717e",
+   "new": "2b3be57e",
+   "_addr": "0x7E854A60",
+   "_note": "art_GetFilterType row of value 115 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3DE078",
+   "expect": "aec06c7e",
+   "new": "333be57e",
+   "_addr": "0x7E7FF098",
+   "_note": "live-view still row of value 115 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3DE024",
+   "expect": "21c16c7e",
+   "new": "333be57e",
+   "_addr": "0x7E7FF044",
+   "_note": "live-view movie row of value 115 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3E689C",
+   "expect": "0fbb6d7e",
+   "new": "3b3be57e",
+   "_addr": "0x7E8078BC",
+   "_note": "live-view still row of value 115 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3E6848",
+   "expect": "82bb6d7e",
+   "new": "3b3be57e",
+   "_addr": "0x7E807868",
+   "_note": "live-view movie row of value 115 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x4312C8",
+   "expect": "f8db707e",
+   "new": "f4db707e",
+   "_addr": "0x7E8522E8",
+   "_note": "record kind of value 115 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x43131C",
+   "expect": "1bdf707e",
+   "new": "9fdc707e",
+   "_addr": "0x7E85233C",
+   "_note": "EXIF case of value 115 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x799A2C",
+   "expect": "f816947e",
+   "new": "f416947e",
+   "_addr": "0x7EBBAA4C",
+   "_note": "'is art' of value 115 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x433A4C",
+   "expect": "68be717e",
+   "new": "753be57e",
+   "_addr": "0x7E854A6C",
+   "_note": "art_GetFilterType row of value 118 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3DE084",
+   "expect": "bec06c7e",
+   "new": "7d3be57e",
+   "_addr": "0x7E7FF0A4",
+   "_note": "live-view still row of value 118 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3DE030",
+   "expect": "2ec16c7e",
+   "new": "7d3be57e",
+   "_addr": "0x7E7FF050",
+   "_note": "live-view movie row of value 118 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3E68A8",
+   "expect": "1fbb6d7e",
+   "new": "853be57e",
+   "_addr": "0x7E8078C8",
+   "_note": "live-view still row of value 118 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3E6854",
+   "expect": "8fbb6d7e",
+   "new": "853be57e",
+   "_addr": "0x7E807874",
+   "_note": "live-view movie row of value 118 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x4312D4",
+   "expect": "f8db707e",
+   "new": "f4db707e",
+   "_addr": "0x7E8522F4",
+   "_note": "record kind of value 118 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x431328",
+   "expect": "1bdf707e",
+   "new": "9fdc707e",
+   "_addr": "0x7E852348",
+   "_note": "EXIF case of value 118 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x799A38",
+   "expect": "f816947e",
+   "new": "f416947e",
+   "_addr": "0x7EBBAA58",
+   "_note": "'is art' of value 118 (hidden value: flashed)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x8298CC",
+   "expect": "000000006c67a77e",
+   "new": "6f0000004c67a77e",
+   "_addr": "0x7EC4A8EC",
+   "_note": "colour-tone name hash: key 111 as 104"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3EF268",
+   "expect": "00000000281d6f7e",
+   "new": "6f000000d31c6f7e",
+   "_addr": "0x7E810288",
+   "_note": "movie tag hash: key 111 as 100"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x430AFC",
+   "expect": "000000004c98707e",
+   "new": "6f0000004898707e",
+   "_addr": "0x7E851B1C",
+   "_note": "record class hash: key 111 as 100"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x8298D4",
+   "expect": "000000006c67a77e",
+   "new": "700000005c67a77e",
+   "_addr": "0x7EC4A8F4",
+   "_note": "colour-tone name hash: key 112 as 108"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3EF270",
+   "expect": "00000000281d6f7e",
+   "new": "70000000d31c6f7e",
+   "_addr": "0x7E810290",
+   "_note": "movie tag hash: key 112 as 100"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x430B04",
+   "expect": "000000004c98707e",
+   "new": "700000004898707e",
+   "_addr": "0x7E851B24",
+   "_note": "record class hash: key 112 as 100"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x8298DC",
+   "expect": "000000006c67a77e",
+   "new": "720000006067a77e",
+   "_addr": "0x7EC4A8FC",
+   "_note": "colour-tone name hash: key 114 as 109"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3EF278",
+   "expect": "00000000281d6f7e",
+   "new": "72000000d31c6f7e",
+   "_addr": "0x7E810298",
+   "_note": "movie tag hash: key 114 as 100"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x430B0C",
+   "expect": "000000004c98707e",
+   "new": "720000004898707e",
+   "_addr": "0x7E851B2C",
+   "_note": "record class hash: key 114 as 100"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x8298E4",
+   "expect": "000000006c67a77e",
+   "new": "730000006467a77e",
+   "_addr": "0x7EC4A904",
+   "_note": "colour-tone name hash: key 115 as 119"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3EF280",
+   "expect": "00000000281d6f7e",
+   "new": "73000000d31c6f7e",
+   "_addr": "0x7E8102A0",
+   "_note": "movie tag hash: key 115 as 100"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x430B14",
+   "expect": "000000004c98707e",
+   "new": "730000004898707e",
+   "_addr": "0x7E851B34",
+   "_note": "record class hash: key 115 as 100"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x8298F4",
+   "expect": "000000006c67a77e",
+   "new": "760000006867a77e",
+   "_addr": "0x7EC4A914",
+   "_note": "colour-tone name hash: key 118 as 120"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3EF290",
+   "expect": "00000000281d6f7e",
+   "new": "76000000d31c6f7e",
+   "_addr": "0x7E8102B0",
+   "_note": "movie tag hash: key 118 as 100"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x430B24",
+   "expect": "000000004c98707e",
+   "new": "760000004898707e",
+   "_addr": "0x7E851B44",
+   "_note": "record class hash: key 118 as 100"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x12A512",
+   "expect": "4b",
+   "new": "ff",
+   "_addr": "0x7E54B532",
+   "_note": "job block compare of code 75: immediate -1, no art code matches (75 and 125 are film codes)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x12A516",
+   "expect": "7d",
+   "new": "ff",
+   "_addr": "0x7E54B536",
+   "_note": "job block compare of code 125: immediate -1, no art code matches (75 and 125 are film codes)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x12A5D7",
+   "expect": "4b",
+   "new": "ff",
+   "_addr": "0x7E54B5F7",
+   "_note": "job block compare of code 75: immediate -1, no art code matches (75 and 125 are film codes)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x12A5DB",
+   "expect": "7d",
+   "new": "ff",
+   "_addr": "0x7E54B5FB",
+   "_note": "job block compare of code 125: immediate -1, no art code matches (75 and 125 are film codes)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x12AF40",
+   "expect": "4b",
+   "new": "ff",
+   "_addr": "0x7E54BF60",
+   "_note": "job block compare of code 75: immediate -1, no art code matches (75 and 125 are film codes)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x12AF4B",
+   "expect": "7d",
+   "new": "ff",
+   "_addr": "0x7E54BF6B",
+   "_note": "job block compare of code 125: immediate -1, no art code matches (75 and 125 are film codes)"
+  }
+ ]
+}

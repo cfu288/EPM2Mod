@@ -1,0 +1,398 @@
+"""Write patches/stock-films-structure.json and build/stock-films/layout.json: what the stock-filters firmware
+flashes for film looks (design.md, "One mechanism for all 12 entries"). Research code.
+
+    uv run python experiments/2026-11-18-stock-filters/scripts/mkspec_structure.py WORKDIR [LISTING.txt]
+
+Flashed, and reached only through a film code or a hidden stored value (so no stock filter changes):
+  * one film code per menu entry; for each: a tone stub with three records that point at the entry's RAM block,
+    saturation, six-axis and chroma stubs that point at it, and three value stubs (art_GetFilterType and the two
+    live-view functions) that give the code;
+  * the stage-table entries of the eight film codes that no stock entry reaches (75, 92, 125, 94, 98, 144, 156, 159),
+    and tone-hash entries for them and for 79 (target: the stock default; the loader switches it);
+  * the art-matrix chain at the stock compare 0x7E56C6A5: film codes take their RAM matrix; the in-place codes 71, 72,
+    79, 85 take a RAM pointer, 0 = the stock path; every other code goes through the stock compares unchanged;
+  * the hidden stored values 111, 112, 114, 115, 118: their routes to the film codes and their hash keys;
+  * codes 75 and 125: the four compares of the job block that treat them get an immediate no byte matches.
+layout.json lists, per entry, the words the loader switches (address, size, film bytes, stock bytes) and the RAM
+layout. Every expect is a byte of the stock firmware (the feature specs do not touch these bytes: checked).
+"""
+
+import hashlib
+import json
+import os
+import re
+import struct
+import subprocess
+import sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
+sys.path.insert(0, os.path.join(ROOT, "src"))
+from epm2mod.container import parse  # noqa: E402
+from epm2mod.looks import slots  # noqa: E402
+
+SPEC = "stock-films-structure"
+BASE = 0x7E421020
+STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
+BIN = os.path.join(ROOT, "build", "toolchain", "bin")
+
+# Menu entries in menu order: (stock name, stock value, stored value with a film, film code, kind)
+# kind: "inplace" = the entry's own stock code (its stage entries are switched), "route" = a code no stock entry
+# reaches (value routes switched), "hidden" = a hidden stored value (the stored value is switched).
+ENTRIES = [
+    ("Pop Art", 100, 100, 79, "inplace"),
+    ("Soft Focus", 101, 101, 75, "route"),
+    ("Pale&Light Color", 102, 102, 71, "inplace"),
+    ("Light Tone", 103, 103, 72, "inplace"),
+    ("Grainy Film", 104, 111, 94, "hidden"),
+    ("Pin Hole", 105, 105, 92, "route"),
+    ("Diorama", 106, 106, 125, "route"),
+    ("Cross Process", 107, 107, 85, "inplace"),
+    ("Gentle Sepia", 108, 112, 98, "hidden"),
+    ("Dramatic Tone", 109, 114, 144, "hidden"),
+    ("Key Line", 119, 115, 156, "hidden"),
+    ("Watercolor", 120, 118, 159, "hidden"),
+]
+
+# RAM: one block per entry (cached addresses; the image library reads them through the cache)
+FILM_RAM, BLOCK = 0x7E4D8000, 0x2000
+STILLS, LIVE, SAT, SIX_S, SIX_H, CHROMA, MATRIX = 0x0000, 0x0600, 0x1E00, 0x1E10, 0x1E1C, 0x1E30, 0x1EA0
+MATPTR = 0x7E4D07C0              # RAM: u32 matrix pointer per in-place code (the film matrix's address = film,
+                                 # anything else = stock), read uncached
+INPLACE_PTR = {79: 0, 71: 4, 72: 8, 85: 12}
+
+# Stock code that the structure jumps to
+GAMMA_PICK, GAMMA_TAIL = 0x7E56B732, 0x7E56B852
+SAT_COMMON, SIX_COMMON, CHROMA_TAIL = 0x7E56DD79, 0x7E56D8D8, 0x7E566810
+MATRIX_HOOK, MATRIX_HOOK_BYTES = 0x7E56C6A5, bytes.fromhex("a046c811a04f")
+MATRIX_STOCK_70, MATRIX_STOCK_REST, MATRIX_USE = 0x7E56C6B8, 0x7E56C6AD, 0x7E56C764
+WB_PAIRS = 0x7E768DB8            # five pairs (u16, u16); code 71 / mode 102 -> pair 0, type II -> pair 2
+NEUTRAL_75 = [(0x7E54B532, 0x4B), (0x7E54B536, 0x7D), (0x7E54B5F7, 0x4B), (0x7E54B5FB, 0x7D),   # imm8 bytes
+              (0x7E54BF60, 0x4B), (0x7E54BF6B, 0x7D)]
+
+# Free space: code in segment 2, data in segment 3 (code-space-map USABLE areas, free in the stock-filters build)
+CODE_AREA = (0x7EE53830, 0x7EE53D6A)       # the per-code stubs: segment 3, where card-looks-4's code ran
+SHARED_AREA = (0x7ECB0888, 0x7ECB0BA0)     # the shared tone part, the chroma helper and the matrix chain
+DATA_AREA = (0x7EE541B4, 0x7EE548B0)
+
+
+def run(*a):
+    return subprocess.run(a, check=True, capture_output=True, text=True).stdout
+
+
+def main():
+    work = sys.argv[1]
+    listing = sys.argv[2] if len(sys.argv) > 2 else None
+    os.makedirs(work, exist_ok=True)
+    blk = parse(open(os.path.join(ROOT, STOCK), "rb").read()).blocks[0].payload
+    get = lambda a, n: blk[a - BASE:a - BASE + n]
+    word = lambda a: struct.unpack("<I", get(a, 4))[0]
+
+    # ---- data: triples and records (segment 3)
+    data = bytearray()
+    triples, records = {}, {}
+    rec_base = (DATA_AREA[0] + 3) & ~3
+    off = 0
+    for i, (name, _, _, code, _) in enumerate(ENTRIES):
+        blockaddr = FILM_RAM + BLOCK * i
+        recs = []
+        for ch in range(3):
+            words = []
+            for idx in range(slots.RECORD_TABLES):
+                col = idx // 2
+                words.append(blockaddr + STILLS + 512 * ch if idx % 2 else blockaddr + LIVE + 512 * (4 * ch + col))
+            recs.append(rec_base + off)
+            data += struct.pack("<8I", *words)
+            off += 32
+        records[code] = recs
+    for i, (_, _, _, code, _) in enumerate(ENTRIES):
+        triples[code] = rec_base + off
+        data += struct.pack("<3I", *records[code])
+        off += 12
+    assert rec_base + len(data) <= DATA_AREA[1], "data area too small"
+
+    # ---- code (segment 2)
+    asm = [".section .sk,\"ax\""]
+    asm.append("""GCOMMON:                         # a1 = three record addresses (as remap7b-code's shared part)
+    extbu d2
+    movbu (28,sp),d3
+    mov d2,d0
+    mov d3,d1
+    mov (a1),a0
+    call %#x,[d2,d3],8
+    mov a0,(a2)
+    mov d2,d0
+    mov d3,d1
+    mov (4,a1),a0
+    call %#x,[d2,d3],8
+    mov a0,(a3)
+    mov (8,a1),a0
+    jmp %#x""" % (GAMMA_PICK, GAMMA_PICK, GAMMA_TAIL))
+    asm.append("""CGEN:                            # d1 = a 97-byte chroma record: the six pointers of a stock chroma handler
+    mov (4,sp),a0
+    mov d1,(a0)
+    mov d1,d0
+    add 16,d0
+    mov d0,(4,a0)
+    add 16,d0
+    mov d0,(8,a0)
+    add 17,d0
+    mov d0,(12,a0)
+    add 16,d0
+    mov d0,(16,a0)
+    add 16,d0
+    add 20,a0
+    jmp %#x""" % CHROMA_TAIL)
+    asm.append(".section .sc,\"ax\"")
+    for i, (name, _, _, code, _) in enumerate(ENTRIES):
+        b = FILM_RAM + BLOCK * i
+        asm.append("""G%(c)d: mov %(tr)#x,a1
+    jmp GCOMMON
+S%(c)d: mov %(sat)#x,a3
+    jmp %(satc)#x
+X%(c)d: mov %(sixs)#x,a3
+    mov %(sixh)#x,a2
+    jmp %(sixc)#x
+C%(c)d: mov %(chr)#x,d1
+    jmp CGEN
+VF%(c)d: mov %(c)d,d2
+    jmp %(tf)#x
+VL%(c)d: mov %(c)d,d2
+    jmp %(t1)#x
+VM%(c)d: mov %(c)d,d2
+    jmp %(t2)#x""" % {"c": code, "tr": triples[code], "sat": b + SAT, "satc": SAT_COMMON, "sixs": b + SIX_S,
+                     "sixh": b + SIX_H, "sixc": SIX_COMMON, "chr": b + CHROMA, "tf": slots.FILTER_TYPE_TAIL,
+                     "t1": slots.LIVE_VIEW[0][2], "t2": slots.LIVE_VIEW[1][2]})
+    chain = [".section .sk,\"ax\"", "CHAIN:                           # d0 = art code (the stock compare chain 0x7E56C6A5 jumps here)"]
+    for i, (_, _, _, code, kind) in enumerate(ENTRIES):
+        chain.append("    cmp %d,d0\n    beq M%d" % (code, code))
+    chain.append("""STOCKM:
+    cmp 70,d0
+    beq 1f
+    cmp 79,d0
+    beq 1f
+    jmp %#x
+1:  jmp %#x
+MUSE:
+    mov d3,a0
+    jmp %#x""" % (MATRIX_STOCK_REST, MATRIX_STOCK_70, MATRIX_USE))
+    for i, (_, _, _, code, kind) in enumerate(ENTRIES):
+        if kind == "inplace":
+            # only the exact film matrix address counts: RAM that held anything else (stale, changed bits) is stock
+            chain.append("M%d: mov (%#x),a1\n    cmp %#x,a1\n    bne STOCKM\n    bra MUSE" %
+                         (code, MATPTR + 0x40000000 + INPLACE_PTR[code], FILM_RAM + BLOCK * i + MATRIX))
+        else:
+            chain.append("M%d: mov %#x,a1\n    bra MUSE" % (code, FILM_RAM + BLOCK * i + MATRIX))
+    asm += chain
+    asm.append(".section .hk,\"ax\"\n    jmp CHAIN\n    nop")
+    src = "\n".join(asm) + "\n"
+    calls = sorted(set(re.findall(r"(?:jmp|call)\s+0x([0-9a-f]{8})", src)))
+    src = re.sub(r"((?:jmp|call)\s+)0x([0-9a-f]{8})", r"\1s_\2", src)
+    args = ["--defsym=s_%s=0x%s" % (a, a) for a in calls]
+    args += ["--section-start=.sc=%#x" % CODE_AREA[0], "--section-start=.sk=%#x" % SHARED_AREA[0],
+             "--section-start=.hk=%#x" % MATRIX_HOOK]
+    s, o, e = (os.path.join(work, "structure." + x) for x in ("s", "o", "elf"))
+    open(s, "w").write(src)
+    run(BIN + "/mn10300-elf-as", "-o", o, s)
+    run(BIN + "/mn10300-elf-ld", *args, "-e", "%#x" % CODE_AREA[0], "-o", e, o)
+    sym = {l.split()[2]: int(l.split()[0], 16) for l in run(BIN + "/mn10300-elf-nm", e).splitlines()
+           if len(l.split()) == 3}
+
+    def sect(name):
+        b = os.path.join(work, "sect.bin")
+        run(BIN + "/mn10300-elf-objcopy", "-O", "binary", "-j", name, e, b)
+        return open(b, "rb").read()
+
+    code = sect(".sc")
+    assert CODE_AREA[0] + len(code) <= CODE_AREA[1], "code area too small: %d" % len(code)
+    shared = sect(".sk")
+    assert SHARED_AREA[0] + len(shared) <= SHARED_AREA[1], "shared area too small: %d" % len(shared)
+    hook = sect(".hk")
+    assert len(hook) == 6 and get(MATRIX_HOOK, 6) == MATRIX_HOOK_BYTES
+
+    ops = []
+
+    def op(addr, new, note):
+        expect = get(addr, len(new))
+        if expect == new:
+            return
+        ops.append({"type": "bytes", "block": 0, "offset": "0x%X" % (addr - BASE), "expect": expect.hex(),
+                    "new": new.hex(), "_addr": "0x%08X" % addr, "_note": note})
+
+    op(CODE_AREA[0], code, "new code, segment 3: tone, saturation, six-axis, chroma and value stubs of the 12 film "
+       "codes (%d B)" % len(code))
+    op(SHARED_AREA[0], shared, "new code, segment 2: the shared tone part, the chroma helper, the art-matrix chain "
+       "(%d B)" % len(shared))
+    op(rec_base, bytes(data), "data, segment 3: three tone records per film code (member 1 the stills table, member 0 "
+       "the live-view table of the column, both in the entry's RAM block) and the record triples (%d B)" % len(data))
+    op(MATRIX_HOOK, hook, "hook: the stock art-matrix compare chain jumps to CHAIN (film codes first, then the stock "
+       "compares of 70 / 79 / 102 / 103 unchanged)")
+
+    # ---- tone hash: entries for 79 and the route / hidden codes (target: stock default; static targets for the
+    # codes no stock entry reaches)
+    H, N = slots.GAMMA_HASH, slots.GAMMA_HASH_ENTRIES
+    entries = [list(struct.unpack_from("<iI", get(H, 8 * N), 8 * k)) for k in range(N)]
+
+    def place_of(key):
+        p = key & 31
+        for _ in range(N):
+            if entries[p][0] == key:
+                return p
+            if entries[p][0] == 0:
+                return None
+            p = (p + 1) % N
+
+    switch = {name: [] for name, *_ in ENTRIES}
+    gamma_place = {}
+    for name, _, _, c, kind in ENTRIES:
+        key = c - slots.GAMMA_KEY_BASE
+        p = place_of(key)
+        if p is None:
+            p = key & 31
+            while entries[p][0] != 0:
+                p = (p + 1) % N
+            stock_target = slots.GAMMA_DEFAULT_HANDLER
+            target = sym["G%d" % c] if kind != "inplace" else stock_target
+            entries[p] = [key, target]
+            op(H + 8 * p, struct.pack("<iI", key, target), "tone hash: code %d (key %d) -> %s" %
+               (c, key, "its tone stub" if kind != "inplace" else "the stock default (the loader switches it)"))
+        gamma_place[c] = p
+        if kind == "inplace":
+            switch[name].append((H + 8 * p + 4, struct.pack("<I", sym["G%d" % c]),
+                                 struct.pack("<I", entries[p][1]), "tone hash target of code %d" % c))
+
+    # ---- stage tables of the film codes
+    for name, _, _, c, kind in ENTRIES:
+        for (table, first), target, what in ((slots.LOOK_JUMP, slots.IDENTITY_LOOK_HANDLER, "look"),
+                                             (slots.SATURATION_JUMP, sym["S%d" % c], "saturation"),
+                                             (slots.SIX_AXIS_JUMP, sym["X%d" % c], "six-axis"),
+                                             (slots.CHROMA_JUMP, sym["C%d" % c], "chroma")):
+            a = table + 4 * (c - first)
+            if kind == "inplace":
+                switch[name].append((a, struct.pack("<I", target), get(a, 4), "%s entry of code %d" % (what, c)))
+            else:
+                op(a, struct.pack("<I", target), "%s entry of code %d -> %s" % (what, c,
+                   "the identity look" if what == "look" else "its stub"))
+
+    # ---- value routes
+    tails = [("VF", slots.FILTER_TYPE_JUMP, None)] + [("VL", s, m) for s, m, _ in slots.LIVE_VIEW[:1]] + \
+        [("VM", s, m) for s, m, _ in slots.LIVE_VIEW[1:]]
+    for name, stock_value, value, c, kind in ENTRIES:
+        row = 4 * (value - slots.FIRST_ART_VALUE)
+        words = [(slots.FILTER_TYPE_JUMP + row, sym["VF%d" % c], "art_GetFilterType row of value %d" % value)]
+        for (still, movie, _), stub in zip(slots.LIVE_VIEW, ("VL", "VM")):
+            words.append((still + row, sym["%s%d" % (stub, c)], "live-view still row of value %d" % value))
+            words.append((movie + row, sym["%s%d" % (stub, c)], "live-view movie row of value %d" % value))
+        if kind == "hidden":
+            words += [(slots.KIND_JUMP + row, slots.KIND_COLOUR_ONLY, "record kind of value %d" % value),
+                      (slots.EXIF_JUMP + row, slots.EXIF_POP_ART, "EXIF case of value %d" % value),
+                      (slots.IS_ART_JUMP + row, slots.IS_ART_YES, "'is art' of value %d" % value)]
+            for a, w, note in words:
+                op(a, struct.pack("<I", w), note + " (hidden value: flashed)")
+        else:
+            if kind == "route":
+                words.append((slots.KIND_JUMP + row, slots.KIND_COLOUR_ONLY, "record kind of value %d" % value))
+            for a, w, note in words:
+                if word(a) != w:
+                    switch[name].append((a, struct.pack("<I", w), get(a, 4), note))
+
+    # ---- hash keys of the hidden values (as films12-structure)
+    def hash_add(table, key, like, note):
+        raw = get(table, 8 * slots.VALUE_HASH_ENTRIES)
+        ents = [list(struct.unpack_from("<2I", raw, 8 * k)) for k in range(slots.VALUE_HASH_ENTRIES)]
+        for o in ops:
+            a = int(o["_addr"], 16)
+            if table <= a < table + 8 * slots.VALUE_HASH_ENTRIES:
+                k = (a - table) // 8
+                ents[k] = list(struct.unpack("<2I", bytes.fromhex(o["new"])))
+
+        def find(k):
+            p = k & 31
+            for _ in range(32):
+                if ents[p][0] == k:
+                    return p
+                if ents[p][0] == 0:
+                    return None
+                p = (p + 1) % 32
+        src = find(like)
+        assert src is not None and find(key) is None, (hex(table), key)
+        p = key & 31
+        while ents[p][0] != 0:
+            p = (p + 1) % 32
+        op(table + 8 * p, struct.pack("<2I", key, ents[src][1]), note)
+
+    for name, stock_value, value, c, kind in ENTRIES:
+        if kind == "hidden":
+            hash_add(slots.COLOUR_TONE_HASH, value, stock_value, "colour-tone name hash: key %d as %d" % (value, stock_value))
+            hash_add(slots.MOVIE_TAG_HASH, value, slots.POP_ART_VALUE, "movie tag hash: key %d as 100" % value)
+            hash_add(slots.RECORD_CLASS_HASH, value, slots.POP_ART_VALUE, "record class hash: key %d as 100" % value)
+
+    # ---- codes 75 and 125: the job-block compares
+    for a, imm in NEUTRAL_75:
+        assert get(a, 1)[0] == imm, hex(a)
+        op(a, b"\xff", "job block compare of code %d: immediate -1, no art code matches (75 and 125 are film codes)"
+           % imm)
+
+    # ---- hidden entries: the stored value in the value lists, the "is art" lists and the ART-mode preset (data; the
+    # ART bracket constants are code: the loader's hook handles them)
+    extra = {x.entry: x for x in slots.EXTRA_SLOTS}
+    for name, stock_value, value, c, kind in ENTRIES:
+        if kind != "hidden":
+            continue
+        x = extra[name]
+        assert (x.stock_value, x.value, x.art_code) == (stock_value, value, c), name
+        addrs = [t + slots.VALUE_LIST_STEP * x.place for t in slots.VALUE_LISTS]
+        addrs += [t + slots.ART_VALUE_LIST_STEP * (x.place - slots.FIRST_ART_PLACE) for t in slots.ART_VALUE_LISTS]
+        assert get(x.preset_value - 4, 4) == struct.pack("<I", slots.PICTURE_MODE_SETTING), name
+        addrs.append(x.preset_value)
+        for a in addrs:
+            assert get(a, 1)[0] == stock_value, (name, hex(a))
+            switch[name].append((a, bytes((value,)), bytes((stock_value,)), "stored value of the entry"))
+
+    # ---- in-place extras: WB pairs of Pale&Light; RAM matrix pointer (the loader writes it)
+    for name, _, _, c, kind in ENTRIES:
+        if name == "Pale&Light Color":
+            for k in (0, 2):
+                a = WB_PAIRS + 4 * k
+                switch[name].append((a, struct.pack("<2H", 256, 256), get(a, 4), "white-balance pair %d -> 1.0" % k))
+        if kind == "inplace":
+            i = [e[0] for e in ENTRIES].index(name)
+            switch[name].append((MATPTR + INPLACE_PTR[c], struct.pack("<I", FILM_RAM + BLOCK * i + MATRIX),
+                                 b"\0\0\0\0", "RAM matrix pointer of code %d" % c))
+
+    stock_sha = hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest()
+    json.dump({
+        "name": SPEC,
+        "description": (
+            "Film looks on the stock filters, the flashed part (experiments/2026-11-18-stock-filters/design.md): one "
+            "film code per art-filter entry (Pop Art 79, Soft Focus 75, Pale&Light 71, Light Tone 72, Grainy Film 94, Pin "
+            "Hole 92, Diorama 125, Cross Process 85, Gentle Sepia 98, Dramatic Tone 144, Key Line 156, Watercolor 159) "
+            "with tone, saturation, six-axis, chroma and matrix in the entry's RAM block at 0x7E4D8000 + 0x2000 x entry; "
+            "the stage entries of the codes that no stock entry reaches, the art-matrix chain, the hidden stored values "
+            "111, 112, 114, 115, 118 and their hash keys, and the four job-block compares of 75 / 125. Nothing here is "
+            "reached while no entry has a film: the loader switches the entry's words. Every expect is a stock byte."),
+        "base": STOCK, "base_sha256": stock_sha,
+        "status": "candidate: emulator-checked, not flashed",
+        "ops": ops,
+    }, open(os.path.join(ROOT, "patches", SPEC + ".json"), "w"), indent=1)
+    open(os.path.join(ROOT, "patches", SPEC + ".json"), "a").write("\n")
+    layout = {"film_ram": FILM_RAM, "block": BLOCK,
+              "offsets": {"stills": STILLS, "live": LIVE, "sat": SAT, "six_s": SIX_S, "six_h": SIX_H,
+                          "chroma": CHROMA, "matrix": MATRIX},
+              "matptr": MATPTR,
+              "entries": [{"name": n, "stock_value": sv, "value": v, "code": c, "kind": k,
+                           "switch": [{"address": a, "film": f.hex(), "stock": s.hex(), "note": note}
+                                      for a, f, s, note in switch[n]]}
+                          for n, sv, v, c, k in ENTRIES]}
+    os.makedirs(os.path.join(ROOT, "build", "stock-films"), exist_ok=True)
+    json.dump(layout, open(os.path.join(ROOT, "build", "stock-films", "layout.json"), "w"), indent=1)
+    print("wrote patches/%s.json: %d ops; code %d B at %#x, data %d B at %#x" %
+          (SPEC, len(ops), len(code), CODE_AREA[0], len(data), rec_base))
+    for n, *_ in ENTRIES:
+        print("  %-18s switches %2d words" % (n, len(switch[n])))
+    if listing:
+        open(listing, "w").write(run(BIN + "/mn10300-elf-objdump", "-d", "-j", ".sc", "-j", ".sk", "-j", ".hk", e))
+
+
+if __name__ == "__main__":
+    main()
