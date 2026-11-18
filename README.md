@@ -22,11 +22,11 @@ Repository containing the current work for creating a custom firmware mod for th
 
 This firmware is only for an E-PM2. The firmware is unofficial, use it at your own risk. Ensure your battery is full prior to flashing. You can either use the installer or the CLI/command line. CLI is preferred.
 
-### Installer
+### Using the installer
 
 Download the zip from [Releases](https://github.com/cfu288/EPM2Mod/releases), unzip it, and double-click **Start (Mac).command** or **Start (Windows).bat** (Linux: `./start.sh`). Follow the page that opens. On a Mac, the first start is blocked: allow it in System Settings → Privacy & Security → **Open Anyway**.
 
-### Command line
+### Using the command line
 
 1. To build a copy of the firmware, run
 
