@@ -63,16 +63,22 @@ The camera renders its own result, so the accuracy of our computer model does no
 | Limit | Status |
 |---|---|
 | No editor screen exists and no slider widget is known. An editor is built from menu rows; each added row needs a relocated copy of the menu table (done before for Load Looks, Peaking, Debug Log) | V for rows; slider U |
-| Each edited value needs a setting to store it. Only setting 448 is known free; an editor needs about 15 values | U: more dormant settings not searched |
-| Code space: 679 B of code and about 1.4 KB of segment 3 are proven free; an editor needs several KB. The large areas (95 KB, 123 KB) are not proven on the camera | U |
+| Each row needs a setting and its own picker panel. 23 settings are free, but only 3 free setting/panel pairs exist, so a row per control is not possible without moving the panel table | R, E (`settings.md`, `rows.md`) |
+| Code space: an editor needs about 450-600 B of code and 2.7 KB of data (I); the proven space fits it tightly. The PENPAL radio patch code (57,523 B) can be freed with 3 patches (R, `space-penpal.md`) | I, R |
+| The menu covers live view: an edit shows only after leaving the menu | E |
 | Menu rows run no code when their value changes; code polls at each key, as Load Looks does | V |
 | 128 rows per menu list | V |
 
 ### Feasibility
 
-Image processing: feasible, with 6 colours and no per-colour lightness. Firmware: unknown. Code space and value
-storage are the blockers. Settling them needs emulator work and one probe flash (questions: free settings for
-about 15 values; a proven code area of 2 KB or more; live-view lag after an edit). Highest cost and risk of the two.
+Image processing: feasible, with 6 colours and no per-colour lightness. Firmware: feasible as two menu rows
+("Look Edit" picks a control, "Value" sets -7..+7), not yet tried on the camera. The experience is the weak part:
+about 10 presses per control, no live view while editing, the result seen after leaving the menu.
+
+**Status: paused by the owner (2026-11-18).** Compared with the other mods: the PEN-F, E-P7 and OM-3 mods add their
+controls to a stock colour screen that is drawn over live view; the only TruePic VI mod (fenykl, E-PL3) uses menu
+rows as this design does. Not explored: whether a stock live-view screen of this body (iAUTO Live Guide sliders,
+Highlight & Shadow) could host the edits. Resume from step 5 below or from that question.
 
 ### Next steps (owner chose this first, 2026-11-18)
 
@@ -92,10 +98,17 @@ colours (12 rows), contrast, Blacks, Whites, warmth, tint and saturation (6 rows
 
 ## 2. Look import
 
+**Status: next (owner, 2026-11-18).**
+
+### What it is
+
+A user brings a `.cube` LUT, a computer turns it into one EPM2Mod look, and the camera loads it with Load Looks
+into an ART slot under the look's own name (names show in the menus: V, camera log, card-looks-3 and -4,
+"Cyan Test").
+
 ### What carries over from a LUT
 
-There is no LUT stage, so a LUT is approximated by the four stages above (the fit runs on a computer; the result
-is a look file for Load Looks, V).
+There is no LUT stage, so a LUT is approximated by the four stages above.
 
 | What the LUT does | Carries over |
 |---|---|
@@ -103,30 +116,76 @@ is a look file for Load Looks, V).
 | Different tone per channel (tinted shadows or highlights) | Yes |
 | Broad hue or saturation shifts | Yes, in 6 regions |
 | Per-colour lightness, hue changes that depend on brightness, narrow edits (skin only) | No, approximate at best |
+| Black-and-white | Yes, as a black-and-white record (kind 2) |
 
-### Evidence
+### Two kinds of LUT
 
-The 19 film simulations are LUT imports: fitted from spektrafilm LUTs, then measured on the camera
-(`docs/film-emulation.md` section 4): natural colours 1.06 to 1.44 dE, ColorChecker 1.36 to 1.96 dE, out-of-range
-colours 12 to 17 dE. Film-like LUTs: V. Other creative LUTs: U, and the stronger the LUT the worse the fit.
+| Kind | What its input is | How the fit uses it | Status |
+|---|---|---|---|
+| Log LUT (film emulation, "technical" LUTs) | A camera log encoding: V-Log, LogC3, S-Log3, F-Log, ... | The scene's linear light is encoded to the LUT's input, the LUT's output is the target. This is how the 19 films were made (V-Log) | V for V-Log; other log curves: encodings to add, formulas are published |
+| Display LUT (most "creative" LUTs) | An image that is already rendered: Rec.709 or sRGB | The target is the LUT applied to the camera's own Natural rendering of the scene. The model renders Natural to about 0.9 dE (stock modes it was not fitted on: 0.86-0.92) | I: not yet done |
+
+The file does not say which kind it is. The user chooses; there is no reliable automatic guess.
+
+### End-to-end flow
+
+1. The user has a `.cube` file and chooses its input (a list: Rec.709/sRGB, V-Log, LogC3, S-Log3, ...).
+2. The fit runs on the user's computer (section "Where the fit runs") and gives a report: the colour error on
+   natural colours, greys, skin and the ColorChecker; which colours it cannot reach; a good / fair / poor mark.
+3. The user picks an ART slot and a name (up to 16 characters).
+4. The look is written to the card as `EPM2LOOK.BIN` (with the other slots' looks kept as they are).
+5. On the camera: MENU, Custom Menu J, Load Looks, Load. The slot shows the new name (V).
+
+### Where the fit runs
+
+| Part | Needs | Status |
+|---|---|---|
+| The fitter and the camera model (`fit_film2.py`, `model2.py`) | numpy, scipy; move into the package with tests | V as experiment code |
+| The stock tables the model reads (`mocklib.py`, 0x7E74E9BC and the default tone tables) | Read from the user's own downloaded firmware (the installer already downloads it); never shipped by us | I |
+| A command first: `epm2mod looks import FILE.cube --input rec709 --slot ARTn --name NAME` | `uv run` gets numpy and scipy for the command | I |
+| The installer page later | The release is standard library only: add the fit's packages at first use, or a small solver of our own | out of scope until the command works |
+
+### Claims (condition 3)
+
+| Can say | Evidence |
+|---|---|
+| "Film-like LUTs in V-Log work well" | V: 19 films, camera-measured |
+| "This LUT's fit: N dE on natural colours (computed)" | The fit's own number, shown per LUT, marked as computed |
+| "Measured on the camera within N dE of the fit" | Only after round R2 below |
+| Never | "Any LUT", "exact", "matches the original LUT" |
+
+Fit values that go beyond the range the 19 films span are not measured on the camera. Until R2, the fitter keeps
+the parameters inside that range and says so when a LUT needs more.
 
 ### Limits
 
 | Limit | Status |
 |---|---|
-| A `.cube` file does not state its input encoding (sRGB, V-Log, a camera log). A wrong guess gives a wrong look: the user must choose, or only LUTs with a known input are accepted | V (format fact) |
-| The fitter is an experiment script that needs numpy and scipy (`experiments/2026-11-09-film-portra/fit_film2.py`); it runs on a computer | V |
-| Fit quality differs per LUT; it must be shown per LUT, not promised | condition 3 |
+| A `.cube` file does not state its input encoding; a wrong choice gives a wrong look | V (format fact) |
+| Strong creative LUTs (narrow hue edits, per-colour lightness) fit poorly | I, measured by step L2 |
+| Movies get only part of a look (the film curves only in Kodachrome and Superia 400) | V (`docs/film-emulation.md` section 7) |
+| Other white balance presets than daylight: untested | U |
+| Only `.cube`. `.xmp`, Hald PNG and other formats: out of scope | owner |
 
-### Feasibility
+### Steps
 
-Feasible for film-like LUTs with a known input encoding (done 19 times). Other LUTs: per-LUT quality, offered only
-with that LUT's fit error shown.
+| Step | Settles | Where | Camera? |
+|---|---|---|---|
+| L1 | Fitter and model in the package, same results as the experiment code | desk | no |
+| L2 | How well LUTs fit: a test set of free LUTs (film emulations and creative LUTs, log and display), each fitted; the error spread per kind. Used only for testing, not shipped | desk | no |
+| L3 | Display LUTs: the target built on the model's Natural rendering; its fit error | desk | no |
+| L4 | Log encodings other than V-Log (LogC3, S-Log3, F-Log) | desk | no |
+| L5 | The `looks import` command with the report and the clamp to the films' range | desk | no |
+| R2 | Camera check: 3 to 5 imported looks (one film-like, one display LUT, one strong creative LUT), one RAW Data Edit of the test RAW each. Pass: camera within 1 dE of the fit's own prediction on natural colours | camera, no flash (pinned build) | **yes**, about 10 minutes |
+
+L2 decides if the feature is worth offering beyond film-like LUTs: if most creative LUTs fit poorly, the feature
+is "film-like LUTs only" and says so.
 
 ## Open questions
 
 Add here; answer with a label and a source.
 
-1. In-camera edits: which dormant settings can hold editor values? (emulator)
-2. In-camera edits: is 2 KB or more of the large code areas usable? (one probe flash)
-3. Look import: fit error for creative LUTs that are not film-like? (desk: fit a set of LUTs)
+1. In-camera edits (paused): could iAUTO Live Guide or Highlight & Shadow host edits over live view? (emulator)
+2. In-camera edits (paused): code from the PENPAL chunk on the camera? (one probe flash)
+3. Look import: fit error for creative and display LUTs? (L2, L3)
+4. Look import: camera vs fit for imported looks? (R2)

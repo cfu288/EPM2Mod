@@ -36,7 +36,7 @@ Look record, the parts that both kinds have:
 | 0 | 1 | slot: the menu entry, 0 to 11 (table below) |
 | 1 | 1 | kind: 1 colour, 2 black-and-white |
 | 2 | 2 | reserved |
-| 4 | 16 | name: ASCII, padded with 0. The menu still shows the entry's own name |
+| 4 | 16 | name: ASCII, padded with 0. The menus show it (camera log, card-looks-3 and -4) |
 | 46 | 18 | art matrix, 9 x s16, by rows; each row sums to 256 |
 
 Kind 1, colour:
