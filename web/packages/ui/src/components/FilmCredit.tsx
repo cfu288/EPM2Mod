@@ -2,7 +2,7 @@
 export function FilmCredit() {
   return (
     <p className="text-muted text-xs">
-      The film looks are derived from{' '}
+      The film simulations are derived from{' '}
       <a className="hover:text-ink underline" href="https://github.com/andreavolpato/spektrafilm">
         spektrafilm
       </a>{' '}

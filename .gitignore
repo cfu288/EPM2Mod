@@ -35,5 +35,3 @@ src/epm2mod/app/
 # Third-party reference documents (manuals, parts lists). Not redistributable; never commit.
 /references/
 
-# Line art traced from the Olympus parts list (references/). Not to be published until decided.
-/web/apps/site/public/art/

@@ -1,0 +1,100 @@
+.drawing {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.drawing-lines {
+  stroke: var(--drawing-stroke, #9a9a9a);
+  stroke-width: 0.5;
+  transition: stroke-width 900ms ease;
+}
+
+.drawing:hover .drawing-lines {
+  stroke-width: 0.9;
+}
+
+/* the rainbow copy of the lines: fades in and out slowly over the grey ones */
+.drawing-glow {
+  --drawing-stroke: url(#drawing-rainbow);
+  opacity: 0;
+  transition: opacity 900ms ease;
+}
+
+.drawing:hover .drawing-glow {
+  opacity: 1;
+}
+
+/* each stop runs through the colours, a step behind the one before it, so the rainbow flows along the lines */
+@keyframes drawing-rainbow {
+  0%,
+  100% {
+    stop-color: #ef3d5f;
+  }
+  16% {
+    stop-color: #ec9213;
+  }
+  33% {
+    stop-color: #ecc113;
+  }
+  50% {
+    stop-color: #3fbc5e;
+  }
+  66% {
+    stop-color: #137bec;
+  }
+  83% {
+    stop-color: #ac5cd4;
+  }
+}
+
+.drawing stop {
+  stop-color: #ef3d5f;
+  animation: drawing-rainbow 4s linear infinite paused;
+}
+
+.drawing:hover stop {
+  animation-play-state: running;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawing stop,
+  .drawing:hover stop {
+    animation-play-state: paused;
+  }
+}
+
+/* the bit cloud behind the lines: lighter than them, and it does not change on hover */
+.drawing-bits {
+  fill: #c4c4c4;
+  user-select: none;
+}
+
+/* on hover, a few digits light up and go bold now and then, each on its own clock */
+@keyframes bit-twinkle {
+  0%,
+  82%,
+  100% {
+    fill-opacity: var(--o);
+    font-weight: 400;
+  }
+  88% {
+    fill: #8c8c8c;
+    fill-opacity: 1;
+    font-weight: 700;
+  }
+}
+
+.bit-spark {
+  fill-opacity: var(--o);
+}
+
+.drawing:hover .bit-spark {
+  animation: bit-twinkle var(--t) linear var(--d) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawing:hover .bit-spark {
+    animation: none;
+  }
+}

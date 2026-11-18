@@ -8,8 +8,8 @@ scene is the files with one capture time (RAW Data Edit keeps the RAW's); the lo
 The camera writes "Pop Art" for the five newer looks, so those files are named by number (as make_readme_sheet.py
 does).
 
-Writes web/apps/site/public/films/<scene>/<look>.webp (1600 px on the long side, no metadata) and
-web/apps/site/src/filmPhotos.json: the scenes in order, each with its looks in film order.
+Writes web/apps/site/public/films/<scene>/<look>.webp (1600 px on the long side, no metadata), a 320 px thumb.webp
+of the Natural photo, and web/apps/site/src/filmPhotos.json: the scenes in order, each with its looks in film order.
 """
 import json
 import struct
@@ -22,6 +22,7 @@ SHOTS = ROOT / "experiments/2026-11-09-film-portra/shots"
 OUT = ROOT / "web/apps/site/public/films"
 MANIFEST = ROOT / "web/apps/site/src/filmPhotos.json"
 LONG_SIDE = 1600
+THUMB = 320
 
 # ArtFilter value -> the look the first build put there (looks/film-records.json slots, Off = Natural).
 BY_FILTER = {0: "natural", 2: "portra-400", 1: "ektachrome", 3: "pro-400h", 4: "kodachrome", 5: "vision3-250d",
@@ -72,6 +73,10 @@ def main() -> None:
             im.save(OUT / scene / f"{look}.webp", "WEBP", quality=80, method=6)
             entry["looks"][look] = f"films/{scene}/{look}.webp"
             entry["width"], entry["height"] = im.size
+            if look == "natural":
+                im.thumbnail((THUMB, THUMB), Image.LANCZOS)
+                im.save(OUT / scene / "thumb.webp", "WEBP", quality=80, method=6)
+                entry["thumb"] = f"films/{scene}/thumb.webp"
         manifest.append(entry)
         print(scene, len(entry["looks"]), "looks", entry["width"], "x", entry["height"])
     MANIFEST.write_text(json.dumps(manifest, indent=2) + "\n")
