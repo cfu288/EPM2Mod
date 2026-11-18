@@ -57,7 +57,7 @@ ENTRIES = [
 # RAM: one block per entry (cached addresses; the image library reads them through the cache)
 # Tone: 8 tables per channel (record member order: column 0..3 x member 0 / 1), each the film's curve read at the stock
 # default table of the same place (as the record slots Light Tone and Cross Process of the film firmware).
-FILM_RAM, BLOCK = 0x7E4CA000, 0x3200
+FILM_RAM, BLOCK = 0x7E4D1000, 0x3200   # after the loader's status and names (0x7E4D0000-0x7E4D0800); ends 0x7E4F6800
 TONE, SAT, SIX_S, SIX_H, CHROMA, MATRIX = 0x0000, 0x3000, 0x3010, 0x301C, 0x3030, 0x30A0
 MATPTR = 0x7E4C9FC0              # RAM: u32 matrix pointer per in-place code (the film matrix's address = film,
                                  # anything else = stock), read uncached
@@ -367,7 +367,7 @@ MUSE:
             "Film looks on the stock filters, the flashed part (experiments/2026-11-18-stock-filters/design.md): one "
             "film code per art-filter entry (Pop Art 79, Soft Focus 75, Pale&Light 71, Light Tone 72, Grainy Film 94, Pin "
             "Hole 92, Diorama 125, Cross Process 85, Gentle Sepia 98, Dramatic Tone 144, Key Line 156, Watercolor 159) "
-            "with tone, saturation, six-axis, chroma and matrix in the entry's RAM block at 0x7E4CA000 + 0x3200 x entry; "
+            "with tone, saturation, six-axis, chroma and matrix in the entry's RAM block at 0x7E4D1000 + 0x3200 x entry; "
             "the stage entries of the codes that no stock entry reaches, the art-matrix chain, the hidden stored values "
             "111, 112, 114, 115, 118 and their hash keys, and the four job-block compares of 75 / 125. Nothing here is "
             "reached while no entry has a film: the loader switches the entry's words. Every expect is a stock byte."),

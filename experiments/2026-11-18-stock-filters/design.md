@@ -203,6 +203,14 @@ a flashed entry with the stock default handler as target is added; the loader sw
   `258f8be64526dd1813e2b333c21381434554184e64e1c8fa4a5e829fd3c673fc` (19,217 bytes changed). Not yet: the ART
   bracket hook, Cross Process's adaptive-hue hook, the functional emulator sessions.
 
+- 2026-11-18, emulator sessions (`scripts/emu_stock.py`, six sessions on one flash state): the switch words, the
+  listed entries' RAM blocks, the names and the row status equal the model in every state: nothing stored (all
+  stock); Load of the 12 default films (all film; "Pro 400H" on ART 3); restart from flash (applied at start); Load of
+  Velvia in Pop Art and C200 in Key Line (only those two film, ART 3 "Pale&Light Color" again); Load of a file with no
+  film (all stock); a damaged file (refused, unchanged). The first run found the entries' RAM blocks overlapping the
+  loader's names at 0x7E4D0000 (a fault in the names code): the blocks start at 0x7E4D1000 now. sha256
+  `3d7d80781886cdbc76d333bdafff6848bdb7f6ce18d131b102dfb8fd3cc15f83`.
+
 ## Open questions (settle in code and the emulator before any camera run)
 
 - U0. Three more colour-only art codes for Soft Focus, Pin Hole and Diorama (above).
