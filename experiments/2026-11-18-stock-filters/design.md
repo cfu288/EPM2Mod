@@ -256,6 +256,12 @@ a flashed entry with the stock default handler as target is added; the loader sw
 - The emulator gate is complete: build checks, six sessions, Picture Mode remap, stock-vs-build crawls, the stage
   cases, the tables against the film firmware, live view, the other features, the unloaded bytes. Next: the camera run (`docs/camera-log.md`).
 
+- 2026-11-18, camera run 1 (`docs/camera-log.md`, files in `build/fw-test/stock-films`): everything passed except
+  ART BKT, which was not run: the sheet said "Shooting Menu 2 -> Bracketing -> ART BKT", which the E-PM2 does not
+  have. Emulator (stock-films, after a Load): MENU opens the mode screen at P; LEFT x4 = ART ("Apply creative
+  effects"); OK opens the ART list (1 "Portra 400"); entry 13 is ART BKT; RIGHT shows the 12 films On, the other
+  Picture Modes Off.
+
 ## Open questions (settle in code and the emulator before any camera run)
 
 - U0. Three more colour-only art codes for Soft Focus, Pin Hole and Diorama (above).
