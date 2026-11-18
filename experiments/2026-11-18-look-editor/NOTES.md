@@ -74,6 +74,19 @@ Image processing: feasible, with 6 colours and no per-colour lightness. Firmware
 storage are the blockers. Settling them needs emulator work and one probe flash (questions: free settings for
 about 15 values; a proven code area of 2 KB or more; live-view lag after an edit). Highest cost and risk of the two.
 
+### Next steps (owner chose this first, 2026-11-18)
+
+| Step | Settles | Where | Status |
+|---|---|---|---|
+| 1 | The editor's controls (provisional below; the owner may change them) | owner | provisional |
+| 2 | Settings for the rows to show values: about 15 that no stock code uses. They are scratch values only; the edit is stored in the look store, which already persists | emulator and code reading, `settings.md` | running |
+| 3 | Rows with numbers (for example -7 to +7), reusing stock value lists if possible; acting on a change; live view behind the menu | emulator and code reading, `rows.md` | running |
+| 4 | Code size of a minimal editor against free space; more space from the PENPAL (PP-1 Bluetooth) code if needed (owner's idea) | code reading, `space-penpal.md` | running |
+| 5 | One probe flash: code from a new area, live view after a row change and its lag, the edit after a restart | camera, after 2 to 4 | not started |
+
+Provisional controls (step 1): edits apply to the film simulation in use. Hue and saturation for each of the 6
+colours (12 rows), contrast, Blacks, Whites, warmth, tint and saturation (6 rows). Each about -7 to +7.
+
 ## 2. Look import
 
 ### What carries over from a LUT
