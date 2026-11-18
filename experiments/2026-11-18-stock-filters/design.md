@@ -57,6 +57,13 @@ time by the loader today (camera-tested, card-looks-4).
    The loader maps the current setting along with the entry (U: which settings hold the value; read from the
    inventory of films-max section 5a).
 
+## Owner's decisions (2026-11-18)
+
+- F5 in full: "whatever should be the expected behavior for a user should be the proper behavior, nothing confusing or
+  an unintentional artifact of the mod". ART bracket and movies use the loaded film of an entry, as stills and live
+  view do; an entry without a film is the stock filter everywhere.
+- `log-menu` pinned meanwhile; this project starts from it.
+
 ## Open questions (settle in code and the emulator before any camera run)
 
 - U1. Which shared bytes are transparent for the stock codes (point 4).

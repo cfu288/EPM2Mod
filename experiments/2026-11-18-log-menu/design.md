@@ -3,7 +3,7 @@
 The owner's goal: logging is a setting in the camera's menu, so one firmware can write `EPM2LOG.BIN` when the
 user turns it on. Today the log needs a separate debug build for each firmware (`builds/debug-log-*.json`).
 
-Status: candidate `builds/log-menu.json` built and emulator-checked (section "The build"); not flashed.
+Status: `builds/log-menu.json` camera-tested and pinned 2026-11-18 (sha256 `83e7c3d6…`, docs/camera-log.md); guide `docs/guide/debug-log.md`.
 
 Labels: V = verified (emulator or the bytes of the image), I = inferred, U = unknown.
 

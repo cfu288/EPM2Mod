@@ -11,9 +11,9 @@ and delete the item here.
 - Separate project: Olympus's art filters by default, films only in the slots where a user loads one (criteria F1-F5
   in the same design). The installer doesn't wait for it.
 - Not published (owner, 2026-11-17): first a camera test of the firmware with and without film looks, and of every
-  feature, with a build that writes the log. The candidate for it: `builds/log-menu.json`, the log in the firmware,
-  switched by the Custom Menu row Debug Log (J, Off by default); emulator-checked
-  ([log-menu design](../experiments/2026-11-18-log-menu/design.md)).
+  feature, with a build that writes the log: `log-menu` (pinned 2026-11-18) writes it, switched by Custom Menu J ->
+  Debug Log. Next: Olympus's art filters by default
+  ([stock-filters design](../experiments/2026-11-18-stock-filters/design.md)).
 
 ## Level gauge
 

@@ -55,6 +55,8 @@ routines. This file records what the measurements show, so that nobody repeats t
 | Load a card file by name pattern | 0x7E5437F0, used by the lens update for `DCOLYMP/L???????BIN` on a normally booted camera | Verified |
 | Menus | Data tables (list table 0x7F00D710); value records can be re-pointed | Camera-tested for one setting |
 | Menu texts at run time | The loaded language's text table is in RAM (blob 0xBFF3D000, its pointer array at the address in its first word); re-pointing a string id changes the text on screen, also after a language change when written again | Camera-tested 2026-11-17 (`card-looks-4`: loaded looks show their own names) |
+| A dormant setting as an own menu row, kept after power-off | Setting 447 with the stock Off / On panel 608 (Custom Menu J, Debug Log); the firmware never writes it at start | Camera-tested 2026-11-18 (`log-menu`: On kept after power-off and after a flash) |
+| RAM kept across power-off | The log's ring RAM 0x7E4F9000 keeps its content; bits can turn from 0 to 1 while the camera is off (seen twice, both before a start from USB) | Camera-tested 2026-11-18; the ring has a check word since `log-menu` |
 | Settings memory for own data | The EEROM settings bank's unused tail, 53,680 bytes, saved by the firmware and by the bank save API 0x7E680272 | Camera-tested 2026-11-17 (looks kept after power-off without the card) |
 | Hidden art-filter numbers | 110 to 118 exist in the pipeline switches, with no menu value | Verified in code; untested on the camera |
 | Add Effects (Soft Focus, Pin-Hole, White Edge, Frame, Star Light) | Per-filter data lists at 0x7E849E2B to 0x7E849E5A | Verified; on a film slot untested |

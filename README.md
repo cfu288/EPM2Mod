@@ -13,6 +13,7 @@ Repository containing the current work for creating a custom firmware mod for th
 | [Interval shooting](docs/guide/interval-shooting.md) | 
 | [Level gauge](docs/guide/level-gauge.md) | 
 | [Focus peaking](docs/guide/focus-peaking.md) | 
+| [Debug log](docs/guide/debug-log.md) |
 
 ## Dependencies
 
