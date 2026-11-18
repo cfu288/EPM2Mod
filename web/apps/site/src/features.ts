@@ -15,7 +15,7 @@ export const features: Feature[] = [
     id: 'film-looks',
     name: 'Film simulations',
     summary: 'Film colours straight out of the camera.',
-    steps: ['Set the mode dial to ART.', 'Pick a film simulation from the list.'],
+    steps: ['Set the mode dial to P, A, S or M.', 'Press OK, select Picture Mode, and scroll right past Custom.'],
     screens: [{ src: 'ui/quick-menu-portra.png', alt: 'The quick menu with Picture Mode on Portra 400' }],
   },
   {
