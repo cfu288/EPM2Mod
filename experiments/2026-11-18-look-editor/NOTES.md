@@ -36,27 +36,71 @@ Tools that exist:
   harness that needs one flash, then only card files.
 - The debug log (`docs/logging.md`): 31 to 66 B per probe point, `EPM2LOG.BIN` on the card.
 
-## 2. Track A: an editor in the installer, with a preview and LUT import
+## 2. Features by evidence
 
-The first deliverable. It needs no new firmware: it writes `EPM2LOOK.BIN`, and Load Looks does the rest.
+The owner's rule (2026-11-18): build first what can be confirmed deterministically at low effort, and tell users
+only what is measured. A feature moves up a tier only with the evidence its tier asks for.
 
-| Step | Work | Probe and pass mark | Camera? |
+### Tier 1: ship. Camera-verified stages, inside measured ranges, no camera round needed
+
+An editor in the installer that starts from one of the 19 film simulations and changes it with:
+
+| Control | Stage | Why no new camera work |
+|---|---|---|
+| Warmth, tint | art matrix (diagonal) | V stage, not cached; a linear step: the EXIF ColorMatrix equals the prediction (V) |
+| Saturation | saturation gain | V |
+| Contrast, Blacks, Whites, fade | the three tone curves (same change on all three) | V for stills and live view; the camera builds its tables from the curve by a documented rule |
+
+Limits that keep it in Tier 1: every control is clamped to the range the 19 fitted films already span (their
+values were measured on the camera through RAW Data Edit); no six-axis control; output is a normal
+`EPM2LOOK.BIN` for Load Looks, which is camera-verified (card-looks-4).
+
+The preview runs on our own RAWs (the comparison scenes), decoded and white-balanced (daylight), through the
+model's matrix, curve and saturation steps. What users are told: "Preview is approximate; the camera shows the
+result after Load Looks." No accuracy number is shown until one is measured for these controls.
+
+Desk work only: A1 (model and fitter into the package, with tests), A2 (tables from the user's own downloaded
+firmware), A3 (the preview, matrix, curves and saturation only), A4 (controls and their clamps).
+
+### Tier 2: one planned confirmation round, then ship
+
+| Feature | Evidence needed | Round |
+|---|---|---|
+| Wider ranges than the films span | The camera's response at 1x, 2x and 4x the fitted range: clipping or wrapping | R1 |
+| Hue and saturation for 6 colours | The six-axis stage at its extremes; the G, C, M and C-hue directions refitted | R1 |
+| White balance presets other than daylight | Preview vs camera with 4 presets | R1 |
+| A stated preview accuracy ("within N dE") | Preview vs camera on the test RAW for each control | R1 |
+
+R1 is one visit, no flash: the pinned build, one look file with 12 slots, one RAW Data Edit of the test RAW per
+slot (about 15 minutes). Pass marks are fixed before the visit: natural colours below 2 dE preview vs camera,
+greys below 1 dE. A feature whose mark fails stays in Tier 2 or is dropped. If R1 shows an effect it was not
+designed for, the smallest follow-up is written down with its gap; no open-ended re-runs.
+
+### Tier 3: research. No user-facing claim until measured
+
+| Feature | Why it is research | What would move it up |
+|---|---|---|
+| `.cube` import | A LUT does not say its input encoding; strong LUTs need stages this camera lacks (3D LUT, per-colour lightness); fit error varies per LUT | Fit 10 well-known LUTs (A6) and measure 3 on the camera (R2). If shipped: the user picks the encoding, the page shows that LUT's own fit error and the colours it cannot reach, and the text never says "any LUT" |
+| `.xmp` import (Lightroom) | Parameters map only partly (8 HSL colours to 6 axes, no per-colour lightness) | A7, then the same rule as `.cube` |
+| An editor on the camera | Run-time stage updates without refresh, free settings for rows, code space and lag are unknown | Track B probes, one probe flash (F1) |
+| A hidden colour stage in TruePic VI | Not known to exist | C3 (static first, then slots in F1) |
+| Add Effects (glow, vignette) as editor options | Not tried | One data-edit flash (F2) |
+
+## 3. Track A details (installer editor)
+
+| Step | Work | Pass mark | Tier |
 |---|---|---|---|
-| A1 | Move `model2.py` and the fitter into the package (`src/epm2mod/looks/model.py`, `fit.py`) with tests | Same output as the experiment code on the synthetic RAW, dE difference below 0.05 | no |
-| A2 | Get the model's stock tables from the user's own downloaded firmware (the installer already fetches it), never from our files | The extracted tables equal the ones `mocklib.py` reads, byte for byte | no |
-| A3 | A preview: the forward model in TypeScript on a sample photo in camera RGB (our own RAWs, decoded by `orfcodec.py` to the model's input) | Browser preview vs Python model below 0.3 dE on the test chart | no |
-| A4 | Map editor controls to record values (table in section 1); set the safe range of each control | Every control's extremes give a valid record (`looks show` checks it) | no |
-| A5 | Camera check of the preview: a file with 12 edited looks, one RAW Data Edit round per look on one test RAW | Camera JPEG vs preview: natural colours below 2 dE, greys below 1 dE | **yes, round R1** |
-| A6 | `.cube` import: the input encoding is chosen by the user (sRGB, V-Log, LogC3, S-Log3, ...); the fitter fits the stages to it; the page shows the mean and worst dE and the colours out of reach | 10 well-known free LUTs: report the dE spread per LUT | no |
-| A7 | `.xmp` import (Lightroom): presets are parameters (HSL in 8 colours, tone curve, split toning, calibration). Map them; profiles that hold a colour table (`RGBTable`) are a LUT and go through A6 | A few presets, preview vs Lightroom export of the same photo | no |
-| A8 | Where fitting runs: the installer is standard-library Python only. Choose between a small pure-Python or TypeScript solver (Gauss-Newton on these few dozen parameters) and adding numpy to the release | Solver within 0.1 dE of `least_squares` on the 19 films; zip size | no |
-| A9 | Camera check of imports: 3 imported LUTs, measured as A5 | Camera within 0.5 dE of the fit's own error | **yes, round R2** |
+| A1 | `model2.py` and the fitter into the package (`src/epm2mod/looks/model.py`, `fit.py`) with tests | Same output as the experiment code, dE difference below 0.05 | 1 |
+| A2 | The model's stock tables from the user's own downloaded firmware, never from our files | Byte-equal to what `mocklib.py` reads | 1 |
+| A3 | Preview in TypeScript on our comparison-scene RAWs | Browser vs Python model below 0.3 dE | 1 |
+| A4 | Controls, clamps to the films' measured span | Every extreme gives a valid record (`looks show`) | 1 |
+| A5 | Preview vs camera, all controls, in R1 | Natural below 2 dE, greys below 1 dE | 2 |
+| A6 | `.cube` fit with a chosen input encoding; per-LUT error report | dE spread for 10 LUTs | 3 |
+| A7 | `.xmp` mapping | Preview vs a Lightroom export of the same photo | 3 |
+| A8 | Where fitting runs (standard-library installer: small solver, or numpy in the release) | Within 0.1 dE of `least_squares` on the 19 films | 3 |
+| A9 | 3 imported LUTs on the camera (R2) | Within 0.5 dE of the fit's own error | 3 |
 
-Risks: the model is fitted on daylight white balance only (other presets untested); the freeze at the RAW Data
-Edit save (`docs/film-emulation.md` section 7) can stop rounds R1 and R2; the G, C, M axes of the six-axis model
-are approximate, so the preview can be off on those colours (C1 measures it).
-
-## 3. Track B: an editor on the camera
+## 4. Track B details (editor on the camera, Tier 3)
 
 Only after Track A, and only if the probes below pass. Today's mods in other bodies do this with menu rows.
 
@@ -72,7 +116,7 @@ Only after Track A, and only if the probes below pass. Today's mods in other bod
 Go or no-go after B1 to B4: go if the stages change at run time with the refresh, there are settings for at least
 6 rows, and 2 KB or more of proven code space.
 
-## 4. Track C: hardware explorations that both editors need
+## 5. Track C details (hardware facts)
 
 | Step | Question | Probe | Camera? |
 |---|---|---|---|
@@ -83,9 +127,10 @@ Go or no-go after B1 to B4: go if the stages change at run time with the refresh
 | C5 | Add Effects (glow, vignette, white edge) on a film slot, as editor options | The data edit from `docs/todo.md` | **yes, flash F2** |
 | C6 | The freeze at the RAW Data Edit save | The same round on stock firmware | **yes, flash F0 (stock) or skip** |
 
-## 5. What the owner is asked to do on the camera
+## 6. What the owner is asked to do on the camera
 
-In order, each only when the desk work before it is done. No flash is needed before F1.
+Only for Tier 2 and 3, each only when the desk work before it is done. Tier 1 needs none. No flash is needed
+before F1.
 
 | Id | What | Flash? | Brings back |
 |---|---|---|---|
@@ -98,11 +143,8 @@ In order, each only when the desk work before it is done. No flash is needed bef
 Each build passes the usual gates first (`opcheck.py`, `hookcheck.py`, boot and update-path tests in the
 emulator; `docs/flashing.md`). Recovery is the stock update from the card.
 
-## 6. Order of work
+## 7. Order of work
 
-1. Desk: A1, A2, A3, A4, A8, the static half of C3; B2, B3 in the emulator.
-2. Round R1 (A5 + C1 + C2 + C4 in one visit).
-3. Desk: refit the model from R1; A6, A7.
-4. Round R2 (A9).
-5. Flash F1 (B1, B4, B6, the slot half of C3).
-6. Go or no-go for Track B.
+1. Tier 1, desk only: A1 to A4, ship the installer editor with film-based controls.
+2. Round R1 (A5, C1, C2, C4 in one visit); move Tier 2 features up or drop them by their pass marks.
+3. Tier 3 only on the owner's call, one item at a time, each with its evidence before any user-facing text.

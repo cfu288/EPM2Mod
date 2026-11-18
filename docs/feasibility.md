@@ -205,3 +205,5 @@ screen texts for the test instructions.
 5. Keep the real safety steps: the camera log before and after each flash, the stock file at hand,
    the free-space check for a candidate, one change per flash.
 6. Do not spend rounds on polish (fit accuracy, tooling reviews) while a feature question is open.
+7. Tell users only what is measured. A feature's text matches its evidence: the stage, the range, the measured
+   error. No "any LUT", "exact" or "matches the film" without a measurement behind it.
