@@ -55,9 +55,11 @@ ENTRIES = [
 ]
 
 # RAM: one block per entry (cached addresses; the image library reads them through the cache)
-FILM_RAM, BLOCK = 0x7E4D8000, 0x2000
-STILLS, LIVE, SAT, SIX_S, SIX_H, CHROMA, MATRIX = 0x0000, 0x0600, 0x1E00, 0x1E10, 0x1E1C, 0x1E30, 0x1EA0
-MATPTR = 0x7E4D07C0              # RAM: u32 matrix pointer per in-place code (the film matrix's address = film,
+# Tone: 8 tables per channel (record member order: column 0..3 x member 0 / 1), each the film's curve read at the stock
+# default table of the same place (as the record slots Light Tone and Cross Process of the film firmware).
+FILM_RAM, BLOCK = 0x7E4CA000, 0x3200
+TONE, SAT, SIX_S, SIX_H, CHROMA, MATRIX = 0x0000, 0x3000, 0x3010, 0x301C, 0x3030, 0x30A0
+MATPTR = 0x7E4C9FC0              # RAM: u32 matrix pointer per in-place code (the film matrix's address = film,
                                  # anything else = stock), read uncached
 INPLACE_PTR = {79: 0, 71: 4, 72: 8, 85: 12}
 
@@ -71,8 +73,9 @@ NEUTRAL_75 = [(0x7E54B532, 0x4B), (0x7E54B536, 0x7D), (0x7E54B5F7, 0x4B), (0x7E5
               (0x7E54BF60, 0x4B), (0x7E54BF6B, 0x7D)]
 
 # Free space: code in segment 2, data in segment 3 (code-space-map USABLE areas, free in the stock-filters build)
-CODE_AREA = (0x7EE53830, 0x7EE53D6A)       # the per-code stubs: segment 3, where card-looks-4's code ran
-SHARED_AREA = (0x7ECB0888, 0x7ECB0BA0)     # the shared tone part, the chroma helper and the matrix chain
+SHARED_AREA = (0x7ECB0888, 0x7ECB0BA0)     # segment 2: the shared tone part, the chroma helper, the matrix chain, and
+                                           # the stubs of the first six entries
+CODE_AREA = (0x7EBF38BC, 0x7EBF3B10)       # segment 2: the stubs of the other six (after the log's probes)
 DATA_AREA = (0x7EE541B4, 0x7EE548B0)
 
 
@@ -97,10 +100,7 @@ def main():
         blockaddr = FILM_RAM + BLOCK * i
         recs = []
         for ch in range(3):
-            words = []
-            for idx in range(slots.RECORD_TABLES):
-                col = idx // 2
-                words.append(blockaddr + STILLS + 512 * ch if idx % 2 else blockaddr + LIVE + 512 * (4 * ch + col))
+            words = [blockaddr + TONE + 512 * (slots.RECORD_TABLES * ch + idx) for idx in range(slots.RECORD_TABLES)]
             recs.append(rec_base + off)
             data += struct.pack("<8I", *words)
             off += 32
@@ -143,9 +143,9 @@ def main():
     add 16,d0
     add 20,a0
     jmp %#x""" % CHROMA_TAIL)
-    asm.append(".section .sc,\"ax\"")
     for i, (name, _, _, code, _) in enumerate(ENTRIES):
         b = FILM_RAM + BLOCK * i
+        asm.append(".section %s,\"ax\"" % (".sk" if i < 6 else ".sc"))
         asm.append("""G%(c)d: mov %(tr)#x,a1
     jmp GCOMMON
 S%(c)d: mov %(sat)#x,a3
@@ -219,12 +219,12 @@ MUSE:
         ops.append({"type": "bytes", "block": 0, "offset": "0x%X" % (addr - BASE), "expect": expect.hex(),
                     "new": new.hex(), "_addr": "0x%08X" % addr, "_note": note})
 
-    op(CODE_AREA[0], code, "new code, segment 3: tone, saturation, six-axis, chroma and value stubs of the 12 film "
-       "codes (%d B)" % len(code))
-    op(SHARED_AREA[0], shared, "new code, segment 2: the shared tone part, the chroma helper, the art-matrix chain "
-       "(%d B)" % len(shared))
-    op(rec_base, bytes(data), "data, segment 3: three tone records per film code (member 1 the stills table, member 0 "
-       "the live-view table of the column, both in the entry's RAM block) and the record triples (%d B)" % len(data))
+    op(CODE_AREA[0], code, "new code, segment 2: tone, saturation, six-axis, chroma and value stubs of the film "
+       "codes of the last six entries (%d B)" % len(code))
+    op(SHARED_AREA[0], shared, "new code, segment 2: the shared tone part, the chroma helper, the stubs of the first "
+       "six entries, the art-matrix chain (%d B)" % len(shared))
+    op(rec_base, bytes(data), "data, segment 3: three tone records per film code (8 tables each, in the entry's RAM block) "
+       "and the record triples (%d B)" % len(data))
     op(MATRIX_HOOK, hook, "hook: the stock art-matrix compare chain jumps to CHAIN (film codes first, then the stock "
        "compares of 70 / 79 / 102 / 103 unchanged)")
 
@@ -367,7 +367,7 @@ MUSE:
             "Film looks on the stock filters, the flashed part (experiments/2026-11-18-stock-filters/design.md): one "
             "film code per art-filter entry (Pop Art 79, Soft Focus 75, Pale&Light 71, Light Tone 72, Grainy Film 94, Pin "
             "Hole 92, Diorama 125, Cross Process 85, Gentle Sepia 98, Dramatic Tone 144, Key Line 156, Watercolor 159) "
-            "with tone, saturation, six-axis, chroma and matrix in the entry's RAM block at 0x7E4D8000 + 0x2000 x entry; "
+            "with tone, saturation, six-axis, chroma and matrix in the entry's RAM block at 0x7E4CA000 + 0x3200 x entry; "
             "the stage entries of the codes that no stock entry reaches, the art-matrix chain, the hidden stored values "
             "111, 112, 114, 115, 118 and their hash keys, and the four job-block compares of 75 / 125. Nothing here is "
             "reached while no entry has a film: the loader switches the entry's words. Every expect is a stock byte."),
@@ -377,7 +377,7 @@ MUSE:
     }, open(os.path.join(ROOT, "patches", SPEC + ".json"), "w"), indent=1)
     open(os.path.join(ROOT, "patches", SPEC + ".json"), "a").write("\n")
     layout = {"film_ram": FILM_RAM, "block": BLOCK,
-              "offsets": {"stills": STILLS, "live": LIVE, "sat": SAT, "six_s": SIX_S, "six_h": SIX_H,
+              "offsets": {"tone": TONE, "sat": SAT, "six_s": SIX_S, "six_h": SIX_H,
                           "chroma": CHROMA, "matrix": MATRIX},
               "matptr": MATPTR,
               "entries": [{"name": n, "stock_value": sv, "value": v, "code": c, "kind": k,

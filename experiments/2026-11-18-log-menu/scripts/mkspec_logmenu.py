@@ -37,8 +37,11 @@ import mkspec_log as L  # noqa: E402
 from epm2mod.container import parse  # noqa: E402
 from epm2mod.spec import BytesOp, load_spec  # noqa: E402
 
-SPEC = "log-menu"
-BUILD = "log-menu"
+STOCK_FILMS = "--stock-films" in sys.argv   # the log for builds/stock-films.json (experiments/2026-11-18-stock-filters)
+if STOCK_FILMS:
+    sys.argv.remove("--stock-films")
+SPEC = "log-menu-2" if STOCK_FILMS else "log-menu"
+BUILD = "stock-films" if STOCK_FILMS else "log-menu"
 BASE = L.BASE
 STOCK = L.STOCK
 BIN = L.BIN
@@ -53,7 +56,7 @@ AREAS = {
 }
 TASK_ENTRY, TASK_ENTRY_OLD = 0x7E439C9C, 0x7E501CE7      # CPU0 task table, row of id 0x91 (USRTEST_B): the entry word
 TASK_ID = 0x91
-CL_SYMS = "build/card-looks/syms-4.json"                  # card-looks-4's labels (mkspec_looks3.py --v4)
+CL_SYMS = "build/stock-films/syms.json" if STOCK_FILMS else "build/card-looks/syms-4.json"   # the loader's labels
 CL_RSTAT = 0x7E4D0000 + 0x40000000                        # card-looks' status word (uncached)
 LANG, LANG_SPAN = 0xBFF3D000, 0x43000
 LABEL, HELP = 1507, 1508                         # unused built-in EVF texts (1499, 1501, 1502 are peaking-colours')
@@ -224,8 +227,12 @@ def u16(text):
 
 def base_image(work):
     """Block 0 of builds/log-menu.json without this spec, written to WORK/block0_0100.bin."""
-    specs = json.load(open(os.path.join(ROOT, "builds", "card-looks-4.json")))["specs"]
-    specs = [s.replace("custom-menu-rows.json", "custom-menu-rows-2.json") for s in specs]
+    if STOCK_FILMS:
+        specs = [s for s in json.load(open(os.path.join(ROOT, "builds", "stock-films.json")))["specs"]
+                 if not s.startswith("patches/log-menu")]
+    else:
+        specs = json.load(open(os.path.join(ROOT, "builds", "card-looks-4.json")))["specs"]
+        specs = [s.replace("custom-menu-rows.json", "custom-menu-rows-2.json") for s in specs]
     blk = bytearray(parse(open(os.path.join(ROOT, STOCK), "rb").read()).blocks[0].payload)
     for s in specs:
         for o in load_spec(Path(ROOT, s)).ops:
@@ -362,7 +369,9 @@ def main():
         "ops": ops,
     }, open(os.path.join(ROOT, "patches", SPEC + ".json"), "w"), indent=1)
     open(os.path.join(ROOT, "patches", SPEC + ".json"), "a").write("\n")
-    pinned = json.load(open(os.path.join(ROOT, "builds", "card-looks-4.json")))
+    pinned = json.load(open(os.path.join(ROOT, "builds", "stock-films.json" if STOCK_FILMS else "card-looks-4.json")))
+    if STOCK_FILMS:
+        pinned["what"] = pinned["what"].split("; a Debug Log row")[0]
     build = {
         "what": pinned["what"] + "; a Debug Log row in Custom Menu J (Off by default) that writes EPM2LOG.BIN to "
                 "the card for bug reports",

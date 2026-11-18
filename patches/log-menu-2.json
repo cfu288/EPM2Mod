@@ -1,0 +1,281 @@
+{
+ "name": "log-menu-2",
+ "description": "The structured log in the release firmware, switched by the Custom Menu row Debug Log (setting 447, patches/custom-menu-rows-2.json; default Off). log_put / log_chg / log_cnt write 16-byte records into one RAM ring per CPU (0x7E4F9000-0x7E4FD2C0) and return at once when the row is Off: from the first GUI state of a session the log does nothing more with Off, and only the start-up records are in RAM. With On, the flush task (the dormant task USRTEST_B) appends the records to C:\\\\EPM2LOG.BIN when the GUI enters a menu, playback or power-off state and neither the card nor card-looks' task is busy (stops at 4 MiB). Events: boot, firmware errors, GUI states, log_setting, the probes of log-probes (peaking, picture mode, level gauge, interval shooting, film looks, shooting callbacks), pk_stats, pk_guard and card_task (each run of card-looks' task). The code of log-core, log-probes, log-peaking-time and log-peaking-guard, placed again; the hook of the GUI state setter jumps to this T_GUI, which ends with a jump to card-looks' T_GUI. The event ids are in logs/events.json (build id 33ca8d15f4f1c877). See experiments/2026-11-18-log-menu/design.md and docs/logging.md.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "candidate: emulator-checked, not flashed",
+ "_build_id": "33ca8d15f4f1c877",
+ "_ram": "the log's rings and state 0x7E4F9000-0x7E4FD2C0 (uncached alias); LOGON is PST+2",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA84F4",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "cff0f2e67da765c91aca06cff0f2e6f84d04af00c87f2bfff85d04ca06cff0f2e6fcab42d04fbeaf02c86afafcfff7cbcbfcde00904fbe335080af00c808fcde20b04fbef80e04f82e18f15f4cc816fccf45504c316e0cf81e04f81e08f81e0cf81e10f80e04f1ef4cf81e04f233f81e18f1dffae3ff01f8c304f16ef87220f1dff87e22fca774009098f81e24f81628f8322cf2fbcbcbcef0de0000cf0881f2e0f1e08003cd78ff000059505c548004cd6dff0000ce084208fcaa493a5060dc80d7f5ffcf88f2e6fcdc40d04fbe008520605029ffc9fcfca9e9544160f8c110fcace6544160f211f1e404fca400904fbefcc845504c31c90ffca510904fbe44fc8510904fbe8001cd15ff0000f2fbcbcbce88fcdcac34737edcada70300cf08fca5c4e82b60fca0d41c5b60fcdd50d04fbe2c0201cdcbfe0000ce08420800420482dcbbca1f00cf0881f2e0f1e0fcdd58d04fbe2c0301cda9fe0000ce0882ddbfe50a000008dcecf50a00cf08fca964d04fbea500c82881f8c1105c2cf82020f82414f84101f211f82410f1e4f1d5fcdd60d04fbe2c0401cd73fe0000ce08f8732200f81310dcbad02500cf088dfcdc54c2787ef380fcdd68d04fbe2c0002cd41fe0000ce08fcdc54c2787edce53b0a00cf08f8474ff82314fcdd70d04fbe2c0005cd1efe0000ce089014f17c748003dc8e2f0a00cf08f1d5f1ecfcdd78d04fbe2c0105cdfcfd0000ce0888dd432b0a00f074dc43300a00cf08fcdce4c8787ef384f8b934fcdd80d04fbe2c0205cdd2fd0000ce08fcdce4c8787edc17510a00cf08f1e4812c0003cdd5fd0000ce0886838001fcdc9f137c7edcfeca1a00cf08fcad464c3f60f8c110fcac3a4c3f60f211f1e4fcad2e4c3f60f8c110fcac224c3f60f2112c0103cd96fd0000ce083c20104308dcbd02f9ff8002f85325dcb0cf25008010f85324fcdd98d04fbe75fca474009098f101f80104e1f81504f8410840f85108f8e007c912f81104f86322f1e02c0501cd49fd0000dc8ccf2500",
+   "_addr": "0x7E4C9514",
+   "_note": "new code, kernel range: log_put, log_chg, log_cnt, T_ERR, T_BOOT, the routines of the hooks in segment 1 and the kernel, and the timing probe of peaking (T_TIME0, T_TIME0B, T_TICK) (734 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA80CA",
+   "expect": "ffffffffffffffffffffffffffffffffff",
+   "new": "fca474009098fc8198d04fbedcb6060000",
+   "_addr": "0x7E4C90EA",
+   "_note": "new code, kernel range, the 0xFF run after T_HIT of peaking-fast: T_TIME0 (as log-peaking-time) (17 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1BC4",
+   "expect": "5930340073617665005a3031005a30320063616e5472696d6d696e67005a3033007472696d6d696e674d6f6465005a3034006765745472696d6d696e67496e666f005a3035006368616e676553697a65005a3036006368616e6765506f736974696f6e005a3037005a303800613031006130320063616e41737065637400613033006173706563744d6f64650061303400676574417370656374496e666f00613035006130360061303700623031006230320063616e436f6c6f720062303300623034006d616b65436f6d70617265507265766965770062303500633031006330320063616e41646a75737400633033006330340064303100643032006430330064303400653031006530320065303300726561647900653034006578656375746541646a7573740065303500653036007374617274436f6d70617265006630310063616e526177006630320066303300737461727443757272656e744d6f64654564697400663034007072657669657743757272656e744d6f64654564697400663035007361766543757272656e744d6f6465456469740066303600656e6443757272656e744d6f64654564697400663037007374617274437573746f6d45646974006630380070726576696577437573746f6d45646974006630390073617665437573746f6d456469740066313000656e64437573746f6d45646974006730310067303200696e646578006730330067",
+   "new": "cff0f8fec00042244228fcdce42dbf7e3d2124f1d42804dd02299dff00148358245928e4422cfca590d04fbea500c83e8a01af00c805ccba01a4c62b8004fc8241d04fbefcde00904fbef80214f81208fcde20b04fbe72fcc845504c31c908f80214f8120800fc8190d04fbefca841d04fbef1e08002fca544d04fbeddd1688dff00008a03582cfcc800004000c405cc6101004238fcdce42dbf7efcddf32dbf7edd57269dff0014938a01bf00c905cc4101fcde00904fbef80a04f80218e840c805ccfe00f80e08aec6038b88f10cfac80002c715fac000fef8060ce1f8160c8bfac300fef81e08f81e14abc905ccd200fcdcc0d04fbe002d8000605029ffc9fcfcdcc0d04fbefccc45504c4760fccc01100020f81004fcda00904fbec8078001f85006fccc33ca8d15f81008fcccf4f1c877f8100cf81c1088f10ca01ec704801ef810144230f8060cf81418f80610f8141c20208cfae0ff01f8c00499f161f8012060f80124f81004f80128f81008f8012cf8100c20104c583028ff4230c9d680034234fcdcc0d04fbe80012d00029dddc4259dff0018fac80002c819a000c934583428ff4234c82c8064dd756885ff8008cad2f81e085838404238cc2efffcda00904fbec90bfcde20b04fbecceafe08ca048a029cdd4d259dff000c5838a000c80ef8c009592ce4fc8190d04fbefc8a41d04fbe00fc8240d04fbedff050433a5c45504d324c4f472e42494e006100cb",
+   "_addr": "0x7EBF2BE4",
+   "_note": "new code, segment 2: the flush task and the file name (530 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D2760",
+   "expect": "634f7353656c66456e645461736b007133320073634f73536c6565705461736b007133330073634f7353656c66536c6565705461736b007133340073634f734372656174654576656e74007133350073634f7344656c6574654576656e74007133360073634f735365744576656e74007133370073634f73495365744576656e74007133380073634f73576169744576656e74007133390073634f73436c6561724576656e74007134300073634f734372656174655175657565007134310073634f7344656c6574655175657565007134320073634f7357726974655175657565007134330073634f73526561645175657565007134340073634f7343726561746553656d6170686f7265007134350073634f7344656c65746553656d6170686f7265007134360073634f735761697453656d6170686f726500",
+   "new": "cf088003fc8264d04fbefca5c4e82b60982c0001dd9d5d8dff0000ce08fa2294018001dce09cf8ffcf08fca5c4e82b60982c0101dd7d5d8dff0000ce0800fa12b000dc8f9cf8ffcf08f1e4818001fc826cd04fbefc8274d04fbefc827cd04fbefc8284d04fbe2c0006dd485d8dff0000ce08420c8793fad3b400dc1922daffcf0889fca0dc0c2b602c0304dd265d8dff0000ce08ddd538d7ffa00cdc1966d7ffcf0889fca0dc0c2b602c0404dd055d8dff0000ce08ddb438d7ffa00cdcc660d7ffcf089000fc804cd04fbe89fca0dc0c2b602c0004dddc5c8dff0000ce08dd8b38d7ffa00cdc124ed9ffcf0889fca04cd04fbe2c0204ddbb5c8dff0000ce08dd6a38d7ffa00cdc0ff6d8ffcf08fca04cd04fbe41fc804cd04fbef1d1fca0dc0c2b602c0104dd8c5c8dff0000ce0892fcdd7d39c57edc375feaff",
+   "_addr": "0x7EBF3780",
+   "_note": "new code, segment 2: routines of the hooks in segments 2 and 3 (314 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D15E0",
+   "expect": "4e3137007472616e73666572496d616765004e31380063616e63656c53656c6563746564416c6c004f303100737461727453696e676c654672616d65004f30320063616e4d6f766543757272656e74004f3033006d6f766543757272656e74004f303400757064617465496d616765004f3035007a6f6f6d496d616765004f3036007363726f6c6c496d616765004f3037006973456e6c61726765004f3038004f3039004f3130004f31310063616e526f74617465004f313200726f74617465496d616765004f31330063616e5072696e74004f313400657261736543757272656e74004f3135004f3136004f3137007374617274536c696465004f313800656e64536c696465004f31390073746172744d6f766543757272656e74436f6e74696e756f7573004f323000656e644d6f766543757272656e74436f6e74696e756f7573004f3231007374617274466173745a6f6f6d004f3232007a6f6f6d496d61676546617374004f323300656e64466173745a6f6f6d004f32340073746172745363726f6c6c46617374004f323500656e645363726f6c6c46617374004f32360073746172745363726f6c6c5a6f6f6d4672616d65004f323700656e645363726f6c6c5a6f6f6d4672616d65004f323800757064617465496d61676553796e6300503031007374617274496e646578005030320067657450616765",
+   "new": "cf88f2e6fca8c4e82b60a002c80b00fc82a4d04fbeca34fca8a4d04fbea000c92a8001fc82a4d04fbefca05cc42a60f86010f8644cf104f1e0fca5cc5751602c0601ddef6e8dff0000f2fbcbcbce8893fcccb1abc87edcf7b7f8ffcfc8f2e683fca842d04fbea000c80a8cf8c408a057c938fccc91d70000900004ddfa5586ffc00c8502a001c9048501fca842d04fbea1c817fc8642d04fbea501c90df1ec8006dd906e8dff0000fca000d0f3bff1d0fcc000300c40fcc800300400c622fa008c17fcc87e27bf7ec816fccc7e27bf7efa108c17fccc9227bf7efa109017fca842d04fbea001c9678dfca448d04fbea1c85dfc8548d04fbef1e08005dd356e8dff000084f8c408a057c80df8c404a002c806a003c939fca840d04fbea000c92ffca8cc0fcbbea000c925fc8544d04fbeddda0e0e008008a000c9148001fc8240d04fbe2c9100ddfb6d85ffc00cf2fbcbcbcec8dc95e70b00cf08fca5cc0fcbbefca000004dbe2c0807ddc86d8dff0000ce0800fc82cc0fcbbedcb11126004400650062007500670020004c006f00670000004f006e003a002000770072006900740065002000450050004d0032004c004f0047002e00420049004e00200074006f0020007400680065000d000a0063006100720064002c00200066006f007200200062007500670020007200650070006f007200740073002e000000",
+   "_addr": "0x7EBF2600",
+   "_note": "new code, segment 2: T_GUI, T_GRD, T_CTASK, the row's texts (508 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x5D2B",
+   "expect": "4208fcaa493a5060",
+   "new": "dc65280a00cbcbcb",
+   "_addr": "0x7E426D4B",
+   "_note": "hook ERR (fw_error fw_error_args): jmp T_ERR + nop + nop + nop. error recorder 0x7E426D4B, entry (pre-reset range; both CPUs)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xE2DB4",
+   "expect": "fcdcac34737e",
+   "new": "dc0458fcffcb",
+   "_addr": "0x7E503DD4",
+   "_note": "hook BOOT (boot): jmp T_BOOT + nop. Usr0 0x7E503DD4, entry (boot task)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x8BE6C4",
+   "expect": "dc0418fdff",
+   "new": "dc772ff1ff",
+   "_addr": "0x7ECDF6E4",
+   "_note": "hook GUI (gui_state): jmp T_GUI. GUI state setter 0x7ECDF5E9, its last trace call (task CA_MAIN)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2A50EB",
+   "expect": "420800420482",
+   "new": "dc2735e0ffcb",
+   "_addr": "0x7E6C610B",
+   "_note": "hook LATCH (pk_latch): jmp T_LATCH + nop. live-view expose setter 0x7E6C610B, entry (mov task)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x157C40",
+   "expect": "82cdd1ef0008",
+   "new": "dcfb09f5ffcb",
+   "_addr": "0x7E578C60",
+   "_note": "hook HEAP (pk_heap_mode): jmp T_HEAP + nop. image-work heap mode setter 0x7E578C60, entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x30574D",
+   "expect": "f8732200f81310",
+   "new": "dc122fdaffcbcb",
+   "_addr": "0x7E72676D",
+   "_note": "hook PK9 (pk_pass9): jmp T_PK9 + nop + nop. Key Line pass 9 0x7E7266D9, after T_K (ART task)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x14C29F",
+   "expect": "fcdc54c2787e",
+   "new": "dc00c4f5ffcb",
+   "_addr": "0x7E56D2BF",
+   "_note": "hook ART (art_sixaxis): jmp T_ART + nop. six-axis stage, dispatch by art code"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x14B66B",
+   "expect": "9014f17c748003",
+   "new": "dc5ad0f5ffcbcb",
+   "_addr": "0x7E56C68B",
+   "_note": "hook STAGE (film_stage): jmp T_STAGE + nop + nop. colour-matrix stage, before the art-matrix choice"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x14B744",
+   "expect": "88cdfefaf074",
+   "new": "dca5cff5ffcb",
+   "_addr": "0x7E56C764",
+   "_note": "hook MATRIX (film_matrix): jmp T_MATRIX + nop. colour-matrix stage, art matrix apply"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x14D840",
+   "expect": "fcdce4c8787e",
+   "new": "dcccaef5ffcb",
+   "_addr": "0x7E56E860",
+   "_note": "hook CURVE (film_curve): jmp T_CURVE + nop. tone-curve selector 0x7E56E837, dispatch by art code"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x255241",
+   "expect": "86838001fcdc9f137c7e",
+   "new": "dcf334e5ffcbcbcbcbcb",
+   "_addr": "0x7E676261",
+   "_note": "hook ADJ (lv_adjust): jmp T_ADJ + nop + nop + nop + nop + nop. api_adj_Set_Slope_Adjust 0x7E676261, entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x38A3F",
+   "expect": "3c20104308",
+   "new": "dc13fd0600",
+   "_addr": "0x7E459A5F",
+   "_note": "hook LVV (lv_values): jmp T_LVV. accelerometer table reload 0x7E459A5F, entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x75C45D",
+   "expect": "fa2294018001",
+   "new": "dc03630700cb",
+   "_addr": "0x7EB7D47D",
+   "_note": "hook MFON (pk_mf_start): jmp T_MFON + nop. CmpSts_MfAssist::entryMfAssistOn, after T_ON and the trace call"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x75C42C",
+   "expect": "00fa12b000",
+   "new": "dc5c630700",
+   "_addr": "0x7EB7D44C",
+   "_note": "hook MFOFF (pk_mf_end): jmp T_MFOFF. CmpSts_MfAssist::entryMfAssistOff, after T_OFF and the trace call"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x5749EB",
+   "expect": "420c8793fad3b400",
+   "new": "dcbcdd2500cbcbcb",
+   "_addr": "0x7E995A0B",
+   "_note": "hook CBS (shoot_cbs): jmp T_CBS + nop + nop + nop. shooting callback 0x7E995A0B, entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x548E0F",
+   "expect": "cdbad2a00c",
+   "new": "dcd0992800",
+   "_addr": "0x7E969E2F",
+   "_note": "hook IVSET (iv_state_set): jmp T_IVSET. setIntervalShootingState 0x7E969E1E, trace call"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x5488DD",
+   "expect": "cdecd7a00c",
+   "new": "dc239f2800",
+   "_addr": "0x7E9698FD",
+   "_note": "hook IVCLR (iv_state_clear): jmp T_IVCLR. clearIntervalShootingState 0x7E9698EC, trace call"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x567650",
+   "expect": "dd79eafdffa00c",
+   "new": "dcd1b12600cbcb",
+   "_addr": "0x7E988670",
+   "_note": "hook IVSTART (iv_start): jmp T_IVSTART + nop + nop. startIntervalShooting 0x7E98849B, last trace call"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x561E6E",
+   "expect": "dd5b42feffa00c",
+   "new": "dcdc092700cbcb",
+   "_addr": "0x7E982E8E",
+   "_note": "hook IVEND (iv_end): jmp T_IVEND + nop + nop. endIntervalShooting 0x7E982DF3, last trace call"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x6787C5",
+   "expect": "92fcdd7d39c57e",
+   "new": "dca6a01500cbcb",
+   "_addr": "0x7EA997E5",
+   "_note": "hook IVFRAME (iv_frame): jmp T_IVFRAME + nop + nop. recordingDone_interval 0x7EA997E5, entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x30573C",
+   "expect": "8002f85325",
+   "new": "dc8e29daff",
+   "_addr": "0x7E72675C",
+   "_note": "hook TIME0 (pk_stats): jmp T_TIME0. Key Line pass 9, `mov 2,d0` / `movbu d0,(37,a3)` (ucMode), before hook K"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x305754",
+   "expect": "8010f85324",
+   "new": "dc4230daff",
+   "_addr": "0x7E726774",
+   "_note": "hook TICK (pk_stats): jmp T_TICK. Key Line pass 9, `mov 16,d0` / `movbu d0,(36,a3)` (ucBit), after the gain is stored"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x75CE26",
+   "expect": "93fcccb1abc87e",
+   "new": "dcba470700cbcb",
+   "_addr": "0x7EB7DE46",
+   "_note": "hook GRD (pk_guard): jmp T_GRD + nop + nop. CmpSts_MfAssist::rcvStartMFAssistIn_MFAssistOn 0x7EB7DE46, entry: `mov a0,a3` / `mov imm32,d0` (a focus-ring event while MF Assist is on; GUI task, segment 2)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA32903",
+   "expect": "00fc82cc0fcbbe",
+   "new": "dc35eed9ffcbcb",
+   "_addr": "0x7EE53923",
+   "_note": "hook CTASK (card_task): jmp T_CTASK + nop + nop. card-looks' T_END: `clr d0` / `movbu d0,(BUSY)` (segment 3, task USRTEST_A)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x18C7C",
+   "expect": "e71c507e",
+   "new": "e42bbf7e",
+   "_addr": "0x7E439C9C",
+   "_note": "CPU0 task table, row of id 0x91 (USRTEST_B, dormant in stock): entry 0x7E501CE7 -> FLUSH 0x7EBF2BE4"
+  }
+ ]
+}

@@ -193,6 +193,16 @@ a flashed entry with the stock default handler as target is added; the loader sw
   loader switches them; their RAM matrix pointer counts only when it holds the exact film address (RAM in the gap
   is not reliably zero at a start: the log ring survived power-offs).
 
+- 2026-11-18, item 2 (`scripts/mkspec_loader.py` -> `patches/card-looks-5.json`, `patches/looks-menu-4.json`): the
+  card-looks-4 assembly with no snapshot, no live tables and no Built-in; APPLY into each listed entry's RAM block
+  (one operation list for all entries, 8 tone tables per channel); MASK and SWITCH (words written as words); the
+  Picture Mode remap in T_GUI after a switch. The structure moved to segment 2 (stubs 435 B at 0x7EBF38BC, shared part
+  and stubs 707 B at 0x7ECB0888); RAM blocks 0x7E4CA000-0x7E4EF800 (0x3200 each).
+  `builds/stock-films.json` = the feature specs + looks-menu-4 + stock-films-structure + card-looks-5 + log-menu-2
+  (`mkspec_logmenu.py --stock-films`). `epm2mod make`: free space PASS, boot-test PASS, update-path-test PASS, sha256
+  `258f8be64526dd1813e2b333c21381434554184e64e1c8fa4a5e829fd3c673fc` (19,217 bytes changed). Not yet: the ART
+  bracket hook, Cross Process's adaptive-hue hook, the functional emulator sessions.
+
 ## Open questions (settle in code and the emulator before any camera run)
 
 - U0. Three more colour-only art codes for Soft Focus, Pin Hole and Diorama (above).

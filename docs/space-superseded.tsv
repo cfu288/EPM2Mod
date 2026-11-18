@@ -19,3 +19,12 @@ patches/log-core.json	patches/log-menu.json	log-menu is the log core (with an Of
 patches/log-probes.json	patches/log-menu.json	as log-core: the probe routines are part of log-menu, in the same runs
 patches/log-peaking-time.json	patches/log-menu.json	as log-core: the timing probe's routines are part of log-menu, in the kernel run 0x7E4C9514
 patches/log-peaking-guard.json	patches/log-menu.json	as log-core: T_GRD is part of log-menu, at 0x7EBF2600 (its old place 0x7EBF2510 is the longer item table of custom-menu-rows-2)
+patches/card-looks-4.json	patches/card-looks-5.json	card-looks-5 is the loader of card-looks-4 for the stock-filters firmware: the same hook, task and code runs, without the snapshot, the live tables and Built-in, with the switch lists (experiments/2026-11-18-stock-filters/design.md)
+patches/looks-menu-3.json	patches/looks-menu-4.json	looks-menu-4 is looks-menu-3 without Built-in: the same row, list and data area
+patches/remap7b-code.json	patches/stock-films-structure.json	the stock-filters firmware replaces the film firmware: stock-films-structure takes the place of the film specs, in their free runs (experiments/2026-11-18-stock-filters/design.md)
+patches/films12-structure.json	patches/stock-films-structure.json	as remap7b-code
+patches/seven-films-5.json	patches/stock-films-structure.json	as remap7b-code
+patches/seven-fixes-1.json	patches/stock-films-structure.json	as remap7b-code
+patches/seven-movie-1.json	patches/stock-films-structure.json	as remap7b-code
+patches/films12cl-looks.json	patches/stock-films-structure.json	as remap7b-code
+patches/log-menu.json	patches/log-menu-2.json	log-menu-2 is log-menu for the stock-filters firmware: the same code and runs, chained to card-looks-5's T_GUI and with its card_task probe at card-looks-5's T_END (experiments/2026-11-18-stock-filters/design.md)
