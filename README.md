@@ -14,13 +14,22 @@ Repository containing the current work for creating a custom firmware mod for th
 | [Level gauge](docs/guide/level-gauge.md) | 
 | [Focus peaking](docs/guide/focus-peaking.md) | 
 
-## Dependencies
-
-- [uv](https://docs.astral.sh/uv/getting-started/installation/)
-
 ## Install
 
 This firmware is only for an E-PM2. The firmware is unofficial, use it at your own risk. Ensure your battery is full prior to flashing.
+
+### With the installer
+
+1. Download the zip of the newest release from [Releases](https://github.com/cfu288/EPM2Mod/releases) and unzip it.
+2. Start the installer in the unzipped folder:
+   - Mac: double-click **Start (Mac).command**. The first time, macOS blocks it: System Settings → Privacy & Security → **Open Anyway** → **Open**.
+   - Windows: double-click **Start (Windows).bat**. If Windows protects your PC: **More info** → **Run anyway**.
+   - Linux: run `./start.sh`.
+3. A page opens in your browser. Follow it: it writes to your SD card (or gives a zip) and ends with the steps for the camera.
+
+### With the command line
+
+Needs [uv](https://docs.astral.sh/uv/getting-started/installation/).
 
 1. To build a copy of the firmware, run
 

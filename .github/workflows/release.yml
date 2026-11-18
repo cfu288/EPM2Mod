@@ -91,16 +91,20 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: release
       - uses: actions/download-artifact@v8
         with:
           name: release-zip
           path: zip
       - env:
           GH_TOKEN: ${{ github.token }}
-        # a tag with a hyphen (v0.1.0-rc.1) is a pre-release: for testing, not yet for everyone
+        # a tag with a hyphen (v2026.11.18-rc.1) is a pre-release: for testing, not yet for everyone
         run: |
+          { cat release/NOTES.md; echo; echo "Firmware sha256 \`${{ needs.build.outputs.sha256 }}\`."; } > notes.md
           pre=""
           case "${{ github.ref_name }}" in *-*) pre="--prerelease" ;; esac
           gh release create "${{ github.ref_name }}" zip/*.zip $pre --repo "${{ github.repository }}" \
             --title "EPM2Mod ${GITHUB_REF_NAME#v}" \
-            --notes "Unzip, then double-click Start (Mac).command or Start (Windows).bat (Linux: ./start.sh); see README.txt. Firmware sha256 ${{ needs.build.outputs.sha256 }}."
+            --notes-file notes.md
