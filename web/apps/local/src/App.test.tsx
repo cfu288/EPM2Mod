@@ -24,6 +24,7 @@ function server(cards = [CARD]) {
       if (path === '/api/build') return reply(BUILD)
       if (path === '/api/cards') return reply(cards)
       if (path === '/api/job') return reply(job)
+      if (path === '/api/quit') return reply({ ok: true })
       if (path === '/api/make') {
         const body = JSON.parse(init?.body as string) as { firmware: string; choices: string[]; card: string | null }
         made.push(body)
@@ -87,6 +88,8 @@ describe('the local app', () => {
     expect(steps).not.toHaveTextContent('Load Looks')
     expect(steps).not.toHaveTextContent('zip')
     expect(screen.queryByText(/derived from/)).toBeNull()
+    await user.click(screen.getByRole('button', { name: 'Finish' }))
+    expect(await screen.findByRole('heading', { name: 'EPM2Mod has stopped' })).toBeInTheDocument()
   })
 
   it('restores the original firmware without the film step', async () => {

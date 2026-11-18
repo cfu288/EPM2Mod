@@ -399,10 +399,11 @@ function BuildStep(props: { job: Job | null; firmware: Firmware; onRetry: () => 
 function InstallStep(props: {
   job: Job
   cardName: string
-  /** A sentence that names a slot the user changed, for the check, for example "ART 2 shows C200." */
+  /** Names a slot the user changed, for the check, for example "C200 in ART 2." */
   changed: string
   onZip: () => void
   onRestart: () => void
+  onFinish: () => void
 }) {
   const { job } = props
   const zip = job.card === null
@@ -413,9 +414,14 @@ function InstallStep(props: {
     <Step
       title="Install on the camera"
       actions={
-        <button type="button" onClick={props.onRestart} className={secondary}>
-          Start over
-        </button>
+        <>
+          <button type="button" onClick={props.onRestart} className={secondary}>
+            Start over
+          </button>
+          <button type="button" onClick={props.onFinish} className={primary}>
+            Finish
+          </button>
+        </>
       }
     >
       <p className="font-bold">{zip ? 'Done.' : `Done: ${what} is on ${props.cardName}.`}</p>
@@ -468,6 +474,7 @@ export default function App() {
   const [job, setJob] = useState<Job | null>(null)
   const [problem, setProblem] = useState<string | null>(null)
   const [lastCustom, setLastCustom] = useState(false)
+  const [finished, setFinished] = useState(false)
   const running = job !== null && !job.done
   const flow = FLOWS[firmware]
 
@@ -488,6 +495,16 @@ export default function App() {
       setProblem(message(error))
     })
     refreshCards()
+  }, [])
+
+  // tell the server the page is open; it stops a few minutes after the page is closed
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      api.ping().catch(() => undefined)
+    }, 10000)
+    return () => {
+      window.clearInterval(timer)
+    }
   }, [])
 
   // on the first screen, look for cards every 2 seconds
@@ -550,6 +567,17 @@ export default function App() {
   }
 
   const canGoBack = step === 'start' || step === 'firmware' || step === 'films'
+
+  if (finished)
+    return (
+      <PageFrame subtitle="Installer">
+        <main className="mx-auto max-w-3xl px-4 py-10">
+          <Step title="EPM2Mod has stopped">
+            <p>You can close this tab.</p>
+          </Step>
+        </main>
+      </PageFrame>
+    )
 
   return (
     <PageFrame subtitle="Installer">
@@ -628,6 +656,16 @@ export default function App() {
             cardName={cards.find((c) => c.path === job.card && c.name !== '')?.name ?? 'SD card'}
             changed={changedSlot(looks.items)}
             onZip={downloadZip}
+            onFinish={() => {
+              api.quit().then(
+                () => {
+                  setFinished(true)
+                },
+                (error: unknown) => {
+                  setProblem(message(error))
+                },
+              )
+            }}
             onRestart={() => {
               setJob(null)
               setCustomizing(false)

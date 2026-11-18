@@ -59,4 +59,6 @@ export const api = {
     json<Job>('/api/make', { method: 'POST', body: JSON.stringify({ firmware, choices, card }) }),
   job: () => json<Job | null>('/api/job'),
   zip: async () => (await call('/api/zip')).blob(),
+  ping: () => call('/api/ping'),
+  quit: () => call('/api/quit', { method: 'POST' }),
 }

@@ -228,6 +228,33 @@ class ServerTests(unittest.TestCase):
         )
         self.assertEqual((calls, self.runner.calls), ([None], []))
 
+    def test_ping_keeps_it_alive_and_quit_stops_it(self) -> None:
+        app = self.server.app
+        app.last_seen = 0.0
+        self.assertTrue(app.idle(1000.0, limit=10))
+        status, _ = self.server.request("GET", "/api/ping")
+        self.assertEqual(status, 200)
+        self.assertFalse(app.idle(app.last_seen + 5, limit=10))
+        status, _ = self.server.request("GET", "/api/ping", token=False)
+        self.assertEqual(status, 403)
+        self.assertFalse(app.quit.is_set())
+        status, _ = self.server.request("POST", "/api/quit", token=False)
+        self.assertEqual(status, 403)
+        self.assertFalse(app.quit.is_set())
+        status, _ = self.server.request("POST", "/api/quit")
+        self.assertEqual(status, 200)
+        self.assertTrue(app.quit.is_set())
+
+    def test_a_running_job_is_never_idle(self) -> None:
+        self.runner.release.clear()
+        status, _ = self.server.request(
+            "POST", "/api/make", {"firmware": "epm2mod", "choices": [], "card": None}
+        )
+        self.assertEqual(status, 202)
+        self.assertFalse(self.server.app.idle(10**9, limit=10))
+        self.runner.release.set()
+        self.server.wait()
+
     def test_wrong_requests_are_refused(self) -> None:
         for body in (
             {"firmware": "epm2mod", "choices": ["ART2=velvia"]},

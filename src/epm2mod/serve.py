@@ -19,6 +19,10 @@ API (JSON):
   choices. One job at a time; a wrong request, or one while a job runs, gets 400 and the reason.
 - ``GET /api/job``: the last job: its progress lines, and when it is done, the error or the result.
 - ``GET /api/zip``: the files of the last finished job, as a zip.
+- ``GET /api/ping``: the page is still open. ``POST /api/quit``: stop the server.
+
+The server stops by itself on ``POST /api/quit`` (the page's Finish), or when no page has called it for
+``IDLE_SECONDS`` and no job runs (the page was closed).
 
 Every other path is a file of the built app page (``web/``, ``npm run build:app``).
 """
@@ -31,6 +35,7 @@ import json
 import mimetypes
 import secrets
 import threading
+import time
 import webbrowser
 import zipfile
 from collections.abc import Callable
@@ -52,6 +57,9 @@ from .stock import CARD_FOLDER, EPM2_V16
 
 #: The built app page, part of the package.
 STATIC = Path(__file__).resolve().parent / "app"
+
+#: How long the server waits for the page before it stops. Browsers slow timers in background tabs to one a minute.
+IDLE_SECONDS = 180.0
 
 #: The largest request body: a list of twelve choices and a path.
 _MAX_BODY = 16 * 1024
@@ -204,6 +212,13 @@ class App:
         self.description = pinned_description(paths)
         self.job: Job | None = None
         self.lock = threading.Lock()
+        self.last_seen = time.monotonic()
+        self.quit = threading.Event()
+
+    def idle(self, now: float, limit: float = IDLE_SECONDS) -> bool:
+        """Return True if no page has called the server for ``limit`` seconds and no job runs."""
+        running = self.job is not None and not self.job.done
+        return not running and now - self.last_seen > limit
 
     def build(self) -> dict[str, Any]:
         """Return the pinned build."""
@@ -345,6 +360,8 @@ class Handler(BaseHTTPRequestHandler):
         """Answer a request from elsewhere with 403 and return True."""
         path = urlsplit(self.path).path
         if self._host_ok() and (not path.startswith("/api/") or self._api_ok()):
+            if path.startswith("/api/"):
+                self.app.last_seen = time.monotonic()
             return False
         self._json(HTTPStatus.FORBIDDEN, {"error": "forbidden"})
         return True
@@ -363,6 +380,8 @@ class Handler(BaseHTTPRequestHandler):
             self._json(HTTPStatus.OK, app.build())
         elif path == "/api/cards":
             self._json(HTTPStatus.OK, app.cards())
+        elif path == "/api/ping":
+            self._json(HTTPStatus.OK, {"ok": True})
         elif path == "/api/job":
             self._json(HTTPStatus.OK, app.job.state() if app.job else None)
         elif path == "/api/zip":
@@ -382,8 +401,12 @@ class Handler(BaseHTTPRequestHandler):
             self._file(path)
 
     def do_POST(self) -> None:
-        """Answer ``POST /api/make``."""
+        """Answer ``POST /api/make`` and ``POST /api/quit``."""
         if self._refused():
+            return
+        if urlsplit(self.path).path == "/api/quit":
+            self._json(HTTPStatus.OK, {"ok": True})
+            self.app.quit.set()
             return
         if urlsplit(self.path).path != "/api/make":
             self._json(HTTPStatus.NOT_FOUND, {"error": "no such call"})
@@ -449,10 +472,22 @@ def serve(paths: RepoPaths, port: int = 0, browser: bool = True) -> None:
     httpd = server(app, port)
     url = page_url(app, httpd)
     print(f"EPM2Mod is open in your browser: {url}", flush=True)
-    print("Keep this window open while you use the page. Close it to stop.", flush=True)
+    print(
+        "Leave this window open while you use the page. It stops when you select Finish.",
+        flush=True,
+    )
     if browser:
         webbrowser.open(url)
+
+    def watch() -> None:
+        """Stop the server on Finish, or when the page has been gone for ``IDLE_SECONDS``."""
+        while not app.quit.wait(5.0) and not app.idle(time.monotonic()):
+            pass
+        httpd.shutdown()
+
+    threading.Thread(target=watch, daemon=True).start()
     try:
         httpd.serve_forever()
     finally:
         httpd.server_close()
+    print("EPM2Mod has stopped. You can close this window.", flush=True)

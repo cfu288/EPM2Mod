@@ -10,8 +10,8 @@ Start
   Linux:    run ./start.sh in a terminal.
 
 A page opens in your browser. It makes the firmware, adds film looks if you choose them,
-and writes the files to your SD card or gives you a zip. Keep the window that opened with
-it while you use the page; close that window to stop.
+and writes the files to your SD card or gives you a zip. Select Finish on the page to stop
+EPM2Mod; it also stops a few minutes after you close the page.
 
 The first start downloads uv (a Python launcher) and Python 3.12 into the folder .uv here.
 Each start downloads Olympus's firmware from OM Digital Solutions if it is not here yet.
