@@ -96,11 +96,6 @@ silent shutter, on-screen information). The notes and the candidate `osd-battery
 
 ## Foundations
 
-- Log defect (second camera log, 2026-11-15): the ring header is trusted when its magic word is
-  right. After a firmware update the RAM held old content with changed bits and a 0x5A5A5A5A
-  fill, the magic word matched, and the record numbers were garbage. Give the header a check
-  (index and its complement, bounds), start a new ring when it fails, and make the decoder drop
-  records that cannot be real.
 - Structured log: works on the camera (2026-11-15). Evaluation of the first log and the next
   probes (power-on factor, real restart count, per-CPU gates, peaking loop time, flush end):
   `experiments/2026-11-15-log/evaluation-1.md`. Unknown: if the ring RAM survives a crash restart.

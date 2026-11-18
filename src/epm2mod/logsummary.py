@@ -87,10 +87,11 @@ def _sessions(records: list[Line]) -> list[str]:
         recovered = sum(1 for line in mine if line.get("recovered"))
         if recovered:
             text += f"; {_count(recovered, 'record')} written by the next session"
-        last = max(
-            (line for line in ring0 if not line.get("recovered")),
-            key=lambda line: int(line["seq"]),
-        )
+        own = [line for line in ring0 if not line.get("recovered")]
+        if not own:
+            out.append(text + "; no record of its own")
+            continue
+        last = max(own, key=lambda line: int(line["seq"]))
         off = last["event"] == "flush" and _raw(last, "gui_state") >> 12 == 2
         text += "; ends with the flush at power off" if off else "; no flush at the end"
         out.append(text)

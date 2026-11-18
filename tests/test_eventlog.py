@@ -291,7 +291,8 @@ class DecodeTests(unittest.TestCase):
             json.dumps(line)
 
     def test_an_unknown_id_is_given_as_numbers(self) -> None:
-        got = lines(block(7, [record(0x7FFE, 7, 10, 1, 2)]))
+        # a block of a build whose dictionary is not given
+        got = lines(block(7, [record(0x7FFE, 7, 10, 1, 2)], build=b"\x01" * 8))[1:]
         self.assertEqual(got[0]["event"], "unknown_0x7FFE")
         self.assertEqual(got[0]["id"], 0x7FFE)
         self.assertIs(got[0]["unknown"], True)
@@ -339,9 +340,27 @@ class DecodeTests(unittest.TestCase):
     def test_the_sequence_number_is_16_bits_of_the_record_number(self) -> None:
         got = lines(block(0x1FFFE, [record(3, n, n) for n in range(0x1FFFE, 0x20001)]))
         self.assertEqual([line["seq"] for line in got], [0x1FFFE, 0x1FFFF, 0x20000])
-        self.assertTrue(all("seq_in_record" not in line for line in got))
-        got = lines(block(5, [record(3, 9, 0)]))
-        self.assertEqual(got[0]["seq_in_record"], 9)
+        self.assertTrue(all("marker" not in line for line in got))
+
+    def test_records_that_cannot_be_real_are_dropped(self) -> None:
+        # a slot whose sequence is not its place, and an id that the block's own dictionary does not have
+        got = lines(
+            block(
+                5,
+                [
+                    record(3, 5, 0),
+                    record(3, 9, 1),
+                    record(0x7FFE, 7, 2),
+                    record(3, 8, 3),
+                ],
+            )
+        )
+        self.assertEqual(
+            [line.get("marker") or line["seq"] for line in got], [5, "damaged", 8]
+        )
+        self.assertEqual(
+            got[1], {"marker": "damaged", "cpu": 0, "seq": 6, "records": 2}
+        )
 
     def test_two_sessions_after_a_power_cycle(self) -> None:
         one = block(0, [record(1, 0, 100), record(3, 1, 200)])
@@ -884,6 +903,16 @@ class SummaryTests(unittest.TestCase):
         )
         self.assertIn(
             "session 2: 0.0 s, 1 record (CPU 0: 1); RAM was kept; no flush at the end",
+            text,
+        )
+
+    def test_a_session_whose_records_were_all_written_by_the_next(self) -> None:
+        boot = {"seq": 0, "cpu": 0, "session": 1, "time_us": 100, "event": "boot"}
+        boot.update(level="info", args={}, build="00", recovered=True)
+        text = logsummary.summarize([boot])
+        self.assertIn(
+            "session 1: 0.0 s, 1 record (CPU 0: 1); cold start (new ring); "
+            "1 record written by the next session; no record of its own",
             text,
         )
 

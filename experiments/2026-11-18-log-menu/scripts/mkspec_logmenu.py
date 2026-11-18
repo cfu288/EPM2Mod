@@ -45,6 +45,8 @@ BIN = L.BIN
 AREAS = {
     ".k": (0x7E4C9514, 0x7E4C9800, "kernel range: log_put, log_chg, log_cnt, T_ERR, T_BOOT, the routines of the "
            "hooks in segment 1 and the kernel, and the timing probe of peaking (T_TIME0, T_TIME0B, T_TICK)"),
+    ".t0": (0x7E4C90EA, 0x7E4C90FC, "kernel range, the 0xFF run after T_HIT of peaking-fast: T_TIME0 (as "
+            "log-peaking-time)"),
     ".uc": (0x7EBF2BE4, 0x7EBF2E80, "segment 2: the flush task and the file name"),
     ".up": (0x7EBF3780, 0x7EBF38BC, "segment 2: routines of the hooks in segments 2 and 3"),
     ".ug": (0x7EBF2600, 0x7EBF2890, "segment 2: T_GUI, T_GRD, T_CTASK, the row's texts"),
@@ -70,6 +72,52 @@ GATE = """lp_body:
     movbu (LOGON),d3             # the row is Off: no record
     cmp 2,d3
     beq lp_done
+"""
+
+# The ring check (camera log of 2026-11-18: bits of the ring's RAM turned from 0 to 1 while the camera was off, the
+# magic word stayed, and a flush wrote 512 stale slots). The header keeps the complement of w at +24; a ring whose
+# w + check is not -1 (cleared RAM, a ring of an older build, changed bits) is not trusted: log_put starts a new
+# ring, the flush skips it. f is never above w.
+RING_OLD = """1:  mov (a2),d3
+    cmp MAGIC,d3
+    beq 2f
+    mov MAGIC,d3                 # RAM was clear (or never used): start an empty ring
+"""
+RING_NEW = """1:  mov (4,a2),d3                # w, and its complement at +24: w + check = -1 in a ring that can be trusted
+    mov (24,a2),a3
+    add a3,d3
+    inc d3
+    beq 2f
+    mov MAGIC,d3                 # RAM was clear, of another build, or changed while off: start an empty ring
+"""
+RING_OLD2 = """    inc d3
+    mov d3,(4,a2)
+    mov a3,d3
+"""
+RING_NEW2 = """    inc d3
+    mov d3,(4,a2)
+    not d3
+    mov d3,(24,a2)               # the check
+    mov a3,d3
+"""
+FLUSH_OLD = """f_ring:
+    mov (a2),d0
+    cmp MAGIC,d0
+    bne f_next
+    mov (4,a2),d2                # w
+    mov (8,a2),d3                # f: records already in the file
+"""
+FLUSH_NEW = """f_ring:
+    mov (4,a2),d2                # w
+    mov (24,a2),d0
+    add d2,d0
+    inc d0
+    bne f_next                   # the ring's check fails: nothing from it
+    mov (8,a2),d3                # f: records already in the file
+    cmp d3,d2
+    bcc 9f
+    mov d2,d3                    # f above w cannot be: nothing older than w
+9:
 """
 
 T_GUI = """
@@ -234,10 +282,14 @@ def main():
     core_k = L.CORE_K.replace(".section .kc,", ".section .k,")
     assert core_k.count("lp_body:\n") == 1
     core_k = core_k.replace("lp_body:\n", GATE)
+    assert core_k.count(RING_OLD) == 1 and L.CORE_U.count(FLUSH_OLD) == 1
+    core_k = core_k.replace(RING_OLD, RING_NEW)
+    assert core_k.count(RING_OLD2) == 1
+    core_k = core_k.replace(RING_OLD2, RING_NEW2)
     probes_k = L.PROBES_K.replace(".section .kp,", ".section .k,")
     core_u = L.CORE_U[:L.CORE_U.index("T_GUI:")]
-    core_u = core_u.replace("task USRTEST_A (id 0x90", "task USRTEST_B (id 0x91")
-    time_asm = re.sub(r'\.section \.t[01k],"ax"', '.section .k,"ax"', L.TIME_ASM)
+    core_u = core_u.replace("task USRTEST_A (id 0x90", "task USRTEST_B (id 0x91").replace(FLUSH_OLD, FLUSH_NEW)
+    time_asm = re.sub(r'\.section \.t[1k],"ax"', '.section .k,"ax"', L.TIME_ASM)
     time_asm = time_asm.replace("%(n)d passes", "%(n_time)d passes")
     guard = L.GUARD_ASM.replace(".section .gu,", ".section .ug,")
     asm = L.SYMS + SYMS_EXTRA % val + (core_k + probes_k + core_u + L.PROBES_U + time_asm + guard + T_GUI) % val

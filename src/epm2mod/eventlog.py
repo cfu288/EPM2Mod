@@ -547,6 +547,8 @@ def _read(
         ring.drops = drops
         if joins != (cpu, first):
             run += 1
+        known = ident == words.build_id or ident in others
+        damaged = 0
         done = 0
         while done < count and len(data) - offset >= RECORD_SIZE:
             if _is_header(data, offset):
@@ -555,6 +557,23 @@ def _read(
             ring.seen[first + done] = raw
             ring.seen.pop(first + done - SEEN_RECORDS, None)
             event, sequence, timer, arg0, arg1 = _RECORD.unpack(raw)
+            # The firmware writes the low 16 bits of the record's number and only ids
+            # of its own dictionary: anything else is a stale or changed slot.
+            if sequence != (first + done) & 0xFFFF or (
+                known and event not in chosen.events
+            ):
+                if not damaged:
+                    mark: dict[str, Any] = {
+                        "marker": "damaged",
+                        "cpu": cpu,
+                        "seq": first + done,
+                    }
+                    items.append(mark)
+                damaged += 1
+                mark["records"] = damaged
+                offset += RECORD_SIZE
+                done += 1
+                continue
             items.append(
                 _Entry(
                     cpu,
@@ -733,8 +752,6 @@ def _line(entry: _Entry) -> dict[str, Any]:
         "session": entry.session,
         "time_us": entry.time_us,
     }
-    if entry.sequence != entry.number & 0xFFFF:
-        line["seq_in_record"] = entry.sequence
     event = entry.words.events.get(entry.ident)
     values = (entry.arg0, entry.arg1)
     if event is None:
@@ -766,9 +783,9 @@ def decode(
     ``session``, ``time_us`` (microseconds since the start; it goes on across
     timer wraps inside a session), ``event``, ``level``, ``args`` and
     ``build``. ``names`` is there when a name table of the dictionary has a
-    name for a value: its keys are ``arg`` or ``arg.field``. A record whose id
-    is not in the dictionary has ``unknown: true``, its ``id`` and the two raw
-    arguments.
+    name for a value: its keys are ``arg`` or ``arg.field``. A record of a
+    block whose dictionary is not given, with an id that is not in ``words``,
+    has ``unknown: true``, its ``id`` and the two raw arguments.
 
     ``session`` counts the starts of the camera in the file, from 1. A session
     begins at its ``boot`` record, or at the records that the same start put
@@ -787,6 +804,10 @@ def decode(
       counts as a repeat only when all its records up to the last one read
       are the same bytes.
     - ``truncated``: a block ends before its last record (``missing``).
+    - ``damaged``: records that cannot be real were dropped (``records``): the
+      sequence number in the record is not its place in the block, or the id
+      is not in the dictionary of the block's build. A slot of the ring that
+      was stale or changed in RAM gives them.
     - ``garbage``: bytes that are not part of a block were skipped (zero bytes
       after a block are padding and give no marker).
     - ``dictionary_mismatch``: a block was written by a firmware with a

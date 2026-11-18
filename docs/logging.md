@@ -42,7 +42,11 @@ A record has 16 bytes, little endian:
 | 12 | 4 | arg1 |
 
 Each CPU has its own ring of 512 records in RAM. A new record replaces the oldest one. `log_put` never
-calls the file system and never waits.
+calls the file system and never waits. In `log-menu` the ring header also keeps the complement of its record count
+at +24. A ring whose count and complement do not match (cleared RAM, the ring of an older build, bits that changed
+while the camera was off) is not trusted: `log_put` starts a new ring and the flush skips it. The ring of the older
+builds had only a magic word, and a camera log of 2026-11-18 shows what that let through: after bits changed while
+the camera was off, a flush wrote 512 stale slots.
 
 ## The file
 
@@ -103,9 +107,12 @@ Without the option, one line is one record:
   them like this: they are in the same write as the new session's start, after the old session's last `flush`
   record, and their time is later than the new `boot` record's time (or more than 1 s before it). For CPU 1 the
   border is the record at which the time goes back.
-- A record with an id that is not in the dictionary has `unknown: true` and its two raw arguments.
+- A record with an id that is not in the dictionary has `unknown: true` and its two raw arguments, when the
+  block's build has no dictionary in `logs/`.
 - A line with `marker` is not a record: `gap` (records were lost, with the count), `ring_restart` (RAM was
-  clear at a start), `repeat` (records that are in the file twice; they are given once), `truncated`,
+  clear at a start), `repeat` (records that are in the file twice; they are given once), `damaged` (records that
+  cannot be real were dropped: the sequence number in the record is not its place in the block, or the id is not in
+  the dictionary of the block's build; stale or changed slots of the ring give them), `truncated`,
   `garbage`, `dictionary_mismatch` (the file comes from a firmware whose dictionary is not in `logs/`: use the
   `logs/events.json` of that commit, `--dict FILE`).
 

@@ -124,7 +124,8 @@ emulator).
 - `docs/space-superseded.tsv`: `custom-menu-rows` -> `custom-menu-rows-2`; `log-core`, `log-probes`,
   `log-peaking-time`, `log-peaking-guard` -> `log-menu`.
 - `builds/log-menu.json` = the pinned specs with `custom-menu-rows-2` in place of `custom-menu-rows`, then
-  `log-menu`. sha256 `5002e8d795ea2578d7bb6b5d4e12e445b35a87465fc1e81db4136a79a1a64c7f`.
+  `log-menu`. sha256 `5002e8d795ea2578d7bb6b5d4e12e445b35a87465fc1e81db4136a79a1a64c7f` (camera run 1; the ring
+  check below changes it).
 
 ## Emulator results (2026-11-18)
 
@@ -141,6 +142,27 @@ its records stayed in the ring for the next flush.
 
 Not testable in the emulator: the picture probes (live view, Key Line pass 9, film stages) and the camera's card.
 These need the camera run (L5).
+
+## The ring check (2026-11-18, after the first camera run)
+
+The camera run of `5002e8d7` (docs/camera-log.md) worked, and its second upload showed the old defect of the log
+(docs/todo.md, 2026-11-15): sessions 35 to 38 hold stale and changed records. The ring's RAM is kept across a
+power-off; while the camera was off, bits of the header and the slots turned from 0 to 1 (record count 0x4810xxxx,
+`ring_found` 0x02000003; both times the next start came from USB, power-on factor 0x1000). The magic word stayed, so
+the next session went on in that ring, and its flush wrote 512 stale slots.
+
+- Firmware (`mkspec_logmenu.py`, RING_NEW, FLUSH_NEW): the header keeps the complement of the record count at +24.
+  `log_put` starts a new ring when count + complement is not -1 (this also covers cleared RAM and random content,
+  so it replaces the magic test there); the flush skips such a ring, and takes f = w when f > w. 17 more bytes in
+  the kernel run; T_TIME0 moved back to 0x7E4C90EA, where log-peaking-time had it. Kernel run: 734 of 748 B.
+- Decoder (`src/epm2mod/eventlog.py`): records that cannot be real are dropped under a `damaged` marker (the
+  sequence in the record is not its place in the block, or the id is not in the dictionary of the block's build).
+  `epm2mod log --summary` no longer stops on a session with no record of its own.
+- Emulator (V): `run_logmenu.sh` sessions 1-5 as before (the ring goes on: w 25, 42); a ring saved at the end of an
+  On session and put back before the next start: kept, its 6 unflushed records come out as `recovered`; the same
+  ring with bits 0x48104000 set in the count: a new ring, no stale record; the same ring without the check word (an
+  older build's ring): a new ring. boot-test PASS, update-path-test PASS, hookcheck only remap7b-code.
+- sha256 `83e7c3d6d4f92c6e10f713e992b41078b8b6da382cecb0dd3e5b0e3817ff12ec`.
 
 ## Next
 
