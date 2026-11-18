@@ -2,6 +2,8 @@
 
 Date: 2026-11-14. Evidence: [experiments/2026-11-14-feasibility/](../experiments/2026-11-14-feasibility/).
 
+Other Olympus generations, and what each can be modded to do: [model-matrix.md](model-matrix.md).
+
 ## Why this file exists
 
 For the first week this project changed only tables that the stock code reads. That was a choice,
