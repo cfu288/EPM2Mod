@@ -40,6 +40,8 @@ if f"4/5 sha256 {expected}" not in made:
     sys.exit(f"make: the sha256 is not {expected}")
 if not (folder / "build" / "card" / "DCOLYMP" / "E1019999.BIN").is_file():
     sys.exit("make: no build/card/DCOLYMP/E1019999.BIN")
+if not (folder / "build" / "card" / "EPM2LOOK.BIN").is_file():
+    sys.exit("make: no build/card/EPM2LOOK.BIN (the 12 default films)")
 run("cards")
 
 server = subprocess.Popen(

@@ -101,7 +101,30 @@ def _make(args: argparse.Namespace, paths: RepoPaths) -> int:
     card = None if args.card is None else Path(args.card)
     output = None if args.out is None else Path(args.out)
     make(paths, description, card=card, log=print, stock=EPM2_V16, output=output)
+    if _LOOKS_LOADER in description.specs:
+        _write_default_looks(paths, card)
     return 0
+
+
+#: The loader spec of the build with Olympus's art filters: its films come from a look file on the card.
+_LOOKS_LOADER = "patches/card-looks-5.json"
+
+
+def _write_default_looks(paths: RepoPaths, card: Path | None) -> None:
+    """Write the look file of the 12 default films beside the firmware, as the local app does."""
+    from .looks import lookfile, records
+
+    data, _ = records.pack_choices(paths, records.built_in_choices(records.load(paths)))
+    write_bytes(paths.card / lookfile.CARD_NAME, data)
+    out = (
+        paths.card / lookfile.CARD_NAME
+        if card is None
+        else records.write_to_card(card, data)
+    )
+    print(
+        f"    look file: {out} (the 12 default films; on the camera: MENU -> Custom Menu -> J -> "
+        "Load Looks -> Load)"
+    )
 
 
 def _pin(args: argparse.Namespace, paths: RepoPaths) -> int:

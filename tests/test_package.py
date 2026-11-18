@@ -1834,7 +1834,7 @@ class RealFirmwareTests(unittest.TestCase):
         pinned = builds.pinned_description(PATHS)
         with tempfile.TemporaryDirectory() as folder:
             paths = RepoPaths(Path(folder))
-            for name in ("firmware", "patches", "builds"):
+            for name in ("firmware", "patches", "builds", "looks"):
                 (paths.root / name).symlink_to(ROOT / name)
             shutil.copy(PATHS.pinned, paths.pinned)
             out, env = io.StringIO(), {paths_module.ROOT_ENV: folder}
@@ -1843,6 +1843,8 @@ class RealFirmwareTests(unittest.TestCase):
             image = paths.output / f"{pinned.name}.BIN"
             self.assertEqual(sha256_bytes(image.read_bytes()), pinned.sha256)
             self.assertIn(f"sha256 {pinned.sha256}", out.getvalue())
+            # the pinned build has Olympus's filters: make also writes the 12 default films
+            self.assertTrue((paths.card / "EPM2LOOK.BIN").is_file())
 
 
 if __name__ == "__main__":

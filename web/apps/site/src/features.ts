@@ -41,7 +41,7 @@ export const features: Feature[] = [
     name: 'Interval shooting',
     summary: 'Time-lapses without a remote.',
     steps: [
-      'Set the mode dial to P, A, S or M, and set the camera clock.',
+      'Press MENU, select P on the first screen, and press OK. Set the camera clock.',
       'MENU → Shooting Menu 2 → Time Lapse Settings → On. Set the frames and the interval.',
       'For a film simulation, press OK → Picture Mode and pick one.',
       'Press the shutter button to start.',

@@ -30,7 +30,7 @@ from epm2mod import cli, serve, stock  # noqa: E402
 from epm2mod.builds import pinned_description  # noqa: E402
 from epm2mod.cards import Card  # noqa: E402
 from epm2mod.errors import BuildError  # noqa: E402
-from epm2mod.looks import lookfile  # noqa: E402
+from epm2mod.looks import lookfile, records  # noqa: E402
 from epm2mod.paths import RepoPaths  # noqa: E402
 
 PATHS = RepoPaths(ROOT)
@@ -398,6 +398,31 @@ class EndToEndTests(unittest.TestCase):
                     if p.is_file()
                 ),
                 names,
+            )
+
+    def test_make_on_a_card_writes_what_the_app_writes_by_default(self) -> None:
+        with tempfile.TemporaryDirectory() as folder:
+            (Path(folder) / "repo").mkdir()
+            paths = sandbox(Path(folder) / "repo")
+            app_card = Path(folder) / "app-card"
+            cli_card = Path(folder) / "cli-card"
+            app_card.mkdir()
+            cli_card.mkdir()
+            description = pinned_description(paths)
+            default = records.built_in_choices(records.load(paths))
+            serve.run_job(
+                paths, description, default, app_card, lambda line: None, lambda n: None
+            )
+            env = {"EPM2MOD_ROOT": str(paths.root)}
+            with redirect_stdout(io.StringIO()), mock.patch.dict(os.environ, env):
+                self.assertEqual(cli.main(["make", "--card", str(cli_card)]), 0)
+            for name in ("DCOLYMP/E1019999.BIN", lookfile.CARD_NAME):
+                self.assertEqual(
+                    (app_card / name).read_bytes(), (cli_card / name).read_bytes()
+                )
+            self.assertEqual(
+                (paths.card / lookfile.CARD_NAME).read_bytes(),
+                (cli_card / lookfile.CARD_NAME).read_bytes(),
             )
 
 
