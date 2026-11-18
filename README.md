@@ -44,9 +44,15 @@ For developers. Needs [uv](https://docs.astral.sh/uv/getting-started/installatio
    uv run tools/make_firmware.py --card /path/to/card
    ```
 2. Copy the folder `build/card/DCOLYMP` to the top folder of an SD card, beside `DCIM`. `E1019999.BIN` must be the only file in `DCOLYMP`.
-3. Put the card in the camera. With the camera off, hold **OK** and the **ON/OFF** button together. When the orange lamp on the front of the camera (the AF illuminator) lights steadily, let go of both.
+3. Optional, your own film looks: `uv run epm2mod looks list` shows the films. Pick one for any ART number and write the file to the card:
+
+   ```sh
+   uv run epm2mod looks pack ART2=velvia ART6=double-x --card /path/to/card
+   ```
+4. Put the card in the camera. With the camera off, hold **OK** and the **ON/OFF** button together. When the orange lamp on the front of the camera (the AF illuminator) lights steadily, let go of both.
    - While the lamp is steady, the camera is writing the firmware. This takes 1 to 2 minutes. Do not switch the camera off.
    - When the lamp blinks, the update is done. Switch the camera off and on again.
+5. If you packed film looks: MENU → Custom Menu → J → **Load Looks** → **Load** → OK. See [Looks from the SD card](docs/guide/card-looks.md).
 
 To go back to the original firmware, choose **Olympus original** in the installer, or see [docs/install.md](docs/install.md).
 
