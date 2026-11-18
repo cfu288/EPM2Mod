@@ -112,6 +112,45 @@ the value after 1/250 is 30 s. The stored value is the Q8 Tv (1/4 s gave 0x0200)
 - So Olympus added a second limit beside the flash one and split the flash threshold from the ISO threshold (I).
   The prototype in section 5 does the same thing in 50 bytes.
 
+### 4.1 How the PEN-F 3.1 does it (traced 2026-11-18)
+
+Firmware `OLY_E_122_3101_0000_0000.BIN` (sha256 77398610…69f2c, in `experiments/2026-11-08-feature-map/out/firmware/`).
+Same instruction set as the E-PM2 (MN103), block-0 base 0x60021020. Function database:
+`python3 tools/fwmap.py --fw PENF.BIN --base 0x60021020 --out /tmp/scratch/penf build`. English texts:
+`experiments/2026-11-15-feature-survey/scripts/lang_enu.py` on block 1. All addresses below are PEN-F.
+
+UI (V, data):
+
+- Custom Menu E → ISO-Auto Set (text 155) opens a screen with two rows: "Upper Limit / Default" (text 2874) and
+  "Lowest S/S Setting" (text 2875). Row record 0x60F963D6 (kind 4, text 2875). Manual page 181 agrees.
+- Value list 0x60F943D0 (a second, identical one at 0x60F94694): 59 items of 12 B. **Auto, then 60 s to 1/8000 in
+  1/3 EV steps.** Auto is text 71; the speeds are ASCII strings.
+- Two settings: tag **0x5351** (Auto or not) and tag **0x536A** (the speed, Q8 Tv). Filled into the mode block at
+  0x605DDA19: `shutter_iso_limit = (0x5351 == 0) ? 0x7FFF : 0x536A`.
+
+Mode block (V, debug printer 0x6112C54D): `stb_sync` +16, `iso_limiter` +22, `iso_standard` +24,
+`shutter_stb_limit` +26 (tag 0x9ABA, the same tag as the E-PM2's Slow Limit), **`shutter_iso_limit` +28**.
+
+Logic (V read; not run):
+
+| Function | What it does |
+|---|---|
+| `exp_cal_still` 0x605B906E | Same frame as the E-PM2's. `flash_point_tv` (result +54) = clamp(1/(2 f), low, high) via 0x605D7106 |
+| Gate 0x605BB441 | Lowest S/S is **active** only if: flash off (+5 = 0), program code 3 (P), 4 (A), 36 or 37, ISO Auto (set +2 = 0), +28 ≠ 0x7FFF, and 0x605D68E1(+36, +44) = 0 (fields +36/+44 not named; U) |
+| Rounding 0x605D344E | Rounds the limit up to the exposure step grid (set +12: 85 = 1/3 EV, 128 = 1/2, 256 = 1 EV; tables 0x6065D7B0, 0x6065D830, 0x6065D888) |
+| Tv corner resolver 0x605B9CD4, mark **0x5F00** | Active: the corner **is** the rounded Lowest S/S. No focal-length term, no 1/30 floor, no Slow Limit. Not active: the stock rule 0x605B97B0 |
+| Stock rule 0x605B97B0 (marks 0x5E00, 0x5F00) | `max(1/(2 f), Slow Limit)`, floor 1/30, cap X-Sync (+16) **only with the flash on**, else the cap is +18 (not named; I = the fastest speed). If active, then also `max(…, Lowest S/S)` |
+| 0x605B984A | When +28 = 3328 (1/8000) it calls 0x605BB42C, the body's fastest speed (I: "1/8000" means "fastest") |
+
+What this means for the E-PM2 row (section 7):
+
+- Olympus's limit **replaces** the focal-length rule in P and A with ISO Auto and no flash. So it can be slower than
+  1/30 and slower than 1/(2 f). Our prototype only takes a max, so it can only make the hold speed faster.
+- Olympus's list is 1/3 EV from 60 s; the E-PM2's top speed is 1/4000, so the same list would be Auto + 56 items.
+- The X-Sync cap only with the flash on is the same change as our prototype.
+- Nothing can be copied: the E-PM2 has no mark 0x5F00 and no second field. The method fits in the in-place rewrite of
+  0x7E694001 if the active case returns the limit instead of the max (I; size not checked).
+
 ## 5. The smallest change
 
 | Step | Change | State |
