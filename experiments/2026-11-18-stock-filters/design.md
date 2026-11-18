@@ -237,6 +237,18 @@ a flashed entry with the stock default handler as target is added; the loader sw
   firmware's member-0 tables of the ten three-table slots were interpolated (within 8 codes); here each is the curve
   read at its stock default, as the record slots always did.
 
+- 2026-11-18, live view (`experiments/2026-11-16-films-max/scripts/scen_films.py`, the firmware's own live-view tasks,
+  3 frames without and 3 with the peaking request):
+  - all 12 films loaded (`loaded_image.py`), the stored values 100, 101, 102, 103, 105, 106, 107 and the hidden 111,
+    112, 114, 115, 118, and 119: a picture in every frame, no anomaly, peaking lines (pass 9 gain 0x0200) in every
+    case. Code byte: Pop Art 79, Soft Focus 75, Diorama 125, Pin Hole 0 (code 92: the new codes read 0 in this rig,
+    films-max). The rig's "expected" codes are those of the film firmware.
+  - nothing loaded, the stock values: equal to the reference build with the mod's features and no film part
+    (`nofilm`): Soft Focus 69, Pin Hole and Dramatic Tone no picture, Diorama an error report and no picture,
+    Watercolor a write to a freed block, in both: limits of the rig with the stock effect filters, not changes.
+- The emulator gate is complete: build checks, six sessions, Picture Mode remap, stock-vs-build crawls, the stage
+  cases, the tables against the film firmware, live view. Next: the camera run (`docs/camera-log.md`).
+
 ## Open questions (settle in code and the emulator before any camera run)
 
 - U0. Three more colour-only art codes for Soft Focus, Pin Hole and Diorama (above).
