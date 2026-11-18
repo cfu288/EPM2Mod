@@ -5,17 +5,15 @@ with their names, after power-off and without the card.
 
 ## Make a file
 
-On the web, without the command line: [the film looks page](https://cfu288.github.io/EPM2Mod/). Choose a film for
-each ART number and download the file. Or with the repository:
-
-`uv run epm2mod looks list` shows the 19 films you can choose. Pick a film for any ART number the camera shows, with
-the card in the computer:
+On the web, [the film looks page](https://cfu288.github.io/EPM2Mod/) makes the file. The installer makes it when you
+select Customize. On the command line, change any film in this command (`uv run epm2mod looks list` shows all 19, and
+`uv run epm2mod cards` shows the card's folder):
 
 ```sh
-uv run epm2mod looks pack ART2=velvia ART6=double-x ART12=vision3-500t --card /path/to/card
+uv run epm2mod looks pack ART1=portra-400 ART2=ektachrome ART3=pro-400h ART4=kodachrome ART5=double-x ART6=vision3-250d ART7=velvia ART8=superia-400 ART9=provia ART10=portra-160 ART11=gold-200 ART12=vision3-500t --card /path/to/card
 ```
 
-The camera shows each film's own name. Unlisted ART numbers keep their built-in look.
+It writes `EPM2LOOK.BIN` to the top folder of the card. Without the card, use `-o FILE` and copy the file there.
 
 ## Load
 
