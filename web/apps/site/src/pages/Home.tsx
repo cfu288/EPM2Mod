@@ -53,7 +53,7 @@ export function Home() {
         <span className="absolute bottom-0 left-0 p-4 text-white sm:p-8">
           <span className="block text-sm tracking-widest uppercase">Portra 400</span>
           <span className="font-display mt-1 inline-flex items-center gap-x-2 text-2xl font-extrabold sm:text-3xl">
-            Compare 12 film simulations
+            Compare film simulations
             <Chevron />
           </span>
         </span>
