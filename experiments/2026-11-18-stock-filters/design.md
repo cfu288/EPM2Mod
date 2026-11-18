@@ -119,6 +119,38 @@ record and movie-art range tests (69-183) must accept the code (U).
 Plan for the three entries: code 92 for one if the dynamic reads show nothing, codes above 184 for the others; or
 all three above 184 with one mechanism.
 
+### Choice for the three effect entries (2026-11-18)
+
+Codes 75 / 125 and 92, all inside every stage's table range (gamma 71-170, look 8-184, saturation 69-184, six-axis
+9-184, chroma 69-168: the range tests at 0x7E56B7A6, 0x7E56E84D, 0x7E56DC78, 0x7E56D2AB, 0x7E5662E2), so the 18 range
+tests 69-183 / 184 of the record and movie-art code do not matter.
+
+- 75 / 125: reached in stock only through the hidden value 111 (no menu entry stores it). Compared after a read of
+  the art code at four job-block sites (0x7E54B52E, 0x7E54B5F3, 0x7E54BF5C, 0x7E54BF67: a flag-dependent extra step);
+  in no hash table, in no compare cluster, not in the effect lists. At flash time these four compares get an
+  immediate that no byte matches (-1). Stock never produces 75 or 125, so this changes no stock filter (I, by
+  reachability; `filter_type` above).
+- 92: no compare of the art code found (static: films-max 5a kind B; the 59 `cmp 92` of the image are other values).
+- Codes 84, 117, 119 (with 121, 123, 124) are in the monochrome / Dramatic / Watercolor groups of the hashes 0x7E74A568
+  and 0x7E78B29C and in several compare clusters: more to neutralize; not used. 95 and 161: their only tests sit next to
+  shooting-mode codes on a value that may not be the art code; not used.
+
+### The three mechanisms
+
+| Entries | Stored value | Art code with a film | What the loader switches | What is flashed |
+|---|---|---|---|---|
+| Pop Art, Pale&Light Color, Light Tone, Cross Process (colour-only filters) | stock | the entry's own type I code (70, 71, 72, 85), all types | the film tables over the stock ones; the code's stage words (tone stub, look, chroma, matrix flag), the WB pair, Cross Process's adaptive-hue flag; type II / III routed to type I | the matrix chain and a hook for the adaptive hue that read RAM flags |
+| Soft Focus, Pin Hole, Diorama (effect filters) | stock | 75, 125 and 92, all types | the value's routing words (art_GetFilterType, the two live-view functions' still and movie tables, record kind, EXIF, "is art") | the codes' stage entries, stubs and handlers with own tables; the 75 / 125 compares neutralized |
+| Grainy Film, Gentle Sepia, Dramatic Tone, Key Line, Watercolor (value-tested filters) | hidden 111, 112, 114, 115, 118 | 94, 98, 144, 156, 159 (as films-12) | the stored value: the three value lists, the three "is art" lists, the ART-mode preset; the current Picture Mode setting; the ART bracket constants through a hook | the hidden values' and codes' structure (films12-structure) with own tables |
+
+Own tables: films-12 borrowed stock tables of Pin Hole I / II / III, Diorama and code 153, and 15 tone tables that no
+record used once remap7b had freed them. In the stock base those belong to stock filters, so the film codes get
+their own tables in the RAM gap (written by the loader from the look file, like the live-view tables of card-looks-4)
+and stubs or handlers in free space that point at them.
+
+Hooks from the image library into segment 2 follow the allowed remap7b-code case (`tools/emu/hookcheck-allow.tsv`):
+code that only image jobs reach runs after segment 2 is loaded. Each new hook needs that evidence.
+
 ## Open questions (settle in code and the emulator before any camera run)
 
 - U0. Three more colour-only art codes for Soft Focus, Pin Hole and Diorama (above).
