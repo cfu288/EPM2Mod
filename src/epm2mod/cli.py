@@ -2,22 +2,22 @@
 
 ::
 
-    epm2mod make [BUILD.json] [--out FILE] [--card DIR]   make a firmware build
+    epm2mod make [BUILD.json] [--out FILE] [--card DIR]   make the firmware
     epm2mod pin BUILD.json --date D --sha256 H    record a passed camera test; pin the build
-    epm2mod fetch-stock                           download and check the stock firmware
-    epm2mod builds                                list the build descriptions
-    epm2mod cards                                 list the SD cards plugged into this computer
-    epm2mod restore [--card DIR] [-o FILE]        Olympus's original firmware, to go back from EPM2Mod
-    epm2mod serve [--port N] [--no-browser]       open the local app page
-    epm2mod release [-o DIR] [--version V]        write the release zip (launchers, package, pinned build)
-    epm2mod apply SPEC... -o OUT.BIN              apply patch specs (no build description)
+    epm2mod fetch-stock                           download Olympus's firmware and check it
+    epm2mod builds                                list the build descriptions and the pinned one
+    epm2mod cards                                 list the SD cards in this computer
+    epm2mod restore [--card DIR] [-o FILE]        put Olympus's original firmware on the SD card
+    epm2mod serve [--port N] [--no-browser]       open the installer page
+    epm2mod release [-o DIR] [--version V]        write the release zip
+    epm2mod apply SPEC... -o OUT.BIN              apply patch specs, without a build description
     epm2mod info FIRMWARE.BIN                     describe a firmware file
-    epm2mod readme [--check]                      refresh the generated parts of the documents
+    epm2mod readme [--check]                      update the generated parts of the documents
     epm2mod looks [--check | --write]             check or write the film-look patch specs
-    epm2mod looks list                            the films a look file can hold
+    epm2mod looks list                            list the films for looks pack
     epm2mod looks pack [ART2=velvia ... | LIST.json] [-o FILE | --card DIR]
-                                                  write a look file for the SD card
-    epm2mod looks show FILE [--json]              check a look file and describe it
+                                                  write the film choice for the SD card
+    epm2mod looks show FILE [--json]              check a look file and list its films
     epm2mod log FILE [--dict EVENTS.json] [--summary]
                                                   decode a camera log file to JSON lines
 
@@ -371,7 +371,7 @@ def build_parser() -> argparse.ArgumentParser:
     """Return the argument parser of the ``epm2mod`` command."""
     parser = argparse.ArgumentParser(
         prog="epm2mod",
-        description="Build and check custom firmware for the Olympus PEN E-PM2.",
+        description="Make EPM2Mod, firmware for the Olympus PEN E-PM2, and put it on an SD card.",
     )
     parser.add_argument("--version", action="version", version=__version__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -382,100 +382,114 @@ def build_parser() -> argparse.ArgumentParser:
         sub.set_defaults(run=handler)
         return sub
 
-    make_cmd = command("make", _make, "Make a firmware build: download, patch, check.")
+    make_cmd = command(
+        "make",
+        _make,
+        "Make the firmware: download Olympus's firmware, add EPM2Mod, check the result.",
+    )
     make_cmd.add_argument(
         "build",
         nargs="?",
-        help="build description (builds/NAME.json); default: the pinned build",
+        help="a build description, builds/NAME.json; default: the pinned build",
     )
     make_cmd.add_argument(
         "-o",
         "--out",
         metavar="FILE",
-        help="also write the firmware file to FILE (in a folder: under the "
-        "camera's file name, E1019999.BIN)",
+        help="also write the firmware to FILE (into a folder: as E1019999.BIN)",
     )
     make_cmd.add_argument(
         "--card",
         metavar="DIR",
-        help="also put the firmware on an SD card: DIR is the top folder of the "
-        "card (any folder works); the file is written to DIR/DCOLYMP/E1019999.BIN",
+        help="also write the firmware to the SD card at DIR, as DIR/DCOLYMP/E1019999.BIN",
     )
 
     pin_cmd = command(
-        "pin", _pin, "Record a passed camera test and make the build the pinned one."
+        "pin",
+        _pin,
+        "Record a passed camera test and make the build the default of make.",
     )
-    pin_cmd.add_argument("build", help="the build description that was tested")
+    pin_cmd.add_argument("build", help="the tested build description")
     pin_cmd.add_argument(
-        "--date", required=True, metavar="YYYY-MM-DD", help="the date of the test"
+        "--date", required=True, metavar="YYYY-MM-DD", help="the day of the camera test"
     )
     pin_cmd.add_argument(
         "--sha256",
         required=True,
         metavar="HEX",
-        help="sha256 of the firmware file that was flashed (from the camera log)",
+        help="the sha256 of the flashed file, from the camera log",
     )
 
-    command("fetch-stock", _fetch_stock, "Download and check the stock firmware.")
-    command("builds", _builds, "List the build descriptions.")
-    command("cards", _cards, "List the SD cards plugged into this computer.")
+    command("fetch-stock", _fetch_stock, "Download Olympus's firmware and check it.")
+    command("builds", _builds, "List the build descriptions and the pinned one.")
+    command("cards", _cards, "List the SD cards in this computer.")
     restore_cmd = command(
-        "restore", _restore, "Put Olympus's original firmware on the SD card."
+        "restore",
+        _restore,
+        "Put Olympus's original firmware on the SD card, to remove EPM2Mod.",
     )
     restore_cmd.add_argument(
-        "--card", metavar="DIR", help="the top folder of the SD card"
+        "--card", metavar="DIR", help="write it to the SD card at DIR"
     )
-    restore_cmd.add_argument("-o", "--out", metavar="FILE", help="write the file here")
-    serve_cmd = command(
-        "serve", _serve, "Open the local app: make the firmware and the look file."
+    restore_cmd.add_argument("-o", "--out", metavar="FILE", help="write it to FILE")
+    serve_cmd = command("serve", _serve, "Open the installer page in the browser.")
+    serve_cmd.add_argument(
+        "--port", type=int, default=0, help="the port on 127.0.0.1; default: a free one"
     )
     serve_cmd.add_argument(
-        "--port", type=int, default=0, help="port on 127.0.0.1; default: a free one"
-    )
-    serve_cmd.add_argument(
-        "--no-browser", action="store_true", help="print the address only"
+        "--no-browser",
+        action="store_true",
+        help="print the page's address in place of opening the browser",
     )
     release_cmd = command(
-        "release", _release, "Write the release zip for users who don't code."
+        "release",
+        _release,
+        "Write the release zip: the installer, its launchers and the pinned build.",
     )
     release_cmd.add_argument(
-        "-o", "--out", metavar="DIR", help="the folder of the zip; default: build/"
+        "-o", "--out", metavar="DIR", help="the folder for the zip; default: build/"
     )
     release_cmd.add_argument(
         "--version",
         metavar="V",
-        help="calendar version, like 2026.11.18 or 2026.11.18-rc.1; default: today",
+        help="the calendar version, like 2026.11.18 or 2026.11.18-rc.1; default: today",
     )
 
     apply_cmd = command(
-        "apply", _apply, "Apply patch specs to the stock firmware (for experiments)."
+        "apply",
+        _apply,
+        "Apply patch specs to Olympus's firmware, without a build description.",
     )
-    apply_cmd.add_argument(
-        "specs", nargs="+", help="patch spec files, in the order to apply"
-    )
+    apply_cmd.add_argument("specs", nargs="+", help="patch spec files, in order")
     apply_cmd.add_argument(
         "-o", "--out", required=True, help="the firmware file to write"
     )
     apply_cmd.add_argument(
-        "-v", "--verbose", action="store_true", help="print every operation"
+        "-v", "--verbose", action="store_true", help="print each change"
     )
 
     info_cmd = command("info", _info, "Describe a firmware file.")
-    info_cmd.add_argument("firmware", help="a firmware file")
+    info_cmd.add_argument("firmware", help="the firmware file")
 
     readme_cmd = command(
-        "readme", _readme, "Refresh the generated parts of the documents."
+        "readme", _readme, "Update the generated parts of the documents."
     )
     readme_cmd.add_argument(
-        "--check", action="store_true", help="only say if they are up to date"
+        "--check",
+        action="store_true",
+        help="report whether they are up to date and change nothing",
     )
 
     looks_cmd = command(
-        "looks", _looks, "Check or write the generated film-look patch specs."
+        "looks",
+        _looks,
+        "Check or write the film-look patch specs that the fit files generate.",
     )
     looks_mode = looks_cmd.add_mutually_exclusive_group()
     looks_mode.add_argument(
-        "--check", action="store_true", help="compare only; this is the default"
+        "--check",
+        action="store_true",
+        help="compare the generated specs with patches/ (the default)",
     )
     looks_mode.add_argument(
         "--write", action="store_true", help="write the generated specs to patches/"
@@ -483,45 +497,43 @@ def build_parser() -> argparse.ArgumentParser:
     looks_actions = looks_cmd.add_subparsers(dest="action")
     looks_actions.add_parser(
         "list",
-        help="the films a look file can hold",
-        description="List the fitted films that a look file can hold, with their ids.",
+        help="list the films for looks pack",
+        description="List the films for looks pack: the name to use, the name the camera shows, "
+        "and the ART number that holds each film by default.",
     )
     pack_cmd = looks_actions.add_parser(
         "pack",
-        help="write a look file for the SD card",
-        description="Write a look file (EPM2LOOK.BIN) for the SD card: from choices "
-        "like ART2=velvia ART6=double-x (the ART number the camera shows and a "
-        "film of 'epm2mod looks list'), or from a look list. "
-        "The ART entries not chosen keep their built-in look.",
+        help="write the film choice for the SD card",
+        description="Write EPM2LOOK.BIN, which sets the film of each ART number. Give "
+        "ART<n>=<film> for each ART number to change, with names from 'epm2mod looks "
+        "list'. The other ART numbers keep their default film. With no choices: the 12 "
+        "default films. The camera loads the file from Custom Menu J, Load Looks.",
     )
     pack_cmd.add_argument(
         "items",
         nargs="*",
-        help="ART<n>=<film> choices, or one look list; default: "
-        "looks/card-looks.json (the built-in looks)",
+        help="ART<n>=<film> choices, or one look list file; none: the 12 default films",
     )
     where = pack_cmd.add_mutually_exclusive_group()
     where.add_argument(
         "-o",
         "--out",
         metavar="FILE",
-        help="where to write it (a folder: under the name EPM2LOOK.BIN); "
-        "default: build/EPM2LOOK.BIN",
+        help="write it to FILE (into a folder: as EPM2LOOK.BIN); default: "
+        "build/EPM2LOOK.BIN",
     )
     where.add_argument(
         "--card",
         metavar="DIR",
-        help="write it straight to the top folder DIR of the SD card",
+        help="write it to the SD card at DIR",
     )
     show_cmd = looks_actions.add_parser(
         "show",
-        help="check a look file and describe it",
-        description="Check a look file as the camera does and list its looks.",
+        help="check a look file and list its films",
+        description="Check a look file as the camera does, and list its films.",
     )
     show_cmd.add_argument("file", help="the look file")
-    show_cmd.add_argument(
-        "--json", action="store_true", help="print the looks in their JSON form"
-    )
+    show_cmd.add_argument("--json", action="store_true", help="print the looks as JSON")
 
     log_cmd = command(
         "log", _log, "Decode a camera log file (EPM2LOG.BIN) to JSON lines."
@@ -530,8 +542,8 @@ def build_parser() -> argparse.ArgumentParser:
     log_cmd.add_argument(
         "--dict",
         metavar="EVENTS.json",
-        help="the event dictionary; default: logs/events.json of the repository, "
-        "and logs/events-BUILDID.json for a log of an older build",
+        help="the event dictionary; default: logs/events.json, or "
+        "logs/events-BUILDID.json for a log of an older build",
     )
     log_cmd.add_argument(
         "--summary",
