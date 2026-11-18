@@ -31,10 +31,10 @@ On a Mac, the first start is blocked: allow it in System Settings → Privacy & 
 1. With [uv](https://docs.astral.sh/uv/getting-started/installation/) installed, put EPM2Mod on the SD card, with its 12 default films, as the installer does (`uv run epm2mod cards` shows the card's folder):
 
    ```sh
-   uv run tools/make_firmware.py --card /path/to/card
+   uv run epm2mod make --card /path/to/card
    ```
 
-   Without the card in this computer, `uv run tools/make_firmware.py` writes `build/card/DCOLYMP`. Copy that folder to the top of the card, beside `DCIM`.
+   Without the card in this computer, `uv run epm2mod make` writes `build/card/DCOLYMP`. Copy that folder to the top of the card, beside `DCIM`.
 2. To choose the films, change any of the 12 in this command and run it too (`uv run epm2mod looks list` shows all 19 films):
 
    ```sh
