@@ -142,7 +142,7 @@
    "kind": "Colour negative, approximate colours",
    "medium": "negative, on Kodak Portra Endura paper",
    "fit": "looks/fits/portra800push2.npz",
-   "note": "less accurate than the others; before 2026-11-18 this fit was listed as Portra 800"
+   "note": "less accurate than the others"
   },
   {
    "id": "tri-x",
