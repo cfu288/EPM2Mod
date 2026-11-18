@@ -80,8 +80,8 @@ silent shutter, on-screen information). The notes and the candidate `osd-battery
 - **Minimum shutter speed with Auto ISO: the stock firmware has it.** The program holds the shutter at
   max(1/(2 × focal length), 1/30, Flash Slow Limit), also without a flash. Set MENU → Custom Menu →
   F → Slow Limit to 1/250 (the default is 1/60). Verified in the function harness, not yet on the
-  camera. A row of its own up to 1/4000 is prototyped (50 bytes in place, about one day with its
-  menu row). Exposure compensation in M with Auto ISO: 2 bytes at 0x7E5878AF, not run.
+  camera. A row of its own is planned as the PEN-F does it: Auto or 60 s to 1/4000, used in P and A
+  with ISO Auto and no flash (GitHub issue #2; plan in the notes, §7). Exposure compensation in M with Auto ISO: 2 bytes at 0x7E5878AF, not run.
   Notes: `experiments/2026-11-17-auto-iso-min-shutter/NOTES.md`.
 
 - **Anti-shock 0 s and a silent shutter: not settled.** The E-P5 is no donor: the bodies with 0 s

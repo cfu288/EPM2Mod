@@ -197,6 +197,11 @@ Effort: (a) 1 to 2 hours with the emulator checks; (b) half a day.
 
 ## 7. Build plan for the row "ISO-Auto Min S/S" (after the camera test of section 8)
 
+Design (decided 2026-11-18, from §4.1): follow the PEN-F. Values Auto, 60 s to 1/4000 in 1/3 EV (56 items). Active
+only with the flash off, P or A, and ISO Auto; then `tv_th` **is** the chosen speed (not a max), so it can be slower
+than 1/30 and 1/(2 f). Otherwise the stock rule, with the X-Sync cap only when the flash is on. Steps 2 and 5 below
+change to match: the threshold rewrite needs the set block (ISO Auto test) and a 56-item list. GitHub issue #2.
+
 | # | Step | Effort |
 |---|---|---|
 | 1 | Camera test of # Slow Limit on the pinned build. If it holds 1/250, decide whether 1/500 and faster are wanted at all | 2 min, owner |
