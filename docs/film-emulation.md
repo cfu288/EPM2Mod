@@ -227,6 +227,10 @@ Side effects on entries we did not turn into films: the second types (Pop Art II
 
 - The looks match a **simulation** of each film; nobody has compared them with real film here.
 - No grain or halation.
+- Per-colour control has six axes (red, yellow, green, cyan, blue, magenta), not the 12 of a colour wheel. The
+  12-colour editors in mods for the PEN-F, E-P7, OM-3 and E-M10 I write a 12-record table that TruePic VII and
+  later image processors have. None is known in the E-PM2's TruePic VI
+  ([`feasibility.md`](feasibility.md#colour-wheel-and-twelve-colour-editors)).
 - All measurements use the camera's daylight colour matrix. Other white balance settings
   (tungsten, shade) use different matrices and are untested.
 - Live view and movie mode work in all seven entries. A movie gets only part of each look: the

@@ -35,6 +35,7 @@ routines. This file records what the measurements show, so that nobody repeats t
 | No 4K, no RAW video | Hardware | Sensor modes in the firmware (table 0x7E7BA370); card path about 25 to 28 MB/s (measured on the E-M5) |
 | 1080p at 30 fps only; the 60, 120 and 240 fps modes drop most lines | Hardware, as far as known | Sensor mode table; no sensor register map found |
 | No 3D lookup table; the hue stage has six axes | Image processor | Firmware search; measured stages |
+| No colour wheel: no 12-colour hue, saturation and lightness editor as on the PEN-F, E-P7, OM-3 and the E-M10 I mod | Image processor, as far as known | No 12-record colour table in the firmware. See "Colour wheel and twelve colour editors" below |
 | A look is a set of ROM tables chosen by art-filter number | Firmware design | Read from the firmware. Tables at a RAM address are **untested**, not impossible |
 | 128 rows in one menu list | Firmware | Camera-tested |
 | The emulator shows no camera picture | Tooling | It has no image processor, no sensor and no mechanism. Since 2026-11-14 it does boot the firmware from reset and draws the shooting screens and the whole menu system, with keys, saved settings and an SD card (see "The emulator" below) |
@@ -92,6 +93,38 @@ routines. This file records what the measurements show, so that nobody repeats t
 Not in this firmware at all (no text, no code): focus peaking, Color Creator, keystone, focus
 bracketing, zebra, silent shutter. These must be ported or written. They are not hidden features.
 
+## Colour wheel and twelve colour editors
+
+Checked 2026-11-18 against the four public mods that have one, after users asked for it for older bodies.
+
+**What the other mods do.** Each one adds new editor code that writes hue, saturation and lightness into a
+12-record colour table that the image processor already has. None of them makes 12 colours out of fewer axes.
+
+| Mod | Body (processor) | Stock colour features | What the mod changes |
+|---|---|---|---|
+| [oly_fw_analysis](https://github.com/fishcu/oly_fw_analysis/blob/HEAD/docs/color/pen-f/HSL_TABLES.md) | PEN-F (TruePic VII) | COLOR profiles: saturation of 12 colours | Hue and lightness written into the stock 12-record table (28 bytes per record) after the stock builder. "The native HSL tables also contain hue and lightness coefficients" |
+| [caduceus-ep7](https://github.com/cakelesscoder/caduceus-ep7/blob/HEAD/docs/HSL_PORT.md) | E-P7 (TruePic VIII) | COLOR profiles, Color Creator | The same: "the native HSL tables already carry hue and lightness coefficients; stock firmware just doesn't expose them" |
+| [caduceus-om3](https://github.com/androidfanman/caduceus-om3/blob/HEAD/docs/DEVELOPER_NOTES.md) | OM-3 (TruePic X) | COLOR profiles | The same, on the OM-3's colour builder |
+| [om10mi-mods](https://github.com/Meghnus/om10mi-mods/blob/HEAD/docs/lookfile/LOOKFILE_SPEC.md) | E-M10 I (TruePic VII) | Color Creator only, no COLOR profiles | A 12-colour editor. "The camera has a 12-region table of hue shift, saturation and lightness per colour region": the table is in the hardware although no stock menu used it |
+
+**What this means for the E-PM2 (TruePic VI).** The 12-colour table is a TruePic VII and later feature as far
+as anyone has shown. The E-PM2 firmware has the six-axis hue and saturation stage (red, yellow, green, cyan, blue,
+magenta) and no 12-record table, no Color Creator code and no colour-profile text. The PEN-F has a six-axis stage
+of its own beside its 12-record table, so the six-axis stage found here does not point to a hidden 12-colour one.
+No mod for a TruePic VI body (E-PL3, E-PL5, E-PL6, E-P5, E-M5, E-PM2) has a 12-colour editor. The E-P5 has no
+Color Creator either (manual, verified in the 2026-11-15 survey).
+
+**What is possible here:**
+
+- A six-colour editor: hue and saturation for red, yellow, green, cyan, blue and magenta, written into the
+  six-axis stage. It is coarser than a colour wheel (60 degrees per axis, not 30), and green, cyan and magenta are
+  only approximate in our model of the stage (section 5 of `experiments/2026-11-14-feasibility/firmware.md`).
+- A Color Creator-like control (one hue turn and one saturation for the whole picture) through the 3x3 colour
+  matrix, which every film simulation already sets.
+- Lightness per colour is not possible with the known stages.
+- A 12-colour editor needs a 12-colour stage in TruePic VI. It is not known whether the hardware has one. The
+  probe is in the table below. Until a probe finds one, a 12-colour editor is not possible on this body.
+
 ## Unknowns and their probes
 
 | Unknown | Probe |
@@ -102,6 +135,7 @@ bracketing, zebra, silent shutter. These must be ported or written. They are not
 | Can the load range be made longer to reach the unloaded 1.59 MB? | The Caduceus method: move the end word in steps, with a pattern and a checksum reported to a card file |
 | Does the updater write the blank tails of blocks 1 to 3? | Write a marker there, read it back with 0x7E6756B5 |
 | Does this body recover from a boot loop by card update? | Owner's decision |
+| Does TruePic VI have a 12-colour hue table that the firmware never uses? | Compare the image-library parameter builders with the PEN-F's COLOR builder (12 records, sectors interleaved as 2(r%6)+r/6). Check the unused art-filter entries: on the E-M10 I one held a hidden YCbCr colour key ([fishcu, e-m10/PROCESSING.md](https://github.com/fishcu/oly_fw_analysis/blob/HEAD/docs/color/e-m10/PROCESSING.md)). A missing string does not prove the hardware lacks it |
 
 ## Where code may go
 
