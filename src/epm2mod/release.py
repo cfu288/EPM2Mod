@@ -1,6 +1,6 @@
 """The release zip (``epm2mod release``): what a user who doesn't code downloads.
 
-The zip holds one folder, ``EPM2Mod-<build>/``, with what ``epm2mod make`` and ``epm2mod serve`` need for the
+The zip holds one folder, ``EPM2Mod-<version>/``, with what ``epm2mod make`` and ``epm2mod serve`` need for the
 pinned build, and nothing else:
 
 - the package (``src/epm2mod``, with the built app page ``src/epm2mod/app``);
@@ -17,6 +17,8 @@ standard library, so it runs from ``src`` with no install step.
 
 from __future__ import annotations
 
+import datetime
+import re
 import zipfile
 from collections.abc import Iterator
 from pathlib import Path
@@ -75,13 +77,28 @@ def _package(src: Path) -> Iterator[tuple[str, Path]]:
             yield source.relative_to(src.parent).as_posix(), source
 
 
-def make_release(paths: RepoPaths, out: Path) -> Path:
-    """Write the release zip into the folder ``out`` and return its path.
+#: A release's version: calendar date (``2026.11.18``), a number for a second release that day (``.2``), and
+#: ``-rc.N`` for a pre-release or ``-dev`` for a test build.
+_VERSION = re.compile(r"^\d{4}\.\d{2}\.\d{2}(\.\d+)?(-rc\.\d+|-dev)?$")
+
+
+def today_version() -> str:
+    """Return today's calendar version (UTC), for example ``2026.11.18``."""
+    return datetime.datetime.now(datetime.timezone.utc).strftime("%Y.%m.%d")
+
+
+def make_release(paths: RepoPaths, out: Path, version: str) -> Path:
+    """Write the release zip ``EPM2Mod-<version>.zip`` into the folder ``out`` and return its path.
 
     Raises:
-        BuildError: if a file is missing (``release_files``) or the zip can't be written.
+        BuildError: if the version is not a calendar version, a file is missing (``release_files``) or the zip
+            can't be written.
     """
-    name = f"EPM2Mod-{pinned_description(paths).name}"
+    if not _VERSION.match(version):
+        raise BuildError(
+            f"'{version}': a version is a date, like 2026.11.18 or 2026.11.18-rc.1"
+        )
+    name = f"EPM2Mod-{version}"
     target = out / f"{name}.zip"
     files = release_files(paths)
     try:

@@ -41,7 +41,12 @@ jobs:
         env:
           PYTHONPATH: src
         run: |
-          python -m epm2mod release -o dist
+          # calendar version: the tag without its v (v2026.11.18-rc.1), or today's date with -dev on a branch
+          case "$GITHUB_REF" in
+            refs/tags/v*) version="${GITHUB_REF_NAME#v}" ;;
+            *) version="$(date -u +%Y.%m.%d)-dev" ;;
+          esac
+          python -m epm2mod release -o dist --version "$version"
           name=$(basename dist/*.zip .zip)
           echo "name=$name" >> "$GITHUB_OUTPUT"
           echo "sha256=$(python -c 'from epm2mod.builds import pinned_description; from epm2mod.paths import repo_paths; print(pinned_description(repo_paths()).sha256)')" >> "$GITHUB_OUTPUT"
@@ -97,5 +102,5 @@ jobs:
           pre=""
           case "${{ github.ref_name }}" in *-*) pre="--prerelease" ;; esac
           gh release create "${{ github.ref_name }}" zip/*.zip $pre --repo "${{ github.repository }}" \
-            --title "EPM2Mod ${{ github.ref_name }}" \
+            --title "EPM2Mod ${GITHUB_REF_NAME#v}" \
             --notes "Unzip, then double-click Start (Mac).command or Start (Windows).bat (Linux: ./start.sh); see README.txt. Firmware sha256 ${{ needs.build.outputs.sha256 }}."

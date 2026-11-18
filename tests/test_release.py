@@ -22,6 +22,7 @@ from support import ROOT  # noqa: E402
 
 from epm2mod import release, stock  # noqa: E402
 from epm2mod.builds import pinned_description  # noqa: E402
+from epm2mod.errors import BuildError  # noqa: E402
 from epm2mod.paths import RepoPaths  # noqa: E402
 
 PATHS = RepoPaths(ROOT)
@@ -33,8 +34,10 @@ HAVE_STOCK = stock.stock_path(PATHS).is_file()
 class ZipTests(unittest.TestCase):
     def setUp(self) -> None:
         self.folder = tempfile.TemporaryDirectory()
-        self.zip = release.make_release(PATHS, Path(self.folder.name))
-        self.top = f"EPM2Mod-{pinned_description(PATHS).name}/"
+        self.zip = release.make_release(
+            PATHS, Path(self.folder.name), "2026.11.18-rc.1"
+        )
+        self.top = "EPM2Mod-2026.11.18-rc.1/"
 
     def tearDown(self) -> None:
         self.folder.cleanup()
@@ -72,9 +75,16 @@ class ZipTests(unittest.TestCase):
         self.assertIn(b"\r\n", batch)
         self.assertNotIn(b"\n", batch.replace(b"\r\n", b""))
 
+    def test_the_version_is_a_date(self) -> None:
+        self.assertEqual(self.zip.name, "EPM2Mod-2026.11.18-rc.1.zip")
+        self.assertRegex(release.today_version(), r"^\d{4}\.\d{2}\.\d{2}$")
+        for bad in ("card-looks-4", "0.1.0", "2026.11.18-final", "../x"):
+            with self.assertRaises(BuildError, msg=bad):
+                release.make_release(PATHS, Path(self.folder.name), bad)
+
     def test_the_same_files_give_the_same_zip(self) -> None:
         with tempfile.TemporaryDirectory() as other:
-            again = release.make_release(PATHS, Path(other))
+            again = release.make_release(PATHS, Path(other), "2026.11.18-rc.1")
             self.assertEqual(again.read_bytes(), self.zip.read_bytes())
 
 
@@ -84,10 +94,10 @@ class ZipTests(unittest.TestCase):
 class FromTheZipTests(unittest.TestCase):
     def test_the_unpacked_release_makes_the_pinned_build(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
-            archive = release.make_release(PATHS, Path(folder))
+            archive = release.make_release(PATHS, Path(folder), "2026.11.18")
             with zipfile.ZipFile(archive) as unpack:
                 unpack.extractall(folder)
-            top = Path(folder) / f"EPM2Mod-{pinned_description(PATHS).name}"
+            top = Path(folder) / "EPM2Mod-2026.11.18"
             local = stock.stock_path(RepoPaths(top))
             local.parent.mkdir(parents=True)
             shutil.copyfile(stock.stock_path(PATHS), local)
