@@ -3,9 +3,10 @@
  "record_size": 16,
  "time": "raw value of timer channel 9 (0x98900074): a 30-bit counter that counts down, one step per microsecond",
  "levels": ["debug", "info", "warn", "error"],
- "note": "The dictionary of the next debug build. tables, names and doc are notes: they are not part of the build id. The dictionary of a flashed build is kept as events-<build id>.json (docs/logging.md)",
+ "note": "The dictionary of builds/log-menu.json. tables, names and doc are notes: they are not part of the build id. The dictionary of a flashed build is kept as events-<build id>.json (docs/logging.md)",
  "tables": {
   "bank_status": {"0": "applied", "1": "no record", "2": "bad length or sum"},
+  "card_status": {"0": "Off (no action yet)", "0x7EE544B4": "Loading", "0x7EE54480": "Loaded", "0x7EE54490": "No file", "0x7EE544A0": "Bad file", "0x7EE5446C": "Built-in"},
   "gui_state": {
    "0x0002": "leaves shooting for power off",
    "0x10xx": "Boot",
@@ -164,6 +165,10 @@
    "doc": "The GUI sub-application state changed (0x57xx menu, 0x3xxx playback, 0x2xxx power off and sleep, 0x5xxx shooting)",
    "names": {"state": "gui_state", "previous": "gui_state"},
    "args": [{"name": "state", "format": "hex"}, {"name": "previous", "format": "hex"}]},
+  {"id": 6, "name": "log_setting", "level": "info", "spec": "log-core",
+   "doc": "The Debug Log row (Custom Menu J, setting 447) is On: written at the first GUI state of a session and when the row changes to On in the menu. With the row Off the log writes no record after the first GUI state of a session (patches/log-menu.json); the records before that are the start-up records",
+   "names": {"gui_state": "gui_state"},
+   "args": [{"name": "value", "format": "dec"}, {"name": "gui_state", "format": "hex"}]},
 
   {"id": 256, "name": "pk_mf_start", "level": "info", "spec": "log-probes", "feature": "peaking",
    "doc": "MF Assist starts (entryMfAssistOn). R is 1 already. C is still the colour of the MF Assist run before (0 after power-on): the mov task reads setting 458 into C in the next frame, in the call that sets L (see pk_latch)",
@@ -263,6 +268,11 @@
   {"id": 1799, "name": "bank_look", "level": "info", "spec": "log-card-keep", "feature": "card-looks",
    "doc": "At the first GUI state of a session: the stored look. status 0 = applied to the Pro 400H matrix, 1 = no record, 2 = bad length or sum; first2 = the table's values 0 and 1 read back from RAM (low half value 0)",
    "names": {"status": "bank_status"},
-   "args": [{"name": "status", "format": "dec"}, {"name": "first2", "format": "hex"}]}
+   "args": [{"name": "status", "format": "dec"}, {"name": "first2", "format": "hex"}]},
+  {"id": 1800, "name": "card_task", "level": "info", "spec": "log-menu", "feature": "card-looks",
+   "doc": "A run of the film-looks task of card-looks-4 ended (at its T_END). mode: start = keep the built-in tables and apply the stored looks, load = Load, built-in = Built-in, texts = the row texts and names after a language change; store_ok = the store held a valid look file at the last check; status = the text the Load Looks row shows",
+   "names": {"status": "card_status"},
+   "args": [{"name": "flags", "format": "hex", "fields": [{"name": "busy", "shift": 0, "bits": 8}, {"name": "applied", "shift": 8, "bits": 8}, {"name": "store_ok", "shift": 16, "bits": 8}, {"name": "mode", "shift": 24, "bits": 8, "enum": {"0": "start", "1": "load", "2": "built-in", "3": "texts"}}]},
+            {"name": "status", "format": "hex"}]}
  ]
 }

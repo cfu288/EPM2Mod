@@ -4,8 +4,13 @@ For developers. A debug build of the firmware writes event records to the file `
 card. `epm2mod log` turns the file into JSON lines. The design notes, the evidence and the camera test
 are in [experiments/2026-11-15-log/NOTES.md](../experiments/2026-11-15-log/NOTES.md).
 
-The log is in the build `builds/debug-log.json` only: the pinned specs, then `patches/log-core.json` and
-`patches/log-probes.json`. The pinned build has no log code.
+The candidate `builds/log-menu.json` has the log in the firmware, switched by the Custom Menu row **Debug Log**
+(MENU → Custom Menu → J → Debug Log → On; Off by default): `patches/log-menu.json`, the code of the four specs below
+with an Off switch ([log-menu design](../experiments/2026-11-18-log-menu/design.md)). The pinned build has no log
+code.
+
+The debug build `builds/debug-log.json`: the pinned specs of 2026-11-15, then `patches/log-core.json` and
+`patches/log-probes.json`.
 
 A second debug build, `builds/debug-log-peaking-fast.json`, is the candidate `peaking-fast` with the same two
 specs and `patches/log-peaking-time.json` (event `pk_stats`: the time of the colour loop and the frame period

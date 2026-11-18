@@ -1049,7 +1049,7 @@ def main():
         for e in events.split():
             assert [x for x in d["events"] if x["name"] == e][0]["spec"] == spec, e
             used.add(e)
-    other = {e["name"] for e in d["events"] if e["spec"] in (TIME_SPEC, GUARD_SPEC)}
+    other = {e["name"] for e in d["events"] if e["spec"] in (TIME_SPEC, GUARD_SPEC, "log-menu")} | {"log_setting"}
     assert used | {"flush"} | other == set(ev), sorted(set(ev) - used)
     asm = SYMS + (CORE_K + CORE_U + PROBES_K + PROBES_U) % val
     args = ["--defsym=s_%s=0x%s" % (a, a) for a in sorted(set(re.findall(r"(?:jmp|call)\s+0x([0-9a-f]{8})", asm)))]
@@ -1733,18 +1733,19 @@ def card_read(spec=CARD_SPEC, asm_text=CARD_ASM, areas={".cr": CARD_AREA}, event
         open(listing, "w").write(re.sub(r"/[^\s:]*logcard\.elf", "logcard.elf", txt))
 
 
-if len(sys.argv) > 1 and sys.argv[1] == "--peaking-time":
-    peaking_time()
-elif len(sys.argv) > 1 and sys.argv[1] == "--card-read":
-    card_read()
-elif len(sys.argv) > 1 and sys.argv[1] == "--card-probe":
-    card_read(PROBE_SPEC, PROBE_ASM, PROBE_AREAS, ("card_read", "card_rec", "card_done"),
-              {"allow": "\n".join("    .long %#x, %d" % a for a in PROBE_ALLOW)})
-elif len(sys.argv) > 1 and sys.argv[1] == "--card-keep":
-    card_read(KEEP_SPEC, KEEP_ASM, KEEP_AREAS, ("card_read", "card_keep", "bank_tail", "bank_look"), None, KEEP_HOOK2)
-elif len(sys.argv) > 1 and sys.argv[1] == "--card-look":
-    card_read(LOOK_SPEC, LOOK_ASM, LOOK_AREAS, ("card_read", "card_look"), {"table": "%#x" % LOOK_TABLE})
-elif len(sys.argv) > 1 and sys.argv[1] == "--peaking-guard":
-    peaking_guard()
-else:
-    main()
+if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "--peaking-time":
+        peaking_time()
+    elif len(sys.argv) > 1 and sys.argv[1] == "--card-read":
+        card_read()
+    elif len(sys.argv) > 1 and sys.argv[1] == "--card-probe":
+        card_read(PROBE_SPEC, PROBE_ASM, PROBE_AREAS, ("card_read", "card_rec", "card_done"),
+                  {"allow": "\n".join("    .long %#x, %d" % a for a in PROBE_ALLOW)})
+    elif len(sys.argv) > 1 and sys.argv[1] == "--card-keep":
+        card_read(KEEP_SPEC, KEEP_ASM, KEEP_AREAS, ("card_read", "card_keep", "bank_tail", "bank_look"), None, KEEP_HOOK2)
+    elif len(sys.argv) > 1 and sys.argv[1] == "--card-look":
+        card_read(LOOK_SPEC, LOOK_ASM, LOOK_AREAS, ("card_read", "card_look"), {"table": "%#x" % LOOK_TABLE})
+    elif len(sys.argv) > 1 and sys.argv[1] == "--peaking-guard":
+        peaking_guard()
+    else:
+        main()
