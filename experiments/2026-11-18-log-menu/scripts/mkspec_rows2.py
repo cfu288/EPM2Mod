@@ -10,7 +10,7 @@ Changes against custom-menu-rows (design.md, finding 8):
     0x7EBF2898, and card-looks-4's code starts at 0x7EBF2890); the 11 page records point at it;
   row constants: last index 81, count 82, row-state array 164 B; rows in group J 7 -> 8;
   panel 608 gets a value -> text list (Off 0, On 1) after the child list.
-The row's label and help are the unused built-in EVF texts 1502 and 1499; the log's GUI routine
+The row's label and help are the unused built-in EVF texts 1507 and 1508; the log's GUI routine
 (patches/log-menu.json) points them at "Debug Log" and its help in the loaded language's table in RAM.
 Every expect is a byte string of the specs before custom-menu-rows in builds/card-looks-4.json.
 """
@@ -33,7 +33,7 @@ BASE = 0x7E421020
 STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
 ITEMS, OLD_KIDS, KIDS = 0x7EBF1FF0, 0x7EBF2600, 0x7EE3CBF4
 ROWS = 82
-LABEL, HELP = 1502, 1499
+LABEL, HELP = 1507, 1508                         # unused built-in EVF texts (1499, 1501, 1502 are peaking-colours')
 SETTING, PANEL = 447, 608
 LOG_ROW = struct.pack("<HHIHHHH", 9, LABEL, SETTING, 7, HELP, PANEL, 0)
 LOG_KID = struct.pack("<II", PANEL, SETTING)

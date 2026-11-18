@@ -10,7 +10,7 @@ log-peaking-time, log-peaking-guard), assembled again in one spec on the pinned 
     log_chg and log_cnt return at once when it is 2: after the first GUI state of a session with the row Off, no
     record is written and the flush never runs. Before that (the start-up) records go to the ring in RAM.
   * T_GUI reads the row at the first GUI state of a session and at every GUI state call in the menu (0x57xx); a
-    change to On writes log_setting. It points the texts 1502 and 1499 (the row's label and help) at "Debug Log"
+    change to On writes log_setting. It points the texts 1507 and 1508 (the row's label and help) at "Debug Log"
     and its help in the loaded language's table. It skips the flush while card-looks' task runs. It ends with a
     jump to card-looks' T_GUI, which runs the replaced trace call and jumps back: card-looks-4's code is unchanged,
     the hook at 0x7ECDF6E4 jumps here.
@@ -54,7 +54,7 @@ TASK_ID = 0x91
 CL_SYMS = "build/card-looks/syms-4.json"                  # card-looks-4's labels (mkspec_looks3.py --v4)
 CL_RSTAT = 0x7E4D0000 + 0x40000000                        # card-looks' status word (uncached)
 LANG, LANG_SPAN = 0xBFF3D000, 0x43000
-LABEL, HELP = 1502, 1499
+LABEL, HELP = 1507, 1508                         # unused built-in EVF texts (1499, 1501, 1502 are peaking-colours')
 TXT_LABEL = "Debug Log"
 TXT_HELP = "On: write EPM2LOG.BIN to the\r\ncard, for bug reports."
 CTASK_SITE = 7                                            # bytes at card-looks' T_END: `clr d0` / `movbu d0,(BUSY)`

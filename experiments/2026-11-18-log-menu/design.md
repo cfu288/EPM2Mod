@@ -30,7 +30,7 @@ Labels: V = verified (emulator or the bytes of the image), I = inferred, U = unk
 
 ## Findings
 
-Scripts: `scripts/overlap.py` (each op of a spec against the pinned build), `scripts/free_after.py` (free bytes
+Scripts: `scripts/run_logmenu.sh` (the emulator sessions of L2-L4), `scripts/overlap.py` (each op of a spec against the pinned build), `scripts/free_after.py` (free bytes
 after the pinned build and the given specs), `scripts/run_447.sh` with `scripts/prm447.mjs` (setting 447 in the
 emulator).
 
@@ -81,7 +81,9 @@ emulator).
      (0x7EFFA820), so the menu reads segment 3 data (I).
    - The row's value text: panel 608 has no value -> text list (the word at 0x7F014F94 is 0). New list Off (0) /
      On (1), 72 B in segment 3 data, and the word points at it.
-   - Label and help: two unused built-in EVF texts, for example 1502 ("Style 3") and 1499 (the old help of 1498).
+   - Label and help: two unused built-in EVF texts. Built: 1507 and 1508 (eye-sensor help texts). 1499, 1501 and
+     1502 are taken: `peaking-colours` points them at Blue, Red and Yellow (the first candidate used 1502 and 1499,
+     and the menu crawl showed "Debug Log" in place of Yellow in the Peaking list).
      The log's T_GUI points them, in the loaded language's table in RAM, at English strings, as card-looks does
      for its row (about 45 B: it checks its label pointer at each call, so a language change is handled).
 9. **The flush reads the setting (plan).** In the log's T_GUI, before it starts the flush: prm_get(0xD791) and no
@@ -112,7 +114,7 @@ emulator).
     (about 15 instructions), plus the setting read while in a menu. No record, no flush, no card access.
   - The flush task is USRTEST_B; T_GUI skips a flush while card-looks' task runs.
   - The hook at 0x7ECDF6E4 jumps to the log's T_GUI, which ends with a jump to card-looks' T_GUI.
-  - T_GUI points the texts 1502 and 1499 at "Debug Log" and its help ("On: write EPM2LOG.BIN to the card, for
+  - T_GUI points the texts 1507 and 1508 at "Debug Log" and its help ("On: write EPM2LOG.BIN to the card, for
     bug reports.") in the loaded language's table, as card-looks does for its row.
   - Placement: kernel run 0x7E4C9514-0x7E4C97F9 (741 of 748 B: the core, the kernel probes and the timing
     probe); segment 2: the flush task at 0x7EBF2BE4 (527 B), the probes at 0x7EBF3780 (314 B), T_GUI, T_GRD,
@@ -122,7 +124,7 @@ emulator).
 - `docs/space-superseded.tsv`: `custom-menu-rows` -> `custom-menu-rows-2`; `log-core`, `log-probes`,
   `log-peaking-time`, `log-peaking-guard` -> `log-menu`.
 - `builds/log-menu.json` = the pinned specs with `custom-menu-rows-2` in place of `custom-menu-rows`, then
-  `log-menu`. sha256 `234d659c18a82fc5c0adcdb77f8d9813565b6161a748a84a5ef981f9b1e522c0`.
+  `log-menu`. sha256 `5002e8d795ea2578d7bb6b5d4e12e445b35a87465fc1e81db4136a79a1a64c7f`.
 
 ## Emulator results (2026-11-18)
 
@@ -131,6 +133,7 @@ emulator).
 | L1 | Free-space check PASS (no first code), boot-test PASS, update-path-test PASS, hookcheck: only the allowed remap7b-code entry, as the pinned build |
 | L2 | The row is the last of J (its own page: J has 8 rows), Off / On. Off (the default): 2 start-up records in RAM, then none through menus and playback, and 0 blocks written to the card. A 1 written by the menu reads 1 after a restart (the first GUI state of the next session writes `log_setting` 1) |
 | L3 | On: the session wrote `EPM2LOG.BIN` (2,048 B, 4 flushes); `epm2mod log --summary` decodes it: boot, log_setting, gui_state, flush, shoot_cbs, lv_values, build id 33ca8d15f4f1c877. A restart appends session 2 |
+| Menus (owner's criterion 13 of card-looks) | Shallow crawls P and ART against card-looks-4: 378 / 214 screens equal; only J differs (the first page gets a scroll bar, Debug Log is on its own page). The first candidate failed here: Peaking's Yellow showed "Debug Log" (shared text ids), fixed with 1507 / 1508 |
 | L4 | Log On: Load Looks -> Load gives Loaded; `card_task` records mode start at 47 ms and mode load with status Loaded. Log Off: Load Looks -> Built-in gives Built-in, no card write. After the switch to Off the file stayed at 4,096 B through two sessions |
 
 One flush of session 2 gave `no_file`: the emulator's card stand-in fault of `experiments/2026-11-15-log/NOTES.md`;
