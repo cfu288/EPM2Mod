@@ -18,10 +18,10 @@
    "type": "bytes",
    "block": 0,
    "offset": "0x88F868",
-   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-   "new": "16f8bb1c888df001dda2ae8bffc008f012888df82104dd94ae8bffc008f013f82108dca8af8bff5c0464842810f810042810f810082811f8100c2810f8101028102014dc455f8bfffcdd3446e57ecab2fcdf00404d7edc9bd48bfffcdf10404d7efcde1c404d7edce9cf8bfffccd30404d7ecab58a4fdca5b5a6ff8a4fdc49b8a1ff8a4fdcb8b2a2fffcdd4046e57ecc71fffcdf00724d7edc59d48bfffcdf10724d7efcde1c724d7edca7cf8bfffccd30724d7ecc73ff8a4bdc62b5a6ff8a4bdc06b8a1ff8a4bdc75b2a2fffcdd4c46e57ecc2efffcdf00a44d7edc16d48bfffcdf10a44d7efcde1ca44d7edc64cf8bfffccd30a44d7ecc30ff8a47dc1fb5a6ff8a47dcc3b7a1ff8a47dc32b2a2fffcdd5846e57eccebfefcdf00d64d7edcd3d38bfffcdf10d64d7efcde1cd64d7edc21cf8bfffccd30d64d7eccedfe8a48dcdcb4a6ff8a48dc80b7a1ff8a48dcefb1a2fffcdd6446e57ecca8fefcdf00084e7edc90d38bfffcdf10084e7efcde1c084e7edcdece8bfffccd30084e7eccaafe8a5edc99b4a6ff8a5edc3db7a1ff8a5edcacb1a2fffcdd7046e57ecc65fefcdf003a4e7edc4dd38bfffcdf103a4e7efcde1c3a4e7edc9bce8bfffccd303a4e7ecc67fe8a5cdc56b4a6ff8a5cdcfab6a1ff8a5cdc69b1a2ffa04fc868a04bc874a047c878a048c905cc8200a05ec905cc8b00a05cc905cc8c00a07dc905cc8d00a055c905cc8e00a062c905cc9700fac89000c905cc9600fac89c00c905cc9500fac89f00c905cc9400a046c80ba04fc807dcf4bb8bffdcfabb8bfff1ecdc9fbc8bfffca1c09f4cbefcd9a0404d7ec9dbcaebfcdda0724d7ecae3fca1c49f4cbefcd9a0a44d7ec9c3cad3fca1c89f4cbefcd9a0d64d7ec9b3cac3fcdda0084e7ecabbfcdda03a4e7ecab3fcdda06c4e7ecaabfca1cc9f4cbefcd9a09e4e7ec98bca9bfcdda0d04e7eca93fcdda0024f7eca8bfcdda0344f7eca83fcdda0664f7ecc7bff",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "16f8bb1c888df001dda2ae8bffc008f012888df82104dd94ae8bffc008f013f82108dca8af8bff5c0464842810f810042810f810082811f8100c2810f8101028102014dc455f8bfffcdd3446e57ecab2fcdf00404d7edc9bd48bfffcdf10404d7efcde1c404d7edce9cf8bfffccd30404d7ecab58a4fdca5b5a6ff8a4fdc49b8a1ff8a4fdcb8b2a2fffcdd4046e57ecc71fffcdf00724d7edc59d48bfffcdf10724d7efcde1c724d7edca7cf8bfffccd30724d7ecc73ff8a4bdc62b5a6ff8a4bdc06b8a1ff8a4bdc75b2a2fffcdd4c46e57ecc2efffcdf00a44d7edc16d48bfffcdf10a44d7efcde1ca44d7edc64cf8bfffccd30a44d7ecc30ff8a47dc1fb5a6ff8a47dcc3b7a1ff8a47dc32b2a2fffcdd5846e57eccebfefcdf00d64d7edcd3d38bfffcdf10d64d7efcde1cd64d7edc21cf8bfffccd30d64d7eccedfe8a48dcdcb4a6ff8a48dc80b7a1ff8a48dcefb1a2fffcdd6446e57ecca8fefcdf00084e7edc90d38bfffcdf10084e7efcde1c084e7edcdece8bfffccd30084e7eccaafe8a5edc99b4a6ff8a5edc3db7a1ff8a5edcacb1a2fffcdd7046e57ecc65fefcdf003a4e7edc4dd38bfffcdf103a4e7efcde1c3a4e7edc9bce8bfffccd303a4e7ecc67fe8a5cdc56b4a6ff8a5cdcfab6a1ff8a5cdc69b1a2ffa04fc868a04bc874a047c878a048c905cc8200a05ec905cc8b00a05cc905cc8c00a07dc905cc8d00a055c905cc8e00a062c905cc9700fac89000c905cc9600fac89c00c905cc9500fac89f00c905cc9400a046c80ba04fc807dcf4bb8bffdcfabb8bfff1ecdc9fbc8bfffca1c09f4cbefcd9a0404d7ec9dbcaebfcdda0724d7ecae3fca1c49f4cbefcd9a0a44d7ec9c3cad3fca1c89f4cbefcd9a0d64d7ec9b3cac3fcdda0084e7ecabbfcdda03a4e7ecab3fcdda06c4e7ecaabfca1cc9f4cbefcd9a09e4e7ec98bca9bfcdda0d04e7eca93fcdda0024f7eca8bfcdda0344f7eca83fcdda0664f7ecc7bfffca1cc9f4cbefcd9a09e4e7ec80ca002c80d8501a004c807dcb25689ffdc055689ff",
    "_addr": "0x7ECB0888",
-   "_note": "new code, segment 2: the shared tone part, the chroma helper, the stubs of the first six entries, the art-matrix chain (707 B)"
+   "_note": "new code, segment 2: the shared tone part, the chroma helper, the stubs of the first six entries, the art-matrix chain (741 B)"
   },
   {
    "type": "bytes",
@@ -40,6 +40,555 @@
    "new": "dcbb437400cb",
    "_addr": "0x7E56C6A5",
    "_note": "hook: the stock art-matrix compare chain jumps to CHAIN (film codes first, then the stock compares of 70 / 79 / 102 / 103 unchanged)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x125140",
+   "expect": "a002c80b8501",
+   "new": "dceba97600cb",
+   "_addr": "0x7E546160",
+   "_note": "hook: Cross Process's adaptive-hue test (`cmp 2,d0; beq; mov 1,d1`) -> HUE: no hue while the entry has a film, else the stock tests"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D14F2",
+   "expect": "00676574496d61676554797065004e3034006765",
+   "new": "af68c80daf6fc809f1e8dc0d3fe8ffdc2a3fe8ff",
+   "_addr": "0x7EBF2512",
+   "_note": "new code, segment 2: ART bracket routine BK0 (20 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D150A",
+   "expect": "6c6c496e666f004e3035006765744d",
+   "new": "fca9804f84bef4d0f063dc143fe8ff",
+   "_addr": "0x7EBF252A",
+   "_note": "new code, segment 2: ART bracket routine BK1 (15 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1522",
+   "expect": "4e3036006765744e756d626572004e30370067",
+   "new": "a068c80ca06fc80877dc262eeaffdc422eeaff",
+   "_addr": "0x7EBF2542",
+   "_note": "new code, segment 2: ART bracket routine BK2 (19 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D17DC",
+   "expect": "496e666f00503033006765744375",
+   "new": "fca8804f84bef4c41edc8c2beaff",
+   "_addr": "0x7EBF27FC",
+   "_note": "new code, segment 2: ART bracket routine BK3 (14 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D17F4",
+   "expect": "503034006368616e6765496e6465784e756d626572005030",
+   "new": "af68c811af6fc80dfccc51d20000dc4c4e9bffdc634e9bff",
+   "_addr": "0x7EBF2814",
+   "_note": "new code, segment 2: ART bracket routine BK4 (24 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D180C",
+   "expect": "35005030360050303700503038005030390050",
+   "new": "fca8804f84bef052fccc61dd0000dcfd519bff",
+   "_addr": "0x7EBF282C",
+   "_note": "new code, segment 2: ART bracket routine BK5 (19 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1824",
+   "expect": "617274457870616e64416e696d6174696f6e0050",
+   "new": "af6cc80daf70c809f1e8dc7d3ce8ffdc9b3ce8ff",
+   "_addr": "0x7EBF2844",
+   "_note": "new code, segment 2: ART bracket routine BK6 (20 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D183C",
+   "expect": "6f766543757272656e744469726563",
+   "new": "fca9805084bef4d0f063dc853ce8ff",
+   "_addr": "0x7EBF285C",
+   "_note": "new code, segment 2: ART bracket routine BK7 (15 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1854",
+   "expect": "4d6f76655061676500503133006d6f76655061",
+   "new": "a06cc80ca070c80877dc942beaffdcb02beaff",
+   "_addr": "0x7EBF2874",
+   "_note": "new code, segment 2: ART bracket routine BK8 (19 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D18A8",
+   "expect": "3500513036005130370051303800",
+   "new": "fca8805084bef4c41edc602beaff",
+   "_addr": "0x7EBF28C8",
+   "_note": "new code, segment 2: ART bracket routine BK9 (14 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D18C0",
+   "expect": "6174696f6e00513042005230310073746172744d6f766965",
+   "new": "af6cc811af70c80dfccc91d20000dc194e9bffdc314e9bff",
+   "_addr": "0x7EBF28E0",
+   "_note": "new code, segment 2: ART bracket routine BK10 (24 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D2A50",
+   "expect": "00723137007365745472616e73706172",
+   "new": "fca8805084bef0522cd144dc86409bff",
+   "_addr": "0x7EBF3A70",
+   "_note": "new code, segment 2: ART bracket routine BK11 (16 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D2A68",
+   "expect": "72657365745472616e73706172656e7400723139",
+   "new": "af6dc80daf72c809f1e8dc622ae8ffdc7f2ae8ff",
+   "_addr": "0x7EBF3A88",
+   "_note": "new code, segment 2: ART bracket routine BK12 (20 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D2A80",
+   "expect": "5672616d496e666f00723230006672",
+   "new": "fca9c05084bef4d0f063dc692ae8ff",
+   "_addr": "0x7EBF3AA0",
+   "_note": "new code, segment 2: ART bracket routine BK13 (15 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D2A98",
+   "expect": "6f007232310073657444697370496e666f0073",
+   "new": "a06dc80ca072c80877dc7819eaffdc9419eaff",
+   "_addr": "0x7EBF3AB8",
+   "_note": "new code, segment 2: ART bracket routine BK14 (19 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D2AB0",
+   "expect": "436f6e74726f6c42617365007330",
+   "new": "fca8c05084bef4c41edc8019eaff",
+   "_addr": "0x7EBF3AD0",
+   "_note": "new code, segment 2: ART bracket routine BK15 (14 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D2AC8",
+   "expect": "6c44697265637400733033004c566775696465506c617465",
+   "new": "af6dc811af72c80dfccca1d20000dc383c9bffdc503c9bff",
+   "_addr": "0x7EBF3AE8",
+   "_note": "new code, segment 2: ART bracket routine BK16 (24 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D2B18",
+   "expect": "74303400676574576966695374617475730074",
+   "new": "fca8c05084bef052fccc61dd0000dcdb3f9bff",
+   "_addr": "0x7EBF3B38",
+   "_note": "new code, segment 2: ART bracket routine BK17 (19 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D2B30",
+   "expect": "7457696669535349440074303600736574576966",
+   "new": "af77c80daf73c809f1e8dcc229e8ffdce029e8ff",
+   "_addr": "0x7EBF3B50",
+   "_note": "new code, segment 2: ART bracket routine BK18 (20 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D2B48",
+   "expect": "73776f726400743037006765744f6e",
+   "new": "fca9005184bef4d0f063dcca29e8ff",
+   "_addr": "0x7EBF3B68",
+   "_note": "new code, segment 2: ART bracket routine BK19 (15 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D2B60",
+   "expect": "776f726400743038007365744f6e6554696d6550",
+   "new": "a077c80da073c809f003dcd818eaffdcf218eaff",
+   "_addr": "0x7EBF3B80",
+   "_note": "new code, segment 2: ART bracket routine BK20 (20 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D0070",
+   "expect": "412a2a3a2043616d657261436f6d",
+   "new": "fca8005184bef4c41edce743eaff",
+   "_addr": "0x7EBF1090",
+   "_note": "new code, segment 2: ART bracket routine BK21 (14 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D0088",
+   "expect": "657474696e67436f6e74726f6c6c657200432a2a3a",
+   "new": "af77c80eaf73c80a2c8161dc9f669bffdcb6669bff",
+   "_addr": "0x7EBF10A8",
+   "_note": "new code, segment 2: ART bracket routine BK22 (21 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D00A0",
+   "expect": "636b47726f756e644374726c00442a2a",
+   "new": "fca8005184bef0522cc144dca96a9bff",
+   "_addr": "0x7EBF10C0",
+   "_note": "new code, segment 2: ART bracket routine BK23 (16 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D00B8",
+   "expect": "74726c00452a2a3a20446174654374726c00462a",
+   "new": "af78c80daf76c809f1e8dc6354e8ffdc8054e8ff",
+   "_addr": "0x7EBF10D8",
+   "_note": "new code, segment 2: ART bracket routine BK24 (20 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1DD8",
+   "expect": "006730350067303600673037006730",
+   "new": "fca9405184bef4d0f063dc6237e8ff",
+   "_addr": "0x7EBF2DF8",
+   "_note": "new code, segment 2: ART bracket routine BK25 (15 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1DF0",
+   "expect": "75737450726576696577006730390061646a7573",
+   "new": "a078c80da076c809f003dc6f26eaffdc8926eaff",
+   "_addr": "0x7EBF2E10",
+   "_note": "new code, segment 2: ART bracket routine BK26 (20 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1E08",
+   "expect": "6e00673130006731310067313200",
+   "new": "fca8405184bef4c41edc7626eaff",
+   "_addr": "0x7EBF2E28",
+   "_note": "new code, segment 2: ART bracket routine BK27 (14 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1E20",
+   "expect": "726c61790067313400683031006830320068303300683034",
+   "new": "af78c811af76c80dfccc81dd0000dc2a499bffdc41499bff",
+   "_addr": "0x7EBF2E40",
+   "_note": "new code, segment 2: ART bracket routine BK28 (24 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1E38",
+   "expect": "00683035006830360068303700683038",
+   "new": "fca8405184bef0522cc144dc3f4d9bff",
+   "_addr": "0x7EBF2E58",
+   "_note": "new code, segment 2: ART bracket routine BK29 (16 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x655403",
+   "expect": "af68c826f1e8",
+   "new": "dcefc01700cb",
+   "_addr": "0x7EA76423",
+   "_note": "hook: ART bracket, Grainy Film cmp of the entry's stored value -> BK0 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x655422",
+   "expect": "8568f4d0f063",
+   "new": "dce8c01700cb",
+   "_addr": "0x7EA76442",
+   "_note": "hook: ART bracket, Grainy Film mov of the entry's stored value -> BK1 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x67434C",
+   "expect": "a068c82477",
+   "new": "dcd6d11500",
+   "_addr": "0x7EA9536C",
+   "_note": "hook: ART bracket, Grainy Film cmp of the entry's stored value -> BK2 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x67436C",
+   "expect": "8068f4c41e",
+   "new": "dc70d41500",
+   "_addr": "0x7EA9538C",
+   "_note": "hook: ART bracket, Grainy Film mov of the entry's stored value -> BK3 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x186644",
+   "expect": "af68c824fccc51d20000",
+   "new": "dcb0b16400cbcbcbcbcb",
+   "_addr": "0x7E5A7664",
+   "_note": "hook: ART bracket, Grainy Film cmp of the entry's stored value -> BK4 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x186A0D",
+   "expect": "8068f052fccc61dd0000",
+   "new": "dcffad6400cbcbcbcbcb",
+   "_addr": "0x7E5A7A2D",
+   "_note": "hook: ART bracket, Grainy Film mov of the entry's stored value -> BK5 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x6554A5",
+   "expect": "af6cc827f1e8",
+   "new": "dc7fc31700cb",
+   "_addr": "0x7EA764C5",
+   "_note": "hook: ART bracket, Gentle Sepia cmp of the entry's stored value -> BK6 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x6554C5",
+   "expect": "856cf4d0f063",
+   "new": "dc77c31700cb",
+   "_addr": "0x7EA764E5",
+   "_note": "hook: ART bracket, Gentle Sepia mov of the entry's stored value -> BK7 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x6743EC",
+   "expect": "a06cc82477",
+   "new": "dc68d41500",
+   "_addr": "0x7EA9540C",
+   "_note": "hook: ART bracket, Gentle Sepia cmp of the entry's stored value -> BK8 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x67440C",
+   "expect": "806cf4c41e",
+   "new": "dc9cd41500",
+   "_addr": "0x7EA9542C",
+   "_note": "hook: ART bracket, Gentle Sepia mov of the entry's stored value -> BK9 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x1866DD",
+   "expect": "af6cc825fccc91d20000",
+   "new": "dce3b16400cbcbcbcbcb",
+   "_addr": "0x7E5A76FD",
+   "_note": "hook: ART bracket, Gentle Sepia cmp of the entry's stored value -> BK10 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x186ADA",
+   "expect": "806cf0522cd144",
+   "new": "dc76bf6400cbcb",
+   "_addr": "0x7E5A7AFA",
+   "_note": "hook: ART bracket, Gentle Sepia mov of the entry's stored value -> BK11 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x6554CE",
+   "expect": "af6dc826f1e8",
+   "new": "dc9ad51700cb",
+   "_addr": "0x7EA764EE",
+   "_note": "hook: ART bracket, Dramatic Tone cmp of the entry's stored value -> BK12 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x6554ED",
+   "expect": "856df4d0f063",
+   "new": "dc93d51700cb",
+   "_addr": "0x7EA7650D",
+   "_note": "hook: ART bracket, Dramatic Tone mov of the entry's stored value -> BK13 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x674414",
+   "expect": "a06dc82477",
+   "new": "dc84e61500",
+   "_addr": "0x7EA95434",
+   "_note": "hook: ART bracket, Dramatic Tone cmp of the entry's stored value -> BK14 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x674434",
+   "expect": "806df4c41e",
+   "new": "dc7ce61500",
+   "_addr": "0x7EA95454",
+   "_note": "hook: ART bracket, Dramatic Tone mov of the entry's stored value -> BK15 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x186704",
+   "expect": "af6dc825fccca1d20000",
+   "new": "dcc4c36400cbcbcbcbcb",
+   "_addr": "0x7E5A7724",
+   "_note": "hook: ART bracket, Dramatic Tone cmp of the entry's stored value -> BK16 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x186AF7",
+   "expect": "806df052fccc61dd0000",
+   "new": "dc21c06400cbcbcbcbcb",
+   "_addr": "0x7E5A7B17",
+   "_note": "hook: ART bracket, Dramatic Tone mov of the entry's stored value -> BK17 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x6554F6",
+   "expect": "af77c827f1e8",
+   "new": "dc3ad61700cb",
+   "_addr": "0x7EA76516",
+   "_note": "hook: ART bracket, Key Line cmp of the entry's stored value -> BK18 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x655516",
+   "expect": "8577f4d0f063",
+   "new": "dc32d61700cb",
+   "_addr": "0x7EA76536",
+   "_note": "hook: ART bracket, Key Line mov of the entry's stored value -> BK19 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x67443C",
+   "expect": "a077c823f003",
+   "new": "dc24e71500cb",
+   "_addr": "0x7EA9545C",
+   "_note": "hook: ART bracket, Key Line cmp of the entry's stored value -> BK20 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x67445B",
+   "expect": "8077f4c41e",
+   "new": "dc15bc1500",
+   "_addr": "0x7EA9547B",
+   "_note": "hook: ART bracket, Key Line mov of the entry's stored value -> BK21 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x18672B",
+   "expect": "af77c8212c8161",
+   "new": "dc5d996400cbcb",
+   "_addr": "0x7E5A774B",
+   "_note": "hook: ART bracket, Key Line cmp of the entry's stored value -> BK22 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x186B4D",
+   "expect": "8077f0522cc144",
+   "new": "dc53956400cbcb",
+   "_addr": "0x7E5A7B6D",
+   "_note": "hook: ART bracket, Key Line mov of the entry's stored value -> BK23 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x65551F",
+   "expect": "af78c826f1e8",
+   "new": "dc99ab1700cb",
+   "_addr": "0x7EA7653F",
+   "_note": "hook: ART bracket, Watercolor cmp of the entry's stored value -> BK24 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x65553E",
+   "expect": "8578f4d0f063",
+   "new": "dc9ac81700cb",
+   "_addr": "0x7EA7655E",
+   "_note": "hook: ART bracket, Watercolor mov of the entry's stored value -> BK25 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x674463",
+   "expect": "a078c823f003",
+   "new": "dc8dd91500cb",
+   "_addr": "0x7EA95483",
+   "_note": "hook: ART bracket, Watercolor cmp of the entry's stored value -> BK26 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x674482",
+   "expect": "8078f4c41e",
+   "new": "dc86d91500",
+   "_addr": "0x7EA954A2",
+   "_note": "hook: ART bracket, Watercolor mov of the entry's stored value -> BK27 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x18674E",
+   "expect": "af78c824fccc81dd0000",
+   "new": "dcd2b66400cbcbcbcbcb",
+   "_addr": "0x7E5A776E",
+   "_note": "hook: ART bracket, Watercolor cmp of the entry's stored value -> BK28 (the value-list byte of setting 111)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x186B7B",
+   "expect": "8078f0522cc144",
+   "new": "dcbdb26400cbcb",
+   "_addr": "0x7E5A7B9B",
+   "_note": "hook: ART bracket, Watercolor mov of the entry's stored value -> BK29 (the value-list byte of setting 111)"
   },
   {
    "type": "bytes",

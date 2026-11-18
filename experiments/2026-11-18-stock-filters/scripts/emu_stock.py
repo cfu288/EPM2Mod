@@ -171,13 +171,17 @@ def main():
                 at += 2 * sz
 
     load, pmode = e3.LOAD, e3.PMODE
+    # the quick menu's Picture Mode: from Natural, 7 to the right is ART 3, 15 is ART 11 (Key Line)
+    pick_kl = ["key:OK", "w:300", "key:UP"] + ["key:RIGHT"] * 15 + ["shot:kl-before", "key:OK", "w:500"]
+    show_pm = ["key:OK", "w:300", "key:UP", "w:300", "shot:pm-now", "key:OK", "w:500"]
     plan = [
         (1, {"EPM2LOOK.BIN": files["F12"]}, False, ["dump:start"] + load + ["dump:load"] + pmode,
          [("start", [], "Off"), ("load", f12, "Loaded")]),
         (2, {}, True, ["dump:start"] + pmode, [("start", f12, "Off")]),
-        (3, {"EPM2LOOK.BIN": files["PART"]}, True, ["dump:start"] + load + ["dump:load"] + pmode,
+        (3, {"EPM2LOOK.BIN": files["PART"]}, True, ["dump:start"] + pick_kl + load + ["dump:load"] + show_pm,
          [("start", f12, "Off"), ("load", part, "Loaded")]),
-        (4, {"EPM2LOOK.BIN": files["EMPTY"]}, True, load + ["dump:load"] + pmode, [("load", [], "Loaded")]),
+        (4, {"EPM2LOOK.BIN": files["EMPTY"]}, True, show_pm[:-2] + ["shot:pm-start", "key:OK", "w:500"] + load +
+         ["dump:load"] + show_pm, [("load", [], "Loaded")]),
         (5, {"EPM2LOOK.BIN": files["BAD"]}, True, load + ["dump:load"], [("load", [], "Bad file")]),
         (6, None, True, ["dump:start"], [("start", [], "Off")]),
     ]

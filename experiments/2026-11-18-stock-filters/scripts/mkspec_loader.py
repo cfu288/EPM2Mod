@@ -9,8 +9,8 @@ The camera-tested loader of card-looks-4 (experiments/2026-11-17-card-looks/scri
     addresses relative to the block (tone: 8 tables per channel, the curve read at each stock default table);
   * SWITCH: for each entry its words of layout.json, the film bytes when the file lists the entry, else the stock
     bytes (words are written as words);
-  * PMREMAP, from T_GUI after the task switched: settings 111, 509, 510 that hold the stock value of an entry whose
-    list now holds its hidden value get the hidden value, and the other way round.
+  * PMREMAP, from T_GUI after a Load: the info ids 111 (Picture Mode), 509, 510 (Get/Set_CameraInfo) that hold the
+    stock value of an entry that now has a film get its hidden value, and the other way round.
 """
 
 import hashlib
@@ -39,7 +39,7 @@ RUNS = dict(m3.RUNS)
 RUNS[".ap"] = RUNS[".x1"]                     # APPLY grows: with the rest in the reclaimed area of segment 3
 del RUNS[".x1"]
 DATA = [(0x7EE40B18, 0x7EE411F6), (0x7F033B7C, 0x7F034000), (0x7EE546C4, 0x7EE548B0)]
-PMSETTINGS = (111, 509, 510)                  # settings that hold a stored Picture Mode value
+PMSETTINGS = (111, 509, 510)                  # info ids that hold a stored Picture Mode value
 
 HEAD_REPLACE = [
     # equates: no snapshot, no live tables, the switch table; REMAP is a fifth flag byte in the code (0 at boot)
@@ -47,7 +47,7 @@ HEAD_REPLACE = [
 """, """.equ SWTAB,    %(swtab)#x        # 12 pointers: each entry's switch list {u32 count, count x {u32 address,
                                  # u8 size, 3 x 0, 4 film bytes, 4 stock bytes}}
 .equ BLOCKS,   %(blocks)#x       # 12 u32: each entry's RAM block
-.equ PMSET,    %(pmset)#x        # u16 setting ids, 0 at the end
+.equ PMSET,    %(pmset)#x        # u16 info ids, 0 at the end
 .equ PMMAP,    %(pmmap)#x        # 5 x {u8 stock value, u8 hidden value, u16 0, u32 the entry's byte in list 111}
 """),
     (""".equ DEFREC,   %(defrec)#x       # the stock default tone record: 4 columns x (member 0, member 1)
@@ -119,8 +119,11 @@ T_STORED:"""),
 1:  clr d0
     movbu d0,(STOREOK)
 2:  calls SWITCH                 # film words for those entries, stock words for the others
-    mov 1,d0
+    movbu (MODE),d0              # after a Load only: the Picture Mode settings take the switched values (at a start
+    cmp 1,d0                     # they hold them already: saved after the Load)
+    bne 3f
     movbu d0,(REMAP)
+3:
 """),
     # the row's texts: Load Looks, Load, the help (no Built-in)
     ("""    mov TXTTAB,a0
@@ -197,7 +200,7 @@ SWITCH:                          # d0 = the entries with a film
     movm (sp),[d2,d3,a2,a3]
     rets
 
-PMREMAP:                         # GUI task: the Picture Mode settings follow the entries' stored values
+PMREMAP:                         # GUI task, after a Load: the Picture Mode settings follow the entries' stored values
     movm [d2,d3,a2,a3],(sp)
     add -28,sp                   # (8) setting list, (12) id, (16) value, (20) map, (24) left
     mov PMSET,a0
@@ -209,34 +212,31 @@ PMREMAP:                         # GUI task: the Picture Mode settings follow th
     add 2,a0
     mov a0,(8,sp)
     mov d0,(12,sp)
-    mov sp,a0
-    add 16,a0
-    clr d1
-    mov d1,(a0)
-    call 0x7ee01d38,[d2,a2],12   # getSetting(id, &value)
+    call 0x7e67f822,[],4         # Get_CameraInfo(id) -> d0
+    mov d0,(16,sp)
     mov PMMAP,a0
     mov a0,(20,sp)
     mov 5,d0
     mov d0,(24,sp)
 2:  mov (20,sp),a0
     mov (4,a0),a1
-    movbu (a1),d1                # the entry's stored value now
-    mov (16,sp),d0               # the setting's value
+    movbu (a1),d1                # the entry's stored value now (its byte in the value list)
+    mov (16,sp),d0
     movbu (a0),d2                # stock
     movbu (1,a0),d3              # hidden
     cmp d2,d0
     bne 3f
     cmp d3,d1
     bne 5f
-    mov d3,d1                    # stock value, the entry has a film: the hidden value
+    mov d3,d1                    # the stock value, and the entry has a film: the hidden value
     bra 4f
 3:  cmp d3,d0
     bne 5f
     cmp d2,d1
     bne 5f
-    mov d2,d1                    # hidden value, the entry has no film: the stock value
+    mov d2,d1                    # the hidden value, and the entry has no film: the stock value
 4:  mov (12,sp),d0
-    call 0x7ee01d4e,[d2,d3,a2],32   # setSetting(id, value)
+    call 0x7e67f882,[d2,d3],12   # Set_CameraInfo(id, value)
     bra 1b
 5:  mov (20,sp),a0
     add 8,a0
@@ -380,12 +380,10 @@ def main():
     txttab = place(b"".join(struct.pack("<HHI", tid, 0, strings[k]) for tid, k in
                             ((m3.T_LABEL, "label"), (m3.T_LOAD, "load"), (m3.T_HELP, "help"))))
     pmset = place(struct.pack("<%dH" % (len(PMSETTINGS) + 1), *PMSETTINGS, 0))
-    hidden = [e for e in layout["entries"] if e["kind"] == "hidden"]
-    first_list = slots.VALUE_LISTS[0]
     pm = b""
-    for e in hidden:
-        x = [s for s in slots.EXTRA_SLOTS if s.entry == e["name"]][0]
-        pm += struct.pack("<BBHI", e["stock_value"], e["value"], 0, first_list + slots.VALUE_LIST_STEP * x.place)
+    for e in [e for e in layout["entries"] if e["kind"] == "hidden"]:
+        x = [x for x in slots.EXTRA_SLOTS if x.entry == e["name"]][0]
+        pm += struct.pack("<BBHI", e["stock_value"], e["value"], 0, slots.VALUE_LISTS[0] + slots.VALUE_LIST_STEP * x.place)
     pmmap = place(pm)
 
     # ---- the assembly
@@ -450,7 +448,7 @@ def main():
     for k, blob in enumerate(areas):
         if blob:
             op(DATA[k][0], bytes(blob), "data (%d B): the loader's slot table, CRC table, operation list, RAM blocks, "
-               "switch lists, name ids, texts, Picture Mode settings and map" % len(blob))
+               "switch lists, name ids, texts, Picture Mode settings" % len(blob))
             print("data %d: %4d B at %#x" % (k, len(blob), DATA[k][0]))
     h = sect(".hs")
     assert len(h) == hook[1] and h[0] == 0xDC and get(hook[0], 5) == hook[2]

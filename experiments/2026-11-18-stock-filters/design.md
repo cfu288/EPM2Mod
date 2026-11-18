@@ -211,6 +211,25 @@ a flashed entry with the stock default handler as target is added; the loader sw
   loader's names at 0x7E4D0000 (a fault in the names code): the blocks start at 0x7E4D1000 now. sha256
   `3d7d80781886cdbc76d333bdafff6848bdb7f6ce18d131b102dfb8fd3cc15f83`.
 
+- 2026-11-18, the hooks and the Picture Mode (sha256 `2859767da0014bcb637ca3016898c940f7678d244794d3d5bb231c7e8c0ba8cd`):
+  - ART bracket: 30 hooks at the five hidden entries' constants in the two menu list builders (0x7EA7633A,
+    0x7EA9528D) and the frame composer (0x7E5A75AE): a compare skips the entry at its stock or hidden value; a value
+    load takes the entry's byte of the value list of info 111 (stock or hidden, as the loader switched it). No flag.
+    The routines are in 24-byte slots of free runs of segment 2 (osd-battery's runs are left free).
+  - Cross Process's adaptive hue: hook 0x7E546160; off only while the entry's matrix pointer holds the film address.
+  - No replaced instruction of the 32 hooks is a branch target (`mkspec_log.branch_targets_inside`). The six
+    segment-1 hooks are in `tools/emu/hookcheck-allow.tsv` (image job and ART bracket capture only; boot-test and
+    update-path-test pass).
+  - The Picture Mode: after a Load, the info ids 111, 509, 510 that hold an entry's stock value while the entry has a
+    film take its hidden value, and the other way round (Get_CameraInfo 0x7E67F822, Set_CameraInfo 0x7E67F882, in
+    T_GUI). Emulator, the stored value (prm tag 0x9481) at the next start: Key Line selected, C200 loaded into Key
+    Line -> 115; a file with no film -> 119. Two dead ends on the way: the GUI's getSetting(111) is another
+    numbering (it gave 19), and a remap at every start changed the boot (boot-test failed): the remap runs after a
+    Load only.
+  - The six sessions of `emu_stock.py` pass on this build; crawls P and ART against stock: every art-filter screen
+    equal (ART list, Picture Mode lists, quick menu); only the mod's rows differ (Custom Menu A and J, Shooting Menu
+    2's Time Lapse Settings).
+
 ## Open questions (settle in code and the emulator before any camera run)
 
 - U0. Three more colour-only art codes for Soft Focus, Pin Hole and Diorama (above).

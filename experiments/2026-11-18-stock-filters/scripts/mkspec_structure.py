@@ -73,10 +73,77 @@ NEUTRAL_75 = [(0x7E54B532, 0x4B), (0x7E54B536, 0x7D), (0x7E54B5F7, 0x4B), (0x7E5
               (0x7E54BF60, 0x4B), (0x7E54BF6B, 0x7D)]
 
 # Free space: code in segment 2, data in segment 3 (code-space-map USABLE areas, free in the stock-filters build)
-SHARED_AREA = (0x7ECB0888, 0x7ECB0BA0)     # segment 2: the shared tone part, the chroma helper, the matrix chain, and
+SHARED_AREA = (0x7ECB0888, 0x7ECB0BA0)     # (0x7ECB0BA0-0x7ECB0EE7 is interval-timelapse-v2's)
+# the ART bracket routines: one 26-byte slot each, in free runs of segment 2 that no spec of the build uses
+# (osd-battery, a candidate, keeps 0x7EBF1F50-0x7EBF1FF0 and 0x7EBF2560-0x7EBF2600)
+BRACKET_RUNS = [(0x7EBF2512, 0x7EBF2560), (0x7EBF27FC, 0x7EBF2890), (0x7EBF28C8, 0x7EBF2900), (0x7EBF3A70, 0x7EBF3B10),
+                (0x7EBF3B38, 0x7EBF3BAD), (0x7EBF1090, 0x7EBF10FC), (0x7EBF2DF8, 0x7EBF2E80)]
+BRACKET_SLOT = 24     # segment 2: the shared tone part, the chroma helper, the matrix chain, and
                                            # the stubs of the first six entries
 CODE_AREA = (0x7EBF38BC, 0x7EBF3B10)       # segment 2: the stubs of the other six (after the log's probes)
 DATA_AREA = (0x7EE541B4, 0x7EE548B0)
+
+
+HUE_SITE, HUE_BYTES = 0x7E546160, bytes.fromhex("a002c80b8501")   # Cross Process: `cmp 2,d0; beq; mov 1,d1`
+HUE_APPLY, HUE_SKIP = 0x7E54616D, 0x7E546215
+
+
+def site_insns(blk, a, n):
+    """Whole instructions from a, at least n bytes: [(address, bytes, mnemonic, operands)]."""
+    out = subprocess.run([BIN + "/mn10300-elf-objdump", "-D", "-b", "binary", "-m", "mn10300",
+                          "--adjust-vma=%#x" % BASE, "--start-address=%#x" % a, "--stop-address=%#x" % (a + n + 8),
+                          os.path.join(ROOT, "build", "blocks", "OLY_E_101_1600_0000_0000.BIN.block0.bin")],
+                         capture_output=True, text=True).stdout
+    rows = []
+    for l in out.splitlines():
+        m = re.match(r"^\s*([0-9a-f]{8}):\t((?:[0-9a-f]{2} )+)\s*(?:\t(\S+)\s*(.*))?$", l)
+        if m:
+            if m.group(3) is None:
+                rows[-1][1] += bytes.fromhex(m.group(2).replace(" ", ""))
+            else:
+                rows.append([int(m.group(1), 16), bytes.fromhex(m.group(2).replace(" ", "")), m.group(3),
+                             (m.group(4) or "").strip()])
+    taken, size = [], 0
+    for r in rows:
+        if size >= n:
+            break
+        taken.append(r)
+        size += len(r[1])
+    return taken
+
+
+def bracket_hooks(blk, extra):
+    """The ART bracket sites of the hidden entries: (site, length, asm of the routine) for each.
+    A compare `cmp V,dN; beq T` skips the entry also at its hidden value; a value `mov V,dN` loads the entry's current
+    stored value from its byte in the value list of setting 111 (the loader switches that byte)."""
+    hooks = []
+    for x in extra:
+        list_byte = slots.VALUE_LISTS[0] + slots.VALUE_LIST_STEP * x.place
+        for a in x.bracket.addresses:
+            ins = site_insns(blk, a - 1, 5)
+            first = ins[0]
+            body = []
+            if first[2] == "cmp":
+                reg = first[3].split(",")[1]
+                assert first[3] == "%d,%s" % (x.stock_value, reg) and ins[1][2] == "beq", ins
+                target = int(ins[1][3], 16)
+                body += ["cmp %d,%s" % (x.stock_value, reg), "beq 5f", "cmp %d,%s" % (x.value, reg), "beq 5f"]
+                rest = ins[2:]
+                tail = ["5:  jmp %#x" % target]
+            else:
+                reg = first[3].split(",")[1]
+                assert first[2] == "mov" and first[3] == "%d,%s" % (x.stock_value, reg), ins
+                body += ["movbu (%#x),%s" % (list_byte + 0x40000000, reg)]
+                rest = ins[1:]
+                tail = []
+            n = sum(len(r[1]) for r in ins)
+            for r in rest:
+                assert not re.match(r"^(b[a-z]{1,2}|jmp|call|calls|ret|retf|rets)$", r[2]), r
+                body.append(".byte " + ", ".join("0x%02x" % c for c in r[1]) + "    # " + r[2] + " " + r[3])
+            body.append("jmp %#x" % (a - 1 + n))
+            body += tail
+            hooks.append((a - 1, n, body, "%s %s" % (x.entry, first[2])))
+    return hooks
 
 
 def run(*a):
@@ -184,13 +251,38 @@ MUSE:
         else:
             chain.append("M%d: mov %#x,a1\n    bra MUSE" % (code, FILM_RAM + BLOCK * i + MATRIX))
     asm += chain
+    # Cross Process's scene-adaptive hue: off while the entry has a film (the matrix pointer holds the film address)
+    xp = [i for i, e in enumerate(ENTRIES) if e[3] == 85][0]
+    asm.append(""".section .sk,"ax"
+HUE: mov (%#x),a1
+    cmp %#x,a1
+    beq 1f
+    cmp 2,d0
+    beq 2f
+    mov 1,d1
+    cmp 4,d0
+    beq 2f
+1:  jmp %#x
+2:  jmp %#x""" % (MATPTR + 0x40000000 + INPLACE_PTR[85], FILM_RAM + BLOCK * xp + MATRIX, HUE_SKIP, HUE_APPLY))
+    asm.append(".section .hu,\"ax\"\n    jmp HUE\n    nop")
+    extra = [x for x in slots.EXTRA_SLOTS if x.entry in {e[0] for e in ENTRIES if e[4] == "hidden"}]
+    bhooks = bracket_hooks(blk, extra)
+    slots_at = []
+    for lo, hi in BRACKET_RUNS:
+        slots_at += list(range(lo, hi - BRACKET_SLOT + 1, BRACKET_SLOT))
+    assert len(slots_at) >= len(bhooks), "too few slots for the bracket routines"
+    for k, (site, n, body, what) in enumerate(bhooks):
+        asm.append(".section .q%d,\"ax\"\nBK%d:  # %s at %#x\n    " % (k, k, what, site) + "\n    ".join(body))
+        asm.append(".section .b%d,\"ax\"\n    jmp BK%d\n" % (k, k) + "    nop\n" * (n - 5))
     asm.append(".section .hk,\"ax\"\n    jmp CHAIN\n    nop")
     src = "\n".join(asm) + "\n"
     calls = sorted(set(re.findall(r"(?:jmp|call)\s+0x([0-9a-f]{8})", src)))
     src = re.sub(r"((?:jmp|call)\s+)0x([0-9a-f]{8})", r"\1s_\2", src)
     args = ["--defsym=s_%s=0x%s" % (a, a) for a in calls]
     args += ["--section-start=.sc=%#x" % CODE_AREA[0], "--section-start=.sk=%#x" % SHARED_AREA[0],
-             "--section-start=.hk=%#x" % MATRIX_HOOK]
+             "--section-start=.hk=%#x" % MATRIX_HOOK, "--section-start=.hu=%#x" % HUE_SITE]
+    args += ["--section-start=.b%d=%#x" % (k, site) for k, (site, _, _, _) in enumerate(bhooks)]
+    args += ["--section-start=.q%d=%#x" % (k, slots_at[k]) for k in range(len(bhooks))]
     s, o, e = (os.path.join(work, "structure." + x) for x in ("s", "o", "elf"))
     open(s, "w").write(src)
     run(BIN + "/mn10300-elf-as", "-o", o, s)
@@ -227,6 +319,19 @@ MUSE:
        "and the record triples (%d B)" % len(data))
     op(MATRIX_HOOK, hook, "hook: the stock art-matrix compare chain jumps to CHAIN (film codes first, then the stock "
        "compares of 70 / 79 / 102 / 103 unchanged)")
+    hu = sect(".hu")
+    assert len(hu) == 6 and get(HUE_SITE, 6) == HUE_BYTES
+    op(HUE_SITE, hu, "hook: Cross Process's adaptive-hue test (`cmp 2,d0; beq; mov 1,d1`) -> HUE: no hue while the "
+       "entry has a film, else the stock tests")
+    for k in range(len(bhooks)):
+        q = sect(".q%d" % k)
+        assert len(q) <= BRACKET_SLOT, (k, len(q))
+        op(slots_at[k], q, "new code, segment 2: ART bracket routine BK%d (%d B)" % (k, len(q)))
+    for k, (site, n, body, what) in enumerate(bhooks):
+        h = sect(".b%d" % k)
+        assert len(h) == n and h[0] == 0xDC
+        op(site, h, "hook: ART bracket, %s of the entry's stored value -> BK%d (the value-list byte of setting 111)"
+           % (what, k))
 
     # ---- tone hash: entries for 79 and the route / hidden codes (target: stock default; static targets for the
     # codes no stock entry reaches)
