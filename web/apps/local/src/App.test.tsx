@@ -80,7 +80,9 @@ describe('the local app', () => {
     expect(made).toEqual([{ firmware: 'epm2mod', choices: [], card: CARD.path }])
     expect(await screen.findByRole('heading', { name: 'Install on the camera' })).toBeInTheDocument()
     const steps = screen.getByRole('list', { name: 'Install steps' })
-    expect(steps).toHaveTextContent('Press and hold the OK button')
+    expect(steps).toHaveTextContent(
+      'Press and hold the OK button (the middle of the arrow pad) and the ON/OFF button together.',
+    )
     expect(steps).toHaveTextContent('such as Portra 400')
     expect(steps).not.toHaveTextContent('Load Looks')
     expect(steps).not.toHaveTextContent('zip')

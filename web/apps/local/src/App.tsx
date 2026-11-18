@@ -448,11 +448,13 @@ function InstallStep(props: {
           Charge the camera&apos;s battery fully. With the camera off, open the battery/card cover on the bottom, put
           the battery in, and push the card in until it clicks. Close the cover.
         </li>
-        <li>Press and hold the OK button (the middle of the arrow pad). While you hold it, press the ON/OFF button.</li>
         <li>
-          When an orange lamp lights, let go of OK. The lamp stays on for 1 to 2 minutes while the camera updates. Until
-          it blinks, keep the cover closed, the battery in, and the buttons untouched. Still on after 10 minutes? Get
-          help (link below).
+          Press and hold the OK button (the middle of the arrow pad) and the ON/OFF button together. When the orange
+          lamp on the front of the camera lights steadily, let go of both.
+        </li>
+        <li>
+          The lamp stays on for 1 to 2 minutes while the camera updates. Until it blinks, keep the cover closed, the
+          battery in, and the buttons untouched. Still on after 10 minutes? Get help (link below).
         </li>
         <li>
           When the lamp blinks, the update is done. Press ON/OFF to turn the camera off, then again to turn it on.

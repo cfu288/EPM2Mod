@@ -16,7 +16,7 @@ This procedure is **confirmed on the E-PM2** (see [camera-log.md](camera-log.md)
    shasum -a 256 /Volumes/SDCARD/DCOLYMP/E1019999.BIN
    cd ~ && diskutil eject /Volumes/SDCARD
    ```
-4. With the camera off and the card in, hold **OK** and power on.
+4. With the camera off and the card in, hold **OK** and the **ON/OFF** button together. When the orange lamp on the front (the AF illuminator) lights steadily, let go of both (owner, 2026-11-18).
 5. The lamp shows progress:
    - **Solid orange, about 1–1.5 min:** writing. **Do not touch the camera.**
    - **Blinking:** finished. It keeps blinking until you power off.
