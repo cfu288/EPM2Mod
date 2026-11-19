@@ -14,7 +14,7 @@ describe('the look file', () => {
     )
   })
 
-  it('packs twelve slots as `epm2mod looks pack` does with the same choices', async () => {
+  it('packs twelve slots as `epm2mod films set` does with the same choices', async () => {
     const mix: Record<number, string> = { 1: 'velvia', 5: 'double-x', 11: 'vision3-500t' }
     const items = builtInSlots().map((item, i) => ({ ...item, filmId: mix[i] ?? item.filmId }))
     expect(await sha256(lookFile(items))).toBe('13599e2d1ad67ee54bf591473199f5a1af18be55661c7a20fb4698855ed4ef1a')

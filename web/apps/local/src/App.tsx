@@ -2,17 +2,13 @@ import { useEffect, useId, useState, type ReactNode } from 'react'
 import { ArrowDownTrayIcon, ArrowPathIcon } from '@heroicons/react/20/solid'
 import {
   builtInSlots,
-  CARD_NAME,
   choicesOf,
-  filmById,
   FilmCredit,
   MenuEditor,
   PageFrame,
-  slots,
   StripPreview,
   useLooks,
   type Looks,
-  type SlotItem,
 } from '@epm2mod/ui'
 import { api, type Build, type Card, type Firmware, type Job } from './api'
 import { Timeline } from './Timeline'
@@ -32,12 +28,6 @@ const FLOWS: Record<Firmware, StepId[]> = {
 }
 const ZIP_NAME = 'EPM2Mod-card.zip'
 
-/** Names the first slot whose film differs from the default, for the check after Load Looks: "C200 in ART 2." */
-function changedSlot(items: readonly SlotItem[]): string {
-  const index = items.findIndex((item, i) => item.filmId !== null && item.filmId !== slots[i]?.builtIn)
-  const id = items[index]?.filmId
-  return id ? `${filmById(id).name} in ART ${String(index + 1)}.` : 'film names, such as Portra 400.'
-}
 const HELP = 'https://github.com/cfu288/EPM2Mod/blob/main/docs/install.md'
 
 /** A card in the list: its name, size and where it is mounted. */
@@ -396,20 +386,18 @@ function BuildStep(props: { job: Job | null; firmware: Firmware; onRetry: () => 
   )
 }
 
+/** The steps on the camera come from the server (`epm2mod serve`), the same as the command line prints. */
 function InstallStep(props: {
   job: Job
   cardName: string
-  /** Names a slot the user changed, for the check, for example "C200 in ART 2." */
-  changed: string
   onZip: () => void
   onRestart: () => void
   onFinish: () => void
 }) {
   const { job } = props
   const zip = job.card === null
-  const looks = job.files.includes(CARD_NAME)
-  const original = job.firmware === 'original'
-  const what = original ? "Olympus's original firmware" : 'EPM2Mod'
+  const what = job.firmware === 'original' ? "Olympus's original firmware" : 'EPM2Mod'
+  const flash = job.camera_steps.findIndex((step) => step.id === 'flash') + 1
   return (
     <Step
       title="Install on the camera"
@@ -432,29 +420,12 @@ function InstallStep(props: {
         </button>
       )}
       <ol aria-label="Install steps" className="list-decimal space-y-2 pl-5">
-        {zip && <li>Copy DCOLYMP{looks ? ` and ${CARD_NAME}` : ''} from the zip to the top of the SD card.</li>}
-        <li>Eject the card (Mac: ⏏ in Finder. Windows: right-click → Eject) and take it out.</li>
-        <li>Put a charged battery and the card in the camera (cover on the bottom).</li>
-        <li>
-          Hold OK (middle of the arrow pad) and ON/OFF together until the orange lamp on the front stays lit, then let
-          go.
-        </li>
-        <li>Leave the camera alone until the lamp blinks (1 to 2 minutes).</li>
-        <li>Turn the camera off and on.</li>
-        <li>To check: MENU → SETUP → wrench tab → Firmware reads Body : 1.6 EPM2Mod and the release date.</li>
-        {looks && (
-          <li>
-            MENU → SETUP → gears tab → J → Load Looks → Load → OK. No gears tab? Wrench tab → Menu Display → Custom Menu
-            → On.
-          </li>
-        )}
-        <li>
-          Check: MENU → ART shows{' '}
-          {looks ? props.changed : original ? 'the art filters, such as Pop Art.' : 'film names, such as Portra 400.'}
-        </li>
+        {job.camera_steps.map((step) => (
+          <li key={step.id}>{step.text}</li>
+        ))}
       </ol>
       <p className="text-ink-soft text-sm">
-        Camera started normally? Turn it off and repeat step {zip ? 4 : 3}.{' '}
+        Camera started normally? Turn it off and repeat step {flash}.{' '}
         <a className="hover:text-ink underline" href={HELP}>
           Other problem?
         </a>
@@ -654,7 +625,6 @@ export default function App() {
           <InstallStep
             job={job}
             cardName={cards.find((c) => c.path === job.card && c.name !== '')?.name ?? 'SD card'}
-            changed={changedSlot(looks.items)}
             onZip={downloadZip}
             onFinish={() => {
               api.quit().then(

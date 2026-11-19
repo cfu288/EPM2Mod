@@ -113,22 +113,33 @@ function CliSteps() {
         </p>
         <Code>{`git clone ${REPO}.git\ncd EPM2Mod`}</Code>
       </Step>
-      <Step n={2} title="Make the firmware">
+      <Step n={2} title="Write the card">
         <p>Format the SD card in the camera first. Then, with the card in the computer:</p>
-        <Code>{'uv run epm2mod make --card /path/to/card'}</Code>
+        <Code>{'uv run epm2mod install --card /path/to/card'}</Code>
         <p>
           <code>/path/to/card</code> is the card&apos;s folder: <code>uv run epm2mod cards</code> lists it.
         </p>
         <p>
-          <code>make</code> also writes the 12 default film simulations. To choose your own, put a command-line name
+          <code>install</code> also writes the 12 default film simulations. To choose your own, put a command-line name
           from the{' '}
           <Link href={href('films', '#all-films')} className="underline">
             film simulation list
           </Link>{' '}
-          in each ART slot. ART1 is the first entry of the camera&apos;s ART menu (Pop Art), ART12 the last
-          (Watercolor). A slot you leave out keeps its Olympus art filter.
+          (or <code>uv run epm2mod films</code>) in each ART slot. ART1 is the first entry of the camera&apos;s ART menu
+          (Pop Art), ART12 the last (Watercolor). A slot you leave out keeps its Olympus art filter.
         </p>
-        <Code>{'uv run epm2mod looks pack ART1=portra-400 ART2=velvia --card /path/to/card'}</Code>
+        <Code>{'uv run epm2mod install --card /path/to/card ART1=portra-400 ART2=velvia'}</Code>
+        <p>To change only the film simulations later:</p>
+        <Code>{'uv run epm2mod films set --card /path/to/card ART2=velvia'}</Code>
+        <p>To see what is on the card and what will not work:</p>
+        <Code>{'uv run epm2mod inspect --card /path/to/card'}</Code>
+        <p>
+          All commands:{' '}
+          <a href={`${REPO}/blob/main/docs/cli.md`} className="underline">
+            command-line reference
+          </a>
+          .
+        </p>
       </Step>
       <Flash n={3} />
       <CustomMenu n={4} />

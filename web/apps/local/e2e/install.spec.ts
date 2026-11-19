@@ -25,6 +25,16 @@ async function fakeServer(page: Page) {
       sha256: 'ab'.repeat(32),
       card: body?.card ?? null,
       files: ['DCOLYMP/E1019999.BIN', ...(body?.choices.length ? ['EPM2LOOK.BIN'] : [])],
+      // as src/epm2mod/camera_steps.py makes them, cut to the ones the tests read
+      camera_steps: done
+        ? [
+            ...(body?.card == null
+              ? [{ id: 'copy', text: 'Copy DCOLYMP and EPM2LOOK.BIN to the top of the SD card.' }]
+              : []),
+            { id: 'flash', text: 'Hold OK (middle of the arrow pad) and ON/OFF together.' },
+            { id: 'load-films', text: 'MENU → SETUP → gears tab → J → Load Looks → Load → OK.' },
+          ]
+        : [],
     }
   }
   await page.route('/api/**', async (route) => {

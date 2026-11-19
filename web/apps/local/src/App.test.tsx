@@ -14,6 +14,30 @@ const CARD = {
   label: 'CARD, 32.0 GB (31.0 GB free), /media/u/CARD',
 }
 
+interface MakeBody {
+  firmware: string
+  choices: string[]
+  card: string | null
+}
+
+/** Camera steps as `epm2mod serve` sends them (src/epm2mod/camera_steps.py), cut to the ones the tests read. */
+function cameraSteps(body: MakeBody) {
+  const films = body.choices.length > 0
+  const art = body.firmware === 'original' ? 'the art filters, such as Pop Art.' : 'film names, such as Portra 400.'
+  return [
+    ...(body.card === null
+      ? [{ id: 'copy', text: `Copy DCOLYMP${films ? ' and EPM2LOOK.BIN' : ''} to the top of the SD card.` }]
+      : []),
+    { id: 'eject', text: 'Eject the card (Mac: ⏏ in Finder. Windows: right-click → Eject) and take it out.' },
+    {
+      id: 'flash',
+      text: 'Hold OK (middle of the arrow pad) and ON/OFF together until the orange lamp on the front stays lit, then let go.',
+    },
+    ...(films ? [{ id: 'load-films', text: 'MENU → SETUP → gears tab → J → Load Looks → Load → OK.' }] : []),
+    { id: 'check-art', text: `Check: MENU → ART shows ${art}` },
+  ]
+}
+
 /** A fake `epm2mod serve`: it records the calls to /api/make and ends each job at once. */
 function server(cards = [CARD]) {
   const made: unknown[] = []
@@ -28,7 +52,7 @@ function server(cards = [CARD]) {
       if (path === '/api/job') return reply(job)
       if (path === '/api/quit') return reply({ ok: true })
       if (path === '/api/make') {
-        const body = JSON.parse(init?.body as string) as { firmware: string; choices: string[]; card: string | null }
+        const body = JSON.parse(init?.body as string) as MakeBody
         made.push(body)
         const files = ['DCOLYMP/E1019999.BIN', ...(body.choices.length ? ['EPM2LOOK.BIN'] : [])]
         job = {
@@ -42,6 +66,7 @@ function server(cards = [CARD]) {
           sha256: BUILD.sha256,
           card: body.card,
           files,
+          camera_steps: cameraSteps(body),
         }
         return reply(job)
       }
@@ -88,7 +113,8 @@ describe('the local app', () => {
     )
     expect(steps).toHaveTextContent('MENU → SETUP → gears tab → J → Load Looks → Load → OK.')
     expect(steps).toHaveTextContent('Check: MENU → ART shows film names, such as Portra 400.')
-    expect(steps).not.toHaveTextContent('zip')
+    expect(steps).not.toHaveTextContent('Copy')
+    expect(screen.getByText(/repeat step 2/)).toBeInTheDocument()
     expect(screen.queryByText(/derived from/)).toBeNull()
     await user.click(screen.getByRole('button', { name: 'Finish' }))
     expect(await screen.findByRole('heading', { name: 'EPM2Mod has stopped' })).toBeInTheDocument()
@@ -151,8 +177,8 @@ describe('the local app', () => {
     expect(first?.choices.slice(0, 3)).toEqual(['ART1=portra-400', 'ART2=c200', 'ART3=pro-400h'])
     expect(await screen.findByRole('button', { name: 'Download EPM2Mod-card.zip' })).toBeInTheDocument()
     const steps = screen.getByRole('list', { name: 'Install steps' })
-    expect(steps).toHaveTextContent('Copy DCOLYMP and EPM2LOOK.BIN from the zip to the top of the SD card.')
-    expect(steps).toHaveTextContent('Check: MENU → ART shows C200 in ART 2.')
+    expect(steps).toHaveTextContent('Copy DCOLYMP and EPM2LOOK.BIN to the top of the SD card.')
     expect(steps).toHaveTextContent('MENU → SETUP → gears tab → J → Load Looks → Load → OK.')
+    expect(screen.getByText(/repeat step 3/)).toBeInTheDocument()
   })
 })

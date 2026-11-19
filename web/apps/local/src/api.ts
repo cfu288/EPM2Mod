@@ -18,6 +18,13 @@ export interface Card {
 /** EPM2Mod, or Olympus's original firmware (the way back). */
 export type Firmware = 'epm2mod' | 'original'
 
+/** A step on the camera after the files are made (src/epm2mod/camera_steps.py). */
+export interface CameraStep {
+  /** What the step does, for example `flash` or `load-films`. */
+  id: string
+  text: string
+}
+
 export interface Job {
   job: number
   firmware: Firmware
@@ -32,6 +39,8 @@ export interface Job {
   card: string | null
   /** The files made, by their path on the card. */
   files: string[]
+  /** The steps on the camera, when the job is done. */
+  camera_steps: CameraStep[]
 }
 
 const token = () => new URLSearchParams(window.location.hash.slice(1)).get('token') ?? ''
