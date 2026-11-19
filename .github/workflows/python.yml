@@ -28,4 +28,4 @@ jobs:
       - run: uv run mypy
       - run: uv run python -m unittest discover -s tests
       # a tested build: make compares the result with the recorded sha256 and fails on any difference
-      - run: uv run epm2mod make
+      - run: uv run epm2mod make "$(uv run python -c 'import json, pathlib; print(pathlib.Path(json.load(open("pinned-build.json"))["build"]).stem)')"
