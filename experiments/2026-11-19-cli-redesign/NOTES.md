@@ -152,3 +152,95 @@ Grouped as `epm2mod --help` shows them. Every `--help` ends with one or two exam
 1. Settled: dated experiment notes and the camera log keep the old command names (owner).
 2. Kept after owner review: `serve` (camera owners never type it; the launchers start it) and `restore` (it puts
    Olympus's firmware back; it does not remove the film file or any films kept in the camera).
+
+## Revision 3: design review (2026-11-19)
+
+Three blind reviewers (conventions, design from scratch, scripts and card safety) read only `--help`, `docs/cli.md`
+and sample runs, and challenged every choice. Each finding was checked against the real CLI. Owner decisions:
+`--film`, and no film set in the CLI. The other choices follow common CLI practice; the owner can overrule any of
+them.
+
+### Films (owner)
+
+- `--film ARTn=FILM`, repeatable, replaces the positional `ARTn=FILM` (install, films set). A slot named twice is a
+  usage error.
+- **The CLI has no film set.** The base is the firmware's own: Olympus's 12 art filters. No `--film`: `install` and
+  `make` write the firmware only (no `EPM2LOOK.BIN`); `films set` with no `--film` is a usage error. Each `--film`
+  puts one film simulation in one slot; a slot that is not named keeps its Olympus art filter (by design; one camera
+  test with a two-film file is still to be done).
+- The 12-film preset is the installer page's own data (`web/apps/local`), sent as 12 choices. The catalogue keeps
+  the films and each slot's Olympus filter name; `builtIn`, `default_art`, `default_choices` and "In the default look
+  file" go. `looks/card-looks.json` stays a developer look list (input of `films pack`).
+
+### Commands and arguments
+
+| Before | After | Why |
+|---|---|---|
+| `looks` (compare) / `looks --write`, `docs` / `docs --write` | `generate` (writes) / `generate --check` (compare, exit 1, lists the files) | Generators write by default and take `--check` (cargo fmt, black, terraform fmt); one CI check, so specs and docs cannot drift apart |
+| `looks pack LIST` | `films pack LIST` | One noun for the film file |
+| `--untested` | `--allow-untested` | Override flags say what they allow (cargo --allow-dirty) |
+| `release` checks; `--yes` acts | `release` acts; `--dry-run` checks | A missing flag must not turn into a silent success; same idiom as every writer |
+| `package -o DIR`, `--version V` | `package --out-dir DIR`, `--release-version V` | `-o` is a file everywhere; `--version` is the tool's version |
+| `-o PATH`: folder if it exists or ends in `/` | `-o FILE` is always a file; refused when it is on a listed SD card (use `--card`) | `restore -o /Volumes/CARD/` put the file where the camera does not look; `-o ./newdir` made a file |
+| `--eject` fails | a warning: exit 0, `"ejected": false` with the reason; the eject step stays | The write succeeded |
+| `log` prints JSON lines; `--summary` | summary by default; `--json` one document with the events | Same as every other command |
+| `epm2mod --help` in the release folder lists developer commands | the developer and release groups are hidden when there is no checkout (typed, they still exit with the message) | Owners see only what runs |
+| Help and examples say `epm2mod` | the launchers pass their own name (`./start.sh`, `.\start.ps1`) for usage lines, examples and hints | Copying an example must work |
+| `films` usage shows ACTION as required; no slot map | ACTION optional; `films` also prints the 12 slots with their Olympus filter names | Users choose by slot |
+
+### Defaults the CLI must not assume (owner: "whatever recommends a set of films should store it")
+
+A default is allowed only when it is data that its owner stores (the pinned build, which `pin` records in the
+repository or the release folder) or a plain convention (`--port` 0 = a free port; `serve` opens the browser). A
+default that decides for the user is removed.
+
+| Default | After |
+|---|---|
+| The 12-film set (`install`, `make`, `films set`, the installer server) | Gone from the CLI and the library (see Films). The installer page stores its own preset |
+| `make` with no BUILD makes the pinned build | `make BUILD`: the build is required |
+| `apply --from` defaults to Olympus's firmware 1.6 | `--from FILE` is required |
+| `package --version` defaults to today | `--release-version` is required |
+| The stock firmware: `stock=EPM2_V16` is a default argument in the library and the CLI | Each build description names its stock firmware; `restore` writes the stock firmware of the pinned build; no library function has a default stock firmware |
+| The check step says "Firmware reads Body : 1.6 EPM2Mod and the release date" for every build | The text comes from the build: its label (`Body : 1.6  EPM2Mod 2026.11.19`), or `Body : 1.6` for a build without one |
+| `camera_steps` functions default `art_shows` to "film names, such as Portra 400" | No default; the caller names what was written (the first film and its slot, or the art filters) |
+| `inspect` with neither FILE nor `--card` | Usage error: one of them is required |
+| The installer page selects the first card when several are listed | It selects a card only when exactly one is listed |
+| (proposed in review) `pin --date` defaults to today | Not adopted: the date of the camera test is a fact the caller states |
+| (proposed in review) eject by default | Not adopted: the CLI does not assume what the user does next; `--eject` stays opt-in |
+
+Kept: `install --build` defaults to the pinned build (data that `pin` stores); `release` makes a test release unless
+`--final` (the safe side); `package --out-dir` defaults to the locator's output folder; `log --dict` tries the
+dictionaries of the known builds.
+
+### Output and exit codes
+
+| Code | Meaning | What a caller does |
+|---|---|---|
+| 0 | done (also: an empty `cards` list) | |
+| 1 | a check found a difference or a problem (`generate --check`, `inspect` "will not work", `release --dry-run` not ready) | show it; like diff and grep |
+| 2 | wrong usage | fix the command |
+| 3 | not found: no such path, file not recognised, unknown build | fix the name or path |
+| 4 | refused; a named flag overrides it (`--allow-untested`) | ask the user, then pass the flag |
+| 5 | not safe: a checksum, read-back or download sha256 differs, firmware for another model | stop; never retry with a flag |
+| 6 | environment: no network, no checkout, the card is not a camera card, not writable or full | fix the setup, then retry |
+| 70 | internal error (an uncaught exception) | report |
+| 130 | interrupted (any signal); no file half-written | |
+
+- `--json`: success and failure print one document on stdout. Every document has `schema` 2, `command`, `version`
+  (the tool's) and `ok`; a failure has `error` {`code` (a stable name), `exit`, `message`, `override` (the flag, or
+  null)}. Usage errors too, when `--json` is in the arguments. Policy: added keys do not change `schema`; a removed or
+  renamed key or a changed type does; consumers ignore keys they do not know. `docs/cli.md` lists every key,
+  nested keys included, and a test compares it with real output.
+- Writes: a file whose sha256 on the card is already right is not written again (`"unchanged": true`). Removed
+  `DCOLYMP` files are printed ("would remove" / "removed"), not only in JSON.
+
+### Kept after challenge
+
+`install` and `films set` stay separate (no flash for films); `restore`; `--card` required, no auto-pick (Etcher,
+rpi-imager); results on stdout, the rest on stderr; no prompts; `--dry-run` on every writer; `apply`; the build is
+positional on `make` and `pin` (the thing they act on), a flag on `install`; `serve` (owner).
+
+### Known limits (not changed)
+
+- The read-back may come from the computer's cache, so a fake-capacity card can pass it.
+- A partial film file (fewer than 12 slots) is not camera-tested yet.
