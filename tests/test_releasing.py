@@ -22,18 +22,18 @@ from epm2mod.releasing import next_version, release_notes  # noqa: E402
 
 class NextVersionTests(unittest.TestCase):
     def test_the_first_test_release_of_a_day_is_rc_1(self) -> None:
-        self.assertEqual(next_version("2026-11-20", ["v2026.11.19-rc.1"], final=False), "2026.11.20-rc.1")
+        self.assertEqual(next_version("2026.11.20", ["v2026.11.19-rc.1"], final=False), "2026.11.20-rc.1")
 
     def test_the_next_test_release_counts_up_from_the_highest(self) -> None:
         tags = ["v2026.11.19-rc.1", "v2026.11.19-rc.3", "v2026.11.19-rc.2", "v2026.11.18-rc.9"]
-        self.assertEqual(next_version("2026-11-19", tags, final=False), "2026.11.19-rc.4")
+        self.assertEqual(next_version("2026.11.19", tags, final=False), "2026.11.19-rc.4")
 
     def test_a_final_release_is_the_date(self) -> None:
-        self.assertEqual(next_version("2026-11-19", ["v2026.11.19-rc.1"], final=True), "2026.11.19")
+        self.assertEqual(next_version("2026.11.19", ["v2026.11.19-rc.1"], final=True), "2026.11.19")
 
     def test_a_final_release_is_tagged_once(self) -> None:
         with self.assertRaises(BuildError):
-            next_version("2026-11-19", ["v2026.11.19"], final=True)
+            next_version("2026.11.19", ["v2026.11.19"], final=True)
 
 
 class ReleaseNotesTests(unittest.TestCase):

@@ -121,14 +121,18 @@ name.
 
 A release is a tag; GitHub makes, tests and publishes it (`.github/workflows/release.yml`).
 
-1. Pin the camera-tested build (`uv run epm2mod pin ...`) and push.
+1. Give the candidate build a label, the date its Firmware screen shows: `"label": "2026.11.19"` and the spec
+   `patches/build-label.json` in `builds/NAME.json` (the screen then reads "Body : 1.6  EPM2Mod 2026.11.19"). The label
+   is part of the firmware, so it is set before the camera test. Pin the camera-tested build (`uv run epm2mod pin ...`)
+   and push.
 2. `uv run epm2mod release` checks and shows the release: the pinned build has a camera test and a row in
    `docs/camera-log.md`, the tree is clean and pushed, the generated documents and the feature lists are current,
-   and the newest CI runs on main passed. It names the version from the camera-test date (`v2026.11.19-rc.N`, or
-   `v2026.11.19` with `--final`) and writes the notes: the build, the feat and fix commits since the last tag, the sha256.
+   and the newest CI runs on main passed. It names the version from the label (`v2026.11.19-rc.N`, or `v2026.11.19`
+   with `--final`) and writes the notes: the build, the feat and fix commits since the last tag, the sha256.
 3. `uv run epm2mod release --yes --push` tags and pushes it. The tag's message becomes the release notes.
 
-`uv run epm2mod package` makes the same zip locally, without publishing.
+`uv run epm2mod package` makes the same zip locally, without publishing. It refuses a version that does not start with
+the pinned build's label.
 
 ## Tests
 

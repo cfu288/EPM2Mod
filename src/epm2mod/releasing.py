@@ -5,9 +5,9 @@ zip with ``epm2mod package``, tests it on three systems and publishes it with
 the tag's message as the release notes. This module only decides whether the
 repository is ready, which version comes next, and what the notes say.
 
-The version is the pinned build's camera-test date: ``2026.11.19`` for a final
-release, ``2026.11.19-rc.N`` for a test release, N one more than the highest
-existing for that date.
+The version is the pinned build's label, the date its Firmware screen shows:
+``2026.11.19`` for a final release, ``2026.11.19-rc.N`` for a test release, N
+one more than the highest existing for that date.
 """
 
 from __future__ import annotations
@@ -29,18 +29,18 @@ from .paths import RepoPaths
 WORKFLOWS = ("release.yml", "web.yml")
 
 
-def next_version(tested: str, tags: list[str], final: bool) -> str:
-    """Return the next calendar version for a build camera-tested on ``tested``.
+def next_version(label: str, tags: list[str], final: bool) -> str:
+    """Return the next calendar version for a build labelled ``label``.
 
     Args:
-        tested: the ISO date of the camera test, like ``2026-11-19``.
+        label: the build's label, like ``2026.11.19``.
         tags: the existing tag names, like ``v2026.11.19-rc.1``.
         final: True for a release for everyone, False for a test release.
 
     Raises:
         BuildError: if the final release of that date is already tagged.
     """
-    day = tested.replace("-", ".")
+    day = label
     if final:
         if f"v{day}" in tags:
             raise BuildError(f"v{day} is already tagged")
@@ -148,6 +148,9 @@ def plan(paths: RepoPaths, final: bool) -> tuple[Plan | None, list[str]]:
     if pinned.sha256 is None or pinned.camera_tested is None:
         problems.append(f"the pinned build {pinned.name} has no camera test")
         return None, problems
+    if pinned.label is None:
+        problems.append(f"the pinned build {pinned.name} has no label")
+        return None, problems
     if pinned.sha256 not in read_text(paths.resolve("docs/camera-log.md")):
         problems.append(f"docs/camera-log.md has no row for {pinned.sha256[:8]}")
     if _git(paths, "status", "--porcelain", "--untracked-files=no"):
@@ -162,7 +165,7 @@ def plan(paths: RepoPaths, final: bool) -> tuple[Plan | None, list[str]]:
     problems += _ci_problems(paths, commit)
     tags = _git(paths, "tag", "--list", "v*").split()
     try:
-        version = next_version(pinned.camera_tested, tags, final)
+        version = next_version(pinned.label, tags, final)
     except BuildError as error:
         return None, problems + [str(error)]
     if problems:

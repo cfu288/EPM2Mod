@@ -61,6 +61,7 @@ from .fileio import (
     sync_folder,
     write_bytes,
 )
+from .label import LABEL_SPEC, with_label
 from .hashing import sha256_bytes
 from .paths import RepoPaths
 from .spec import Applied, PatchSpec, apply_specs, load_spec
@@ -91,10 +92,20 @@ class MakeResult:
 def load_specs(paths: RepoPaths, description: BuildDescription) -> list[PatchSpec]:
     """Read the patch specs of a build, in order.
 
+    The label spec gets the build's label in place of its placeholder
+    (``label.with_label``).
+
     Raises:
         SpecError: if a spec is missing or not valid.
+        BuildError: if the label cannot be written.
     """
-    return [load_spec(paths.resolve(relative)) for relative in description.specs]
+    specs = []
+    for relative in description.specs:
+        spec = load_spec(paths.resolve(relative))
+        if relative == LABEL_SPEC and description.label is not None:
+            spec = with_label(spec, description.label)
+        specs.append(spec)
+    return specs
 
 
 def build_image(

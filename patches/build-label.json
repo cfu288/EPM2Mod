@@ -1,0 +1,45 @@
+{
+ "name": "build-label",
+ "description": "Build label: the Firmware screen (Setup Menu, Firmware) shows 'Body : 1.6  EPM2Mod YYYY.MM.DD', the 'label' of the build description; epm2mod make writes it over the placeholder 0000.00.00 (src/epm2mod/label.py). The version number is not changed (block 0 header +16 = 0x1600, prm tag 0xC082). Four byte edits, no new code: the panel's object grows so that its value text holds 48 characters, the Body line formats with its own text in a wider box, and that text in unreferenced debug strings of segment 2. See experiments/2026-11-19-build-label/NOTES.md.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "candidate: emulator-checked, not flashed",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x8F834E",
+   "expect": "2ca803",
+   "new": "2c0004",
+   "_addr": "0x7ED1936E",
+   "_note": "panel 99 (Firmware screen) object: 936 -> 1024 bytes; its last field (+928) is the value text, which grows from 4 to 48 UTF-16 characters"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x957BB6",
+   "expect": "d43df97e",
+   "new": "ec2fbb7e",
+   "_addr": "0x7ED78BD6",
+   "_note": "panel 99, line 0 (Body): the format text 0x7EBB2FEC instead of the shared L\"%X.%X\""
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xB72884",
+   "expect": "7101aa00640020007101aa0064002000",
+   "new": "4b01aa00550120004b01aa0055012000",
+   "_addr": "0x7EF938A4",
+   "_note": "panel 99, widget 10 (the Body value), both copies of its rectangle: x 369 w 100 -> x 331 w 341 (640-wide coordinates; the text is centred in it)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x791FCC",
+   "expect": "74203d20002a2a2a2a2a2a2a2a2a2a204e6f20446576446174615472616e7366657220456e64202a2a2a2a2a2a2a2a2a2a0a002a2a2a2a2a2a2a2a2a2a20456e6420446576446174615472616e73666572202a2a2a2a2a2a2a2a2a2a0a000000",
+   "new": "250058002e002500580020002000450050004d0032004d006f006400200030003000300030002e00300030002e003000300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+   "_addr": "0x7EBB2FEC",
+   "_note": "the Body line's format text L\"%X.%X  EPM2Mod YYYY.MM.DD\" in unreferenced Bluetooth debug strings (reclaim-space row 2); epm2mod make writes the build's label in place of 0000.00.00"
+  }
+ ]
+}

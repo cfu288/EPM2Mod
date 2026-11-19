@@ -373,11 +373,18 @@ def _package(args: argparse.Namespace, paths: RepoPaths) -> int:
     """Run ``epm2mod package``: write the release zip."""
     from .release import make_release, today_version
 
-    out = make_release(
-        paths,
-        Path(args.out) if args.out else paths.output,
-        args.version or today_version(),
-    )
+    version = args.version or today_version()
+    label = pinned_description(paths).label
+    if (
+        label is not None
+        and not version.startswith(label)
+        and not version.endswith("-dev")
+    ):
+        raise BuildError(
+            f"the version {version} does not match the pinned build's label {label}: "
+            "start the release with 'epm2mod release'"
+        )
+    out = make_release(paths, Path(args.out) if args.out else paths.output, version)
     print(
         f"wrote {out}: {out.stat().st_size} bytes, sha256 {sha256_bytes(out.read_bytes())}"
     )

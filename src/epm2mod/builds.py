@@ -37,10 +37,11 @@ from typing import Any
 from .errors import BuildError
 from .fileio import read_json, write_json
 from .hashing import is_sha256
+from .label import LABEL_SPEC, check_label
 from .paths import SPEC_FOLDER, RepoPaths, is_repo_relative
 
 _NAME = re.compile(r"[a-z0-9][a-z0-9._-]*")
-_KEYS = {"what", "specs", "sha256", "camera_tested", "first_code"}
+_KEYS = {"what", "specs", "sha256", "camera_tested", "first_code", "label"}
 _SUFFIX = ".json"
 
 
@@ -100,6 +101,8 @@ class BuildDescription:
         camera_tested: ISO date of that test; present exactly when ``sha256`` is.
         first_code: True if the build runs code in an area where no
             camera-tested build runs code yet.
+        label: the date ``YYYY.MM.DD`` that the camera's Firmware screen shows
+            after "EPM2Mod"; present exactly when ``specs`` lists the label spec.
     """
 
     name: str
@@ -108,6 +111,7 @@ class BuildDescription:
     sha256: str | None = None
     camera_tested: str | None = None
     first_code: bool = False
+    label: str | None = None
 
     def __post_init__(self) -> None:
         """Check the description. Every instance is valid.
@@ -144,6 +148,13 @@ class BuildDescription:
         if self.sha256 is not None:
             _check_sha256(self.sha256, self.name)
             _check_date(self.camera_tested, self.name)
+        if self.label is not None:
+            check_label(self.label, self.name)
+        if (self.label is None) == (LABEL_SPEC in self.specs):
+            raise BuildError(
+                f"{self.name}: 'label' and the spec {LABEL_SPEC} go together: "
+                "give both or neither"
+            )
 
     @property
     def tested(self) -> bool:
@@ -179,6 +190,8 @@ class BuildDescription:
             raw["camera_tested"] = self.camera_tested
         if self.first_code:
             raw["first_code"] = True
+        if self.label is not None:
+            raw["label"] = self.label
         return raw
 
 
@@ -216,6 +229,7 @@ def description_from_json(name: str, raw: Any) -> BuildDescription:
         sha256=None if sha256 is None else _check_sha256(sha256, name),
         camera_tested=None if tested is None else _check_date(tested, name),
         first_code="first_code" in raw,
+        label=None if raw.get("label") is None else check_label(raw["label"], name),
     )
 
 
