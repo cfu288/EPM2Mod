@@ -1,0 +1,177 @@
+{
+ "name": "sixaxis-probe-1",
+ "description": "Probe of the six-value saturation and hue records (NOTES \u00a711.2, \u00a716): Vivid, Muted and Portrait each get two saturation slots (+40/-40) and two hue slots (+20/-20), all four variants of each record written alike. Temporary: these three modes render wrongly on this build. Compare RAW Data Edits of the same ORF before and after.",
+ "status": "built, NOT camera-tested",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x348226",
+   "expect": "120004001800000008000800",
+   "new": "280000000000d8ff00000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x348232",
+   "expect": "000002000400fffffaff0000",
+   "new": "0000140000000000ecff0000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x34820e",
+   "expect": "120007001800000008000800",
+   "new": "280000000000d8ff00000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x34821a",
+   "expect": "000005000400fffffaff0000",
+   "new": "0000140000000000ecff0000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x347fb6",
+   "expect": "120004001800000008000800",
+   "new": "280000000000d8ff00000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x347fc2",
+   "expect": "000002000400fffffaff0000",
+   "new": "0000140000000000ecff0000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x347f9e",
+   "expect": "120007001800000008000800",
+   "new": "280000000000d8ff00000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x347faa",
+   "expect": "000005000400fffffaff0000",
+   "new": "0000140000000000ecff0000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x348256",
+   "expect": "eaff0400f0ff00000400f8ff",
+   "new": "0000280000000000d8ff0000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x348262",
+   "expect": "03000000fdff070008000a00",
+   "new": "00000000140000000000ecff"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x34823e",
+   "expect": "eaff0700f0ff00000400f8ff",
+   "new": "0000280000000000d8ff0000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x34824a",
+   "expect": "03000300fdff090008000a00",
+   "new": "00000000140000000000ecff"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x347fe6",
+   "expect": "eaff0400f0ff00000400f8ff",
+   "new": "0000280000000000d8ff0000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x347ff2",
+   "expect": "03000000fdff070008000a00",
+   "new": "00000000140000000000ecff"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x347fce",
+   "expect": "eaff0700f0ff00000400f8ff",
+   "new": "0000280000000000d8ff0000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x347fda",
+   "expect": "03000300fdff090008000a00",
+   "new": "00000000140000000000ecff"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x348286",
+   "expect": "0e0000000000050000000000",
+   "new": "00000000280000000000d8ff"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x348292",
+   "expect": "ffff00000200feff00000000",
+   "new": "140000000000ecff00000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x34826e",
+   "expect": "0e0003000000050000000000",
+   "new": "00000000280000000000d8ff"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x34827a",
+   "expect": "ffff03000200feff00000000",
+   "new": "140000000000ecff00000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x348016",
+   "expect": "0e0000000000050000000000",
+   "new": "00000000280000000000d8ff"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x348022",
+   "expect": "ffff00000200feff00000000",
+   "new": "140000000000ecff00000000"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x347ffe",
+   "expect": "0e0003000000050000000000",
+   "new": "00000000280000000000d8ff"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x34800a",
+   "expect": "ffff03000200feff00000000",
+   "new": "140000000000ecff00000000"
+  }
+ ]
+}

@@ -1,0 +1,16 @@
+{
+ "name": "slot3-chroma-linear",
+ "description": "Pop Art I (codes 70 / 79): replace its six chroma-curve tables (0x7E74B8BA, 97 bytes; flat near neutral, steep outside) by the linear set Cross Process I and Light Tone use (0x7E74BAA4). Data only. NOTES \u00a730.2.",
+ "status": "camera-tested 2026-11-12 as part of build/seven-films-2.BIN (sha256 1f7d0db62f906da4e10de0ad3546f58f4eb5d1b008ae8e4baeb7a1e2b5170c01); see docs/camera-log.md",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x32a89a",
+   "expect": "000000177d8083e8ffffffffffffffff000000007f8081ffffffffffffffffff00000000a02a2aa0000000000000000000000000177d8083e8ffffffffffffffff000000007f8081ffffffffffffffffff00000000a02a2aa00000000000000000",
+   "new": "000000004080c0ffffffffffffffffff000000004080c0ffffffffffffffffff0000000080808080000000000000000000000000004080c0ffffffffffffffffff000000004080c0ffffffffffffffffff00000000808080800000000000000000"
+  }
+ ]
+}

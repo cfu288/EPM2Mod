@@ -245,3 +245,24 @@ positional on `make` and `pin` (the thing they act on), a flag on `install`; `se
 
 - The read-back may come from the computer's cache, so a fake-capacity card can pass it.
 - A partial film file (fewer than 12 slots) is not camera-tested yet.
+
+## Revision 4: no folder in the code (owner, 2026-11-19)
+
+Owner: "the cli should not be hard coded to any folder, and if params are needed things should be passed in as
+args". The pattern is a project manifest found by walking up from the current folder (package.json, Cargo.toml,
+pyproject.toml), with output and cache locations as arguments.
+
+- **Manifest.** `epm2mod.json` at the top of a project names every file and folder the tools read or write: build
+  descriptions, patch specs, the pinned build, film data (catalogue, film records, look lists, older film lists),
+  event dictionaries, documents with generated blocks, emulator and space tools, the output folder, the cache folder
+  for Olympus's firmware, and the installer page. A checkout and the release zip each have one; the zip's replaces
+  `release.json` and says it is a release. No folder or file name of the project is in `src/epm2mod` (a test scans
+  the whole package, not only `cli.py`); the camera's own names (`DCOLYMP`, `E1019999.BIN`, `EPM2LOOK.BIN`) stay.
+- **Finding it.** `--project DIR` (global option) names the project folder. Without it: the nearest folder at or
+  above the current folder that holds `epm2mod.json`. Not found: exit 6 with the message. `EPM2MOD_ROOT` and the
+  fallback to the package's own folder go (no alias).
+- **Arguments for locations.** `make --out-dir DIR` (default: the manifest's output folder). `--cache DIR` on the
+  commands that use Olympus's firmware (`install`, `restore`, `fetch-stock`, `make`, `apply`): where it is downloaded
+  and kept (default: the manifest's cache folder). `--stock FILE` on the same commands: use this copy of Olympus's
+  firmware (checked by its sha256) and download nothing.
+- **Defaults.** A default location is always the manifest's value: data the project stores, not code.

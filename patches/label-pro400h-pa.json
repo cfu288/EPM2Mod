@@ -1,0 +1,3 @@
+{"name": "label-pro400h-pa", "description": "Rename the menu label 'Pop Art' to 'Pro400H' (same length; 20 English copies in block 1). Text only. Shared by Pop Art I and II.", "status": "built, NOT camera-tested",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN", "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [{"type": "utf16-replace-all", "block": 1, "old": "Pop Art", "new": "Pro400H", "count": 20}]}

@@ -1,0 +1,3 @@
+{"name": "label-ektachrome-lt", "description": "Rename the menu label 'Light Tone' to 'Ektachrome' (same length; 2 copies in block 1, shared by all languages). Text only.", "status": "built, NOT camera-tested",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN", "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [{"type": "utf16-replace-all", "block": 1, "old": "Light Tone", "new": "Ektachrome", "count": 2}]}

@@ -1,0 +1,86 @@
+{
+ "name": "slot3-code",
+ "description": "Third film slot in the top-level Pop Art entry (codes 70 / 79): 119 bytes of new code at 0x7E880F5C (slot3/cave.s), a jump from the matrix compare chain, the gamma range check 71 -> 70 and hash entries. First patch with NEW CODE. NOTES \u00a729-30.",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x45ff3c",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "16f8bb1c888dfcdcdcb3787eddcaa7ceffc008f012888dfcdcfcb3787eddb9a7ceffc008f013fcdc7cb4787edccaa8ceffa055c81ba057c817a048c818a051c814a046c815a04fc811dcc6b7ceffdc0eb7ceffdc14b7cefff1ecfcddc20f887edca8b7ceffff000100000000000000010000000000000001"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x14b685",
+   "expect": "a046c811a0",
+   "new": "dce8483100"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x14a787",
+   "expect": "47",
+   "new": "46"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b178",
+   "expect": "61b8567e",
+   "new": "5c0f887e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b17c",
+   "expect": "0000000061b8567e",
+   "new": "090000005c0f887e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b140",
+   "expect": "e7b7567e",
+   "new": "61b8567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b188",
+   "expect": "e7b7567e",
+   "new": "61b8567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b138",
+   "expect": "22b8567e",
+   "new": "61b8567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b150",
+   "expect": "22b8567e",
+   "new": "61b8567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1a0",
+   "expect": "f0b7567e",
+   "new": "61b8567e"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x36b1b8",
+   "expect": "f0b7567e",
+   "new": "61b8567e"
+  }
+ ],
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "built, NOT camera-tested"
+}

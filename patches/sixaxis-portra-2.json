@@ -1,0 +1,23 @@
+{
+ "name": "sixaxis-portra-2",
+ "description": "Cross Process I six-axis records refitted with the model recalibrated on the probe and xp3 camera results (fit_sixaxis2.py, NOTES \u00a720). Apply on top of film-portra-xp.",
+ "status": "built, NOT camera-tested",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3484de",
+   "expect": "000003000000000000000000",
+   "new": "0e00d8ff2700e3ff0c00f3ff"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3484ea",
+   "expect": "000003000000000000000000",
+   "new": "ffff12000c001400f7ff1400"
+  }
+ ]
+}
