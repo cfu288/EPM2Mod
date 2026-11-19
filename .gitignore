@@ -35,3 +35,7 @@ src/epm2mod/app/
 # Third-party reference documents (manuals, parts lists). Not redistributable; never commit.
 /references/
 
+
+# Raw files of the site photos and the film tests, copied together for convenience (raws/README.md). Local only:
+# the photos carry the owner's name in their metadata.
+/raws/
