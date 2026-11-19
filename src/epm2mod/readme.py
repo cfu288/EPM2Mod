@@ -81,7 +81,8 @@ def films_block(paths: RepoPaths) -> str:
     """Return the table of every film a look file can hold, with the ART entry it is loaded into by default.
 
     The firmware keeps Olympus's art filters; the films reach the camera in a look file (``looks/film-records.json``).
-    The installer and ``make`` write the twelve default films, one per ART entry; the others can be chosen.
+    The installer and ``make`` write the twelve default films, one per ART entry; the others can be chosen. The
+    command-line name is what ``epm2mod looks pack ART1=NAME`` takes.
     """
     films = records.load(paths)
     default = {slot.built_in: slot for slot in films.slots}
@@ -90,11 +91,11 @@ def films_block(paths: RepoPaths) -> str:
         slot = default.get(film.id)
         where = f"ART {slot.art} ({slot.entry})" if slot else ""
         rows.append(
-            f"| {cell(film.name)} | {cell(film.film)} ({cell(film.medium)}) "
+            f"| {cell(film.name)} | `{film.id}` | {cell(film.film)} ({cell(film.medium)}) "
             f"| {cell(film.kind)} | {cell(where)} |"
         )
     return (
-        "| Menu name | Film | Type | Loaded by default |\n|---|---|---|---|\n"
+        "| Menu name | Command-line name | Film | Type | Loaded by default |\n|---|---|---|---|---|\n"
         + "\n".join(rows)
         + "\n"
     )

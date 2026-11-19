@@ -5,7 +5,7 @@ camera keeps them, with their names, after power-off and without the card.
 
 ## Make a file
 
-The installer always writes the file, with the 12 default film simulations or your choice. On the command line, change any film simulation in this command (`uv run epm2mod looks list` shows all 22, and
+The installer always writes the file, with the 12 default film simulations or your choice. On the command line, change any film simulation in this command (the names are in the [film table](film-looks.md#available-film-simulations) and in `uv run epm2mod looks list`, and
 `uv run epm2mod cards` shows the card's folder):
 
 ```sh
