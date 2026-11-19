@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Draw block 0 of the E-PM2 v1.6 firmware as a memory map (SVG), in address order.
 
-    python3 tools/memmap_svg.py [-o docs/memory-map.svg] [SPEC.json ...]
+    python3 tools/memmap_svg.py [-o docs/reference/memory-map.svg] [SPEC.json ...]
 
 Each cell is 256 bytes; each row is 64 KiB. A cell takes the colour of the most important thing in it:
 patched bytes > verified free space > unproven blank space > code / data / blank.
-Inputs: the stock block 0, build/map/functions.tsv (code vs data), docs/code-space-map.tsv (free-space verdicts,
+Inputs: the stock block 0, build/map/functions.tsv (code vs data), docs/reference/code-space-map.tsv (free-space verdicts,
 made by tools/freespace.py map) and the patch specs given on the command line (default: the current stack).
 Code vs data is the function database's page classification plus the known rodata ranges, so small tables inside
 code pages show as code.
@@ -17,7 +17,7 @@ BASE = 0x7E421020
 BLOCK0 = "build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin"
 CELL, COLS, PX = 256, 256, 4
 
-# (start, end, name, when it is in RAM) - from docs/code-space-map.md section 1
+# (start, end, name, when it is in RAM) - from docs/reference/code-space-map.md section 1
 LOADS = [
     (0x7E421020, 0x7E430000, "reset code", "before reset"),
     (0x7E430000, 0x7E4C9800, "kernel, drivers", "reset"),
@@ -30,7 +30,7 @@ LOADS = [
     (0x7F100000, 0x7F119000, "third Usr1 load", "Usr1"),
     (0x7F14B000, 0x7F14B820, "SRAM image", "reset"),
 ]
-# (start, what is there) - from docs/firmware-map.md, "Address regions of block 0"
+# (start, what is there) - from docs/reference/firmware-map.md, "Address regions of block 0"
 MODULES = [
     (0x7E421020, "reset code, kernel"),
     (0x7E44B000, "drivers, debug shell, peripheral tasks"),
@@ -127,7 +127,7 @@ def classify(specs):
             o += 1
     # free-space verdicts
     verdicts = {"USABLE-CODE": "freecode", "USABLE-DATA": "freedata", "NEEDS-DECISION": "unproven", "USED": None}
-    path = os.path.join(ROOT, "docs/code-space-map.tsv")
+    path = os.path.join(ROOT, "docs/reference/code-space-map.tsv")
     if os.path.exists(path):
         for r in csv.DictReader(open(path), delimiter="\t"):
             name = verdicts.get(r["verdict"])
@@ -197,7 +197,7 @@ def render(cls, out):
         a = BASE + r * COLS * CELL
         svg.append(f'<text x="{left - 6}" y="{top + r * PX + 9}" text-anchor="end" fill="#333">0x{a:08X}</text>'
                    f'<line x1="{left - 4}" y1="{top + r * PX}" x2="{left}" y2="{top + r * PX}" stroke="#333"/>')
-    # right side: black bars = ranges copied to RAM; labels = what is there (docs/firmware-map.md)
+    # right side: black bars = ranges copied to RAM; labels = what is there (docs/reference/firmware-map.md)
     xr = left + COLS * PX + 8
     for lo, hi, name, when in LOADS:
         r0 = (lo - BASE) // (CELL * COLS)
@@ -226,7 +226,7 @@ def render(cls, out):
         if w > 70:
             svg.append(f'<text x="{x + 4:.2f}" y="{by + 17}" fill="#fff">{totals[k] / n * 100:.1f}%</text>')
         x += w
-    svg.append(f'<text x="{left}" y="{by + 46}" fill="#444">Free and unproven areas come from docs/code-space-map.tsv '
+    svg.append(f'<text x="{left}" y="{by + 46}" fill="#444">Free and unproven areas come from docs/reference/code-space-map.tsv '
                f'(tools/freespace.py). Code vs data follows the function database, so tables inside code pages '
                f'show as code.</text>')
     svg.append("</svg>")
@@ -237,7 +237,7 @@ def render(cls, out):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("specs", nargs="*")
-    ap.add_argument("-o", "--out", default=os.path.join(ROOT, "docs/memory-map.svg"))
+    ap.add_argument("-o", "--out", default=os.path.join(ROOT, "docs/reference/memory-map.svg"))
     a = ap.parse_args()
     _, classes = classify(a.specs or DEFAULT_SPECS)
     t = render(classes, a.out)

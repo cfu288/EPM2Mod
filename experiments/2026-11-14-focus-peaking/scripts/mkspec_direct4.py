@@ -32,7 +32,7 @@ BIN = os.path.join(os.path.abspath(__file__).split("/experiments/")[0], "build",
 FUNCS = os.path.join(ROOT, "build/map/functions.txt")
 
 AREAS = {
-    # Kernel range, 0xFF run 0x7E4C90CA-0x7E4C9800 (docs/code-space-map.md 3.2, all six checks ok). The reset code
+    # Kernel range, 0xFF run 0x7E4C90CA-0x7E4C9800 (docs/reference/code-space-map.md 3.2, all six checks ok). The reset code
     # loads it with the kernel, so it is in RAM before any task and on the update path. interval-frames-240 has
     # data at 0x7E4C9100-0x7E4C9180 (its op ends at 0x7E4C9184). No code has run here.
     ".k": (0x7E4C9200, 0x7E4C9800, "kernel range, 0xFF run: getL, T_A, T_B, T_C, T_D1/T_D2, T_H, T_I, T_G, T_E1, T_E2, "

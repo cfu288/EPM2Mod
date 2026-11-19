@@ -7,17 +7,17 @@ Answer: yes. Labels: **V** = ran here; **I** = inferred.
 
 ## What was done
 
-- om-emu is the git submodule `emulator/om-emu`, pinned to upstream commit
+- om-emu is the git submodule `third_party/om-emu`, pinned to upstream commit
   `0819080133f6ca7edd455dfdfa209bd9eed291cc` (2026-11-14, the newest commit of `main` on 2026-11-15).
   The licence came with commit 18a8162; the pin is 70 commits after it, and 231 after the old base 96bf756.
-- Our changes to om-emu are two patch files in `emulator/om-emu-patches/`. `emulator/setup.sh`
+- Our changes to om-emu are two patch files in `tools/emu/om-emu-patches/`. `tools/emu/setup.sh`
   exports the submodule to `build/om-emu/` and applies them there. The submodule is not edited.
-- Our drivers moved to `emulator/e101/` and our tools to `emulator/boot/`. Every path in them comes
-  from the environment or from the repository (`emulator/e101/paths.mjs`, `emulator/emuenv.py`,
-  `emulator/boot/env.sh`).
-- New commands: `emulator/boot-test`, `emulator/update-path-test`, `emulator/emu-run`,
-  `emulator/mkstate`. See `emulator/boot/README.md`.
-- `emulator/omemu.py` (and with it `emurun.py` and `scenario.py`) uses `build/om-emu` when it exists.
+- Our drivers moved to `tools/emu/e101/` and our tools to `tools/emu/boot/`. Every path in them comes
+  from the environment or from the repository (`tools/emu/e101/paths.mjs`, `tools/emu/emuenv.py`,
+  `tools/emu/boot/env.sh`).
+- New commands: `tools/emu/boot-test`, `tools/emu/update-path-test`, `tools/emu/emu-run`,
+  `tools/emu/mkstate`. See `tools/emu/boot/README.md`.
+- `tools/emu/omemu.py` (and with it `emurun.py` and `scenario.py`) uses `build/om-emu` when it exists.
 
 ## The patches on the newer commit
 
@@ -25,7 +25,7 @@ The old tree was on upstream commit 96bf756. Between it and the pin upstream cha
 files we patch (`cpu.mjs`, `interp.mjs`, `models.mjs`, `hle.mjs`), 269 lines added and 44 removed in all. None of our hunks
 overlaps an upstream change: both old diffs apply to the pin with no fuzz and no offset error (V,
 `git apply --check`, and `patch --fuzz=0` in `setup.sh`). The one old diff of 246 lines is now two
-files: `0001` is the function-only model (what `emulator/omemu.py` needs), `0002` is the rest (the
+files: `0001` is the function-only model (what `tools/emu/omemu.py` needs), `0002` is the rest (the
 full boot). `0002` changes one line that `0001` adds (the INTC facts of the E101 entry).
 
 Upstream changes near our code, and why they do not change our results (V by the equal reports below):
@@ -68,15 +68,15 @@ file it wrote.
 
 - Screenshots and crawl outputs (about 1 GB, thousands of PNG files). They are outputs, and camera
   screens belong in `docs/images/ui/` only.
-- Settings state files. They hold data that the firmware wrote. `emulator/mkstate` makes them again.
+- Settings state files. They hold data that the firmware wrote. `tools/emu/mkstate` makes them again.
 - One-off probes of the port (`setup-*.mjs`, `probe.mjs`, `waits.mjs`, `bt.mjs`, `calltrace.mjs` and
   about 30 more short files), `demo.sh` (its sequences are in the guides' screenshots and in
   `mkstate`), and the checks of single builds, which are already in their experiments
   (`experiments/2026-11-14-level-gauge/scripts/step-b-emu/`,
   `experiments/2026-11-14-focus-peaking/scripts/menu-emu/` and `colours-emu/`,
   `experiments/2026-11-15-log/scripts/log-emu/`). Those copies still name the old work folder; with
-  the tools of `emulator/boot/` they need `emulator/emu-run` in place of `$NODE` and `BLOCKS`.
-- The lab notebook of the port. Its durable content is `emulator/boot/README.md`.
+  the tools of `tools/emu/boot/` they need `tools/emu/emu-run` in place of `$NODE` and `BLOCKS`.
+- The lab notebook of the port. Its durable content is `tools/emu/boot/README.md`.
 
 ## For epm2mod make
 
@@ -84,7 +84,7 @@ Not wired in (another session was building). The call for a candidate:
 
 ```python
 for check in ("boot-test", "update-path-test"):
-    done = subprocess.run([sys.executable, str(repo / "emulator" / check), str(image_path)],
+    done = subprocess.run([sys.executable, str(repo / "tools" / "emu" / check), str(image_path)],
                           cwd=repo, capture_output=True, text=True)
     # done.returncode: 0 pass, 1 fail (done.stdout has the reason), 2 usage, 3 emulator not set up
 ```

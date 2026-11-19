@@ -101,7 +101,7 @@ How the bodies were compared:
 
 ## 5. Spec ops ([patches/interval-timelapse.json](patches/interval-timelapse.json))
 - **Base:** sha256 34d339ac…3e300. Each `expect` carries 4 context bytes on each side.
-- **Checked:** `emulator/patchblock.py` applies all 5 ops (14 bytes differ in 7 runs, scratch image only) (V).
+- **Checked:** `tools/emu/patchblock.py` applies all 5 ops (14 bytes differ in 7 runs, scratch image only) (V).
 
 | # | Block-0 offset (runtime) | Change |
 |---|---|---|
@@ -114,7 +114,7 @@ How the bodies were compared:
 The .data tab layout (b) needs no change, because the row count of tab 1 stays 5.
 
 ## 6. Emulator (V; om-emu, function level, `results/emu-*.txt|json`)
-The new cases are in `emulator/cases.py`. Each has an independent Python model that reads the image's own tables.
+The new cases are in `tools/emu/cases.py`. Each has an independent Python model that reads the image's own tables.
 
 | Case | Entry | Rows | Stock model | Diff vs the spec |
 |---|---|---|---|---|
@@ -289,7 +289,7 @@ Reviews: [review-1-memory.md](review-1-memory.md), [review-2-code.md](review-2-c
 | Loaded at boot | Usr1 0x7E504BF2–0x7E504C18: SYSFMEM read, source 0x80794800, destination 0xBE8F5800, size `0x7ECB1000 − 0x7E8F5800`. This is before the segment-3 load, so segment-3 GUI code can always read the table, and the two segment-2 hooks no longer jump into a later segment (review 2 S1, review 1 §7.1) |
 | Unreferenced | An any-alignment scan of 0x7ECB0888–0x7ECB1000 (and the 0xBE… alias) finds only the copy-end constant 0x7ECB1000 |
 | Code already runs there | remap7b-code puts code at 0x7ECB0888 (`mov imm,a1; bra; … call 0x7E56B732`). It is in every seven-films build, which are camera-tested (docs/camera-log.md) |
-| Every spec in `patches/` | None of the 8 current specs touches the range or any v2 op window (0 overlaps, including the .data and menu-table ops). **Three superseded specs in `patches/` do use the padding** (film-vision3-250d-pl1, slots7-neutral, slots12-code: 0x7ECB0888–0x7ECB0F3F), so v2 cannot be combined with those. Only 0x7ECB0F40–0x7ECB0FFF (192 B) is free of every spec ever written, which is too small. `results/specscan-v2.txt` |
+| Every spec in `patches/` | None of the 8 current specs touches the range or any v2 op window (0 overlaps, including the .data and menu-table ops). **Three superseded specs in `patches/history/` do use the padding** (film-vision3-250d-pl1, slots7-neutral, slots12-code: 0x7ECB0888–0x7ECB0F3F), so v2 cannot be combined with those. Only 0x7ECB0F40–0x7ECB0FFF (192 B) is free of every spec ever written, which is too small. `results/specscan-v2.txt` |
 
 - **Layout:**
 
@@ -304,7 +304,7 @@ Reviews: [review-1-memory.md](review-1-memory.md), [review-2-code.md](review-2-c
 
   All 6 table pointers, the record pointer and the 7 `jmp` hooks are regenerated (`scripts/mkspec_v2.py`), and the trampolines are re-assembled at the new addresses.
 - **Review 2 N2 stays (I).** An unused tab slot (0xFF) would index base + 2,544, which is 0x7ECB1594, in the unloaded gap. As in stock and the E-PL6, the cursor is bounded by the tab counts, so the slot is not read.
-- **Applies on both bases (V, `emulator/patchblock.py` into scratch):**
+- **Applies on both bases (V, `tools/emu/patchblock.py` into scratch):**
   - stock + v2: block-0 sha256 `d8c35ce3…2c327f69`, 921 bytes changed;
   - the seven-films-6 specs + v2: `8992f2c2…693d28ec`.
 
@@ -393,7 +393,7 @@ Images: stock, films, stock + v2, films + v2, E-PL6 1.4. Model errors: 0 in ever
 
 | Range | Why it is safe | Other specs |
 |---|---|---|
-| 0x7E4C9100–0x7E4C917F (mcon list) | 0xFF padding 0x7E4C90CA–0x7E4C97FF at the end of the range the **reset stub** loads (0x7E430000–0x7E4C9800, review 1 §0). The only window into it is the copy-end constant. The record is boot-part data, so its list does not depend on a Usr1 segment | untouched by every spec in `patches/` and `patches/` |
+| 0x7E4C9100–0x7E4C917F (mcon list) | 0xFF padding 0x7E4C90CA–0x7E4C97FF at the end of the range the **reset stub** loads (0x7E430000–0x7E4C9800, review 1 §0). The only window into it is the copy-end constant. The record is boot-part data, so its list does not depend on a Usr1 segment | untouched by every spec in `patches/` and `patches/history/` |
 | 0x7EBF1100–0x7EBF1EFF (editor items, 3,584 B) | Inside the unreferenced `sdk` shell name list 0x7EBF1090–0x7EBF3BAC (class A in `experiments/2026-11-13-reclaim-space`; my scan again finds no window into the part used). Segment 2, loaded before the GUI segment. Cost: that debug-shell name text is overwritten | untouched by every spec |
 
 - **Applies on:** stock, and the film set + v2 (scratch build of block 0, sha256 `7d460c4c7288…`).
@@ -487,4 +487,4 @@ Images: stock, films, stock + v2, films + v2, E-PL6 1.4. Model errors: 0 in ever
   - `modedef.py`: MODE defaults;
   - `mkspec.py`: builds the ops from the stock bytes.
 - `results/`: emulator diffs (`emu-*.txt`, `emu-*.json`), function pairing (`pair-*.txt`), `rowshift-constants.txt`, `mode-defaults.txt`, `page-child-lists.txt`, `strings-timelapse.tsv`.
-- `emulator/cases.py`: the new cases `menu_help`, `menu_child`, `menu_value` and `ivl_guard`.
+- `tools/emu/cases.py`: the new cases `menu_help`, `menu_child`, `menu_value` and `ivl_guard`.

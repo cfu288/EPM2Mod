@@ -1,6 +1,6 @@
 {
  "name": "log-probes",
- "description": "Structured log, probes of the features: peaking (MF Assist start and end, the L / R / L2 / C bytes, heap mode, pass 9), six-axis art code, level gauge (Adjust mode and values), interval shooting (start, frames, end, state bits), film looks (matrix stage, matrix table, curve handler), shooting callbacks. Each probe is a hook and a small routine that calls the log core. Needs log-core. DEBUG builds only. The event ids are in logs/events.json (build id d1ddd46b4dac2414). A delta on builds/peaking-colours.json: every expect is a byte string of that build. See experiments/2026-11-15-log/NOTES.md and docs/logging.md.",
+ "description": "Structured log, probes of the features: peaking (MF Assist start and end, the L / R / L2 / C bytes, heap mode, pass 9), six-axis art code, level gauge (Adjust mode and values), interval shooting (start, frames, end, state bits), film looks (matrix stage, matrix table, curve handler), shooting callbacks. Each probe is a hook and a small routine that calls the log core. Needs log-core. DEBUG builds only. The event ids are in logs/events.json (build id d1ddd46b4dac2414). A delta on builds/peaking-colours.json: every expect is a byte string of that build. See experiments/2026-11-15-log/NOTES.md and docs/reference/logging.md.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
  "status": "candidate: emulator-checked, not flashed",

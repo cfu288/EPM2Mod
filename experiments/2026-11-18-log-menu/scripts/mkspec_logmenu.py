@@ -361,7 +361,7 @@ def main():
             "card_task (each run of card-looks' task). The code of log-core, log-probes, log-peaking-time and "
             "log-peaking-guard, placed again; the hook of the GUI state setter jumps to this T_GUI, which ends with "
             "a jump to card-looks' T_GUI. The event ids are in logs/events.json (build id %s). See "
-            "experiments/2026-11-18-log-menu/design.md and docs/logging.md." % bid.hex()),
+            "experiments/2026-11-18-log-menu/design.md and docs/reference/logging.md." % bid.hex()),
         "base": STOCK, "base_sha256": stock_sha,
         "status": "candidate: emulator-checked, not flashed",
         "_build_id": bid.hex(),

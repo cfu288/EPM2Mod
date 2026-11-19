@@ -5,7 +5,7 @@ Date: 2026-11-19. Goal: each release shows its name on the camera, for example "
 
 Labels: **V** = verified (code, bytes or emulator), **I** = inferred, **U** = unknown.
 
-Scripts: `scripts/fwplay.mjs` (play steps, plus `HDR=1`, `wstr:`, `hex:`, `wset:`), `gen/build-label/mkspec.py`
+Scripts: `scripts/fwplay.mjs` (play steps, plus `HDR=1`, `wstr:`, `hex:`, `wset:`), `scripts/mkspec_label.py`
 (writes `patches/build-label-proto.json`). Screenshots: `results/`.
 
 ## 1. The Firmware screen
@@ -83,15 +83,15 @@ Lightroom show Software as text and do not parse it; Olympus software (OI.Worksp
 
 ## 4. Prototype
 
-`gen/build-label/mkspec.py [LABEL]` writes `patches/build-label-proto.json`. `builds/build-label-proto.json` = the 16
+`scripts/mkspec_label.py [LABEL]` writes `patches/build-label-proto.json`. `builds/build-label-proto.json` = the 16
 specs of `builds/lss.json` + the proto.
 
 | Check | Result | Label |
 |---|---|---|
 | `uv run epm2mod make builds/build-label-proto.json` | free-space check PASS (0 FAIL); sha256 `5c284fd8030fee224187f09169faa150c1060f342119f704049b1334e940e506` | V |
-| `emulator/boot-test builds/build-label-proto.json` | exit 0 | V emulator |
-| `emulator/update-path-test builds/build-label-proto.json` | exit 0 | V emulator |
-| `emulator/hookcheck.py patches/build-label-proto.json` | exit 0, 0 transfers. The whole build list gives the same 7 FAIL lines as the pinned `lss` (all in `stock-films-structure.json`) | V |
+| `tools/emu/boot-test builds/build-label-proto.json` | exit 0 | V emulator |
+| `tools/emu/update-path-test builds/build-label-proto.json` | exit 0 | V emulator |
+| `tools/emu/hookcheck.py patches/build-label-proto.json` | exit 0, 0 transfers. The whole build list gives the same 7 FAIL lines as the pinned `lss` (all in `stock-films-structure.json`) | V |
 | Firmware screen, lss (`HDR=1`) | "Body : 1.6" (`results/lss-firmware.png`); without `HDR=1` "Body : 0.0" (`results/lss-firmware-emulator-0.0.png`) | V emulator |
 | Firmware screen, proto | "Body : 1.6  EPM2Mod 2026.11.19", text x 387–694 in the box 371–712 (`results/proto-firmware.png`) | V emulator |
 | Longer dates (text written in RAM with `wset:`) | 2026.12.31: x 385–697 (`results/proto-firmware-2026.12.31.png`); 2028.08.08 (widest digits): x 377–705 (`results/proto-firmware-2028.08.08.png`) | V emulator |
@@ -100,7 +100,7 @@ specs of `builds/lss.json` + the proto.
 Command for the screenshots (from the repository root; STATE = a copy of `build/emu/state/lss-p.json`):
 
 ```
-HDR=1 E101_RTC=2026-11-19T12:00:00 E101_STATE=STATE emulator/emu-run builds/build-label-proto.json \
+HDR=1 E101_RTC=2026-11-19T12:00:00 E101_STATE=STATE tools/emu/emu-run builds/build-label-proto.json \
   $PWD/experiments/2026-11-19-build-label/scripts/fwplay.mjs /tmp/scratch/shots w:500 key:MENU key:RIGHT key:OK \
   key:DOWN key:DOWN key:DOWN key:DOWN key:DOWN key:RIGHT key:DOWN key:DOWN key:DOWN key:DOWN key:DOWN key:OK w:500 \
   shot:firmware
@@ -139,7 +139,7 @@ On the camera, with the 17 mm lens, the Lens "1.1" stayed centred in its stock b
 further left (`results/before-align-four-lines.png`, emulator with faked Lens, Flash and Acc versions: Body at x 387,
 Lens 446, Flash 440, Acc 443).
 
-**Method (data only, `patches/build-label.json`, from `gen/build-label/mkspec.py`):** the box edit now covers all four
+**Method (data only, `patches/build-label.json`, from `scripts/mkspec_label.py`):** the box edit now covers all four
 value widgets 10–13 (both copies, 0x7EF938A4–0x7EF938E3): (369, y, 100, 32) → (337, y, 335, 32), screen x 377–712;
 and the four value descriptors' alignment field (0x7EF93C74, 0x7EF93CD0, 0x7EF93D2C, 0x7EF93D88) goes from 0x101
 (centred) to 0x100 (left, the labels' value). The other edits and the placeholder are unchanged.

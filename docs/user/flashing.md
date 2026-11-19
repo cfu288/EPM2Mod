@@ -1,0 +1,33 @@
+# Flashing the E-PM2 from an SD card
+
+This procedure is confirmed on the E-PM2 with stock and modified firmware since 2026-11-08 ([camera log](../camera-log/README.md)).
+
+## Steps
+
+1. Charge the battery fully. Use a small card formatted in the camera.
+2. Build or choose a BIN:
+   - Stock: `firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN`
+   - Modified: make it with `uv run epm2mod make NAME` (see [../README.md](../../README.md) and [conventions.md](../dev/conventions.md), "Making firmware"). The result is `build/<name>.BIN`, and a copy at `build/card/DCOLYMP/E1019999.BIN`. `uv run epm2mod install --card DIR --build NAME` (add `--allow-untested` for a candidate) makes the same file and puts it at `DIR/DCOLYMP/E1019999.BIN` (`DIR`: the card's top folder), and checks the copy. With `-o FILE`, `make` writes one more copy of the file at `FILE`. The flags are in [cli.md](../reference/cli.md).
+3. Copy it to the card as **`DCOLYMP/E1019999.BIN`**. It must be the only file in `DCOLYMP`. Check the sha256 on the card against the build output.
+4. With the camera off and the card in, hold **OK** and the **ON/OFF** button together. When the orange lamp on the front (the AF illuminator) lights steadily, let go of both.
+5. The lamp shows progress:
+   - **Solid orange, about 1–1.5 min:** writing. **Do not touch the camera.**
+   - **Blinking:** finished. It keeps blinking until you power off.
+6. Power off, then on normally. Check MENU → SETUP → wrench tab → Firmware: an EPM2Mod build reads `Body : 1.6  EPM2Mod YYYY.MM.DD`.
+7. **Recovery:** flash the stock BIN the same way. Proven on 2026-11-08: it went from modified back to stock.
+
+If the camera boots straight to live view at step 4, the file wasn't recognised and nothing was written. The fallback name is `E1011600.BIN`, but it may be ignored as an equal version.
+
+**Never** put an E-PL5 file (`E100…`) on the card. The E-PM2 updater searches for `E100????BIN` and accepts the E-PL5 model id 0x1000 for main packages (verified in code, see [firmware-map.md](../reference/firmware-map.md) §2), so it would not reject one. Check that header bytes 2–3 read `10 10` before every flash.
+
+## Sources (checked 2026-11-08)
+
+| # | Source | Camera | What it says |
+|---|---|---|---|
+| A | lightsnowdev, "New Olympus OM-D and PEN Firmware Leaks!" (12 Nov 2014, Wayback) | **E-PM2**, E-P5, E-M5, others | "If you have an E-PM2 rename it to `E1011300.BIN` … folder called `DCOLYMP` … start the camera while pushing the OK button. The red LED will go on for about 1 minute. If it's flashing on/off … the process is finished." |
+| B | lightsnowdev, Firmware Control page (2014, Wayback) | Includes the E-PM2 | Same method. "Wait until the red LED is blinking on/off. This means the process is finished." |
+| C | xdel.ru `install-fw.txt` | E-M5 III | "orange front LED will turn on. DO NOT TURN THE CAMERA OFF WHILE THE LED IS ON. Wait until it blinks rapidly. This means the process is finished." |
+| D | ep5-fw-reverse `HARDWARE_RUNBOOK.md` (2026-10-24) | E-P5 | `DCOLYMP\E1089999.BIN`, hold OK. Reads blinking as still writing, which **is wrong for the E-PM2**. |
+| E | E-PM2 v1.6 block 0 (local) | E-PM2 | Contains `DCOLYMP`, the pattern table `E101????BIN … E100????BIN`, and `[firmup]` strings. |
+
+The `9999` suffix makes the camera treat the file as newer than anything installed (PhotoDmiK: "9999 in name of BIN file fools updater to think its newer 9.999 version").

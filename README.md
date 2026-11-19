@@ -38,6 +38,6 @@ uv run epm2mod install --card /path/to/card --film ART1=portra-400 --film ART2=e
 
 Do the steps that `install` prints. To use other film simulations, change the names ([film table](docs/guide/film-looks.md#available-film-simulations)).
 
-To go back to the original firmware, see [docs/install.md](docs/install.md).
+To go back to the original firmware, see [docs/user/install.md](docs/user/install.md).
 
 > This project was created with heavy use of AI assistance.

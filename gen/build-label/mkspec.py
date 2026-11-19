@@ -11,7 +11,7 @@ edits, no new code (NOTES.md sections 3 and 6):
      the Lens, Flash and Acc lines keep the stock text;
   3. the four value boxes (Body, Lens, Flash, Acc) start at one x and are 335 pixels wide (a box clips its text);
   4. the four value widgets are left-aligned (descriptor field +36: 0x101 centred -> 0x100 left, as the labels);
-  5. that text, in the Bluetooth debug strings of segment 2 (reclaim-space row 2, docs/space-candidates.tsv), after
+  5. that text, in the Bluetooth debug strings of segment 2 (reclaim-space row 2, tools/space-ledger/candidates.tsv), after
      the part that patches/lss-menu.json uses.
 """
 

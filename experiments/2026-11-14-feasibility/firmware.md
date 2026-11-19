@@ -399,12 +399,12 @@ unless marked; the list-page mechanics are camera-tested by the interval patches
 
 ## 8. Emulator
 
-`emulator` (om-emu at `~/opt/om-emu` with the local E101 model; present on this machine;
-`python3 emulator/emurun.py list` ran and printed 25 cases — VERIFIED).
+`tools/emu` (om-emu at `~/opt/om-emu` with the local E101 model; present on this machine;
+`python3 tools/emu/emurun.py list` ran and printed 25 cases — VERIFIED).
 
 - **Single functions only.** No boot, no kernel, no tasks, no interrupts, no second core, no IMG engine, no
   display, no sensor, no card. RAM starts at zero and `.data` is not copied. The whole block is mapped, so
-  code placed in an unloaded gap would wrongly "work" (`emulator/README.md` "Limits", VERIFIED-DOC).
+  code placed in an unloaded gap would wrongly "work" (`tools/emu/README.md` "Limits", VERIFIED-DOC).
 - What it has been used for: table selectors (`curve_select`, `gamma_select`, `matrix_choice`, `six_handler`,
   `filter_type`, `art_kind`), menu table walkers with stubbed getters (`menu_help`, `menu_child`,
   `menu_value`, `frames_editor`), interval logic with every callee stubbed, encoder parameter functions.

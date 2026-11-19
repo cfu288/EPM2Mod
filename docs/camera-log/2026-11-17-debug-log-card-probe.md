@@ -1,0 +1,5 @@
+# 2026-11-17: builds/debug-log-card-probe.json
+
+| Date (UTC) | Build | sha256 | Result |
+|---|---|---|---|
+| 2026-11-17 | `builds/debug-log-card-probe.json` (`debug-log-films-12d` + `patches/log-card-probe.json`: the probe harness) | `9005cfcb70c8927348d183c14a46a95b99e1f03b597f0267a1eea3d2e01b4014` | **OK. Both stage probes passed, with the refresh flag.** Pro 400H, a colourful scene. Test 1 (`sat0-force.bin`, log session 22): the saturation pair written at the first menu (6.26 s), refresh run; photo PB170145 before (mean colour 28.0), PB170146 after (mean colour 0.0: exactly grey); the owner saw live view turn black and white. Test 2 (`toner0-force.bin`, session 25): the red tone table written (5.48 s); PB170147 before (R/G/B 51/50/46), PB170148 after (5/47/45: red removed); live view looked normal, greener only with the shutter half pressed (live view reads other tables; at S1 it uses the stills tables, I). No error record, every flush ok. Sessions 20, 21, 23, 24: starts that went straight to power-off while files were swapped. |

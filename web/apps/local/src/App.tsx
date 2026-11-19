@@ -20,7 +20,7 @@ const FLOWS: Record<Firmware, StepId[]> = {
 }
 const ZIP_NAME = 'EPM2Mod-card.zip'
 
-const HELP = 'https://github.com/cfu288/EPM2Mod/blob/main/docs/install.md'
+const HELP = 'https://github.com/cfu288/EPM2Mod/blob/main/docs/user/install.md'
 
 /** A card in the list: its name, size and where it is mounted. */
 const cardLabel = (c: Card) => `${c.name || 'SD card'} · ${String(Math.round(c.size / 1e9))} GB · ${c.path}`

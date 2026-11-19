@@ -1,0 +1,5 @@
+# 2026-11-14: patches/peaking-direct-1.json
+
+| Date (UTC) | Build | sha256 | Result |
+|---|---|---|---|
+| 2026-11-14 | the pinned specs (with the level gauge) + `patches/peaking-direct-1.json` (`builds/peaking-direct-1.json`, `build/peaking-direct-1.BIN`) | `23d469c6a9f14e09d2ea693ae172ef3c29c657c4ccf5468d64e99cb2b33275fd` | **Flashed; partly works; two crashes.** User report: (1) ordinary picture taking without manual focus works. (2) Key Line live view works, so **code runs from 0x7EBF1F00** (first code in that area: proven). User: "Focus peaking worked on key line" (what was seen there is not yet clear). (3) In Natural, turning the focus ring gave a long delay before the magnified view showed; it showed only when the ring stopped; no lines seen ("might have missed it"); unusable. (4) **Two crashes** while flipping quickly through the filters in the menu, a different filter each time. Cause unknown; not yet known whether an earlier build does the same. Details and diagnosis: `experiments/2026-11-14-focus-peaking/NOTES.md`. |

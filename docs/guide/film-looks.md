@@ -52,10 +52,10 @@ Each Load replaces the last one: an ART entry the file leaves out goes back to i
 ## Limits
 
 - The simulations change colour and tone only. There is no halation and no grain.
-- There is no colour wheel. The camera has a 12-colour stage for photos only (not live view or movies), and EPM2Mod does not change it ([more](../feasibility.md#colour-wheel-and-twelve-colour-editors)).
+- There is no colour wheel. The camera has a 12-colour stage for photos only (not live view or movies), and EPM2Mod does not change it ([more](../dev/feasibility.md#colour-wheel-and-twelve-colour-editors)).
 - Movies only get part of each simulation.
 - Filter Type and Add Effects are not tested with the film simulations.
 - The Load Looks row's texts are English in every menu language.
 
-How the simulations were made and measured: [film emulation](../film-emulation.md). The file format:
-[look-file-format.md](../look-file-format.md).
+How the simulations were made and measured: [film emulation](../dev/film-emulation.md). The file format:
+[look-file-format.md](../reference/look-file-format.md).

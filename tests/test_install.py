@@ -5,7 +5,7 @@
 They run on the tiny firmware of ``test_package`` and need nothing but the repository. ``NoCheckoutTests`` lays
 out a folder as the release zip does (``release.data_files``) and runs every command for camera owners there, to
 show that they need no checkout. ``JsonTests`` compares the keys of real ``--json`` documents with the keys that
-``cli.COMMANDS`` (and so ``docs/cli.md``) lists.
+``cli.COMMANDS`` (and so ``docs/reference/cli.md``) lists.
 """
 
 from __future__ import annotations
@@ -770,13 +770,13 @@ OPAQUE = {"events"}
 
 
 class JsonTests(CardCase):
-    """The keys of real documents are the keys that ``cli.COMMANDS`` and ``docs/cli.md`` list."""
+    """The keys of real documents are the keys that ``cli.COMMANDS`` and ``docs/reference/cli.md`` list."""
 
     def documented(self, command: str) -> set[str]:
         return {*cli.COMMON_JSON, *cli.COMMANDS[command].json}
 
     def test_docs_cli_md_lists_every_key(self) -> None:
-        text = (ROOT / "docs" / "cli.md").read_text(encoding="utf-8")
+        text = (ROOT / "docs" / "reference" / "cli.md").read_text(encoding="utf-8")
         for command in cli.COMMANDS:
             for key in self.documented(command):
                 self.assertIn(f"- `{key}`: ", text, f"{command}: {key}")

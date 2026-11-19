@@ -109,7 +109,7 @@ tables). There are no code patches yet: every op in `patches/*.json` is a `bytes
   - The SD updater's own validator was also run on synthetic containers (19/19)
     [X EP7:docs/SD_UPDATE.md:8-13].
 - **OM-3 (whole firmware).** om-emu "play sessions": UI navigation, a card image, screenshots, in-session native calls
-  [X OM3:emulatorlator/session_autoload.mjs:1-30].
+  [X OM3:tools/emulator/session_autoload.mjs:1-30].
 - **Blind spots both projects found:** no alignment faults, screen stack, DMA or cache, or ISP pixels
   [X EP7:docs/FIRMWARE_GUIDE.md:553-556]. And the emulator maps the gaps between sections, but **the camera does not
   load them**: code placed in such a gap ran in om-emu but was absent on the camera

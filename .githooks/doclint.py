@@ -8,10 +8,10 @@
 Rules, and the files each one covers:
 
 1. Simplified Technical English (third_party/ste100/ste_lint.py), hard rules only:
-   README.md, docs/install.md, docs/guide/*.md.
+   README.md, docs/user/install.md, docs/guide/*.md.
 2. A heading has no punctuation (: ; , ! ? ( ) and dashes) and no full stop at its end:
    the files of rule 1, every other README.md outside experiments/, AGENTS.md, NOTICE.md,
-   docs/conventions.md, docs/feasibility.md, docs/todo.md.
+   docs/dev/conventions.md, docs/dev/feasibility.md, TODO.md.
 3. A guide shows the screen: docs/guide/*.md has one or more pictures.
 
 Text that is not prose is left out of rule 1: code, generated blocks, comments, tables, links,
@@ -27,8 +27,8 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STE = os.path.join(ROOT, "third_party", "ste100", "ste_lint.py")
-PROSE = ["README.md", "docs/install.md", "docs/guide/*.md"]
-HEADINGS = PROSE + ["AGENTS.md", "NOTICE.md", "docs/conventions.md", "docs/feasibility.md", "docs/todo.md"]
+PROSE = ["README.md", "docs/user/install.md", "docs/guide/*.md"]
+HEADINGS = PROSE + ["AGENTS.md", "NOTICE.md", "docs/dev/conventions.md", "docs/dev/feasibility.md", "TODO.md"]
 HEADING_PUNCTUATION = re.compile(r"[:;,!?()—–]|\.\s*$")
 
 

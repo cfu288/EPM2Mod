@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Verify candidate free areas in E-PM2 v1.6 block 0 (read-only; standard library only).
 
-    python3 tools/freespace.py map                    # regenerate docs/code-space-map.md and .tsv
+    python3 tools/freespace.py map                    # regenerate docs/reference/code-space-map.md and .tsv
     python3 tools/freespace.py check SPEC [SPEC ...]  # verify the bytes that specs add in free areas
     python3 tools/freespace.py area 0x7E4C9100        # all checks for the area that holds an address
     python3 tools/freespace.py selftest               # known facts; a few seconds
@@ -29,13 +29,13 @@ STOCK_BLOCK0 = "build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin"
 STOCK_BLOCK0_SHA256 = "1b7c4bb187e5e0b6e76ef362a4095a5b3fcf92917367999d32d6b6404b71468d"
 LINEAR = "build/map/linear.txt"
 FUNCTIONS = "build/map/functions.tsv"
-CANDIDATES = "docs/space-candidates.tsv"
-BOUNDS = "docs/space-bounds.tsv"
-WAIVERS = "docs/space-pointer-waivers.tsv"
-SUPERSEDED = "docs/space-superseded.tsv"
-CAMERA_LOG = "docs/camera-log.md"
-MAP_MD = "docs/code-space-map.md"
-MAP_TSV = "docs/code-space-map.tsv"
+CANDIDATES = "tools/space-ledger/candidates.tsv"
+BOUNDS = "tools/space-ledger/bounds.tsv"
+WAIVERS = "tools/space-ledger/pointer-waivers.tsv"
+SUPERSEDED = "tools/space-ledger/superseded.tsv"
+CAMERA_LOG = "docs/camera-log/"
+MAP_MD = "docs/reference/code-space-map.md"
+MAP_TSV = "docs/reference/code-space-map.tsv"
 SPEC_GLOBS = ["patches/*.json", "experiments/*/patches/*.json",
               "emulator/specs/*.json"]
 
@@ -614,12 +614,13 @@ def all_specs():
 
 
 def camera_tested():
-    """Spec names that appear in an OK row of docs/camera-log.md -> first such row's date."""
+    """Spec names that appear in an OK row of the camera log (one file per flash, docs/camera-log/) -> the date of
+    the earliest such row."""
     out = {}
-    p = rel(CAMERA_LOG)
-    if not os.path.exists(p):
-        return out
-    for line in open(p, encoding="utf-8"):
+    lines = []
+    for p in sorted(glob.glob(os.path.join(rel(CAMERA_LOG), "*.md"))):
+        lines += open(p, encoding="utf-8").read().splitlines()
+    for line in lines:
         c = [x.strip() for x in line.split("|")]
         if len(c) < 6 or not c[4].startswith("**OK"):
             continue

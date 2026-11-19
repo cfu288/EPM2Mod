@@ -37,7 +37,7 @@ def containing(a):
 
 hits, total, soft = [], 0, 0
 files = sorted(glob.glob(os.path.join(repo, 'experiments/2026-11-08-feature-map/sections/*.md')))
-files.append(os.path.join(repo, 'docs/firmware-map.md'))
+files.append(os.path.join(repo, 'docs/reference/firmware-map.md'))
 for path in files:
     for n, line in enumerate(open(path), 1):
         line = re.sub(r'~~.*?~~', '', line)

@@ -11,7 +11,7 @@ uv run epm2mod pin NAME --date YYYY-MM-DD --sha256 HEX      # after a passed cam
 ```
 
 All firmware that goes on a camera is made this way. The procedure for a new build is in
-[`docs/conventions.md`](../docs/conventions.md), "Making firmware".
+[`docs/dev/conventions.md`](../docs/dev/conventions.md), "Making firmware".
 
 ## Tested builds
 

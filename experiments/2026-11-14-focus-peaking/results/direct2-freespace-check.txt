@@ -25,7 +25,7 @@
    check: FAIL (4 FAIL)
 
 2. The same check with patches/peaking-direct-1.json (and its copy in specs/) listed as superseded by direct-2.
-   The list docs/space-superseded.tsv was not changed: the tool was run with a scratch copy of the list plus two lines.
+   The list tools/space-ledger/superseded.tsv was not changed: the tool was run with a scratch copy of the list plus two lines.
    PASS  patches/remap7b-code.json op 0 at 0x7E880F5C: 120 B 0x7E880F5C-0x7E880FD4 in area 0x7E880F5C-0x7E881000 (segment-1), as data, verdict USABLE-CODE [12 history/superseded spec(s) used these bytes]
    PASS  patches/remap7b-code.json op 1 at 0x7ECB0888: 760 B 0x7ECB0888-0x7ECB0B80 in area 0x7ECB0888-0x7ECB1000 (segment-2), as code, verdict USABLE-CODE [11 history/superseded spec(s) used these bytes]
    PASS  patches/seven-fixes-1.json op 0 at 0x7E880FD4: 16 B 0x7E880FD4-0x7E880FE4 in area 0x7E880F5C-0x7E881000 (segment-1), as data, verdict USABLE-CODE

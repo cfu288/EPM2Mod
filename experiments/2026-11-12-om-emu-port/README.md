@@ -2,7 +2,7 @@
 
 om-emu (github.com/flatpanda/om-emu, a JavaScript emulator of Olympus/OM firmware) now runs single E-PM2 v1.6 functions, stock against patched.
 
-- **Tool:** `emulator/`. Setup and usage are in emulator/README.md; the cases are in emulator/cases.py. It uses om-emu installed at `~/opt/om-emu` and Node 26.13.1 at `~/opt/node26`. Both live outside the repo, and Node is not on the shared PATH.
+- **Tool:** `tools/emu/`. Setup and usage are in tools/emu/README.md; the cases are in tools/emu/cases.py. It uses om-emu installed at `~/opt/om-emu` and Node 26.13.1 at `~/opt/node26`. Both live outside the repo, and Node is not on the shared PATH.
 - **om-emu changes:** kept outside the repo at `~/opt/om-emu-E101.patch` (om-emu has no licence). They are:
   - a local **E101** model on the E118-family board, with image base 0x7E421020 and 512 MiB DRAM;
   - the compositor and OSD models moved off 0x9C000000, which is a per-CPU window on the E-PM2;
@@ -11,7 +11,7 @@ om-emu (github.com/flatpanda/om-emu, a JavaScript emulator of Olympus/OM firmwar
   - **`rec_limit.diff.json`:** the recording-limit routine 0x7E6EDE08. 48 rows; a 1740 → 3600 edit changes exactly the 6 rows stock clamps at 1740 s.
   - **`curve_select.film-portra.json` and `curve_select.film-portra-xp.json`:** the tone-curve selector 0x7E56E837. `film-portra.json` also changes art codes 9/13/55/129/133.
 
-  Later cases (the QP set-up and rate control, the bitrate table, the parameter check) are in emulator/cases.py. Their reports are in experiments/2026-11-12-hardware/05-qp-floor.md and 06-bitrate-and-limit.md.
+  Later cases (the QP set-up and rate control, the bitrate table, the parameter check) are in tools/emu/cases.py. Their reports are in experiments/2026-11-12-hardware/05-qp-floor.md and 06-bitrate-and-limit.md.
 - **Limits:**
   - single functions only: no boot, no kernel, no second core;
   - no IMG engine or codec hardware;

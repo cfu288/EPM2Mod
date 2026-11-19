@@ -1,4 +1,4 @@
-"""Free bytes left in each area of docs/code-space-map.tsv after builds/card-looks-4.json and the specs given.
+"""Free bytes left in each area of docs/reference/code-space-map.tsv after builds/card-looks-4.json and the specs given.
 
     uv run python experiments/2026-11-18-log-menu/scripts/free_after.py patches/log-core.json patches/log-probes.json
 """
@@ -12,7 +12,7 @@ for s in specs:
     for op in load_spec(Path(s)).ops:
         if isinstance(op, BytesOp) and op.block == 0:
             used.update(range(BASE + op.offset, BASE + op.offset + len(op.new)))
-rows = list(csv.DictReader(open('docs/code-space-map.tsv'), delimiter='\t'))
+rows = list(csv.DictReader(open('docs/reference/code-space-map.tsv'), delimiter='\t'))
 tot = {}
 for r in rows:
     if r['verdict'] in ('REJECT',): continue

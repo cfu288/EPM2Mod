@@ -7,7 +7,7 @@ Question: the new value list of setting info 483 (prm 0xDE21, frame count; mcon 
 - **C:** an unreferenced debug string in segment 1. Concrete choice made here: **0x7E81372A–0x7E8137A9**.
 
 Labels: **V** = read in the bytes / disassembly of stock block 0 or of a scratch-built image, or run in the emulator. **I** = inferred.
-Method: read-only. Scratch images built with `emulator/patchblock.py` into `/tmp/scratch/trace483/` (films + v2 = sha256 `8992f2c2…`, films + v2 + frames = `7d460c4c…`). Scratch scripts (not kept): call-graph closure over `build/map/calls.tsv`, a window scan (every 4-byte window at every byte offset, for the runtime address, the uncached alias +0x40000000 and both flash aliases 0x402C0020 / 0x802C0020 + offset), and an om-emu run with read watchpoints.
+Method: read-only. Scratch images built with `tools/emu/patchblock.py` into `/tmp/scratch/trace483/` (films + v2 = sha256 `8992f2c2…`, films + v2 + frames = `7d460c4c…`). Scratch scripts (not kept): call-graph closure over `build/map/calls.tsv`, a window scan (every 4-byte window at every byte offset, for the runtime address, the uncached alias +0x40000000 and both flash aliases 0x402C0020 / 0x802C0020 + offset), and an om-emu run with read watchpoints.
 
 **Result: keep A. No new spec was generated.** B is safe for the editor rows (Trace 3) but is the weakest home for the list. C is a sound fallback.
 
@@ -137,7 +137,7 @@ Entry points ran natively in om-emu with read watchpoints on the list of 483, on
 - A is the only home that is valid before mcon init, in every boot path, without overwriting anything, and whose "nothing reads into it" rests on code, not on a string-pool rule.
 - **B is not recommended for the list.** The traces show no early reader, so it would work, but it adds the only load-order assumption (I) of the three and gains nothing.
 - **C is the fallback** if a camera test ever shows a problem with padding in the kernel copy: move only the list (128 B) and the record pointer.
-- The current spec applies on stock (block-0 sha256 `b9b5e4f6…`) and on films + v2 (`7d460c4c…`), and its ranges are disjoint from the 1,593 block-0 ops of the other 61 spec files (`patches/`, `patches/`, `experiments/*/patches/`, `emulator/specs/`).
+- The current spec applies on stock (block-0 sha256 `b9b5e4f6…`) and on films + v2 (`7d460c4c…`), and its ranges are disjoint from the 1,593 block-0 ops of the other 61 spec files (`patches/`, `patches/history/`, `experiments/*/patches/`, `tools/emu/specs/`).
 
 ## 6. Limits
 

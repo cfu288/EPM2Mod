@@ -12,8 +12,8 @@
     "src/epm2mod/camera_steps.py",
     "README.md",
     "docs/guide/film-looks.md",
-    "docs/debug-log.md",
-    "docs/logging.md",
+    "docs/user/debug-log.md",
+    "docs/reference/logging.md",
     "web/apps/site/src/features.ts",
     "web/apps/site/src/pages/Install.tsx",
     "web/apps/local/src/App.test.tsx",
@@ -26,7 +26,7 @@
    "truth": [],
    "copies": [
     "docs/guide/film-looks.md",
-    "docs/debug-log.md",
+    "docs/user/debug-log.md",
     "docs/guide/level-gauge.md",
     "web/apps/site/src/pages/Install.tsx",
     "src/epm2mod/camera_steps.py"
@@ -44,7 +44,7 @@
    "copies": [
     "README.md",
     "docs/guide/film-looks.md",
-    "docs/film-emulation.md",
+    "docs/dev/film-emulation.md",
     "looks/README.md",
     "NOTICE.md",
     "src/epm2mod/catalogue.py",
@@ -67,7 +67,7 @@
    ],
    "copies": [
     "README.md",
-    "docs/flashing.md",
+    "docs/user/flashing.md",
     "web/apps/site/src/pages/Install.tsx",
     "web/apps/local/src/App.test.tsx",
     "web/apps/local/e2e/install.spec.ts",
@@ -85,12 +85,12 @@
     "builds/*.json"
    ],
    "copies": [
-    "docs/install.md",
+    "docs/user/install.md",
     "builds/README.md",
-    "docs/camera-log.md",
-    "docs/todo.md",
-    "docs/logging.md",
-    "docs/look-file-format.md",
+    "docs/camera-log/",
+    "TODO.md",
+    "docs/reference/logging.md",
+    "docs/reference/look-file-format.md",
     "AGENTS.md",
     "docs/guide/*.md",
     "web/apps/site/src/features.ts",
@@ -99,7 +99,7 @@
     "src/epm2mod/readme.py"
    ],
    "regenerate": [
-    "uv run epm2mod generate (docs/install.md and builds/README.md blocks)"
+    "uv run epm2mod generate (docs/user/install.md and builds/README.md blocks)"
    ]
   },
   {
@@ -128,19 +128,19 @@
     "src/epm2mod/cardio.py"
    ],
    "copies": [
-    "docs/cli.md",
+    "docs/reference/cli.md",
     "README.md",
-    "docs/flashing.md",
-    "docs/install.md",
+    "docs/user/flashing.md",
+    "docs/user/install.md",
     "docs/guide/film-looks.md",
-    "docs/look-file-format.md",
+    "docs/reference/look-file-format.md",
     "release/README.txt",
     "release/start.sh",
     "release/start.ps1",
     "web/apps/site/src/pages/Install.tsx"
    ],
    "regenerate": [
-    "uv run epm2mod generate (docs/cli.md, from the command definitions)"
+    "uv run epm2mod generate (docs/reference/cli.md, from the command definitions)"
    ]
   },
   {
@@ -210,8 +210,8 @@
     "logs/events.json"
    ],
    "copies": [
-    "docs/debug-log.md",
-    "docs/logging.md"
+    "docs/user/debug-log.md",
+    "docs/reference/logging.md"
    ]
   },
   {
@@ -222,7 +222,7 @@
     "src/epm2mod/looks/records.py"
    ],
    "copies": [
-    "docs/look-file-format.md",
+    "docs/reference/look-file-format.md",
     "web/packages/ui/src/lib/lookfile.ts"
    ]
   },

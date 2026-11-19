@@ -91,7 +91,7 @@ The table 0x7E6EE4A2 writes one value per MOV mode to both peak 0xA0753564 and a
 
 - **Cases:**
   - `rec_limit`: the model now reads all rates, reserves and limits from the image. It adds `peak`, `rate_in_step` and `fill_4g`: the file size at the stop if video ran at the table peak, + 375 sectors/s + reserve, as a share of 4 GiB.
-  - New: `rate_table`, `enc_param_check` and `enc_rate_fields` (emulator/cases.py, README).
+  - New: `rate_table`, `enc_param_check` and `enc_rate_fields` (tools/emu/cases.py, README).
 - **Stock:** all five cases match their models (48 / 8 / 18 / 23 / 22 rows, 0 failing).
 
 | Diff vs stock | rec_limit | rate_table | enc_param_check | enc_rate_fields | qp_setup |

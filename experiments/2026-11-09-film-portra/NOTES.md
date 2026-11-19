@@ -113,7 +113,7 @@ parameters. **Tested 2026-11-09: it does not** (§10.3).
 | 1 | a. match measured curves to the stored tables (**done**, §10.4, §11.1); b. curve selector → mode / art-code → table (**done**, §11.1); c. writers of ctx+3939…3972 (not needed for the look curves; open); d. hue-sector / chroma records (**found**, §11.2; meaning of the 6+6 values open); e. per-channel rendering (**done: split toning in the art path**, §11.3); f. `UnknownBlock1` diff (**done: negative**, §10.3); **g. locate the split-toning tables (next)**; h. Cross Process's extra luminance stage (open) | Written E-PM2 pipeline model: stages, where each mode's values live, what each can express |
 | 2 | One-flash location proof: an obvious change to Cross Process I's look curve 0x7E75F2F0 (e.g. invert it), checked with RAW Data Edit of a Cross Process ORF | Observed change = predicted |
 | 3 | Camera model + fitter (port GRKit or gr3-film-mods); calibrate to shoot 1 until stock modes are predicted within ~ΔE 1 | Model accuracy; predicted ΔE free vs menu-only vs stock |
-| 4 | `patches/film-portra.json` (tables + "Portrait" → "Portra" label); flash; RAW Data Edit the B3 and S1 ORFs + 1 live shot; measure | Camera ≈ prediction; ΔE vs T |
+| 4 | `patches/history/film-portra.json` (tables + "Portrait" → "Portra" label); flash; RAW Data Edit the B3 and S1 ORFs + 1 live shot; measure | Camera ≈ prediction; ΔE vs T |
 | 5 | More looks (Muted → Gold/Ektar, Monotone → Tri-X) | — |
 
 Expected rounds for phase 2–4: about 4–6 flashes, each 1 flash + 2 RAW Data Edits + 1 shot
@@ -397,7 +397,7 @@ their stock change relative to Contrast 0). Tested end to end with a synthetic L
 builds). Saturation is reported but not yet written into the patch (per-mode offset byte or
 hue-sector record: to decide once the target is in). Tone-only by construction: no split toning.
 
-### 12.5 Probe build `patches/curve-probe-1.json` → `build/curve-probe-1.BIN`
+### 12.5 Probe build `patches/history/curve-probe-1.json` → `build/curve-probe-1.BIN`
 sha256 `c658d0620c0a0b89adae8b619ce7b4503ab67b022ebb2bb44bdf1decd410ee68`; 590 bytes differ from
 stock; all block checksums OK; data only (two 512-byte tables). **Not flashed.**
 1. Cross Process I look curve 0x7E75F2F0 := identity → shows its toning stage alone.
@@ -435,7 +435,7 @@ and run `spektrafilm-lut build --film kodak_portra_400 --print kodak_portra_endu
   So the tone-only patch is a real but modest gain over the best menu setting (3.2 → 2.3–2.6).
   The rest needs colour stages (split toning, hue shifts) that this slot's model does not have.
   The menu comparison covers the eight stock settings measured, not every combination.
-- **Build:** `patches/film-portra.json` → `build/film-portra.BIN` (Portrait's five look curves,
+- **Build:** `patches/history/film-portra.json` → `build/film-portra.BIN` (Portrait's five look curves,
   Contrast −2…+2; nothing else). **Not flashed.** Use it with Portrait, Saturation −2.
 - Not done: the "Portrait" → "Portra" menu label; saturation written into the firmware (the
   per-mode offset byte, §12.2, is traced but untested).
@@ -467,7 +467,7 @@ Process's saturation gain (281) and hue records are neutral (§11.2, §12.2). No
 remaining 3.4 codes, and the extra buffer of §12.3. The probe below settles whether anything else
 in Cross Process differs from Natural.
 
-### 14.3 Verification build `patches/curve-probe-2.json` → `build/curve-probe-2.BIN`
+### 14.3 Verification build `patches/history/curve-probe-2.json` → `build/curve-probe-2.BIN`
 sha256 `0d08b3508374b46c2c47601c05e535d7050ad8e9acae94db6317fe24e7623a75`. Data only, 26 ops:
 Cross Process I's 24 base tables := the default record's tables, look curve 0x7E75F2F0 := identity,
 saturation pair 0x7E7696B4 := 338 (the Saturation +2 step). **Prediction: Cross Process I renders
@@ -475,7 +475,7 @@ exactly like Natural with Saturation +2.** Test on this firmware: RAW Data Edit 
 Cross Process I and once as Natural with Saturation +2; the two JPEGs should match. Supersedes
 curve-probe-1.
 
-### 14.4 Portra build `patches/film-portra-xp.json` → `build/film-portra-xp.BIN`
+### 14.4 Portra build `patches/history/film-portra-xp.json` → `build/film-portra-xp.BIN`
 (Re-scored with the corrected model in §16.3: unchanged, because this build's look curve is the identity. A variant with a fitted luma curve is `film-portra-xp2`.)
 sha256 `8dacf8c52947805f71070bb2b2498e7a6e109b81d2874e473d87843a1cdf5386`. Data only, same 26
 locations. `fit_look.py --slot crossprocess`: three monotone curves G_c (20 knots each) on the
@@ -515,7 +515,7 @@ menu still says "Cross Process" (label not patched); Cross Process II is untouch
   intended ranges (block 0: the 24 base tables 0x7E74F7BC…0x7E7593BB, look curve 0x7E75F2F0, the
   4-byte saturation pair 0x7E7696B4); blocks 1–3 and the OM tail are identical; the only other
   change is block 0's trailer (its checksum word). File size unchanged.
-- Label: `patches/label-portra.json` renames "Cross Process" → "Portra 400" (20 English copies in
+- Label: `patches/history/label-portra.json` renames "Cross Process" → "Portra 400" (20 English copies in
   block 1, NUL-padded to the same length; nothing blocked this earlier, it was simply left out).
   The label is shared by Cross Process I and II, so II (unchanged, still the stock look) also reads
   "Portra 400"; translated labels in other languages are unchanged.
@@ -601,7 +601,7 @@ curve is the identity.
   is the identity. Letting the luma look curve vary as well (`--free-look`): loss 1.17 → 0.96,
   grey 0.60 → 0.35, ColorChecker 4.40 → 4.37, hold-out 2.11 → **2.01** (p95 5.39 → 5.35),
   saturation 0.865 (gain 228). A small predicted gain.
-- **`patches/film-portra-xp2.json`** (26 ops: 24 base tables, look curve 0x7E75F2F0 = fitted luma
+- **`patches/history/film-portra-xp2.json`** (26 ops: 24 base tables, look curve 0x7E75F2F0 = fitted luma
   curve, saturation 228) + `label-portra` → **`build/film-portra-xp2-labelled.BIN`**, sha256
   `601817f28cfcb82b57255210c11e269812d8dba651aa831774988c96c2a69e79`. All four block checksums OK;
   decoded diff vs stock: block 0 7,396 bytes, all inside the 26 ranges; block 1 260 bytes, all
@@ -648,7 +648,7 @@ Patch centres from hand-picked corners; v from each file's own WB and ColorMatri
   the per-colour (six-axis) stage is what is missing.
 - The 5300K shots under lamp light are far outside the target's assumptions (grays are orange).
 
-### 17.2 `patches/sixaxis-probe-1.json` → `build/sixaxis-probe-1.BIN`
+### 17.2 `patches/history/sixaxis-probe-1.json` → `build/sixaxis-probe-1.BIN`
 = film-portra-xp + label-portra + the probe, sha256
 `58e0aeddcf56a1ba6bd7bbbabd77cdb67930358f90345a75913b0817de9ea397`; differs from the installed
 build in 154 bytes, all inside the records 0x7E768FBE–0x7E7692BD; checksums OK. NOT flashed.
@@ -691,7 +691,7 @@ camera boots (`docs/camera-log.md` to be updated with the user's timings).
   (0x7E56D5F5…) runs extra code that reads the P+16 buffer and P+54 / P+56; not decoded, so the
   records may not act exactly as in the normal modes.
 
-### 18.3 `patches/sixaxis-portra-1.json` → `build/film-portra-xp3-labelled.BIN`
+### 18.3 `patches/history/sixaxis-portra-1.json` → `build/film-portra-xp3-labelled.BIN`
 Curves and saturation as flashed (film-portra-xp), label as before, plus Cross Process I's records:
 saturation (R G B Y C M) = (21, −40, 39, −27, 16, −12), hue = (−2, 20, 14, 20, −9, 20). Fitted with
 the provisional model on the GRKit-weighted samples plus the real Spyder shot (camera output of
@@ -744,7 +744,7 @@ PB110252. Next: refit the units from PB090250 + PB110251, then refit the 12 valu
   +0.1…0.6 % per unit. (R's negative side and several others rest on small values.)
 - Refit with it ("xp4"): saturation (14, −40, 39, −29, 12, −13), hue (−1, 18, 12, 20, −9, 20), almost
   the xp3 values. Predicted Spyder colours 2.65 → 2.43, hold-out 1.44 → 1.38: **inside the model's
-  own error, so not a reason to flash.** Built anyway: `patches/sixaxis-portra-2.json` →
+  own error, so not a reason to flash.** Built anyway: `patches/history/sixaxis-portra-2.json` →
   `build/film-portra-xp4-labelled.BIN`, sha256
   `24e24bf320484e9f5d029cdc16a362b607c477a55b93263c94abd9f380fe7e3d`, checksums OK, NOT flashed.
 - **Fresh live capture PB110252 (xp3, SpyderCheckr, Auto WB, lamp):** ΔE2000 vs target all 2.31,
@@ -789,7 +789,7 @@ the pre-stage signal is known from the raw. ΔE2000 predicted vs real "after":
   scenes is untested.
 - Corrections: §18.2's "six sectors in output CbCr" and §20's units are superseded by this.
 
-### 21.2 Refit (`fit_sixaxis4.py`) → `patches/sixaxis-portra-3.json` → `build/film-portra-xp5-labelled.BIN`
+### 21.2 Refit (`fit_sixaxis4.py`) → `patches/history/sixaxis-portra-3.json` → `build/film-portra-xp5-labelled.BIN`
 Curves and saturation as flashed; 12 values refitted with the new model, inside the probed range:
 saturation (R G B Y C M) = (13, −40, 20, −22, 39, −21), hue = (−2, 20, 20, 20, −12, 20).
 
@@ -882,7 +882,7 @@ ranges, block 1 = the 20 labels only, blocks 2–3 and tail identical, checksums
   candidates: the firmware renormalises the product matrix to 7-bit rows (CODE_DIG §4), six-axis
   linearity at these values, matrix × six-axis interaction.
 
-### 23.2 Delta refit (`fit_delta.py`) → `patches/film-portra-xp8.json` → `build/film-portra-xp8-labelled.BIN`
+### 23.2 Delta refit (`fit_delta.py`) → `patches/history/film-portra-xp8.json` → `build/film-portra-xp8-labelled.BIN`
 For the colours measured with xp7 (Spyder, chart) the prediction is measured + model(new) −
 model(xp7), so only the change relies on the model; parameters are held near xp7.
 
@@ -961,7 +961,7 @@ Natural colours (1,122) 1.47 (p95 2.98); near-neutrals 1.55; gray ramp 1.32.
 5. Remaining model error ≈ 0.9 ΔE on natural colours in every mode, much of it 8-bit rounding in
    the dark patches.
 
-### 25.4 Refit xp9 (`fit_xp9.py` → `patches/film-portra-xp9.json` → `build/film-portra-xp9-labelled.BIN`)
+### 25.4 Refit xp9 (`fit_xp9.py` → `patches/history/film-portra-xp9.json` → `build/film-portra-xp9-labelled.BIN`)
 Objective: GRKit sample set through the corrected model (grays with the measured gray-ramp
 correction) + the mock patches as measured xp8 + model change. R hue fixed at 0.
 
@@ -1059,12 +1059,12 @@ Test: RAW Data Edit `PB120001.ORF` with art filter Pop Art II.
   0.95 but grid 8.2, and it changes the WB (406/510 instead of 520/470): not clean. Pop Art I 2.0
   (six-axis values far outside the calibrated range); its still code 70 is key 0 in the gamma hash
   table (= empty), so it cannot be re-pointed there.
-- `fit_film.py --slot lighttone` → `patches/film-ektachrome-lt.json`: same fit values as §26.3;
+- `fit_film.py --slot lighttone` → `patches/history/film-ektachrome-lt.json`: same fit values as §26.3;
   gamma hash entries for keys 2 and 11 (codes 72, 81) 0x7E56B7F0 → 0x7E56B82A; look 0x7E75EAF0,
   saturation pair 0x7E7696A8, six-axis 0x7E7694B6 / 0x7E7694C2, matrix table 0x7E768F58 with the
   compares re-keyed 0x7E56C6AE: 66 → 48 (72), 0x7E56C6B2: 67 → 51 (81). Pop Art II loses its
   matrix; Cross Process II shares the curves. Codes 147 / 150 (other Light Tone keys) untouched.
-- `patches/label-ektachrome-lt.json`: "Light Tone" → "Ektachrome" (same length, 2 copies in block
+- `patches/history/label-ektachrome-lt.json`: "Light Tone" → "Ektachrome" (same length, 2 copies in block
   1, shared by all languages).
 - `build/film-portra-xp9-ektachrome-lt.BIN` = film-portra-xp9 + film-ektachrome-lt +
   xp-adaptive-hue-off + label-portra + label-ektachrome-lt; sha256
@@ -1237,7 +1237,7 @@ EXIF ColorMatrix as predicted for both. A vs B: RGB identical in 100 % of 2,194 
   the boot read's range); the hash reading above; behaviour of movie / live view with code 79.
 - A fourth film would need 3 tables (1.5 KB, all 8 variant pointers to one table per channel) in
   the 1.9 KB run, and a clean host entry, which is the harder part (§26.5, docs/art-filter-slots.md).
-- Test tooling: `emulator` (om-emu) could run the patched selector functions before a flash, but
+- Test tooling: `tools/emu` (om-emu) could run the patched selector functions before a flash, but
   om-emu and Node 26 are not installed on this machine.
 
 ### 29.4 Candidate films for a third slot (model-only fits, `fit_film.py`, 2026-11-12)
@@ -1264,7 +1264,7 @@ No black-and-white profiles exist in spektrafilm; the user chose to stay with co
   hold-out 0.85. gain 269; S (1, −17, −4, 1, 0, −12); H (0, 8, 3, 16, −3, 7); art ×256 [[224, 48, −16],
   [−6, 259, 3], [−18, 17, 257]]; expected EXIF ColorMatrix 356 −48 −52 / −68 368 −44 / −20 −100 376.
 - `slot3/cave.s` (120 bytes at 0x7E880F5C; `gamma3` 0x7E880F5C, `matrix3` 0x7E880F8D, table `t3`
-  0x7E880FC2, even address) and `slot3/build_slot3.py` → `patches/slot3-code.json`:
+  0x7E880FC2, even address) and `slot3/build_slot3.py` → `patches/history/slot3-code.json`:
   new code; 5-byte `jmp matrix3` at 0x7E56C6A5 (the rest of the old compare chain is dead code);
   range check 0x7E56B7A7 47 → 46; hash entry 8 handler → gamma3, entry 9 := key 9 → gamma3; Pale&Light
   I (keys 1, 10), Pop Art II (32, 33) and codes 147 / 150 → default handler 0x7E56B861.
@@ -1287,7 +1287,7 @@ No black-and-white profiles exist in spektrafilm; the user chose to stay with co
 
 ### 30.1 `three-films-1` on the camera (2026-11-12): the new code works
 - Flashed by the user (the emulator cases `gamma_select` / `matrix_choice` were written in
-  `emulator/cases.py` but not run: no permission for those commands; `curve_select` self-check
+  `tools/emu/cases.py` but not run: no permission for those commands; `curve_select` self-check
   passed, 229 rows). Uploads PB120152–154 → `shots/mock2/{A_portra_xp10_3f1, A_ektachrome_lt3_3f1,
   A_pro400h_pa1}.JPG`.
 - **Portra and Ektachrome: RGB identical to the previous build in 100 % of 6,588 / 6,587 patches.**
@@ -1317,7 +1317,7 @@ No black-and-white profiles exist in spektrafilm; the user chose to stay with co
   three-films-1 by those 20 bytes and the checksum. NOT camera-tested. The Pro 400H values are
   still the model-only fit; a correction refit follows the next measurement.
 
-### 30.3 Emulator runs of the new code (run by the user, 2026-11-12; `emulator/cases.py`)
+### 30.3 Emulator runs of the new code (run by the user, 2026-11-12; `tools/emu/cases.py`)
 Stock block 0 vs block 0 with film-portra-xp10-s3 + film-ektachrome-lt3-s3 + slot3-code +
 film-pro400h-pa1 + xp-adaptive-hue-off.
 - `matrix_choice` (256 art codes): **8 changed, 248 identical, 0 flagged.** 70 / 79: table 1 →
@@ -1412,7 +1412,7 @@ firmware unstable. Write-up: `docs/art-slots-evaluation.md`. Working notes:
   bits 0x80 / 0xA0 / 0xC0) and member 0 / 1 from a flag. Default record: member-0 tables are one
   flatter curve (mean |Δ| 131 of 1023 from the stills table), member-1 tables differ by column
   (0x7E74E9BC stills; 0x7E7519BC = 0x7E7579BC, mean |Δ| 22; 0x7E7549BC, 38).
-- **Seven-slot mechanism** (`slots/cave2.s`, `slots/build_slots.py` → `patches/slots7-code.json`,
+- **Seven-slot mechanism** (`slots/cave2.s`, `slots/build_slots.py` → `patches/history/slots7-code.json`,
   `slots7-neutral.json`; layout `slots/slots7_layout.json`): stubs g4…g7 + `gcommon` (a1 = three
   record addresses; 0x7E56B732 does not touch a1), `matrix7`, tables t4…t7, 12 records, 2 tables at
   0x7ECB0888; 2 tables at 0x7F033B7C; 8 tables in former look tables (0x7E75E4F0, E8F0, ECF0, F0F0,
@@ -1421,7 +1421,7 @@ firmware unstable. Write-up: `docs/art-slots-evaluation.md`. Working notes:
   of codes 102, 103, 145, 146, 167, 168, 106 → 0x7E56E94A (Portra's identity copy); chroma entries →
   0x7E5664A0; WB pairs 0 and 1 → 256; effect hash entries 1 and 14 → 0x7E72A665; soft-focus compare
   immediates → 0xFF.
-- **Emulator** (`emulator/cases.py`: `gamma_select` now models the pick routine and reads slot
+- **Emulator** (`tools/emu/cases.py`: `gamma_select` now models the pick routine and reads slot
   stubs; `matrix_choice` models matrix7; `emurun.py` counts the patched run's reads):
   matrix_choice 256 rows, 16 changed, 0 flagged; gamma_select 917 rows, 116 changed, model equal in
   all, 6 flagged = codes 69, 78, 73, 82, 86, 88 with the P+87 flag set (stock: alternative default
@@ -1462,7 +1462,7 @@ firmware unstable. Write-up: `docs/art-slots-evaluation.md`. Working notes:
 
 `slots/build_slots12.py` generates `slots/cave12.s` (nine generic slots: stubs `g_<name>`,
 `gcommon`, a two-part compare chain `matrix12` / `chainB`, nine matrix tables, 27 records; 1,456 of
-1,912 bytes at 0x7ECB0888, 320 of them code) and writes `patches/slots12-code.json`,
+1,912 bytes at 0x7ECB0888, 320 of them code) and writes `patches/history/slots12-code.json`,
 `slots12-neutral.json`, `film-pro400h-pa2-s12.json`; layout `slots/slots12_layout.json`.
 - Slots and numbers: Pale&Light 71 / 80, Soft Focus 69 / 78, Pin Hole 73 / 82, Diorama 86 / 88;
   Grainy Film → 102 / 103, Gentle Sepia → 106, Dramatic Tone → 108, Key Line → 145 / 146,
@@ -1496,7 +1496,7 @@ firmware unstable. Write-up: `docs/art-slots-evaluation.md`. Working notes:
   filters (by picture mode: Soft Focus 3, Pin Hole 4, Diorama 3; Pale&Light is 1). §32 removed
   their effect modules but left the classification, so live view waits for art processing that
   no longer produces anything. This was the open risk noted in the evaluation (approach "A").
-- Fix (the noted fallback): `patches/slots7-kind.json` sets all three record-side classifications
+- Fix (the noted fallback): `patches/history/slots7-kind.json` sets all three record-side classifications
   to the colour-only value 1 for those entries: by picture mode (table 0x7E8522AC, read by
   0x7E70DBDE, 49 callers), by code (table 0x7E8520E0, read by 0x7E70DBB6) and by code in the hash
   0x7E852354 (read by 0x7E70E298; key = code − 68; found now). `slots12-kind.json` does the same
@@ -1528,7 +1528,7 @@ firmware unstable. Write-up: `docs/art-slots-evaluation.md`. Working notes:
   small or low-risk change. Also: 106 and 108 (Pin Hole II / III) are in those lists, so they are
   not colour-only numbers; the twelve-slot design of §33 used them for Sepia and Dramatic Tone and
   would freeze the same way. **`twelve-slots-neutral(-b)` must not be flashed.**
-- **Remap design** (`slots/build_remap7.py` → `patches/remap7-code.json`, `remap7-neutral.json`):
+- **Remap design** (`slots/build_remap7.py` → `patches/history/remap7-code.json`, `remap7-neutral.json`):
   leave 69, 73, 86 and everything about them stock. Send the three MENU ENTRIES to numbers that
   every path already treats as colour-only, through `art_GetFilterType`'s jump table 0x7E854A24
   (data): Soft Focus (mode 101) → 102 (new 2-instruction snippet in code area 2), Pin Hole (105) →
@@ -1568,7 +1568,7 @@ firmware unstable. Write-up: `docs/art-slots-evaluation.md`. Working notes:
   `art_chk_type_mov` returns for a number outside its lists.
 - What the three failures do show: Pale&Light I, converted in place in all three builds, was never
   reported frozen, and the three films kept working.
-- `slots/build_four.py` → `patches/four-code.json`, `four-neutral.json`: the three-film structure
+- `slots/build_four.py` → `patches/history/four-code.json`, `four-neutral.json`: the three-film structure
   plus Pale&Light I only (gamma stub, matrix, shared look, linear chroma, WB pair 1.0); nothing
   else. Pro 400H keeps all 24 tables (`film-pro400h-pa2`). Emulator, stock vs the patch set:
   `filter_type` 0 changed, `art_kind` 0 changed, `matrix_choice` 10 changed / 0 flagged,
@@ -1657,7 +1657,7 @@ The neutral test of §37.6 proved which tables each new slot selects, but with a
 stages do nothing (identity matrix, zero six-axis records) and the three curves are equal. Each new
 slot reaches its six-axis records through a different stock handler (Diorama's through the Cross
 Process branch), and each has its own matrix table. `slots/fill_slots.py` writes the Portra xp10
-fit into all four generic slots (`patches/check-portra-in-new-slots.json`);
+fit into all four generic slots (`patches/history/check-portra-in-new-slots.json`);
 `build/seven-slots-portra-check.BIN`, sha256
 `354a706908a616b4ec8ce843e9c6409d6afa1c75b9e04a3b8bc0a85385949842`.
 Expected: a RAW development of the test image in Pale&Light, Soft Focus, Pin Hole and Diorama is
@@ -1771,7 +1771,7 @@ dominates the look. Correction to §29.4: Vision3 250D's nearest installed look 
   document names (chart series PB0901xx, SpyderCheckr PB1102xx, real photos PA30/31xxxx, the
   per-round folders) were deleted at the user's request; sections that analyse them cannot be
   re-run. The cached patch readings `out/mock/read_*.npz` were kept.
-- Superseded patch specs moved to `patches/`; superseded firmware builds deleted.
+- Superseded patch specs moved to `patches/history/`; superseded firmware builds deleted.
 - `make_mock.py` / `make_mock2.py` now take the donor ORF from `shots/testraw/PB090221.ORF`.
 
 ## 43. Restart cause found for Diorama; chroma curves fitted; second types; `seven-films-3` (2026-11-12; NOT flashed)

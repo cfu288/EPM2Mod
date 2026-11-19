@@ -3,7 +3,7 @@
 Adversarial review before a camera flash. Read-only: nothing was built under `build/`, `tools/build.py` was not run, no flash, no commit.
 
 - **Labels:** **V** = read in the bytes / disassembly or run by me. **I** = inferred.
-- **Images (scratch, `emulator/patchblock.py`):**
+- **Images (scratch, `tools/emu/patchblock.py`):**
   - stock block 0, sha256 `1b7c4bb1…71468d`;
   - films = remap7b-code + seven-fixes-1 + seven-movie-1 + seven-structure-extra + seven-films-5 + xp-adaptive-hue-off + seven-labels (the `seven-films-6` list in README.md step 3 and in the last row of docs/camera-log.md), `00d4f31f…380398`;
   - films + v2, `8992f2c2…693d28ec` (the same hash with v2 applied first);
@@ -25,7 +25,7 @@ Adversarial review before a camera flash. Read-only: nothing was built under `bu
 - **Optional fix:** use 0x602BE874 in the four trampolines (4 imm32 changes). The .data initial value there is also 0. This is not needed for the first flash.
 
 ### N2. NOTE: stale text
-- `emulator/cases.py`, case `ivl_selector`: the description still says "patched: jmp to T2 0x7F033E40". v2 uses 0x7ECB0DC8.
+- `tools/emu/cases.py`, case `ivl_selector`: the description still says "patched: jmp to T2 0x7F033E40". v2 uses 0x7ECB0DC8.
 - The spec has no `expected_sha256` (correct until a camera test).
 - The op at 0x7ECB0BA0 starts 4 bytes before the table (4 context bytes of 0xFF). The description's range 0x7ECB0BA4–0x7ECB0EE2 is the content range. Both are correct.
 
@@ -112,7 +112,7 @@ Adversarial review before a camera flash. Read-only: nothing was built under `bu
 - All film ops are in segment 1 (0x7E546161–0x7E880FE4), in the padding 0x7ECB0888–0x7ECB0B9D, and in block 1. v2's ops are in the MODE defaults, .data, 0x7E98855B, 0x7E997BD5, the GUI segment and the padding after 0x7ECB0BA0.
 - No 4-byte value in the films' new bytes points into a v2 window.
 - No film op touches the value switch, a formatter call site, the tab layout, a page record, the selector or the four GUI handlers.
-- **Three specs in `patches/` use the same padding.** They are not in the camera build and must not be combined with v2.
+- **Three specs in `patches/history/` use the same padding.** They are not in the camera build and must not be combined with v2.
 
 ## Advice for the first flash (I)
 - Build the seven film specs + v2 in the README order. The block-0 hash to expect is `8992f2c2…693d28ec`.

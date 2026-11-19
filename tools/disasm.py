@@ -8,7 +8,7 @@
 Notes:
 - MN103 has variable-length instructions, so starting mid-instruction gives garbage until it resyncs.
   Use --before to start earlier, and trust output only after the first clean line.
-- The runtime base (BASE) is verified by string pointers in the movie routine (see docs/firmware-format.md).
+- The runtime base (BASE) is verified by string pointers in the movie routine (see docs/reference/firmware-format.md).
 """
 import argparse, os, shutil, subprocess, sys
 

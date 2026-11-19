@@ -64,7 +64,7 @@ time by the loader today (camera-tested, card-looks-4).
   view do; an entry without a film is the stock filter everywhere.
 - `log-menu` pinned meanwhile; this project starts from it.
 
-## Finding: art codes (2026-11-18, emulator, `emulator/emurun.py run filter_type` on stock)
+## Finding: art codes (2026-11-18, emulator, `tools/emu/emurun.py run filter_type` on stock)
 
 `art_GetFilterType` on stock firmware, stored value -> art code for Filter Type I / II / III:
 
@@ -110,7 +110,7 @@ record and movie-art range tests (69-183) must accept the code (U).
 - Codes 75, 84, 117, 119: compared in the image library (films-max 3.1): not clean.
 - Codes above 184 (films-max 3.3): no table has an entry, so each of the five table stages needs a hook that loads
   the slot's own handler (about 150 B). The hooks are in the image library (segment 1). Code reached only through
-  the image-job table may jump to segment 2 (the allowed remap7b-code hook, `emulator/hookcheck-allow.tsv`); the
+  the image-job table may jump to segment 2 (the allowed remap7b-code hook, `tools/emu/hookcheck-allow.tsv`); the
   same argument for the five stage selectors is I and must be checked. The record and movie-art code tests the
   range 69-183 (U how a code outside it is treated: as "no art", the plain path, would be right for a colour-only
   film). Probe: one hidden-value entry with code 200 in the live-view rig (`experiments/2026-11-16-films-max/scripts/
@@ -148,7 +148,7 @@ record used once remap7b had freed them. In the stock base those belong to stock
 their own tables in the RAM gap (written by the loader from the look file, like the live-view tables of card-looks-4)
 and stubs or handlers in free space that point at them.
 
-Hooks from the image library into segment 2 follow the allowed remap7b-code case (`emulator/hookcheck-allow.tsv`):
+Hooks from the image library into segment 2 follow the allowed remap7b-code case (`tools/emu/hookcheck-allow.tsv`):
 code that only image jobs reach runs after segment 2 is loaded. Each new hook needs that evidence.
 
 ### One mechanism for all 12 entries (2026-11-18, replaces the three rows above)
@@ -181,19 +181,19 @@ a flashed entry with the stock default handler as target is added; the loader sw
 
 ## Build log
 
-- 2026-11-18, item 1 (`gen/stock-films/structure.py` -> `patches/stock-films-structure.json`, 103 operations; the
+- 2026-11-18, item 1 (`scripts/mkspec_structure.py` -> `patches/stock-films-structure.json`, 103 operations; the
   loader's switch lists in `build/stock-films/layout.json`): stubs 861 B at 0x7EE53830 (segment 3, where card-looks-4's
   code ran), the shared tone part, the chroma helper and the matrix chain at 0x7ECB0888, records 1,296 B at 0x7EE541B4.
   Switch lists: Pop Art 11 words, Soft Focus 6, Pale&Light 13, Light Tone 11, Pin Hole 6, Diorama 6, Cross Process 11,
   each hidden entry 7 bytes (the value lists, the "is art" lists, the ART-mode preset).
-  F1 in the emulator, stock against stock + the structure (`emulator/emurun.py diff`): `filter_type` changes only the
+  F1 in the emulator, stock against stock + the structure (`tools/emu/emurun.py diff`): `filter_type` changes only the
   hidden values 111, 112, 114, 115, 118; `art_kind` only 115, 118; `gamma_select` and `curve_select` only the film
   codes 75, 92, 125, 94, 98, 144, 156, 159; `six_handler` nothing; the matrix chain (all 256 codes, stock against
   patched without the case's model) only the eight film codes. The in-place codes 71, 72, 79, 85 are stock until the
   loader switches them; their RAM matrix pointer counts only when it holds the exact film address (RAM in the gap
   is not reliably zero at a start: the log ring survived power-offs).
 
-- 2026-11-18, item 2 (`gen/stock-films/loader.py` -> `patches/card-looks-5.json`, `patches/looks-menu-4.json`): the
+- 2026-11-18, item 2 (`scripts/mkspec_loader.py` -> `patches/card-looks-5.json`, `patches/looks-menu-4.json`): the
   card-looks-4 assembly with no snapshot, no live tables and no Built-in; APPLY into each listed entry's RAM block
   (one operation list for all entries, 8 tone tables per channel); MASK and SWITCH (words written as words); the
   Picture Mode remap in T_GUI after a switch. The structure moved to segment 2 (stubs 435 B at 0x7EBF38BC, shared part
@@ -218,7 +218,7 @@ a flashed entry with the stock default handler as target is added; the loader sw
     The routines are in 24-byte slots of free runs of segment 2 (osd-battery's runs are left free).
   - Cross Process's adaptive hue: hook 0x7E546160; off only while the entry's matrix pointer holds the film address.
   - No replaced instruction of the 32 hooks is a branch target (`mkspec_log.branch_targets_inside`). The six
-    segment-1 hooks are in `emulator/hookcheck-allow.tsv` (image job and ART bracket capture only; boot-test and
+    segment-1 hooks are in `tools/emu/hookcheck-allow.tsv` (image job and ART bracket capture only; boot-test and
     update-path-test pass).
   - The Picture Mode: after a Load, the info ids 111, 509, 510 that hold an entry's stock value while the entry has a
     film take its hidden value, and the other way round (Get_CameraInfo 0x7E67F822, Set_CameraInfo 0x7E67F882, in

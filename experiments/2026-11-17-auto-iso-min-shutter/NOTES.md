@@ -205,7 +205,7 @@ change to match: the threshold rewrite needs the set block (ISO Auto test) and a
 | # | Step | Effort |
 |---|---|---|
 | 1 | Camera test of # Slow Limit on the pinned build. If it holds 1/250, decide whether 1/500 and faster are wanted at all | 2 min, owner |
-| 2 | Take `specs/proto-threshold-inplace.json` as the code spec. Check 0x60413275 on the pinned image (`scripts/tagplay.mjs … tag:d791`). Run `scripts/expcal.py --patch`, `emulator/hookcheck.py` | 30 min |
+| 2 | Take `specs/proto-threshold-inplace.json` as the code spec. Check 0x60413275 on the pinned image (`scripts/tagplay.mjs … tag:d791`). Run `scripts/expcal.py --patch`, `tools/emu/hookcheck.py` | 30 min |
 | 3 | Setting: dormant **447** (tag 0xD791, MODE bank, u8, default 0; EVF info, no reader found by the static scan; its list page is the dormant panel 608, descriptor 0x7F00BFCC). Mode-controller record 0x7E84C41C: list (0, 1) at 0x7E849EC2, length 2 → a stock byte list 0…7 (to find in segment 1), length 8. Check the reset lists as Peaking §15.2 did for 458 | 1 h |
 | 4 | Menu row in group E after ISO-Auto (index 45 of the item table 0x7EBF2000): `{4, text 1498, 447, 0, order, help 1509, value list 608, 0}`. 81-row table → the dead 79-row tables of `level-adjust-row` at 0x7EBF3000–0x7EBF3780 (1,920 B, no reader since `peaking-menu`); child list grows in place at 0x7EBF2600 (+8 B, 120 B free behind it); 10 address loads, 11 page records, counts 79/80 → 80/81, row-state array 160 → 162 B, rows of group E 13 → 14 in the `.data` image. Generator: copy `experiments/2026-11-14-focus-peaking/scripts/mkspec_menu.py` | 3 h |
 | 5 | List of panel 608: 8 items of 28 B. "Auto" = kind 2 with text 53. Speeds = kind 8 with numerator 1 and the denominator as a number (the stock items are `00 08 0100 fa00 …` for 1/250), so no new texts (I for 1/4000). Value → text list entry 608 (table 0x7F014614, now null). Both fit behind the new item table | 1 h |
@@ -384,9 +384,9 @@ ISO-Auto Set) was `1ce469bf…aa8`.
 | Check | Result |
 |---|---|
 | `epm2mod make` (free-space check inside) | exit 0; check PASS (0 FAIL) |
-| `emulator/boot-test builds/lss.json` | exit 0, PASS |
-| `emulator/update-path-test builds/lss.json` | exit 0, PASS |
-| `emulator/opcheck.py builds/lss.json` | exit 0; 16 specs, 501 byte ops, 0 FAIL |
+| `tools/emu/boot-test builds/lss.json` | exit 0, PASS |
+| `tools/emu/update-path-test builds/lss.json` | exit 0, PASS |
+| `tools/emu/opcheck.py builds/lss.json` | exit 0; 16 specs, 501 byte ops, 0 FAIL |
 | Crawl `p-nocard-shallow`, `crawlcmp.py` against `stock-films` | exit 0; 269 screens equal outside the Custom Menu rows; rows 82 → 83: 13 lost, 14 new, all cursor positions of group E; firmware errors equal |
 | The same against the first `lss` image (row after ISO-Auto Set) | exit 0; 269 equal; rows 83 / 83: 7 lost, 7 new, the cursor positions of the first page of E |
 | `shotdiff.sh` D → Info Settings and its 4 sub-lists (first candidate) | 0 of 12 differ (texts 1503/1504 not shown there) |
@@ -424,7 +424,7 @@ LOWSS, +32 slowest. 9 breakpoints in place of 8 (PEN-F 0x605BA4B9; E-PM2 0x7E694
   (0x605BABE3–0x605BACE0): to the nearest 1/3 EV (85/170 grid) — up for P when stage 5 has no length — the change
   limited to ±42 by moving ISO back (1/3 EV step), and the **shutter** takes the rest.
 
-### 12.2 The E-PM2 code (`gen/lss-core/lss.s`, generator `gen/lss-core/mkspec.py`, spec `patches/lss-core.json`)
+### 12.2 The E-PM2 code (`scripts/lss.s`, generator `scripts/mkspec_lss_core.py`, spec `patches/lss-core.json`)
 
 641 B of new code in the exp debug printers 0x7E69E9EA–0x7E69EEAF (segment 1). Five edits, no RAM:
 

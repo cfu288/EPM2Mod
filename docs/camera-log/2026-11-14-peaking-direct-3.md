@@ -1,0 +1,5 @@
+# 2026-11-14: peaking-direct-3
+
+| Date (UTC) | Build | sha256 | Result |
+|---|---|---|---|
+| 2026-11-14 | `peaking-direct-3` | `5330c0b80149aabbaaf578dbed6cc6592929f4e2b2f914005593a30262c4c325` | **Flashed; still crashes at a filter change.** User: in the quick menu (OK → Picture Mode strip, not the ART screen), a crash when the selection moves right from Vis 250D, or left to the entry after it. User: "seems to be art 7" (ART 7 = Velvia, the Diorama entry). In Key Line with the focus ring turned: no lines on sharp edges; the view zooms in, the Key Line effect goes away during the zoom, and it comes back after a few seconds. So the magnified view drops the art effect. Later report on the same build: "on another filter i see the focus peaking" (the filter: Portra). Correction by the user: Key Line has the lines too; they are fine and were missed at first. So the lines do show with one look or more. Not yet reported: Natural with the ring, the photo, and if the pinned build does the same at ART 7. |

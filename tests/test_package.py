@@ -1641,7 +1641,7 @@ class ReadmeTests(unittest.TestCase):
         )
         self.assertNotIn(marker, fileio.read_text(paths.readme))
         # The same block in two documents is refused.
-        fileio.write_text(paths.resolve("docs/install.md"), text[cut:])
+        fileio.write_text(paths.resolve("docs/user/install.md"), text[cut:])
         with self.assertRaisesRegex(BuildError, "found 2 times"):
             readme.is_current(paths)
 
@@ -1667,14 +1667,14 @@ class ReadmeTests(unittest.TestCase):
             (
                 0,
                 f"no spec changed\nwrote {paths.readme}\n"
-                f"wrote {paths.resolve('docs/cli.md')}\n",
+                f"wrote {paths.resolve('docs/reference/cli.md')}\n",
             ),
         )
         self.assertEqual(run(), (0, "no spec changed\ndocuments: no change\n"))
         self.assertEqual(run("--check")[0], 0)
         self.assertEqual(
-            fileio.read_text(paths.resolve("docs/cli.md")),
-            fileio.read_text(ROOT / "docs" / "cli.md"),
+            fileio.read_text(paths.resolve("docs/reference/cli.md")),
+            fileio.read_text(ROOT / "docs" / "reference" / "cli.md"),
         )
 
 

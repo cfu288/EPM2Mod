@@ -15,7 +15,7 @@ FILM = ["remap7b-code", "seven-fixes-1", "seven-movie-1", "seven-structure-extra
         "films12-entry-grainy-film", "films12-entry-gentle-sepia", "films12-entry-dramatic-tone",
         "films12-entry-key-line", "films12-entry-watercolor"]
 areas = [(int(r["start"], 16), int(r["end"], 16), r["verdict"])
-         for r in csv.DictReader(open(ROOT / "docs/code-space-map.tsv"), delimiter="\t")]
+         for r in csv.DictReader(open(ROOT / "docs/reference/code-space-map.tsv"), delimiter="\t")]
 
 
 def area(a):

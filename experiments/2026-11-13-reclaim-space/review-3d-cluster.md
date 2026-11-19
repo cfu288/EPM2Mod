@@ -197,4 +197,4 @@ then counts raw `call` d16/d32 at every byte of that body's block 0.
   keeps all but 73 B live because of one unaligned window, 0x7E872862 → 0x7EE3D470, which was not examined
   here. Possible extra space, **unproven**.
 - Reproduce: `python3 scan.py` (40 s), `xbody.py` (needs the other bodies' block-0 images and map DBs),
-  `emu3d.py` (needs the om-emu setup of `emulator/README.md`), all in `/tmp/scratch/rev3d/`.
+  `emu3d.py` (needs the om-emu setup of `tools/emu/README.md`), all in `/tmp/scratch/rev3d/`.

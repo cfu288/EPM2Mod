@@ -46,7 +46,7 @@ except ImportError:  # pragma: no cover
     HAVE_NUMPY = False
 
 #: The look file of ``looks/card-looks.json`` (the twelve looks of the pinned
-#: films, all colour looks): the test vector of docs/look-file-format.md.
+#: films, all colour looks): the test vector of docs/reference/look-file-format.md.
 CARD_LOOKS_SHA256 = "5d5df335dc14100a3fb7c90265ca07470419f12f52f806cc6b80f1bc09cae7ad"
 
 CURVE = tuple(min(1023, k + k // 2) for k in range(1024))

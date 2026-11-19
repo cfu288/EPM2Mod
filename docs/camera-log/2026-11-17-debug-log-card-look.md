@@ -1,0 +1,5 @@
+# 2026-11-17: builds/debug-log-card-look.json
+
+| Date (UTC) | Build | sha256 | Result |
+|---|---|---|---|
+| 2026-11-17 | `builds/debug-log-card-look.json` (`debug-log-films-12d` + `patches/log-card-look.json`: probe 2) | `d6955aac7bd33660f37ebe39d259b6282edb6da99bcc8707c3c00dba9df27f73` | **Flashed; the write works, its effect on the picture is not settled.** Log session 17: the load ran at 3.34 s when the GUI entered live control (state 0x5705): `card_read` bytes 26 "LOOK", `card_look` written 9, read back 0x0096004D (the grey row): the new values are in RAM. The still's colour stage ran on CPU 0 (the writing CPU) with art 71 and the table 0x7ECB0988 at 12.2 s. All three photos (PB170140-142) were taken after the load and show a dim, almost colourless room, so they cannot show a change: colour spread at equal brightness 0.5 levels in each (what a grey matrix gives, but the scene is nearly grey anyway). Retake planned: a colourful scene, photo A before any OK, MENU or PLAY. Session 16 (the start after the flash) has garbage records, the known ring-header defect of docs/todo.md. |

@@ -2,7 +2,7 @@ import { filmById, slots } from './films'
 import { crc32, decodeBase64, nameProblem, packLooks, RECORD_BYTES } from './lookfile'
 import { lookFile, type SlotItem } from './selection'
 
-/** Twelve rows: the films of `looks/card-looks.json`, the look list whose file docs/look-file-format.md gives. */
+/** Twelve rows: the films of `looks/card-looks.json`, the look list whose file docs/reference/look-file-format.md gives. */
 const TWELVE = [
   'portra-400',
   'ektachrome',
@@ -25,7 +25,7 @@ async function sha256(bytes: Uint8Array): Promise<string> {
 }
 
 describe('the look file', () => {
-  it('packs twelve films to the bytes of `epm2mod films pack looks/card-looks.json` (docs/look-file-format.md)', async () => {
+  it('packs twelve films to the bytes of `epm2mod films pack looks/card-looks.json` (docs/reference/look-file-format.md)', async () => {
     expect(await sha256(lookFile(twelve()))).toBe('5d5df335dc14100a3fb7c90265ca07470419f12f52f806cc6b80f1bc09cae7ad')
   })
 

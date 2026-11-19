@@ -151,8 +151,9 @@ def plan(paths: RepoPaths, final: bool) -> tuple[Plan | None, list[str]]:
     if pinned.label is None:
         problems.append(f"the pinned build {pinned.name} has no label")
         return None, problems
-    if pinned.sha256 not in read_text(paths.resolve("docs/camera-log.md")):
-        problems.append(f"docs/camera-log.md has no row for {pinned.sha256[:8]}")
+    log = paths.resolve("docs/camera-log")
+    if not any(pinned.sha256 in read_text(entry) for entry in sorted(log.glob("*.md"))):
+        problems.append(f"docs/camera-log/ has no file for {pinned.sha256[:8]}")
     if _git(paths, "status", "--porcelain", "--untracked-files=no"):
         problems.append("the working tree has changes: commit or stash them")
     _git(paths, "fetch", "--quiet", "--tags", "origin")

@@ -47,7 +47,7 @@ restart so that the last events before a crash can be read (Memfault's reboot tr
 
 A hook in the pre-reset range (the error recorder) jumps into the kernel range. The reset code copies the kernel
 before any code that can reach the recorder: none of the 15 calls before the copy at 0x7E421228, and not the flash
-read 0x7E4217E6 itself, reaches 0x7E426D4B in the call graph (**V** static). `emulator/hookcheck.py`: 72 transfers,
+read 0x7E4217E6 itself, reaches 0x7E426D4B in the call graph (**V** static). `tools/emu/hookcheck.py`: 72 transfers,
 0 FAIL.
 
 ## 3. Addresses
@@ -134,8 +134,8 @@ folder; `logplay.mjs` copies the card's files back to that folder after a run.
 | Check | Result | Label |
 |---|---|---|
 | `.venv/bin/epm2mod make builds/debug-log.json` | sha256 `e74f1aec…bda8`; free-space check PASS, 0 FAIL, no `first_code` (`results/freespace-check.txt`) | V |
-| `emulator/opcheck.py builds/debug-log.json` | 18 specs, 0 FAIL | V |
-| `emulator/hookcheck.py` on the two specs | 72 transfers, 0 FAIL: every hook in the pre-reset range, the kernel or segment 1 goes to the kernel range (`results/hookcheck.txt`) | V |
+| `tools/emu/opcheck.py builds/debug-log.json` | 18 specs, 0 FAIL | V |
+| `tools/emu/hookcheck.py` on the two specs | 72 transfers, 0 FAIL: every hook in the pre-reset range, the kernel or segment 1 goes to the kernel range (`results/hookcheck.txt`) | V |
 | The generator's own checks | each site is on an instruction boundary of the pinned build; no replaced instruction is pc-relative but `call`, which is assembled again; no instruction and no 4-byte word of block 0 names an address inside a replaced range | V |
 | (a) Boot, `stage2-boot.mjs 2000` | PASS. Against the pinned report 3 lines differ: the instruction counts (cpu0 +570: the new code; cpu1 −2,982: CPU1 runs no new code, its ring stays empty, and its idle polling follows the timing of CPU0, **I**), the time of the second start-up error (37.6 → 37.7 ms) and the count of idle-loop visits (`results/emu-boot-diff.txt`) | V |
 | Update path (`audit/update-boot.mjs`: OK held at power-on), without and with an update file on the card | the same lines as the pinned image but the times; the update file is found and read | V |

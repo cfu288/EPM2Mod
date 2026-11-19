@@ -1,0 +1,5 @@
+# 2026-11-17: builds/card-looks.json
+
+| Date (UTC) | Build | sha256 | Result |
+|---|---|---|---|
+| 2026-11-17 | `builds/card-looks.json` (`films-12d` + `patches/card-looks.json`: looks loaded from the SD card, kept in the camera; no debug log) | `889dbcaf49b3ee0a00266ac6420d87f3f47031d0f9e81e3af9b99640ebe35949` | **OK. Looks from the SD card work: load, keep, refuse, load back.** Pro 400H, a desk scene with a red glass, one flash, five sessions (photos PB170150-PB170154). GREY.BIN, MENU, MENU: live view black and white at once, photo 1 grey (colour spread 0.32). Power off, file deleted, power on: grey before any key, photo 2 (0.31). SWAP.BIN, MENU, MENU: red and blue swapped (the red glass blue; B-R +11.3). BAD.BIN (one byte damaged), MENU, MENU: still swapped (B-R +9.7), refused. DEFAULT.BIN, MENU, MENU: normal Pro 400H (glass red, B-R -0.9). No freeze, every start normal. Emulator before the flash: free space PASS, op check 0 FAIL, hookcheck only the allowed remap7b-code entry, boot-test PASS, update-path-test PASS, five sessions PASS (`experiments/2026-11-17-card-looks/scripts/emu_looks.py`). Pinned. |

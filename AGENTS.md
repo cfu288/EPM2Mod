@@ -1,7 +1,7 @@
 # Working Rules for AI Agents on This Repository
 
-Read [docs/feasibility.md](docs/feasibility.md) first: the real limits of the camera and of the firmware's resources,
-with evidence. Open work is in [docs/todo.md](docs/todo.md): add an item when the owner asks for one, delete it when
+Read [docs/dev/feasibility.md](docs/dev/feasibility.md) first: the real limits of the camera and of the firmware's resources,
+with evidence. Open work is in [TODO.md](TODO.md): add an item when the owner asks for one, delete it when
 it is done.
 
 ## Evidence
@@ -24,9 +24,9 @@ it is done.
 7. **Before you offer a build that adds or moves a hook,** run `emulator/hookcheck.py`, `emulator/boot-test` and
    `emulator/update-path-test` on it (exit status 0 = pass), and for a menu change the emulator's screenshot
    comparison. A build that can crash at start-up is the one failure with no known way back
-   ([feasibility](docs/feasibility.md), "The emulator").
+   ([feasibility](docs/dev/feasibility.md), "The emulator").
 8. **Safety steps:** make firmware only from a build description with the CLI, log each flash in
-   `docs/camera-log.md` before and after, keep the stock file at hand, change one thing per flash.
+   `docs/camera-log/` before and after, keep the stock file at hand, change one thing per flash.
 9. **Test instructions the owner can follow with the camera in hand:** take each menu path from the camera manual or
    the firmware's menu text, not from memory. Name each screen as the camera shows it, one step per arrow. Say how to
    switch on anything the path needs, the expected result, and what each other result means.
@@ -45,7 +45,7 @@ it is done.
     the command line, the site), not where the data is stored.
 15. **When a feature passes its camera test,** in the same piece of work: pin the build, regenerate the generated
     documents, write or update its guide in `docs/guide/` (how to switch it on and use it, screenshots, limits), add
-    one linked line to the feature list in `README.md`, and update the camera log and `docs/feasibility.md`. The root
+    one linked line to the feature list in `README.md`, and update the camera log and `docs/dev/feasibility.md`. The root
     `README.md` is an index with the short install steps. A feature without a guide is not finished.
 16. **Documents match the current state.** Read each changed document as a first-time user, against the current
     build and commands. A generated block that is "up to date" only proves the generator ran: read its content.
@@ -60,15 +60,15 @@ it is done.
 19. **Do what was asked, and no more.** Settle details by common practice without asking. Bring anything that adds
     scope or changes a decision to the owner first. A renamed command or flag is changed everywhere in the same
     change, with no alias.
-20. **Dated notes are records.** Do not edit `experiments/*/NOTES.md`, design notes or `docs/camera-log.md` to match
-    later changes.
+20. **Dated notes are records.** Do not edit `experiments/*/NOTES.md`, design notes or `docs/camera-log/` to match
+    later changes. Where a path has moved since, [docs/dev/moved-paths.md](docs/dev/moved-paths.md) gives the new one.
 21. **Do not polish while a feature question is open.** Fit accuracy and tooling reviews come after the feature works
     on the camera.
 
 ## Code and commits
 
 22. `src/epm2mod/` is production code (black, `mypy --strict`, docstrings, tests); `experiments/` is research code. See
-    [docs/conventions.md](docs/conventions.md). The command-line reference is [docs/cli.md](docs/cli.md).
+    [docs/dev/conventions.md](docs/dev/conventions.md). The command-line reference is [docs/reference/cli.md](docs/reference/cli.md).
 23. **Writing in files:** short plain sentences, terms defined. Use placeholders for machine paths and hosts
     (`/path/to/...`, `USER@HOST`). The pre-commit hook refuses real ones.
 24. **Commit and push your work** to `origin main` without asking. Do not force-push or rewrite history unless the

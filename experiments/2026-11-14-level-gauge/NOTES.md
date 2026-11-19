@@ -373,7 +373,7 @@ Emulator work folder `~/opt/om-emu-e101-boot-work/level-adjust/` (scripts, logs,
 | Check | Result | Label |
 |---|---|---|
 | `tools/freespace.py check` (in `epm2mod make`) | PASS, 0 FAIL | V |
-| `emulator/hookcheck.py` on the 11 specs | the same 13 transfers and the same 1 known FAIL (0x7E56C6A5, remap7b-code) as the pinned build; this spec alone: 0 transfers | V |
+| `tools/emu/hookcheck.py` on the 11 specs | the same 13 transfers and the same 1 known FAIL (0x7E56C6A5, remap7b-code) as the pinned build; this spec alone: 0 transfers | V |
 | (a) Boot, `stage2-boot.mjs 2000` | PASS; the report equals the pinned build's except the wall time | V |
 | (b) Menu crawl, P mode, card, clock set, every sub-screen: 4,250 screens | Outside the Custom Menu rows: 1,875 screens, all byte-equal. Custom Menu rows, compared as sets of screens (the insert shifts the crawl's row numbers): 1,498 in both; 8 pinned screens gone, and they are the J page with 5 rows (4 cursor positions, the Pixel Mapping pop-up, 3 Warning Level pop-ups); 11 new: the same 8 with 6 rows, the cursor on Level Adjust, Reset, Adjust. No row missing. Firmware error log: only the two start-up entries, as on pinned. Crawler notes equal | V |
 | (b) Shallow crawls: P without card, iAUTO, ART, movie | Only the J page differs (3 or 4 screens redrawn, 1 new cursor position: the row can be selected in every mode) | V |

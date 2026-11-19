@@ -1,0 +1,5 @@
+# 2026-11-12: patches/seven-films-5.json
+
+| Date (UTC) | Build | sha256 | Result |
+|---|---|---|---|
+| 2026-11-12 (night) | remap7b-code + seven-fixes-1 + seven-structure-extra + `patches/seven-films-5.json` + xp-adaptive-hue-off + seven-labels (`build/seven-films-5.BIN`) | `0443a388…8f9b29ae` | **OK. Seven films, final.** (`seven-films-4` was never flashed.) All seven EXIF matrices as predicted. Every film landed within about 0.1 of the anchored prediction. ΔE2000 vs target, natural / skin / ColorChecker ×5 EV / grays / out-of-range: Portra 1.26 / 1.15 / 1.63 / 0.78 / 14.1; Ektachrome 1.27 / 1.18 / 1.69 / 0.72 / 13.9; Pro 400H 1.15 / 1.01 / 1.51 / 0.67 / 15.0; Kodachrome 1.06 / 0.80 / 1.36 / 0.68 / 15.8; Vision3 250D 1.19 / 1.00 / 1.63 / 0.73 / 12.7; Velvia 1.44 / 1.56 / 1.91 / 0.81 / 16.8; Superia 1.36 / 1.65 / 1.96 / 0.75 / 12.0. Camera vs second model 0.89–0.96 on natural colours. Stock picture modes developed for the model calibration (Natural, Vivid, Muted, Portrait): model predicts them to 0.82–0.92. Files: `shots/films5/`, `shots/measured/F5_*`, `M_*`. NOTES §46. |

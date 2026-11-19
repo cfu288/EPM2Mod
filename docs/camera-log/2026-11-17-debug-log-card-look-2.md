@@ -1,0 +1,5 @@
+# 2026-11-17: builds/debug-log-card-look.json
+
+| Date (UTC) | Build | sha256 | Result |
+|---|---|---|---|
+| 2026-11-17 | `builds/debug-log-card-look.json` (retake, no new flash) | `d6955aac7bd33660f37ebe39d259b6282edb6da99bcc8707c3c00dba9df27f73` | **OK. Probe 2 passed: a look written in RAM at run time takes effect at once, in the photo and in live view.** A colourful scene (a striped picture on a screen) in Pro 400H: photo A before any menu (PB170143: mean colour 75.7, colour spread at equal brightness 53.9) and photo B after MENU, MENU (PB170144: 4.9 and 1.0: black and white, the grey matrix of the card file). The owner saw live view turn black and white after the menu (live view's colour stage runs on CPU 1, the writer is CPU 0). Log session 19: `card_read` bytes 26, `card_look` written 9, read back 0x0096004D. Session 18 (a start that went straight to power-off in 0.5 s) has records with flipped bits (`card_read` bytes -1 at power-off, `card_look` written 0x10000000): the RAM defect of docs/todo.md, not the probe. |

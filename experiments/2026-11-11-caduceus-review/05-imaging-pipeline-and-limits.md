@@ -2,7 +2,7 @@
 
 **Question.** Which parts of the Caduceus imaging pipeline and look system cannot be done on the E-PM2, and which are only unbuilt or untested?
 
-**Method.** Static reading of the v1.6 block 0 with `tools/fwmap.py` and `tools/disasm.py`, plus runs in the in-repo emulator (`emulator/`, on scratch copies, never in the repo). Five read-only Opus agents did the digging; the coordinator re-read these in the bytes: the enable masks of tables A and B and Muted, that Muted differs from A only in the mask, that the two orphan tables are copies of A and B, the four loader end words, the art hash at 0x7E85C45C, and the record for setting 111. Nothing was built for a camera or flashed.
+**Method.** Static reading of the v1.6 block 0 with `tools/fwmap.py` and `tools/disasm.py`, plus runs in the in-repo emulator (`tools/emu/`, on scratch copies, never in the repo). Five read-only Opus agents did the digging; the coordinator re-read these in the bytes: the enable masks of tables A and B and Muted, that Muted differs from A only in the mask, that the two orphan tables are copies of A and B, the four loader end words, the art hash at 0x7E85C45C, and the record for setting 111. Nothing was built for a camera or flashed.
 
 Labels: **[V]** read in our bytes or run in the emulator, **[C]** camera result already in `docs/camera-log.md` or the NOTES, **[X]** stated by an external source, **[I]** inferred, **[?]** needs a camera (the probe is named).
 

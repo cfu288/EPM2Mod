@@ -3,7 +3,7 @@
 A film slot is an art-filter menu entry whose processing was made colour-only.
 Its look is seven things in block 0 of the firmware. All addresses here are run-time
 addresses of E-PM2 firmware 1.6; ``BLOCK0_BASE`` turns them into payload offsets.
-How they were found: ``docs/art-filter-slots.md`` and
+How they were found: ``docs/dev/art-filter-slots.md`` and
 ``experiments/2026-11-09-film-portra/NOTES.md``.
 """
 

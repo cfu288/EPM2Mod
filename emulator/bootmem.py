@@ -1,4 +1,4 @@
-"""Give emulator RAM the content that the E-PM2 boot code gives it (the load map of docs/code-space-map.md).
+"""Give emulator RAM the content that the E-PM2 boot code gives it (the load map of docs/reference/code-space-map.md).
 
 om-emu maps the whole block 0 at its runtime address and leaves all other RAM zero. The camera does this instead:
   - the boot code copies only some ranges of block 0 from flash to RAM (kernel, data-image, sram-image, segments 1-3,

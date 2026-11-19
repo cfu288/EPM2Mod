@@ -200,9 +200,9 @@ without a build.
   segment-2 code breaks rule 13 of `AGENTS.md` unless there is proof that the site runs only after
   Usr1. Argument (**I**): a still phase runs only on a request of TAKE, and TAKE gets it from the
   application in segments 2 and 3. The power-on shutter move is `COM_READY_ON` in cam_mec_ctrl, not a
-  still phase. Proof to collect: `emulator/hookcheck.py`, `boot-test` and `update-path-test` on the
+  still phase. Proof to collect: `tools/emu/hookcheck.py`, `boot-test` and `update-path-test` on the
   build, and build 1 on the camera (no still record before the boot record). Then one line in
-  `emulator/hookcheck-allow.tsv`.
+  `tools/emu/hookcheck-allow.tsv`.
 
 ## 5. Plan for (a): start the sensor late, leave the shutter alone
 

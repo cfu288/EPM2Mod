@@ -3,7 +3,7 @@
 
     python3 emulator/hookcheck.py SPEC.json [SPEC.json ...] [--allow 0xSITE=reason ...]
 
-Why: the boot code copies block 0 to RAM in steps (docs/code-space-map.md, load map). The kernel and segment 1 are
+Why: the boot code copies block 0 to RAM in steps (docs/reference/code-space-map.md, load map). The kernel and segment 1 are
 in RAM first; segment 2, segment 3 and usr1-third arrive later, from the Usr1 task, and never on the firmware-update
 path. A hook in early code that jumps to late code crashes when the hooked function runs before the copy. This
 happened: the hook of peaking-direct-2 in the heap mode chooser 0x7E714833 (segment 1) jumped to 0x7EBF1F74

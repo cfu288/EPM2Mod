@@ -129,7 +129,7 @@ settings (level-gauge notes, section 3.3), and the mode numbers are a fixed swit
 | RAM | 0x602BE8C8 (u32 time of the last read), 0x602BE8CC (u16 last count): slots 21 and 22 of the table 0x602BE874. No constant in the image names them and their initial values are 0 (the argument of focus-peaking notes 11.3 for slot 20) | 6 B | V static |
 
 The two hooks are in segment 3 (GUI code) and jump to segment 2. Both segments are loaded by the same
-task, so the kernel rule does not apply (`emulator/hookcheck.py patches/osd-battery.json`: 12 transfers,
+task, so the kernel rule does not apply (`tools/emu/hookcheck.py patches/osd-battery.json`: 12 transfers,
 0 FAIL). The routine calls kernel and segment-1 code (timer, semaphore, A/D read), which is loaded earlier.
 
 ## 6. Step 1: `patches/osd-battery.json`, build `builds/osd-battery.json`

@@ -22,7 +22,7 @@ HIDDEN = [111, 112, 114, 115, 118]
 
 
 def main():
-    areas = [(int(r["start"], 16), int(r["end"], 16)) for r in csv.DictReader(open(ROOT / "docs/code-space-map.tsv"), delimiter="\t")]
+    areas = [(int(r["start"], 16), int(r["end"], 16)) for r in csv.DictReader(open(ROOT / "docs/reference/code-space-map.tsv"), delimiter="\t")]
     layout = json.load(open(ROOT / "build/stock-films/layout.json"))
     switched = {w["address"] + i for e in layout["entries"] for w in e["switch"]
                 for i in range(len(bytes.fromhex(w["film"])))}

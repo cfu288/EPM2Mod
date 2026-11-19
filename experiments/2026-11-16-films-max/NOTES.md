@@ -162,8 +162,8 @@ names too, put `film-names-all-languages` back in place of `films12-names`.
 | Check | Result |
 |---|---|
 | `epm2mod make` for both builds: free-space check, boot test, update-path test | PASS, PASS, PASS |
-| `emulator/opcheck.py` both builds | 0 FAIL |
-| `emulator/hookcheck.py patches/films12-structure.json` | 18 transfers, 0 FAIL (no new hook; one changed jump inside segment 2) |
+| `tools/emu/opcheck.py` both builds | 0 FAIL |
+| `tools/emu/hookcheck.py patches/films12-structure.json` | 18 transfers, 0 FAIL (no new hook; one changed jump inside segment 2) |
 | `black`, `mypy --strict`, `python -m unittest discover -s tests` | clean; 185 tests OK (11 new in `tests/test_looks_extra.py`) |
 | **`scripts/stage_check.py`** (new): for every stored value of the lists, `art_GetFilterType` (types 1 to 3) and the four live-view tables run in the emulator; for every code they give, all six stages' dispatch; the tables each stage ends with compared byte for byte with what the generator makes from the fit | pinned PASS (12 values, 28 codes). films-12 **PASS** (12 values, 19 codes): every entry gives one code in all still paths and one in both movie tables, class 1, no code in an effect list; all 12 looks are their films; the seven old entries give the same codes, tables and contents as pinned; the 12 ART presets store the list's values (`results/stage-check-films-12.txt`) |
 | Peaking S6 (six-axis dispatch for codes 9–184), S7 (`scen_direct4.py`) | 0 FAULT. S6 prints FAIL for films-12 because it lists codes whose result differs from pinned: 94, 98, 144, 156, 159, the five new codes, as intended. S7 PASS (`results/scen-s6-s7-films-12.txt`) |

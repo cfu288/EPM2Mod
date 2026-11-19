@@ -9,7 +9,7 @@ setSetting, as the menu does, and starts the task in mode 1. The firmware writes
 a camera shows Off. There is no load at the first menu.
 
 Needs build/films-12d.BIN (uv run epm2mod make films-12d) and the toolchain (tools/setup.sh).
-The design is design.md sections 2-5 and 9.3; the file format is docs/look-file-format.md.
+The design is design.md sections 2-5 and 9.3; the file format is docs/reference/look-file-format.md.
 
 What the spec adds to films-12d (no debug log):
   * T_GUI, a hook on the GUI state setter's last trace call (0x7ECDF6E4, task CA_MAIN; the site log-core used,
@@ -51,7 +51,7 @@ SPEC = "card-looks"
 BASE_BUILD = "builds/films-12d.json"
 STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
 
-# where the code goes: free runs of the segment-2 code areas (docs/code-space-map.md; the runs of the persistence
+# where the code goes: free runs of the segment-2 code areas (docs/reference/code-space-map.md; the runs of the persistence
 # probe log-card-keep, which this spec supersedes, and the free end of the area 0x7ECB0888-0x7ECB1000)
 RUNS = {
     ".tk": (0x7ECB0EE8, 0x7ECB1000),
@@ -703,7 +703,7 @@ def main():
             "description": (
                 "Film looks loaded from the SD card with the menu row 'Load Looks', kept in the camera, for twelve "
                 "colour slots (every art-filter entry takes any look). A look file C:\\EPM2LOOK.BIN "
-                "(docs/look-file-format.md) holds up to 12 looks. When the GUI leaves the menu (not to power-off) "
+                "(docs/reference/look-file-format.md) holds up to 12 looks. When the GUI leaves the menu (not to power-off) "
                 "with setting 449 (prm tag 0xD7B1, the row of patches/looks-menu.json) at Load (0) and the card is not "
                 "being written, the dormant task USRTEST_A reads the file into the "
                 "EEROM settings bank's unused tail (0x%08X), checks it (magic, version, lengths, CRC-32, camera and "

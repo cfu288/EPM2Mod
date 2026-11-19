@@ -43,7 +43,7 @@ Scratch: `/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/qp/`.
   - the clip's first frame came out at QP 25 while software proposed 33 (V: the builder in the emulator gives 33 with an empty history; 04 gives frame 1 = 25), so the hardware picks its own QP;
   - one P-frame is at 22.
 
-## 3. Emulator tests (emulator, cases `qp_setup`, `qp_rc`, `qp_size_model`)
+## 3. Emulator tests (tools/emu, cases `qp_setup`, `qp_rc`, `qp_size_model`)
 
 - **Stubs:**
   - every codec-driver vtable entry points at scratch code `clr d0; rets`, and the struct is read from the dead stack;
@@ -102,7 +102,7 @@ Scratch: `/tmp/scratch/04b1caa0-6975-4677-98e3-f42129671871/scratchpad/qp/`.
 
 ## Files
 
-- `emulator/cases.py`: the new cases `qp_setup`, `qp_rc` and `qp_size_model`, appended at the end.
-- `emulator/specs/qp-floor-16.json`: the requested 0xA84A00-only spec.
-- `emulator/specs/qp-floor-16-both.json`: both floor bytes.
-- `emulator/README.md` was not updated.
+- `tools/emu/cases.py`: the new cases `qp_setup`, `qp_rc` and `qp_size_model`, appended at the end.
+- `tools/emu/specs/qp-floor-16.json`: the requested 0xA84A00-only spec.
+- `tools/emu/specs/qp-floor-16-both.json`: both floor bytes.
+- `tools/emu/README.md` was not updated.

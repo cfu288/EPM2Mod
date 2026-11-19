@@ -235,7 +235,7 @@ in source are marked **REPORTED (agent-verified)**; I did not re-read them, exce
   audit and models which sections the boot loader leaves loaded. No new bodies. REPORTED (agent-verified).
 - **Licence: none.** REPORTED (agent-verified); the earlier local review says the same.
 - **For the E-PM2 today:** this project already runs single E-PM2 functions in a locally patched om-emu
-  (`emulator/README.md:3-28`). A UI session would need a real port. INFERRED: weeks,
+  (`tools/emu/README.md:3-28`). A UI session would need a real port. INFERRED: weeks,
   as the earlier review estimated, and upstream will not do it.
 
 ### 4.3 Recovery from a bad flash: what is proven where

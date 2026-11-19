@@ -1,0 +1,5 @@
+# 2026-11-14: peaking-direct-2
+
+| Date (UTC) | Build | sha256 | Result |
+|---|---|---|---|
+| 2026-11-14 (never flashed) | `peaking-direct-2` | `b5493233ab4bef63fe5ca8f9a230e7f31a843221710ba9432f59da1be8929d78` | **DO NOT FLASH. Withdrawn before any flash.** In the emulator (stock firmware booted from reset on both cores) this build crashes during start-up, while the pinned build boots exactly like stock. The new hook at 0x7E7149B6 is in segment 1, in a function that the boot task calls during Usr0, and it jumps to code at 0x7EBF1F74 in segment 2. Segment 2 is copied to RAM later, by Usr1. So the jump lands in memory that is not loaded yet. On the camera this would be a crash at every start, and probably on the update path too (Usr1 does not run there, so segment 2 is never loaded): the boot-loop case, with no recorded recovery on this body. Rule from this: a hook in the kernel or in segment 1 must jump only to code in the kernel or segment 1, unless the function is proven to run only after Usr1. The spec is kept in `experiments/2026-11-14-focus-peaking/specs/` as a record. The build file was deleted. |

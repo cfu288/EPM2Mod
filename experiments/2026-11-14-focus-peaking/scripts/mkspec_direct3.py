@@ -39,7 +39,7 @@ FUNCS = os.path.join(ROOT, "build/map/functions.txt")
 # Camera-proven code space (freespace.py verdict USABLE-CODE). 0x7ECB0EF0-0x7ECB0F16 is left alone: the
 # probe-A spec in patches/ claims these 38 bytes.
 AREAS = {
-    # Segment 1, statically checked dead code (docs/code-space-map.md 3.3, verdict USABLE-DATA, all six checks ok).
+    # Segment 1, statically checked dead code (docs/reference/code-space-map.md 3.3, verdict USABLE-DATA, all six checks ok).
     # No code has run here. Every routine that a segment-1 hook reaches must be in segment 1: segment 2 is not in
     # RAM yet when the boot task first runs the heap mode chooser (hook M), and never on the update path.
     ".p0": (0x7E50A201, 0x7E50A20C, "segment 1, reclaimed dead code: getL"),

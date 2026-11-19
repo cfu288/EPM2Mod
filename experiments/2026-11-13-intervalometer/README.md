@@ -86,7 +86,7 @@ The list cannot be longer than 128 rows, because the screen keeps its position i
 ## 4. How it was checked
 
 1. **Against the E-PL6.** Every changed table equals the E-PL6's table byte for byte. Every piece of new code equals the E-PL6's code instruction for instruction, apart from addresses.
-2. **In the emulator** (`emulator`, single functions). On the patched image, every menu row gives the same help text (43 of 43), the same OK target (43 of 43) and the same value (74 of 74) as the E-PL6 image. The keep-awake code makes the same calls in the same order on all 40 selector inputs and all 14 start paths. The movie guard and the frame list have their own cases. The film patches behave the same with and without the interval specs.
+2. **In the emulator** (`tools/emu`, single functions). On the patched image, every menu row gives the same help text (43 of 43), the same OK target (43 of 43) and the same value (74 of 74) as the E-PL6 image. The keep-awake code makes the same calls in the same order on all 40 selector inputs and all 14 start paths. The movie guard and the frame list have their own cases. The film patches behave the same with and without the interval specs.
 3. **By independent review.** Four reviews by reviewers who did not write the patch: [memory](review-1-memory.md), [code](review-2-code.md), [the final spec](review-3-v2.md) and [the 240-frame spec](review-4-frames240.md). They found two real defects in the first version, which v2 corrects: the new bytes were in space that the film patches already use, and the movie guard was missing. A separate [trace](trace-frames-list-location.md) shows that nothing reads the frame list before the code that needs it is loaded.
 4. **With the free-space tool.** `python3 tools/freespace.py check` passes on the full list of specs: no two specs use the same bytes, and every new byte is in memory that the camera loads and that nothing else refers to. Run it before each build.
 5. **On the camera.** See the next section.
@@ -107,7 +107,7 @@ A static check cannot see an address that the firmware computes while it runs. T
 - **Interval Time cannot be 0.** The firmware uses "timer, 0 ms" to stop the interval timer, so the sequence would stop after the first frame. The menu refuses to store 0 for this reason. For back-to-back frames, use sequential shooting (NOTES §14).
 - **More than 240 frames** in one sequence is not possible with this design. Start a second sequence.
 - **The debug text under the new Frame rows** (names for the `sdk` debug command) is overwritten. The command itself uses a different copy of the names.
-- **Three superseded film specs** in `patches/` use the same padding and cannot be combined with v2.
+- **Three superseded film specs** in `patches/history/` use the same padding and cannot be combined with v2.
 
 ## 7. Risks
 
@@ -136,7 +136,7 @@ Specs 1–3 are kept for reference only. Do not build spec 2 or 3 with the film 
 | `review-1` … `review-4`, `trace-frames-list-location.md` | The independent reviews and the frame-list trace |
 | `scripts/` | Spec generators (`mkspec_v2.py`, `mkspec_frames240.py`), cross-body comparison and scan helpers. NOTES "Files" lists each one |
 | `results/` | Emulator output, function pairing, scans |
-| `emulator/cases.py` (repo root) | The emulator cases: `menu_help`, `menu_child`, `menu_value`, `ivl_guard`, `ivl_selector`, `ivl_start`, `ivl_movie_guard`, `ivl_shot_done`, `frames_step`, `frames_editor` |
+| `tools/emu/cases.py` (repo root) | The emulator cases: `menu_help`, `menu_child`, `menu_value`, `ivl_guard`, `ivl_selector`, `ivl_start`, `ivl_movie_guard`, `ivl_shot_done`, `frames_step`, `frames_editor` |
 
 > **Where the shipped specs are.** `interval-timelapse-v2.json` and `interval-frames-240.json` are
 > part of the pinned firmware build, so they live in `patches/` at the top of the repository. The

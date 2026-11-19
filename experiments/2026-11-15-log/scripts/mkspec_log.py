@@ -814,7 +814,7 @@ def peaking_time():
                        "of the peaking code changes. Needs log-core and log-probes before it: every expect is a byte "
                        "string of that build. It puts the build id %s of logs/events.json into the block header. "
                        "DEBUG builds only. See experiments/2026-11-14-focus-peaking/NOTES.md section 17 and "
-                       "docs/logging.md." % (TIME_EVERY, TIME_EVERY, bid.hex()),
+                       "docs/reference/logging.md." % (TIME_EVERY, TIME_EVERY, bid.hex()),
         "base": STOCK, "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
         "status": "candidate: emulator-checked, not flashed",
         "_delta_on": "builds/debug-log-peaking-fast.json without this spec",
@@ -950,7 +950,7 @@ def peaking_guard():
                        "segment 2; no byte of the peaking code changes. Needs log-core, log-probes and "
                        "log-peaking-time before it: every expect is a byte string of that build. It puts the build "
                        "id %s of logs/events.json into the block header. DEBUG builds only. See "
-                       "experiments/2026-11-14-focus-peaking/NOTES.md section 18 and docs/logging.md." % bid.hex(),
+                       "experiments/2026-11-14-focus-peaking/NOTES.md section 18 and docs/reference/logging.md." % bid.hex(),
         "base": STOCK, "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
         "status": "candidate: emulator-checked, not flashed",
         "_delta_on": "builds/debug-log-peaking-fast-2.json without this spec",
@@ -1120,7 +1120,7 @@ def main():
             "name": spec,
             "description": text[spec] + " The event ids are in logs/events.json (build id %s). A delta on %s: every "
                            "expect is a byte string of that build. See experiments/2026-11-15-log/NOTES.md and "
-                           "docs/logging.md." % (bid.hex(), PINNED),
+                           "docs/reference/logging.md." % (bid.hex(), PINNED),
             "base": STOCK, "base_sha256": stock_sha,
             "status": "candidate: emulator-checked, not flashed",
             "_delta_on": "%s (sha256 %s)" % (PINNED, PINNED_SHA),
@@ -1275,7 +1275,7 @@ PROBE_DESCRIPTION = ("Structured log, the probe harness of looks loaded from the
                      "log-card-look, on the specs of builds/debug-log-films-12d.json. It puts the build id %s of "
                      "logs/events.json into the block header. DEBUG builds only. See "
                      "experiments/2026-11-17-card-looks/design.md section 8.")
-# runs of segment 2 that no spec ledgers (docs/code-space-map.md; the segment-3 tail is for data only)
+# runs of segment 2 that no spec ledgers (docs/reference/code-space-map.md; the segment-3 tail is for data only)
 PROBE_AREAS = {".cr": (0x7EBF2888, 0x7EBF2900), ".ca": (0x7EBF2B90, 0x7EBF2C00), ".p3": (0x7EBF2A8C, 0x7EBF2B00),
                ".p4": (0x7EBF3B10, 0x7EBF3B52), ".p5": (0x7EBF1090, 0x7EBF10FC)}   # segment 2 only: code space
 # the tables of the Pale&Light Color slot (Pro 400H, codes 71 and 80; src/epm2mod/looks/slots.py): start, length
@@ -1718,7 +1718,7 @@ def card_read(spec=CARD_SPEC, asm_text=CARD_ASM, areas={".cr": CARD_AREA}, event
                        "code, not stock) and its routine after the flush task. Needs the specs of "
                        "builds/debug-log-films-12d.json before it: every expect is a byte string of that build. It "
                        "puts the build id %s of logs/events.json into the block header. DEBUG builds only. See "
-                       "experiments/2026-11-17-card-looks/NOTES.md and docs/logging.md." % bid.hex()),
+                       "experiments/2026-11-17-card-looks/NOTES.md and docs/reference/logging.md." % bid.hex()),
         "base": STOCK, "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
         "status": "candidate: emulator-checked, not flashed",
         "_delta_on": "builds/debug-log-films-12d.json",

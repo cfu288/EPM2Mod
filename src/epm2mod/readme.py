@@ -56,7 +56,7 @@ def pinned_block(paths: RepoPaths) -> str:
     return (
         f"The installer and `install` write the firmware **`{pinned.name}`**: {what}. "
         f"We tested this build on a real E-PM2 on {pinned.camera_tested} "
-        "([camera log](camera-log.md)).\n\n"
+        "([camera log](../camera-log/)).\n\n"
         "| | sha256 |\n|---|---|\n"
         f"| Stock firmware, `{stock.file_name}` | `{stock.sha256}` |\n"
         f"| Pinned build, `{pinned.name}` | `{pinned.sha256}` |\n"
@@ -222,13 +222,13 @@ def cli_reference(paths: RepoPaths) -> str:
 
 #: The files that are generated whole, relative to the repository root.
 GENERATED_FILES: dict[str, Callable[[RepoPaths], str]] = {
-    "docs/cli.md": cli_reference,
+    "docs/reference/cli.md": cli_reference,
 }
 
 #: The files that may hold generated blocks, relative to the repository root.
 DOCUMENTS = (
     "README.md",
-    "docs/install.md",
+    "docs/user/install.md",
     "docs/guide/film-looks.md",
     "builds/README.md",
 )
