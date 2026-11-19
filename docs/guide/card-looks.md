@@ -16,7 +16,7 @@ It writes `EPM2LOOK.BIN` to the top folder of the card. Without the card, use `-
 
 ## Load
 
-MENU → Custom Menu → J → **Load Looks** → **Load** → OK. The row reads Loading, then **Loaded** at the next key.
+MENU → SETUP → Custom Menu → J → **Load Looks** → **Load** → OK. The row reads Loading, then **Loaded** at the next key.
 
 <img src="../images/ui/load-looks-list.png" width="320" alt="Load Looks with Off and Load">
 <img src="../images/ui/load-looks-loaded.png" width="320" alt="Load Looks reads Loaded">
@@ -26,7 +26,7 @@ The entry shows the look's name everywhere the camera shows a film name.
 <img src="../images/ui/picture-mode-loaded.png" width="320" alt="The Picture Mode strip with Portra 800">
 
 Each Load replaces the last one: an entry the file leaves out goes back to its Olympus art filter. You can delete
-the file. **No file**: `EPM2LOOK.BIN` is not in the top folder of the card. **Bad file**: the file is damaged or incomplete. Make it again. In both cases nothing changed. No Custom Menu tab (gears icon): enable it in **Setup Menu → Menu Display**.
+the file. **No file**: `EPM2LOOK.BIN` is not in the top folder of the card. **Bad file**: the file is damaged or incomplete. Make it again. In both cases nothing changed. No Custom Menu tab (gears icon): enable it in **MENU → SETUP → Setup Menu (wrench tab) → Menu Display**.
 
 ## Limits
 

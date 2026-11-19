@@ -17,7 +17,7 @@ export const features: Feature[] = [
     summary: 'Film colours straight out of the camera.',
     steps: [
       'Install EPM2Mod with the installer. It puts the film simulations on the SD card.',
-      'MENU → Custom Menu → J → Load Looks → Load. Until then the camera has the Olympus art filters.',
+      'MENU → SETUP → Custom Menu → J → Load Looks → Load. Until then the camera has the Olympus art filters.',
       'Press OK, select Picture Mode, and scroll right past Custom.',
     ],
     screens: [{ src: 'ui/quick-menu-portra.png', alt: 'The quick menu with Picture Mode on Portra 400' }],
@@ -28,7 +28,7 @@ export const features: Feature[] = [
     summary: 'Change film simulations without reflashing the camera.',
     steps: [
       'Choose film simulations in the installer and write them to the SD card.',
-      'MENU → Custom Menu → J → Load Looks → Load.',
+      'MENU → SETUP → Custom Menu → J → Load Looks → Load.',
       'An art filter that the file leaves out goes back to the Olympus filter.',
     ],
     screens: [
@@ -42,7 +42,7 @@ export const features: Feature[] = [
     summary: 'Time-lapses without a remote.',
     steps: [
       'Press MENU, select P on the first screen, and press OK. Set the camera clock.',
-      'MENU → Shooting Menu 2 → Time Lapse Settings → On. Set the frames and the interval.',
+      'MENU → SETUP → Shooting Menu 2 → Time Lapse Settings → On. Set the frames and the interval.',
       'For a film simulation, press OK → Picture Mode and pick one.',
       'Press the shutter button to start.',
     ],
@@ -56,9 +56,9 @@ export const features: Feature[] = [
     name: 'Level gauge',
     summary: 'Keep horizons straight.',
     steps: [
-      'MENU → Custom Menu → D → Info Settings → LV-Info → Level Gauge.',
+      'MENU → SETUP → Custom Menu → D → Info Settings → LV-Info → Level Gauge.',
       'In live view, press INFO until the bars appear.',
-      'To calibrate, put the camera flat, then MENU → Custom Menu → J → Level Adjust → Adjust.',
+      'To calibrate, put the camera flat, then MENU → SETUP → Custom Menu → J → Level Adjust → Adjust.',
     ],
     screens: [
       { src: 'ui/level-gauge.png', alt: 'The level gauge in live view' },
@@ -70,9 +70,9 @@ export const features: Feature[] = [
     name: 'Focus peaking',
     summary: 'Easier manual focus.',
     steps: [
-      'MENU → Custom Menu → A → MF Assist → On.',
+      'MENU → SETUP → Custom Menu → A → MF Assist → On.',
       'Set the focus mode to MF and turn the focus ring.',
-      'To change the colour: MENU → Custom Menu → A → Peaking.',
+      'To change the colour: MENU → SETUP → Custom Menu → A → Peaking.',
     ],
     screens: [{ src: 'ui/peaking-list.png', alt: 'Custom Menu A with the Peaking list' }],
   },
@@ -82,7 +82,7 @@ export const features: Feature[] = [
     summary: 'Sharp moving subjects, or less noise on still ones, in dim light.',
     steps: [
       'Set the shooting mode to P or A, and ISO to Auto.',
-      'MENU → Custom Menu → E. Exp/▣/ISO → Lowest S/S Setting.',
+      'MENU → SETUP → Custom Menu → E. Exp/▣/ISO → Lowest S/S Setting.',
       'Press RIGHT, choose a speed with UP/DOWN, and press OK.',
     ],
     screens: [

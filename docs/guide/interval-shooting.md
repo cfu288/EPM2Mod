@@ -2,7 +2,7 @@
 
 ## Setup
 
-Set the mode to P, A, S or M, and make sure the camera clock is set. Then go to **MENU → Shooting Menu 2 → Time Lapse Settings** and select **On**.
+Set the mode to P, A, S or M, and make sure the camera clock is set. Then go to **MENU → SETUP → Shooting Menu 2 → Time Lapse Settings** and select **On**.
 
 <img src="../images/ui/shooting-menu-2.png" width="320" alt="Shooting Menu 2 with Time Lapse Settings">
 <img src="../images/ui/time-lapse-settings.png" width="320" alt="The Time Lapse Settings screen">

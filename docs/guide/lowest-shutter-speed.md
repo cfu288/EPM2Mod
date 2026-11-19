@@ -4,13 +4,13 @@ In P and A with ISO Auto, choose the shutter speed at which the camera starts to
 
 ## Setup
 
-Go to **MENU → Custom Menu → E. Exp/▣/ISO → Lowest S/S Setting**, press **RIGHT**, choose a speed with **UP/DOWN**,
+Go to **MENU → SETUP → Custom Menu → E. Exp/▣/ISO → Lowest S/S Setting**, press **RIGHT**, choose a speed with **UP/DOWN**,
 and press **OK**.
 
 <img src="../images/ui/lowest-ss-row.png" width="320" alt="Custom Menu E with the Lowest S/S Setting row">
 <img src="../images/ui/lowest-ss-list.png" width="320" alt="Lowest S/S Setting set to 1/15">
 
-If the menu has no Custom Menu tab (gears icon), enable it in **Setup Menu → Menu Display**.
+If the menu has no Custom Menu tab (gears icon), enable it in **MENU → SETUP → Setup Menu (wrench tab) → Menu Display**.
 
 ## Usage
 

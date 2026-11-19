@@ -4,12 +4,12 @@ The camera writes what it does to a file on the card.
 
 ## Setup
 
-Go to **MENU → Custom Menu → J**, press **DOWN** past Load Looks to **Debug Log**, select **On**, and press **OK**.
+Go to **MENU → SETUP → Custom Menu → J**, press **DOWN** past Load Looks to **Debug Log**, select **On**, and press **OK**.
 
 <img src="../images/ui/debug-log-list.png" width="320" alt="Debug Log with Off and On">
 <img src="../images/ui/debug-log-on.png" width="320" alt="Debug Log reads On">
 
-If the menu has no Custom Menu tab (gears icon), enable it in **Setup Menu → Menu Display**.
+If the menu has no Custom Menu tab (gears icon), enable it in **MENU → SETUP → Setup Menu (wrench tab) → Menu Display**.
 
 ## Usage
 

@@ -9,13 +9,6 @@ This procedure is **confirmed on the E-PM2** (see [camera-log.md](camera-log.md)
    - Stock: `firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN`
    - Modified: make it with `uv run epm2mod make [builds/NAME.json]` (see [../README.md](../README.md) and [conventions.md](conventions.md), "Making firmware"). The result is `build/<name>.BIN`, and a copy at `build/card/DCOLYMP/E1019999.BIN`. With `--card DIR` the script also puts it at `DIR/DCOLYMP/E1019999.BIN` (`DIR`: the card's top folder) and checks the copy. With `--out FILE` it writes one more copy of the file at `FILE`.
 3. Copy it to the card as **`DCOLYMP/E1019999.BIN`**. It must be the only file in `DCOLYMP`. Check the sha256 on the card against the build output.
-   From the Mac:
-   ```bash
-   scp USER@HOST:/path/to/EPM2Mod/build/NAME.BIN \
-     /Volumes/SDCARD/DCOLYMP/E1019999.BIN
-   shasum -a 256 /Volumes/SDCARD/DCOLYMP/E1019999.BIN
-   cd ~ && diskutil eject /Volumes/SDCARD
-   ```
 4. With the camera off and the card in, hold **OK** and the **ON/OFF** button together. When the orange lamp on the front (the AF illuminator) lights steadily, let go of both (owner, 2026-11-18).
 5. The lamp shows progress:
    - **Solid orange, about 1–1.5 min:** writing. **Do not touch the camera.**

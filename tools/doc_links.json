@@ -3,7 +3,7 @@
  "groups": [
   {
    "name": "Load Looks menu path and options",
-   "fact": "MENU → Custom Menu → J → Load Looks → Load, and the row's options (Off / Load, no Built-in)",
+   "fact": "MENU → SETUP → Custom Menu → J → Load Looks → Load, and the row's options (Off / Load, no Built-in)",
    "truth": [
     "patches/looks-menu-*.json",
     "patches/card-looks-*.json"
@@ -24,7 +24,7 @@
   },
   {
    "name": "Custom Menu tab missing",
-   "fact": "No gears tab: Setup Menu → Menu Display → Custom Menu → On",
+   "fact": "No gears tab: MENU → SETUP → Setup Menu (wrench tab) → Menu Display → Custom Menu → On",
    "truth": [],
    "copies": [
     "docs/guide/card-looks.md",

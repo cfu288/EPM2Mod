@@ -5,7 +5,7 @@ card. `epm2mod log` turns the file into JSON lines. The design notes, the eviden
 are in [experiments/2026-11-15-log/NOTES.md](../experiments/2026-11-15-log/NOTES.md).
 
 The pinned build (`builds/stock-films.json`) has the log in the firmware, switched by the Custom Menu row **Debug Log**
-(MENU → Custom Menu → J → Debug Log → On; Off by default): `patches/log-menu-2.json`, the code of the four specs below
+(MENU → SETUP → Custom Menu → J → Debug Log → On; Off by default): `patches/log-menu-2.json`, the code of the four specs below
 with an Off switch ([log-menu design](../experiments/2026-11-18-log-menu/design.md)). It was first pinned in
 `builds/log-menu.json`.
 

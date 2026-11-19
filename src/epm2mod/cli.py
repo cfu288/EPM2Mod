@@ -123,7 +123,7 @@ def _write_default_looks(paths: RepoPaths, card: Path | None) -> None:
         else records.write_to_card(card, data)
     )
     print(
-        f"    look file: {out} (the 12 default films; on the camera: MENU -> Custom Menu -> J -> "
+        f"    look file: {out} (the 12 default films; on the camera: MENU -> SETUP -> Custom Menu -> J -> "
         "Load Looks -> Load)"
     )
 
@@ -239,7 +239,7 @@ def _looks_pack(args: argparse.Namespace, paths: RepoPaths) -> int:
     if args.card:
         out = records.write_to_card(Path(args.card), data)
     else:
-        out = Path(args.out) if args.out else paths.output / lookfile.CARD_NAME
+        out = Path(args.out) if args.out else paths.card / lookfile.CARD_NAME
         if out.is_dir():
             out = out / lookfile.CARD_NAME
         write_bytes(out, data)
@@ -248,7 +248,7 @@ def _looks_pack(args: argparse.Namespace, paths: RepoPaths) -> int:
         print(f"  ART {look.slot + 1:2}  {look.name}")
     if not args.card:
         print(f"copy it to the top folder of the SD card as {lookfile.CARD_NAME}")
-    print("on the camera: MENU -> Custom Menu -> J -> Load Looks -> Load")
+    print("on the camera: MENU -> SETUP -> Custom Menu -> J -> Load Looks -> Load")
     return 0
 
 
@@ -608,7 +608,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--out",
         metavar="FILE",
         help="write it to FILE (into a folder: as EPM2LOOK.BIN); default: "
-        "build/EPM2LOOK.BIN",
+        "build/card/EPM2LOOK.BIN, beside the firmware that make writes",
     )
     where.add_argument(
         "--card",

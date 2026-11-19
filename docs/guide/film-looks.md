@@ -5,7 +5,7 @@ photos and live view.
 
 ## Usage
 
-Install with the installer, which puts the films on the SD card. Then MENU → Custom Menu → J → **Load Looks** →
+Install with the installer, which puts the films on the SD card. Then MENU → SETUP → Custom Menu → J → **Load Looks** →
 **Load** → OK ([more](card-looks.md)).
 
 In P, A, S or M mode, press **OK**, select **Picture Mode**, and scroll right past Custom. The film simulations are also in the **ART** mode list.

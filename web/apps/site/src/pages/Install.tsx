@@ -48,8 +48,8 @@ function CustomMenu({ n }: { n: number }) {
   return (
     <Step n={n} title="Show the Custom Menu">
       <p>
-        Most features are in the Custom Menu (gears tab). If it is missing: MENU → Setup Menu (wrench) → Menu Display →
-        Custom Menu → On.
+        Most features are in the Custom Menu (gears tab). If it is missing: MENU → SETUP → Setup Menu (wrench tab) →
+        Menu Display → Custom Menu → On.
       </p>
     </Step>
   )
@@ -91,7 +91,9 @@ function InstallerSteps() {
       <Flash n={4} />
       <CustomMenu n={5} />
       <Step n={6} title="Load the film simulations">
-        <p>MENU → Custom Menu → J → Load Looks → Load. Until then, the ART entries are the Olympus art filters.</p>
+        <p>
+          MENU → SETUP → Custom Menu → J → Load Looks → Load. Until then, the ART entries are the Olympus art filters.
+        </p>
       </Step>
     </ol>
   )
@@ -130,7 +132,9 @@ function CliSteps() {
       <Flash n={3} />
       <CustomMenu n={4} />
       <Step n={5} title="Load the film simulations">
-        <p>MENU → Custom Menu → J → Load Looks → Load. Until then, the ART entries are the Olympus art filters.</p>
+        <p>
+          MENU → SETUP → Custom Menu → J → Load Looks → Load. Until then, the ART entries are the Olympus art filters.
+        </p>
       </Step>
     </ol>
   )

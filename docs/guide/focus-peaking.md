@@ -4,9 +4,9 @@ When you turn the focus ring, the view zooms in and highlights sharp edges with 
 
 ## Setup
 
-1. Go to **MENU → Custom Menu → A → MF Assist** and select **On**.
+1. Go to **MENU → SETUP → Custom Menu → A → MF Assist** and select **On**.
 2. Set the focus mode to **MF**.
-3. To choose the line colour, go to **MENU → Custom Menu → A → Peaking** and select **White**, **Red**, **Yellow** or **Blue**. Select **Off** to disable the lines.
+3. To choose the line colour, go to **MENU → SETUP → Custom Menu → A → Peaking** and select **White**, **Red**, **Yellow** or **Blue**. Select **Off** to disable the lines.
 
 <img src="../images/ui/peaking-list.png" width="320" alt="Custom Menu A with the Peaking list">
 
