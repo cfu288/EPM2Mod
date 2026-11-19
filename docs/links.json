@@ -1,5 +1,5 @@
 {
- "about": "Facts that live in more than one file. When a file of a group is edited, the agent hook (tools/doc_links.py) names the other files of that group. 'truth' is where the fact comes from; 'copies' repeat it. Paths are globs from the repository root. tests/test_doc_links.py checks that every glob matches a file.",
+ "about": "Facts that live in more than one file. When a file of a group is edited, the agent hook (.claude/hooks/doc_links.py) names the other files of that group. 'truth' is where the fact comes from; 'copies' repeat it. Paths are globs from the repository root. tests/test_doc_links.py checks that every glob matches a file.",
  "groups": [
   {
    "name": "Load Looks menu path and options",

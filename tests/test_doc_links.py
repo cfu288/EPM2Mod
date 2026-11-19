@@ -1,4 +1,4 @@
-"""Tests of the link map for the agent hook: ``tools/doc_links.json`` and ``tools/doc_links.py``.
+"""Tests of the link map for the agent hook: ``docs/links.json`` and ``.claude/hooks/doc_links.py``.
 
     uv run python -m unittest discover -s tests
 """
@@ -14,8 +14,8 @@ import uuid
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-MAP = ROOT / "tools" / "doc_links.json"
-SCRIPT = ROOT / "tools" / "doc_links.py"
+MAP = ROOT / "docs" / "links.json"
+SCRIPT = ROOT / ".claude" / "hooks" / "doc_links.py"
 
 
 def run_hook(payload: dict) -> str:
@@ -35,7 +35,7 @@ class DocLinksTests(unittest.TestCase):
             for pattern in group.get("truth", []) + group.get("copies", [])
             if not glob.glob(str(ROOT / pattern))
         ]
-        self.assertEqual(missing, [], "tools/doc_links.json names files that are gone")
+        self.assertEqual(missing, [], "docs/links.json names files that are gone")
 
     def test_an_edit_of_a_linked_file_names_the_others_once_per_session(self) -> None:
         session = f"test-{uuid.uuid4().hex}"

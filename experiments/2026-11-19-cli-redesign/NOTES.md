@@ -135,7 +135,7 @@ Grouped as `epm2mod --help` shows them. Every `--help` ends with one or two exam
 | `web/apps/local` | Camera steps from the server |
 | `web/apps/site` Install page | Command-line tab: `install`, `films`, `films set`, `restore`, `inspect --card` |
 | README, `docs/guide/*`, `docs/install.md`, `docs/look-file-format.md`, `docs/logging.md`, `docs/conventions.md`, `docs/feasibility.md`, `AGENTS.md`, `looks/README.md`, `web/README.md`, `release/README.txt` | New names; link the generated CLI reference |
-| `tools/doc_links.json` | The command-line group; the CLI reference as generated |
+| `docs/links.json` | The command-line group; the CLI reference as generated |
 | `experiments/*/scripts` that run the CLI | New names |
 | Dated experiment notes, `docs/camera-log.md` | Not changed: they are dated records of what was run (owner) |
 

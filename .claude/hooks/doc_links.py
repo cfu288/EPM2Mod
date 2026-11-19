@@ -1,13 +1,13 @@
 """Tell the agent which other files repeat a fact when it edits one of them (a Claude Code PostToolUse hook).
 
-    .claude/settings.json runs:  python3 tools/doc_links.py   (stdin: the hook's JSON)
+    .claude/settings.json runs:  python3 .claude/hooks/doc_links.py   (stdin: the hook's JSON)
 
-Reads the edited file's path from the hook input, finds the groups of tools/doc_links.json that hold it (as truth or
+Reads the edited file's path from the hook input, finds the groups of docs/links.json that hold it (as truth or
 as a copy), and prints a PostToolUse result whose additionalContext names the other files of each group. A group is
 named once per session (state in the system temp folder), so repeated edits stay quiet. It never blocks and never
 fails the tool call: on any problem it prints nothing.
 
-    python3 tools/doc_links.py --file README.md      the same lookup without the hook, for a person
+    python3 .claude/hooks/doc_links.py --file README.md      the same lookup without the hook, for a person
 """
 from __future__ import annotations
 
@@ -17,8 +17,8 @@ import sys
 import tempfile
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-MAP = ROOT / "tools" / "doc_links.json"
+ROOT = Path(__file__).resolve().parents[2]
+MAP = ROOT / "docs" / "links.json"
 
 
 def groups_for(rel: str, groups: list[dict]) -> list[tuple[dict, str]]:
@@ -34,7 +34,7 @@ def groups_for(rel: str, groups: list[dict]) -> list[tuple[dict, str]]:
 
 def message(rel: str, found: list[tuple[dict, str]]) -> str:
     """The note for the agent: per group, the fact and the other files to check."""
-    lines = [f"Linked files for {rel} (tools/doc_links.json). Check whether this edit changes a fact they repeat:"]
+    lines = [f"Linked files for {rel} (docs/links.json). Check whether this edit changes a fact they repeat:"]
     for group, role in found:
         others = [p for p in group.get("truth", []) + group.get("copies", []) if not fnmatch.fnmatch(rel, p)]
         lines.append(f"- {group['name']} ({'source of the fact' if role == 'truth' else 'a copy'}): {group['fact']}")

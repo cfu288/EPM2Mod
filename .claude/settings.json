@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/tools/doc_links.py\"",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/doc_links.py\"",
             "timeout": 10
           }
         ]

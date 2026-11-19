@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Check the documents that users read. The pre-commit hook runs this on staged files.
 
-    python3 tools/doclint.py FILE.md ...     check the given files that are in scope
-    python3 tools/doclint.py --all           check every file in scope
-    python3 tools/doclint.py --selftest
+    python3 .githooks/doclint.py FILE.md ...     check the given files that are in scope
+    python3 .githooks/doclint.py --all           check every file in scope
+    python3 .githooks/doclint.py --selftest
 
 Rules, and the files each one covers:
 
-1. Simplified Technical English (tools/third_party/ste100/ste_lint.py), hard rules only:
+1. Simplified Technical English (third_party/ste100/ste_lint.py), hard rules only:
    README.md, docs/install.md, docs/guide/*.md.
 2. A heading has no punctuation (: ; , ! ? ( ) and dashes) and no full stop at its end:
    the files of rule 1, every other README.md outside experiments/, AGENTS.md, NOTICE.md,
@@ -26,7 +26,7 @@ import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STE = os.path.join(ROOT, "tools", "third_party", "ste100", "ste_lint.py")
+STE = os.path.join(ROOT, "third_party", "ste100", "ste_lint.py")
 PROSE = ["README.md", "docs/install.md", "docs/guide/*.md"]
 HEADINGS = PROSE + ["AGENTS.md", "NOTICE.md", "docs/conventions.md", "docs/feasibility.md", "docs/todo.md"]
 HEADING_PUNCTUATION = re.compile(r"[:;,!?()—–]|\.\s*$")
@@ -39,7 +39,7 @@ def matches(path, patterns):
 def heading_scope(path):
     if matches(path, HEADINGS):
         return True
-    return os.path.basename(path) == "README.md" and not path.startswith(("experiments/", "tools/third_party/"))
+    return os.path.basename(path) == "README.md" and not path.startswith(("experiments/", "third_party/"))
 
 
 def in_scope(path):
@@ -120,7 +120,7 @@ def main(argv):
     for line in problems:
         print(line)
     if problems:
-        print("doclint: %d problem(s). Rules: python3 tools/doclint.py --help" % len(problems))
+        print("doclint: %d problem(s). Rules: python3 .githooks/doclint.py --help" % len(problems))
     return 1 if problems else 0
 
 

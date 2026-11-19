@@ -28,8 +28,8 @@ other people's work. That material keeps its own terms.
 
 ## Included tool
 
-`tools/third_party/ste100/ste_lint.py` is the linter of https://github.com/danyuchn/asd-ste100-skill by
-Dustin Yuchen Teng, MIT licence (`tools/third_party/ste100/LICENSE`). It checks the documents.
+`third_party/ste100/ste_lint.py` is the linter of https://github.com/danyuchn/asd-ste100-skill by
+Dustin Yuchen Teng, MIT licence (`third_party/ste100/LICENSE`). It checks the documents.
 
 ## Tools you install yourself
 

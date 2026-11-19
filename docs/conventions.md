@@ -34,7 +34,7 @@ Examples: `feat(cli)!: revision 3 of the CLI spec`, `docs(camera-log): the build
 | `tools/make_firmware.py`, `tools/fetch_stock.py` | The two main commands of the package as stand-alone scripts. `tools/_package.py` lets them import the package without an install. |
 | `tools/build.py`, `tools/oetool.py` | Older command-line forms. They call the package. Older scripts in `tools/` and `experiments/` import them. Do not use them to make firmware for a camera. |
 | `tools/freespace.py`, `tools/fwmap.py`, `tools/disasm.py`, `tools/memmap_svg.py`, `tools/emu/` | Analysis tools: the free-space check, the function database of block 0, MN103 disassembly (GNU objdump from `tools/setup.sh`, which builds it from the submodule `third_party/binutils-gdb` into `build/toolchain/`), the memory map figure, the emulator harness. |
-| `tools/checks.py`, `tools/doclint.py`, `tools/doc_links.py`, `tools/doc_links.json`, `tools/toolchain.py` | `checks.py` runs the off-camera checks of a build: only those its specs call for, in parallel, with a cache. `doclint.py` checks the documents that users read. The pre-commit hook runs it on staged files. `doc_links.py` tells the agent which other files repeat a fact when it edits one of them (the groups are in `doc_links.json`). `toolchain.py` says where the MN103 binutils are. |
+| `tools/checks.py`, `.githooks/doclint.py`, `.claude/hooks/doc_links.py`, `docs/links.json`, `tools/toolchain.py` | `checks.py` runs the off-camera checks of a build: only those its specs call for, in parallel, with a cache. `doclint.py` checks the documents that users read. The pre-commit hook runs it on staged files. `doc_links.py` tells the agent which other files repeat a fact when it edits one of them (the groups are in `doc_links.json`). `toolchain.py` says where the MN103 binutils are. |
 | `third_party/om-emu`, `tools/emu/setup.sh` | The emulator: our om-emu fork (branch `e101`, with the E-PM2's boot lab) as a git submodule, and the command that initialises it. Emulator code goes into the fork, not into this repository. `tools/emu/boot-test` and `tools/emu/update-path-test` are the start-up checks of a build. |
 | `builds/`, `pinned-build.json` | One description per firmware build, and the pointer to the last camera-tested build. See *Making firmware*. |
 | `patches/` | One JSON spec per mod. Each operation states the bytes that it replaces. `patches/` holds superseded and failed specs as a record. |
@@ -53,7 +53,7 @@ Examples: `feat(cli)!: revision 3 of the CLI spec`, `docs(camera-log): the build
   module, class and function of the package (a test checks this; the test files need docstrings
   on helpers only where the name does not say enough), and a test for each behaviour (see *Tests*). The pre-commit hook
   formats the staged files of the package and its tests and runs mypy. It also refuses machine paths and hosts
-  in the staged changes, and runs `tools/doclint.py` on the staged `.md` files. `.githooks/commit-msg` checks the
+  in the staged changes, and runs `.githooks/doclint.py` on the staged `.md` files. `.githooks/commit-msg` checks the
   Conventional Commits form and removes AI attribution lines. To run the checks by hand:
 
   ```bash
