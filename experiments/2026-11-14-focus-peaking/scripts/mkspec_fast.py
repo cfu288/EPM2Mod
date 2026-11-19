@@ -1,6 +1,6 @@
-"""Write patches/peaking-fast.json: a faster colour loop for Red / Yellow / Blue peaking.
+"""Write data/specs/peaking-fast.json: a faster colour loop for Red / Yellow / Blue peaking.
 
-Research code. NOTES.md section 17. The spec is a delta on the pinned build builds/peaking-colours.json: every
+Research code. NOTES.md section 17. The spec is a delta on the pinned build data/builds/peaking-colours.json: every
 `expect` is a byte string of that build, not of the stock file.
 
 The pinned loop (T_COL of peaking-colours) looks at every row: 3 word reads and 11 instructions for each group of
@@ -167,13 +167,13 @@ def main():
                        "per group of 4 pixels, and writes the colour over the whole group in that row and the next "
                        "one with 6 word writes: the lines are drawn in blocks of 4 x 2 pixels. About 3 times fewer "
                        "instructions and bus reads for a frame without lines, and about 10 times fewer bus accesses "
-                       "for the lines. White and Off do not change. A delta on builds/peaking-colours.json: every "
+                       "for the lines. White and Off do not change. A delta on data/builds/peaking-colours.json: every "
                        "expect is a byte string of that build. See experiments/2026-11-14-focus-peaking/NOTES.md "
                        "section 17.",
         "base": STOCK,
         "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
         "status": "candidate: emulator-checked, not flashed",
-        "_delta_on": "builds/peaking-colours.json (sha256 %s)" % PINNED_SHA,
+        "_delta_on": "data/builds/peaking-colours.json (sha256 %s)" % PINNED_SHA,
         "_ram": "no new RAM; 16 more bytes of the ART task's stack (40 in all)",
         "_symbols": {k: "0x%08X" % sym[k] for k in ("T_FAST", "T_FAST_END", "T_HIT")},
         "ops": ops,

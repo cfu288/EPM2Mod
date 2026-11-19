@@ -1,0 +1,19 @@
+{
+ "what": "Seven film looks as art filters, interval shooting with up to 240 frames, the level gauge, and Level Adjust (calibrate the level gauge)",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
+ "specs": [
+  "data/specs/remap7b-code.json",
+  "data/specs/seven-fixes-1.json",
+  "data/specs/seven-movie-1.json",
+  "data/specs/seven-structure-extra.json",
+  "data/specs/seven-films-5.json",
+  "data/specs/xp-adaptive-hue-off.json",
+  "data/specs/seven-labels.json",
+  "data/specs/interval-timelapse-v2.json",
+  "data/specs/interval-frames-240.json",
+  "data/specs/level-gauge-lvinfo-row.json",
+  "data/specs/level-adjust-row.json"
+ ],
+ "sha256": "e93d1589b3406ec991e3f32225acf6e2c2074aa58fc5394ca06a93da83797b66",
+ "camera_tested": "2026-11-14"
+}

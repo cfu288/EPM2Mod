@@ -1,6 +1,6 @@
 {
  "what": "g of the grain program of art code 74, second measurement: x = g(Y_in); knots",
- "source": "reading F12c_doublex (test RAW, RAW Data Edit in the Double-X entry of films-12c, table T of looks/fits/doublex.npz)",
+ "source": "reading F12c_doublex (test RAW, RAW Data Edit in the Double-X entry of films-12c, table T of data/films/fits/doublex.npz)",
  "y_in": [
   6.47,
   10.99,

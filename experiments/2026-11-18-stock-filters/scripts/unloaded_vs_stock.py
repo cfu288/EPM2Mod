@@ -1,4 +1,4 @@
-"""F1 at byte level: every byte of block 0 that the film part of builds/stock-films.json changes against Olympus's
+"""F1 at byte level: every byte of block 0 that the film part of data/builds/stock-films.json changes against Olympus's
 firmware, sorted into the classes that leave the stock filters as they are with nothing loaded. A byte in no class
 fails.
 
@@ -39,8 +39,8 @@ def main():
     classes = {}
     bad = []
     for name in FILM_SPECS:
-        raw = json.load(open(ROOT / "patches" / (name + ".json")))["ops"]
-        for op, r in zip(load_spec(ROOT / "patches" / (name + ".json")).ops, raw):
+        raw = json.load(open(ROOT / "data" / "specs" / (name + ".json")))["ops"]
+        for op, r in zip(load_spec(ROOT / "data" / "specs" / (name + ".json")).ops, raw):
             if not isinstance(op, BytesOp) or op.block != 0:
                 classes["text (block 1): the row's English texts, as the pinned build"] = classes.get("text (block 1): the row's English texts, as the pinned build", 0) + 1
                 continue

@@ -8,7 +8,7 @@
 set -u
 S=$(mkdir -p "$1" && cd "$1" && pwd); OLD=${2:-}
 R=experiments/2026-11-15-emulator-in-repo/results; mkdir -p $R
-PINNED=builds/peaking-colours.json
+PINNED=data/builds/peaking-colours.json
 export OM_EMU_BUILD=build/om-emu-verify OM_EMU_DIR=$PWD/build/om-emu-verify EMU_IMAGES=$S/images EMU_TMP=$S EMU_STATE=$S/state EMU_OUT=$S/out
 clean() { sed -e "s#$S#/tmp/scratch#g" -e "s#$PWD/##g" -e "s#$PWD#.#g" ${OLD:+-e "s#$OLD#OLD_WORK#g"} -e "s#$HOME#~#g"; }
 bad=0
@@ -24,7 +24,7 @@ tail -3 $R/setup.txt
 # 2. boot test: stock, the pinned build, the debug-log build
 expect 0 boot-test-stock emulator/boot-test stock --out $S/boot-stock
 expect 0 boot-test-peaking-colours emulator/boot-test $PINNED --out $S/boot-pinned
-expect 0 boot-test-debug-log emulator/boot-test builds/debug-log.json --out $S/boot-debug
+expect 0 boot-test-debug-log emulator/boot-test data/builds/debug-log.json --out $S/boot-debug
 for n in stock pinned debug; do cp $S/boot-$n/boot-image.txt $R/boot-report-$n.txt; done
 # 3. update path
 expect 0 update-path-test-stock emulator/update-path-test stock

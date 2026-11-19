@@ -1,6 +1,6 @@
 """Seven film slots: assemble the code areas and write the patches (NOTES §32).
-  patches/slots7-code.json     structure: both code areas, gamma hash, look / chroma / effect dispatch, WB pairs
-  patches/slots7-neutral.json  a neutral look (= stock Natural settings) in the four new slots, to test them
+  data/specs/slots7-code.json     structure: both code areas, gamma hash, look / chroma / effect dispatch, WB pairs
+  data/specs/slots7-neutral.json  a neutral look (= stock Natural settings) in the four new slots, to test them
 Slots: Cross Process I, Light Tone, Pop Art I (as before) + Pale&Light I, Soft Focus, Pin Hole I, Diorama.
    python3 -I build_slots.py"""
 import json, os, struct, subprocess, sys
@@ -86,7 +86,7 @@ def main():
     ops = [o for o in ops if o["expect"] != o["new"]]
     base = dict(base="firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN", base_sha256="34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300", status="built, NOT camera-tested")
     json.dump(dict(name="slots7-code", description="Seven film slots (replaces slot3-code): code areas 0x7E880F5C (120 B) and 0x7ECB0888, gamma hash, look / chroma / effect dispatch, WB pairs. "
-                   "Use with the -s3 film patches, film-pro400h-pa*, slot3-chroma-linear and a look for each new slot. NOTES §32.", ops=ops, **base), open(os.path.join(ROOT, "patches/slots7-code.json"), "w"), indent=1)
+                   "Use with the -s3 film patches, film-pro400h-pa*, slot3-chroma-linear and a look for each new slot. NOTES §32.", ops=ops, **base), open(os.path.join(ROOT, "data/specs/slots7-code.json"), "w"), indent=1)
     # neutral look for the four new slots: default gamma table, saturation gain 282, six-axis zero, identity matrix (already in the code area)
     dflt = b0[0x7E74E9BC - B:0x7E74E9BC - B + 512]; nops = []
     for s in NEW.values():
@@ -95,7 +95,7 @@ def main():
             nops.append({"type": "bytes", "block": 0, "offset": hex(a - B), "expect": exp.hex(), "new": dflt.hex()})
         nops += [op(s["sat"], struct.pack("<2H", 282, 282)), op(s["six"][0], struct.pack("<6h", *[0] * 6)), op(s["six"][1], struct.pack("<6h", *[0] * 6))]
     json.dump(dict(name="slots7-neutral", description="Test content for the four new film slots: stock Natural settings (default gamma table per channel, saturation 282, six-axis zero). "
-                   "With slots7-code each new slot should render like Natural. NOTES §32.", ops=[o for o in nops if o["expect"] != o["new"]], **base), open(os.path.join(ROOT, "patches/slots7-neutral.json"), "w"), indent=1)
+                   "With slots7-code each new slot should render like Natural. NOTES §32.", ops=[o for o in nops if o["expect"] != o["new"]], **base), open(os.path.join(ROOT, "data/specs/slots7-neutral.json"), "w"), indent=1)
     json.dump(dict(s1={k: hex(v) for k, v in s1.items()}, s2={k: hex(v) for k, v in s2.items()}, tables={k: hex(v) for k, v in tabsym.items()},
                    hash=[[hex(k), hex(h)] for k, h in ent]), open(os.path.join(HERE, "slots7_layout.json"), "w"), indent=1)
     print("code area 1:", len(c1), "B; code area 2:", len(c2), "of", CAVE2_LEN, "B (code", s2["endc"] - CAVE2, "B); structural ops:", len(ops))

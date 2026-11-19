@@ -1,0 +1,101 @@
+{
+ "name": "films12-entry-watercolor",
+ "description": "The menu entry Watercolor stores the hidden Picture Mode value 118 in place of 120, so it selects the film look Kodak Vision3 500T (art code 159): one byte in each Picture Mode value list, in each constant of the ART bracket routines and in the preset of the filter in ART shooting mode. Needs the structure spec and the looks spec. Leave this spec out and the entry is the stock filter Watercolor again.",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x424120",
+   "expect": "78",
+   "new": "76"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x4263a0",
+   "expect": "78",
+   "new": "76"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x426860",
+   "expect": "78",
+   "new": "76"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3f7f32",
+   "expect": "78",
+   "new": "76"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x403096",
+   "expect": "78",
+   "new": "76"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x4031b6",
+   "expect": "78",
+   "new": "76"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x655520",
+   "expect": "78",
+   "new": "76"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x65553f",
+   "expect": "78",
+   "new": "76"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x674464",
+   "expect": "78",
+   "new": "76"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x674483",
+   "expect": "78",
+   "new": "76"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x18674f",
+   "expect": "78",
+   "new": "76"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x186b7c",
+   "expect": "78",
+   "new": "76"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x40bb48",
+   "expect": "78",
+   "new": "76"
+  }
+ ],
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "inputs_sha256": "74d6576097c26aa22315e9b84702c9a0bcb63d9b3f4f007919e9add8e420fb37",
+ "status": "built, NOT camera-tested"
+}

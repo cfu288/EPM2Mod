@@ -3,7 +3,7 @@
 Plain-language summary, written 2026-11-12. **Since 2026-11-18 the firmware keeps Olympus's 12 art filters and the
 films are loaded from the SD card** ([`guide/film-looks.md`](../guide/film-looks.md), [`install.md`](../user/install.md)). The build
 names and the seven-entry layout below are the history of how the looks were made and measured. The catalogue now
-has 22 films (`looks/catalogue.json`). The detailed lab notes are in
+has 22 films (`data/films/catalogue.json`). The detailed lab notes are in
 `experiments/2026-11-09-film-portra/NOTES.md`; the technical slot reference is
 [`art-filter-slots.md`](art-filter-slots.md); every flash is logged in [`camera-log.md`](../camera-log/README.md).
 
@@ -29,7 +29,7 @@ Build at the time (2026-11-13): `seven-films-6`. The top-level README has the bu
 flash steps. The patch list, in order: `remap7b-code`, `seven-fixes-1`, `seven-movie-1`,
 `seven-structure-extra`, `seven-films-5`, `xp-adaptive-hue-off`, `seven-labels`.
 
-Earlier and failed patch specs are kept in `patches/` as a record; do not build from them
+Earlier and failed patch specs are kept in `data/specs/` as a record; do not build from them
 without reading the camera log.
 
 What a look is made of: the camera has no "film" feature and no general colour lookup table. Each
@@ -251,8 +251,8 @@ Side effects: an entry keeps its Olympus effects until a loaded film simulation 
    a slide film.
 2. Fit: `fit_film2.py --lut <target> --name <name>` (second camera model: matrix, three curves,
    per-hue values, saturation and the two chroma curves in one go).
-3. Add the film as data: the fit in `looks/fits/`, an entry in `looks/catalogue.json`, then regenerate
-   `looks/film-records.json` (`web/scripts/export_films.py`). No flash: load it from the card,
+3. Add the film as data: the fit in `data/films/fits/`, an entry in `data/films/catalogue.json`, then regenerate
+   `data/films/film-records.json` (`web/scripts/export_films.py`). No flash: load it from the card,
    develop `PB130001.ORF` with that look, copy the JPEG back.
 4. Correct: `fit_film2.py --name <name2> --anchor <reading of that JPEG> out/fit_<name>.npz`,
    load the corrected film file from the card, check again with `check_film.py`.

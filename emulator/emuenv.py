@@ -8,7 +8,7 @@
 
 An IMAGE argument of the tools is one of:
     stock                the stock firmware, firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN
-    builds/NAME.json     a build description; its image is build/NAME.BIN (made by `epm2mod make NAME`)
+    data/builds/NAME.json     a build description; its image is build/NAME.BIN (made by `epm2mod make NAME`)
     PATH.BIN             a firmware file
     FOLDER               a folder that `tools/oetool.py unpack` made (it has manifest.json)
 No firmware is in the repository: the tools unpack an image into EMU_IMAGES/NAME-SHA8/ when needed.

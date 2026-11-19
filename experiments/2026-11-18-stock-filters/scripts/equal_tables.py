@@ -1,6 +1,6 @@
 """The gate "a loaded entry reads the film firmware's values" (design.md): the tables of each entry in the camera-tested
-film firmware (builds/log-menu.json, which flashes the 12 default films) against the entry's RAM block after a Load
-of the same 12 films in builds/stock-films.json (loaded_image.py).
+film firmware (data/builds/log-menu.json, which flashes the 12 default films) against the entry's RAM block after a Load
+of the same 12 films in data/builds/stock-films.json (loaded_image.py).
 
     uv run python experiments/2026-11-18-stock-filters/scripts/equal_tables.py FILM_BLOCK0 LOADED_BLOCK0
 """

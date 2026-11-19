@@ -1,13 +1,13 @@
-"""Copy model-only fits to looks/fits/ and check them the way the patch generator reads them.
+"""Copy model-only fits to data/films/fits/ and check them the way the patch generator reads them.
 
 The seven installed files are byte copies of out/fit_film-NAME-m1.npz; this does the same with out/fit_film-NAME-n1.npz,
 (or -n2, the pass that fit_table.py marks chosen),
-after these checks: same keys, dtypes and shapes as looks/fits/velvia100.npz; the 'lut' field is a relative path
+after these checks: same keys, dtypes and shapes as data/films/fits/velvia100.npz; the 'lut' field is a relative path
 (no machine path); the file loads with epm2mod.looks.generate.load_fit; chroma_record() gives 97 bytes; gain, S, H, A
 pass whole_numbers() with the ranges film_ops() uses; the curves are finite and inside 0..1023.
 Run from the top of the repository:
    .venv/bin/python experiments/2026-11-16-films-max/scripts/export_fit.py [--check-only] NAME[=SOURCE] ...
-NAME is the file name in looks/fits/ (ektar100); SOURCE is the fit in out/ if it is not NAME-n1 (gold200=gold200ca-n2).
+NAME is the file name in data/films/fits/ (ektar100); SOURCE is the fit in out/ if it is not NAME-n1 (gold200=gold200ca-n2).
 """
 import shutil, sys
 from pathlib import Path
@@ -16,7 +16,7 @@ from epm2mod.looks import generate as g
 
 ROOT = Path(__file__).resolve().parents[3]
 OUT = ROOT / "experiments" / "2026-11-09-film-portra" / "out"
-FITS = ROOT / "looks" / "fits"
+FITS = ROOT / "data" / "films" / "fits"
 
 def check(path: Path, ref: dict) -> list[str]:
     bad = []; fit = g.load_fit(path); where = path.name
@@ -49,7 +49,7 @@ def main(argv: list[str]) -> int:
             if dst.exists() and dst.read_bytes() != src.read_bytes(): print(f"{name}: NOT exported: {dst.name} exists with other content"); failed += 1; continue
             shutil.copyfile(src, dst)
         bad = check(dst, ref); failed += bool(bad)
-        print(f"{name}: " + ("; ".join(bad) if bad else f"ok (looks/fits/{dst.name}, lut {str(g.load_fit(dst)['lut'])})"))
+        print(f"{name}: " + ("; ".join(bad) if bad else f"ok (data/films/fits/{dst.name}, lut {str(g.load_fit(dst)['lut'])})"))
     return 1 if failed else 0
 
 if __name__ == "__main__":

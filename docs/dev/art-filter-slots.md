@@ -68,7 +68,7 @@ near the saturation gain]**.
    code ≥ 71. Code 69 (Soft Focus) is below the range too.
 5. **Other code switches on the same byte.** Effect filters run a pixel module after development
    (ART task 0x7E729E25). Cross Process (85, 167) runs a scene-adaptive hue routine (0x7E5460F0,
-   switched off by `patches/xp-adaptive-hue-off.json`). Pale&Light changes the white balance.
+   switched off by `data/specs/xp-adaptive-hue-off.json`). Pale&Light changes the white balance.
 6. **Stage (f) was missed until 2026-11-12** because its tables are straight lines for the first two
    slots used. Until then this document called Pop Art I and II "none found" under extra processing.
    Any other undiscovered per-code stage would show the same way: as a slot whose stock rendering

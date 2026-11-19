@@ -1,4 +1,4 @@
-"""Write patches/films-contiguous.json: the seven film looks next to each other in every list of looks.
+"""Write data/specs/films-contiguous.json: the seven film looks next to each other in every list of looks.
 
 Run from the repository root (the pinned build must be in build/):
 
@@ -116,7 +116,7 @@ def main() -> None:
     """Write the spec."""
     parser = argparse.ArgumentParser(description=(__doc__ or "").split("\n")[1])
     parser.add_argument("--pinned", default="build/peaking-fast.BIN")
-    parser.add_argument("--out", default="patches/films-contiguous.json")
+    parser.add_argument("--out", default="data/specs/films-contiguous.json")
     parser.add_argument("--table", action="store_true")
     args = parser.parse_args()
     raw = Path(args.pinned).read_bytes()
@@ -204,13 +204,13 @@ def main() -> None:
             "texts ART5 to ART8 (ids 1653 to 1656) in all 34 languages move with them, so Vis 250D, Velvia and "
             "Superia 400 show ART 5, 6, 7 and Grainy Film shows ART 8. No stored value, art code or picture "
             "table changes: a saved Picture Mode still selects the same look. A delta on "
-            "builds/peaking-fast.json: every expect is a byte string of that build. Made by "
+            "data/builds/peaking-fast.json: every expect is a byte string of that build. Made by "
             "experiments/2026-11-15-films-contiguous/scripts/make_spec.py."
         ),
         "base": STOCK,
         "base_sha256": sha256_bytes(Path(STOCK).read_bytes()),
         "status": "candidate: emulator-checked, not flashed",
-        "_delta_on": f"builds/peaking-fast.json (sha256 {PINNED_SHA256})",
+        "_delta_on": f"data/builds/peaking-fast.json (sha256 {PINNED_SHA256})",
         "ops": ops,
     }
     Path(args.out).write_text(json.dumps(spec, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")

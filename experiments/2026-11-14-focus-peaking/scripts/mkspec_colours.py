@@ -1,6 +1,6 @@
-"""Write patches/peaking-colours.json: the Peaking list becomes Off / White / Red / Yellow / Blue.
+"""Write data/specs/peaking-colours.json: the Peaking list becomes Off / White / Red / Yellow / Blue.
 
-Research code. NOTES.md section 16. The spec is a delta on the pinned build builds/peaking-menu-names.json: every
+Research code. NOTES.md section 16. The spec is a delta on the pinned build data/builds/peaking-menu-names.json: every
 `expect` is a byte string of that build, not of the stock file.
 
 What it writes:
@@ -262,12 +262,12 @@ def main():
                        "pass. For a colour, new code in Key Line pass 9 writes the colour over the pixels of the "
                        "picture where the line image is 64 or more, and the combine job gets usGain2 = 0. The colour "
                        "names are the stock texts of the B&W filter list in all 34 languages. A delta on "
-                       "builds/peaking-menu-names.json: every expect is a byte string of that build. See "
+                       "data/builds/peaking-menu-names.json: every expect is a byte string of that build. See "
                        "experiments/2026-11-14-focus-peaking/NOTES.md section 16.",
         "base": STOCK,
         "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
         "status": "candidate: emulator-checked, not flashed",
-        "_delta_on": "builds/peaking-menu-names.json (sha256 %s)" % PINNED_SHA,
+        "_delta_on": "data/builds/peaking-menu-names.json (sha256 %s)" % PINNED_SHA,
         "_ram": "no new RAM; the new code uses 24 bytes of the ART task's stack",
         "ops": ops,
     }

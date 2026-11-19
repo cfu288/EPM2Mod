@@ -1,4 +1,4 @@
-# mkspec_frames240.py: build patches/interval-frames-240.json
+# mkspec_frames240.py: build data/specs/interval-frames-240.json
 # Frame count (info 483): 1-99 by 1 (stock labels), then 100-240 by 5 (composed number labels) = 128 choices,
 # the most the list editor can index (its key handler sign-extends the byte index: 0x7EE017BB / 0x7EE017FC).
 import json, struct

@@ -2,7 +2,7 @@
 
     uv run python experiments/2026-11-17-auto-iso-min-shutter/scripts/mkspec_lss_menu.py
 
-patches/custom-menu-rows-3.json takes the place of custom-menu-rows-2 in builds/stock-films.json. It is
+data/specs/custom-menu-rows-3.json takes the place of custom-menu-rows-2 in data/builds/stock-films.json. It is
 custom-menu-rows-2 with one row more: "Lowest S/S Setting" in group E before ISO-Auto Set (setting 653, panel 609,
 value -> text list 609). Why a new spec and not a delta: a delta cannot move or grow custom-menu-rows-2's item table,
 because `epm2mod make` refuses a change to a byte that custom-menu-rows-2 covers and keeps (byte 0xBF of the 10
@@ -11,9 +11,9 @@ address loads, and 81 bytes of the table). NOTES.md section 11.
     0x7EBF2512, where stock-films-structure's BK0 starts); the 10 address loads point at it;
   child list: 84 entries in place at 0x7EE3CBF4 (8 B longer); Debug Log's value -> text list moves 8 B to 0x7EE3CE94;
   row constants: last index 82, count 83, row-state array 166 B; rows in group E 13 -> 14.
-Every expect is a byte string of the specs before custom-menu-rows-2 in builds/stock-films.json.
+Every expect is a byte string of the specs before custom-menu-rows-2 in data/builds/stock-films.json.
 
-patches/lss-menu.json goes last. Setting 653 (prm tag 0x9F11, MODE bank, u8; ROM and full-reset default 0), the list
+data/specs/lss-menu.json goes last. Setting 653 (prm tag 0x9F11, MODE bank, u8; ROM and full-reset default 0), the list
 of panel 609 (56 items: Auto, 60" ... 1/4000 in 1/3 EV; the stored value is the index 0..55), the value -> text list
 609, and the English texts 1503 (label) and 1504 (help).
 """
@@ -33,7 +33,7 @@ from epm2mod.spec import apply_specs, load_spec  # noqa: E402
 
 BASE = 0x7E421020
 STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
-BUILD = "builds/stock-films.json"
+BUILD = "data/builds/stock-films.json"
 OLD = "custom-menu-rows-2"
 ROWS3 = "custom-menu-rows-3"
 LSS = "lss-menu"
@@ -118,16 +118,16 @@ def spec(name, description, ops, **extra):
          "status": "candidate: emulator-checked, not flashed"}
     d.update(extra)
     d["ops"] = ops
-    with open(os.path.join(ROOT, "patches", name + ".json"), "w") as fh:
+    with open(os.path.join(ROOT, "data", "specs", name + ".json"), "w") as fh:
         json.dump(d, fh, indent=1)
         fh.write("\n")
-    print("wrote patches/%s.json: %d ops" % (name, len(ops)))
+    print("wrote data/specs/%s.json: %d ops" % (name, len(ops)))
 
 
 def rows3(specs):
-    before = specs[:specs.index("patches/%s.json" % OLD)]
+    before = specs[:specs.index("data/specs/%s.json" % OLD)]
     o = Ops(*image(before))
-    old = json.load(open(os.path.join(ROOT, "patches", OLD + ".json")))
+    old = json.load(open(os.path.join(ROOT, "data", "specs", OLD + ".json")))
     for x in old["ops"]:
         a, note = x.get("_addr"), x["_note"]
         if a == "0x%08X" % OLD_ITEMS:
@@ -172,9 +172,9 @@ def rows3(specs):
     assert sum(1 for x in o.ops if x["_note"].startswith("page record")) == 11
     assert sum(1 for x in o.ops if x["new"] in [v[0] for v in CONSTS.values()]) == 9
     spec(ROWS3, "The Custom Menu with four added rows: Peaking in A after MF Assist, Load Looks and Debug Log in J "
-         "(all three as patches/custom-menu-rows-2.json, whose place this spec takes) and Lowest S/S Setting in E "
+         "(all three as data/specs/custom-menu-rows-2.json, whose place this spec takes) and Lowest S/S Setting in E "
          "before ISO-Auto Set (setting %d, panel %d, value -> text list %d; the list and texts are in "
-         "patches/lss-menu.json, which a build with this spec needs). No stock row is changed. An 83-row copy of the "
+         "data/specs/lss-menu.json, which a build with this spec needs). No stock row is changed. An 83-row copy of the "
          "item table at 0x%08X (10 address loads re-pointed), the 84-entry child list in place at 0x%08X (Debug Log's "
          "value -> text list moved to 0x%08X), 9 row constants (last index 82, count 83, row-state array 166 B), the "
          "group sizes of A (11), E (14) and J (8). Every expect is a byte string of the specs before "
@@ -235,7 +235,7 @@ def lss(specs):
     for tid, s in TEXTS.items():
         o.text(eng, tid, s)
     spec(LSS, "Lowest S/S Setting (GitHub issue #2), the menu part: the list and texts of the row that "
-         "patches/custom-menu-rows-3.json adds to Custom Menu E before ISO-Auto Set. Setting %d (prm tag 0x9F11, MODE "
+         "data/specs/custom-menu-rows-3.json adds to Custom Menu E before ISO-Auto Set. Setting %d (prm tag 0x9F11, MODE "
          "bank, u8, ROM and full-reset default 0; no stock code reads or writes it, experiments/2026-11-18-look-editor"
          "/settings.md) holds the index 0..55 of: Auto, 60\", 50\", 40\", 30\" ... 1/250 (the stock # Slow Limit "
          "records), 1/320 ... 1/4000. Panel 609 (a list page of the dormant setting 448) gets the 56 items, the "

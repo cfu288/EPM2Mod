@@ -72,13 +72,13 @@ The slot is the place of the entry in the art-filter menu. Each slot takes the k
 `card-looks-4` and the pinned build (`card-looks-5`) every slot takes a colour look (a black-and-white film is a colour look with saturation gain 0); in
 `card-looks` slot 4 (Grainy Film) takes only a black-and-white look (kind 2) and the others only colour looks.
 
-| Slot | Menu entry | Look in `looks/card-looks.json` |
+| Slot | Menu entry | Look in `data/films/card-looks.json` |
 |---|---|---|
 | 0 | Pop Art | Portra 400 |
 | 1 | Soft Focus | Ektachrome |
 | 2 | Pale&Light Color | Pro 400H |
 | 3 | Light Tone | Kodachrome |
-| 4 | Grainy Film | Double-X (a colour look with saturation 0, `looks/fits/doublex3.npz`) |
+| 4 | Grainy Film | Double-X (a colour look with saturation 0, `data/films/fits/doublex3.npz`) |
 | 5 | Pin Hole | Vis 250D |
 | 6 | Diorama | Velvia |
 | 7 | Cross Process | Superia 400 |
@@ -118,7 +118,7 @@ function crc32(bytes) {
 
 ## Test vector
 
-`uv run epm2mod films pack looks/card-looks.json -o FILE` gives 20,528 bytes with sha256
+`uv run epm2mod films pack data/films/card-looks.json -o FILE` gives 20,528 bytes with sha256
 `5d5df335dc14100a3fb7c90265ca07470419f12f52f806cc6b80f1bc09cae7ad`. Its first 32 bytes:
 
 ```

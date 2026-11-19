@@ -1,6 +1,6 @@
-import data from '../../../../../looks/film-records.json'
+import data from '../../../../../data/films/film-records.json'
 
-/** A fitted film the look file can hold (looks/film-records.json in the repository, made from looks/catalogue.json). */
+/** A fitted film the look file can hold (data/films/film-records.json in the repository, made from data/films/catalogue.json). */
 export interface Film {
   id: string
   /** The name the camera shows, at most 16 characters. */

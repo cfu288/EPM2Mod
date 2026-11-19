@@ -1,0 +1,75 @@
+{
+ "name": "log-peaking-time",
+ "description": "Structured log, timing probe of peaking: event pk_stats, one record per 8 runs of Key Line pass 9 (the Key Line art filter, White peaking and colour peaking): the microseconds from before the peaking hook of the pass to after it, summed over these passes (for a colour that is the colour loop), and usGain2 of the last pass. The time between two records is 8 frame periods. Two hooks in stock bytes of pass 9 and their routines in the kernel range; no byte of the peaking code changes. Needs log-core and log-probes before it: every expect is a byte string of that build. It puts the build id fe2f543f94c74a91 of data/logdict/events.json into the block header. DEBUG builds only. See experiments/2026-11-14-focus-peaking/NOTES.md section 17 and docs/reference/logging.md.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "candidate: emulator-checked, not flashed",
+ "_delta_on": "data/builds/debug-log-peaking-fast.json without this spec",
+ "_build_id": "fe2f543f94c74a91",
+ "_ram": "9 bytes of the log's state block (PST+88)",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA879D",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "8010f85324fcdd98d04fbe75fca474009098f101f80104e1f81504f8410840f85108f8e007c914f81104f86322f1e02c0501dd42fdffff0000dc83cf2500",
+   "_addr": "0x7E4C97BD",
+   "_note": "new code, kernel range, 0xFF run: T_TICK (62 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA80CA",
+   "expect": "ffffffffffffffffffffffffffffffffff",
+   "new": "fca474009098fc8198d04fbedc2b050000",
+   "_addr": "0x7E4C90EA",
+   "_note": "new code, kernel range, 0xFF run: T_TIME0 (17 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA8601",
+   "expect": "ffffffffffffffffffff",
+   "new": "8002f85325dc3bd12500",
+   "_addr": "0x7E4C9621",
+   "_note": "new code, kernel range, 0xFF run: T_TIME0B (10 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x30573C",
+   "expect": "8002f85325",
+   "new": "dc8e29daff",
+   "_addr": "0x7E72675C",
+   "_note": "hook (pk_stats): jmp T_TIME0. Key Line pass 9, `mov 2,d0` / `movbu d0,(37,a3)` (ucMode), before hook K"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x305754",
+   "expect": "8010f85324",
+   "new": "dc4930daff",
+   "_addr": "0x7E726774",
+   "_note": "hook (pk_stats): jmp T_TICK. Key Line pass 9, `mov 16,d0` / `movbu d0,(36,a3)` (ucBit), after the gain is stored"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1D04",
+   "expect": "d1ddd46b",
+   "new": "fe2f543f",
+   "_addr": "0x7EBF2D24",
+   "_note": "flush task, block header: build id bytes 0-3 d1ddd46b -> fe2f543f (data/logdict/events.json)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1D0D",
+   "expect": "4dac2414",
+   "new": "94c74a91",
+   "_addr": "0x7EBF2D2D",
+   "_note": "flush task, block header: build id bytes 4-7 4dac2414 -> 94c74a91 (data/logdict/events.json)"
+  }
+ ]
+}

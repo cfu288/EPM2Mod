@@ -1,9 +1,9 @@
-"""builds/card-looks-3.json in the emulator: the acceptance criteria that the emulator can see (design.md section 10).
+"""data/builds/card-looks-3.json in the emulator: the acceptance criteria that the emulator can see (design.md section 10).
 
     uv run python experiments/2026-11-17-card-looks/scripts/emu_looks3.py
 
 Needs build/card-looks-3.BIN, the files that mkspec_looks3.py writes into build/card-looks/ and the settings state
-build/emu/state/card-looks-3-p.json (emulator/mkstate builds/card-looks-3.json ... p). Sessions share the
+build/emu/state/card-looks-3-p.json (emulator/mkstate data/builds/card-looks-3.json ... p). Sessions share the
 camera's flash. Each dump is compared with the model: the slot tables, the live (member-0) tables and the records
 that point at them, the names of the 12 entries in the loaded language, the row's texts and its status.
 
@@ -39,9 +39,9 @@ from epm2mod.paths import RepoPaths  # noqa: E402
 
 WORK = os.path.join(ROOT, "build", "card-looks")
 EMU = os.path.join(WORK, "emu")
-V4 = "--v4" in sys.argv    # builds/card-looks-4.json: Load Looks is an added row, after Eye-Fi
+V4 = "--v4" in sys.argv    # data/builds/card-looks-4.json: Load Looks is an added row, after Eye-Fi
 N = "4" if V4 else "3"
-BUILD = "builds/card-looks-%s.json" % N
+BUILD = "data/builds/card-looks-%s.json" % N
 RTC = "2026-11-17T12:00:00"
 NAV = ("key:MENU key:RIGHT key:OK key:DOWN key:DOWN key:DOWN key:RIGHT " + "key:DOWN " * 9 + "key:RIGHT " +
        "key:DOWN " * (5 if V4 else 4)).split()
@@ -75,9 +75,9 @@ def main():
     ids, recs, rlive = syms["IDS"], syms["RECS"], syms["RLIVE"]
     paths = RepoPaths(Path(ROOT))
     default = lookpack.load_list(paths, paths.card_looks)
-    fit = lookpack.load_fit(paths.resolve("looks/fits/c200.npz"))
+    fit = lookpack.load_fit(paths.resolve("data/films/fits/c200.npz"))
     test = [lookpack.look_of_fit(fit, e, "C200", "c200") for e in lookfile.MENU_ENTRIES]
-    velvia = lookpack.load_fit(paths.resolve("looks/fits/velvia100.npz"))
+    velvia = lookpack.load_fit(paths.resolve("data/films/fits/velvia100.npz"))
     part = [lookpack.look_of_fit(velvia, "Pale&Light Color", "Velvia 2", "v"),
             lookpack.look_of_fit(fit, "Grainy Film", "C200 in 4", "c")]
     files = {"TEST": lookfile.pack(test), "PART": lookfile.pack(part)}

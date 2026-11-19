@@ -5,8 +5,8 @@
    "name": "Load Looks menu path and options",
    "fact": "MENU → SETUP → Custom Menu → J → Load Looks → Load, and the row's options (Off / Load, no Built-in)",
    "truth": [
-    "patches/looks-menu-*.json",
-    "patches/card-looks-*.json"
+    "data/specs/looks-menu-*.json",
+    "data/specs/card-looks-*.json"
    ],
    "copies": [
     "src/epm2mod/camera_steps.py",
@@ -36,16 +36,16 @@
    "name": "Film catalogue",
    "fact": "The films, their count, names, notes, and the Olympus art filter of each ART entry",
    "truth": [
-    "looks/catalogue.json",
-    "looks/card-looks.json",
-    "looks/film-records.json",
-    "looks/fits/*.npz"
+    "data/films/catalogue.json",
+    "data/films/card-looks.json",
+    "data/films/film-records.json",
+    "data/films/fits/*.npz"
    ],
    "copies": [
     "README.md",
     "docs/guide/film-looks.md",
     "docs/dev/film-emulation.md",
-    "looks/README.md",
+    "data/films/README.md",
     "NOTICE.md",
     "src/epm2mod/catalogue.py",
     "web/apps/site/src/pages/Films.tsx",
@@ -81,12 +81,12 @@
    "name": "Pinned build",
    "fact": "Which build is pinned and what it does (today: Olympus art filters kept, films loaded from the card)",
    "truth": [
-    "pinned-build.json",
-    "builds/*.json"
+    "data/pinned-build.json",
+    "data/builds/*.json"
    ],
    "copies": [
     "docs/user/install.md",
-    "builds/README.md",
+    "data/builds/README.md",
     "docs/camera-log/",
     "TODO.md",
     "docs/reference/logging.md",
@@ -99,7 +99,7 @@
     "src/epm2mod/readme.py"
    ],
    "regenerate": [
-    "uv run epm2mod generate (docs/user/install.md and builds/README.md blocks)"
+    "uv run epm2mod generate (docs/user/install.md and data/builds/README.md blocks)"
    ]
   },
   {
@@ -147,7 +147,7 @@
    "name": "Feature list",
    "fact": "What EPM2Mod adds: film simulations, looks from the card, interval shooting, level gauge, focus peaking, debug log, lowest shutter speed",
    "truth": [
-    "pinned-build.json"
+    "data/pinned-build.json"
    ],
    "copies": [
     "README.md",
@@ -161,7 +161,7 @@
    "name": "Focus peaking",
    "fact": "Menu path, colours, behaviour",
    "truth": [
-    "patches/peaking*.json"
+    "data/specs/peaking*.json"
    ],
    "copies": [
     "docs/guide/focus-peaking.md",
@@ -172,7 +172,7 @@
    "name": "Interval shooting",
    "fact": "Menu path, frame counts, timing limits",
    "truth": [
-    "patches/interval*.json"
+    "data/specs/interval*.json"
    ],
    "copies": [
     "docs/guide/interval-shooting.md",
@@ -183,7 +183,7 @@
    "name": "Level gauge",
    "fact": "Menu paths for the gauge and Level Adjust",
    "truth": [
-    "patches/level*.json"
+    "data/specs/level*.json"
    ],
    "copies": [
     "docs/guide/level-gauge.md",
@@ -194,8 +194,8 @@
    "name": "Lowest shutter speed",
    "fact": "Menu path, values, when it applies (P and A, ISO Auto, no flash)",
    "truth": [
-    "patches/lss-*.json",
-    "patches/custom-menu-rows-3.json"
+    "data/specs/lss-*.json",
+    "data/specs/custom-menu-rows-3.json"
    ],
    "copies": [
     "docs/guide/lowest-shutter-speed.md",
@@ -206,8 +206,8 @@
    "name": "Debug log",
    "fact": "The Debug Log row, the file EPM2LOG.BIN, its size cap",
    "truth": [
-    "patches/log-menu*.json",
-    "logs/events.json"
+    "data/specs/log-menu*.json",
+    "data/logdict/events.json"
    ],
    "copies": [
     "docs/user/debug-log.md",
@@ -230,12 +230,12 @@
    "name": "Licence of the film data",
    "fact": "Which fits and specs derive from spektrafilm (CC BY-SA 4.0)",
    "truth": [
-    "looks/fits/*.npz"
+    "data/films/fits/*.npz"
    ],
    "copies": [
     "NOTICE.md",
-    "patches/NOTICE.md",
-    "looks/README.md",
+    "data/specs/NOTICE.md",
+    "data/films/README.md",
     "web/packages/ui/src/components/FilmCredit.tsx"
    ]
   },

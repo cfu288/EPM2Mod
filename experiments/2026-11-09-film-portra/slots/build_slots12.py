@@ -1,7 +1,7 @@
 """Twelve film slots: every visible art filter (NOTES §33). Generates slots/cave12.s, assembles it, and writes
-  patches/slots12-code.json     structure (replaces slot3-code / slots7-code)
-  patches/slots12-neutral.json  stock Natural settings in the nine slots that hold no film yet
-  patches/film-pro400h-pa2-s12.json  the Pro 400H patch reduced to its three stills tables
+  data/specs/slots12-code.json     structure (replaces slot3-code / slots7-code)
+  data/specs/slots12-neutral.json  stock Natural settings in the nine slots that hold no film yet
+  data/specs/film-pro400h-pa2-s12.json  the Pro 400H patch reduced to its three stills tables
 Slots: Cross Process I, Light Tone (stock three-record handlers), Pop Art I (gamma3), and nine generic ones:
 Pale&Light I, Soft Focus, Pin Hole I, Diorama under their own filter numbers; Grainy Film, Gentle Sepia, Dramatic
 Tone, Key Line, Watercolor through the numbers of hidden second types (102, 106, 108, 145, 167), which
@@ -110,18 +110,18 @@ def main():
     base = dict(base="firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN", base_sha256="34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300", status="built, NOT camera-tested")
     json.dump(dict(name="slots12-code", description="Twelve film slots (replaces slot3-code / slots7-code): code areas, gamma hash, look / chroma / effect dispatch, WB pairs, and the art_GetFilterType "
                    "immediates that send Grainy Film, Gentle Sepia, Dramatic Tone, Key Line, Watercolor to the numbers 102, 106, 108, 145, 167. NOTES §33.", ops=ops, **base),
-              open(os.path.join(ROOT, "patches/slots12-code.json"), "w"), indent=1)
+              open(os.path.join(ROOT, "data/specs/slots12-code.json"), "w"), indent=1)
     dflt = b0[0x7E74E9BC - B:0x7E74E9BC - B + 512]; nops = []; lay = {}
     for i, (n, codes, sat, six, mode) in enumerate(SLOTS):
         tabs = POOL[3 * i:3 * i + 3]; lay[n] = dict(codes=codes, tabs=[hex(t) for t in tabs], sat=hex(sat), six=[hex(x) for x in six], matrix=hex(s2[f"t_{n}"]), stub=hex(s2[f"g_{n}"]))
         for t in tabs: nops.append({"type": "bytes", "block": 0, "offset": hex(t - B), "expect": b0[t - B:t - B + 512].hex(), "new": dflt.hex()})
         nops += [op(sat, struct.pack("<2H", 282, 282)), op(six[0], struct.pack("<6h", *[0] * 6)), op(six[1], struct.pack("<6h", *[0] * 6))]
     json.dump(dict(name="slots12-neutral", description="Stock Natural settings in the nine generic film slots (test content). NOTES §33.", ops=[o for o in nops if o["expect"] != o["new"]], **base),
-              open(os.path.join(ROOT, "patches/slots12-neutral.json"), "w"), indent=1)
-    pro = json.load(open(os.path.join(ROOT, "patches/film-pro400h-pa2.json"))); freed = {hex(t - B) for t in FREED}; n0 = len(pro["ops"])
+              open(os.path.join(ROOT, "data/specs/slots12-neutral.json"), "w"), indent=1)
+    pro = json.load(open(os.path.join(ROOT, "data/specs/film-pro400h-pa2.json"))); freed = {hex(t - B) for t in FREED}; n0 = len(pro["ops"])
     pro["ops"] = [o for o in pro["ops"] if o.get("offset") not in freed]; assert n0 - len(pro["ops"]) == 21
     pro["name"] += "-s12"; pro["description"] += " Reduced to its three stills tables: for builds with slots12-code."
-    json.dump(pro, open(os.path.join(ROOT, "patches/film-pro400h-pa2-s12.json"), "w"), indent=1)
+    json.dump(pro, open(os.path.join(ROOT, "data/specs/film-pro400h-pa2-s12.json"), "w"), indent=1)
     json.dump(dict(slots=lay, s1={k: hex(v) for k, v in s1.items()}, s2={k: hex(v) for k, v in s2.items()}, hash=[[hex(k), hex(h)] for k, h in ent]), open(os.path.join(HERE, "slots12_layout.json"), "w"), indent=1)
     print("code area 2:", len(c2), "of", CAVE2_LEN, "B (code", s2["endc"] - CAVE2, "B); structural ops:", len(ops), "; code 70 matches hash entry", i70, "; free hash entries:", sum(1 for e in ent if e[0] == 0))
 if __name__ == "__main__":

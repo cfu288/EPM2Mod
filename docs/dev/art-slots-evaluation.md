@@ -92,7 +92,7 @@ Natural settings. NOT flashed. Test: develop the test RAW in Pale&Light, Soft Fo
 Diorama. Each should come out like Natural: no blur, no vignette, normal white balance. That one
 flash answers whether the four slots are clean. Films then go in as data only
 (`fit_film.py --slot palelight1 | softfocus | pinhole1 | diorama`; tool path checked with a
-Vision3 250D fit, `patches/film-vision3-250d-pl1.json`).
+Vision3 250D fit, `data/specs/film-vision3-250d-pl1.json`).
 
 ## 4. Why the other five are different
 

@@ -1,9 +1,9 @@
-"""Write looks/film-records.json, the films that look files are packed from (epm2mod.looks.lookpack.web_data).
+"""Write data/films/film-records.json, the films that look files are packed from (epm2mod.looks.lookpack.web_data).
 
     uv run python web/scripts/export_films.py
 
 The CLI (`epm2mod install`, `epm2mod films set`), the local app and the web site all read it. Run this after a change of
-looks/catalogue.json or a fit; tests/test_lookfile.py fails while the file is out of date.
+data/films/catalogue.json or a fit; tests/test_lookfile.py fails while the file is out of date.
 """
 
 import json

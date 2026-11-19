@@ -1,9 +1,9 @@
-"""Write patches/film-names-all-languages.json: the film names in all 34 menu languages.
+"""Write data/specs/film-names-all-languages.json: the film names in all 34 menu languages.
 
 Run from the repository root:
 
     .venv/bin/python experiments/2026-11-14-emulator-audit/scripts/film_names_spec.py \
-        --pinned build/peaking-gain-2x.BIN [--out patches/film-names-all-languages.json] [--table]
+        --pinned build/peaking-gain-2x.BIN [--out data/specs/film-names-all-languages.json] [--table]
 
 The spec is a delta on the pinned build: each `expect` is what the pinned build has.
 
@@ -229,7 +229,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=(__doc__ or "").split("\n")[0])
     parser.add_argument("--stock", default=STOCK)
     parser.add_argument("--pinned", required=True, help="the pinned build's .BIN")
-    parser.add_argument("--out", default="patches/film-names-all-languages.json")
+    parser.add_argument("--out", default="data/specs/film-names-all-languages.json")
     parser.add_argument("--table", action="store_true", help="print one line per language and id, write nothing")
     args = parser.parse_args()
     stock_file = Path(args.stock).read_bytes()
@@ -276,7 +276,7 @@ def main() -> None:
             "The seven film names in all 34 menu languages (string ids "
             + ", ".join(str(i) for i in sorted(IDS))
             + "), and the French label of the effect 'Add Soft Focus Effect' (id 764) back to its stock text. "
-            "A delta on patches/seven-labels.json: apply after it. A name longer than its old string is moved "
+            "A delta on data/specs/seven-labels.json: apply after it. A name longer than its old string is moved "
             "inside the language's text pool and the pointer of its id is changed. Made by "
             "experiments/2026-11-14-emulator-audit/scripts/film_names_spec.py."
         ),

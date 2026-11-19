@@ -7,7 +7,7 @@ cd $R
 ER=$R/emulator/emu-run
 # 1. boot reports (raw, not normalised)
 $ER stock stage2-boot.mjs 2000 > $OUT/boot-stock.txt 2>&1; echo "boot-stock exit $?" >> $OUT/exits.txt
-$ER builds/films-12.json stage2-boot.mjs 2000 > $OUT/boot-films12.txt 2>&1; echo "boot-films12 exit $?" >> $OUT/exits.txt
+$ER data/builds/films-12.json stage2-boot.mjs 2000 > $OUT/boot-films12.txt 2>&1; echo "boot-films12 exit $?" >> $OUT/exits.txt
 # 2. update path: OK held, a card with the stock file as DCOLYMP/E1019999.BIN
 mkdir -p $OUT/card/DCOLYMP && cp firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN $OUT/card/DCOLYMP/E1019999.BIN
 E101_CARD=$OUT/card $ER stock update-boot.mjs 3000 > $OUT/update-stock.txt 2>&1; echo "update-stock exit $?" >> $OUT/exits.txt

@@ -11,7 +11,7 @@ NODE=${OM_EMU_NODE:-$(python3 -c "import sys; sys.path.insert(0, '$EMU'); import
 export OM_EMU_DIR=${OM_EMU_DIR:-$(python3 -c "import sys; sys.path.insert(0, '$EMU'); import emuenv; print(emuenv.require_om_emu())")} || { echo "run emulator/setup.sh first" >&2; exit 3 }
 EMU_OUT=${EMU_OUT:-$EPM2_REPO/build/emu/out}
 EMU_STATE=${EMU_STATE:-$EPM2_REPO/build/emu/state}
-# blocks IMAGE -> the folder of unpacked blocks (stock, builds/NAME.json, a .BIN file or a folder)
+# blocks IMAGE -> the folder of unpacked blocks (stock, data/builds/NAME.json, a .BIN file or a folder)
 blocks() { $EMU/emu-run --blocks $1 || { echo "cannot unpack $1" >&2; exit 3 } }
 # imgname IMAGE -> the short name used for output folders and state files (stock, peaking-colours, ...)
 imgname() { local n=${1:t}; print -r -- ${n%.*} }

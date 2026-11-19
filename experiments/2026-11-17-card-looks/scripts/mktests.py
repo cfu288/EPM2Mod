@@ -1,13 +1,13 @@
-"""Write the look files of the camera test of builds/card-looks.json (design.md section 9.3, step 4).
+"""Write the look files of the camera test of data/builds/card-looks.json (design.md section 9.3, step 4).
 
     uv run python experiments/2026-11-17-card-looks/scripts/mktests.py [OUTDIR]     (default build/card-looks/test)
     uv run python experiments/2026-11-17-card-looks/scripts/mktests.py --v2 [OUTDIR] (default build/card-looks/test-2)
 
---v2 (builds/card-looks-2.json, twelve colour slots): SWAP.BIN exchanges the looks of Pro 400H (slot 2) and Double-X
+--v2 (data/builds/card-looks-2.json, twelve colour slots): SWAP.BIN exchanges the looks of Pro 400H (slot 2) and Double-X
 (slot 4): the Double-X entry shows Pro 400H in colour, the Pro 400H entry Double-X in black and white; DEFAULT.BIN
-holds the looks of looks/card-looks.json.
+holds the looks of data/films/card-looks.json.
 
-Each file holds the twelve looks of looks/card-looks.json; GREY and SWAP change Pro 400H (Pale&Light Color, slot 2)
+Each file holds the twelve looks of data/films/card-looks.json; GREY and SWAP change Pro 400H (Pale&Light Color, slot 2)
 so that a photo and live view show at once whether a file was loaded:
   GREY.BIN     Pro 400H with saturation gain 0: a black-and-white picture
   SWAP.BIN     Pro 400H with an art matrix that swaps red and blue: blue sky turns orange
@@ -31,7 +31,7 @@ paths = RepoPaths(Path(ROOT))
 V2 = "--v2" in sys.argv
 V3 = "--v3" in sys.argv
 args = [a for a in sys.argv[1:] if a not in ("--v2", "--v3")]
-if V3:      # builds/card-looks-3.json: CYAN.BIN = the built-in looks, Pro 400H (slot 2) named "Cyan Test" with a red
+if V3:      # data/builds/card-looks-3.json: CYAN.BIN = the built-in looks, Pro 400H (slot 2) named "Cyan Test" with a red
             # tone curve of 0 (photo and live view cyan, without half-press if the live tables work)
     default = lookpack.load_list(paths, paths.card_looks)
     looks = list(default)

@@ -1,6 +1,6 @@
-"""Write patches/peaking-save-guard.json: peaking waits while another owner has blocks in the image-work heap.
+"""Write data/specs/peaking-save-guard.json: peaking waits while another owner has blocks in the image-work heap.
 
-Research code. NOTES.md section 18. The spec is a delta on the pinned build builds/peaking-fast.json: every
+Research code. NOTES.md section 18. The spec is a delta on the pinned build data/builds/peaking-fast.json: every
 `expect` is a byte string of that build, not of the stock file.
 
 Two rules, both read the heap's own counters (the test of the stock setter 0x7E578C60, 0x7E578FC0 -> 0x7E577016:
@@ -178,12 +178,12 @@ def main():
                        "heap-mode hook: when peaking ends and the pool of mode 1 still has a block in use, the heap "
                        "stays in mode 1 until a later call finds the pool empty. Before, the heap was re-divided under "
                        "those blocks, the art buffers were refused in every frame, and the camera restarted (firmware "
-                       "error 0x34000002, camera log of 2026-11-16). A delta on builds/peaking-fast.json: every expect "
+                       "error 0x34000002, camera log of 2026-11-16). A delta on data/builds/peaking-fast.json: every expect "
                        "is a byte string of that build. See experiments/2026-11-14-focus-peaking/NOTES.md section 18.",
         "base": STOCK,
         "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
         "status": "candidate: emulator-checked, not flashed",
-        "_delta_on": "builds/peaking-fast.json (sha256 %s)" % PINNED_SHA,
+        "_delta_on": "data/builds/peaking-fast.json (sha256 %s)" % PINNED_SHA,
         "_ram": "no new RAM. L (0x602BE8C4) and its copy L2 can now hold 2 = held by the guard; reads the heap mode "
                 "0x605157CC and the two pool objects named at 0x602AC458 / 0x602AC45C",
         "_symbols": {k: "0x%08X" % sym[k] for k in ("T_GUARD", "G_HOLD", "T_M2", "M_HOLD")},

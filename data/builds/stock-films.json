@@ -1,0 +1,22 @@
+{
+ "what": "The twelve Olympus art filters unchanged; film looks loaded from the SD card with Custom Menu J, Load Looks, overwrite the entries the file lists; interval shooting with up to 240 frames, a level gauge with calibration, and focus peaking; a Debug Log row in Custom Menu J (Off by default) that writes EPM2LOG.BIN to the card for bug reports",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
+ "specs": [
+  "data/specs/interval-timelapse-v2.json",
+  "data/specs/interval-frames-240.json",
+  "data/specs/level-gauge-lvinfo-row.json",
+  "data/specs/level-adjust-row.json",
+  "data/specs/peaking-direct-4.json",
+  "data/specs/peaking-gain-2x.json",
+  "data/specs/custom-menu-rows-2.json",
+  "data/specs/peaking-colours.json",
+  "data/specs/peaking-fast.json",
+  "data/specs/peaking-save-guard.json",
+  "data/specs/looks-menu-4.json",
+  "data/specs/stock-films-structure.json",
+  "data/specs/card-looks-5.json",
+  "data/specs/log-menu-2.json"
+ ],
+ "sha256": "2859767da0014bcb637ca3016898c940f7678d244794d3d5bb231c7e8c0ba8cd",
+ "camera_tested": "2026-11-18"
+}

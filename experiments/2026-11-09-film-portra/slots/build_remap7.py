@@ -2,7 +2,7 @@
 sent to filter numbers that every part of the firmware already treats as colour-only, and those numbers get the
 film tables. Soft Focus -> 102 (Pop Art II's number), Pin Hole -> 145 (Pale&Light II), Diorama -> 167 (Cross Process
 II). Numbers 69, 73, 86 and their effect, live-view and movie handling stay stock.
-  patches/remap7b-code.json (the working second version; the first, remap7-code, is in patches/history), patches/remap7-neutral.json     python3 -I build_remap7.py"""
+  data/specs/remap7b-code.json (the working second version; the first, remap7-code, is in data/specs/history), data/specs/remap7-neutral.json     python3 -I build_remap7.py"""
 import json, os, struct, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_slots12 as b
@@ -54,14 +54,14 @@ def main():
     base = dict(base="firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN", base_sha256="34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300", status="built, NOT camera-tested")
     json.dump(dict(name="remap7b-code", description="Seven film slots, remap design, second version (replaces remap7-code): as remap7-code, and the same menu-entry -> number change in the two "
                    "live-view / movie-art tables (0x7E7FF05C, 0x7E807880), all WB multiplier pairs 1.0, and numbers 167 / 168 on the default path of the hash 0x7E78C6E4. NOTES §37.", ops=ops, **base),
-              open(os.path.join(b.ROOT, "patches/remap7b-code.json"), "w"), indent=1)
+              open(os.path.join(b.ROOT, "data/specs/remap7b-code.json"), "w"), indent=1)
     dflt = b0[0x7E74E9BC - B:0x7E74E9BC - B + 512]; nops = []; lay = {}
     for i, (n, codes, sat, six, mode) in enumerate(b.SLOTS):
         tabs = b.POOL[3 * i:3 * i + 3]; lay[n] = dict(codes=codes, tabs=[hex(t) for t in tabs], sat=hex(sat), six=[hex(x) for x in six], matrix=hex(s2[f"t_{n}"]))
         for t in tabs: nops.append({"type": "bytes", "block": 0, "offset": hex(t - B), "expect": b0[t - B:t - B + 512].hex(), "new": dflt.hex()})
         nops += [op(sat, struct.pack("<2H", 282, 282)), op(six[0], struct.pack("<6h", *[0] * 6)), op(six[1], struct.pack("<6h", *[0] * 6))]
     json.dump(dict(name="remap7-neutral", description="Stock Natural settings in the four new slots of remap7-code (test content). NOTES §35.", ops=[o for o in nops if o["expect"] != o["new"]], **base),
-              open(os.path.join(b.ROOT, "patches/remap7-neutral.json"), "w"), indent=1)
+              open(os.path.join(b.ROOT, "data/specs/remap7-neutral.json"), "w"), indent=1)
     json.dump(dict(slots=lay, s2={k: hex(v) for k, v in s2.items()}), open(os.path.join(b.HERE, "remap7_layout.json"), "w"), indent=1)
     print("code area 2:", len(c2), "B; ops:", len(ops), "; snippets", hex(s2["ft_soft"]), hex(s2["ft_dio"]), "; code 70 at hash entry", i70)
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 #!/bin/zsh
 # lang-all.sh IMAGE [LANG...]: the Picture Mode list and the ART list in every menu language.
-# IMAGE: stock, builds/NAME.json, a .BIN file or a folder of unpacked blocks.
+# IMAGE: stock, data/builds/NAME.json, a .BIN file or a folder of unpacked blocks.
 # Per language four runs of play.mjs, each from a copy of the image's English settings states (mode P and ART mode,
 # EMU_STATE/NAME-p.json and NAME-art.json, made with emulator/mkstate when missing): set the language in
 # Setup Menu -> language grid, then

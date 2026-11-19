@@ -1,4 +1,4 @@
-"""Write patches/custom-menu-rows-2.json: the Custom Menu of patches/custom-menu-rows.json with one row more, Debug
+"""Write data/specs/custom-menu-rows-2.json: the Custom Menu of data/specs/custom-menu-rows.json with one row more, Debug
 Log (setting 447, the stock Off / On panel 608) at the end of J, after Load Looks. It takes the place of
 custom-menu-rows; no stock row is changed.
 
@@ -11,8 +11,8 @@ Changes against custom-menu-rows (design.md, finding 8):
   row constants: last index 81, count 82, row-state array 164 B; rows in group J 7 -> 8;
   panel 608 gets a value -> text list (Off 0, On 1) after the child list.
 The row's label and help are the unused built-in EVF texts 1507 and 1508; the log's GUI routine
-(patches/log-menu.json) points them at "Debug Log" and its help in the loaded language's table in RAM.
-Every expect is a byte string of the specs before custom-menu-rows in builds/card-looks-4.json.
+(data/specs/log-menu.json) points them at "Debug Log" and its help in the loaded language's table in RAM.
+Every expect is a byte string of the specs before custom-menu-rows in data/builds/card-looks-4.json.
 """
 
 import hashlib
@@ -52,9 +52,9 @@ CONSTS = {                                         # custom-menu-rows' value -> 
 
 
 def base_block():
-    """Block 0 of the specs before custom-menu-rows in builds/card-looks-4.json."""
-    specs = json.load(open(os.path.join(ROOT, "builds", "card-looks-4.json")))["specs"]
-    before = specs[:specs.index("patches/%s.json" % OLD)]
+    """Block 0 of the specs before custom-menu-rows in data/builds/card-looks-4.json."""
+    specs = json.load(open(os.path.join(ROOT, "data", "builds", "card-looks-4.json")))["specs"]
+    before = specs[:specs.index("data/specs/%s.json" % OLD)]
     blk = bytearray(parse(open(os.path.join(ROOT, STOCK), "rb").read()).blocks[0].payload)
     for s in before:
         for o in load_spec(Path(ROOT, s)).ops:
@@ -65,7 +65,7 @@ def base_block():
 
 
 def main():
-    old = json.load(open(os.path.join(ROOT, "patches", OLD + ".json")))
+    old = json.load(open(os.path.join(ROOT, "data", "specs", OLD + ".json")))
     blk = base_block()
     get = lambda a, n: blk[a - BASE:a - BASE + n]
     ops = []
@@ -120,13 +120,13 @@ def main():
         "name": SPEC,
         "description": (
             "The Custom Menu with three added rows: Peaking in A after MF Assist, Load Looks in J after Eye-Fi (both "
-            "as patches/custom-menu-rows.json, whose place this spec takes) and Debug Log in J after Load Looks "
+            "as data/specs/custom-menu-rows.json, whose place this spec takes) and Debug Log in J after Load Looks "
             "(setting %d, the stock Off / On list panel %d; Off is 0, the setting's default). No stock row is "
             "changed. An 82-row copy of the item table at 0x7EBF1FF0 (10 address loads re-pointed), an 82-entry "
             "child list in segment 3 data at 0x%08X (11 page records re-pointed), 9 row constants (last index 81, "
             "count 82, row-state array 164 B), the group sizes of A (11) and J (8), and a value -> text list for "
-            "panel %d. The row's texts %d and %d are pointed at English strings by patches/log-menu.json. Every "
-            "expect is a byte string of the specs before custom-menu-rows in builds/card-looks-4.json. See "
+            "panel %d. The row's texts %d and %d are pointed at English strings by data/specs/log-menu.json. Every "
+            "expect is a byte string of the specs before custom-menu-rows in data/builds/card-looks-4.json. See "
             "experiments/2026-11-18-log-menu/design.md." % (SETTING, PANEL, KIDS, PANEL, LABEL, HELP)),
         "base": STOCK,
         "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
@@ -135,10 +135,10 @@ def main():
                 "next addressed object is 0x606A32F0)",
         "ops": ops,
     }
-    with open(os.path.join(ROOT, "patches", SPEC + ".json"), "w") as fh:
+    with open(os.path.join(ROOT, "data", "specs", SPEC + ".json"), "w") as fh:
         json.dump(spec, fh, indent=1)
         fh.write("\n")
-    print("wrote patches/%s.json: %d ops" % (SPEC, len(ops)))
+    print("wrote data/specs/%s.json: %d ops" % (SPEC, len(ops)))
 
 
 if __name__ == "__main__":

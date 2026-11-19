@@ -51,9 +51,9 @@ class ZipTests(unittest.TestCase):
         for spec in pinned_description(PATHS).specs:
             self.assertIn(spec, inside)
         for name in (
-            "pinned-build.json",
+            "data/pinned-build.json",
             "release.json",
-            "looks/film-records.json",
+            "data/films/film-records.json",
             "src/epm2mod/__main__.py",
             "src/epm2mod/app/index.html",
             "Start (Mac).command",

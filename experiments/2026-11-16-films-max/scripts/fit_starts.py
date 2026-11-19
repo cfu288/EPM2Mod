@@ -1,5 +1,5 @@
 """fit_film2.py, unchanged except for the starting points of the optimiser: the fits of installed looks named with
---starts (looks/fits/NAME.npz) replace the two standard starts (neutral, Portra). Reason: the control fit of Velvia
+--starts (data/films/fits/NAME.npz) replace the two standard starts (neutral, Portra). Reason: the control fit of Velvia
 with the standard starts ended in a worse minimum than the installed Velvia fit scored by the model alone.
 Run from the film-portra folder:
    ../../.venv/bin/python -I ../2026-11-16-films-max/scripts/fit_starts.py --starts ektachrome,kodachrome64 --lut out/lut/.../x.cube --name film-x-n2 --edge-weight 0.25

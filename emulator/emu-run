@@ -2,11 +2,11 @@
 """emu-run IMAGE TOOL [ARG...]: unpack IMAGE when needed, then run a full-boot tool on it.
 
     emulator/emu-run stock stage2-boot.mjs 2000
-    emulator/emu-run builds/peaking-colours.json play.mjs /tmp/scratch/shots shot:01 key:MENU shot:02
+    emulator/emu-run data/builds/peaking-colours.json play.mjs /tmp/scratch/shots shot:01 key:MENU shot:02
     emulator/emu-run build/debug-log.BIN shot.mjs 3000 /tmp/scratch/x.png
     emulator/emu-run --blocks IMAGE          print the folder of unpacked blocks and stop
 
-IMAGE: stock, builds/NAME.json, a .BIN file, or a folder of unpacked blocks (see emuenv.py).
+IMAGE: stock, data/builds/NAME.json, a .BIN file, or a folder of unpacked blocks (see emuenv.py).
 TOOL: a file of emulator/boot/ (or a path to another .mjs file). The tool's environment variables
 (E101_STATE, E101_CARD, E101_RTC, ...) pass through. The exit status is the tool's; 3 = set-up missing.
 """

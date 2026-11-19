@@ -1,9 +1,9 @@
-"""Write patches/card-looks.json and builds/card-looks.json: film looks loaded from the SD card and kept in the camera.
+"""Write data/specs/card-looks.json and data/builds/card-looks.json: film looks loaded from the SD card and kept in the camera.
 
     uv run python experiments/2026-11-17-card-looks/scripts/mkspec_looks.py [--v2] [LISTING.txt]
 
---v2 writes patches/card-looks-2.json and builds/card-looks-2.json instead: the same loader for twelve colour slots
-(mkspec_slots.LAYOUT, Grainy Film a colour slot) with the menu row of patches/looks-menu.json as its trigger: when the
+--v2 writes data/specs/card-looks-2.json and data/builds/card-looks-2.json instead: the same loader for twelve colour slots
+(mkspec_slots.LAYOUT, Grainy Film a colour slot) with the menu row of data/specs/looks-menu.json as its trigger: when the
 GUI leaves the menu (not to power-off) with setting 449 at Load (0), T_GUI sets it back to Off (1) with the GUI's
 setSetting, as the menu does, and starts the task in mode 1. The firmware writes 1 into the setting at every start, so
 a camera shows Off. There is no load at the first menu.
@@ -23,7 +23,7 @@ What the spec adds to films-12d (no debug log):
     of the record to an address, or make a tone table from a curve of the record and a stock default table), in two
     data areas of segment 3.
 
-The script checks its own tables with a Python model of VERIFY and APPLY: the look file of looks/card-looks.json
+The script checks its own tables with a Python model of VERIFY and APPLY: the look file of data/films/card-looks.json
 applied to films-12d leaves every byte as it is (the built-in looks are the same looks), and another file changes
 only the slot tables.
 """
@@ -48,7 +48,7 @@ from epm2mod.paths import RepoPaths  # noqa: E402
 BIN = os.path.join(ROOT, "build", "toolchain", "bin")
 BASE = slots.BLOCK0_BASE
 SPEC = "card-looks"
-BASE_BUILD = "builds/films-12d.json"
+BASE_BUILD = "data/builds/films-12d.json"
 STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
 
 # where the code goes: free runs of the segment-2 code areas (docs/reference/code-space-map.md; the runs of the persistence
@@ -410,7 +410,7 @@ T_GUI:                           # the "state =" trace call of the GUI state set
     lsr 4,d0
     cmp 2,d0                     # 0x2xxx: power off, sleep
     beq 9f
-    mov 0xd7b1,d0                # setting 449, the row "Load Looks" (patches/looks-menu.json): 0 = Load, 1 = Off
+    mov 0xd7b1,d0                # setting 449, the row "Load Looks" (data/specs/looks-menu.json): 0 = Load, 1 = Off
     mov 0,a0
     clr d1
     call 0x7e457c75,[d2,d3],12   # prm_get(tag, 0, 0)
@@ -468,7 +468,7 @@ def slot_ops(b, v2=False):
     colour = {s.entry: s for s in slots.SLOTS}
     extra = {s.entry: s.look for s in slots.EXTRA_SLOTS}
     # films-12d: Grainy Film holds the black-and-white film; Gentle Sepia stores Grainy Film's hidden value, so its
-    # colour film uses the tables of the first extra slot (looks/films-12-bw.json, "moved_to")
+    # colour film uses the tables of the first extra slot (data/films/films-12-bw.json, "moved_to")
     where = {**colour, "Gentle Sepia": extra["Grainy Film"], "Dramatic Tone": extra["Dramatic Tone"],
              "Key Line": extra["Key Line"], "Watercolor": extra["Watercolor"]}
     if v2:
@@ -592,11 +592,11 @@ def main():
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         import mkspec_slots
         SPEC = "card-looks-2"
-        base_specs = mkspec_slots.LAYOUT + ["patches/looks-menu.json"]
+        base_specs = mkspec_slots.LAYOUT + ["data/specs/looks-menu.json"]
         fw = os.path.join(work, "base-2.BIN")
         subprocess.run(["uv", "run", "epm2mod", "apply", *base_specs, "--from", "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN", "-o", fw], cwd=ROOT, check=True,
                        capture_output=True)
-        blk_name, delta_on = "base-2.block0.bin", "the specs of builds/card-looks-2.json before it"
+        blk_name, delta_on = "base-2.block0.bin", "the specs of data/builds/card-looks-2.json before it"
     else:
         build = json.load(open(os.path.join(ROOT, BASE_BUILD)))
         base_specs = build["specs"]
@@ -612,7 +612,7 @@ def main():
     # the model: the built-in looks give the bytes of the base; a file with other looks changes only slot tables
     items = json.load(open(paths.card_looks))["looks"]
     if not v2:      # films-12d: Double-X in its black-and-white slot (the fit with A, T, L)
-        items = [dict(i, fit="looks/fits/doublex2.npz") if i["entry"] == "Grainy Film" else i for i in items]
+        items = [dict(i, fit="data/films/fits/doublex2.npz") if i["entry"] == "Grainy Film" else i for i in items]
     listing_json = os.path.join(work, "list-%s.json" % SPEC)
     json.dump({"looks": items}, open(listing_json, "w"))
     looks = lookpack.load_list(paths, Path(listing_json))
@@ -621,7 +621,7 @@ def main():
     same = bytearray(b)
     model_apply(same, data, table)
     assert same == b, "the built-in looks as a look file do not give the base's bytes"
-    other = lookfile.pack([lookpack.look_of_fit(lookpack.load_fit(paths.resolve("looks/fits/c200.npz")), e, "C200",
+    other = lookfile.pack([lookpack.look_of_fit(lookpack.load_fit(paths.resolve("data/films/fits/c200.npz")), e, "C200",
                                                 "c200") for e in lookfile.MENU_ENTRIES if v2 or e != "Grainy Film"])
     assert model_verify(other, kinds)
     changed = bytearray(b)
@@ -692,11 +692,11 @@ def main():
     json.dump([[a, 2 * n if d else n] for _, ops in table for _, n, a, d in ops],
               open(os.path.join(work, "spans%s.json" % ("-2" if v2 else "")), "w"))
 
-    out = os.path.join(ROOT, "patches", SPEC + ".json")
+    out = os.path.join(ROOT, "data", "specs", SPEC + ".json")
     if not v2:      # the pinned spec: check that it is what this script makes; its notes (status) stay
         have = json.load(open(out))["ops"]
-        assert have == ops, "patches/card-looks.json differs from what this script makes"
-        print("patches/card-looks.json: unchanged (%d ops)" % len(ops))
+        assert have == ops, "data/specs/card-looks.json differs from what this script makes"
+        print("data/specs/card-looks.json: unchanged (%d ops)" % len(ops))
     else:
         spec = {
             "name": SPEC,
@@ -704,7 +704,7 @@ def main():
                 "Film looks loaded from the SD card with the menu row 'Load Looks', kept in the camera, for twelve "
                 "colour slots (every art-filter entry takes any look). A look file C:\\EPM2LOOK.BIN "
                 "(docs/reference/look-file-format.md) holds up to 12 looks. When the GUI leaves the menu (not to power-off) "
-                "with setting 449 (prm tag 0xD7B1, the row of patches/looks-menu.json) at Load (0) and the card is not "
+                "with setting 449 (prm tag 0xD7B1, the row of data/specs/looks-menu.json) at Load (0) and the card is not "
                 "being written, the dormant task USRTEST_A reads the file into the "
                 "EEROM settings bank's unused tail (0x%08X), checks it (magic, version, lengths, CRC-32, camera and "
                 "firmware, slots and kinds), copies it into the store at 0x%08X and, when a byte changed, calls the "
@@ -716,7 +716,7 @@ def main():
                 "menu does; the firmware writes 1 into it at every start, so a camera shows Off. "
                 "A bad file changes nothing; without a file the stored looks stay. The hook on the GUI state "
                 "setter's trace call 0x7ECDF6E4, the task, the code runs and the data areas of "
-                "patches/card-looks.json (camera-tested 2026-11-17), whose place it takes. Every expect is a byte "
+                "data/specs/card-looks.json (camera-tested 2026-11-17), whose place it takes. Every expect is a byte "
                 "string of %s. See experiments/2026-11-17-card-looks/design.md section 9.5." % (SCRATCH, STORE, delta_on)),
             "base": STOCK,
             "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
@@ -733,12 +733,12 @@ def main():
             "what": "Film simulations in the twelve art filter entries, each of which takes any look; film looks "
                     "loaded from the SD card with the menu row Load Looks and kept in the camera; interval shooting "
                     "with up to 240 frames, a level gauge with calibration, and focus peaking",
-            "specs": base_specs + ["patches/%s.json" % SPEC],
+            "specs": base_specs + ["data/specs/%s.json" % SPEC],
         }
-        with open(os.path.join(ROOT, "builds", SPEC + ".json"), "w") as f:
+        with open(os.path.join(ROOT, "data", "builds", SPEC + ".json"), "w") as f:
             json.dump(desc, f, indent=1)
             f.write("\n")
-        print("wrote patches/%s.json (%d ops) and builds/%s.json" % (SPEC, len(ops), SPEC))
+        print("wrote data/specs/%s.json (%d ops) and data/builds/%s.json" % (SPEC, len(ops), SPEC))
     if argv:
         txt = run(BIN + "/mn10300-elf-objdump", "-d", *sum((["-j", k] for k in RUNS), []), "-j", ".hs", e)
         open(argv[0], "w").write(re.sub(r"/[^\s:]*looks\.elf", "looks.elf", txt))

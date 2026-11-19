@@ -1,7 +1,7 @@
 """Apply a build's specs in memory and write the image to a scratch file, for emulator checks while `epm2mod make`
 cannot run. Not a way to make firmware for a camera: it runs none of the checks of `make`.
 
-    .venv/bin/python experiments/2026-11-16-doublex/scripts/apply_only.py builds/NAME.json /tmp/scratch/NAME.BIN
+    .venv/bin/python experiments/2026-11-16-doublex/scripts/apply_only.py data/builds/NAME.json /tmp/scratch/NAME.BIN
 """
 import sys
 from pathlib import Path

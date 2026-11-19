@@ -45,7 +45,7 @@ try:
 except ImportError:  # pragma: no cover
     HAVE_NUMPY = False
 
-#: The look file of ``looks/card-looks.json`` (the twelve looks of the pinned
+#: The look file of ``data/films/card-looks.json`` (the twelve looks of the pinned
 #: films, all colour looks): the test vector of docs/reference/look-file-format.md.
 CARD_LOOKS_SHA256 = "5d5df335dc14100a3fb7c90265ca07470419f12f52f806cc6b80f1bc09cae7ad"
 
@@ -239,7 +239,7 @@ class PackTests(unittest.TestCase):
     def test_a_fit_with_a_matrix_and_two_tables_gives_a_black_and_white_look(
         self,
     ) -> None:
-        fit = lookpack.load_fit(PATHS.resolve("looks/fits/doublex2.npz"))
+        fit = lookpack.load_fit(PATHS.resolve("data/films/fits/doublex2.npz"))
         look = lookpack.look_of_fit(fit, "Grainy Film", "Double-X", "doublex2")
         self.assertIsInstance(look, MonoLook)
         assert isinstance(look, MonoLook)
@@ -256,7 +256,7 @@ class PackTests(unittest.TestCase):
                         {
                             "entry": "Art Bracket",
                             "name": "x",
-                            "fit": "looks/fits/portra.npz",
+                            "fit": "data/films/fits/portra.npz",
                         }
                     ]
                 },
@@ -353,7 +353,7 @@ class ChoiceTests(unittest.TestCase):
         eleven = json.loads(json.dumps(raw))
         del eleven["slots"][11]
         with tempfile.TemporaryDirectory() as folder:
-            (Path(folder) / "looks").mkdir()
+            (Path(folder) / "data" / "films").mkdir(parents=True)
             paths = RepoPaths(Path(folder))
             for bad in (broken_record, wrong_name, wrong_entry, a_preset, eleven, []):
                 paths.film_records.write_text(json.dumps(bad))

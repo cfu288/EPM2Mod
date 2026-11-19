@@ -2,7 +2,7 @@
 
     uv run python web/scripts/render_previews.py
 
-For each film of looks/catalogue.json: boots the pinned build (card-looks-4) in the boot lab with a card whose
+For each film of data/films/catalogue.json: boots the pinned build (card-looks-4) in the boot lab with a card whose
 EPM2LOOK.BIN holds that film in all 12 entries, loads it (MENU -> Custom Menu -> J -> Load Looks -> Load), opens
 the Picture Mode strip (OK, UP) and takes a screenshot at ART 1 to ART 12 (the strip: y 356-480 of the screen).
 
@@ -16,7 +16,7 @@ order the user sets. The script checks that the films' strips differ only inside
 not change with the position; otherwise the split would be wrong and it stops.
 
 Needs the emulator (emulator/setup.sh), build/card-looks-4.BIN and the state build/emu/state/card-looks-4-p.json
-(emulator/mkstate builds/card-looks-4.json build/emu/state/card-looks-4-p.json p).
+(emulator/mkstate data/builds/card-looks-4.json build/emu/state/card-looks-4-p.json p).
 """
 import os
 import shutil
@@ -33,7 +33,7 @@ from PIL import Image, ImageChops  # noqa: E402
 from epm2mod.looks import lookfile, records  # noqa: E402
 from epm2mod.paths import RepoPaths  # noqa: E402
 
-BUILD = "builds/card-looks-4.json"
+BUILD = "data/builds/card-looks-4.json"
 STATE = ROOT / "build/emu/state/card-looks-4-p.json"
 OUT = ROOT / "web/packages/ui/src/previews"
 CROP = (0, 356, 720, 480)

@@ -25,11 +25,11 @@ if TYPE_CHECKING:
     from .stock import StockFirmware
 
 #: The file that marks the top of the repository.
-ROOT_MARKER = "pinned-build.json"
+ROOT_MARKER = "data/pinned-build.json"
 #: Environment variable that names the repository root explicitly.
 ROOT_ENV = "EPM2MOD_ROOT"
 #: The folder that holds the patch specs a build may use.
-SPEC_FOLDER = "patches"
+SPEC_FOLDER = "data/specs"
 #: The file that marks an unpacked release folder (``epm2mod package`` writes it).
 RELEASE_MARKER = "release.json"
 
@@ -55,7 +55,7 @@ class RepoPaths:
     @property
     def builds(self) -> Path:
         """The folder of build descriptions."""
-        return self.root / "builds"
+        return self.root / "data" / "builds"
 
     @property
     def output(self) -> Path:
@@ -75,32 +75,32 @@ class RepoPaths:
     @property
     def films(self) -> Path:
         """The list of film looks and the menu entries they replace."""
-        return self.root / "looks" / "films.json"
+        return self.root / "data" / "films" / "films.json"
 
     @property
     def more_films(self) -> Path:
         """The list of the film looks beyond the first seven."""
-        return self.root / "looks" / "more-films.json"
+        return self.root / "data" / "films" / "more-films.json"
 
     @property
     def bw_films(self) -> Path:
         """The film list with a black-and-white film in the Grainy Film entry."""
-        return self.root / "looks" / "films-12-bw.json"
+        return self.root / "data" / "films" / "films-12-bw.json"
 
     @property
     def card_looks(self) -> Path:
         """A developer look list of fit files (the input of ``films pack``)."""
-        return self.root / "looks" / "card-looks.json"
+        return self.root / "data" / "films" / "card-looks.json"
 
     @property
     def catalogue(self) -> Path:
         """The fitted films that a look file can hold."""
-        return self.root / "looks" / "catalogue.json"
+        return self.root / "data" / "films" / "catalogue.json"
 
     @property
     def film_records(self) -> Path:
         """The films with their look records, which look files are packed from."""
-        return self.root / "looks" / "film-records.json"
+        return self.root / "data" / "films" / "film-records.json"
 
     @property
     def free_space_tool(self) -> Path:
@@ -121,7 +121,7 @@ class RepoPaths:
     @property
     def events(self) -> Path:
         """The event dictionary of the debug log."""
-        return self.root / "logs" / "events.json"
+        return self.root / "data" / "logdict" / "events.json"
 
     # The locator (``catalogue.Locator``).
 
@@ -228,7 +228,7 @@ def find_root(start: Path | None = None) -> Path:
 
     The root is the folder named by the ``EPM2MOD_ROOT`` environment variable,
     if it is set. Otherwise it is the nearest parent of ``start`` (default: the
-    current folder) that holds ``pinned-build.json``, or else the nearest such
+    current folder) that holds ``data/pinned-build.json``, or else the nearest such
     parent of this source file.
 
     Args:

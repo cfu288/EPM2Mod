@@ -1,13 +1,13 @@
-"""Write patches/films12cl-looks.json: the twelve films of the pinned build in twelve colour slots.
+"""Write data/specs/films12cl-looks.json: the twelve films of the pinned build in twelve colour slots.
 
     uv run python experiments/2026-11-17-card-looks/scripts/mkspec_slots.py
 
-Grainy Film becomes a colour slot like the other eleven (patches/films12-entry-grainy-film.json: value 111, art code
+Grainy Film becomes a colour slot like the other eleven (data/specs/films12-entry-grainy-film.json: value 111, art code
 94, the tables of the first extra slot), and Gentle Sepia stores its own hidden value again
-(patches/films12-entry-gentle-sepia.json: value 112, art code 98). This spec takes the place of
-patches/films12-looks.json: the five extra slots get Kodak Double-X as a colour look (looks/fits/doublex3.npz:
+(data/specs/films12-entry-gentle-sepia.json: value 112, art code 98). This spec takes the place of
+data/specs/films12-looks.json: the five extra slots get Kodak Double-X as a colour look (data/films/fits/doublex3.npz:
 saturation 0, scripts/fit_bw_colour.py), Fujifilm Provia 100F, and the three films of films12-looks, so the menu
-(patches/films12bw-names.json) keeps the films of the pinned build. The grain program of the stock Grainy Film is no
+(data/specs/films12bw-names.json) keeps the films of the pinned build. The grain program of the stock Grainy Film is no
 longer used. Every expect is a byte string of the specs before it in LAYOUT.
 """
 import hashlib, json, os, subprocess, sys
@@ -23,26 +23,26 @@ from epm2mod.spec import op_to_json  # noqa: E402
 SPEC = "films12cl-looks"
 STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
 # the specs of the layout, in build order; SPEC goes after films12-looks
-LAYOUT = [s for s in json.load(open(os.path.join(ROOT, "builds/card-looks.json")))["specs"]
-          if s not in ("patches/films12bw-doublex.json", "patches/films12bw-doublex2.json",
-                       "patches/films12bw-entry-gentle-sepia.json", "patches/card-looks.json")]
-LAYOUT.insert(LAYOUT.index("patches/films12bw-names.json") + 1, "patches/films12-entry-grainy-film.json")
-LAYOUT.insert(LAYOUT.index("patches/films12-entry-grainy-film.json") + 1, "patches/films12-entry-gentle-sepia.json")
-LAYOUT[LAYOUT.index("patches/films12-looks.json")] = "patches/%s.json" % SPEC
-# the layout with the Custom Menu of patches/custom-menu-rows.json (Peaking and Load Looks added) in place of
+LAYOUT = [s for s in json.load(open(os.path.join(ROOT, "data/builds/card-looks.json")))["specs"]
+          if s not in ("data/specs/films12bw-doublex.json", "data/specs/films12bw-doublex2.json",
+                       "data/specs/films12bw-entry-gentle-sepia.json", "data/specs/card-looks.json")]
+LAYOUT.insert(LAYOUT.index("data/specs/films12bw-names.json") + 1, "data/specs/films12-entry-grainy-film.json")
+LAYOUT.insert(LAYOUT.index("data/specs/films12-entry-grainy-film.json") + 1, "data/specs/films12-entry-gentle-sepia.json")
+LAYOUT[LAYOUT.index("data/specs/films12-looks.json")] = "data/specs/%s.json" % SPEC
+# the layout with the Custom Menu of data/specs/custom-menu-rows.json (Peaking and Load Looks added) in place of
 # peaking-menu (card-looks-4)
-LAYOUT4 = [("patches/custom-menu-rows.json" if x == "patches/peaking-menu.json" else x) for x in LAYOUT]
+LAYOUT4 = [("data/specs/custom-menu-rows.json" if x == "data/specs/peaking-menu.json" else x) for x in LAYOUT]
 FILMS = [
     (Film("Grainy Film", "Kodak Double-X 5222", "black-and-white negative, on Kodak 2302 print film", "Double-X",
-          "looks/fits/doublex3.npz"), slots.EXTRA_SLOTS[0].look),
-    (Film("Gentle Sepia", "Fujifilm Provia 100F", "slide", "Provia", "looks/fits/provia100f.npz"),
+          "data/films/fits/doublex3.npz"), slots.EXTRA_SLOTS[0].look),
+    (Film("Gentle Sepia", "Fujifilm Provia 100F", "slide", "Provia", "data/films/fits/provia100f.npz"),
      slots.EXTRA_SLOTS[1].look),
 ]
-_more = {f["entry"]: f for f in json.load(open(os.path.join(ROOT, "looks/more-films.json")))["films"]}
+_more = {f["entry"]: f for f in json.load(open(os.path.join(ROOT, "data/films/more-films.json")))["films"]}
 FILMS += [(Film(**_more[e]), x.look) for e, x in zip(("Dramatic Tone", "Key Line", "Watercolor"), slots.EXTRA_SLOTS[2:])]
 
 if __name__ == "__main__":
-    before = LAYOUT[:LAYOUT.index("patches/%s.json" % SPEC)]
+    before = LAYOUT[:LAYOUT.index("data/specs/%s.json" % SPEC)]
     work = os.path.join(ROOT, "build", "card-looks")
     os.makedirs(work, exist_ok=True)
     out = os.path.join(work, "before-cl.BIN")
@@ -56,11 +56,11 @@ if __name__ == "__main__":
         "name": SPEC,
         "attribution": generate.ATTRIBUTION,
         "description": ("The films of the pinned build in twelve colour slots: Kodak Double-X 5222 as a colour look "
-                        "(saturation 0, the art matrix sets the grey mix, one tone curve; looks/fits/doublex3.npz) in "
+                        "(saturation 0, the art matrix sets the grey mix, one tone curve; data/films/fits/doublex3.npz) in "
                         "the tables of the first extra slot, which Grainy Film selects with "
-                        "patches/films12-entry-grainy-film.json, and Fujifilm Provia 100F in the tables of the second, "
-                        "which Gentle Sepia selects with patches/films12-entry-gentle-sepia.json; Kodak Portra 160, "
-                        "Kodak Gold 200 and Kodak Vision3 500T as in patches/films12-looks.json, whose place this spec "
+                        "data/specs/films12-entry-grainy-film.json, and Fujifilm Provia 100F in the tables of the second, "
+                        "which Gentle Sepia selects with data/specs/films12-entry-gentle-sepia.json; Kodak Portra 160, "
+                        "Kodak Gold 200 and Kodak Vision3 500T as in data/specs/films12-looks.json, whose place this spec "
                         "takes. No grain program. See experiments/2026-11-17-card-looks/design.md "
                         "section 9.5."),
         "base": STOCK,
@@ -68,8 +68,8 @@ if __name__ == "__main__":
         "status": "candidate: emulator-checked, not flashed",
         "ops": [op_to_json(op) for op in ops],
     }
-    with open(os.path.join(ROOT, "patches", SPEC + ".json"), "w") as fh:
+    with open(os.path.join(ROOT, "data", "specs", SPEC + ".json"), "w") as fh:
         json.dump(spec, fh, indent=1)
         fh.write("\n")
-    print("wrote patches/%s.json: %d ops, %d bytes" % (SPEC, len(ops), sum(len(o.new) for o in ops)))
+    print("wrote data/specs/%s.json: %d ops, %d bytes" % (SPEC, len(ops), sum(len(o.new) for o in ops)))
     print("layout:", " ".join(os.path.basename(s)[:-5] for s in LAYOUT))

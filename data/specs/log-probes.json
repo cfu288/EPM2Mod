@@ -1,0 +1,182 @@
+{
+ "name": "log-probes",
+ "description": "Structured log, probes of the features: peaking (MF Assist start and end, the L / R / L2 / C bytes, heap mode, pass 9), six-axis art code, level gauge (Adjust mode and values), interval shooting (start, frames, end, state bits), film looks (matrix stage, matrix table, curve handler), shooting callbacks. Each probe is a hook and a small routine that calls the log core. Needs log-core. DEBUG builds only. The event ids are in data/logdict/events.json (build id d1ddd46b4dac2414). A delta on data/builds/peaking-colours.json: every expect is a byte string of that build. See experiments/2026-11-15-log/NOTES.md and docs/reference/logging.md.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "candidate: emulator-checked, not flashed",
+ "_delta_on": "data/builds/peaking-colours.json (sha256 4d6b1f26ed92d66b62b4d7dc32d26168e33fd8b153a7655d6c0d9a58267456f8)",
+ "_build_id": "d1ddd46b4dac2414",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA8610",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "cf08fca5c4e82b60fca0d41c5b60fcdd50d04fbe2c0201ddcdfeffff0000ce08420800420482dcbbca1f00cf0881f2e0f1e0fcdd58d04fbe2c0301dda9feffff0000ce0882ddbde50a000008dceaf50a00cf08fca964d04fbea500c82a81f8c1105c2cf82020f82414f84101f211f82410f1e4f1d5fcdd60d04fbe2c0401dd71feffff0000ce08f8732200f81310dcb6d02500cf088dfcdc54c2787ef380fcdd68d04fbe2c0002dd3dfeffff0000ce08fcdc54c2787edcdf3b0a00cf08f8474ff82314fcdd70d04fbe2c0005dd18feffff0000ce089014f17c748003dc862f0a00cf08f1d5f1ecfcdd78d04fbe2c0105ddf4fdffff0000ce0888dd392b0a00f074dc39300a00cf08fcdce4c8787ef384f8b934fcdd80d04fbe2c0205ddc8fdffff0000ce08fcdce4c8787edc0b510a00cf08f1e4812c0003ddc9fdffff0000ce0886838001fcdc9f137c7edcf0ca1a00cf08fcad464c3f60f8c110fcac3a4c3f60f211f1e4fcad2e4c3f60f8c110fcac224c3f60f2112c0103dd88fdffff0000ce083c20104308dcad02f9ffcb",
+   "_addr": "0x7E4C9630",
+   "_note": "new code, kernel range: routines of the hooks in segment 1 and the kernel (397 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D2760",
+   "expect": "634f7353656c66456e645461736b007133320073634f73536c6565705461736b007133330073634f7353656c66536c6565705461736b007133340073634f734372656174654576656e74007133350073634f7344656c6574654576656e74007133360073634f735365744576656e74007133370073634f73495365744576656e74007133380073634f73576169744576656e74007133390073634f73436c6561724576656e74007134300073634f734372656174655175657565007134310073634f7344656c6574655175657565007134320073634f7357726974655175657565007134330073634f73526561645175657565007134340073634f7343726561746553656d6170686f7265007134350073634f7344656c65746553656d6170686f7265007134360073634f735761697453656d6170686f726500",
+   "new": "cf088003fc8264d04fbefca5c4e82b60982c0001dd9d5d8dff0000ce08fa2294018001dce09cf8ffcf08fca5c4e82b60982c0101dd7d5d8dff0000ce0800fa12b000dc8f9cf8ffcf08f1e4818001fc826cd04fbefc8274d04fbefc827cd04fbefc8284d04fbe2c0006dd485d8dff0000ce08420c8793fad3b400dc1922daffcf0889fca0dc0c2b602c0304dd265d8dff0000ce08ddd538d7ffa00cdc1966d7ffcf0889fca0dc0c2b602c0404dd055d8dff0000ce08ddb438d7ffa00cdcc660d7ffcf089000fc804cd04fbe89fca0dc0c2b602c0004dddc5c8dff0000ce08dd8b38d7ffa00cdc124ed9ffcf0889fca04cd04fbe2c0204ddbb5c8dff0000ce08dd6a38d7ffa00cdc0ff6d8ffcf08fca04cd04fbe41fc804cd04fbef1d1fca0dc0c2b602c0104dd8c5c8dff0000ce0892fcdd7d39c57edc375feaff",
+   "_addr": "0x7EBF3780",
+   "_note": "new code, segment 2: routines of the hooks in segments 2 and 3 (314 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2A50EB",
+   "expect": "420800420482",
+   "new": "dc2535e0ffcb",
+   "_addr": "0x7E6C610B",
+   "_note": "hook LATCH (pk_latch): jmp T_LATCH + nop. live-view expose setter 0x7E6C610B, entry (mov task)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x157C40",
+   "expect": "82cdd1ef0008",
+   "new": "dcfb09f5ffcb",
+   "_addr": "0x7E578C60",
+   "_note": "hook HEAP (pk_heap_mode): jmp T_HEAP + nop. image-work heap mode setter 0x7E578C60, entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x30574D",
+   "expect": "f8732200f81310",
+   "new": "dc142fdaffcbcb",
+   "_addr": "0x7E72676D",
+   "_note": "hook PK9 (pk_pass9): jmp T_PK9 + nop + nop. Key Line pass 9 0x7E7266D9, after T_K (ART task)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x14C29F",
+   "expect": "fcdc54c2787e",
+   "new": "dc04c4f5ffcb",
+   "_addr": "0x7E56D2BF",
+   "_note": "hook ART (art_sixaxis): jmp T_ART + nop. six-axis stage, dispatch by art code"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x14B66B",
+   "expect": "9014f17c748003",
+   "new": "dc60d0f5ffcbcb",
+   "_addr": "0x7E56C68B",
+   "_note": "hook STAGE (film_stage): jmp T_STAGE + nop + nop. colour-matrix stage, before the art-matrix choice"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x14B744",
+   "expect": "88cdfefaf074",
+   "new": "dcadcff5ffcb",
+   "_addr": "0x7E56C764",
+   "_note": "hook MATRIX (film_matrix): jmp T_MATRIX + nop. colour-matrix stage, art matrix apply"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x14D840",
+   "expect": "fcdce4c8787e",
+   "new": "dcd6aef5ffcb",
+   "_addr": "0x7E56E860",
+   "_note": "hook CURVE (film_curve): jmp T_CURVE + nop. tone-curve selector 0x7E56E837, dispatch by art code"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x255241",
+   "expect": "86838001fcdc9f137c7e",
+   "new": "dcff34e5ffcbcbcbcbcb",
+   "_addr": "0x7E676261",
+   "_note": "hook ADJ (lv_adjust): jmp T_ADJ + nop + nop + nop + nop + nop. api_adj_Set_Slope_Adjust 0x7E676261, entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x38A3F",
+   "expect": "3c20104308",
+   "new": "dc21fd0600",
+   "_addr": "0x7E459A5F",
+   "_note": "hook LVV (lv_values): jmp T_LVV. accelerometer table reload 0x7E459A5F, entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x75C45D",
+   "expect": "fa2294018001",
+   "new": "dc03630700cb",
+   "_addr": "0x7EB7D47D",
+   "_note": "hook MFON (pk_mf_start): jmp T_MFON + nop. CmpSts_MfAssist::entryMfAssistOn, after T_ON and the trace call"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x75C42C",
+   "expect": "00fa12b000",
+   "new": "dc5c630700",
+   "_addr": "0x7EB7D44C",
+   "_note": "hook MFOFF (pk_mf_end): jmp T_MFOFF. CmpSts_MfAssist::entryMfAssistOff, after T_OFF and the trace call"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x5749EB",
+   "expect": "420c8793fad3b400",
+   "new": "dcbcdd2500cbcbcb",
+   "_addr": "0x7E995A0B",
+   "_note": "hook CBS (shoot_cbs): jmp T_CBS + nop + nop + nop. shooting callback 0x7E995A0B, entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x548E0F",
+   "expect": "cdbad2a00c",
+   "new": "dcd0992800",
+   "_addr": "0x7E969E2F",
+   "_note": "hook IVSET (iv_state_set): jmp T_IVSET. setIntervalShootingState 0x7E969E1E, trace call"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x5488DD",
+   "expect": "cdecd7a00c",
+   "new": "dc239f2800",
+   "_addr": "0x7E9698FD",
+   "_note": "hook IVCLR (iv_state_clear): jmp T_IVCLR. clearIntervalShootingState 0x7E9698EC, trace call"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x567650",
+   "expect": "dd79eafdffa00c",
+   "new": "dcd1b12600cbcb",
+   "_addr": "0x7E988670",
+   "_note": "hook IVSTART (iv_start): jmp T_IVSTART + nop + nop. startIntervalShooting 0x7E98849B, last trace call"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x561E6E",
+   "expect": "dd5b42feffa00c",
+   "new": "dcdc092700cbcb",
+   "_addr": "0x7E982E8E",
+   "_note": "hook IVEND (iv_end): jmp T_IVEND + nop + nop. endIntervalShooting 0x7E982DF3, last trace call"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x6787C5",
+   "expect": "92fcdd7d39c57e",
+   "new": "dca6a01500cbcb",
+   "_addr": "0x7EA997E5",
+   "_note": "hook IVFRAME (iv_frame): jmp T_IVFRAME + nop + nop. recordingDone_interval 0x7EA997E5, entry"
+  }
+ ]
+}

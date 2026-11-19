@@ -1,20 +1,20 @@
-tools/freespace.py check, specs of builds/peaking-fast.json
-PASS  patches/peaking-fast.json op 0 at 0x7E4C9184: 117 B 0x7E4C9184-0x7E4C91F9 in area 0x7E4C90CA-0x7E4C9800 (kernel), as code, verdict USABLE-CODE
-PASS  patches/peaking-fast.json op 1 at 0x7E4C90CA: 32 B 0x7E4C90CA-0x7E4C90EA in area 0x7E4C90CA-0x7E4C9800 (kernel), as data, verdict USABLE-CODE
-PASS  patches/peaking-fast.json op 2 at 0x7E4C9453: 5 B 0x7E4C9453-0x7E4C9458 in area 0x7E4C90CA-0x7E4C9800 (kernel), as data, verdict USABLE-CODE [edits bytes of patches/peaking-colours.json in place (expect matches its output)]
+tools/freespace.py check, specs of data/builds/peaking-fast.json
+PASS  data/specs/peaking-fast.json op 0 at 0x7E4C9184: 117 B 0x7E4C9184-0x7E4C91F9 in area 0x7E4C90CA-0x7E4C9800 (kernel), as code, verdict USABLE-CODE
+PASS  data/specs/peaking-fast.json op 1 at 0x7E4C90CA: 32 B 0x7E4C90CA-0x7E4C90EA in area 0x7E4C90CA-0x7E4C9800 (kernel), as data, verdict USABLE-CODE
+PASS  data/specs/peaking-fast.json op 2 at 0x7E4C9453: 5 B 0x7E4C9453-0x7E4C9458 in area 0x7E4C90CA-0x7E4C9800 (kernel), as data, verdict USABLE-CODE [edits bytes of data/specs/peaking-colours.json in place (expect matches its output)]
 PASS  SRAM callers: 42 constant calls and jumps of the SRAM code looked at
 PASS  load order: S0 boot-order check: 64 transfers, 0 FAIL (every transfer from early-loaded code stays in early-loaded code)
 check: PASS (0 FAIL)
 
-tools/freespace.py check, specs of builds/debug-log-peaking-fast.json
-PASS  patches/peaking-fast.json op 0 at 0x7E4C9184: 117 B 0x7E4C9184-0x7E4C91F9 in area 0x7E4C90CA-0x7E4C9800 (kernel), as code, verdict USABLE-CODE
-PASS  patches/peaking-fast.json op 1 at 0x7E4C90CA: 32 B 0x7E4C90CA-0x7E4C90EA in area 0x7E4C90CA-0x7E4C9800 (kernel), as data, verdict USABLE-CODE
-PASS  patches/peaking-fast.json op 2 at 0x7E4C9453: 5 B 0x7E4C9453-0x7E4C9458 in area 0x7E4C90CA-0x7E4C9800 (kernel), as data, verdict USABLE-CODE [edits bytes of patches/peaking-colours.json in place (expect matches its output)]
-PASS  patches/log-peaking-time.json op 0 at 0x7E4C97BD: 62 B 0x7E4C97BD-0x7E4C97FB in area 0x7E4C90CA-0x7E4C9800 (kernel), as code, verdict USABLE-CODE
-PASS  patches/log-peaking-time.json op 1 at 0x7E4C90EA: 17 B 0x7E4C90EA-0x7E4C90FB in area 0x7E4C90CA-0x7E4C9800 (kernel), as code, verdict USABLE-CODE
-PASS  patches/log-peaking-time.json op 2 at 0x7E4C9621: 10 B 0x7E4C9621-0x7E4C962B in area 0x7E4C90CA-0x7E4C9800 (kernel), as data, verdict USABLE-CODE
-PASS  patches/log-peaking-time.json op 5 at 0x7EBF2D24: 4 B 0x7EBF2D24-0x7EBF2D28 in area 0x7EBF1090-0x7EBF3BAD (segment-2), as data, verdict USABLE-CODE [edits bytes of patches/log-core.json in place (expect matches its output)]
-PASS  patches/log-peaking-time.json op 6 at 0x7EBF2D2D: 4 B 0x7EBF2D2D-0x7EBF2D31 in area 0x7EBF1090-0x7EBF3BAD (segment-2), as data, verdict USABLE-CODE [edits bytes of patches/log-core.json in place (expect matches its output)]
+tools/freespace.py check, specs of data/builds/debug-log-peaking-fast.json
+PASS  data/specs/peaking-fast.json op 0 at 0x7E4C9184: 117 B 0x7E4C9184-0x7E4C91F9 in area 0x7E4C90CA-0x7E4C9800 (kernel), as code, verdict USABLE-CODE
+PASS  data/specs/peaking-fast.json op 1 at 0x7E4C90CA: 32 B 0x7E4C90CA-0x7E4C90EA in area 0x7E4C90CA-0x7E4C9800 (kernel), as data, verdict USABLE-CODE
+PASS  data/specs/peaking-fast.json op 2 at 0x7E4C9453: 5 B 0x7E4C9453-0x7E4C9458 in area 0x7E4C90CA-0x7E4C9800 (kernel), as data, verdict USABLE-CODE [edits bytes of data/specs/peaking-colours.json in place (expect matches its output)]
+PASS  data/specs/log-peaking-time.json op 0 at 0x7E4C97BD: 62 B 0x7E4C97BD-0x7E4C97FB in area 0x7E4C90CA-0x7E4C9800 (kernel), as code, verdict USABLE-CODE
+PASS  data/specs/log-peaking-time.json op 1 at 0x7E4C90EA: 17 B 0x7E4C90EA-0x7E4C90FB in area 0x7E4C90CA-0x7E4C9800 (kernel), as code, verdict USABLE-CODE
+PASS  data/specs/log-peaking-time.json op 2 at 0x7E4C9621: 10 B 0x7E4C9621-0x7E4C962B in area 0x7E4C90CA-0x7E4C9800 (kernel), as data, verdict USABLE-CODE
+PASS  data/specs/log-peaking-time.json op 5 at 0x7EBF2D24: 4 B 0x7EBF2D24-0x7EBF2D28 in area 0x7EBF1090-0x7EBF3BAD (segment-2), as data, verdict USABLE-CODE [edits bytes of data/specs/log-core.json in place (expect matches its output)]
+PASS  data/specs/log-peaking-time.json op 6 at 0x7EBF2D2D: 4 B 0x7EBF2D2D-0x7EBF2D31 in area 0x7EBF1090-0x7EBF3BAD (segment-2), as data, verdict USABLE-CODE [edits bytes of data/specs/log-core.json in place (expect matches its output)]
 PASS  SRAM callers: 42 constant calls and jumps of the SRAM code looked at
 PASS  load order: S0 boot-order check: 142 transfers, 0 FAIL (every transfer from early-loaded code stays in early-loaded code)
 check: PASS (0 FAIL)

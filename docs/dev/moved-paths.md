@@ -5,8 +5,8 @@ path that moved. A folder row covers every file in it.
 
 | Old path | New path | Since |
 |---|---|---|
-| `patches/history/NAME.json` | `patches/NAME.json`, marked `history` in `tools/space-ledger/superseded.tsv` | 2026-11-19 |
-| `patches/history/README.md` | `patches/HISTORY.md` | 2026-11-19 |
+| `patches/history/NAME.json` | `data/specs/NAME.json`, marked `history` in `tools/space-ledger/superseded.tsv` | 2026-11-19 |
+| `patches/history/README.md` | `data/specs/HISTORY.md` | 2026-11-19 |
 | `raws/`, `references/` | `.local/raws/`, `.local/references/` (not in git) | 2026-11-19 |
 | `tools/doclint.py` | `.githooks/doclint.py` | 2026-11-19 |
 | `tools/doc_links.py` | `.claude/hooks/doc_links.py` | 2026-11-19 |
@@ -24,3 +24,8 @@ path that moved. A folder row covers every file in it.
 | `docs/conventions.md`, `docs/feasibility.md`, `docs/verification.md`, `docs/art-filter-slots.md`, `docs/art-slots-evaluation.md`, `docs/film-emulation.md`, `docs/film-sim-comparison.pdf` | `docs/dev/` | 2026-11-19 |
 | `docs/todo.md` | `TODO.md` | 2026-11-19 |
 | `docs/space-candidates.tsv`, `docs/space-bounds.tsv`, `docs/space-pointer-waivers.tsv`, `docs/space-superseded.tsv` | `tools/space-ledger/candidates.tsv`, `bounds.tsv`, `pointer-waivers.tsv`, `superseded.tsv` | 2026-11-19 |
+| `patches/` | `data/specs/` | 2026-11-19 |
+| `builds/` | `data/builds/` | 2026-11-19 |
+| `pinned-build.json` | `data/pinned-build.json` | 2026-11-19 |
+| `looks/` | `data/films/` | 2026-11-19 |
+| `logs/` | `data/logdict/` | 2026-11-19 |

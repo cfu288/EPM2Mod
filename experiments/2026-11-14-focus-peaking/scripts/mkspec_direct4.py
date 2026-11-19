@@ -11,7 +11,7 @@ Changes from mkspec_direct3.py (direct-3). The routines are the same text; only 
    (loaded by the reset code with the kernel, before every task; the spec interval-frames-240 keeps data at
    0x7E4C9100 in the same run and the camera reads it).
 4. T_ON and T_OFF start at 0x7EBF1F28, not 0x7EBF1F00: the op of interval-frames-240 covers 0x7EBF1F00-03, and
-   patches/peaking-direct-3.json still holds 0x7EBF1F00-0x7EBF1F27 in the free-space ledger. direct-1's code ran
+   data/specs/peaking-direct-3.json still holds 0x7EBF1F00-0x7EBF1F27 in the free-space ledger. direct-1's code ran
    in 0x7EBF1F00-0x7EBF1FB6 on the camera.
 5. Option: the gain of the line image (T_K), default 256 as in direct-3.
 

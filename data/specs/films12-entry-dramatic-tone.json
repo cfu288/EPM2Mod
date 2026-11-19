@@ -1,0 +1,101 @@
+{
+ "name": "films12-entry-dramatic-tone",
+ "description": "The menu entry Dramatic Tone stores the hidden Picture Mode value 114 in place of 109, so it selects the film look Kodak Portra 160 (art code 144): one byte in each Picture Mode value list, in each constant of the ART bracket routines and in the preset of the filter in ART shooting mode. Needs the structure spec and the looks spec. Leave this spec out and the entry is the stock filter Dramatic Tone again.",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x4240a0",
+   "expect": "6d",
+   "new": "72"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x426320",
+   "expect": "6d",
+   "new": "72"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x4267e0",
+   "expect": "6d",
+   "new": "72"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3f7f22",
+   "expect": "6d",
+   "new": "72"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x403086",
+   "expect": "6d",
+   "new": "72"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x4031a6",
+   "expect": "6d",
+   "new": "72"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x6554cf",
+   "expect": "6d",
+   "new": "72"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x6554ee",
+   "expect": "6d",
+   "new": "72"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x674415",
+   "expect": "6d",
+   "new": "72"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x674435",
+   "expect": "6d",
+   "new": "72"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x186705",
+   "expect": "6d",
+   "new": "72"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x186af8",
+   "expect": "6d",
+   "new": "72"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x40b4d8",
+   "expect": "6d",
+   "new": "72"
+  }
+ ],
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "inputs_sha256": "74d6576097c26aa22315e9b84702c9a0bcb63d9b3f4f007919e9add8e420fb37",
+ "status": "built, NOT camera-tested"
+}

@@ -31,7 +31,7 @@ s0 = np.interp(b1[:, 0], b0[:, 0], b0[:, 1])
 gx = np.maximum.accumulate(np.convolve(np.r_[gx[0], gx, gx[-1]], [0.25, 0.5, 0.25], "valid"))
 old = m.g_of(b1[:, 0])
 m.TRANSFER_2.write_text(json.dumps({"what": "g of the grain program of art code 74, second measurement: x = g(Y_in); knots",
-    "source": f"reading {name} (test RAW, RAW Data Edit in the Double-X entry of films-12c, table T of looks/fits/doublex.npz)",
+    "source": f"reading {name} (test RAW, RAW Data Edit in the Double-X entry of films-12c, table T of data/films/fits/doublex.npz)",
     "y_in": b1[:, 0].round(2).tolist(), "x": gx.round(2).tolist()}, indent=1) + "\n")
 print(f"Double-X reading: {int(ok1.sum())} patches give x, Y_in {yi1[ok1].min():.0f} to {yi1[ok1].max():.0f}; stock reading: {int(ok0.sum())} patches, Y_in {yi0[ok0].min():.0f} to {yi0[ok0].max():.0f}")
 print("Y_in: x from the Double-X reading | from the stock reading | g2 | first g")

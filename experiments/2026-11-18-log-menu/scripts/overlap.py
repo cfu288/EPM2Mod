@@ -1,6 +1,6 @@
-"""Ops of extra specs on top of builds/card-looks-4.json: does each expect match, and does a pinned spec own the bytes.
+"""Ops of extra specs on top of data/builds/card-looks-4.json: does each expect match, and does a pinned spec own the bytes.
 
-    uv run python experiments/2026-11-18-log-menu/scripts/overlap.py patches/log-core.json patches/log-probes.json
+    uv run python experiments/2026-11-18-log-menu/scripts/overlap.py data/specs/log-core.json data/specs/log-probes.json
 """
 import json, sys
 from pathlib import Path
@@ -11,7 +11,7 @@ from epm2mod.container import parse
 root = Path.cwd()
 paths = RepoPaths(root)
 stock = read_stock(paths)
-build = json.load(open('builds/card-looks-4.json'))
+build = json.load(open('data/builds/card-looks-4.json'))
 specs = [load_spec(Path(s)) for s in build['specs']]
 c = parse(stock)
 pay = [bytearray(b.payload) for b in c.blocks]

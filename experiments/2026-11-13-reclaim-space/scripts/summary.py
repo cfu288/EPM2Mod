@@ -14,7 +14,7 @@ BLOB = {0x7F019206}
 
 def patched():
     out = []
-    for pat in ("patches/*.json", "patches/*.json", "experiments/*/patches/*.json", "emulator/specs/*.json"):
+    for pat in ("data/specs/*.json", "data/specs/*.json", "experiments/*/patches/*.json", "emulator/specs/*.json"):
         for f in glob.glob(os.path.join(ROOT, pat)):
             for op in json.load(open(f)).get("ops", []):
                 if op.get("type") == "bytes" and op.get("block") == 0:

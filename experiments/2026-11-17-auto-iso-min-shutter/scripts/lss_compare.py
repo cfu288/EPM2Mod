@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Differential test: the E-PM2 with patches/lss-core.json against the PEN-F 3.1's own exposure code.
+"""Differential test: the E-PM2 with data/specs/lss-core.json against the PEN-F 3.1's own exposure code.
 
     uv run python experiments/2026-11-17-auto-iso-min-shutter/scripts/lss_compare.py PENF_BLOCK0 [--show N]
 
@@ -47,7 +47,7 @@ def main():
     a = ap.parse_args()
     R = list(rows(a.quick))
     tmp = "/dev/shm/lss-core.block0.bin"
-    open(tmp, "wb").write(patchblock.patched_block0([os.path.join(ROOT, "patches", "lss-core.json")])[1])
+    open(tmp, "wb").write(patchblock.patched_block0([os.path.join(ROOT, "data", "specs", "lss-core.json")])[1])
     with omemu.Emu() as e:
         e.load(omemu.check_stock())
         stock = [expcal.run(e, r)[1] for r in R]

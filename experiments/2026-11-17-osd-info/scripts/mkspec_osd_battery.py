@@ -1,6 +1,6 @@
 """Write the patch spec osd-battery: the battery charge as a percentage on the live-view information screen.
 
-Research code. The spec is a delta on the pinned build builds/films-12d.json: every `expect` is a byte string of
+Research code. The spec is a delta on the pinned build data/builds/films-12d.json: every `expect` is a byte string of
 that build (all sites hold stock bytes, or bytes of the listed free area).
 
 What the spec does (NOTES.md in this folder has the evidence):
@@ -19,7 +19,7 @@ import json, os, re, struct, subprocess, sys
 BASE = 0x7E421020
 STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
 STOCK_SHA = "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300"
-PINNED = "builds/films-12d.json"
+PINNED = "data/builds/films-12d.json"
 PINNED_SHA = "2cdd18e7004821b2e443ec4f08db06ab9a0d4f0f700ab53db8c4bbc1dad93e32"
 BIN = os.path.join(os.path.abspath(__file__).split("/experiments/")[0], "build", "toolchain", "bin")
 

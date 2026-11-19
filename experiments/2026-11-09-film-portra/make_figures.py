@@ -1,4 +1,4 @@
-"""Figures for README.md, from the camera readings in out/mock/ and the fits in looks/fits/ (top of the repository) (NOTES §45-46).
+"""Figures for README.md, from the camera readings in out/mock/ and the fits in data/films/fits/ (top of the repository) (NOTES §45-46).
    ../../.venv/bin/python -I make_figures.py        -> figures/*.png"""
 import os, sys
 sys.argv = ["x"]; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

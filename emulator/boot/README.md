@@ -16,13 +16,13 @@ emulator/setup.sh          # initialises emulator/om-emu at the pinned commit
 ```
 
 Node 26 or newer (`tools/setup.sh`; override: `OM_EMU_NODE`). No firmware is in the repository: an
-IMAGE argument is `stock`, `builds/NAME.json` (its file `build/NAME.BIN`) or a `.BIN` file.
+IMAGE argument is `stock`, `data/builds/NAME.json` (its file `build/NAME.BIN`) or a `.BIN` file.
 
 ## The two checks
 
 ```sh
-emulator/boot-test builds/NAME.json
-emulator/update-path-test builds/NAME.json
+emulator/boot-test data/builds/NAME.json
+emulator/update-path-test data/builds/NAME.json
 ```
 
 Exit status of both: **0** pass, **1** fail (one line says why, then the lines that differ), **2** wrong
@@ -72,9 +72,9 @@ ERASE, MAGNIFY, UP, DOWN, LEFT, RIGHT, CUSTOM1, CUSTOM2, POWER, S1, S2.
 Example, the Peaking list of the pinned build:
 
 ```sh
-emulator/mkstate builds/peaking-colours.json build/emu/state/peaking-colours-p.json p
+emulator/mkstate data/builds/peaking-colours.json build/emu/state/peaking-colours-p.json p
 cp build/emu/state/peaking-colours-p.json /tmp/scratch/s.json
-E101_STATE=/tmp/scratch/s.json emulator/emu-run builds/peaking-colours.json play.mjs /tmp/scratch/shots \
+E101_STATE=/tmp/scratch/s.json emulator/emu-run data/builds/peaking-colours.json play.mjs /tmp/scratch/shots \
   w:500 key:MENU key:RIGHT key:OK key:DOWN key:DOWN key:DOWN key:RIGHT key:RIGHT \
   key:DOWN key:DOWN key:DOWN key:DOWN key:DOWN key:DOWN key:DOWN key:RIGHT shot:peaking-list
 ```

@@ -16,7 +16,7 @@ FILM_DATA = ("seven-films", "films12cl-looks")
 
 
 def main():
-    build = json.loads((ROOT / json.loads((ROOT / "pinned-build.json").read_text())["build"]).read_text())
+    build = json.loads((ROOT / json.loads((ROOT / "data/pinned-build.json").read_text())["build"]).read_text())
     bits = []
     for spec in build["specs"]:
         if Path(spec).stem.startswith(FILM_DATA):

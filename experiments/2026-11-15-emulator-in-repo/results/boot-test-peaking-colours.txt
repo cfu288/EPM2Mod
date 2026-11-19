@@ -1,3 +1,3 @@
-$ emulator/boot-test builds/peaking-colours.json --out /tmp/scratch/boot-pinned
-boot-test: PASS: builds/peaking-colours.json boots as stock does (2000 ms of lab time; lines with allowed differences: line 1, line 40)
+$ emulator/boot-test data/builds/peaking-colours.json --out /tmp/scratch/boot-pinned
+boot-test: PASS: data/builds/peaking-colours.json boots as stock does (2000 ms of lab time; lines with allowed differences: line 1, line 40)
 exit status 0 (expected 0)

@@ -2,7 +2,7 @@
 """Run the E-PM2 still-exposure routine exp_cal_still (0x7E693D00) in the function harness.
 
     python3 experiments/2026-11-17-auto-iso-min-shutter/scripts/expcal.py            # the tables of NOTES.md
-    python3 .../expcal.py --patch patches/SPEC.json                                  # the same on a patched block 0
+    python3 .../expcal.py --patch data/specs/SPEC.json                                  # the same on a patched block 0
     python3 .../expcal.py --row mode=3 focal=17 slow=0x800 bv=0x200 -v                # one row, all fields
 
 The routine runs as stock code. Stand-ins (stubs) answer the calls that leave the exp module:

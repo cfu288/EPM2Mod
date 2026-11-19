@@ -5,7 +5,7 @@
 The log files are made here, byte by byte, as the firmware's flush task writes
 them. ``SessionTests`` has the patterns of the first log from a camera
 (``experiments/2026-11-15-log/evaluation-1.md``). The last tests read the
-repository's own dictionaries in ``logs/``.
+repository's own dictionaries in ``data/logdict/``.
 """
 
 from __future__ import annotations
@@ -753,7 +753,7 @@ class OlderBuildTests(unittest.TestCase):
 
 def repository_words() -> tuple[eventlog.Dictionary, dict[str, int]]:
     """Return the repository's dictionary and its event ids by name."""
-    raw = json.loads((ROOT / "logs" / "events.json").read_text(encoding="utf-8"))
+    raw = json.loads((ROOT / "data" / "logdict" / "events.json").read_text(encoding="utf-8"))
     words = eventlog.load_dictionary(raw)
     return words, {event.name: number for number, event in words.events.items()}
 
@@ -959,14 +959,14 @@ class CommandTests(unittest.TestCase):
             self.assertIn("events: boot 1, tick 1", out.splitlines())
 
     def test_the_repository_dictionaries(self) -> None:
-        raw = json.loads((ROOT / "logs" / "events.json").read_text(encoding="utf-8"))
+        raw = json.loads((ROOT / "data" / "logdict" / "events.json").read_text(encoding="utf-8"))
         words = eventlog.load_dictionary(raw)
         names = {event.name for event in words.events.values()}
         self.assertIn(eventlog.BOOT_EVENT, names)
         self.assertIn(eventlog.FLUSH_EVENT, names)
         # the dictionary of a build that was flashed is kept under its build id
         known = {words.build_id.hex()}
-        for path in sorted((ROOT / "logs").glob("events-*.json")):
+        for path in sorted((ROOT / "data" / "logdict").glob("events-*.json")):
             kept = eventlog.load_dictionary(
                 json.loads(path.read_text(encoding="utf-8")), inherit=words
             )
@@ -975,7 +975,7 @@ class CommandTests(unittest.TestCase):
         # the two patch specs were generated from one of these dictionaries
         for name in ("log-core", "log-probes"):
             spec = json.loads(
-                (ROOT / "patches" / f"{name}.json").read_text(encoding="utf-8")
+                (ROOT / "data" / "specs" / f"{name}.json").read_text(encoding="utf-8")
             )
             self.assertIn(spec["_build_id"], known, name)
         # each id range belongs to one feature
@@ -985,7 +985,7 @@ class CommandTests(unittest.TestCase):
             else:
                 self.assertGreaterEqual(event["id"], 256, event["name"])
         # the film slots of the dictionary are entries of the film list
-        films = json.loads((ROOT / "looks" / "films.json").read_text(encoding="utf-8"))
+        films = json.loads((ROOT / "data" / "films" / "films.json").read_text(encoding="utf-8"))
         entries = {film["entry"] for film in films["films"]}
         self.assertEqual(set(words.film_entries.values()), entries)
         named = eventlog.name_films(words, films)
@@ -994,7 +994,7 @@ class CommandTests(unittest.TestCase):
     def test_log_reads_a_file_of_the_flashed_build(self) -> None:
         # The build that was on the camera on 2026-11-15 has the build id
         # d1ddd46b4dac2414. Its boot argument has the old name. The command
-        # finds its dictionary in logs/ without an option.
+        # finds its dictionary in data/logdict/ without an option.
         flashed = bytes.fromhex("d1ddd46b4dac2414")
         with tempfile.TemporaryDirectory() as folder:
             log = Path(folder, "EPM2LOG.BIN")

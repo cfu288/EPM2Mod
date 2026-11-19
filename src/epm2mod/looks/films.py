@@ -1,4 +1,4 @@
-"""The film list: ``looks/films.json``."""
+"""The film list: ``data/films/films.json``."""
 
 from __future__ import annotations
 
@@ -65,7 +65,7 @@ class Film:
 
 @dataclass(frozen=True)
 class FilmList:
-    """The content of ``looks/films.json``.
+    """The content of ``data/films/films.json``.
 
     Attributes:
         films: the films: one per film slot, in menu order.
@@ -210,7 +210,7 @@ def specs_with_other_inputs(paths: RepoPaths) -> list[str]:
 
 @dataclass(frozen=True)
 class MoreFilmList:
-    """The content of ``looks/more-films.json``: the films beyond the first seven.
+    """The content of ``data/films/more-films.json``: the films beyond the first seven.
 
     Attributes:
         films: the films: one per extra slot, in menu order.
@@ -313,7 +313,7 @@ def load_more_films(paths: RepoPaths) -> MoreFilmList:
 
 
 def more_inputs_digest(paths: RepoPaths, film_list: MoreFilmList) -> str:
-    """Return one SHA-256 over ``looks/more-films.json`` and its fit files.
+    """Return one SHA-256 over ``data/films/more-films.json`` and its fit files.
 
     Raises:
         BuildError: if a fit file cannot be read.
@@ -327,7 +327,7 @@ def more_inputs_digest(paths: RepoPaths, film_list: MoreFilmList) -> str:
 
 @dataclass(frozen=True)
 class BwFilmList:
-    """The content of ``looks/films-12-bw.json``.
+    """The content of ``data/films/films-12-bw.json``.
 
     The list is a variant of ``MoreFilmList``. The entry of the
     black-and-white slot holds a black-and-white film and keeps its stock
@@ -434,7 +434,7 @@ def load_bw_films(paths: RepoPaths) -> BwFilmList:
 def bw_inputs_digest(paths: RepoPaths, film_list: BwFilmList) -> str:
     """Return one SHA-256 over the data of the list with a black-and-white film.
 
-    The data: ``looks/films-12-bw.json``, the fit of its film, the list of the
+    The data: ``data/films/films-12-bw.json``, the fit of its film, the list of the
     films beyond the first seven (its labels name the film that moves), and
     the fits of the refits.
 

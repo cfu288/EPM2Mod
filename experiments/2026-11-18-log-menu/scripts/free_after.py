@@ -1,12 +1,12 @@
-"""Free bytes left in each area of docs/reference/code-space-map.tsv after builds/card-looks-4.json and the specs given.
+"""Free bytes left in each area of docs/reference/code-space-map.tsv after data/builds/card-looks-4.json and the specs given.
 
-    uv run python experiments/2026-11-18-log-menu/scripts/free_after.py patches/log-core.json patches/log-probes.json
+    uv run python experiments/2026-11-18-log-menu/scripts/free_after.py data/specs/log-core.json data/specs/log-probes.json
 """
 import csv, json, sys
 from pathlib import Path
 from epm2mod.spec import load_spec, BytesOp
 BASE = 0x7E421020
-specs = json.load(open('builds/card-looks-4.json'))['specs'] + sys.argv[1:]
+specs = json.load(open('data/builds/card-looks-4.json'))['specs'] + sys.argv[1:]
 used = set()
 for s in specs:
     for op in load_spec(Path(s)).ops:

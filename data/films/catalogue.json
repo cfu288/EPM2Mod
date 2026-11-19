@@ -1,0 +1,202 @@
+{
+ "films": [
+  {
+   "id": "portra-400",
+   "name": "Portra 400",
+   "film": "Kodak Portra 400",
+   "kind": "Colour negative",
+   "medium": "negative, on Kodak Portra Endura paper",
+   "fit": "data/films/fits/portra.npz",
+   "note": "camera-corrected"
+  },
+  {
+   "id": "ektachrome",
+   "name": "Ektachrome",
+   "film": "Kodak Ektachrome 100",
+   "kind": "Slide",
+   "medium": "slide",
+   "fit": "data/films/fits/ektachrome.npz",
+   "note": "camera-corrected"
+  },
+  {
+   "id": "pro-400h",
+   "name": "Pro 400H",
+   "film": "Fujifilm Pro 400H",
+   "kind": "Colour negative",
+   "medium": "negative, on Fuji Crystal Archive paper",
+   "fit": "data/films/fits/pro400h.npz",
+   "note": "camera-corrected"
+  },
+  {
+   "id": "kodachrome",
+   "name": "Kodachrome",
+   "film": "Kodak Kodachrome 64",
+   "kind": "Slide",
+   "medium": "slide",
+   "fit": "data/films/fits/kodachrome64.npz",
+   "note": "camera-corrected"
+  },
+  {
+   "id": "double-x",
+   "name": "Double-X",
+   "film": "Kodak Double-X 5222",
+   "kind": "Black and white",
+   "medium": "black-and-white negative, on Kodak 2302 print film",
+   "fit": "data/films/fits/doublex3.npz",
+   "note": "no grain"
+  },
+  {
+   "id": "vision3-250d",
+   "name": "Vis 250D",
+   "film": "Kodak Vision3 250D",
+   "kind": "Cinema, daylight",
+   "medium": "cinema negative, on Kodak 2383 print film",
+   "fit": "data/films/fits/vision3250d.npz",
+   "note": "camera-corrected"
+  },
+  {
+   "id": "velvia",
+   "name": "Velvia",
+   "film": "Fujifilm Velvia 100",
+   "kind": "Slide",
+   "medium": "slide",
+   "fit": "data/films/fits/velvia100.npz",
+   "note": "camera-corrected"
+  },
+  {
+   "id": "superia-400",
+   "name": "Superia 400",
+   "film": "Fujifilm Superia X-tra 400",
+   "kind": "Colour negative",
+   "medium": "negative, on Fuji Crystal Archive paper",
+   "fit": "data/films/fits/superia400.npz",
+   "note": "camera-corrected"
+  },
+  {
+   "id": "provia",
+   "name": "Provia",
+   "film": "Fujifilm Provia 100F",
+   "kind": "Slide",
+   "medium": "slide",
+   "fit": "data/films/fits/provia100f.npz",
+   "note": ""
+  },
+  {
+   "id": "portra-160",
+   "name": "Portra 160",
+   "film": "Kodak Portra 160",
+   "kind": "Colour negative",
+   "medium": "negative, on Kodak Portra Endura paper",
+   "fit": "data/films/fits/portra160.npz",
+   "note": ""
+  },
+  {
+   "id": "gold-200",
+   "name": "Gold 200",
+   "film": "Kodak Gold 200",
+   "kind": "Colour negative",
+   "medium": "negative, on Fuji Crystal Archive paper",
+   "fit": "data/films/fits/gold200.npz",
+   "note": ""
+  },
+  {
+   "id": "vision3-500t",
+   "name": "Vis 500T",
+   "film": "Kodak Vision3 500T",
+   "kind": "Cinema, tungsten light",
+   "medium": "cinema negative, on Kodak 2383 print film",
+   "fit": "data/films/fits/vision3500t.npz",
+   "note": ""
+  },
+  {
+   "id": "ektar-100",
+   "name": "Ektar 100",
+   "film": "Kodak Ektar 100",
+   "kind": "Colour negative",
+   "medium": "negative, on Kodak Portra Endura paper",
+   "fit": "data/films/fits/ektar100.npz",
+   "note": ""
+  },
+  {
+   "id": "portra-800",
+   "name": "Portra 800",
+   "film": "Kodak Portra 800",
+   "kind": "Colour negative",
+   "medium": "negative, on Kodak Portra Endura paper",
+   "fit": "data/films/fits/portra800.npz",
+   "note": ""
+  },
+  {
+   "id": "portra-800-push1",
+   "name": "Portra 800 +1",
+   "film": "Kodak Portra 800, pushed 1 stop",
+   "kind": "Colour negative, approximate colours",
+   "medium": "negative, on Kodak Portra Endura paper",
+   "fit": "data/films/fits/portra800push1.npz",
+   "note": "less accurate than the others"
+  },
+  {
+   "id": "portra-800-push2",
+   "name": "Portra 800 +2",
+   "film": "Kodak Portra 800, pushed 2 stops",
+   "kind": "Colour negative, approximate colours",
+   "medium": "negative, on Kodak Portra Endura paper",
+   "fit": "data/films/fits/portra800push2.npz",
+   "note": "less accurate than the others"
+  },
+  {
+   "id": "tri-x",
+   "name": "Tri-X",
+   "film": "Kodak Tri-X Reversal 7266",
+   "kind": "Black and white",
+   "medium": "black-and-white reversal film",
+   "fit": "data/films/fits/trix.npz",
+   "note": ""
+  },
+  {
+   "id": "c200",
+   "name": "C200",
+   "film": "Fujifilm C200",
+   "kind": "Colour negative",
+   "medium": "negative, on Fuji Crystal Archive paper",
+   "fit": "data/films/fits/c200.npz",
+   "note": ""
+  },
+  {
+   "id": "ultramax-400",
+   "name": "UltraMax 400",
+   "film": "Kodak UltraMax 400",
+   "kind": "Colour negative",
+   "medium": "negative, on Kodak Portra Endura paper",
+   "fit": "data/films/fits/ultramax400.npz",
+   "note": ""
+  },
+  {
+   "id": "verita-200d",
+   "name": "Verita 200D",
+   "film": "Kodak Verita 200D",
+   "kind": "Cinema, daylight",
+   "medium": "cinema negative, on Kodak 2383 print film",
+   "fit": "data/films/fits/verita200d.npz",
+   "note": ""
+  },
+  {
+   "id": "vision3-50d",
+   "name": "Vis 50D",
+   "film": "Kodak Vision3 50D",
+   "kind": "Cinema, daylight",
+   "medium": "cinema negative, on Kodak 2383 print film",
+   "fit": "data/films/fits/vision350d.npz",
+   "note": ""
+  },
+  {
+   "id": "vision3-200t",
+   "name": "Vis 200T",
+   "film": "Kodak Vision3 200T",
+   "kind": "Cinema, tungsten light",
+   "medium": "cinema negative, on Kodak 2383 print film",
+   "fit": "data/films/fits/vision3200t.npz",
+   "note": ""
+  }
+ ]
+}

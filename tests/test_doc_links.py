@@ -39,7 +39,7 @@ class DocLinksTests(unittest.TestCase):
 
     def test_an_edit_of_a_linked_file_names_the_others_once_per_session(self) -> None:
         session = f"test-{uuid.uuid4().hex}"
-        event = {"session_id": session, "tool_name": "Edit", "tool_input": {"file_path": str(ROOT / "looks/catalogue.json")}}
+        event = {"session_id": session, "tool_name": "Edit", "tool_input": {"file_path": str(ROOT / "data/films/catalogue.json")}}
         first = json.loads(run_hook(event))
         context = first["hookSpecificOutput"]["additionalContext"]
         self.assertEqual(first["hookSpecificOutput"]["hookEventName"], "PostToolUse")

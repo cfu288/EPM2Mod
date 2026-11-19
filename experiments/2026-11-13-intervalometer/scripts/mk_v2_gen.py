@@ -3,7 +3,7 @@ def rep(a,b):
     global s
     assert s.count(a)>=1, a[:70]; s=s.replace(a,b,1)
 rep("# mkspec_awake.py (= mkspec_insert.py + awake_part.py): build","# mkspec_v2.py (mkspec_insert.py + awake_part.py, relocated to the segment-2 padding, + guard_part.py): build")
-rep("patches/interval-timelapse-insert-awake.json","patches/interval-timelapse-v2.json")
+rep("data/specs/interval-timelapse-insert-awake.json","data/specs/interval-timelapse-v2.json")
 rep('"name":"interval-timelapse-insert-awake"','"name":"interval-timelapse-v2"')
 rep("open(SC+'insert_desc.txt').read().strip()+' '+open(SC+'awake_desc.txt').read().strip()","open(SC+'v2_desc.txt').read().strip()")
 rep("""FREE_LO, FREE_HI = 0x7F033C00, 0x7F034000

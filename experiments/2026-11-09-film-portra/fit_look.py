@@ -15,11 +15,11 @@ and writes them as Cross Process I's 24 base tables (4 variants x 2 x 3 channels
 curve to the identity and its saturation gain pair. Slot "portrait" fits one shared look curve.
 
 Without --lut: validates the model on shoot 1. With --lut FILE.cube: fits, compares with every
-menu setting the model covers, writes patches/<name>.json.
+menu setting the model covers, writes data/specs/<name>.json.
 
     ../../.venv/bin/python -I fit_look.py
     ../../.venv/bin/python -I fit_look.py --lut portra.cube --slot crossprocess --name film-portra-xp
-    ../../.venv/bin/python -I fit_look.py --probe          # writes patches/curve-probe-2.json
+    ../../.venv/bin/python -I fit_look.py --probe          # writes data/specs/curve-probe-2.json
 """
 import argparse
 import importlib.util
@@ -300,7 +300,7 @@ def write_spec(name, desc, ops):
     json.dump({"name": name, "description": desc, "status": "built, NOT camera-tested",
                "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
                "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300", "ops": ops},
-              open(os.path.join(ROOT, "patches", name + ".json"), "w"), indent=1)
+              open(os.path.join(ROOT, "data", "specs", name + ".json"), "w"), indent=1)
 
 
 def main():
@@ -321,7 +321,7 @@ def main():
         write_spec("curve-probe-2", "Verification of the per-channel base-gamma tables (NOTES §14). Cross Process I := the default "
                    "(Natural) base gammas in all three channels, identity look curve, saturation gain 338 (the Saturation +2 "
                    "step). Prediction: Cross Process I renders exactly like Natural with Saturation +2.", xp_ops(ident, 338))
-        lines.append("wrote patches/curve-probe-2.json")
+        lines.append("wrote data/specs/curve-probe-2.json")
     if a.lut:
         cube, size = load_cube(a.lut)
         lin, w, kind = samples()
@@ -360,7 +360,7 @@ def main():
                 new = look if la == PORTRAIT[2] else np.interp(np.interp(look, old0, X), X, table(la))
                 ops.append(op(la, pack(new)))
             write_spec(a.name, f"Portrait look curves (Contrast -2..+2) fitted to {os.path.basename(a.lut)}; tone only (model {MODEL}).", ops)
-        lines.append(f"wrote patches/{a.name}.json")
+        lines.append(f"wrote data/specs/{a.name}.json")
     open(os.path.join(HERE, "out", f"fit_report_{a.name}.txt" if a.lut else "fit_report.txt"), "w").write("\n".join(lines) + "\n")
     print("\n".join(lines))
 

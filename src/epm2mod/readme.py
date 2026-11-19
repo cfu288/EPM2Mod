@@ -84,7 +84,7 @@ def builds_block(paths: RepoPaths) -> str:
 def films_block(paths: RepoPaths) -> str:
     """Return the table of every film a look file can hold.
 
-    The firmware keeps Olympus's art filters; the films reach the camera in a look file (``looks/film-records.json``).
+    The firmware keeps Olympus's art filters; the films reach the camera in a look file (``data/films/film-records.json``).
     The command-line name is what ``epm2mod install --film ART1=NAME`` and ``epm2mod films set --film ART1=NAME``
     take.
     """
@@ -230,7 +230,7 @@ DOCUMENTS = (
     "README.md",
     "docs/user/install.md",
     "docs/guide/film-looks.md",
-    "builds/README.md",
+    "data/builds/README.md",
 )
 #: Text that separates the documents when they are checked as one.
 _JOIN = "\n\x00next document\x00\n"

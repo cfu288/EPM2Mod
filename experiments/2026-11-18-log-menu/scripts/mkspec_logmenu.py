@@ -1,5 +1,5 @@
-"""Write patches/log-menu.json and builds/log-menu.json: the structured log in the release firmware, switched by the
-Custom Menu row Debug Log (setting 447; patches/custom-menu-rows-2.json). design.md in this folder.
+"""Write data/specs/log-menu.json and data/builds/log-menu.json: the structured log in the release firmware, switched by the
+Custom Menu row Debug Log (setting 447; data/specs/custom-menu-rows-2.json). design.md in this folder.
 
     uv run python experiments/2026-11-18-log-menu/scripts/mkspec_logmenu.py WORKDIR [LISTING.txt]
     WORKDIR: a scratch folder outside the repository
@@ -18,7 +18,7 @@ log-peaking-time, log-peaking-guard), assembled again in one spec on the pinned 
   * a probe at card-looks' T_END: card_task.
   * placement: the kernel routines of log-core, log-probes and log-peaking-time in one run 0x7E4C9514-0x7E4C9800;
     T_GUI, T_GRD, T_CTASK and the texts in 0x7EBF2600-0x7EBF2890 (custom-menu-rows' child list was there).
-Every expect is a byte string of builds/log-menu.json's specs before this one.
+Every expect is a byte string of data/builds/log-menu.json's specs before this one.
 """
 
 import hashlib
@@ -37,7 +37,7 @@ import mkspec_log as L  # noqa: E402
 from epm2mod.container import parse  # noqa: E402
 from epm2mod.spec import BytesOp, load_spec  # noqa: E402
 
-STOCK_FILMS = "--stock-films" in sys.argv   # the log for builds/stock-films.json (experiments/2026-11-18-stock-filters)
+STOCK_FILMS = "--stock-films" in sys.argv   # the log for data/builds/stock-films.json (experiments/2026-11-18-stock-filters)
 if STOCK_FILMS:
     sys.argv.remove("--stock-films")
 SPEC = "log-menu-2" if STOCK_FILMS else "log-menu"
@@ -226,12 +226,12 @@ def u16(text):
 
 
 def base_image(work):
-    """Block 0 of builds/log-menu.json without this spec, written to WORK/block0_0100.bin."""
+    """Block 0 of data/builds/log-menu.json without this spec, written to WORK/block0_0100.bin."""
     if STOCK_FILMS:
-        specs = [s for s in json.load(open(os.path.join(ROOT, "builds", "stock-films.json")))["specs"]
-                 if not s.startswith("patches/log-menu")]
+        specs = [s for s in json.load(open(os.path.join(ROOT, "data", "builds", "stock-films.json")))["specs"]
+                 if not s.startswith("data/specs/log-menu")]
     else:
-        specs = json.load(open(os.path.join(ROOT, "builds", "card-looks-4.json")))["specs"]
+        specs = json.load(open(os.path.join(ROOT, "data", "builds", "card-looks-4.json")))["specs"]
         specs = [s.replace("custom-menu-rows.json", "custom-menu-rows-2.json") for s in specs]
     blk = bytearray(parse(open(os.path.join(ROOT, STOCK), "rb").read()).blocks[0].payload)
     for s in specs:
@@ -251,7 +251,7 @@ def main():
     specs, blk, blk_path = base_image(work)
     stock = parse(open(os.path.join(ROOT, STOCK), "rb").read()).blocks[0].payload
     get = lambda a, n: blk[a - BASE:a - BASE + n]
-    d = json.load(open(os.path.join(ROOT, "logs/events.json")))
+    d = json.load(open(os.path.join(ROOT, "data/logdict/events.json")))
     ev = {e["name"]: e["id"] for e in d["events"]}
     bid = L.build_id(d["events"])
     cl = json.load(open(os.path.join(ROOT, CL_SYMS)))
@@ -351,7 +351,7 @@ def main():
         "name": SPEC,
         "description": (
             "The structured log in the release firmware, switched by the Custom Menu row Debug Log (setting 447, "
-            "patches/custom-menu-rows-2.json; default Off). log_put / log_chg / log_cnt write 16-byte records into "
+            "data/specs/custom-menu-rows-2.json; default Off). log_put / log_chg / log_cnt write 16-byte records into "
             "one RAM ring per CPU (0x7E4F9000-0x7E4FD2C0) and return at once when the row is Off: from the first GUI "
             "state of a session the log does nothing more with Off, and only the start-up records are in RAM. With "
             "On, the flush task (the dormant task USRTEST_B) appends the records to C:\\\\EPM2LOG.BIN when the GUI "
@@ -360,26 +360,26 @@ def main():
             "picture mode, level gauge, interval shooting, film looks, shooting callbacks), pk_stats, pk_guard and "
             "card_task (each run of card-looks' task). The code of log-core, log-probes, log-peaking-time and "
             "log-peaking-guard, placed again; the hook of the GUI state setter jumps to this T_GUI, which ends with "
-            "a jump to card-looks' T_GUI. The event ids are in logs/events.json (build id %s). See "
+            "a jump to card-looks' T_GUI. The event ids are in data/logdict/events.json (build id %s). See "
             "experiments/2026-11-18-log-menu/design.md and docs/reference/logging.md." % bid.hex()),
         "base": STOCK, "base_sha256": stock_sha,
         "status": "candidate: emulator-checked, not flashed",
         "_build_id": bid.hex(),
         "_ram": "the log's rings and state 0x7E4F9000-0x7E4FD2C0 (uncached alias); LOGON is PST+2",
         "ops": ops,
-    }, open(os.path.join(ROOT, "patches", SPEC + ".json"), "w"), indent=1)
-    open(os.path.join(ROOT, "patches", SPEC + ".json"), "a").write("\n")
-    pinned = json.load(open(os.path.join(ROOT, "builds", "stock-films.json" if STOCK_FILMS else "card-looks-4.json")))
+    }, open(os.path.join(ROOT, "data", "specs", SPEC + ".json"), "w"), indent=1)
+    open(os.path.join(ROOT, "data", "specs", SPEC + ".json"), "a").write("\n")
+    pinned = json.load(open(os.path.join(ROOT, "data", "builds", "stock-films.json" if STOCK_FILMS else "card-looks-4.json")))
     if STOCK_FILMS:
         pinned["what"] = pinned["what"].split("; a Debug Log row")[0]
     build = {
         "what": pinned["what"] + "; a Debug Log row in Custom Menu J (Off by default) that writes EPM2LOG.BIN to "
                 "the card for bug reports",
-        "specs": specs + ["patches/%s.json" % SPEC],
+        "specs": specs + ["data/specs/%s.json" % SPEC],
     }
-    json.dump(build, open(os.path.join(ROOT, "builds", BUILD + ".json"), "w"), indent=1)
-    open(os.path.join(ROOT, "builds", BUILD + ".json"), "a").write("\n")
-    print("wrote patches/%s.json (%d ops) and builds/%s.json; build id %s" % (SPEC, len(ops), BUILD, bid.hex()))
+    json.dump(build, open(os.path.join(ROOT, "data", "builds", BUILD + ".json"), "w"), indent=1)
+    open(os.path.join(ROOT, "data", "builds", BUILD + ".json"), "a").write("\n")
+    print("wrote data/specs/%s.json (%d ops) and data/builds/%s.json; build id %s" % (SPEC, len(ops), BUILD, bid.hex()))
     print("\n".join(report))
     if listing:
         secs = sum((["-j", n] for n in list(AREAS) + [".h" + n for n in hooks]), [])

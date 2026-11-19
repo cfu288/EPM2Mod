@@ -2,7 +2,7 @@
 
     .venv/bin/python experiments/2026-11-16-doublex/scripts/stage_check_bw.py IMAGE.BIN [--films12 build/films-12.BIN] [--refit N]
 
---refit N: the image has the Nth later fit of looks/films-12-bw.json (its grain table, in a spare table).
+--refit N: the image has the Nth later fit of data/films/films-12-bw.json (its grain table, in a spare table).
 
 1. Runs experiments/2026-11-16-films-max/scripts/stage_check.py on IMAGE (with --base, the twelve-film image). That
    check knows no black-and-white film: it must report one failure only, "value 104: a stock filter that differs

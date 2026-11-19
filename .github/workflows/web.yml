@@ -4,9 +4,9 @@ name: web
 on:
   push:
     branches: [main]
-    paths: ['web/**', 'looks/film-records.json', '.github/workflows/web.yml', '.nvmrc']
+    paths: ['web/**', 'data/films/film-records.json', '.github/workflows/web.yml', '.nvmrc']
   pull_request:
-    paths: ['web/**', 'looks/film-records.json', '.github/workflows/web.yml', '.nvmrc']
+    paths: ['web/**', 'data/films/film-records.json', '.github/workflows/web.yml', '.nvmrc']
   workflow_dispatch:
 
 permissions:

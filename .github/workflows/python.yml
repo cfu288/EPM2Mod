@@ -28,7 +28,7 @@ jobs:
       - run: uv run mypy
       - run: uv run python -m unittest discover -s tests
       # a tested build: make compares the result with the recorded sha256 and fails on any difference
-      - run: uv run epm2mod make "$(uv run python -c 'import json, pathlib; print(pathlib.Path(json.load(open("pinned-build.json"))["build"]).stem)')"
+      - run: uv run epm2mod make "$(uv run python -c 'import json, pathlib; print(pathlib.Path(json.load(open("data/pinned-build.json"))["build"]).stem)')"
 
   # the specs that gen/ makes must be what its generators make from committed inputs
   generators:
@@ -52,4 +52,4 @@ jobs:
       - run: gen/run.sh --check
       # the free-space check of the pinned build's specs (make skips it for a camera-tested build); it needs the map
       - run: uv run python tools/fwmap.py build
-      - run: uv run python tools/freespace.py check $(uv run python -c 'import json; print(" ".join(json.load(open(json.load(open("pinned-build.json"))["build"]))["specs"]))')
+      - run: uv run python tools/freespace.py check $(uv run python -c 'import json; print(" ".join(json.load(open(json.load(open("data/pinned-build.json"))["build"]))["specs"]))')

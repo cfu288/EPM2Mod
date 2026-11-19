@@ -1,7 +1,7 @@
 #!/bin/zsh
 # shotdiff.sh IMAGE_A IMAGE_B OUTDIR STEP...   (the pre-flash check of a menu patch)
 # Runs the same play.mjs key script on two images and reports which screenshots differ (cmp per PNG).
-# IMAGE: stock, builds/NAME.json, a .BIN file or a folder of unpacked blocks.
+# IMAGE: stock, data/builds/NAME.json, a .BIN file or a folder of unpacked blocks.
 # Each image starts from a copy of its settings state EMU_STATE/NAME-MODE.json (MODE from SHOTDIFF_MODE, default p;
 # made with emulator/mkstate when missing), or with SHOTDIFF_STATE=<file> from that file for both,
 # or with SHOTDIFF_STATE=none from an empty settings store.

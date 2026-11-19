@@ -51,8 +51,11 @@ def data_files(paths: RepoPaths, version: str) -> list[tuple[str, bytes]]:
     description = pinned_description(paths)
     sources = [
         (ROOT_MARKER, paths.pinned),
-        (f"builds/{description.name}.json", paths.builds / f"{description.name}.json"),
-        ("looks/film-records.json", paths.film_records),
+        (
+            f"data/builds/{description.name}.json",
+            paths.builds / f"{description.name}.json",
+        ),
+        ("data/films/film-records.json", paths.film_records),
     ]
     sources += [(spec, paths.resolve(spec)) for spec in description.specs]
     missing = [str(source) for _, source in sources if not source.is_file()]

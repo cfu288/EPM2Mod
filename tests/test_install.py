@@ -64,7 +64,7 @@ from epm2mod.paths import ROOT_ENV, RepoPaths  # noqa: E402
 
 FIRMWARE = "DCOLYMP/E1019999.BIN"
 FILMS_OP = {**BYTE_OP, "offset": "0x20", "expect": "2021", "new": "ccdd"}
-LOADER = "patches/loader.json"
+LOADER = "data/specs/loader.json"
 
 
 class FilmRepo(TinyRepo):
@@ -73,11 +73,11 @@ class FilmRepo(TinyRepo):
     def __init__(self, folder: Path) -> None:
         super().__init__(folder)
         self.write(
-            "looks/film-records.json",
-            (ROOT / "looks" / "film-records.json").read_bytes(),
+            "data/films/film-records.json",
+            (ROOT / "data" / "films" / "film-records.json").read_bytes(),
         )
         self.write_json(LOADER, spec_json("loader", [FILMS_OP]))
-        specs = ("patches/a.json", LOADER)
+        specs = ("data/specs/a.json", LOADER)
         loaded = spec.apply_specs(
             TINY, [spec.load_spec(self.paths.resolve(name)) for name in specs]
         )
@@ -360,7 +360,7 @@ class InstallTests(CardCase):
 
     def test_the_stock_firmware_is_the_one_the_build_names(self) -> None:
         other = builds.BuildDescription(
-            "other", "x", ("patches/a.json",), stock="NOT-KNOWN.BIN"
+            "other", "x", ("data/specs/a.json",), stock="NOT-KNOWN.BIN"
         )
         with self.assertRaisesRegex(Exception, "'stock' must be one of"):
             pipeline.firmware(self.repo.paths, other)
@@ -650,7 +650,7 @@ class CommandTests(CardCase):
             ("pin", "new", "--date", "2026-11-10", "--sha256", self.repo.sha256),
             (
                 "apply",
-                str(self.repo.paths.resolve("patches/a.json")),
+                str(self.repo.paths.resolve("data/specs/a.json")),
                 "--from",
                 str(self.repo.paths.stock_file(TINY_STOCK)),
                 "-o",

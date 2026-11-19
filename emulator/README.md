@@ -27,7 +27,7 @@ The fork has a port of om-emu's lab to the E-PM2 (`MODELS.E101`, `src/fw/ports.m
 | File | What it does |
 |---|---|
 | `omemu.py` | Driver. Starts `emu/bin/debug.mjs --serve` with `OM_EMU_MODEL=E101` and speaks its JSON-lines protocol. `Emu.call()` calls a function through a real `call` instruction in scratch RAM, using the callee's register list and frame size from its call sites in the image. Stubs are breakpoints: Python sets the return registers, then the CPU returns through a `retf` that has the frame of the call that reached the stub. Each call records an exec trace, and the caller rejects code that ran outside the case's ranges. The call also checks that sp is balanced on return. |
-| `patchblock.py` | Builds a patched block 0 from `patches/*.json`-style specs, with the same base-hash and expected-byte checks as `epm2mod make` (it imports `build.apply_op` and `oetool.parse`). It prints the changed runtime ranges. Ops on other blocks are checked and reported as not emulated. |
+| `patchblock.py` | Builds a patched block 0 from `data/specs/*.json`-style specs, with the same base-hash and expected-byte checks as `epm2mod make` (it imports `build.apply_op` and `oetool.parse`). It prints the changed runtime ranges. Ops on other blocks are checked and reported as not emulated. |
 | `cases.py` | Named cases: entry, allowed code ranges, stubs, input rows, outputs, and a Python model of the expected outputs. |
 | `emurun.py` | CLI: `list`, `run CASE` (one image, checked against the model) and `diff CASE --patch SPEC…` or `--image BLOCK0` (stock against patched). Exits 1 on any mismatch, fault, stray code or unexpected change. |
 | `bootmem.py`, `scenario.py`, `osmodel.py`, `liveview.py`, `hookcheck.py` | Scenario runs; see "Scenario runs" below. |
@@ -44,8 +44,8 @@ python3 emulator/emurun.py run rec_limit
 python3 emulator/emurun.py diff rec_limit \
     --patch emulator/specs/rec-limit-3600.json
 python3 emulator/emurun.py diff curve_select \
-    --patch patches/film-portra.json --json /tmp/out.json
-python3 emulator/patchblock.py patches/film-portra-xp.json \
+    --patch data/specs/film-portra.json --json /tmp/out.json
+python3 emulator/patchblock.py data/specs/film-portra-xp.json \
     -o /tmp/xp.block0.bin
 ```
 
@@ -89,8 +89,8 @@ The two print helpers would also return at once natively, because their mask wor
 
 **Diffs:**
 - **`rec_limit` with `rec-limit-3600.json`:** 6 of 48 rows change. They are exactly the rows that stock clamps at 1740 s, all on 64 GiB of free space. Each new limit is the 4 GiB file cap, because each cap is below 3600: MOV q6 lo 1853 s, MOV q3 hi 2363 s, MOV q3 lo 2977 s, AVCHD q5 lo and q3 hi 1762 s, AVCHD q3 lo 2049 s. MOV q4 (limit 7200) does not change, and neither do the free-space-limited rows. This confirms the gains given in experiments/2026-11-08-disassembly/NOTES.md (**V**).
-- **`curve_select` with `patches/film-portra.json`:** 12 of 229 rows change. 7 are Portrait (mode 4) at contrast −3…+3. The other 5 are **art codes 9, 13, 55, 129 and 133**, which also select Portrait's Contrast 0 table 0x7E75DAF0 through the jump table 0x7E78C8E4 (**V**). So that patch changes more than Portrait. What those art codes are (scene modes?) is **I**, not traced.
-- **`curve_select` with `patches/film-portra-xp.json`:** 2 rows change, art codes 85 and 87 (Cross Process I, table 0x7E75F2F0). The patch's 24 base-gamma tables are not read by this selector, so this case does not test them.
+- **`curve_select` with `data/specs/film-portra.json`:** 12 of 229 rows change. 7 are Portrait (mode 4) at contrast −3…+3. The other 5 are **art codes 9, 13, 55, 129 and 133**, which also select Portrait's Contrast 0 table 0x7E75DAF0 through the jump table 0x7E78C8E4 (**V**). So that patch changes more than Portrait. What those art codes are (scene modes?) is **I**, not traced.
+- **`curve_select` with `data/specs/film-portra-xp.json`:** 2 rows change, art codes 85 and 87 (Cross Process I, table 0x7E75F2F0). The patch's 24 base-gamma tables are not read by this selector, so this case does not test them.
 - **`curve_select` read check:** in all three diffs, every row that changed read patched bytes, and every row that read patched bytes changed.
 
 **Side findings (V in the emulator):**

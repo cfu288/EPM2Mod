@@ -1,7 +1,7 @@
 // watch_reads.mjs: a SETUP module for emulator/boot/play.mjs. It puts read watchpoints on the stored Picture
 // Mode and ART mode code (the RAM image of the settings bank "mode") and writes every reader to WATCH_OUT (JSON):
 //   SETUP=$PWD/experiments/2026-11-16-films-max/scripts/watch_reads.mjs WATCH_OUT=/tmp/scratch/reads.json \
-//     emulator/emu-run builds/films-12.json play.mjs /tmp/scratch/shots STEP...
+//     emulator/emu-run data/builds/films-12.json play.mjs /tmp/scratch/shots STEP...
 // A record: the pc of the reading instruction and the first six code addresses on the stack (the callers: the
 // settings getter reads the byte for everybody, so the caller is what tells the readers apart).
 // The bank is at 0x60404674 (emulator/e101/boot.mjs). Offsets found by choosing entries and comparing states:

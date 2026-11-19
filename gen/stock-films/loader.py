@@ -1,4 +1,4 @@
-"""Write patches/looks-menu-4.json and patches/card-looks-5.json: the loader of film looks for the stock-filters
+"""Write data/specs/looks-menu-4.json and data/specs/card-looks-5.json: the loader of film looks for the stock-filters
 firmware (experiments/2026-11-18-stock-filters/design.md). Needs build/stock-films/layout.json (gen/stock-films/structure.py).
 
     uv run python gen/stock-films/loader.py WORKDIR [LISTING.txt]
@@ -317,7 +317,7 @@ def main():
     get = lambda a, n: stock_blk[a - BASE:a - BASE + n]
 
     # ---- looks-menu-4: Off / Load
-    old = json.load(open(os.path.join(ROOT, "patches", "looks-menu-3.json")))
+    old = json.load(open(os.path.join(ROOT, "data", "specs", "looks-menu-3.json")))
     mops = []
     for o in old["ops"]:
         a = o.get("_addr")
@@ -336,12 +336,12 @@ def main():
         mops.append(n)
     sha = hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest()
     json.dump({"name": MENU, "description": "The list, texts and status of the menu row 'Load Looks' (Custom Menu J, "
-               "added by patches/custom-menu-rows-2.json): Off / Load. As patches/looks-menu-3.json without Built-in. "
+               "added by data/specs/custom-menu-rows-2.json): Off / Load. As data/specs/looks-menu-3.json without Built-in. "
                "Its value is the dormant setting 449 (prm tag 0xD7B1); Off is 1, Load 0. When Off the row shows text "
                "1495, which the loader points at the result of the last load.",
                "base": STOCK, "base_sha256": sha, "status": "candidate: emulator-checked, not flashed", "ops": mops},
-              open(os.path.join(ROOT, "patches", MENU + ".json"), "w"), indent=1)
-    open(os.path.join(ROOT, "patches", MENU + ".json"), "a").write("\n")
+              open(os.path.join(ROOT, "data", "specs", MENU + ".json"), "w"), indent=1)
+    open(os.path.join(ROOT, "data", "specs", MENU + ".json"), "a").write("\n")
 
     # ---- the operation list (relative to a block) and the tables
     off = layout["offsets"]
@@ -471,9 +471,9 @@ def main():
                "BLOCKS": blocks}, open(os.path.join(ROOT, "build", "stock-films", "syms.json"), "w"))
     json.dump({"name": SPEC, "description": (
         "Film looks loaded from the SD card onto the stock art filters (experiments/2026-11-18-stock-filters/"
-        "design.md), with the menu row Load Looks (patches/looks-menu-4.json: Off / Load). Load reads C:\\\\EPM2LOOK.BIN, "
+        "design.md), with the menu row Load Looks (data/specs/looks-menu-4.json: Off / Load). Load reads C:\\\\EPM2LOOK.BIN, "
         "checks it as card-looks-4 does, keeps it in the EEROM bank's unused tail (store 0x%08X) and applies it: each "
-        "listed entry's tables go into its RAM block (patches/stock-films-structure.json), then each entry's switch "
+        "listed entry's tables go into its RAM block (data/specs/stock-films-structure.json), then each entry's switch "
         "list is written, its film words when the file lists it and its stock words otherwise; the Picture Mode "
         "settings 111, 509, 510 follow the stored values of the entries with a hidden value. Every start applies the "
         "stored file. The hook on the GUI state setter's trace call 0x7ECDF6E4, the task USRTEST_A. Every expect is a "
@@ -482,9 +482,9 @@ def main():
         "_ram": "the EEROM bank's unused tail: store 0x%08X, scratch 0x%08X; RAM: status, names 0x%08X-0x%08X; the "
                 "entries' blocks 0x%08X-0x%08X; 5 flag bytes in the code" % (mk.STORE, mk.SCRATCH, m3.RAM, m3.RAM + 0x800,
                                                                          blocks[0], blocks[-1] + layout["block"]),
-        "ops": out}, open(os.path.join(ROOT, "patches", SPEC + ".json"), "w"), indent=1)
-    open(os.path.join(ROOT, "patches", SPEC + ".json"), "a").write("\n")
-    print("wrote patches/%s.json (%d ops), patches/%s.json; T_GUI %#x, T_TASK %#x, T_END %#x" % (
+        "ops": out}, open(os.path.join(ROOT, "data", "specs", SPEC + ".json"), "w"), indent=1)
+    open(os.path.join(ROOT, "data", "specs", SPEC + ".json"), "a").write("\n")
+    print("wrote data/specs/%s.json (%d ops), data/specs/%s.json; T_GUI %#x, T_TASK %#x, T_END %#x" % (
         SPEC, len(out), MENU, syms["T_GUI"], syms["T_TASK"], syms["T_END"]))
     if listing:
         open(listing, "w").write(mk.run(BIN + "/mn10300-elf-objdump", "-d", *sum((["-j", k] for k in RUNS), []),

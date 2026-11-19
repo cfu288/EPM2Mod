@@ -1,8 +1,8 @@
 """Seven films in menu order (NOTES §39). SUPERSEDED for the current build by `uv run epm2mod generate`
-(src/epm2mod/looks/, data in looks/); kept as the record of how builds 1-5 were generated. Writes
-  patches/seven-structure-extra.json   what the three old film patches used to carry besides the look itself
-  patches/seven-films-<tag>.json       one fitted film per slot
-  patches/seven-labels.json            menu labels (exact strings only)
+(src/epm2mod/looks/, data in data/films/); kept as the record of how builds 1-5 were generated. Writes
+  data/specs/seven-structure-extra.json   what the three old film patches used to carry besides the look itself
+  data/specs/seven-films-<tag>.json       one fitted film per slot
+  data/specs/seven-labels.json            menu labels (exact strings only)
 Build: remap7b-code + slot3-chroma-linear + xp-adaptive-hue-off + the three above.
 Slot = menu entry; films are assigned top to bottom in the order they were added (the seven slots are
 equivalent: NOTES §38.1).      ../../.venv/bin/python -I slots/build_seven_films.py <tag>"""
@@ -52,10 +52,10 @@ extra = [op(a, ident_look) for a in (0x7E75F2F0, 0x7E75EAF0, 0x7E75E6F0)]       
 extra += [op(0x7E78C154 + 8 * i + 4, struct.pack("<I", 0x7E56B82A)) for i in (2, 11)]             # Light Tone 72 / 81 -> the three-record handler of Cross Process II
 json.dump(dict(name="seven-structure-extra", description="Structure the three first film patches carried besides their look: stock identity look table for Cross Process I, Light Tone and Pop Art I; "
                "Light Tone's gamma hash entries. For builds with remap7b-code that take their films from seven-films-*.json. NOTES §39.", ops=[o for o in extra if o["expect"] != o["new"]], **base),
-          open(os.path.join(ROOT, "patches/seven-structure-extra.json"), "w"), indent=1)
+          open(os.path.join(ROOT, "data/specs/seven-structure-extra.json"), "w"), indent=1)
 ops = []; summary = {}
 for slot, (fit, label) in FILMS.items():
-    _f = os.path.join(HERE, "..", fit); z = np.load(_f); s = SLOTS[slot]; n = len(s["tables"]) // 3   # the working fits in out/ (not in git); the published fits and the current generator: looks/ and `epm2mod generate`
+    _f = os.path.join(HERE, "..", fit); z = np.load(_f); s = SLOTS[slot]; n = len(s["tables"]) // 3   # the working fits in out/ (not in git); the published fits and the current generator: data/films/ and `epm2mod generate`
     for i, (t, d) in enumerate(s["tables"]): ops.append(op(t, pack(np.interp(tab(d), np.arange(1024), z["G"][i // n]))))
     gain = int(z["gain"])
     ops += [op(s["sat"], struct.pack("<2H", gain, gain)), op(s["six"][0], struct.pack("<6h", *z["S"].astype(int))), op(s["six"][1], struct.pack("<6h", *z["H"].astype(int))),
@@ -66,7 +66,7 @@ for slot, (fit, label) in FILMS.items():
         ops.append(op(CHROMA[slot], chroma.record(cb, cr)))
     summary[slot] = dict(fit=fit, label=label, gain=gain, S=z["S"].astype(int).tolist(), H=z["H"].astype(int).tolist(), A=z["A"].astype(int).tolist())
 json.dump(dict(name=f"seven-films-{tag}", attribution=ATTRIB, description="Seven films, one per film slot, in menu order: " + "; ".join(f"{k} = {os.path.basename(v[0])[9:-4]}" for k, v in FILMS.items()) + ". NOTES §39.",
-               ops=[o for o in ops if o["expect"] != o["new"]], **base), open(os.path.join(ROOT, f"patches/seven-films-{tag}.json"), "w"), indent=1)
+               ops=[o for o in ops if o["expect"] != o["new"]], **base), open(os.path.join(ROOT, f"data/specs/seven-films-{tag}.json"), "w"), indent=1)
 json.dump(summary, open(os.path.join(HERE, f"seven_films_{tag}.json"), "w"), indent=1)
 # labels: only the entry's own string (preceded by NUL or by an '@Axxx@' tag, followed by NUL), not longer strings that contain it
 sys.path.insert(0, os.path.join(ROOT, "tools")); import oetool
@@ -81,5 +81,5 @@ for slot, (fit, label) in FILMS.items():
         lops.append({"type": "bytes", "block": 1, "offset": hex(i), "expect": old.hex(), "new": new.hex()}); k += 1
     counts[slot] = k
 json.dump(dict(name="seven-labels", description="Menu labels of the seven film slots (replaces label-portra, label-ektachrome-lt, label-pro400h-pa): " + ", ".join(f"'{k}' -> '{v[1]}'" for k, v in FILMS.items())
-               + ". Only the entry's own strings; longer strings containing the name (e.g. 'Add Soft Focus Effect') are left alone.", ops=lops, **base), open(os.path.join(ROOT, "patches/seven-labels.json"), "w"), indent=1)
+               + ". Only the entry's own strings; longer strings containing the name (e.g. 'Add Soft Focus Effect') are left alone.", ops=lops, **base), open(os.path.join(ROOT, "data/specs/seven-labels.json"), "w"), indent=1)
 print("film ops", len(ops), "; label strings changed per entry", counts)

@@ -1,4 +1,4 @@
-# specscan.py OURSPEC [LO-HI]: every spec under patches/ and patches/history: block-0 op windows; overlaps with
+# specscan.py OURSPEC [LO-HI]: every spec under data/specs/ and data/specs/history: block-0 op windows; overlaps with
 # OURSPEC's op windows and with the runtime range LO-HI; also other block-0 op types
 import json, glob, sys, os
 B=0x7E421020; ROOT='/path/to/EPM2Mod/'
@@ -16,7 +16,7 @@ ours=json.load(open(sys.argv[1])); ow=wins(ours)
 rng=tuple(int(x,16)-B for x in sys.argv[2].split('-')) if len(sys.argv)>2 else None
 FILMS=['remap7b-code','seven-fixes-1','seven-movie-1','seven-structure-extra','seven-films-5','xp-adaptive-hue-off','seven-labels']
 tot=0
-for f in sorted(glob.glob(ROOT+'patches/*.json')+glob.glob(ROOT+'patches/*.json')):
+for f in sorted(glob.glob(ROOT+'data/specs/*.json')+glob.glob(ROOT+'data/specs/*.json')):
     s=json.load(open(f)); w=wins(s); name=os.path.relpath(f,ROOT+'patches')
     other=[x[2] for x in w if x[0] is None]
     hits=[]; inr=[]

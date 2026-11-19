@@ -1,11 +1,11 @@
 """Build descriptions and the pinned build.
 
-A build description is a JSON file in ``builds/``::
+A build description is a JSON file in ``data/builds/``::
 
     {
       "what": "Seven film looks as art filters",
       "stock": "OLY_E_101_1600_0000_0000.BIN",
-      "specs": ["patches/a.json", "patches/b.json"],
+      "specs": ["data/specs/a.json", "data/specs/b.json"],
       "sha256": "...",                 (only after a camera test)
       "camera_tested": "2026-11-13",   (only after a camera test)
       "first_code": true               (optional; see below)
@@ -13,7 +13,7 @@ A build description is a JSON file in ``builds/``::
 
 The name of a build is the name of its file without ``.json``; it is not
 written inside the file. ``stock`` names the stock firmware the build starts
-from: a key of ``stock.STOCK_FIRMWARE`` (the maker's file name). The specs are files in ``patches/``, written relative
+from: a key of ``stock.STOCK_FIRMWARE`` (the maker's file name). The specs are files in ``data/specs/``, written relative
 to the repository root, and are applied in the order given. ``sha256`` and
 ``camera_tested`` are either both present (a tested build) or both absent (a
 candidate).
@@ -23,8 +23,8 @@ where no camera-tested build runs code yet. The free-space check refuses such
 a build unless the description says so, because only the flash can show that
 code runs there. The key is either absent or ``true``.
 
-``pinned-build.json`` at the top of the repository holds
-``{"build": "builds/NAME.json"}``: the description of the last build that
+``data/pinned-build.json`` at the top of the repository holds
+``{"build": "data/builds/NAME.json"}``: the description of the last build that
 passed a camera test.
 """
 
@@ -73,10 +73,10 @@ def _check_date(value: object, where: str) -> str:
 
 
 def check_spec_path(text: object, where: str) -> str:
-    """Return ``text`` if it names a patch spec file in ``patches/``, else raise.
+    """Return ``text`` if it names a patch spec file in ``data/specs/``, else raise.
 
     A spec path is relative to the repository root, has forward slashes, no
-    ``.`` or ``..`` parts, starts with ``patches/`` and ends with ``.json``.
+    ``.`` or ``..`` parts, starts with ``data/specs/`` and ends with ``.json``.
     """
     if (
         not isinstance(text, str)
@@ -278,30 +278,30 @@ def description_path(paths: RepoPaths, name: str) -> Path:
 
 
 def save_description(paths: RepoPaths, description: BuildDescription) -> Path:
-    """Write a description to ``builds/NAME.json`` and return the path."""
+    """Write a description to ``data/builds/NAME.json`` and return the path."""
     path = description_path(paths, description.name)
     write_json(path, description.to_json(), BuildError)
     return path
 
 
 def all_descriptions(paths: RepoPaths) -> list[BuildDescription]:
-    """Return every description in ``builds/``, sorted by name."""
+    """Return every description in ``data/builds/``, sorted by name."""
     found = [load_description(path) for path in paths.builds.glob("*" + _SUFFIX)]
     return sorted(found, key=lambda description: description.name)
 
 
 def pinned_path(paths: RepoPaths) -> Path:
-    """Return the path of the description that ``pinned-build.json`` names.
+    """Return the path of the description that ``data/pinned-build.json`` names.
 
     The description itself is not read.
 
     Raises:
         BuildError: if the pointer file is missing or malformed, or does not
-            name a file directly in ``builds/``.
+            name a file directly in ``data/builds/``.
     """
     raw = read_json(paths.pinned, BuildError)
     target = raw.get("build") if isinstance(raw, dict) and len(raw) == 1 else None
-    prefix = paths.builds.name + "/"
+    prefix = paths.relative(paths.builds) + "/"
     if (
         not isinstance(target, str)
         or not is_repo_relative(target)
@@ -315,7 +315,7 @@ def pinned_path(paths: RepoPaths) -> Path:
 
 
 def pinned_description(paths: RepoPaths) -> BuildDescription:
-    """Return the description that ``pinned-build.json`` names.
+    """Return the description that ``data/pinned-build.json`` names.
 
     Raises:
         BuildError: as ``pinned_path``, and if the description cannot be read

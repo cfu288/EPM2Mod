@@ -1,5 +1,5 @@
 #!/bin/zsh
-# screens.sh NEW [OLD]: the emulator checks of a films build (NEW, builds/NAME.json) against the pinned build (OLD).
+# screens.sh NEW [OLD]: the emulator checks of a films build (NEW, data/builds/NAME.json) against the pinned build (OLD).
 # Output: build/emu/films-max/NAME/ (ignored by git). Needs both .BIN files (epm2mod make) and emulator/setup.sh.
 #   1 screens   every list of looks, English: live control strip (P and movie), Picture Mode list, Picture Mode
 #               Settings, ART list, ART BKT list            -> NAME/new/*.png, NAME/pinned/*.png

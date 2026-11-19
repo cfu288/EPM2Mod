@@ -77,7 +77,7 @@ candidate `osd-battery` are kept.
   `experiments/2026-11-15-log/evaluation-1.md`. Unknown: if the ring RAM survives a crash restart.
   A ring overflows after about 100 s of peaking without a menu. The camera writes compact binary event
   records to `EPM2LOG.BIN` on the card; `epm2mod log` decodes them with the dictionary
-  `logs/events.json`. The pinned build has it: Custom Menu J → Debug Log (Off by default). Probes go into the old
+  `data/logdict/events.json`. The pinned build has it: Custom Menu J → Debug Log (Off by default). Probes go into the old
   features too (peaking, picture mode changes, level gauge, interval, film looks, firmware errors).
   Next: code from the card.
 - Feature candidates from the survey of 22 other bodies and of other mods:

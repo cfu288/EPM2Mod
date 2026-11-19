@@ -1,14 +1,14 @@
 # Generators
 
-Scripts whose output ships: each writes patch specs into `patches/` from committed inputs (Olympus's firmware, the
+Scripts whose output ships: each writes patch specs into `data/specs/` from committed inputs (Olympus's firmware, the
 `.s` sources here, the package). CI runs `gen/run.sh --check`, which fails when a committed spec is not what its
 generator makes.
 
 | Folder | Writes | Notes |
 |---|---|---|
-| `lss-core/` | `patches/lss-core.json` | Lowest S/S Setting, exposure part: `lss.s` (MN103) assembled into the exp debug printers. `experiments/2026-11-17-auto-iso-min-shutter/NOTES.md` section 12 |
-| `build-label/` | `patches/build-label.json` | The Firmware screen's label, with the placeholder date that `epm2mod make` replaces. `experiments/2026-11-19-build-label/NOTES.md` |
-| `stock-films/` | `patches/stock-films-structure.json`, `patches/looks-menu-4.json`, `patches/card-looks-5.json` | Film looks on the stock art filters: `structure.py` first (it writes `build/stock-films/layout.json`), then `loader.py`. `mkspec_looks.py`, `mkspec_looks3.py` and `mkspec_slots.py` are copies of `experiments/2026-11-17-card-looks/scripts/` that the loader imports. `experiments/2026-11-18-stock-filters/design.md` |
+| `lss-core/` | `data/specs/lss-core.json` | Lowest S/S Setting, exposure part: `lss.s` (MN103) assembled into the exp debug printers. `experiments/2026-11-17-auto-iso-min-shutter/NOTES.md` section 12 |
+| `build-label/` | `data/specs/build-label.json` | The Firmware screen's label, with the placeholder date that `epm2mod make` replaces. `experiments/2026-11-19-build-label/NOTES.md` |
+| `stock-films/` | `data/specs/stock-films-structure.json`, `data/specs/looks-menu-4.json`, `data/specs/card-looks-5.json` | Film looks on the stock art filters: `structure.py` first (it writes `build/stock-films/layout.json`), then `loader.py`. `mkspec_looks.py`, `mkspec_looks3.py` and `mkspec_slots.py` are copies of `experiments/2026-11-17-card-looks/scripts/` that the loader imports. `experiments/2026-11-18-stock-filters/design.md` |
 
 Run them all: `gen/run.sh`. It needs the MN103 binutils (`tools/setup.sh --binutils`) and Olympus's firmware
 (`uv run epm2mod fetch-stock`).

@@ -1,7 +1,7 @@
 """Fit a black-and-white film to the Grainy Film entry: the grey mix (art matrix) and one tone curve.
 
    .venv/bin/python -I experiments/2026-11-16-doublex/scripts/fit_mono.py --name doublex
-   ... --name doublex2 --transfer 2 --matrix-from looks/fits/doublex.npz
+   ... --name doublex2 --transfer 2 --matrix-from data/films/fits/doublex.npz
 
 Target: monolib.target (spektrafilm dev, Double-X on 2302, neutral). Samples and weights: those of the colour fits
 (fit_film2.py: reading A_natural of the test RAW; grays 150, ColorChecker 20, skin 60, natural 1, skin series 20,

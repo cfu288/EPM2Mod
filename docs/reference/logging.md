@@ -5,22 +5,22 @@ card. `epm2mod log` turns the file into a short report, or its events into JSON 
 are in [experiments/2026-11-15-log/NOTES.md](../../experiments/2026-11-15-log/NOTES.md).
 
 The pinned build has the log in the firmware, switched by the Custom Menu row **Debug Log**
-(MENU → SETUP → Custom Menu → J → Debug Log → On; Off by default; [setup](../user/debug-log.md)): `patches/log-menu-2.json`, the code of the four specs below
+(MENU → SETUP → Custom Menu → J → Debug Log → On; Off by default; [setup](../user/debug-log.md)): `data/specs/log-menu-2.json`, the code of the four specs below
 with an Off switch ([log-menu design](../../experiments/2026-11-18-log-menu/design.md)). It was first pinned in
-`builds/log-menu.json`.
+`data/builds/log-menu.json`.
 
 ## The parts
 
 | Part | Where | What it does |
 |---|---|---|
-| Dictionary | `logs/events.json` | The id, name, level and argument formats of each event, and name tables for values. The camera stores no text |
-| Dictionaries of flashed builds | `logs/events-BUILDID.json` | The event list of a build that was on a camera, kept when `events.json` changes |
+| Dictionary | `data/logdict/events.json` | The id, name, level and argument formats of each event, and name tables for values. The camera stores no text |
+| Dictionaries of flashed builds | `data/logdict/events-BUILDID.json` | The event list of a build that was on a camera, kept when `events.json` changes |
 | Generator | `experiments/2026-11-15-log/scripts/mkspec_log.py` | Reads the dictionary and writes the two patch specs |
-| Generator of the release log | `experiments/2026-11-18-log-menu/scripts/mkspec_logmenu.py` | Writes `patches/log-menu-2.json` (with `--stock-films`). It imports `mkspec_log.py` |
-| Log core | `patches/log-core.json` | `log_put`, `log_chg`, `log_cnt`, the flush task, and the events boot, firmware error and GUI state |
-| Probes | `patches/log-probes.json` | One hook and one small routine per event of a feature |
-| Timing probe of peaking | `patches/log-peaking-time.json` | Event `pk_stats`, one record per 8 runs of Key Line pass 9. Written by `mkspec_log.py --peaking-time`. It also puts the build id of `logs/events.json` into the block header |
-| Probe of the save guard of peaking | `patches/log-peaking-guard.json` | Event `pk_guard`, one record per hold of the peaking latch after a shot. Written by `mkspec_log.py --peaking-guard`. It puts the build id of `logs/events.json` into the block header |
+| Generator of the release log | `experiments/2026-11-18-log-menu/scripts/mkspec_logmenu.py` | Writes `data/specs/log-menu-2.json` (with `--stock-films`). It imports `mkspec_log.py` |
+| Log core | `data/specs/log-core.json` | `log_put`, `log_chg`, `log_cnt`, the flush task, and the events boot, firmware error and GUI state |
+| Probes | `data/specs/log-probes.json` | One hook and one small routine per event of a feature |
+| Timing probe of peaking | `data/specs/log-peaking-time.json` | Event `pk_stats`, one record per 8 runs of Key Line pass 9. Written by `mkspec_log.py --peaking-time`. It also puts the build id of `data/logdict/events.json` into the block header |
+| Probe of the save guard of peaking | `data/specs/log-peaking-guard.json` | Event `pk_guard`, one record per hold of the peaking latch after a shot. Written by `mkspec_log.py --peaking-guard`. It puts the build id of `data/logdict/events.json` into the block header |
 | Decoder | `src/epm2mod/eventlog.py`, `src/epm2mod/logsummary.py`, command `epm2mod log` | Reads the file and the dictionary, prints a summary, or the events as JSON |
 
 ## The record
@@ -94,7 +94,7 @@ Without the option, one line is one record:
   the boot task runs at 101 ms.
 - `time_us` starts near 0 at power-on. Both CPUs read the same timer.
 - `names` gives the name of a value where the dictionary has a table for it: GUI states, shooting callbacks,
-  art codes (with the film of `looks/films.json`, for the older seven-film builds only), matrix tables, the peaking colour. The key is the argument, or
+  art codes (with the film of `data/films/films.json`, for the older seven-film builds only), matrix tables, the peaking colour. The key is the argument, or
   `argument.field`. `args` always holds the number.
 - `recovered: true`: the record was still in RAM after a restart and the next session wrote it. It has the
   session number of the session that logged it. These are the last events before a crash. The decoder finds
@@ -102,13 +102,13 @@ Without the option, one line is one record:
   record, and their time is later than the new `boot` record's time (or more than 1 s before it). For CPU 1 the
   border is the record at which the time goes back.
 - A record with an id that is not in the dictionary has `unknown: true` and its two raw arguments, when the
-  block's build has no dictionary in `logs/`.
+  block's build has no dictionary in `data/logdict/`.
 - A line with `marker` is not a record: `gap` (records were lost, with the count), `ring_restart` (RAM was
   clear at a start), `repeat` (records that are in the file twice; they are given once), `damaged` (records that
   cannot be real were dropped: the sequence number in the record is not its place in the block, or the id is not in
   the dictionary of the block's build; stale or changed slots of the ring give them), `truncated`,
-  `garbage`, `dictionary_mismatch` (the file comes from a firmware whose dictionary is not in `logs/`: use the
-  `logs/events.json` of that commit, `--dict FILE`).
+  `garbage`, `dictionary_mismatch` (the file comes from a firmware whose dictionary is not in `data/logdict/`: use the
+  `data/logdict/events.json` of that commit, `--dict FILE`).
 
 `boot` has the argument `ring_found` (`session` in the build `d1ddd46b4dac2414`). It is not the session number.
 The boot hook adds 1 when it finds a ring in RAM. On the camera the error records of the same start have
@@ -120,7 +120,7 @@ To filter, use `jq`: `jq -c '.events[] | select(.level == "error")' /tmp/scratch
 
 ## The dictionary, name tables and older builds
 
-`logs/events.json` has three kinds of content:
+`data/logdict/events.json` has three kinds of content:
 
 | Key | Use | Part of the build id |
 |---|---|---|
@@ -131,24 +131,24 @@ To filter, use `jq`: `jq -c '.events[] | select(.level == "error")' /tmp/scratch
 - `tables` maps a table name to `{value: text}`. A value is decimal (`"259"`), hexadecimal (`"0x5B00"`) or a
   group of 256 values (`"0x5Bxx"`, used when the value has no entry of its own).
 - `names` of an event maps an argument (`"state"`) or a field (`"latch.C"`) to a table name.
-- `film_entries` says which art code belongs to which menu entry of `looks/films.json`, for the older seven-film
+- `film_entries` says which art code belongs to which menu entry of `data/films/films.json`, for the older seven-film
   builds only. `epm2mod log` then shows the film: `Velvia (Diorama)`.
 - A name that is inferred says so in its text. Correct a name, a `doc` text or a table at any time: the build
   id stays, and old log files decode with the new names.
 
 **When an id, a name, a level or an argument changes, the build id changes.** A camera may still run the build
-with the old id. So, before the change, copy the event list to `logs/events-BUILDID.json` (the keys `format`,
+with the old id. So, before the change, copy the event list to `data/logdict/events-BUILDID.json` (the keys `format`,
 `record_size`, `events`; no `tables`: it takes those of `events.json`). `epm2mod log` reads every
-`logs/events-*.json` and decodes each block with the dictionary that has the block's build id. A test checks
+`data/logdict/events-*.json` and decodes each block with the dictionary that has the block's build id. A test checks
 that the file name is the build id of its content, and that the two patch specs carry the build id of one of the
-dictionaries in `logs/`.
+dictionaries in `data/logdict/`.
 
-The current build id is the one of `logs/events.json` (`33ca8d15f4f1c877`, carried by `patches/log-menu-2.json`).
-`logs/events-*.json` hold the dictionaries of older flashed builds.
+The current build id is the one of `data/logdict/events.json` (`33ca8d15f4f1c877`, carried by `data/specs/log-menu-2.json`).
+`data/logdict/events-*.json` hold the dictionaries of older flashed builds.
 
 ## How to add an event and a probe
 
-1. **Add the event to `logs/events.json`.** Take the next id in the range of the feature (1 to 255 core,
+1. **Add the event to `data/logdict/events.json`.** Take the next id in the range of the feature (1 to 255 core,
    256 peaking, 512 picture mode, 768 level gauge, 1024 interval, 1280 film looks, 1536 shooting, 1792 card
    looks; a new feature takes the next multiple of 256). Give `name`, `level`, `spec`, `doc` and at most two
    `args`. An
@@ -185,16 +185,16 @@ The current build id is the one of `logs/events.json` (`33ca8d15f4f1c877`, carri
    python3 tools/oetool.py unpack build/epm2mod-2026.11.19.BIN /tmp/scratch/pinned
    uv run python experiments/2026-11-15-log/scripts/mkspec_log.py /tmp/scratch/pinned /tmp/scratch/asm
    uv run epm2mod make debug-log
-   python3 emulator/opcheck.py builds/debug-log.json
-   python3 emulator/hookcheck.py patches/log-core.json patches/log-probes.json
+   python3 emulator/opcheck.py data/builds/debug-log.json
+   python3 emulator/hookcheck.py data/specs/log-core.json data/specs/log-probes.json
    ```
 
    `experiments/2026-11-18-log-menu/scripts/mkspec_logmenu.py` (with `--stock-films`) imports `mkspec_log.py`
-   and writes `patches/log-menu-2.json`, the log of the pinned build. Then run the emulator checks of the notes. The generator refuses a site that is not on an instruction
+   and writes `data/specs/log-menu-2.json`, the log of the pinned build. Then run the emulator checks of the notes. The generator refuses a site that is not on an instruction
    boundary, a pc-relative instruction other than `call`, and a branch target inside the replaced bytes.
 5. A change of an id, name, level or argument gives a new build id. If the old build was flashed, keep its
    event list first (section "The dictionary, name tables and older builds"). The `doc` texts, `names` and
-   `tables` do not count. A test fails when the two specs carry a build id that no dictionary in `logs/` has.
+   `tables` do not count. A test fails when the two specs carry a build id that no dictionary in `data/logdict/` has.
 6. Give the enumerated values of a new event a table, so that the JSON and the summary show names.
 
 A probe costs 31 to 66 bytes for its routine and 5 to 10 bytes at its site, and no RAM, or 8 bytes of RAM for

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Run the off-camera checks of a build: only those its specs call for, in parallel, with a cache.
 
-    python3 tools/checks.py builds/NAME.json [--tier quick|full] [--jobs N] [--no-cache] [--list]
+    python3 tools/checks.py data/builds/NAME.json [--tier quick|full] [--jobs N] [--no-cache] [--list]
 
 quick   the static checks, the emulator start and update path, and the colour-stage check of the film entries.
         Run it after each change. A few minutes at most.
@@ -130,7 +130,7 @@ def plan(description: Path, tier: str) -> list[Check]:
     if tier == "quick":
         return checks
 
-    peaking = has("patches/peaking-")
+    peaking = has("data/specs/peaking-")
     name = description.stem
     if films12:
         script = FILMS / "scen_films.py"
@@ -212,7 +212,7 @@ def summary(check: Check, result: Result) -> str:
 def main(argv: list[str]) -> int:
     """Run the command line."""
     parser = argparse.ArgumentParser(description=(__doc__ or "").split("\n")[0])
-    parser.add_argument("build", type=Path, help="build description, builds/NAME.json")
+    parser.add_argument("build", type=Path, help="build description, data/builds/NAME.json")
     parser.add_argument("--tier", choices=TIERS, default="quick")
     parser.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) - 1))
     parser.add_argument("--no-cache", action="store_true", help="run every check again")

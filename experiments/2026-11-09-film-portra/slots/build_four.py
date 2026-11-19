@@ -1,6 +1,6 @@
 """Four film slots (NOTES §36): the three films + Pale&Light I converted in place. Nothing about Soft Focus, Pin Hole,
 Diorama or any other effect filter is touched (three attempts to convert those froze live view).
-  patches/four-code.json, patches/four-neutral.json      python3 -I build_four.py"""
+  data/specs/four-code.json, data/specs/four-neutral.json      python3 -I build_four.py"""
 import json, os, struct, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_slots12 as b
@@ -29,12 +29,12 @@ def main():
     ops = [o for o in ops if o["expect"] != o["new"]]
     base = dict(base="firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN", base_sha256="34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300", status="built, NOT camera-tested")
     json.dump(dict(name="four-code", description="Four film slots (replaces slot3-code): the three-film structure plus Pale&Light I (codes 71 / 80) as a generic slot: gamma stub, matrix, "
-                   "shared look, linear chroma, WB multipliers 1.0. No effect filter is touched. NOTES §36.", ops=ops, **base), open(os.path.join(b.ROOT, "patches/four-code.json"), "w"), indent=1)
+                   "shared look, linear chroma, WB multipliers 1.0. No effect filter is touched. NOTES §36.", ops=ops, **base), open(os.path.join(b.ROOT, "data/specs/four-code.json"), "w"), indent=1)
     dflt = b0[0x7E74E9BC - B:0x7E74E9BC - B + 512]
     nops = [{"type": "bytes", "block": 0, "offset": hex(t - B), "expect": b0[t - B:t - B + 512].hex(), "new": dflt.hex()} for t in b.POOL]
     nops += [op(0x7E7696A4, struct.pack("<2H", 282, 282)), op(0x7E76949E, struct.pack("<6h", *[0] * 6)), op(0x7E7694AA, struct.pack("<6h", *[0] * 6))]
     json.dump(dict(name="four-neutral", description="Stock Natural settings in the Pale&Light I slot of four-code (test content). NOTES §36.", ops=[o for o in nops if o["expect"] != o["new"]], **base),
-              open(os.path.join(b.ROOT, "patches/four-neutral.json"), "w"), indent=1)
+              open(os.path.join(b.ROOT, "data/specs/four-neutral.json"), "w"), indent=1)
     json.dump(dict(tabs=[hex(t) for t in b.POOL], matrix=hex(s2["t_palelight1"]), stub=hex(s2["g_palelight1"])), open(os.path.join(b.HERE, "four_layout.json"), "w"), indent=1)
     print("code area 2:", len(c2), "B; ops:", len(ops))
 if __name__ == "__main__":

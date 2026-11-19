@@ -20,7 +20,7 @@ BIN = os.path.join(os.path.abspath(__file__).split("/experiments/")[0], "build",
 FUNCS = os.path.join(ROOT, "build/map/functions.txt")
 
 # Camera-proven code space (freespace.py verdict USABLE-CODE). 0x7ECB0EF0-0x7ECB0F16 is left alone: the
-# probe-A spec in patches/ claims these 38 bytes.
+# probe-A spec in data/specs/ claims these 38 bytes.
 AREAS = {
     ".p0": (0x7ECB0EE3, 0x7ECB0EF0, "camera-proven padding, segment 2: getL"),
     ".p1": (0x7ECB0F16, 0x7ECB1000, "camera-proven padding, segment 2: T_A, T_B, T_C, T_D1/T_D2, T_H, T_I"),

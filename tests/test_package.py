@@ -98,7 +98,7 @@ class TinyRepo:
     def __init__(self, folder: Path) -> None:
         self.paths = RepoPaths(folder)
         self.write("firmware/TINY.BIN", TINY)
-        self.write_json("patches/a.json", spec_json("a", [BYTE_OP]))
+        self.write_json("data/specs/a.json", spec_json("a", [BYTE_OP]))
         applied = spec.apply_specs(
             TINY, [spec.spec_from_json(spec_json("a", [BYTE_OP]))]
         )
@@ -107,13 +107,16 @@ class TinyRepo:
         self.tested = builds.BuildDescription(
             "good",
             "A tiny build",
-            ("patches/a.json",),
+            ("data/specs/a.json",),
             self.sha256,
             "2026-11-13",
             stock=TINY_STOCK.file_name,
         )
         self.candidate = builds.BuildDescription(
-            "new", "A tiny candidate", ("patches/a.json",), stock=TINY_STOCK.file_name
+            "new",
+            "A tiny candidate",
+            ("data/specs/a.json",),
+            stock=TINY_STOCK.file_name,
         )
         builds.pin(self.paths, self.tested)
         builds.save_description(self.paths, self.candidate)
@@ -570,7 +573,7 @@ class SpecTests(unittest.TestCase):
 
 class PathAndFileTests(unittest.TestCase):
     def test_is_repo_relative(self) -> None:
-        for good in ("patches/a.json", "a", "looks/fits/x.npz"):
+        for good in ("data/specs/a.json", "a", "data/films/fits/x.npz"):
             self.assertTrue(is_repo_relative(good), good)
         for bad in (
             "",
@@ -607,7 +610,9 @@ class PathAndFileTests(unittest.TestCase):
             with mock.patch.dict(os.environ, {paths_module.ROOT_ENV: folder}):
                 with self.assertRaises(RepositoryError):
                     paths_module.find_root()
-            (Path(folder) / paths_module.ROOT_MARKER).write_text("{}")
+            marker = Path(folder) / paths_module.ROOT_MARKER
+            marker.parent.mkdir(parents=True, exist_ok=True)
+            marker.write_text("{}")
             with mock.patch.dict(os.environ, {paths_module.ROOT_ENV: folder}):
                 self.assertEqual(paths_module.find_root(), Path(folder).absolute())
 
@@ -754,7 +759,7 @@ class BuildDescriptionTests(unittest.TestCase):
     GOOD: dict[str, Any] = {
         "what": "Something",
         "stock": "x",
-        "specs": ["patches/a.json"],
+        "specs": ["data/specs/a.json"],
     }
 
     def test_candidate_and_tested(self) -> None:
@@ -797,15 +802,15 @@ class BuildDescriptionTests(unittest.TestCase):
             {**self.GOOD, "what": "two\nlines"},
             {**self.GOOD, "what": 5},
             {**self.GOOD, "specs": []},
-            {**self.GOOD, "specs": "patches/a.json"},
-            {**self.GOOD, "specs": ["patches/a.json", "patches/a.json"]},
+            {**self.GOOD, "specs": "data/specs/a.json"},
+            {**self.GOOD, "specs": ["data/specs/a.json", "data/specs/a.json"]},
             {**self.GOOD, "specs": ["../a.json"]},
             {**self.GOOD, "specs": ["/etc/a.json"]},
-            {**self.GOOD, "specs": ["patches/../x/a.json"]},
+            {**self.GOOD, "specs": ["data/specs/../x/a.json"]},
             {**self.GOOD, "specs": ["./patches/a.json"]},
             {**self.GOOD, "specs": ["patches\\a.json"]},
             {**self.GOOD, "specs": ["experiments/x/patches/a.json"]},
-            {**self.GOOD, "specs": ["patches/a.txt"]},
+            {**self.GOOD, "specs": ["data/specs/a.txt"]},
             {**self.GOOD, "specs": [5]},
             {**self.GOOD, "sha256": "a" * 64},
             {**self.GOOD, "camera_tested": "2026-11-13"},
@@ -823,7 +828,7 @@ class BuildDescriptionTests(unittest.TestCase):
                 builds.description_from_json(name, self.GOOD)
         with self.assertRaises(BuildError):
             builds.BuildDescription(
-                "b", "w", ("patches/a.json",), sha256="a" * 64, stock="x"
+                "b", "w", ("data/specs/a.json",), sha256="a" * 64, stock="x"
             )
         candidate = builds.description_from_json("b", self.GOOD)
         for sha, date in (("short", "2026-11-13"), ("a" * 64, "2026-13-40")):
@@ -874,7 +879,7 @@ class BuildDescriptionTests(unittest.TestCase):
             written = [call.args[0].name for call in w.call_args_list]
             self.assertEqual(written, ["b.json", "pinned-build.json"])
             self.assertEqual(
-                json.loads(paths.pinned.read_text()), {"build": "builds/b.json"}
+                json.loads(paths.pinned.read_text()), {"build": "data/builds/b.json"}
             )
             self.assertEqual(builds.pinned_description(paths), tested)
             self.assertEqual(builds.all_descriptions(paths), [tested])
@@ -886,27 +891,29 @@ class BuildDescriptionTests(unittest.TestCase):
             builds.description_path(paths, "b-2").unlink()
             pointers: list[Any] = [
                 {"build": "../elsewhere.json"},
-                {"build": "builds/sub/b.json"},
-                {"build": "builds/../builds/b.json"},
+                {"build": "data/builds/sub/b.json"},
+                {"build": "data/builds/../builds/b.json"},
                 {"build": "b.json"},
-                {"build": "patches/b.json"},
+                {"build": "data/specs/b.json"},
                 {"build": 5},
-                {"build": "builds/b.json", "other": 1},
+                {"build": "data/builds/b.json", "other": 1},
                 [],
             ]
             # Each of these would name a readable, tested description if the
-            # pointer were not held to "a file directly in builds/".
+            # pointer were not held to "a file directly in data/builds/".
             (paths.builds / "sub").mkdir()
             for copy in (paths.builds / "sub" / "b.json", paths.root / "b.json"):
                 shutil.copy(paths.builds / "b.json", copy)
-            (paths.root / "patches").mkdir()
-            shutil.copy(paths.builds / "b.json", paths.root / "patches" / "b.json")
+            (paths.root / "data" / "specs").mkdir()
+            shutil.copy(
+                paths.builds / "b.json", paths.root / "data" / "specs" / "b.json"
+            )
             for pointer in pointers:
                 paths.pinned.write_text(json.dumps(pointer))
                 with self.subTest(pointer=pointer), self.assertRaises(BuildError):
                     builds.pinned_description(paths)
             builds.save_description(paths, builds.description_from_json("c", self.GOOD))
-            paths.pinned.write_text(json.dumps({"build": "builds/c.json"}))
+            paths.pinned.write_text(json.dumps({"build": "data/builds/c.json"}))
             with self.assertRaises(BuildError):
                 builds.pinned_description(
                     paths
@@ -1027,7 +1034,7 @@ class MakeTests(RepoCase):
     def test_a_wrong_result_leaves_no_output_and_removes_the_old_one(self) -> None:
         self.make(self.repo.tested)
         self.repo.write_json(
-            "patches/a.json", spec_json("a", [{**BYTE_OP, "new": "cccc"}])
+            "data/specs/a.json", spec_json("a", [{**BYTE_OP, "new": "cccc"}])
         )
         with self.assertRaises(BuildError):
             self.make(self.repo.tested)
@@ -1115,19 +1122,19 @@ class MakeTests(RepoCase):
         first = builds.BuildDescription(
             "probe",
             "A probe",
-            ("patches/a.json",),
+            ("data/specs/a.json",),
             first_code=True,
             stock=TINY_STOCK.file_name,
         )
         lines.clear()
         self.make(first, log=lines.append)
         text = "\n".join(lines)
-        self.assertIn("check patches/a.json --first-code", text)
+        self.assertIn("check data/specs/a.json --first-code", text)
         self.assertIn("FIRST CODE", text)
 
     def test_a_missing_spec_is_found_before_the_free_space_check(self) -> None:
         self.repo.free_space_tool(1)
-        self.repo.paths.resolve("patches/a.json").unlink()
+        self.repo.paths.resolve("data/specs/a.json").unlink()
         with self.assertRaises(SpecError):
             self.make(self.repo.candidate)
 
@@ -1225,7 +1232,7 @@ class RecordTestTests(RepoCase):
     def test_a_spec_changed_after_the_flash_cannot_be_recorded(self) -> None:
         flashed = self.repo.sha256
         self.repo.write_json(
-            "patches/a.json", spec_json("a", [{**BYTE_OP, "new": "cccc"}])
+            "data/specs/a.json", spec_json("a", [{**BYTE_OP, "new": "cccc"}])
         )
         with self.assertRaises(BuildError):
             self.record(self.repo.candidate, flashed, "2026-11-10")
@@ -1270,7 +1277,7 @@ class CommandLineTests(RepoCase):
 
     def test_a_build_is_named_not_given_as_a_path(self) -> None:
         for argv in (
-            ("make", "builds/new.json"),
+            ("make", "data/builds/new.json"),
             ("make", "none"),
             ("pin", "nope", "--date", "2026-11-10", "--sha256", "0" * 64),
         ):
@@ -1308,7 +1315,7 @@ class CommandLineTests(RepoCase):
 
     def test_an_empty_argument_is_an_error(self) -> None:
         record = ("--date", "2026-11-10", "--sha256", self.repo.sha256)
-        spec_file = str(self.repo.paths.resolve("patches/a.json"))
+        spec_file = str(self.repo.paths.resolve("data/specs/a.json"))
         cases: list[tuple[tuple[str, ...], int]] = [
             (("make", ""), 3),
             (("make", "good", "-o", ""), 2),
@@ -1362,7 +1369,7 @@ class CommandLineTests(RepoCase):
         self.assertEqual(status, 6, text)
 
     def test_apply(self) -> None:
-        spec_file = str(self.repo.paths.resolve("patches/a.json"))
+        spec_file = str(self.repo.paths.resolve("data/specs/a.json"))
         out = self.repo.paths.root / "out" / "x.BIN"
         start = self.repo.write("start.BIN", TINY)
         with mock.patch("epm2mod.cli.write_bytes", wraps=fileio.write_bytes) as write:
@@ -1388,7 +1395,7 @@ class CommandLineTests(RepoCase):
         start = str(stock.stock_path(self.repo.paths, TINY_STOCK))
         for expected, status_wanted in (("0" * 64, 5), (self.repo.sha256, 0)):
             raw = {**spec_json("b", [BYTE_OP]), "expected_sha256": expected}
-            spec_file = str(self.repo.write_json("patches/b.json", raw))
+            spec_file = str(self.repo.write_json("data/specs/b.json", raw))
             status, text = self.run_cli(
                 "apply", spec_file, "--from", start, "-o", str(out)
             )
@@ -1399,8 +1406,8 @@ class CommandLineTests(RepoCase):
         first = {**spec_json("b", [BYTE_OP]), "expected_sha256": "0" * 64}
         other_op = {**BYTE_OP, "offset": "0x20", "expect": "2021"}
         files = [
-            str(self.repo.write_json("patches/b.json", first)),
-            str(self.repo.write_json("patches/c.json", spec_json("c", [other_op]))),
+            str(self.repo.write_json("data/specs/b.json", first)),
+            str(self.repo.write_json("data/specs/c.json", spec_json("c", [other_op]))),
         ]
         out = self.repo.paths.root / "x.BIN"
         start = str(stock.stock_path(self.repo.paths, TINY_STOCK))
@@ -1409,7 +1416,7 @@ class CommandLineTests(RepoCase):
         self.assertTrue(out.exists())
 
     def test_apply_does_not_write_over_the_stock_firmware(self) -> None:
-        spec_file = str(self.repo.paths.resolve("patches/a.json"))
+        spec_file = str(self.repo.paths.resolve("data/specs/a.json"))
         stock_file = stock.stock_path(self.repo.paths, TINY_STOCK)
         link = self.repo.paths.root / "link.BIN"
         link.symlink_to(stock_file)
@@ -1603,10 +1610,10 @@ class ReadmeTests(unittest.TestCase):
         folder = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, folder, True)
         paths = RepoPaths(Path(folder))
-        for name in ("builds", "looks"):
+        for name in ("builds", "films"):
             shutil.copytree(
-                ROOT / name,
-                paths.root / name,
+                ROOT / "data" / name,
+                paths.root / "data" / name,
                 ignore=shutil.ignore_patterns("*.npz", "*.md"),
             )
         shutil.copy(PATHS.pinned, paths.pinned)
@@ -1633,11 +1640,13 @@ class ReadmeTests(unittest.TestCase):
         marker = "<!-- BEGIN GENERATED: builds -->"
         cut = text.index(marker)
         fileio.write_text(paths.readme, text[:cut])
-        fileio.write_text(paths.resolve("builds/README.md"), "# Builds\n" + text[cut:])
+        fileio.write_text(
+            paths.resolve("data/builds/README.md"), "# Builds\n" + text[cut:]
+        )
         self.assertTrue(readme.rewrite(paths))
         self.assertTrue(readme.is_current(paths))
         self.assertNotIn(
-            "STALE TEXT", fileio.read_text(paths.resolve("builds/README.md"))
+            "STALE TEXT", fileio.read_text(paths.resolve("data/builds/README.md"))
         )
         self.assertNotIn(marker, fileio.read_text(paths.readme))
         # The same block in two documents is refused.
@@ -1695,7 +1704,7 @@ class FilmInputsTests(unittest.TestCase):
         self.addCleanup(shutil.rmtree, folder, True)
         paths = RepoPaths(Path(folder))
         film_list = films.load_films(PATHS)
-        shutil.copytree(ROOT / "looks", paths.root / "looks")
+        shutil.copytree(ROOT / "data" / "films", paths.root / "data" / "films")
         for spec_path in film_list.spec_paths:
             target = paths.resolve(spec_path)
             target.parent.mkdir(exist_ok=True)
@@ -1750,8 +1759,10 @@ class RealFirmwareTests(unittest.TestCase):
         pinned = builds.pinned_description(PATHS)
         with tempfile.TemporaryDirectory() as folder:
             paths = RepoPaths(Path(folder))
-            for name in ("firmware", "patches", "builds", "looks"):
-                (paths.root / name).symlink_to(ROOT / name)
+            (paths.root / "firmware").symlink_to(ROOT / "firmware")
+            (paths.root / "data").mkdir()
+            for name in ("specs", "builds", "films"):
+                (paths.root / "data" / name).symlink_to(ROOT / "data" / name)
             shutil.copy(PATHS.pinned, paths.pinned)
             out, env = io.StringIO(), {paths_module.ROOT_ENV: folder}
             with mock.patch.dict(os.environ, env), contextlib.redirect_stdout(out):

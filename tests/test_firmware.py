@@ -37,7 +37,7 @@ class TestStock(unittest.TestCase):
 @unittest.skipUnless(STOCK, "stock firmware not present")
 class TestPatchSpecs(unittest.TestCase):
     def test_specs_with_expected_hash_reproduce(self):
-        for spec in glob.glob(os.path.join(ROOT, "patches/*.json")):
+        for spec in glob.glob(os.path.join(ROOT, "data/specs/*.json")):
             s = json.loads(pathlib.Path(spec).read_text(encoding="utf-8"))
             if not s.get("expected_sha256"):
                 continue

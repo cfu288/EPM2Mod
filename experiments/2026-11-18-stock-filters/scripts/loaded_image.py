@@ -1,4 +1,4 @@
-"""Write a block 0 of builds/stock-films.json as the loader leaves it after a Load of the 12 default films: every
+"""Write a block 0 of data/builds/stock-films.json as the loader leaves it after a Load of the 12 default films: every
 entry's switch words at their film bytes and every entry's RAM block filled (the model of emu_stock.py). For the
 live-view rig (experiments/2026-11-16-films-max/scripts/scen_films.py), which runs on a block-0 image.
 

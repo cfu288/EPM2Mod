@@ -1,0 +1,101 @@
+{
+ "name": "films12-entry-gentle-sepia",
+ "description": "The menu entry Gentle Sepia stores the hidden Picture Mode value 112 in place of 108, so it selects the film look Kodak Ektar 100 (art code 98): one byte in each Picture Mode value list, in each constant of the ART bracket routines and in the preset of the filter in ART shooting mode. Needs the structure spec and the looks spec. Leave this spec out and the entry is the stock filter Gentle Sepia again.",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x424060",
+   "expect": "6c",
+   "new": "70"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x4262e0",
+   "expect": "6c",
+   "new": "70"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x4267a0",
+   "expect": "6c",
+   "new": "70"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3f7f1a",
+   "expect": "6c",
+   "new": "70"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x40307e",
+   "expect": "6c",
+   "new": "70"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x40319e",
+   "expect": "6c",
+   "new": "70"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x6554a6",
+   "expect": "6c",
+   "new": "70"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x6554c6",
+   "expect": "6c",
+   "new": "70"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x6743ed",
+   "expect": "6c",
+   "new": "70"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x67440d",
+   "expect": "6c",
+   "new": "70"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x1866de",
+   "expect": "6c",
+   "new": "70"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x186adb",
+   "expect": "6c",
+   "new": "70"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x40b1a0",
+   "expect": "6c",
+   "new": "70"
+  }
+ ],
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "inputs_sha256": "74d6576097c26aa22315e9b84702c9a0bcb63d9b3f4f007919e9add8e420fb37",
+ "status": "built, NOT camera-tested"
+}

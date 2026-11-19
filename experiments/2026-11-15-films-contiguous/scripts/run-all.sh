@@ -4,7 +4,7 @@
 # Output: build/emu/films-contiguous/ (ignored by git); the lines that matter are printed.
 cd ${0:A:h}/../../..
 S=${0:A:h}; O=build/emu/films-contiguous
-old=builds/peaking-fast.json; new=builds/films-contiguous.json
+old=data/builds/peaking-fast.json; new=data/builds/films-contiguous.json
 export E101_RTC=2026-11-14T12:00:00 EMU_OUT=$PWD/$O/out EMU_STATE=$PWD/$O/state
 for m in p art movie; do [[ -f $O/state/pinned-$m.json ]] || emulator/mkstate $old $O/state/pinned-$m.json $m; done
 echo "== screens"; $S/shots.sh $old pinned; $S/shots.sh $new new

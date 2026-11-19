@@ -17,7 +17,7 @@ from .errors import BuildError
 from .spec import BytesOp, PatchSpec
 
 #: The spec that shows the label, relative to the repository root.
-LABEL_SPEC = "patches/build-label.json"
+LABEL_SPEC = "data/specs/build-label.json"
 #: The date in the committed spec's text that the label replaces.
 PLACEHOLDER = "0000.00.00"
 

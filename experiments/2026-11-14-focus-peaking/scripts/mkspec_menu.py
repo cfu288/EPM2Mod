@@ -1,6 +1,6 @@
-"""Write patches/peaking-menu.json: the menu row "Peaking" (Off / White / Black) for the focus-peaking build.
+"""Write data/specs/peaking-menu.json: the menu row "Peaking" (Off / White / Black) for the focus-peaking build.
 
-Research code. NOTES.md section 15. The spec is a delta on the pinned build builds/peaking-gain-2x.json: every
+Research code. NOTES.md section 15. The spec is a delta on the pinned build data/builds/peaking-gain-2x.json: every
 `expect` is a byte string of that build, not of the stock file.
 
 What it writes:
@@ -215,12 +215,12 @@ def main():
                        "(gain 512). Black: Key Line's own gain 0xFF00, the E-P5 value for black lines. The value is the "
                        "dormant setting 458 (prm tag 0x8971, MODE bank; 1 Off, 2 Black, 3 White; 3 is its value after a full "
                        "reset, and every value but 1 and 2 gives White); its list "
-                       "is the dormant panel 607. A delta on builds/peaking-gain-2x.json: every expect is a byte "
+                       "is the dormant panel 607. A delta on data/builds/peaking-gain-2x.json: every expect is a byte "
                        "string of that build. See experiments/2026-11-14-focus-peaking/NOTES.md section 15.",
         "base": STOCK,
         "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
         "status": "candidate: emulator-checked, not flashed",
-        "_delta_on": "builds/peaking-gain-2x.json (sha256 %s)" % PINNED_SHA,
+        "_delta_on": "data/builds/peaking-gain-2x.json (sha256 %s)" % PINNED_SHA,
         "_ram": "one new byte 0x602BE8C7 (C), the fourth byte of the unused slot 20 of table 0x602BE874 that holds L, "
                 "R, L2; the row-state array of the Custom Menu page grows by 2 bytes into 0x606A31B6-B7",
         "ops": ops,

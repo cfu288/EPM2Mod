@@ -2,9 +2,9 @@
 
     uv run python experiments/2026-11-17-card-looks/scripts/emu_looks.py [--v2]
 
---v2: builds/card-looks-2.json (twelve colour slots, the menu row Load Looks). TEST has C200 in all 12 slots, and a
+--v2: data/builds/card-looks-2.json (twelve colour slots, the menu row Load Looks). TEST has C200 in all 12 slots, and a
 load is MENU -> Custom Menu -> J -> Load Looks -> Load, then out of the menu. Its sessions start from the settings
-state build/emu/state/card-looks-2-p.json (emulator/mkstate builds/card-looks-2.json ... p); screenshots go to
+state build/emu/state/card-looks-2-p.json (emulator/mkstate data/builds/card-looks-2.json ... p); screenshots go to
 build/card-looks/emu/shots-2/.
 
 Needs build/card-looks.BIN (uv run epm2mod make card-looks) and the files that mkspec_looks.py writes
@@ -16,7 +16,7 @@ compares the slot tables in RAM with what they must hold:
   2. no look file, the RAM banks taken out of the state (only the flash brings the store back): TEST at start
   3. card with BAD (TEST with one byte changed): refused; TEST stays, nothing saved
   4. no card: TEST at start
-  5. card with DEFAULT (the looks of looks/card-looks.json): after MENU the flashed looks again
+  5. card with DEFAULT (the looks of data/films/card-looks.json): after MENU the flashed looks again
 """
 
 import json
@@ -42,7 +42,7 @@ RTC = "2026-11-17T12:00:00"
 
 V2 = "--v2" in sys.argv
 SUF = "-2" if V2 else ""
-BUILD = "builds/card-looks%s.json" % SUF
+BUILD = "data/builds/card-looks%s.json" % SUF
 NAV = ("key:MENU key:RIGHT key:OK key:DOWN key:DOWN key:DOWN key:RIGHT " + "key:DOWN " * 9 + "key:RIGHT " +
        "key:DOWN " * 4).split()
 LOAD = NAV + ["shot:row", "key:RIGHT", "key:DOWN", "key:OK", "shot:load", "key:MENU", "key:MENU", "w:2000"]
@@ -57,7 +57,7 @@ def files():
     else:           # films-12d's looks: Double-X in its black-and-white slot
         lst = os.path.join(WORK, "list-card-looks.json")
         default = lookpack.load_list(paths, Path(lst))
-    fit = lookpack.load_fit(paths.resolve("looks/fits/c200.npz"))
+    fit = lookpack.load_fit(paths.resolve("data/films/fits/c200.npz"))
     test = [lookpack.look_of_fit(fit, e, "C200", "c200") for e in lookfile.MENU_ENTRIES if V2 or e != "Grainy Film"]
     if not V2:
         mono = default[4]

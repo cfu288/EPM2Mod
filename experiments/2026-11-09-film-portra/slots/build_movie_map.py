@@ -1,4 +1,4 @@
-"""patches/seven-movie-1.json: movie mode for the three remapped entries (NOTES §47), on top of remap7b-code + seven-fixes-1.
+"""data/specs/seven-movie-1.json: movie mode for the three remapped entries (NOTES §47), on top of remap7b-code + seven-fixes-1.
 
 The live-view code has its own menu-entry -> art-code tables, one pair for stills and one for movies, in two functions
 (0x7E6CBFD3: 0x7E7FF05C / 0x7E7FF008; 0x7E6DBA95: 0x7E807880 / 0x7E80782C). remap7b changed the stills pair for Soft
@@ -13,7 +13,7 @@ import json, os, struct, subprocess, sys, tempfile
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.join(HERE, "..", "..", ".."); B = 0x7E421020
 sys.path.insert(0, os.path.join(ROOT, "emulator")); import patchblock
 BIN = os.path.join(os.path.abspath(__file__).split("/experiments/")[0], "build", "toolchain", "bin", "mn10300-elf-")
-stock, cur, _ = patchblock.patched_block0([os.path.join(ROOT, "patches", n) for n in ("remap7b-code.json", "seven-fixes-1.json")])
+stock, cur, _ = patchblock.patched_block0([os.path.join(ROOT, "data", "specs", n) for n in ("remap7b-code.json", "seven-fixes-1.json")])
 def op(a, new): return {"type": "bytes", "block": 0, "offset": hex(a - B), "expect": cur[a - B:a - B + len(new)].hex(), "new": bytes(new).hex()}
 u32 = lambda img, a: struct.unpack_from("<I", img, a - B)[0]
 CAVE, SIX_JT, SIX_STUB = 0x7ECB0B80, 0x7E78C254, 0x7E880FD4
@@ -36,5 +36,5 @@ ops.append(op(SIX_JT + 4 * (168 - 9), struct.pack("<I", SIX_STUB)))
 json.dump(dict(name="seven-movie-1", description="On top of remap7b-code + seven-fixes-1: in movie mode the Soft Focus, Pin Hole and Diorama entries give the colour-only movie codes 103 / 146 / 168 "
                "(they gave the stock effect codes 78 / 82 / 88 while art_GetFilterType gave 102 / 145 / 167, which froze the display); art code 168 gets the plain six-axis handler of 167. NOTES §47.",
                status="built, NOT camera-tested", base="firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN", base_sha256="34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300", ops=ops),
-          open(os.path.join(ROOT, "patches", "seven-movie-1.json"), "w"), indent=1)
+          open(os.path.join(ROOT, "data", "specs", "seven-movie-1.json"), "w"), indent=1)
 print("ops", len(ops), "; stubs", {k: hex(v) for k, v in sorted(sym.items()) if k.startswith("m")}, code.hex())

@@ -1,0 +1,3754 @@
+{
+ "name": "films-contiguous",
+ "description": "The seven film looks next to each other in every list of looks: the entry Grainy Film moves from the fifth place to the eighth, behind Superia 400. Only the order of list entries changes (the Picture Mode value lists of info 111, 509 and 510, the rows of Shooting Menu 1 -> Picture Mode, of ART BKT and of Picture Mode Settings, the ART list records with the eight tables that the ART list page keeps by place, and the ART mode value list). The number pictures ART 5 to ART 8, the icon escapes of string ids 601, 602, 603 and 582 and the texts ART5 to ART8 (ids 1653 to 1656) in all 34 languages move with them, so Vis 250D, Velvia and Superia 400 show ART 5, 6, 7 and Grainy Film shows ART 8. No stored value, art code or picture table changes: a saved Picture Mode still selects the same look. A delta on data/builds/peaking-fast.json: every expect is a byte string of that build. Made by experiments/2026-11-15-films-contiguous/scripts/make_spec.py.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "candidate: emulator-checked, not flashed",
+ "_delta_on": "data/builds/peaking-fast.json (sha256 0e8a25b9578b8119b14b4895be7d2a0b70d7315e5e817758699777f0f31d917e)",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x423f60",
+   "expect": "68",
+   "new": "69",
+   "_note": "Picture Mode value list (info 111): stored values, 64 B each"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x423fa0",
+   "expect": "69",
+   "new": "6a",
+   "_note": "Picture Mode value list (info 111): stored values, 64 B each"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x423fe0",
+   "expect": "6a",
+   "new": "6b",
+   "_note": "Picture Mode value list (info 111): stored values, 64 B each"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x424020",
+   "expect": "6b",
+   "new": "68",
+   "_note": "Picture Mode value list (info 111): stored values, 64 B each"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x41e718",
+   "expect": "0c",
+   "new": "0d",
+   "_note": "Picture Mode value list (info 111): menu values, u32"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x41e71c",
+   "expect": "0d",
+   "new": "0e",
+   "_note": "Picture Mode value list (info 111): menu values, u32"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x41e720",
+   "expect": "0e",
+   "new": "0f",
+   "_note": "Picture Mode value list (info 111): menu values, u32"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x41e724",
+   "expect": "0f",
+   "new": "0c",
+   "_note": "Picture Mode value list (info 111): menu values, u32"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x4261e0",
+   "expect": "68",
+   "new": "69",
+   "_note": "RAW-edit picture mode list (info 509): stored values"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x426220",
+   "expect": "69",
+   "new": "6a",
+   "_note": "RAW-edit picture mode list (info 509): stored values"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x426260",
+   "expect": "6a",
+   "new": "6b",
+   "_note": "RAW-edit picture mode list (info 509): stored values"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x4262a0",
+   "expect": "6b",
+   "new": "68",
+   "_note": "RAW-edit picture mode list (info 509): stored values"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x41e940",
+   "expect": "0c",
+   "new": "0d",
+   "_note": "RAW-edit picture mode list (info 509): menu values"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x41e944",
+   "expect": "0d",
+   "new": "0e",
+   "_note": "RAW-edit picture mode list (info 509): menu values"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x41e948",
+   "expect": "0e",
+   "new": "0f",
+   "_note": "RAW-edit picture mode list (info 509): menu values"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x41e94c",
+   "expect": "0f",
+   "new": "0c",
+   "_note": "RAW-edit picture mode list (info 509): menu values"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x4266a0",
+   "expect": "68",
+   "new": "69",
+   "_note": "RAW-edit picture mode list (info 510): stored values"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x4266e0",
+   "expect": "69",
+   "new": "6a",
+   "_note": "RAW-edit picture mode list (info 510): stored values"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x426720",
+   "expect": "6a",
+   "new": "6b",
+   "_note": "RAW-edit picture mode list (info 510): stored values"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x426760",
+   "expect": "6b",
+   "new": "68",
+   "_note": "RAW-edit picture mode list (info 510): stored values"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x41e98c",
+   "expect": "0c",
+   "new": "0d",
+   "_note": "RAW-edit picture mode list (info 510): menu values"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x41e990",
+   "expect": "0d",
+   "new": "0e",
+   "_note": "RAW-edit picture mode list (info 510): menu values"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x41e994",
+   "expect": "0e",
+   "new": "0f",
+   "_note": "RAW-edit picture mode list (info 510): menu values"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x41e998",
+   "expect": "0f",
+   "new": "0c",
+   "_note": "RAW-edit picture mode list (info 510): menu values"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbce648",
+   "expect": "64",
+   "new": "65",
+   "_note": "Shooting Menu 1 -> Picture Mode rows (row table 0x7EFEF4FC, rows 18..21)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbce654",
+   "expect": "59",
+   "new": "5a",
+   "_note": "Shooting Menu 1 -> Picture Mode rows (row table 0x7EFEF4FC, rows 18..21)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbce65c",
+   "expect": "65",
+   "new": "66",
+   "_note": "Shooting Menu 1 -> Picture Mode rows (row table 0x7EFEF4FC, rows 18..21)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbce668",
+   "expect": "5a",
+   "new": "5b",
+   "_note": "Shooting Menu 1 -> Picture Mode rows (row table 0x7EFEF4FC, rows 18..21)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbce670",
+   "expect": "66",
+   "new": "67",
+   "_note": "Shooting Menu 1 -> Picture Mode rows (row table 0x7EFEF4FC, rows 18..21)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbce67c",
+   "expect": "5b",
+   "new": "46",
+   "_note": "Shooting Menu 1 -> Picture Mode rows (row table 0x7EFEF4FC, rows 18..21)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbce684",
+   "expect": "67",
+   "new": "64",
+   "_note": "Shooting Menu 1 -> Picture Mode rows (row table 0x7EFEF4FC, rows 18..21)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbce690",
+   "expect": "46",
+   "new": "59",
+   "_note": "Shooting Menu 1 -> Picture Mode rows (row table 0x7EFEF4FC, rows 18..21)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbd53f8",
+   "expect": "0c",
+   "new": "0d",
+   "_note": "Shooting Menu 1 -> Picture Mode: row -> menu value, u32"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbd53fc",
+   "expect": "0d",
+   "new": "0e",
+   "_note": "Shooting Menu 1 -> Picture Mode: row -> menu value, u32"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbd5400",
+   "expect": "0e",
+   "new": "0f",
+   "_note": "Shooting Menu 1 -> Picture Mode: row -> menu value, u32"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbd5404",
+   "expect": "0f",
+   "new": "0c",
+   "_note": "Shooting Menu 1 -> Picture Mode: row -> menu value, u32"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbcead0",
+   "expect": "a2",
+   "new": "a3",
+   "_note": "ART BKT rows (row table, rows 76..79)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbceadc",
+   "expect": "40",
+   "new": "45",
+   "_note": "ART BKT rows (row table, rows 76..79)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbceae4",
+   "expect": "a3",
+   "new": "a4",
+   "_note": "ART BKT rows (row table, rows 76..79)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbceaf0",
+   "expect": "45",
+   "new": "3d",
+   "_note": "ART BKT rows (row table, rows 76..79)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbceaf8",
+   "expect": "a4",
+   "new": "a5",
+   "_note": "ART BKT rows (row table, rows 76..79)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbceb04",
+   "expect": "3d",
+   "new": "3c",
+   "_note": "ART BKT rows (row table, rows 76..79)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbceb0c",
+   "expect": "a5",
+   "new": "a2",
+   "_note": "ART BKT rows (row table, rows 76..79)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbceb18",
+   "expect": "3c",
+   "new": "40",
+   "_note": "ART BKT rows (row table, rows 76..79)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbd8d5c",
+   "expect": "40",
+   "new": "41",
+   "_note": "ART BKT: row -> its Off / On page and bracket flag (pages 576..579, info 418..421)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbd8d60",
+   "expect": "a2",
+   "new": "a3",
+   "_note": "ART BKT: row -> its Off / On page and bracket flag (pages 576..579, info 418..421)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbd8d64",
+   "expect": "41",
+   "new": "42",
+   "_note": "ART BKT: row -> its Off / On page and bracket flag (pages 576..579, info 418..421)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbd8d68",
+   "expect": "a3",
+   "new": "a4",
+   "_note": "ART BKT: row -> its Off / On page and bracket flag (pages 576..579, info 418..421)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbd8d6c",
+   "expect": "42",
+   "new": "43",
+   "_note": "ART BKT: row -> its Off / On page and bracket flag (pages 576..579, info 418..421)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbd8d70",
+   "expect": "a4",
+   "new": "a5",
+   "_note": "ART BKT: row -> its Off / On page and bracket flag (pages 576..579, info 418..421)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbd8d74",
+   "expect": "43",
+   "new": "40",
+   "_note": "ART BKT: row -> its Off / On page and bracket flag (pages 576..579, info 418..421)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbd8d78",
+   "expect": "a5",
+   "new": "a2",
+   "_note": "ART BKT: row -> its Off / On page and bracket flag (pages 576..579, info 418..421)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbcef1c",
+   "expect": "64",
+   "new": "65",
+   "_note": "Picture Mode Settings rows (row table, rows 131..134)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbcef28",
+   "expect": "40",
+   "new": "45",
+   "_note": "Picture Mode Settings rows (row table, rows 131..134)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbcef30",
+   "expect": "65",
+   "new": "66",
+   "_note": "Picture Mode Settings rows (row table, rows 131..134)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbcef3c",
+   "expect": "45",
+   "new": "3d",
+   "_note": "Picture Mode Settings rows (row table, rows 131..134)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbcef44",
+   "expect": "66",
+   "new": "67",
+   "_note": "Picture Mode Settings rows (row table, rows 131..134)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbcef50",
+   "expect": "3d",
+   "new": "3c",
+   "_note": "Picture Mode Settings rows (row table, rows 131..134)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbcef58",
+   "expect": "67",
+   "new": "64",
+   "_note": "Picture Mode Settings rows (row table, rows 131..134)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbcef64",
+   "expect": "3c",
+   "new": "40",
+   "_note": "Picture Mode Settings rows (row table, rows 131..134)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbd833c",
+   "expect": "ed",
+   "new": "ee",
+   "_note": "Picture Mode Settings: row -> its Off / On page (pages 237..240, show flags 356..359)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbd8344",
+   "expect": "ee",
+   "new": "ef",
+   "_note": "Picture Mode Settings: row -> its Off / On page (pages 237..240, show flags 356..359)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbd834c",
+   "expect": "ef",
+   "new": "f0",
+   "_note": "Picture Mode Settings: row -> its Off / On page (pages 237..240, show flags 356..359)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbd8354",
+   "expect": "f0",
+   "new": "ed",
+   "_note": "Picture Mode Settings: row -> its Off / On page (pages 237..240, show flags 356..359)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7ba4",
+   "expect": "4a",
+   "new": "49",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7ba8",
+   "expect": "40",
+   "new": "45",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7baa",
+   "expect": "c0",
+   "new": "c2",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bac",
+   "expect": "bf",
+   "new": "c1",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bae",
+   "expect": "b6",
+   "new": "c0",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bb0",
+   "expect": "bb",
+   "new": "c1",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bb2",
+   "expect": "00",
+   "new": "c2",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bb4",
+   "expect": "b7",
+   "new": "00",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bb6",
+   "expect": "b8",
+   "new": "00",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bb8",
+   "expect": "b9",
+   "new": "00",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bba",
+   "expect": "ba",
+   "new": "00",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bbc",
+   "expect": "bc",
+   "new": "00",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bbe",
+   "expect": "bd",
+   "new": "00",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bc0",
+   "expect": "be",
+   "new": "00",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bc2",
+   "expect": "bf",
+   "new": "00",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bc4",
+   "expect": "64",
+   "new": "65",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bc6",
+   "expect": "6d",
+   "new": "6e",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bc8",
+   "expect": "74",
+   "new": "75",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bca",
+   "expect": "d101d301",
+   "new": "d007d007",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bd0",
+   "expect": "49",
+   "new": "56",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bd4",
+   "expect": "45",
+   "new": "3d",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bd6",
+   "expect": "c2",
+   "new": "c4",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bd8",
+   "expect": "c1",
+   "new": "c3",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bda",
+   "expect": "c0",
+   "new": "c3",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bdc",
+   "expect": "c1",
+   "new": "00",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bde",
+   "expect": "c2",
+   "new": "00",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bf0",
+   "expect": "65",
+   "new": "66",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bf2",
+   "expect": "6e0175",
+   "new": "d0077c",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7bfc",
+   "expect": "56",
+   "new": "55",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c00",
+   "expect": "3d",
+   "new": "3c",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c02",
+   "expect": "c4",
+   "new": "c6",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c04",
+   "expect": "c3",
+   "new": "c5",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c06",
+   "expect": "c3",
+   "new": "c4",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c08",
+   "expect": "00",
+   "new": "c5",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c1c",
+   "expect": "66",
+   "new": "67",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c1e",
+   "expect": "d0077c",
+   "new": "700179",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c28",
+   "expect": "55",
+   "new": "4a",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c2c",
+   "expect": "3c",
+   "new": "40",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c2e",
+   "expect": "c6",
+   "new": "c0",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c30",
+   "expect": "c5",
+   "new": "bf",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c32",
+   "expect": "c4",
+   "new": "b6",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c34",
+   "expect": "c5",
+   "new": "bb",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c38",
+   "expect": "00",
+   "new": "b7",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c3a",
+   "expect": "00",
+   "new": "b8",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c3c",
+   "expect": "00",
+   "new": "b9",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c3e",
+   "expect": "00",
+   "new": "ba",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c40",
+   "expect": "00",
+   "new": "bc",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c42",
+   "expect": "00",
+   "new": "bd",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c44",
+   "expect": "00",
+   "new": "be",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c46",
+   "expect": "00",
+   "new": "bf",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c48",
+   "expect": "67",
+   "new": "64",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c4a",
+   "expect": "70",
+   "new": "6d",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c4c",
+   "expect": "79",
+   "new": "74",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7c4e",
+   "expect": "d007d007",
+   "new": "d101d301",
+   "_note": "ART list records, 44 B each (code, name, pictures, settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x428768",
+   "expect": "4a495655",
+   "new": "4956554a",
+   "_note": "ART mode value list (info 281): art codes, u8"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7784",
+   "expect": "f900fe000000fa",
+   "new": "03010401050100",
+   "_note": "ART list page: rows of the Filter Type / Add Effects screen, 30 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc778c",
+   "expect": "ff",
+   "new": "00",
+   "_note": "ART list page: rows of the Filter Type / Add Effects screen, 30 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7790",
+   "expect": "fb",
+   "new": "00",
+   "_note": "ART list page: rows of the Filter Type / Add Effects screen, 30 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7793",
+   "expect": "01",
+   "new": "00",
+   "_note": "ART list page: rows of the Filter Type / Add Effects screen, 30 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7796",
+   "expect": "fc",
+   "new": "00",
+   "_note": "ART list page: rows of the Filter Type / Add Effects screen, 30 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7798",
+   "expect": "0101",
+   "new": "0000",
+   "_note": "ART list page: rows of the Filter Type / Add Effects screen, 30 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc779c",
+   "expect": "fd",
+   "new": "00",
+   "_note": "ART list page: rows of the Filter Type / Add Effects screen, 30 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc779e",
+   "expect": "0201",
+   "new": "0000",
+   "_note": "ART list page: rows of the Filter Type / Add Effects screen, 30 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc77a2",
+   "expect": "03",
+   "new": "06",
+   "_note": "ART list page: rows of the Filter Type / Add Effects screen, 30 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc77a4",
+   "expect": "04010501",
+   "new": "00000000",
+   "_note": "ART list page: rows of the Filter Type / Add Effects screen, 30 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc77c0",
+   "expect": "06",
+   "new": "07",
+   "_note": "ART list page: rows of the Filter Type / Add Effects screen, 30 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc77c2",
+   "expect": "0000",
+   "new": "0801",
+   "_note": "ART list page: rows of the Filter Type / Add Effects screen, 30 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc77de",
+   "expect": "07010801",
+   "new": "f900fe00",
+   "_note": "ART list page: rows of the Filter Type / Add Effects screen, 30 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc77e4",
+   "expect": "00",
+   "new": "fa",
+   "_note": "ART list page: rows of the Filter Type / Add Effects screen, 30 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc77e6",
+   "expect": "00",
+   "new": "ff",
+   "_note": "ART list page: rows of the Filter Type / Add Effects screen, 30 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc77ea",
+   "expect": "00",
+   "new": "fb",
+   "_note": "ART list page: rows of the Filter Type / Add Effects screen, 30 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc77ed",
+   "expect": "00",
+   "new": "01",
+   "_note": "ART list page: rows of the Filter Type / Add Effects screen, 30 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc77f0",
+   "expect": "00",
+   "new": "fc",
+   "_note": "ART list page: rows of the Filter Type / Add Effects screen, 30 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc77f2",
+   "expect": "0000",
+   "new": "0101",
+   "_note": "ART list page: rows of the Filter Type / Add Effects screen, 30 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc77f6",
+   "expect": "00",
+   "new": "fd",
+   "_note": "ART list page: rows of the Filter Type / Add Effects screen, 30 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc77f8",
+   "expect": "0000",
+   "new": "0201",
+   "_note": "ART list page: rows of the Filter Type / Add Effects screen, 30 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7894",
+   "expect": "6d",
+   "new": "6e",
+   "_note": "ART list page: setting ids of that screen (type, effect, two more), 8 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7896",
+   "expect": "74",
+   "new": "75",
+   "_note": "ART list page: setting ids of that screen (type, effect, two more), 8 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7898",
+   "expect": "d101d3016e0175",
+   "new": "d007d007d0077c",
+   "_note": "ART list page: setting ids of that screen (type, effect, two more), 8 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc78a4",
+   "expect": "d0077c",
+   "new": "700179",
+   "_note": "ART list page: setting ids of that screen (type, effect, two more), 8 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc78ac",
+   "expect": "70",
+   "new": "6d",
+   "_note": "ART list page: setting ids of that screen (type, effect, two more), 8 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc78ae",
+   "expect": "79",
+   "new": "74",
+   "_note": "ART list page: setting ids of that screen (type, effect, two more), 8 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc78b0",
+   "expect": "d007d007",
+   "new": "d101d301",
+   "_note": "ART list page: setting ids of that screen (type, effect, two more), 8 B per entry"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc78e4",
+   "expect": "9721",
+   "new": "6923",
+   "_note": "ART list page: jump table 0x7EFE88F4 by place (function 0x7EDD1E80)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc78e8",
+   "expect": "6923",
+   "new": "4e24",
+   "_note": "ART list page: jump table 0x7EFE88F4 by place (function 0x7EDD1E80)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc78ec",
+   "expect": "4e",
+   "new": "c4",
+   "_note": "ART list page: jump table 0x7EFE88F4 by place (function 0x7EDD1E80)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc78f0",
+   "expect": "c424",
+   "new": "9721",
+   "_note": "ART list page: jump table 0x7EFE88F4 by place (function 0x7EDD1E80)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7994",
+   "expect": "fb5e",
+   "new": "2f5f",
+   "_note": "ART list page: jump table 0x7EFE89A4 by place (writes the settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7998",
+   "expect": "2f",
+   "new": "46",
+   "_note": "ART list page: jump table 0x7EFE89A4 by place (writes the settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc799c",
+   "expect": "46",
+   "new": "4f",
+   "_note": "ART list page: jump table 0x7EFE89A4 by place (writes the settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc79a0",
+   "expect": "4f5f",
+   "new": "fb5e",
+   "_note": "ART list page: jump table 0x7EFE89A4 by place (writes the settings)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc79c4",
+   "expect": "c060",
+   "new": "9361",
+   "_note": "ART list page: jump table 0x7EFE89D4 by place (function 0x7EDD6084)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc79c8",
+   "expect": "9361",
+   "new": "c862",
+   "_note": "ART list page: jump table 0x7EFE89D4 by place (function 0x7EDD6084)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc79cc",
+   "expect": "c862",
+   "new": "c060",
+   "_note": "ART list page: jump table 0x7EFE89D4 by place (function 0x7EDD6084)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc79f4",
+   "expect": "7066",
+   "new": "8c67",
+   "_note": "ART list page: jump table 0x7EFE8A04 by place (function 0x7EDD62CB)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc79fc",
+   "expect": "8c67",
+   "new": "7066",
+   "_note": "ART list page: jump table 0x7EFE8A04 by place (function 0x7EDD62CB)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7a24",
+   "expect": "af6a",
+   "new": "3a6c",
+   "_note": "ART list page: jump table 0x7EFE8A34 by place (function 0x7EDD6A72)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7a30",
+   "expect": "3a6c",
+   "new": "af6a",
+   "_note": "ART list page: jump table 0x7EFE8A34 by place (function 0x7EDD6A72)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7a54",
+   "expect": "746c",
+   "new": "816e",
+   "_note": "ART list page: jump table 0x7EFE8A64 by place (function 0x7EDD6C3D)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xbc7a60",
+   "expect": "816e",
+   "new": "746c",
+   "_note": "ART list page: jump table 0x7EFE8A64 by place (function 0x7EDD6C3D)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2cd320",
+   "expect": "cc2b",
+   "new": "303f",
+   "_note": "picture 0xbf: ART 5..8, ART list, chosen (64x48)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2cd328",
+   "expect": "4832",
+   "new": "cc2b",
+   "_note": "picture 0xc1: ART 5..8, ART list, chosen (64x48)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2cd330",
+   "expect": "b438",
+   "new": "4832",
+   "_note": "picture 0xc3: ART 5..8, ART list, chosen (64x48)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2cd338",
+   "expect": "303f",
+   "new": "b438",
+   "_note": "picture 0xc5: ART 5..8, ART list, chosen (64x48)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2cd324",
+   "expect": "80d7",
+   "new": "34e3",
+   "_note": "picture 0xc0: ART 5..8, ART list (50x38)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2cd32c",
+   "expect": "70db",
+   "new": "80d7",
+   "_note": "picture 0xc2: ART 5..8, ART list (50x38)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2cd334",
+   "expect": "48df",
+   "new": "70db",
+   "_note": "picture 0xc4: ART 5..8, ART list (50x38)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2cd33c",
+   "expect": "34e3",
+   "new": "48df",
+   "_note": "picture 0xc6: ART 5..8, ART list (50x38)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2cd8d0",
+   "expect": "b092",
+   "new": "c8a4",
+   "_note": "picture 0x22b: ART 5..8, live control strip, chosen (64x48)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2cd8d4",
+   "expect": "c098",
+   "new": "b092",
+   "_note": "picture 0x22c: ART 5..8, live control strip, chosen (64x48)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2cd8d8",
+   "expect": "ac9e",
+   "new": "c098",
+   "_note": "picture 0x22d: ART 5..8, live control strip, chosen (64x48)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2cd8dc",
+   "expect": "c8a4",
+   "new": "ac9e",
+   "_note": "picture 0x22e: ART 5..8, live control strip, chosen (64x48)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2cd914",
+   "expect": "d019",
+   "new": "1426",
+   "_note": "picture 0x23c: ART 5..8, live control strip (50x38)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2cd918",
+   "expect": "f01d",
+   "new": "d019",
+   "_note": "picture 0x23d: ART 5..8, live control strip (50x38)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2cd91c",
+   "expect": "f421",
+   "new": "f01d",
+   "_note": "picture 0x23e: ART 5..8, live control strip (50x38)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2cd920",
+   "expect": "1426",
+   "new": "f421",
+   "_note": "picture 0x23f: ART 5..8, live control strip (50x38)"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2cdde4",
+   "expect": "18ee",
+   "new": "5cfa",
+   "_note": "picture 0x370: ART 5..8, 50x38, dark"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2cde4c",
+   "expect": "38f2",
+   "new": "18ee",
+   "_note": "picture 0x38a: ART 5..8, 50x38, dark"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2cde58",
+   "expect": "3cf6",
+   "new": "38f2",
+   "_note": "picture 0x38d: ART 5..8, 50x38, dark"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2cde5c",
+   "expect": "5cfa",
+   "new": "3cf6",
+   "_note": "picture 0x38e: ART 5..8, 50x38, dark"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2ce2c4",
+   "expect": "047d",
+   "new": "348e",
+   "_note": "picture 0x4a8: ART 5..8, 54x54"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2ce2c8",
+   "expect": "c882",
+   "new": "047d",
+   "_note": "picture 0x4a9: ART 5..8, 54x54"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2ce2cc",
+   "expect": "7488",
+   "new": "c882",
+   "_note": "picture 0x4aa: ART 5..8, 54x54"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2ce2d0",
+   "expect": "348e",
+   "new": "7488",
+   "_note": "picture 0x4ab: ART 5..8, 54x54"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2ce550",
+   "expect": "f05b",
+   "new": "c064",
+   "_note": "picture 0x54b: ART 5..8, 44x32, grey"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2ce554",
+   "expect": "e85e",
+   "new": "f05b",
+   "_note": "picture 0x54c: ART 5..8, 44x32, grey"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2ce558",
+   "expect": "d461",
+   "new": "e85e",
+   "_note": "picture 0x54d: ART 5..8, 44x32, grey"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2ce55c",
+   "expect": "c064",
+   "new": "d461",
+   "_note": "picture 0x54e: ART 5..8, 44x32, grey"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2ce7d4",
+   "expect": "28f3",
+   "new": "e0fa",
+   "_note": "picture 0x5ec: ART 5..8, 44x32, black"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2ce7d8",
+   "expect": "bcf5",
+   "new": "28f3",
+   "_note": "picture 0x5ed: ART 5..8, 44x32, black"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2ce7dc",
+   "expect": "44f8",
+   "new": "bcf5",
+   "_note": "picture 0x5ee: ART 5..8, 44x32, black"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2ce7e0",
+   "expect": "e0fa",
+   "new": "44f8",
+   "_note": "picture 0x5ef: ART 5..8, 44x32, black"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2f83c2",
+   "expect": "38",
+   "new": "37",
+   "_note": "bgr (language 1): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2f8744",
+   "expect": "35",
+   "new": "38",
+   "_note": "bgr (language 1): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2f876c",
+   "expect": "36",
+   "new": "35",
+   "_note": "bgr (language 1): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x2f8796",
+   "expect": "37",
+   "new": "36",
+   "_note": "bgr (language 1): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x304602",
+   "expect": "35",
+   "new": "38",
+   "_note": "bgr (language 1): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x30460c",
+   "expect": "36",
+   "new": "35",
+   "_note": "bgr (language 1): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x304616",
+   "expect": "37",
+   "new": "36",
+   "_note": "bgr (language 1): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x304620",
+   "expect": "38",
+   "new": "37",
+   "_note": "bgr (language 1): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3091ba",
+   "expect": "36",
+   "new": "35",
+   "_note": "chs (language 2): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x30b68a",
+   "expect": "37",
+   "new": "36",
+   "_note": "chs (language 2): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x30b87e",
+   "expect": "38",
+   "new": "37",
+   "_note": "chs (language 2): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x30b8c4",
+   "expect": "35",
+   "new": "38",
+   "_note": "chs (language 2): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x311070",
+   "expect": "35",
+   "new": "38",
+   "_note": "chs (language 2): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31107a",
+   "expect": "36",
+   "new": "35",
+   "_note": "chs (language 2): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x311084",
+   "expect": "37",
+   "new": "36",
+   "_note": "chs (language 2): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31108e",
+   "expect": "38",
+   "new": "37",
+   "_note": "chs (language 2): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3147c4",
+   "expect": "36",
+   "new": "35",
+   "_note": "cht (language 3): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x316cdc",
+   "expect": "37",
+   "new": "36",
+   "_note": "cht (language 3): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x316ecc",
+   "expect": "38",
+   "new": "37",
+   "_note": "cht (language 3): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x316f12",
+   "expect": "35",
+   "new": "38",
+   "_note": "cht (language 3): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31c6be",
+   "expect": "35",
+   "new": "38",
+   "_note": "cht (language 3): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31c6c8",
+   "expect": "36",
+   "new": "35",
+   "_note": "cht (language 3): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31c6d2",
+   "expect": "37",
+   "new": "36",
+   "_note": "cht (language 3): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31c6dc",
+   "expect": "38",
+   "new": "37",
+   "_note": "cht (language 3): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x325508",
+   "expect": "38",
+   "new": "37",
+   "_note": "csy (language 4): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x32585c",
+   "expect": "35",
+   "new": "38",
+   "_note": "csy (language 4): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x325880",
+   "expect": "36",
+   "new": "35",
+   "_note": "csy (language 4): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3258aa",
+   "expect": "37",
+   "new": "36",
+   "_note": "csy (language 4): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x330a7e",
+   "expect": "35",
+   "new": "38",
+   "_note": "csy (language 4): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x330a88",
+   "expect": "36",
+   "new": "35",
+   "_note": "csy (language 4): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x330a92",
+   "expect": "37",
+   "new": "36",
+   "_note": "csy (language 4): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x330a9c",
+   "expect": "38",
+   "new": "37",
+   "_note": "csy (language 4): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x33a6d6",
+   "expect": "38",
+   "new": "37",
+   "_note": "dan (language 5): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x33aa28",
+   "expect": "35",
+   "new": "38",
+   "_note": "dan (language 5): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x33aa4c",
+   "expect": "36",
+   "new": "35",
+   "_note": "dan (language 5): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x33aa6c",
+   "expect": "37",
+   "new": "36",
+   "_note": "dan (language 5): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x345c80",
+   "expect": "35",
+   "new": "38",
+   "_note": "dan (language 5): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x345c8a",
+   "expect": "36",
+   "new": "35",
+   "_note": "dan (language 5): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x345c94",
+   "expect": "37",
+   "new": "36",
+   "_note": "dan (language 5): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x345c9e",
+   "expect": "38",
+   "new": "37",
+   "_note": "dan (language 5): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x35030e",
+   "expect": "38",
+   "new": "37",
+   "_note": "deu (language 6): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x350686",
+   "expect": "35",
+   "new": "38",
+   "_note": "deu (language 6): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3506b0",
+   "expect": "36",
+   "new": "35",
+   "_note": "deu (language 6): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3506d2",
+   "expect": "37",
+   "new": "36",
+   "_note": "deu (language 6): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x35c5e4",
+   "expect": "35",
+   "new": "38",
+   "_note": "deu (language 6): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x35c5ee",
+   "expect": "36",
+   "new": "35",
+   "_note": "deu (language 6): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x35c5f8",
+   "expect": "37",
+   "new": "36",
+   "_note": "deu (language 6): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x35c602",
+   "expect": "38",
+   "new": "37",
+   "_note": "deu (language 6): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x366f74",
+   "expect": "38",
+   "new": "37",
+   "_note": "ell (language 7): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3672dc",
+   "expect": "35",
+   "new": "38",
+   "_note": "ell (language 7): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x367304",
+   "expect": "36",
+   "new": "35",
+   "_note": "ell (language 7): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x367322",
+   "expect": "37",
+   "new": "36",
+   "_note": "ell (language 7): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x373be6",
+   "expect": "35",
+   "new": "38",
+   "_note": "ell (language 7): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x373bf0",
+   "expect": "36",
+   "new": "35",
+   "_note": "ell (language 7): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x373bfa",
+   "expect": "37",
+   "new": "36",
+   "_note": "ell (language 7): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x373c04",
+   "expect": "38",
+   "new": "37",
+   "_note": "ell (language 7): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x37d95a",
+   "expect": "38",
+   "new": "37",
+   "_note": "enu (language 8): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x37dc9a",
+   "expect": "35",
+   "new": "38",
+   "_note": "enu (language 8): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x37dcbe",
+   "expect": "36",
+   "new": "35",
+   "_note": "enu (language 8): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x37dcdc",
+   "expect": "37",
+   "new": "36",
+   "_note": "enu (language 8): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x389390",
+   "expect": "35",
+   "new": "38",
+   "_note": "enu (language 8): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x38939a",
+   "expect": "36",
+   "new": "35",
+   "_note": "enu (language 8): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3893a4",
+   "expect": "37",
+   "new": "36",
+   "_note": "enu (language 8): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3893ae",
+   "expect": "38",
+   "new": "37",
+   "_note": "enu (language 8): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x393016",
+   "expect": "38",
+   "new": "37",
+   "_note": "esp (language 9): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x393358",
+   "expect": "35",
+   "new": "38",
+   "_note": "esp (language 9): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x39337c",
+   "expect": "36",
+   "new": "35",
+   "_note": "esp (language 9): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3933a0",
+   "expect": "37",
+   "new": "36",
+   "_note": "esp (language 9): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x39ebe6",
+   "expect": "35",
+   "new": "38",
+   "_note": "esp (language 9): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x39ebf0",
+   "expect": "36",
+   "new": "35",
+   "_note": "esp (language 9): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x39ebfa",
+   "expect": "37",
+   "new": "36",
+   "_note": "esp (language 9): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x39ec04",
+   "expect": "38",
+   "new": "37",
+   "_note": "esp (language 9): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3a8842",
+   "expect": "38",
+   "new": "37",
+   "_note": "eti (language 10): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3a8b84",
+   "expect": "35",
+   "new": "38",
+   "_note": "eti (language 10): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3a8bac",
+   "expect": "36",
+   "new": "35",
+   "_note": "eti (language 10): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3a8bca",
+   "expect": "37",
+   "new": "36",
+   "_note": "eti (language 10): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3b3d02",
+   "expect": "35",
+   "new": "38",
+   "_note": "eti (language 10): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3b3d0c",
+   "expect": "36",
+   "new": "35",
+   "_note": "eti (language 10): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3b3d16",
+   "expect": "37",
+   "new": "36",
+   "_note": "eti (language 10): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3b3d20",
+   "expect": "38",
+   "new": "37",
+   "_note": "eti (language 10): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3bdca8",
+   "expect": "38",
+   "new": "37",
+   "_note": "fin (language 11): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3be006",
+   "expect": "35",
+   "new": "38",
+   "_note": "fin (language 11): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3be030",
+   "expect": "36",
+   "new": "35",
+   "_note": "fin (language 11): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3be054",
+   "expect": "37",
+   "new": "36",
+   "_note": "fin (language 11): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3c996a",
+   "expect": "35",
+   "new": "38",
+   "_note": "fin (language 11): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3c9974",
+   "expect": "36",
+   "new": "35",
+   "_note": "fin (language 11): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3c997e",
+   "expect": "37",
+   "new": "36",
+   "_note": "fin (language 11): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3c9988",
+   "expect": "38",
+   "new": "37",
+   "_note": "fin (language 11): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3ce068",
+   "expect": "36",
+   "new": "35",
+   "_note": "fra (language 12): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3d39c4",
+   "expect": "38",
+   "new": "37",
+   "_note": "fra (language 12): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3d3d08",
+   "expect": "35",
+   "new": "38",
+   "_note": "fra (language 12): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3d3d5c",
+   "expect": "37",
+   "new": "36",
+   "_note": "fra (language 12): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3dff1e",
+   "expect": "35",
+   "new": "38",
+   "_note": "fra (language 12): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3dff28",
+   "expect": "36",
+   "new": "35",
+   "_note": "fra (language 12): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3dff32",
+   "expect": "37",
+   "new": "36",
+   "_note": "fra (language 12): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3dff3c",
+   "expect": "38",
+   "new": "37",
+   "_note": "fra (language 12): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3ea3ba",
+   "expect": "38",
+   "new": "37",
+   "_note": "hrv (language 13): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3ea728",
+   "expect": "35",
+   "new": "38",
+   "_note": "hrv (language 13): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3ea74c",
+   "expect": "36",
+   "new": "35",
+   "_note": "hrv (language 13): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3ea76a",
+   "expect": "37",
+   "new": "36",
+   "_note": "hrv (language 13): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3f6b7c",
+   "expect": "35",
+   "new": "38",
+   "_note": "hrv (language 13): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3f6b86",
+   "expect": "36",
+   "new": "35",
+   "_note": "hrv (language 13): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3f6b90",
+   "expect": "37",
+   "new": "36",
+   "_note": "hrv (language 13): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3f6b9a",
+   "expect": "38",
+   "new": "37",
+   "_note": "hrv (language 13): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x400f2c",
+   "expect": "38",
+   "new": "37",
+   "_note": "hun (language 14): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x401270",
+   "expect": "35",
+   "new": "38",
+   "_note": "hun (language 14): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x401298",
+   "expect": "36",
+   "new": "35",
+   "_note": "hun (language 14): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4012b6",
+   "expect": "37",
+   "new": "36",
+   "_note": "hun (language 14): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x40d2f8",
+   "expect": "35",
+   "new": "38",
+   "_note": "hun (language 14): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x40d302",
+   "expect": "36",
+   "new": "35",
+   "_note": "hun (language 14): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x40d30c",
+   "expect": "37",
+   "new": "36",
+   "_note": "hun (language 14): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x40d316",
+   "expect": "38",
+   "new": "37",
+   "_note": "hun (language 14): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4172a8",
+   "expect": "38",
+   "new": "37",
+   "_note": "ind (language 15): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4175f6",
+   "expect": "35",
+   "new": "38",
+   "_note": "ind (language 15): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x41761e",
+   "expect": "36",
+   "new": "35",
+   "_note": "ind (language 15): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x417644",
+   "expect": "37",
+   "new": "36",
+   "_note": "ind (language 15): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4233ea",
+   "expect": "35",
+   "new": "38",
+   "_note": "ind (language 15): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4233f4",
+   "expect": "36",
+   "new": "35",
+   "_note": "ind (language 15): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4233fe",
+   "expect": "37",
+   "new": "36",
+   "_note": "ind (language 15): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x423408",
+   "expect": "38",
+   "new": "37",
+   "_note": "ind (language 15): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x42d752",
+   "expect": "38",
+   "new": "37",
+   "_note": "ita (language 16): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x42dacc",
+   "expect": "35",
+   "new": "38",
+   "_note": "ita (language 16): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x42daf8",
+   "expect": "36",
+   "new": "35",
+   "_note": "ita (language 16): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x42db24",
+   "expect": "37",
+   "new": "36",
+   "_note": "ita (language 16): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4399e0",
+   "expect": "35",
+   "new": "38",
+   "_note": "ita (language 16): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4399ea",
+   "expect": "36",
+   "new": "35",
+   "_note": "ita (language 16): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4399f4",
+   "expect": "37",
+   "new": "36",
+   "_note": "ita (language 16): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4399fe",
+   "expect": "38",
+   "new": "37",
+   "_note": "ita (language 16): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x43dfee",
+   "expect": "35",
+   "new": "38",
+   "_note": "jpn (language 17): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x43e00c",
+   "expect": "36",
+   "new": "35",
+   "_note": "jpn (language 17): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4415e6",
+   "expect": "37",
+   "new": "36",
+   "_note": "jpn (language 17): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x441806",
+   "expect": "38",
+   "new": "37",
+   "_note": "jpn (language 17): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x449830",
+   "expect": "35",
+   "new": "38",
+   "_note": "jpn (language 17): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x44983a",
+   "expect": "36",
+   "new": "35",
+   "_note": "jpn (language 17): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x449844",
+   "expect": "37",
+   "new": "36",
+   "_note": "jpn (language 17): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x44984e",
+   "expect": "38",
+   "new": "37",
+   "_note": "jpn (language 17): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x44d9ee",
+   "expect": "35",
+   "new": "38",
+   "_note": "kor (language 18): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x44da08",
+   "expect": "37",
+   "new": "36",
+   "_note": "kor (language 18): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x450fbc",
+   "expect": "36",
+   "new": "35",
+   "_note": "kor (language 18): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x45119e",
+   "expect": "38",
+   "new": "37",
+   "_note": "kor (language 18): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x459494",
+   "expect": "35",
+   "new": "38",
+   "_note": "kor (language 18): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x45949e",
+   "expect": "36",
+   "new": "35",
+   "_note": "kor (language 18): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4594a8",
+   "expect": "37",
+   "new": "36",
+   "_note": "kor (language 18): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4594b2",
+   "expect": "38",
+   "new": "37",
+   "_note": "kor (language 18): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x45d274",
+   "expect": "36",
+   "new": "35",
+   "_note": "lth (language 19): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x462e58",
+   "expect": "38",
+   "new": "37",
+   "_note": "lth (language 19): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4631c8",
+   "expect": "35",
+   "new": "38",
+   "_note": "lth (language 19): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x463216",
+   "expect": "37",
+   "new": "36",
+   "_note": "lth (language 19): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x46f478",
+   "expect": "35",
+   "new": "38",
+   "_note": "lth (language 19): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x46f482",
+   "expect": "36",
+   "new": "35",
+   "_note": "lth (language 19): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x46f48c",
+   "expect": "37",
+   "new": "36",
+   "_note": "lth (language 19): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x46f496",
+   "expect": "38",
+   "new": "37",
+   "_note": "lth (language 19): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x479804",
+   "expect": "38",
+   "new": "37",
+   "_note": "lvi (language 20): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x479b70",
+   "expect": "35",
+   "new": "38",
+   "_note": "lvi (language 20): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x479b9c",
+   "expect": "36",
+   "new": "35",
+   "_note": "lvi (language 20): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x479bba",
+   "expect": "37",
+   "new": "36",
+   "_note": "lvi (language 20): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4860ea",
+   "expect": "35",
+   "new": "38",
+   "_note": "lvi (language 20): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4860f4",
+   "expect": "36",
+   "new": "35",
+   "_note": "lvi (language 20): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4860fe",
+   "expect": "37",
+   "new": "36",
+   "_note": "lvi (language 20): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x486108",
+   "expect": "38",
+   "new": "37",
+   "_note": "lvi (language 20): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x48fde8",
+   "expect": "38",
+   "new": "37",
+   "_note": "msl (language 21): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x490146",
+   "expect": "35",
+   "new": "38",
+   "_note": "msl (language 21): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x490166",
+   "expect": "36",
+   "new": "35",
+   "_note": "msl (language 21): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x490184",
+   "expect": "37",
+   "new": "36",
+   "_note": "msl (language 21): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x49b70a",
+   "expect": "35",
+   "new": "38",
+   "_note": "msl (language 21): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x49b714",
+   "expect": "36",
+   "new": "35",
+   "_note": "msl (language 21): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x49b71e",
+   "expect": "37",
+   "new": "36",
+   "_note": "msl (language 21): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x49b728",
+   "expect": "38",
+   "new": "37",
+   "_note": "msl (language 21): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x49fedc",
+   "expect": "36",
+   "new": "35",
+   "_note": "nld (language 22): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4a586e",
+   "expect": "38",
+   "new": "37",
+   "_note": "nld (language 22): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4a5bd2",
+   "expect": "35",
+   "new": "38",
+   "_note": "nld (language 22): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4a5c18",
+   "expect": "37",
+   "new": "36",
+   "_note": "nld (language 22): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4b1c92",
+   "expect": "35",
+   "new": "38",
+   "_note": "nld (language 22): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4b1c9c",
+   "expect": "36",
+   "new": "35",
+   "_note": "nld (language 22): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4b1ca6",
+   "expect": "37",
+   "new": "36",
+   "_note": "nld (language 22): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4b1cb0",
+   "expect": "38",
+   "new": "37",
+   "_note": "nld (language 22): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4bb440",
+   "expect": "38",
+   "new": "37",
+   "_note": "nor (language 23): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4bb766",
+   "expect": "35",
+   "new": "38",
+   "_note": "nor (language 23): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4bb78a",
+   "expect": "36",
+   "new": "35",
+   "_note": "nor (language 23): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4bb7ac",
+   "expect": "37",
+   "new": "36",
+   "_note": "nor (language 23): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4c65d2",
+   "expect": "35",
+   "new": "38",
+   "_note": "nor (language 23): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4c65dc",
+   "expect": "36",
+   "new": "35",
+   "_note": "nor (language 23): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4c65e6",
+   "expect": "37",
+   "new": "36",
+   "_note": "nor (language 23): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4c65f0",
+   "expect": "38",
+   "new": "37",
+   "_note": "nor (language 23): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4d05dc",
+   "expect": "38",
+   "new": "37",
+   "_note": "plk (language 24): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4d0962",
+   "expect": "35",
+   "new": "38",
+   "_note": "plk (language 24): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4d098c",
+   "expect": "36",
+   "new": "35",
+   "_note": "plk (language 24): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4d09c2",
+   "expect": "37",
+   "new": "36",
+   "_note": "plk (language 24): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4dce7a",
+   "expect": "35",
+   "new": "38",
+   "_note": "plk (language 24): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4dce84",
+   "expect": "36",
+   "new": "35",
+   "_note": "plk (language 24): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4dce8e",
+   "expect": "37",
+   "new": "36",
+   "_note": "plk (language 24): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4dce98",
+   "expect": "38",
+   "new": "37",
+   "_note": "plk (language 24): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4e7640",
+   "expect": "38",
+   "new": "37",
+   "_note": "ptg (language 25): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4e79a8",
+   "expect": "35",
+   "new": "38",
+   "_note": "ptg (language 25): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4e79d4",
+   "expect": "36",
+   "new": "35",
+   "_note": "ptg (language 25): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4e79fe",
+   "expect": "37",
+   "new": "36",
+   "_note": "ptg (language 25): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4f40e4",
+   "expect": "35",
+   "new": "38",
+   "_note": "ptg (language 25): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4f40ee",
+   "expect": "36",
+   "new": "35",
+   "_note": "ptg (language 25): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4f40f8",
+   "expect": "37",
+   "new": "36",
+   "_note": "ptg (language 25): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4f4102",
+   "expect": "38",
+   "new": "37",
+   "_note": "ptg (language 25): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4feba2",
+   "expect": "38",
+   "new": "37",
+   "_note": "rom (language 26): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4feefe",
+   "expect": "35",
+   "new": "38",
+   "_note": "rom (language 26): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4fef34",
+   "expect": "36",
+   "new": "35",
+   "_note": "rom (language 26): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4fef52",
+   "expect": "37",
+   "new": "36",
+   "_note": "rom (language 26): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x50b294",
+   "expect": "35",
+   "new": "38",
+   "_note": "rom (language 26): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x50b29e",
+   "expect": "36",
+   "new": "35",
+   "_note": "rom (language 26): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x50b2a8",
+   "expect": "37",
+   "new": "36",
+   "_note": "rom (language 26): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x50b2b2",
+   "expect": "38",
+   "new": "37",
+   "_note": "rom (language 26): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x50fa46",
+   "expect": "36",
+   "new": "35",
+   "_note": "rus (language 27): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x514a60",
+   "expect": "38",
+   "new": "37",
+   "_note": "rus (language 27): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x514d96",
+   "expect": "35",
+   "new": "38",
+   "_note": "rus (language 27): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x514dd4",
+   "expect": "37",
+   "new": "36",
+   "_note": "rus (language 27): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x51f9c6",
+   "expect": "35",
+   "new": "38",
+   "_note": "rus (language 27): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x51f9d0",
+   "expect": "36",
+   "new": "35",
+   "_note": "rus (language 27): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x51f9da",
+   "expect": "37",
+   "new": "36",
+   "_note": "rus (language 27): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x51f9e4",
+   "expect": "38",
+   "new": "37",
+   "_note": "rus (language 27): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5292cc",
+   "expect": "38",
+   "new": "37",
+   "_note": "sky (language 28): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5295f8",
+   "expect": "35",
+   "new": "38",
+   "_note": "sky (language 28): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x52961c",
+   "expect": "36",
+   "new": "35",
+   "_note": "sky (language 28): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x529650",
+   "expect": "37",
+   "new": "36",
+   "_note": "sky (language 28): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x534b14",
+   "expect": "35",
+   "new": "38",
+   "_note": "sky (language 28): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x534b1e",
+   "expect": "36",
+   "new": "35",
+   "_note": "sky (language 28): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x534b28",
+   "expect": "37",
+   "new": "36",
+   "_note": "sky (language 28): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x534b32",
+   "expect": "38",
+   "new": "37",
+   "_note": "sky (language 28): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x53f210",
+   "expect": "38",
+   "new": "37",
+   "_note": "slv (language 29): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x53f560",
+   "expect": "35",
+   "new": "38",
+   "_note": "slv (language 29): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x53f586",
+   "expect": "36",
+   "new": "35",
+   "_note": "slv (language 29): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x53f5bc",
+   "expect": "37",
+   "new": "36",
+   "_note": "slv (language 29): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x54bd8e",
+   "expect": "35",
+   "new": "38",
+   "_note": "slv (language 29): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x54bd98",
+   "expect": "36",
+   "new": "35",
+   "_note": "slv (language 29): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x54bda2",
+   "expect": "37",
+   "new": "36",
+   "_note": "slv (language 29): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x54bdac",
+   "expect": "38",
+   "new": "37",
+   "_note": "slv (language 29): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x55674a",
+   "expect": "38",
+   "new": "37",
+   "_note": "srb (language 30): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x556ab2",
+   "expect": "35",
+   "new": "38",
+   "_note": "srb (language 30): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x556ad6",
+   "expect": "36",
+   "new": "35",
+   "_note": "srb (language 30): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x556b04",
+   "expect": "37",
+   "new": "36",
+   "_note": "srb (language 30): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x562c40",
+   "expect": "35",
+   "new": "38",
+   "_note": "srb (language 30): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x562c4a",
+   "expect": "36",
+   "new": "35",
+   "_note": "srb (language 30): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x562c54",
+   "expect": "37",
+   "new": "36",
+   "_note": "srb (language 30): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x562c5e",
+   "expect": "38",
+   "new": "37",
+   "_note": "srb (language 30): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x56c884",
+   "expect": "38",
+   "new": "37",
+   "_note": "sve (language 31): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x56cbd0",
+   "expect": "35",
+   "new": "38",
+   "_note": "sve (language 31): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x56cbfc",
+   "expect": "36",
+   "new": "35",
+   "_note": "sve (language 31): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x56cc1c",
+   "expect": "37",
+   "new": "36",
+   "_note": "sve (language 31): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x57808c",
+   "expect": "35",
+   "new": "38",
+   "_note": "sve (language 31): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x578096",
+   "expect": "36",
+   "new": "35",
+   "_note": "sve (language 31): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5780a0",
+   "expect": "37",
+   "new": "36",
+   "_note": "sve (language 31): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5780aa",
+   "expect": "38",
+   "new": "37",
+   "_note": "sve (language 31): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x57c866",
+   "expect": "38",
+   "new": "37",
+   "_note": "tha (language 32): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5814a4",
+   "expect": "35",
+   "new": "38",
+   "_note": "tha (language 32): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5814c6",
+   "expect": "36",
+   "new": "35",
+   "_note": "tha (language 32): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5814ea",
+   "expect": "37",
+   "new": "36",
+   "_note": "tha (language 32): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x58af9e",
+   "expect": "35",
+   "new": "38",
+   "_note": "tha (language 32): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x58afa8",
+   "expect": "36",
+   "new": "35",
+   "_note": "tha (language 32): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x58afb2",
+   "expect": "37",
+   "new": "36",
+   "_note": "tha (language 32): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x58afbc",
+   "expect": "38",
+   "new": "37",
+   "_note": "tha (language 32): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x594a52",
+   "expect": "38",
+   "new": "37",
+   "_note": "trk (language 33): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x594d92",
+   "expect": "35",
+   "new": "38",
+   "_note": "trk (language 33): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x594db6",
+   "expect": "36",
+   "new": "35",
+   "_note": "trk (language 33): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x594dda",
+   "expect": "37",
+   "new": "36",
+   "_note": "trk (language 33): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5a028e",
+   "expect": "35",
+   "new": "38",
+   "_note": "trk (language 33): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5a0298",
+   "expect": "36",
+   "new": "35",
+   "_note": "trk (language 33): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5a02a2",
+   "expect": "37",
+   "new": "36",
+   "_note": "trk (language 33): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5a02ac",
+   "expect": "38",
+   "new": "37",
+   "_note": "trk (language 33): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5a4648",
+   "expect": "36",
+   "new": "35",
+   "_note": "ukr (language 34): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5a9ed0",
+   "expect": "38",
+   "new": "37",
+   "_note": "ukr (language 34): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5aa228",
+   "expect": "35",
+   "new": "38",
+   "_note": "ukr (language 34): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5aa266",
+   "expect": "37",
+   "new": "36",
+   "_note": "ukr (language 34): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5b6024",
+   "expect": "35",
+   "new": "38",
+   "_note": "ukr (language 34): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5b602e",
+   "expect": "36",
+   "new": "35",
+   "_note": "ukr (language 34): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5b6038",
+   "expect": "37",
+   "new": "36",
+   "_note": "ukr (language 34): ART numbers of four entries"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5b6042",
+   "expect": "38",
+   "new": "37",
+   "_note": "ukr (language 34): ART numbers of four entries"
+  }
+ ]
+}

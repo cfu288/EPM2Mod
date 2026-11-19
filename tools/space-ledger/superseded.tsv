@@ -1,76 +1,76 @@
-# Hand-maintained list of specs outside patches/ that a later spec replaces, for tools/freespace.py.
+# Hand-maintained list of specs outside data/specs/ that a later spec replaces, for tools/freespace.py.
 # Their bytes are shown in the ledger as "superseded" and do not count as used or as an overlap.
 # Columns (tab-separated): spec (path from the repo root), superseded by, evidence.
-experiments/2026-11-13-intervalometer/patches/interval-timelapse-insert-awake.json	patches/interval-timelapse-v2.json	description of v2: "v2 of interval-timelapse-insert-awake.json after two reviews"; v2 moved the code from the segment-3 tail to the segment-2 tail
+experiments/2026-11-13-intervalometer/patches/interval-timelapse-insert-awake.json	data/specs/interval-timelapse-v2.json	description of v2: "v2 of interval-timelapse-insert-awake.json after two reviews"; v2 moved the code from the segment-3 tail to the segment-2 tail
 experiments/2026-11-13-intervalometer/patches/interval-timelapse-insert.json	experiments/2026-11-13-intervalometer/patches/interval-timelapse-insert-awake.json	insert-awake is the same spec plus the keep-awake hold (same segment-3 tail bytes)
-patches/log-card-read.json	patches/log-card-look.json	log-card-look is probe 2 in place of probe 1 (log-card-read, camera-tested 2026-11-17): the same hook at the flush task entry, the same base, its T_CRD in the same run 0x7EBF2888 (experiments/2026-11-17-card-looks/NOTES.md)
-patches/log-card-look.json	patches/log-card-probe.json	log-card-probe is the probe harness in place of probe 2 (log-card-look, camera-tested 2026-11-17): the same hook and base, its T_CRD and T_HDR in the same runs 0x7EBF2888 and 0x7EBF2B90 (experiments/2026-11-17-card-looks/design.md section 8)
-patches/log-card-probe.json	patches/log-card-keep.json	log-card-keep is the persistence probe after the probe harness (log-card-probe, flashed first): the same hook and base, its code in the same free runs of segment 2 (experiments/2026-11-17-card-looks/design.md section 8)
-patches/log-card-keep.json	patches/card-looks.json	card-looks is the feature after the persistence probe (log-card-keep, camera-tested 2026-11-17): its code reuses the probe's free runs of segment 2; the two are never in one build (log-card-keep needs the debug log, card-looks is on films-12d) (experiments/2026-11-17-card-looks/design.md section 9.3)
-patches/films12-looks.json	patches/films12cl-looks.json	films12cl-looks is films12-looks for the layout with twelve colour slots: the same five tables, Double-X (as a colour look) and Provia in the first two extra slots (experiments/2026-11-17-card-looks/design.md section 9.5); 24 of its 40 ops are equal to those of films12-looks
-patches/card-looks.json	patches/card-looks-2.json	card-looks-2 is the card-looks loader for twelve colour slots with the menu row of looks-menu as its trigger: the same hook, task, code runs and data areas (experiments/2026-11-17-card-looks/design.md section 9.5)
-patches/card-looks-2.json	patches/card-looks-3.json	card-looks-3 is the loader of card-looks-2 (flashed 2026-11-17, not accepted) with names, status, Built-in and live tables: the same hook, task, code runs and data areas (experiments/2026-11-17-card-looks/design.md section 10)
-patches/looks-menu.json	patches/looks-menu-2.json	looks-menu-2 is looks-menu with a third item (Built-in) and a status text: the same row, list and data area (experiments/2026-11-17-card-looks/design.md section 10)
-patches/peaking-menu.json	patches/custom-menu-rows.json	custom-menu-rows is peaking-menu with one more added row (Load Looks): the same list, texts and code, its item table one row longer at 0x7EBF1FF0 and its child list one entry longer at 0x7EBF2600 (experiments/2026-11-17-card-looks/design.md section 10.2)
-patches/looks-menu-2.json	patches/looks-menu-3.json	looks-menu-3 is looks-menu-2 without the edit of the Touch Screen Settings row: Load Looks is an added row now (custom-menu-rows); the same list, texts and data area (experiments/2026-11-17-card-looks/design.md section 10.2)
-patches/card-looks-3.json	patches/card-looks-4.json	card-looks-4 is card-looks-3 with its first run moved to 0x7EBF2890 (the longer child list of custom-menu-rows ends there): the same hook, task, code and data areas (experiments/2026-11-17-card-looks/design.md section 10.2)
-patches/custom-menu-rows.json	patches/custom-menu-rows-2.json	custom-menu-rows-2 is custom-menu-rows with one more added row (Debug Log): the same operations, its item table one row longer at 0x7EBF1FF0, its child list one entry longer and moved to segment 3 data at 0x7EE3CBF4 (experiments/2026-11-18-log-menu/design.md)
-patches/log-core.json	patches/log-menu.json	log-menu is the log core (with an Off switch), the probes, the timing probe and the guard probe assembled again on the pinned build: the same code in the same kernel run 0x7E4C9514 and the segment-2 runs 0x7EBF2BE4 and 0x7EBF3780 (experiments/2026-11-18-log-menu/design.md)
-patches/log-probes.json	patches/log-menu.json	as log-core: the probe routines are part of log-menu, in the same runs
-patches/log-peaking-time.json	patches/log-menu.json	as log-core: the timing probe's routines are part of log-menu, in the kernel run 0x7E4C9514
-patches/log-peaking-guard.json	patches/log-menu.json	as log-core: T_GRD is part of log-menu, at 0x7EBF2600 (its old place 0x7EBF2510 is the longer item table of custom-menu-rows-2)
-patches/card-looks-4.json	patches/card-looks-5.json	card-looks-5 is the loader of card-looks-4 for the stock-filters firmware: the same hook, task and code runs, without the snapshot, the live tables and Built-in, with the switch lists (experiments/2026-11-18-stock-filters/design.md)
-patches/looks-menu-3.json	patches/looks-menu-4.json	looks-menu-4 is looks-menu-3 without Built-in: the same row, list and data area
-patches/remap7b-code.json	patches/stock-films-structure.json	the stock-filters firmware replaces the film firmware: stock-films-structure takes the place of the film specs, in their free runs (experiments/2026-11-18-stock-filters/design.md)
-patches/films12-structure.json	patches/stock-films-structure.json	as remap7b-code
-patches/seven-films-5.json	patches/stock-films-structure.json	as remap7b-code
-patches/seven-fixes-1.json	patches/stock-films-structure.json	as remap7b-code
-patches/seven-movie-1.json	patches/stock-films-structure.json	as remap7b-code
-patches/films12cl-looks.json	patches/stock-films-structure.json	as remap7b-code
-patches/log-menu.json	patches/log-menu-2.json	log-menu-2 is log-menu for the stock-filters firmware: the same code and runs, chained to card-looks-5's T_GUI and with its card_task probe at card-looks-5's T_END (experiments/2026-11-18-stock-filters/design.md)
-patches/custom-menu-rows-2.json	patches/custom-menu-rows-3.json	custom-menu-rows-3 is custom-menu-rows-2 with one more added row (Lowest S/S Setting in group E): the same operations, its item table one row longer at 0x7EBF1FE0 (16 B earlier, same end), its child list one entry longer in place at 0x7EE3CBF4 and the Debug Log value list 8 B later (experiments/2026-11-17-auto-iso-min-shutter/NOTES.md section 8)
-patches/build-label-proto.json	patches/build-label.json	build-label is the prototype with the placeholder date 0000.00.00 in place of 2026.11.19 in its text; epm2mod make writes the build label there (src/epm2mod/label.py); the other three edits are the same
-# Rows with 'history' in the second column: specs of earlier builds that no build uses now and that no single spec replaced (until 2026-11-19 they sat in patches/).
-patches/check-portra-in-new-slots.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/curve-probe-1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/curve-probe-2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/film-ektachrome-lt2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/film-ektachrome-lt3.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/film-ektachrome-lt3-s3.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/film-ektachrome-lt.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/film-ektachrome-pa2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/film-portra.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/film-portra-xp10.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/film-portra-xp10-s3.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/film-portra-xp2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/film-portra-xp7.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/film-portra-xp8.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/film-portra-xp9.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/film-portra-xp.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/film-pro400h-pa1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/film-pro400h-pa2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/film-pro400h-pa2-s12.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/film-vision3-250d-pl1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/four-code.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/four-neutral.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/label-ektachrome-lt.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/label-portra.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/label-pro400h-pa.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/remap7-code.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/remap7-neutral.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/seven-films-1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/seven-films-2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/seven-films-3.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/seven-films-4.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/sixaxis-portra-1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/sixaxis-portra-2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/sixaxis-portra-3.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/sixaxis-probe-1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/slot3-chroma-linear.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/slot3-code.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/slots12-code.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/slots12-kind.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/slots12-neutral.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/slots7-code.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/slots7-kind.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
-patches/slots7-neutral.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+data/specs/log-card-read.json	data/specs/log-card-look.json	log-card-look is probe 2 in place of probe 1 (log-card-read, camera-tested 2026-11-17): the same hook at the flush task entry, the same base, its T_CRD in the same run 0x7EBF2888 (experiments/2026-11-17-card-looks/NOTES.md)
+data/specs/log-card-look.json	data/specs/log-card-probe.json	log-card-probe is the probe harness in place of probe 2 (log-card-look, camera-tested 2026-11-17): the same hook and base, its T_CRD and T_HDR in the same runs 0x7EBF2888 and 0x7EBF2B90 (experiments/2026-11-17-card-looks/design.md section 8)
+data/specs/log-card-probe.json	data/specs/log-card-keep.json	log-card-keep is the persistence probe after the probe harness (log-card-probe, flashed first): the same hook and base, its code in the same free runs of segment 2 (experiments/2026-11-17-card-looks/design.md section 8)
+data/specs/log-card-keep.json	data/specs/card-looks.json	card-looks is the feature after the persistence probe (log-card-keep, camera-tested 2026-11-17): its code reuses the probe's free runs of segment 2; the two are never in one build (log-card-keep needs the debug log, card-looks is on films-12d) (experiments/2026-11-17-card-looks/design.md section 9.3)
+data/specs/films12-looks.json	data/specs/films12cl-looks.json	films12cl-looks is films12-looks for the layout with twelve colour slots: the same five tables, Double-X (as a colour look) and Provia in the first two extra slots (experiments/2026-11-17-card-looks/design.md section 9.5); 24 of its 40 ops are equal to those of films12-looks
+data/specs/card-looks.json	data/specs/card-looks-2.json	card-looks-2 is the card-looks loader for twelve colour slots with the menu row of looks-menu as its trigger: the same hook, task, code runs and data areas (experiments/2026-11-17-card-looks/design.md section 9.5)
+data/specs/card-looks-2.json	data/specs/card-looks-3.json	card-looks-3 is the loader of card-looks-2 (flashed 2026-11-17, not accepted) with names, status, Built-in and live tables: the same hook, task, code runs and data areas (experiments/2026-11-17-card-looks/design.md section 10)
+data/specs/looks-menu.json	data/specs/looks-menu-2.json	looks-menu-2 is looks-menu with a third item (Built-in) and a status text: the same row, list and data area (experiments/2026-11-17-card-looks/design.md section 10)
+data/specs/peaking-menu.json	data/specs/custom-menu-rows.json	custom-menu-rows is peaking-menu with one more added row (Load Looks): the same list, texts and code, its item table one row longer at 0x7EBF1FF0 and its child list one entry longer at 0x7EBF2600 (experiments/2026-11-17-card-looks/design.md section 10.2)
+data/specs/looks-menu-2.json	data/specs/looks-menu-3.json	looks-menu-3 is looks-menu-2 without the edit of the Touch Screen Settings row: Load Looks is an added row now (custom-menu-rows); the same list, texts and data area (experiments/2026-11-17-card-looks/design.md section 10.2)
+data/specs/card-looks-3.json	data/specs/card-looks-4.json	card-looks-4 is card-looks-3 with its first run moved to 0x7EBF2890 (the longer child list of custom-menu-rows ends there): the same hook, task, code and data areas (experiments/2026-11-17-card-looks/design.md section 10.2)
+data/specs/custom-menu-rows.json	data/specs/custom-menu-rows-2.json	custom-menu-rows-2 is custom-menu-rows with one more added row (Debug Log): the same operations, its item table one row longer at 0x7EBF1FF0, its child list one entry longer and moved to segment 3 data at 0x7EE3CBF4 (experiments/2026-11-18-log-menu/design.md)
+data/specs/log-core.json	data/specs/log-menu.json	log-menu is the log core (with an Off switch), the probes, the timing probe and the guard probe assembled again on the pinned build: the same code in the same kernel run 0x7E4C9514 and the segment-2 runs 0x7EBF2BE4 and 0x7EBF3780 (experiments/2026-11-18-log-menu/design.md)
+data/specs/log-probes.json	data/specs/log-menu.json	as log-core: the probe routines are part of log-menu, in the same runs
+data/specs/log-peaking-time.json	data/specs/log-menu.json	as log-core: the timing probe's routines are part of log-menu, in the kernel run 0x7E4C9514
+data/specs/log-peaking-guard.json	data/specs/log-menu.json	as log-core: T_GRD is part of log-menu, at 0x7EBF2600 (its old place 0x7EBF2510 is the longer item table of custom-menu-rows-2)
+data/specs/card-looks-4.json	data/specs/card-looks-5.json	card-looks-5 is the loader of card-looks-4 for the stock-filters firmware: the same hook, task and code runs, without the snapshot, the live tables and Built-in, with the switch lists (experiments/2026-11-18-stock-filters/design.md)
+data/specs/looks-menu-3.json	data/specs/looks-menu-4.json	looks-menu-4 is looks-menu-3 without Built-in: the same row, list and data area
+data/specs/remap7b-code.json	data/specs/stock-films-structure.json	the stock-filters firmware replaces the film firmware: stock-films-structure takes the place of the film specs, in their free runs (experiments/2026-11-18-stock-filters/design.md)
+data/specs/films12-structure.json	data/specs/stock-films-structure.json	as remap7b-code
+data/specs/seven-films-5.json	data/specs/stock-films-structure.json	as remap7b-code
+data/specs/seven-fixes-1.json	data/specs/stock-films-structure.json	as remap7b-code
+data/specs/seven-movie-1.json	data/specs/stock-films-structure.json	as remap7b-code
+data/specs/films12cl-looks.json	data/specs/stock-films-structure.json	as remap7b-code
+data/specs/log-menu.json	data/specs/log-menu-2.json	log-menu-2 is log-menu for the stock-filters firmware: the same code and runs, chained to card-looks-5's T_GUI and with its card_task probe at card-looks-5's T_END (experiments/2026-11-18-stock-filters/design.md)
+data/specs/custom-menu-rows-2.json	data/specs/custom-menu-rows-3.json	custom-menu-rows-3 is custom-menu-rows-2 with one more added row (Lowest S/S Setting in group E): the same operations, its item table one row longer at 0x7EBF1FE0 (16 B earlier, same end), its child list one entry longer in place at 0x7EE3CBF4 and the Debug Log value list 8 B later (experiments/2026-11-17-auto-iso-min-shutter/NOTES.md section 8)
+data/specs/build-label-proto.json	data/specs/build-label.json	build-label is the prototype with the placeholder date 0000.00.00 in place of 2026.11.19 in its text; epm2mod make writes the build label there (src/epm2mod/label.py); the other three edits are the same
+# Rows with 'history' in the second column: specs of earlier builds that no build uses now and that no single spec replaced (until 2026-11-19 they sat in data/specs/).
+data/specs/check-portra-in-new-slots.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/curve-probe-1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/curve-probe-2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/film-ektachrome-lt2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/film-ektachrome-lt3.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/film-ektachrome-lt3-s3.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/film-ektachrome-lt.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/film-ektachrome-pa2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/film-portra.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/film-portra-xp10.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/film-portra-xp10-s3.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/film-portra-xp2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/film-portra-xp7.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/film-portra-xp8.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/film-portra-xp9.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/film-portra-xp.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/film-pro400h-pa1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/film-pro400h-pa2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/film-pro400h-pa2-s12.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/film-vision3-250d-pl1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/four-code.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/four-neutral.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/label-ektachrome-lt.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/label-portra.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/label-pro400h-pa.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/remap7-code.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/remap7-neutral.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/seven-films-1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/seven-films-2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/seven-films-3.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/seven-films-4.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/sixaxis-portra-1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/sixaxis-portra-2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/sixaxis-portra-3.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/sixaxis-probe-1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/slot3-chroma-linear.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/slot3-code.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/slots12-code.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/slots12-kind.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/slots12-neutral.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/slots7-code.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/slots7-kind.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/slots7-neutral.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/

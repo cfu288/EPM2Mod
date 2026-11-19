@@ -450,8 +450,8 @@ def generate_all(paths: RepoPaths, stock: StockFirmware) -> list[GeneratedSpec]:
 
     Returns:
         The three specs of the first seven films and, if the repository has
-        ``looks/more-films.json``, the specs of the films beyond them, and, if
-        it has ``looks/films-12-bw.json``, the specs of that list.
+        ``data/films/more-films.json``, the specs of the films beyond them, and, if
+        it has ``data/films/films-12-bw.json``, the specs of that list.
 
     Raises:
         BuildError: if a film list or a fit file is wrong.

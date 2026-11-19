@@ -3,15 +3,15 @@
 Run from the repository root, after `epm2mod make` has made the base build:
 
     .venv/bin/python experiments/2026-11-16-films-max/scripts/names_spec.py \
-        --base build/peaking-fast.BIN [--out patches/films12-names.json] [--table]
+        --base build/peaking-fast.BIN [--out data/specs/films12-names.json] [--table]
 
-The names come from looks/more-films.json (entry -> label). The text-pool reader is that of
+The names come from data/films/more-films.json (entry -> label). The text-pool reader is that of
 experiments/2026-11-14-emulator-audit/scripts/film_names_spec.py. If every name fits its old string, the names
 are written in place. Else the old strings of the names are joined where they touch, the names with an icon
 go into them, and a plain name points into the name with its icon; neighbours in the pool move (text not
 changed) when that joins enough room. Every other string id reads as in the base build (checked).
 
-The spec takes the place of patches/film-names-all-languages.json in a build: its operations are the difference
+The spec takes the place of data/specs/film-names-all-languages.json in a build: its operations are the difference
 between the base build without that spec and the base build with the new names. (`epm2mod make` lets no later
 spec change a byte that an earlier spec covers and keeps; the Japanese names need such bytes of that spec.)
 """
@@ -268,17 +268,17 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=(__doc__ or "").split("\n")[0])
     parser.add_argument("--stock", default=names.STOCK)
     parser.add_argument("--base", required=True, help="the .BIN of the build that the spec is a delta on")
-    parser.add_argument("--films", default="looks/more-films.json")
-    parser.add_argument("--out", default="patches/films12-names.json")
+    parser.add_argument("--films", default="data/films/more-films.json")
+    parser.add_argument("--out", default="data/specs/films12-names.json")
     parser.add_argument(
         "--earlier",
         nargs="*",
-        default=["patches/seven-labels.json"],
+        default=["data/specs/seven-labels.json"],
         help="the specs of the build that change menu texts and stay in it",
     )
     parser.add_argument(
         "--replaces",
-        default="patches/film-names-all-languages.json",
+        default="data/specs/film-names-all-languages.json",
         help="the spec of the base build that this spec takes the place of (its changes become part of this spec)",
     )
     parser.add_argument("--table", action="store_true", help="print one line per language and id, write nothing")
@@ -378,7 +378,7 @@ def main() -> None:
                 if shared
                 else ""
             )
-            + "). The spec also holds what patches/film-names-all-languages.json does (the names of the first seven "
+            + "). The spec also holds what data/specs/film-names-all-languages.json does (the names of the first seven "
             "films in all languages) and takes its place in a build: put it after the other specs of the pinned "
             "build, and leave film-names-all-languages out. One spec, because `epm2mod make` lets no later spec "
             "change a byte that an earlier spec covers and keeps, and the Japanese names need such bytes. A name "

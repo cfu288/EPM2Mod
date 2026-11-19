@@ -24,7 +24,7 @@ import json, os, struct, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 BASE = 0x7E421020
 STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
-STOCK_SHA = json.load(open(os.path.join(ROOT, "patches/interval-frames-240.json")))["base_sha256"]
+STOCK_SHA = json.load(open(os.path.join(ROOT, "data/specs/interval-frames-240.json")))["base_sha256"]
 BLOCK0 = os.path.join(ROOT, "build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin")
 
 ROW = 0x7EFF0424        # row "594, 1503, 448, 2, 7, 1, 866"

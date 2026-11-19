@@ -1,0 +1,16 @@
+{
+ "specs": {
+  "films": "data/specs/seven-films-5.json",
+  "labels": "data/specs/seven-labels.json",
+  "structure": "data/specs/seven-structure-extra.json"
+ },
+ "films": [
+  {"entry": "Pop Art", "film": "Kodak Portra 400", "medium": "negative, on Kodak Portra Endura paper", "label": "Portra", "fit": "data/films/fits/portra.npz"},
+  {"entry": "Soft Focus", "film": "Kodak Ektachrome 100", "medium": "slide", "label": "Ektachrome", "fit": "data/films/fits/ektachrome.npz"},
+  {"entry": "Pale&Light Color", "film": "Fuji Pro 400H", "medium": "negative, on Fuji Crystal Archive paper", "label": "Pro 400H", "fit": "data/films/fits/pro400h.npz"},
+  {"entry": "Light Tone", "film": "Kodak Kodachrome 64", "medium": "slide", "label": "Kodachrome", "fit": "data/films/fits/kodachrome64.npz"},
+  {"entry": "Pin Hole", "film": "Kodak Vision3 250D", "medium": "cinema negative, on Kodak 2383 print film", "label": "Vis 250D", "fit": "data/films/fits/vision3250d.npz"},
+  {"entry": "Diorama", "film": "Fuji Velvia 100", "medium": "slide", "label": "Velvia", "fit": "data/films/fits/velvia100.npz"},
+  {"entry": "Cross Process", "film": "Fuji Superia X-tra 400", "medium": "negative, on Fuji Crystal Archive paper", "label": "Superia 400", "fit": "data/films/fits/superia400.npz"}
+ ]
+}

@@ -1,4 +1,4 @@
-"""builds/stock-films.json in the emulator: what the loader does to the switched words and the entries' RAM blocks
+"""data/builds/stock-films.json in the emulator: what the loader does to the switched words and the entries' RAM blocks
 (design.md, F1 and F2). Research code.
 
     uv run python experiments/2026-11-18-stock-filters/scripts/emu_stock.py
@@ -42,7 +42,7 @@ from epm2mod.paths import RepoPaths  # noqa: E402
 
 WORK = os.path.join(ROOT, "build", "stock-films")
 EMU = os.path.join(WORK, "emu")
-BUILD = "builds/stock-films.json"
+BUILD = "data/builds/stock-films.json"
 RTC = "2026-11-18T12:00:00"
 
 
@@ -95,8 +95,8 @@ def main():
 
     f12 = lookpack.load_list(paths, paths.card_looks)
     assert [x.slot for x in f12] == list(range(12))
-    velvia = lookpack.load_fit(paths.resolve("looks/fits/velvia100.npz"))
-    c200 = lookpack.load_fit(paths.resolve("looks/fits/c200.npz"))
+    velvia = lookpack.load_fit(paths.resolve("data/films/fits/velvia100.npz"))
+    c200 = lookpack.load_fit(paths.resolve("data/films/fits/c200.npz"))
     part = [lookpack.look_of_fit(velvia, "Pop Art", "Velvia T", "v"), lookpack.look_of_fit(c200, "Key Line", "C200 T", "c")]
     files = {"F12": lookfile.pack(f12), "PART": lookfile.pack(part), "EMPTY": lookfile.pack([])}
     bad = bytearray(files["PART"])

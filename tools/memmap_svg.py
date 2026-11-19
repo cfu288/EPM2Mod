@@ -73,11 +73,11 @@ CLASSES = {
     "flash":    (1, "#7a6f66", "content never loaded to RAM"),
     "blank":    (0, "#2a2d31", "blank, never loaded"),
 }
-DEFAULT_SPECS = ["patches/remap7b-code.json", "patches/seven-fixes-1.json", "patches/seven-movie-1.json",
-                 "patches/seven-structure-extra.json", "patches/seven-films-5.json",
-                 "patches/xp-adaptive-hue-off.json", "patches/seven-labels.json",
-                 "patches/interval-timelapse-v2.json",
-                 "patches/interval-frames-240.json"]
+DEFAULT_SPECS = ["data/specs/remap7b-code.json", "data/specs/seven-fixes-1.json", "data/specs/seven-movie-1.json",
+                 "data/specs/seven-structure-extra.json", "data/specs/seven-films-5.json",
+                 "data/specs/xp-adaptive-hue-off.json", "data/specs/seven-labels.json",
+                 "data/specs/interval-timelapse-v2.json",
+                 "data/specs/interval-frames-240.json"]
 
 
 def classify(specs):

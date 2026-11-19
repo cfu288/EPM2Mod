@@ -1,6 +1,6 @@
 """Write the patch spec for step B: the "Level Adjust" row in the Custom Menu's last group (Utility).
 
-Research code. It reads the stock E-PM2 block 0 and writes patches/level-adjust-row.json.
+Research code. It reads the stock E-PM2 block 0 and writes data/specs/level-adjust-row.json.
 
 The Custom Menu is one list of rows in two parallel tables (NOTES.md section 12):
   item table  0x7EFF7E80, 78 records of 16 bytes
@@ -25,7 +25,7 @@ import json, os, struct, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 BASE = 0x7E421020
 STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
-STOCK_SHA = json.load(open(os.path.join(ROOT, "patches/interval-frames-240.json")))["base_sha256"]
+STOCK_SHA = json.load(open(os.path.join(ROOT, "data/specs/interval-frames-240.json")))["base_sha256"]
 BLOCK0 = os.path.join(ROOT, "build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin")
 
 OLD_ITEMS, N = 0x7EFF7E80, 78   # item table and its row count

@@ -2,7 +2,7 @@
 """mkstate IMAGE OUT.json [MODE]: make a settings state file for play.mjs, crawl.mjs and the other tools.
 
     emulator/mkstate stock build/emu/state/stock-p.json p
-    emulator/mkstate builds/peaking-colours.json build/emu/state/pinned-p.json p
+    emulator/mkstate data/builds/peaking-colours.json build/emu/state/pinned-p.json p
 
 The emulator starts with an empty settings store: Japanese, the Custom Menu hidden, mode iAUTO. This tool
 boots IMAGE with an empty store and sets through the camera's own menus, by key presses:

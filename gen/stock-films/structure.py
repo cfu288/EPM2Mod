@@ -1,4 +1,4 @@
-"""Write patches/stock-films-structure.json and build/stock-films/layout.json: what the stock-filters firmware
+"""Write data/specs/stock-films-structure.json and build/stock-films/layout.json: what the stock-filters firmware
 flashes for film looks (design.md, "One mechanism for all 12 entries"). Research code.
 
     uv run python gen/stock-films/structure.py WORKDIR [LISTING.txt]
@@ -493,8 +493,8 @@ HUE: mov (%#x),a1
         "base": STOCK, "base_sha256": stock_sha,
         "status": "candidate: emulator-checked, not flashed",
         "ops": ops,
-    }, open(os.path.join(ROOT, "patches", SPEC + ".json"), "w"), indent=1)
-    open(os.path.join(ROOT, "patches", SPEC + ".json"), "a").write("\n")
+    }, open(os.path.join(ROOT, "data", "specs", SPEC + ".json"), "w"), indent=1)
+    open(os.path.join(ROOT, "data", "specs", SPEC + ".json"), "a").write("\n")
     layout = {"film_ram": FILM_RAM, "block": BLOCK,
               "offsets": {"tone": TONE, "sat": SAT, "six_s": SIX_S, "six_h": SIX_H,
                           "chroma": CHROMA, "matrix": MATRIX},
@@ -505,7 +505,7 @@ HUE: mov (%#x),a1
                           for n, sv, v, c, k in ENTRIES]}
     os.makedirs(os.path.join(ROOT, "build", "stock-films"), exist_ok=True)
     json.dump(layout, open(os.path.join(ROOT, "build", "stock-films", "layout.json"), "w"), indent=1)
-    print("wrote patches/%s.json: %d ops; code %d B at %#x, data %d B at %#x" %
+    print("wrote data/specs/%s.json: %d ops; code %d B at %#x, data %d B at %#x" %
           (SPEC, len(ops), len(code), CODE_AREA[0], len(data), rec_base))
     for n, *_ in ENTRIES:
         print("  %-18s switches %2d words" % (n, len(switch[n])))

@@ -1,4 +1,4 @@
-"""Every byte the film specs of builds/log-menu.json change, split into free space (new bytes that nothing stock
+"""Every byte the film specs of data/builds/log-menu.json change, split into free space (new bytes that nothing stock
 reads) and stock bytes (stock code or data changed), with the op's note.
 
     uv run python experiments/2026-11-18-stock-filters/scripts/inventory.py
@@ -27,8 +27,8 @@ def area(a):
 
 tot = {}
 for name in FILM:
-    raw = json.load(open(ROOT / "patches" / (name + ".json")))
-    sp = load_spec(ROOT / "patches" / (name + ".json"))
+    raw = json.load(open(ROOT / "data" / "specs" / (name + ".json")))
+    sp = load_spec(ROOT / "data" / "specs" / (name + ".json"))
     free = stock = text = 0
     rows = []
     for o, r in zip(sp.ops, raw["ops"]):

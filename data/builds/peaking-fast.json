@@ -1,0 +1,25 @@
+{
+ "what": "Seven film looks named in all 34 languages, interval shooting with up to 240 frames, the level gauge with Level Adjust, and focus peaking with the setting Off / White / Red / Yellow / Blue at 10 frames per second",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
+ "specs": [
+  "data/specs/remap7b-code.json",
+  "data/specs/seven-fixes-1.json",
+  "data/specs/seven-movie-1.json",
+  "data/specs/seven-structure-extra.json",
+  "data/specs/seven-films-5.json",
+  "data/specs/xp-adaptive-hue-off.json",
+  "data/specs/seven-labels.json",
+  "data/specs/interval-timelapse-v2.json",
+  "data/specs/interval-frames-240.json",
+  "data/specs/level-gauge-lvinfo-row.json",
+  "data/specs/level-adjust-row.json",
+  "data/specs/peaking-direct-4.json",
+  "data/specs/peaking-gain-2x.json",
+  "data/specs/peaking-menu.json",
+  "data/specs/film-names-all-languages.json",
+  "data/specs/peaking-colours.json",
+  "data/specs/peaking-fast.json"
+ ],
+ "sha256": "0e8a25b9578b8119b14b4895be7d2a0b70d7315e5e817758699777f0f31d917e",
+ "camera_tested": "2026-11-15"
+}

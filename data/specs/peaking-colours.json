@@ -1,0 +1,916 @@
+{
+ "name": "peaking-colours",
+ "description": "Focus peaking in colour: the list of Custom Menu A > Peaking becomes Off / White / Red / Yellow / Blue (setting 458: 1 Off, 3 White, 2 Red, 4 Yellow, 5 Blue; 3 stays the value after a full reset; Black is gone, a camera that was set to Black shows Red). White is the pinned build's pass. For a colour, new code in Key Line pass 9 writes the colour over the pixels of the picture where the line image is 64 or more, and the combine job gets usGain2 = 0. The colour names are the stock texts of the B&W filter list in all 34 languages. A delta on data/builds/peaking-menu-names.json: every expect is a byte string of that build. See experiments/2026-11-14-focus-peaking/NOTES.md section 16.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "candidate: emulator-checked, not flashed",
+ "_delta_on": "data/builds/peaking-menu-names.json (sha256 4ea4ffd773d6f05d16867f55b9fef4bce5d53fc8659a9b16362f7ac771a6bc30)",
+ "_ram": "no new RAM; the new code uses 24 bytes of the ART task's stack",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x42B568",
+   "expect": "25",
+   "new": "28",
+   "_addr": "0x7E84C588",
+   "_note": "mode controller, value list of setting 458: 0x7E849F25 (1, 2, 3) -> 0x7E849F28 (the stock list 1..10)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x42B570",
+   "expect": "03",
+   "new": "05",
+   "_addr": "0x7E84C590",
+   "_note": "mode controller, setting 458: 3 values -> 5 values (1, 2, 3, 4, 5)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D19E0",
+   "expect": "6e7400543130006368616e6765446174655072696e7400543131006765745072696e74436f756e740054313200726573657276655072696e740054313300656e6400543134005431350063616e526573657276650055303100553032007374617274536c69646553686f77005530330055303400656e64536c69646553686f77005530350063616e536c6964",
+   "new": "00025b050000000000000000d007000001000000c0000000c50000000002dc050000000000000000d007000003000000c0000000c50000000002dd050000000000000000d007000002000000c0000000c50000000002de050000000000000000d007000004000000c0000000c50000000002db050000000000000000d007000005000000c0000000c5000000",
+   "_addr": "0x7EBF2A00",
+   "_note": "list items of panel 607: Off (value 1), White (3), Red (2), Yellow (4), Blue (5); 28 B each"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBEAF9E",
+   "expect": "03",
+   "new": "05",
+   "_addr": "0x7F00BFBE",
+   "_note": "list descriptor of panel 607: 3 items -> 5 items"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBEAFA9",
+   "expect": "29",
+   "new": "2a",
+   "_addr": "0x7F00BFC9",
+   "_note": "list descriptor of panel 607: items 0x7EBF2900 -> 0x7EBF2A00"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1AE0",
+   "expect": "6e67650057303300676574437572736f72506f736974696f6e005730340067657450726573656e6365496d61676500573035006d6f7665437572736f720057303600573037005730390058303100583032007365745363726f6c6c5461726765740058303300583034007365744261736500583035005830360058303700583038005830390058313000697353616d65",
+   "new": "01000000020000005b0500000000000000000000000000000300000002000000dc0500000000000000000000000000000200000002000000dd0500000000000000000000000000000400000002000000de0500000000000000000000000000000500000002000000db050000000000000000000000000000f1ffffff0000000000000000000000000000000000000000",
+   "_addr": "0x7EBF2B00",
+   "_note": "value -> text list of the row: 1 Off, 3 White, 2 Red, 4 Yellow, 5 Blue, end mark -15 (24 B each)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBF3F70",
+   "expect": "6029",
+   "new": "002b",
+   "_addr": "0x7F014F90",
+   "_note": "value -> text list 607: 0x7EBF2960 -> 0x7EBF2B00"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA83D0",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "fca8c7e82b60a002c812a004c80ea005c80a2c0002dc9affffffcff0f8fef854fcdcf8944c7ef1607c5c24f82020f82410f86428f8c502845482e0e84200f8682489eae6f1024a04f8642af1e7f82014a500c847a000c843f1d0f1d5f214f8ec03c938580092f16270f80404f214f80408f214fce0c0c0c0c0c92d200c210cb8c9e85804f160f16123ffbf00c9d7f8fe08cef000dc1bfffffff8fe08cef02c0002dc0efffffff84001a040c4128df85500f8c508f85501f8c508f85502f84004a040c4128df85503f8c508f85504f8c508f85505f84007a040c4128df85506f8c508f85507f8c508f85508f8400aa040c4128df85509f8c508f8550af8c508f8550bcc79ffcbcbcb0000000000000000ff00000000000000ffff00000050ff00cb000000",
+   "_addr": "0x7E4C93F0",
+   "_note": "new code, kernel range, 0xFF run after T_K2: T_K3, T_COL, colour table (292 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA83B8",
+   "expect": "fca8c7e82b60",
+   "new": "dc18000000cb",
+   "_addr": "0x7E4C93D8",
+   "_note": "T_K2: `movbu (C),d0` -> `jmp T_K3` + nop"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x308658",
+   "expect": "38e2f4bf",
+   "new": "08daf3bf",
+   "_note": "bgr text 1501: pointer to '\u0418\u0437\u0433\u043b\u0435\u0434 2' -> to '\u0427\u0435\u0440\u0432\u0435\u043d' inside text 122 'R: \u0427\u0435\u0440\u0432\u0435\u043d'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x30865C",
+   "expect": "4ae2f4bf",
+   "new": "30daf3bf",
+   "_note": "bgr text 1502: pointer to '\u0418\u0437\u0433\u043b\u0435\u0434 3' -> to '\u0416\u044a\u043b\u0442' inside text 124 'Ye: \u0416\u044a\u043b\u0442'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x308650",
+   "expect": "c2e1f4bf",
+   "new": "a2d9f3bf",
+   "_note": "bgr text 1499: pointer to '\u0418\u0437\u0431\u0435\u0440\u0435\u0442\u0435 \u0438\u0437\u0433\u043b\u0435\u0434 \u043d\u0430\\r\\n\u0432\u0433\u0440\u0430\u0434\u0435\u043d\u0438\u044f \u0435\u043b\u0435\u043a\u0442\u0440\u043e\u043d\u0435\u043d\\r\\n\u0432\u0438\u0437\u044c\u043e\u0440.' -> to '\u0421\u0438\u043d' inside text 117 'B: \u0421\u0438\u043d'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x313D98",
+   "expect": "f846f4bf",
+   "new": "fad4f3bf",
+   "_note": "chs text 1501: pointer to '\u7c7b\u578b 2' -> to '\u7ea2\u8272' inside text 122 'R:\u7ea2\u8272'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x313D9C",
+   "expect": "0247f4bf",
+   "new": "10d5f3bf",
+   "_note": "chs text 1502: pointer to '\u7c7b\u578b 3' -> to '\u9ec4\u8272' inside text 124 'Ye:\u9ec4\u8272'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x313D90",
+   "expect": "d046f4bf",
+   "new": "c6d4f3bf",
+   "_note": "chs text 1499: pointer to '\u5728\u5185\u7f6eEVF\u4e2d\u9009\u62e9\u663e\u793a\u7c7b\u578b.' -> to '\u84dd\u8272' inside text 117 'B:\u84dd\u8272'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31F3D8",
+   "expect": "1e47f4bf",
+   "new": "0cd5f3bf",
+   "_note": "cht text 1501: pointer to '\u98a8\u683c 2' -> to '\u7d05\u8272' inside text 122 'R:\u7d05\u8272'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31F3DC",
+   "expect": "2847f4bf",
+   "new": "22d5f3bf",
+   "_note": "cht text 1502: pointer to '\u98a8\u683c 3' -> to '\u9ec3\u8272' inside text 124 'Ye:\u9ec3\u8272'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x31F3D0",
+   "expect": "f446f4bf",
+   "new": "d8d4f3bf",
+   "_note": "cht text 1499: pointer to '\u9078\u64c7\u4e00\u500b\u5167\u7f6eEVF\u7684\u986f\u793a\u98a8\u683c\u3002' -> to '\u85cd\u8272' inside text 117 'B:\u85cd\u8272'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3347FC",
+   "expect": "80d1f4bf",
+   "new": "2ed9f3bf",
+   "_note": "csy text 1501: pointer to 'Styl 2' -> to '\u010cerven\u00e1' inside text 122 'R:\u010cerven\u00e1'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x334800",
+   "expect": "8ed1f4bf",
+   "new": "58d9f3bf",
+   "_note": "csy text 1502: pointer to 'Styl 3' -> to '\u017dlut\u00e1' inside text 124 'Ye:\u017dlut\u00e1'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3347F4",
+   "expect": "0cd1f4bf",
+   "new": "c4d8f3bf",
+   "_note": "csy text 1499: pointer to 'Zvolte styl zobrazen\u00ed pro\\r\\nvestav\u011bn\u00fd el. hled\u00e1\u010dek.' -> to 'Modr\u00e1' inside text 117 'B:Modr\u00e1'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x349B40",
+   "expect": "8acdf4bf",
+   "new": "dad8f3bf",
+   "_note": "dan text 1501: pointer to 'Stil 2' -> to 'R\u00f8d' inside text 122 'R:R\u00f8d'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x349B44",
+   "expect": "98cdf4bf",
+   "new": "f8d8f3bf",
+   "_note": "dan text 1502: pointer to 'Stil 3' -> to 'Gul' inside text 124 'Ye:Gul'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x349B38",
+   "expect": "2ecdf4bf",
+   "new": "86d8f3bf",
+   "_note": "dan text 1499: pointer to 'V\u00e6lg et \"display\" \\r\\ntil indbygget EVF.' -> to 'Bl\u00e5' inside text 117 'B:Bl\u00e5'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3602C0",
+   "expect": "40e4f4bf",
+   "new": "cad9f3bf",
+   "_note": "deu text 1501: pointer to 'Stil 2' -> to 'Rot' inside text 122 'R:Rot'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3602C4",
+   "expect": "4ee4f4bf",
+   "new": "e8d9f3bf",
+   "_note": "deu text 1502: pointer to 'Stil 3' -> to 'Gelb' inside text 124 'Ye:Gelb'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3602B8",
+   "expect": "c2e3f4bf",
+   "new": "72d9f3bf",
+   "_note": "deu text 1499: pointer to 'W\u00e4hlt den Stil des eingebauten\\r\\nelektronischen Suchers.' -> to 'Blau' inside text 117 'B:Blau'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x377920",
+   "expect": "f4f1f4bf",
+   "new": "70daf3bf",
+   "_note": "ell text 1501: pointer to '\u03a3\u03c4\u03b9\u03bb 2' -> to '\u039a\u03cc\u03ba\u03ba\u03b9\u03bd\u03bf' inside text 122 'R:\u039a\u03cc\u03ba\u03ba\u03b9\u03bd\u03bf'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x377924",
+   "expect": "02f2f4bf",
+   "new": "94daf3bf",
+   "_note": "ell text 1502: pointer to '\u03a3\u03c4\u03b9\u03bb 3' -> to '\u039a\u03af\u03c4\u03c1\u03b9\u03bd\u03bf' inside text 124 'Y:\u039a\u03af\u03c4\u03c1\u03b9\u03bd\u03bf'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x377918",
+   "expect": "52f1f4bf",
+   "new": "1adaf3bf",
+   "_note": "ell text 1499: pointer to '\u0395\u03c0\u03b9\u03bb\u03ad\u03be\u03c4\u03b5 \u03c3\u03c4\u03b9\u03bb \u03c0\u03c1\u03bf\u03b2\u03bf\u03bb\u03ae\u03c2 \\r\\n\u03b3\u03b9\u03b1 \u03c4\u03bf \u03b5\u03bd\u03c3\u03c9\u03bc\u03b1\u03c4\u03c9\u03bc\u03ad\u03bd\u03bf \\r\\n\u03b7\u03bb\u03b5\u03ba\u03c4\u03c1\u03bf\u03bd\u03b9\u03ba\u03cc \u03c3\u03ba\u03cc\u03c0\u03b5\u03c5\u03c4\u03c1\u03bf EVF.' -> to '\u039c\u03c0\u03bb\u03b5' inside text 117 'B:\u039c\u03c0\u03bb\u03b5'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x38CECC",
+   "expect": "5ad4f4bf",
+   "new": "f6d8f3bf",
+   "_note": "enu text 1501: pointer to 'Black' -> to 'Red' inside text 122 'R:Red'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x38CED0",
+   "expect": "6ad4f4bf",
+   "new": "14d9f3bf",
+   "_note": "enu text 1502: pointer to 'Style 3' -> to 'Yellow' inside text 124 'Ye:Yellow'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x38CEC4",
+   "expect": "f4d3f4bf",
+   "new": "9ed8f3bf",
+   "_note": "enu text 1499: pointer to 'Select a display style for built-\\r\\nin EVF.' -> to 'Blue' inside text 117 'B:Blue'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3A28F0",
+   "expect": "88d6f4bf",
+   "new": "2cd9f3bf",
+   "_note": "esp text 1501: pointer to 'Estilo 2' -> to 'Rojo' inside text 122 'R:Rojo'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3A28F4",
+   "expect": "9ad6f4bf",
+   "new": "4cd9f3bf",
+   "_note": "esp text 1502: pointer to 'Estilo 3' -> to 'Amarillo' inside text 124 'Ye:Amarillo'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3A28E8",
+   "expect": "fad5f4bf",
+   "new": "d2d8f3bf",
+   "_note": "esp text 1499: pointer to 'Seleccionar un estilo \\r\\npara el visor electr\u00f3nico\\r\\nintegrado.' -> to 'Azul' inside text 117 'B:Azul'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3B7C04",
+   "expect": "24cef4bf",
+   "new": "f8d8f3bf",
+   "_note": "eti text 1501: pointer to 'Stiil 2' -> to 'Punane' inside text 122 'R:Punane'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3B7C08",
+   "expect": "34cef4bf",
+   "new": "1ed9f3bf",
+   "_note": "eti text 1502: pointer to 'Stiil 3' -> to 'Kuldne' inside text 124 'Ye:Kuldne'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3B7BFC",
+   "expect": "d0cdf4bf",
+   "new": "9ed8f3bf",
+   "_note": "eti text 1499: pointer to 'Vali integreeritud EVF kuvastiil.' -> to 'Sinine' inside text 117 'B:Sinine'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3CD51C",
+   "expect": "7ad6f4bf",
+   "new": "66d9f3bf",
+   "_note": "fin text 1501: pointer to 'Tyyli 2' -> to 'punain.' inside text 122 'R:punain.'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3CD520",
+   "expect": "8ad6f4bf",
+   "new": "8ed9f3bf",
+   "_note": "fin text 1502: pointer to 'Tyyli 3' -> to 'kelt.' inside text 124 'Ye:kelt.'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3CD514",
+   "expect": "fed5f4bf",
+   "new": "08d9f3bf",
+   "_note": "fin text 1499: pointer to 'Valitse sis\u00e4\u00e4nrakennetussa\\r\\netsimess\u00e4 k\u00e4ytetty tyyli.' -> to 'sininen' inside text 117 'B:sininen'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3E3D44",
+   "expect": "2ae3f4bf",
+   "new": "ead9f3bf",
+   "_note": "fra text 1501: pointer to 'Mode 2' -> to 'Rouge' inside text 122 'R:Rouge'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3E3D48",
+   "expect": "38e3f4bf",
+   "new": "0cdaf3bf",
+   "_note": "fra text 1502: pointer to 'Mode 3' -> to 'Jaune' inside text 124 'Ye:Jaune'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3E3D3C",
+   "expect": "c0e2f4bf",
+   "new": "96d9f3bf",
+   "_note": "fra text 1499: pointer to \"S\u00e9lectionnez le mode \\r\\nd'affichage du viseur.\" -> to 'Bleu' inside text 117 'B:Bleu'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3FA834",
+   "expect": "28e8f4bf",
+   "new": "b4d9f3bf",
+   "_note": "hrv text 1501: pointer to 'Stil 2' -> to 'Crveni' inside text 122 'R: Crveni'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3FA838",
+   "expect": "36e8f4bf",
+   "new": "dcd9f3bf",
+   "_note": "hrv text 1502: pointer to 'Stil 3' -> to '\u017duti' inside text 124 'Ye:\u017duti'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x3FA82C",
+   "expect": "dee7f4bf",
+   "new": "56d9f3bf",
+   "_note": "hrv text 1499: pointer to 'Odabir stila ugra\u0111enog EVF-a.' -> to 'Plavi' inside text 117 'B: Plavi'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x410EEC",
+   "expect": "4ae3f4bf",
+   "new": "8cd9f3bf",
+   "_note": "hun text 1501: pointer to '2. st\u00edlus' -> to 'V\u00f6r\u00f6s' inside text 122 'R:V\u00f6r\u00f6s'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x410EF0",
+   "expect": "5ee3f4bf",
+   "new": "b0d9f3bf",
+   "_note": "hun text 1502: pointer to '3. st\u00edlus' -> to 'S\u00e1rga' inside text 124 'Ye:S\u00e1rga'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x410EE4",
+   "expect": "cae2f4bf",
+   "new": "44d9f3bf",
+   "_note": "hun text 1499: pointer to 'A be\u00e9p\u00edtett EVF megjelen\u00edt\u00e9si\\r\\nst\u00edlus\u00e1nak be\u00e1ll\u00edt\u00e1sa.' -> to 'K\u00e9k' inside text 117 'B:K\u00e9k'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x427014",
+   "expect": "54def4bf",
+   "new": "64d9f3bf",
+   "_note": "ind text 1501: pointer to 'Gaya 2' -> to 'Red' inside text 122 'R:Red'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x427018",
+   "expect": "62def4bf",
+   "new": "82d9f3bf",
+   "_note": "ind text 1502: pointer to 'Gaya 3' -> to 'Yellow' inside text 124 'Ye:Yellow'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x42700C",
+   "expect": "f0ddf4bf",
+   "new": "0ad9f3bf",
+   "_note": "ind text 1499: pointer to 'Memilih gaya tampilan untuk\\r\\nEVF internal.' -> to 'Blue' inside text 117 'B:Blue'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x43D560",
+   "expect": "d8e2f4bf",
+   "new": "56d9f3bf",
+   "_note": "ita text 1501: pointer to 'Stile 2' -> to 'Rosso' inside text 122 'R:Rosso'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x43D564",
+   "expect": "e8e2f4bf",
+   "new": "7ad9f3bf",
+   "_note": "ita text 1502: pointer to 'Stile 3' -> to 'Giallo' inside text 124 'Ye:Giallo'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x43D558",
+   "expect": "50e2f4bf",
+   "new": "fcd8f3bf",
+   "_note": "ita text 1499: pointer to 'Seleziona uno stile\\r\\nvisualizzazione per il\\r\\nEVF integrato.' -> to 'Blu' inside text 117 'B:Blu'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x44CE98",
+   "expect": "387ff4bf",
+   "new": "3ed6f3bf",
+   "_note": "jpn text 1501: pointer to '\u30b9\u30bf\u30a4\u30eb2' -> to '\u8d64' inside text 122 'R:\u8d64'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x44CE9C",
+   "expect": "447ff4bf",
+   "new": "54d6f3bf",
+   "_note": "jpn text 1502: pointer to '\u30b9\u30bf\u30a4\u30eb3' -> to '\u9ec4' inside text 124 'Ye:\u9ec4'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x44CE90",
+   "expect": "f47ef4bf",
+   "new": "0cd6f3bf",
+   "_note": "jpn text 1499: pointer to '\u5185\u8535EVF\u306b\u8868\u793a\u3059\u308b\u753b\u9762\u306e\\r\\n\u30b9\u30bf\u30a4\u30eb\u3092\u5909\u66f4\u3067\u304d\u307e\u3059\u3002' -> to '\u9752' inside text 117 'B:\u9752'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x45C618",
+   "expect": "d281f4bf",
+   "new": "ded5f3bf",
+   "_note": "kor text 1501: pointer to '\uc2a4\ud0c0\uc77c 2' -> to '\ube68\uac04\uc0c9' inside text 122 'R:\ube68\uac04\uc0c9'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x45C61C",
+   "expect": "de81f4bf",
+   "new": "fad5f3bf",
+   "_note": "kor text 1502: pointer to '\uc2a4\ud0c0\uc77c 3' -> to '\ub178\ub780\uc0c9' inside text 124 'Ye:\ub178\ub780\uc0c9'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x45C610",
+   "expect": "9681f4bf",
+   "new": "a0d5f3bf",
+   "_note": "kor text 1499: pointer to '\ub0b4\uc7a5 EVF\uc758 \ud45c\uc2dc \uc2a4\ud0c0\uc77c\uc744\\r\\n\uc120\ud0dd\ud569\ub2c8\ub2e4.' -> to '\ud30c\ub780\uc0c9' inside text 117 'B:\ud30c\ub780\uc0c9'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x473174",
+   "expect": "18e7f4bf",
+   "new": "30daf3bf",
+   "_note": "lth text 1501: pointer to '2 stilius' -> to 'Raud.' inside text 122 'R:Raud.'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x473178",
+   "expect": "2ce7f4bf",
+   "new": "56daf3bf",
+   "_note": "lth text 1502: pointer to '3 stilius' -> to 'Gelt.' inside text 124 'Ye: Gelt.'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x47316C",
+   "expect": "b0e6f4bf",
+   "new": "d0d9f3bf",
+   "_note": "lth text 1499: pointer to 'Pasirinkite \u012fmontuoto EVF ekrano\\r\\nstili\u0173.' -> to 'M\u0117lynas' inside text 117 'B:M\u0117lynas'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x489CB0",
+   "expect": "3ee9f4bf",
+   "new": "ecd9f3bf",
+   "_note": "lvi text 1501: pointer to 'Stils2' -> to 'Sarkans' inside text 122 'R:Sarkans'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x489CB4",
+   "expect": "4ce9f4bf",
+   "new": "14daf3bf",
+   "_note": "lvi text 1502: pointer to 'Stils 3' -> to 'Dzelt.' inside text 124 'Ye:Dzelt.'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x489CA8",
+   "expect": "98e8f4bf",
+   "new": "96d9f3bf",
+   "_note": "lvi text 1499: pointer to 'Izv\u0113lieties displeja stilu\\r\\nieb\u016bv\u0113tajam elektroniskajam\\r\\nskatu mekl\u0113t\u0101jam.' -> to 'Zils' inside text 117 'B:Zils'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x49F310",
+   "expect": "bcd3f4bf",
+   "new": "eed8f3bf",
+   "_note": "msl text 1501: pointer to 'Gaya 2' -> to 'Merah' inside text 122 'R:Merah'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x49F314",
+   "expect": "cad3f4bf",
+   "new": "10d9f3bf",
+   "_note": "msl text 1502: pointer to 'Gaya 3' -> to 'Kuning' inside text 124 'Ye:Kuning'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x49F308",
+   "expect": "48d3f4bf",
+   "new": "9ad8f3bf",
+   "_note": "msl text 1499: pointer to 'Pilih suatu gaya paparan untuk\\r\\nEVF terbina dalam.' -> to 'Biru' inside text 117 'B:Biru'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4B59E0",
+   "expect": "80e2f4bf",
+   "new": "2ed9f3bf",
+   "_note": "nld text 1501: pointer to 'Stijl 2' -> to 'Rood' inside text 122 'R:Rood'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4B59E4",
+   "expect": "90e2f4bf",
+   "new": "4ed9f3bf",
+   "_note": "nld text 1502: pointer to 'Stijl 3' -> to 'Geel' inside text 124 'Ye:Geel'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4B59D8",
+   "expect": "08e2f4bf",
+   "new": "d4d8f3bf",
+   "_note": "nld text 1499: pointer to 'Selecteer weergavestijl voor\\r\\nde ingebouwde zoeker.' -> to 'Blauw' inside text 117 'B:Blauw'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4C9FE8",
+   "expect": "d2c6f4bf",
+   "new": "fad8f3bf",
+   "_note": "nor text 1501: pointer to 'Stil 2' -> to 'R\u00f8d' inside text 122 'R:R\u00f8d'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4C9FEC",
+   "expect": "e0c6f4bf",
+   "new": "18d9f3bf",
+   "_note": "nor text 1502: pointer to 'Stil 3' -> to 'Gul' inside text 124 'Ye:Gul'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4C9FE0",
+   "expect": "7ec6f4bf",
+   "new": "a2d8f3bf",
+   "_note": "nor text 1499: pointer to 'Velg visningstil for innebygd EVF.' -> to 'Bl\u00e5' inside text 117 'B:Bl\u00e5'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4E0C84",
+   "expect": "18e9f4bf",
+   "new": "c6d9f3bf",
+   "_note": "plk text 1501: pointer to 'Styl 2' -> to 'Czerw.' inside text 122 'R:Czerw.'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4E0C88",
+   "expect": "26e9f4bf",
+   "new": "ead9f3bf",
+   "_note": "plk text 1502: pointer to 'Styl 3' -> to '\u017b\u00f3\u0142ty' inside text 124 'Ye:\u017b\u00f3\u0142ty'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4E0C7C",
+   "expect": "98e8f4bf",
+   "new": "66d9f3bf",
+   "_note": "plk text 1499: pointer to 'Wybierz styl wy\u015bwietlania\\r\\ndla wbudowanego wizjera\\r\\nEVF.' -> to 'Nieb.' inside text 117 'B:Nieb.'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4F8384",
+   "expect": "68edf4bf",
+   "new": "a4d9f3bf",
+   "_note": "ptg text 1501: pointer to 'Estilo 2' -> to 'Vermelho' inside text 122 'R:Vermelho'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4F8388",
+   "expect": "7aedf4bf",
+   "new": "ccd9f3bf",
+   "_note": "ptg text 1502: pointer to 'Estilo 3' -> to 'Amarelo' inside text 124 'Ye:Amarelo'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x4F837C",
+   "expect": "e2ecf4bf",
+   "new": "50d9f3bf",
+   "_note": "ptg text 1499: pointer to 'Seleccione um estilo de exibi\u00e7\u00e3o\\r\\npara o EVF incorporado.' -> to 'Azul' inside text 117 'B:Azul'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x50EF70",
+   "expect": "0ce9f4bf",
+   "new": "aed9f3bf",
+   "_note": "rom text 1501: pointer to 'Stil 2' -> to 'Rosu' inside text 122 'R: Rosu'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x50EF74",
+   "expect": "1ae9f4bf",
+   "new": "d2d9f3bf",
+   "_note": "rom text 1502: pointer to 'Stil 3' -> to 'Galben' inside text 124 'Ye: Galben'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x50EF68",
+   "expect": "8ae8f4bf",
+   "new": "4cd9f3bf",
+   "_note": "rom text 1499: pointer to 'Selecteaza un stil pentru\\r\\nvizorul electronic incorporat.' -> to 'Albastru' inside text 117 'B: Albastru'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x523710",
+   "expect": "1ec5f4bf",
+   "new": "54d9f3bf",
+   "_note": "rus text 1501: pointer to '\u0421\u0442\u0438\u043b\u044c 2' -> to '\u041a\u0440\u0430\u0441\u043d\u044b\u0439' inside text 122 'R:\u041a\u0440\u0430\u0441\u043d\u044b\u0439'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x523714",
+   "expect": "2ec5f4bf",
+   "new": "7ad9f3bf",
+   "_note": "rus text 1502: pointer to '\u0421\u0442\u0438\u043b\u044c 3' -> to '\u0416\u0435\u043b\u0442\u044b\u0439' inside text 124 'Ye:\u0416\u0435\u043b\u0442\u044b\u0439'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x523708",
+   "expect": "d8c4f4bf",
+   "new": "e8d8f3bf",
+   "_note": "rus text 1499: pointer to '\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0441\u0442\u0438\u043b\u044c \u0434\u0438\u0441\u043f\u043b\u0435\u044f \u042d\u0412\u0418' -> to '\u0421\u0438\u043d\u0438\u0439' inside text 117 'B:\u0421\u0438\u043d\u0438\u0439'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5388BC",
+   "expect": "c6cdf4bf",
+   "new": "0cd9f3bf",
+   "_note": "sky text 1501: pointer to '\u0160t\u00fdl 2' -> to '\u010cerven\u00fd' inside text 122 'R:\u010cerven\u00fd'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5388C0",
+   "expect": "d4cdf4bf",
+   "new": "32d9f3bf",
+   "_note": "sky text 1502: pointer to '\u0160t\u00fdl 3' -> to '\u017dlt\u00fd' inside text 124 'Ye:\u017dlt\u00fd'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5388B4",
+   "expect": "4ccdf4bf",
+   "new": "b0d8f3bf",
+   "_note": "sky text 1499: pointer to 'Vyberie zobrazenie \u0161t\u00fdlu \\r\\npre vstavan\u00fd el. h\u013ead\u00e1\u010dik.' -> to 'Modr\u00fd' inside text 117 'B:Modr\u00fd'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x550300",
+   "expect": "92edf4bf",
+   "new": "3cdaf3bf",
+   "_note": "slv text 1501: pointer to 'Slog 2' -> to 'rde\u010da' inside text 122 'R:rde\u010da'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x550304",
+   "expect": "a0edf4bf",
+   "new": "60daf3bf",
+   "_note": "slv text 1502: pointer to 'Slog 3' -> to 'rumena' inside text 124 'Ye:rumena'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5502F8",
+   "expect": "08edf4bf",
+   "new": "e0d9f3bf",
+   "_note": "slv text 1499: pointer to 'Izbira sloga prikaza\\r\\nslike v vgrajenem\\r\\nelektronskem iskalu.' -> to 'modra' inside text 117 'B:modra'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5667E4",
+   "expect": "eee2f4bf",
+   "new": "7ed9f3bf",
+   "_note": "srb text 1501: pointer to 'Stil 2' -> to 'Crveno' inside text 122 'R:Crveno'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5667E8",
+   "expect": "fce2f4bf",
+   "new": "a2d9f3bf",
+   "_note": "srb text 1502: pointer to 'Stil 3' -> to '\u017duto' inside text 124 'Ye:\u017duto'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5667DC",
+   "expect": "76e2f4bf",
+   "new": "20d9f3bf",
+   "_note": "srb text 1499: pointer to 'Izaberite stil prikaza za\\r\\nugra\u0111eno el. tra\u017eilo EVF.' -> to 'Plavo' inside text 117 'B:Plavo'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x57BC14",
+   "expect": "26d3f4bf",
+   "new": "04d9f3bf",
+   "_note": "sve text 1501: pointer to 'Style 2' -> to 'R\u00f6d' inside text 122 'R:R\u00f6d'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x57BC18",
+   "expect": "36d3f4bf",
+   "new": "22d9f3bf",
+   "_note": "sve text 1502: pointer to 'Style 3' -> to 'Gul' inside text 124 'Ye:Gul'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x57BC0C",
+   "expect": "aad2f4bf",
+   "new": "aed8f3bf",
+   "_note": "sve text 1499: pointer to 'V\u00e4lj visningsstil f\u00f6r \\r\\ninbyggd elektronisk \\r\\ns\u00f6kare.' -> to 'Bl\u00e5' inside text 117 'B:Bl\u00e5'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x58EDA0",
+   "expect": "78adf4bf",
+   "new": "ccd8f3bf",
+   "_note": "tha text 1501: pointer to '\u0e23\u0e39\u0e1b\u0e41\u0e1a\u0e1a 2' -> to '\u0e41\u0e14\u0e07' inside text 122 'R:\u0e41\u0e14\u0e07'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x58EDA4",
+   "expect": "8aadf4bf",
+   "new": "ecd8f3bf",
+   "_note": "tha text 1502: pointer to '\u0e23\u0e39\u0e1b\u0e41\u0e1a\u0e1a 3' -> to '\u0e40\u0e2b\u0e25\u0e37\u0e2d\u0e07' inside text 124 'Ye:\u0e40\u0e2b\u0e25\u0e37\u0e2d\u0e07'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x58ED98",
+   "expect": "18adf4bf",
+   "new": "76d8f3bf",
+   "_note": "tha text 1499: pointer to '\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e23\u0e39\u0e1b\u0e41\u0e1a\u0e1a\u0e01\u0e32\u0e23\u0e41\u0e2a\u0e14\u0e07\u0e1c\u0e25\\r\\n\u0e2a\u0e33\u0e2b\u0e23\u0e31\u0e1a EVF \u0e43\u0e19\u0e15\u0e31\u0e27' -> to '\u0e19\u0e49\u0e33\u0e40\u0e07\u0e34\u0e19' inside text 117 'B:\u0e19\u0e49\u0e33\u0e40\u0e07\u0e34\u0e19'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5A3B54",
+   "expect": "d2cff4bf",
+   "new": "c2d8f3bf",
+   "_note": "trk text 1501: pointer to 'Stil 2' -> to 'Kirm\u0131z\u0131' inside text 122 'R:Kirm\u0131z\u0131'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5A3B58",
+   "expect": "e0cff4bf",
+   "new": "e8d8f3bf",
+   "_note": "trk text 1502: pointer to 'Stil 3' -> to 'Sar\u0131' inside text 124 'Ye:Sar\u0131'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5A3B4C",
+   "expect": "70cff4bf",
+   "new": "70d8f3bf",
+   "_note": "trk text 1499: pointer to 'Dahili EVF i\u00e7in bir g\u00f6r\u00fcnt\u00fc\\r\\nstili se\u00e7in.' -> to 'Mavi' inside text 117 'B:Mavi'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5B9E7C",
+   "expect": "2cdff4bf",
+   "new": "c4d9f3bf",
+   "_note": "ukr text 1501: pointer to '\u0422\u0438\u043f 2' -> to '\u0427\u0435\u0440\u0432\u043e\u043d.' inside text 122 'R:\u0427\u0435\u0440\u0432\u043e\u043d.'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5B9E80",
+   "expect": "38dff4bf",
+   "new": "ead9f3bf",
+   "_note": "ukr text 1502: pointer to '\u0422\u0438\u043f 3' -> to '\u0416\u043e\u0432\u0442\u0438\u0439' inside text 124 'Ye:\u0416\u043e\u0432\u0442\u0438\u0439'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x5B9E74",
+   "expect": "bedef4bf",
+   "new": "64d9f3bf",
+   "_note": "ukr text 1499: pointer to '\u0412\u0438\u0431\u0435\u0440\u0456\u0442\u044c \u0442\u0438\u043f \u0432\u0456\u0434\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u043d\u044f \\r\\n\u0434\u043b\u044f \u0432\u0431\u0443\u0434\u043e\u0432\u0430\u043d\u043e\u0433\u043e EVF.' -> to '\u0421\u0438\u043d\u0456\u0439' inside text 117 'B:\u0421\u0438\u043d\u0456\u0439'"
+  },
+  {
+   "type": "bytes",
+   "block": 1,
+   "offset": "0x388756",
+   "expect": "7700680069007400650020006f007200200062006c00610063006b0020006c0069006e0065007300",
+   "new": "6c0069006e0065007300200069006e0020007400680061007400200063006f006c006f0072002000",
+   "_note": "English text 1506: 'Show white or black lines\\r\\non sharp edges while\\r\\nMF Assist magnifies.' -> 'Show lines in that color \\r\\non sharp edges while\\r\\nMF Assist magnifies.'"
+  }
+ ]
+}

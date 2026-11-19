@@ -372,7 +372,7 @@ def generate(paths: RepoPaths, stock: StockFirmware) -> list[GeneratedSpec]:
                 "space of segment 2; the image library's table "
                 "entries of the new art codes; and the entries of the tables "
                 "that the firmware reads with a stored Picture Mode value ("
-                f"{codes}). A delta on patches/remap7b-code.json: it changes the "
+                f"{codes}). A delta on data/specs/remap7b-code.json: it changes the "
                 "last jump of that spec's matrix chain. No menu entry stores one "
                 "of these values without its entry spec."
             ),

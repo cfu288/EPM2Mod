@@ -1,7 +1,7 @@
-"""Write patches/log-core.json and patches/log-probes.json: the structured log (NOTES.md in this folder).
+"""Write data/specs/log-core.json and data/specs/log-probes.json: the structured log (NOTES.md in this folder).
 
-Research code. Both specs are deltas on the pinned build builds/peaking-colours.json: every `expect` is a byte
-string of that build. The event ids come from logs/events.json, which the decoder (`epm2mod log`) also reads.
+Research code. Both specs are deltas on the pinned build data/builds/peaking-colours.json: every `expect` is a byte
+string of that build. The event ids come from data/logdict/events.json, which the decoder (`epm2mod log`) also reads.
 The build id in each block header is the first 8 bytes of a sha256 of the dictionary's events (id, name, level, args).
 
 log-core:   log_put / log_chg / log_cnt (kernel range), the firmware-error hook, the boot hook, the flush task
@@ -19,39 +19,39 @@ Usage: mkspec_log.py PINNED_DIR WORKDIR [LISTING.txt]
   WORKDIR     scratch folder for the assembler files (outside the repository)
 
        mkspec_log.py --peaking-time BASE_DIR WORKDIR [LISTING.txt]
-  Writes patches/log-peaking-time.json only: the timing probe of the build debug-log-peaking-fast (event pk_stats).
+  Writes data/specs/log-peaking-time.json only: the timing probe of the build debug-log-peaking-fast (event pk_stats).
   It is a delta on the specs of that build before it (the pinned specs, peaking-fast, log-core, log-probes), and
-  it does not write log-core or log-probes. It also puts the build id of logs/events.json into the flush task,
+  it does not write log-core or log-probes. It also puts the build id of data/logdict/events.json into the flush task,
   in place of the id that log-core carries.
-  BASE_DIR    unpacked image of builds/debug-log-peaking-fast.json without its last spec
+  BASE_DIR    unpacked image of data/builds/debug-log-peaking-fast.json without its last spec
 
        mkspec_log.py --peaking-guard BASE_DIR WORKDIR [LISTING.txt]
-  Writes patches/log-peaking-guard.json only: event pk_guard of the build debug-log-peaking-fast-2. It is a delta
+  Writes data/specs/log-peaking-guard.json only: event pk_guard of the build debug-log-peaking-fast-2. It is a delta
   on the specs of that build before it (the pinned specs, peaking-save-guard, log-core, log-probes,
-  log-peaking-time). Its one hook is in stock bytes. It puts the build id of logs/events.json into the flush task, in place of the id that
+  log-peaking-time). Its one hook is in stock bytes. It puts the build id of data/logdict/events.json into the flush task, in place of the id that
   log-peaking-time left there.
   BASE_DIR    a folder with block0_0100.bin of that build without its last spec (emulator/patchblock.py -o)
 
        mkspec_log.py --card-read BASE_DIR WORKDIR [LISTING.txt]
-  Writes patches/log-card-read.json only: the card-read probe of the build debug-log-card-read (event card_read;
-  experiments/2026-11-17-card-looks/NOTES.md). It is a delta on builds/debug-log-films-12d.json. Its hook
+  Writes data/specs/log-card-read.json only: the card-read probe of the build debug-log-card-read (event card_read;
+  experiments/2026-11-17-card-looks/NOTES.md). It is a delta on data/builds/debug-log-films-12d.json. Its hook
   is the flush task's entry (log-core's code), its routine in a free run of segment 2's listed area. It puts the build
-  id of logs/events.json into the flush task, in place of the id that log-peaking-guard left there.
-  BASE_DIR    unpacked image of builds/debug-log-films-12d.json (block0_0100.bin)
+  id of data/logdict/events.json into the flush task, in place of the id that log-peaking-guard left there.
+  BASE_DIR    unpacked image of data/builds/debug-log-films-12d.json (block0_0100.bin)
 
        mkspec_log.py --card-look BASE_DIR WORKDIR [LISTING.txt]
-  Writes patches/log-card-look.json only: probe 2 of the build debug-log-card-look (events card_read, card_look):
+  Writes data/specs/log-card-look.json only: probe 2 of the build debug-log-card-look (events card_read, card_look):
   the card-read probe that also copies an art matrix from the file into the table of codes 71 and 80 (Pro 400H)
   in RAM. It takes the place of log-card-read (the same base, BASE_DIR as for --card-read).
 
        mkspec_log.py --card-probe BASE_DIR WORKDIR [LISTING.txt]
-  Writes patches/log-card-probe.json only: the probe harness of the build debug-log-card-probe (events card_read,
+  Writes data/specs/log-card-probe.json only: the probe harness of the build debug-log-card-probe (events card_read,
   card_rec, card_done): the card file holds records {address, length, bytes}, each written only when it lies inside
   one of the tables of the Pro 400H slot, and a flag that forces the look stages to recompute. It takes the place
   of log-card-look (the same base, BASE_DIR as for --card-read).
 
        mkspec_log.py --card-keep BASE_DIR WORKDIR [LISTING.txt]
-  Writes patches/log-card-keep.json only: the persistence probe of the build debug-log-card-keep (events card_read,
+  Writes data/specs/log-card-keep.json only: the persistence probe of the build debug-log-card-keep (events card_read,
   card_keep, bank_tail, bank_look): a look file sets the Pro 400H matrix and is kept in the EEROM bank's tail, and
   every start applies the kept matrix at its first GUI state. In place of log-card-look (BASE_DIR as for --card-read).
 """
@@ -60,7 +60,7 @@ import hashlib, json, os, re, struct, subprocess, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 BASE = 0x7E421020
 STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
-PINNED = "builds/peaking-colours.json"
+PINNED = "data/builds/peaking-colours.json"
 PINNED_SHA = "4d6b1f26ed92d66b62b4d7dc32d26168e33fd8b153a7655d6c0d9a58267456f8"
 BIN = os.path.join(os.path.abspath(__file__).split("/experiments/")[0], "build", "toolchain", "bin")
 MAPS = [os.path.join(ROOT, "build/map", f) for f in ("functions.txt", "linear.txt")]
@@ -315,7 +315,7 @@ f_block:                         # one block = one 512-byte sector: header, up t
     beq 2f
     mov 1,d0
     movbu d0,(6,a0)
-2:  mov %(bid0)d,d0              # build id: sha256 of the event list of logs/events.json, first 8 bytes
+2:  mov %(bid0)d,d0              # build id: sha256 of the event list of data/logdict/events.json, first 8 bytes
     mov d0,(8,a0)
     mov %(bid1)d,d0
     mov d0,(12,a0)
@@ -735,18 +735,18 @@ TIME_EVERY = 8
 
 
 def peaking_time():
-    """Write patches/log-peaking-time.json (see the usage text)."""
+    """Write data/specs/log-peaking-time.json (see the usage text)."""
     base, work = sys.argv[2:4]
     listing = sys.argv[4] if len(sys.argv) > 4 else None
     os.makedirs(work, exist_ok=True)
     blk_path = os.path.join(base, "block0_0100.bin")
     blk = open(blk_path, "rb").read()
     get = lambda a, n: blk[a - BASE:a - BASE + n]
-    d = json.load(open(os.path.join(ROOT, "logs/events.json")))
+    d = json.load(open(os.path.join(ROOT, "data/logdict/events.json")))
     mine = [e for e in d["events"] if e["spec"] == TIME_SPEC]
     assert [e["name"] for e in mine] == ["pk_stats"]
     bid = build_id(d["events"])
-    old = bytes.fromhex(json.load(open(os.path.join(ROOT, "patches/log-core.json")))["_build_id"])
+    old = bytes.fromhex(json.load(open(os.path.join(ROOT, "data/specs/log-core.json")))["_build_id"])
     # log_put: the third entry of the log core, found by its first instructions after log_chg and log_cnt
     lo = AREAS[".kc"][0]
     head = bytes.fromhex("cff0f2e6")                           # movm [d2,d3,a2,a3],(sp) / mov psw,d2
@@ -802,8 +802,8 @@ def peaking_time():
             new = bid[half:half + 4]
             diff = [k for k in range(4) if new[k] != old[half + k]]
             op(BASE + i + 2 + diff[0], new[diff[0]:diff[-1] + 1], "flush task, block header: build id bytes %d-%d %s -> %s "
-               "(logs/events.json)" % (half, half + 3, old[half:half + 4].hex(), new.hex()))
-    out = os.path.join(ROOT, "patches", TIME_SPEC + ".json")
+               "(data/logdict/events.json)" % (half, half + 3, old[half:half + 4].hex(), new.hex()))
+    out = os.path.join(ROOT, "data", "specs", TIME_SPEC + ".json")
     json.dump({
         "name": TIME_SPEC,
         "description": "Structured log, timing probe of peaking: event pk_stats, one record per %d runs of Key Line "
@@ -812,12 +812,12 @@ def peaking_time():
                        "is the colour loop), and usGain2 of the last pass. The time between two records is %d frame "
                        "periods. Two hooks in stock bytes of pass 9 and their routines in the kernel range; no byte "
                        "of the peaking code changes. Needs log-core and log-probes before it: every expect is a byte "
-                       "string of that build. It puts the build id %s of logs/events.json into the block header. "
+                       "string of that build. It puts the build id %s of data/logdict/events.json into the block header. "
                        "DEBUG builds only. See experiments/2026-11-14-focus-peaking/NOTES.md section 17 and "
                        "docs/reference/logging.md." % (TIME_EVERY, TIME_EVERY, bid.hex()),
         "base": STOCK, "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
         "status": "candidate: emulator-checked, not flashed",
-        "_delta_on": "builds/debug-log-peaking-fast.json without this spec",
+        "_delta_on": "data/builds/debug-log-peaking-fast.json without this spec",
         "_build_id": bid.hex(),
         "_ram": "9 bytes of the log's state block (PST+88)",
         "ops": ops,
@@ -830,7 +830,7 @@ def peaking_time():
 
 
 # The probe of the save guard of peaking (focus-peaking NOTES section 18). Its own spec, as the timing probe.
-# The guard (patches/peaking-save-guard.json) writes 2 to the latch byte L while it holds the lines back. The
+# The guard (data/specs/peaking-save-guard.json) writes 2 to the latch byte L while it holds the lines back. The
 # kernel range of the debug builds has no free run left, and a hook inside the guard's own bytes would make the
 # free-space check of every build without the log fail. So the probe is in stock bytes of segment 2: the handler
 # that the MF Assist state object runs for each focus-ring event while MF Assist is on. It reads L there.
@@ -875,18 +875,18 @@ T_GRD:
 
 
 def peaking_guard():
-    """Write patches/log-peaking-guard.json (see the usage text)."""
+    """Write data/specs/log-peaking-guard.json (see the usage text)."""
     base, work = sys.argv[2:4]
     listing = sys.argv[4] if len(sys.argv) > 4 else None
     os.makedirs(work, exist_ok=True)
     blk_path = os.path.join(base, "block0_0100.bin")
     blk = open(blk_path, "rb").read()
     get = lambda a, n: blk[a - BASE:a - BASE + n]
-    d = json.load(open(os.path.join(ROOT, "logs/events.json")))
+    d = json.load(open(os.path.join(ROOT, "data/logdict/events.json")))
     mine = [e for e in d["events"] if e["spec"] == GUARD_SPEC]
     assert [e["name"] for e in mine] == ["pk_guard"]
     bid = build_id(d["events"])
-    old = bytes.fromhex(json.load(open(os.path.join(ROOT, "patches", TIME_SPEC + ".json")))["_build_id"])
+    old = bytes.fromhex(json.load(open(os.path.join(ROOT, "data", "specs", TIME_SPEC + ".json")))["_build_id"])
     lo = AREAS[".kc"][0]
     head = bytes.fromhex("cff0f2e6")                           # movm [d2,d3,a2,a3],(sp) / mov psw,d2
     at = [lo + i for i in range(0x40) if get(lo + i, 4) == head]
@@ -935,13 +935,13 @@ def peaking_guard():
         word = b"\xfc\xcc" + old[half:half + 4]
         i = blk.find(word)
         assert i >= 0 and blk.find(word, i + 1) < 0 and AREAS[".uc"][0] <= BASE + i < AREAS[".uc"][1], half
-        op(BASE + i + 2, bid[half:half + 4], "flush task, block header: build id bytes %d-%d %s -> %s (logs/events.json)"
+        op(BASE + i + 2, bid[half:half + 4], "flush task, block header: build id bytes %d-%d %s -> %s (data/logdict/events.json)"
            % (half, half + 3, old[half:half + 4].hex(), bid[half:half + 4].hex()))
-    out = os.path.join(ROOT, "patches", GUARD_SPEC + ".json")
+    out = os.path.join(ROOT, "data", "specs", GUARD_SPEC + ".json")
     json.dump({
         "name": GUARD_SPEC,
         "description": "Structured log, probe of the save guard of peaking: event pk_guard. The guard of "
-                       "patches/peaking-save-guard.json writes 2 to the latch byte L while it holds the lines back. "
+                       "data/specs/peaking-save-guard.json writes 2 to the latch byte L while it holds the lines back. "
                        "The probe reads L at each focus-ring event while MF Assist is on (the handler "
                        "rcvStartMFAssistIn_MFAssistOn of the MF Assist state object) and writes one record per hold: "
                        "the heap mode, and the units in use in the pool of the heap modes 0 and 2, which is the "
@@ -949,11 +949,11 @@ def peaking_guard():
                        "pk_latch shows every hold (L = 2). One hook in stock bytes of segment 2 and its routine in "
                        "segment 2; no byte of the peaking code changes. Needs log-core, log-probes and "
                        "log-peaking-time before it: every expect is a byte string of that build. It puts the build "
-                       "id %s of logs/events.json into the block header. DEBUG builds only. See "
+                       "id %s of data/logdict/events.json into the block header. DEBUG builds only. See "
                        "experiments/2026-11-14-focus-peaking/NOTES.md section 18 and docs/reference/logging.md." % bid.hex(),
         "base": STOCK, "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
         "status": "candidate: emulator-checked, not flashed",
-        "_delta_on": "builds/debug-log-peaking-fast-2.json without this spec",
+        "_delta_on": "data/builds/debug-log-peaking-fast-2.json without this spec",
         "_build_id": bid.hex(),
         "_ram": "1 byte of the log's state block (PST+100)",
         "ops": ops,
@@ -1035,7 +1035,7 @@ def main():
     os.makedirs(work, exist_ok=True)
     blk_path = os.path.join(pinned, "block0_0100.bin")
     blk = open(blk_path, "rb").read()
-    d = json.load(open(os.path.join(ROOT, "logs/events.json")))
+    d = json.load(open(os.path.join(ROOT, "data/logdict/events.json")))
     assert d["record_size"] == 16
     ev = {e["name"]: e["id"] for e in d["events"]}
     assert len(ev) == len(d["events"]) == len({e["id"] for e in d["events"]})
@@ -1115,10 +1115,10 @@ def main():
                       "DEBUG builds only.",
     }
     for spec in ops:
-        out = os.path.join(ROOT, "patches", spec + ".json")
+        out = os.path.join(ROOT, "data", "specs", spec + ".json")
         json.dump({
             "name": spec,
-            "description": text[spec] + " The event ids are in logs/events.json (build id %s). A delta on %s: every "
+            "description": text[spec] + " The event ids are in data/logdict/events.json (build id %s). A delta on %s: every "
                            "expect is a byte string of that build. See experiments/2026-11-15-log/NOTES.md and "
                            "docs/reference/logging.md." % (bid.hex(), PINNED),
             "base": STOCK, "base_sha256": stock_sha,
@@ -1256,8 +1256,8 @@ LOOK_DESCRIPTION = ("Structured log, probe 2 of looks loaded from the card: at t
                     "its uncached alias, and card_look gives the number of values written and values 0 and 1 read "
                     "back from RAM. The colour stage that reads the table runs on CPU 1. Then the flush runs as "
                     "before. One hook at the flush task's entry (log-core's code) and two routines in free runs of "
-                    "segment 2. In place of log-card-read, on the specs of builds/debug-log-films-12d.json. It puts "
-                    "the build id %s of logs/events.json into the block header. DEBUG builds only. See "
+                    "segment 2. In place of log-card-read, on the specs of data/builds/debug-log-films-12d.json. It puts "
+                    "the build id %s of data/logdict/events.json into the block header. DEBUG builds only. See "
                     "experiments/2026-11-17-card-looks/NOTES.md.")
 
 
@@ -1272,8 +1272,8 @@ PROBE_DESCRIPTION = ("Structured log, the probe harness of looks loaded from the
                      "stores 0 into the IMG library's builder words 0xA07500B4 / 0xA07500B8 and 0xFF into the "
                      "gamma states' art-code bytes, as the boot init does, so the look stages recompute. card_done "
                      "gives the records written and the flags. Then the flush runs as before. In place of "
-                     "log-card-look, on the specs of builds/debug-log-films-12d.json. It puts the build id %s of "
-                     "logs/events.json into the block header. DEBUG builds only. See "
+                     "log-card-look, on the specs of data/builds/debug-log-films-12d.json. It puts the build id %s of "
+                     "data/logdict/events.json into the block header. DEBUG builds only. See "
                      "experiments/2026-11-17-card-looks/design.md section 8.")
 # runs of segment 2 that no spec ledgers (docs/reference/code-space-map.md; the segment-3 tail is for data only)
 PROBE_AREAS = {".cr": (0x7EBF2888, 0x7EBF2900), ".ca": (0x7EBF2B90, 0x7EBF2C00), ".p3": (0x7EBF2A8C, 0x7EBF2B00),
@@ -1457,8 +1457,8 @@ KEEP_DESCRIPTION = ("Structured log, the persistence probe of looks loaded from 
                     "matrix into the table (bank_look: status 0 applied, 1 no record, 2 bad length or sum; the table's "
                     "first two values). At the first flush, before the card file, it logs bank_tail (the number of nonzero "
                     "words in the unused tail 0x603F74B8-0x60404668, the first word of the record). The firmware saves the bank to flash itself (power-off, sleep, every start). In "
-                    "place of log-card-look, on the specs of builds/debug-log-films-12d.json. It puts the build id %s "
-                    "of logs/events.json into the block header. DEBUG builds only. See "
+                    "place of log-card-look, on the specs of data/builds/debug-log-films-12d.json. It puts the build id %s "
+                    "of data/logdict/events.json into the block header. DEBUG builds only. See "
                     "experiments/2026-11-17-card-looks/design.md section 8 (P4, P5).")
 KEEP_ASM = """
 .equ CRDONE, PST+104         # u8: the card file was read in this session (T_BOOT clears PST at every start)
@@ -1632,18 +1632,18 @@ T_BAPPLY:
 
 
 def card_read(spec=CARD_SPEC, asm_text=CARD_ASM, areas={".cr": CARD_AREA}, events=("card_read",), extra=None, hook2=None):
-    """Write patches/log-card-read.json, or with the other arguments patches/log-card-look.json (see the usage text)."""
+    """Write data/specs/log-card-read.json, or with the other arguments data/specs/log-card-look.json (see the usage text)."""
     base, work = sys.argv[2:4]
     listing = sys.argv[4] if len(sys.argv) > 4 else None
     os.makedirs(work, exist_ok=True)
     blk_path = os.path.join(base, "block0_0100.bin")
     blk = open(blk_path, "rb").read()
     get = lambda a, n: blk[a - BASE:a - BASE + n]
-    d = json.load(open(os.path.join(ROOT, "logs/events.json")))
+    d = json.load(open(os.path.join(ROOT, "data/logdict/events.json")))
     mine = {e["name"]: e["id"] for e in d["events"] if e["name"] in events}
     assert sorted(mine) == sorted(events), mine
     bid = build_id(d["events"])
-    old = bytes.fromhex(json.load(open(os.path.join(ROOT, "patches", GUARD_SPEC + ".json")))["_build_id"])
+    old = bytes.fromhex(json.load(open(os.path.join(ROOT, "data", "specs", GUARD_SPEC + ".json")))["_build_id"])
     lo = AREAS[".kc"][0]
     head = bytes.fromhex("cff0f2e6")
     at = [lo + i for i in range(0x40) if get(lo + i, 4) == head]
@@ -1706,9 +1706,9 @@ def card_read(spec=CARD_SPEC, asm_text=CARD_ASM, areas={".cr": CARD_AREA}, event
         word = b"\xfc\xcc" + old[half:half + 4]
         i = blk.find(word)
         assert i >= 0 and blk.find(word, i + 1) < 0 and AREAS[".uc"][0] <= BASE + i < AREAS[".uc"][1], half
-        op(BASE + i + 2, bid[half:half + 4], "flush task, block header: build id bytes %d-%d %s -> %s (logs/events.json)"
+        op(BASE + i + 2, bid[half:half + 4], "flush task, block header: build id bytes %d-%d %s -> %s (data/logdict/events.json)"
            % (half, half + 3, old[half:half + 4].hex(), bid[half:half + 4].hex()))
-    out = os.path.join(ROOT, "patches", spec + ".json")
+    out = os.path.join(ROOT, "data", "specs", spec + ".json")
     json.dump({
         "name": spec,
         "description": (LOOK_DESCRIPTION % bid.hex()) if spec == LOOK_SPEC else (PROBE_DESCRIPTION % bid.hex()) if spec == PROBE_SPEC else (KEEP_DESCRIPTION % bid.hex()) if spec == KEEP_SPEC else ("Structured log, the card-read probe: at the first flush of a session (the GUI enters a menu, "
@@ -1716,12 +1716,12 @@ def card_read(spec=CARD_SPEC, asm_text=CARD_ASM, areas={".cr": CARD_AREA}, event
                        "first 16 bytes with fileif_fread (0x7E5C536F), closes it, and writes the event card_read "
                        "(bytes read, -1 when the file did not open; bytes 0-3 of the file). Then the flush runs as before. One hook at the flush task's entry (log-core's "
                        "code, not stock) and its routine after the flush task. Needs the specs of "
-                       "builds/debug-log-films-12d.json before it: every expect is a byte string of that build. It "
-                       "puts the build id %s of logs/events.json into the block header. DEBUG builds only. See "
+                       "data/builds/debug-log-films-12d.json before it: every expect is a byte string of that build. It "
+                       "puts the build id %s of data/logdict/events.json into the block header. DEBUG builds only. See "
                        "experiments/2026-11-17-card-looks/NOTES.md and docs/reference/logging.md." % bid.hex()),
         "base": STOCK, "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
         "status": "candidate: emulator-checked, not flashed",
-        "_delta_on": "builds/debug-log-films-12d.json",
+        "_delta_on": "data/builds/debug-log-films-12d.json",
         "_build_id": bid.hex(),
         "_ram": "1 byte of the log's state block (PST+104); the flush task's block buffer for the read",
         "ops": ops,

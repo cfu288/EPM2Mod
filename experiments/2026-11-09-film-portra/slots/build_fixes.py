@@ -1,4 +1,4 @@
-"""patches/seven-fixes-1.json: three structural changes on top of remap7b-code (NOTES §43).
+"""data/specs/seven-fixes-1.json: three structural changes on top of remap7b-code (NOTES §43).
   1. Diorama entry (art code 167): its six-axis handler is Cross Process's (0x7E56D5CF), which reads image statistics
      through a buffer pointer that the stock code sets only for the Grainy Film and Cross Process picture modes. Reached
      from the Diorama picture mode the pointer is uninitialised stack. 167 now gets a plain handler (new, 17 bytes in the
@@ -13,7 +13,7 @@ import json, os, struct, subprocess, sys, tempfile
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.join(HERE, "..", "..", ".."); B = 0x7E421020
 sys.path.insert(0, os.path.join(ROOT, "emulator")); import patchblock
 BIN = os.path.join(os.path.abspath(__file__).split("/experiments/")[0], "build", "toolchain", "bin", "mn10300-elf-")
-stock, cur, _ = patchblock.patched_block0([os.path.join(ROOT, "patches", "remap7b-code.json")])       # state these ops are applied to
+stock, cur, _ = patchblock.patched_block0([os.path.join(ROOT, "data", "specs", "remap7b-code.json")])       # state these ops are applied to
 def op(a, new): return {"type": "bytes", "block": 0, "offset": hex(a - B), "expect": cur[a - B:a - B + len(new)].hex(), "new": bytes(new).hex()}
 u32 = lambda img, a: struct.unpack_from("<I", img, a - B)[0]
 STUB, TAIL, SIX_S, SIX_H = 0x7E880FD4, 0x7E56D8D8, 0x7E769622, 0x7E76962E
@@ -36,5 +36,5 @@ for a, old, new in ((0x7E71BDDB, 102, 70), (0x7E71BDF1, 145, 71), (0x7E71BE0D, 1
 json.dump(dict(name="seven-fixes-1", description="On top of remap7b-code: plain six-axis handler for art code 167 (Diorama entry no longer runs Cross Process's statistics code through an uninitialised pointer); "
                "each film slot's stills code uses its own chroma-curve record, movie codes use a linear one; Pop Art II, Pale&Light II and Cross Process II select the type I code. NOTES §43.",
                status="built, NOT camera-tested", base="firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN", base_sha256="34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
-               ops=[o for o in ops if o["expect"] != o["new"]]), open(os.path.join(ROOT, "patches", "seven-fixes-1.json"), "w"), indent=1)
+               ops=[o for o in ops if o["expect"] != o["new"]]), open(os.path.join(ROOT, "data", "specs", "seven-fixes-1.json"), "w"), indent=1)
 print("ops", len(ops), "stub", stub.hex())

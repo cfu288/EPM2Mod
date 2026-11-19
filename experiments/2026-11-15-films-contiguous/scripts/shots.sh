@@ -1,6 +1,6 @@
 #!/bin/zsh
 # shots.sh IMAGE NAME [STATEPREFIX]: the screens that list the art entries, English.
-# IMAGE: builds/NAME.json, a .BIN file or stock. Output: build/emu/films-contiguous/NAME/*.png.
+# IMAGE: data/builds/NAME.json, a .BIN file or stock. Output: build/emu/films-contiguous/NAME/*.png.
 # STATEPREFIX: settings states PREFIX-p.json, PREFIX-art.json, PREFIX-movie.json (default: the pinned build's,
 # build/emu/films-contiguous/state/pinned; made with emulator/mkstate). Copies are used.
 #   lc-00..19   mode P, OK (live control), UP (Picture Mode), RIGHT x 19

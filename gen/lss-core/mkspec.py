@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Assemble gen/lss-core/lss.s and write patches/lss-core.json: the exposure part of "Lowest S/S Setting".
+"""Assemble gen/lss-core/lss.s and write data/specs/lss-core.json: the exposure part of "Lowest S/S Setting".
 
     uv run python gen/lss-core/mkspec.py [WORKDIR]
 
@@ -95,7 +95,7 @@ def main():
             op(AUTO_SITE, au, "call 0x7E694006 (jmp NEWAUTO) in place of the auto path 0x7E6947C1"),
         ],
     }
-    p = os.path.join(ROOT, "patches", "lss-core.json")
+    p = os.path.join(ROOT, "data", "specs", "lss-core.json")
     json.dump(spec, open(p, "w"), indent=1)
     print("wrote", os.path.relpath(p, ROOT), len(code), "bytes;", spec["_symbols"])
 

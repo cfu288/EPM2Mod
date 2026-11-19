@@ -1,4 +1,4 @@
-"""The film records: ``looks/film-records.json``.
+"""The film records: ``data/films/film-records.json``.
 
 The one list of films that look files are packed from: by ``epm2mod install`` and ``epm2mod films set``, the local app and the web site
 (which reads the same file). Each film has its look record (1,708 bytes, base64) for slot 0 under the film's name;
@@ -65,7 +65,7 @@ class Slot:
 
 @dataclass(frozen=True)
 class Records:
-    """The content of ``looks/film-records.json``.
+    """The content of ``data/films/film-records.json``.
 
     Attributes:
         films: the films by id, in file order.

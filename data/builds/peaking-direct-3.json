@@ -1,0 +1,18 @@
+{
+ "what": "SUPERSEDED by peaking-direct-4 (crashes at ART 7, overwrites the sleep routine). Focus peaking, third build: light edge lines in live view while MF Assist runs, on top of the build seven-films-6-interval-240-level",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
+ "specs": [
+  "data/specs/remap7b-code.json",
+  "data/specs/seven-fixes-1.json",
+  "data/specs/seven-movie-1.json",
+  "data/specs/seven-structure-extra.json",
+  "data/specs/seven-films-5.json",
+  "data/specs/xp-adaptive-hue-off.json",
+  "data/specs/seven-labels.json",
+  "data/specs/interval-timelapse-v2.json",
+  "data/specs/interval-frames-240.json",
+  "data/specs/level-gauge-lvinfo-row.json",
+  "data/specs/peaking-direct-3.json"
+ ],
+ "first_code": true
+}

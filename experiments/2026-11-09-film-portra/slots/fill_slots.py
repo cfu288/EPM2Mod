@@ -16,5 +16,5 @@ for n, s in L.items():
             op(int(s["six"][1], 16), struct.pack("<6h", *z["H"].astype(int))), op(int(s["matrix"], 16), struct.pack("<9h", *z["A"].astype(int).ravel()), ident)]
 json.dump(dict(name=name, description=f"Test content: the fit {os.path.basename(fit)} written into every generic slot of {os.path.basename(layout)} ({', '.join(L)}). NOTES §38.", status="built, NOT camera-tested",
                base="firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN", base_sha256="34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300", ops=[o for o in ops if o["expect"] != o["new"]]),
-          open(os.path.join(ROOT, f"patches/{name}.json"), "w"), indent=1)
+          open(os.path.join(ROOT, f"data/specs/{name}.json"), "w"), indent=1)
 print(name, len(ops), "ops; slots", list(L))

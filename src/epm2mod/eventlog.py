@@ -3,7 +3,7 @@
 A debug build of the firmware writes binary event records to the SD card. The
 records hold numbers only. The meaning of each event id (its name, its level and
 the names and formats of its two arguments) is in the dictionary
-``logs/events.json``, which the firmware generator also reads.
+``data/logdict/events.json``, which the firmware generator also reads.
 
 The file is a list of blocks. The firmware writes blocks of 512 bytes: a header,
 at most 30 records, then zero bytes. The decoder takes a block of any length
@@ -37,7 +37,7 @@ which argument or field of an event uses which table (``names`` of an event).
 These and the ``doc`` texts are notes for the reader: they are not part of the
 build id, so they can be corrected for a firmware that is already on a camera.
 A change of an id, a name, a level or an argument gives a new build id. The
-dictionary of a flashed build is then kept as ``logs/events-<build id>.json``,
+dictionary of a flashed build is then kept as ``data/logdict/events-<build id>.json``,
 and :func:`decode` takes it for the blocks that carry its build id.
 """
 
@@ -173,7 +173,7 @@ class Dictionary:
         film_table: the table whose keys are art codes of film-look slots, or
             an empty text.
         film_entries: art code to the menu entry of the slot, as the film list
-            ``looks/films.json`` names it.
+            ``data/films/films.json`` names it.
     """
 
     events: dict[int, Event]
@@ -297,7 +297,7 @@ def _names(entry: Any, args: tuple[Argument, ...], where: str) -> dict[str, str]
 
 
 def load_dictionary(raw: Any, inherit: Dictionary | None = None) -> Dictionary:
-    """Return the dictionary that a parsed ``logs/events.json`` describes.
+    """Return the dictionary that a parsed ``data/logdict/events.json`` describes.
 
     Args:
         raw: the parsed JSON object.
@@ -358,7 +358,7 @@ def load_dictionary(raw: Any, inherit: Dictionary | None = None) -> Dictionary:
 
 
 def name_films(words: Dictionary, films: Any) -> Dictionary:
-    """Return the dictionary with the film labels of ``looks/films.json``.
+    """Return the dictionary with the film labels of ``data/films/films.json``.
 
     The dictionary knows which art code belongs to which menu entry. The film
     list knows which film is in which menu entry. The names of these art codes

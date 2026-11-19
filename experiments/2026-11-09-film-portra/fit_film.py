@@ -18,7 +18,7 @@ from mocklib import *
 
 SLOTS = {"xp1": dict(gamma_recs=(0x7E78B41C, 0x7E78B43C, 0x7E78B45C), look=0x7E75F2F0, sat=0x7E7696B4, six_s=0x7E7694FE, six_h=0x7E76950A, matrix=0x7E768F46,
                      repoint=[], code=[(0x7E56C6A6, b"\x46", b"\x55"), (0x7E56C6AA, b"\x4f", b"\x57")]),     # Cross Process I (85 / 87)
-         # Top-level Pop Art (codes 70 / 79) as a third film slot: needs patches/slot3-code.json (new code; NOTES 29-30).
+         # Top-level Pop Art (codes 70 / 79) as a third film slot: needs data/specs/slot3-code.json (new code; NOTES 29-30).
          # Gamma records = those of Pale&Light, Light Tone, Pop Art II; matrix table t3 inside the new code (holds an identity until written).
          "popart1": dict(gamma_recs=(0x7E78B3DC, 0x7E78B3FC, 0x7E78B47C), look=0x7E75E6F0, sat=0x7E7696A0, six_s=0x7E769486, six_h=0x7E769492, matrix=0x7E880FC2,
                          matrix_expect=struct.pack("<9h", 256, 0, 0, 0, 256, 0, 0, 0, 256), repoint=[], code=[]),
@@ -29,7 +29,7 @@ SLOTS = {"xp1": dict(gamma_recs=(0x7E78B41C, 0x7E78B43C, 0x7E78B45C), look=0x7E7
          "lighttone": dict(gamma_recs=(0x7E78B49C, 0x7E78B4BC, 0x7E78B4DC), look=0x7E75EAF0, sat=0x7E7696A8, six_s=0x7E7694B6, six_h=0x7E7694C2, matrix=0x7E768F58,
                            repoint=[(0x7E78C154 + 2 * 8 + 4, 0x7E56B7F0, 0x7E56B82A), (0x7E78C154 + 11 * 8 + 4, 0x7E56B7F0, 0x7E56B82A)],
                            code=[(0x7E56C6AE, b"\x66", b"\x48"), (0x7E56C6B2, b"\x67", b"\x51")])}
-# The four slots added by patches/slots7-code.json (NOTES 32): three own gamma tables each (the column stills use),
+# The four slots added by data/specs/slots7-code.json (NOTES 32): three own gamma tables each (the column stills use),
 # shared identity look table, linear chroma curves, matrix table in code area 2. Addresses from slots/slots7_layout.json.
 _lay = os.path.join(HERE, "slots", "slots7_layout.json")
 if os.path.exists(_lay):

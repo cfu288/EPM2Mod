@@ -232,7 +232,7 @@ def main(test, argv):
 
     name = "boot-test" if test is boot_test else "update-path-test"
     ap = argparse.ArgumentParser(prog=name, description=(test.__doc__ or "").split("\n")[0], epilog="Exit status: 0 pass, 1 fail (the reason is printed), 2 wrong arguments, 3 the emulator is not set up or the image file is missing.")
-    ap.add_argument("image", nargs="?", help="stock, builds/NAME.json, a .BIN file or a folder of unpacked blocks")
+    ap.add_argument("image", nargs="?", help="stock, data/builds/NAME.json, a .BIN file or a folder of unpacked blocks")
     ap.add_argument("--ref", default="stock", help="the reference image (default: stock)")
     ap.add_argument("--ms", type=int, default=2000 if test is boot_test else 3000, help="lab time in ms")
     ap.add_argument("--out", help="folder for the two raw reports")

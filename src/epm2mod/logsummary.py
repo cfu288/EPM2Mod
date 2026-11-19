@@ -6,7 +6,7 @@ records, the flushes, the count of each event, and one line per feature of the
 mod (peaking, film looks, shooting, interval shooting, level gauge).
 
 The feature lines read events by their names in the repository's dictionary
-``logs/events.json``. A file that does not have an event gives no line for it.
+``data/logdict/events.json``. A file that does not have an event gives no line for it.
 The report states what the records say. It does not judge them: the reader
 compares the numbers with what was done on the camera.
 """

@@ -1,7 +1,7 @@
 #!/bin/zsh
 # crawl-all.sh CONFIG IMAGE...: run the menu crawl units of one configuration on the images, PAR (default 8) at a time.
 # CONFIG = <mode>-<card|nocard>-<full|shallow>, mode in iauto p movie art.
-# IMAGE: stock, builds/NAME.json, a .BIN file or a folder of unpacked blocks.
+# IMAGE: stock, data/builds/NAME.json, a .BIN file or a folder of unpacked blocks.
 # Output: EMU_OUT/crawl/CONFIG/<image name>/<unit>.NN...png and <unit>.log.json (EMU_OUT default: build/emu/out).
 # "full" = DEPTH 4 (every sub-screen, every list scrolled to its end); "shallow" = DEPTH 1 (each row's first
 # sub-screen, scrolled). With a card the clock is set too (E101_RTC), as on a camera in use; without a card the

@@ -2,7 +2,7 @@
 
 The package is the production side of this repository. It reads the maker's
 firmware container, applies patch specs to it, and makes the firmware builds
-that are described in ``builds/``. The research code under ``experiments/``
+that are described in ``data/builds/``. The research code under ``experiments/``
 is not part of it.
 
 Modules:

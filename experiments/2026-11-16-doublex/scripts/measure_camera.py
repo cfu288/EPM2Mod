@@ -4,7 +4,7 @@
    ../../.venv/bin/python -I read_mock.py shots/measured/F12c_doublex.JPG
    ../../.venv/bin/python -I ../2026-11-16-doublex/scripts/measure_camera.py F12c_doublex [FIT [TRANSFER]]
 
-FIT: the fit of the build, a file name in looks/fits/ without .npz (default doublex). TRANSFER: 1 or 2, which
+FIT: the fit of the build, a file name in data/films/fits/ without .npz (default doublex). TRANSFER: 1 or 2, which
 measurement of g the model uses (default 1, as the first fit; the second fit takes 2).
 
 Prints, per patch set, mean |dL*| / mean dE2000 of: camera against model, camera against target, model against

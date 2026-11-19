@@ -1,7 +1,7 @@
 """Generator of the film-look patch specs.
 
-The looks are data: ``looks/films.json`` says which film goes in which
-art-filter menu entry, and ``looks/fits/*.npz`` holds the fitted values of each
+The looks are data: ``data/films/films.json`` says which film goes in which
+art-filter menu entry, and ``data/films/fits/*.npz`` holds the fitted values of each
 film. This package turns that data into the three patch specs that the
 firmware builds use.
 

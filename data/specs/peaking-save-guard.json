@@ -1,0 +1,44 @@
+{
+ "name": "peaking-save-guard",
+ "description": "Focus peaking waits while another owner has blocks in the image-work heap. (1) The latch: when the heap is not in mode 1 and the pool of the modes 0 and 2 has a block in use (a photo that is being developed and saved), the latch byte L gets 2 in place of 1: MF Assist magnifies at once, as with Peaking Off, and the lines start in the first frame in which the pool is empty. (2) The heap-mode hook: when peaking ends and the pool of mode 1 still has a block in use, the heap stays in mode 1 until a later call finds the pool empty. Before, the heap was re-divided under those blocks, the art buffers were refused in every frame, and the camera restarted (firmware error 0x34000002, camera log of 2026-11-16). A delta on data/builds/peaking-fast.json: every expect is a byte string of that build. See experiments/2026-11-14-focus-peaking/NOTES.md section 18.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "candidate: emulator-checked, not flashed",
+ "_delta_on": "data/builds/peaking-fast.json (sha256 0e8a25b9578b8119b14b4895be7d2a0b70d7315e5e817758699777f0f31d917e)",
+ "_ram": "no new RAM. L (0x602BE8C4) and its copy L2 can now hold 2 = held by the guard; reads the heap mode 0x605157CC and the two pool objects named at 0x602AC458 / 0x602AC45C",
+ "_symbols": {
+  "T_GUARD": "0x7E4C9497",
+  "G_HOLD": "0x7E4C94B3",
+  "T_M2": "0x7E4C94BF",
+  "M_HOLD": "0x7E4C94F2"
+ },
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA8477",
+   "expect": "4001a040c4128df85500f8c508f85501f8c508f85502f84004a040c4128df85503f8c508f85504f8c508f85505f84007a040c4128df85506f8c508f85507f8c508f85508f8400aa040c4128df85509f8c508f8550af8c508f8550bcc79ffcbcbcb",
+   "new": "fcaccc575160a001c817fca05cc42a60f86010f8644cf104c8078502cc95fd850100f85104cc88fdc911fca4d0035b6028ffa002c505cc87fea501c823fcaccc575160a001c919fca058c42a60f86010f1e5f8644cf104f1d5c805ccdbffcc61fe",
+   "_addr": "0x7E4C9497",
+   "_note": "new code in place of the row loop of peaking-colours that peaking-fast left without a reader: T_GUARD, T_M2 (97 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA821F",
+   "expect": "4400f85104",
+   "new": "dc58020000",
+   "_addr": "0x7E4C923F",
+   "_note": "T_A, after the last stock condition: `inc d1` / `clr d0` / `movbu d0,(4,a1)` -> `jmp T_GUARD`"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA8326",
+   "expect": "c910fca4d0035b60",
+   "new": "dc79010000cbcbcb",
+   "_addr": "0x7E4C9346",
+   "_note": "T_M, after `call getL`: `bne` / `mov (0x605B03D0),d0` -> `jmp T_M2` + 3 nop"
+  }
+ ]
+}

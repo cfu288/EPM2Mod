@@ -248,7 +248,7 @@ class UnitTests(unittest.TestCase):
     def test_generated_fields(self) -> None:
         op = BytesOp(0, 16, b"\x00", b"\x01")
         made = generate.GeneratedSpec(
-            "patches/x-1.json", "text", (op,), "a" * 64, "credit"
+            "data/specs/x-1.json", "text", (op,), "a" * 64, "credit"
         )
         fields = made.generated_fields(stock.EPM2_V16)
         self.assertEqual(
@@ -264,7 +264,7 @@ class UnitTests(unittest.TestCase):
             ],
         )
         self.assertEqual(fields["name"], "x-1")
-        plain = generate.GeneratedSpec("patches/y.json", "text", (op,), "a" * 64)
+        plain = generate.GeneratedSpec("data/specs/y.json", "text", (op,), "a" * 64)
         self.assertNotIn("attribution", plain.generated_fields(stock.EPM2_V16))
 
 
@@ -314,12 +314,12 @@ class FilmListTests(unittest.TestCase):
             changed(0, medium=5),
             changed(0, fit="../outside.npz"),
             changed(0, fit="/abs/fit.npz"),
-            changed(0, fits="looks/fits/portra.npz"),
+            changed(0, fits="data/films/fits/portra.npz"),
             {**self.good, "specs": {**specs, "films": "elsewhere/x.json"}},
             {**self.good, "specs": {**specs, "labels": "../x.json"}},
             {**self.good, "specs": {**specs, "labels": specs["films"]}},
-            {**self.good, "specs": {**specs, "extra": "patches/x.json"}},
-            {**self.good, "specs": {"films": "patches/a.json"}},
+            {**self.good, "specs": {**specs, "extra": "data/specs/x.json"}},
+            {**self.good, "specs": {"films": "data/specs/a.json"}},
         ]
         for raw in bad:
             with self.subTest(raw=str(raw)[:60]), self.assertRaises(BuildError):
@@ -481,7 +481,7 @@ class GeneratorTests(SyntheticCase):
         self.assertIn("differs from the generated spec", text)
         status, text = run()
         self.assertEqual(status, 0, text)
-        self.assertEqual(text.count("wrote patches/"), 3)
+        self.assertEqual(text.count("wrote data/specs/"), 3)
         self.assertEqual(run("--check")[0], 0)
         self.assertEqual(run(), (0, "no spec changed\ndocuments: no change\n"))
 
@@ -489,16 +489,16 @@ class GeneratorTests(SyntheticCase):
 @unittest.skipUnless(HAVE_STOCK, "stock firmware not present")
 class RealFirmwareLooksTests(unittest.TestCase):
     def copy_of_the_repository(self) -> RepoPaths:
-        """Return a temporary repository with its own looks/ and patches/."""
+        """Return a temporary repository with its own data/films/ and data/specs/."""
         folder = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, folder, True)
         paths = RepoPaths(Path(folder))
         (paths.root / "firmware").symlink_to(ROOT / "firmware")
-        for name in ("looks", "builds"):
-            shutil.copytree(ROOT / name, paths.root / name)
+        for name in ("films", "builds"):
+            shutil.copytree(ROOT / "data" / name, paths.root / "data" / name)
         shutil.copytree(
-            ROOT / "patches",
-            paths.root / "patches",
+            ROOT / "data" / "specs",
+            paths.root / "data" / "specs",
             ignore=shutil.ignore_patterns("history"),
         )
         shutil.copy(PATHS.pinned, paths.pinned)

@@ -1,6 +1,6 @@
 """Assemble slot3/cave.s and write the patches for a three-film build (NOTES §30).
-  patches/slot3-code.json   the new routines, the jump to matrix3, the gamma range check, hash entries
-  patches/<film>-s3.json     copies of the two installed film patches without their matrix-compare
+  data/specs/slot3-code.json   the new routines, the jump to matrix3, the gamma range check, hash entries
+  data/specs/<film>-s3.json     copies of the two installed film patches without their matrix-compare
                              immediates (matrix3 replaces the whole compare chain)
    python3 -I build_slot3.py film-portra-xp10 film-ektachrome-lt3"""
 import json, os, struct, subprocess, sys
@@ -35,13 +35,13 @@ def main():
     base = dict(base="firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN", base_sha256="34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300", status="built, NOT camera-tested")
     json.dump(dict(name="slot3-code", description="Third film slot in the top-level Pop Art entry (codes 70 / 79): 119 bytes of new code at 0x7E880F5C (slot3/cave.s), "
                    "a jump from the matrix compare chain, the gamma range check 71 -> 70 and hash entries. First patch with NEW CODE. NOTES §29-30.", ops=ops, **base),
-              open(os.path.join(ROOT, "patches/slot3-code.json"), "w"), indent=1)
+              open(os.path.join(ROOT, "data/specs/slot3-code.json"), "w"), indent=1)
     CMP = {hex(a - B) for a in (0x7E56C6A6, 0x7E56C6AA, 0x7E56C6AE, 0x7E56C6B2)}
     for name in sys.argv[1:]:
-        s = json.load(open(os.path.join(ROOT, f"patches/{name}.json"))); n0 = len(s["ops"]); s["ops"] = [o for o in s["ops"] if o.get("offset") not in CMP]
+        s = json.load(open(os.path.join(ROOT, f"data/specs/{name}.json"))); n0 = len(s["ops"]); s["ops"] = [o for o in s["ops"] if o.get("offset") not in CMP]
         assert n0 - len(s["ops"]) == 2, name
         s["name"] = name + "-s3"; s["description"] += " Without the two matrix-compare immediates: for builds with slot3-code."
-        json.dump(s, open(os.path.join(ROOT, f"patches/{name}-s3.json"), "w"), indent=1)
+        json.dump(s, open(os.path.join(ROOT, f"data/specs/{name}-s3.json"), "w"), indent=1)
     print("cave", len(code), "bytes;", {k: hex(v) for k, v in sym.items() if k in ("gamma3", "matrix3", "t3")}, "; jump bytes", jmp.hex(), "; ops", len(ops))
 if __name__ == "__main__":
     main()

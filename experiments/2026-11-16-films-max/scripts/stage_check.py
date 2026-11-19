@@ -17,7 +17,7 @@ alone). For the image NAME it does, with the firmware's own code in the emulator
    (e) art matrix from the compare chain 0x7E56C6A5, (f) chroma curves 0x7E5662D9 from its table lookup.
    Each run ends at the stage's common tail; the tables that the code leaves there are read back.
    FAULT = the CPU left the code of block 0 or did not reach a tail.
-3. Intended look. For a film entry (looks/films.json, looks/more-films.json) the bytes of those tables are
+3. Intended look. For a film entry (data/films/films.json, data/films/more-films.json) the bytes of those tables are
    compared with the bytes that the production generator makes from the film's fit: three tone tables (stills
    variant), the identity look table, the saturation pair, the six-axis records, the matrix and the chroma record.
    For a movie code the matrix, the saturation pair and the six-axis records must be the film's; its tone tables
@@ -186,7 +186,7 @@ class Image:
             return (got["a3"], got["a2"])
         if got["pc"] == 0x7E56D5F5:
             # the Cross Process handler: it loads its two records and goes on to the scene statistics (which
-            # patches/xp-adaptive-hue-off.json makes without effect). The records are in a3 and a2 here too.
+            # data/specs/xp-adaptive-hue-off.json makes without effect). The records are in a3 and a2 here too.
             return ("statistics", got["a3"], got["a2"])
         return {0x7E56D76A: "default"}.get(got["pc"], f"tail {got['pc']:#x}")
 

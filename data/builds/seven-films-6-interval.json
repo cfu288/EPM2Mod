@@ -1,0 +1,16 @@
+{
+ "what": "Seven film looks as art filters, and interval shooting with up to 99 frames",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
+ "specs": [
+  "data/specs/remap7b-code.json",
+  "data/specs/seven-fixes-1.json",
+  "data/specs/seven-movie-1.json",
+  "data/specs/seven-structure-extra.json",
+  "data/specs/seven-films-5.json",
+  "data/specs/xp-adaptive-hue-off.json",
+  "data/specs/seven-labels.json",
+  "data/specs/interval-timelapse-v2.json"
+ ],
+ "sha256": "f52ea6976ac2e9c567b2c07d7556b96b6431c8fcd2d90de195abdb76059e0104",
+ "camera_tested": "2026-11-13"
+}

@@ -1,14 +1,14 @@
-"""Write patches/looks-menu.json: the menu row "Load Looks" (Off / Load) in Custom Menu J.
+"""Write data/specs/looks-menu.json: the menu row "Load Looks" (Off / Load) in Custom Menu J.
 
     uv run python experiments/2026-11-17-card-looks/scripts/mkspec_lmenu.py [--v3]
 
---v3 writes patches/looks-menu-2.json: the list gets a third item, Built-in (value 2), and the row shows a status text
-when it is Off: text 1495, which the loader of patches/card-looks-3.json points at "Off", "Loaded", "No file",
+--v3 writes data/specs/looks-menu-2.json: the list gets a third item, Built-in (value 2), and the row shows a status text
+when it is Off: text 1495, which the loader of data/specs/card-looks-3.json points at "Off", "Loaded", "No file",
 "Bad file" or "Built-in" (English texts here; the loader writes them for every language at run time).
 
 The row takes the place of "Touch Screen Settings" (setting 427), the fifth row of J: the E-PM2 has no touch screen
 (the row comes with the firmware it shares with the E-PL5). No row is added, so no table moves and no row constant
-changes. (An added row needs the item table and the child list of patches/peaking-menu.json to grow or move; every
+changes. (An added row needs the item table and the child list of data/specs/peaking-menu.json to grow or move; every
 place for them has bytes that an earlier spec covers and keeps, which src/epm2mod/spec.py refuses to change.)
   (a) the row in the item table of peaking-menu (0x7EBF2000, index 78): {group 9, text 1498, setting 449, order 4,
       help 1497, value list 610, 0};
@@ -18,7 +18,7 @@ place for them has bytes that an earlier spec covers and keeps, which src/epm2mo
       the value -> text list 610 for the row (null in stock) at NAMES: 1 Off, 0 Load;
   (d) English texts (block 1): 1498 "Built-in EVF Style" -> "Load Looks", 1497 (the help of the built-in EVF grid)
       -> the row's help, 1496 "@A07A@ Displayed Grid" -> "Load". Texts of built-in EVF panels: the body has none.
-The loader (patches/card-looks-2.json) reads setting 449 (prm tag 0xD7B1, MODE bank, one byte; no stock code reads
+The loader (data/specs/card-looks-2.json) reads setting 449 (prm tag 0xD7B1, MODE bank, one byte; no stock code reads
 it, experiments/2026-11-17-osd-info/NOTES.md section 7) when the GUI leaves the menu; at 0 (Load) it sets it back to 1
 with the GUI's setSetting 0x7EE01D4E, as the menu does, and starts the load.
 Every expect is a byte string of the specs before it (mkspec_slots.LAYOUT).
@@ -32,7 +32,7 @@ sys.path.insert(0, os.path.join(ROOT, "src"))
 from epm2mod.container import parse  # noqa: E402
 import mkspec_slots  # noqa: E402
 
-V4 = "--v4" in sys.argv      # the row itself is in patches/custom-menu-rows.json: no row edit here
+V4 = "--v4" in sys.argv      # the row itself is in data/specs/custom-menu-rows.json: no row edit here
 V3 = "--v3" in sys.argv or V4
 SPEC = "looks-menu-3" if V4 else "looks-menu-2" if V3 else "looks-menu"
 BASE = 0x7E421020
@@ -62,7 +62,7 @@ TEXTS_V3 = (
 )
 
 
-OLD_DESCRIPTION = "The menu row 'Load Looks' (Off / Load) in Custom Menu J, in the place of Touch Screen Settings (the E-PM2 has no touch screen). Its value is the dormant setting 449 (prm tag 0xD7B1, MODE bank, one byte, default 0, read by no stock code); its list is the stock Off / On panel 610 with 'On' shown as 'Load'. The loader of patches/card-looks-2.json reads the setting when the GUI leaves the menu and sets it back to Off (1; Load is 0, so that the value 1 that the firmware gives the setting at every start reads Off). An edit of one row and one child entry of the tables of patches/peaking-menu.json, the list of panel 610, and three English texts of built-in EVF panels (block 1). Other languages keep the old texts of these ids. See experiments/2026-11-17-card-looks/design.md section 9.5."
+OLD_DESCRIPTION = "The menu row 'Load Looks' (Off / Load) in Custom Menu J, in the place of Touch Screen Settings (the E-PM2 has no touch screen). Its value is the dormant setting 449 (prm tag 0xD7B1, MODE bank, one byte, default 0, read by no stock code); its list is the stock Off / On panel 610 with 'On' shown as 'Load'. The loader of data/specs/card-looks-2.json reads the setting when the GUI leaves the menu and sets it back to Off (1; Load is 0, so that the value 1 that the firmware gives the setting at every start reads Off). An edit of one row and one child entry of the tables of data/specs/peaking-menu.json, the list of panel 610, and three English texts of built-in EVF panels (block 1). Other languages keep the old texts of these ids. See experiments/2026-11-17-card-looks/design.md section 9.5."
 
 
 def main():
@@ -86,7 +86,7 @@ def main():
         o["_note"] = note
         ops.append(o)
 
-    # (a) the row, (b) its child entry (v4: an added row, patches/custom-menu-rows.json)
+    # (a) the row, (b) its child entry (v4: an added row, data/specs/custom-menu-rows.json)
     assert V4 or struct.unpack("<HHIHHHH", get(ITEMS + 16 * AT, 16)) == (9, 544, 427, 4, 1132, 0, 1)   # Touch Screen Settings
     assert V4 or struct.unpack("<II", get(KIDS + 8 * AT, 8)) == (174, 427)
     if not V4:
@@ -136,16 +136,16 @@ def main():
             "touch screen). Its value is the dormant setting 449 (prm tag 0xD7B1, MODE bank, one byte, read by no "
             "stock code; the firmware writes 1 into it at every start); its list is the stock Off / On panel 610. "
             "Three items: Off (1), Load (0), Built-in (2). When it is Off the row shows text 1495, which the loader "
-            "of patches/card-looks-3.json points at the result of the last action (Off, Loaded, No file, Bad file, "
+            "of data/specs/card-looks-3.json points at the result of the last action (Off, Loaded, No file, Bad file, "
             "Built-in). The loader starts at Load or Built-in and sets the row back to Off. An edit of one row and "
-            "one child entry of the tables of patches/peaking-menu.json, the list of panel 610, and English texts of "
+            "one child entry of the tables of data/specs/peaking-menu.json, the list of panel 610, and English texts of "
             "built-in EVF panels (block 1). See experiments/2026-11-17-card-looks/design.md section 10."
             if V3 and not V4 else
-            "The list, texts and status of the menu row 'Load Looks', which patches/custom-menu-rows.json adds at the "
+            "The list, texts and status of the menu row 'Load Looks', which data/specs/custom-menu-rows.json adds at the "
             "end of Custom Menu J. Its value is the dormant setting 449 (prm tag 0xD7B1, MODE bank, one byte, read by "
             "no stock code; the firmware writes 1 into it at every start); its list is the stock Off / On panel 610, "
             "with three items: Off (1), Load (0), Built-in (2). When it is Off the row shows text 1495, which the "
-            "loader of patches/card-looks-4.json points at the result of the last action (Off, Loaded, No file, Bad "
+            "loader of data/specs/card-looks-4.json points at the result of the last action (Off, Loaded, No file, Bad "
             "file, Built-in). English texts of built-in EVF panels (block 1); the loader writes the row's texts into "
             "every language at run time. See experiments/2026-11-17-card-looks/design.md section 10.2."
             if V4 else OLD_DESCRIPTION),
@@ -154,10 +154,10 @@ def main():
         "status": "candidate: emulator-checked, not flashed",
         "ops": ops,
     }
-    with open(os.path.join(ROOT, "patches", SPEC + ".json"), "w") as fh:
+    with open(os.path.join(ROOT, "data", "specs", SPEC + ".json"), "w") as fh:
         json.dump(spec, fh, indent=1)
         fh.write("\n")
-    print("wrote patches/%s.json: %d ops" % (SPEC, len(ops)))
+    print("wrote data/specs/%s.json: %d ops" % (SPEC, len(ops)))
 
 
 if __name__ == "__main__":

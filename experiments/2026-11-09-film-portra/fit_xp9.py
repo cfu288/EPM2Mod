@@ -1,4 +1,4 @@
-"""Refit of the Portra slot from the mock-image measurement of xp8 (NOTES §25) -> patches/film-portra-xp9.json
+"""Refit of the Portra slot from the mock-image measurement of xp8 (NOTES §25) -> data/specs/film-portra-xp9.json
 
 Model = mocklib.render with: the look table's highlight shoulder, the six-axis vectors calibrated on
 five mock renderings (fit_mock.py), saturation = 0.926 x gain / 249 (measured for xp8), and the

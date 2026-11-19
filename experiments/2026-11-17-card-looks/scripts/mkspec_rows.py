@@ -1,4 +1,4 @@
-"""Write patches/custom-menu-rows.json: the Custom Menu with two added rows, Peaking (as patches/peaking-menu.json)
+"""Write data/specs/custom-menu-rows.json: the Custom Menu with two added rows, Peaking (as data/specs/peaking-menu.json)
 and Load Looks (at the end of J, after Eye-Fi). It takes the place of peaking-menu; no stock row is changed.
 
     uv run python experiments/2026-11-17-card-looks/scripts/mkspec_rows.py
@@ -12,8 +12,8 @@ and the two tables with one row more:
   row constants from level-adjust-row's (last index 78, count 79, row-state array 158 B) to 80, 81, 162 B;
   rows in group A (0) 10 -> 11 and in group J (9) 6 -> 7 in the .data image.
 The row Load Looks is {group 9, text 1498, setting 449, order 6, help 1497, value list 610, 0} with the child entry
-(panel 610, setting 449); its list, texts and status are patches/looks-menu-3.json (mkspec_lmenu.py --v4).
-Every expect is a byte string of the specs before peaking-menu in builds/card-looks-3.json.
+(panel 610, setting 449); its list, texts and status are data/specs/looks-menu-3.json (mkspec_lmenu.py --v4).
+Every expect is a byte string of the specs before peaking-menu in data/builds/card-looks-3.json.
 """
 import hashlib, json, os, struct, subprocess, sys
 
@@ -47,9 +47,9 @@ CONSTS = (
 
 
 def main():
-    peak = json.load(open(os.path.join(ROOT, "patches", "peaking-menu.json")))
-    build = json.load(open(os.path.join(ROOT, "builds", "card-looks-3.json")))["specs"]
-    before = build[:build.index("patches/peaking-menu.json")]
+    peak = json.load(open(os.path.join(ROOT, "data", "specs", "peaking-menu.json")))
+    build = json.load(open(os.path.join(ROOT, "data", "builds", "card-looks-3.json")))["specs"]
+    before = build[:build.index("data/specs/peaking-menu.json")]
     work = os.path.join(ROOT, "build", "card-looks")
     os.makedirs(work, exist_ok=True)
     out = os.path.join(work, "before-rows.BIN")
@@ -103,12 +103,12 @@ def main():
         "name": SPEC,
         "description": (
             "The Custom Menu with two added rows: Peaking in A after MF Assist (Off / White / Black; everything of "
-            "patches/peaking-menu.json, whose place this spec takes: its list, texts and code unchanged) and Load Looks "
-            "in J after Eye-Fi (setting 449, list panel 610: patches/looks-menu-3.json). No stock row is changed. An "
+            "data/specs/peaking-menu.json, whose place this spec takes: its list, texts and code unchanged) and Load Looks "
+            "in J after Eye-Fi (setting 449, list panel 610: data/specs/looks-menu-3.json). No stock row is changed. An "
             "81-row copy of the item table at 0x7EBF1FF0 (10 address loads re-pointed), an 81-entry child list at "
             "0x7EBF2600 (11 page records re-pointed), 9 row constants (last index 80, count 81, row-state array 162 B) "
             "and the group sizes of A (11) and J (7) in the .data image. Every expect is a byte string of the specs "
-            "before peaking-menu in builds/card-looks-3.json. See experiments/2026-11-17-card-looks/design.md section 10.2."),
+            "before peaking-menu in data/builds/card-looks-3.json. See experiments/2026-11-17-card-looks/design.md section 10.2."),
         "base": STOCK,
         "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
         "status": "candidate: emulator-checked, not flashed",
@@ -116,10 +116,10 @@ def main():
                 "next addressed object is 0x606A32F0)",
         "ops": ops,
     }
-    with open(os.path.join(ROOT, "patches", SPEC + ".json"), "w") as fh:
+    with open(os.path.join(ROOT, "data", "specs", SPEC + ".json"), "w") as fh:
         json.dump(spec, fh, indent=1)
         fh.write("\n")
-    print("wrote patches/%s.json: %d ops" % (SPEC, len(ops)))
+    print("wrote data/specs/%s.json: %d ops" % (SPEC, len(ops)))
 
 
 if __name__ == "__main__":

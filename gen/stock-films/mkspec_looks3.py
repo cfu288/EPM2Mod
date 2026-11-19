@@ -1,4 +1,4 @@
-"""Write patches/card-looks-3.json and builds/card-looks-3.json: the looks loader for the acceptance criteria of
+"""Write data/specs/card-looks-3.json and data/builds/card-looks-3.json: the looks loader for the acceptance criteria of
 design.md section 10.
 
     uv run python experiments/2026-11-17-card-looks/scripts/mkspec_looks3.py [LISTING.txt]
@@ -45,9 +45,9 @@ from epm2mod.container import parse  # noqa: E402
 from epm2mod.looks import lookfile, lookpack, slots  # noqa: E402
 from epm2mod.paths import RepoPaths  # noqa: E402
 
-V4 = "--v4" in sys.argv          # card-looks-4: the Custom Menu of patches/custom-menu-rows.json (an added row)
+V4 = "--v4" in sys.argv          # card-looks-4: the Custom Menu of data/specs/custom-menu-rows.json (an added row)
 SPEC = "card-looks-4" if V4 else "card-looks-3"
-MENU_SPEC = "patches/looks-menu-3.json" if V4 else "patches/looks-menu-2.json"
+MENU_SPEC = "data/specs/looks-menu-3.json" if V4 else "data/specs/looks-menu-2.json"
 BASE = mk.BASE
 BIN = mk.BIN
 RUNS = dict(mk.RUNS)
@@ -769,7 +769,7 @@ def main():
     spec = {
         "name": SPEC,
         "description": (
-            "Film looks loaded from the SD card with the menu row 'Load Looks' (patches/looks-menu-2.json), kept in "
+            "Film looks loaded from the SD card with the menu row 'Load Looks' (data/specs/looks-menu-2.json), kept in "
             "the camera, for twelve colour slots. Load (setting 449 = 0) reads C:\\\\EPM2LOOK.BIN into the EEROM "
             "bank's unused tail, checks it (magic, version, lengths, CRC-32, camera and firmware, slots and kinds), "
             "keeps it in the store at 0x%08X (bank save when a byte changed), puts back the built-in tables and "
@@ -780,9 +780,9 @@ def main():
             "file, Bad file, Built-in. The row's texts are written into every language's table. Every start applies "
             "the stored looks. The hook on the GUI state setter's trace call 0x7ECDF6E4, the task USRTEST_A, the "
             "code runs of card-looks-2 and new code in the reclaimed code area 0x7EE53830 of segment 3. Every "
-            "expect is a byte string of the specs of builds/card-looks-3.json before it. See "
+            "expect is a byte string of the specs of data/builds/card-looks-3.json before it. See "
             "experiments/2026-11-17-card-looks/design.md section 10." % mk.STORE).replace(
-            "patches/looks-menu-2.json", MENU_SPEC).replace("builds/card-looks-3.json", "builds/%s.json" % SPEC),
+            "data/specs/looks-menu-2.json", MENU_SPEC).replace("data/builds/card-looks-3.json", "data/builds/%s.json" % SPEC),
         "base": STOCK,
         "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
         "status": "candidate: emulator-checked, not flashed",
@@ -792,7 +792,7 @@ def main():
                    rlive + 36 * 4 * 512),
         "ops": ops,
     }
-    with open(os.path.join(ROOT, "patches", SPEC + ".json"), "w") as f:
+    with open(os.path.join(ROOT, "data", "specs", SPEC + ".json"), "w") as f:
         json.dump(spec, f, indent=1)
         f.write("\n")
     desc = {
@@ -800,13 +800,13 @@ def main():
                 "loaded from the SD card with the menu row Load Looks in Custom Menu J, shown under their own names and kept in "
                 "the camera; interval shooting with up to 240 frames, a level gauge with calibration, and focus "
                 "peaking",
-        "specs": base_specs + ["patches/%s.json" % SPEC],
+        "specs": base_specs + ["data/specs/%s.json" % SPEC],
         "first_code": True,
     }
-    with open(os.path.join(ROOT, "builds", SPEC + ".json"), "w") as f:
+    with open(os.path.join(ROOT, "data", "builds", SPEC + ".json"), "w") as f:
         json.dump(desc, f, indent=1)
         f.write("\n")
-    print("wrote patches/%s.json (%d ops) and builds/%s.json" % (SPEC, len(ops), SPEC))
+    print("wrote data/specs/%s.json (%d ops) and data/builds/%s.json" % (SPEC, len(ops), SPEC))
     argv = [a for a in sys.argv[1:] if a != "--v4"]
     if argv:
         txt = mk.run(BIN + "/mn10300-elf-objdump", "-d", *sum((["-j", k] for k in RUNS), []), "-j", ".hs", e)

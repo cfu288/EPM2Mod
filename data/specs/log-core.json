@@ -1,0 +1,65 @@
+{
+ "name": "log-core",
+ "description": "Structured log, core: log_put / log_chg / log_cnt write 16-byte records {u16 id, u16 sequence, u32 time, u32 arg0, u32 arg1} into one RAM ring per CPU (512 records each, in RAM that no load or clear touches, 0x7E4F9000-0x7E4FD2C0 through the uncached alias). They never call the file system. Events: boot, firmware error (the recorder 0x7E426D4B), GUI state. The dormant task USRTEST_A becomes the flush task: when the GUI enters a menu, playback or power-off state and the card is not being written, it appends the new records to C:\\EPM2LOG.BIN in 512-byte blocks (stops at 4 MiB). DEBUG builds only. The event ids are in data/logdict/events.json (build id d1ddd46b4dac2414). A delta on data/builds/peaking-colours.json: every expect is a byte string of that build. See experiments/2026-11-15-log/NOTES.md and docs/reference/logging.md.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "candidate: emulator-checked, not flashed",
+ "_delta_on": "data/builds/peaking-colours.json (sha256 4d6b1f26ed92d66b62b4d7dc32d26168e33fd8b153a7655d6c0d9a58267456f8)",
+ "_build_id": "d1ddd46b4dac2414",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA84F4",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "cff0f2e67da765c91aca06cff0f2e6f84d04af00c86e2bfff85d04ca06cff0f2e6fafcfff7cbcbfcde00904fbe335080af00c808fcde20b04fbe7efccb45504c31c816fccf45504c316e0cf81e04f81e08f81e0cf81e10f80e04f1ef4cf81e04f1dffae3ff01f8c304f16ef87220f1dff87e22fca774009098f81e24f81628f8322cf2fbcbcbcef0de0000cf0881f2e0f1e08003cd89ff000059505c548004cd7eff0000ce084208fcaa493a5060dc91d7f5ffcf88f2e6fcdc40d04fbe008520605029ffc9fcfca9e9544160f8c110fcace6544160f211f1e404fca400904fbefcc845504c31c90ffca510904fbe44fc8510904fbe8001cd26ff0000f2fbcbcbce88fcdcac34737edcbea70300",
+   "_addr": "0x7E4C9514",
+   "_note": "new code, kernel range: log_put, log_chg, log_cnt, T_ERR, T_BOOT (269 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1BE0",
+   "expect": "005a3033007472696d6d696e674d6f6465005a3034006765745472696d6d696e67496e666f005a3035006368616e676553697a65005a3036006368616e6765506f736974696f6e005a3037005a303800613031006130320063616e41737065637400613033006173706563744d6f64650061303400676574417370656374496e666f00613035006130360061303700623031006230320063616e436f6c6f720062303300623034006d616b65436f6d70617265507265766965770062303500633031006330320063616e41646a75737400633033006330340064303100643032006430330064303400653031006530320065303300726561647900653034006578656375746541646a7573740065303500653036007374617274436f6d70617265006630310063616e526177006630320066303300737461727443757272656e744d6f64654564697400663034007072657669657743757272656e744d6f64654564697400663035007361766543757272656e744d6f6465456469740066303600656e6443757272656e744d6f64654564697400663037007374617274437573746f6d45646974006630380070726576696577437573746f6d45646974006630390073617665437573746f6d456469740066313000656e64437573746f6d45646974006730310067303200696e646578006730330067303400673035006730360067303700673038006d616b6541646a75737450726576696577006730390061646a7573744761696e006731300067313100673132006731330063616e4f7665726c6179006731340068303100683032006830330068303400683035006830360068303700683038006930310072656164794578656375746553656c6641646a",
+   "new": "cff0f8fec00042244228fcdcfe2dbf7e3d2124f1d42804dde6289dff00148358245928e4422cfca590d04fbea500c83e8a01af00c805ccb801a4c62b8004fc8241d04fbefcde00904fbef80214f81208fcde20b04fbe72fcc845504c31c908f80214f8120800fc8190d04fbefca841d04fbef1e08002fca544d04fbeddb5688dff00008a03582cfcc800004000c405cc5f01004238fcdcfe2dbf7efcdd0d2ebf7edd3b269dff0014938a01bf00c905cc3f01fcde00904fbe72fcc845504c31c805ccfd00f80a04f80e0888f10cfac80002c715fac000fef8060ce1f8160c8bfac300fef81e08f81e14abc905ccd200fcdcc0d04fbe002d8000605029ffc9fcfcdcc0d04fbefccc45504c4760fccc01100020f81004fcda00904fbec8078001f85006fcccd1ddd46bf81008fccc4dac2414f8100cf81c1088f10ca01ec704801ef810144230f8060cf81418f80610f8141c20208cfae0ff01f8c00499f161f8012060f80124f81004f80128f81008f8012cf8100c20104c583028ff4230c9d680034234fcdcc0d04fbe80012d00029dddaa259dff0018fac80002c819a000c934583428ff4234c82c8064dd5b6885ff8008cad2f81e085838404238cc2efffcda00904fbec90bfcde20b04fbeccecfe08ca048a029cdd33259dff000c5838a000c80ef8c009592ce4fc8190d04fbefc8a41d04fbe00fc8240d04fbedff050433a5c45504d324c4f472e42494e006100cf88f2e681fca448d04fbea1c853fc8548d04fbef1e08005dd0a678dff000084f8c408a057c80df8c404a002c806a003c92ffca840d04fbea000c925fc8544d04fbeddb9070e008008a000c9148001fc8240d04fbe2c9000ddda6685ffc00cf2fbcbcbce88ddbf340f00b010dc6ec80e00",
+   "_addr": "0x7EBF2C00",
+   "_note": "new code, segment 2: flush task, T_GUI, file name (640 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x5D2B",
+   "expect": "4208fcaa493a5060",
+   "new": "dc54280a00cbcbcb",
+   "_addr": "0x7E426D4B",
+   "_note": "hook ERR (fw_error fw_error_args): jmp T_ERR + nop + nop + nop. error recorder 0x7E426D4B, entry (pre-reset range; both CPUs)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xE2DB4",
+   "expect": "fcdcac34737e",
+   "new": "dcf357fcffcb",
+   "_addr": "0x7E503DD4",
+   "_note": "hook BOOT (boot): jmp T_BOOT + nop. Usr0 0x7E503DD4, entry (boot task)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x8BE6C4",
+   "expect": "cd4f6cb010",
+   "new": "dc2b37f1ff",
+   "_addr": "0x7ECDF6E4",
+   "_note": "hook GUI (gui_state): jmp T_GUI. GUI state setter 0x7ECDF5E9, its last trace call (task CA_MAIN)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x18C60",
+   "expect": "5b1c50",
+   "new": "002cbf",
+   "_addr": "0x7E439C80",
+   "_note": "CPU0 task table, row of id 0x90 (USRTEST_A, dormant in stock): entry 0x7E501C5B -> FLUSH 0x7EBF2C00"
+  }
+ ]
+}

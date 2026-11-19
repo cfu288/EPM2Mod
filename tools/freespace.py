@@ -36,7 +36,7 @@ SUPERSEDED = "tools/space-ledger/superseded.tsv"
 CAMERA_LOG = "docs/camera-log/"
 MAP_MD = "docs/reference/code-space-map.md"
 MAP_TSV = "docs/reference/code-space-map.tsv"
-SPEC_GLOBS = ["patches/*.json", "experiments/*/patches/*.json",
+SPEC_GLOBS = ["data/specs/*.json", "experiments/*/patches/*.json",
               "emulator/specs/*.json"]
 
 BASE = 0x7E421020            # runtime address of block-0 file offset 0
@@ -1361,7 +1361,7 @@ def selftest():
     t("  it is blank in stock", a.checks["content"][0] == PASS and sp.b[0x7E4C9100 - BASE:0x7E4C9180 - BASE] == b"\xff" * 128)
     t("  it has no pointer", a.checks["pointers"][0] == PASS and not [x for x in a.hits if 0x7E4C9100 <= x[1] < 0x7E4C9180], a.checks["pointers"][1])
     s3 = sp.analyse(sp.area_at(0x7F033B7C))
-    t("segment-3 tail is used by seven-films-5", any(p == "patches/seven-films-5.json" and c == "current" and sum(y - x for x, y in s) == 1024
+    t("segment-3 tail is used by seven-films-5", any(p == "data/specs/seven-films-5.json" and c == "current" and sum(y - x for x, y in s) == 1024
                                                       for p, c, s in s3.ledger_rows), str(s3.ledger_rows))
     quiet = lambda *x: None
     base = {"base": STOCK_FW}
@@ -1369,7 +1369,7 @@ def selftest():
         {"type": "bytes", "block": 0, "offset": hex(0x7F033C00 - BASE), "expect": "ff" * 16, "new": "00" * 16}]))
     t("a fake spec that overlaps seven-films-5 FAILs (alone: ledger overlap)", check_specs(sp, [fake], quiet) == 1)
     lines = []
-    films = [s for s in sp.specs if s.path == "patches/four-neutral.json"]      # applies on stock; writes the same tail
+    films = [s for s in sp.specs if s.path == "data/specs/four-neutral.json"]      # applies on stock; writes the same tail
     t("the same fake spec FAILs after a spec that wrote those bytes (expect mismatch)",
       len(films) == 1 and check_specs(sp, films + [fake], lines.append) >= 1
       and any(x.startswith("FAIL") and "selftest/overlap.json" in x and "expect bytes" in x for x in lines), "\n".join(lines))

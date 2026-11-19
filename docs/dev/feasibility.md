@@ -134,7 +134,7 @@ movies.
 | Unknown | Probe |
 |---|---|
 | Does code run from the statically checked free areas, and from RAM? | A small routine there that writes a marker to a card file |
-| ~~Which task and moment are safe for file reads?~~ | **Answered 2026-11-17 (camera):** the dormant task USRTEST_A, started from the GUI state hook at the first menu or playback screen, reads a 20 KB file (`builds/card-looks.json`) |
+| ~~Which task and moment are safe for file reads?~~ | **Answered 2026-11-17 (camera):** the dormant task USRTEST_A, started from the GUI state hook at the first menu or playback screen, reads a 20 KB file (`data/builds/card-looks.json`) |
 | ~~Does the image engine accept tables at a RAM address?~~ | **Answered 2026-11-17 (camera):** tables written in RAM at run time take effect in the next photo and in live view, after the boot init's cache refresh (`experiments/2026-11-17-card-looks/design.md` section 9.2) |
 | Can the load range be made longer to reach the unloaded 1.59 MB? | The Caduceus method: move the end word in steps, with a pattern and a checksum reported to a card file |
 | Does the updater write the blank tails of blocks 1 to 3? | Write a marker there, read it back with 0x7E6756B5 |
@@ -153,7 +153,7 @@ showed a crash at start-up before anyone flashed it. On the camera that is a boo
 also break the update path, which is the only way back.
 
 Check every build that adds a hook with the boot test of the emulator before a flash:
-`emulator/boot-test builds/NAME.json` and `emulator/update-path-test builds/NAME.json`.
+`emulator/boot-test data/builds/NAME.json` and `emulator/update-path-test data/builds/NAME.json`.
 
 ## The emulator
 
@@ -166,7 +166,7 @@ stand-ins and the limits are in
 and scripts in [emulator/boot/README.md](../../emulator/boot/README.md). Upstream lists this camera
 generation as "no work planned".
 
-IMAGE is `stock`, `builds/NAME.json` or a `.BIN` file. No firmware is in the repository.
+IMAGE is `stock`, `data/builds/NAME.json` or a `.BIN` file. No firmware is in the repository.
 
 | Check | Command (from the repository root) | What it proves |
 |---|---|---|

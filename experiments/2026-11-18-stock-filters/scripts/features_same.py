@@ -1,5 +1,5 @@
 """The function cases of the features (interval shooting, the frame count, the menu rows) on the pinned build and on
-builds/stock-films.json: every row must give the same outputs.
+data/builds/stock-films.json: every row must give the same outputs.
 
     python3 experiments/2026-11-18-stock-filters/scripts/features_same.py PINNED_BLOCK0 NEW_BLOCK0
 """

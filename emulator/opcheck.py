@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Static checks of the ops of a whole build (all its specs, in order). No emulator.
 
-    python3 emulator/opcheck.py builds/NAME.json
+    python3 emulator/opcheck.py data/builds/NAME.json
     python3 emulator/opcheck.py SPEC.json [SPEC.json ...]
 
 Check 1, silent overlap. Every spec makes its `expect` bytes from the stock file. When an op of spec A ends in a

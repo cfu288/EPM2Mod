@@ -9,7 +9,7 @@ sat 0, the identity look table of the film slots):
     grey = IDENT(luma(c(BASE(K u P^T)) / 4))
 
 Target, samples and weights: those of the Double-X fit (experiments/2026-11-16-doublex/scripts/fit_mono.py).
-Output: looks/fits/NAME.npz in the colour fit layout (G, gain, S, H, A, P, Cb, Cr, slopes), and a report.
+Output: data/films/fits/NAME.npz in the colour fit layout (G, gain, S, H, A, P, Cb, Cr, slopes), and a report.
 """
 import argparse, os, sys
 import numpy as np
@@ -23,7 +23,7 @@ import chroma as C  # noqa: E402
 import model2 as M2  # noqa: E402
 
 ap = argparse.ArgumentParser(); ap.add_argument("--name", required=True)
-ap.add_argument("--matrix-from", default="looks/fits/doublex2.npz", help="start matrix (fit file, repository path)")
+ap.add_argument("--matrix-from", default="data/films/fits/doublex2.npz", help="start matrix (fit file, repository path)")
 a = ap.parse_args()
 
 A = m.load("A_natural"); k = A["kind"]; NK = 25
@@ -73,7 +73,7 @@ lines += [f"  art table x256 {At.tolist()} (rows {At.sum(1).tolist()})",
           f"  grey weights of scene R, G, B: {(m.LUMA @ Pq @ np.linalg.inv(m.M5300)).round(3).tolist()}",
           f"  curve at base 0, 128, ... 1023: {c[::128].astype(int).tolist()} {int(c[1023])}; largest step {int(np.diff(c).max())}",
           f"  18 % grey: target {m.target(np.full((1, 3), m.fl.V_GRAY))[0]:.1f}, fit {grey(np.linalg.solve(m.M5300, np.full(3, m.fl.V_GRAY))[None], Pq, c)[0]:.1f}"]
-np.savez(os.path.join(ROOT, "looks", "fits", a.name + ".npz"), G=G, gain=np.int64(0), sat=np.float64(0.0), S=np.zeros(6),
+np.savez(os.path.join(ROOT, "data", "films", "fits", a.name + ".npz"), G=G, gain=np.int64(0), sat=np.float64(0.0), S=np.zeros(6),
          H=np.zeros(6), A=At.astype(np.int64), P=Pq, lut=m.LUT, Cb=np.stack([x, y, s[:16]]), Cr=np.stack([x, y, s[:16]]),
          Cb_slope17=s, Cr_slope17=s, model="model2-bw-colour")
 rep = os.path.join(ROOT, "experiments", "2026-11-17-card-looks", "results")

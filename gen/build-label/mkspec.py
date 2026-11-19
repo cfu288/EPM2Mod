@@ -1,4 +1,4 @@
-"""Write patches/build-label.json: the Firmware screen shows "Body : 1.6  EPM2Mod <label>". Research code.
+"""Write data/specs/build-label.json: the Firmware screen shows "Body : 1.6  EPM2Mod <label>". Research code.
 
     uv run python gen/build-label/mkspec.py [LABEL] [OUT.json]
 
@@ -12,7 +12,7 @@ edits, no new code (NOTES.md sections 3 and 6):
   3. the four value boxes (Body, Lens, Flash, Acc) start at one x and are 335 pixels wide (a box clips its text);
   4. the four value widgets are left-aligned (descriptor field +36: 0x101 centred -> 0x100 left, as the labels);
   5. that text, in the Bluetooth debug strings of segment 2 (reclaim-space row 2, tools/space-ledger/candidates.tsv), after
-     the part that patches/lss-menu.json uses.
+     the part that data/specs/lss-menu.json uses.
 """
 
 import hashlib
@@ -81,7 +81,7 @@ def label_ops(block0: bytes, label: str) -> list[dict]:
 
 def main() -> None:
     label = sys.argv[1] if len(sys.argv) > 1 else "EPM2Mod 0000.00.00"
-    out = sys.argv[2] if len(sys.argv) > 2 else os.path.join(ROOT, "patches", "build-label.json")
+    out = sys.argv[2] if len(sys.argv) > 2 else os.path.join(ROOT, "data", "specs", "build-label.json")
     data = open(os.path.join(ROOT, STOCK), "rb").read()
     block0 = parse(data).blocks[0].payload
     spec = {

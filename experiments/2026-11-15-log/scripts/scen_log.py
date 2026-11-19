@@ -47,7 +47,7 @@ STALE = 0x602A4954                      # a word that stock code copies from an 
 UNCACHED = 0x40000000
 TIMER = 0x98900074
 MF_ON_SITE = 0x7EB7D47D                 # hook MFON of log-probes: entryMfAssistOn after its trace call
-WORDS = load_dictionary(json.load(open(os.path.join(ROOT, "logs", "events.json"))))
+WORDS = load_dictionary(json.load(open(os.path.join(ROOT, "data", "logdict", "events.json"))))
 OUT = print
 
 

@@ -1,6 +1,6 @@
 """Dynamic inventory of the readers of the Picture Mode and of the art code, and the comparison with readers.py.
 
-    .venv/bin/python experiments/2026-11-16-films-max/scripts/readers_dynamic.py builds/films-12.json BLOCK0 OUTDIR
+    .venv/bin/python experiments/2026-11-16-films-max/scripts/readers_dynamic.py data/builds/films-12.json BLOCK0 OUTDIR
 
 BLOCK0 is block 0 of the same build (for the live-view rig). OUTDIR is a scratch folder outside the repository.
 Needs results/readers.tsv (run readers.py first), the settings states of screens.sh

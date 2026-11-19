@@ -1,6 +1,6 @@
 """Generate the patch specs of the film list with a black-and-white film.
 
-``looks/films-12-bw.json`` is a variant of the list of the films beyond the
+``data/films/films-12-bw.json`` is a variant of the list of the films beyond the
 first seven (``extra``). The entry Grainy Film holds a black-and-white film
 and keeps its stock stored value and art codes, so the firmware makes the
 picture monochrome and runs its grain program (``slots.MonoSlot``). The colour

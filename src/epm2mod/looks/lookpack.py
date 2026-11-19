@@ -1,9 +1,9 @@
 """Make look files for the SD card from the fit files (``web/scripts/export_films.py`` makes the film records with it).
 
-A look list (``looks/card-looks.json``) names, for each menu entry, a fit file
+A look list (``data/films/card-looks.json``) names, for each menu entry, a fit file
 and the name of the look::
 
-    {"looks": [{"entry": "Pop Art", "name": "Portra", "fit": "looks/fits/portra.npz"}, ...]}
+    {"looks": [{"entry": "Pop Art", "name": "Portra", "fit": "data/films/fits/portra.npz"}, ...]}
 
 A fit with tone curves (``G``) gives a colour look; a fit with an art matrix
 and two tone tables (``A``, ``T``, ``L``) gives a black-and-white look. The
@@ -137,7 +137,7 @@ def load_list(paths: RepoPaths, path: Path) -> list[Look]:
 
 @dataclass(frozen=True)
 class CatalogueFilm:
-    """A fitted film that a look file can hold (``looks/catalogue.json``).
+    """A fitted film that a look file can hold (``data/films/catalogue.json``).
 
     Attributes:
         id: the short name used on the command line, for example ``velvia``.
@@ -159,7 +159,7 @@ class CatalogueFilm:
 
 
 def load_catalogue(paths: RepoPaths) -> dict[str, CatalogueFilm]:
-    """Return the fitted films of ``looks/catalogue.json`` by id, in file order.
+    """Return the fitted films of ``data/films/catalogue.json`` by id, in file order.
 
     Raises:
         BuildError: if the catalogue is missing or malformed.
@@ -183,7 +183,7 @@ def load_catalogue(paths: RepoPaths) -> dict[str, CatalogueFilm]:
 
 
 def web_data(paths: RepoPaths) -> dict[str, Any]:
-    """Return the film records (``looks/film-records.json``, read by ``records.load``).
+    """Return the film records (``data/films/film-records.json``, read by ``records.load``).
 
     ``films``: the catalogue, each film with its look record (1,708 bytes, base64) for slot 0 under the film's name.
     ``slots``: the twelve ART entries in menu order, with the Olympus art filter that each one keeps when a look

@@ -62,7 +62,7 @@ class DescriptionTests(unittest.TestCase):
             BuildDescription(
                 name="x",
                 what="x",
-                specs=("patches/lss-core.json",),
+                specs=("data/specs/lss-core.json",),
                 label="2026.11.19",
                 stock="x",
             )

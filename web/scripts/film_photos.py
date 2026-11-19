@@ -24,7 +24,7 @@ MANIFEST = ROOT / "web/apps/site/src/filmPhotos.json"
 LONG_SIDE = 1600
 THUMB = 320
 
-# ArtFilter value -> the look the first build put there (looks/film-records.json slots, Off = Natural).
+# ArtFilter value -> the look the first build put there (data/films/film-records.json slots, Off = Natural).
 BY_FILTER = {0: "natural", 2: "portra-400", 1: "ektachrome", 3: "pro-400h", 4: "kodachrome", 5: "vision3-250d",
              9: "velvia", 10: "superia-400"}
 GALLERY = {131: "natural", 119: "portra-400", 120: "ektachrome", 121: "pro-400h", 122: "kodachrome",

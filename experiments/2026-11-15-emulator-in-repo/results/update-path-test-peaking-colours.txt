@@ -1,3 +1,3 @@
-$ emulator/update-path-test builds/peaking-colours.json --out /tmp/scratch/update-pinned
-update-path-test: PASS: builds/peaking-colours.json finds the update file as stock does (39 console lines equal up to the body-controller step, segment 2 not loaded, no fault)
+$ emulator/update-path-test data/builds/peaking-colours.json --out /tmp/scratch/update-pinned
+update-path-test: PASS: data/builds/peaking-colours.json finds the update file as stock does (39 console lines equal up to the body-controller step, segment 2 not loaded, no fault)
 exit status 0 (expected 0)
