@@ -22,7 +22,7 @@ git config core.hooksPath .githooks
 | `refactor`, `chore`, `build`, `ci`, `perf`, `style`, `revert` | as usual |
 | `exp` | ad-hoc work in `experiments/` |
 
-Suggested scopes: `oetool`, `build`, `patch/<name>`, `flash`, `camera-log`, `format`, `exp/<slug>`.
+Suggested scopes: `card-looks`, `web`, `peaking`, `looks`, `camera-log`, and for `exp` the experiment's slug (`exp(cli-redesign)`).
 
 Examples: `feat(patch/movie-limit): raise 29-min cap to 9 h`, `docs(camera-log): record movie-limit flash`.
 
@@ -30,16 +30,17 @@ Examples: `feat(patch/movie-limit): raise 29-min cap to 9 h`, `docs(camera-log):
 
 | Path | What |
 |---|---|
-| `src/epm2mod/` | The production package. It makes the firmware: container format, patch specs, stock download, build descriptions, build steps, film-spec generator. Command: `uv run epm2mod --help`, all commands in [cli.md](cli.md). See *Production code and research code*. |
+| `src/epm2mod/` | The production package. It makes the firmware: container format, patch specs, stock download, build descriptions, build steps, film-spec generator, the look-file packer (`looks/`), card writing (`cards.py`, `cardio.py`), the installer server (`serve.py`), release code (`release.py`, `releasing.py`), the log decoder (`eventlog.py`, `logsummary.py`). Command: `uv run epm2mod --help`, all commands in [cli.md](cli.md). See *Production code and research code*. |
 | `tools/make_firmware.py`, `tools/fetch_stock.py` | The two main commands of the package as stand-alone scripts. `tools/_package.py` lets them import the package without an install. |
 | `tools/build.py`, `tools/oetool.py` | Older command-line forms. They call the package. Older scripts in `tools/` and `experiments/` import them. Do not use them to make firmware for a camera. |
 | `tools/freespace.py`, `tools/fwmap.py`, `tools/disasm.py`, `tools/memmap_svg.py`, `tools/emu/` | Analysis tools: the free-space check, the function database of block 0, MN103 disassembly (GNU objdump from `tools/setup.sh`, which builds it from the submodule `third_party/binutils-gdb` into `build/toolchain/`), the memory map figure, the emulator harness. |
+| `tools/checks.py`, `tools/doclint.py`, `tools/doc_links.py`, `tools/doc_links.json`, `tools/toolchain.py` | `checks.py` runs the off-camera checks of a build: only those its specs call for, in parallel, with a cache. `doclint.py` checks the documents that users read. The pre-commit hook runs it on staged files. `doc_links.py` tells the agent which other files repeat a fact when it edits one of them (the groups are in `doc_links.json`). `toolchain.py` says where the MN103 binutils are. |
 | `third_party/om-emu`, `tools/emu/setup.sh` | The emulator: our om-emu fork (branch `e101`, with the E-PM2's boot lab) as a git submodule, and the command that initialises it. Emulator code goes into the fork, not into this repository. `tools/emu/boot-test` and `tools/emu/update-path-test` are the start-up checks of a build. |
 | `builds/`, `pinned-build.json` | One description per firmware build, and the pointer to the last camera-tested build. See *Making firmware*. |
 | `patches/` | One JSON spec per mod. Each operation states the bytes that it replaces. `patches/history/` holds superseded and failed specs as a record. |
-| `web/` | The film-looks web app (React, Vite): users choose films for the ART slots and download `EPM2LOOK.BIN`. Published to GitHub Pages by `.github/workflows/web.yml`. See [../web/README.md](../web/README.md). |
-| `looks/` | The film list and the fitted values. The three film patch specs are generated from them. |
-| `logs/` | The event dictionary of the structured log of debug builds. The log's patch specs and the decoder (`epm2mod log`) read it. See [logging.md](logging.md). |
+| `web/` | Two apps (React, Vite): `apps/site`, the public site (GitHub Pages, `.github/workflows/web.yml`), and `apps/local`, the installer page, served by `src/epm2mod/serve.py`. `packages/ui` holds what they share. See [../web/README.md](../web/README.md). |
+| `looks/` | `catalogue.json` (the film simulations), `card-looks.json` (the 12 default film simulations, one per ART entry), `fits/` (the fitted values) and the generated `film-records.json`. `films.json` and `more-films.json` serve older builds. |
+| `logs/` | The event dictionary of the Debug Log. The log's patch specs and the decoder (`epm2mod log`) read it. See [logging.md](logging.md). |
 | `docs/` | Knowledge that lasts. Each fact there must have a source or must be reproducible. |
 | `experiments/YYYY-MM-DD-slug/` | Ad-hoc scripts and `NOTES.md`. Put large files in the `out/` subfolder, which git ignores. When a result is reliable, move it into `docs/`, `tools/` or the package. |
 | `tests/` | The unittest suite. See *Tests*. |
@@ -51,7 +52,9 @@ Examples: `feat(patch/movie-limit): raise 29-min cap to 9 h`, `docs(camera-log):
   formatted with black (line length 88), type-checked with `mypy --strict`, a docstring on every
   module, class and function of the package (a test checks this; the test files need docstrings
   on helpers only where the name does not say enough), and a test for each behaviour (see *Tests*). The pre-commit hook
-  formats the staged files of the package and its tests and runs mypy. To run the checks by hand:
+  formats the staged files of the package and its tests and runs mypy. It also refuses machine paths and hosts
+  in the staged changes, and runs `tools/doclint.py` on the staged `.md` files. `.githooks/commit-msg` checks the
+  Conventional Commits form and removes AI attribution lines. To run the checks by hand:
 
   ```bash
   uv run black src tests/support.py tests/test_package.py tests/test_looks.py
@@ -67,10 +70,13 @@ Examples: `feat(patch/movie-limit): raise 29-min cap to 9 h`, `docs(camera-log):
   a top-level folder (as `looks/` was) and the spec into `patches/`.
 - **`tools/`** holds stand-alone scripts. `make_firmware.py`, `fetch_stock.py`, `build.py` and
   `oetool.py` are thin commands over the package. The others (`freespace.py`, `fwmap.py`,
-  `disasm.py`, `memmap_svg.py`, `emu/`) are analysis tools.
+  `disasm.py`, `memmap_svg.py`, `emu/`) are analysis tools. `checks.py` runs the off-camera checks of a build,
+  `doclint.py` checks the documents that users read, `doc_links.py` names the files that repeat a fact, and
+  `toolchain.py` finds the MN103 binutils.
 - **Generated, not written by hand:** the parts of the documents between `GENERATED` markers and
-  the CLI reference [cli.md](cli.md) (`uv run epm2mod docs --write`), and the three film patch specs (`uv run epm2mod looks --write`, from
-  `looks/films.json` and `looks/fits/`). A build's name is the file name of its description. Tests
+  the CLI reference [cli.md](cli.md) (`uv run epm2mod docs --write`), the film patch specs of the older builds (`uv run epm2mod looks --write`, from
+  `looks/films.json`, `looks/more-films.json` and `looks/fits/`), and `looks/film-records.json`
+  (`uv run python web/scripts/export_films.py`, from `looks/catalogue.json`, `looks/card-looks.json` and the fits). A build's name is the file name of its description. Tests
   fail if a generated part is out of date.
 - **One environment:** `uv sync` makes `.venv` with the package, the development tools and the
   packages that the research scripts import (`pyproject.toml`, groups `dev` and `research`).
