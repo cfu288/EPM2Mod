@@ -10,7 +10,7 @@ Notes:
   Use --before to start earlier, and trust output only after the first clean line.
 - The runtime base (BASE) is verified by string pointers in the movie routine (see docs/reference/firmware-format.md).
 """
-import argparse, os, shutil, subprocess, sys
+import argparse, os, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))

@@ -5,7 +5,7 @@ films are loaded from the SD card** ([`guide/film-looks.md`](../guide/film-looks
 names and the seven-entry layout below are the history of how the looks were made and measured. The catalogue now
 has 22 films (`data/films/catalogue.json`). The detailed lab notes are in
 `experiments/2026-11-09-film-portra/NOTES.md`; the technical slot reference is
-[`art-filter-slots.md`](art-filter-slots.md); every flash is logged in [`camera-log.md`](../camera-log/README.md).
+[`art-filter-slots.md`](art-filter-slots.md); every flash is logged in the [camera log](../camera-log/README.md).
 
 ## 1. What we built
 

@@ -6,4 +6,4 @@
   - The OM tail differs from the E-PL5's only in the model ID and checksum.
   - Block 0 has no independent reference. The camera ran it (2026-11-08) and stock behaviour looked normal.
 - **Tool:** `oetool` unpack→pack reproduces all six stock files exactly.
-- **Camera:** see [camera-log.md](../camera-log/README.md). Modified firmware is accepted.
+- **Camera:** see the [camera log](../camera-log/README.md). Modified firmware is accepted.

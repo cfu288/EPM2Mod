@@ -19,7 +19,7 @@ Limits: only control transfers with a constant target are seen (not `jmp (a0)`, 
 reads of late data). The classes come from tools/freespace.py's load model. It says nothing about the order of
 tasks after the copies.
 """
-import argparse, json, os, re, shutil, subprocess, sys, tempfile
+import argparse, json, os, re, subprocess, sys, tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)

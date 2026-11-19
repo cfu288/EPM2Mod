@@ -26,7 +26,6 @@ and clears the whole pattern (the kernel does that for a flag made with the clea
 attribute of each flag was not read from the kernel tables: list the exceptions in os.keep_flags). This is a model, not the kernel: priorities, time-outs that
 expire, and pre-emption do not exist here.
 """
-import struct
 from collections import deque
 from scenario import BLOCK
 

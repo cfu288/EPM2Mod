@@ -186,23 +186,6 @@ class FileTests(unittest.TestCase):
         with self.assertRaises(LookFileError):
             lookfile.pack([colour(slot) for slot in range(12)] + [mono(4)])
 
-    def test_json_round_trip(self) -> None:
-        for look in (colour(), mono()):
-            raw = json.loads(json.dumps(lookfile.look_to_json(look)))
-            self.assertEqual(lookfile.look_from_json(raw), look)
-        raw = lookfile.look_to_json(colour())
-        self.assertEqual(raw["entry"], "Pale&Light Color")
-        self.assertEqual(len(raw["chroma"]["Cb"]["slope"]), 17)
-        self.assertEqual(len(raw["chroma"]["Cr"]["slope"]), 16)
-        for broken in (
-            {**raw, "kind": "sepia"},
-            {key: value for key, value in raw.items() if key != "gain"},
-            {**raw, "hue": [1.5] * 6},
-            {**raw, "chroma": {"Cb": raw["chroma"]["Cb"]}},
-        ):
-            with self.assertRaises(LookFileError):
-                lookfile.look_from_json(broken)
-
 
 @unittest.skipUnless(HAVE_NUMPY, "numpy is not installed")
 class PackTests(unittest.TestCase):

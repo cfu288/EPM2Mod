@@ -1,7 +1,7 @@
 # Conventions
 
 See also: [feasibility.md](feasibility.md) (what is possible, the emulator), [todo.md](../../TODO.md) (open
-work), [camera-log.md](../camera-log/README.md) (every update done on a camera),
+work), [camera log](../camera-log/README.md) (every update done on a camera),
 [../builds/README.md](../../data/builds/README.md) (the tested builds), [../AGENTS.md](../../AGENTS.md) (rules for AI
 agents), [../NOTICE.md](../../NOTICE.md) (licences and credits).
 
@@ -92,12 +92,10 @@ descriptions, patch specs and film lists are data: they are also relative to the
 - **`experiments/` is research code.** It may be rough. It may import the package; the package never
   imports from `experiments/`, and a build description may only name patch specs in `data/specs/`.
   When a result becomes part of how firmware is made, move the code into the package, the data into
-  a top-level folder (as `data/films/` was) and the spec into `data/specs/`.
-- **`tools/`** holds stand-alone scripts. `make_firmware.py`, `fetch_stock.py`, `build.py` and
-  `oetool.py` are thin commands over the package. The others (`freespace.py`, `fwmap.py`,
-  `disasm.py`, `memmap_svg.py`, `emu/`) are analysis tools. `checks.py` runs the off-camera checks of a build,
-  `doclint.py` checks the documents that users read, `doc_links.py` names the files that repeat a fact, and
-  `toolchain.py` finds the MN103 binutils.
+  a folder of `data/` (as `data/films/` was) and the spec into `data/specs/`.
+- **`tools/`** holds stand-alone scripts. `oetool.py` is a thin command over the package. The others
+  (`freespace.py`, `fwmap.py`, `disasm.py`, `memmap_svg.py`) are analysis tools. `checks.py` runs the off-camera
+  checks of a build and `toolchain.py` finds the MN103 binutils. The emulator harness is in `emulator/`.
 - **Generated, not written by hand:** the parts of the documents between `GENERATED` markers and
   the CLI reference [cli.md](../reference/cli.md) and the film patch specs of the older builds (from `data/films/films.json`,
   `data/films/more-films.json` and `data/films/fits/`): `uv run epm2mod generate` writes them. `data/films/film-records.json`
@@ -132,7 +130,7 @@ build.
    only a flash can show that code runs there. When a build is meant to be that test, add
    `"first_code": true` to its description. The script then accepts the area if it passes every
    static check, and prints a FIRST CODE line. Say in the camera log which area is new.
-3. **Log it** in [camera-log.md](../camera-log/README.md) with that sha256. Write it to the card with
+3. **Log it** in the [camera log](../camera-log/README.md) with that sha256. Write it to the card with
    `uv run epm2mod install --card DIR --build NAME --allow-untested`, then flash it.
 4. **If the camera test passes:**
    `uv run epm2mod pin NAME --date YYYY-MM-DD --sha256 THE_SHA256_FROM_THE_LOG`.
@@ -183,4 +181,4 @@ you pin a build.
 
 ## Camera-testing rule
 
-Never flash a build that hasn't been recorded in [camera-log.md](../camera-log/README.md) before and after: file, sha256, lamp timings, result. Keep the stock BIN at hand for recovery.
+Never flash a build that hasn't been recorded in the [camera log](../camera-log/README.md) before and after: file, sha256, lamp timings, result. Keep the stock BIN at hand for recovery.

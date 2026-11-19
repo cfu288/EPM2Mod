@@ -10,9 +10,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from .looks.lookfile import CARD_NAME
-from .stock import CARD_FOLDER
-
 #: The menu path that loads the film file into the camera.
 LOAD_LOOKS = (
     "MENU → SETUP → gears tab → J → Load Looks → Load → OK. "
@@ -122,7 +119,3 @@ def film_steps(
         Step("load-films", LOAD_LOOKS),
         Step("check-art", f"Check that MENU → ART shows {art_shows}"),
     ]
-
-
-#: The names of the files on the card, for the copy step.
-CARD_FILES = (CARD_FOLDER, CARD_NAME)
