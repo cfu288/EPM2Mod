@@ -2,6 +2,9 @@
 
 Date: 2026-11-19. Desk work only. Nothing was built or flashed.
 
+Status: the owner agreed to the acceptance criteria (§5) on 2026-11-19 and deferred the work. Release Lag-Time was
+deferred the same day.
+
 Labels: **V** verified (firmware bytes, manual), **I** inferred, **U** unknown.
 
 ## 1. What Light Box is
