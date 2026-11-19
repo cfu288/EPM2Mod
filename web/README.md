@@ -5,8 +5,8 @@ Two pages share one package of components and data:
 | Folder                        | What it is                                                                                                                           | Served by                                                                                                |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
 | `packages/ui` (`@epm2mod/ui`) | the ART-menu editor (`MenuEditor`, `useLooks`), the preview (`StripPreview`), the page frame, the film data and the look-file packer | both apps                                                                                                |
-| `apps/site`                   | the public page: features, film comparison, install steps                                                                            | GitHub Pages, https://cfu288.github.io/EPM2Mod/ (`.github/workflows/web.yml`, on every change to `main`) |
-| `apps/local`                  | the local app: make the firmware, add film looks, write to an SD card or download a zip                                              | `epm2mod serve` (`src/epm2mod/serve.py`), from the build in `src/epm2mod/app/` (not in git)              |
+| `apps/site`                   | the public site: Home, Features, Film Simulations, Install                                                                           | GitHub Pages, https://cfu288.github.io/EPM2Mod/ (`.github/workflows/web.yml`, on every change to `main`) |
+| `apps/local`                  | the local app: make the firmware, add film simulations, write to an SD card or download a zip                                        | `epm2mod serve` (`src/epm2mod/serve.py`), from the build in `src/epm2mod/app/` (not in git)              |
 
 Rules (the lint refuses a break of them): an app imports shared code only from `@epm2mod/ui` and
 `@epm2mod/ui/theme.css`, never from another app and never from a path inside `packages/ui`. Code that both apps need
@@ -16,7 +16,7 @@ goes into `packages/ui` and is exported from its `src/index.ts`. Each app keeps 
   pages: black and white, square buttons that invert on hover, sections under a thick black rule
   (`packages/ui/src/theme.css`). Fonts: Sora (headings) and Arimo (text), the free fonts nearest to that site's Neue
   Machina and Helvetica Neue (glyph overlap); computers with Helvetica Neue use it.
-- `../looks/film-records.json`: the films and their look records, the same file that `epm2mod films set` reads. Made
+- `../looks/film-records.json`: the film simulations and their look records, the same file that `epm2mod films set` reads. Made
   by `uv run python web/scripts/export_films.py` from `looks/catalogue.json` (a test of the Python suite fails when it
   is out of date).
 - `packages/ui/src/previews/`: the camera's Picture Mode strip, drawn by the emulator, in two layers: `menu/art<N>.png`
