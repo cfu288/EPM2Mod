@@ -35,7 +35,7 @@
   },
   {
    "name": "Film catalogue",
-   "fact": "The films, their count, names, notes, and the 12 defaults per ART entry",
+   "fact": "The films, their count, names, notes, and the Olympus art filter of each ART entry",
    "truth": [
     "looks/catalogue.json",
     "looks/card-looks.json",
@@ -52,13 +52,13 @@
     "src/epm2mod/catalogue.py",
     "web/apps/site/src/pages/Films.tsx",
     "web/apps/site/src/App.test.tsx",
-    "web/apps/local/src/App.tsx",
+    "web/apps/local/src/preset.ts",
     "tests/test_lookfile.py",
     "src/epm2mod/readme.py"
    ],
    "regenerate": [
     "uv run python web/scripts/export_films.py (film-records.json from catalogue.json)",
-    "uv run epm2mod docs --write (the film table in docs/guide/film-looks.md)"
+    "uv run epm2mod generate (the film table in docs/guide/film-looks.md)"
    ]
   },
   {
@@ -76,7 +76,7 @@
     "release/README.txt"
    ],
    "regenerate": [
-    "uv run epm2mod docs --write (the camera steps in README.md)"
+    "uv run epm2mod generate (the camera steps in README.md)"
    ]
   },
   {
@@ -101,7 +101,7 @@
     "src/epm2mod/readme.py"
    ],
    "regenerate": [
-    "uv run epm2mod docs --write (docs/install.md and builds/README.md blocks)"
+    "uv run epm2mod generate (docs/install.md and builds/README.md blocks)"
    ]
   },
   {
@@ -142,7 +142,7 @@
     "web/apps/site/src/pages/Install.tsx"
    ],
    "regenerate": [
-    "uv run epm2mod docs --write (docs/cli.md, from the command definitions)"
+    "uv run epm2mod generate (docs/cli.md, from the command definitions)"
    ]
   },
   {

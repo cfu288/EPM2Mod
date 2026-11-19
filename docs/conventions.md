@@ -69,8 +69,8 @@ Examples: `feat(patch/movie-limit): raise 29-min cap to 9 h`, `docs(camera-log):
   `oetool.py` are thin commands over the package. The others (`freespace.py`, `fwmap.py`,
   `disasm.py`, `memmap_svg.py`, `emu/`) are analysis tools.
 - **Generated, not written by hand:** the parts of the documents between `GENERATED` markers and
-  the CLI reference [cli.md](cli.md) (`uv run epm2mod docs --write`), and the three film patch specs (`uv run epm2mod looks --write`, from
-  `looks/films.json` and `looks/fits/`). A build's name is the file name of its description. Tests
+  the CLI reference [cli.md](cli.md), and the three film patch specs (from `looks/films.json` and `looks/fits/`):
+  `uv run epm2mod generate` writes them. A build's name is the file name of its description. Tests
   fail if a generated part is out of date.
 - **One environment:** `uv sync` makes `.venv` with the package, the development tools and the
   packages that the research scripts import (`pyproject.toml`, groups `dev` and `research`).
@@ -101,13 +101,13 @@ build.
    `"first_code": true` to its description. The script then accepts the area if it passes every
    static check, and prints a FIRST CODE line. Say in the camera log which area is new.
 3. **Log it** in [camera-log.md](camera-log.md) with that sha256. Write it to the card with
-   `uv run epm2mod install --card DIR --build NAME --untested`, then flash it.
+   `uv run epm2mod install --card DIR --build NAME --allow-untested`, then flash it.
 4. **If the camera test passes:**
    `uv run epm2mod pin NAME --date YYYY-MM-DD --sha256 THE_SHA256_FROM_THE_LOG`.
    The command makes the build again in memory and records the test only if the result has that
    sha256, so a spec that changed after the flash cannot be recorded as tested. It writes the sha256
    and the date into the description and makes it the pinned build. Then:
-   - run `uv run epm2mod docs --write`. It refreshes the generated parts of the documents
+   - run `uv run epm2mod generate`. It refreshes the generated parts of the documents
      (`README.md`, `docs/install.md`, `docs/guide/film-looks.md`, `builds/README.md`, `docs/cli.md`).
    - update what is written by hand: the feature list in `README.md` (one line and a link per
      feature), the feature's guide in `docs/guide/` (how to switch it on and use it, with
@@ -126,13 +126,13 @@ A release is a tag; GitHub makes, tests and publishes it (`.github/workflows/rel
    `patches/build-label.json` in `builds/NAME.json` (the screen then reads "Body : 1.6  EPM2Mod 2026.11.19"). The label
    is part of the firmware, so it is set before the camera test. Pin the camera-tested build (`uv run epm2mod pin ...`)
    and push.
-2. `uv run epm2mod release` checks and shows the release: the pinned build has a camera test and a row in
+2. `uv run epm2mod release --dry-run` checks and shows the release: the pinned build has a camera test and a row in
    `docs/camera-log.md`, the tree is clean and pushed, the generated documents and the feature lists are current,
    and the newest CI runs on main passed. It names the version from the label (`v2026.11.19-rc.N`, or `v2026.11.19`
    with `--final`) and writes the notes: the build, the feat and fix commits since the last tag, the sha256.
-3. `uv run epm2mod release --yes --push` tags and pushes it. The tag's message becomes the release notes.
+3. `uv run epm2mod release --push` tags and pushes it. The tag's message becomes the release notes.
 
-`uv run epm2mod package` makes the same zip locally, without publishing. It refuses a version that does not start with
+`uv run epm2mod package --release-version V` makes the same zip locally, without publishing. It refuses a version that does not start with
 the pinned build's label.
 
 ## Tests

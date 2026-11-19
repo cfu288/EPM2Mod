@@ -39,16 +39,16 @@ cd EPM2Mod
 ```
 
 1. Format the card in the camera. This makes the `DCIM` folder. Put the card in the computer. `uv run epm2mod cards` shows the folder of the card (for example `/Volumes/NO NAME` on a Mac or `E:\` on Windows).
-2. Write EPM2Mod and the 12 default film simulations to the card:
+2. Write EPM2Mod to the card:
 
    ```sh
    uv run epm2mod install --card /path/to/card
    ```
 
-   This downloads the Olympus firmware, applies the patches, and writes `DCOLYMP/E1019999.BIN` and `EPM2LOOK.BIN` to the card. To choose the film simulations, put a film simulation in each ART slot. ART1 is the first entry of the camera's ART menu (Pop Art), ART12 the last (Watercolor). A slot you leave out keeps its Olympus art filter. The names are in the [film table](docs/guide/film-looks.md#available-film-simulations), or run `uv run epm2mod films`:
+   This downloads the Olympus firmware, applies the patches, and writes `DCOLYMP/E1019999.BIN` to the card. To add film simulations, put a film simulation in each ART slot with `--film`: `install` then also writes `EPM2LOOK.BIN`. ART1 is the first entry of the camera's ART menu (Pop Art), ART12 the last (Watercolor). A slot you leave out keeps its Olympus art filter. The names are in the [film table](docs/guide/film-looks.md#available-film-simulations), or run `uv run epm2mod films`:
 
    ```sh
-   uv run epm2mod install --card /path/to/card ART1=portra-400 ART2=ektachrome ART3=pro-400h ART4=kodachrome ART5=double-x ART6=vision3-250d ART7=velvia ART8=superia-400 ART9=provia ART10=portra-160 ART11=gold-200 ART12=vision3-500t
+   uv run epm2mod install --card /path/to/card --film ART1=portra-400 --film ART2=ektachrome --film ART3=pro-400h --film ART4=kodachrome --film ART5=double-x --film ART6=vision3-250d --film ART7=velvia --film ART8=superia-400 --film ART9=provia --film ART10=portra-160 --film ART11=gold-200 --film ART12=vision3-500t
    ```
 3. Do the steps that `install` shows:
 

@@ -5,11 +5,11 @@ camera keeps them, with their names, after power-off and without the card.
 
 ## Make a file
 
-The installer always writes the file, with the 12 default film simulations or your choice. On the command line, put a film simulation in each ART slot. ART1 is the first entry of the camera's ART menu (Pop Art), ART12 the last (Watercolor). A slot you leave out keeps its Olympus art filter. Change any film simulation in this command (the names are in the [film table](film-looks.md#available-film-simulations) and in `uv run epm2mod films`, and
+The installer always writes the file, with the 12 default film simulations or your choice. On the command line, put a film simulation in each ART slot with `--film`. ART1 is the first entry of the camera's ART menu (Pop Art), ART12 the last (Watercolor). A slot you leave out keeps its Olympus art filter. Change any film simulation in this command (the names are in the [film table](film-looks.md#available-film-simulations) and in `uv run epm2mod films`, and
 `uv run epm2mod cards` shows the card's folder):
 
 ```sh
-uv run epm2mod films set --card /path/to/card ART1=portra-400 ART2=ektachrome ART3=pro-400h ART4=kodachrome ART5=double-x ART6=vision3-250d ART7=velvia ART8=superia-400 ART9=provia ART10=portra-160 ART11=gold-200 ART12=vision3-500t
+uv run epm2mod films set --card /path/to/card --film ART1=portra-400 --film ART2=ektachrome --film ART3=pro-400h --film ART4=kodachrome --film ART5=double-x --film ART6=vision3-250d --film ART7=velvia --film ART8=superia-400 --film ART9=provia --film ART10=portra-160 --film ART11=gold-200 --film ART12=vision3-500t
 ```
 
 It writes `EPM2LOOK.BIN` to the top folder of the card. Without the card, use `-o FILE` and copy the file there. The other options are in the [command-line reference](../cli.md).

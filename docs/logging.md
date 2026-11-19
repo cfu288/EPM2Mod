@@ -1,7 +1,7 @@
 # The structured log
 
 For developers. A debug build of the firmware writes event records to the file `EPM2LOG.BIN` on the SD
-card. `epm2mod log` turns the file into JSON lines. The design notes, the evidence and the camera test
+card. `epm2mod log` turns the file into a short report, or its events into JSON (`--json`). The design notes, the evidence and the camera test
 are in [experiments/2026-11-15-log/NOTES.md](../experiments/2026-11-15-log/NOTES.md).
 
 The pinned build (`builds/stock-films.json`) has the log in the firmware, switched by the Custom Menu row **Debug Log**
@@ -27,7 +27,7 @@ of peaking; focus-peaking notes, section 17).
 | Probes | `patches/log-probes.json` | One hook and one small routine per event of a feature |
 | Timing probe of peaking | `patches/log-peaking-time.json` | Event `pk_stats`, one record per 8 runs of Key Line pass 9. Written by `mkspec_log.py --peaking-time`. It also puts the build id of `logs/events.json` into the block header |
 | Probe of the save guard of peaking | `patches/log-peaking-guard.json` | Event `pk_guard`, one record per hold of the peaking latch after a shot. Written by `mkspec_log.py --peaking-guard`. It puts the build id of `logs/events.json` into the block header |
-| Decoder | `src/epm2mod/eventlog.py`, `src/epm2mod/logsummary.py`, command `epm2mod log` | Reads the file and the dictionary, prints JSON lines or a summary |
+| Decoder | `src/epm2mod/eventlog.py`, `src/epm2mod/logsummary.py`, command `epm2mod log` | Reads the file and the dictionary, prints a summary, or the events as JSON |
 
 ## The record
 
@@ -79,11 +79,11 @@ not keep them (`flush` then shows `not_saved`).
 
 ```sh
 cp /path/to/card/EPM2LOG.BIN /tmp/scratch/
-uv run epm2mod log /tmp/scratch/EPM2LOG.BIN --summary
-uv run epm2mod log /tmp/scratch/EPM2LOG.BIN > /tmp/scratch/log.jsonl
+uv run epm2mod log /tmp/scratch/EPM2LOG.BIN
+uv run epm2mod log /tmp/scratch/EPM2LOG.BIN --json > /tmp/scratch/log.json
 ```
 
-`--summary` prints a short report: the sessions, lost records, the firmware's error records, the flushes, the
+`epm2mod log` prints a short report: the sessions, lost records, the firmware's error records, the flushes, the
 count of each event, the screens, and one or two lines for peaking, the film looks, shooting, interval shooting
 and the level gauge. Start with it. The evaluation of the first file from a camera is in
 [experiments/2026-11-15-log/evaluation-1.md](../experiments/2026-11-15-log/evaluation-1.md).
@@ -121,7 +121,7 @@ The boot hook adds 1 when it finds a ring in RAM. On the camera the error record
 already made the ring, so a power-on gives 1. A restart that kept the RAM gives 2 or more. The camera clears
 this RAM at power-off (camera result 1).
 
-To filter, use `jq`: `jq -c 'select(.level == "error")' /tmp/scratch/log.jsonl`.
+To filter, use `jq`: `jq -c '.events[] | select(.level == "error")' /tmp/scratch/log.json`.
 
 ## The dictionary, name tables and older builds
 
@@ -208,7 +208,7 @@ event `pk_guard`. `patches/log-peaking-guard.json` puts that id into the flush t
 5. A change of an id, name, level or argument gives a new build id. If the old build was flashed, keep its
    event list first (section "The dictionary, name tables and older builds"). The `doc` texts, `names` and
    `tables` do not count. A test fails when the two specs carry a build id that no dictionary in `logs/` has.
-6. Give the enumerated values of a new event a table, so that the JSON lines and the summary show names.
+6. Give the enumerated values of a new event a table, so that the JSON and the summary show names.
 
 A probe costs 31 to 66 bytes for its routine and 5 to 10 bytes at its site, and no RAM, or 8 bytes of RAM for
 a gate. One `log_put` call runs about

@@ -14,7 +14,7 @@ If the menu has no Custom Menu tab (gears icon), enable it in **MENU â†’ SETUP â
 ## Usage
 
 With **On**, the camera adds to `EPM2LOG.BIN` in the top folder of the card each time you open a menu or playback, and
-at power-off. With the command-line install, `uv run epm2mod log EPM2LOG.BIN --summary` reads the file
+at power-off. With the command-line install, `uv run epm2mod log EPM2LOG.BIN` reads the file
 ([the log format](../logging.md)).
 
 ## Limits

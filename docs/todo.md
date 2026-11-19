@@ -96,7 +96,7 @@ candidate `osd-battery` are kept. The minimum shutter speed was taken up again o
   probes (power-on factor, real restart count, per-CPU gates, peaking loop time, flush end):
   `experiments/2026-11-15-log/evaluation-1.md`. Unknown: if the ring RAM survives a crash restart.
   A ring overflows after about 100 s of peaking without a menu. The camera writes compact binary event
-  records to `EPM2LOG.BIN` on the card; `epm2mod log` decodes them to JSON lines with the dictionary
+  records to `EPM2LOG.BIN` on the card; `epm2mod log` decodes them with the dictionary
   `logs/events.json`. A debug build only: the pinned build stays without it. Probes go into the old
   features too (peaking, picture mode changes, level gauge, interval, film looks, firmware errors).
   Next after it: read a file, looks from the card, code from the card.

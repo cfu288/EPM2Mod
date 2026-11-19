@@ -120,17 +120,17 @@ function CliSteps() {
           <code>/path/to/card</code> is the card&apos;s folder: <code>uv run epm2mod cards</code> lists it.
         </p>
         <p>
-          <code>install</code> also writes the 12 default film simulations. To choose your own, put a command-line name
-          from the{' '}
+          <code>install</code> writes the firmware. To add film simulations, give <code>--film</code> with a
+          command-line name from the{' '}
           <Link href={href('films', '#all-films')} className="underline">
             film simulation list
           </Link>{' '}
-          (or <code>uv run epm2mod films</code>) in each ART slot. ART1 is the first entry of the camera&apos;s ART menu
-          (Pop Art), ART12 the last (Watercolor). A slot you leave out keeps its Olympus art filter.
+          (or <code>uv run epm2mod films</code>) for each ART slot. ART1 is the first entry of the camera&apos;s ART
+          menu (Pop Art), ART12 the last (Watercolor). A slot you leave out keeps its Olympus art filter.
         </p>
-        <Code>{'uv run epm2mod install --card /path/to/card ART1=portra-400 ART2=velvia'}</Code>
+        <Code>{'uv run epm2mod install --card /path/to/card --film ART1=portra-400 --film ART2=velvia'}</Code>
         <p>To change only the film simulations later:</p>
-        <Code>{'uv run epm2mod films set --card /path/to/card ART2=velvia'}</Code>
+        <Code>{'uv run epm2mod films set --card /path/to/card --film ART2=velvia'}</Code>
         <p>To see what is on the card and what will not work:</p>
         <Code>{'uv run epm2mod inspect --card /path/to/card'}</Code>
         <p>

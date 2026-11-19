@@ -5,9 +5,8 @@ been tested on a camera, the sha256 of the result and the date of the test. The 
 file name. Every build starts from the stock E-PM2 v1.6 firmware.
 
 ```bash
-uv run epm2mod make                                # the pinned build (pinned-build.json names it)
-uv run epm2mod make NAME                           # another build
-uv run epm2mod install --card DIR --build NAME --untested   # a candidate on the SD card
+uv run epm2mod make NAME                           # a build
+uv run epm2mod install --card DIR --build NAME --allow-untested   # a candidate on the SD card
 uv run epm2mod pin NAME --date YYYY-MM-DD --sha256 HEX      # after a passed camera test
 ```
 
