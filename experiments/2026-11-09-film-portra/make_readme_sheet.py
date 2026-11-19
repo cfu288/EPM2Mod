@@ -36,8 +36,8 @@ nh = round(W * newer[0].height / newer[0].width)
 width = 2 * M + len(LOOKS) * W + (len(LOOKS) - 1) * GAP
 height = M + HEAD + sum(h + CAP + GAP for _, h in rows) + 70 + nh + CAP + M
 page = Image.new("RGB", (width, height), "white"); d = ImageDraw.Draw(page)
-d.text((M, M - 8), "Adding film emulations to the Olympus E-PM2 using custom firmware", font=font(26, True), fill="black")
-d.text((M, M + 28), 'Each row is one RAW file developed in the camera with every look. The first column is the default "Natural" profile in camera.', font=font(13), fill=(90, 90, 90))
+d.text((M, M - 8), "Film emulations for the Olympus E-PM2 using custom firmware", font=font(26, True), fill="black")
+d.text((M, M + 28), 'The first image in each row is the default "Natural" profile in camera.', font=font(13), fill=(90, 90, 90))
 y = M + HEAD
 for c, (_, name, label) in enumerate(LOOKS):
     x = M + c * (W + GAP)
