@@ -2,7 +2,7 @@
 
 ![A timeline of Olympus and OM SYSTEM cameras that have custom firmware projects, from the E-PL3 in 2011 to the OM-5 Mark II in 2025](../images/landscape.png)
 
-EPM2Mod supports the oldest camera of the Olympus firmware mods that have a release. The E-PL3 is older, but its project is research only. The list holds the projects on GitHub, in the [OM Firmware Atlas](https://github.com/xulfr/om-firmware-atlas) and in a [43rumors roundup](https://www.43rumors.com/new-mft-hacking-roundup-e-pm2-gains-focus-peaking-e-p7-gets-150mbps-4k-and-more-om-3-upgrades/), on 2026-11-19.
+The list holds the Olympus custom firmware projects we know of: those on GitHub, in the [OM Firmware Atlas](https://github.com/xulfr/om-firmware-atlas) and in a [43rumors roundup](https://www.43rumors.com/new-mft-hacking-roundup-e-pm2-gains-focus-peaking-e-p7-gets-150mbps-4k-and-more-om-3-upgrades/), on 2026-11-19.
 
 | Announced | Camera | Projects |
 |---|---|---|
