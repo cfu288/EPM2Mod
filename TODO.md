@@ -9,7 +9,7 @@ Test releases up to v2026.11.19-rc.2. Open: the final release.
 
 ## Level gauge
 
-- Level Adjust works (2026-11-14). Not yet reported: the calibration after power off and on, and
+- Level Adjust works (2026-11-14), and the calibration is kept after power off and on (owner). Not yet reported:
   Reset.
 - Not yet reported: the info menu of an electronic
   viewfinder (the new row re-uses the unused panel 594, "EVF Info Settings").
@@ -39,8 +39,8 @@ Test releases up to v2026.11.19-rc.2. Open: the final release.
 
 ## Interval shooting
 
-- Not yet reported: a full sequence of 240 frames, the cancellation of a sequence, intervals longer
-  than 90 seconds, a full card.
+- Sequences of more than 100 frames work (owner). Not yet reported: a full sequence of 240 frames, the
+  cancellation of a sequence, intervals longer than 90 seconds, a full card.
 - In the emulator, Time Lapse On with 230 frames and 16 shots left gives "Card Full", and after a
   restart the row reads Off. Find out on the camera: set more frames than the card has room for.
 - An empty settings store shows Frame 99, 00:00:01, 00:00:01 in the emulator, not 10 frames and
