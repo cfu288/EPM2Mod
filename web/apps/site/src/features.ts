@@ -83,7 +83,7 @@ export const features: Feature[] = [
     steps: [
       'Set the shooting mode to P or A, and ISO to Auto.',
       'MENU → Custom Menu → E. Exp/▣/ISO → Lowest S/S Setting.',
-      'Press RIGHT, choose a speed with UP/DOWN, and press OK: faster for moving subjects, slower for still ones.',
+      'Press RIGHT, choose a speed with UP/DOWN, and press OK.',
     ],
     screens: [
       { src: 'ui/lowest-ss-row.png', alt: 'Custom Menu E with the Lowest S/S Setting row' },
