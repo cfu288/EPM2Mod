@@ -26,7 +26,7 @@ __pycache__/
 src/epm2mod/app/
 .DS_Store
 
-# om-emu is the submodule third_party/om-emu, our fork (branch e101) with the E-PM2's boot lab.
+# om-emu is the submodule emulator/om-emu, our fork (branch e101) with the E-PM2's boot lab.
 # Unpacked images (build/emu) are under build/, ignored above.
 # Old diffs made before om-emu had a licence stay out:
 **/om-emu-E101.patch
