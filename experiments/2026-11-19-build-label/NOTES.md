@@ -68,7 +68,11 @@ Options, smallest first:
 
 Widget table found on the way (V): panel 99's boxes at 0x7EF93804, 14 widgets × 2 copies × {x, y, w, h}: 0 guide
 bar, 1 title (20, 11, 600, 32), 2–5 labels (191, y), 6–9 colons (311, y, 18), 10–13 values (369, y, 100);
-y = 170, 206, 242, 278.
+y = 170, 206, 242, 278. Widget descriptors (92 bytes each) from 0x7EF93914 (widget 1): {u16 0x8010, u16 widget id,
+box pointer, 9, pointer, 2, text id, ...}; the field at +36 is the alignment: 0x100 left (labels), 0x101 centred
+(title, colons, values). Section 6 uses it.
+
+This section describes the first version (camera-tested 2026-11-19, "Works!"). Section 6 replaces the box edit.
 
 **Exif Software tag (report only, not built).** The writer copies "Version x.x" (0x7E8517D9, 12 bytes, the next
 string follows) into a 32-byte field. A label fits: "Version 1.6 EPM2Mod 2026.11.19" is 30 characters of 31. It
@@ -128,3 +132,33 @@ candidate is made, before the flash, and the camera test covers it.
   refused; two runs give the same sha256; changing only the label changes the sha256 (so `pin` refuses a changed
   label, as it does for a changed spec); the stock-firmware test group makes the labelled build and checks its
   recorded sha256.
+
+## 6. The four values start at one x (2026-11-19, after the camera test)
+
+On the camera, with the 17 mm lens, the Lens "1.1" stayed centred in its stock box while the Body text started
+further left (`results/before-align-four-lines.png`, emulator with faked Lens, Flash and Acc versions: Body at x 387,
+Lens 446, Flash 440, Acc 443).
+
+**Method (data only, `patches/build-label.json`, from `scripts/mkspec_label.py`):** the box edit now covers all four
+value widgets 10–13 (both copies, 0x7EF938A4–0x7EF938E3): (369, y, 100, 32) → (337, y, 335, 32), screen x 377–712;
+and the four value descriptors' alignment field (0x7EF93C74, 0x7EF93CD0, 0x7EF93D2C, 0x7EF93D88) goes from 0x101
+(centred) to 0x100 (left, the labels' value). The other edits and the placeholder are unchanged.
+
+**Emulator check:** `FAKEVER=6:1100,10:2000,8:1000` in `scripts/fwplay.mjs` makes the page's Lens, Flash and Acc
+version reads succeed (hooks after each read at 0x7EDFD930, 0x7EDFD94D, 0x7EDFD96A: d0 = 0 and the u16 in the page's
+record). First lit pixel of each value text:
+
+| Screenshot | Body | Lens | Flash | Acc |
+|---|---|---|---|---|
+| `results/aligned-four-lines-2026.11.19.png` | 378 (ends 685) | 378 | 378 | 378 |
+| `results/aligned-four-lines-2028.08.08.png` | 378 (ends 706, box ends 712) | 378 | 378 | 378 |
+| `results/aligned-body-lens-2026.11.19.png` | 378 | 378 | – | – |
+| `results/aligned-body-lens-2028.08.08.png` | 378 (ends 706) | 378 | – | – |
+
+The 2028.08.08 text is written in RAM with `wset:`, over the made build's text.
+`uv run epm2mod make builds/epm2mod-2026.11.19.json`: free-space check PASS, boot-test PASS, update-path-test PASS,
+sha256 `6441130e9cc6cd5f06dc70e35950e05b0401f9a3f606694cf2c806a0bc209f62`. hookcheck of the spec: 0 transfers.
+`uv run python -m unittest tests.test_label`: OK.
+
+Change from stock: the values now start at screen x 378, right after the colon (x 357–362). Stock starts them about
+x 440 (centred). Not checked: the real lens, flash and accessory reads (faked here); the camera.

@@ -1,6 +1,6 @@
 {
  "name": "build-label",
- "description": "Build label: the Firmware screen (Setup Menu, Firmware) shows 'Body : 1.6  EPM2Mod YYYY.MM.DD', the 'label' of the build description; epm2mod make writes it over the placeholder 0000.00.00 (src/epm2mod/label.py). The version number is not changed (block 0 header +16 = 0x1600, prm tag 0xC082). Four byte edits, no new code: the panel's object grows so that its value text holds 48 characters, the Body line formats with its own text in a wider box, and that text in unreferenced debug strings of segment 2. See experiments/2026-11-19-build-label/NOTES.md.",
+ "description": "Build label: the Firmware screen (Setup Menu, Firmware) shows 'Body : 1.6  EPM2Mod YYYY.MM.DD', the 'label' of the build description; epm2mod make writes it over the placeholder 0000.00.00 (src/epm2mod/label.py). The version number is not changed (block 0 header +16 = 0x1600, prm tag 0xC082). Byte edits, no new code: the panel's object grows so that its value text holds 48 characters; the Body line formats with its own text, in unreferenced debug strings of segment 2; the four value texts (Body, Lens, Flash, Acc) are left-aligned in wider boxes that start at one x, so they line up as in stock. See experiments/2026-11-19-build-label/NOTES.md.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
  "status": "candidate: emulator-checked, not flashed",
@@ -27,10 +27,46 @@
    "type": "bytes",
    "block": 0,
    "offset": "0xB72884",
-   "expect": "7101aa00640020007101aa0064002000",
-   "new": "4b01aa00550120004b01aa0055012000",
+   "expect": "7101aa00640020007101aa00640020007101ce00640020007101ce00640020007101f200640020007101f2006400200071011601640020007101160164002000",
+   "new": "5101aa004f0120005101aa004f0120005101ce004f0120005101ce004f0120005101f2004f0120005101f2004f012000510116014f012000510116014f012000",
    "_addr": "0x7EF938A4",
-   "_note": "panel 99, widget 10 (the Body value), both copies of its rectangle: x 369 w 100 -> x 331 w 341 (640-wide coordinates; the text is centred in it)"
+   "_note": "panel 99, widgets 10-13 (the Body, Lens, Flash and Acc values), both copies of each rectangle: x 369 w 100 -> x 337 w 335 (640-wide coordinates, screen x = x + 40); a box clips its text"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xB72C54",
+   "expect": "01010000",
+   "new": "00010000",
+   "_addr": "0x7EF93C74",
+   "_note": "panel 99, widget 10 (the Body value): alignment 0x101 (centred) -> 0x100 (left, as the labels), so that the four values start at one x"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xB72CB0",
+   "expect": "01010000",
+   "new": "00010000",
+   "_addr": "0x7EF93CD0",
+   "_note": "panel 99, widget 11 (the Lens value): alignment 0x101 (centred) -> 0x100 (left, as the labels), so that the four values start at one x"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xB72D0C",
+   "expect": "01010000",
+   "new": "00010000",
+   "_addr": "0x7EF93D2C",
+   "_note": "panel 99, widget 12 (the Flash value): alignment 0x101 (centred) -> 0x100 (left, as the labels), so that the four values start at one x"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xB72D68",
+   "expect": "01010000",
+   "new": "00010000",
+   "_addr": "0x7EF93D88",
+   "_note": "panel 99, widget 13 (the Acc value): alignment 0x101 (centred) -> 0x100 (left, as the labels), so that the four values start at one x"
   },
   {
    "type": "bytes",

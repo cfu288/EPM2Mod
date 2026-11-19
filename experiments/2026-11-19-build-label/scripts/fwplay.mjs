@@ -33,6 +33,15 @@ for (const w of (process.env.DUMPAT ?? '').split(',').filter(Boolean)) {
     console.log(`at ${pc}: a0 ${a.toString(16)} a1 ${(R[A1] >>> 0).toString(16)} :: ${Array.from({ length: Number(n) }, (_, i) => bb(a + i).toString(16).padStart(2, '0')).join('')}`);
   });
 }
+// FAKEVER=KIND:HEX[,KIND:HEX]: the Firmware page's version reads (page slot 0x7EDFD8E6) of kind 6 (Lens), 10 (Flash)
+// or 8 (Acc) succeed with that u16, e.g. 6:1100 = "1.1". The hook is on the instruction after each read: d0 = 0 (read
+// ok) and the u16 written into the page's record (d3 + 4, + 6, + 8), as a real read would
+const { D0, D3 } = await import(path.join(E, 'machine.mjs'));
+const AFTER = { 6: [0x7EDFD930, 4], 10: [0x7EDFD94D, 6], 8: [0x7EDFD96A, 8] };
+for (const w of (process.env.FAKEVER ?? '').split(',').filter(Boolean)) {
+  const [k, v] = w.split(':'); const [pc, off] = AFTER[k]; const val = parseInt(v, 16);
+  e.hook(pc, 'fakever' + k, () => { R[D0] = 0; e.wr((R[D3] >>> 0) + off, new Uint8Array([val & 0xFF, val >> 8])); });
+}
 const out = process.argv[2]; fs.mkdirSync(out, { recursive: true });
 const run = (ms) => { const r = e.run({ maxLabMs: ms, maxMs: 600000 }); if (r.why !== 'labtime') { console.log('STOP', JSON.stringify(r)); process.exit(2); } };
 const b = (a) => (e.r32(a & ~3) >>> (8 * (a & 3))) & 0xFF;
