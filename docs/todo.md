@@ -74,15 +74,13 @@ and delete the item here.
 
 ## Exposure
 
-Deferred by the owner on 2026-11-17: the items of this section (minimum shutter speed, anti-shock 0 s,
-silent shutter, on-screen information). The notes and the candidate `osd-battery` are kept.
+Deferred by the owner on 2026-11-17: anti-shock 0 s, silent shutter, on-screen information. The notes and the
+candidate `osd-battery` are kept. The minimum shutter speed was taken up again on 2026-11-18 (GitHub issue #2).
 
-- **Minimum shutter speed with Auto ISO: the stock firmware has it.** The program holds the shutter at
-  max(1/(2 × focal length), 1/30, Flash Slow Limit), also without a flash. Set MENU → Custom Menu →
-  F → Slow Limit to 1/250 (the default is 1/60). Verified in the function harness, not yet on the
-  camera. A row of its own is planned as the PEN-F does it: Auto or 60 s to 1/4000, used in P and A
-  with ISO Auto and no flash (GitHub issue #2; plan in the notes, §7). Exposure compensation in M with Auto ISO: 2 bytes at 0x7E5878AF, not run.
-  Notes: `experiments/2026-11-17-auto-iso-min-shutter/NOTES.md`.
+- **Lowest S/S Setting (GitHub issue #2): candidate `builds/lss.json`, not flashed.** Custom Menu E -> Lowest S/S
+  Setting (Auto, 60" ... 1/4000). The exposure code copies the PEN-F 3.1's and matches it in the function harness.
+  Next: one camera run. Exposure compensation in M with Auto ISO: 2 bytes at 0x7E5878AF, not run.
+  Notes: `experiments/2026-11-17-auto-iso-min-shutter/NOTES.md` sections 11 and 12.
 
 - **Anti-shock 0 s and a silent shutter: not settled.** The E-P5 is no donor: the bodies with 0 s
   program the sensor with another register set. A route of our own: stock shutter order, sensor

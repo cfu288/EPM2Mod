@@ -28,3 +28,4 @@ patches/seven-fixes-1.json	patches/stock-films-structure.json	as remap7b-code
 patches/seven-movie-1.json	patches/stock-films-structure.json	as remap7b-code
 patches/films12cl-looks.json	patches/stock-films-structure.json	as remap7b-code
 patches/log-menu.json	patches/log-menu-2.json	log-menu-2 is log-menu for the stock-filters firmware: the same code and runs, chained to card-looks-5's T_GUI and with its card_task probe at card-looks-5's T_END (experiments/2026-11-18-stock-filters/design.md)
+patches/custom-menu-rows-2.json	patches/custom-menu-rows-3.json	custom-menu-rows-3 is custom-menu-rows-2 with one more added row (Lowest S/S Setting in group E): the same operations, its item table one row longer at 0x7EBF1FE0 (16 B earlier, same end), its child list one entry longer in place at 0x7EE3CBF4 and the Debug Log value list 8 B later (experiments/2026-11-17-auto-iso-min-shutter/NOTES.md section 8)

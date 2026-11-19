@@ -28,7 +28,7 @@ STATE = 0x605A7C50          # 18 halfwords that 0x7E692BF3 copies (the live-view
 
 D = dict(mode=3, ae=0, focal=34, bv=0x500, av_open=0x02B0, av_close=0x0900, av_set=0x0400, tv_set=0x0600,
          sv_set=0, cv=0, limit=0x0900, std=0x0600, slow=0x0600, sync=0x0800, stb_onoff=0, strobe=0, c222=0,
-         k=0)
+         k=0, step=85)
 
 
 def s16(v):
@@ -58,7 +58,7 @@ def run(emu, row):
     struct.pack_into("<h", m, 24, s16(r["slow"]))
     emu.write(MODE, bytes(m))
     # set: tv, sv (0 = Auto), av, cv (exposure compensation), cv_stb, step, program_shift
-    emu.write(SET, struct.pack("<8h", s16(r["tv_set"]), s16(r["sv_set"]), s16(r["av_set"]), s16(r["cv"]), 0, 85, 0, 0))
+    emu.write(SET, struct.pack("<8h", s16(r["tv_set"]), s16(r["sv_set"]), s16(r["av_set"]), s16(r["cv"]), 0, r["step"], 0, 0))
     emu.write(BV, struct.pack("<6h", *[s16(r["bv"])] * 6) + bytes(196))
     emu.write(P16, bytes(68)); emu.write(STILL, bytes(56)); emu.write(P24, bytes(32))
     emu.write(STATE, bytes(36))
@@ -83,7 +83,7 @@ def run(emu, row):
         0x7E507E4B: lambda e, g: {"d0": g["d0"].bit_length() - 1 if g["d0"] else 32},
     }
     emu.write(K_ADDR, bytes([r["k"]]))
-    res = emu.call(ENTRY, {"a0": ARG}, stubs=stubs, frame=(0xF0, 68))
+    res = emu.call(ENTRY, {"a0": ARG}, stubs=stubs, frame=(0xF0, 68), trace=False)
     st = emu.read(STILL, 56)
     f = struct.unpack_from("<24h", st, 0)
     out = dict(bv=f[0], tv=f[1], sv=f[2], sv_target=f[3], av=f[4], cv=f[5], over=st[21], over_exp=st[22],

@@ -285,3 +285,184 @@ Probes for a debug build (describe only; `logs/events.json` and the generator we
 | Which calculation gives the numbers on the screen before the half-press? | `ae_still_*` records against the screen |
 | Kind-8 list item with denominator 4000; reset and Myset of setting 447; RAM after the row-state array | Emulator, steps 3 to 5 of the plan |
 | Compensation in M: does tag 0x80BA keep the P value in M; does live view follow | Emulator with `tagplay.mjs`; then one camera test of the 2-byte gate |
+
+## 11. Menu row "Lowest S/S Setting" (asked for as "8. Menu row"; the number 8 is taken above)
+
+Date: 2026-11-19. Emulator only. Not flashed. `epm2mod make` refuses the build (free-space check, see "Space").
+
+![Row](results/lss-row-auto.png) ![List](results/lss-list-auto.png) ![1/15](results/lss-row-1-15.png)
+
+### 11.1 Where the row is
+
+MENU → Custom Menu → **E. Exp/ ▣ /ISO** → **Lowest S/S Setting** (the 7th row, after ISO-Auto Set) → RIGHT opens
+the value box (▲ value ▼, the box of # Slow Limit) → UP/DOWN → OK. Values: Auto, 60, 50 … 1, 1/1.3 … 1/4000. Seconds
+show without a mark (as the stock # Slow Limit list). Default Auto.
+
+Not in the ISO-Auto Set screen (the PEN-F place), V: that screen is page 143, a page class of its own (0x7EDE6826–
+0x7EDE6DD8) on panel 83 (two fields, shared with pages 126 and 453). The class code knows two fields with ISO index
+tables (`cmp 21` / `cmp 22`). A third field needs a new panel layout and a rewritten class. No stock three-field
+panel of that kind was found (I).
+
+### 11.2 Interface for the exposure code
+
+| Item | Value | Label |
+|---|---|---|
+| Setting | **653**, prm tag **0x9F11**, MODE bank, u8 | V (tables) |
+| RAM | **0x60413225** (`tagplay.mjs … tag:9f11`, pinned image and this image) | V emulator, I camera |
+| Value | index 0..55: **0 = Auto**, 1 = 60 s, 19 = 1 s, 31 = 1/15, 43 = 1/250, 55 = 1/4000 | V emulator |
+| Index → Tv (Q8) | i ≥ 1: `Tv = trunc((i − 19) × 256 / 3)` (−1536 … 3072) | V for i = 4..43 (equal to the stock # Slow Limit values), I for the rest |
+| Default | 0: ROM prm default 0 and full-reset default 0; the emulator's first boot holds 0 | V tables, V emulator; U the owner's camera |
+| Who writes it | only the row. No constant-id access in stock; not in bank lists (Myset), restore lists or the boot reset; a full reset writes 0 | R (`../2026-11-18-look-editor/settings.md`) |
+
+Why not 447 (the plan of section 7): 447 is Debug Log (`custom-menu-rows-2`), 449 Load Looks, 446/458 Peaking.
+448 (tag 0xD7A1, panel 609) is free, but its full-reset default is 1 (60 s) and the emulator's first boot holds 1
+(V): a camera would show 60 s on first use. 653 has 0 in both defaults. Panel 609 is only the list page; its
+descriptor now names setting 653.
+
+### 11.3 What the specs change
+
+`scripts/mkspec_lss_menu.py` writes both.
+
+- `patches/custom-menu-rows-3.json` (48 ops) takes the place of `custom-menu-rows-2` in the build. A delta on top
+  cannot add a row: `epm2mod make` refuses a change to a byte that `custom-menu-rows-2` covers and keeps (byte 0xBF
+  of each of the 10 item-table address loads, 81 bytes of its table, 35 of its child list; V, `spec.py`
+  `_check_kept_bytes`). So the row needs a new table spec, as `custom-menu-rows-2` replaced `custom-menu-rows`.
+  - item table: 83 rows at **0x7EBF1FE0** (16 B earlier, still ends at 0x7EBF2512 where `stock-films-structure`
+    BK0 starts); row `{4, 1503, 653, order 11, 1504, value list 609, 0}` at index 44; 10 address loads.
+  - child list: 84 entries in place at 0x7EE3CBF4, (609, 653) at index 44. Debug Log's value list moves 8 B to
+    0x7EE3CE94 (word 0x7F014F94).
+  - constants: last index 82, count 83, row-state array 166 B (RAM to 0x606A31BD; next object 0x606A32F0, R);
+    rows in group E 13 → 14 (.data 0x7E8EE858). Everything else as `custom-menu-rows-2`.
+  - `docs/space-superseded.tsv`: new row `custom-menu-rows-2` → `custom-menu-rows-3`.
+- `patches/lss-menu.json` (7 ops, last in the build):
+  - 56 items (28 B) at **0x7EBB1F4C** and the value → text list (57 × 24 B) at **0x7EBB256C**, ending 0x7EBB2AC4.
+    30 … 1/250 are copies of the stock # Slow Limit records (0x7F006EE4) with the index as value; Auto is kind 2,
+    text 71; 60/50/40 kind 3; 1/320 … 1/4000 kind 8.
+  - descriptor 0x7F00BFDC: setting 448, 2 items → setting 653, 56 items. Value → text word 609 (0x7F014F98).
+  - page registry 0x7EFE1B00: list 609 from the generic list page 0x7EDC7ECB to **0x7EE01678**, the class of
+    # Slow Limit and Interval Frame (128 items). The generic page's cursor wraps after 40 items (V emulator: the 41st
+    DOWN went back to Auto).
+  - English texts 1503 → "Lowest S/S Setting", 1504 → "Choose the shutter speed at / which the camera raises / ISO
+    in P and A." (the label and help of panel 594 "EVF Info Settings", which no menu reaches since
+    `level-gauge-lvinfo-row`). Other languages show the old EVF texts.
+  - No code, no hook.
+
+### 11.4 Space (the open decision)
+
+The two lists need 1,568 B and 1,368 B in one piece each. After the pinned build no USABLE area has a run that size
+(largest free runs 733 B in segment 3 and 408 B in segment 2; `level-adjust-row`'s dead tables at 0x7EBF3000 are
+blocked by its kept bytes). The lists are in **0x7EBB1F4C–0x7EBB304C**, Bluetooth debug strings that
+`experiments/2026-11-13-reclaim-space/README.md` row 2 grades A (no reference into the run). `tools/freespace.py`
+gives it NEEDS-DECISION: two pointer hits that it calls unaligned data words (0x7E86D81A, 0x7E864E1F, segment-1
+data) and no proven bound for the string before it (ends with its NUL at 0x7EBB1F4B). `make` fails with exactly
+these two FAIL lines; every other line passes.
+
+Ways on: (a) the owner accepts the area (two rows in `docs/space-pointer-waivers.tsv` and one in
+`docs/space-bounds.tsv`); (b) no decision: build the value → text list in RAM by code at the first GUI state and
+take `level-adjust-row` out of the build (`custom-menu-rows-3` covers all its live bytes), so the items fit in
+0x7EBF2E68–0x7EBF3780.
+
+### 11.5 Checks
+
+The image for the emulator was made with `epm2mod.spec.apply_specs` (the code of `make` without the free-space
+check), sha256 `a4a80c8292d9ed7e156a1edc94f1e66f9d062f67d643bb2fd785f67b58658c57`. It is not a flash file.
+
+| Check | Result |
+|---|---|
+| `tools/freespace.py check` (all 15 specs) | exit 1: 2 FAIL, both `lss-menu` in the NEEDS-DECISION area; `custom-menu-rows-3` PASS |
+| `tools/emu/boot-test` | exit 0, PASS |
+| `tools/emu/update-path-test` | exit 0, PASS |
+| `tools/emu/hookcheck.py custom-menu-rows-3 lss-menu` | exit 0; 5 transfers, all `custom-menu-rows-2`'s peaking hooks (kernel → kernel); no new hook |
+| Crawl `p-nocard-shallow` against `stock-films` (`crawlcmp.py`) | 269 screens equal outside the Custom Menu rows; rows 82 → 83 screens: 13 lost and 14 new, all cursor positions of group E; firmware errors and notes equal |
+| `shotdiff.sh` D → Info Settings and its 4 sub-lists | 0 of 12 differ (texts 1503/1504 not shown there) |
+| Value list | Auto → 1/4000 in 55 DOWN, the 56th wraps to Auto; MENU cancels (`results/lss-list-1-4000.png`) |
+| 1/15 kept | tag 0x9F11 = 0 before, 31 after OK; 31 after a restart with the RAM banks kept and after a restart from flash only; the row shows 1/15 (`results/lss-row-after-restart.png`) |
+
+Not checked: the help text (the emulator shows no help text for any row), other languages, the owner's stored
+value of 653 (U; 0 expected), the value box's text sits about 20 px above the box's centre on this bottom row (the
+same box on # Slow Limit, the 2nd row, is centred; cosmetic, I: the box is moved up to fit the screen).
+
+## 12. Exposure part "lss-core" (2026-11-19)
+
+Labels as above. All addresses E-PM2 unless marked PEN-F.
+
+### 12.1 What the PEN-F does (V, read; and run in the PEN-F harness)
+
+The PEN-F's program line is the E-PM2's with **one more stage**. Corner block (PEN-F): +24 fastest, +26 STOCK, +28
+LOWSS, +32 slowest. 9 breakpoints in place of 8 (PEN-F 0x605BA4B9; E-PM2 0x7E6948AE):
+
+| BP | PEN-F | E-PM2 |
+|---|---|---|
+| 0–4 | as the E-PM2 with hold = STOCK | c6/c8/c10 + c22/c24 − Sv − f(Sv) |
+| 5' | c10 + LOWSS − c18 − f(c16) | – |
+| 6' | c10 + LOWSS − c16 − f(c16) | BP5 with hold = LOWSS |
+| 7', 8' | as the E-PM2's BP6, BP7 | |
+
+- STOCK = 0x605B97B0: max(1/(2 f), Slow Limit), not slower than 1/30, then the cap: the flash's sync speed (+16) with
+  the flash on, else the X-Sync setting (tag 0x94BA); then, when the limit applies, max(…, Lowest S/S).
+- LOWSS = the Lowest S/S when it applies, else STOCK. Both clamped to [slowest, fastest].
+- Gate 0x605BB441: flash off, mode P (3) or A (4) (also 36, 37: not on the E-PM2), ISO Auto, value not Auto, and
+  0x605D68E1(+36, +44) = 0 (U; no E-PM2 counterpart found, not copied). Rounding 0x605D344E: up to the exposure step.
+- Stage 5 (BP4..BP5'): the shutter falls at the base ISO c18 (the E-PM2's stage function 0x7E694DDE with c18 for c16).
+  Stage 6 (BP5'..BP6'): ISO rises at LOWSS (0x7E694D34 with hold = LOWSS), then the PEN-F's own rounding
+  (0x605BABE3–0x605BACE0): to the nearest 1/3 EV (85/170 grid) — up for P when stage 5 has no length — the change
+  limited to ±42 by moving ISO back (1/3 EV step), and the **shutter** takes the rest.
+
+### 12.2 The E-PM2 code (`scripts/lss.s`, generator `scripts/mkspec_lss_core.py`, spec `patches/lss-core.json`)
+
+641 B of new code in the exp debug printers 0x7E69E9EA–0x7E69EEAF (segment 1). Five edits, no RAM:
+
+| Address | Edit |
+|---|---|
+| 0x7E69E9EA | NEWTH (the STOCK rule), GATE, NEWAUTO (stages 5 and 6 and the rounding); calls only segment-1 and kernel code |
+| 0x7E69E858 | the shell command "exp still info" no longer calls the printers (5 nops) |
+| 0x7E693D4B | `call 0x7E694001,[d2,d3,a2,a3],32` (5-byte form, as stock) |
+| 0x7E694001 | the stock tv_th (one caller) becomes `jmp NEWTH; jmp NEWAUTO` (the new code is beyond d16 range) |
+| 0x7E694610 | `call 0x7E694006,[d2,d3,a2,a3],76` in place of the auto path |
+
+- The setting: 653 (tag 0x9F11, RAM byte 0x60413225, section 11). Value i = 1..55 → Q8 Tv trunc(256 (i − 19) / 3),
+  the PEN-F's 1/3 EV table; 1/2 EV and 1 EV exposure steps round up as the PEN-F does.
+- NEWTH finds the set block through a2 (exp_cal_still's argument list, untouched at the call). NEWAUTO gets the mode,
+  set and corner blocks as arguments of the auto path.
+- Mistakes found in the harness, fixed: 7-byte calls over the stock 5-byte calls; locals inside the saved registers;
+  `retf` after `div` (MDR); the AM33 `mov sp,dn` (now assembled for plain MN10300).
+
+### 12.3 Differential test (`scripts/penf_expcal.py`, `scripts/lss_compare.py`, `results/lss-compare.txt`)
+
+The PEN-F 3.1's exposure routine runs in the E-PM2 function harness (same instruction set; its code and tables are
+written at their own addresses). Stock E-PM2 against stock PEN-F: Tv and Av equal in every row, Sv differs by a
+fixed 376 (the PEN-F's ISO scale). Rows: P and A, 4 focal lengths, 2 Slow Limits, 10 Lowest S/S values, 2 High
+Limits, flash on/off, 3 exposure steps, BV −6 to +10.6 in 1/3 EV, manual ISO.
+
+| Rows | Result |
+|---|---|
+| 15,996 | limit on: Tv, Av, Sv equal to the PEN-F's |
+| 852 | limit on: the PEN-F goes faster than 1/4000 (its top speed is 1/8000); the E-PM2 output is its stock 1/4000 |
+| 5,076 | limit off (Auto, flash on, manual ISO): equal to the stock E-PM2 |
+| 0 | different, or changed when off |
+
+Not the same as the PEN-F, on purpose or by the body (V in the harness):
+- The PEN-F's top speed is 1/8000; at the brightest rows it goes past 1/4000, the E-PM2 cannot.
+- Without the limit (Auto, flash, manual ISO, other modes) the E-PM2 keeps its own code: e.g. its ISO rounding
+  (84/171 up) where the PEN-F rounds A mode to the nearest step. Those are body differences, not this feature.
+- U: the PEN-F gate's fields +36/+44. The per-ISO correction f(Sv) is 0 in both harnesses (settings read stubbed);
+  the code paths that use it are the PEN-F's formulas, copied (BP5' uses f(c16), as the PEN-F does).
+
+### 12.4 Build `builds/lss.json`
+
+`stock-films` with `custom-menu-rows-3` in place of `custom-menu-rows-2`, then `lss-menu`, `lss-core`. Checks:
+free-space PASS; boot-test PASS; update-path-test PASS; hookcheck: all lss-core transfers stay in segment 1 / kernel
+(the 7 FAILs are the pinned build's allowed hooks, same as stock-films); opcheck 0 FAIL. Shared files changed:
+`docs/space-candidates.tsv` (2 rows), `docs/space-pointer-waivers.tsv` (3 rows), `docs/space-bounds.tsv` (1 row),
+`docs/space-superseded.tsv` (1 row, by the menu work).
+
+### 12.5 Acceptance criteria (owner's view)
+
+| # | Criterion | How checked | State |
+|---|---|---|---|
+| 1 | Custom Menu E has a row Lowest S/S Setting after ISO-Auto Set; Auto by default | emulator screenshots (section 11) | pass (emulator) |
+| 2 | The list goes Auto, 60" … 1/4000 in 1/3 EV; the value survives power off | emulator | pass (emulator) |
+| 3 | P and A, ISO Auto, no flash: ISO starts to rise at the chosen speed | harness vs PEN-F; camera | pass (harness); camera not run |
+| 4 | Slower than the stock speed: P first lowers the shutter at base ISO down to it | harness vs PEN-F; camera | pass (harness); camera not run |
+| 5 | Auto, flash on, manual ISO, other modes: exposure as before | harness vs stock; camera | pass (harness); camera not run |
+| 6 | Nothing that works today breaks (start, update, menus, looks, peaking, level gauge, Debug Log) | boot/update tests, menu crawl; camera | pass (emulator); camera not run |

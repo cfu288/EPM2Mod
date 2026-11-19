@@ -1,0 +1,4 @@
+  5076  off: same as stock
+   852  on: PEN-F faster than 1/4000 (its top speed is 1/8000)
+ 15996  on: same as PEN-F
+ 21924  rows

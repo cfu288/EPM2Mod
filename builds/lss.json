@@ -1,0 +1,21 @@
+{
+ "what": "Lowest S/S Setting (GitHub issue #2), as the PEN-F 3.1 does it: builds/stock-films.json with custom-menu-rows-3 in place of custom-menu-rows-2 (a row Lowest S/S Setting in Custom Menu E after ISO-Auto Set), lss-menu (its 56 values Auto, 60\" ... 1/4000, setting 653, default Auto) and lss-core (in P and A with ISO Auto and no flash, ISO starts to rise at the chosen speed; slower than the stock speed, P first lowers the shutter at base ISO)",
+ "specs": [
+  "patches/interval-timelapse-v2.json",
+  "patches/interval-frames-240.json",
+  "patches/level-gauge-lvinfo-row.json",
+  "patches/level-adjust-row.json",
+  "patches/peaking-direct-4.json",
+  "patches/peaking-gain-2x.json",
+  "patches/custom-menu-rows-3.json",
+  "patches/peaking-colours.json",
+  "patches/peaking-fast.json",
+  "patches/peaking-save-guard.json",
+  "patches/looks-menu-4.json",
+  "patches/stock-films-structure.json",
+  "patches/card-looks-5.json",
+  "patches/log-menu-2.json",
+  "patches/lss-menu.json",
+  "patches/lss-core.json"
+ ]
+}

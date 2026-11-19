@@ -1,0 +1,61 @@
+{
+ "name": "lss-core",
+ "description": "Lowest S/S Setting, exposure part, as the PEN-F 3.1 does it: in P and A with ISO Auto and no flash, the shutter speed where ISO starts to rise is the chosen speed (setting 653, tag 0x9F11, RAM byte 0x60413225: 0 Auto, 1..55 = 60 s .. 1/4000 in 1/3 EV). Slower than the stock speed, P first lowers the shutter at base ISO down to it. Code in the exp debug printers (segment 1). See experiments/2026-11-17-auto-iso-min-shutter/NOTES.md section 9.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "candidate: harness-checked, not flashed",
+ "_symbols": {
+  "GATE": "0X7E69EA48",
+  "NEWAUTO": "0X7E69EA99",
+  "NEWTH": "0X7E69E9EA",
+  "SEG6": "0X7E69EB31",
+  "STOCK": "0X7E69EC5A"
+ },
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x27d9ca",
+   "expect": "92f1d8fcdceaf77d7edd3c7be6ffa028f042fcdcfef77d7edd2d7be6ffa028f84201fcdc12f87d7edd1d7be6ffa028f84202fcdc26f87d7e10dd0c7be6ffa028f84203fcdc3af87d7eddfc7ae6ffa028f84204fcdc4ef87d7eddec7ae6ffa028f84205fcdc62f87d7edddc7ae6ffa028f84206fcdc76f87d7eddcc7ae6ffa028f84207fcdc8af87d7eddbc7ae6ffa028f84208fcdc9ef87d7eddac7ae6ffa028f84209fcdcb2f87d7edd9c7ae6ffa028f8620afcdcc6f87d7edd8c7ae6ffa028f8620cfcdcdaf87d7edd7c7ae6ffa028f8420efcdceef87d7e10dd6b7ae6ffa028f86210fcdc02f97d7e18dd5a7ae6ffa028f84212fcdc16f97d7edd4a7ae6ffa028f8420ffcdc2af97d7edd3a7ae6ffa028f84213fcdc3ef97d7edd2a7ae6ffa028f86214fcdc52f97d7e18dd197ae6ffa028f86216fcdc66f97d7e18dd087ae6ffa028f86218fcdc7af97d7e18ddf779e6ffa028f8421afcdc8ef97d7edde779e6ffa028f8421bfcdca2f97d7eddd779e6ffa028f8621cfcdcb6f97d7e18ddc679e6ffa028f8421efcdccaf97d7eddb679e6ffa028f8421ffcdcdef97d7edda679e6ffa028f842282222fcdcf2f97d7edd9479e6ffa028f062fcdc06fa7d7e18dd8479e6ffa028f86202fcdc1afa7d7e18dd7379e6ffa028f86204fcdc2efa7d7e18dd6279e6ffa028df200892f1d8fcdc42fa7d7edd4f79e6ffa028f062fcdc55fa7d7e18dd3f79e6ffa028f86202fcdc66fa7d7e18dd2e79e6ffa028f86204fcdc77fa7d7e18dd1d79e6ffa028f86206fcdc88fa7d7e18dd0c79e6ffa028f8620afcdc99fa7d7e18ddfb78e6ffa028f8620cfcdcaafa7d7e18ddea78e6ffa028f8620efcdcbbfa7d7e18ddd978e6ffa028df200892f1d8fcdcccfa7d7eddc6",
+   "new": "f82604470c92f8c00edd0a94e6ffc00c1882f8661819a6c20386faca0005c1072e0005ca24f84206a001c907f86610ca13fcccba940000900004dd5192dbffc00c8119a6c30386985d0ccd1400000418fac8ff7fc806a2c2038288dff020f84006a000c946f84003a003c806a004c93bf86102a000c934fca825324160a000c82aa037c52628edf8c0088503f2d0f264f8650afac98000c808fac90001c90929ffe4f231f204df00042cff7fdf0004f1d397f1e642149cf1e1cda5ff000418fac8ff7fc905ccab01f8661a19a4c20384f8661619a4c30384f893303c201cf1d03c202cf1d19c99dddd5dfffff034f86a021af8bc2418a2c305cc77019cf8621018dde767ffff800818f89336f8660a19f8bc3018e1f8621218f101f8bc3618f10119f89732a6c321f86210f89334f86212f872108c999cddbd62fffff020f8bc34f87210dff04cf8660a19f8bc3018e1f8621018f101f8bc3618f10119a6c105cc1001f86218f89334f8bc30f872188001f893384b044e083c201cf1d13d212af8bc2c9cddc661fffff02cf8bc34f8721808f8bc32f8bd24a4c9048a01f89a3af1edf8690488f8e0fff84703a503c91ef8b93aa500c81704a000c8298555a4c3242daa00a4c31e2d0001ca1904a02ac0148555a07fc00e2daa00fac8d400c0052d000188fae000ffe4f87104181af108f8b93aa500c809f84703a504c93b5c14f8640aa555c928a000c214a0d6c220f86504282af101f8750480d6ca12a02ac30ef8650428d6f101f87504802af8bd30e1f87502dff04cf8bd3219f8be221aa9c216f8c801f8660ae1f87508f8bd30e1f87502dff04cc910f8be201aa9c209f8bd2ca501c8c9f8660ae1f87508dff04cf1ec9d5814f1d9dd605bfffff03cdff04c",
+   "_addr": "0X7E69E9EA",
+   "_note": "new code, 641 B of 1221 (exp debug printers, segment 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x27d838",
+   "expect": "cdd2000004",
+   "new": "cbcbcbcbcb",
+   "_addr": "0X7E69E858",
+   "_note": "shell command 'exp still info' no longer calls the printers 0x7E69E92A (nop x 5)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x272d2b",
+   "expect": "cdb602a00c",
+   "new": "cdb602f020",
+   "_addr": "0X7E693D4B",
+   "_note": "call 0x7E694001 with the frame of NEWTH"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x272fe1",
+   "expect": "92f8c00eddf83de7ffc0",
+   "new": "dce9a90000dc93aa0000",
+   "_addr": "0X7E694001",
+   "_note": "the stock tv_th (one caller) becomes: jmp NEWTH; jmp NEWAUTO"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2735f0",
+   "expect": "cdb101f03c",
+   "new": "cdf6f9f04c",
+   "_addr": "0X7E694610",
+   "_note": "call 0x7E694006 (jmp NEWAUTO) in place of the auto path 0x7E6947C1"
+  }
+ ]
+}

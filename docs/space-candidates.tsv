@@ -19,3 +19,5 @@
 7E805088	7E805CE8	text	auto	reclaim-space row 9	[AVCHD] AvmidApi record prints; automatic rule only
 7E7D6717	7E7D71FD	text	auto	reclaim-space row 9	api_tft_* strings; automatic rule only
 7E50C46E	7E50C517	code	auto	reclaim-space row 10	unreferenced in the function map; callers from the SRAM code not excluded by hand
+7E69E92A	7E69E96F	code	checked	auto-iso-min-shutter NOTES section 9	exp debug printer dispatcher: its one caller is the shell command "exp still info" (0x7E69E772 <- 0x7E69B75D); lss-core replaces that call (0x7E69E858) with nops. No new bytes here; listed so that its calls into the printers count as listed
+7E69E9EA	7E69EEAF	code	checked	auto-iso-min-shutter NOTES section 9	exp debug printers [mode]/[set]/[still]/[bv] (0x7E69E9EA, 0x7E69EBD7, 0x7E69EC60, 0x7E69EDF3): one caller each, the dispatcher 0x7E69E92A. 0x7E69E96F (still bv/av/tv, called by the capture 0x7E69E86F) stays outside
