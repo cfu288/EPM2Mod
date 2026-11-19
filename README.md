@@ -7,7 +7,7 @@ Repository containing the current work for creating a custom firmware mod for th
 | Feature | |
 |---|---|
 | [Film simulations](docs/guide/film-looks.md) | <img src="docs/images/ui/quick-menu-portra.png" width="240" alt="The quick menu with Picture Mode on Portra 400"> |
-| [Looks from the SD card](docs/guide/card-looks.md) | <img src="docs/images/ui/load-looks-loaded.png" width="240" alt="Load Looks reads Loaded"> |
+| [Film simulations from the SD card](docs/guide/card-looks.md) | <img src="docs/images/ui/load-looks-loaded.png" width="240" alt="Load Looks reads Loaded"> |
 | [Interval shooting](docs/guide/interval-shooting.md) | <img src="docs/images/ui/time-lapse-settings.png" width="240" alt="The Time Lapse Settings screen"> |
 | [Level gauge](docs/guide/level-gauge.md) | <img src="docs/images/ui/level-gauge.png" width="240" alt="The level gauge in live view"> |
 | [Focus peaking](docs/guide/focus-peaking.md) | <img src="docs/images/ui/peaking-list.png" width="240" alt="Custom Menu A with the Peaking list"> |

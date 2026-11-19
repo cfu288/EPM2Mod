@@ -1,6 +1,6 @@
-# Looks from the SD Card
+# Film Simulations from the SD Card
 
-The camera comes with the Olympus art filters. A file on the SD card puts a film in each ART entry it lists. The
+The camera comes with the Olympus art filters. A file on the SD card puts a film simulation in each ART entry it lists. The
 camera keeps them, with their names, after power-off and without the card.
 
 ## Make a file
@@ -21,7 +21,7 @@ MENU → SETUP → Custom Menu → J → **Load Looks** → **Load** → OK. The
 <img src="../images/ui/load-looks-list.png" width="320" alt="Load Looks with Off and Load">
 <img src="../images/ui/load-looks-loaded.png" width="320" alt="Load Looks reads Loaded">
 
-The entry shows the look's name everywhere the camera shows a film name.
+The entry shows the film simulation's name everywhere the camera shows a film name.
 
 <img src="../images/ui/picture-mode-loaded.png" width="320" alt="The Picture Mode strip with Portra 800">
 
@@ -31,7 +31,7 @@ the file. **No file**: `EPM2LOOK.BIN` is not in the top folder of the card. **Ba
 ## Limits
 
 - The row's texts are English in every menu language.
-- No look has grain.
+- No film simulation has grain.
 
-File format, for a program that writes looks: [look-file-format.md](../look-file-format.md). Design and tests:
+File format, for a program that writes film files: [look-file-format.md](../look-file-format.md). Design and tests:
 [card-looks design](../../experiments/2026-11-17-card-looks/design.md).
