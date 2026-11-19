@@ -1,5 +1,5 @@
 {
- "what": "CANDIDATE, not camera-tested: gauge-info with the level gauge's left position (camera held vertically), including its scale dots and marker, moved right of the ISO and touch icons, as on the PEN-F (see experiments/2026-11-19-gauge-info/NOTES.md)",
+ "what": "The twelve Olympus art filters unchanged; film simulations loaded from the SD card with Custom Menu J, Load Looks, overwrite the entries the file lists; interval shooting with up to 240 frames, a level gauge with calibration that keeps the shooting information of the histogram screen (as the PEN-F does), and focus peaking; a Debug Log row in Custom Menu J (Off by default) that writes EPM2LOG.BIN to the card for developers; a Lowest S/S Setting row in Custom Menu E (the shutter speed at which ISO Auto starts to rise in P and A); the Firmware screen shows the build's label (Body : 1.6  EPM2Mod 2026.11.19)",
  "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "data/specs/interval-timelapse-v2.json",
@@ -22,5 +22,7 @@
   "data/specs/gauge-info.json",
   "data/specs/gauge-bar-left-2.json"
  ],
+ "sha256": "fd0ab8a4b9e90dc201d84d49a924589855f3f0f1715f05885c5bb5a33313f019",
+ "camera_tested": "2026-11-19",
  "label": "2026.11.19"
 }

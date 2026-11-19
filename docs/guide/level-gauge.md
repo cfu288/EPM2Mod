@@ -10,7 +10,7 @@ If the menu has no Custom Menu tab (gears icon), enable it in **MENU â†’ SETUP â
 
 ## Usage
 
-In live view, press **INFO** until the two bars appear. A bar turns green when that axis is level.
+In live view, press **INFO** until the two bars appear. A bar turns green when that axis is level. The shooting information stays on the screen, so you can check the exposure and ISO while you level the camera.
 
 <img src="../images/ui/level-gauge.png" width="320" alt="The level gauge in live view">
 

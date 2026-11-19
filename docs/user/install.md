@@ -1,12 +1,12 @@
 # Install
 
 <!-- BEGIN GENERATED: pinned-build -->
-The installer and `install` write the firmware **`epm2mod-2026.11.19`**: the twelve Olympus art filters unchanged; film simulations loaded from the SD card with Custom Menu J, Load Looks, overwrite the entries the file lists; interval shooting with up to 240 frames, a level gauge with calibration, and focus peaking; a Debug Log row in Custom Menu J (Off by default) that writes EPM2LOG.BIN to the card for developers; a Lowest S/S Setting row in Custom Menu E (the shutter speed at which ISO Auto starts to rise in P and A); the Firmware screen shows the build's label (Body : 1.6 EPM2Mod 2026.11.19). We tested this build on a real E-PM2 on 2026-11-19 ([camera log](../camera-log/)).
+The installer and `install` write the firmware **`gauge-info-3`**: the twelve Olympus art filters unchanged; film simulations loaded from the SD card with Custom Menu J, Load Looks, overwrite the entries the file lists; interval shooting with up to 240 frames, a level gauge with calibration that keeps the shooting information of the histogram screen (as the PEN-F does), and focus peaking; a Debug Log row in Custom Menu J (Off by default) that writes EPM2LOG.BIN to the card for developers; a Lowest S/S Setting row in Custom Menu E (the shutter speed at which ISO Auto starts to rise in P and A); the Firmware screen shows the build's label (Body : 1.6 EPM2Mod 2026.11.19). We tested this build on a real E-PM2 on 2026-11-19 ([camera log](../camera-log/)).
 
 | | sha256 |
 |---|---|
 | Stock firmware, `OLY_E_101_1600_0000_0000.BIN` | `34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300` |
-| Pinned build, `epm2mod-2026.11.19` | `6441130e9cc6cd5f06dc70e35950e05b0401f9a3f606694cf2c806a0bc209f62` |
+| Pinned build, `gauge-info-3` | `fd0ab8a4b9e90dc201d84d49a924589855f3f0f1715f05885c5bb5a33313f019` |
 <!-- END GENERATED: pinned-build -->
 
 The install steps are in the [README](../../README.md#install).

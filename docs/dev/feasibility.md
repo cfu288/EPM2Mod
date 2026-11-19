@@ -83,6 +83,10 @@ Other Olympus generations, and what each can be modded to do: [model-matrix.md](
 - ~~Level gauge~~ **Done on 2026-11-14 with three data edits and no code.** The whole feature was in
   the firmware; only a menu row was missing. Lesson: compare with the E-PL6 first. It shares 58,642
   identical functions with this body (the E-P5: 21,940).
+- ~~Shooting information on the level gauge screen~~ **Done on 2026-11-19** (`gauge-info`, `gauge-bar-left-2`; GitHub
+  issue #1). Data edits only: eleven layout lists of the live-view producers get the gauge's layout, and the bar's
+  position when the camera is held vertically moves inward, as the PEN-F places it
+  (`experiments/2026-11-19-gauge-info/NOTES.md`).
 - The other E-PL6 additions (small AF target, ISO LOW), ported as interval shooting was.
 - A simple on-camera editor made from existing menu lists.
 

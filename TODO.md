@@ -11,7 +11,7 @@ Test releases up to v2026.11.19-rc.2. Open: the final release.
 
 - Level Adjust works (2026-11-14). Not yet reported: the calibration after power off and on, and
   Reset.
-- Not yet reported: the gauge in portrait orientation, and the info menu of an electronic
+- Not yet reported: the info menu of an electronic
   viewfinder (the new row re-uses the unused panel 594, "EVF Info Settings").
 
 ## Focus peaking
