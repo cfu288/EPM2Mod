@@ -1,0 +1,45 @@
+{
+ "name": "movie-wide-writer",
+ "description": "1080 movie frame 1920 wide, the writer side (with data/specs/movie-wide-frame.json, the reader side): record 7 (mode code 517, HSHR) of the TAKE sensor-mode request table 0x7E793184, which 0x7E5A897F copies into the camera-core request. The written line becomes 1960 px (was 1680) and the pre-processor's horizontal resize step 1.2 (4915 in Q12, was 5734 = 1.4), with the second Bayer phase 1433 (was 1843); the input stays 2352 px (1680 x 1.4 = 1960 x 1.2). The line count 1312 and the window start 44/11 stay. DEBUG builds only. See experiments/2026-11-19-movie-sampling/NOTES.md section 14.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "candidate: emulator-checked, not flashed",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3722BC",
+   "expect": "9006",
+   "new": "a807",
+   "_addr": "0x7E7932DC",
+   "_note": "TAKE sensor-mode request table 0x7E793184, record 7 (code 517, HSHR) +8: written line width 1680 -> 1960 (request +4)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3722DC",
+   "expect": "3307",
+   "new": "9905",
+   "_addr": "0x7E7932FC",
+   "_note": "record 7 +40: resize phase 1843 -> 1433 = 1024 + (4915 - 4096) / 2 (request +48)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3722E0",
+   "expect": "3307",
+   "new": "9905",
+   "_addr": "0x7E793300",
+   "_note": "record 7 +44: resize phase 1843 -> 1433 (request +52)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3722E2",
+   "expect": "6616",
+   "new": "3313",
+   "_addr": "0x7E793302",
+   "_note": "record 7 +46: horizontal resize step 5734 (1.4 in Q12) -> 4915 (1.2) (request +54)"
+  }
+ ]
+}

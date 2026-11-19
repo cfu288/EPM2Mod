@@ -1,5 +1,6 @@
-"""Write data/specs/movie-wide-frame.json: the 1080 movie Bayer frame 1938 x 1296 (effective 1920 x 1296, stride 1960)
-in place of 1662 x 1296 (effective 1646, stride 1680). NOTES.md section 12.
+"""Write data/specs/movie-wide-frame.json (the reader side, NOTES.md section 12) and data/specs/movie-wide-writer.json
+(the writer side, section 14): the 1080 movie Bayer frame 1938 x 1296 (effective 1920 x 1296, stride 1960) in place of
+1662 x 1296 (effective 1646, stride 1680).
 
     uv run python experiments/2026-11-19-movie-sampling/scripts/mkspec_wide.py
 
@@ -43,32 +44,57 @@ OPS = [
 ]
 
 
-def main():
-    """Check every site against stock block 0 and write the spec."""
+# The writer: record 7 (mode code 517, HSHR) of the TAKE sensor-mode request table 0x7E793184 (18 records of 48 B,
+# lookup 0x7E5A8AD2), copied into the camera-core request by 0x7E5A897F: +8 the written line width (request +4), and
+# the pre-processor's horizontal resize block (request +46..+54): step 5734 = 1.4 in Q12, and the phase of the second
+# colour of each Bayer pair, 1843 = 1024 + (5734 - 4096) / 2. 1680 x 1.4 = 1960 x 1.2 = 2352 input px.
+REC = 0x7E7932D4
+WRITER_OPS = [
+    (REC + 8, h16(1680), h16(1960), "TAKE sensor-mode request table 0x7E793184, record 7 (code 517, HSHR) +8: written line width 1680 -> 1960 (request +4)"),
+    (REC + 40, h16(1843), h16(1433), "record 7 +40: resize phase 1843 -> 1433 = 1024 + (4915 - 4096) / 2 (request +48)"),
+    (REC + 44, h16(1843), h16(1433), "record 7 +44: resize phase 1843 -> 1433 (request +52)"),
+    (REC + 46, h16(5734), h16(4915), "record 7 +46: horizontal resize step 5734 (1.4 in Q12) -> 4915 (1.2) (request +54)"),
+]
+
+
+def write(spec, op_list, description):
+    """Check every site against stock block 0 and write one spec."""
     blk = open(STOCK_BLOCK, "rb").read()
     ops = []
-    for addr, old, new, note in OPS:
+    for addr, old, new, note in op_list:
         assert len(old) == len(new) and blk[addr - BASE:addr - BASE + len(old)] == old, hex(addr)
         diff = [i for i in range(len(old)) if old[i] != new[i]]
         a, b = diff[0], diff[-1] + 1          # only the bytes that change, so the free-space ledger stays exact
         ops.append({"type": "bytes", "block": 0, "offset": "0x%X" % (addr + a - BASE), "expect": old[a:b].hex(),
                     "new": new[a:b].hex(), "_addr": "0x%08X" % (addr + a), "_note": note})
-    out = os.path.join(ROOT, "data", "specs", SPEC + ".json")
+    out = os.path.join(ROOT, "data", "specs", spec + ".json")
     json.dump({
-        "name": SPEC,
-        "description": "1080 movie frame 1920 wide: the HSHR (1080 and 720 movie) Bayer frame becomes 1938 x 1296 with "
-                       "an effective 1920 x 1296 and a stride of 1960, in place of 1662 x 1296, 1646 x 1296 and 1680. The "
-                       "pre-processor then shrinks the 2326-px sensor line by 1.2 instead of 1.4, and 1080 needs no "
-                       "horizontal upscale. Changed: the TAKE request, the movie mode table, the IMG resize builders, "
-                       "the AE set (its sensor window stays 2326 px), art_get_bayer_size entry 5, and the Movie IS crop "
-                       "(1414 -> 1650) and shift divisor (1.4 -> 1.2). Immediates only. Not conditional: 720p uses the "
-                       "same frame. DEBUG builds only. See experiments/2026-11-19-movie-sampling/NOTES.md section 12.",
+        "name": spec,
+        "description": description,
         "base": STOCK, "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
         "status": "candidate: emulator-checked, not flashed",
         "ops": ops,
     }, open(out, "w"), indent=1)
     open(out, "a").write("\n")
     print("wrote", os.path.relpath(out, ROOT), len(ops), "ops")
+
+
+def main():
+    """Write both specs."""
+    write(SPEC, OPS, "1080 movie frame 1920 wide: the HSHR (1080 and 720 movie) Bayer frame becomes 1938 x 1296 with "
+                       "an effective 1920 x 1296 and a stride of 1960, in place of 1662 x 1296, 1646 x 1296 and 1680. The "
+                       "pre-processor then shrinks the 2326-px sensor line by 1.2 instead of 1.4, and 1080 needs no "
+                       "horizontal upscale. Changed: the TAKE request, the movie mode table, the IMG resize builders, "
+                       "the AE set (its sensor window stays 2326 px), art_get_bayer_size entry 5, and the Movie IS crop "
+                       "(1414 -> 1650) and shift divisor (1.4 -> 1.2). Immediates only. Not conditional: 720p uses the "
+                       "same frame. DEBUG builds only. See experiments/2026-11-19-movie-sampling/NOTES.md section 12.")
+    write("movie-wide-writer", WRITER_OPS,
+          "1080 movie frame 1920 wide, the writer side (with data/specs/movie-wide-frame.json, the reader side): record 7 "
+          "(mode code 517, HSHR) of the TAKE sensor-mode request table 0x7E793184, which 0x7E5A897F copies into the "
+          "camera-core request. The written line becomes 1960 px (was 1680) and the pre-processor's horizontal resize "
+          "step 1.2 (4915 in Q12, was 5734 = 1.4), with the second Bayer phase 1433 (was 1843); the input stays 2352 px "
+          "(1680 x 1.4 = 1960 x 1.2). The line count 1312 and the window start 44/11 stay. DEBUG builds only. See "
+          "experiments/2026-11-19-movie-sampling/NOTES.md section 14.")
 
 
 if __name__ == "__main__":

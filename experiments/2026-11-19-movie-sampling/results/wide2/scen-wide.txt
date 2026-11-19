@@ -1,0 +1,16 @@
+base writer: request window x0/y0/width/lines (44, 11, 1680, 1312), resize block (1, 1, 1024, 1843, 1024, 1843, 5734), input 2351.8 px: as the model
+base: HSHR record stride/width/height/eff w/eff h = (1680, 1662, 1312, 1646, 1296), centre 831/656, IS crop 1414 x 1114: as the model
+  reached: ['mov_image_process (through)', 'movie request builder', 'through start handler']
+  IMG builders: 0 runs of the HSHR branch (none); steps stored (H, V): none
+  model: H step 3511, V step 4915 -> not reached in the rig
+wide writer: request window x0/y0/width/lines (44, 11, 1680, 1312), resize block (1, 1, 1024, 1843, 1024, 1843, 5734), input 2351.8 px: as the model
+wide: HSHR record stride/width/height/eff w/eff h = (1960, 1938, 1312, 1920, 1296), centre 969/656, IS crop 1650 x 1114: as the model
+  reached: ['mov_image_process (through)', 'movie request builder', 'through start handler']
+  IMG builders: 0 runs of the HSHR branch (none); steps stored (H, V): none
+  model: H step 4096, V step 4915 -> not reached in the rig
+wide-2 writer: request window x0/y0/width/lines (44, 11, 1960, 1312), resize block (1, 1, 1024, 1433, 1024, 1433, 4915), input 2351.9 px: as the model
+wide-2: HSHR record stride/width/height/eff w/eff h = (1960, 1938, 1312, 1920, 1296), centre 969/656, IS crop 1650 x 1114: as the model
+  reached: ['mov_image_process (through)', 'movie request builder', 'through start handler']
+  IMG builders: 0 runs of the HSHR branch (none); steps stored (H, V): none
+  model: H step 4096, V step 4915 -> not reached in the rig
+RESULT: PASS

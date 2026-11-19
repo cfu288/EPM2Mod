@@ -1,0 +1,29 @@
+{
+ "what": "DEBUG build, not for normal use: debug-log-movie-bitrate (the pinned build with the movie timing probe and higher movie bit rates) with the 1080 movie frame 1920 wide, reader and writer: the pre-processor writes 1960-px lines (1938 used, 1920 effective) at a 1.2 resize, and the develop job reads them so, in place of 1680-px lines at 1.4. 720p uses the same frame",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
+ "specs": [
+  "data/specs/interval-timelapse-v2.json",
+  "data/specs/interval-frames-240.json",
+  "data/specs/level-gauge-lvinfo-row.json",
+  "data/specs/level-adjust-row.json",
+  "data/specs/peaking-direct-4.json",
+  "data/specs/peaking-gain-2x.json",
+  "data/specs/custom-menu-rows-3.json",
+  "data/specs/peaking-colours.json",
+  "data/specs/peaking-fast.json",
+  "data/specs/peaking-save-guard.json",
+  "data/specs/looks-menu-4.json",
+  "data/specs/stock-films-structure.json",
+  "data/specs/card-looks-5.json",
+  "data/specs/log-menu-2.json",
+  "data/specs/lss-menu.json",
+  "data/specs/lss-core.json",
+  "data/specs/build-label.json",
+  "data/specs/log-movie-time.json",
+  "data/specs/movie-bitrate-32.json",
+  "data/specs/movie-wide-frame.json",
+  "data/specs/movie-wide-writer.json"
+ ],
+ "label": "2026.11.19",
+ "first_code": true
+}

@@ -1,8 +1,14 @@
 """Scenario check of data/specs/movie-wide-frame.json in the live-view rig (emulator/liveview.py). NOTES.md section 12.
 
-    uv run python experiments/2026-11-19-movie-sampling/scripts/scen_wide.py BASE_BLOCK0 WIDE_BLOCK0
-    BASE  block0_0100.bin of build/debug-log-movie-bitrate.BIN (tools/oetool.py unpack)
-    WIDE  block0_0100.bin of build/debug-log-movie-wide.BIN
+    uv run python experiments/2026-11-19-movie-sampling/scripts/scen_wide.py BASE_BLOCK0 WIDE_BLOCK0 [WIDE2_BLOCK0]
+    BASE   block0_0100.bin of build/debug-log-movie-bitrate.BIN (tools/oetool.py unpack)
+    WIDE   block0_0100.bin of build/debug-log-movie-wide.BIN (reader side only, NOTES.md section 12)
+    WIDE2  block0_0100.bin of build/debug-log-movie-wide-2.BIN (reader and writer, section 14)
+
+The writer (section 14): on each image the TAKE request builder 0x7E5A897F runs for mode code 517 (HSHR) with the
+firmware's own table, as TAKE 0x7E59A66F calls it for the request that it hands to the camera core (0x7E59A81D). Pass =
+the request's line width and resize block as the model: stock and WIDE 1680 / step 5734 / phases 1024, 1843; WIDE2
+1960 / 4915 / 1024, 1433; window start 44/11 and 1312 lines in all; the input 1680 x 5734 = 1960 x 4915 (to 0.1 px).
 
 On each image: the mov layer's own start and Through Start (it builds the movie mode table, 0x7E6C410A), Natural,
 movie size 6 (1080), then frames with the camera record saying sensor mode HSHR (the camera core is not in the rig,
@@ -22,6 +28,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
 sys.path.insert(0, os.path.join(ROOT, "emulator"))
 from liveview import LiveView  # noqa: E402
+from scenario import Scenario  # noqa: E402
 
 PM, NATURAL, MOVIE_SIZE = 38017, 2, 34145
 HSHR_REC = 0x605B0882                 # movie mode table, record 3 (HSHR), 30 bytes
@@ -54,12 +61,35 @@ def run(path, name):
         return rec, seen, faults
 
 
+WRITER = {"base": (1680, 5734, 1843), "wide": (1680, 5734, 1843), "wide-2": (1960, 4915, 1433)}
+REQ = 0x7D210000                      # scratch for the request
+
+
+def writer(path, name):
+    """The camera-core request that 0x7E5A897F builds for mode code 517. Returns (window, resize block, fault)."""
+    sc = Scenario(path, name=name)
+    sc.write(REQ, b"\0" * 64)
+    r = sc.call(0x7E5A897F, {"d0": 517, "d1": 0, "a0": REQ, "a1": 0}, frame=(0xF0, 44))
+    win = struct.unpack("<4H", sc.read(REQ, 8))
+    blk = (sc.r8(REQ + 44), sc.r8(REQ + 45)) + struct.unpack("<5H", sc.read(REQ + 46, 10))
+    sc.close()
+    return win, blk, r.fault
+
+
 def main():
-    """Run both images and compare with the model."""
+    """Run the images and compare with the model."""
     ok_all = True
-    for name, path in (("base", sys.argv[1]), ("wide", sys.argv[2])):
+    images = [("base", sys.argv[1]), ("wide", sys.argv[2])] + ([("wide-2", sys.argv[3])] if len(sys.argv) > 3 else [])
+    for name, path in images:
+        win, blk, fault = writer(path, name)
+        w, step, ph = WRITER[name]
+        w_ok = not fault and win == (44, 11, w, 1312) and blk == (1, 1, 1024, ph, 1024, ph, step)
+        print("%s writer: request window x0/y0/width/lines %s, resize block %s, input %.1f px: %s" % (
+            name, win, blk, win[2] * blk[6] / 4096, "as the model" if w_ok else "NOT as the model (%d, %d, %d) %s" % (
+                w, step, ph, fault or "")))
+        ok_all &= w_ok
         rec, seen, faults = run(path, name)
-        geom, is_w, hstep = MODEL[name]
+        geom, is_w, hstep = MODEL["base" if name == "base" else "wide"]
         rec_ok = (rec[0], rec[1], rec[2], rec[3], rec[4]) == geom and rec[9] == is_w
         print("%s: HSHR record stride/width/height/eff w/eff h = %s, centre %d/%d, IS crop %d x %d: %s" % (
             name, rec[:5], rec[5], rec[6], rec[9], rec[10], "as the model" if rec_ok else "NOT as the model %s" % (geom,)))

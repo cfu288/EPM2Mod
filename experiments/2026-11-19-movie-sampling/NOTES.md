@@ -250,7 +250,8 @@ The camera-log entry before the flash: `docs/camera-log/2026-11-19-debug-log-mov
 - `scripts/mkspec_movtime.py`: writes `data/specs/log-movie-time.json`.
 - `scripts/scen_movtime.py`: the hook check of section 5.3.
 - `scripts/movtime_report.py`: the per-clip report.
-- `scripts/mkspec_wide.py`, `scripts/scen_wide.py`: the 1920-wide frame spec and its rig check (section 12).
+- `scripts/mkspec_wide.py`, `scripts/scen_wide.py`: the 1920-wide frame specs (reader and writer) and their checks
+  (sections 12, 14); `scripts/camregs.mjs`: the full-boot register trace of section 14.1.
 - `scripts/geom_scan.py`, `scripts/geom_otherbody.py`, `scripts/geom_calc_r.py`: the desk-check scripts of sections 2
   and 3.
 - `results/`: the check outputs and the listing.
@@ -487,3 +488,85 @@ encoder took the 1920 output at 25 Mb/s.
 
 Not yet answered: whether the pre-processor can write 1938-px lines. Next build: find the writer's geometry source and
 change it in step with the reader.
+
+## 14. The writer side: build `debug-log-movie-wide-2` (2026-11-19, not flashed)
+
+Asked by the owner after §13. The build is `debug-log-movie-bitrate` plus `data/specs/movie-wide-frame.json` (the
+reader side of §12, unchanged) plus `data/specs/movie-wide-writer.json` (the writer side, 4 ops). Both specs are
+written by `scripts/mkspec_wide.py`.
+
+### 14.1 The writer's geometry source
+
+TAKE builds two requests for the camera core and hands both over in one message (0x7E59A66F: request A at
+0x605164D8 by 0x7E5A897F, request B at 0x60516608 by 0x7E5A9093; the message gets A's address at 0x7E59A81D) (V).
+Request A comes from a table that §12 did not touch:
+
+- **The table (V).** 0x7E793184, 18 records of 48 bytes, looked up by mode code (0x7E5A8AD2). Record 7, code 517
+  (HSHR; TAKE's readout byte 0x0A gives 517, 0x7E59CC38), at 0x7E7932D4:
+  `+4` x0 44, `+6` y0 11, **`+8` width 1680**, `+10` lines 1312, and, in this record only, a resize block:
+  `+24..+35` six bytes twice (01 01 F3 4C 4C F3, I: a 6-tap filter), `+36` 1, then `1024, 1843, 1024, 1843`,
+  **`+46` 5734**.
+- **The copy (V).** 0x7E5A897F copies `+4..+10` to request A `+0..+6`, and the resize block to request `+44..+54`
+  (flags 1, 1; `1024, 1843, 1024, 1843, 5734`), with a pointer to the filter bytes at `+40`.
+- **The meaning (I, strong).**
+  - 5734 = 1.3999 × 4096: the pre-processor's horizontal step in Q12.
+  - 1680 is the written line, padding included: the stride the camera showed in §13.
+  - 1680 × 1.4 = 2352 input px.
+  - 1843 = 1024 + (5734 − 4096) / 2: the phase of the second colour of each Bayer pair (the two colours of a row are
+    one pixel apart, so their phases differ by (step − 1) / 2).
+- **Why this is the writer.** It is the only data source of 1680 × 1312 in block 0. The other 1680s are struct
+  offsets, the debug dump, or sites that §12 changed, and §12 changed every 1662 and 1646 (V, scans of §12.1 and of
+  this section). The camera wrote 1680-px lines after §12 had changed every other source (§13).
+- **Not traced to the registers (U).** The emulator cannot follow request A into the camera core's register writes.
+  With live view's start sent to the real TAKE (`scripts/camregs.mjs`, E101_TAKEFAKE=none, a movie-mode state, the
+  AE divide by an empty statistics count given 1), TAKE builds request A for code 513 (HS live view) through this
+  builder, and the camera core then waits for sensor events. It never requests 517, and the size writer 0x7E6540F8
+  is not reached (`results/wide2/fullboot-liveview-base.json`).
+
+### 14.2 The change
+
+| Site | Stock | New |
+|---|---|---|
+| 0x7E7932DC (record 7 +8) | 1680 | 1960: written line, the stride of §12 |
+| 0x7E793302 (+46) | 5734 (1.4) | 4915 (1.2) |
+| 0x7E7932FC, 0x7E793300 (+40, +44) | 1843 | 1433 = 1024 + (4915 − 4096) / 2 |
+
+- **Kept:** 1312 lines, the start 44/11 and the filter bytes. The input stays 2352 px (1960 × 4915 / 4096 = 2351.9;
+  stock 2351.8).
+- **Request B:** its HSHR record (table 0x7E7934E4, code 517: 56, 27, 82 × 14, 64 × 20, …) is a statistics grid. It
+  is left as it is: AE works in sensor coordinates, where nothing changes (I; §12.1, calc_r).
+
+### 14.3 Checks (exit status 0 = pass)
+
+| Check | Result |
+|---|---|
+| `uv run epm2mod make debug-log-movie-wide-2` | sha256 **8e644f7e1497082a19d2c66198a84bf22a252bf9c5e5c89c9d9917d34cdb5c9d** |
+| `tools/freespace.py check --first-code` | PASS; both movie specs only edit existing bytes (`results/wide2/freespace.txt`) |
+| `emulator/opcheck.py` | PASS, 21 specs, 546 byte ops |
+| `emulator/hookcheck.py` (with the allow list) | PASS, 0 FAIL (no hook added) |
+| `emulator/boot-test`, `emulator/update-path-test` | PASS, PASS |
+| `scripts/scen_wide.py` on the bit-rate build, wide and wide-2 | PASS (`results/wide2/scen-wide.txt`). The builder 0x7E5A897F, run for code 517 on each image, returns request A as the model: (44, 11, 1680, 1312), step 5734, phases 1024/1843 for the bit-rate build and wide (the cause of §13); (44, 11, 1960, 1312), step 4915, phases 1024/1433 for wide-2. The movie table of the through-start handler is as in §12.3 |
+| Test suite | 307 tests OK |
+
+### 14.4 Acceptance criteria
+
+The criteria of §12.4, unchanged:
+
+1. 30 fps, no corrupt frames, no early stop.
+2. More fine horizontal detail than `results/PB190001.MOV`, and round things stay round.
+3. Frame time under 33 ms.
+4. Photos and playback as before; 720p untested.
+
+Also: no magenta bands, and no garbage at the bottom of the frame.
+
+### 14.5 What a failure looks like now
+
+| Picture | Meaning (I) |
+|---|---|
+| Bands every 280 px and garbage at the bottom, as in §13 | the writer still writes 1680-px lines: request A does not set the written line, and another source exists |
+| Bands with another period, or a slant | writer and reader disagree on the stride: the writer pads 1960 to another stride (for example 1968 = 16-px rounding) |
+| Black, frozen or garbled live view; recording stops; `fw_error` records | the pre-processor refuses a 1960-px line or the 1.2 step (its limit, §2) |
+| A clean picture, stretched or squeezed sideways | the step and the developed width disagree: some site keeps 1.4 |
+| Colour fringes on vertical edges (green / magenta), the picture otherwise sharp | the phase model (1433) is wrong; the geometry is right |
+| Exposure follows only part of the frame | the statistics grid of request B is in output coordinates after all (§14.2) |
+| Garbage near the bottom or in the next buffer, a freeze while recording | the 1960 × 1312 frame does not fit the Bayer slot (§3.3) |
