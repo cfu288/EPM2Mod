@@ -198,14 +198,14 @@ step 3 are also the stock baseline for later comparison (I, from the code). No s
 
 4. MENU → SETUP → Custom Menu → J → Debug Log → On → OK. (No Custom Menu tab: MENU → SETUP → Setup Menu → Menu Display
    turns it on.)
-5. Press MENU. On the top menu press ◀/▶ to the movie mode icon (n). Press Q.
-6. Press Q for the live control. Press ▲/▼ to the shooting mode item and ◀/▶ to **P**. Press Q.
-7. Live control → record mode item → **Full HD Fine** → Q.
+5. Press MENU. On the first screen press ◀/▶ to the movie mode icon (the movie camera). Press OK.
+6. Press OK for the live control. Press ▲/▼ to the shooting mode item and ◀/▶ to **P**. Press OK.
+7. Live control → record mode item → **Full HD Fine** → OK.
 8. Use a card that the camera does not limit (SD speed class 6 or above, manual p. 48).
 
-**Clips.** Each clip: press the R button, count 10 seconds, press R again. Wait until the card lamp is off. Then press
+**Clips.** Each clip: press the movie button (red dot), count 10 seconds, press it again. Wait until the card lamp is off. Then press
 ▶ (playback; this writes the log), look at the clip once, and press ▶ again to go back. Change the settings in the live
-control (Q, ▲/▼ to the item, ◀/▶ to the value, Q).
+control (OK, ▲/▼ to the item, ◀/▶ to the value, OK).
 
 | Clip | Picture Mode | Image Stabilizer | Subject |
 |---|---|---|---|
