@@ -8,7 +8,7 @@ GUI leaves the menu (not to power-off) with setting 449 at Load (0), T_GUI sets 
 setSetting, as the menu does, and starts the task in mode 1. The firmware writes 1 into the setting at every start, so
 a camera shows Off. There is no load at the first menu.
 
-Needs build/films-12d.BIN (uv run epm2mod make builds/films-12d.json) and the toolchain (tools/setup.sh).
+Needs build/films-12d.BIN (uv run epm2mod make films-12d) and the toolchain (tools/setup.sh).
 The design is design.md sections 2-5 and 9.3; the file format is docs/look-file-format.md.
 
 What the spec adds to films-12d (no debug log):
@@ -601,7 +601,7 @@ def main():
         build = json.load(open(os.path.join(ROOT, BASE_BUILD)))
         base_specs = build["specs"]
         fw = os.path.join(ROOT, "build", "films-12d.BIN")
-        assert hashlib.sha256(open(fw, "rb").read()).hexdigest() == build["sha256"], "make builds/films-12d.json first"
+        assert hashlib.sha256(open(fw, "rb").read()).hexdigest() == build["sha256"], "epm2mod make films-12d first"
         blk_name, delta_on = "films-12d.block0.bin", BASE_BUILD
     b = block0(fw)
     blk_path = os.path.join(work, blk_name)

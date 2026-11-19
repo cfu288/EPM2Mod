@@ -7,7 +7,7 @@ load is MENU -> Custom Menu -> J -> Load Looks -> Load, then out of the menu. It
 state build/emu/state/card-looks-2-p.json (tools/emu/mkstate builds/card-looks-2.json ... p); screenshots go to
 build/card-looks/emu/shots-2/.
 
-Needs build/card-looks.BIN (uv run epm2mod make builds/card-looks.json) and the files that mkspec_looks.py writes
+Needs build/card-looks.BIN (uv run epm2mod make card-looks) and the files that mkspec_looks.py writes
 into build/card-looks/ (syms.json, spans.json, films-12d.block0.bin). Each session boots the build, and each dump
 compares the slot tables in RAM with what they must hold:
 

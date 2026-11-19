@@ -1,4 +1,4 @@
-"""Make look files for the SD card from the fit files (``epm2mod looks pack``).
+"""Make look files for the SD card from the fit files (``web/scripts/export_films.py`` makes the film records with it).
 
 A look list (``looks/card-looks.json``) names, for each menu entry, a fit file
 and the name of the look::

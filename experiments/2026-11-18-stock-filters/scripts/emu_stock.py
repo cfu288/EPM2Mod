@@ -3,7 +3,7 @@
 
     uv run python experiments/2026-11-18-stock-filters/scripts/emu_stock.py
 
-Needs build/stock-films.BIN (epm2mod make builds/stock-films.json), build/stock-films/{layout,syms}.json and the state
+Needs build/stock-films.BIN (epm2mod make stock-films), build/stock-films/{layout,syms}.json and the state
 build/emu/state/stock-films-p.json. Sessions share the camera's flash; each dump is compared with a model:
   switch words: for each entry the film bytes when the stored file lists it, else the stock bytes (F1, F2);
   RAM blocks: each listed entry's block equals APPLY of its record (Python model) on a zero block;

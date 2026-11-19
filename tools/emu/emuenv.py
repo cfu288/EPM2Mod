@@ -8,7 +8,7 @@
 
 An IMAGE argument of the tools is one of:
     stock                the stock firmware, firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN
-    builds/NAME.json     a build description; its image is build/NAME.BIN (made by `epm2mod make`)
+    builds/NAME.json     a build description; its image is build/NAME.BIN (made by `epm2mod make NAME`)
     PATH.BIN             a firmware file
     FOLDER               a folder that `tools/oetool.py unpack` made (it has manifest.json)
 No firmware is in the repository: the tools unpack an image into EMU_IMAGES/NAME-SHA8/ when needed.
@@ -87,7 +87,7 @@ def image_bin(image):
         name = os.path.splitext(os.path.basename(image))[0]
         path = os.path.join(REPO, "build", name + ".BIN")
         if not os.path.exists(path):
-            raise EmuSetupError(f"{image}: its image {os.path.relpath(path, REPO)} does not exist (make it with `epm2mod make {image}`)")
+            raise EmuSetupError(f"{image}: its image {os.path.relpath(path, REPO)} does not exist (make it with `epm2mod make {name}`)")
         want = desc.get("sha256")
         if want and sha256(path) != want:
             raise EmuSetupError(f"{image}: {os.path.relpath(path, REPO)} does not have the sha256 the description gives (make the build again)")

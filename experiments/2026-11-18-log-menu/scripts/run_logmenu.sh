@@ -10,7 +10,7 @@ set -e
 W=${1:?a scratch folder}
 rm -rf $W; mkdir -p $W/card/DCIM/100OLYMP
 cp build/emu/state/log-menu-p.json $W/st.json
-uv run epm2mod looks pack ART1=velvia ART2=portra-400 -o $W/card/EPM2LOOK.BIN > /dev/null
+uv run epm2mod films set ART1=velvia ART2=portra-400 -o $W/card/EPM2LOOK.BIN > /dev/null 2>&1
 J=(key:MENU key:RIGHT key:OK key:DOWN key:DOWN key:DOWN key:RIGHT key:DOWN key:DOWN key:DOWN key:DOWN key:DOWN key:DOWN
    key:DOWN key:DOWN key:DOWN key:RIGHT key:DOWN key:DOWN key:DOWN key:DOWN key:DOWN)       # Custom Menu J, Load Looks
 LOG=($J key:DOWN)                                                                          # Debug Log

@@ -6,9 +6,10 @@
 """Make a firmware build: download the stock firmware, apply the patch specs, check the result.
 
     uv run tools/make_firmware.py                        the pinned build
-    uv run tools/make_firmware.py --card /path/to/card   the same, and put on that SD card (in DCOLYMP/)
-    uv run tools/make_firmware.py --out FILE             the same, and one more copy of the file at FILE
-    uv run tools/make_firmware.py builds/NAME.json       another build
+    uv run tools/make_firmware.py -o PATH                the same, and one more copy of the file at PATH
+    uv run tools/make_firmware.py NAME                   another build
+
+To write a card, use `epm2mod install --card DIR` (docs/cli.md).
 
 This is `epm2mod make` (src/epm2mod/pipeline.py) for people who have not installed the package.
 Python standard library only; `uv run` gets a Python for you, or use `python3` (3.10 or newer).

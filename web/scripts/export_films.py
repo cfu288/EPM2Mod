@@ -2,7 +2,7 @@
 
     uv run python web/scripts/export_films.py
 
-The CLI (`epm2mod looks pack`), the local app and the web site all read it. Run this after a change of
+The CLI (`epm2mod install`, `epm2mod films set`), the local app and the web site all read it. Run this after a change of
 looks/catalogue.json, looks/card-looks.json or a fit; tests/test_lookfile.py fails while the file is out of date.
 """
 

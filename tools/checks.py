@@ -8,7 +8,7 @@ quick   the static checks, the emulator start and update path, and the colour-st
 full    quick, and the scenario runs (live view of the film entries, the peaking save guard, the peaking and log
         scenarios). Run it once before a build is offered for a flash.
 
-The image build/NAME.BIN must exist (`epm2mod make builds/NAME.json`). A check runs again only when its inputs
+The image build/NAME.BIN must exist (`epm2mod make NAME`). A check runs again only when its inputs
 changed: the image, the patch specs, the check's own script and the files under tools/. Results are kept in
 build/check-cache/ (ignored by git). A check that needs an image that is absent (a reference build) is skipped
 with the reason.
@@ -98,7 +98,7 @@ def plan(description: Path, tier: str) -> list[Check]:
     specs = [str(s) for s in raw["specs"]]
     image = ROOT / "build" / (description.stem + ".BIN")
     if not image.exists():
-        raise ValueError(f"{image.relative_to(ROOT)} is absent: run 'epm2mod make {description}' first")
+        raise ValueError(f"{image.relative_to(ROOT)} is absent: run 'epm2mod make {description.stem}' first")
     spec_files = tuple(ROOT / s for s in specs)
     tools = tool_files()
     py = sys.executable

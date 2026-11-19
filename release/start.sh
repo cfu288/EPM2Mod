@@ -1,7 +1,8 @@
 #!/bin/sh
 # Start EPM2Mod (macOS and Linux). Everything it downloads stays in this folder (.uv): delete the folder to remove it.
 #   ./start.sh            open the installer page in the browser
-#   ./start.sh make       make the firmware on the command line (any epm2mod command works)
+#   ./start.sh install --card /path/to/card   write EPM2Mod to the SD card on the command line
+#   ./start.sh --help     the other commands for camera owners
 set -eu
 cd "$(dirname "$0")"
 
@@ -17,7 +18,7 @@ esac
 
 UV=.uv/bin/uv
 if [ ! -x "$UV" ] || [ "$("$UV" --version 2>/dev/null | cut -d' ' -f2)" != "$UV_VERSION" ]; then
-  echo "Getting uv $UV_VERSION (once)..."
+  echo "Getting uv $UV_VERSION (once)..." >&2
   mkdir -p .uv/bin
   ARCHIVE=".uv/$ASSET.tar.gz"
   curl --proto '=https' --tlsv1.2 -fsSL -o "$ARCHIVE" \

@@ -1,6 +1,7 @@
 # Start EPM2Mod (Windows). Everything it downloads stays in this folder (.uv): delete the folder to remove it.
 #   start.ps1           open the installer page in the browser
-#   start.ps1 make      make the firmware on the command line (any epm2mod command works)
+#   start.ps1 install --card E:\   write EPM2Mod to the SD card on the command line
+#   start.ps1 --help    the other commands for camera owners
 $ErrorActionPreference = 'Stop'
 
 # Windows PowerShell 5.1 may offer only old TLS versions, which GitHub refuses
@@ -22,7 +23,7 @@ $Bin = Join-Path $PSScriptRoot '.uv\bin'
 $Uv = Join-Path $Bin 'uv.exe'
 $Have = if (Test-Path -LiteralPath $Uv) { ((& $Uv --version) -split ' ')[1] } else { '' }
 if ($Have -ne $UvVersion) {
-  Write-Host "Getting uv $UvVersion (once)..."
+  [Console]::Error.WriteLine("Getting uv $UvVersion (once)...")
   New-Item -ItemType Directory -Force -Path $Bin | Out-Null
   $Archive = Join-Path $PSScriptRoot ".uv\$Asset.zip"
   (New-Object System.Net.WebClient).DownloadFile("https://github.com/astral-sh/uv/releases/download/$UvVersion/$Asset.zip", $Archive)

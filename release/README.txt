@@ -18,6 +18,9 @@ EPM2Mod; it also stops a few minutes after you close the page.
 The first start downloads uv (a Python launcher) and Python 3.12 into the folder .uv here.
 Each start downloads Olympus's firmware from OM Digital Solutions if it is not here yet.
 
+Command line (no page): ./start.sh install --card /path/to/card
+  (Windows: start.ps1 install --card E:\). ./start.sh --help lists the commands.
+
 Remove: delete this folder.
 
 Project, help and how to go back to Olympus's firmware: https://github.com/cfu288/EPM2Mod

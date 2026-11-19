@@ -9,6 +9,7 @@
     "patches/card-looks-*.json"
    ],
    "copies": [
+    "src/epm2mod/camera_steps.py",
     "README.md",
     "docs/guide/card-looks.md",
     "docs/guide/film-looks.md",
@@ -16,10 +17,8 @@
     "docs/logging.md",
     "web/apps/site/src/features.ts",
     "web/apps/site/src/pages/Install.tsx",
-    "web/apps/local/src/App.tsx",
     "web/apps/local/src/App.test.tsx",
-    "web/apps/local/e2e/install.spec.ts",
-    "src/epm2mod/cli.py"
+    "web/apps/local/e2e/install.spec.ts"
    ]
   },
   {
@@ -31,7 +30,7 @@
     "docs/guide/debug-log.md",
     "docs/guide/level-gauge.md",
     "web/apps/site/src/pages/Install.tsx",
-    "web/apps/local/src/App.tsx"
+    "src/epm2mod/camera_steps.py"
    ]
   },
   {
@@ -50,7 +49,7 @@
     "docs/film-emulation.md",
     "looks/README.md",
     "NOTICE.md",
-    "src/epm2mod/cli.py",
+    "src/epm2mod/catalogue.py",
     "web/apps/site/src/pages/Films.tsx",
     "web/apps/site/src/App.test.tsx",
     "web/apps/local/src/App.tsx",
@@ -59,21 +58,25 @@
    ],
    "regenerate": [
     "uv run python web/scripts/export_films.py (film-records.json from catalogue.json)",
-    "uv run epm2mod readme (the film table in docs/guide/film-looks.md)"
+    "uv run epm2mod docs --write (the film table in docs/guide/film-looks.md)"
    ]
   },
   {
    "name": "Flash procedure",
    "fact": "Card in, hold OK and ON/OFF, steady lamp 1 to 2 minutes, blinking lamp = done, restart",
-   "truth": [],
+   "truth": [
+    "src/epm2mod/camera_steps.py"
+   ],
    "copies": [
     "README.md",
     "docs/flashing.md",
     "web/apps/site/src/pages/Install.tsx",
-    "web/apps/local/src/App.tsx",
     "web/apps/local/src/App.test.tsx",
-    "src/epm2mod/cli.py",
+    "web/apps/local/e2e/install.spec.ts",
     "release/README.txt"
+   ],
+   "regenerate": [
+    "uv run epm2mod docs --write (the camera steps in README.md)"
    ]
   },
   {
@@ -98,7 +101,7 @@
     "src/epm2mod/readme.py"
    ],
    "regenerate": [
-    "uv run epm2mod readme (docs/install.md and builds/README.md blocks)"
+    "uv run epm2mod docs --write (docs/install.md and builds/README.md blocks)"
    ]
   },
   {
@@ -120,17 +123,26 @@
   },
   {
    "name": "Command-line install",
-   "fact": "git clone, uv, epm2mod make/looks pack/restore and their options",
+   "fact": "git clone, uv, epm2mod install / films / films set / restore / inspect / cards and their options",
    "truth": [
     "src/epm2mod/cli.py",
-    "src/epm2mod/pipeline.py"
+    "src/epm2mod/pipeline.py",
+    "src/epm2mod/cardio.py"
    ],
    "copies": [
+    "docs/cli.md",
     "README.md",
     "docs/flashing.md",
     "docs/install.md",
     "docs/guide/card-looks.md",
+    "docs/look-file-format.md",
+    "release/README.txt",
+    "release/start.sh",
+    "release/start.ps1",
     "web/apps/site/src/pages/Install.tsx"
+   ],
+   "regenerate": [
+    "uv run epm2mod docs --write (docs/cli.md, from the command definitions)"
    ]
   },
   {
