@@ -70,7 +70,7 @@ def main():
     os.makedirs(work, exist_ok=True)
     before = mkspec_slots.LAYOUT4 if V4 else mkspec_slots.LAYOUT
     out = os.path.join(work, "before-menu.BIN")
-    subprocess.run(["uv", "run", "epm2mod", "apply", *before, "-o", out], cwd=ROOT, check=True, capture_output=True)
+    subprocess.run(["uv", "run", "epm2mod", "apply", *before, "--from", "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN", "-o", out], cwd=ROOT, check=True, capture_output=True)
     c = parse(open(out, "rb").read())
     blk, b1 = c.blocks[0].payload, c.blocks[1].payload
     get = lambda a, n: blk[a - BASE:a - BASE + n]

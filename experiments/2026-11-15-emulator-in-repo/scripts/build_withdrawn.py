@@ -21,4 +21,5 @@ from epm2mod import cli, spec  # noqa: E402
 spec._check_kept_bytes = lambda *a, **k: None  # the withdrawn spec predates this check
 specs = json.loads((REPO / "builds/seven-films-6-interval-240-level.json").read_text())["specs"]
 specs.append("experiments/2026-11-14-focus-peaking/specs/peaking-direct-2.json")
-sys.exit(cli.main(["apply", *[str(REPO / s) for s in specs], "-o", sys.argv[1]]))
+stock = str(REPO / "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN")
+sys.exit(cli.main(["apply", *[str(REPO / s) for s in specs], "--from", stock, "-o", sys.argv[1]]))

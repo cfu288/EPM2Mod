@@ -625,7 +625,7 @@ def main():
     os.makedirs(work, exist_ok=True)
     base_specs = (mkspec_slots.LAYOUT4 if V4 else mkspec_slots.LAYOUT) + [MENU_SPEC]
     fw = os.path.join(work, "base-%s.BIN" % ("4" if V4 else "3"))
-    subprocess.run(["uv", "run", "epm2mod", "apply", *base_specs, "-o", fw], cwd=ROOT, check=True,
+    subprocess.run(["uv", "run", "epm2mod", "apply", *base_specs, "--from", "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN", "-o", fw], cwd=ROOT, check=True,
                    capture_output=True)
     b = mk.block0(fw)
     blk_path = os.path.join(work, "base-%s.block0.bin" % ("4" if V4 else "3"))

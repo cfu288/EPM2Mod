@@ -33,7 +33,7 @@ flowchart TD
     B --> F[Fit<br/>fit_film2.py]
     M[Camera model<br/>model2.py + calib/model2.npz] --> F
     F --> P[Stage numbers of the look<br/>looks/fits/*.npz]
-    P -->|epm2mod looks| J[Patch spec<br/>patches/seven-films-N.json]
+    P -->|epm2mod generate| J[Patch spec<br/>patches/seven-films-N.json]
     J -->|tools/build.py + stock firmware| BIN[Firmware image]
     BIN -->|flash| CAM[Camera]
     T[Synthetic test RAW<br/>testraw/PB130001.ORF] -->|RAW Data Edit with the look| CAM
@@ -280,7 +280,7 @@ weak colour alone.
 | `check_film.py`, `make_figures.py`, `make_comparison.py` | score of one camera JPEG; the figures above; the photo comparison sheet |
 | `bake_slide.py` | target LUT for slide films (spektrafilm with the print step off) |
 | `slots/build_fixes.py`, `slots/build_movie_map.py` | write the two patch specs of the current build that hold new code (they need the MN10300 assembler) |
-| `slots/build_seven_films.py` | the first generator of the film specs. The current one is in the package: `uv run epm2mod looks` (`src/epm2mod/looks/`, data in `looks/`) |
+| `slots/build_seven_films.py` | the first generator of the film specs. The current one is in the package: `uv run epm2mod generate` (`src/epm2mod/looks/`, data in `looks/`) |
 | `slots/`, `slot3/` (other files) | assembly for the new code, and the generators of earlier builds |
 | `calib/`, `testraw/`, `figures/` | the model constants, the test RAWs, the figures. The seven looks are in `looks/fits/` at the top of the repository |
 | `fit_film.py`, `fit_xp9.py`, other `analyze_*`, `fit_*`, `check_*`, `extract.py`, `make_chart.py`, `make_mock.py` | earlier stages (photographed chart, first test image, first model); kept because NOTES refers to them |

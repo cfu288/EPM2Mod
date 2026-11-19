@@ -594,7 +594,7 @@ def main():
         SPEC = "card-looks-2"
         base_specs = mkspec_slots.LAYOUT + ["patches/looks-menu.json"]
         fw = os.path.join(work, "base-2.BIN")
-        subprocess.run(["uv", "run", "epm2mod", "apply", *base_specs, "-o", fw], cwd=ROOT, check=True,
+        subprocess.run(["uv", "run", "epm2mod", "apply", *base_specs, "--from", "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN", "-o", fw], cwd=ROOT, check=True,
                        capture_output=True)
         blk_name, delta_on = "base-2.block0.bin", "the specs of builds/card-looks-2.json before it"
     else:

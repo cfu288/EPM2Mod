@@ -53,7 +53,7 @@ def main():
     work = os.path.join(ROOT, "build", "card-looks")
     os.makedirs(work, exist_ok=True)
     out = os.path.join(work, "before-rows.BIN")
-    subprocess.run(["uv", "run", "epm2mod", "apply", *before, "-o", out], cwd=ROOT, check=True, capture_output=True)
+    subprocess.run(["uv", "run", "epm2mod", "apply", *before, "--from", "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN", "-o", out], cwd=ROOT, check=True, capture_output=True)
     blk = parse(open(out, "rb").read()).blocks[0].payload
     get = lambda a, n: bytes(blk[a - BASE:a - BASE + n])
     by_addr = {o.get("_addr"): o for o in peak["ops"]}

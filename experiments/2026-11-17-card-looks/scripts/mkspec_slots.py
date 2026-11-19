@@ -46,7 +46,7 @@ if __name__ == "__main__":
     work = os.path.join(ROOT, "build", "card-looks")
     os.makedirs(work, exist_ok=True)
     out = os.path.join(work, "before-cl.BIN")
-    subprocess.run(["uv", "run", "epm2mod", "apply", *before, "-o", out], cwd=ROOT, check=True, capture_output=True)
+    subprocess.run(["uv", "run", "epm2mod", "apply", *before, "--from", "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN", "-o", out], cwd=ROOT, check=True, capture_output=True)
     program = generate.Program(parse(open(out, "rb").read()).blocks[0].payload)
     ops = []
     for film, slot in FILMS:

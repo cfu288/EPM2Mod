@@ -7,6 +7,7 @@
 # and the decoder: $EPM2_REPO/.venv/bin/epm2mod. No argument = a b c d e f g h. The menu crawls are crawls.sh.
 cd ${0:A:h}/.. && . ./env.sh
 W=log; DEC=$EPM2_REPO/.venv/bin/epm2mod
+events() { $DEC log $1 --json | python3 -c 'import json, sys; [print(json.dumps(e)) for e in json.load(sys.stdin)["events"]]'; }  # the events, a JSON line each
 export E101_RTC=2026-11-14T12:00:00
 what=($@); (( $#what )) || what=(a b c d e f g h)
 card() { rm -rf $SCRATCH/$1; mkdir -p $SCRATCH/$1/DCIM/100OLYMP; }
@@ -31,11 +32,11 @@ b)  # the session with a card: the log file appears in the host folder and decod
     card logcard; state lb
     BLOCKS=$SCRATCH/log-debug E101_STATE=$SCRATCH/lb.json E101_CARD=$SCRATCH/logcard $NODE $W/logplay.mjs $W/session $SESSION ring:end > $W/session.txt 2>&1
     grep 'ring end\|card\|done\|STOP' $W/session.txt | cut -c1-200
-    $DEC log $SCRATCH/logcard/EPM2LOG.BIN > $W/session.jsonl && cp $SCRATCH/logcard/EPM2LOG.BIN $W/session-EPM2LOG.BIN && brief < $W/session.jsonl | tee $W/session-brief.txt;;
+    events $SCRATCH/logcard/EPM2LOG.BIN > $W/session.jsonl && cp $SCRATCH/logcard/EPM2LOG.BIN $W/session-EPM2LOG.BIN && brief < $W/session.jsonl | tee $W/session-brief.txt;;
 c)  # a second run with the same card folder appends a second session
     state lc
     BLOCKS=$SCRATCH/log-debug E101_STATE=$SCRATCH/lc.json E101_CARD=$SCRATCH/logcard $NODE $W/logplay.mjs $W/tmp w:500 key:MENU key:MENU key:PLAY ring:end 2>&1 | grep 'ring end cpu0\|card ->\|STOP'
-    $DEC log $SCRATCH/logcard/EPM2LOG.BIN > $W/two-sessions.jsonl
+    events $SCRATCH/logcard/EPM2LOG.BIN > $W/two-sessions.jsonl
     python3 -c '
 import sys, json, collections
 c = collections.Counter(); m = []
@@ -53,7 +54,7 @@ d)  # no card: no hang, the same screens as pinned
 e)  # ring overflow: 700 records from interrupt context before the first flush; and records of CPU1
     card logcard-e; state le
     BLOCKS=$SCRATCH/log-debug E101_STATE=$SCRATCH/le.json E101_CARD=$SCRATCH/logcard-e $NODE $W/logplay.mjs $W/tmp w:500 burst:700 ring:burst cpu1:3 key:MENU ring:flushed 2>&1 | grep 'ring.*cpu\|card ->\|STOP'
-    $DEC log $SCRATCH/logcard-e/EPM2LOG.BIN > $W/overflow.jsonl
+    events $SCRATCH/logcard-e/EPM2LOG.BIN > $W/overflow.jsonl
     python3 -c '
 import sys, json
 L = [json.loads(l) for l in open(sys.argv[1])]
@@ -64,7 +65,7 @@ f)  # a restart that finds the ring in RAM (what a crash and the camera's own re
     card logcard-f; state lf
     BLOCKS=$SCRATCH/log-debug E101_STATE=$SCRATCH/lf.json E101_CARD=$SCRATCH/logcard-f $NODE $W/logplay.mjs $W/tmp w:500 key:MENU key:MENU burst:5 ring:A save:$SCRATCH/ringA.bin 2>&1 | grep 'ring A cpu0\|card ->'
     BLOCKS=$SCRATCH/log-debug E101_STATE=$SCRATCH/lf.json E101_CARD=$SCRATCH/logcard-f $NODE $W/logplay.mjs $W/tmp seed:$SCRATCH/ringA.bin w:500 ring:B key:MENU ring:B-flushed 2>&1 | grep 'ring B.* cpu0\|card ->'
-    $DEC log $SCRATCH/logcard-f/EPM2LOG.BIN > $W/restart.jsonl; brief < $W/restart.jsonl | sed -n '18,32p' | tee $W/restart-brief.txt;;
+    events $SCRATCH/logcard-f/EPM2LOG.BIN > $W/restart.jsonl; brief < $W/restart.jsonl | sed -n '18,32p' | tee $W/restart-brief.txt;;
 g)  # the firmware-error hook: the two known start-up errors, by the emulator's own observer and in the log
     grep -o 'firmware error log entries.*' $W/boot-log-debug.txt | cut -c1-200
     grep '"fw_error' $W/session.jsonl | cut -c1-200
@@ -74,7 +75,7 @@ h)  # many flushes: every record must be in the file once and in order, whatever
     for run in 1 2; do
       card logcard-h; state lh; K=(); for i in {1..40}; do K+=(key:MENU); done; [[ $run == 2 ]] && K=(burst:3 $K key:PLAY key:PLAY key:MENU)
       BLOCKS=$SCRATCH/log-debug E101_STATE=$SCRATCH/lh.json E101_CARD=$SCRATCH/logcard-h $NODE $W/logplay.mjs $W/tmp w:500 $K ring:end 2>&1 | grep 'ring end cpu0\|card ->\|STOP'
-      $DEC log $SCRATCH/logcard-h/EPM2LOG.BIN | python3 -c '
+      events $SCRATCH/logcard-h/EPM2LOG.BIN | python3 -c '
 import sys, json, collections
 L = [json.loads(l) for l in sys.stdin]
 seqs = [d["seq"] for d in L if "marker" not in d]

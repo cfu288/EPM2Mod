@@ -10,7 +10,7 @@ set -e
 W=${1:?a scratch folder}
 rm -rf $W; mkdir -p $W/card/DCIM/100OLYMP
 cp build/emu/state/log-menu-p.json $W/st.json
-uv run epm2mod films set ART1=velvia ART2=portra-400 -o $W/card/EPM2LOOK.BIN > /dev/null 2>&1
+uv run epm2mod films set --film ART1=velvia --film ART2=portra-400 -o $W/card/EPM2LOOK.BIN > /dev/null 2>&1
 J=(key:MENU key:RIGHT key:OK key:DOWN key:DOWN key:DOWN key:RIGHT key:DOWN key:DOWN key:DOWN key:DOWN key:DOWN key:DOWN
    key:DOWN key:DOWN key:DOWN key:RIGHT key:DOWN key:DOWN key:DOWN key:DOWN key:DOWN)       # Custom Menu J, Load Looks
 LOG=($J key:DOWN)                                                                          # Debug Log
@@ -24,5 +24,5 @@ echo "3 restart On, Load"; run s3 w:500 $J key:RIGHT key:DOWN key:OK w:1500 key:
 echo "4 Off"; run s4 w:500 $LOG key:RIGHT key:UP key:OK w:500 shot:j-off ring:off $OUT ring:end; size
 echo "5 restart Off, Built-in"; run s5 w:500 ring:start $J key:RIGHT key:DOWN key:DOWN key:OK w:1500 key:UP key:DOWN \
   shot:load-builtin $OUT ring:end; size
-uv run epm2mod log $W/card/EPM2LOG.BIN --summary | head -4
-uv run epm2mod log $W/card/EPM2LOG.BIN | grep -E '"(log_setting|card_task)"' | cut -c1-200
+uv run epm2mod log $W/card/EPM2LOG.BIN | head -4
+uv run epm2mod log $W/card/EPM2LOG.BIN --json | python3 -c 'import json, sys; [print(json.dumps(e)) for e in json.load(sys.stdin)["events"]]' | grep -E '"(log_setting|card_task)"' | cut -c1-200
