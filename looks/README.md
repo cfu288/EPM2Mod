@@ -1,10 +1,11 @@
 # Film look data
 
-- `films.json`: which film goes in which art-filter menu entry, the name shown in the menu, and the
+- `films.json`: for the older builds that replace art filters in the firmware (the pinned build keeps Olympus's
+  filters and loads films from the card): which film goes in which art-filter menu entry, the name shown in the menu, and the
   fit file of the film. It also names the three patch specs that are generated from this data.
 - `catalogue.json`: every fitted film that a look file for the SD card can hold, with the short id that
   `epm2mod looks pack ART2=velvia` uses and the name the camera shows (`epm2mod looks list`).
-- `card-looks.json`: the twelve built-in looks as a look list.
+- `card-looks.json`: the twelve default films, one per ART entry, that the installer and `make` write to the card.
 - `film-records.json`: each film of the catalogue with its look record, and the built-in film of each ART entry.
   `epm2mod looks pack`, the local app and the web site pack look files from it, without numpy. Made from the fits
   by `uv run python web/scripts/export_films.py`; a test fails when it is out of date.
@@ -15,8 +16,8 @@
   which of the five other art-filter entries, its menu name and its fit file, and the names of the specs
   that are generated from it: `films12-structure` (code and table entries), `films12-looks` (the looks)
   and one `films12-entry-*` spec per menu entry. Leave an entry spec out of a build and that entry is the
-  stock art filter again. `fits/` also holds fits that no list uses yet (C200, Portra 800, UltraMax 400,
-  Verita 200D, Vision3 50D and 200T; from 2026-11-18 also Portra 800 pushed 1 and 2 stops and Tri-X).
+  stock art filter again. `fits/` also holds fits that no firmware list uses (C200, Portra 800, UltraMax 400,
+  Verita 200D, Vision3 50D and 200T, Portra 800 pushed 1 and 2 stops, Tri-X); every fit is in `catalogue.json`.
 
 - `films-12-bw.json`: a variant of `more-films.json` with a black-and-white film (the candidate build
   `films-12-bw`). The entry Grainy Film keeps its stored value, its art codes and its grain program and holds

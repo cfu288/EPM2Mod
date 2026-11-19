@@ -1,11 +1,11 @@
 # The look file (EPM2LOOK.BIN), version 1
 
-A look file holds up to twelve film looks, one per art-filter menu entry. A camera with the card-looks build reads
-it from the top folder of the SD card, checks it, writes the looks into the slots and keeps a copy in its settings
+A look file holds up to twelve film looks, one per art-filter menu entry. The pinned build (`stock-films`) reads
+it from the top folder of the SD card when Load Looks runs, checks it, writes the looks into the entries it lists and keeps a copy in its settings
 memory. The looks then stay after a restart and without the card, until another file is loaded.
 
-Make one with `uv run epm2mod looks pack [ART2=velvia ... | LIST.json] [-o FILE]` (no argument: the twelve films of
-the pinned build). Check one with `uv run epm2mod looks show FILE [--json]`. Code:
+Make one with `uv run epm2mod looks pack [ART2=velvia ... | LIST.json] [-o FILE]` (no argument: the twelve default films,
+`looks/card-looks.json`). Check one with `uv run epm2mod looks show FILE [--json]`. Code:
 `src/epm2mod/looks/lookfile.py` (the format), `src/epm2mod/looks/records.py` (from the film records), `src/epm2mod/looks/lookpack.py` (from the fit files). Why the format
 is this way: `experiments/2026-11-17-card-looks/design.md` section 5.
 

@@ -3,7 +3,6 @@
 export { Chevron } from './components/Chevron'
 export { FilmCredit } from './components/FilmCredit'
 export { FilmLibrary } from './components/FilmLibrary'
-export { LoadSteps } from './components/LoadSteps'
 export { MenuEditor } from './components/MenuEditor'
 export { PageFrame, REPO } from './components/PageFrame'
 export { SlotList } from './components/SlotList'

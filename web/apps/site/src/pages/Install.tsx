@@ -67,7 +67,8 @@ function InstallerSteps() {
         <dl className="grid grid-cols-[6rem_1fr] gap-y-2">
           <dt className="font-bold">Mac</dt>
           <dd>
-            Double-click <code>Start (Mac).command</code>. The first time, right-click it and choose Open.
+            Double-click <code>Start (Mac).command</code>. The first time, macOS blocks it: System Settings → Privacy
+            &amp; Security → Open Anyway.
           </dd>
           <dt className="font-bold">Windows</dt>
           <dd>

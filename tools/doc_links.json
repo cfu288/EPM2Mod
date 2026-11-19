@@ -5,13 +5,13 @@
    "name": "Load Looks menu path and options",
    "fact": "MENU → Custom Menu → J → Load Looks → Load, and the row's options (Off / Load, no Built-in)",
    "truth": ["patches/looks-menu-*.json", "patches/card-looks-*.json"],
-   "copies": ["README.md", "docs/guide/card-looks.md", "docs/guide/film-looks.md", "docs/guide/debug-log.md", "docs/logging.md", "web/apps/site/src/features.ts", "web/apps/site/src/pages/Install.tsx", "web/packages/ui/src/components/LoadSteps.tsx", "web/apps/local/src/App.tsx", "web/apps/local/src/App.test.tsx", "web/apps/local/e2e/install.spec.ts", "src/epm2mod/cli.py"]
+   "copies": ["README.md", "docs/guide/card-looks.md", "docs/guide/film-looks.md", "docs/guide/debug-log.md", "docs/logging.md", "web/apps/site/src/features.ts", "web/apps/site/src/pages/Install.tsx", "web/apps/local/src/App.tsx", "web/apps/local/src/App.test.tsx", "web/apps/local/e2e/install.spec.ts", "src/epm2mod/cli.py"]
   },
   {
    "name": "Custom Menu tab missing",
    "fact": "No gears tab: Setup Menu → Menu Display → Custom Menu → On",
    "truth": [],
-   "copies": ["docs/guide/card-looks.md", "docs/guide/debug-log.md", "docs/guide/level-gauge.md", "web/apps/site/src/pages/Install.tsx", "web/packages/ui/src/components/LoadSteps.tsx", "web/apps/local/src/App.tsx"]
+   "copies": ["docs/guide/card-looks.md", "docs/guide/debug-log.md", "docs/guide/level-gauge.md", "web/apps/site/src/pages/Install.tsx", "web/apps/local/src/App.tsx"]
   },
   {
    "name": "Film catalogue",

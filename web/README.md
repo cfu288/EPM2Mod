@@ -1,12 +1,12 @@
-# The film-looks site and the local app
+# The site and the local app
 
 Two pages share one package of components and data:
 
-| Folder                        | What it is                                                                                                                                                               | Served by                                                                                                |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
-| `packages/ui` (`@epm2mod/ui`) | the ART-menu editor (`MenuEditor`, `useLooks`), the preview (`StripPreview`), the page frame, the camera steps for the look file, the film data and the look-file packer | both apps                                                                                                |
-| `apps/site`                   | the public page: choose the films and download `EPM2LOOK.BIN`                                                                                                            | GitHub Pages, https://cfu288.github.io/EPM2Mod/ (`.github/workflows/web.yml`, on every change to `main`) |
-| `apps/local`                  | the local app: make the firmware, add film looks, write to an SD card or download a zip                                                                                  | `epm2mod serve` (`src/epm2mod/serve.py`), from the build in `src/epm2mod/app/` (not in git)              |
+| Folder                        | What it is                                                                                                                           | Served by                                                                                                |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| `packages/ui` (`@epm2mod/ui`) | the ART-menu editor (`MenuEditor`, `useLooks`), the preview (`StripPreview`), the page frame, the film data and the look-file packer | both apps                                                                                                |
+| `apps/site`                   | the public page: features, film comparison, install steps                                                                            | GitHub Pages, https://cfu288.github.io/EPM2Mod/ (`.github/workflows/web.yml`, on every change to `main`) |
+| `apps/local`                  | the local app: make the firmware, add film looks, write to an SD card or download a zip                                              | `epm2mod serve` (`src/epm2mod/serve.py`), from the build in `src/epm2mod/app/` (not in git)              |
 
 Rules (the lint refuses a break of them): an app imports shared code only from `@epm2mod/ui` and
 `@epm2mod/ui/theme.css`, never from another app and never from a path inside `packages/ui`. Code that both apps need

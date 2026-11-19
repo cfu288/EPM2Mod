@@ -338,7 +338,9 @@ def _restore(args: argparse.Namespace, paths: RepoPaths) -> int:
             out = out / "E1019999.BIN"
         write_bytes(out, data)
         print(f"wrote {out}: copy it to the card as DCOLYMP/E1019999.BIN")
-    print("Then, with the camera off, hold OK and switch the camera on.")
+    print(
+        "Then put the card in the camera. With the camera off, hold OK and ON/OFF together."
+    )
     return 0
 
 
