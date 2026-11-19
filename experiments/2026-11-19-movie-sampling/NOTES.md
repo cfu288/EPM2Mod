@@ -718,3 +718,30 @@ in it the two clips look alike by eye. A gradient measure differs between the cl
 noise, so it is not evidence. A fair A/B needs a sharply focused flat target.
 
 720 (clip 4) is clean (criterion 4). No photo came back.
+
+## 18. Second A/B session, 2026-11-19 (same build)
+
+Four clips of a desk with a notebook (`results/ab/PB190007`–`10`; frames `camera-frames-7-8-9-10.png`). The owner
+turned the camera off and on after each mode change. The log was not copied (the sheet's copy command left it out).
+
+| Clip | Mode (SPS) | Picture |
+|---|---|---|
+| PB190007 | Full HD Fine | garbled |
+| PB190008 | Full HD Fine | clean |
+| PB190009 | Full HD Normal | garbled |
+| PB190010 | Full HD Normal | clean |
+
+So the switch fails also after a restart, on the first clip of a mode (I: the first live-view set-up after power-on
+does not pass every site with the new choice; the recording's end restarts live view and the second clip is
+consistent). Not traced: the work stops here (below).
+
+**A/B (clips 8 and 10, same place, notebook in focus; `camera-crop-clip8-vs-clip10.png`, 2× crops):** by eye the
+logo's edges are at most marginally crisper in the wide frame. Measured on the same 420×260 region: horizontal edge
+steepness |dx| p99 42.0 (wide) against 44.0 (stock), p99.9 69.0 against 73.1; vertical |dy| (unchanged sampling)
+32.0/75.0 against 33.0/75.0. **No measurable gain from the wide frame.** (I) The detail is set before the resize:
+by the sensor's 2×2 read-out and the develop job's own filtering, so keeping 1920 samples instead of 1646 adds no
+resolvable detail.
+
+**Decision (owner's criterion of 2026-11-19: stop if this pair shows no visible difference):** the wide-frame work
+stops. The switch bug is not fixed. Kept as findings: the writer/reader geometry (§12–§14), the timing headroom
+(§9, §15), and that bit rate is no longer the limit (§11).
