@@ -25,7 +25,7 @@ look. Live view shows it too.
 | **Superia 400** | Cross Process | Fuji Superia X-tra 400 negative, printed on Fuji Crystal Archive paper |
 | Gentle Sepia, Dramatic Tone, Key Line, Watercolor | (unchanged) | |
 
-Current build on the camera: `build/seven-films-6.BIN`. The top-level README has the build and
+Build at the time (2026-11-13): `seven-films-6`. The top-level README has the build and
 flash steps. The patch list, in order: `remap7b-code`, `seven-fixes-1`, `seven-movie-1`,
 `seven-structure-extra`, `seven-films-5`, `xp-adaptive-hue-off`, `seven-labels`.
 
@@ -185,7 +185,7 @@ Three things follow from this:
 
 ## 6. What we found about each filter
 
-| Menu entry | Finding | Use as a film slot |
+| Menu entry | Finding | Use as a film slot (survey of 2026-11-12) |
 |---|---|---|
 | Cross Process | Has separate red, green, blue curves built in. Also had a routine that shifts blue and cyan depending on how blue the scene is; we switched it off. | **Portra 400** |
 | Light Tone | No hidden processing: the model reproduces its stock look to 0.94 ΔE. Has one type only, so the menu entry is the slot. | **Ektachrome** |
@@ -216,39 +216,34 @@ Other findings:
   A test build with the same film in all the new slots produced pixel-identical files, so the
   seven slots are interchangeable.
 - **Free space is scarce.** The firmware file has large empty areas, but they are gaps the camera
-  never loads into memory. About 3.5 KB of loaded free space exists in total.
+  never loads into memory. The loaded free space is in [code-space-map.md §4](code-space-map.md#4-totals-bytes).
 - **The camera rounds the colour matrix** in a specific way before using it, and records the result
   in each JPEG's metadata. Reproducing that rule lets us predict the recorded matrix exactly, which
   is a quick check that a build did what we intended.
 - **The camera's "neutral" brightness curve is not neutral:** it compresses highlights. Every look
   that keeps it has to allow for that.
-- **Menu labels** can be replaced only by text no longer than the original ("Velvia" for "Diorama"), which is why some names are abbreviated.
+- **Menu labels** in the firmware can be replaced only by text no longer than the original ("Velvia" for "Diorama"), which is why some names are abbreviated. A loaded film file's names take up to 16 characters.
 
-Side effects on entries we did not turn into films: the second types (Pop Art II, Pale&Light II, Cross Process II) lose their own look or share curves with a film, and the original Soft Focus, Pin Hole and Diorama stills effects are no longer reachable from the menu (their movie versions are).
+Side effects: an entry keeps its Olympus effects until a loaded film simulation overwrites the entry.
 
 ## 7. Limits and open points
 
 - The looks match a **simulation** of each film; nobody has compared them with real film here.
 - No grain or halation.
-- Per-colour control has six axes (red, yellow, green, cyan, blue, magenta), not the 12 of a colour wheel. The
-  12-colour editors in mods for the PEN-F, E-P7, OM-3 and E-M10 I write a 12-record table that TruePic VII and
-  later image processors have. None is known in the E-PM2's TruePic VI
+- Per-colour control uses the six-axis stage (red, yellow, green, cyan, blue, magenta). A 12-region stage exists
+  for stills only, and every film uses Natural's table there
   ([`feasibility.md`](feasibility.md#colour-wheel-and-twelve-colour-editors)).
-- All measurements use the camera's daylight colour matrix. Other white balance settings
-  (tungsten, shade) use different matrices and are untested.
+- White balance presets: Shade (7500 K) and Incandescent (3000 K) were measured, and the film simulations hold
+  (`experiments/2026-11-09-film-portra/NOTES.md` section 44).
 - Live view and movie mode work in all seven entries. A movie gets only part of each look: the
   film's matrix, saturation and per-hue values, but the film's brightness curves only in Kodachrome
   and Superia 400. The other five have film curves for stills only (not enough table space).
-- **Open problem:** twice the camera froze and restarted at the moment RAW Data Edit was about to
-  save. It is not known whether the modified firmware, or the hand-made test file, is involved; it
-  has not been tried on stock firmware. See the camera log.
-- Art bracketing and other white balance presets are untested with the new entries.
+- Twice the camera froze and restarted at the moment RAW Data Edit was about to save. The cause of the
+  Diorama case was found and fixed (`seven-fixes-1`). **Open problem:** the restart in another entry. See the
+  camera log.
 - Deep shadows are a little darker than the film targets ask for (the lifted blacks of negative
   film are not fully reproduced).
-- Seven is the practical limit. Grainy Film, Gentle Sepia, Dramatic Tone, Key Line and Watercolor
-  have no low-risk route to becoming film slots ([`art-slots-evaluation.md`](art-slots-evaluation.md)).
-- The menu order itself was not changed; films were assigned to the seven usable entries from the
-  top down, which leaves Grainy Film in the middle.
+- All 12 entries take a film simulation (Load Looks).
 
 ## 8. Adding or changing a film
 
@@ -256,9 +251,8 @@ Side effects on entries we did not turn into films: the second types (Pop Art II
    a slide film.
 2. Fit: `fit_film2.py --lut <target> --name <name>` (second camera model: matrix, three curves,
    per-hue values, saturation and the two chroma curves in one go).
-3. Put the fit's name into a new entry of the `FITS` table in
-   `experiments/2026-11-09-film-portra/slots/build_seven_films.py` (and a label no longer than the
-   entry's stock name in `LABELS`), run it with the new tag, build with `tools/build.py`, flash,
+3. Add the film as data: the fit in `looks/fits/`, an entry in `looks/catalogue.json`, then regenerate
+   `looks/film-records.json` (`web/scripts/export_films.py`). No flash: load it from the card,
    develop `PB130001.ORF` with that look, copy the JPEG back.
 4. Correct: `fit_film2.py --name <name2> --anchor <reading of that JPEG> out/fit_<name>.npz`,
    rebuild, flash, check again with `check_film.py`.
