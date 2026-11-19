@@ -37,8 +37,8 @@ it is done.
     goes. No background or history in user instructions: link to the notes. A menu path is one line, with an emulator
     screenshot beside it.
 11. **Say why, not only what.** A feature line says what it does for the photographer.
-12. **Words:** "film simulations" (never "films", "looks" or "film looks" for them; "Load Looks" and file names are
-    the camera's own). Use the camera's names for menus and settings.
+12. **Words:** "film simulations" (never "films", "looks" or "film looks" for them; "Load Looks", file names and
+    command names are exempt). Use the camera's names for menus and settings.
 13. **No support channel.** The firmware is unofficial and used at the user's own risk: do not point users to the
     owner, issues or bug reports.
 14. **Write for the reader's layer.** Wording follows what is true for the tool the reader uses (the installer page,
@@ -57,8 +57,9 @@ it is done.
     recommends something stores it.
 18. **Before you apply a decision, state its scope** (which component, which reader) and check each affected place
     against it. Do not apply a decision as a word replacement.
-19. **Do only what was approved.** Report anything extra as a question. A renamed command or flag is changed
-    everywhere in the same change, with no alias.
+19. **Do what was asked, and no more.** Settle details by common practice without asking. Bring anything that adds
+    scope or changes a decision to the owner first. A renamed command or flag is changed everywhere in the same
+    change, with no alias.
 20. **Dated notes are records.** Do not edit `experiments/*/NOTES.md`, design notes or `docs/camera-log.md` to match
     later changes.
 21. **Do not polish while a feature question is open.** Fit accuracy and tooling reviews come after the feature works
