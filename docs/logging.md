@@ -4,17 +4,10 @@ For developers. A debug build of the firmware writes event records to the file `
 card. `epm2mod log` turns the file into JSON lines. The design notes, the evidence and the camera test
 are in [experiments/2026-11-15-log/NOTES.md](../experiments/2026-11-15-log/NOTES.md).
 
-The pinned build (`builds/stock-films.json`) has the log in the firmware, switched by the Custom Menu row **Debug Log**
+The pinned build has the log in the firmware, switched by the Custom Menu row **Debug Log**
 (MENU → SETUP → Custom Menu → J → Debug Log → On; Off by default): `patches/log-menu-2.json`, the code of the four specs below
 with an Off switch ([log-menu design](../experiments/2026-11-18-log-menu/design.md)). It was first pinned in
 `builds/log-menu.json`.
-
-The debug build `builds/debug-log.json`: the pinned specs of 2026-11-15, then `patches/log-core.json` and
-`patches/log-probes.json`.
-
-A second debug build, `builds/debug-log-peaking-fast.json`, is the candidate `peaking-fast` with the same two
-specs and `patches/log-peaking-time.json` (event `pk_stats`: the time of the colour loop and the frame period
-of peaking; focus-peaking notes, section 17).
 
 ## The parts
 
@@ -23,6 +16,7 @@ of peaking; focus-peaking notes, section 17).
 | Dictionary | `logs/events.json` | The id, name, level and argument formats of each event, and name tables for values. The camera stores no text |
 | Dictionaries of flashed builds | `logs/events-BUILDID.json` | The event list of a build that was on a camera, kept when `events.json` changes |
 | Generator | `experiments/2026-11-15-log/scripts/mkspec_log.py` | Reads the dictionary and writes the two patch specs |
+| Generator of the release log | `experiments/2026-11-18-log-menu/scripts/mkspec_logmenu.py` | Writes `patches/log-menu-2.json` (with `--stock-films`). It imports `mkspec_log.py` |
 | Log core | `patches/log-core.json` | `log_put`, `log_chg`, `log_cnt`, the flush task, and the events boot, firmware error and GUI state |
 | Probes | `patches/log-probes.json` | One hook and one small routine per event of a feature |
 | Timing probe of peaking | `patches/log-peaking-time.json` | Event `pk_stats`, one record per 8 runs of Key Line pass 9. Written by `mkspec_log.py --peaking-time`. It also puts the build id of `logs/events.json` into the block header |
@@ -67,7 +61,7 @@ writes as many blocks as it needs for each CPU that has new records. The header:
 | 28 | 4 | how often the boot hook found a ring in RAM (CPU 0; see `boot` below) |
 
 The flush runs when the GUI enters a menu, playback or the power-off state, and only if the GUI's
-`isMediaWriting` says that the card is idle. It stops when the file has 4 MiB: delete the file to go on.
+`isMediaWriting` says that the card is idle and neither the card nor card-looks' task is busy. It stops when the file has 4 MiB: delete the file to go on.
 
 Why whole 512-byte blocks: the stock `fileif_fwrite` reads a sector before it changes a part of it, and that
 read fails for a sector that is past the end of the file. An append that starts and ends on a sector boundary
@@ -84,7 +78,7 @@ uv run epm2mod log /tmp/scratch/EPM2LOG.BIN > /tmp/scratch/log.jsonl
 ```
 
 `--summary` prints a short report: the sessions, lost records, the firmware's error records, the flushes, the
-count of each event, the screens, and one or two lines for peaking, the film looks, shooting, interval shooting
+count of each event, the screens, and one or two lines for peaking, the film simulations, shooting, interval shooting
 and the level gauge. Start with it. The evaluation of the first file from a camera is in
 [experiments/2026-11-15-log/evaluation-1.md](../experiments/2026-11-15-log/evaluation-1.md).
 
@@ -100,7 +94,7 @@ Without the option, one line is one record:
   the boot task runs at 101 ms.
 - `time_us` starts near 0 at power-on. Both CPUs read the same timer.
 - `names` gives the name of a value where the dictionary has a table for it: GUI states, shooting callbacks,
-  art codes (with the film of `looks/films.json`), matrix tables, the peaking colour. The key is the argument, or
+  art codes (with the film of `looks/films.json`, for the older seven-film builds only), matrix tables, the peaking colour. The key is the argument, or
   `argument.field`. `args` always holds the number.
 - `recovered: true`: the record was still in RAM after a restart and the next session wrote it. It has the
   session number of the session that logged it. These are the last events before a crash. The decoder finds
@@ -118,8 +112,9 @@ Without the option, one line is one record:
 
 `boot` has the argument `ring_found` (`session` in the build `d1ddd46b4dac2414`). It is not the session number.
 The boot hook adds 1 when it finds a ring in RAM. On the camera the error records of the same start have
-already made the ring, so a power-on gives 1. A restart that kept the RAM gives 2 or more. The camera clears
-this RAM at power-off (camera result 1).
+already made the ring, so a power-on gives 1. A restart that kept the RAM gives 2 or more. The ring RAM keeps
+its content at power-off, and bits can change while the camera is off: the check word decides whether the ring is
+used (section "The record").
 
 To filter, use `jq`: `jq -c 'select(.level == "error")' /tmp/scratch/log.jsonl`.
 
@@ -136,8 +131,8 @@ To filter, use `jq`: `jq -c 'select(.level == "error")' /tmp/scratch/log.jsonl`.
 - `tables` maps a table name to `{value: text}`. A value is decimal (`"259"`), hexadecimal (`"0x5B00"`) or a
   group of 256 values (`"0x5Bxx"`, used when the value has no entry of its own).
 - `names` of an event maps an argument (`"state"`) or a field (`"latch.C"`) to a table name.
-- `film_entries` says which art code belongs to which menu entry of `looks/films.json`. `epm2mod log` then shows
-  the film: `Velvia (Diorama)`.
+- `film_entries` says which art code belongs to which menu entry of `looks/films.json`, for the older seven-film
+  builds only. `epm2mod log` then shows the film: `Velvia (Diorama)`.
 - A name that is inferred says so in its text. Correct a name, a `doc` text or a table at any time: the build
   id stays, and old log files decode with the new names.
 
@@ -148,24 +143,15 @@ with the old id. So, before the change, copy the event list to `logs/events-BUIL
 that the file name is the build id of its content, and that the two patch specs carry the build id of one of the
 dictionaries in `logs/`.
 
-State on 2026-11-15: `patches/log-core.json` and `patches/log-probes.json` are the flashed ones (build id
-`d1ddd46b4dac2414`, dictionary `logs/events-d1ddd46b4dac2414.json`). `logs/events.json` (build id
-`fe2f543f94c74a91`) renames three arguments (`boot.session` → `ring_found`, `iv_end.frames` → `iv_frames`,
-`film_matrix.d3` → `stack`) and adds the event `pk_stats`. The generator gives the same code for it but the 8 bytes
-of the build id in the flush task (checked). The next full generator run writes the two specs with the new id.
-Until then `patches/log-peaking-time.json` changes these 8 bytes itself, so the build `debug-log-peaking-fast`
-writes blocks with the id `fe2f543f94c74a91`, and the build `debug-log` is still the flashed one.
-
-State on 2026-11-16: `debug-log-peaking-fast` and `debug-log-films-12` (id `fe2f543f94c74a91`) were flashed; their
-dictionary is kept as `logs/events-fe2f543f94c74a91.json`. `logs/events.json` (build id `da49b2f5e7e62ca7`) adds the
-event `pk_guard`. `patches/log-peaking-guard.json` puts that id into the flush task, in the builds
-`debug-log-peaking-fast-2` and `debug-log-films-12b`.
+The current build id is the one of `logs/events.json` (`33ca8d15f4f1c877`, carried by `patches/log-menu-2.json`).
+`logs/events-*.json` hold the dictionaries of older flashed builds.
 
 ## How to add an event and a probe
 
 1. **Add the event to `logs/events.json`.** Take the next id in the range of the feature (1 to 255 core,
-   256 peaking, 512 picture mode, 768 level gauge, 1024 interval, 1280 film looks, 1536 shooting; a new
-   feature takes the next multiple of 256). Give `name`, `level`, `spec`, `doc` and at most two `args`. An
+   256 peaking, 512 picture mode, 768 level gauge, 1024 interval, 1280 film looks, 1536 shooting, 1792 card
+   looks; a new feature takes the next multiple of 256). Give `name`, `level`, `spec`, `doc` and at most two
+   `args`. An
    argument has a `name`, a `format` (`hex`, `dec`, `sdec`, `addr`) and, for packed values, `fields` (name,
    shift, bits, and if needed `format` or `enum`).
 2. **Choose the hook site.** It is 5 or more bytes of whole instructions in the pinned build, with no
@@ -196,14 +182,15 @@ event `pk_guard`. `patches/log-peaking-guard.json` puts that id into the flush t
 4. **Generate, build, check:**
 
    ```sh
-   python3 tools/oetool.py unpack build/peaking-colours.BIN /tmp/scratch/pinned
+   python3 tools/oetool.py unpack build/epm2mod-2026.11.19.BIN /tmp/scratch/pinned
    uv run python experiments/2026-11-15-log/scripts/mkspec_log.py /tmp/scratch/pinned /tmp/scratch/asm
    uv run epm2mod make debug-log
    python3 tools/emu/opcheck.py builds/debug-log.json
    python3 tools/emu/hookcheck.py patches/log-core.json patches/log-probes.json
    ```
 
-   Then run the emulator checks of the notes. The generator refuses a site that is not on an instruction
+   `experiments/2026-11-18-log-menu/scripts/mkspec_logmenu.py` (with `--stock-films`) imports `mkspec_log.py`
+   and writes `patches/log-menu-2.json`, the log of the pinned build. Then run the emulator checks of the notes. The generator refuses a site that is not on an instruction
    boundary, a pc-relative instruction other than `call`, and a branch target inside the replaced bytes.
 5. A change of an id, name, level or argument gives a new build id. If the old build was flashed, keep its
    event list first (section "The dictionary, name tables and older builds"). The `doc` texts, `names` and
