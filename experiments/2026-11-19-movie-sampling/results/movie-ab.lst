@@ -1,0 +1,272 @@
+
+ab.elf:     file format elf32-mn10300
+
+
+Disassembly of section .s7e59ee7e:
+
+7e59ee7e <.s7e59ee7e>:
+7e59ee7e:	dc da ff 0f 	jmp	7e69ee58 <T_TAKE>
+7e59ee82:	00 
+7e59ee83:	cb          	nop	
+
+Disassembly of section .s7e5a8a90:
+
+7e5a8a90 <.s7e5a8a90>:
+7e5a8a90:	dc cc 84 2d 	jmp	7e880f5c <T_REQ>
+7e5a8a94:	00 
+
+Disassembly of section .s7e6c438b:
+
+7e6c438b <.s7e6c438b>:
+7e6c438b:	dc 0d cc 1b 	jmp	7e880f98 <T_TAB>
+7e6c438f:	00 
+7e6c4390:	cb          	nop	
+7e6c4391:	cb          	nop	
+7e6c4392:	cb          	nop	
+7e6c4393:	cb          	nop	
+
+Disassembly of section .s7e6cb8b3:
+
+7e6cb8b3 <.s7e6cb8b3>:
+7e6cb8b3:	dc ed 75 52 	jmp	7ebf2ea0 <T_ISC>
+7e6cb8b7:	00 
+7e6cb8b8:	cb          	nop	
+
+Disassembly of section .s7e6cb981:
+
+7e6cb981 <.s7e6cb981>:
+7e6cb981:	dc 09 35 fd 	jmp	7e69ee8a <T_ISD>
+7e6cb985:	ff 
+7e6cb986:	cb          	nop	
+
+Disassembly of section .s7e54a2ce:
+
+7e54a2ce <.s7e54a2ce>:
+7e54a2ce:	dc f1 8b 6a 	jmp	7ebf2ebf <T_IMG1>
+7e54a2d2:	00 
+
+Disassembly of section .s7e54a5e9:
+
+7e54a5e9 <.s7e54a5e9>:
+7e54a5e9:	dc ed 88 6a 	jmp	7ebf2ed6 <T_IMG2>
+7e54a5ed:	00 
+
+Disassembly of section .s7e7290f4:
+
+7e7290f4 <.s7e7290f4>:
+7e7290f4:	dc f9 9d 4c 	jmp	7ebf2eed <T_ABS>
+7e7290f8:	00 
+7e7290f9:	cb          	nop	
+7e7290fa:	cb          	nop	
+7e7290fb:	cb          	nop	
+
+Disassembly of section .a1:
+
+7e69ee0b <SETW>:
+7e69ee0b:	f2 e0       	mov	mdr,d0
+7e69ee0d:	83          	mov	d0,d3
+7e69ee0e:	f8 fe f8    	add	-8,sp
+7e69ee11:	08          	clr	d2
+7e69ee12:	fc cc 61 85 	mov	34145,d0
+7e69ee16:	00 00 
+7e69ee18:	04          	clr	d1
+7e69ee19:	90 00       	mov	0,a0
+7e69ee1b:	dd 5a 8e db 	call	7e457c75 <s_7e457c75>,[d2,d3],12
+7e69ee1f:	ff c0 0c 
+7e69ee22:	1c          	exthu	d0
+7e69ee23:	a0 06       	cmp	6,d0
+7e69ee25:	c9 1a       	bne	7e69ee3f <.L1^B1>
+7e69ee27:	fc cc 51 81 	mov	33105,d0
+7e69ee2b:	00 00 
+7e69ee2d:	85 07       	mov	7,d1
+7e69ee2f:	90 00       	mov	0,a0
+7e69ee31:	dd 44 8e db 	call	7e457c75 <s_7e457c75>,[d2,d3],12
+7e69ee35:	ff c0 0c 
+7e69ee38:	1c          	exthu	d0
+7e69ee39:	a0 01       	cmp	1,d0
+7e69ee3b:	c9 04       	bne	7e69ee3f <.L1^B1>
+7e69ee3d:	8a 01       	mov	1,d2
+
+7e69ee3f <.L1^B1>:
+7e69ee3f:	fc 8a 1c d3 	movbu	d2,(be4fd31c <W+0x0>)
+7e69ee43:	4f be 
+7e69ee45:	89          	mov	d2,d1
+7e69ee46:	f1 ec       	mov	d3,a0
+7e69ee48:	2c 02 08    	mov	2050,d0
+7e69ee4b:	dd e6 a6 e2 	call	7e4c9531 <log_put>,[],0
+7e69ee4f:	ff 00 00 
+7e69ee52:	f8 fe 08    	add	8,sp
+7e69ee55:	df 00 00    	ret	[],0
+
+7e69ee58 <T_TAKE>:
+7e69ee58:	cf c8       	movm	[d2,d3,other],(sp)
+7e69ee5a:	cd b1 ff 00 	call	7e69ee0b <SETW>,[],0
+7e69ee5e:	00 
+7e69ee5f:	ce c8       	movm	(sp),[d2,d3,other]
+7e69ee61:	fc a8 1c d3 	movbu	(be4fd31c <W+0x0>),d0
+7e69ee65:	4f be 
+7e69ee67:	a0 00       	cmp	0,d0
+7e69ee69:	2c 7e 06    	mov	1662,d0
+7e69ee6c:	c8 05       	beq	7e69ee71 <.L1^B2>
+7e69ee6e:	2c 92 07    	mov	1938,d0
+
+7e69ee71 <.L1^B2>:
+7e69ee71:	f8 70 06    	movhu	d0,(6,a0)
+7e69ee74:	2c 20 05    	mov	1312,d0
+7e69ee77:	f8 70 08    	movhu	d0,(8,a0)
+7e69ee7a:	2c 6e 06    	mov	1646,d0
+7e69ee7d:	c8 05       	beq	7e69ee82 <.L2^B1>
+7e69ee7f:	2c 80 07    	mov	1920,d0
+
+7e69ee82 <.L2^B1>:
+7e69ee82:	f8 70 0a    	movhu	d0,(10,a0)
+7e69ee85:	dc 0b 00 f0 	jmp	7e59ee90 <s_7e59ee90>
+7e69ee89:	ff 
+
+7e69ee8a <T_ISD>:
+7e69ee8a:	fc aa 1c d3 	movbu	(be4fd31c <W+0x0>),d2
+7e69ee8e:	4f be 
+7e69ee90:	aa 00       	cmp	0,d2
+7e69ee92:	fc ce 66 66 	mov	91750,d2
+7e69ee96:	01 00 
+7e69ee98:	c8 08       	beq	7e69eea0 <.L1^B3>
+7e69ee9a:	fc ce 33 33 	mov	78643,d2
+7e69ee9e:	01 00 
+
+7e69eea0 <.L1^B3>:
+7e69eea0:	dc e7 ca 02 	jmp	7e6cb987 <s_7e6cb987>
+7e69eea4:	00 
+
+Disassembly of section .a2:
+
+7e880f5c <T_REQ>:
+7e880f5c:	80 01       	mov	1,d0
+7e880f5e:	f8 73 26    	movhu	d0,(38,a3)
+7e880f61:	58 10       	mov	(16,sp),d0
+7e880f63:	fa c8 05 02 	cmp	517,d0
+7e880f67:	c9 2c       	bne	7e880f93 <.L9^B1>
+7e880f69:	cf c8       	movm	[d2,d3,other],(sp)
+7e880f6b:	dd a0 de e1 	call	7e69ee0b <SETW>,[],0
+7e880f6f:	ff 00 00 
+7e880f72:	ce c8       	movm	(sp),[d2,d3,other]
+7e880f74:	fc a8 1c d3 	movbu	(be4fd31c <W+0x0>),d0
+7e880f78:	4f be 
+7e880f7a:	a0 00       	cmp	0,d0
+7e880f7c:	c8 17       	beq	7e880f93 <.L9^B1>
+7e880f7e:	2c a8 07    	mov	1960,d0
+7e880f81:	f8 73 04    	movhu	d0,(4,a3)
+7e880f84:	2c 99 05    	mov	1433,d0
+7e880f87:	f8 73 30    	movhu	d0,(48,a3)
+7e880f8a:	f8 73 34    	movhu	d0,(52,a3)
+7e880f8d:	2c 33 13    	mov	4915,d0
+7e880f90:	f8 73 36    	movhu	d0,(54,a3)
+
+7e880f93 <.L9^B1>:
+7e880f93:	dc 02 7b d2 	jmp	7e5a8a95 <s_7e5a8a95>
+7e880f97:	ff 
+
+7e880f98 <T_TAB>:
+7e880f98:	cf c8       	movm	[d2,d3,other],(sp)
+7e880f9a:	dd 71 de e1 	call	7e69ee0b <SETW>,[],0
+7e880f9e:	ff 00 00 
+7e880fa1:	fc a8 1c d3 	movbu	(be4fd31c <W+0x0>),d0
+7e880fa5:	4f be 
+7e880fa7:	a0 00       	cmp	0,d0
+7e880fa9:	c8 29       	beq	7e880fd2 <.L9^B2>
+7e880fab:	fc dc 82 08 	mov	1616578690,a0
+7e880faf:	5b 60 
+7e880fb1:	2c a8 07    	mov	1960,d0
+7e880fb4:	f0 70       	movhu	d0,(a0)
+7e880fb6:	2c 92 07    	mov	1938,d0
+7e880fb9:	f8 70 02    	movhu	d0,(2,a0)
+7e880fbc:	2c 80 07    	mov	1920,d0
+7e880fbf:	f8 70 06    	movhu	d0,(6,a0)
+7e880fc2:	f8 60 0a    	movhu	(10,a0),d0
+7e880fc5:	fa c0 8a 00 	add	138,d0
+7e880fc9:	f8 70 0a    	movhu	d0,(10,a0)
+7e880fcc:	2c 72 06    	mov	1650,d0
+7e880fcf:	f8 70 12    	movhu	d0,(18,a0)
+
+7e880fd2 <.L9^B2>:
+7e880fd2:	ce c8       	movm	(sp),[d2,d3,other]
+7e880fd4:	2d e0 03    	mov	992,d1
+7e880fd7:	fc 87 a0 08 	movhu	d1,(605b08a0 <WAKE+0x19b3b7>)
+7e880fdb:	5b 60 
+7e880fdd:	dc b7 33 e4 	jmp	7e6c4394 <s_7e6c4394>
+7e880fe1:	ff 
+
+Disassembly of section .a3:
+
+7ebf2e9f <_stack+0x7eb72e9f>:
+	...
+
+7ebf2ea0 <T_ISC>:
+7ebf2ea0:	cf 08       	movm	[other],(sp)
+7ebf2ea2:	fc a9 1c d3 	movbu	(be4fd31c <W+0x0>),d1
+7ebf2ea6:	4f be 
+7ebf2ea8:	a5 00       	cmp	0,d1
+7ebf2eaa:	2c 86 05    	mov	1414,d0
+7ebf2ead:	c8 05       	beq	7ebf2eb2 <.L1^B4>
+7ebf2eaf:	2c 72 06    	mov	1650,d0
+
+7ebf2eb2 <.L1^B4>:
+7ebf2eb2:	f8 72 74    	movhu	d0,(116,a2)
+7ebf2eb5:	ce 08       	movm	(sp),[other]
+7ebf2eb7:	f8 62 74    	movhu	(116,a2),d0
+7ebf2eba:	dc ff 89 ad 	jmp	7e6cb8b9 <s_7e6cb8b9>
+7ebf2ebe:	ff 
+
+7ebf2ebf <T_IMG1>:
+7ebf2ebf:	fc a8 1c d3 	movbu	(be4fd31c <W+0x0>),d0
+7ebf2ec3:	4f be 
+7ebf2ec5:	a0 00       	cmp	0,d0
+7ebf2ec7:	2c 6e 06    	mov	1646,d0
+7ebf2eca:	c8 05       	beq	7ebf2ecf <.L1^B5>
+7ebf2ecc:	2c 80 07    	mov	1920,d0
+
+7ebf2ecf <.L1^B5>:
+7ebf2ecf:	f2 71       	divu	d0,d1
+7ebf2ed1:	dc 02 74 95 	jmp	7e54a2d3 <s_7e54a2d3>
+7ebf2ed5:	ff 
+
+7ebf2ed6 <T_IMG2>:
+7ebf2ed6:	fc a8 1c d3 	movbu	(be4fd31c <W+0x0>),d0
+7ebf2eda:	4f be 
+7ebf2edc:	a0 00       	cmp	0,d0
+7ebf2ede:	2c 6e 06    	mov	1646,d0
+7ebf2ee1:	c8 05       	beq	7ebf2ee6 <.L1^B6>
+7ebf2ee3:	2c 80 07    	mov	1920,d0
+
+7ebf2ee6 <.L1^B6>:
+7ebf2ee6:	f2 72       	divu	d0,d2
+7ebf2ee8:	dc 06 77 95 	jmp	7e54a5ee <s_7e54a5ee>
+7ebf2eec:	ff 
+
+7ebf2eed <T_ABS>:
+7ebf2eed:	f1 e8       	mov	d2,a0
+7ebf2eef:	fc d0 8c b3 	add	2122691468,a0
+7ebf2ef3:	85 7e 
+7ebf2ef5:	aa 50       	cmp	80,d2
+7ebf2ef7:	c9 12       	bne	7ebf2f09 <.L1^B7>
+7ebf2ef9:	fc aa 1c d3 	movbu	(be4fd31c <W+0x0>),d2
+7ebf2efd:	4f be 
+7ebf2eff:	aa 00       	cmp	0,d2
+7ebf2f01:	c8 08       	beq	7ebf2f09 <.L1^B7>
+7ebf2f03:	fc dc 10 2f 	mov	2126458640,a0
+7ebf2f07:	bf 7e 
+
+7ebf2f09 <.L1^B7>:
+7ebf2f09:	dc f3 61 b3 	jmp	7e7290fc <s_7e7290fc>
+7ebf2f0d:	ff 
+	...
+
+7ebf2f10 <WIDEBAYER>:
+7ebf2f10:	a8          	cmp	d2,d0
+7ebf2f11:	07 92 07    	movhu	d1,(792 <___ctors+0x792>)
+7ebf2f14:	20 05       	add	5,a0
+7ebf2f16:	00          	clr	d0
+7ebf2f17:	00          	clr	d0
+7ebf2f18:	80 07       	mov	7,d0
+7ebf2f1a:	10          	extb	d0
+7ebf2f1b:	05 c9 03    	mov	d1,(3c9 <___ctors+0x3c9>)
+7ebf2f1e:	90 02       	mov	2,a0

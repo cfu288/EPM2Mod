@@ -1,0 +1,28 @@
+{
+ "what": "DEBUG build, not for normal use: debug-log-movie-bitrate (the pinned build with the movie timing probe and higher movie bit rates) with an A/B switch of the 1080 movie frame by record mode: Full HD Fine records the 1920-wide frame (1960-px lines at a 1.2 resize), Full HD Normal and every other record mode the stock frame (1680-px lines at 1.4). The Debug Log records each choice (event mv_set)",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
+ "specs": [
+  "data/specs/interval-timelapse-v2.json",
+  "data/specs/interval-frames-240.json",
+  "data/specs/level-gauge-lvinfo-row.json",
+  "data/specs/level-adjust-row.json",
+  "data/specs/peaking-direct-4.json",
+  "data/specs/peaking-gain-2x.json",
+  "data/specs/custom-menu-rows-3.json",
+  "data/specs/peaking-colours.json",
+  "data/specs/peaking-fast.json",
+  "data/specs/peaking-save-guard.json",
+  "data/specs/looks-menu-4.json",
+  "data/specs/stock-films-structure.json",
+  "data/specs/card-looks-5.json",
+  "data/specs/log-menu-2.json",
+  "data/specs/lss-menu.json",
+  "data/specs/lss-core.json",
+  "data/specs/build-label.json",
+  "data/specs/log-movie-time.json",
+  "data/specs/movie-bitrate-32.json",
+  "data/specs/movie-ab.json"
+ ],
+ "label": "2026.11.19",
+ "first_code": true
+}

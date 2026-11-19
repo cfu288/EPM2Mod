@@ -281,6 +281,9 @@
   {"id": 2049, "name": "mv_enc", "level": "debug", "spec": "log-movie-time", "feature": "movie",
    "doc": "One record per packet that the task MOV_ENCODE (CPU 1, 0x7E6D554A) handles, written when its handler returns. us = the microseconds in the handler. kind 0 = packet command 256 (handler 0x7E6D5641), 1 = any other command (handler 0x7E6D564D); what the commands are is not known. art_us = the microseconds that the task ART_SUB (CPU 1) spent in its handler 0x7E72CD3E since the last mv_enc record: art-filter work on CPU 1. In the first record of a session art_us is not valid (no start value). Only in the build debug-log-movie-time",
    "args": [{"name": "enc", "format": "hex", "fields": [{"name": "us", "shift": 0, "bits": 31, "format": "dec"}, {"name": "kind", "shift": 31, "bits": 1}]},
-            {"name": "art_us", "format": "dec"}]}
+            {"name": "art_us", "format": "dec"}]},
+  {"id": 2050, "name": "mv_set", "level": "info", "spec": "movie-ab", "feature": "movie",
+   "doc": "The movie frame was chosen for a live-view or record set-up (build debug-log-movie-ab). wide = 1: the 1920-wide frame (record mode Full HD Fine), 0: the stock frame. site: where the choice was made (the return address of the call in the routine of the hook): the TAKE request builder's HSHR case, the movie mode table of Through Start, or the writer request for mode code 517 (the listing experiments/2026-11-19-movie-sampling/results/movie-ab.lst gives the addresses). One set-up gives one record per site",
+   "args": [{"name": "wide", "format": "dec"}, {"name": "site", "format": "addr"}]}
  ]
 }

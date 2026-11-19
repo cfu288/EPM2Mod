@@ -252,6 +252,7 @@ The camera-log entry before the flash: `docs/camera-log/2026-11-19-debug-log-mov
 - `scripts/movtime_report.py`: the per-clip report.
 - `scripts/mkspec_wide.py`, `scripts/scen_wide.py`: the 1920-wide frame specs (reader and writer) and their checks
   (sections 12, 14); `scripts/camregs.mjs`: the full-boot register trace of section 14.1.
+- `scripts/mkspec_ab.py`, `scripts/scen_ab.py`: the A/B switch by record mode and its check (section 16).
 - `scripts/geom_scan.py`, `scripts/geom_otherbody.py`, `scripts/geom_calc_r.py`: the desk-check scripts of sections 2
   and 3.
 - `results/`: the check outputs and the listing.
@@ -592,3 +593,102 @@ writer and reader agree (record 517 of 0x7E793184 is the writer's source); the d
 
 **Open:** a fair detail comparison. It needs the same subject from the same place on a support, with this build and
 with the 1646 build.
+
+## 16. A/B switch by record mode: build `debug-log-movie-ab` (2026-11-19, not flashed)
+
+Asked by the owner after §15: one build that records both frames, so the same subject can be filmed from the same place
+with each. The build is `debug-log-movie-bitrate` plus `data/specs/movie-ab.json` (written by `scripts/mkspec_ab.py`;
+listing `results/movie-ab.lst`). It does not contain `movie-wide-frame.json` or `movie-wide-writer.json`. Their values
+are chosen at run time:
+
+- **Full HD Fine** (setting 34145 = 6 and setting 33105 index 7 = 1): every value of the two wide specs.
+- **Full HD Normal and every other record mode** (720 included): the stock values.
+
+### 16.1 Design
+
+- **The choice.** SETW reads the two settings with the firmware's getter 0x7E457C75. It stores W (1 = wide) in one
+  byte, 0x7E4FD31C (used through the uncached alias, so CPU 1 reads the same value). It also writes `mv_set`
+  (wide, site) to the Debug Log.
+- **Where the choice is made.** SETW runs at the three places that set the frame up, each in the task that reads the
+  value:
+  - T_TAKE: the TAKE request builder's HSHR case (TAKE task). It writes +6, +8, +10 itself: 1938/1312/1920 or
+    1662/1312/1646.
+  - T_REQ: the writer request for mode code 517, after 0x7E5A897F has copied record 7 (TAKE task). With W it writes the
+    line 1960, the phases 1433 and the step 4915 over the copied stock values.
+  - T_TAB: the movie mode table, after Through Start has built the stock HSHR record (MOV_TASK). With W it writes 1960,
+    1938, 1920, the centre +138 and the IS crop 1650 over it.
+- **The readers that run later** read W and pick one of two constants:
+  - Movie IS crop (1414 / 1650) and IS shift divisor (91750 / 78643);
+  - the two IMG divisors (1646 / 1920);
+  - `art_get_bayer_size` entry 5 (the stock table entry, or a copy with the wide values).
+- **No code is changed at run time.** The stock tables in the image stay as they are. Only RAM that the firmware itself
+  fills (the request, the movie mode table) is written after the firmware has filled it.
+- **The AE set** stays stock: its sensor window is 2326 px with either set (§12.1).
+- **Placement.**
+  - Segment 1: SETW, T_TAKE and T_ISD at 0x7E69EE0B (154 B); T_REQ and T_TAB at 0x7E880F5C (135 B).
+  - Segment 2: T_ISC, T_IMG1, T_IMG2, T_ABS and the wide art record at 0x7EBF2E9F (125 B).
+  - The four segment-2 hooks run only in movie frames with Movie IS, and in art jobs. Rows with the reasons are in
+    `emulator/hookcheck-allow.tsv`, as for stock-films-structure.
+- **The Debug Log.** The new event makes a new dictionary id, 67901828e4565aeb; the old one is kept as
+  `data/logdict/events-34775ddcf8f5f0af.json`. The id change edits bytes that log-movie-time had already changed in
+  log-menu-2's flush task. `tools/freespace.py` now accepts such an edit of an edit (`_stacked`). Before that, the
+  draft spec made the check of every other build fail.
+
+### 16.2 Checks (exit status 0 = pass)
+
+| Check | Result |
+|---|---|
+| `uv run epm2mod make debug-log-movie-ab` | sha256 **74ba7a530f49a904f3196102354b49114e87dc1bf09cec043c84e844502d3435** |
+| `tools/freespace.py check --first-code` | PASS (`results/ab/freespace.txt`); the same check of the pinned build, `debug-log-movie-bitrate` and `debug-log-movie-wide-2` also passes |
+| `emulator/opcheck.py` | PASS, 20 specs, 541 byte ops |
+| `emulator/hookcheck.py` (with the allow list) | PASS, 293 transfers, 0 FAIL; the four segment-1 → segment-2 hooks of this spec are allowed |
+| `emulator/boot-test`, `emulator/update-path-test` | PASS, PASS (the update path loads no segment 2 and does not fault) |
+| `scripts/scen_ab.py` | PASS (`results/ab/scen-ab.txt`); see below |
+| Test suite | 307 tests OK |
+
+What `scripts/scen_ab.py` runs, on BASE (`debug-log-movie-bitrate`) and AB, through the firmware's own settings
+getter:
+
+- Each step of one set-up: the writer request for 517, the TAKE HSHR case, Through Start in the live-view rig with
+  three HSHR frames, then the readers.
+- **AB Full HD Fine:** every value of the wide specs.
+- **AB Full HD Normal and AB HD Fine:** exactly the values of BASE, and the same registers at the end of every piece
+  and call.
+- **The log:** three `mv_set` records per set-up, with wide = 1 for Fine and 0 for the others.
+
+### 16.3 What the emulator could not show
+
+- Live view in the full-boot emulator requests mode 513 (HS) and waits for sensor events (§14.1). So it cannot show
+  which set-up steps run again when the record mode changes in the live control. On the camera, `mv_set` shows it: each
+  set-up writes one record per site with the choice.
+- U: whether a record-mode change restarts the set-up. The test turns the camera off and on after each change, which
+  makes a fresh set-up.
+
+### 16.4 How the owner switches (menu names from the manual, pp. 45, 52)
+
+1. Movie mode (the n icon on the top menu), Picture Mode Natural, Image Stabilizer OFF.
+2. Press OK for the live control.
+3. On the record mode item, choose **Full HD Fine** (the wide frame) or **Full HD Normal** (the stock frame), then
+   press OK.
+4. Turn the camera off and on.
+
+The bit rate also differs between the two modes: Fine 32 Mb/s, Normal 24 Mb/s in this build (§10). The encoder stays
+near QP 21–22 in both (§11), so detail differences come from the frame.
+
+### 16.5 Acceptance criteria
+
+1. In Full HD Fine, clips are as in §15: clean, 30 fps, and `mv_set` wide = 1 at each set-up.
+2. In Full HD Normal, clips are as in §9: the stock frame, and `mv_set` wide = 0.
+3. The same chart or text, from the same place on a support, filmed once in each mode. Compare frame by frame for
+   horizontal detail.
+4. 720p and photos as before. In this build 720 uses the stock frame.
+
+### 16.6 What a failure looks like
+
+| What the camera shows | Meaning (I) |
+|---|---|
+| §13's magenta bands in one mode | writer and reader were set up with different choices: one set-up step did not run again after the mode change (the `mv_set` records then differ between sites) |
+| Fine looks like Normal (soft, `total_us` about 22 ms), `mv_set` 0 | SETW reads another setting than the menu changes (the Fine index of 33105) |
+| No `mv_set` record at all | the set-up does not pass the hooked sites; the pictures follow the stock values |
+| A freeze or restart at the start of live view or of a clip | a hook routine (it calls the settings getter from the TAKE task and from MOV_TASK) |
+| Fine with Movie IS or an art filter gives a wrong picture | the segment-2 readers; untested, outside the acceptance test |

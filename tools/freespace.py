@@ -837,9 +837,23 @@ class Space:
                 continue
             met = True
             a0 = BASE + op.off
-            if q.expect[x - qlo:y - qlo] != op.new[x - a0:y - a0]:
+            want, got = q.expect[x - qlo:y - qlo], op.new[x - a0:y - a0]
+            if want != got and not self._stacked(path, op.spec.path, x, y, got, want):
                 return False
         return met
+
+    def _stacked(self, top, bottom, x, y, below, above):
+        """True if a third current spec edits x..y in place from `below` (the output of `bottom`) to `above` (what `top`
+        expects there): `top` is an in-place edit of an in-place edit (for example a later log spec that changes the
+        build id that an earlier log spec wrote into the flush task)."""
+        for mid in self.specs:
+            if mid.path in (top, bottom) or mid.history or mid.path in self.superseded:
+                continue
+            for m in mid.ops:
+                mlo, mhi = BASE + m.off, BASE + m.off + len(m.new)
+                if mlo <= x and y <= mhi and m.expect[x - mlo:y - mlo] == below and m.new[x - mlo:y - mlo] == above:
+                    return True
+        return False
 
     # ---- code evidence
     def code_evidence(self, a):

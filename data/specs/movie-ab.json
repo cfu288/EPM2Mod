@@ -1,0 +1,129 @@
+{
+ "name": "movie-ab",
+ "description": "1080 movie frame by record mode: Full HD Fine (setting 34145 = 6 and 33105[7] = 1) uses the 1920-wide Bayer frame of movie-wide-frame.json and movie-wide-writer.json (written lines of 1960 px at a 1.2 resize, 1938 x 1296, 1920 effective); every other record mode, 720 included, keeps the stock frame. The choice is made where the frame is set up (the TAKE request builder's HSHR case, the writer request for mode code 517, the movie mode table of Through Start) and stored in one RAM byte that the later readers (Movie IS crop and shift, the IMG divisors, art_get_bayer_size) read. Event mv_set records each choice. Eight hooks in stock bytes; the set-up routines and the IS shift in segment 1; the IS crop, the IMG divisors and art_get_bayer_size in segment 2 (they run only in movie frames with Movie IS and in art jobs; emulator/hookcheck-allow.tsv). Needs data/builds/debug-log-movie-bitrate.json's specs before it. It puts the build id 67901828e4565aeb of data/logdict/events.json into the block header. DEBUG builds only. See experiments/2026-11-19-movie-sampling/NOTES.md section 16.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "candidate: emulator-checked, not flashed",
+ "_delta_on": "data/builds/debug-log-movie-bitrate.json",
+ "_build_id": "67901828e4565aeb",
+ "_ram": "1 byte at 0x7E4FD31C (uncached 0xBE4FD31C), byte 28 of log-movie-time's 32 bytes",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x27DDEB",
+   "expect": "7d7e18dd2177e6ffa028f8620afcdca0fc7d7e18dd1077e6ffa028f86204fcdcaffc7d7e18ddff76e6ffa028f86206fcdcbefc7d7e18ddee76e6ffa028f86202fcdccdfc7d7e18dddd76e6ffa028f0621618fcdcdcfc7d7eddcc76e6ffa028fa42c800fcdcebfc7d7eddbb76e6ffa02888fcdcfafc7d7eddad76e6ffa028fa42c900fcdc09fd7d7edd9c76e6ffa028fa62ca00fcdc18fd7d7e18",
+   "new": "f2e083f8fef808fccc61850000049000dd5a8edbffc00c1ca006c91afccc5181000085079000dd448edbffc00c1ca001c9048a01fc8a1cd34fbe89f1ec2c0208dde6a6e2ff0000f8fe08df0000cfc8cdb1ff0000cec8fca81cd34fbea0002c7e06c8052c9207f870062c2005f870082c6e06c8052c8007f8700adc0b00f0fffcaa1cd34fbeaa00fcce66660100c808fcce33330100dce7ca0200",
+   "_addr": "0x7E69EE0B",
+   "_note": "new code, segment 1, the free end of lss-core's area after log-movie-time: T_TAKE, T_ISD, SETW (154 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x45FF3C",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "8001f873265810fac80502c92ccfc8dda0dee1ff0000cec8fca81cd34fbea000c8172ca807f873042c9905f87330f873342c3313f87336dc027bd2ffcfc8dd71dee1ff0000fca81cd34fbea000c829fcdc82085b602ca807f0702c9207f870022c8007f87006f8600afac08a00f8700a2c7206f87012cec82de003fc87a0085b60dcb733e4ffcb",
+   "_addr": "0x7E880F5C",
+   "_note": "new code, segment 1, the free run before peaking-direct-3's bytes: T_REQ, T_TAB (135 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1E7F",
+   "expect": "4974656d4e756d62657200693035006765744d656e754974656d006930360067657444656661756c744974656d006930370067657453656c6563744974656d4e756d626572006930380067657453656c6563744974656d00693039006765744265666f7265416374696f6e0069313000676574537472696e670069313100676574",
+   "new": "00cf08fca91cd34fbea5002c8605c8052c7206f87274ce08f86274dcff89adfffca81cd34fbea0002c6e06c8052c8007f271dc027495fffca81cd34fbea0002c6e06c8052c8007f272dc067795fff1e8fcd08cb3857eaa50c912fcaa1cd34fbeaa00c808fcdc102fbf7edcf361b3ff0000a80792072005000080071005c9039002",
+   "_addr": "0x7EBF2E9F",
+   "_note": "new code, segment 2, a free run of the listed area (readers that run only in movie frames with Movie IS and in art jobs): T_ISC, T_IMG1, T_IMG2, T_ABS (129 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x17DE5E",
+   "expect": "2c7e06f87006",
+   "new": "dcdaff0f00cb",
+   "_addr": "0x7E59EE7E",
+   "_note": "hook: jmp T_TAKE + nop. TAKE request builder 0x7E59EE0A, HSHR case: `mov 1662,d0` / `movhu d0,(6,a0)`; the routine sets +6, +8, +10"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x187A70",
+   "expect": "8001f87326",
+   "new": "dccc842d00",
+   "_addr": "0x7E5A8A90",
+   "_note": "hook: jmp T_REQ. writer request builder 0x7E5A897F, after the resize block: `mov 1,d0` / `movhu d0,(38,a3)`"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2A336B",
+   "expect": "2de003fc87a0085b60",
+   "new": "dc0dcc1b00cbcbcbcb",
+   "_addr": "0x7E6C438B",
+   "_note": "hook: jmp T_TAB + nop + nop + nop + nop. movie mode table 0x7E6C410A, after the HSHR record: `mov 992,d1` / `movhu d1,(0x605B08A0)`"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2AA893",
+   "expect": "2c8605f87274",
+   "new": "dced755200cb",
+   "_addr": "0x7E6CB8B3",
+   "_note": "hook: jmp T_ISC + nop. Movie IS crop 0x7E6CB860, HSHR: `mov 1414,d0` / `movhu d0,(116,a2)`"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2AA961",
+   "expect": "fcce66660100",
+   "new": "dc0935fdffcb",
+   "_addr": "0x7E6CB981",
+   "_note": "hook: jmp T_ISD + nop. Movie IS shift 0x7E6CB90B, HSHR: `mov 91750,d2`"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x1292AE",
+   "expect": "2c6e06f271",
+   "new": "dcf18b6a00",
+   "_addr": "0x7E54A2CE",
+   "_note": "hook: jmp T_IMG1. IMG resize builder 0x7E54A0D0, IMG mode 5 (Dramatic Tone branch): `mov 1646,d0` / `divu d0,d1`"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x1295C9",
+   "expect": "2c6e06f272",
+   "new": "dced886a00",
+   "_addr": "0x7E54A5E9",
+   "_note": "hook: jmp T_IMG2. IMG resize builder 0x7E54A468, IMG mode 5: `mov 1646,d0` / `divu d0,d2`"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x3080D4",
+   "expect": "f1e8fcd08cb3857e",
+   "new": "dcf99d4c00cbcbcb",
+   "_addr": "0x7E7290F4",
+   "_note": "hook: jmp T_ABS + nop + nop + nop. art_get_bayer_size 0x7E7290B5, its end: `mov d2,a0` / `add 0x7E85B38C,a0`"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1CEA",
+   "expect": "34775ddc",
+   "new": "67901828",
+   "_addr": "0x7EBF2D0A",
+   "_note": "flush task, block header: build id bytes 0-3 34775ddc -> 67901828 (data/logdict/events.json)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1CF3",
+   "expect": "f8f5f0af",
+   "new": "e4565aeb",
+   "_addr": "0x7EBF2D13",
+   "_note": "flush task, block header: build id bytes 4-7 f8f5f0af -> e4565aeb (data/logdict/events.json)"
+  }
+ ]
+}

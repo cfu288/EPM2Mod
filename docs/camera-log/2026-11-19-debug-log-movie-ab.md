@@ -1,0 +1,5 @@
+# 2026-11-19: builds/debug-log-movie-ab.json
+
+| Date (UTC) | Build | sha256 | Result |
+|---|---|---|---|
+| 2026-11-19 | `builds/debug-log-movie-ab.json`: DEBUG build, `debug-log-movie-bitrate` + `specs/movie-ab.json` (A/B switch by record mode: Full HD Fine the 1920-wide frame of `debug-log-movie-wide-2`, every other record mode the stock frame; event mv_set). FIRST CODE line for 0x7E880F5C-0x7E880FE3 (segment 1) and 0x7EBF2E9F-0x7EBF2F1C (segment 2); four segment-1 hooks jump to segment 2 (emulator/hookcheck-allow.tsv) | `74ba7a530f49a904f3196102354b49114e87dc1bf09cec043c84e844502d3435` | **Candidate, not flashed.** Test and criteria: experiments/2026-11-19-movie-sampling/NOTES.md section 16. |
