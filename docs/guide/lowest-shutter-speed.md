@@ -1,7 +1,6 @@
 # Lowest S/S Setting
 
-In P and A with ISO Auto, choose the shutter speed at which the camera starts to raise ISO. It works as on the
-Olympus PEN-F.
+In P and A with ISO Auto, choose the shutter speed at which the camera starts to raise ISO.
 
 ## Setup
 
