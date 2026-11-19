@@ -274,7 +274,7 @@ COMMANDS: dict[str, Command] = {
             "make",
             DEVELOPERS,
             "Make a build into the output folder.",
-            "NAME.BIN and card/ (DCOLYMP and the film file) in the output folder",
+            "NAME.BIN, and DCOLYMP with the film file as on the card, in the output folder",
             True,
             _DOWNLOAD,
             ("epm2mod make", "epm2mod make debug-log -o ./"),

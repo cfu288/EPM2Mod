@@ -265,7 +265,7 @@ Make a build into the output folder.
 epm2mod make [-h] [-o PATH] [--dry-run] [--json] [BUILD]
 ```
 
-- Output: NAME.BIN and card/ (DCOLYMP and the film file) in the output folder.
+- Output: NAME.BIN, and DCOLYMP with the film file as on the card, in the output folder.
 - Needs: a checkout. Network: when Olympus's firmware is not downloaded yet.
 
 | Argument | What | Default |
