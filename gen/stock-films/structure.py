@@ -88,12 +88,26 @@ HUE_SITE, HUE_BYTES = 0x7E546160, bytes.fromhex("a002c80b8501")   # Cross Proces
 HUE_APPLY, HUE_SKIP = 0x7E54616D, 0x7E546215
 
 
+_BLOCK_FILE = {}
+
+
+def _block_file(blk):
+    """A file with the bytes of block 0, for objdump: written once per run from the block in memory."""
+    if "path" not in _BLOCK_FILE:
+        import tempfile
+        f = tempfile.NamedTemporaryFile(suffix=".block0.bin", delete=False)
+        f.write(bytes(blk))
+        f.close()
+        _BLOCK_FILE["path"] = f.name
+    return _BLOCK_FILE["path"]
+
+
 def site_insns(blk, a, n):
     """Whole instructions from a, at least n bytes: [(address, bytes, mnemonic, operands)]."""
     out = subprocess.run([BIN + "/mn10300-elf-objdump", "-D", "-b", "binary", "-m", "mn10300",
                           "--adjust-vma=%#x" % BASE, "--start-address=%#x" % a, "--stop-address=%#x" % (a + n + 8),
-                          os.path.join(ROOT, "build", "blocks", "OLY_E_101_1600_0000_0000.BIN.block0.bin")],
-                         capture_output=True, text=True).stdout
+                          _block_file(blk)],
+                         capture_output=True, text=True, check=True).stdout
     rows = []
     for l in out.splitlines():
         m = re.match(r"^\s*([0-9a-f]{8}):\t((?:[0-9a-f]{2} )+)\s*(?:\t(\S+)\s*(.*))?$", l)

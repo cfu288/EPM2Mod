@@ -298,6 +298,16 @@ def cut(text, start, end):
     return text[:i] + text[j:]
 
 
+def stock_block_file():
+    """A file with block 0 of Olympus's firmware, for objdump (a temporary file made from the stock firmware)."""
+    import tempfile
+    stock = os.path.join(ROOT, "firmware", "stock", "E-PM2", "OLY_E_101_1600_0000_0000.BIN")
+    f = tempfile.NamedTemporaryFile(suffix=".block0.bin", delete=False)
+    f.write(bytes(parse(open(stock, "rb").read()).blocks[0].payload))
+    f.close()
+    return f.name
+
+
 def main():
     work = sys.argv[1]
     listing = sys.argv[2] if len(sys.argv) > 2 else None
@@ -405,8 +415,7 @@ def main():
             "lang_neg": (-m3.LANG) & 0xFFFFFFFF, "lang_span": m3.LANG_SPAN, "label_off": 4 * m3.T_LABEL,
             "off_off": 4 * m3.T_OFF, "status_off": 4 * m3.T_STATUS, "ram": m3.RAM, "rw0": mk.REFRESH_WORDS[0],
             "rw1": mk.REFRESH_WORDS[1], "rb0": mk.REFRESH_BYTES[0], "rb1": mk.REFRESH_BYTES[1],
-            "displaced": mk.displaced(os.path.join(ROOT, "build", "blocks",
-                                                   "OLY_E_101_1600_0000_0000.BIN.block0.bin"), hook[0], hook[1]),
+            "displaced": mk.displaced(stock_block_file(), hook[0], hook[1]),
             "back": hook[0] + hook[1]}
     asm = head % subs + tail % subs + NEW_ASM
     RUNS[".x2"] = RUNS[".ap"]
