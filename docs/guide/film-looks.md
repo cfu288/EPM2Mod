@@ -1,16 +1,24 @@
 # Film Simulations
 
-The camera comes with the Olympus art filters. Load Looks puts the film simulations in their place. They work for
-photos and live view.
+The camera comes with the Olympus art filters. A film file on the SD card puts a film simulation in each ART entry it
+lists. The camera keeps them, with their names, after power-off and without the card. They work for photos and live
+view.
 
 ## Usage
 
-Install with the installer, which puts the film simulations on the SD card, or on the command line with `--film` ([install](../../README.md#using-the-command-line)). Then MENU → SETUP → Custom Menu → J → **Load Looks** →
-**Load** → OK ([more](card-looks.md)).
+1. Put the film file on the card with the installer, or on the command line with `--film`
+   ([install](../../README.md#using-the-command-line)). To change only the film simulations later:
+   `uv run epm2mod films set --card /path/to/card --film ART2=velvia`.
+2. MENU → SETUP → Custom Menu → J → **Load Looks** → **Load** → OK. The row reads Loading, then **Loaded**.
 
-In P, A, S or M mode, press **OK**, select **Picture Mode**, and scroll right past Custom. The film simulations are also in the **ART** mode list.
+   <img src="../images/ui/load-looks-list.png" width="320" alt="Load Looks with Off and Load">
+   <img src="../images/ui/load-looks-loaded.png" width="320" alt="Load Looks reads Loaded">
+3. In P, A, S or M mode, press **OK**, select **Picture Mode**, and scroll right past Custom. The film simulations
+   are also in the **ART** mode list.
 
-<img src="../images/ui/quick-menu-portra.png" width="320" alt="The quick menu with Picture Mode on Portra 400">
+   <img src="../images/ui/quick-menu-portra.png" width="320" alt="The quick menu with Picture Mode on Portra 400">
+
+Each Load replaces the last one: an ART entry the file leaves out goes back to its Olympus art filter.
 
 ## Available Film Simulations
 
@@ -45,9 +53,9 @@ In P, A, S or M mode, press **OK**, select **Picture Mode**, and scroll right pa
 
 - The simulations change colour and tone only. There is no halation and no grain.
 - There is no colour wheel. The camera has a 12-colour stage for photos only (not live view or movies), and EPM2Mod does not change it ([more](../feasibility.md#colour-wheel-and-twelve-colour-editors)).
-- You can choose another film simulation for any of them: [Film simulations from the SD card](card-looks.md).
 - Movies only get part of each simulation.
 - Filter Type and Add Effects are not tested with the film simulations.
-- An ART entry that has a film simulation does not have its Olympus art filter. To get the art filter back, load a file that does not list that entry ([more](card-looks.md)).
+- The Load Looks row's texts are English in every menu language.
 
-For how the simulations were made and measured, see [film emulation](../film-emulation.md).
+How the simulations were made and measured: [film emulation](../film-emulation.md). The file format:
+[look-file-format.md](../look-file-format.md).

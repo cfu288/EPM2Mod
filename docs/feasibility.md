@@ -73,7 +73,7 @@ Other Olympus generations, and what each can be modded to do: [model-matrix.md](
 
 **Medium effort: new code, method known**
 
-- ~~Looks loaded from a file on the card~~ **Done on 2026-11-17** (`docs/guide/card-looks.md`): our own task
+- ~~Looks loaded from a file on the card~~ **Done on 2026-11-17** (`docs/guide/film-looks.md`): our own task
   reads the file when Load Looks → Load runs, keeps it in the EEROM settings bank's unused tail (53,680 bytes,
   empty on this camera, saved by the firmware) and writes each listed entry's tables into its RAM block. Every
   start applies the stored copy.

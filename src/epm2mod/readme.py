@@ -331,12 +331,10 @@ def rewrite(paths: RepoPaths) -> list[Path]:
 #: ``docs/guide/``; None for a guide that is deliberately not on the site.
 SITE_IDS: dict[str, str | None] = {
     "film-looks": "film-looks",
-    "card-looks": "card-looks",
     "interval-shooting": "interval",
     "level-gauge": "level",
     "focus-peaking": "peaking",
     "lowest-shutter-speed": "lowest-ss",
-    "debug-log": None,  # a tool for bug reports, not a camera feature
 }
 #: The site's feature list, relative to the repository root.
 SITE_FEATURES = "web/apps/site/src/features.ts"

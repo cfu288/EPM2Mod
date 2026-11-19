@@ -23,20 +23,6 @@ export const features: Feature[] = [
     screens: [{ src: 'ui/quick-menu-portra.png', alt: 'The quick menu with Picture Mode on Portra 400' }],
   },
   {
-    id: 'card-looks',
-    name: 'Swap film simulations',
-    summary: 'Change film simulations without reflashing the camera.',
-    steps: [
-      'Choose film simulations in the installer and write them to the SD card.',
-      'MENU → SETUP → Custom Menu → J → Load Looks → Load.',
-      'An art filter that the file leaves out goes back to the Olympus filter.',
-    ],
-    screens: [
-      { src: 'ui/load-looks-loaded.png', alt: 'Load Looks reads Loaded' },
-      { src: 'ui/picture-mode-loaded.png', alt: 'The Picture Mode strip with Portra 800' },
-    ],
-  },
-  {
     id: 'interval',
     name: 'Interval shooting',
     summary: 'Time-lapses without a remote.',

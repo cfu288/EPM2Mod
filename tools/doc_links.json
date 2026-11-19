@@ -11,9 +11,8 @@
    "copies": [
     "src/epm2mod/camera_steps.py",
     "README.md",
-    "docs/guide/card-looks.md",
     "docs/guide/film-looks.md",
-    "docs/guide/debug-log.md",
+    "docs/debug-log.md",
     "docs/logging.md",
     "web/apps/site/src/features.ts",
     "web/apps/site/src/pages/Install.tsx",
@@ -26,8 +25,8 @@
    "fact": "No gears tab: MENU → SETUP → Setup Menu (wrench tab) → Menu Display → Custom Menu → On",
    "truth": [],
    "copies": [
-    "docs/guide/card-looks.md",
-    "docs/guide/debug-log.md",
+    "docs/guide/film-looks.md",
+    "docs/debug-log.md",
     "docs/guide/level-gauge.md",
     "web/apps/site/src/pages/Install.tsx",
     "src/epm2mod/camera_steps.py"
@@ -44,7 +43,6 @@
    ],
    "copies": [
     "README.md",
-    "docs/guide/card-looks.md",
     "docs/guide/film-looks.md",
     "docs/film-emulation.md",
     "looks/README.md",
@@ -134,7 +132,7 @@
     "README.md",
     "docs/flashing.md",
     "docs/install.md",
-    "docs/guide/card-looks.md",
+    "docs/guide/film-looks.md",
     "docs/look-file-format.md",
     "release/README.txt",
     "release/start.sh",
@@ -212,7 +210,7 @@
     "logs/events.json"
    ],
    "copies": [
-    "docs/guide/debug-log.md",
+    "docs/debug-log.md",
     "docs/logging.md"
    ]
   },

@@ -6,8 +6,8 @@ The camera writes what it does to a file on the card.
 
 Go to **MENU → SETUP → Custom Menu → J**, press **DOWN** past Load Looks to **Debug Log**, select **On**, and press **OK**.
 
-<img src="../images/ui/debug-log-list.png" width="320" alt="Debug Log with Off and On">
-<img src="../images/ui/debug-log-on.png" width="320" alt="Debug Log reads On">
+<img src="images/ui/debug-log-list.png" width="320" alt="Debug Log with Off and On">
+<img src="images/ui/debug-log-on.png" width="320" alt="Debug Log reads On">
 
 If the menu has no Custom Menu tab (gears icon), enable it in **MENU → SETUP → Setup Menu (wrench tab) → Menu Display**.
 
@@ -15,7 +15,7 @@ If the menu has no Custom Menu tab (gears icon), enable it in **MENU → SETUP �
 
 With **On**, the camera adds to `EPM2LOG.BIN` in the top folder of the card each time you open a menu or playback, and
 at power-off. With the command-line install, `uv run epm2mod log EPM2LOG.BIN` reads the file
-([the log format](../logging.md)).
+([the log format](logging.md)).
 
 ## Limits
 

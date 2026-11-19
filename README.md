@@ -7,11 +7,9 @@ Repository containing the current work for creating a custom firmware mod for th
 | Feature | |
 |---|---|
 | [Film simulations](docs/guide/film-looks.md) | <img src="docs/images/ui/quick-menu-portra.png" width="240" alt="The quick menu with Picture Mode on Portra 400"> |
-| [Film simulations from the SD card](docs/guide/card-looks.md) | <img src="docs/images/ui/load-looks-loaded.png" width="240" alt="Load Looks reads Loaded"> |
 | [Interval shooting](docs/guide/interval-shooting.md) | <img src="docs/images/ui/time-lapse-settings.png" width="240" alt="The Time Lapse Settings screen"> |
 | [Level gauge](docs/guide/level-gauge.md) | <img src="docs/images/ui/level-gauge.png" width="240" alt="The level gauge in live view"> |
 | [Focus peaking](docs/guide/focus-peaking.md) | <img src="docs/images/ui/peaking-list.png" width="240" alt="Custom Menu A with the Peaking list"> |
-| [Debug log](docs/guide/debug-log.md) | <img src="docs/images/ui/debug-log-on.png" width="240" alt="Debug Log reads On"> |
 | [Lowest shutter speed for ISO Auto](docs/guide/lowest-shutter-speed.md) | <img src="docs/images/ui/lowest-ss-list.png" width="240" alt="Lowest S/S Setting set to 1/15"> |
 
 [![Nine photos, each developed in the camera with Natural and the film simulations](docs/images/film-sim-comparison.jpg)](https://cfu288.github.io/EPM2Mod/films)

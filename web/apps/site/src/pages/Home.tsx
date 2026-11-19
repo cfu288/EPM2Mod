@@ -29,18 +29,16 @@ export function Home() {
           Features
         </h2>
         <ol className="mt-8 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
-          {features
-            .filter((feature) => feature.id !== 'card-looks')
-            .map((feature) => (
-              <li key={feature.id} className="border-rule border-t pt-4">
-                <h3 className="font-bold">
-                  <Link href={href('features', `#${feature.id}`)} className="hover:underline">
-                    {feature.name}
-                  </Link>
-                </h3>
-                <p className="text-ink-soft mt-2 text-sm">{feature.summary}</p>
-              </li>
-            ))}
+          {features.map((feature) => (
+            <li key={feature.id} className="border-rule border-t pt-4">
+              <h3 className="font-bold">
+                <Link href={href('features', `#${feature.id}`)} className="hover:underline">
+                  {feature.name}
+                </Link>
+              </h3>
+              <p className="text-ink-soft mt-2 text-sm">{feature.summary}</p>
+            </li>
+          ))}
         </ol>
       </section>
 
