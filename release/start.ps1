@@ -45,6 +45,8 @@ if ($Have -ne $UvVersion) {
 $env:UV_CACHE_DIR = Join-Path $PSScriptRoot '.uv\cache'
 $env:UV_PYTHON_INSTALL_DIR = Join-Path $PSScriptRoot '.uv\python'
 $env:PYTHONPATH = Join-Path $PSScriptRoot 'src'
+# the name in usage lines, examples and hints: the one a user types here
+$env:EPM2MOD_PROG = '.\start.ps1'
 # @(...) keeps one argument a list: a lone string would be passed letter by letter
 $Command = @(if ($args.Count -eq 0) { 'serve' } else { $args })
 & $Uv run --no-project --managed-python --python 3.12 python -m epm2mod @Command

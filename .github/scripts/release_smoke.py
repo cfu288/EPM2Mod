@@ -6,9 +6,9 @@ A folder with a DCIM folder stands in for the SD card (EPM2MOD_TEST_CARDS lists 
 
 1. `LAUNCHER install --card CARD --dry-run --json` names the pinned build's sha256 and writes nothing.
 2. `LAUNCHER install --card CARD --json` gets uv and Python, downloads OM's firmware, makes the pinned build and
-   writes it and the 12 default films to the card: its sha256 must be the expected one.
+   writes it to the card (no --film: no film file): its sha256 must be the expected one.
 3. `LAUNCHER inspect --card CARD --json` finds that build and nothing that will not work.
-4. `LAUNCHER cards --json` lists the stand-in card. `LAUNCHER make` refuses with exit 5: no checkout.
+4. `LAUNCHER cards --json` lists the stand-in card. `LAUNCHER make BUILD` refuses with exit 6: no checkout.
 5. `LAUNCHER serve --no-browser` serves the page, and the API answers with the token and refuses without it.
 """
 
@@ -47,8 +47,8 @@ def run(*args: str, status: int = 0) -> str:
 
 def document(*args: str) -> dict:
     found = json.loads(run(*args, "--json"))
-    if found.get("schema") != 1:
-        sys.exit(f"{' '.join(args)}: not a schema 1 document")
+    if found.get("schema") != 2 or found.get("ok") is not True:
+        sys.exit(f"{' '.join(args)}: not a schema 2 document of a success")
     return found
 
 
@@ -58,15 +58,14 @@ if planned["files"][0]["sha256"] != expected or list(card.rglob("*.BIN")):
 installed = document("install", "--card", str(card))
 if installed["files"][0]["sha256"] != expected:
     sys.exit(f"install: the sha256 is not {expected}")
-for name in ("DCOLYMP/E1019999.BIN", "EPM2LOOK.BIN"):
-    if not (card / name).is_file():
-        sys.exit(f"install: no {name} on the card")
+if not (card / "DCOLYMP/E1019999.BIN").is_file() or (card / "EPM2LOOK.BIN").exists():
+    sys.exit("install: the card does not hold the firmware only")
 inspected = document("inspect", "--card", str(card))
 if inspected["files"][0]["sha256"] != expected or inspected["problems"]:
     sys.exit(f"inspect: {inspected}")
 if [found["path"] for found in document("cards")["cards"]] != [str(card)]:
     sys.exit("cards: the stand-in card is not listed")
-run("make", status=5)
+run("make", installed["build"]["name"], status=6)
 
 server = subprocess.Popen(
     launcher + ["serve", "--no-browser", "--port", "8765"],

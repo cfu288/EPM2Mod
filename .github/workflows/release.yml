@@ -46,7 +46,7 @@ jobs:
             refs/tags/v*) version="${GITHUB_REF_NAME#v}" ;;
             *) version="$(date -u +%Y.%m.%d)-dev" ;;
           esac
-          python -m epm2mod package -o dist --version "$version"
+          python -m epm2mod package --out-dir dist --release-version "$version"
           name=$(basename dist/*.zip .zip)
           echo "name=$name" >> "$GITHUB_OUTPUT"
           echo "sha256=$(python -c 'from epm2mod.builds import pinned_description; from epm2mod.paths import repo_paths; print(pinned_description(repo_paths()).sha256)')" >> "$GITHUB_OUTPUT"
