@@ -692,3 +692,29 @@ near QP 21–22 in both (§11), so detail differences come from the frame.
 | No `mv_set` record at all | the set-up does not pass the hooked sites; the pictures follow the stock values |
 | A freeze or restart at the start of live view or of a clip | a hook routine (it calls the settings getter from the TAKE task and from MOV_TASK) |
 | Fine with Movie IS or an art filter gives a wrong picture | the segment-2 readers; untested, outside the acceptance test |
+
+## 17. Camera run of `debug-log-movie-ab`, 2026-11-19
+
+Five clips came back (`results/ab/`; frames `camera-frames-1-2-3-5.png`). The record mode of each clip is read from its
+SPS (HRD 32.77 Mb/s = Full HD Fine, 24.58 = Full HD Normal, 20.48 = HD Fine); restarts from the log's sessions and the
+`mv_set` times (session 2 has the records 24 s apart that match clips 1 and 2).
+
+| Clip | Mode | Restart before it | Picture |
+|---|---|---|---|
+| PB190001 | Full HD Fine (wide) | yes | clean |
+| PB190002 | Full HD Normal | **no** (changed in the live control) | **garbled**: the pink bands of §13 |
+| PB190003 | Full HD Normal | yes | clean |
+| PB190004 | HD Fine (720) | – | clean |
+| PB190005 | Full HD Fine | **no** | **garbled** |
+
+**Finding (V):** a record-mode change in the live control does not re-run every set-up site. The sites that run at
+live-view start keep the old choice; the site at the recording start (`mv_set` site 0x7E880F72) takes the new one, so
+writer and reader disagree. With a restart after each change, both modes are clean. Fix for a later build: decide once
+per live-view start and use that choice at every site, or force the live-view restart on a mode change.
+
+**A/B (clips 1 and 3, same place):** the alignment shift is 2 px in each direction, so the field of view is the same
+(V: the wide frame keeps the stock framing). The scene is a room with a soft focus (`camera-crop-clip1-vs-clip3.png`);
+in it the two clips look alike by eye. A gradient measure differs between the clips but is dominated by focus and
+noise, so it is not evidence. A fair A/B needs a sharply focused flat target.
+
+720 (clip 4) is clean (criterion 4). No photo came back.
