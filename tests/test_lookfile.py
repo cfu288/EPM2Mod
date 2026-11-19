@@ -219,6 +219,16 @@ class PackTests(unittest.TestCase):
         self.assertEqual(sha256_bytes(data), CARD_LOOKS_SHA256)
         self.assertEqual(lookfile.unpack(data), looks)
 
+    def test_looks_pack_writes_a_look_list_of_fit_files(self) -> None:
+        with tempfile.TemporaryDirectory() as folder, redirect_stderr(io.StringIO()):
+            out = Path(folder) / lookfile.CARD_NAME
+            argv = ["looks", "pack", str(PATHS.card_looks), "-o", str(out)]
+            with redirect_stdout(io.StringIO()):
+                self.assertEqual(cli.main([*argv, "--dry-run"]), 0)
+                self.assertFalse(out.exists())
+                self.assertEqual(cli.main(argv), 0)
+            self.assertEqual(sha256_bytes(out.read_bytes()), CARD_LOOKS_SHA256)
+
     def test_the_film_records_are_current(self) -> None:
         self.assertEqual(
             json.loads(PATHS.film_records.read_text()),

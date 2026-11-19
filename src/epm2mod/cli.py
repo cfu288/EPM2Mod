@@ -352,6 +352,24 @@ COMMANDS: dict[str, Command] = {
             {1: "a spec differs from the one the fit files make"},
         ),
         Command(
+            "looks pack",
+            DEVELOPERS,
+            "Write a film file from a look list of fit files, for films that are not in the catalogue yet.",
+            "the film file on the card or at PATH; then the camera steps",
+            True,
+            "",
+            ("epm2mod looks pack LIST --card /path/to/card",),
+            {
+                "dry_run": "true if nothing was written",
+                "card": "the card, or null",
+                "files": _FILES,
+                "films": "the films of the film file (art, name)",
+                "ejected": "true if the card was ejected",
+                "camera_steps": _STEPS,
+            },
+            {5: "the card is not a camera card, not writable or full"},
+        ),
+        Command(
             "log",
             DEVELOPERS,
             "Decode a camera log file (EPM2LOG.BIN).",
@@ -572,6 +590,28 @@ def _films(args: argparse.Namespace, ctx: Context) -> int:
     for film in films.films.values():
         print(f"{film.name:<17} {film.id:<18} {film.film:<34} {film.kind}")
     return 0
+
+
+def _looks_pack(args: argparse.Namespace, ctx: Context, checkout: RepoPaths) -> int:
+    """Run ``epm2mod looks pack``: a film file from a look list of fit files (developers)."""
+    from .looks.lookfile import CARD_NAME
+
+    try:
+        from .looks import lookpack
+    except ModuleNotFoundError as error:
+        raise _numpy_needed(error) from None
+    args.command_name = "looks pack"
+    looks = lookpack.load_list(checkout, Path(args.list))
+    out = None if args.out is None else output_path(args.out, CARD_NAME)
+    outcome = set_films(
+        ctx.locator,
+        card=_card(args.card),
+        out=out,
+        dry_run=args.dry_run,
+        eject=args.eject,
+        looks=looks,
+    )
+    return _report_outcome(args, outcome)
 
 
 def _films_set(args: argparse.Namespace, ctx: Context) -> int:
@@ -803,8 +843,10 @@ def _numpy_needed(error: ModuleNotFoundError) -> BuildError:
 
 
 def _looks(args: argparse.Namespace, ctx: Context) -> int:
-    """Run ``epm2mod looks``: compare or write the film patch specs."""
+    """Run ``epm2mod looks``: compare or write the film patch specs, or ``looks pack``."""
     checkout = ctx.checkout()
+    if getattr(args, "action", None) == "pack":
+        return _looks_pack(args, ctx, checkout)
     try:
         from .looks import generate
     except ModuleNotFoundError as error:
@@ -1178,6 +1220,24 @@ def _arguments(name: str, parser: argparse.ArgumentParser) -> None:
         parser.add_argument(
             "--write", action="store_true", help="write them; default: compare only"
         )
+        if name == "looks":
+            actions = parser.add_subparsers(dest="action", metavar="ACTION")
+            command = COMMANDS["looks pack"]
+            sub = actions.add_parser(
+                "pack",
+                prog="epm2mod looks pack",
+                help=command.summary,
+                description=_text(command),
+                epilog=_epilog(command),
+                formatter_class=argparse.RawDescriptionHelpFormatter,
+            )
+            sub.add_argument(
+                "list", metavar="LIST", help="a look list (JSON) of fit files"
+            )
+            _add_destination(sub, "EPM2LOOK.BIN")
+            _add_dry_run(sub)
+            _add_eject(sub)
+            _add_json(sub)
     elif name == "log":
         parser.add_argument(
             "file", metavar="FILE", help="the log file from the SD card"

@@ -408,7 +408,7 @@ epm2mod fetch-stock
 Compare (default) or write the film patch specs that the fit files make.
 
 ```
-epm2mod looks [-h] [--write]
+epm2mod looks [-h] [--write] ACTION ...
 ```
 
 - Output: which specs differ; with --write, the specs.
@@ -425,6 +425,43 @@ Examples:
 ```sh
 epm2mod looks
 epm2mod looks --write
+```
+
+### epm2mod looks pack
+
+Write a film file from a look list of fit files, for films that are not in the catalogue yet.
+
+```
+epm2mod looks pack [-h] (--card DIR | -o PATH) [--dry-run] [--eject] [--json] LIST
+```
+
+- Output: the film file on the card or at PATH; then the camera steps.
+- Needs: a checkout. Network: never.
+
+| Argument | What | Default |
+|---|---|---|
+| `LIST` | a look list (JSON) of fit files |  |
+| `--card DIR` | the top folder of the SD card |  |
+| `-o, --out PATH` | a file, or a folder (or a path that ends in /) for EPM2LOOK.BIN |  |
+| `--dry-run` | print what would be written and replaced; write nothing |  |
+| `--eject` | eject the card after the write |  |
+| `--json` | print one JSON document (schema 1) on stdout |  |
+
+`--json` keys beside `schema` and `command`:
+
+- `dry_run`: true if nothing was written
+- `card`: the card, or null
+- `files`: each file written (path, role, size, sha256, replaced)
+- `films`: the films of the film file (art, name)
+- `ejected`: true if the card was ejected
+- `camera_steps`: the steps on the camera (id, text)
+
+- Exit 5: the card is not a camera card, not writable or full.
+
+Examples:
+
+```sh
+epm2mod looks pack LIST --card /path/to/card
 ```
 
 ### epm2mod log

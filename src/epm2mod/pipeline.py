@@ -451,7 +451,7 @@ def install(
     names = [CARD_FOLDER] + ([lookfile.CARD_NAME] if films is not None else [])
     steps = flash_steps(
         films=films is not None,
-        copy=copy_text(names) if card is None else None,
+        copy=copy_text(names, "the zip") if card is None else None,
         ejected=ejected,
         art_shows=catalogue.art_check(paths, wanted),
     )
@@ -475,15 +475,26 @@ def set_films(
     dry_run: bool = False,
     eject: bool = False,
     is_card: Callable[[Path], bool] = cardio.is_card,
+    looks: Sequence[lookfile.Look] | None = None,
 ) -> Outcome:
-    """Write only the film file, to a card or a file (``epm2mod films set``).
+    """Write only the film file, to a card or a file (``epm2mod films set``, ``looks pack``).
 
-    ``choices`` as for ``install``; None: the 12 default films. Exactly one of ``card`` and ``out`` is given.
+    ``choices`` as for ``install``; None: the 12 default films. ``looks``, if given, are written in place of the
+    choices (``looks pack``: a look list of fit files, for developers). Exactly one of ``card`` and ``out`` is given.
 
     Raises:
         Epm2ModError: with a message for the user, if a step fails.
     """
-    data, looks = _film_file(paths, choices)
+    if looks is None:
+        data, looks = _film_file(paths, choices)
+        art_shows = catalogue.art_check(paths, choices)
+    else:
+        data = lookfile.pack(looks)
+        art_shows = (
+            f"the films of the list, such as {looks[0].name}."
+            if looks
+            else "the art filters."
+        )
     content = {FILMS: Content.of(data)}
     if card is not None:
         files, removed, ejected = _finish(card, content, dry_run, eject, is_card)
@@ -502,9 +513,7 @@ def set_films(
             if out.name == lookfile.CARD_NAME
             else (f"Copy {out.name} to the top of the SD card as {lookfile.CARD_NAME}.")
         )
-    steps = film_steps(
-        copy=copy, ejected=ejected, art_shows=catalogue.art_check(paths, choices)
-    )
+    steps = film_steps(copy=copy, ejected=ejected, art_shows=art_shows)
     return Outcome(
         files, removed, tuple(steps), dry_run, card, ejected, None, tuple(looks)
     )

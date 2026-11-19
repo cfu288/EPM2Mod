@@ -53,9 +53,11 @@ def _start(copy: str | None, ejected: bool) -> list[Step]:
     return steps
 
 
-def copy_text(names: list[str]) -> str:
-    """Return the copy step for files that were not written to a card: their names, to the top of the card."""
-    return f"Copy {' and '.join(names)} to the top of the SD card."
+def copy_text(names: list[str], source: str | None = None) -> str:
+    """Return the copy step for files that were not written to a card: their names (and where they are), to the top
+    of the card."""
+    where = f" from {source}" if source else ""
+    return f"Copy {' and '.join(names)}{where} to the top of the SD card."
 
 
 def flash_steps(
