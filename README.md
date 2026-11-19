@@ -71,7 +71,7 @@ To go back to the original firmware, see [docs/install.md](docs/install.md).
 
 - **The camera starts normally instead of writing:** it found no firmware file it accepts. `DCOLYMP/E1019999.BIN` must be in the top folder of the card and be the only file in `DCOLYMP`.
 - **Load Looks shows No file:** `EPM2LOOK.BIN` is not in the top folder of the card.
-- **Load Looks shows Bad file:** the file is damaged or incomplete. Make it again with the installer or `epm2mod films set`. Nothing was changed.
+- **Load Looks shows Bad file:** the file is damaged or incomplete. Make it again with the installer or `uv run epm2mod films set`.
 
 ![Nine photos, each developed in the camera with stock Natural and the film simulations](docs/images/film-sim-comparison.jpg)
 

@@ -24,7 +24,7 @@ The install steps are in the [README](../README.md#install).
    ```
 
    Without a card: `uv run epm2mod restore -o FILE`, then copy the file to the card as `DCOLYMP/E1019999.BIN`.
-2. Do the steps that `restore` shows. They are the same as for the mod (step 3 of the [README](../README.md#install)).
+2. Flash it the same way as the mod (step 3 of the [README](../README.md#install)).
 
 The installer does the same: choose **Olympus original** at the Firmware step.
 

@@ -26,7 +26,7 @@ The entry shows the look's name everywhere the camera shows a film name.
 <img src="../images/ui/picture-mode-loaded.png" width="320" alt="The Picture Mode strip with Portra 800">
 
 Each Load replaces the last one: an entry the file leaves out goes back to its Olympus art filter. You can delete
-the file. **No file**: `EPM2LOOK.BIN` is not in the top folder of the card. **Bad file**: the file is damaged or incomplete. Make it again. In both cases nothing changed. No Custom Menu tab (gears icon): enable it in **MENU → SETUP → Setup Menu (wrench tab) → Menu Display**.
+the file. **No file**: `EPM2LOOK.BIN` is not in the top folder of the card. **Bad file**: the file is damaged or incomplete. Make it again. No Custom Menu tab (gears icon): enable it in **MENU → SETUP → Setup Menu (wrench tab) → Menu Display**.
 
 ## Limits
 

@@ -219,7 +219,7 @@ export function Install() {
           <li>
             Load Looks shows No file: <code>EPM2LOOK.BIN</code> is not in the top folder of the card.
           </li>
-          <li>Load Looks shows Bad file: the file is damaged or incomplete. Make it again. Nothing was changed.</li>
+          <li>Load Looks shows Bad file: the file is damaged or incomplete. Make it again.</li>
         </ul>
       </section>
     </div>
