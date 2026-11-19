@@ -123,8 +123,8 @@ Pointer windows that are explained and do not count as hits: `code-nonoperand` (
 
 | Range | Size | Source | Verdict | Use | Used | Free | L | C | P | O | W | B | Failing check: evidence |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 0x7E43F2B0-0x7E440000 | 3408 | 0xFF run | NEEDS-DECISION | data | 0 | 3408 | ok | ok | ok | ok | ok | ? | **predecessor**: data before (2131320000000000); bound not proven: nothing shows where the reader of the object before stops; nearest referenced address before: 0x7E43F264 (from 0x7E43F0C0); after: 0x7E441505 (from 0x7E868D91) |
-| 0x7E440010-0x7E448000 | 32752 | 0xFF run | NEEDS-DECISION | data | 0 | 32752 | ok | ok | FAIL | ok | ok | ? | **pointers**: 7 hit(s): 0x7E4409BB at 0x7E860125 via flash [unaligned data word: eec2e9c4bbf92d40e2e0ee09]; 0x7E4410A5 at 0x7E862AE0 via flash-uncached [4-aligned data word: e8995313a5002e80000000ab]; 0x7E4410D0 at 0x7E7F55C8 via flash [4-aligned data word: d6187f62d0002e40bd0351bd]; 0x7E441505 at 0x7E868D91 via runtime [unaligned data word: 7010191f0515447efd96db6a] ...; explained noise: 188 code-nonoperand, 1 double-table, 4 straddle, 4 waived; windows in the other blocks (reported, not counted: resource blocks, not classified): block 1 19, block 2 0, block 3 37, tail 0; **predecessor**: data before (0000000000000000); bound not proven: nothing shows where the reader of the object before stops; nearest referenced address before: none found in the same 64 KiB page; after: 0x7E448020 (from 0x7E426814) |
+| 0x7E43F2B0-0x7E440000 | 3408 | 0xFF run | NEEDS-DECISION | data | 0 | 3408 | ok | ok | ok | ok | ok | ? | **predecessor**: data before (2131320000000000); bound not proven: nothing shows where the reader of the object before stops; nearest referenced address before: 0x7E43F264 (from 0x7E43F0C0); after: 0x7E448020 (from 0x7E426814) |
+| 0x7E440010-0x7E448000 | 32752 | 0xFF run | NEEDS-DECISION | data | 0 | 32752 | ok | ok | FAIL | ok | ok | ? | **pointers**: 5 hit(s): 0x7E4409BB at 0x7E860125 via flash [unaligned data word: eec2e9c4bbf92d40e2e0ee09]; 0x7E4410A5 at 0x7E862AE0 via flash-uncached [4-aligned data word: e8995313a5002e80000000ab]; 0x7E4410D0 at 0x7E7F55C8 via flash [4-aligned data word: d6187f62d0002e40bd0351bd]; 0x7E441678 at 0x7E7F2B1C via flash-uncached [4-aligned data word: 10608b0678062e8001438c01] ...; explained noise: 188 code-nonoperand, 1 double-table, 4 straddle, 6 waived; windows in the other blocks (reported, not counted: resource blocks, not classified): block 1 19, block 2 0, block 3 37, tail 0; **predecessor**: data before (0000000000000000); bound not proven: nothing shows where the reader of the object before stops; nearest referenced address before: none found in the same 64 KiB page; after: 0x7E448020 (from 0x7E426814) |
 | 0x7E44806A-0x7E449000 | 3990 | 0xFF run | NEEDS-DECISION | data | 0 | 3990 | ok | ok | FAIL | ok | ok | ? | **pointers**: 2 hit(s): 0x7E44876C at 0x7F02C7BF via runtime [unaligned data word: 7bb02ebc6c87447e6ddefa38]; 0x7E448C59 at 0x7E7F3B8D via flash [unaligned data word: 58521953597c2e403150046e]; explained noise: 11 code-nonoperand, 1 straddle, 1 waived; windows in the other blocks (reported, not counted: resource blocks, not classified): block 1 0, block 2 0, block 3 3, tail 0; **predecessor**: data before (0007f2f3cbde0000); bound not proven: nothing shows where the reader of the object before stops; nearest referenced address before: 0x7E448050 (from 0x7E42684A); after: 0x7E44A007 (from 0x7E43BF40) |
 | 0x7E4C67F8-0x7E4C6820 | 40 | 0xFF run | NEEDS-DECISION | data | 0 | 40 | ok | ok | ok | ok | ok | ? | **predecessor**: data before (0000000000000000); bound not proven: nothing shows where the reader of the object before stops; nearest referenced address before: 0x7E4C6788 (from 0x7E46225F, 0x7E4622A0, 0x7E4622F6 ...); after: 0x7E4C68E0 (from 0x7E46226C, 0x7E46230C, 0x7E46233D) |
 | 0x7E4C90CA-0x7E4C9800 | 1846 | 0xFF run | USABLE-CODE | code | 1824 | 22 | ok | ok | ok | ok | ok | ok | code evidence: patches/log-core.json (camera log 2026-11-15): jump at 0x7E426D4B to 0x7E4C959F |
@@ -132,11 +132,13 @@ Pointer windows that are explained and do not count as hits: `code-nonoperand` (
 Ledger (bytes that specs change inside an area; `history` and `superseded` do not reduce the free count):
 
 - 0x7E4C90CA-0x7E4C9800: free 0x7E4C90FB-0x7E4C90FC (1), 0x7E4C91F9-0x7E4C9200 (7), 0x7E4C97F2-0x7E4C9800 (14)
-  - `patches/custom-menu-rows-2.json` (current): 85 B in 0x7E4C9226-0x7E4C922C, 0x7E4C9394-0x7E4C9397, 0x7E4C93A4-0x7E4C93F0
+  - `patches/custom-menu-rows-2.json` (superseded): 85 B in 0x7E4C9226-0x7E4C922C, 0x7E4C9394-0x7E4C9397, 0x7E4C93A4-0x7E4C93F0
+  - `patches/custom-menu-rows-3.json` (current): 85 B in 0x7E4C9226-0x7E4C922C, 0x7E4C9394-0x7E4C9397, 0x7E4C93A4-0x7E4C93F0
   - `patches/custom-menu-rows.json` (superseded): 85 B in 0x7E4C9226-0x7E4C922C, 0x7E4C9394-0x7E4C9397, 0x7E4C93A4-0x7E4C93F0
   - `patches/interval-frames-240.json` (current): 136 B in 0x7E4C90FC-0x7E4C9184
   - `patches/log-core.json` (superseded): 269 B in 0x7E4C9514-0x7E4C9621
-  - `patches/log-menu.json` (current): 751 B in 0x7E4C90EA-0x7E4C90FB, 0x7E4C9514-0x7E4C97F2
+  - `patches/log-menu-2.json` (current): 751 B in 0x7E4C90EA-0x7E4C90FB, 0x7E4C9514-0x7E4C97F2
+  - `patches/log-menu.json` (superseded): 751 B in 0x7E4C90EA-0x7E4C90FB, 0x7E4C9514-0x7E4C97F2
   - `patches/log-peaking-time.json` (superseded): 89 B in 0x7E4C90EA-0x7E4C90FB, 0x7E4C9621-0x7E4C962B, 0x7E4C97BD-0x7E4C97FB
   - `patches/log-probes.json` (superseded): 397 B in 0x7E4C9630-0x7E4C97BD
   - `patches/peaking-colours.json` (current): 298 B in 0x7E4C93D8-0x7E4C93DE, 0x7E4C93F0-0x7E4C9514
@@ -151,6 +153,8 @@ Ledger (bytes that specs change inside an area; `history` and `superseded` do no
 | Range | Size | Source | Verdict | Use | Used | Free | L | C | P | O | W | B | Failing check: evidence |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 0x7E50C46E-0x7E50C517 | 169 | listed: reclaim-space row 10 (code, auto) | NEEDS-DECISION | data | 0 | 169 | ok | ? | ok | FAIL | ok | ok | **content**: listed as reclaimed code by the automatic rule only, not checked by hand (reclaim-space row 10); **operands**: 1 operand(s) in functions: call 0x7E50C46E at 0x7E50A323; 7 from listed areas, 0 outside the function DB (data decoded as code) ignored |
+| 0x7E69E92A-0x7E69E96F | 69 | listed: auto-iso-min-shutter NOTES section 9 (code, checked) | NEEDS-DECISION | data | 0 | 69 | ok | ok | ok | FAIL | ok | ok | **operands**: 1 operand(s) in functions: call 0x7E69E92A at 0x7E69E858; 0 from listed areas, 0 outside the function DB (data decoded as code) ignored |
+| 0x7E69E9EA-0x7E69EEAF | 1221 | listed: auto-iso-min-shutter NOTES section 9 (code, checked) | USABLE-DATA | data | 641 | 580 | ok | ok | ok | ok | ok | ok | - |
 | 0x7E74C796-0x7E74C7B8 | 34 | 0xFF run | NEEDS-DECISION | data | 0 | 34 | ok | ok | FAIL | ok | ok | ? | **pointers**: 1 hit(s): 0x7E74C7A0 at 0x7E7896FC via runtime [4-aligned data word: 88c7747ea0c7747eb8c7747e]; explained noise: none; windows in the other blocks (reported, not counted: resource blocks, not classified): block 1 0, block 2 0, block 3 0, tail 0; **predecessor**: data before (0005000500050014); bound not proven: nothing shows where the reader of the object before stops; nearest referenced address before: 0x7E74C788 (from 0x7E7896F8); after: 0x7E74C7B8 (from 0x7E789700) |
 | 0x7E74C7F6-0x7E74C818 | 34 | 0xFF run | NEEDS-DECISION | data | 0 | 34 | ok | ok | FAIL | ok | ok | ? | **pointers**: 1 hit(s): 0x7E74C800 at 0x7E78970C via runtime [4-aligned data word: e8c7747e00c8747e18c8747e]; explained noise: none; windows in the other blocks (reported, not counted: resource blocks, not classified): block 1 0, block 2 0, block 3 0, tail 0; **predecessor**: data before (0005000500050014); bound not proven: nothing shows where the reader of the object before stops; nearest referenced address before: 0x7E74C7E8 (from 0x7E789708); after: 0x7E74C818 (from 0x7E789710) |
 | 0x7E74C856-0x7E74C878 | 34 | 0xFF run | NEEDS-DECISION | data | 0 | 34 | ok | ok | FAIL | ok | ok | ? | **pointers**: 1 hit(s): 0x7E74C860 at 0x7E78971C via runtime [4-aligned data word: 48c8747e60c8747e78c8747e]; explained noise: none; windows in the other blocks (reported, not counted: resource blocks, not classified): block 1 0, block 2 0, block 3 0, tail 0; **predecessor**: data before (000400040004000f); bound not proven: nothing shows where the reader of the object before stops; nearest referenced address before: 0x7E74C848 (from 0x7E789718); after: 0x7E74C878 (from 0x7E789720) |
@@ -163,15 +167,17 @@ Ledger (bytes that specs change inside an area; `history` and `superseded` do no
 | 0x7E805088-0x7E805CE8 | 3168 | listed: reclaim-space row 9 (text, auto) | NEEDS-DECISION | data | 0 | 3168 | ok | ? | ok | ok | ok | ? | **content**: listed as reclaimed text by the automatic rule only, not checked by hand (reclaim-space row 9); **predecessor**: data before (494e4954204f4b00); bound not proven: nothing shows where the reader of the object before stops; nearest referenced address before: 0x7E805028 (from 0x7E6D7F36); after: 0x7E805CE8 (from 0x7E6D85EE) |
 | 0x7E813170-0x7E813ED0 | 3424 | listed: reclaim-space row 9 (text, auto) | NEEDS-DECISION | data | 0 | 3424 | ok | ? | ok | ok | ok | ? | **content**: listed as reclaimed text by the automatic rule only, not checked by hand (reclaim-space row 9); **predecessor**: data before (6365515743310000); bound not proven: nothing shows where the reader of the object before stops; nearest referenced address before: 0x7E813166 (from 0x7E6FC959); after: 0x7E813ED0 (from 0x7E6FCFE6) |
 | 0x7E86DD60-0x7E86DD80 | 32 | 0xFF run | NEEDS-DECISION | data | 0 | 32 | ok | ok | ok | ok | ok | ? | **predecessor**: data before (c6c6c7c7c8c8c9c9); bound not proven: nothing shows where the reader of the object before stops; nearest referenced address before: 0x7E86DC5F (from 0x7E73116C, 0x7E7311AF); after: 0x7E86DD80 (from 0x7E5586BB) |
-| 0x7E880F5C-0x7E881000 | 164 | 0xFF run | USABLE-CODE | code | 162 | 2 | ok | ok | ok | ok | ok | ok | code evidence: patches/history/slot3-code.json (camera log 2026-11-12 (time not recorded)): jump at 0x7E56C6A5 to 0x7E880F8D |
+| 0x7E880F5C-0x7E881000 | 164 | 0xFF run | USABLE-CODE | code | 26 | 138 | ok | ok | ok | ok | ok | ok | code evidence: patches/history/slot3-code.json (camera log 2026-11-12 (time not recorded)): jump at 0x7E56C6A5 to 0x7E880F8D |
 
 Ledger (bytes that specs change inside an area; `history` and `superseded` do not reduce the free count):
 
-- 0x7E880F5C-0x7E881000: free 0x7E880FFE-0x7E881000 (2)
+- 0x7E69E9EA-0x7E69EEAF: free 0x7E69EC6B-0x7E69EEAF (580)
+  - `patches/lss-core.json` (current): 641 B in 0x7E69E9EA-0x7E69EC6B
+- 0x7E880F5C-0x7E881000: free 0x7E880F5C-0x7E880FE4 (136), 0x7E880FFE-0x7E881000 (2)
   - `patches/peaking-direct-3.json` (current): 26 B in 0x7E880FE4-0x7E880FFE
-  - `patches/remap7b-code.json` (current): 120 B in 0x7E880F5C-0x7E880FD4
-  - `patches/seven-films-5.json` (current): 18 B in 0x7E880FC2-0x7E880FD4
-  - `patches/seven-fixes-1.json` (current): 17 B in 0x7E880FD4-0x7E880FE5
+  - `patches/remap7b-code.json` (superseded): 120 B in 0x7E880F5C-0x7E880FD4
+  - `patches/seven-films-5.json` (superseded): 18 B in 0x7E880FC2-0x7E880FD4
+  - `patches/seven-fixes-1.json` (superseded): 17 B in 0x7E880FD4-0x7E880FE5
   - `patches/history/film-pro400h-pa1.json` (history): 18 B in 0x7E880FC2-0x7E880FD4
   - `patches/history/film-pro400h-pa2-s12.json` (history): 18 B in 0x7E880FC2-0x7E880FD4
   - `patches/history/film-pro400h-pa2.json` (history): 18 B in 0x7E880FC2-0x7E880FD4
@@ -197,24 +203,30 @@ Ledger (bytes that specs change inside an area; `history` and `superseded` do no
 
 | Range | Size | Source | Verdict | Use | Used | Free | L | C | P | O | W | B | Failing check: evidence |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 0x7EBB1F4C-0x7EBB304C | 4352 | listed: reclaim-space row 2 (text, checked) | NEEDS-DECISION | data | 0 | 4352 | ok | ok | FAIL | ok | ok | ? | **pointers**: 2 hit(s): 0x7EBB2010 at 0x7E86D81A via flash [unaligned data word: 1021c08a1010a54000604014]; 0x7EBB2A12 at 0x7E864E1F via flash [unaligned data word: 44f00120121aa5403a14cb40]; explained noise: 17 code-nonoperand; windows in the other blocks (reported, not counted: resource blocks, not classified): block 1 0, block 2 0, block 3 2, tail 0; **predecessor**: data before (6c6c6261636b0a00); bound not proven: nothing shows where the reader of the object before stops; nearest referenced address before: 0x7EBB1F08 (from 0x7E92352B); after: 0x7EBB30A1 (from 0x7E9238F8) |
-| 0x7EBF1090-0x7EBF3BAD | 11037 | listed: reclaim-space row 1 (text, checked) | USABLE-CODE | code | 10437 | 600 | ok | ok | ok | ok | ok | ok | code evidence: patches/log-core.json (camera log 2026-11-15): jump at 0x7ECDF6E4 to 0x7EBF2E0F |
+| 0x7EBB1F4C-0x7EBB304C | 4352 | listed: reclaim-space row 2 (text, checked) | USABLE-DATA | data | 3032 | 1320 | ok | ok | ok | ok | ok | ok | - |
+| 0x7EBF1090-0x7EBF3BAD | 11037 | listed: reclaim-space row 1 (text, checked) | USABLE-CODE | code | 10461 | 576 | ok | ok | ok | ok | ok | ok | code evidence: patches/log-core.json (camera log 2026-11-15): jump at 0x7ECDF6E4 to 0x7EBF2E0F |
 | 0x7ECAFE3A-0x7ECAFE7C | 66 | 0xFF run | NEEDS-DECISION | data | 0 | 66 | ok | ok | FAIL | ok | ok | ? | **pointers**: 1 hit(s): 0x7ECAFE3B at 0x7EBA8F45 via runtime [mov 2127232571,a3 at 0x7EBA8F43]; explained noise: none; windows in the other blocks (reported, not counted: resource blocks, not classified): block 1 0, block 2 0, block 3 0, tail 0; **predecessor**: data before (fefefefefefefefe); bound not proven: nothing shows where the reader of the object before stops; nearest referenced address before: 0x7ECAFD3B (from 0x7EBA9CDE); after: 0x7ECAFF3C (from 0x7EBA9FDA) |
-| 0x7ECB0888-0x7ECB1000 | 1912 | 0xFF run | USABLE-CODE | code | 1857 | 55 | ok | ok | ok | ok | ok | ok | code evidence: patches/card-looks-3.json (camera log 2026-11-17): jump at 0x7ECDF6E4 to 0x7ECB0EE8 |
+| 0x7ECB0888-0x7ECB1000 | 1912 | 0xFF run | USABLE-CODE | code | 1836 | 76 | ok | ok | ok | ok | ok | ok | code evidence: patches/card-looks-3.json (camera log 2026-11-17): jump at 0x7ECDF6E4 to 0x7ECB0EE8 |
 
 Ledger (bytes that specs change inside an area; `history` and `superseded` do not reduce the free count):
 
-- 0x7EBF1090-0x7EBF3BAD: free 0x7EBF10F3-0x7EBF10FC (9), 0x7EBF1F27-0x7EBF1F28 (1), 0x7EBF1FCA-0x7EBF1FF0 (38), 0x7EBF2512-0x7EBF256C (90), 0x7EBF25EA-0x7EBF2600 (22), 0x7EBF27FC-0x7EBF2890 (148), 0x7EBF28C7-0x7EBF2900 (57), 0x7EBF2954-0x7EBF2960 (12), 0x7EBF29EF-0x7EBF2A00 (17), 0x7EBF2AF9-0x7EBF2B00 (7), 0x7EBF2BE3-0x7EBF2BE4 (1), 0x7EBF2DF6-0x7EBF2E80 (138), 0x7EBF2FF1-0x7EBF3000 (15), 0x7EBF34F2-0x7EBF3500 (14), 0x7EBF38BA-0x7EBF38BC (2), 0x7EBF3B36-0x7EBF3B52 (28), 0x7EBF3BAC-0x7EBF3BAD (1)
+- 0x7EBB1F4C-0x7EBB304C: free 0x7EBB2AC4-0x7EBB2FEC (1320)
+  - `patches/build-label-proto.json` (superseded): 96 B in 0x7EBB2FEC-0x7EBB304C
+  - `patches/build-label.json` (current): 96 B in 0x7EBB2FEC-0x7EBB304C
+  - `patches/lss-menu.json` (current): 2936 B in 0x7EBB1F4C-0x7EBB2AC4
+- 0x7EBF1090-0x7EBF3BAD: free 0x7EBF109E-0x7EBF10A8 (10), 0x7EBF10BD-0x7EBF10C0 (3), 0x7EBF10D0-0x7EBF10D8 (8), 0x7EBF10EC-0x7EBF10FC (16), 0x7EBF1F27-0x7EBF1F28 (1), 0x7EBF1FCA-0x7EBF1FE0 (22), 0x7EBF2526-0x7EBF252A (4), 0x7EBF2539-0x7EBF2542 (9), 0x7EBF2555-0x7EBF256C (23), 0x7EBF25EA-0x7EBF2600 (22), 0x7EBF280A-0x7EBF2814 (10), 0x7EBF283F-0x7EBF2844 (5), 0x7EBF2858-0x7EBF285C (4), 0x7EBF286B-0x7EBF2874 (9), 0x7EBF2887-0x7EBF2890 (9), 0x7EBF28C7-0x7EBF28C8 (1), 0x7EBF28D6-0x7EBF28E0 (10), 0x7EBF28F8-0x7EBF2900 (8), 0x7EBF2954-0x7EBF2960 (12), 0x7EBF29EF-0x7EBF2A00 (17), 0x7EBF2AF9-0x7EBF2B00 (7), 0x7EBF2BE3-0x7EBF2BE4 (1), 0x7EBF2DF6-0x7EBF2DF8 (2), 0x7EBF2E07-0x7EBF2E10 (9), 0x7EBF2E24-0x7EBF2E28 (4), 0x7EBF2E36-0x7EBF2E40 (10), 0x7EBF2E68-0x7EBF2E9A (50), 0x7EBF2E9F-0x7EBF2F40 (161), 0x7EBF2FF1-0x7EBF3000 (15), 0x7EBF34F2-0x7EBF3500 (14), 0x7EBF38BA-0x7EBF38BC (2), 0x7EBF3A6F-0x7EBF3A70 (1), 0x7EBF3A80-0x7EBF3A88 (8), 0x7EBF3A9C-0x7EBF3AA0 (4), 0x7EBF3AAF-0x7EBF3AB8 (9), 0x7EBF3ACB-0x7EBF3AD0 (5), 0x7EBF3ADE-0x7EBF3AE8 (10), 0x7EBF3B00-0x7EBF3B10 (16), 0x7EBF3B36-0x7EBF3B38 (2), 0x7EBF3B4B-0x7EBF3B50 (5), 0x7EBF3B64-0x7EBF3B68 (4), 0x7EBF3B77-0x7EBF3B80 (9), 0x7EBF3B94-0x7EBF3BAD (25)
   - `patches/card-looks-2.json` (superseded): 494 B in 0x7EBF1090-0x7EBF10F3, 0x7EBF2888-0x7EBF28FE, 0x7EBF29C0-0x7EBF29EF, 0x7EBF2A8C-0x7EBF2AF9, 0x7EBF2B90-0x7EBF2BE3, 0x7EBF3B10-0x7EBF3B36
   - `patches/card-looks-3.json` (superseded): 430 B in 0x7EBF1090-0x7EBF10F3, 0x7EBF2888-0x7EBF28BE, 0x7EBF29C0-0x7EBF29EF, 0x7EBF2A8C-0x7EBF2AF9, 0x7EBF2B90-0x7EBF2BE3, 0x7EBF3B10-0x7EBF3B36
-  - `patches/card-looks-4.json` (current): 431 B in 0x7EBF1090-0x7EBF10F3, 0x7EBF2890-0x7EBF28C7, 0x7EBF29C0-0x7EBF29EF, 0x7EBF2A8C-0x7EBF2AF9, 0x7EBF2B90-0x7EBF2BE3, 0x7EBF3B10-0x7EBF3B36
+  - `patches/card-looks-4.json` (superseded): 431 B in 0x7EBF1090-0x7EBF10F3, 0x7EBF2890-0x7EBF28C7, 0x7EBF29C0-0x7EBF29EF, 0x7EBF2A8C-0x7EBF2AF9, 0x7EBF2B90-0x7EBF2BE3, 0x7EBF3B10-0x7EBF3B36
+  - `patches/card-looks-5.json` (current): 332 B in 0x7EBF2890-0x7EBF28C7, 0x7EBF29C0-0x7EBF29EF, 0x7EBF2A8C-0x7EBF2AF9, 0x7EBF2B90-0x7EBF2BE3, 0x7EBF3B10-0x7EBF3B36
   - `patches/card-looks.json` (superseded): 494 B in 0x7EBF1090-0x7EBF10F3, 0x7EBF2888-0x7EBF28FE, 0x7EBF29C0-0x7EBF29EF, 0x7EBF2A8C-0x7EBF2AF9, 0x7EBF2B90-0x7EBF2BE3, 0x7EBF3B10-0x7EBF3B36
-  - `patches/custom-menu-rows-2.json` (current): 1494 B in 0x7EBF1FF0-0x7EBF2512, 0x7EBF2900-0x7EBF2954, 0x7EBF2960-0x7EBF29C0
+  - `patches/custom-menu-rows-2.json` (superseded): 1494 B in 0x7EBF1FF0-0x7EBF2512, 0x7EBF2900-0x7EBF2954, 0x7EBF2960-0x7EBF29C0
+  - `patches/custom-menu-rows-3.json` (current): 1510 B in 0x7EBF1FE0-0x7EBF2512, 0x7EBF2900-0x7EBF2954, 0x7EBF2960-0x7EBF29C0
   - `patches/custom-menu-rows.json` (superseded): 2134 B in 0x7EBF1FF0-0x7EBF2502, 0x7EBF2600-0x7EBF2890, 0x7EBF2900-0x7EBF2954, 0x7EBF2960-0x7EBF29C0
   - `patches/films12-looks.json` (superseded): 90 B in 0x7EBF3B52-0x7EBF3BAC
-  - `patches/films12-structure.json` (current): 788 B in 0x7EBF2E80-0x7EBF2F40, 0x7EBF38BC-0x7EBF3B10
+  - `patches/films12-structure.json` (superseded): 788 B in 0x7EBF2E80-0x7EBF2F40, 0x7EBF38BC-0x7EBF3B10
   - `patches/films12bw-doublex.json` (current): 49 B in 0x7EBF2E9A-0x7EBF2E9F, 0x7EBF2F40-0x7EBF2F6C
-  - `patches/films12cl-looks.json` (current): 90 B in 0x7EBF3B52-0x7EBF3BAC
+  - `patches/films12cl-looks.json` (superseded): 90 B in 0x7EBF3B52-0x7EBF3BAC
   - `patches/interval-frames-240.json` (current): 3592 B in 0x7EBF10FC-0x7EBF1F04
   - `patches/level-adjust-row.json` (current): 1906 B in 0x7EBF3000-0x7EBF34F2, 0x7EBF3500-0x7EBF3780
   - `patches/log-card-keep.json` (superseded): 496 B in 0x7EBF1090-0x7EBF10FB, 0x7EBF2888-0x7EBF28F0, 0x7EBF29C0-0x7EBF29E9, 0x7EBF2A8C-0x7EBF2AF9, 0x7EBF2B90-0x7EBF2BE0, 0x7EBF2C00-0x7EBF2C05, 0x7EBF2D24-0x7EBF2D28, 0x7EBF2D2D-0x7EBF2D31, 0x7EBF2E0F-0x7EBF2E14, 0x7EBF3B10-0x7EBF3B35
@@ -222,7 +234,8 @@ Ledger (bytes that specs change inside an area; `history` and `superseded` do no
   - `patches/log-card-probe.json` (superseded): 463 B in 0x7EBF1090-0x7EBF10EF, 0x7EBF2888-0x7EBF28F1, 0x7EBF2A8C-0x7EBF2AF8, 0x7EBF2B90-0x7EBF2BF6, 0x7EBF2C00-0x7EBF2C05, 0x7EBF2D24-0x7EBF2D28, 0x7EBF2D2D-0x7EBF2D31, 0x7EBF3B10-0x7EBF3B38
   - `patches/log-card-read.json` (superseded): 129 B in 0x7EBF2888-0x7EBF28FC, 0x7EBF2C00-0x7EBF2C05, 0x7EBF2D24-0x7EBF2D28, 0x7EBF2D2D-0x7EBF2D31
   - `patches/log-core.json` (superseded): 640 B in 0x7EBF2C00-0x7EBF2E80
-  - `patches/log-menu.json` (current): 1352 B in 0x7EBF2600-0x7EBF27FC, 0x7EBF2BE4-0x7EBF2DF6, 0x7EBF3780-0x7EBF38BA
+  - `patches/log-menu-2.json` (current): 1352 B in 0x7EBF2600-0x7EBF27FC, 0x7EBF2BE4-0x7EBF2DF6, 0x7EBF3780-0x7EBF38BA
+  - `patches/log-menu.json` (superseded): 1352 B in 0x7EBF2600-0x7EBF27FC, 0x7EBF2BE4-0x7EBF2DF6, 0x7EBF3780-0x7EBF38BA
   - `patches/log-peaking-guard.json` (superseded): 99 B in 0x7EBF2510-0x7EBF256B, 0x7EBF2D24-0x7EBF2D28, 0x7EBF2D2D-0x7EBF2D31
   - `patches/log-peaking-time.json` (superseded): 8 B in 0x7EBF2D24-0x7EBF2D28, 0x7EBF2D2D-0x7EBF2D31
   - `patches/log-probes.json` (superseded): 314 B in 0x7EBF3780-0x7EBF38BA
@@ -233,16 +246,19 @@ Ledger (bytes that specs change inside an area; `history` and `superseded` do no
   - `patches/peaking-direct-3.json` (current): 39 B in 0x7EBF1F00-0x7EBF1F27
   - `patches/peaking-direct-4.json` (current): 39 B in 0x7EBF1F28-0x7EBF1F4F
   - `patches/peaking-menu.json` (superseded): 2110 B in 0x7EBF2000-0x7EBF2502, 0x7EBF2600-0x7EBF2888, 0x7EBF2900-0x7EBF2954, 0x7EBF2960-0x7EBF29C0
-- 0x7ECB0888-0x7ECB1000: free 0x7ECB0B9E-0x7ECB0BA0 (2), 0x7ECB0EE7-0x7ECB0EE8 (1), 0x7ECB0FCC-0x7ECB1000 (52)
+  - `patches/stock-films-structure.json` (current): 980 B in 0x7EBF1090-0x7EBF109E, 0x7EBF10A8-0x7EBF10BD, 0x7EBF10C0-0x7EBF10D0, 0x7EBF10D8-0x7EBF10EC, 0x7EBF2512-0x7EBF2526, 0x7EBF252A-0x7EBF2539, 0x7EBF2542-0x7EBF2555, 0x7EBF27FC-0x7EBF280A, 0x7EBF2814-0x7EBF283F, 0x7EBF2844-0x7EBF2858, 0x7EBF285C-0x7EBF286B, 0x7EBF2874-0x7EBF2887, 0x7EBF28C8-0x7EBF28D6, 0x7EBF28E0-0x7EBF28F8, 0x7EBF2DF8-0x7EBF2E07, 0x7EBF2E10-0x7EBF2E24, 0x7EBF2E28-0x7EBF2E36, 0x7EBF2E40-0x7EBF2E68, 0x7EBF38BC-0x7EBF3A6F, 0x7EBF3A70-0x7EBF3A80, 0x7EBF3A88-0x7EBF3A9C, 0x7EBF3AA0-0x7EBF3AAF, 0x7EBF3AB8-0x7EBF3ACB, 0x7EBF3AD0-0x7EBF3ADE, 0x7EBF3AE8-0x7EBF3B00, 0x7EBF3B38-0x7EBF3B4B, 0x7EBF3B50-0x7EBF3B64, 0x7EBF3B68-0x7EBF3B77, 0x7EBF3B80-0x7EBF3B94
+- 0x7ECB0888-0x7ECB1000: free 0x7ECB0B6D-0x7ECB0BA0 (51), 0x7ECB0EE7-0x7ECB0EE8 (1), 0x7ECB0FE8-0x7ECB1000 (24)
   - `patches/card-looks-2.json` (superseded): 256 B in 0x7ECB0EE8-0x7ECB0FE8
   - `patches/card-looks-3.json` (superseded): 228 B in 0x7ECB0EE8-0x7ECB0FCC
-  - `patches/card-looks-4.json` (current): 228 B in 0x7ECB0EE8-0x7ECB0FCC
+  - `patches/card-looks-4.json` (superseded): 228 B in 0x7ECB0EE8-0x7ECB0FCC
+  - `patches/card-looks-5.json` (current): 256 B in 0x7ECB0EE8-0x7ECB0FE8
   - `patches/card-looks.json` (superseded): 240 B in 0x7ECB0EE8-0x7ECB0FD8
-  - `patches/films12-structure.json` (current): 5 B in 0x7ECB094C-0x7ECB0951
+  - `patches/films12-structure.json` (superseded): 5 B in 0x7ECB094C-0x7ECB0951
   - `patches/interval-timelapse-v2.json` (current): 839 B in 0x7ECB0BA0-0x7ECB0EE7
-  - `patches/remap7b-code.json` (current): 760 B in 0x7ECB0888-0x7ECB0B80
-  - `patches/seven-films-5.json` (current): 72 B in 0x7ECB0988-0x7ECB09D0
-  - `patches/seven-movie-1.json` (current): 30 B in 0x7ECB0B80-0x7ECB0B9E
+  - `patches/remap7b-code.json` (superseded): 760 B in 0x7ECB0888-0x7ECB0B80
+  - `patches/seven-films-5.json` (superseded): 72 B in 0x7ECB0988-0x7ECB09D0
+  - `patches/seven-movie-1.json` (superseded): 30 B in 0x7ECB0B80-0x7ECB0B9E
+  - `patches/stock-films-structure.json` (current): 741 B in 0x7ECB0888-0x7ECB0B6D
   - `patches/history/check-portra-in-new-slots.json` (history): 72 B in 0x7ECB0988-0x7ECB09D0
   - `patches/history/film-vision3-250d-pl1.json` (history): 1042 B in 0x7ECB0948-0x7ECB095A, 0x7ECB0B40-0x7ECB0F40
   - `patches/history/four-code.json` (history): 256 B in 0x7ECB0888-0x7ECB0988
@@ -259,40 +275,47 @@ Ledger (bytes that specs change inside an area; `history` and `superseded` do no
 
 | Range | Size | Source | Verdict | Use | Used | Free | L | C | P | O | W | B | Failing check: evidence |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 0x7EE3CBF2-0x7EE3CFE2 | 1008 | listed: reclaim-space row 6 (code, checked) | USABLE-DATA | data | 736 | 272 | ok | ok | ok | ok | ok | ok | - |
+| 0x7EE3CBF2-0x7EE3CFE2 | 1008 | listed: reclaim-space row 6 (code, checked) | USABLE-DATA | data | 744 | 264 | ok | ok | ok | ok | ok | ok | - |
 | 0x7EE40728-0x7EE40877 | 335 | listed: reclaim-space row 8 (code, checked) | USABLE-DATA | data | 0 | 335 | ok | ok | ok | ok | ok | ok | - |
-| 0x7EE40B17-0x7EE411F6 | 1759 | listed: reclaim-space row 4 (code, checked) | USABLE-DATA | data | 1660 | 99 | ok | ok | ok | ok | ok | ok | - |
+| 0x7EE40B17-0x7EE411F6 | 1759 | listed: reclaim-space row 4 (code, checked) | USABLE-DATA | data | 1758 | 1 | ok | ok | ok | ok | ok | ok | - |
 | 0x7EE46C39-0x7EE46CB0 | 119 | listed: reclaim-space row 8 (code, checked) | USABLE-DATA | data | 0 | 119 | ok | ok | ok | ok | ok | ok | - |
-| 0x7EE46D27-0x7EE4709D | 886 | listed: reclaim-space row 7 (code, checked) | USABLE-DATA | data | 180 | 706 | ok | ok | ok | ok | ok | ok | - |
-| 0x7EE5382E-0x7EE53D6A | 1340 | listed: reclaim-space row 5 (code, checked) | USABLE-DATA | data | 930 | 410 | ok | ok | ok | ok | ok | ok | - |
-| 0x7EE541B3-0x7EE548B1 | 1790 | listed: reclaim-space row 3 (code, checked) | USABLE-DATA | data | 816 | 974 | ok | ok | ok | ok | ok | ok | - |
+| 0x7EE46D27-0x7EE4709D | 886 | listed: reclaim-space row 7 (code, checked) | USABLE-DATA | data | 128 | 758 | ok | ok | ok | ok | ok | ok | - |
+| 0x7EE5382E-0x7EE53D6A | 1340 | listed: reclaim-space row 5 (code, checked) | USABLE-DATA | data | 941 | 399 | ok | ok | ok | ok | ok | ok | - |
+| 0x7EE541B3-0x7EE548B1 | 1790 | listed: reclaim-space row 3 (code, checked) | USABLE-DATA | data | 1296 | 494 | ok | ok | ok | ok | ok | ok | - |
 | 0x7F030748-0x7F0307A8 | 96 | 0xFF run | NEEDS-DECISION | data | 0 | 96 | ok | ok | FAIL | ok | ok | ? | **pointers**: 4 hit(s): 0x7F030748 at 0x7EEA7022 via runtime [add 2130904904,a3 at 0x7EEA7020]; 0x7F030748 at 0x7EEA774F via runtime [add 2130904904,a3 at 0x7EEA774D]; 0x7F030778 at 0x7EEA6FEC via runtime [add 2130904952,a0 at 0x7EEA6FEA]; 0x7F030778 at 0x7EEA7713 via runtime [add 2130904952,a0 at 0x7EEA7711]; explained noise: none; windows in the other blocks (reported, not counted: resource blocks, not classified): block 1 0, block 2 0, block 3 0, tail 0; **predecessor**: data before (766e766e766e766e); bound not proven: nothing shows where the reader of the object before stops; nearest referenced address before: 0x7F0306E8 (from 0x7EEA70B8, 0x7EEA71CE, 0x7EEA77F1 ...); after: 0x7F0307A8 (from 0x7EEA6FBD, 0x7EEA76E4) |
-| 0x7F033B7C-0x7F034000 | 1156 | 0xFF run | USABLE-DATA | data | 1024 | 132 | ok | ok | ok | ok | ok | ok | - |
+| 0x7F033B7C-0x7F034000 | 1156 | 0xFF run | USABLE-DATA | data | 796 | 360 | ok | ok | ok | ok | ok | ok | - |
 
 Ledger (bytes that specs change inside an area; `history` and `superseded` do not reduce the free count):
 
-- 0x7EE3CBF2-0x7EE3CFE2: free 0x7EE3CBF2-0x7EE3CBF4 (2), 0x7EE3CED4-0x7EE3CFE2 (270)
-  - `patches/custom-menu-rows-2.json` (current): 736 B in 0x7EE3CBF4-0x7EE3CED4
-- 0x7EE40B17-0x7EE411F6: free 0x7EE40B17-0x7EE40B18 (1), 0x7EE41194-0x7EE411F6 (98)
+- 0x7EE3CBF2-0x7EE3CFE2: free 0x7EE3CBF2-0x7EE3CBF4 (2), 0x7EE3CEDC-0x7EE3CFE2 (262)
+  - `patches/custom-menu-rows-2.json` (superseded): 736 B in 0x7EE3CBF4-0x7EE3CED4
+  - `patches/custom-menu-rows-3.json` (current): 744 B in 0x7EE3CBF4-0x7EE3CEDC
+- 0x7EE40B17-0x7EE411F6: free 0x7EE40B17-0x7EE40B18 (1)
   - `patches/card-looks-2.json` (superseded): 1660 B in 0x7EE40B18-0x7EE41194
   - `patches/card-looks-3.json` (superseded): 1660 B in 0x7EE40B18-0x7EE41194
-  - `patches/card-looks-4.json` (current): 1660 B in 0x7EE40B18-0x7EE41194
+  - `patches/card-looks-4.json` (superseded): 1660 B in 0x7EE40B18-0x7EE41194
+  - `patches/card-looks-5.json` (current): 1758 B in 0x7EE40B18-0x7EE411F6
   - `patches/card-looks.json` (superseded): 1704 B in 0x7EE40B18-0x7EE411C0
-- 0x7EE46D27-0x7EE4709D: free 0x7EE46D27-0x7EE46D28 (1), 0x7EE46DDC-0x7EE4709D (705)
+- 0x7EE46D27-0x7EE4709D: free 0x7EE46D27-0x7EE46D28 (1), 0x7EE46D70-0x7EE46D88 (24), 0x7EE46DC0-0x7EE4709D (733)
   - `patches/looks-menu-2.json` (superseded): 180 B in 0x7EE46D28-0x7EE46DDC
-  - `patches/looks-menu-3.json` (current): 180 B in 0x7EE46D28-0x7EE46DDC
+  - `patches/looks-menu-3.json` (superseded): 180 B in 0x7EE46D28-0x7EE46DDC
+  - `patches/looks-menu-4.json` (current): 128 B in 0x7EE46D28-0x7EE46D70, 0x7EE46D88-0x7EE46DC0
   - `patches/looks-menu.json` (superseded): 72 B in 0x7EE46D28-0x7EE46D70
-- 0x7EE5382E-0x7EE53D6A: free 0x7EE5382E-0x7EE53830 (2), 0x7EE53BD2-0x7EE53D6A (408)
+- 0x7EE5382E-0x7EE53D6A: free 0x7EE5382E-0x7EE53830 (2), 0x7EE53BDD-0x7EE53D6A (397)
   - `patches/card-looks-3.json` (superseded): 930 B in 0x7EE53830-0x7EE53BD2
-  - `patches/card-looks-4.json` (current): 930 B in 0x7EE53830-0x7EE53BD2
-  - `patches/log-menu.json` (current): 7 B in 0x7EE53949-0x7EE53950
-- 0x7EE541B3-0x7EE548B1: free 0x7EE541B3-0x7EE541B4 (1), 0x7EE544E4-0x7EE548B1 (973)
+  - `patches/card-looks-4.json` (superseded): 930 B in 0x7EE53830-0x7EE53BD2
+  - `patches/card-looks-5.json` (current): 941 B in 0x7EE53830-0x7EE53BDD
+  - `patches/log-menu-2.json` (current): 7 B in 0x7EE5392B-0x7EE53932
+  - `patches/log-menu.json` (superseded): 7 B in 0x7EE53949-0x7EE53950
+- 0x7EE541B3-0x7EE548B1: free 0x7EE541B3-0x7EE541B4 (1), 0x7EE546C4-0x7EE548B1 (493)
   - `patches/card-looks-2.json` (superseded): 348 B in 0x7EE541B4-0x7EE54310
   - `patches/card-looks-3.json` (superseded): 816 B in 0x7EE541B4-0x7EE544E4
-  - `patches/card-looks-4.json` (current): 816 B in 0x7EE541B4-0x7EE544E4
+  - `patches/card-looks-4.json` (superseded): 816 B in 0x7EE541B4-0x7EE544E4
   - `patches/card-looks.json` (superseded): 232 B in 0x7EE541B4-0x7EE5429C
-- 0x7F033B7C-0x7F034000: free 0x7F033F7C-0x7F034000 (132)
-  - `patches/seven-films-5.json` (current): 1024 B in 0x7F033B7C-0x7F033F7C
+  - `patches/stock-films-structure.json` (current): 1296 B in 0x7EE541B4-0x7EE546C4
+- 0x7F033B7C-0x7F034000: free 0x7F033E98-0x7F034000 (360)
+  - `patches/card-looks-5.json` (current): 796 B in 0x7F033B7C-0x7F033E98
+  - `patches/seven-films-5.json` (superseded): 1024 B in 0x7F033B7C-0x7F033F7C
   - `patches/history/check-portra-in-new-slots.json` (history): 1024 B in 0x7F033B7C-0x7F033F7C
   - `patches/history/film-vision3-250d-pl1.json` (history): 512 B in 0x7F033B7C-0x7F033D7C
   - `patches/history/four-neutral.json` (history): 1024 B in 0x7F033B7C-0x7F033F7C
@@ -355,24 +378,24 @@ USABLE columns count free bytes only. USED counts bytes of current specs in area
 |---|---|---|---|---|---|
 | pre-reset | 0 | 0 | 0 | 35482 | 120 |
 | kernel | 0 | 22 | 1824 | 40190 | 0 |
-| segment-1 | 0 | 2 | 162 | 13266 | 0 |
+| segment-1 | 580 | 138 | 667 | 13335 | 0 |
 | data-image | 0 | 0 | 0 | 0 | 222 |
-| segment-2 | 0 | 655 | 12294 | 4418 | 0 |
-| segment-3 | 3047 | 0 | 5346 | 96 | 0 |
+| segment-2 | 1320 | 652 | 15329 | 66 | 0 |
+| segment-3 | 2730 | 0 | 5663 | 96 | 0 |
 | overlay-A | 0 | 0 | 0 | 574 | 0 |
 | overlay-B | 0 | 0 | 0 | 892 | 0 |
 | usr1-third | 0 | 0 | 0 | 156 | 0 |
 | sram-image | 0 | 0 | 0 | 32 | 663 |
 | not loaded | 0 | 0 | 0 | 0 | 1586842 |
-| **all** | 3047 | 679 | 19626 | 95106 | 1587847 |
+| **all** | 4630 | 812 | 23483 | 90823 | 1587847 |
 
 ## 5. Hand files
 
 | File | Rows | Columns |
 |---|---|---|
-| `docs/space-candidates.tsv` | 14 | start, end (exclusive), kind, status (`checked` or `auto`), source, note |
-| `docs/space-bounds.tsv` | 6 | object, bound (exclusive), reader site, expected bytes at the site, evidence |
-| `docs/space-pointer-waivers.tsv` | 2 | first site, end (exclusive), expected bytes at the first site, evidence |
-| `docs/space-superseded.tsv` | 18 | spec, superseded by, evidence |
+| `docs/space-candidates.tsv` | 16 | start, end (exclusive), kind, status (`checked` or `auto`), source, note |
+| `docs/space-bounds.tsv` | 7 | object, bound (exclusive), reader site, expected bytes at the site, evidence |
+| `docs/space-pointer-waivers.tsv` | 5 | first site, end (exclusive), expected bytes at the first site, evidence |
+| `docs/space-superseded.tsv` | 29 | spec, superseded by, evidence |
 
 The full evidence text of every check is in `docs/code-space-map.tsv`.
