@@ -570,3 +570,25 @@ Also: no magenta bands, and no garbage at the bottom of the frame.
 | Colour fringes on vertical edges (green / magenta), the picture otherwise sharp | the phase model (1433) is wrong; the geometry is right |
 | Exposure follows only part of the frame | the statistics grid of request B is in output coordinates after all (§14.2) |
 | Garbage near the bottom or in the next buffer, a freeze while recording | the 1960 × 1312 frame does not fit the Bayer slot (§3.3) |
+
+## 15. Camera run of `debug-log-movie-wide-2`, 2026-11-19
+
+The owner flashed it and recorded five handheld clips, all 1920×1080 (a room, a shirt, three of the screen); no
+photo and no 720 clip came back. Files: `results/wide2/` (frames `camera-frames-1-3.png`, `camera-frames-4-5.png`).
+
+| Criterion (§12, §14) | Result |
+|---|---|
+| 1. 1080 at 30 fps, no corrupt frames, no early stop | **Pass (V).** Clean pictures: no bands, no slant, no bottom garbage; 29.83–29.86 frames/s, `ret` 0, no new firmware error |
+| 2a. Round objects stay round | **Pass (V, by eye):** the shirt buttons are round |
+| 2b. More horizontal detail than the 1646 baseline | **Not shown.** The baseline chart clip (`../PB190001.MOV`) is out of focus and farther away (`camera-crop-old-vs-new.png`), so a crop comparison measures focus, not sampling. A spectrum test (energy above 0.43 cycles/px horizontally, where a 1646→1920 stretch has none) did not separate the clips: compression and sharpening put energy there in both |
+| 3. Frame time under 33 ms | **Pass (V):** 23.7–23.8 ms median, 24.8–25.2 ms p95 (22.1 / 23.1 at 1646); one slow first frame per clip (44 ms) as before |
+| 4. 720p, photos, playback | 720 and photos **not tried**; every clip played in the camera |
+
+One clip (log clip 4, 21.6 ms) is faster, as the IS crop was in §9 (I: that clip had M-IS1); its picture is clean.
+
+**What this settles (V):** the pre-processor writes 1960-px lines at the 1.2 step; the frame fits the Bayer slot;
+writer and reader agree (record 517 of 0x7E793184 is the writer's source); the develop job and the encoder take it at
+30 fps with about 8 ms to spare.
+
+**Open:** a fair detail comparison. It needs the same subject from the same place on a support, with this build and
+with the 1646 build.

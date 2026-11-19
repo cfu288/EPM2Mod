@@ -1,0 +1,26 @@
+records lost: cpu 0: 696, cpu 1: 1436, cpu 0: 4, cpu 1: 313, cpu 1: 126, cpu 1: 99
+clip 1 (session 2): 33 frames in 1.18 s = 27.87 per s
+  period_us    mean 36244  p95 64518  max 95632   periods > 1.5 frames: 2
+  total_us     mean 21695  p95 24943  max 25403   frames > 33367 us: 0
+  develop_us   -   frames with no develop call: 33
+  ret          {'0x0000': 33}
+clip 2 (session 2): 414 frames in 13.86 s = 29.86 per s
+  period_us    mean 33514  p95 34863  max 94742   periods > 1.5 frames: 2
+  total_us     mean 23845  p95 25168  max 31492   frames > 33367 us: 0
+  develop_us   -   frames with no develop call: 414
+  ret          {'0x0000': 414}
+clip 3 (session 2): 448 frames in 15.00 s = 29.86 per s
+  period_us    mean 33507  p95 35074  max 96014   periods > 1.5 frames: 2
+  total_us     mean 23754  p95 24872  max 43991   frames > 33367 us: 1
+  develop_us   -   frames with no develop call: 448
+  ret          {'0x0000': 448}
+clip 4 (session 2): 350 frames in 11.73 s = 29.83 per s
+  period_us    mean 33553  p95 34947  max 98678   periods > 1.5 frames: 2
+  total_us     mean 21567  p95 22693  max 30693   frames > 33367 us: 0
+  develop_us   -   frames with no develop call: 350
+  ret          {'0x0000': 350}
+clip 5 (session 2): 337 frames in 11.30 s = 29.83 per s
+  period_us    mean 33555  p95 34792  max 94969   periods > 1.5 frames: 2
+  total_us     mean 23723  p95 24781  max 44859   frames > 33367 us: 1
+  develop_us   -   frames with no develop call: 337
+  ret          {'0x0000': 337}
