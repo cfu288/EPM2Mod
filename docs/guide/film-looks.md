@@ -15,7 +15,7 @@ In P, A, S or M mode, press **OK**, select **Picture Mode**, and scroll right pa
 ## Available Film Simulations
 
 <!-- BEGIN GENERATED: films -->
-| Menu name | Command-line name | Film | Type | Loaded by default |
+| Menu name | Command-line name | Film | Type | In the default look file |
 |---|---|---|---|---|
 | Portra 400 | `portra-400` | Kodak Portra 400 (negative, on Kodak Portra Endura paper) | Colour negative | ART 1 (Pop Art) |
 | Ektachrome | `ektachrome` | Kodak Ektachrome 100 (slide) | Slide | ART 2 (Soft Focus) |

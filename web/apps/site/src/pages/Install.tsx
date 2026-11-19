@@ -38,8 +38,8 @@ function Flash({ n }: { n: number }) {
         Press and hold OK (the centre of the arrow pad) and ON/OFF together. Let go when the orange lamp on the front
         stays lit.
       </p>
-      <p>Wait 1 to 2 minutes, until the lamp blinks. Do not touch the camera.</p>
-      <p>Press ON/OFF twice to restart the camera.</p>
+      <p>Writing takes 1 to 2 minutes. Do not switch the camera off until the lamp blinks.</p>
+      <p>When the lamp blinks, switch the camera off and on again.</p>
     </Step>
   )
 }
@@ -69,8 +69,8 @@ function InstallerSteps() {
         <dl className="grid grid-cols-[6rem_1fr] gap-y-2">
           <dt className="font-bold">Mac</dt>
           <dd>
-            Double-click <code>Start (Mac).command</code>. The first time, macOS blocks it: System Settings → Privacy
-            &amp; Security → Open Anyway.
+            Double-click <code>Start (Mac).command</code>. The first time, macOS blocks it: open System Settings →
+            Privacy &amp; Security, scroll down, select Open Anyway next to it, then Open.
           </dd>
           <dt className="font-bold">Windows</dt>
           <dd>
@@ -83,7 +83,10 @@ function InstallerSteps() {
         </dl>
       </Step>
       <Step n={3} title="Make the firmware">
-        <p>A page opens in your browser. Follow it to write the firmware to the SD card.</p>
+        <p>
+          Format the SD card in the camera first. A page opens in your browser: follow it to write the firmware to the
+          card.
+        </p>
       </Step>
       <Flash n={4} />
       <CustomMenu n={5} />
@@ -108,9 +111,14 @@ function CliSteps() {
         <Code>{`git clone ${REPO}.git\ncd EPM2Mod`}</Code>
       </Step>
       <Step n={2} title="Make the firmware">
+        <p>Format the SD card in the camera first. Then, with the card in the computer:</p>
         <Code>{'uv run epm2mod make --card /path/to/card'}</Code>
         <p>
-          That writes the 12 default film simulations. To choose your own, put a command-line name from the{' '}
+          <code>/path/to/card</code> is the card&apos;s folder: <code>uv run epm2mod cards</code> lists it.
+        </p>
+        <p>
+          <code>make</code> also writes the 12 default film simulations. To choose your own, put a command-line name
+          from the{' '}
           <Link href={href('films', '#all-films')} className="underline">
             film simulation list
           </Link>{' '}
@@ -184,6 +192,19 @@ export function Install() {
             <p>Then flash it the same way.</p>
           </div>
         )}
+      </section>
+
+      <section className="min-w-0">
+        <h2 className="section-title border-t-[6px] pt-4 text-lg">If something does not work</h2>
+        <ul className="text-ink-soft mt-3 max-w-2xl list-disc space-y-2 pl-5">
+          <li>
+            The camera starts normally instead of writing: it found no firmware file it accepts. Make the card again.
+          </li>
+          <li>
+            Load Looks shows No file: <code>EPM2LOOK.BIN</code> is not in the top folder of the card.
+          </li>
+          <li>Load Looks shows Bad file: the file is damaged or incomplete. Make it again. Nothing was changed.</li>
+        </ul>
       </section>
     </div>
   )

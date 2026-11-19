@@ -9,6 +9,8 @@ Start
             If Windows protects your PC: More info, then Run anyway.
   Linux:    run ./start.sh in a terminal.
 
+Charge the camera's battery fully before you flash.
+
 A page opens in your browser. It makes the firmware, adds the film simulations you choose,
 and writes the files to your SD card or gives you a zip. Select Finish on the page to stop
 EPM2Mod; it also stops a few minutes after you close the page.

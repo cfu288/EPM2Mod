@@ -1,6 +1,6 @@
 # Debug Log
 
-The camera writes what it does to a file on the card. Send the file with a bug report.
+The camera writes what it does to a file on the card.
 
 ## Setup
 
@@ -14,7 +14,7 @@ If the menu has no Custom Menu tab (gears icon), enable it in **Setup Menu → M
 ## Usage
 
 With **On**, the camera adds to `EPM2LOG.BIN` in the top folder of the card each time you open a menu or playback, and
-at power-off. To read the file on a computer: `uv run epm2mod log EPM2LOG.BIN --summary`
+at power-off. With the command-line install, `uv run epm2mod log EPM2LOG.BIN --summary` reads the file
 ([the log format](../logging.md)).
 
 ## Limits

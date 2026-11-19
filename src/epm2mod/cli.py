@@ -567,7 +567,9 @@ def build_parser() -> argparse.ArgumentParser:
     looks_cmd = command(
         "looks",
         _looks,
-        "Check or write the film-look patch specs that the fit files generate.",
+        "Film simulations for the SD card: list them, pack a look file, show one. "
+        "With no action, or with --check or --write (for developers): compare or write "
+        "the film-look patch specs that the fit files generate.",
     )
     looks_mode = looks_cmd.add_mutually_exclusive_group()
     looks_mode.add_argument(

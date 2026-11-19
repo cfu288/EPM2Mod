@@ -50,7 +50,7 @@ def pinned_block(paths: RepoPaths) -> str:
     pinned = pinned_description(paths)
     what = cell(pinned.what[:1].lower() + pinned.what[1:]).rstrip(".")
     return (
-        f"The pinned build is **`{pinned.name}`**: {what}. "
+        f"The installer and `make` build the firmware **`{pinned.name}`**: {what}. "
         f"We tested this build on a real E-PM2 on {pinned.camera_tested} "
         "([camera log](camera-log.md)).\n\n"
         "| | sha256 |\n|---|---|\n"
@@ -95,7 +95,7 @@ def films_block(paths: RepoPaths) -> str:
             f"| {cell(film.kind)} | {cell(where)} |"
         )
     return (
-        "| Menu name | Command-line name | Film | Type | Loaded by default |\n|---|---|---|---|---|\n"
+        "| Menu name | Command-line name | Film | Type | In the default look file |\n|---|---|---|---|---|\n"
         + "\n".join(rows)
         + "\n"
     )

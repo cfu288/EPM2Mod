@@ -26,12 +26,12 @@ The entry shows the look's name everywhere the camera shows a film name.
 <img src="../images/ui/picture-mode-loaded.png" width="320" alt="The Picture Mode strip with Portra 800">
 
 Each Load replaces the last one: an entry the file leaves out goes back to its Olympus art filter. You can delete
-the file. **No file** or **Bad file** means nothing changed. No Custom Menu tab (gears icon): enable it in **Setup Menu → Menu Display**.
+the file. **No file**: `EPM2LOOK.BIN` is not in the top folder of the card. **Bad file**: the file is damaged or incomplete. Make it again. In both cases nothing changed. No Custom Menu tab (gears icon): enable it in **Setup Menu → Menu Display**.
 
 ## Limits
 
 - The row's texts are English in every menu language.
-- No look has grain. Double-X has had none since this build.
+- No look has grain.
 
 File format, for a program that writes looks: [look-file-format.md](../look-file-format.md). Design and tests:
 [card-looks design](../../experiments/2026-11-17-card-looks/design.md).

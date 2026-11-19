@@ -1,7 +1,7 @@
 # Install
 
 <!-- BEGIN GENERATED: pinned-build -->
-The pinned build is **`lss`**: the twelve Olympus art filters unchanged; film looks loaded from the SD card with Custom Menu J, Load Looks, overwrite the entries the file lists; interval shooting with up to 240 frames, a level gauge with calibration, and focus peaking; a Debug Log row in Custom Menu J (Off by default) that writes EPM2LOG.BIN to the card for bug reports; a Lowest S/S Setting row in Custom Menu E (the shutter speed at which ISO Auto starts to rise in P and A). We tested this build on a real E-PM2 on 2026-11-19 ([camera log](camera-log.md)).
+The installer and `make` build the firmware **`lss`**: the twelve Olympus art filters unchanged; film looks loaded from the SD card with Custom Menu J, Load Looks, overwrite the entries the file lists; interval shooting with up to 240 frames, a level gauge with calibration, and focus peaking; a Debug Log row in Custom Menu J (Off by default) that writes EPM2LOG.BIN to the card for bug reports; a Lowest S/S Setting row in Custom Menu E (the shutter speed at which ISO Auto starts to rise in P and A). We tested this build on a real E-PM2 on 2026-11-19 ([camera log](camera-log.md)).
 
 | | sha256 |
 |---|---|
