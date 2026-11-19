@@ -115,38 +115,25 @@ function CliSteps() {
       </Step>
       <Step n={2} title="Write the card">
         <p>Format the SD card in the camera first. Then, with the card in the computer:</p>
-        <Code>{'uv run epm2mod install --card /path/to/card'}</Code>
+        <Code>
+          {
+            'uv run epm2mod install --card /path/to/card --film ART1=portra-400 --film ART2=ektachrome --film ART3=pro-400h --film ART4=kodachrome --film ART5=double-x --film ART6=vision3-250d --film ART7=velvia --film ART8=superia-400 --film ART9=provia --film ART10=portra-160 --film ART11=gold-200 --film ART12=vision3-500t'
+          }
+        </Code>
         <p>
-          <code>/path/to/card</code> is the card&apos;s folder: <code>uv run epm2mod cards</code> lists it.
-        </p>
-        <p>
-          <code>install</code> writes the firmware. To add film simulations, give <code>--film</code> with a
-          command-line name from the{' '}
+          <code>/path/to/card</code> is the card&apos;s folder: <code>uv run epm2mod cards</code> lists it. To use other
+          film simulations, change the names (
           <Link href={href('films', '#all-films')} className="underline">
             film simulation list
-          </Link>{' '}
-          (or <code>uv run epm2mod films</code>) for each ART slot. ART1 is the first entry of the camera&apos;s ART
-          menu (Pop Art), ART12 the last (Watercolor). A slot you leave out keeps its Olympus art filter.
-        </p>
-        <Code>{'uv run epm2mod install --card /path/to/card --film ART1=portra-400 --film ART2=velvia'}</Code>
-        <p>To change only the film simulations later:</p>
-        <Code>{'uv run epm2mod films set --card /path/to/card --film ART2=velvia'}</Code>
-        <p>To see what is on the card and what will not work:</p>
-        <Code>{'uv run epm2mod inspect --card /path/to/card'}</Code>
-        <p>
-          All commands:{' '}
-          <a href={`${REPO}/blob/main/docs/cli.md`} className="underline">
-            command-line reference
-          </a>
-          .
+          </Link>
+          ).
         </p>
       </Step>
       <Flash n={3} />
       <CustomMenu n={4} />
       <Step n={5} title="Load the film simulations">
         <p>
-          If you gave <code>--film</code>: MENU → SETUP → Custom Menu → J → Load Looks → Load. Until then, the ART
-          entries are the Olympus art filters.
+          MENU → SETUP → Custom Menu → J → Load Looks → Load. Until then, the ART entries are the Olympus art filters.
         </p>
       </Step>
     </ol>

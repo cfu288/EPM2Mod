@@ -24,7 +24,6 @@ import re
 from collections.abc import Callable
 from pathlib import Path
 
-from . import camera_steps, catalogue
 from .builds import all_descriptions, pinned_description
 from .errors import BuildError
 from .fileio import read_text, write_text
@@ -100,24 +99,6 @@ def films_block(paths: RepoPaths) -> str:
         + "\n".join(rows)
         + "\n"
     )
-
-
-#: The films of the README's example ``install`` command, whose camera steps ``steps_block`` writes.
-STEPS_EXAMPLE = ("ART1=portra-400",)
-
-
-def steps_block(paths: RepoPaths) -> str:
-    """Return the camera steps after ``epm2mod install`` writes the pinned build and films to the card, as a list.
-
-    The films are ``STEPS_EXAMPLE``.
-    """
-    looks = records.looks_of_choices(records.load(paths), STEPS_EXAMPLE)
-    steps = camera_steps.flash_steps(
-        films=True,
-        firmware=camera_steps.firmware_reads(pinned_description(paths).label),
-        art_shows=catalogue.art_check(looks),
-    )
-    return "".join(f"{number}. {step.text}\n" for number, step in enumerate(steps, 1))
 
 
 def _code(text: str) -> str:
@@ -259,7 +240,6 @@ BLOCKS: dict[str, Callable[[RepoPaths], str]] = {
     "pinned-build": pinned_block,
     "builds": builds_block,
     "films": films_block,
-    "camera-steps": steps_block,
 }
 
 

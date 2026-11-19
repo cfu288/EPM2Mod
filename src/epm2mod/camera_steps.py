@@ -2,7 +2,7 @@
 
 Each step is a ``Step``: an id that does not change and the text a user reads. The command line prints the texts
 (``epm2mod install``, ``films set``, ``restore``) and puts them in ``--json``; the installer page gets them from the
-server (``serve.Job.state``); the document generator (``readme.steps_block``) writes them into the README.
+server (``serve.Job.state``).
 """
 
 from __future__ import annotations

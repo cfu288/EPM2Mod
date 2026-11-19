@@ -31,39 +31,14 @@ Download the zip from [Releases](https://github.com/cfu288/EPM2Mod/releases), un
 
 ### Using the command line
 
-Get the code:
+Format the card in the camera and put it in the computer (`uv run epm2mod cards` shows its folder). Then:
 
 ```sh
-git clone https://github.com/cfu288/EPM2Mod.git
-cd EPM2Mod
+git clone https://github.com/cfu288/EPM2Mod.git && cd EPM2Mod
+uv run epm2mod install --card /path/to/card --film ART1=portra-400 --film ART2=ektachrome --film ART3=pro-400h --film ART4=kodachrome --film ART5=double-x --film ART6=vision3-250d --film ART7=velvia --film ART8=superia-400 --film ART9=provia --film ART10=portra-160 --film ART11=gold-200 --film ART12=vision3-500t
 ```
 
-1. Format the card in the camera. This makes the `DCIM` folder. Put the card in the computer. `uv run epm2mod cards` shows the folder of the card (for example `/Volumes/NO NAME` on a Mac or `E:\` on Windows).
-2. Write EPM2Mod to the card:
-
-   ```sh
-   uv run epm2mod install --card /path/to/card
-   ```
-
-   This downloads the Olympus firmware, applies the patches, and writes `DCOLYMP/E1019999.BIN` to the card. To add film simulations, give `--film ARTn=NAME` once for each ART slot you want to change: `install` then also writes `EPM2LOOK.BIN`. ART1 is the first entry of the camera's ART menu (Pop Art), ART12 the last (Watercolor). A slot you leave out keeps its Olympus art filter. The names are in the [film table](docs/guide/film-looks.md#available-film-simulations), or run `uv run epm2mod films`:
-
-   ```sh
-   uv run epm2mod install --card /path/to/card --film ART1=portra-400 --film ART2=velvia
-   ```
-3. Do the steps that `install` shows. For the command with `--film`, they are:
-
-<!-- BEGIN GENERATED: camera-steps -->
-1. Eject the card (Mac: ⏏ in Finder. Windows: right-click → Eject) and take it out.
-2. Put a charged battery and the card in the camera (cover on the bottom).
-3. Hold OK (middle of the arrow pad) and ON/OFF together until the orange lamp on the front stays lit, then let go.
-4. Leave the camera alone until the lamp blinks (1 to 2 minutes).
-5. Turn the camera off and on.
-6. To check: MENU → SETUP → wrench tab → Firmware reads Body : 1.6  EPM2Mod 2026.11.19.
-7. MENU → SETUP → gears tab → J → Load Looks → Load → OK. No gears tab? Wrench tab → Menu Display → Custom Menu → On.
-8. Check: MENU → ART shows Portra 400 in ART 1.
-<!-- END GENERATED: camera-steps -->
-
-While the lamp is steady, the camera writes the firmware. Do not switch the camera off. All commands and options are in the [command-line reference](docs/cli.md).
+Do the steps that `install` prints. To use other film simulations, change the names ([film table](docs/guide/film-looks.md#available-film-simulations)).
 
 To go back to the original firmware, see [docs/install.md](docs/install.md).
 

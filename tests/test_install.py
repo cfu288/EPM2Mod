@@ -744,13 +744,6 @@ class CameraStepsTests(unittest.TestCase):
         self.assertEqual(
             check, "To check: MENU → SETUP → wrench tab → Firmware reads Body : 1.6."
         )
-        # the pinned build has a label: the README shows it
-        label = RepoPaths(ROOT).pinned_build().label
-        self.assertIsNotNone(label)
-        self.assertIn(
-            f"Firmware reads Body : 1.6  EPM2Mod {label}.",
-            readme.steps_block(RepoPaths(ROOT)),
-        )
 
     def test_the_art_check_names_the_first_film_by_slot(self) -> None:
         films = records.load(RepoPaths(ROOT))
