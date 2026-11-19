@@ -82,7 +82,7 @@ function BackButton({ onClick }: { onClick: () => void }) {
 function Choice(props: {
   group: string
   title: string
-  line: string
+  line?: string
   checked: boolean
   onChoose: () => void
   children?: ReactNode
@@ -95,7 +95,7 @@ function Choice(props: {
           id={id}
           type="radio"
           name={props.group}
-          aria-describedby={`${id}-line`}
+          aria-describedby={props.line ? `${id}-line` : undefined}
           checked={props.checked}
           onChange={props.onChoose}
           className="accent-ink mt-1 size-4"
@@ -104,9 +104,11 @@ function Choice(props: {
           <label htmlFor={id} className="block cursor-pointer font-bold">
             {props.title}
           </label>
-          <p id={`${id}-line`} className="text-ink-soft text-sm">
-            {props.line}
-          </p>
+          {props.line && (
+            <p id={`${id}-line`} className="text-ink-soft text-sm">
+              {props.line}
+            </p>
+          )}
         </div>
       </div>
       {props.checked && props.children}
@@ -136,7 +138,6 @@ function StartStep(props: {
         <Choice
           group="output"
           title="Write to an SD card"
-          line="Your photos stay on it."
           checked={!props.zip}
           onChoose={() => {
             props.onZip(false)
@@ -164,7 +165,9 @@ function StartStep(props: {
                   ))}
                 </select>
                 {props.cards.length > 1 && (
-                  <p className="text-ink-soft">Not sure which? Take the camera&apos;s card out: its entry goes away.</p>
+                  <p className="text-ink-soft">
+                    To find the camera&apos;s card, take it out and see which entry goes away.
+                  </p>
                 )}
               </>
             ) : (
@@ -181,7 +184,6 @@ function StartStep(props: {
         <Choice
           group="output"
           title="Download a zip"
-          line="Copy it to the card yourself."
           checked={props.zip}
           onChoose={() => {
             props.onZip(true)
