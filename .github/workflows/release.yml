@@ -1,4 +1,4 @@
-# The release zip for users who don't code (epm2mod release): built once, then unpacked and started with each
+# The release zip for users who don't code (epm2mod package; a tag from epm2mod release publishes it): built once, then unpacked and started with each
 # system's launcher on Linux, macOS and Windows, which makes the pinned build from OM's firmware. A tag v* also
 # publishes the zip as a GitHub release.
 name: release
@@ -46,7 +46,7 @@ jobs:
             refs/tags/v*) version="${GITHUB_REF_NAME#v}" ;;
             *) version="$(date -u +%Y.%m.%d)-dev" ;;
           esac
-          python -m epm2mod release -o dist --version "$version"
+          python -m epm2mod package -o dist --version "$version"
           name=$(basename dist/*.zip .zip)
           echo "name=$name" >> "$GITHUB_OUTPUT"
           echo "sha256=$(python -c 'from epm2mod.builds import pinned_description; from epm2mod.paths import repo_paths; print(pinned_description(repo_paths()).sha256)')" >> "$GITHUB_OUTPUT"
@@ -102,7 +102,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         # a tag with a hyphen (v2026.11.18-rc.1) is a pre-release: for testing, not yet for everyone
         run: |
-          { cat release/NOTES.md; echo; echo "Firmware sha256 \`${{ needs.build.outputs.sha256 }}\`."; } > notes.md
+          # the notes that epm2mod release wrote into the annotated tag (what is in it, what changed), then how to install
+          ref=$(gh api "repos/${{ github.repository }}/git/ref/tags/${{ github.ref_name }}" --jq '.object.type + " " + .object.sha')
+          case "$ref" in tag\ *) gh api "repos/${{ github.repository }}/git/tags/${ref#tag }" --jq .message > tagnotes.md ;; *) : > tagnotes.md ;; esac
+          if grep -q '^EPM2Mod ' tagnotes.md; then
+            { cat tagnotes.md; echo; cat release/NOTES.md; } > notes.md
+          else
+            { cat release/NOTES.md; echo; echo "Firmware sha256 \`${{ needs.build.outputs.sha256 }}\`."; } > notes.md
+          fi
           pre=""
           case "${{ github.ref_name }}" in *-*) pre="--prerelease" ;; esac
           gh release create "${{ github.ref_name }}" zip/*.zip $pre --repo "${{ github.repository }}" \

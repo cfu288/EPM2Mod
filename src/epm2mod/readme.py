@@ -183,3 +183,45 @@ def rewrite(paths: RepoPaths) -> bool:
             write_text(path, new)
             changed = True
     return changed
+
+
+#: The site's id (``web/apps/site/src/features.ts``) of each feature guide in
+#: ``docs/guide/``; None for a guide that is deliberately not on the site.
+SITE_IDS: dict[str, str | None] = {
+    "film-looks": "film-looks",
+    "card-looks": "card-looks",
+    "interval-shooting": "interval",
+    "level-gauge": "level",
+    "focus-peaking": "peaking",
+    "lowest-shutter-speed": "lowest-ss",
+    "debug-log": None,  # a tool for bug reports, not a camera feature
+}
+#: The site's feature list, relative to the repository root.
+SITE_FEATURES = "web/apps/site/src/features.ts"
+
+
+def feature_problems(paths: RepoPaths) -> list[str]:
+    """Return what is missing between the feature guides, the README and the site.
+
+    Every guide in ``docs/guide/`` must be linked from ``README.md`` and be named
+    in ``SITE_IDS``; every site id there must be in the site's feature list.
+    """
+    guides = sorted(p.stem for p in paths.resolve("docs/guide").glob("*.md"))
+    readme_text = read_text(paths.resolve("README.md"))
+    site_path = paths.resolve(SITE_FEATURES)
+    site_ids = (
+        set(re.findall(r"\bid: '([^']+)'", read_text(site_path)))
+        if site_path.exists()
+        else set()
+    )
+    problems = []
+    for guide in guides:
+        if f"(docs/guide/{guide}.md)" not in readme_text:
+            problems.append(f"README.md does not link docs/guide/{guide}.md")
+        if guide not in SITE_IDS:
+            problems.append(
+                f"docs/guide/{guide}.md is not in readme.SITE_IDS: add its site id, or None"
+            )
+        elif SITE_IDS[guide] is not None and SITE_IDS[guide] not in site_ids:
+            problems.append(f"{SITE_FEATURES} has no feature '{SITE_IDS[guide]}'")
+    return problems

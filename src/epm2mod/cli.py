@@ -9,7 +9,8 @@
     epm2mod cards                                 list the SD cards in this computer
     epm2mod restore [--card DIR] [-o FILE]        put Olympus's original firmware on the SD card
     epm2mod serve [--port N] [--no-browser]       open the installer page
-    epm2mod release [-o DIR] [--version V]        write the release zip
+    epm2mod package [-o DIR] [--version V]        write the release zip
+    epm2mod release [--final] [--push]            check, name and tag a release of the pinned build
     epm2mod apply SPEC... -o OUT.BIN              apply patch specs, without a build description
     epm2mod info FIRMWARE.BIN                     describe a firmware file
     epm2mod readme [--check]                      update the generated parts of the documents
@@ -191,10 +192,14 @@ def _info(args: argparse.Namespace, paths: RepoPaths) -> int:
 def _readme(args: argparse.Namespace, paths: RepoPaths) -> int:
     """Run ``epm2mod readme``."""
     if args.check:
-        if readme.is_current(paths):
+        problems = readme.feature_problems(paths)
+        for problem in problems:
+            print(f"feature list: {problem}")
+        if readme.is_current(paths) and not problems:
             print("the generated parts of the documents are up to date")
             return 0
-        print("the generated parts are out of date; run 'epm2mod readme'")
+        if not readme.is_current(paths):
+            print("the generated parts are out of date; run 'epm2mod readme'")
         return 1
     print("documents: updated" if readme.rewrite(paths) else "documents: no change")
     return 0
@@ -364,8 +369,8 @@ def _serve(args: argparse.Namespace, paths: RepoPaths) -> int:
     return 0
 
 
-def _release(args: argparse.Namespace, paths: RepoPaths) -> int:
-    """Run ``epm2mod release``: write the release zip."""
+def _package(args: argparse.Namespace, paths: RepoPaths) -> int:
+    """Run ``epm2mod package``: write the release zip."""
     from .release import make_release, today_version
 
     out = make_release(
@@ -375,6 +380,33 @@ def _release(args: argparse.Namespace, paths: RepoPaths) -> int:
     )
     print(
         f"wrote {out}: {out.stat().st_size} bytes, sha256 {sha256_bytes(out.read_bytes())}"
+    )
+    return 0
+
+
+def _release(args: argparse.Namespace, paths: RepoPaths) -> int:
+    """Run ``epm2mod release``: check the repository, then tag the next release."""
+    from .releasing import plan, tag
+
+    release, problems = plan(paths, final=args.final)
+    if release is None:
+        for problem in problems:
+            print(f"not ready: {problem}")
+        return 1
+    print(release.notes)
+    if not args.yes:
+        print(
+            f"ready: {release.tag} on {release.commit[:7]}. Run again with --yes to tag it."
+        )
+        return 0
+    tag(paths, release, push=args.push)
+    print(
+        f"tagged {release.tag}"
+        + (
+            " and pushed it"
+            if args.push
+            else "; push it with: git push origin " + release.tag
+        )
     )
     return 0
 
@@ -466,18 +498,38 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="print the page's address in place of opening the browser",
     )
-    release_cmd = command(
-        "release",
-        _release,
+    package_cmd = command(
+        "package",
+        _package,
         "Write the release zip: the installer, its launchers and the pinned build.",
     )
-    release_cmd.add_argument(
+    package_cmd.add_argument(
         "-o", "--out", metavar="DIR", help="the folder for the zip; default: build/"
     )
-    release_cmd.add_argument(
+    package_cmd.add_argument(
         "--version",
         metavar="V",
         help="the calendar version, like 2026.11.18 or 2026.11.18-rc.1; default: today",
+    )
+
+    release_cmd = command(
+        "release",
+        _release,
+        "Check the repository and tag the next release of the pinned build; "
+        "GitHub then makes, tests and publishes it.",
+    )
+    release_cmd.add_argument(
+        "--final",
+        action="store_true",
+        help="a release for everyone (vYYYY.MM.DD); default: a test release (-rc.N)",
+    )
+    release_cmd.add_argument(
+        "--yes",
+        action="store_true",
+        help="create the tag; without it, only check and show",
+    )
+    release_cmd.add_argument(
+        "--push", action="store_true", help="push the tag, which starts the publishing"
     )
 
     apply_cmd = command(

@@ -1,4 +1,4 @@
-"""The release zip (``epm2mod release``): what a user who doesn't code downloads.
+"""The release zip (``epm2mod package``): what a user who doesn't code downloads.
 
 The zip holds one folder, ``EPM2Mod-<version>/``, with what ``epm2mod make`` and ``epm2mod serve`` need for the
 pinned build, and nothing else:

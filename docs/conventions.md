@@ -117,6 +117,19 @@ build.
 A test record is never changed. A build that changes after its test gets a description with a new
 name.
 
+## Releases
+
+A release is a tag; GitHub makes, tests and publishes it (`.github/workflows/release.yml`).
+
+1. Pin the camera-tested build (`uv run epm2mod pin ...`) and push.
+2. `uv run epm2mod release` checks and shows the release: the pinned build has a camera test and a row in
+   `docs/camera-log.md`, the tree is clean and pushed, the generated documents and the feature lists are current,
+   and the newest CI runs on main passed. It names the version from the camera-test date (`v2026.11.19-rc.N`, or
+   `v2026.11.19` with `--final`) and writes the notes: the build, the feat and fix commits since the last tag, the sha256.
+3. `uv run epm2mod release --yes --push` tags and pushes it. The tag's message becomes the release notes.
+
+`uv run epm2mod package` makes the same zip locally, without publishing.
+
 ## Tests
 
 `uv run python -m unittest discover -s tests` runs all tests. What a test run proves depends on
