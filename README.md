@@ -17,7 +17,7 @@ Repository containing the current work for creating a custom firmware mod for th
 ## Dependencies
 
 - [uv](https://docs.astral.sh/uv/getting-started/installation/)
-- [git](https://git-scm.com/downloads), for the command line
+- [git](https://git-scm.com/downloads)
 
 ## Install
 
