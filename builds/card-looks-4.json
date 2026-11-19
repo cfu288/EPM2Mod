@@ -1,5 +1,6 @@
 {
  "what": "Film simulations in the twelve art filter entries, each of which takes any look; film looks loaded from the SD card with the menu row Load Looks in Custom Menu J, shown under their own names and kept in the camera; interval shooting with up to 240 frames, a level gauge with calibration, and focus peaking",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",

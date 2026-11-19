@@ -1,5 +1,6 @@
 {
  "what": "The twelve Olympus art filters unchanged; film looks loaded from the SD card with Custom Menu J, Load Looks, overwrite the entries the file lists; interval shooting with up to 240 frames, a level gauge with calibration, and focus peaking; a Debug Log row in Custom Menu J (Off by default) that writes EPM2LOG.BIN to the card for bug reports; a Lowest S/S Setting row in Custom Menu E (the shutter speed at which ISO Auto starts to rise in P and A)",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "patches/interval-timelapse-v2.json",
   "patches/interval-frames-240.json",

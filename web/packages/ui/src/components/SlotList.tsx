@@ -75,9 +75,7 @@ function SlotRow({ item, index, selected, onSelect, onRemove }: RowProps) {
       ) : (
         <span className="min-w-0 flex-auto">
           <span className={`block truncate ${sub}`}>Empty</span>
-          <span className={`block truncate text-xs ${sub}`}>
-            Keeps the default film: {filmById(slots[index]?.builtIn ?? '').film}
-          </span>
+          <span className={`block truncate text-xs ${sub}`}>{slots[index]?.entry}</span>
         </span>
       )}
     </li>

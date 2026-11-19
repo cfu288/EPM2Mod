@@ -29,7 +29,7 @@ from epm2mod.looks import extra, films, generate, mono, slots  # noqa: E402
 from epm2mod.paths import RepoPaths  # noqa: E402
 
 PATHS = RepoPaths(ROOT)
-HAVE_STOCK = stock.stock_path(PATHS).is_file()
+HAVE_STOCK = stock.stock_path(PATHS, stock.EPM2_V16).is_file()
 
 
 class ChainTests(unittest.TestCase):
@@ -94,7 +94,11 @@ class ListTests(unittest.TestCase):
 class RealFirmwareMonoTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        payload = parse(stock.read_stock(PATHS)).blocks[generate.PROGRAM_BLOCK].payload
+        payload = (
+            parse(stock.read_stock(PATHS, stock.EPM2_V16))
+            .blocks[generate.PROGRAM_BLOCK]
+            .payload
+        )
         cls.program = generate.Program(payload)
         cls.layout = extra.Layout(
             slots.EXTRA_SLOTS, cls.program.record(slots.DEFAULT_RECORD)
@@ -168,9 +172,11 @@ class RealFirmwareMonoTests(unittest.TestCase):
             )
 
     def test_the_committed_specs_are_the_generated_ones(self) -> None:
-        paths = [spec.path for spec in mono.generate(PATHS)]
+        paths = [spec.path for spec in mono.generate(PATHS, stock.EPM2_V16)]
         self.assertEqual(paths, list(films.load_bw_films(PATHS).spec_paths))
-        self.assertEqual(generate.stale(PATHS), [], "run: uv run epm2mod looks --write")
+        self.assertEqual(
+            generate.stale(PATHS, stock.EPM2_V16), [], "run: uv run epm2mod generate"
+        )
 
 
 if __name__ == "__main__":

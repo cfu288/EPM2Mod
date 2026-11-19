@@ -1,17 +1,17 @@
 """The ``epm2mod`` command: it parses the arguments, calls the package's functions and formats their results.
 
-The commands are in ``COMMANDS``, grouped by who uses them; ``epm2mod --help`` shows the groups, and
-``readme.cli_reference`` writes the CLI reference page from the same definitions. The rules that every command
-follows:
+The commands are in ``COMMANDS``, grouped by who uses them; ``epm2mod --help`` shows the groups (outside a checkout
+only the commands for camera owners), and ``readme.cli_reference`` writes the CLI reference page from the same
+definitions. The rules that every command follows:
 
-1. Destinations: ``--card DIR`` is the top folder of an SD card; ``-o PATH`` is a file, or an existing folder (or a
-   path that ends in a slash) that gets the usual file name.
+1. Destinations: ``--card DIR`` is the top folder of an SD card; ``-o FILE`` is always a file, and never one on a
+   listed SD card.
 2. Results go to stdout; progress, hints and the camera steps go to stderr.
-3. ``--json`` prints one document on stdout, with ``schema`` (``SCHEMA``).
-4. Exit statuses: 0 done, 1 failed, 2 wrong usage, 3 nothing found or not recognised, 4 a check failed, 5 the
-   environment (``errors``); 130 if the run was interrupted.
+3. ``--json`` prints one document on stdout, on success and on failure (``SCHEMA``, ``COMMON_JSON``).
+4. Exit statuses: ``EXIT_STATUSES`` (``errors``).
 5. ``--dry-run`` on every command that writes: what would be written; nothing is written.
 6. No prompts.
+7. Usage lines, examples and hints name the program as the launcher calls it (``PROG_ENV``).
 
 This module holds no knowledge of where the data is: it asks the locator (``catalogue.locate``) for everything.
 """
@@ -22,23 +22,28 @@ import argparse
 import contextlib
 import io
 import json
+import os
 import signal
 import sys
+import traceback
 from collections.abc import Callable, Iterator, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, NoReturn
 
 from . import __version__, camera_steps, catalogue, readme
-from .builds import BuildDescription, pinned_path
+from .builds import BuildDescription
 from .cardio import Planned, output_path
 from .catalogue import Locator
-from .container import describe, parse
 from .errors import (
+    FAILED,
+    INTERNAL,
+    INTERRUPTED,
     BuildCheckError,
     BuildError,
     Epm2ModError,
     NotFoundError,
+    RepositoryError,
     UsageError,
 )
 from .eventlog import Dictionary, decode, load_dictionary, name_films
@@ -61,10 +66,30 @@ from .pipeline import (
     set_films,
 )
 from .spec import apply_specs, load_spec
-from .stock import EPM2_V16, fetch, read_stock, stock_path
+from .stock import STOCK_FIRMWARE, fetch, read_stock, stock_path
 
-#: The version of the ``--json`` documents. A change that breaks a reader raises it.
-SCHEMA = 1
+#: The version of the ``--json`` documents. A removed or renamed key, or a changed type, raises it; an added key
+#: does not, and readers ignore keys they do not know.
+SCHEMA = 2
+#: The environment variable by which a launcher gives the name it is called by (``./start.sh``), for usage lines,
+#: examples and hints.
+PROG_ENV = "EPM2MOD_PROG"
+#: The program's name when no launcher names it.
+PROG = "epm2mod"
+
+
+def prog() -> str:
+    """Return the program's name for usage lines, examples and hints: the launcher's (``PROG_ENV``), or ``epm2mod``."""
+    return os.environ.get(PROG_ENV) or PROG
+
+
+def named(text: str, name: str) -> str:
+    """Return ``text`` with each command line that starts with ``epm2mod`` started with ``name``."""
+    if name == PROG:
+        return text
+    if text.startswith(PROG + " "):
+        text = name + text[len(PROG) :]
+    return text.replace(f"'{PROG} ", f"'{name} ")
 
 
 class Context:
@@ -90,9 +115,16 @@ class Context:
         """Return the checkout, for a developer or release command.
 
         Raises:
-            RepositoryError: outside a checkout (exit status 5).
+            RepositoryError: outside a checkout (exit status 6).
         """
         return self.locator.checkout()
+
+    def has_checkout(self) -> bool:
+        """Return True if the commands run in a checkout (else ``--help`` shows the commands for camera owners only)."""
+        try:
+            return self.locator.kind == "checkout"
+        except RepositoryError:
+            return False
 
 
 Handler = Callable[[argparse.Namespace, Context], int]
@@ -109,9 +141,11 @@ class Command:
         output: what it writes or prints by default.
         checkout: True if it needs a checkout of the repository.
         network: when it uses the network, or "" for never.
-        examples: one or two command lines.
-        json: the keys of its ``--json`` document (beside ``schema`` and ``command``), or {} for no ``--json``.
-        exits: what each exit status other than 0, 1 and 2 means for it.
+        examples: one or two command lines, which start with ``epm2mod``.
+        json: the keys of its ``--json`` document beside ``COMMON_JSON``, nested keys included (``files[].path``:
+            the key ``path`` of each item of the list ``files``; ``build.name``: the key ``name`` of the object
+            ``build``), or {} for no ``--json``.
+        exits: what each exit status other than 0 and 2 means for it.
     """
 
     name: str
@@ -136,19 +170,86 @@ GROUPS = {
     DEVELOPERS: "need a checkout",
     RELEASES: "need a checkout",
 }
-#: The exit statuses of every command.
-EXIT_STATUSES = {
-    0: "done",
-    1: "failed",
-    2: "wrong usage",
-    3: "nothing found, or a file that is not recognised",
-    4: "a check failed: a checksum, a read-back, the camera model, an untested build",
-    5: "the environment: no network, no checkout, a card that is not writable or full",
-    130: "interrupted; no file was left half-written",
+#: The exit statuses of every command: what each one means, and what a caller does.
+EXIT_STATUSES: dict[int, tuple[str, str]] = {
+    0: ("done (also: an empty cards list)", ""),
+    1: (
+        'a check found a difference or a problem (generate --check, inspect "will not work", '
+        "release --dry-run not ready)",
+        "show it; like diff and grep",
+    ),
+    2: ("wrong usage", "fix the command"),
+    3: (
+        "not found: no such path, file not recognised, unknown build",
+        "fix the name or path",
+    ),
+    4: (
+        "refused; a named flag overrides it (--allow-untested)",
+        "ask the user, then pass the flag",
+    ),
+    5: (
+        "not safe: a checksum, read-back or download sha256 differs, firmware for another model",
+        "stop; never retry with a flag",
+    ),
+    6: (
+        "environment: no network, no checkout, the card is not a camera card, not writable or full",
+        "fix the setup, then retry",
+    ),
+    INTERNAL: ("internal error (an uncaught exception)", "report"),
+    INTERRUPTED: ("interrupted (any signal); no file half-written", ""),
+}
+#: The keys of every ``--json`` document.
+COMMON_JSON = {
+    "schema": f"the version of the document: {SCHEMA}",
+    "command": "the command, like films set (null for a usage error before the command is known)",
+    "version": "the tool's version",
+    "ok": "true if the command did its work (exit status 0)",
+    "error": "only on failure: what went wrong",
+    "error.code": "a stable name of the kind of failure",
+    "error.exit": "the exit status",
+    "error.message": "the message, as on stderr",
+    "error.override": "the flag that overrides a refusal (exit status 4), else null",
 }
 _DOWNLOAD = "when Olympus's firmware is not downloaded yet"
-_FILES = "each file written (path, role, size, sha256, replaced)"
-_STEPS = "the steps on the camera (id, text)"
+_FILES = {
+    "files": "each file written, or with --dry-run to be written",
+    "files[].path": "where it goes",
+    "files[].role": "firmware or films",
+    "files[].size": "its size in bytes",
+    "files[].sha256": "its sha256 (null for a dry run of a build that is not camera-tested)",
+    "files[].replaced": "true if a file of that name was there",
+    "files[].unchanged": "true if that file already held these bytes: it was not written again",
+}
+_STEPS = {
+    "camera_steps": "the steps on the camera",
+    "camera_steps[].id": "what the step does, for a program (eject, flash, load-films, ...)",
+    "camera_steps[].text": "what the user reads",
+}
+_BUILD = {
+    "build": "the build",
+    "build.name": "its name",
+    "build.what": "what it gives the user",
+    "build.sha256": "the sha256 of its firmware (null if it is not camera-tested)",
+    "build.tested": "true if it passed a camera test",
+    "build.camera_tested": "the date of that test, or null",
+    "build.label": "the label on the camera's Firmware screen, or null",
+}
+_FILMS = {
+    "films": "the films of the film file",
+    "films[].art": "the ART slot, 1 to 12",
+    "films[].name": "the name the camera shows",
+}
+_CARD_WRITE = {
+    "dry_run": "true if nothing was written",
+    "card": "the card, or null",
+}
+_EJECT = {
+    "ejected": "true if the card was ejected",
+    "eject_error": "why the card was not ejected after --eject (the files are written), else null",
+}
+_REMOVED = {"removed": "the extra files removed from DCOLYMP"}
+_FILMS_SET_JSON = {**_CARD_WRITE, **_FILES, **_FILMS, **_EJECT, **_STEPS}
+_SET_EXITS = {6: "the card is not a camera card, not writable or full"}
 
 COMMANDS: dict[str, Command] = {
     command.name: command
@@ -161,85 +262,93 @@ COMMANDS: dict[str, Command] = {
             False,
             "",
             ("epm2mod cards",),
-            {"cards": "the cards (path, name, size, free, label)"},
-            {3: "no SD card found"},
+            {
+                "cards": "the cards",
+                "cards[].path": "the top folder of the card",
+                "cards[].name": "the card's name",
+                "cards[].size": "its size in bytes",
+                "cards[].free": "its free space in bytes",
+                "cards[].label": "the line that the text output shows",
+            },
         ),
         Command(
             "install",
             OWNERS,
-            "Make the firmware and write it and the film file to the SD card.",
-            "the firmware and the film file on the card; then the camera steps",
+            "Make the firmware and write it, and the film file of the --film choices, to the SD card.",
+            "the firmware on the card, and the film file if --film is given; then the camera steps",
             False,
             _DOWNLOAD,
             (
                 "epm2mod install --card /path/to/card",
-                "epm2mod install --card /path/to/card ART1=portra-400 ART2=velvia",
+                "epm2mod install --card /path/to/card --film ART1=portra-400 --film ART2=velvia",
             ),
             {
-                "dry_run": "true if nothing was written",
-                "card": "the card",
-                "build": "the build (name, what, sha256, tested, label)",
-                "files": _FILES,
-                "removed": "the extra files removed from DCOLYMP",
-                "films": "the films of the film file (art, name)",
-                "ejected": "true if the card was ejected",
-                "camera_steps": _STEPS,
+                **_CARD_WRITE,
+                **_BUILD,
+                **_FILES,
+                **_REMOVED,
+                **_FILMS,
+                **_EJECT,
+                **_STEPS,
             },
             {
-                4: "a check failed (an untested build without --untested, a read-back, the model)",
-                5: "no network, or the card is not a camera card, not writable or full",
+                3: "no build of that name",
+                4: "a build without a passed camera test, without --allow-untested",
+                5: "a read-back or the sha256 of the result differs, or the firmware is for another model",
+                6: "no network, or the card is not a camera card, not writable or full",
             },
         ),
         Command(
             "films",
             OWNERS,
-            "List the film simulations.",
-            "a line per film: menu name, command-line name, film, type",
+            "List the film simulations and the 12 ART slots.",
+            "a line per film: menu name, command-line name, film, type; then a line per ART slot with its Olympus "
+            "art filter",
             False,
             "",
             ("epm2mod films",),
-            {"films": "the films (id, name, film, kind, medium, note, default_art)"},
+            {
+                "films": "the films",
+                "films[].id": "the command-line name",
+                "films[].name": "the menu name",
+                "films[].film": "the film",
+                "films[].kind": "the type",
+                "films[].medium": "how the film was simulated",
+                "films[].note": "a remark, or an empty text",
+                "slots": "the 12 ART slots",
+                "slots[].art": "the slot, 1 to 12",
+                "slots[].entry": "its Olympus art filter",
+            },
         ),
         Command(
             "films set",
             OWNERS,
             "Write only the film file.",
-            "the film file on the card or at PATH; then the camera steps",
+            "the film file on the card or at FILE; then the camera steps",
             False,
             "",
             (
-                "epm2mod films set --card /path/to/card ART2=velvia ART6=double-x",
-                "epm2mod films set -o EPM2LOOK.BIN",
+                "epm2mod films set --card /path/to/card --film ART2=velvia --film ART6=double-x",
+                "epm2mod films set -o EPM2LOOK.BIN --film ART1=portra-400",
             ),
-            {
-                "dry_run": "true if nothing was written",
-                "card": "the card, or null",
-                "files": _FILES,
-                "films": "the films of the film file (art, name)",
-                "ejected": "true if the card was ejected",
-                "camera_steps": _STEPS,
-            },
-            {5: "the card is not a camera card, not writable or full"},
+            _FILMS_SET_JSON,
+            _SET_EXITS,
         ),
         Command(
             "restore",
             OWNERS,
             "Write Olympus's original firmware, to remove EPM2Mod.",
-            "the original firmware on the card or at PATH; then the camera steps",
+            "the original firmware on the card or at FILE; then the camera steps",
             False,
             _DOWNLOAD,
-            ("epm2mod restore --card /path/to/card", "epm2mod restore -o ./"),
+            (
+                "epm2mod restore --card /path/to/card",
+                "epm2mod restore -o E1019999.BIN",
+            ),
+            {**_CARD_WRITE, **_FILES, **_REMOVED, **_EJECT, **_STEPS},
             {
-                "dry_run": "true if nothing was written",
-                "card": "the card, or null",
-                "files": _FILES,
-                "removed": "the extra files removed from DCOLYMP",
-                "ejected": "true if the card was ejected",
-                "camera_steps": _STEPS,
-            },
-            {
-                4: "a check failed (the download, a read-back)",
-                5: "no network, or a card problem",
+                5: "the download or a read-back differs",
+                6: "no network, or a card problem",
             },
         ),
         Command(
@@ -252,13 +361,25 @@ COMMANDS: dict[str, Command] = {
             ("epm2mod inspect --card /path/to/card", "epm2mod inspect E1019999.BIN"),
             {
                 "card": "the card, or null",
-                "files": "a report per file (path, kind, size, sha256, model, build, version, checksums_ok, films, "
-                "problem)",
+                "files": "a report per file",
+                "files[].path": "the file",
+                "files[].kind": "firmware or films",
+                "files[].size": "its size in bytes",
+                "files[].sha256": "its sha256",
+                "files[].model": "the camera model of a firmware file, else null",
+                "files[].build": "the build a firmware file is (a build name, or Olympus original), or null",
+                "files[].version": "the firmware's version, or null",
+                "files[].checksums_ok": "for a firmware file, true if every block's checksum is right, else null",
+                "files[].films": "the films of a film file",
+                "files[].films[].art": "the ART slot",
+                "files[].films[].name": "the name the camera shows",
+                "files[].films[].kind": "colour or black-and-white",
+                "files[].problem": "what is wrong with the file, or null",
                 "problems": "what will not work, in words",
             },
             {
+                1: "something will not work (see problems)",
                 3: "no such file, a file it does not know, or a card with neither file",
-                4: "something will not work (see problems)",
             },
         ),
         Command(
@@ -274,17 +395,20 @@ COMMANDS: dict[str, Command] = {
             "make",
             DEVELOPERS,
             "Make a build into the output folder.",
-            "NAME.BIN, and DCOLYMP with the film file as on the card, in the output folder",
+            "NAME.BIN, and DCOLYMP with the firmware as on the card, in the output folder",
             True,
             _DOWNLOAD,
-            ("epm2mod make", "epm2mod make debug-log -o ./"),
+            (
+                "epm2mod make epm2mod-2026.11.19",
+                "epm2mod make debug-log -o E1019999.BIN",
+            ),
             {
                 "dry_run": "true if nothing was written",
-                "build": "the build (name, what, sha256, tested, label)",
+                **_BUILD,
                 "sha256": "the firmware's sha256 (null for a dry run of a candidate)",
-                "files": _FILES,
+                **_FILES,
             },
-            {4: "the result is not the recorded build"},
+            {3: "no build of that name", 5: "the result is not the recorded build"},
         ),
         Command(
             "builds",
@@ -296,7 +420,13 @@ COMMANDS: dict[str, Command] = {
             ("epm2mod builds",),
             {
                 "pinned": "the name of the pinned build",
-                "builds": "the builds (name, what, sha256, tested, label, specs)",
+                "builds": "the builds",
+                **{
+                    f"builds[].{key[len('build.'):]}": text
+                    for key, text in _BUILD.items()
+                    if key != "build"
+                },
+                "builds[].specs": "the number of its patch specs",
             },
         ),
         Command(
@@ -308,26 +438,26 @@ COMMANDS: dict[str, Command] = {
             "",
             ("epm2mod pin NAME --date 2026-11-19 --sha256 HEX",),
             {},
-            {4: "the build does not give that sha256"},
+            {5: "the build does not give that sha256"},
         ),
         Command(
             "apply",
             DEVELOPERS,
             "Apply patch specs without a build description.",
-            "the firmware file at PATH",
+            "the firmware file at FILE",
             True,
             "",
-            ("epm2mod apply SPEC -o test.BIN",),
+            ("epm2mod apply SPEC --from OLY_E_101_1600_0000_0000.BIN -o test.BIN",),
             {},
             {
-                3: "Olympus's firmware is not downloaded (and no --from)",
-                4: "the result is not the sha256 the spec states",
+                3: "the --from file is missing",
+                5: "the result is not the sha256 the spec states",
             },
         ),
         Command(
             "fetch-stock",
             DEVELOPERS,
-            "Download Olympus's firmware and check it.",
+            "Download Olympus's firmware of the pinned build and check it.",
             "the firmware in the cache folder, and its path",
             True,
             _DOWNLOAD,
@@ -338,56 +468,42 @@ COMMANDS: dict[str, Command] = {
                 "downloaded": "true if it was downloaded now",
                 "dry_run": "true if nothing was downloaded",
             },
-            {4: "the download is not the right file", 5: "no network"},
+            {5: "the download is not the right file", 6: "no network"},
         ),
         Command(
-            "looks",
-            DEVELOPERS,
-            "Compare (default) or write the film patch specs that the fit files make.",
-            "which specs differ; with --write, the specs",
-            True,
-            "",
-            ("epm2mod looks", "epm2mod looks --write"),
-            {},
-            {1: "a spec differs from the one the fit files make"},
-        ),
-        Command(
-            "looks pack",
+            "films pack",
             DEVELOPERS,
             "Write a film file from a look list of fit files, for films that are not in the catalogue yet.",
-            "the film file on the card or at PATH; then the camera steps",
+            "the film file on the card or at FILE; then the camera steps",
             True,
             "",
-            ("epm2mod looks pack LIST --card /path/to/card",),
-            {
-                "dry_run": "true if nothing was written",
-                "card": "the card, or null",
-                "files": _FILES,
-                "films": "the films of the film file (art, name)",
-                "ejected": "true if the card was ejected",
-                "camera_steps": _STEPS,
-            },
-            {5: "the card is not a camera card, not writable or full"},
+            ("epm2mod films pack LIST --card /path/to/card",),
+            _FILMS_SET_JSON,
+            _SET_EXITS,
+        ),
+        Command(
+            "generate",
+            DEVELOPERS,
+            "Write the film patch specs that the fit files make, the generated parts of the documents and the CLI "
+            "reference.",
+            "the files it wrote; with --check, the files that differ",
+            True,
+            "",
+            ("epm2mod generate", "epm2mod generate --check"),
+            {},
+            {1: "with --check: a file differs from the generated one"},
         ),
         Command(
             "log",
             DEVELOPERS,
             "Decode a camera log file (EPM2LOG.BIN).",
-            "a JSON line per event, or a short report with --summary",
+            "a short report",
             True,
             "",
-            ("epm2mod log EPM2LOG.BIN --summary",),
-        ),
-        Command(
-            "docs",
-            DEVELOPERS,
-            "Compare (default) or write the generated parts of the documents and the CLI reference.",
-            "which documents differ; with --write, the documents",
-            True,
-            "",
-            ("epm2mod docs", "epm2mod docs --write"),
-            {},
-            {1: "a document is not up to date"},
+            ("epm2mod log EPM2LOG.BIN", "epm2mod log EPM2LOG.BIN --json"),
+            {
+                "events": "the events in order, each an object with the keys that the event dictionary gives it",
+            },
         ),
         Command(
             "package",
@@ -396,7 +512,7 @@ COMMANDS: dict[str, Command] = {
             "EPM2Mod-VERSION.zip in the output folder",
             True,
             "",
-            ("epm2mod package --version 2026.11.19-dev",),
+            ("epm2mod package --release-version 2026.11.19-dev",),
             {
                 "dry_run": "true if nothing was written",
                 "zip": "the zip's path",
@@ -407,11 +523,11 @@ COMMANDS: dict[str, Command] = {
         Command(
             "release",
             RELEASES,
-            "Check and tag the next release; without --yes, only check.",
-            "the release notes; with --yes, a tag",
+            "Check and tag the next release; with --dry-run, only check.",
+            "the release notes and a tag; with --dry-run, the release notes",
             True,
             "the network for the checks of CI and with --push",
-            ("epm2mod release", "epm2mod release --final --yes --push"),
+            ("epm2mod release --dry-run", "epm2mod release --final --push"),
             {},
             {1: "the repository is not ready for a release"},
         ),
@@ -425,8 +541,8 @@ def _progress(line: str) -> None:
 
 
 def _hint(text: str) -> None:
-    """Print a hint on stderr."""
-    print(text, file=sys.stderr)
+    """Print a hint on stderr, with the program's name in its command lines."""
+    print(named(text, prog()), file=sys.stderr)
 
 
 def _print_steps(steps: Sequence[camera_steps.Step]) -> None:
@@ -437,10 +553,23 @@ def _print_steps(steps: Sequence[camera_steps.Step]) -> None:
             _hint(f"  {number}. {item.text}")
 
 
-def _document(args: argparse.Namespace, **values: Any) -> None:
-    """Print the ``--json`` document of a command on stdout."""
-    document = {"schema": SCHEMA, "command": args.command_name, **values}
+def _document(command: str | None, ok: bool, **values: Any) -> None:
+    """Print a ``--json`` document on stdout."""
+    document = {
+        "schema": SCHEMA,
+        "command": command,
+        "version": __version__,
+        "ok": ok,
+        **values,
+    }
     print(json.dumps(document, indent=1))
+
+
+def _error_json(
+    code: str, status: int, message: str, override: str | None = None
+) -> dict[str, Any]:
+    """Return the ``error`` object of a ``--json`` document."""
+    return {"code": code, "exit": status, "message": message, "override": override}
 
 
 def _build_json(build: BuildDescription | None) -> dict[str, Any] | None:
@@ -461,19 +590,15 @@ def _file_lines(files: Sequence[Planned], dry_run: bool) -> list[str]:
     """Return a result line per file."""
     lines = []
     for planned in files:
-        verb = (
-            ("would replace" if planned.replaces else "would write")
-            if dry_run
-            else ("replaced" if planned.replaces else "wrote")
-        )
+        if planned.unchanged:
+            verb = "unchanged"
+        elif dry_run:
+            verb = "would replace" if planned.replaces else "would write"
+        else:
+            verb = "replaced" if planned.replaces else "wrote"
         sha = planned.content.sha256 or "not known before it is made"
         lines.append(f"{verb} {planned.path} ({planned.role}, sha256 {sha})")
     return lines
-
-
-def _choices(items: Sequence[str]) -> list[str] | None:
-    """Return the film choices of the command line; None for none (the 12 default films)."""
-    return list(items) or None
 
 
 def _card(text: str | None) -> Path | None:
@@ -489,6 +614,11 @@ def _card(text: str | None) -> Path | None:
     return Path(text)
 
 
+def _out(text: str | None) -> Path | None:
+    """Return the file of ``-o FILE`` (``cardio.output_path``), or None."""
+    return None if text is None else output_path(text)
+
+
 def _report_outcome(args: argparse.Namespace, outcome: Outcome) -> int:
     """Print what a command for camera owners did, and the camera steps."""
     if args.json:
@@ -502,10 +632,15 @@ def _report_outcome(args: argparse.Namespace, outcome: Outcome) -> int:
                 {"art": look.slot + 1, "name": look.name} for look in outcome.looks
             ],
             "ejected": outcome.ejected,
+            "eject_error": outcome.eject_error,
             "camera_steps": [item.to_json() for item in outcome.steps],
         }
         keys = COMMANDS[args.command_name].json
-        _document(args, **{key: value for key, value in values.items() if key in keys})
+        _document(
+            args.command_name,
+            True,
+            **{key: value for key, value in values.items() if key in keys},
+        )
     else:
         verb = "would remove" if outcome.dry_run else "removed"
         lines = [f"{verb} {path}" for path in outcome.removed]
@@ -514,6 +649,8 @@ def _report_outcome(args: argparse.Namespace, outcome: Outcome) -> int:
         print("\n".join(lines))
     if outcome.ejected:
         _hint(f"ejected {outcome.card}")
+    if outcome.eject_error is not None:
+        _hint(f"warning: {outcome.eject_error}")
     if not outcome.dry_run:
         _print_steps(outcome.steps)
     return 0
@@ -526,7 +663,8 @@ def _cards(args: argparse.Namespace, ctx: Context) -> int:
     found = cards()
     if args.json:
         _document(
-            args,
+            args.command_name,
+            True,
             cards=[
                 {
                     "path": str(card.path),
@@ -543,7 +681,6 @@ def _cards(args: argparse.Namespace, ctx: Context) -> int:
             print(describe(card))
     if not found:
         _hint("no SD card found: plug one in")
-        return 3
     return 0
 
 
@@ -552,26 +689,27 @@ def _install(args: argparse.Namespace, ctx: Context) -> int:
     outcome = install(
         ctx.locator,
         _card(args.card),
-        _choices(args.choices),
+        args.films or [],
         build=args.build,
-        untested=args.untested,
+        allow_untested=args.allow_untested,
         dry_run=args.dry_run,
         eject=args.eject,
         log=_progress,
-        stock=EPM2_V16,
     )
     return _report_outcome(args, outcome)
 
 
 def _films(args: argparse.Namespace, ctx: Context) -> int:
-    """Run ``epm2mod films`` (the list) or ``epm2mod films set``."""
+    """Run ``epm2mod films`` (the list), ``films set`` or ``films pack``."""
     if args.action == "set":
         return _films_set(args, ctx)
+    if args.action == "pack":
+        return _films_pack(args, ctx)
     films = catalogue.films(ctx.locator)
-    default = {slot.built_in: slot.art for slot in films.slots}
     if args.json:
         _document(
-            args,
+            args.command_name,
+            True,
             films=[
                 {
                     "id": film.id,
@@ -580,33 +718,36 @@ def _films(args: argparse.Namespace, ctx: Context) -> int:
                     "kind": film.kind,
                     "medium": film.medium,
                     "note": film.note,
-                    "default_art": default.get(film.id),
                 }
                 for film in films.films.values()
             ],
+            slots=[{"art": slot.art, "entry": slot.entry} for slot in films.slots],
         )
         return 0
     print(f"{'Menu name':<17} {'Command-line name':<18} {'Film':<34} Type")
     for film in films.films.values():
         print(f"{film.name:<17} {film.id:<18} {film.film:<34} {film.kind}")
+    print()
+    print(f"{'ART slot':<9} Olympus art filter")
+    for slot in films.slots:
+        print(f"{'ART' + str(slot.art):<9} {slot.entry}")
     return 0
 
 
-def _looks_pack(args: argparse.Namespace, ctx: Context, checkout: RepoPaths) -> int:
-    """Run ``epm2mod looks pack``: a film file from a look list of fit files (developers)."""
-    from .looks.lookfile import CARD_NAME
-
+def _films_pack(args: argparse.Namespace, ctx: Context) -> int:
+    """Run ``epm2mod films pack``: a film file from a look list of fit files (developers)."""
+    checkout = ctx.checkout()
     try:
         from .looks import lookpack
     except ModuleNotFoundError as error:
         raise _numpy_needed(error) from None
-    args.command_name = "looks pack"
+    args.command_name = "films pack"
     looks = lookpack.load_list(checkout, Path(args.list))
-    out = None if args.out is None else output_path(args.out, CARD_NAME)
     outcome = set_films(
         ctx.locator,
+        [],
         card=_card(args.card),
-        out=out,
+        out=_out(args.out),
         dry_run=args.dry_run,
         eject=args.eject,
         looks=looks,
@@ -616,15 +757,12 @@ def _looks_pack(args: argparse.Namespace, ctx: Context, checkout: RepoPaths) -> 
 
 def _films_set(args: argparse.Namespace, ctx: Context) -> int:
     """Run ``epm2mod films set``: write only the film file."""
-    from .looks.lookfile import CARD_NAME
-
     args.command_name = "films set"
-    out = None if args.out is None else output_path(args.out, CARD_NAME)
     outcome = set_films(
         ctx.locator,
-        _choices(args.choices),
+        args.films,
         card=_card(args.card),
-        out=out,
+        out=_out(args.out),
         dry_run=args.dry_run,
         eject=args.eject,
     )
@@ -633,15 +771,13 @@ def _films_set(args: argparse.Namespace, ctx: Context) -> int:
 
 def _restore(args: argparse.Namespace, ctx: Context) -> int:
     """Run ``epm2mod restore``: Olympus's original firmware to the card or a file."""
-    out = None if args.out is None else output_path(args.out, EPM2_V16.card_name)
     outcome = restore(
         ctx.locator,
         card=_card(args.card),
-        out=out,
+        out=_out(args.out),
         dry_run=args.dry_run,
         eject=args.eject,
         log=_progress,
-        stock=EPM2_V16,
     )
     return _report_outcome(args, outcome)
 
@@ -666,16 +802,26 @@ def _inspect(args: argparse.Namespace, ctx: Context) -> int:
     if (args.file is None) == (args.card is None):
         raise UsageError("give a FILE or --card DIR")
     found: Inspection = (
-        inspect_file(ctx.locator, Path(args.file), EPM2_V16)
+        inspect_file(ctx.locator, Path(args.file))
         if args.file is not None
-        else inspect_card(ctx.locator, Path(args.card), EPM2_V16)
+        else inspect_card(ctx.locator, Path(args.card))
     )
+    ok = not found.problems
     if args.json:
+        error = (
+            {}
+            if ok
+            else {
+                "error": _error_json("will_not_work", FAILED, "; ".join(found.problems))
+            }
+        )
         _document(
-            args,
+            args.command_name,
+            ok,
             card=None if found.card is None else str(found.card),
             files=[report.to_json() for report in found.files],
             problems=list(found.problems),
+            **error,
         )
     else:
         print(
@@ -683,7 +829,7 @@ def _inspect(args: argparse.Namespace, ctx: Context) -> int:
         )
         for problem in found.problems:
             print(f"will not work: {problem}")
-    return 4 if found.problems else 0
+    return 0 if ok else FAILED
 
 
 def _serve(args: argparse.Namespace, ctx: Context) -> int:
@@ -697,29 +843,25 @@ def _serve(args: argparse.Namespace, ctx: Context) -> int:
 def _make(args: argparse.Namespace, ctx: Context) -> int:
     """Run ``epm2mod make``.
 
-    What an earlier run left is removed before a description is read: first
-    the card folder, then the image of the build. Its name comes from the
-    argument, or from the pointer to the pinned build.
+    What an earlier run left is removed before the description is read: first the card folder, then the image of
+    the build.
     """
     checkout = ctx.checkout()
     if not args.dry_run:
         clear_outputs(checkout, None)
-        clear_outputs(checkout, args.build or pinned_path(checkout).stem)
-    description = (
-        checkout.pinned_build() if args.build is None else checkout.build(args.build)
-    )
-    output = None if args.out is None else output_path(args.out, EPM2_V16.card_name)
+        clear_outputs(checkout, args.build)
+    description = checkout.build(args.build)
     result: MakeResult = make(
         checkout,
         description,
         log=_progress,
-        stock=EPM2_V16,
-        output=output,
+        output=_out(args.out),
         dry_run=args.dry_run,
     )
     if args.json:
         _document(
-            args,
+            args.command_name,
+            True,
             dry_run=args.dry_run,
             build=_build_json(description),
             sha256=result.sha256,
@@ -729,9 +871,8 @@ def _make(args: argparse.Namespace, ctx: Context) -> int:
         print("\n".join(_file_lines(result.files, args.dry_run)))
     if not args.dry_run:
         _hint(
-            "To write a card: epm2mod install --card DIR"
-            + ("" if args.build is None else f" --build {description.name}")
-            + ("" if description.tested else " --untested")
+            f"To write a card: epm2mod install --card DIR --build {description.name}"
+            + ("" if description.tested else " --allow-untested")
         )
     return 0
 
@@ -743,7 +884,8 @@ def _builds(args: argparse.Namespace, ctx: Context) -> int:
     found = checkout.all_builds()
     if args.json:
         _document(
-            args,
+            args.command_name,
+            True,
             pinned=pinned,
             builds=[
                 {**(_build_json(build) or {}), "specs": len(build.specs)}
@@ -766,8 +908,7 @@ def _pin(args: argparse.Namespace, ctx: Context) -> int:
         checkout.build(args.build),
         args.sha256,
         args.date,
-        log=print,
-        stock=EPM2_V16,
+        log=lambda line: print(named(line, prog())),
         dry_run=args.dry_run,
     )
     return 0
@@ -776,12 +917,9 @@ def _pin(args: argparse.Namespace, ctx: Context) -> int:
 def _apply(args: argparse.Namespace, ctx: Context) -> int:
     """Run ``epm2mod apply``."""
     checkout = ctx.checkout()
+    out = output_path(args.out)
     specs = [load_spec(Path(spec)) for spec in args.specs]
-    source = (
-        read_stock(checkout, EPM2_V16)
-        if args.source is None
-        else read_bytes(Path(args.source), NotFoundError)
-    )
+    source = read_bytes(Path(args.source), NotFoundError)
     applied = apply_specs(source, specs)
     if args.verbose:
         _hint("\n".join(applied.log))
@@ -792,9 +930,11 @@ def _apply(args: argparse.Namespace, ctx: Context) -> int:
             f"{specs[0].name}: the result has sha256 {digest}, "
             f"the spec expects {expected}; nothing was written"
         )
-    out = output_path(args.out, EPM2_V16.card_name)
     try:
-        is_stock = out.resolve() == stock_path(checkout, EPM2_V16).resolve()
+        is_stock = any(
+            out.resolve() == stock_path(checkout, stock).resolve()
+            for stock in STOCK_FIRMWARE.values()
+        )
     except (OSError, RuntimeError) as error:
         raise BuildError(f"{out}: cannot be used as a path: {error}") from None
     if is_stock:
@@ -809,20 +949,22 @@ def _apply(args: argparse.Namespace, ctx: Context) -> int:
 
 
 def _fetch_stock(args: argparse.Namespace, ctx: Context) -> int:
-    """Run ``epm2mod fetch-stock``."""
+    """Run ``epm2mod fetch-stock``: the stock firmware of the pinned build."""
     checkout = ctx.checkout()
-    path = stock_path(checkout, EPM2_V16)
+    stock = checkout.pinned_build().stock_firmware
+    path = stock_path(checkout, stock)
     there = path.exists()
     if args.dry_run:
         if there:
-            read_stock(checkout, EPM2_V16)
+            read_stock(checkout, stock)
     else:
-        fetch(checkout, EPM2_V16, log=_progress)
+        fetch(checkout, stock, log=_progress)
     if args.json:
         _document(
-            args,
+            args.command_name,
+            True,
             path=str(path),
-            sha256=EPM2_V16.sha256,
+            sha256=stock.sha256,
             downloaded=not there and not args.dry_run,
             dry_run=args.dry_run,
         )
@@ -838,21 +980,20 @@ def _numpy_needed(error: ModuleNotFoundError) -> BuildError:
         raise error
     return BuildError(
         "numpy is needed for the film looks. In a checkout, 'uv run epm2mod "
-        "looks' installs it."
+        "generate' installs it."
     )
 
 
-def _looks(args: argparse.Namespace, ctx: Context) -> int:
-    """Run ``epm2mod looks``: compare or write the film patch specs, or ``looks pack``."""
+def _generate(args: argparse.Namespace, ctx: Context) -> int:
+    """Run ``epm2mod generate``: write (or, with ``--check``, compare) the film patch specs and the documents."""
     checkout = ctx.checkout()
-    if getattr(args, "action", None) == "pack":
-        return _looks_pack(args, ctx, checkout)
     try:
         from .looks import generate
     except ModuleNotFoundError as error:
         raise _numpy_needed(error) from None
-    if args.write:
-        changed = generate.write(checkout, EPM2_V16)
+    stock = checkout.pinned_build().stock_firmware
+    if not args.check:
+        changed = generate.write(checkout, stock)
         print("\n".join(f"wrote {path}" for path in changed) or "no spec changed")
         if changed:
             _hint(
@@ -860,13 +1001,24 @@ def _looks(args: argparse.Namespace, ctx: Context) -> int:
                 "camera-tested' and a tested build that uses it no longer gives its "
                 "recorded sha256. 'epm2mod make' tells you."
             )
+        written = readme.rewrite(checkout)
+        print("\n".join(f"wrote {path}" for path in written) or "documents: no change")
         return 0
-    stale = generate.stale(checkout, EPM2_V16)
-    if stale:
-        print("\n".join(f"{path}: differs from the generated spec" for path in stale))
-        _hint("run 'epm2mod looks --write'")
-        return 1
+    stale_specs = generate.stale(checkout, stock)
+    for spec_path in stale_specs:
+        print(f"{spec_path}: differs from the generated spec")
+    problems = readme.feature_problems(checkout)
+    for problem in problems:
+        print(f"feature list: {problem}")
+    stale_documents = readme.stale(checkout)
+    for path in stale_documents:
+        print(f"{path}: the generated parts are out of date")
+    if stale_specs or stale_documents:
+        _hint("run 'epm2mod generate'")
+    if stale_specs or stale_documents or problems:
+        return FAILED
     print("the film-look specs are the generated ones")
+    print("the generated parts of the documents are up to date")
     return 0
 
 
@@ -887,51 +1039,23 @@ def _dictionaries(args: argparse.Namespace, checkout: RepoPaths) -> list[Diction
 
 
 def _log(args: argparse.Namespace, ctx: Context) -> int:
-    """Run ``epm2mod log``: print a camera log as JSON lines or as a summary."""
+    """Run ``epm2mod log``: print a short report on a camera log, or its events as one ``--json`` document."""
     words, *older = _dictionaries(args, ctx.checkout())
     others = {other.build_id: other for other in older}
-    lines = decode(read_bytes(Path(args.file)), words, others)
-    if args.summary:
-        print("\n".join(summarize(lines)))
+    lines = list(decode(read_bytes(Path(args.file)), words, others))
+    if args.json:
+        _document(args.command_name, True, events=lines)
         return 0
-    for line in lines:
-        print(json.dumps(line))
-    return 0
-
-
-def _docs(args: argparse.Namespace, ctx: Context) -> int:
-    """Run ``epm2mod docs``: compare or write the generated parts of the documents."""
-    checkout = ctx.checkout()
-    if args.write:
-        changed = readme.rewrite(checkout)
-        print("\n".join(f"wrote {path}" for path in changed) or "documents: no change")
-        return 0
-    problems = readme.feature_problems(checkout)
-    for problem in problems:
-        print(f"feature list: {problem}")
-    stale = readme.stale(checkout)
-    for path in stale:
-        print(f"{path}: the generated parts are out of date")
-    if stale:
-        _hint("run 'epm2mod docs --write'")
-    if stale or problems:
-        return 1
-    print("the generated parts of the documents are up to date")
+    print("\n".join(summarize(lines)))
     return 0
 
 
 def _package(args: argparse.Namespace, ctx: Context) -> int:
     """Run ``epm2mod package``: write the release zip."""
-    from .release import (
-        check_version,
-        make_release,
-        release_files,
-        today_version,
-        zip_path,
-    )
+    from .release import check_version, make_release, release_files, zip_path
 
     checkout = ctx.checkout()
-    version = args.version or today_version()
+    version = args.release_version
     check_version(version)
     label = checkout.pinned_build().label
     if (
@@ -943,7 +1067,7 @@ def _package(args: argparse.Namespace, ctx: Context) -> int:
             f"the version {version} does not match the pinned build's label {label}: "
             "start the release with 'epm2mod release'"
         )
-    folder = Path(args.out) if args.out else checkout.output_folder()
+    folder = Path(args.out_dir) if args.out_dir else checkout.output_folder()
     contents = [name for name, _ in release_files(checkout, version)]
     if args.dry_run:
         out, digest = zip_path(folder, version), None
@@ -952,7 +1076,12 @@ def _package(args: argparse.Namespace, ctx: Context) -> int:
         digest = sha256_bytes(out.read_bytes())
     if args.json:
         _document(
-            args, dry_run=args.dry_run, zip=str(out), sha256=digest, contents=contents
+            args.command_name,
+            True,
+            dry_run=args.dry_run,
+            zip=str(out),
+            sha256=digest,
+            contents=contents,
         )
     elif args.dry_run:
         print(f"would write {out}: {len(contents)} files")
@@ -962,7 +1091,7 @@ def _package(args: argparse.Namespace, ctx: Context) -> int:
 
 
 def _release(args: argparse.Namespace, ctx: Context) -> int:
-    """Run ``epm2mod release``: check the repository, then tag the next release."""
+    """Run ``epm2mod release``: check the repository, then tag the next release (``--dry-run``: only check)."""
     from .releasing import plan, tag
 
     checkout = ctx.checkout()
@@ -970,12 +1099,10 @@ def _release(args: argparse.Namespace, ctx: Context) -> int:
     if release is None:
         for problem in problems:
             print(f"not ready: {problem}")
-        return 1
+        return FAILED
     print(release.notes)
-    if not args.yes:
-        _hint(
-            f"ready: {release.tag} on {release.commit[:7]}. Run again with --yes to tag it."
-        )
+    if args.dry_run:
+        _hint(f"ready: {release.tag} on {release.commit[:7]}.")
         return 0
     tag(checkout, release, push=args.push)
     print(
@@ -1002,9 +1129,8 @@ HANDLERS: dict[str, Handler] = {
     "pin": _pin,
     "apply": _apply,
     "fetch-stock": _fetch_stock,
-    "looks": _looks,
+    "generate": _generate,
     "log": _log,
-    "docs": _docs,
     "package": _package,
     "release": _release,
 }
@@ -1020,30 +1146,47 @@ def _text(command: Command) -> str:
         f"Needs: {needs}. Network: {command.network or 'never'}.",
     ]
     if command.json:
+        top = [key for key in command.json if "." not in key and "[" not in key]
         lines.append(
-            "--json: one document with schema, command, "
-            + ", ".join(command.json)
+            "--json: one document with "
+            + ", ".join([*(k for k in COMMON_JSON if "." not in k), *top])
             + "."
         )
     return "\n".join(lines)
 
 
-def _epilog(command: Command) -> str:
+def _epilog(command: Command, name: str) -> str:
     """Return the examples at the end of a command's ``--help``."""
-    return "examples:\n" + "\n".join(f"  {line}" for line in command.examples)
+    return "examples:\n" + "\n".join(
+        f"  {named(line, name)}" for line in command.examples
+    )
 
 
-def _top_help() -> str:
-    """Return the list of commands of ``epm2mod --help``, by group."""
+def _top_help(name: str, developer: bool) -> str:
+    """Return the list of commands of ``epm2mod --help``, by group; without ``developer``, the owners' group only."""
     blocks = []
     for group, note in GROUPS.items():
+        if group != OWNERS and not developer:
+            continue
         lines = [f"{group} ({note}):"]
         for command in COMMANDS.values():
             if command.group == group:
                 lines.append(f"  {command.name:<12} {command.summary}")
         blocks.append("\n".join(lines))
-    blocks.append("examples:\n  epm2mod install --card /path/to/card\n  epm2mod films")
+    blocks.append(f"examples:\n  {name} install --card /path/to/card\n  {name} films")
     return "\n\n".join(blocks)
+
+
+class _Parser(argparse.ArgumentParser):
+    """An argument parser whose usage errors become a ``UsageError`` when the run prints ``--json``."""
+
+    json_errors = False
+
+    def error(self, message: str) -> NoReturn:
+        """Raise ``UsageError`` for ``--json``; else print the usage and the error, and exit 2."""
+        if self.json_errors:
+            raise UsageError(message)
+        super().error(message)
 
 
 def _add_json(parser: argparse.ArgumentParser) -> None:
@@ -1071,74 +1214,92 @@ def _add_eject(parser: argparse.ArgumentParser) -> None:
     )
 
 
-def _add_choices(parser: argparse.ArgumentParser) -> None:
-    """Add the film choices ``ARTn=FILM``."""
+def _add_films(parser: argparse.ArgumentParser, name: str, required: bool) -> None:
+    """Add ``--film ARTn=FILM``, which can be given more than once."""
     parser.add_argument(
-        "choices",
-        nargs="*",
+        "--film",
+        dest="films",
+        action="append",
+        required=required,
         metavar="ARTn=FILM",
-        help="a film for an ART entry: ART1 (Pop Art) to ART12 (Watercolor), names from 'epm2mod films'. "
-        "Only the named entries get a film; the others keep their Olympus art filter. None: the 12 default films",
+        help="a film simulation for an ART slot: ART1 (Pop Art) to ART12 (Watercolor), names from "
+        f"'{name} films'. Give it once per slot. The slots that are not named keep their Olympus art filter",
     )
 
 
-def _add_destination(parser: argparse.ArgumentParser, usual: str) -> None:
-    """Add ``--card DIR`` and ``-o PATH``, one of which is needed."""
+def _add_destination(parser: argparse.ArgumentParser) -> None:
+    """Add ``--card DIR`` and ``-o FILE``, one of which is needed."""
     where = parser.add_mutually_exclusive_group(required=True)
     where.add_argument("--card", metavar="DIR", help="the top folder of the SD card")
     where.add_argument(
         "-o",
         "--out",
-        metavar="PATH",
-        help=f"a file, or a folder (or a path that ends in /) for {usual}",
+        metavar="FILE",
+        help="the file to write; not on an SD card (use --card)",
     )
 
 
-def _arguments(name: str, parser: argparse.ArgumentParser) -> None:
+def _add_action(
+    actions: Any, action: str, name: str, developer: bool
+) -> argparse.ArgumentParser:
+    """Add the sub-command ``films ACTION``; a developer sub-command is listed only in a checkout."""
+    command = COMMANDS[f"films {action}"]
+    listed = developer or command.group == OWNERS
+    return actions.add_parser(  # type: ignore[no-any-return]
+        action,
+        prog=f"{name} films {action}",
+        description=_text(command),
+        epilog=_epilog(command, name),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        **({"help": command.summary} if listed else {}),
+    )
+
+
+def _arguments(
+    command: str, parser: argparse.ArgumentParser, name: str, developer: bool
+) -> None:
     """Add the arguments of one command."""
-    if name == "cards":
+    if command == "cards":
         _add_json(parser)
-    elif name == "install":
+    elif command == "install":
         parser.add_argument(
             "--card", metavar="DIR", required=True, help="the top folder of the SD card"
         )
-        _add_choices(parser)
+        _add_films(parser, name, required=False)
         parser.add_argument(
             "--build",
             metavar="BUILD",
             help="the name of another build; default: the pinned build",
         )
         parser.add_argument(
-            "--untested",
+            "--allow-untested",
             action="store_true",
-            help="accept a build that has no passed camera test",
+            help="allow a build that has no passed camera test",
         )
         _add_dry_run(parser)
         _add_eject(parser)
         _add_json(parser)
-    elif name == "films":
+    elif command == "films":
         _add_json(parser)
-        actions = parser.add_subparsers(dest="action", metavar="ACTION")
-        command = COMMANDS["films set"]
-        sub = actions.add_parser(
-            "set",
-            prog="epm2mod films set",
-            help=command.summary,
-            description=_text(command),
-            epilog=_epilog(command),
-            formatter_class=argparse.RawDescriptionHelpFormatter,
-        )
-        _add_destination(sub, "EPM2LOOK.BIN")
-        _add_choices(sub)
+        actions = parser.add_subparsers(dest="action", metavar="[ACTION]")
+        sub = _add_action(actions, "set", name, developer)
+        _add_destination(sub)
+        _add_films(sub, name, required=True)
         _add_dry_run(sub)
         _add_eject(sub)
         _add_json(sub)
-    elif name == "restore":
-        _add_destination(parser, "E1019999.BIN")
+        sub = _add_action(actions, "pack", name, developer)
+        sub.add_argument("list", metavar="LIST", help="a look list (JSON) of fit files")
+        _add_destination(sub)
+        _add_dry_run(sub)
+        _add_eject(sub)
+        _add_json(sub)
+    elif command == "restore":
+        _add_destination(parser)
         _add_dry_run(parser)
         _add_eject(parser)
         _add_json(parser)
-    elif name == "inspect":
+    elif command == "inspect":
         parser.add_argument(
             "file", nargs="?", metavar="FILE", help="a firmware file or a film file"
         )
@@ -1146,7 +1307,7 @@ def _arguments(name: str, parser: argparse.ArgumentParser) -> None:
             "--card", metavar="DIR", help="the top folder of the SD card"
         )
         _add_json(parser)
-    elif name == "serve":
+    elif command == "serve":
         parser.add_argument(
             "--port",
             type=int,
@@ -1158,24 +1319,19 @@ def _arguments(name: str, parser: argparse.ArgumentParser) -> None:
             action="store_true",
             help="print the page's address in place of opening the browser",
         )
-    elif name == "make":
-        parser.add_argument(
-            "build",
-            nargs="?",
-            metavar="BUILD",
-            help="the name of a build; default: the pinned build",
-        )
+    elif command == "make":
+        parser.add_argument("build", metavar="BUILD", help="the name of a build")
         parser.add_argument(
             "-o",
             "--out",
-            metavar="PATH",
-            help="also write the firmware to PATH (a folder: as E1019999.BIN)",
+            metavar="FILE",
+            help="also write the firmware to FILE; not on an SD card",
         )
         _add_dry_run(parser)
         _add_json(parser)
-    elif name == "builds":
+    elif command == "builds":
         _add_json(parser)
-    elif name == "pin":
+    elif command == "pin":
         parser.add_argument(
             "build", metavar="BUILD", help="the name of the tested build"
         )
@@ -1192,7 +1348,7 @@ def _arguments(name: str, parser: argparse.ArgumentParser) -> None:
             help="the sha256 of the flashed file, from the camera log",
         )
         _add_dry_run(parser)
-    elif name == "apply":
+    elif command == "apply":
         parser.add_argument(
             "specs", nargs="+", metavar="SPEC", help="patch spec files, in order"
         )
@@ -1200,45 +1356,30 @@ def _arguments(name: str, parser: argparse.ArgumentParser) -> None:
             "-o",
             "--out",
             required=True,
-            metavar="PATH",
-            help="the firmware file to write",
+            metavar="FILE",
+            help="the firmware file to write; not on an SD card",
         )
         parser.add_argument(
             "--from",
             dest="source",
+            required=True,
             metavar="FILE",
-            help="the firmware to start from; default: Olympus's firmware",
+            help="the firmware to start from",
         )
         parser.add_argument(
             "-v", "--verbose", action="store_true", help="print each change"
         )
         _add_dry_run(parser)
-    elif name == "fetch-stock":
+    elif command == "fetch-stock":
         _add_dry_run(parser)
         _add_json(parser)
-    elif name in ("looks", "docs"):
+    elif command == "generate":
         parser.add_argument(
-            "--write", action="store_true", help="write them; default: compare only"
+            "--check",
+            action="store_true",
+            help="write nothing; list the files that differ from the generated ones, and exit 1 if any does",
         )
-        if name == "looks":
-            actions = parser.add_subparsers(dest="action", metavar="ACTION")
-            command = COMMANDS["looks pack"]
-            sub = actions.add_parser(
-                "pack",
-                prog="epm2mod looks pack",
-                help=command.summary,
-                description=_text(command),
-                epilog=_epilog(command),
-                formatter_class=argparse.RawDescriptionHelpFormatter,
-            )
-            sub.add_argument(
-                "list", metavar="LIST", help="a look list (JSON) of fit files"
-            )
-            _add_destination(sub, "EPM2LOOK.BIN")
-            _add_dry_run(sub)
-            _add_eject(sub)
-            _add_json(sub)
-    elif name == "log":
+    elif command == "log":
         parser.add_argument(
             "file", metavar="FILE", help="the log file from the SD card"
         )
@@ -1247,35 +1388,31 @@ def _arguments(name: str, parser: argparse.ArgumentParser) -> None:
             metavar="FILE",
             help="the event dictionary; default: the current one, and those of older builds",
         )
+        _add_json(parser)
+    elif command == "package":
         parser.add_argument(
-            "--summary",
-            action="store_true",
-            help="print a short report in place of the JSON lines",
-        )
-    elif name == "package":
-        parser.add_argument(
-            "-o",
-            "--out",
+            "--out-dir",
             metavar="DIR",
             help="the folder for the zip; default: the output folder",
         )
         parser.add_argument(
-            "--version",
+            "--release-version",
+            required=True,
             metavar="V",
-            help="the calendar version, like 2026.11.18 or 2026.11.18-rc.1; default: today",
+            help="the calendar version, like 2026.11.18 or 2026.11.18-rc.1",
         )
         _add_dry_run(parser)
         _add_json(parser)
-    elif name == "release":
+    elif command == "release":
         parser.add_argument(
             "--final",
             action="store_true",
             help="a release for everyone (vYYYY.MM.DD); default: a test release (-rc.N)",
         )
         parser.add_argument(
-            "--yes",
+            "--dry-run",
             action="store_true",
-            help="create the tag; without it, only check and show",
+            help="only check and show; create no tag",
         )
         parser.add_argument(
             "--push",
@@ -1284,14 +1421,19 @@ def _arguments(name: str, parser: argparse.ArgumentParser) -> None:
         )
 
 
-def build_parser() -> argparse.ArgumentParser:
-    """Return the argument parser of the ``epm2mod`` command."""
-    parser = argparse.ArgumentParser(
-        prog="epm2mod",
-        usage="epm2mod [--version] COMMAND [ARGS]",
+def build_parser(name: str, developer: bool) -> argparse.ArgumentParser:
+    """Return the argument parser of the ``epm2mod`` command.
+
+    Args:
+        name: the program's name in usage lines and examples (``prog``).
+        developer: True to list the commands for developers and releases in ``--help`` (in a checkout).
+    """
+    parser = _Parser(
+        prog=name,
+        usage=f"{name} [--version] COMMAND [ARGS]",
         description="Make EPM2Mod, firmware for the Olympus PEN E-PM2, and put it on an SD card. "
-        "'epm2mod COMMAND --help' describes a command.",
-        epilog=_top_help(),
+        f"'{name} COMMAND --help' describes a command.",
+        epilog=_top_help(name, developer),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("--version", action="version", version=__version__)
@@ -1301,17 +1443,17 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="COMMAND",
         help="one of the commands below",
     )
-    for name, handler in HANDLERS.items():
-        command = COMMANDS[name]
+    for command_name, handler in HANDLERS.items():
+        command = COMMANDS[command_name]
         sub = commands.add_parser(
-            name,
-            prog=f"epm2mod {name}",
+            command_name,
+            prog=f"{name} {command_name}",
             description=_text(command),
-            epilog=_epilog(command),
+            epilog=_epilog(command, name),
             formatter_class=argparse.RawDescriptionHelpFormatter,
         )
-        sub.set_defaults(run=handler, command_name=name)
-        _arguments(name, sub)
+        sub.set_defaults(run=handler, command_name=command_name)
+        _arguments(command_name, sub, name, developer)
     return parser
 
 
@@ -1347,20 +1489,56 @@ def interruptible() -> Iterator[None]:
             signal.signal(number, handler)
 
 
+def _command_of(argv: Sequence[str]) -> str | None:
+    """Return the command that the arguments name (``films set`` for a sub-command), or None."""
+    words = [word for word in argv if not word.startswith("-")]
+    if not words or words[0] not in HANDLERS:
+        return None
+    if words[0] == "films" and len(words) > 1 and f"films {words[1]}" in COMMANDS:
+        return f"films {words[1]}"
+    return words[0]
+
+
 def main(argv: Sequence[str] | None = None, context: Context | None = None) -> int:
     """Run the ``epm2mod`` command and return its exit status."""
-    args = build_parser().parse_args(argv)
+    arguments = list(sys.argv[1:] if argv is None else argv)
     for stream in (sys.stdout, sys.stderr):
         # A console that cannot show a character must not stop a run half-way.
         if isinstance(stream, io.TextIOWrapper):
             stream.reconfigure(errors="backslashreplace")
-    handler: Handler = args.run
+    ctx = context or Context()
+    name = prog()
+    as_json = "--json" in arguments
+    command = _command_of(arguments)
+
+    def failed(code: str, status: int, message: str, override: str | None) -> int:
+        """Report a failure on stderr and, with ``--json``, as a document; return its exit status."""
+        print(f"{name}: {message}", file=sys.stderr)
+        if as_json:
+            _document(
+                command, False, error=_error_json(code, status, message, override)
+            )
+        return status
+
+    _Parser.json_errors = as_json
     try:
+        try:
+            args = build_parser(name, ctx.has_checkout()).parse_args(arguments)
+        finally:
+            _Parser.json_errors = False
+        handler: Handler = args.run
         with interruptible():
-            return handler(args, context or Context())
+            return handler(args, ctx)
     except Epm2ModError as error:
-        print(f"epm2mod: {error}", file=sys.stderr)
-        return error.exit_status
+        message = named(str(error), name)
+        return failed(error.code, error.exit_status, message, error.override)
     except KeyboardInterrupt:
-        print("epm2mod: interrupted; no file was left half-written", file=sys.stderr)
-        return 130
+        return failed(
+            "interrupted",
+            INTERRUPTED,
+            "interrupted; no file was left half-written",
+            None,
+        )
+    except Exception as error:  # an internal error: the caller reports it
+        traceback.print_exc()
+        return failed("internal", INTERNAL, f"internal error: {error!r}", None)

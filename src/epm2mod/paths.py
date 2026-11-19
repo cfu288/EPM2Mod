@@ -89,7 +89,7 @@ class RepoPaths:
 
     @property
     def card_looks(self) -> Path:
-        """The look list of the default look file for the SD card."""
+        """A developer look list of fit files (the input of ``films pack``)."""
         return self.root / "looks" / "card-looks.json"
 
     @property

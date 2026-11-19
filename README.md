@@ -58,9 +58,9 @@ cd EPM2Mod
 3. Hold OK (middle of the arrow pad) and ON/OFF together until the orange lamp on the front stays lit, then let go.
 4. Leave the camera alone until the lamp blinks (1 to 2 minutes).
 5. Turn the camera off and on.
-6. To check: MENU → SETUP → wrench tab → Firmware reads Body : 1.6 EPM2Mod and the release date.
+6. To check: MENU → SETUP → wrench tab → Firmware reads Body : 1.6  EPM2Mod 2026.11.19.
 7. MENU → SETUP → gears tab → J → Load Looks → Load → OK. No gears tab? Wrench tab → Menu Display → Custom Menu → On.
-8. Check: MENU → ART shows film names, such as Portra 400.
+8. Check: MENU → ART shows Portra 400 in ART 1.
 <!-- END GENERATED: camera-steps -->
 
 While the lamp is steady, the camera writes the firmware. Do not switch the camera off. All commands and options are in the [command-line reference](docs/cli.md).

@@ -1,5 +1,6 @@
 {
  "what": "Focus peaking, fourth build: light edge lines in live view while MF Assist runs, on top of the build seven-films-6-interval-240-level-adjust. Fixes the crash of peaking-direct-3 at the Velvia entry",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",

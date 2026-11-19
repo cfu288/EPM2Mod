@@ -1,16 +1,8 @@
 import { useEffect, useId, useState, type ReactNode } from 'react'
 import { ArrowDownTrayIcon, ArrowPathIcon } from '@heroicons/react/20/solid'
-import {
-  builtInSlots,
-  choicesOf,
-  FilmCredit,
-  MenuEditor,
-  PageFrame,
-  StripPreview,
-  useLooks,
-  type Looks,
-} from '@epm2mod/ui'
+import { choicesOf, FilmCredit, MenuEditor, PageFrame, StripPreview, useLooks, type Looks } from '@epm2mod/ui'
 import { api, type Build, type Card, type Firmware, type Job } from './api'
+import { presetSlots } from './preset'
 import { Timeline } from './Timeline'
 
 type StepId = 'start' | 'firmware' | 'films' | 'build' | 'install'
@@ -32,7 +24,7 @@ const HELP = 'https://github.com/cfu288/EPM2Mod/blob/main/docs/install.md'
 
 /** A card in the list: its name, size and where it is mounted. */
 const cardLabel = (c: Card) => `${c.name || 'SD card'} · ${String(Math.round(c.size / 1e9))} GB · ${c.path}`
-const DEFAULT_CHOICES = choicesOf(builtInSlots())
+const DEFAULT_CHOICES = choicesOf(presetSlots())
 
 /** What the user sees while the job runs, and the step of the job (`steps` of `epm2mod serve`) that ends each one. */
 function stages(job: Job | null, firmware: Firmware) {
@@ -164,6 +156,7 @@ function StartStep(props: {
                   }}
                   className="border-ink w-full border bg-white px-2 py-2"
                 >
+                  {props.card === '' && <option value="" disabled />}
                   {props.cards.map((c) => (
                     <option key={c.path} value={c.path}>
                       {cardLabel(c)}
@@ -435,7 +428,7 @@ function InstallStep(props: {
 }
 
 export default function App() {
-  const looks = useLooks()
+  const looks = useLooks(presetSlots)
   const [step, setStep] = useState<StepId>('start')
   const [firmware, setFirmware] = useState<Firmware>('epm2mod')
   const [customizing, setCustomizing] = useState(false)
@@ -454,7 +447,10 @@ export default function App() {
     api.cards().then(
       (found) => {
         setCards(found)
-        setCard((current) => (found.some((c) => c.path === current) ? current : (found[0]?.path ?? '')))
+        // a card is chosen for the user only when it is the only one
+        setCard((current) =>
+          found.some((c) => c.path === current) ? current : found.length === 1 ? (found[0]?.path ?? '') : '',
+        )
       },
       (error: unknown) => {
         setProblem(message(error))

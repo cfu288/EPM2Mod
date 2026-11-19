@@ -3,16 +3,18 @@
 Rules (``plan`` checks them before anything is written; ``write`` does the work):
 
 - The folder must be a camera card: a card that ``cards.cards`` lists (removable, FAT or exFAT) with a ``DCIM``
-  folder, which the camera makes when it formats the card. Else ``CardError`` (exit status 5).
+  folder, which the camera makes when it formats the card. Else ``CardError`` (exit status 6).
 - The card must have room for the new files, less the files they replace.
 - The camera's updater needs the firmware to be the only file in ``DCOLYMP``. Every other file there (the ``._``
   files that macOS writes, a temporary file of an interrupted run, any other file) is removed when the firmware is
   written. A folder in ``DCOLYMP`` stops the write: it is not removed.
+- A file whose sha256 on the card is already the right one is not written again (``Planned.unchanged``).
 - Each file goes to a temporary name, is flushed to the card, takes its name, and is read back from the card: the
-  sha256 of what is read must be the sha256 of what was written (``CheckError``, exit status 4).
+  sha256 of what is read must be the sha256 of what was written (``CheckError``, exit status 5).
 - Firmware whose model is not the E-PM2 is refused (``check_model``): the updater would accept an E-PL5 file.
 - No backup files go on the card: they would break the one-file rule of ``DCOLYMP``.
 - ``eject`` ejects the card after the write.
+- ``-o FILE`` (``output_path``) is always a file, and never a file on a listed card: that is what ``--card`` is for.
 """
 
 from __future__ import annotations
@@ -28,7 +30,7 @@ from typing import Any
 
 from . import cards as card_list
 from .container import parse
-from .errors import CardError, CheckError, ContainerError, Epm2ModError
+from .errors import CardError, CheckError, ContainerError, UsageError
 from .fileio import describe_os_error, read_bytes, write_bytes
 from .hashing import sha256_bytes
 from .looks.lookfile import CARD_NAME
@@ -75,12 +77,14 @@ class Planned:
         role: ``firmware`` or ``films``.
         content: what it holds.
         replaces: True if a file of that name is there already.
+        unchanged: True if that file already holds ``content`` (its sha256): it is not written again.
     """
 
     path: Path
     role: str
     content: Content
     replaces: bool
+    unchanged: bool = False
 
     def to_json(self) -> dict[str, Any]:
         """Return the file for ``--json``."""
@@ -90,11 +94,12 @@ class Planned:
             "size": self.content.size,
             "sha256": self.content.sha256,
             "replaced": self.replaces,
+            "unchanged": self.unchanged,
         }
 
 
 def planned_file(path: Path, role: str, content: Content) -> Planned:
-    """Return a file that is written outside a card (``-o PATH``)."""
+    """Return a file that is written outside a card (``-o FILE``)."""
     return Planned(path, role, content, path.is_file())
 
 
@@ -141,19 +146,26 @@ def check_model(firmware: bytes) -> None:
         )
 
 
-def output_path(text: str, usual_name: str) -> Path:
-    """Return the file that ``-o PATH`` names (rule 1 of the command line).
-
-    An existing folder, or a path that ends in a slash, gets the usual file name; anything else is the file.
+def output_path(text: str) -> Path:
+    """Return the file that ``-o FILE`` names: always a file, and never one on a listed SD card.
 
     Raises:
-        Epm2ModError: if the text is empty.
+        UsageError: if the text is empty, names a folder (or ends in a slash), or names a place on an SD card that
+            ``cards.cards`` lists (``--card`` writes a card).
     """
     if not text:
-        raise Epm2ModError("-o needs a path")
+        raise UsageError("-o needs a file")
     path = Path(text)
     if text.endswith(("/", os.sep)) or path.is_dir():
-        return path / usual_name
+        raise UsageError(f"{text}: is a folder; -o takes a file")
+    try:
+        wanted = path.absolute().resolve()
+        listed = [card.path for card in card_list.cards()]
+        found = next((c for c in listed if wanted.is_relative_to(c.resolve())), None)
+    except OSError:
+        found = None
+    if found is not None:
+        raise UsageError(f"{text}: is on the SD card {found}; use --card {found}")
     return path
 
 
@@ -209,15 +221,17 @@ def plan(
     if firmware is not None and firmware.data is not None:
         check_model(firmware.data)
     planned = []
-    replaced_bytes = 0
+    need = 0
     for name, content in files.items():
         target = card / name
         replaces = target.is_file()
-        if replaces:
-            replaced_bytes += target.stat().st_size
-        planned.append(Planned(target, ROLES.get(name, "file"), content, replaces))
+        unchanged = replaces and _holds(target, content)
+        if not unchanged:
+            need += content.size - (target.stat().st_size if replaces else 0)
+        planned.append(
+            Planned(target, ROLES.get(name, "file"), content, replaces, unchanged)
+        )
     removed = _extra_files(card) if FIRMWARE in files else []
-    need = sum(content.size for content in files.values()) - replaced_bytes
     try:
         free = shutil.disk_usage(card).free
     except OSError as error:
@@ -227,6 +241,17 @@ def plan(
             f"{card}: the card is full ({free} bytes free, {need} needed). Make room on it, then run this again."
         )
     return Plan(card, tuple(planned), tuple(removed))
+
+
+def _holds(target: Path, content: Content) -> bool:
+    """Return True if the file ``target`` already holds ``content`` (same size and sha256).
+
+    Raises:
+        CardError: if the file cannot be read.
+    """
+    if content.sha256 is None or target.stat().st_size != content.size:
+        return False
+    return sha256_bytes(read_bytes(target, CardError)) == content.sha256
 
 
 def write_file(target: Path, data: bytes) -> None:
@@ -249,7 +274,7 @@ def write_file(target: Path, data: bytes) -> None:
 
 
 def write(plan: Plan) -> None:
-    """Do a write that ``plan`` returned: remove the extra files of ``DCOLYMP``, then write each file.
+    """Do a write that ``plan`` returned: remove the extra files of ``DCOLYMP``, then write each file that changed.
 
     Raises:
         CardError: if a file cannot be removed or written.
@@ -265,6 +290,8 @@ def write(plan: Plan) -> None:
                 f"{extra}: cannot be removed: {describe_os_error(error)}"
             ) from None
     for planned in plan.files:
+        if planned.unchanged:
+            continue
         if planned.content.data is None:
             raise ValueError(f"{planned.path}: a plan of a dry run cannot be written")
         write_file(planned.path, planned.content.data)

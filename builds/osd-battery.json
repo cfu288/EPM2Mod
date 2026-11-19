@@ -1,5 +1,6 @@
 {
  "what": "CANDIDATE, not camera-tested: the pinned build films-12d with the battery charge as a percentage at the top left of the live-view information screen (scale inferred from the E-PL3; see experiments/2026-11-17-osd-info/NOTES.md)",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",

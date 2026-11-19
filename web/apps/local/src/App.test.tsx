@@ -1,17 +1,24 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { builtInSlots, choicesOf } from '@epm2mod/ui'
+import { choicesOf, lookFile } from '@epm2mod/ui'
 import App from './App'
 import type { Job } from './api'
+import { PRESET, presetSlots } from './preset'
 
 const BUILD = { name: 'card-looks-4', what: 'Film simulations', sha256: 'ab'.repeat(32) }
-const DEFAULT = choicesOf(builtInSlots())
+const DEFAULT = choicesOf(presetSlots())
 const CARD = {
   path: '/media/u/CARD',
   name: 'CARD',
   size: 32e9,
   free: 31e9,
   label: 'CARD, 32.0 GB (31.0 GB free), /media/u/CARD',
+}
+const OTHER = { ...CARD, path: '/media/u/OTHER', name: 'OTHER', label: 'OTHER' }
+
+async function sha256(bytes: Uint8Array): Promise<string> {
+  const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', bytes as BufferSource))
+  return Array.from(digest, (b) => b.toString(16).padStart(2, '0')).join('')
 }
 
 interface MakeBody {
@@ -23,7 +30,8 @@ interface MakeBody {
 /** Camera steps as `epm2mod serve` sends them (src/epm2mod/camera_steps.py), cut to the ones the tests read. */
 function cameraSteps(body: MakeBody) {
   const films = body.choices.length > 0
-  const art = body.firmware === 'original' ? 'the art filters, such as Pop Art.' : 'film names, such as Portra 400.'
+  const first = body.choices[0]?.split('=')
+  const art = first ? `${first[1] ?? ''} in ART ${(first[0] ?? '').slice(3)}.` : 'the art filters, such as Pop Art.'
   return [
     ...(body.card === null
       ? [{ id: 'copy', text: `Copy DCOLYMP${films ? ' and EPM2LOOK.BIN' : ''} to the top of the SD card.` }]
@@ -112,7 +120,7 @@ describe('the local app', () => {
       'Hold OK (middle of the arrow pad) and ON/OFF together until the orange lamp on the front stays lit, then let go.',
     )
     expect(steps).toHaveTextContent('MENU → SETUP → gears tab → J → Load Looks → Load → OK.')
-    expect(steps).toHaveTextContent('Check: MENU → ART shows film names, such as Portra 400.')
+    expect(steps).toHaveTextContent('Check: MENU → ART shows portra-400 in ART 1.')
     expect(steps).not.toHaveTextContent('Copy')
     expect(screen.getByText(/repeat step 2/)).toBeInTheDocument()
     expect(screen.queryByText(/derived from/)).toBeNull()
@@ -131,6 +139,27 @@ describe('the local app', () => {
     expect(made).toEqual([{ firmware: 'original', choices: [], card: CARD.path }])
     expect(await screen.findByRole('heading', { name: 'Install on the camera' })).toBeInTheDocument()
     expect(screen.getByRole('list', { name: 'Install steps' })).toHaveTextContent('such as Pop Art')
+  })
+
+  it('keeps its default film simulations: the look file of the repository tool', async () => {
+    expect(PRESET).toHaveLength(12)
+    expect(await sha256(lookFile(presetSlots()))).toBe(
+      '5d5df335dc14100a3fb7c90265ca07470419f12f52f806cc6b80f1bc09cae7ad',
+    )
+  })
+
+  it('chooses a card only when one card is plugged in', async () => {
+    const made = server([CARD, OTHER])
+    const user = userEvent.setup()
+    render(<App />)
+    const select = await screen.findByRole('combobox', { name: 'Card' })
+    expect(select).toHaveValue('')
+    expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled()
+    await user.selectOptions(select, OTHER.path)
+    await next(user)
+    await next(user)
+    await user.click(screen.getByRole('button', { name: 'Use the default film simulations' }))
+    expect(made).toEqual([{ firmware: 'epm2mod', choices: DEFAULT, card: OTHER.path }])
   })
 
   it('asks for a card when none is plugged in', async () => {

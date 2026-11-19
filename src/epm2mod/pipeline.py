@@ -5,9 +5,10 @@ returns what it did as data; the command line only formats it.
 
 For camera owners (work from the release folder):
 
-- ``install``: make the firmware in memory and write it, with the film file, to an SD card (``cardio``).
+- ``install``: make the firmware in memory and write it, with a film file if films are chosen, to an SD card
+  (``cardio``).
 - ``set_films``: write only the film file.
-- ``restore``: write Olympus's original firmware.
+- ``restore``: write Olympus's original firmware: the stock firmware of the pinned build.
 - ``inspect_file``, ``inspect_card``: say what a firmware file, a film file or a card holds.
 
 For developers (need a checkout for the checks of a new build):
@@ -33,6 +34,9 @@ process is killed outright or the power fails: then a ``.part`` file can stay, a
 
 With ``dry_run`` a function checks what it can without the network (the build, the choices, the card) and returns
 what it would write; the SHA-256 of a firmware is then the recorded one, or None for a candidate.
+
+No function chooses for the caller: the films are the choices given (none: no film file), the stock firmware is the
+one the build description names, and ``restore`` writes the stock firmware of the pinned build.
 """
 
 from __future__ import annotations
@@ -49,13 +53,14 @@ from typing import Any
 
 from . import cardio, catalogue
 from .builds import BuildDescription, check_test_date, pin
-from .camera_steps import Step, copy_text, film_steps, flash_steps
+from .camera_steps import Step, copy_text, film_steps, firmware_reads, flash_steps
 from .cardio import FILMS, FIRMWARE, Content, Planned, planned_file
 from .catalogue import Locator
 from .container import parse
 from .errors import (
     BuildCheckError,
     BuildError,
+    CardError,
     ContainerError,
     LookFileError,
     NotFoundError,
@@ -66,12 +71,9 @@ from .label import LABEL_SPEC, with_label
 from .looks import lookfile
 from .paths import RepoPaths
 from .spec import Applied, PatchSpec, apply_specs, load_spec
-from .stock import CARD_FOLDER, EPM2_V16, StockFirmware, obtain_stock, read_stock
+from .stock import CARD_FOLDER, obtain_stock, read_stock
 
 _CHECK_OUTPUT_LIMIT = 3000
-
-#: The loader spec of the builds that keep Olympus's art filters: their films come from the film file on the card.
-FILM_LOADER = "patches/card-looks-5.json"
 
 #: The number of steps of ``make`` and ``install``; ``step`` reports each one when it ends.
 STEPS = 5
@@ -228,20 +230,14 @@ def check_in_emulator(paths: RepoPaths, image: Path) -> list[str]:
     return lines
 
 
-def loads_films(description: BuildDescription) -> bool:
-    """Return True if the build loads its films from the film file on the card."""
-    return FILM_LOADER in description.specs
-
-
 def firmware(
     paths: Locator,
     description: BuildDescription,
     log: Log = silent,
-    stock: StockFirmware = EPM2_V16,
     step: Callable[[int], None] = no_step,
     emulator_image: Path | None = None,
 ) -> tuple[bytes, str]:
-    """Make a build's firmware in memory: steps 1 to 4 of the module text.
+    """Make a build's firmware in memory: steps 1 to 4 of the module text, from the stock firmware it names.
 
     A candidate needs a checkout for its checks (the free-space check, and the emulator for ``emulator_image``, a
     path where the image is written for the emulator; None: a temporary file).
@@ -254,7 +250,7 @@ def firmware(
     """
     specs = load_specs(paths, description)
     checkout = None if description.tested else paths.checkout()
-    stock_data = obtain_stock(paths, stock, log)
+    stock_data = obtain_stock(paths, description.stock_firmware, log)
     log("1/5 stock firmware: ok")
     step(1)
     if checkout is None:
@@ -316,6 +312,7 @@ class Outcome:
         ejected: True if the card was ejected.
         build: the build of the firmware, or None.
         looks: the looks of the film file, if one is written.
+        eject_error: why the card was not ejected when an eject was asked for, or None. The write is done.
     """
 
     files: tuple[Planned, ...]
@@ -326,6 +323,7 @@ class Outcome:
     ejected: bool = False
     build: BuildDescription | None = None
     looks: tuple[lookfile.Look, ...] = field(default=())
+    eject_error: str | None = None
 
     def file_data(self) -> dict[str, bytes]:
         """Return the files' bytes by their path on the card (for the installer page's zip)."""
@@ -338,17 +336,16 @@ class Outcome:
 
 
 def _film_file(
-    paths: Locator, choices: Sequence[str] | None
+    paths: Locator, choices: Sequence[str]
 ) -> tuple[bytes, list[lookfile.Look]]:
-    """Return the film file of choices (None: the 12 default films) and its looks.
+    """Return the film file of choices like ``ART2=velvia``, and its looks.
 
     Raises:
         UsageError: if a choice is wrong.
     """
     from .looks import records
 
-    wanted = catalogue.default_choices(paths) if choices is None else choices
-    return records.pack_choices(paths, wanted)
+    return records.pack_choices(paths, choices)
 
 
 def _write_card(
@@ -356,17 +353,23 @@ def _write_card(
     files: dict[str, Content],
     eject: bool,
     is_card: Callable[[Path], bool],
-) -> tuple[cardio.Plan, bool]:
+) -> tuple[cardio.Plan, bool, str | None]:
     """Write files to a card that ``cardio.plan`` accepts, and eject it if asked.
 
+    An eject that fails does not undo the write: its reason is returned.
+
     Returns:
-        The plan that was done, and True if the card was ejected.
+        The plan that was done, True if the card was ejected, and why an eject failed (or None).
     """
     done = cardio.plan(card, files, is_card)
     cardio.write(done)
-    if eject:
+    if not eject:
+        return done, False, None
+    try:
         cardio.eject(done.card)
-    return done, eject
+    except CardError as error:
+        return done, False, str(error)
+    return done, True, None
 
 
 def _finish(
@@ -375,58 +378,54 @@ def _finish(
     dry_run: bool,
     eject: bool,
     is_card: Callable[[Path], bool],
-) -> tuple[tuple[Planned, ...], tuple[Path, ...], bool]:
-    """Check (dry run) or write the files of a card, and return them, the removed files and the eject."""
+) -> tuple[tuple[Planned, ...], tuple[Path, ...], bool, str | None]:
+    """Check (dry run) or write the files of a card; return them, the removed files, the eject and its error."""
     assert card is not None
     if dry_run:
         planned = cardio.plan(card, files, is_card)
-        return planned.files, planned.removed, False
-    done, ejected = _write_card(card, files, eject, is_card)
-    return done.files, done.removed, ejected
+        return planned.files, planned.removed, False, None
+    done, ejected, eject_error = _write_card(card, files, eject, is_card)
+    return done.files, done.removed, ejected, eject_error
 
 
 def install(
     paths: Locator,
     card: Path | None,
-    choices: Sequence[str] | None = None,
+    choices: Sequence[str],
     build: str | None = None,
-    untested: bool = False,
+    allow_untested: bool = False,
     dry_run: bool = False,
     eject: bool = False,
     log: Log = silent,
     step: Callable[[int], None] = no_step,
-    stock: StockFirmware = EPM2_V16,
     is_card: Callable[[Path], bool] = cardio.is_card,
 ) -> Outcome:
-    """Make the firmware and write it and the film file to a card (``epm2mod install``).
+    """Make the firmware and write it, and the film file of the choices, to a card (``epm2mod install``).
 
     Args:
         paths: the locator.
         card: the card's top folder, or None to make the files in memory only (the installer page's zip).
         choices: choices like ``ART2=velvia``: only those slots get a film, the others keep their Olympus art
-            filter. None: the 12 default films if the build loads films from the card. An empty list: no film file.
+            filter. An empty list: no film file, only the firmware.
         build: the name of the build, or None for the pinned one.
-        untested: True to accept a build without a passed camera test.
+        allow_untested: True to accept a build without a passed camera test.
         dry_run: True to check and return what would be written, and write nothing.
         eject: True to eject the card after the write.
         log: where progress lines go.
         step: called with 1 to ``STEPS`` as each step ends.
-        stock: the stock firmware.
         is_card: says whether a folder is an SD card (``cardio.is_card``).
 
     Raises:
         Epm2ModError: with a message for the user, if a step fails. The card then holds the files it had before,
             except a file that a failed write had already replaced in full.
     """
-    description = catalogue.build_to_install(paths, build, untested)
+    description = catalogue.build_to_install(paths, build, allow_untested)
     load_specs(paths, description)
+    stock = description.stock_firmware
     films: bytes | None = None
     looks: list[lookfile.Look] = []
-    wanted = choices
-    if choices is None and not loads_films(description):
-        wanted = []
-    if wanted is None or wanted:
-        films, looks = _film_file(paths, wanted)
+    if choices:
+        films, looks = _film_file(paths, choices)
     expected = Content(stock.size, description.sha256)
     planned_files: dict[str, Content] = {FIRMWARE: expected}
     if films is not None:
@@ -434,11 +433,14 @@ def install(
     if card is not None:
         cardio.plan(card, planned_files, is_card)
     if not dry_run:
-        image, _ = firmware(paths, description, log, stock, step)
+        image, _ = firmware(paths, description, log, step)
         cardio.check_model(image)
         planned_files[FIRMWARE] = Content.of(image)
+    eject_error = None
     if card is not None:
-        files, removed, ejected = _finish(card, planned_files, dry_run, eject, is_card)
+        files, removed, ejected, eject_error = _finish(
+            card, planned_files, dry_run, eject, is_card
+        )
         if not dry_run:
             log(f"5/5 on the card: {card}  (written, flushed and read back)")
     else:
@@ -451,9 +453,10 @@ def install(
     names = [CARD_FOLDER] + ([lookfile.CARD_NAME] if films is not None else [])
     steps = flash_steps(
         films=films is not None,
+        firmware=firmware_reads(description.label),
+        art_shows=catalogue.art_check(looks),
         copy=copy_text(names, "the zip") if card is None else None,
         ejected=ejected,
-        art_shows=catalogue.art_check(paths, wanted),
     )
     return Outcome(
         files,
@@ -464,12 +467,13 @@ def install(
         ejected,
         description,
         tuple(looks),
+        eject_error,
     )
 
 
 def set_films(
     paths: Locator,
-    choices: Sequence[str] | None = None,
+    choices: Sequence[str],
     card: Path | None = None,
     out: Path | None = None,
     dry_run: bool = False,
@@ -477,27 +481,25 @@ def set_films(
     is_card: Callable[[Path], bool] = cardio.is_card,
     looks: Sequence[lookfile.Look] | None = None,
 ) -> Outcome:
-    """Write only the film file, to a card or a file (``epm2mod films set``, ``looks pack``).
+    """Write only the film file, to a card or a file (``epm2mod films set``, ``films pack``).
 
-    ``choices`` as for ``install``; None: the 12 default films. ``looks``, if given, are written in place of the
-    choices (``looks pack``: a look list of fit files, for developers). Exactly one of ``card`` and ``out`` is given.
+    ``choices`` as for ``install``. ``looks``, if given, are written in place of the choices (``films pack``: a look
+    list of fit files, for developers). Exactly one of ``card`` and ``out`` is given.
 
     Raises:
         Epm2ModError: with a message for the user, if a step fails.
     """
     if looks is None:
         data, looks = _film_file(paths, choices)
-        art_shows = catalogue.art_check(paths, choices)
     else:
         data = lookfile.pack(looks)
-        art_shows = (
-            f"the films of the list, such as {looks[0].name}."
-            if looks
-            else "the art filters."
-        )
+    art_shows = catalogue.art_check(looks)
     content = {FILMS: Content.of(data)}
+    eject_error = None
     if card is not None:
-        files, removed, ejected = _finish(card, content, dry_run, eject, is_card)
+        files, removed, ejected, eject_error = _finish(
+            card, content, dry_run, eject, is_card
+        )
         copy = None
     else:
         assert out is not None
@@ -513,9 +515,17 @@ def set_films(
             if out.name == lookfile.CARD_NAME
             else (f"Copy {out.name} to the top of the SD card as {lookfile.CARD_NAME}.")
         )
-    steps = film_steps(copy=copy, ejected=ejected, art_shows=art_shows)
+    steps = film_steps(art_shows=art_shows, copy=copy, ejected=ejected)
     return Outcome(
-        files, removed, tuple(steps), dry_run, card, ejected, None, tuple(looks)
+        files,
+        removed,
+        tuple(steps),
+        dry_run,
+        card,
+        ejected,
+        None,
+        tuple(looks),
+        eject_error,
     )
 
 
@@ -527,18 +537,19 @@ def restore(
     eject: bool = False,
     log: Log = silent,
     step: Callable[[int], None] = no_step,
-    stock: StockFirmware = EPM2_V16,
     is_card: Callable[[Path], bool] = cardio.is_card,
 ) -> Outcome:
     """Write Olympus's original firmware to a card or a file, to remove EPM2Mod (``epm2mod restore``).
 
-    The stock file is downloaded if absent and checked by its SHA-256 (``obtain_stock``). It does not remove the
-    film file or the films kept in the camera. ``step`` is called with 1 when the file is checked and 2 when it is
-    written. With neither ``card`` nor ``out``, the file is only returned (the installer page's zip).
+    The file is the stock firmware of the pinned build. It is downloaded if absent and checked by its SHA-256
+    (``obtain_stock``). It does not remove the film file or the films kept in the camera. ``step`` is called with 1
+    when the file is checked and 2 when it is written. With neither ``card`` nor ``out``, the file is only returned
+    (the installer page's zip).
 
     Raises:
         Epm2ModError: with a message for the user, if a step fails.
     """
+    stock = paths.pinned_build().stock_firmware
     content = Content(stock.size, stock.sha256)
     if card is not None:
         cardio.plan(card, {FIRMWARE: content}, is_card)
@@ -547,8 +558,9 @@ def restore(
         log("1/2 original firmware: ok")
     step(1)
     copy = None
+    eject_error = None
     if card is not None:
-        files, removed, ejected = _finish(
+        files, removed, ejected, eject_error = _finish(
             card, {FIRMWARE: content}, dry_run, eject, is_card
         )
         if not dry_run:
@@ -565,12 +577,14 @@ def restore(
     step(2)
     steps = flash_steps(
         films=False,
-        original=True,
+        firmware=firmware_reads(None),
+        art_shows=catalogue.art_check(()),
         copy=copy,
         ejected=ejected,
-        art_shows=catalogue.art_check(paths, None, original=True),
     )
-    return Outcome(files, removed, tuple(steps), dry_run, card, ejected)
+    return Outcome(
+        files, removed, tuple(steps), dry_run, card, ejected, eject_error=eject_error
+    )
 
 
 @dataclass(frozen=True)
@@ -636,16 +650,19 @@ class Inspection:
 MODELS = {b"\x10\x10": "E-PM2", b"\x10\x00": "E-PL5"}
 
 
-def _firmware_report(
-    paths: Locator, path: Path, data: bytes, stock: StockFirmware
-) -> FileReport:
+def _stock_files(paths: Locator) -> set[str]:
+    """Return the sha256 of each stock firmware that a build of the locator names."""
+    return {build.stock_firmware.sha256 for build in paths.all_builds()}
+
+
+def _firmware_report(paths: Locator, path: Path, data: bytes) -> FileReport:
     """Return the report of a firmware file."""
     container = parse(data)
     digest = sha256_bytes(data)
     models = {block.header[2:4] for block in container.blocks}
     model = ", ".join(MODELS.get(code, code.hex(" ")) for code in sorted(models))
     build = version = None
-    if digest == stock.sha256:
+    if digest in _stock_files(paths):
         build, version = "Olympus original", "1.6"
     else:
         for description in paths.all_builds():
@@ -696,9 +713,7 @@ def _films_report(path: Path, data: bytes) -> FileReport:
     return FileReport(path, "films", len(data), digest, films=films)
 
 
-def inspect_file(
-    paths: Locator, path: Path, stock: StockFirmware = EPM2_V16
-) -> Inspection:
+def inspect_file(paths: Locator, path: Path) -> Inspection:
     """Say what a firmware file or a film file is (``epm2mod inspect FILE``).
 
     Raises:
@@ -711,7 +726,7 @@ def inspect_file(
         report = _films_report(path, data)
     else:
         try:
-            report = _firmware_report(paths, path, data, stock)
+            report = _firmware_report(paths, path, data)
         except ContainerError:
             raise NotFoundError(
                 f"{path}: is not a firmware file or a film file"
@@ -719,9 +734,7 @@ def inspect_file(
     return Inspection((report,), (report.problem,) if report.problem else ())
 
 
-def inspect_card(
-    paths: Locator, card: Path, stock: StockFirmware = EPM2_V16
-) -> Inspection:
+def inspect_card(paths: Locator, card: Path) -> Inspection:
     """Say what is on a card, and what will not work (``epm2mod inspect --card``).
 
     What will not work: a damaged firmware or film file, firmware for another model, extra files in ``DCOLYMP``,
@@ -738,7 +751,7 @@ def inspect_card(
     if firmware_file.is_file():
         data = read_bytes(firmware_file, NotFoundError)
         try:
-            reports.append(_firmware_report(paths, firmware_file, data, stock))
+            reports.append(_firmware_report(paths, firmware_file, data))
         except ContainerError:
             problems.append(f"{firmware_file}: is not a firmware file")
     if films_file.is_file():
@@ -750,7 +763,7 @@ def inspect_card(
     ]
     folder = card / CARD_FOLDER
     if folder.is_dir():
-        extra = sorted(e.name for e in folder.iterdir() if e.name != stock.card_name)
+        extra = sorted(e.name for e in folder.iterdir() if e.name != firmware_file.name)
         if extra:
             problems.append(
                 f"{folder} holds other files ({', '.join(extra[:4])}): the camera's updater needs the firmware to "
@@ -840,15 +853,14 @@ def make(
     paths: Locator,
     description: BuildDescription,
     log: Log = silent,
-    stock: StockFirmware = EPM2_V16,
     output: Path | None = None,
     step: Callable[[int], None] = no_step,
     dry_run: bool = False,
 ) -> MakeResult:
     """Make a firmware build into the output folder (``epm2mod make``).
 
-    It writes ``NAME.BIN``, and ``card/DCOLYMP/E1019999.BIN`` (with ``card/EPM2LOOK.BIN``, the 12 default films,
-    for a build that loads films from the card), in the output folder; and one more copy to ``output`` if given.
+    It writes ``NAME.BIN`` and ``card/DCOLYMP/E1019999.BIN`` in the output folder, and one more copy to the file
+    ``output`` if given. It writes no film file.
 
     Raises:
         Epm2ModError: with a message for the user, if any step fails. Then
@@ -856,33 +868,23 @@ def make(
             if the run is interrupted (see the module text).
     """
     image = image_path(paths, description.name)
-    if output is not None and output.is_dir():
-        output = output / stock.card_name
+    stock = description.stock_firmware
     card_copy = card_folder(paths) / FIRMWARE
-    films_copy = card_folder(paths) / FILMS
-    films = _film_file(paths, None)[0] if loads_films(description) else None
     if dry_run:
         load_specs(paths, description)
         content = Content(stock.size, description.sha256)
         targets = [image, card_copy] + ([output] if output is not None else [])
         planned = [planned_file(path, "firmware", content) for path in targets]
-        if films is not None:
-            planned.append(planned_file(films_copy, "films", Content.of(films)))
         return MakeResult(
             description, image, card_copy, description.sha256, tuple(planned)
         )
     clear_outputs(paths, description.name)
     try:
-        data, digest = firmware(
-            paths, description, log, stock, step, emulator_image=None
-        )
+        data, digest = firmware(paths, description, log, step, emulator_image=None)
         written = [image, card_copy] + ([output] if output is not None else [])
         planned = [planned_file(path, "firmware", Content.of(data)) for path in written]
         for path in written:
             write_bytes(path, data, BuildError, read_back=True)
-        if films is not None:
-            planned.append(planned_file(films_copy, "films", Content.of(films)))
-            write_bytes(films_copy, films, BuildError, read_back=True)
     except BaseException:
         clear_outputs(paths, description.name)
         raise
@@ -906,7 +908,6 @@ def record_test(
     sha256: str,
     date: str,
     log: Log = silent,
-    stock: StockFirmware = EPM2_V16,
     today: datetime.date | None = None,
     dry_run: bool = False,
 ) -> BuildDescription:
@@ -926,7 +927,6 @@ def record_test(
         sha256: SHA-256 of the firmware file that was flashed.
         date: the date of the test, YYYY-MM-DD; not in the future.
         log: where progress lines go.
-        stock: the stock firmware the build starts from.
         today: the current date; for tests.
         dry_run: True to check everything and write nothing.
 
@@ -940,13 +940,14 @@ def record_test(
     """
     check_test_date(date, today or current_date())
     tested = description.as_tested(sha256, date)
-    _, digest = build_image(tested, load_specs(paths, tested), read_stock(paths, stock))
+    stock_data = read_stock(paths, tested.stock_firmware)
+    _, digest = build_image(tested, load_specs(paths, tested), stock_data)
     if dry_run:
         log(f"would pin: {tested.name}, camera-tested {date}, sha256 {digest}")
         return tested
     pin(paths, tested)
     log(
         f"pinned: {tested.name}, camera-tested {date}, sha256 {digest}. "
-        "Run 'epm2mod docs --write', write the result in the camera log, and commit."
+        "Run 'epm2mod generate', write the result in the camera log, and commit."
     )
     return tested

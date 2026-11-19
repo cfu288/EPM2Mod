@@ -1,5 +1,6 @@
 {
  "what": "Build label prototype, not for a camera yet: the pinned build lss with 'EPM2Mod 2026.11.19' after the body version on the Firmware screen (Setup Menu, Firmware)",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "patches/interval-timelapse-v2.json",
   "patches/interval-frames-240.json",

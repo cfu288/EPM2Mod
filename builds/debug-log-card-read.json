@@ -1,5 +1,6 @@
 {
  "what": "DEBUG probe build, not for normal use: debug-log-films-12d with the card-read probe (at the first menu, playback or power-off of a session it reads the first 16 bytes of C:\\EPM2LOOK.BIN and logs them as card_read and card_data; experiments/2026-11-17-card-looks/NOTES.md)",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",

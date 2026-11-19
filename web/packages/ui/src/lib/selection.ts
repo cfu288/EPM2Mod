@@ -1,4 +1,4 @@
-import { filmById, slots } from './films'
+import { filmById } from './films'
 import { decodeBase64, packLooks } from './lookfile'
 
 /** One of the twelve ART slots in order: a film, or empty (the camera keeps its own look there). */
@@ -9,11 +9,6 @@ export interface SlotItem {
 }
 
 export const SLOT_COUNT = 12
-
-/** The films the camera holds without a look file, in ART order. */
-export function builtInSlots(): SlotItem[] {
-  return slots.map((slot) => ({ key: slot.builtIn, filmId: slot.builtIn }))
-}
 
 let emptyCount = 0
 function emptySlot(): SlotItem {
@@ -57,7 +52,7 @@ export function lookFile(items: readonly SlotItem[]): Uint8Array {
   )
 }
 
-/** The command-line choices of the filled slots, for example `ART2=velvia` (`epm2mod install`, `epm2mod films set`, `epm2mod serve`). */
+/** The choices of the filled slots, for example `ART2=velvia` (`epm2mod install --film`, `epm2mod films set --film`, `epm2mod serve`). */
 export function choicesOf(items: readonly SlotItem[]): string[] {
   return items.flatMap((item, index) => (item.filmId ? [`ART${String(index + 1)}=${item.filmId}`] : []))
 }

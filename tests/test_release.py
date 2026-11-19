@@ -28,7 +28,7 @@ from epm2mod.paths import RepoPaths  # noqa: E402
 
 PATHS = RepoPaths(ROOT)
 HAVE_APP = (ROOT / "src" / "epm2mod" / "app" / "index.html").is_file()
-HAVE_STOCK = stock.stock_path(PATHS).is_file()
+HAVE_STOCK = stock.stock_path(PATHS, stock.EPM2_V16).is_file()
 
 
 @unittest.skipUnless(HAVE_APP, "needs the built app page (npm run build:app)")
@@ -79,7 +79,6 @@ class ZipTests(unittest.TestCase):
 
     def test_the_version_is_a_date(self) -> None:
         self.assertEqual(self.zip.name, "EPM2Mod-2026.11.18-rc.1.zip")
-        self.assertRegex(release.today_version(), r"^\d{4}\.\d{2}\.\d{2}$")
         for bad in ("card-looks-4", "0.1.0", "2026.11.18-final", "../x"):
             with self.assertRaises(BuildError, msg=bad):
                 release.make_release(PATHS, Path(self.folder.name), bad)
@@ -100,9 +99,9 @@ class FromTheZipTests(unittest.TestCase):
             with zipfile.ZipFile(archive) as unpack:
                 unpack.extractall(folder)
             top = Path(folder) / "EPM2Mod-2026.11.18"
-            local = stock.stock_path(RepoPaths(top))
+            local = stock.stock_path(RepoPaths(top), stock.EPM2_V16)
             local.parent.mkdir(parents=True)
-            shutil.copyfile(stock.stock_path(PATHS), local)
+            shutil.copyfile(stock.stock_path(PATHS, stock.EPM2_V16), local)
             card = Path(folder) / "card"
             (card / "DCIM").mkdir(parents=True)
             env = {
@@ -125,10 +124,10 @@ class FromTheZipTests(unittest.TestCase):
             files = json.loads(done.stdout)["files"]
             self.assertEqual(files[0]["sha256"], pinned_description(PATHS).sha256)
             self.assertTrue((card / "DCOLYMP" / "E1019999.BIN").is_file())
-            self.assertTrue((card / "EPM2LOOK.BIN").is_file())
+            self.assertFalse((card / "EPM2LOOK.BIN").exists())  # no --film
             self.assertFalse((top / "build").exists())
             self.assertEqual(run("inspect", "--card", str(card)).returncode, 0)
-            self.assertEqual(run("make").returncode, 5)
+            self.assertEqual(run("make", "x").returncode, 6)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 {
  "what": "DEBUG build, not for normal use: the candidate peaking-fast-2 with the structured log, the timing probe of peaking and the event pk_guard (records to EPM2LOG.BIN on the card; decode with `epm2mod log`)",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",

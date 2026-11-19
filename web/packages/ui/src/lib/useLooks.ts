@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { films, type Film } from './films'
-import { addFilm, builtInSlots, firstEmpty, moveSlot, removeFilm, type SlotItem } from './selection'
+import { addFilm, firstEmpty, moveSlot, removeFilm, type SlotItem } from './selection'
 
 /** The films chosen for ART 1 to 12 and the selected row: the state of the ART-menu editor. */
 export interface Looks {
@@ -12,7 +12,7 @@ export interface Looks {
   remove: (index: number) => void
   /** Put a film into the selected row if it is empty, else into the first empty row. */
   add: (film: Film) => void
-  /** Go back to the films built into the firmware, in their order. */
+  /** Go back to the rows the editor started with. */
   reset: () => void
   /** The row that Add fills: the selected row if it is empty, else the first empty row, or -1. */
   empty: number
@@ -20,9 +20,9 @@ export interface Looks {
   unused: readonly Film[]
 }
 
-/** The state of the ART-menu editor; it starts with the films built into the firmware. */
-export function useLooks(): Looks {
-  const [items, setItems] = useState<SlotItem[]>(builtInSlots)
+/** The state of the ART-menu editor; it starts with the rows that `initial` returns (the app's own choice). */
+export function useLooks(initial: () => SlotItem[]): Looks {
+  const [items, setItems] = useState<SlotItem[]>(initial)
   const [selected, setSelected] = useState(0)
   const empty = items[selected]?.filmId === null ? selected : firstEmpty(items)
   return {
@@ -43,7 +43,7 @@ export function useLooks(): Looks {
       setSelected(empty)
     },
     reset: () => {
-      setItems(builtInSlots())
+      setItems(initial())
       setSelected(0)
     },
     empty,

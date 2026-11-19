@@ -42,7 +42,7 @@ from ..errors import BuildError
 from ..fileio import read_json, write_json
 from ..paths import RepoPaths
 from ..spec import UTF16, BytesOp, Op, op_to_json
-from ..stock import EPM2_V16, StockFirmware, read_stock
+from ..stock import StockFirmware, read_stock
 from . import slots
 from .films import Film, inputs_digest, load_films
 
@@ -366,7 +366,7 @@ def load_fit(path: Path) -> dict[str, NDArray[Any]]:
         raise BuildError(f"{path}: cannot be read as a fit file: {error}") from None
 
 
-def generate(paths: RepoPaths, stock: StockFirmware = EPM2_V16) -> list[GeneratedSpec]:
+def generate(paths: RepoPaths, stock: StockFirmware) -> list[GeneratedSpec]:
     """Generate the three film-look patch specs.
 
     Args:
@@ -445,9 +445,7 @@ def _is_current(on_disk: dict[str, Any] | None, fields: dict[str, Any]) -> bool:
     }
 
 
-def generate_all(
-    paths: RepoPaths, stock: StockFirmware = EPM2_V16
-) -> list[GeneratedSpec]:
+def generate_all(paths: RepoPaths, stock: StockFirmware) -> list[GeneratedSpec]:
     """Generate every film-look patch spec.
 
     Returns:
@@ -471,7 +469,7 @@ def generate_all(
     return specs
 
 
-def stale(paths: RepoPaths, stock: StockFirmware = EPM2_V16) -> list[str]:
+def stale(paths: RepoPaths, stock: StockFirmware) -> list[str]:
     """Return the paths of the spec files whose generated fields are out of date."""
     return [
         spec.path
@@ -480,7 +478,7 @@ def stale(paths: RepoPaths, stock: StockFirmware = EPM2_V16) -> list[str]:
     ]
 
 
-def write(paths: RepoPaths, stock: StockFirmware = EPM2_V16) -> list[str]:
+def write(paths: RepoPaths, stock: StockFirmware) -> list[str]:
     """Bring the spec files up to date and return the paths that changed.
 
     The generated fields are replaced. Notes that people added are kept. If the

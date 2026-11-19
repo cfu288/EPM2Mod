@@ -43,7 +43,7 @@ from epm2mod.paths import RepoPaths  # noqa: E402
 from epm2mod.spec import BytesOp  # noqa: E402
 
 PATHS = RepoPaths(ROOT)
-HAVE_STOCK = stock.stock_path(PATHS).is_file()
+HAVE_STOCK = stock.stock_path(PATHS, stock.EPM2_V16).is_file()
 UTF16 = "utf-16-le"
 
 
@@ -459,24 +459,31 @@ class GeneratorTests(SyntheticCase):
         with self.assertRaises(StockError):
             self.generate()
 
-    def test_the_looks_command(self) -> None:
+    def test_the_generate_command_writes_the_specs(self) -> None:
+        pinned = mock.Mock(stock_firmware=self.repo.stock)
+
         def run(*argv: str) -> tuple[int, str]:
             out = io.StringIO()
             env = {paths_module.ROOT_ENV: str(self.paths.root)}
             with mock.patch.dict(os.environ, env), contextlib.redirect_stdout(out):
-                with mock.patch.object(cli, "EPM2_V16", self.repo.stock):
-                    with contextlib.redirect_stderr(io.StringIO()):
-                        return cli.main(["looks", *argv]), out.getvalue()
+                with (
+                    mock.patch.object(RepoPaths, "pinned_build", return_value=pinned),
+                    mock.patch("epm2mod.readme.rewrite", return_value=[]),
+                    mock.patch("epm2mod.readme.stale", return_value=[]),
+                    mock.patch("epm2mod.readme.feature_problems", return_value=[]),
+                    contextlib.redirect_stderr(io.StringIO()),
+                ):
+                    return cli.main(["generate", *argv]), out.getvalue()
 
         self.paths.pinned.write_text("{}")  # marks the top of the repository
-        status, text = run()
+        status, text = run("--check")
         self.assertEqual(status, 1, text)
         self.assertIn("differs from the generated spec", text)
-        status, text = run("--write")
+        status, text = run()
         self.assertEqual(status, 0, text)
         self.assertEqual(text.count("wrote patches/"), 3)
-        self.assertEqual(run()[0], 0)
-        self.assertEqual(run("--write"), (0, "no spec changed\n"))
+        self.assertEqual(run("--check")[0], 0)
+        self.assertEqual(run(), (0, "no spec changed\ndocuments: no change\n"))
 
 
 @unittest.skipUnless(HAVE_STOCK, "stock firmware not present")
@@ -498,8 +505,12 @@ class RealFirmwareLooksTests(unittest.TestCase):
         return paths
 
     def test_the_committed_specs_are_the_generated_ones(self) -> None:
-        self.assertEqual(generate.stale(PATHS), [], "run: uv run epm2mod looks --write")
-        self.assertEqual(generate.write(self.copy_of_the_repository()), [])
+        self.assertEqual(
+            generate.stale(PATHS, stock.EPM2_V16), [], "run: uv run epm2mod generate"
+        )
+        self.assertEqual(
+            generate.write(self.copy_of_the_repository(), stock.EPM2_V16), []
+        )
 
     def test_a_changed_look_loses_its_test_status_and_breaks_the_tested_build(
         self,
@@ -511,21 +522,25 @@ class RealFirmwareLooksTests(unittest.TestCase):
         arrays["gain"] = arrays["gain"] + 1
         np.savez(fit_path, **arrays)
 
-        self.assertEqual(generate.stale(paths), list(film_list.spec_paths))
-        self.assertEqual(generate.write(paths), list(film_list.spec_paths))
+        self.assertEqual(
+            generate.stale(paths, stock.EPM2_V16), list(film_list.spec_paths)
+        )
+        self.assertEqual(
+            generate.write(paths, stock.EPM2_V16), list(film_list.spec_paths)
+        )
         written = read_json(paths.resolve(film_list.films_spec))
         self.assertEqual(written["status"], generate.NEW_STATUS)
         labels = read_json(paths.resolve(film_list.labels_spec))
         committed = read_json(PATHS.resolve(film_list.labels_spec))
         self.assertEqual(labels["ops"], committed["ops"])
         self.assertEqual(labels["status"], committed["status"])
-        self.assertEqual(generate.stale(paths), [])
+        self.assertEqual(generate.stale(paths, stock.EPM2_V16), [])
 
         # log-menu: the last tested build with the films in the firmware (the pinned one loads them from the card)
         tested = builds.load_description(builds.description_path(paths, "log-menu"))
         specs = pipeline.load_specs(paths, tested)
         with self.assertRaises(BuildError):  # the recorded sha256 no longer fits
-            pipeline.build_image(tested, specs, stock.read_stock(paths))
+            pipeline.build_image(tested, specs, stock.read_stock(paths, stock.EPM2_V16))
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 {
  "what": "The pinned build (peaking-gain-2x) with the seven film names in all 34 menu languages, and the French label of the soft-focus effect as stock",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",

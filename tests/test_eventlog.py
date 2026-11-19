@@ -924,15 +924,19 @@ class CommandTests(unittest.TestCase):
             status = cli.main(list(argv))
         return status, out.getvalue(), err.getvalue()
 
-    def test_log_prints_json_lines(self) -> None:
+    def test_log_prints_one_json_document(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             words = Path(folder, "events.json")
             words.write_text(json.dumps(RAW), encoding="utf-8")
             log = Path(folder, "EPM2LOG.BIN")
             log.write_bytes(block(0, [record(1, 0, 100), record(3, 1, 200)]))
-            status, out, err = self.run_cli("log", str(log), "--dict", str(words))
+            status, out, err = self.run_cli(
+                "log", str(log), "--dict", str(words), "--json"
+            )
             self.assertEqual((status, err), (0, ""))
-            got = [json.loads(line) for line in out.splitlines()]
+            document = json.loads(out)
+            self.assertEqual((document["command"], document["ok"]), ("log", True))
+            got = document["events"]
             self.assertEqual([line["event"] for line in got], ["boot", "tick"])
             log.write_bytes(b"not a log")
             status, out, err = self.run_cli("log", str(log), "--dict", str(words))
@@ -949,9 +953,7 @@ class CommandTests(unittest.TestCase):
             words.write_text(json.dumps(RAW), encoding="utf-8")
             log = Path(folder, "EPM2LOG.BIN")
             log.write_bytes(block(0, [record(1, 0, 100), record(3, 1, 200)]))
-            status, out, err = self.run_cli(
-                "log", str(log), "--dict", str(words), "--summary"
-            )
+            status, out, err = self.run_cli("log", str(log), "--dict", str(words))
             self.assertEqual((status, err), (0, ""))
             self.assertEqual(out.splitlines()[0][:22], "2 records, 1 session, ")
             self.assertIn("events: boot 1, tick 1", out.splitlines())
@@ -1004,9 +1006,9 @@ class CommandTests(unittest.TestCase):
                 )
             )
             with mock.patch.dict(os.environ, {ROOT_ENV: str(ROOT)}):
-                status, out, err = self.run_cli("log", str(log))
+                status, out, err = self.run_cli("log", str(log), "--json")
             self.assertEqual((status, err), (0, ""))
-            got = [json.loads(line) for line in out.splitlines()]
+            got = json.loads(out)["events"]
             self.assertEqual([line.get("marker") for line in got], [None, None])
             self.assertEqual(got[0]["args"]["session"], 1)
             self.assertEqual(got[1]["event"], "film_stage")
@@ -1017,8 +1019,8 @@ class CommandTests(unittest.TestCase):
                 block(0, [record(ids["boot"], 0, 5, 1)], build=words.build_id)
             )
             with mock.patch.dict(os.environ, {ROOT_ENV: str(ROOT)}):
-                status, out, err = self.run_cli("log", str(log))
-            self.assertEqual(json.loads(out)["args"]["ring_found"], 1)
+                status, out, err = self.run_cli("log", str(log), "--json")
+            self.assertEqual(json.loads(out)["events"][0]["args"]["ring_found"], 1)
 
 
 if __name__ == "__main__":

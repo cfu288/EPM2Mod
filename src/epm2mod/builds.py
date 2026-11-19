@@ -4,6 +4,7 @@ A build description is a JSON file in ``builds/``::
 
     {
       "what": "Seven film looks as art filters",
+      "stock": "OLY_E_101_1600_0000_0000.BIN",
       "specs": ["patches/a.json", "patches/b.json"],
       "sha256": "...",                 (only after a camera test)
       "camera_tested": "2026-11-13",   (only after a camera test)
@@ -11,7 +12,8 @@ A build description is a JSON file in ``builds/``::
     }
 
 The name of a build is the name of its file without ``.json``; it is not
-written inside the file. The specs are files in ``patches/``, written relative
+written inside the file. ``stock`` names the stock firmware the build starts
+from: a key of ``stock.STOCK_FIRMWARE`` (the maker's file name). The specs are files in ``patches/``, written relative
 to the repository root, and are applied in the order given. ``sha256`` and
 ``camera_tested`` are either both present (a tested build) or both absent (a
 candidate).
@@ -30,7 +32,7 @@ from __future__ import annotations
 
 import datetime
 import re
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any
 
@@ -39,9 +41,10 @@ from .fileio import read_json, write_json
 from .hashing import is_sha256
 from .label import LABEL_SPEC, check_label
 from .paths import SPEC_FOLDER, RepoPaths, is_repo_relative
+from .stock import StockFirmware, stock_named
 
 _NAME = re.compile(r"[a-z0-9][a-z0-9._-]*")
-_KEYS = {"what", "specs", "sha256", "camera_tested", "first_code", "label"}
+_KEYS = {"what", "stock", "specs", "sha256", "camera_tested", "first_code", "label"}
 _SUFFIX = ".json"
 
 
@@ -103,6 +106,7 @@ class BuildDescription:
             camera-tested build runs code yet.
         label: the date ``YYYY.MM.DD`` that the camera's Firmware screen shows
             after "EPM2Mod"; present exactly when ``specs`` lists the label spec.
+        stock: the name of the stock firmware the build starts from (``stock.STOCK_FIRMWARE``).
     """
 
     name: str
@@ -112,6 +116,7 @@ class BuildDescription:
     camera_tested: str | None = None
     first_code: bool = False
     label: str | None = None
+    stock: str = field(kw_only=True)
 
     def __post_init__(self) -> None:
         """Check the description. Every instance is valid.
@@ -134,6 +139,8 @@ class BuildDescription:
                 f"{self.name}: 'what' must be one line of plain text, "
                 "without '<' or '>'"
             )
+        if not isinstance(self.stock, str) or not self.stock:
+            raise BuildError(f"{self.name}: 'stock' must name the stock firmware")
         if not self.specs:
             raise BuildError(f"{self.name}: 'specs' must name one or more specs")
         for spec in self.specs:
@@ -155,6 +162,15 @@ class BuildDescription:
                 f"{self.name}: 'label' and the spec {LABEL_SPEC} go together: "
                 "give both or neither"
             )
+
+    @property
+    def stock_firmware(self) -> StockFirmware:
+        """The stock firmware the build starts from.
+
+        Raises:
+            BuildError: if ``stock`` names no known stock firmware.
+        """
+        return stock_named(self.stock, self.name)
 
     @property
     def tested(self) -> bool:
@@ -184,7 +200,11 @@ class BuildDescription:
 
     def to_json(self) -> dict[str, Any]:
         """Return the JSON form of the description."""
-        raw: dict[str, Any] = {"what": self.what, "specs": list(self.specs)}
+        raw: dict[str, Any] = {
+            "what": self.what,
+            "stock": self.stock,
+            "specs": list(self.specs),
+        }
         if self.sha256 is not None:
             raw["sha256"] = self.sha256
             raw["camera_tested"] = self.camera_tested
@@ -214,9 +234,11 @@ def description_from_json(name: str, raw: Any) -> BuildDescription:
     unknown = sorted(set(raw) - _KEYS)
     if unknown:
         raise BuildError(f"{name}: unknown key(s): {', '.join(unknown)}")
-    what, specs = raw.get("what"), raw.get("specs")
+    what, specs, stock = raw.get("what"), raw.get("specs"), raw.get("stock")
     if not isinstance(what, str):
         raise BuildError(f"{name}: 'what' must be one line of text")
+    if not isinstance(stock, str):
+        raise BuildError(f"{name}: 'stock' must name the stock firmware")
     if not isinstance(specs, list):
         raise BuildError(f"{name}: 'specs' must be a list of paths")
     sha256, tested = raw.get("sha256"), raw.get("camera_tested")
@@ -230,6 +252,7 @@ def description_from_json(name: str, raw: Any) -> BuildDescription:
         camera_tested=None if tested is None else _check_date(tested, name),
         first_code="first_code" in raw,
         label=None if raw.get("label") is None else check_label(raw["label"], name),
+        stock=stock,
     )
 
 

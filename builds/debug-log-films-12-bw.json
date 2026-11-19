@@ -1,5 +1,6 @@
 {
  "what": "DEBUG build, not for normal use: the candidate films-12-bw with the structured log and the timing probe of peaking, as debug-log-films-12 has them (records to EPM2LOG.BIN on the card; decode with `epm2mod log`)",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",

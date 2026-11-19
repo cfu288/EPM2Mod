@@ -1,6 +1,6 @@
 """Tests of the build label on the Firmware screen, ``epm2mod.label``.
 
-    uv run python -m unittest discover -s tests
+uv run python -m unittest discover -s tests
 """
 
 from __future__ import annotations
@@ -40,10 +40,18 @@ class LabelTests(unittest.TestCase):
 
     def test_the_same_label_gives_the_same_bytes(self) -> None:
         self.assertEqual(with_label(SPEC, "2026.12.31"), with_label(SPEC, "2026.12.31"))
-        self.assertNotEqual(with_label(SPEC, "2026.12.31"), with_label(SPEC, "2026.11.19"))
+        self.assertNotEqual(
+            with_label(SPEC, "2026.12.31"), with_label(SPEC, "2026.11.19")
+        )
 
     def test_a_malformed_label_is_refused(self) -> None:
-        for bad in ("2026-11-19", "2026.13.01", "2026.02.30", "26.11.19", "2026.11.19 "):
+        for bad in (
+            "2026-11-19",
+            "2026.13.01",
+            "2026.02.30",
+            "26.11.19",
+            "2026.11.19 ",
+        ):
             with self.subTest(bad), self.assertRaises(BuildError):
                 with_label(SPEC, bad)
 
@@ -51,13 +59,21 @@ class LabelTests(unittest.TestCase):
 class DescriptionTests(unittest.TestCase):
     def test_a_label_needs_the_label_spec_and_the_spec_needs_a_label(self) -> None:
         with self.assertRaises(BuildError):
-            BuildDescription(name="x", what="x", specs=("patches/lss-core.json",), label="2026.11.19")
+            BuildDescription(
+                name="x",
+                what="x",
+                specs=("patches/lss-core.json",),
+                label="2026.11.19",
+                stock="x",
+            )
         with self.assertRaises(BuildError):
-            BuildDescription(name="x", what="x", specs=(LABEL_SPEC,))
-        BuildDescription(name="x", what="x", specs=(LABEL_SPEC,), label="2026.11.19")
+            BuildDescription(name="x", what="x", specs=(LABEL_SPEC,), stock="x")
+        BuildDescription(
+            name="x", what="x", specs=(LABEL_SPEC,), label="2026.11.19", stock="x"
+        )
 
     def test_the_label_goes_through_json(self) -> None:
-        raw = {"what": "x", "specs": [LABEL_SPEC], "label": "2026.11.19"}
+        raw = {"what": "x", "stock": "x", "specs": [LABEL_SPEC], "label": "2026.11.19"}
         self.assertEqual(description_from_json("x", raw).to_json(), raw)
 
 

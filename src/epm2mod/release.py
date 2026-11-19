@@ -17,7 +17,6 @@ standard library, so it runs from ``src`` with no install step.
 
 from __future__ import annotations
 
-import datetime
 import json
 import re
 import zipfile
@@ -101,11 +100,6 @@ def _package(src: Path) -> Iterator[tuple[str, Path]]:
 #: A release's version: calendar date (``2026.11.18``), a number for a second release that day (``.2``), and
 #: ``-rc.N`` for a pre-release or ``-dev`` for a test build.
 _VERSION = re.compile(r"^\d{4}\.\d{2}\.\d{2}(\.\d+)?(-rc\.\d+|-dev)?$")
-
-
-def today_version() -> str:
-    """Return today's calendar version (UTC), for example ``2026.11.18``."""
-    return datetime.datetime.now(datetime.timezone.utc).strftime("%Y.%m.%d")
 
 
 def check_version(version: str) -> None:

@@ -61,7 +61,7 @@ from epm2mod.hashing import is_sha256, sha256_bytes  # noqa: E402
 from epm2mod.paths import RepoPaths, is_repo_relative  # noqa: E402
 
 PATHS = RepoPaths(ROOT)
-HAVE_STOCK = stock.stock_path(PATHS).is_file()
+HAVE_STOCK = stock.stock_path(PATHS, stock.EPM2_V16).is_file()
 TODAY = datetime.date(2026, 11, 20)
 
 
@@ -77,6 +77,8 @@ TINY_STOCK = stock.StockFirmware(
     hard_code="OLYE101000000000",
     card_name="E1019999.BIN",
 )
+# The tiny builds name it as their stock firmware.
+stock.STOCK_FIRMWARE[TINY_STOCK.file_name] = TINY_STOCK
 BYTE_OP = {
     "type": "bytes",
     "block": 0,
@@ -104,10 +106,15 @@ class TinyRepo:
         self.image = applied.image
         self.sha256 = sha256_bytes(self.image)
         self.tested = builds.BuildDescription(
-            "good", "A tiny build", ("patches/a.json",), self.sha256, "2026-11-13"
+            "good",
+            "A tiny build",
+            ("patches/a.json",),
+            self.sha256,
+            "2026-11-13",
+            stock=TINY_STOCK.file_name,
         )
         self.candidate = builds.BuildDescription(
-            "new", "A tiny candidate", ("patches/a.json",)
+            "new", "A tiny candidate", ("patches/a.json",), stock=TINY_STOCK.file_name
         )
         builds.pin(self.paths, self.tested)
         builds.save_description(self.paths, self.candidate)
@@ -153,7 +160,7 @@ class RepoCase(unittest.TestCase):
     def make(
         self, description: builds.BuildDescription, **kw: Any
     ) -> pipeline.MakeResult:
-        return pipeline.make(self.repo.paths, description, stock=TINY_STOCK, **kw)
+        return pipeline.make(self.repo.paths, description, **kw)
 
 
 @contextlib.contextmanager
@@ -745,7 +752,11 @@ class PathAndFileTests(unittest.TestCase):
 
 
 class BuildDescriptionTests(unittest.TestCase):
-    GOOD: dict[str, Any] = {"what": "Something", "specs": ["patches/a.json"]}
+    GOOD: dict[str, Any] = {
+        "what": "Something",
+        "stock": "x",
+        "specs": ["patches/a.json"],
+    }
 
     def test_candidate_and_tested(self) -> None:
         candidate = builds.description_from_json("my-build", self.GOOD)
@@ -812,7 +823,9 @@ class BuildDescriptionTests(unittest.TestCase):
             with self.subTest(name=name), self.assertRaises(BuildError):
                 builds.description_from_json(name, self.GOOD)
         with self.assertRaises(BuildError):
-            builds.BuildDescription("b", "w", ("patches/a.json",), sha256="a" * 64)
+            builds.BuildDescription(
+                "b", "w", ("patches/a.json",), sha256="a" * 64, stock="x"
+            )
         candidate = builds.description_from_json("b", self.GOOD)
         for sha, date in (("short", "2026-11-13"), ("a" * 64, "2026-13-40")):
             with self.assertRaises(BuildError):
@@ -1101,7 +1114,11 @@ class MakeTests(RepoCase):
         self.make(self.repo.candidate, log=lines.append)
         self.assertNotIn("--first-code", "\n".join(lines))
         first = builds.BuildDescription(
-            "probe", "A probe", ("patches/a.json",), first_code=True
+            "probe",
+            "A probe",
+            ("patches/a.json",),
+            first_code=True,
+            stock=TINY_STOCK.file_name,
         )
         lines.clear()
         self.make(first, log=lines.append)
@@ -1146,10 +1163,6 @@ class MakeTests(RepoCase):
         result = self.make(self.repo.tested, output=named)
         self.assertEqual(named.read_bytes(), result.image.read_bytes())
         self.assertEqual([p.name for p in folder.iterdir()], ["mod.bin"])
-        self.make(self.repo.tested, output=folder)  # a folder: the camera's file name
-        self.assertEqual(
-            sorted(p.name for p in folder.iterdir()), ["E1019999.BIN", "mod.bin"]
-        )
 
     def test_what_an_interrupted_run_left_is_ours_and_is_replaced(self) -> None:
         image = pipeline.image_path(self.repo.paths, "good")
@@ -1165,7 +1178,7 @@ class MakeTests(RepoCase):
         with mock.patch(
             "epm2mod.pipeline.write_bytes", wraps=fileio.write_bytes
         ) as write:
-            self.make(self.repo.tested, output=self.card)
+            self.make(self.repo.tested, output=self.card / "x.BIN")
         self.assertEqual(write.call_count, 3)
         for call in write.call_args_list:
             self.assertIs(call.kwargs.get("read_back"), True, call)
@@ -1182,7 +1195,7 @@ class RecordTestTests(RepoCase):
         self, description: builds.BuildDescription, sha: str, date: str
     ) -> builds.BuildDescription:
         return pipeline.record_test(
-            self.repo.paths, description, sha, date, stock=TINY_STOCK, today=TODAY
+            self.repo.paths, description, sha, date, today=TODAY
         )
 
     def test_a_candidate_becomes_the_pinned_build(self) -> None:
@@ -1222,9 +1235,6 @@ class RecordTestTests(RepoCase):
 class CommandLineTests(RepoCase):
     def setUp(self) -> None:
         super().setUp()
-        patcher = mock.patch.object(cli, "EPM2_V16", TINY_STOCK)
-        patcher.start()
-        self.addCleanup(patcher.stop)
         # ``epm2mod pin`` asks the clock; give it a fixed day.
         clock = mock.patch.object(pipeline, "current_date", return_value=TODAY)
         clock.start()
@@ -1244,8 +1254,8 @@ class CommandLineTests(RepoCase):
         self.assertIn("good (pinned): A tiny build [tested 2026-11-13, 1 specs]", text)
         self.assertIn("new: A tiny candidate [candidate, 1 specs]", text)
 
-    def test_make_the_pinned_build(self) -> None:
-        status, text = self.run_cli("make")
+    def test_make_a_build(self) -> None:
+        status, text = self.run_cli("make", "good")
         self.assertEqual(status, 0, text)
         self.assertIn(f"sha256 {self.repo.sha256}", text)
         self.assertEqual(self.repo.outputs(), ["card/DCOLYMP/E1019999.BIN", "good.BIN"])
@@ -1256,7 +1266,7 @@ class CommandLineTests(RepoCase):
         status, text = self.run_cli("make", "new", "-o", str(out))
         self.assertEqual(status, 0, text)
         self.assertIn("NOT camera-tested", text)
-        self.assertIn("install --card DIR --build new --untested", text)
+        self.assertIn("install --card DIR --build new --allow-untested", text)
         self.assertEqual(out.read_bytes(), self.repo.image)
 
     def test_a_build_is_named_not_given_as_a_path(self) -> None:
@@ -1281,12 +1291,12 @@ class CommandLineTests(RepoCase):
         self.assertEqual(self.repo.outputs(), [])
 
     def test_a_failed_pinned_run_removes_the_image_of_the_earlier_run(self) -> None:
-        for damage in ("<<<<<<< HEAD\n", json.dumps(self.repo.candidate.to_json())):
-            self.assertEqual(self.run_cli("make")[0], 0)
+        for damage in ("<<<<<<< HEAD\n", '{"what": "x"}'):
+            self.assertEqual(self.run_cli("make", "good")[0], 0)
             good = builds.description_path(self.repo.paths, "good")
             saved = good.read_text()
-            good.write_text(damage)  # not JSON; then: not a tested build
-            status, text = self.run_cli("make")
+            good.write_text(damage)  # not JSON; then: not a valid description
+            status, text = self.run_cli("make", "good")
             self.assertEqual(status, 1, text)
             self.assertEqual(self.repo.outputs(), [])
             good.write_text(saved)
@@ -1313,21 +1323,20 @@ class CommandLineTests(RepoCase):
             self.assertEqual(raised.exception.code, 7)
             main.assert_called_once_with(expected)
 
-    def test_a_pointer_that_cannot_be_read_still_removes_the_card_folder(self) -> None:
-        self.assertEqual(self.run_cli("make")[0], 0)
-        self.repo.paths.pinned.write_text("{broken")
-        status, text = self.run_cli("make")
-        self.assertEqual(status, 1, text)
-        self.assertEqual(self.repo.outputs(), ["good.BIN"])  # the documented limit
+    def test_make_needs_the_build(self) -> None:
+        with self.assertRaises(SystemExit) as raised:
+            with contextlib.redirect_stderr(io.StringIO()):
+                self.run_cli("make")
+        self.assertEqual(raised.exception.code, 2)
 
     def test_an_empty_argument_is_an_error(self) -> None:
         record = ("--date", "2026-11-10", "--sha256", self.repo.sha256)
         spec_file = str(self.repo.paths.resolve("patches/a.json"))
         cases: list[tuple[tuple[str, ...], int]] = [
             (("make", ""), 3),
-            (("make", "-o", ""), 1),
-            (("apply", spec_file, "-o", ""), 1),
-            (("apply", spec_file, "-o", "/"), 1),
+            (("make", "good", "-o", ""), 2),
+            (("apply", spec_file, "--from", spec_file, "-o", ""), 2),
+            (("apply", spec_file, "--from", spec_file, "-o", "/"), 2),
             (("pin", "", *record), 3),
             (("install", "--card", ""), 2),
         ]
@@ -1340,7 +1349,7 @@ class CommandLineTests(RepoCase):
     def test_pin(self) -> None:
         argv = ("pin", "new", "--date", "2026-11-10", "--sha256")
         status, text = self.run_cli(*argv, "0" * 64)
-        self.assertEqual(status, 4, text)
+        self.assertEqual(status, 5, text)
         self.assertEqual(builds.pinned_description(self.repo.paths).name, "good")
         status, text = self.run_cli(*argv, self.repo.sha256, "--dry-run")
         self.assertEqual(status, 0, text)
@@ -1369,37 +1378,43 @@ class CommandLineTests(RepoCase):
         path.unlink()
         with answers(catalog_answer(), TINY[:-1]):
             status, text = self.run_cli("fetch-stock")
-        self.assertEqual(status, 4, text)
+        self.assertEqual(status, 5, text)
         self.assertFalse(path.exists())
         with answers(OSError):
             status, text = self.run_cli("fetch-stock")
-        self.assertEqual(status, 5, text)
+        self.assertEqual(status, 6, text)
 
     def test_apply(self) -> None:
         spec_file = str(self.repo.paths.resolve("patches/a.json"))
         out = self.repo.paths.root / "out" / "x.BIN"
+        start = self.repo.write("start.BIN", TINY)
         with mock.patch("epm2mod.cli.write_bytes", wraps=fileio.write_bytes) as write:
-            status, text = self.run_cli("apply", spec_file, "-o", str(out), "-v")
+            status, text = self.run_cli(
+                "apply", spec_file, "--from", str(start), "-o", str(out), "-v"
+            )
         self.assertIs(write.call_args.kwargs.get("read_back"), True)
         self.assertEqual(status, 0, text)
         self.assertEqual(out.read_bytes(), self.repo.image)
         self.assertIn("[a]", text)
         self.assertIn(f"sha256 {self.repo.sha256}", text)
-        start = self.repo.write("start.BIN", TINY)
-        stock.stock_path(self.repo.paths, TINY_STOCK).unlink()
-        status, text = self.run_cli("apply", spec_file, "-o", str(out))
-        self.assertEqual(status, 3, text)
         status, text = self.run_cli(
-            "apply", spec_file, "-o", str(out), "--from", str(start)
+            "apply", spec_file, "-o", str(out), "--from", str(start) + ".missing"
         )
-        self.assertEqual(status, 0, text)
+        self.assertEqual(status, 3, text)
+        with self.assertRaises(SystemExit) as raised:  # --from is needed
+            with contextlib.redirect_stderr(io.StringIO()):
+                self.run_cli("apply", spec_file, "-o", str(out))
+        self.assertEqual(raised.exception.code, 2)
 
     def test_apply_checks_the_sha256_that_a_single_spec_states(self) -> None:
         out = self.repo.paths.root / "x.BIN"
-        for expected, status_wanted in (("0" * 64, 4), (self.repo.sha256, 0)):
+        start = str(stock.stock_path(self.repo.paths, TINY_STOCK))
+        for expected, status_wanted in (("0" * 64, 5), (self.repo.sha256, 0)):
             raw = {**spec_json("b", [BYTE_OP]), "expected_sha256": expected}
             spec_file = str(self.repo.write_json("patches/b.json", raw))
-            status, text = self.run_cli("apply", spec_file, "-o", str(out))
+            status, text = self.run_cli(
+                "apply", spec_file, "--from", start, "-o", str(out)
+            )
             self.assertEqual(status, status_wanted, text)
             self.assertEqual(out.exists(), status_wanted == 0)
 
@@ -1411,7 +1426,8 @@ class CommandLineTests(RepoCase):
             str(self.repo.write_json("patches/c.json", spec_json("c", [other_op]))),
         ]
         out = self.repo.paths.root / "x.BIN"
-        status, text = self.run_cli("apply", *files, "-o", str(out))
+        start = str(stock.stock_path(self.repo.paths, TINY_STOCK))
+        status, text = self.run_cli("apply", *files, "--from", start, "-o", str(out))
         self.assertEqual(status, 0, text)
         self.assertTrue(out.exists())
 
@@ -1422,17 +1438,19 @@ class CommandLineTests(RepoCase):
         link.symlink_to(stock_file)
         for out in (stock_file, stock_file.parent / ".." / stock_file, link):
             with self.subTest(out=out.name):
-                status, text = self.run_cli("apply", spec_file, "-o", str(out))
+                status, text = self.run_cli(
+                    "apply", spec_file, "--from", str(stock_file), "-o", str(out)
+                )
                 self.assertEqual(status, 1, text)
                 self.assertEqual(stock_file.read_bytes(), TINY)
 
-    def test_looks_without_numpy(self) -> None:
+    def test_generate_without_numpy(self) -> None:
         saved = vars(epm2mod.looks).pop("generate", None)
         if saved is not None:
             self.addCleanup(setattr, epm2mod.looks, "generate", saved)
         with mock.patch.dict(sys.modules, {"numpy": None}):
             sys.modules.pop("epm2mod.looks.generate", None)
-            status, text = self.run_cli("looks")
+            status, text = self.run_cli("generate", "--check")
         self.assertEqual(status, 1, text)
         self.assertIn("numpy is needed", text)
 
@@ -1452,13 +1470,13 @@ class CommandLineTests(RepoCase):
         self.assertIs(signal.getsignal(signal.SIGTERM), before)
 
     def test_an_interrupted_command_leaves_no_output_and_says_so(self) -> None:
-        self.assertEqual(self.run_cli("make")[0], 0)
+        self.assertEqual(self.run_cli("make", "good")[0], 0)
 
         def terminate(*args: Any, **kw: Any) -> None:
             signal.raise_signal(signal.SIGTERM)
 
         with mock.patch("epm2mod.pipeline.write_bytes", side_effect=terminate):
-            status, text = self.run_cli("make")
+            status, text = self.run_cli("make", "good")
         self.assertEqual(status, 130, text)
         self.assertIn("interrupted", text)
         self.assertEqual(self.repo.outputs(), [])
@@ -1481,7 +1499,7 @@ class CommandLineTests(RepoCase):
             (("pin", "new", "--date", "2999-01-01", "--sha256", self.repo.sha256), 1),
             (("inspect", str(self.repo.paths.root)), 3),
             (("inspect", "no-such-file"), 3),
-            (("apply", "no-such-spec.json", "-o", "out.BIN"), 1),
+            (("apply", "no-such-spec.json", "--from", "x", "-o", "out.BIN"), 1),
         ]
         self.addCleanup(os.chdir, os.getcwd())
         os.chdir(self.repo.paths.root)
@@ -1513,7 +1531,7 @@ class CommandLineTests(RepoCase):
         with tempfile.TemporaryDirectory() as folder:
             with mock.patch.dict(os.environ, {paths_module.ROOT_ENV: folder}):
                 with contextlib.redirect_stderr(io.StringIO()) as err:
-                    self.assertEqual(cli.main(["builds"]), 5)
+                    self.assertEqual(cli.main(["builds"]), 6)
         self.assertIn("is not the repository", err.getvalue())
 
     def test_inspect(self) -> None:
@@ -1527,7 +1545,7 @@ class CommandLineTests(RepoCase):
         status, text = self.run_cli(
             "inspect", str(self.repo.write("bad.BIN", bytes(damaged)))
         )
-        self.assertEqual(status, 4, text)
+        self.assertEqual(status, 1, text)
         self.assertIn("will not work", text)
 
     def test_every_command_has_help_with_examples(self) -> None:
@@ -1548,14 +1566,18 @@ class CommandLineTests(RepoCase):
 
     def test_the_docs_check_of_this_repository(self) -> None:
         env = {paths_module.ROOT_ENV: str(ROOT)}
-        with mock.patch.dict(os.environ, env):
+        # the specs need the stock firmware; test_looks compares them
+        with (
+            mock.patch.dict(os.environ, env),
+            mock.patch("epm2mod.looks.generate.stale", return_value=[]),
+        ):
             with contextlib.redirect_stdout(io.StringIO()):
-                self.assertEqual(cli.main(["docs"]), 0)
+                self.assertEqual(cli.main(["generate", "--check"]), 0)
 
 
 class ReadmeTests(unittest.TestCase):
     def test_the_readme_is_up_to_date(self) -> None:
-        self.assertTrue(readme.is_current(PATHS), "run: uv run epm2mod docs --write")
+        self.assertTrue(readme.is_current(PATHS), "run: uv run epm2mod generate")
 
     def test_marker_problems(self) -> None:
         text = readme.generated_text(PATHS)
@@ -1646,23 +1668,33 @@ class ReadmeTests(unittest.TestCase):
         with self.assertRaisesRegex(BuildError, "found 2 times"):
             readme.is_current(paths)
 
-    def test_the_docs_command(self) -> None:
+    def test_the_generate_command_writes_the_documents(self) -> None:
         paths = self.stale_copy()
 
         def run(*argv: str) -> tuple[int, str]:
             out = io.StringIO()
             env = {paths_module.ROOT_ENV: str(paths.root)}
             with mock.patch.dict(os.environ, env), contextlib.redirect_stdout(out):
-                with contextlib.redirect_stderr(io.StringIO()):
-                    return cli.main(["docs", *argv]), out.getvalue()
+                with (
+                    contextlib.redirect_stderr(io.StringIO()),
+                    mock.patch("epm2mod.looks.generate.stale", return_value=[]),
+                    mock.patch("epm2mod.looks.generate.write", return_value=[]),
+                ):
+                    return cli.main(["generate", *argv]), out.getvalue()
 
-        self.assertEqual(run()[0], 1)
+        status, text = run("--check")
+        self.assertEqual(status, 1)
+        self.assertIn(f"{paths.readme}: the generated parts are out of date", text)
         self.assertEqual(
-            run("--write"),
-            (0, f"wrote {paths.readme}\nwrote {paths.resolve('docs/cli.md')}\n"),
+            run(),
+            (
+                0,
+                f"no spec changed\nwrote {paths.readme}\n"
+                f"wrote {paths.resolve('docs/cli.md')}\n",
+            ),
         )
-        self.assertEqual(run("--write"), (0, "documents: no change\n"))
-        self.assertEqual(run()[0], 0)
+        self.assertEqual(run(), (0, "no spec changed\ndocuments: no change\n"))
+        self.assertEqual(run("--check")[0], 0)
         self.assertEqual(
             fileio.read_text(paths.resolve("docs/cli.md")),
             fileio.read_text(ROOT / "docs" / "cli.md"),
@@ -1678,7 +1710,7 @@ class FilmInputsTests(unittest.TestCase):
         self.assertEqual(
             films.specs_with_other_inputs(PATHS),
             [],
-            "run: uv run epm2mod looks --write",
+            "run: uv run epm2mod generate",
         )
 
     def test_a_changed_input_is_seen(self) -> None:
@@ -1721,14 +1753,14 @@ class SourceTests(unittest.TestCase):
 @unittest.skipUnless(HAVE_STOCK, "stock firmware not present")
 class RealFirmwareTests(unittest.TestCase):
     def test_the_stock_file_round_trips(self) -> None:
-        data = stock.read_stock(PATHS)
+        data = stock.read_stock(PATHS, stock.EPM2_V16)
         self.assertEqual(len(data), stock.EPM2_V16.size)
         parsed = container.parse(data)
         self.assertTrue(parsed.checksums_ok)
         self.assertEqual(container.serialize(parsed), data)
 
     def test_every_tested_build_gives_its_sha256(self) -> None:
-        data = stock.read_stock(PATHS)
+        data = stock.read_stock(PATHS, stock.EPM2_V16)
         tested = [build for build in builds.all_descriptions(PATHS) if build.tested]
         self.assertTrue(tested)
         for build in tested:
@@ -1746,12 +1778,12 @@ class RealFirmwareTests(unittest.TestCase):
             shutil.copy(PATHS.pinned, paths.pinned)
             out, env = io.StringIO(), {paths_module.ROOT_ENV: folder}
             with mock.patch.dict(os.environ, env), contextlib.redirect_stdout(out):
-                self.assertEqual(cli.main(["make"]), 0)
+                self.assertEqual(cli.main(["make", pinned.name]), 0)
             image = paths.output / f"{pinned.name}.BIN"
             self.assertEqual(sha256_bytes(image.read_bytes()), pinned.sha256)
             self.assertIn(f"sha256 {pinned.sha256}", out.getvalue())
-            # the pinned build has Olympus's filters: make also writes the 12 default films
-            self.assertTrue((paths.card / "EPM2LOOK.BIN").is_file())
+            # make writes the firmware only
+            self.assertFalse((paths.card / "EPM2LOOK.BIN").exists())
 
 
 if __name__ == "__main__":

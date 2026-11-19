@@ -1,5 +1,6 @@
 {
  "what": "DEBUG probe build, not for normal use: debug-log-films-12d with probe 2 of looks loaded from the card (at the first menu, playback or power-off of a session it reads C:\\EPM2LOOK.BIN, and a file that starts with LOOK sets the art matrix of Pro 400H in RAM; experiments/2026-11-17-card-looks/NOTES.md)",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",

@@ -34,7 +34,7 @@ from ..container import parse
 from ..errors import BuildError
 from ..paths import RepoPaths
 from ..spec import BytesOp
-from ..stock import EPM2_V16, StockFirmware, read_stock
+from ..stock import StockFirmware, read_stock
 from . import slots
 from .films import Film, MoreFilmList, load_more_films, more_inputs_digest
 from .generate import (
@@ -334,7 +334,7 @@ def _film_text(films: Sequence[Film]) -> str:
     return "; ".join(f"{film.entry} = {film.film}" for film in films)
 
 
-def generate(paths: RepoPaths, stock: StockFirmware = EPM2_V16) -> list[GeneratedSpec]:
+def generate(paths: RepoPaths, stock: StockFirmware) -> list[GeneratedSpec]:
     """Generate the patch specs of the films beyond the first seven.
 
     Args:

@@ -69,6 +69,26 @@ EPM2_V16 = StockFirmware(
     card_name="E1019999.BIN",
 )
 
+#: The stock firmware files by the name that a build description gives (its ``stock``): the maker's file name.
+STOCK_FIRMWARE: dict[str, StockFirmware] = {EPM2_V16.file_name: EPM2_V16}
+
+
+def stock_named(name: str, where: str) -> StockFirmware:
+    """Return the stock firmware that a build description names.
+
+    Raises:
+        BuildError: if no stock firmware has that name.
+    """
+    from .errors import BuildError
+
+    found = STOCK_FIRMWARE.get(name)
+    if found is None:
+        raise BuildError(
+            f"{where}: 'stock' must be one of: " + ", ".join(sorted(STOCK_FIRMWARE))
+        )
+    return found
+
+
 #: Folder on the SD card that the camera's updater reads.
 CARD_FOLDER = "DCOLYMP"
 
@@ -83,12 +103,12 @@ _REQUEST = (
 )
 
 
-def stock_path(paths: Locator, stock: StockFirmware = EPM2_V16) -> Path:
+def stock_path(paths: Locator, stock: StockFirmware) -> Path:
     """Return where the stock firmware file is kept (the locator decides)."""
     return paths.stock_file(stock)
 
 
-def read_stock(paths: Locator, stock: StockFirmware = EPM2_V16) -> bytes:
+def read_stock(paths: Locator, stock: StockFirmware) -> bytes:
     """Return the bytes of the stock firmware file, after checking their SHA-256.
 
     The check is made on the bytes that are returned, so the caller works on
@@ -176,7 +196,7 @@ def http_get(request: urllib.request.Request, limit: int) -> bytes:
 
 def fetch(
     paths: Locator,
-    stock: StockFirmware = EPM2_V16,
+    stock: StockFirmware,
     log: Log = silent,
 ) -> Path:
     """Make sure the stock firmware file is in the locator's cache, and return its path.
@@ -225,7 +245,7 @@ def fetch(
 
 def obtain_stock(
     paths: Locator,
-    stock: StockFirmware = EPM2_V16,
+    stock: StockFirmware,
     log: Log = silent,
 ) -> bytes:
     """Return the checked bytes of the stock firmware; download the file if it is absent.

@@ -1,5 +1,6 @@
 {
  "what": "CANDIDATE, not camera-tested: the candidate films-12 (twelve film looks) with the save guard of focus peaking (patches/peaking-save-guard.json)",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",

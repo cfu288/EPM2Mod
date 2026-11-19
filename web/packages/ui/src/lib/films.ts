@@ -16,10 +16,8 @@ export interface Film {
 /** An art-filter entry of the camera: ART 1 to 12. */
 export interface Slot {
   art: number
-  /** The entry's stock Olympus name. */
+  /** The entry's Olympus art filter: what the entry keeps when the look file names no film for it. */
   entry: string
-  /** The film the entry holds when no look is loaded. */
-  builtIn: string
 }
 
 export const films: readonly Film[] = data.films

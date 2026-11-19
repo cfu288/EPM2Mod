@@ -1,5 +1,6 @@
 {
  "what": "Eleven colour film looks and Kodak Double-X (black-and-white, in the Grainy Film entry), interval shooting with up to 240 frames, the level gauge with Level Adjust, and focus peaking that waits while a photo is developed",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",

@@ -1,5 +1,6 @@
 {
  "what": "DEBUG build, not for normal use: films-12c with the structured log",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",

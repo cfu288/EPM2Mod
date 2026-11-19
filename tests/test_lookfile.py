@@ -34,7 +34,7 @@ from epm2mod.looks.lookfile import ColourLook, MonoLook  # noqa: E402
 from epm2mod.paths import RepoPaths  # noqa: E402
 
 PATHS = RepoPaths(ROOT)
-HAVE_STOCK = stock.stock_path(PATHS).is_file()
+HAVE_STOCK = stock.stock_path(PATHS, stock.EPM2_V16).is_file()
 try:
     import numpy as np
 
@@ -219,10 +219,10 @@ class PackTests(unittest.TestCase):
         self.assertEqual(sha256_bytes(data), CARD_LOOKS_SHA256)
         self.assertEqual(lookfile.unpack(data), looks)
 
-    def test_looks_pack_writes_a_look_list_of_fit_files(self) -> None:
+    def test_films_pack_writes_a_look_list_of_fit_files(self) -> None:
         with tempfile.TemporaryDirectory() as folder, redirect_stderr(io.StringIO()):
             out = Path(folder) / lookfile.CARD_NAME
-            argv = ["looks", "pack", str(PATHS.card_looks), "-o", str(out)]
+            argv = ["films", "pack", str(PATHS.card_looks), "-o", str(out)]
             with redirect_stdout(io.StringIO()):
                 self.assertEqual(cli.main([*argv, "--dry-run"]), 0)
                 self.assertFalse(out.exists())
@@ -269,9 +269,10 @@ class PackTests(unittest.TestCase):
     def test_the_commands(self) -> None:
         with tempfile.TemporaryDirectory() as folder, redirect_stderr(io.StringIO()):
             out = io.StringIO()
+            path = Path(folder) / lookfile.CARD_NAME
             with redirect_stdout(out):
-                self.assertEqual(cli.main(["films", "set", "-o", folder]), 0)
-                path = Path(folder) / lookfile.CARD_NAME
+                argv = ["films", "pack", str(PATHS.card_looks), "-o", str(path)]
+                self.assertEqual(cli.main(argv), 0)
                 self.assertEqual(sha256_bytes(path.read_bytes()), CARD_LOOKS_SHA256)
                 self.assertEqual(cli.main(["inspect", str(path)]), 0)
             self.assertIn("Double-X", out.getvalue())
@@ -282,7 +283,7 @@ class PackTests(unittest.TestCase):
             self.assertEqual(films[0]["name"], "Portra 400")
             path.write_bytes(path.read_bytes()[:-1])
             with redirect_stdout(io.StringIO()):
-                self.assertEqual(cli.main(["inspect", str(path)]), 4)
+                self.assertEqual(cli.main(["inspect", str(path)]), 1)
 
 
 class ChoiceTests(unittest.TestCase):
@@ -304,8 +305,8 @@ class ChoiceTests(unittest.TestCase):
             [(look.slot, look.name) for look in looks],
             [(1, "Velvia"), (11, "Vis 500T")],
         )
-        self.assertEqual(films.slots[6].built_in, "velvia")
-        same = records.looks_of_choices(films, records.built_in_choices(films))[6]
+        self.assertEqual(films.slots[6].entry, "Diorama")
+        same = records.looks_of_choices(films, ["ART7=velvia"])[0]
         self.assertEqual(dataclasses.replace(looks[0], slot=6), same)
         for bad in (
             ["ART0=velvia"],
@@ -318,23 +319,17 @@ class ChoiceTests(unittest.TestCase):
             with self.assertRaises(UsageError, msg=str(bad)):
                 records.looks_of_choices(films, bad)
 
-    def test_the_built_in_look_file_is_the_test_vector(self) -> None:
-        films = records.load(PATHS)
-        looks = records.looks_of_choices(films, records.built_in_choices(films))
-        self.assertEqual(sha256_bytes(lookfile.pack(looks)), CARD_LOOKS_SHA256)
-
     def test_pack_and_list_work_without_numpy(self) -> None:
         program = (
             "import sys; sys.modules['numpy'] = None\n"
             "from epm2mod import cli\n"
             "assert cli.main(['films']) == 0\n"
-            "assert cli.main(['films', 'set', 'ART2=velvia', '-o', sys.argv[1]]) == 0\n"
-            "assert cli.main(['films', 'set', '-o', sys.argv[1]]) == 0\n"
+            "assert cli.main(['films', 'set', '--film', 'ART2=velvia', '-o', sys.argv[1]]) == 0\n"
             "assert 'numpy' not in [name for name in sys.modules if sys.modules[name]]\n"
         )
         with tempfile.TemporaryDirectory() as folder:
             done = subprocess.run(
-                [sys.executable, "-c", program, folder],
+                [sys.executable, "-c", program, str(Path(folder) / lookfile.CARD_NAME)],
                 env={**os.environ, "PYTHONPATH": str(ROOT / "src")},
                 cwd=ROOT,
                 capture_output=True,
@@ -343,7 +338,7 @@ class ChoiceTests(unittest.TestCase):
             )
             self.assertEqual(done.returncode, 0, done.stderr)
             data = (Path(folder) / lookfile.CARD_NAME).read_bytes()
-            self.assertEqual(sha256_bytes(data), CARD_LOOKS_SHA256)
+            self.assertEqual([look.slot for look in lookfile.unpack(data)], [1])
 
     def test_a_bad_records_file_is_refused(self) -> None:
         raw = json.loads(PATHS.film_records.read_text())
@@ -351,14 +346,16 @@ class ChoiceTests(unittest.TestCase):
         broken_record["films"][0]["record"] = "AAAA"
         wrong_name = json.loads(json.dumps(raw))
         wrong_name["films"][0]["name"] = "Other"
-        unknown_film = json.loads(json.dumps(raw))
-        unknown_film["slots"][0]["builtIn"] = "nofilm"
+        wrong_entry = json.loads(json.dumps(raw))
+        wrong_entry["slots"][0]["entry"] = "Soft Focus"
+        a_preset = json.loads(json.dumps(raw))
+        a_preset["slots"][0]["builtIn"] = "portra-400"
         eleven = json.loads(json.dumps(raw))
         del eleven["slots"][11]
         with tempfile.TemporaryDirectory() as folder:
             (Path(folder) / "looks").mkdir()
             paths = RepoPaths(Path(folder))
-            for bad in (broken_record, wrong_name, unknown_film, eleven, []):
+            for bad in (broken_record, wrong_name, wrong_entry, a_preset, eleven, []):
                 paths.film_records.write_text(json.dumps(bad))
                 with self.assertRaises(BuildError, msg=str(bad)[:60]):
                     records.load(paths)
@@ -369,14 +366,22 @@ class ChoiceTests(unittest.TestCase):
             out = io.StringIO()
             env = {cards.TEST_CARDS_ENV: folder}
             with redirect_stdout(out), mock.patch.dict(os.environ, env):
-                argv = ["films", "set", "ART2=velvia", "ART6=double-x"]
+                argv = [
+                    "films",
+                    "set",
+                    "--film",
+                    "ART2=velvia",
+                    "--film",
+                    "ART6=double-x",
+                ]
                 self.assertEqual(cli.main([*argv, "--card", folder]), 0)
                 self.assertEqual(cli.main(["films"]), 0)
                 missing = str(Path(folder) / "missing")
-                self.assertEqual(cli.main([*argv, "--card", missing]), 5)
+                self.assertEqual(cli.main([*argv, "--card", missing]), 6)
             looks = lookfile.unpack((Path(folder) / lookfile.CARD_NAME).read_bytes())
             self.assertEqual([look.slot for look in looks], [1, 5])
             self.assertIn("vision3-500t", out.getvalue())
+            self.assertIn("ART12     Watercolor", out.getvalue())
 
 
 @unittest.skipUnless(HAVE_NUMPY and HAVE_STOCK, "needs numpy and the stock firmware")

@@ -1,5 +1,6 @@
 {
  "what": "Debug build, first step: the pinned build with the log core only (boot, firmware error and GUI state events; the flush task). No feature probes",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",

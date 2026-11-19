@@ -161,7 +161,7 @@ def plan(paths: RepoPaths, final: bool) -> tuple[Plan | None, list[str]]:
         problems.append("HEAD is not origin/main: push, or check out main")
     if not readme.is_current(paths):
         problems.append(
-            "the generated documents are out of date: run 'epm2mod docs --write'"
+            "the generated documents are out of date: run 'epm2mod generate'"
         )
     problems += [f"feature list: {p}" for p in readme.feature_problems(paths)]
     problems += _ci_problems(paths, commit)

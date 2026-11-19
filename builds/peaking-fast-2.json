@@ -1,5 +1,6 @@
 {
  "what": "CANDIDATE, not camera-tested: the pinned build peaking-fast with the save guard of focus peaking. The lines wait while a photo is being developed and saved (the restart of 2026-11-16: turning the focus ring right after a shot)",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",

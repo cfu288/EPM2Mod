@@ -149,7 +149,7 @@ class CommandTests(unittest.TestCase):
         err = io.StringIO()
         with mock.patch.object(cards, "cards", return_value=[]):
             with redirect_stdout(io.StringIO()), redirect_stderr(err):
-                self.assertEqual(cli.main(["cards"]), 3)
+                self.assertEqual(cli.main(["cards"]), 0)
         self.assertIn("no SD card found", err.getvalue())
 
     def test_folders_for_tests_are_listed_as_cards(self) -> None:

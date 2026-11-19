@@ -29,7 +29,7 @@ from epm2mod.looks import extra, films, generate, slots  # noqa: E402
 from epm2mod.paths import RepoPaths  # noqa: E402
 
 PATHS = RepoPaths(ROOT)
-HAVE_STOCK = stock.stock_path(PATHS).is_file()
+HAVE_STOCK = stock.stock_path(PATHS, stock.EPM2_V16).is_file()
 
 
 class EncoderTests(unittest.TestCase):
@@ -117,7 +117,11 @@ class SlotTests(unittest.TestCase):
 class RealFirmwareExtraTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        payload = parse(stock.read_stock(PATHS)).blocks[generate.PROGRAM_BLOCK].payload
+        payload = (
+            parse(stock.read_stock(PATHS, stock.EPM2_V16))
+            .blocks[generate.PROGRAM_BLOCK]
+            .payload
+        )
         cls.program = generate.Program(payload)
 
     def test_hash_ops_put_a_key_where_the_firmware_finds_it(self) -> None:
@@ -161,9 +165,11 @@ class RealFirmwareExtraTests(unittest.TestCase):
                 self.assertNotEqual(other, struct.pack("<I", slot.saturation_handler))
 
     def test_the_committed_specs_are_the_generated_ones(self) -> None:
-        paths = [spec.path for spec in extra.generate(PATHS)]
+        paths = [spec.path for spec in extra.generate(PATHS, stock.EPM2_V16)]
         self.assertEqual(paths, list(films.load_more_films(PATHS).spec_paths))
-        self.assertEqual(generate.stale(PATHS), [], "run: uv run epm2mod looks --write")
+        self.assertEqual(
+            generate.stale(PATHS, stock.EPM2_V16), [], "run: uv run epm2mod generate"
+        )
 
 
 if __name__ == "__main__":

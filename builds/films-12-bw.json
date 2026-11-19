@@ -1,5 +1,6 @@
 {
  "what": "CANDIDATE, not camera-tested: the twelve-film candidate films-12 with a black-and-white film. The entry Grainy Film keeps its stored value, its art codes and its grain program and holds Kodak Double-X 5222 (on 2302 print film) under the name Double-X; Provia moves to the entry Gentle Sepia, where films-12 has Ektar 100. Against films-12: films12-entry-grainy-film is left out, films12bw-entry-gentle-sepia takes the place of films12-entry-gentle-sepia, films12bw-names takes the place of films12-names, and films12bw-doublex is new",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",

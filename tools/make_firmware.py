@@ -5,9 +5,8 @@
 # ///
 """Make a firmware build: download the stock firmware, apply the patch specs, check the result.
 
-    uv run tools/make_firmware.py                        the pinned build
-    uv run tools/make_firmware.py -o PATH                the same, and one more copy of the file at PATH
-    uv run tools/make_firmware.py NAME                   another build
+    uv run tools/make_firmware.py NAME                   the build NAME
+    uv run tools/make_firmware.py NAME -o FILE           the same, and one more copy of the file at FILE
 
 To write a card, use `epm2mod install --card DIR` (docs/cli.md).
 

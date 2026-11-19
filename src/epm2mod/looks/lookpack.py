@@ -186,12 +186,11 @@ def web_data(paths: RepoPaths) -> dict[str, Any]:
     """Return the film records (``looks/film-records.json``, read by ``records.load``).
 
     ``films``: the catalogue, each film with its look record (1,708 bytes, base64) for slot 0 under the film's name.
-    ``slots``: the twelve ART entries in menu order, with the id of the film each holds when no look is loaded (the
-    look list ``looks/card-looks.json``).
+    ``slots``: the twelve ART entries in menu order, with the Olympus art filter that each one keeps when a look
+    file names no film for it.
 
     Raises:
-        BuildError: if the catalogue or the look list is wrong, or a built-in look is not in the catalogue under the
-            same name.
+        BuildError: if the catalogue is wrong.
     """
     catalogue = load_catalogue(paths)
     films = []
@@ -211,16 +210,10 @@ def web_data(paths: RepoPaths) -> dict[str, Any]:
                 "record": base64.b64encode(record).decode("ascii"),
             }
         )
-    by_fit = {film.fit: film.id for film in catalogue.values()}
-    raw: Any = read_json(paths.card_looks, BuildError)
-    slots = []
-    for number, item in enumerate(raw["looks"], start=1):
-        film_id = by_fit.get(item["fit"])
-        if film_id is None or catalogue[film_id].name != item["name"]:
-            raise BuildError(
-                f"{item['fit']}: a built-in look that the catalogue lacks under '{item['name']}'"
-            )
-        slots.append({"art": number, "entry": item["entry"], "builtIn": film_id})
+    slots = [
+        {"art": number, "entry": entry}
+        for number, entry in enumerate(MENU_ENTRIES, start=1)
+    ]
     return {"films": films, "slots": slots}
 
 

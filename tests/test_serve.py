@@ -36,7 +36,7 @@ from epm2mod.looks import lookfile, records  # noqa: E402
 from epm2mod.paths import RepoPaths  # noqa: E402
 
 PATHS = RepoPaths(ROOT)
-HAVE_STOCK = stock.stock_path(PATHS).is_file()
+HAVE_STOCK = stock.stock_path(PATHS, stock.EPM2_V16).is_file()
 
 
 class Running:
@@ -97,7 +97,11 @@ def outcome(files: dict[str, bytes], films: bool) -> pipeline.Outcome:
             Planned(Path(name), roles[name], Content.of(data), False)
             for name, data in files.items()
         ),
-        steps=tuple(camera_steps.flash_steps(films=films)),
+        steps=tuple(
+            camera_steps.flash_steps(
+                films=films, firmware="Body : 1.6", art_shows="Portra 400 in ART 1."
+            )
+        ),
     )
 
 
@@ -398,16 +402,18 @@ class EndToEndTests(unittest.TestCase):
         done = serve.run_restore(
             self.paths, self.app_card, lambda line: None, steps.append
         )
-        self.assertEqual((done.files[0].content.sha256, steps), (stock.EPM2_V16.sha256, [1, 2]))
+        self.assertEqual(
+            (done.files[0].content.sha256, steps), (stock.EPM2_V16.sha256, [1, 2])
+        )
         on_card = (self.app_card / "DCOLYMP" / "E1019999.BIN").read_bytes()
         self.assertEqual(on_card, stock.read_stock(PATHS, stock.EPM2_V16))
         self.assertEqual(done.file_data()["DCOLYMP/E1019999.BIN"], on_card)
         out = Path(self.folder.name)
         with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
-            self.assertEqual(cli.main(["restore", "-o", str(out)]), 0)
+            self.assertEqual(cli.main(["restore", "-o", str(out / "x.BIN")]), 0)
             with self.assertRaises(SystemExit):
                 cli.main(["restore"])
-        self.assertEqual((out / "E1019999.BIN").read_bytes(), on_card)
+        self.assertEqual((out / "x.BIN").read_bytes(), on_card)
 
     def test_the_app_writes_what_the_command_line_writes(self) -> None:
         choices = ["ART2=velvia", "ART6=double-x", "ART12=vision3-500t"]
@@ -421,32 +427,36 @@ class EndToEndTests(unittest.TestCase):
             done.files[0].content.sha256, pinned_description(self.paths).sha256
         )
         with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
-            argv = ["install", "--card", str(self.cli_card), *choices]
+            films = [word for choice in choices for word in ("--film", choice)]
+            argv = ["install", "--card", str(self.cli_card), *films]
             self.assertEqual(cli.main(argv), 0)
         names = ["DCOLYMP/E1019999.BIN", lookfile.CARD_NAME]
         for name in names:
             self.assertEqual(
                 (self.app_card / name).read_bytes(), (self.cli_card / name).read_bytes()
             )
-            self.assertEqual(done.file_data()[name], (self.cli_card / name).read_bytes())
+            self.assertEqual(
+                done.file_data()[name], (self.cli_card / name).read_bytes()
+            )
         self.assertEqual(self.files(self.app_card), names)
 
-    def test_install_writes_what_the_app_and_make_write_by_default(self) -> None:
-        default = records.built_in_choices(records.load(self.paths))
-        serve.run_job(
-            self.paths, default, self.app_card, lambda line: None, lambda n: None
-        )
+    def test_with_no_film_install_and_make_write_the_firmware_only(self) -> None:
+        serve.run_job(self.paths, [], self.app_card, lambda line: None, lambda n: None)
+        pinned = pinned_description(self.paths).name
         with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
             self.assertEqual(cli.main(["install", "--card", str(self.cli_card)]), 0)
-            self.assertEqual(cli.main(["make"]), 0)
-        for name in ("DCOLYMP/E1019999.BIN", lookfile.CARD_NAME):
-            self.assertEqual(
-                (self.app_card / name).read_bytes(), (self.cli_card / name).read_bytes()
-            )
-            self.assertEqual(
-                (pipeline.card_folder(self.paths) / name).read_bytes(),
-                (self.cli_card / name).read_bytes(),
-            )
+            self.assertEqual(cli.main(["make", pinned]), 0)
+        name = "DCOLYMP/E1019999.BIN"
+        self.assertEqual(self.files(self.cli_card), [name])
+        self.assertEqual(self.files(self.app_card), [name])
+        self.assertEqual(self.files(pipeline.card_folder(self.paths)), [name])
+        self.assertEqual(
+            (self.app_card / name).read_bytes(), (self.cli_card / name).read_bytes()
+        )
+        self.assertEqual(
+            (pipeline.card_folder(self.paths) / name).read_bytes(),
+            (self.cli_card / name).read_bytes(),
+        )
 
 
 if __name__ == "__main__":

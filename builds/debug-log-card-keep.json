@@ -1,5 +1,6 @@
 {
  "what": "DEBUG probe build, not for normal use: debug-log-films-12d with the persistence probe of looks loaded from the card (a LOOK file sets the Pro 400H matrix and is kept in the EEROM settings bank's unused tail; every start applies the kept matrix at its first GUI state; experiments/2026-11-17-card-looks/design.md section 8)",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",

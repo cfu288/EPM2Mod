@@ -1,5 +1,6 @@
 {
  "what": "Seven film looks as art filters, and interval shooting with up to 240 frames",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",

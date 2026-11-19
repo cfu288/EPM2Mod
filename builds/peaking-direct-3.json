@@ -1,5 +1,6 @@
 {
  "what": "SUPERSEDED by peaking-direct-4 (crashes at ART 7, overwrites the sleep routine). Focus peaking, third build: light edge lines in live view while MF Assist runs, on top of the build seven-films-6-interval-240-level",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",

@@ -1,5 +1,6 @@
 {
  "what": "CANDIDATE, not camera-tested: the pinned build peaking-fast with twelve film looks. The five stock art filters Grainy Film, Gentle Sepia, Dramatic Tone, Key Line and Watercolor become Provia, Ektar 100, Portra 160, Gold 200 and Vis 500T (patches/films12-names.json takes the place of film-names-all-languages)",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",

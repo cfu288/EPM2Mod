@@ -202,63 +202,51 @@
  "slots": [
   {
    "art": 1,
-   "entry": "Pop Art",
-   "builtIn": "portra-400"
+   "entry": "Pop Art"
   },
   {
    "art": 2,
-   "entry": "Soft Focus",
-   "builtIn": "ektachrome"
+   "entry": "Soft Focus"
   },
   {
    "art": 3,
-   "entry": "Pale&Light Color",
-   "builtIn": "pro-400h"
+   "entry": "Pale&Light Color"
   },
   {
    "art": 4,
-   "entry": "Light Tone",
-   "builtIn": "kodachrome"
+   "entry": "Light Tone"
   },
   {
    "art": 5,
-   "entry": "Grainy Film",
-   "builtIn": "double-x"
+   "entry": "Grainy Film"
   },
   {
    "art": 6,
-   "entry": "Pin Hole",
-   "builtIn": "vision3-250d"
+   "entry": "Pin Hole"
   },
   {
    "art": 7,
-   "entry": "Diorama",
-   "builtIn": "velvia"
+   "entry": "Diorama"
   },
   {
    "art": 8,
-   "entry": "Cross Process",
-   "builtIn": "superia-400"
+   "entry": "Cross Process"
   },
   {
    "art": 9,
-   "entry": "Gentle Sepia",
-   "builtIn": "provia"
+   "entry": "Gentle Sepia"
   },
   {
    "art": 10,
-   "entry": "Dramatic Tone",
-   "builtIn": "portra-160"
+   "entry": "Dramatic Tone"
   },
   {
    "art": 11,
-   "entry": "Key Line",
-   "builtIn": "gold-200"
+   "entry": "Key Line"
   },
   {
    "art": 12,
-   "entry": "Watercolor",
-   "builtIn": "vision3-500t"
+   "entry": "Watercolor"
   }
  ]
 }

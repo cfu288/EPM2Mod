@@ -12,8 +12,8 @@ output folder, and the event dictionaries of the debug log. ``locate`` picks the
 A third source, such as an installed package (data from ``importlib.resources`` and a cache folder for the user), is
 one more class with the methods of ``Locator`` and one more case in ``locate``. No command changes.
 
-The catalogue functions below (``films``, ``default_choices``, ``build_to_install``, ``art_check``) are what user
-commands, the installer page and the document generator read.
+The catalogue functions below (``films``, ``build_to_install``, ``art_check``) are what user commands, the installer
+page and the document generator read.
 """
 
 from __future__ import annotations
@@ -23,10 +23,11 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Protocol
 
 from .builds import BuildDescription
-from .errors import BuildCheckError, RepositoryError
+from .errors import RefusedError, RepositoryError
 from .paths import RELEASE_MARKER, RepoPaths, find_root
 
 if TYPE_CHECKING:
+    from .looks.lookfile import Look
     from .looks.records import Records
     from .stock import StockFirmware
 
@@ -115,7 +116,7 @@ def locate(start: Path | None = None) -> Locator:
 
 
 def films(locator: Locator) -> Records:
-    """Return the film records: every film a film file can hold, and the twelve ART entries.
+    """Return the film records: every film a film file can hold, and the twelve ART entries with their Olympus names.
 
     Raises:
         BuildError: if the records are missing or malformed.
@@ -125,48 +126,31 @@ def films(locator: Locator) -> Records:
     return records.load(locator)
 
 
-def default_choices(locator: Locator) -> list[str]:
-    """Return the choices of the 12 default films, like ``ART1=portra-400``."""
-    from .looks import records
-
-    return records.built_in_choices(films(locator))
-
-
 def build_to_install(
-    locator: Locator, name: str | None = None, untested: bool = False
+    locator: Locator, name: str | None = None, allow_untested: bool = False
 ) -> BuildDescription:
     """Return the build that ``install`` writes: the pinned one, or the one called ``name``.
 
     Raises:
         NotFoundError: if there is no build of that name.
-        BuildCheckError: if the build has no passed camera test and ``untested`` is False.
+        RefusedError: if the build has no passed camera test and ``allow_untested`` is False.
     """
     description = locator.pinned_build() if name is None else locator.build(name)
-    if not description.tested and not untested:
-        raise BuildCheckError(
-            f"{description.name} has no passed camera test: give --untested to write it anyway"
+    if not description.tested and not allow_untested:
+        raise RefusedError(
+            f"{description.name} has no passed camera test: give --allow-untested to write it anyway",
+            "--allow-untested",
         )
     return description
 
 
-def art_check(
-    locator: Locator, choices: Sequence[str] | None, original: bool = False
-) -> str:
-    """Return what the camera's ART menu shows after the install, for the last camera step.
+def art_check(looks: Sequence[Look]) -> str:
+    """Return what the camera's ART menu shows after a write, for the last camera step.
 
-    The first slot whose film is not its default names the change ("C200 in ART 2."), so a user sees that the
-    file was loaded.
+    The first film by slot names the change ("C200 in ART 2."), so a user sees that the file was loaded; with no
+    films, the ART menu shows the art filters.
     """
-    if original:
+    if not looks:
         return "the art filters, such as Pop Art."
-    if choices:
-        from .looks import records
-
-        catalogue = films(locator)
-        defaults = {slot.art: slot.built_in for slot in catalogue.slots}
-        looks = zip(records.looks_of_choices(catalogue, choices), choices)
-        for look, text in sorted(looks, key=lambda pair: pair[0].slot):
-            film = text.split("=", 1)[1].lower()
-            if defaults.get(look.slot + 1) != film:
-                return f"{look.name} in ART {look.slot + 1}."
-    return "film names, such as Portra 400."
+    first = min(looks, key=lambda look: look.slot)
+    return f"{first.name} in ART {first.slot + 1}."

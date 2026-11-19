@@ -36,7 +36,7 @@ from ..container import parse
 from ..errors import BuildError
 from ..paths import RepoPaths
 from ..spec import BytesOp
-from ..stock import EPM2_V16, StockFirmware, read_stock
+from ..stock import StockFirmware, read_stock
 from . import slots
 from .extra import Layout, branch, compare_d0, entry_ops, hash_ops, jump, load_a1
 from .films import BwFilmList, bw_inputs_digest, load_bw_films, load_more_films
@@ -222,7 +222,7 @@ def moved_entry_ops(
     raise BuildError(f"the structure spec gives the value {source.value} no name")
 
 
-def generate(paths: RepoPaths, stock: StockFirmware = EPM2_V16) -> list[GeneratedSpec]:
+def generate(paths: RepoPaths, stock: StockFirmware) -> list[GeneratedSpec]:
     """Generate the patch specs of the film list with a black-and-white film.
 
     Args:

@@ -60,24 +60,33 @@ def copy_text(names: list[str], source: str | None = None) -> str:
     return f"Copy {' and '.join(names)}{where} to the top of the SD card."
 
 
+def firmware_reads(label: str | None) -> str:
+    """Return what the camera's Firmware screen reads after the flash: the build's label, or ``Body : 1.6``.
+
+    Args:
+        label: the build's label (``BuildDescription.label``), or None for a build without one and for Olympus's
+            original firmware.
+    """
+    return "Body : 1.6" if label is None else f"Body : 1.6  EPM2Mod {label}"
+
+
 def flash_steps(
     *,
     films: bool,
-    original: bool = False,
+    firmware: str,
+    art_shows: str,
     copy: str | None = None,
     ejected: bool = False,
-    art_shows: str = "film names, such as Portra 400.",
 ) -> list[Step]:
     """Return the steps that install a firmware file on the camera.
 
     Args:
         films: True if a film file goes with the firmware: then the steps load it.
-        original: True for Olympus's original firmware (``restore``).
+        firmware: what the Firmware screen reads after the flash (``firmware_reads``).
+        art_shows: what the ART menu shows at the end (``catalogue.art_check``).
         copy: the text of a first step that copies the files to the card, or None if they are on the card.
         ejected: True if the card was ejected already.
-        art_shows: what the ART menu shows at the end (``catalogue.art_check``).
     """
-    firmware = "Body : 1.6" if original else "Body : 1.6 EPM2Mod and the release date"
     steps = _start(copy, ejected) + [
         Step(
             "insert",
@@ -103,9 +112,9 @@ def flash_steps(
 
 def film_steps(
     *,
+    art_shows: str,
     copy: str | None = None,
     ejected: bool = False,
-    art_shows: str = "film names, such as Portra 400.",
 ) -> list[Step]:
     """Return the steps that load a film file into a camera that runs EPM2Mod (``films set``)."""
     return _start(copy, ejected) + [

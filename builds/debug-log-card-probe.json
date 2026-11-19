@@ -1,5 +1,6 @@
 {
  "what": "DEBUG probe build, not for normal use: debug-log-films-12d with the probe harness of looks loaded from the card (at the first menu, playback or power-off of a session it applies an LKP1 file C:\\EPM2LOOK.BIN to the tables of the Pro 400H slot, optionally forcing the look stages to recompute; experiments/2026-11-17-card-looks/design.md section 8)",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "patches/remap7b-code.json",
   "patches/seven-fixes-1.json",

@@ -11,7 +11,6 @@ export { filmById, films, slots, type Film, type Slot } from './lib/films'
 export { CARD_NAME, packLooks } from './lib/lookfile'
 export {
   addFilm,
-  builtInSlots,
   choicesOf,
   firstEmpty,
   lookFile,

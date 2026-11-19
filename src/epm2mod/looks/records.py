@@ -3,7 +3,7 @@
 The one list of films that look files are packed from: by ``epm2mod install`` and ``epm2mod films set``, the local app and the web site
 (which reads the same file). Each film has its look record (1,708 bytes, base64) for slot 0 under the film's name;
 a look file sets the slot and packs the records (``lookfile.pack``). ``slots`` gives the twelve ART entries in menu
-order, with the id of the film each holds when no look is loaded.
+order, with the Olympus art filter that each entry keeps when the file names no film for it.
 
 ``lookpack.web_data`` makes the file from the fit files (``web/scripts/export_films.py``); a test fails when it is
 out of date. This module needs only the standard library.
@@ -56,13 +56,11 @@ class Slot:
 
     Attributes:
         art: the entry's number in the camera's menus, 1 to 12.
-        entry: the entry's stock Olympus name.
-        built_in: the id of the film the entry holds when no look is loaded.
+        entry: the entry's stock Olympus name: the art filter it keeps when no look is loaded.
     """
 
     art: int
     entry: str
-    built_in: str
 
 
 @dataclass(frozen=True)
@@ -122,13 +120,13 @@ def load(paths: Locator) -> Records:
         films[film.id] = film
     slots = []
     for number, item in enumerate(raw["slots"], start=1):
-        if not isinstance(item, dict) or set(item) != {"art", "entry", "builtIn"}:
-            raise BuildError(f"{path}, slot {number}: needs 'art', 'entry', 'builtIn'")
+        if not isinstance(item, dict) or set(item) != {"art", "entry"}:
+            raise BuildError(f"{path}, slot {number}: needs 'art' and 'entry'")
         if number > len(MENU_ENTRIES) or item["art"] != number:
             raise BuildError(f"{path}, slot {number}: 'art' must be {number}")
-        if item["entry"] != MENU_ENTRIES[number - 1] or item["builtIn"] not in films:
-            raise BuildError(f"{path}, slot {number}: a wrong entry or film")
-        slots.append(Slot(number, item["entry"], item["builtIn"]))
+        if item["entry"] != MENU_ENTRIES[number - 1]:
+            raise BuildError(f"{path}, slot {number}: a wrong entry")
+        slots.append(Slot(number, item["entry"]))
     if len(slots) != len(MENU_ENTRIES):
         raise BuildError(f"{path}: {len(MENU_ENTRIES)} slots")
     return Records(films, tuple(slots))
@@ -173,11 +171,6 @@ def looks_of_choices(records: Records, choices: Sequence[str]) -> list[Look]:
         seen.add(number)
         looks.append(dataclasses.replace(records.films[film_id].look, slot=number - 1))
     return looks
-
-
-def built_in_choices(records: Records) -> list[str]:
-    """Return the choices of the look file that holds each slot's built-in film."""
-    return [f"ART{slot.art}={slot.built_in}" for slot in records.slots]
 
 
 def pack_choices(paths: Locator, choices: Sequence[str]) -> tuple[bytes, list[Look]]:

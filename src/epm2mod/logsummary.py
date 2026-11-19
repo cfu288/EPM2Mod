@@ -1,4 +1,4 @@
-"""A short report on a decoded camera log (``epm2mod log FILE --summary``).
+"""A short report on a decoded camera log (``epm2mod log FILE``).
 
 :func:`summarize` takes the objects that :func:`epm2mod.eventlog.decode` yields
 and returns lines of text: the sessions, the markers, the firmware's error
