@@ -125,7 +125,7 @@ describe('the local app', () => {
     expect(screen.getByText(/repeat step 2/)).toBeInTheDocument()
     expect(screen.queryByText(/derived from/)).toBeNull()
     await user.click(screen.getByRole('button', { name: 'Finish' }))
-    expect(await screen.findByRole('heading', { name: 'EPM2Mod has stopped' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'The installer is finished' })).toBeInTheDocument()
   })
 
   it('restores the original firmware without the film step', async () => {

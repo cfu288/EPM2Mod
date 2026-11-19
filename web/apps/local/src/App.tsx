@@ -541,8 +541,8 @@ export default function App() {
     return (
       <PageFrame subtitle="Installer">
         <main className="mx-auto max-w-3xl px-4 py-10">
-          <Step title="EPM2Mod has stopped">
-            <p>You can close this tab.</p>
+          <Step title="The installer is finished">
+            <p>Close this tab and the window that started the installer.</p>
           </Step>
         </main>
       </PageFrame>
