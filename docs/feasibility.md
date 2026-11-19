@@ -1,24 +1,22 @@
 # Feasibility and real limits
 
-Date: 2026-11-14. Evidence: [experiments/2026-11-14-feasibility/](../experiments/2026-11-14-feasibility/).
+Evidence: [experiments/2026-11-14-feasibility/](../experiments/2026-11-14-feasibility/).
 
 Other Olympus generations, and what each can be modded to do: [model-matrix.md](model-matrix.md).
 
 ## Why this file exists
-
-For the first week this project changed only tables that the stock code reads. That was a choice,
-not a limit. The choice was made before anyone measured the hardware, the free space or the stock
-routines. This file records what the measurements show, so that nobody repeats the assumption.
 
 **The rule: a limit counts only if a measurement, a datasheet or the firmware itself proves it.**
 "It could be risky" and "we have not tried" are not limits. They are tasks.
 
 ## What the evidence says about risk
 
-- **A bad flash has always been recoverable here.** Two builds froze live view (`slots7-kind`,
-  `remap7-code`). A normal card update put the camera back each time, in minutes.
-- **New code works.** Three patch specs with new machine code are in the pinned build and passed
-  camera tests (`remap7b-code`, `seven-fixes-1`, `interval-timelapse-v2`).
+- **A bad flash has always been recoverable here.** Five builds failed (three froze live view: `slots7-code`,
+  `slots7-kind`, `remap7-code`, and two crashed: `peaking-direct-1`, `peaking-direct-3`). A normal card update
+  recovered each.
+- **New code works.** Nine patch specs with new machine code are in the pinned build and passed
+  camera tests (`interval-timelapse-v2`, `peaking-direct-4`, `peaking-colours`, `peaking-fast`,
+  `peaking-save-guard`, `stock-films-structure`, `card-looks-5`, `log-menu-2`, `lss-core`).
 - **Others went much further on the same family.** The Caduceus mods for the OM-3 and the E-P7 add an
   on-camera editor, files loaded from the card and new menu entries. Their first camera-tested
   editor was 8.2 KB of code. They report one boot loop on each body, both recovered by a normal card
@@ -37,8 +35,8 @@ routines. This file records what the measurements show, so that nobody repeats t
 | No 4K, no RAW video | Hardware | Sensor modes in the firmware (table 0x7E7BA370); card path about 25 to 28 MB/s (measured on the E-M5) |
 | 1080p at 30 fps only; the 60, 120 and 240 fps modes drop most lines | Hardware, as far as known | Sensor mode table; no sensor register map found |
 | No 3D lookup table; the hue stage has six axes | Image processor | Firmware search; measured stages |
-| No colour wheel: no 12-colour hue, saturation and lightness editor as on the PEN-F, E-P7, OM-3 and the E-M10 I mod | Image processor, as far as known | No 12-record colour table in the firmware. See "Colour wheel and twelve colour editors" below |
-| A look is a set of ROM tables chosen by art-filter number | Firmware design | Read from the firmware. Tables at a RAM address are **untested**, not impossible |
+| No colour wheel in live view or movies: the 12-region hue, saturation and lightness stage runs for stills only | Image processor | Stage at 0x7E76C3C8, pipe A only ([caduceus review 05 §4](../experiments/2026-11-11-caduceus-review/05-imaging-pipeline-and-limits.md#4-the-12-region-stage)) |
+| A film simulation is a set of tables chosen by art-filter number | Firmware design | Read from the firmware. The tables are in RAM, and a Load writes them (camera-tested 2026-11-17) |
 | 128 rows in one menu list | Firmware | Camera-tested |
 | The emulator shows no camera picture | Tooling | It has no image processor, no sensor and no mechanism. Since 2026-11-14 it does boot the firmware from reset and draws the shooting screens and the whole menu system, with keys, saved settings and an SD card (see "The emulator" below) |
 
@@ -50,18 +48,18 @@ routines. This file records what the measurements show, so that nobody repeats t
 | RAM | 512 MiB | Inferred from address use |
 | Accelerometer | 3-axis, with a driver task and a roll/pitch interface | Verified |
 | Code space proven on the camera | 320 bytes, and since 2026-11-14 the area at 0x7EBF1F00 (the first area that had only passed the static checks: code ran there at the first attempt), and the blank run in the kernel range at 0x7E4C9200 (420 bytes of focus-peaking code; 0x7E4C90CA–0x7E4C9800 is the area) | Verified |
-| Code space that passes every static check | 17,578 bytes, never executed | Verified by scan; needs a camera probe |
+| Code space that passes every static check | [code-space-map.md §4](code-space-map.md#4-totals-bytes) | Verified by scan; needs a camera probe |
 | More candidates | 7.2 KB dead 3D helpers; 124 KB debug handlers; 579 KB 3D and slideshow stack; 1.59 MB of the main block that is never loaded | Static only |
 | Data space | Blank tails in blocks 1, 2 and 3: 11.1 MB, 130 KB, 677 KB (flash only) | Verified bytes; updater behaviour unknown |
 | Memory allocator | `scheap` pools, table 0x7E7348E4; 16 KB blocks: alloc 0x7E507325, free 0x7E507333 | Verified |
 | File routines | open 0x7E5C52DC, write 0x7E5C5339, seek 0x7E5C53A5, close 0x7E5C5308, read 0x7E5C536F | Verified from a stock caller (read: argument order inferred) |
 | Load a card file by name pattern | 0x7E5437F0, used by the lens update for `DCOLYMP/L???????BIN` on a normally booted camera | Verified |
 | Menus | Data tables (list table 0x7F00D710); value records can be re-pointed | Camera-tested for one setting |
-| Menu texts at run time | The loaded language's text table is in RAM (blob 0xBFF3D000, its pointer array at the address in its first word); re-pointing a string id changes the text on screen, also after a language change when written again | Camera-tested 2026-11-17 (`card-looks-4`: loaded looks show their own names) |
+| Menu texts at run time | The loaded language's text table is in RAM (blob 0xBFF3D000, its pointer array at the address in its first word); re-pointing a string id changes the text on screen, also after a language change when written again | Camera-tested 2026-11-17 (`card-looks-4`: loaded film simulations show their own names) |
 | A dormant setting as an own menu row, kept after power-off | Setting 447 with the stock Off / On panel 608 (Custom Menu J, Debug Log); the firmware never writes it at start | Camera-tested 2026-11-18 (`log-menu`: On kept after power-off and after a flash) |
 | RAM kept across power-off | The log's ring RAM 0x7E4F9000 keeps its content; bits can turn from 0 to 1 while the camera is off (seen twice, both before a start from USB) | Camera-tested 2026-11-18; the ring has a check word since `log-menu` |
 | Settings memory for own data | The EEROM settings bank's unused tail, 53,680 bytes, saved by the firmware and by the bank save API 0x7E680272 | Camera-tested 2026-11-17 (looks kept after power-off without the card) |
-| Hidden art-filter numbers | 110 to 118 exist in the pipeline switches, with no menu value | Camera-tested 2026-11-18 (`stock-films`: 111, 112, 114, 115, 118 carry films in stills, live view, movie and ART BKT) |
+| Hidden art-filter numbers | 110 to 118 exist in the pipeline switches, with no menu value | Camera-tested 2026-11-18 (`stock-films`: 111, 112, 114, 115, 118 carry film simulations in stills, live view, movie and ART BKT) |
 | Art filters switched at run time | Olympus's 12 filters stay in flash; a Load writes each entry's routing words and its RAM tables (0x7E4D1000, 0x3200 per entry); 30 hooks make ART BKT follow | Camera-tested 2026-11-18 (`stock-films`). For about 0.5 s at power-on, before the loader runs, the selected entry uses its Olympus code (code 88 seen once) |
 | Add Effects (Soft Focus, Pin-Hole, White Edge, Frame, Star Light) | Per-filter data lists at 0x7E849E2B to 0x7E849E5A | Verified; on a film slot untested |
 
@@ -70,15 +68,15 @@ routines. This file records what the measurements show, so that nobody repeats t
 **Low effort: data edits, one camera check each**
 
 - Add Effects on a film look (glow, vignette, white edge, frame).
-- More film entries through the hidden numbers 110 to 118.
 - Higher video bitrate and no 29-minute limit (`experiments/2026-11-12-hardware/`, patches written,
   not flashed).
 
 **Medium effort: new code, method known**
 
 - ~~Looks loaded from a file on the card~~ **Done on 2026-11-17** (`docs/guide/card-looks.md`): our own task
-  reads the file at the first menu, the looks are kept in the EEROM settings bank's unused tail (53,680 bytes,
-  empty on this camera, saved by the firmware) and written into the slot tables in RAM at every start.
+  reads the file when Load Looks → Load runs, keeps it in the EEROM settings bank's unused tail (53,680 bytes,
+  empty on this camera, saved by the firmware) and writes each listed entry's tables into its RAM block. Every
+  start applies the stored copy.
 - ~~Lowest shutter speed for Auto ISO~~ **Done on 2026-11-19** (`lss-menu`, `lss-core`; GitHub issue #2). A copy of
   the PEN-F 3.1's logic in 641 B of segment-1 code; it matches the PEN-F's own code in the function harness and was
   camera-tested in P and A (`experiments/2026-11-17-auto-iso-min-shutter/NOTES.md` sections 11 and 12).
@@ -91,12 +89,11 @@ routines. This file records what the measurements show, so that nobody repeats t
 **High effort: port or write**
 
 - Focus peaking, from the E-P5: done 2026-11-14 (`experiments/2026-11-14-focus-peaking/NOTES.md`).
-- Zero-second anti-shock (electronic first curtain).
 - Colour grain, halation.
 - A custom editor screen.
 - Live Composite.
 
-Not in this firmware at all (no text, no code): focus peaking, Color Creator, keystone, focus
+Not in the stock firmware (no text, no code): focus peaking, Color Creator, keystone, focus
 bracketing, zebra, silent shutter. These must be ported or written. They are not hidden features.
 
 ## Colour wheel and twelve colour editors
@@ -113,12 +110,13 @@ Checked 2026-11-18 against the four public mods that have one, after users asked
 | [caduceus-om3](https://github.com/androidfanman/caduceus-om3/blob/HEAD/docs/DEVELOPER_NOTES.md) | OM-3 (TruePic X) | COLOR profiles | The same, on the OM-3's colour builder |
 | [om10mi-mods](https://github.com/Meghnus/om10mi-mods/blob/HEAD/docs/lookfile/LOOKFILE_SPEC.md) | E-M10 I (TruePic VII) | Color Creator only, no COLOR profiles | A 12-colour editor. "The camera has a 12-region table of hue shift, saturation and lightness per colour region": the table is in the hardware although no stock menu used it |
 
-**What this means for the E-PM2 (TruePic VI).** The 12-colour table is a TruePic VII and later feature as far
-as anyone has shown. The E-PM2 firmware has the six-axis hue and saturation stage (red, yellow, green, cyan, blue,
-magenta) and no 12-record table, no Color Creator code and no colour-profile text. The PEN-F has a six-axis stage
-of its own beside its 12-record table, so the six-axis stage found here does not point to a hidden 12-colour one.
-No mod for a TruePic VI body (E-PL3, E-PL5, E-PL6, E-P5, E-M5, E-PM2) has a 12-colour editor. The E-P5 has no
-Color Creator either (manual, verified in the 2026-11-15 survey).
+**What this means for the E-PM2 (TruePic VI).** TruePic VI has a 12-region hue, saturation and lightness stage
+for stills. Table A is at 0x7E76C3C8 and table B at 0x7E76CF9C: 12 records of 28 bytes each, with an enable mask
+at +3024 (builder 0x7E56E186). The stage runs in pipe A only: stills and RAW Data Edit. Live view and standard
+movie use pipe B, which has no 12-region stage. Every film code falls back to Natural's table A. EPM2Mod does not
+write this table. Evidence: [caduceus review 05 §4](../experiments/2026-11-11-caduceus-review/05-imaging-pipeline-and-limits.md#4-the-12-region-stage).
+A 12-colour editor for stills is possible in principle. It is not built. It would not show in live view or
+movies.
 
 **What is possible here:**
 
@@ -127,11 +125,9 @@ Color Creator either (manual, verified in the 2026-11-15 survey).
   only approximate in our model of the stage (section 5 of `experiments/2026-11-14-feasibility/firmware.md`).
 - A Color Creator-like control (one hue turn and one saturation for the whole picture) through the 3x3 colour
   matrix, which every film simulation already sets.
-- Lightness per colour is not possible with the known stages.
+- Lightness per colour is not possible in live view or movies.
 - In-camera edits on the stages we have, and look import fitted to those stages: requirements and limits in
   `experiments/2026-11-18-look-editor/NOTES.md`.
-- A 12-colour editor needs a 12-colour stage in TruePic VI. It is not known whether the hardware has one. The
-  probe is in the table below. Until a probe finds one, a 12-colour editor is not possible on this body.
 
 ## Unknowns and their probes
 
@@ -143,7 +139,7 @@ Color Creator either (manual, verified in the 2026-11-15 survey).
 | Can the load range be made longer to reach the unloaded 1.59 MB? | The Caduceus method: move the end word in steps, with a pattern and a checksum reported to a card file |
 | Does the updater write the blank tails of blocks 1 to 3? | Write a marker there, read it back with 0x7E6756B5 |
 | Does this body recover from a boot loop by card update? | Owner's decision |
-| Does TruePic VI have a 12-colour hue table that the firmware never uses? | Compare the image-library parameter builders with the PEN-F's COLOR builder (12 records, sectors interleaved as 2(r%6)+r/6). Check the unused art-filter entries: on the E-M10 I one held a hidden YCbCr colour key ([fishcu, e-m10/PROCESSING.md](https://github.com/fishcu/oly_fw_analysis/blob/HEAD/docs/color/e-m10/PROCESSING.md)). A missing string does not prove the hardware lacks it |
+| Can the E-PM2 have zero-second anti-shock (electronic first curtain)? | Needs a sensor probe (`experiments/2026-11-17-anti-shock/NOTES.md`). Deferred by the owner |
 
 ## Where code may go
 
@@ -190,14 +186,6 @@ pass is evidence, not proof.
 
 **Use it before every flash that changes a hook or a menu.** It also gives exact menu paths and
 screen texts for the test instructions.
-
-## Order of work
-
-1. A half-press hook that does nothing.
-2. A file write, for a log channel.
-3. A file read.
-4. The code-space and RAM-table probes, reported through the log.
-5. Features, one per flash.
 
 ## Rules for people and agents who work on this
 
