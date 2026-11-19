@@ -510,3 +510,17 @@ The owner: the value box is centred (V, criterion 1). The steps meant for P were
 
 - V: the slower-than-stock path works on the camera (stage 6, ISO rises at the limit), as the harness predicts.
 - Not yet on the camera: P with a slower limit (stage 5, the shutter falls at base ISO), and the value after power off.
+
+### 12.8 Third camera run (same build, P; photos PB180001–008 of run 3)
+
+| Photos | Framing | Setting | Camera |
+|---|---|---|---|
+| 1–2 | dim | P, Auto | 1/60 f/2.8 ISO 4000 |
+| 5–6 | dim | P, 1/8 | 1/8 f/2.8 ISO 400 |
+| 3–4 | bright | P, Auto | 1/160 f/4.5 ISO 200 |
+| 7–8 | bright | P, 1/8 | 1/160 f/4.5 ISO 200 |
+
+- V: P with a slower limit works (stage 6): 3 EV slower shutter, ISO 4000 → 400.
+- Bright framing: no change, as the PEN-F gives (its stage 5 starts only below the stock hold point at base ISO;
+  this scene is brighter). So stage 5 is still verified in the harness only. A scene where Auto gives 1/60 at
+  ISO 400–1600 would reach it.
