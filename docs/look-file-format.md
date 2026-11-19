@@ -1,6 +1,6 @@
 # The look file (EPM2LOOK.BIN), version 1
 
-A look file holds up to twelve film looks, one per art-filter menu entry. The pinned build (`stock-films`) reads
+A look file holds up to twelve film looks, one per art-filter menu entry. The pinned build reads
 it from the top folder of the SD card when Load Looks runs, checks it, writes the looks into the entries it lists and keeps a copy in its settings
 memory. The looks then stay after a restart and without the card, until another file is loaded.
 
@@ -69,7 +69,7 @@ Kind 2, black-and-white (only build `card-looks`, slot 4; in `card-looks-2` a bl
 ## Slots
 
 The slot is the place of the entry in the art-filter menu. Each slot takes the kind of look it has in the build: in
-`card-looks-4` (and the pinned `log-menu`, which carries its loader) every slot takes a colour look (a black-and-white film is a colour look with saturation gain 0); in
+`card-looks-4` and the pinned build (`card-looks-5`) every slot takes a colour look (a black-and-white film is a colour look with saturation gain 0); in
 `card-looks` slot 4 (Grainy Film) takes only a black-and-white look (kind 2) and the others only colour looks.
 
 | Slot | Menu entry | Look in `looks/card-looks.json` |
@@ -87,8 +87,8 @@ The slot is the place of the entry in the art-filter menu. Each slot takes the k
 | 10 | Key Line | Gold 200 |
 | 11 | Watercolor | Vis 500T |
 
-A file may hold fewer looks: the other slots keep what they have until the next start, and then have their built-in
-look.
+A file may hold fewer looks: an entry the file leaves out has its Olympus art filter again (`card-looks-5` writes
+its stock words).
 
 ## Checks
 
