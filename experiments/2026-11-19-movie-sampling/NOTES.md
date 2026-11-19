@@ -745,3 +745,8 @@ resolvable detail.
 **Recommendation (the stop rule proposed to the owner on 2026-11-19: stop if this pair shows no visible
 difference):** stop the wide-frame work. The switch bug is not fixed. Kept as findings: the writer/reader geometry (§12–§14), the timing headroom
 (§9, §15), and that bit rate is no longer the limit (§11).
+
+## 19. Owner's decision, 2026-11-19
+
+Stop the video work and ship none of it: not the bit rate, not the wide frame, not the recording limit. The camera
+goes back to the pinned build `epm2mod-2026.11.19`. The specs and build descriptions stay as candidates for the record.

@@ -46,11 +46,6 @@ Test releases up to v2026.11.19-rc.2. Open: the final release.
 - An empty settings store shows Frame 99, 00:00:01, 00:00:01 in the emulator, not 10 frames and
   5 seconds. Find out on the camera after Reset → Full.
 
-## Video
-
-- Higher bitrate and no 29-minute limit: the patches are written
-  (`experiments/2026-11-12-hardware/`), not built and not flashed.
-
 ## Exposure
 
 Deferred by the owner on 2026-11-17: anti-shock 0 s, silent shutter, on-screen information. The notes and the
