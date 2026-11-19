@@ -8,7 +8,7 @@ type 1 the art side runs Key Line I (163), the code the mov layer forces. Second
 in segment 1 reaches is now in segment 1 (reclaimed dead code 0x7E50A201 and 0x7E53A55C, and the proven padding
 0x7E880FE4). direct-2 kept them in segment 2, and the boot task runs the heap mode chooser (hook M) before
 segment 2 is copied to RAM. Only T_ON and T_OFF stay in segment 2: their hook sites are in segment 2.
-tools/emu/hookcheck.py checks this rule. The routines themselves are direct-2's.
+emulator/hookcheck.py checks this rule. The routines themselves are direct-2's.
 
 The text below is the direct-2 description.
 

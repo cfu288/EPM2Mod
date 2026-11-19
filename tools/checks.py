@@ -78,13 +78,13 @@ def tool_files() -> tuple[Path, ...]:
 
 
 def block0(image: Path) -> Path:
-    """Return the unpacked block 0 of a firmware image (unpacked on first use by tools/emu/emu-run)."""
+    """Return the unpacked block 0 of a firmware image (unpacked on first use by emulator/emu-run)."""
     done = subprocess.run(
-        [sys.executable, str(ROOT / "tools" / "emu" / "emu-run"), "--blocks", str(image)],
+        [sys.executable, str(ROOT / "emulator" / "emu-run"), "--blocks", str(image)],
         cwd=ROOT, capture_output=True, text=True, check=False,
     )
     if done.returncode != 0:
-        raise RuntimeError((done.stdout + done.stderr).strip() or "tools/emu/emu-run failed")
+        raise RuntimeError((done.stdout + done.stderr).strip() or "emulator/emu-run failed")
     return Path(done.stdout.strip().splitlines()[-1]) / "block0_0100.bin"
 
 
@@ -112,9 +112,9 @@ def plan(description: Path, tier: str) -> list[Check]:
     first_code = ["--first-code"] if raw.get("first_code") else []
     checks = [
         Check("free-space", "quick", (py, "tools/freespace.py", "check", *specs, *first_code), spec_files + tools),
-        Check("op-check", "quick", (py, "tools/emu/opcheck.py", str(description)), spec_files + tools),
-        Check("boot-test", "quick", (py, "tools/emu/boot-test", str(image)), (image,) + tools),
-        Check("update-path-test", "quick", (py, "tools/emu/update-path-test", str(image)), (image,) + tools),
+        Check("op-check", "quick", (py, "emulator/opcheck.py", str(description)), spec_files + tools),
+        Check("boot-test", "quick", (py, "emulator/boot-test", str(image)), (image,) + tools),
+        Check("update-path-test", "quick", (py, "emulator/update-path-test", str(image)), (image,) + tools),
     ]
     films12, black_and_white = has("films12-structure"), has("films12bw-doublex")
     if black_and_white:

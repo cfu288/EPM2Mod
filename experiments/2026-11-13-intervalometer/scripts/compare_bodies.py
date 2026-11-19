@@ -4,10 +4,10 @@
     python3 compare_bodies.py [--cases=a,b] OUT.json NAME=BLOCK0 ...      (first image = reference for the 'vs' columns)
 
 For each case and row: every image's outputs, its model check, and which images differ from the others.
-Uses tools/emu (om-emu). Rows are compared on public outputs only (keys without a leading '_').
+Uses emulator (om-emu). Rows are compared on public outputs only (keys without a leading '_').
 """
 import json, sys, os
-sys.path.insert(0, '/path/to/EPM2Mod/tools/emu')
+sys.path.insert(0, '/path/to/EPM2Mod/emulator')
 import emurun
 from cases import CASES
 args = sys.argv[1:]

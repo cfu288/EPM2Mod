@@ -30,7 +30,7 @@ Usage: mkspec_log.py PINNED_DIR WORKDIR [LISTING.txt]
   on the specs of that build before it (the pinned specs, peaking-save-guard, log-core, log-probes,
   log-peaking-time). Its one hook is in stock bytes. It puts the build id of logs/events.json into the flush task, in place of the id that
   log-peaking-time left there.
-  BASE_DIR    a folder with block0_0100.bin of that build without its last spec (tools/emu/patchblock.py -o)
+  BASE_DIR    a folder with block0_0100.bin of that build without its last spec (emulator/patchblock.py -o)
 
        mkspec_log.py --card-read BASE_DIR WORKDIR [LISTING.txt]
   Writes patches/log-card-read.json only: the card-read probe of the build debug-log-card-read (event card_read;

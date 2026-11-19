@@ -1,4 +1,4 @@
-"""Emulator check of the second direct focus-peaking spec (single functions and code pieces, tools/emu driver).
+"""Emulator check of the second direct focus-peaking spec (single functions and code pieces, emulator driver).
 
 Same method as emu_direct.py. Every case runs on a base image and on the same image with the spec:
   1. flag clear: the patched image gives the same outputs as the base image (byte for byte) in every row;
@@ -17,7 +17,7 @@ Usage: emu_direct2.py BASE_BLOCK0 PATCHED_BLOCK0 [NAME]
 """
 import itertools, os, struct, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-sys.path.insert(0, os.path.join(ROOT, "tools", "emu"))
+sys.path.insert(0, os.path.join(ROOT, "emulator"))
 from omemu import Emu, SP0  # noqa: E402
 
 LFLAG, MFA, LV, MOVST, EXPG = 0x602BE8C4, 0x602B0DA8, 0x605B1CD0, 0x605B039C, 0xA07507CC

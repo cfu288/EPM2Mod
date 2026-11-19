@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Emulator check (om-emu, tools/emu): the two readers of the 30-entry command table 0x7EBF0FA0 never
+"""Emulator check (om-emu, emulator): the two readers of the 30-entry command table 0x7EBF0FA0 never
 read the unreferenced name list 0x7EBF1090-0x7EBF3BAD that follows it.
 
-    python3 emu_sdktable.py            # needs the om-emu setup of tools/emu/README.md
+    python3 emu_sdktable.py            # needs the om-emu setup of emulator/README.md
 
 Lookup 0x7E99BAE5(d0 = argc, a0 = argv) runs natively with strcmp/memset; print, sprintf, sscanf, the
 object getter and the 30 handlers are stubs. Help 0x7E99CF3A runs the same way. A logging read watch
@@ -10,7 +10,7 @@ covers the candidate; a second one covers the table itself as a positive control
 """
 import os, struct, sys
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))
-sys.path.insert(0, os.path.join(ROOT, "tools", "emu"))
+sys.path.insert(0, os.path.join(ROOT, "emulator"))
 import omemu
 
 TABLE, N = 0x7EBF0FA0, 30

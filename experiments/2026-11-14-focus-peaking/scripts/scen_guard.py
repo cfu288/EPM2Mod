@@ -1,4 +1,4 @@
-"""Scenario tests of the save guard (NOTES.md section 18). Uses tools/emu/liveview.py.
+"""Scenario tests of the save guard (NOTES.md section 18). Uses emulator/liveview.py.
 
     python3 scen_guard.py SCENARIO NAME=BLOCK0 [NAME=BLOCK0 ...]
     SCENARIO: s19 ... s26 or all. Each image runs alone; one line per image says PASS or FAIL.
@@ -32,7 +32,7 @@ S26  The event pk_guard of the debug builds (images whose NAME starts with "debu
 """
 import os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-sys.path.insert(0, os.path.join(ROOT, "tools", "emu"))
+sys.path.insert(0, os.path.join(ROOT, "emulator"))
 _src = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scen_peaking.py")).read()
 assert _src.rstrip().endswith("\nmain()")
 _sp = {"__file__": os.path.join(os.path.dirname(os.path.abspath(__file__)), "scen_peaking.py"), "__name__": "scen_peaking"}

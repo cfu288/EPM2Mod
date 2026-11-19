@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+"""emu-run IMAGE TOOL [ARG...]: unpack IMAGE when needed, then run a full-boot tool on it.
+
+    emulator/emu-run stock stage2-boot.mjs 2000
+    emulator/emu-run builds/peaking-colours.json play.mjs /tmp/scratch/shots shot:01 key:MENU shot:02
+    emulator/emu-run build/debug-log.BIN shot.mjs 3000 /tmp/scratch/x.png
+    emulator/emu-run --blocks IMAGE          print the folder of unpacked blocks and stop
+
+IMAGE: stock, builds/NAME.json, a .BIN file, or a folder of unpacked blocks (see emuenv.py).
+TOOL: a file of emulator/boot/ (or a path to another .mjs file). The tool's environment variables
+(E101_STATE, E101_CARD, E101_RTC, ...) pass through. The exit status is the tool's; 3 = set-up missing.
+"""
+import os
+import subprocess
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import emuenv  # noqa: E402
+
+
+def main(argv):
+    if len(argv) >= 2 and argv[0] == "--blocks":
+        print(emuenv.blocks(argv[1]))
+        return 0
+    if len(argv) < 2 or argv[0] in ("-h", "--help"):
+        print(__doc__)
+        return 0 if argv else 2
+    image, tool, args = argv[0], argv[1], argv[2:]
+    return subprocess.run(emuenv.tool_command(tool, args), env=emuenv.tool_env(image)).returncode
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main(sys.argv[1:]))
+    except emuenv.EmuSetupError as e:
+        print(f"emu-run: {e}", file=sys.stderr)
+        sys.exit(3)

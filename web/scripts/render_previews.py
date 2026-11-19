@@ -15,8 +15,8 @@ The web app puts the name of the film in a row over the strip of that row's posi
 order the user sets. The script checks that the films' strips differ only inside NAME and that a film's name does
 not change with the position; otherwise the split would be wrong and it stops.
 
-Needs the emulator (tools/emu/setup.sh), build/card-looks-4.BIN and the state build/emu/state/card-looks-4-p.json
-(tools/emu/mkstate builds/card-looks-4.json build/emu/state/card-looks-4-p.json p).
+Needs the emulator (emulator/setup.sh), build/card-looks-4.BIN and the state build/emu/state/card-looks-4-p.json
+(emulator/mkstate builds/card-looks-4.json build/emu/state/card-looks-4-p.json p).
 """
 import os
 import shutil
@@ -60,7 +60,7 @@ def render(film_id):
         shutil.copy(STATE, state)
         shots = Path(tmp, "shots")
         env = dict(os.environ, E101_STATE=str(state), E101_CARD=str(card), E101_RTC="2026-11-17T12:00:00")
-        out = subprocess.run([str(ROOT / "tools/emu/emu-run"), BUILD, "play.mjs", str(shots), *LOAD, *STRIP],
+        out = subprocess.run([str(ROOT / "emulator/emu-run"), BUILD, "play.mjs", str(shots), *LOAD, *STRIP],
                              cwd=ROOT, env=env, capture_output=True, text=True)
         if out.returncode:
             raise SystemExit("%s: emulator exit %d %s" % (film_id, out.returncode, out.stdout[-300:]))

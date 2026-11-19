@@ -8,7 +8,7 @@ import os
 import sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))
-sys.path.insert(0, os.path.join(ROOT, "tools", "emu"))
+sys.path.insert(0, os.path.join(ROOT, "emulator"))
 import cases  # noqa: E402
 import emurun  # noqa: E402
 

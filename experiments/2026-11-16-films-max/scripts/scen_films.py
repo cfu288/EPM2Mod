@@ -1,8 +1,8 @@
-"""Live-view scenario of the film entries, with and without focus peaking. Uses tools/emu/liveview.py.
+"""Live-view scenario of the film entries, with and without focus peaking. Uses emulator/liveview.py.
 
     .venv/bin/python experiments/2026-11-16-films-max/scripts/scen_films.py BLOCK0 [VALUE ...]
 
-BLOCK0 is the block 0 of a films build (tools/oetool.py unpack, or the block-0 file of tools/emu/patchblock.py).
+BLOCK0 is the block 0 of a films build (tools/oetool.py unpack, or the block-0 file of emulator/patchblock.py).
 For each stored Picture Mode VALUE (default: the twelve values of the films-12 lists, and 119, the value that
 focus peaking forces) the rig runs the firmware's own live-view tasks (experiments/2026-11-14-focus-peaking,
 NOTES section 13.1) for three frames without the MF Assist request and three frames with it (Peaking = White).
@@ -19,7 +19,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
 PEAKING = os.path.join(ROOT, "experiments", "2026-11-14-focus-peaking", "scripts")
-sys.path.insert(0, os.path.join(ROOT, "tools", "emu"))
+sys.path.insert(0, os.path.join(ROOT, "emulator"))
 sys.path.insert(0, PEAKING)
 sys.path.insert(0, os.path.join(ROOT, "src"))
 

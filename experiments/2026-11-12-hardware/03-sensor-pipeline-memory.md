@@ -173,7 +173,7 @@ Other names (**V** strings):
   - movie pool 0xA52B2400 + 316,790,208 B (302 MiB) → 0xB80CF9C0, or 0xA52B2200 + 209.5 MiB in the other mode (0x7E6F287B);
   - near the top: 0xBFFFA000 (24 KiB copied from flash 0x400F0000 at 0x7E44F473), 0xBFFEA000, 0xBFFDA000, 0xBFF9A000 (0x7E45762D) and 0xBFF7A000 (0x7E5B216B).
 - **I (strong):** physical DRAM = **512 MiB**, mapped 0x60000000–0x7FFFFFFF. The block-0 image sits 26 MiB below the top.
-  om-emu's E101 entry uses 512 MiB for the same reason (tools/emu/README.md).
+  om-emu's E101 entry uses 512 MiB for the same reason (emulator/README.md).
 
 ### 5.2 SDRAM controller (0x98A00000 / 0x98B00000)
 - **V** (driver 0x7E449823–0x7E44B11E, `busmes`/`dqsdelay` shell 0x7E44DBF5):
@@ -224,7 +224,7 @@ The missing record and encoder path (§3) are firmer limits.
 | E-PL5/E-PM2 share the E-M5 sensor; Sony-made; part number not public (01:134–143) | 4608×3456 effective, 4624×3472 read | Consistent |
 
 No file in ext/ covers E-M5, E-PL5 or PEN-F sensor modes or DRAM. grep for HSHR/HSSC/sensor mode/SDRAM/DDR finds only
-OM-1/OM-3/E-P7 material (**V**). The om-emu E118 family shares the E-PM2's INTC and timer layout (tools/emu/README.md:20).
+OM-1/OM-3/E-P7 material (**V**). The om-emu E118 family shares the E-PM2's INTC and timer layout (emulator/README.md:20).
 
 ## 7. Corrections and open questions
 

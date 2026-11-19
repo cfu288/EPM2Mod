@@ -1,4 +1,4 @@
-"""Scenario tests of the build debug-log (NOTES.md in this folder). Uses tools/emu and the decoder of the package.
+"""Scenario tests of the build debug-log (NOTES.md in this folder). Uses emulator and the decoder of the package.
 
     python3 scen_log.py SCENARIO PINNED_BLOCK0 DEBUG_BLOCK0
     SCENARIO: s15 s16 s17 or all
@@ -25,7 +25,7 @@ import os, struct, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
 PEAK = os.path.join(ROOT, "experiments", "2026-11-14-focus-peaking", "scripts")
-sys.path.insert(0, os.path.join(ROOT, "tools", "emu"))
+sys.path.insert(0, os.path.join(ROOT, "emulator"))
 sys.path.insert(0, os.path.join(ROOT, "src"))
 import scenario  # noqa: E402
 from scenario import Scenario, diff_pcs, diff_writes, fmt_funcs, patch_ranges  # noqa: E402

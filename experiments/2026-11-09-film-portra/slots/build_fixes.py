@@ -11,7 +11,7 @@
       ../../.venv/bin/python -I slots/build_fixes.py"""
 import json, os, struct, subprocess, sys, tempfile
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.join(HERE, "..", "..", ".."); B = 0x7E421020
-sys.path.insert(0, os.path.join(ROOT, "tools", "emu")); import patchblock
+sys.path.insert(0, os.path.join(ROOT, "emulator")); import patchblock
 BIN = os.path.join(os.path.abspath(__file__).split("/experiments/")[0], "build", "toolchain", "bin", "mn10300-elf-")
 stock, cur, _ = patchblock.patched_block0([os.path.join(ROOT, "patches", "remap7b-code.json")])       # state these ops are applied to
 def op(a, new): return {"type": "bytes", "block": 0, "offset": hex(a - B), "expect": cur[a - B:a - B + len(new)].hex(), "new": bytes(new).hex()}

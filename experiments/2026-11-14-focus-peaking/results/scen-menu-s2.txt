@@ -4,7 +4,7 @@ S2. Picture Mode Natural, two frames, then the request is set, four frames, requ
       path: mov_image_process, expose setter, art change notifier, frame builder, job setup, set_out_area_param, img exec, display update
       mov error prints: '[mov]img_ctrl_size err :' value 0
   real code ran: static constructors, 12 module inits, tasks MOV_TASK, MOV_SUB_TASK, ART_IMG_CM, ART_IMG_CS, MOVDISP_TASK, MOVCOLOR_SUB, MOVART_TASK, ART, ART_IMG_CF, MOVCOLOR.
-  stubbed: device registers (writes dropped, reads 0), uITRON services (tools/emu/osmodel.py), IMG job-done
+  stubbed: device registers (writes dropped, reads 0), uITRON services (emulator/osmodel.py), IMG job-done
   waits (met at once), settings getter (ids not set read 0), white-balance module, CPU cache control, float multiply.
   [gain-2x] frame 2: 1 task runs, 38874 insns, 924 device writes; state 2, expose 0, art record 0x0, heap mode 0, picture True, alloc error False | L=0 R=0 L2=0
       path: mov_image_process, expose setter, art change notifier, frame builder, job setup, set_out_area_param, img exec, display update
@@ -137,7 +137,7 @@ S2. Picture Mode Natural, two frames, then the request is set, four frames, requ
       path: mov_image_process, expose setter, art change notifier, frame builder, job setup, set_out_area_param, img exec, display update
       mov error prints: '[mov]img_ctrl_size err :' value 0
   real code ran: static constructors, 12 module inits, tasks MOV_TASK, MOV_SUB_TASK, ART_IMG_CM, ART_IMG_CS, MOVDISP_TASK, MOVCOLOR_SUB, MOVART_TASK, ART, ART_IMG_CF, MOVCOLOR.
-  stubbed: device registers (writes dropped, reads 0), uITRON services (tools/emu/osmodel.py), IMG job-done
+  stubbed: device registers (writes dropped, reads 0), uITRON services (emulator/osmodel.py), IMG job-done
   waits (met at once), settings getter (ids not set read 0), white-balance module, CPU cache control, float multiply.
   [gain-2x] frame 2: 1 task runs, 38872 insns, 924 device writes; state 2, expose 0, art record 0x0, heap mode 0, picture True, alloc error False | L=0 R=0 L2=0
       path: mov_image_process, expose setter, art change notifier, frame builder, job setup, set_out_area_param, img exec, display update

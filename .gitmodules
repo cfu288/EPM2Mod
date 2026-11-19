@@ -1,5 +1,5 @@
 [submodule "third_party/om-emu"]
-	path = third_party/om-emu
+	path = emulator/om-emu
 	url = https://github.com/cfu288/om-emu.git
 	branch = e101
 [submodule "third_party/binutils-gdb"]

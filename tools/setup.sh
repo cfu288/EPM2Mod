@@ -9,7 +9,7 @@
 #    third_party/binutils-gdb into build/toolchain/ (ignored by git). Needs gcc, make, bison and flex.
 # 2. Node (the major version in .nvmrc) for the emulator: taken from PATH, else from nvm. With nvm
 #    present and no such Node, "nvm install" gets it.
-# 3. The emulator working tree: tools/emu/setup.sh.
+# 3. The emulator working tree: emulator/setup.sh.
 #
 # Nothing is installed outside the repository, but a Node version through nvm.
 set -euo pipefail
@@ -77,4 +77,4 @@ else
 fi
 
 echo "== 3. Emulator working tree"
-if [ $check_only = 1 ]; then tools/emu/setup.sh --check || true; else tools/emu/setup.sh; fi
+if [ $check_only = 1 ]; then emulator/setup.sh --check || true; else emulator/setup.sh; fi

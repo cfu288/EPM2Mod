@@ -1,4 +1,4 @@
-"""Emulator check of probe A (single functions, tools/emu driver).
+"""Emulator check of probe A (single functions, emulator driver).
 
 Test 1: colour-tone getter 0x7E6CBFD3 (d0 = flags, d1 = 0: read the live-view struct, a0 = mode-byte
         pointer) for picture modes 0..6 and 100..120, flags 0 and 1, on stock and on the patched block.
@@ -10,7 +10,7 @@ Usage: emu_probe_a.py STOCK_BLOCK0 PATCHED_BLOCK0
 """
 import os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-sys.path.insert(0, os.path.join(ROOT, "tools", "emu"))
+sys.path.insert(0, os.path.join(ROOT, "emulator"))
 from omemu import Emu, SP0  # noqa: E402
 
 LV_STRUCT = 0x605B1CD0      # returned by 0x7E6ECFB6 for index 0

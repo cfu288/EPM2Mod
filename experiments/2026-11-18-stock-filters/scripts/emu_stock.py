@@ -131,7 +131,7 @@ def main():
             env["E101_CARD"] = folder
         else:
             env.pop("E101_CARD", None)
-        out = subprocess.run([os.path.join(ROOT, "tools/emu/emu-run"), BUILD, os.path.join(CL, "emu_looks.mjs"), *steps],
+        out = subprocess.run([os.path.join(ROOT, "emulator/emu-run"), BUILD, os.path.join(CL, "emu_looks.mjs"), *steps],
                              cwd=ROOT, env=env, capture_output=True, text=True)
         lines = [json.loads(l) for l in out.stdout.splitlines() if l.startswith("{")]
         if out.returncode:

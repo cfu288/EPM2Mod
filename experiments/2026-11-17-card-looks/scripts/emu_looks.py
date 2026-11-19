@@ -4,7 +4,7 @@
 
 --v2: builds/card-looks-2.json (twelve colour slots, the menu row Load Looks). TEST has C200 in all 12 slots, and a
 load is MENU -> Custom Menu -> J -> Load Looks -> Load, then out of the menu. Its sessions start from the settings
-state build/emu/state/card-looks-2-p.json (tools/emu/mkstate builds/card-looks-2.json ... p); screenshots go to
+state build/emu/state/card-looks-2-p.json (emulator/mkstate builds/card-looks-2.json ... p); screenshots go to
 build/card-looks/emu/shots-2/.
 
 Needs build/card-looks.BIN (uv run epm2mod make card-looks) and the files that mkspec_looks.py writes
@@ -94,7 +94,7 @@ def session(n, card, state, steps, drop_ram=False):
         env["E101_CARD"] = folder
     else:
         env.pop("E101_CARD", None)
-    out = subprocess.run([os.path.join(ROOT, "tools/emu/emu-run"), BUILD,
+    out = subprocess.run([os.path.join(ROOT, "emulator/emu-run"), BUILD,
                           os.path.join(HERE, "emu_looks.mjs"), *steps], cwd=ROOT, env=env, capture_output=True,
                          text=True)
     lines = [json.loads(l) for l in out.stdout.splitlines() if l.startswith("{")]

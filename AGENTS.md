@@ -21,8 +21,8 @@ it is done.
    an attempt. A deliberate boot-loop test needs the owner's agreement.
 6. **The owner flashes the camera, you do not.** For each build give the build description, its sha256, the command
    that writes it to the card, and what to check on the camera.
-7. **Before you offer a build that adds or moves a hook,** run `tools/emu/hookcheck.py`, `tools/emu/boot-test` and
-   `tools/emu/update-path-test` on it (exit status 0 = pass), and for a menu change the emulator's screenshot
+7. **Before you offer a build that adds or moves a hook,** run `emulator/hookcheck.py`, `emulator/boot-test` and
+   `emulator/update-path-test` on it (exit status 0 = pass), and for a menu change the emulator's screenshot
    comparison. A build that can crash at start-up is the one failure with no known way back
    ([feasibility](docs/feasibility.md), "The emulator").
 8. **Safety steps:** make firmware only from a build description with the CLI, log each flash in

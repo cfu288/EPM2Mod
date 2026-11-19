@@ -1,7 +1,7 @@
-"""Scenario tests of the focus-peaking builds (NOTES.md section 13). Uses tools/emu/liveview.py.
+"""Scenario tests of the focus-peaking builds (NOTES.md section 13). Uses emulator/liveview.py.
 
     python3 scen_peaking.py SCENARIO PINNED_BLOCK0 NAME=PATCHED_BLOCK0 [NAME=PATCHED_BLOCK0 ...]
-    SCENARIO: s1 s2 s3 s4 s5 or all. The block-0 files come from tools/emu/patchblock.py ... -o /tmp/scratch/x.block0.bin
+    SCENARIO: s1 s2 s3 s4 s5 or all. The block-0 files come from emulator/patchblock.py ... -o /tmp/scratch/x.block0.bin
     A NAME that starts with "direct-1" gets the request the way direct-1 sets it (R and the stock word 0x602B0DA8);
     every other patched image gets it through its own hook at entryMfAssistOn.
 
@@ -9,7 +9,7 @@ Every scenario runs the pinned image and each patched image through the same ste
 """
 import os, struct, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-sys.path.insert(0, os.path.join(ROOT, "tools", "emu"))
+sys.path.insert(0, os.path.join(ROOT, "emulator"))
 import scenario  # noqa: E402
 from scenario import RAM_AND_IMAGE, diff_pcs, diff_writes, fmt_funcs, patch_ranges  # noqa: E402
 from liveview import LiveView, CMD_THROUGH_END, HEAP_MODE, MOV_STATE  # noqa: E402
@@ -109,7 +109,7 @@ def anomalies(lv, f):
 
 def stubbed_note(lv):
     OUT("  real code ran: static constructors, 12 module inits, tasks %s." % ", ".join(lv.tasks))
-    OUT("  stubbed: device registers (writes dropped, reads 0), uITRON services (tools/emu/osmodel.py), IMG job-done")
+    OUT("  stubbed: device registers (writes dropped, reads 0), uITRON services (emulator/osmodel.py), IMG job-done")
     OUT("  waits (met at once), settings getter (ids not set read 0), white-balance module, CPU cache control, float multiply.")
 
 

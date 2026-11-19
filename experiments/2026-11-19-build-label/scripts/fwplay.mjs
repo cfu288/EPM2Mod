@@ -1,13 +1,13 @@
-// fwplay.mjs OUTDIR STEP...: the steps of tools/emu/boot/play.mjs (w:MS, key:NAME[:MS], shot:NAME) plus
+// fwplay.mjs OUTDIR STEP...: the steps of emulator/boot/play.mjs (w:MS, key:NAME[:MS], shot:NAME) plus
 //   wstr:HEX[:N]   print the UTF-16 text at a run-time address (at most N characters, default 64)
 //   hex:HEX[:N]    print N bytes (default 32) at a run-time address
 // HDR=1 writes block 0's container header (32 bytes) at 0x7E421000 before the first instruction, as the camera's
 // first-stage loader leaves it (inferred: the payload runs at 0x7E421020 = header + 32). The emulator does not model
 // that loader, so without HDR=1 the Firmware screen shows "Body : 0.0" (the boot copies 0x7E421010 into prm 0xC082).
-// Run: tools/emu/emu-run IMAGE /abs/path/fwplay.mjs OUTDIR STEP...   (E101_STATE, E101_RTC as in play.mjs)
+// Run: emulator/emu-run IMAGE /abs/path/fwplay.mjs OUTDIR STEP...   (E101_STATE, E101_RTC as in play.mjs)
 import fs from 'node:fs';
 import path from 'node:path';
-const E = path.join(process.env.EPM2_REPO, 'tools/emu/e101');
+const E = path.join(process.env.EPM2_REPO, 'emulator/e101');
 const { createBoot } = await import(path.join(E, 'boot.mjs'));
 const { screenshot } = await import(path.join(E, 'screen.mjs'));
 const { KEYS, press, release } = await import(path.join(E, 'keys.mjs'));

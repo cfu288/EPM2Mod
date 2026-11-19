@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build a patched E-PM2 block 0 (the descrambled payload om-emu loads) from patch specs.
 
-    python3 tools/emu/patchblock.py patches/film-portra.json [more.json ...] -o OUT.block0.bin
+    python3 emulator/patchblock.py patches/film-portra.json [more.json ...] -o OUT.block0.bin
 
 Uses the same spec format and the same checks as tools/build.py (base sha256, every op's expected bytes), through
 build.apply_op and oetool.parse. Only block 0 is written; ops on other blocks are still checked and applied, then

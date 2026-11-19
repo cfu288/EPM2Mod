@@ -105,8 +105,8 @@ Every other films12 spec is unchanged and stays in the build. Generator: `src/ep
 |---|---|
 | `epm2mod make builds/films-12-bw.json`: free-space check, boot test, update-path test | PASS, PASS, PASS |
 | `epm2mod make builds/debug-log-films-12-bw.json` | **not made by `make` yet**: the free-space check fails on `patches/log-core.json` against `patches/log-peaking-guard.json`, a spec of other work in progress; `debug-log-films-12` fails the same way. The same specs applied in memory (`scripts/apply_only.py`) give the sha256 below; that image passes the boot test and the update-path test. Run `make` again when that spec is settled |
-| `tools/emu/opcheck.py`, both builds | 0 FAIL |
-| `tools/emu/hookcheck.py patches/films12bw-doublex.json` | 3 transfers, 0 FAIL (one changed jump inside segment 2, two jumps back to the stock matrix code) |
+| `emulator/opcheck.py`, both builds | 0 FAIL |
+| `emulator/hookcheck.py patches/films12bw-doublex.json` | 3 transfers, 0 FAIL (one changed jump inside segment 2, two jumps back to the stock matrix code) |
 | `black`, `mypy --strict`, `python -m unittest discover -s tests` | clean; 193 tests OK (8 new in `tests/test_looks_mono.py`) |
 | `scripts/stage_check_bw.py` (`results/stage-check-films-12-bw.txt`) | **PASS.** Value 104 gives 74 / 104 (types I / II) and 74 / 83 (still / movie) in all tables, as stock; classes, effect lists and the grain program's entries as stock. Codes 74 and 83: tone, saturation, six-axis, chroma as stock; matrix = the fit; live-view table = the fit's L; grain table = the fit's T; still look tables as stock. Codes 104 / 105 as stock. The other eleven entries: all tables are their films and equal to films-12 (value 111 = Provia now at the Gentle Sepia place); the twelve ART presets store the list's values |
 | `films-max/scripts/scen_films.py`, 12 stored values and 119 (`results/scen-films-12-bw.txt`) | 13 of 13: a picture in every frame, no anomaly, lines with the MF Assist request. Value 104 gives code byte 74 |
@@ -249,7 +249,7 @@ list file now names the refit). Generator: `refits` in `looks/films-12-bw.json`,
 | Check | Result |
 |---|---|
 | `epm2mod make` for both builds: free-space check, boot test, update-path test | PASS, PASS, PASS |
-| `tools/emu/opcheck.py`, both | 0 FAIL |
+| `emulator/opcheck.py`, both | 0 FAIL |
 | `scripts/stage_check_bw.py build/films-12d.BIN --refit 1` (`results/stage-check-films-12d.txt`) | PASS: for 74 and 83 the grain program's look stage gives 0x7E75ECF0 = the second fit's T; matrix, live-view table and every other stage as in the first build; 104 / 105 stock |
 | `films-max/scripts/scen_films.py` for 104, 111, 119 (`results/scen-films-12d.txt`) | 3 of 3: a picture in every frame, no anomaly, lines with the MF Assist request; value 104 gives code byte 74 |
 | `black`, `mypy --strict`, unit tests | clean; 194 OK |

@@ -5,7 +5,7 @@
 # on (lc-1..6), the Picture Mode Settings list (pms) and the ART BKT list (bkt-1, bkt-2).
 # Expected on both builds: the strip has no Grainy Film; the row Grainy Film reads Off in both lists.
 # Output: build/emu/films-contiguous/hidden/{pinned,new}/*.png and sheet.png (upper row pinned, lower row new)
-cd ${0:A:h}/../../.. && . tools/emu/boot/env.sh
+cd ${0:A:h}/../../.. && . emulator/boot/env.sh
 export E101_RTC=${E101_RTC:-2026-11-14T12:00:00}
 old=${1:-builds/peaking-fast.json}; new=${2:-builds/films-contiguous.json}
 src=build/emu/films-contiguous/settings/pinned; out=build/emu/films-contiguous/hidden; rm -rf $out

@@ -1,4 +1,4 @@
-"""Scenario tests of the build peaking-menu (NOTES.md section 15). Uses tools/emu.
+"""Scenario tests of the build peaking-menu (NOTES.md section 15). Uses emulator.
 
     python3 scen_menu.py SCENARIO BASE_BLOCK0 PINNED_BLOCK0 MENU_BLOCK0
     SCENARIO: s8 s9 s10 s11 or all
@@ -23,7 +23,7 @@ S11  The changed routines alone, with the firmware's own settings getter (no sta
 """
 import os, struct, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-sys.path.insert(0, os.path.join(ROOT, "tools", "emu"))
+sys.path.insert(0, os.path.join(ROOT, "emulator"))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import scenario  # noqa: E402
 from scenario import RAM_AND_IMAGE, Scenario, diff_pcs, diff_writes, fmt_funcs, patch_ranges  # noqa: E402

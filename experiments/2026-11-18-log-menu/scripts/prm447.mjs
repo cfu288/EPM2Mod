@@ -1,8 +1,8 @@
 // prmtest.mjs STEP...: SWAP=1: the setSetting(449, v) of the card-looks row writes setting 447 instead.
 // Every session: the first prm_get(0xD7B1) after BOOTMS reads tag 0xD791 (setting 447) instead, prints it, returns 1.
-import { createBoot } from '../../../tools/emu/e101/boot.mjs';
-import { KEYS, press, release } from '../../../tools/emu/e101/keys.mjs';
-import { R, PC, SP, PSW } from '../../../tools/emu/e101/machine.mjs';
+import { createBoot } from '../../../emulator/e101/boot.mjs';
+import { KEYS, press, release } from '../../../emulator/e101/keys.mjs';
+import { R, PC, SP, PSW } from '../../../emulator/e101/machine.mjs';
 const e = createBoot({ blocksDir: process.env.BLOCKS });
 R[PC] = 0x7E421020 | 0; R[SP] = 0x47001FFC | 0; R[PSW] = 0;
 const ms = () => Number((e.m.devices.clock.t / 1e6).toFixed(1));

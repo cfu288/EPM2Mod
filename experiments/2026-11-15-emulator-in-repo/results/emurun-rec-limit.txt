@@ -1,4 +1,4 @@
-$ python3 tools/emu/emurun.py run rec_limit
+$ python3 emulator/emurun.py run rec_limit
 ok   fmt=3 q=6 hi=1 free=500 -> {"ret": 0, "free_frames": 0, "free_frames2": 0, "max_frames": 0, "prints": ["Free Secotr : 500", "MAX   Time  : 0", "Limte Time  : 0"]}
 ok   fmt=3 q=6 hi=1 free=2097152 -> {"ret": 238800, "free_frames": 11940, "free_frames2": 11940, "max_frames": 11940, "prints": ["Free Secotr : 2097152", "MAX   Time  : 398", "Limte Time  : 398"], "peak": 20000000, "rate_in_step": true, "fill_4g": 0.2496, "fits_4g": true}
 ok   fmt=3 q=6 hi=1 free=134217728 -> {"ret": 15315600, "free_frames": 765780, "free_frames2": 765780, "max_frames": 47850, "prints": ["Free Secotr : 134217728", "MAX   Time  : 25526", "Limte Time  : 1595"], "peak": 20000000, "rate_in_step": true, "fill_4g": 0.9998, "fits_4g": true}

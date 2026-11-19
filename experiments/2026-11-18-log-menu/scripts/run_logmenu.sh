@@ -1,6 +1,6 @@
 #!/bin/zsh
 # The emulator checks L2-L4 of builds/log-menu.json (design.md): five sessions on one settings state and one card folder.
-#   tools/emu/mkstate builds/log-menu.json build/emu/state/log-menu-p.json p     (once)
+#   emulator/mkstate builds/log-menu.json build/emu/state/log-menu-p.json p     (once)
 #   zsh experiments/2026-11-18-log-menu/scripts/run_logmenu.sh /tmp/scratch/logmenu
 # 1 row Off (default): menu and playback; the ring keeps its start-up records only, no card write; screenshots of J.
 # 2 row On: menu and playback; EPM2LOG.BIN appears and decodes.
@@ -15,7 +15,7 @@ J=(key:MENU key:RIGHT key:OK key:DOWN key:DOWN key:DOWN key:RIGHT key:DOWN key:D
    key:DOWN key:DOWN key:DOWN key:RIGHT key:DOWN key:DOWN key:DOWN key:DOWN key:DOWN)       # Custom Menu J, Load Looks
 LOG=($J key:DOWN)                                                                          # Debug Log
 OUT=(key:MENU key:MENU key:MENU key:MENU w:500 key:PLAY w:800 key:PLAY w:500)
-run() { E101_STATE=$W/st.json E101_CARD=$W/card E101_RTC=2026-11-18T12:00:00 tools/emu/emu-run builds/log-menu.json \
+run() { E101_STATE=$W/st.json E101_CARD=$W/card E101_RTC=2026-11-18T12:00:00 emulator/emu-run builds/log-menu.json \
           logplay.mjs $W/$1 ${@:2} 2>&1 | grep -E '^ring .* cpu0|^card|^STOP' | sed "s/^/  $1 /"; }
 size() { [[ -f $W/card/EPM2LOG.BIN ]] && echo "  file: $(stat -c %s $W/card/EPM2LOG.BIN) B" || echo "  file: none"; }
 echo "1 Off"; run s1 w:500 ring:start $LOG shot:j-row key:RIGHT shot:j-list $OUT ring:end; size

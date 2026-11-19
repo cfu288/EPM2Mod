@@ -180,7 +180,7 @@ python3 experiments/2026-11-13-reclaim-space/scripts/deadstr.py 64 \
 python3 experiments/2026-11-13-reclaim-space/scripts/summary.py      # class_a.tsv + overlap check
 python3 experiments/2026-11-13-reclaim-space/scripts/cut.py \
     /tmp/scratch/reach.pkl > experiments/2026-11-13-reclaim-space/results/class_b.tsv
-python3 experiments/2026-11-13-reclaim-space/scripts/emu_sdktable.py # needs tools/emu setup
+python3 experiments/2026-11-13-reclaim-space/scripts/emu_sdktable.py # needs emulator setup
 python3 experiments/2026-11-13-reclaim-space/scripts/q.py win 0x7EBF1090 0x7EBF3BAD
 ```
 

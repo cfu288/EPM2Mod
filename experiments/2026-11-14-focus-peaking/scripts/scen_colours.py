@@ -1,4 +1,4 @@
-"""Scenario tests of the build peaking-colours (NOTES.md section 16). Uses tools/emu.
+"""Scenario tests of the build peaking-colours (NOTES.md section 16). Uses emulator.
 
     python3 scen_colours.py SCENARIO BASE_BLOCK0 PINNED_BLOCK0 COLOURS_BLOCK0 [PNG_DIR]
     SCENARIO: s12 s13 s14 or all
@@ -23,7 +23,7 @@ S14  T_K alone from its hook site, with a small frame (8 x 2 pixels) in scratch 
 import os, struct, sys, zlib
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
-sys.path.insert(0, os.path.join(ROOT, "tools", "emu"))
+sys.path.insert(0, os.path.join(ROOT, "emulator"))
 import scenario  # noqa: E402
 from scenario import Scenario  # noqa: E402
 

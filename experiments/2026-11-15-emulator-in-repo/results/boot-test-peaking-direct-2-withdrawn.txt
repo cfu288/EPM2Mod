@@ -1,4 +1,4 @@
-$ tools/emu/boot-test /tmp/scratch/peaking-direct-2.BIN --out /tmp/scratch/boot-withdrawn
+$ emulator/boot-test /tmp/scratch/peaking-direct-2.BIN --out /tmp/scratch/boot-withdrawn
 boot-test: FAIL: /tmp/scratch/peaking-direct-2.BIN does not reach the end of start-up in 2000 ms of lab time (exit 1; stop: {"why":"labtime","pc":2118334195}; cpu1: PARKED core 1 fault 3 at 0x00008940 address 0x00000001 | problems: core 1 fault 3 at 0x00008940 address 0x00000001)
 exit status 1 (expected 1)
 sha256 b5493233ab4bef63fe5ca8f9a230e7f31a843221710ba9432f59da1be8929d78

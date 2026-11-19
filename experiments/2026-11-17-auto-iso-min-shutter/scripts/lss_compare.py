@@ -12,7 +12,7 @@ import argparse, itertools, os, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
-sys.path.insert(0, os.path.join(ROOT, "tools", "emu"))
+sys.path.insert(0, os.path.join(ROOT, "emulator"))
 sys.path.insert(0, HERE)
 import omemu, patchblock, expcal, penf_expcal as pf  # noqa: E402
 from expcal import tv_str, fno_str, s16  # noqa: E402

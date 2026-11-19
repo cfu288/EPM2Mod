@@ -5,7 +5,7 @@
 # builds' screens of one entry below the title line (the title line has the entry's place in the list).
 # Expected: 0 differ.
 # Output: build/emu/films-contiguous/artsub/{pinned,new}/NAME-NN.png
-cd ${0:A:h}/../../.. && . tools/emu/boot/env.sh
+cd ${0:A:h}/../../.. && . emulator/boot/env.sh
 export E101_RTC=${E101_RTC:-2026-11-14T12:00:00}
 old=${1:-builds/peaking-fast.json}; new=${2:-builds/films-contiguous.json}
 st=build/emu/films-contiguous/state/pinned-art.json

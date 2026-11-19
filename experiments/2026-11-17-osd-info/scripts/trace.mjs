@@ -1,5 +1,5 @@
-// SETUP module for tools/emu/boot/play.mjs: observers for the GUI of the shooting screen.
-//   SETUP=/abs/path/trace.mjs TRACE=create,kids TRACE_FROM=0 E101_STATE=... tools/emu/emu-run IMAGE play.mjs OUT STEP...
+// SETUP module for emulator/boot/play.mjs: observers for the GUI of the shooting screen.
+//   SETUP=/abs/path/trace.mjs TRACE=create,kids TRACE_FROM=0 E101_STATE=... emulator/emu-run IMAGE play.mjs OUT STEP...
 // TRACE (comma list):
 //   create  widget factory 0x7ED17DB8: type, parent, resource record (44 bytes)
 //   text    text label setText 0x7ED2D510 and set-by-text-id 0x7ED2CE0C
@@ -11,7 +11,7 @@
 //   kids    at the end: the 155 child slots of the live-view panel (class 0x600A): type, id, rectangle, status
 //   fonts   at the end: the image fonts (table 0x602BA8D8): characters of each
 // Lines are printed at the end; the first number is lab time in ms. TRACE_FROM = first lab ms to log (default 1400).
-const M = await import(process.env.EPM2_REPO + '/tools/emu/e101/machine.mjs');
+const M = await import(process.env.EPM2_REPO + '/emulator/e101/machine.mjs');
 const { R, D0, D1, A0, A1, MDR } = M;
 const hx = (v) => (v >>> 0).toString(16);
 export default function (e) {

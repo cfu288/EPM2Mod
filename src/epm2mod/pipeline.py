@@ -185,8 +185,8 @@ _EMULATOR_NOT_SET_UP = 3
 def check_in_emulator(paths: RepoPaths, image: Path) -> list[str]:
     """Start a firmware image in the emulator: the normal start and the update path.
 
-    The checks are ``tools/emu/boot-test IMAGE`` and
-    ``tools/emu/update-path-test IMAGE``. An image that does not start as the
+    The checks are ``emulator/boot-test IMAGE`` and
+    ``emulator/update-path-test IMAGE``. An image that does not start as the
     stock firmware does, or does not find an update file with OK held, could
     leave the camera with no way back.
 
@@ -200,7 +200,7 @@ def check_in_emulator(paths: RepoPaths, image: Path) -> list[str]:
     lines = []
     for tool in paths.emulator_checks:
         skipped = (
-            f"{tool.name}: SKIPPED, the emulator is not set up (tools/emu/setup.sh). "
+            f"{tool.name}: SKIPPED, the emulator is not set up (emulator/setup.sh). "
             "Do not flash this build before the check has passed."
         )
         if not tool.exists():

@@ -10,7 +10,7 @@ Portra 400 was built, without making the firmware unstable?
 
 Evidence: `experiments/2026-11-09-film-portra/NOTES.md` §26–32, the inventory
 `experiments/2026-11-09-film-portra/slots/artcode_inventory.json`, and the emulator cases in
-`tools/emu/cases.py`. Labels: **[C]** confirmed on the camera, **[E]** confirmed in the emulator,
+`emulator/cases.py`. Labels: **[C]** confirmed on the camera, **[E]** confirmed in the emulator,
 **[R]** read from code or tables, **[I]** inferred.
 
 ## 1. Answer

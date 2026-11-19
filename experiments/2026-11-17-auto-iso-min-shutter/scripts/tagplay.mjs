@@ -1,10 +1,10 @@
-// tagplay.mjs OUTDIR STEP...: the steps of tools/emu/boot/play.mjs (w:MS, key:NAME[:MS], shot:NAME) plus
+// tagplay.mjs OUTDIR STEP...: the steps of emulator/boot/play.mjs (w:MS, key:NAME[:MS], shot:NAME) plus
 //   tag:HEX     print the stored first value of a prm tag (u8 or s16 by the tag's low nibble),
 //               read through the firmware's index table 0x603A0E38 (8 bytes per tag number)
-// Run it with tools/emu/emu-run IMAGE /abs/path/to/tagplay.mjs OUTDIR STEP...   (E101_STATE as in play.mjs)
+// Run it with emulator/emu-run IMAGE /abs/path/to/tagplay.mjs OUTDIR STEP...   (E101_STATE as in play.mjs)
 import fs from 'node:fs';
 import path from 'node:path';
-const E = path.join(process.env.EPM2_REPO, 'tools/emu/e101');
+const E = path.join(process.env.EPM2_REPO, 'emulator/e101');
 const { createBoot } = await import(path.join(E, 'boot.mjs'));
 const { screenshot } = await import(path.join(E, 'screen.mjs'));
 const { KEYS, press, release } = await import(path.join(E, 'keys.mjs'));

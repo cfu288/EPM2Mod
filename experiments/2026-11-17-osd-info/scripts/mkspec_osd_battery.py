@@ -11,7 +11,7 @@ What the spec does (NOTES.md in this folder has the evidence):
      the battery voltage with the stock routine (at most once in 2 s), makes a percentage and sets the label text.
 
 Usage: mkspec_osd_battery.py BLOCK0 WORKDIR OUT.json [LISTING.txt]
-  BLOCK0   block 0 of the pinned build (tools/emu/patchblock.py SPECS -o BLOCK0, or build/emu/NAME-SHA8/block0_0100.bin)
+  BLOCK0   block 0 of the pinned build (emulator/patchblock.py SPECS -o BLOCK0, or build/emu/NAME-SHA8/block0_0100.bin)
   WORKDIR  scratch folder for the assembler files (outside the repository)
 """
 import json, os, re, struct, subprocess, sys

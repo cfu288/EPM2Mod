@@ -185,8 +185,8 @@ The current build id is the one of `logs/events.json` (`33ca8d15f4f1c877`, carri
    python3 tools/oetool.py unpack build/epm2mod-2026.11.19.BIN /tmp/scratch/pinned
    uv run python experiments/2026-11-15-log/scripts/mkspec_log.py /tmp/scratch/pinned /tmp/scratch/asm
    uv run epm2mod make debug-log
-   python3 tools/emu/opcheck.py builds/debug-log.json
-   python3 tools/emu/hookcheck.py patches/log-core.json patches/log-probes.json
+   python3 emulator/opcheck.py builds/debug-log.json
+   python3 emulator/hookcheck.py patches/log-core.json patches/log-probes.json
    ```
 
    `experiments/2026-11-18-log-menu/scripts/mkspec_logmenu.py` (with `--stock-films`) imports `mkspec_log.py`

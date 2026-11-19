@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+"""mkstate IMAGE OUT.json [MODE]: make a settings state file for play.mjs, crawl.mjs and the other tools.
+
+    emulator/mkstate stock build/emu/state/stock-p.json p
+    emulator/mkstate builds/peaking-colours.json build/emu/state/pinned-p.json p
+
+The emulator starts with an empty settings store: Japanese, the Custom Menu hidden, mode iAUTO. This tool
+boots IMAGE with an empty store and sets through the camera's own menus, by key presses:
+  1. the language English (Setup Menu, second row),
+  2. Menu Display: Custom Menu On and Accessory Port Menu On,
+  3. the shooting mode MODE through the top menu: iauto (default), p, art, scn or movie.
+The state the run ends with is written to OUT.json (E101_STATE). A state belongs to the image that made
+it; make one per image. A state file holds settings data written by the firmware, so keep it under
+build/ (ignored by git) and not in the repository.
+Exit status: 0 done, 1 the run failed, 2 wrong arguments, 3 the emulator is not set up.
+"""
+import os
+import subprocess
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import emuenv  # noqa: E402
+
+ENGLISH = "w:500 key:MENU key:LEFT key:LEFT key:OK key:DOWN key:DOWN key:DOWN key:RIGHT key:DOWN key:RIGHT key:DOWN key:OK"
+MENUS_ON = "key:DOWN key:DOWN key:DOWN key:RIGHT key:RIGHT key:DOWN key:OK key:DOWN key:RIGHT key:DOWN key:OK"
+LEAVE = "key:MENU key:MENU key:MENU key:MENU w:500"
+# the top menu opens at iAUTO; its order is ART, iAUTO, SCN, movie, P/A/S/M, SETUP
+MODES = {"iauto": "", "p": "key:MENU key:RIGHT key:RIGHT key:RIGHT key:OK w:500", "art": "key:MENU key:LEFT key:OK w:500 key:OK w:500",
+         "scn": "key:MENU key:RIGHT key:OK w:500 key:OK w:500", "movie": "key:MENU key:RIGHT key:RIGHT key:OK w:500"}
+
+
+def main(argv):
+    if len(argv) not in (2, 3) or (len(argv) == 3 and argv[2] not in MODES):
+        print(__doc__)
+        return 2
+    image, out, mode = argv[0], os.path.abspath(argv[1]), argv[2] if len(argv) == 3 else "iauto"
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    if os.path.exists(out):
+        os.remove(out)
+    shots = out + ".shots"
+    steps = f"{ENGLISH} {MENUS_ON} {LEAVE} {MODES[mode]} shot:state".split()
+    r = subprocess.run(emuenv.tool_command("play.mjs", [shots, *steps]), env=emuenv.tool_env(image, {"E101_STATE": out}), capture_output=True, text=True)
+    if r.returncode != 0 or not os.path.exists(out):
+        print(f"mkstate: the run failed (exit {r.returncode}): {(r.stdout + r.stderr).strip().splitlines()[-1:]}", file=sys.stderr)
+        return 1
+    print(f"mkstate: wrote {argv[1]} (English, Custom Menu and Accessory Port Menu shown, mode {mode}); the last screen is {argv[1]}.shots/state.png")
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main(sys.argv[1:]))
+    except emuenv.EmuSetupError as e:
+        print(f"mkstate: cannot run: {e}", file=sys.stderr)
+        sys.exit(3)

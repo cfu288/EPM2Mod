@@ -1,11 +1,11 @@
 // trace.mjs STEP...: who touches the candidate settings, in the emulator.
-//   tools/emu/emu-run IMAGE $PWD/experiments/2026-11-18-look-editor/scripts/trace.mjs STEP...
+//   emulator/emu-run IMAGE $PWD/experiments/2026-11-18-look-editor/scripts/trace.mjs STEP...
 // Steps: w:MS, key:NAME[:MS], poke:VALUE (write VALUE into every candidate's stored value, RAM only), dump.
 // Logs every call of the prm getter/setter with a candidate tag, of Get/Set_CameraInfo (current, user, bank, W)
 // and of the mode controller's get/set and the GUI's getSetting/setSetting with a candidate id (caller = mdr).
 // Polls every candidate's stored bytes every 20 ms of lab time and logs each change with the lab time.
 import path from 'node:path';
-const E = path.join(process.env.EPM2_REPO, 'tools/emu/e101');
+const E = path.join(process.env.EPM2_REPO, 'emulator/e101');
 const { createBoot } = await import(path.join(E, 'boot.mjs'));
 const { KEYS, press, release } = await import(path.join(E, 'keys.mjs'));
 const { R, PC, SP, PSW } = await import(path.join(E, 'machine.mjs'));

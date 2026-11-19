@@ -2,14 +2,14 @@
 # shots.sh IMAGE NAME [STATEPREFIX]: the screens that list the art entries, English.
 # IMAGE: builds/NAME.json, a .BIN file or stock. Output: build/emu/films-contiguous/NAME/*.png.
 # STATEPREFIX: settings states PREFIX-p.json, PREFIX-art.json, PREFIX-movie.json (default: the pinned build's,
-# build/emu/films-contiguous/state/pinned; made with tools/emu/mkstate). Copies are used.
+# build/emu/films-contiguous/state/pinned; made with emulator/mkstate). Copies are used.
 #   lc-00..19   mode P, OK (live control), UP (Picture Mode), RIGHT x 19
 #   pm-1..3     Shooting Menu 1 -> Picture Mode list, three pages
 #   pms-1..3    Custom Menu D -> Picture Mode Settings list
 #   art-01..13  ART list (12 entries and ART BKT); bkt-1, bkt-2: the ART BKT list
 #   mlc-00..19  movie mode, live control Picture Mode strip
 #   alc-00..13  ART mode, live control: first item, RIGHT x 13
-cd ${0:A:h}/../../.. && . tools/emu/boot/env.sh
+cd ${0:A:h}/../../.. && . emulator/boot/env.sh
 export E101_RTC=${E101_RTC:-2026-11-14T12:00:00}
 img=$1; name=$2; pre=${3:-build/emu/films-contiguous/state/pinned}
 out=build/emu/films-contiguous/$name; mkdir -p $out

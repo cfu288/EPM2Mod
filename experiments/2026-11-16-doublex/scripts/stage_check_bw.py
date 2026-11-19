@@ -1,4 +1,4 @@
-"""Stage check of a build with the black-and-white film in the Grainy Film entry. Uses tools/emu (function harness).
+"""Stage check of a build with the black-and-white film in the Grainy Film entry. Uses emulator (function harness).
 
     .venv/bin/python experiments/2026-11-16-doublex/scripts/stage_check_bw.py IMAGE.BIN [--films12 build/films-12.BIN] [--refit N]
 

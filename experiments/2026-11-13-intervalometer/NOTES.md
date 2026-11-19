@@ -101,7 +101,7 @@ How the bodies were compared:
 
 ## 5. Spec ops ([patches/interval-timelapse.json](patches/interval-timelapse.json))
 - **Base:** sha256 34d339ac…3e300. Each `expect` carries 4 context bytes on each side.
-- **Checked:** `tools/emu/patchblock.py` applies all 5 ops (14 bytes differ in 7 runs, scratch image only) (V).
+- **Checked:** `emulator/patchblock.py` applies all 5 ops (14 bytes differ in 7 runs, scratch image only) (V).
 
 | # | Block-0 offset (runtime) | Change |
 |---|---|---|
@@ -114,7 +114,7 @@ How the bodies were compared:
 The .data tab layout (b) needs no change, because the row count of tab 1 stays 5.
 
 ## 6. Emulator (V; om-emu, function level, `results/emu-*.txt|json`)
-The new cases are in `tools/emu/cases.py`. Each has an independent Python model that reads the image's own tables.
+The new cases are in `emulator/cases.py`. Each has an independent Python model that reads the image's own tables.
 
 | Case | Entry | Rows | Stock model | Diff vs the spec |
 |---|---|---|---|---|
@@ -304,7 +304,7 @@ Reviews: [review-1-memory.md](review-1-memory.md), [review-2-code.md](review-2-c
 
   All 6 table pointers, the record pointer and the 7 `jmp` hooks are regenerated (`scripts/mkspec_v2.py`), and the trampolines are re-assembled at the new addresses.
 - **Review 2 N2 stays (I).** An unused tab slot (0xFF) would index base + 2,544, which is 0x7ECB1594, in the unloaded gap. As in stock and the E-PL6, the cursor is bounded by the tab counts, so the slot is not read.
-- **Applies on both bases (V, `tools/emu/patchblock.py` into scratch):**
+- **Applies on both bases (V, `emulator/patchblock.py` into scratch):**
   - stock + v2: block-0 sha256 `d8c35ce3…2c327f69`, 921 bytes changed;
   - the seven-films-6 specs + v2: `8992f2c2…693d28ec`.
 
@@ -487,4 +487,4 @@ Images: stock, films, stock + v2, films + v2, E-PL6 1.4. Model errors: 0 in ever
   - `modedef.py`: MODE defaults;
   - `mkspec.py`: builds the ops from the stock bytes.
 - `results/`: emulator diffs (`emu-*.txt`, `emu-*.json`), function pairing (`pair-*.txt`), `rowshift-constants.txt`, `mode-defaults.txt`, `page-child-lists.txt`, `strings-timelapse.tsv`.
-- `tools/emu/cases.py`: the new cases `menu_help`, `menu_child`, `menu_value` and `ivl_guard`.
+- `emulator/cases.py`: the new cases `menu_help`, `menu_child`, `menu_value` and `ivl_guard`.

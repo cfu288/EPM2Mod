@@ -9,7 +9,7 @@ The picture table (read from the firmware: lookup 0x7ECFF3AC, base pointer at RA
 block-1 offset 0x2CD024, one u32 per picture number, a run-time pointer to a record
 {u16 kind, u16 width, u16 height, u16 bits, u32 0, u32 size, u32 data pointer, u32 0}. Pointers below
 0xBFA4BE20 are block offset + 0xBF759820, the others block offset + 0xBF314220. The data is the run-length
-format that the OSD engine draws (tools/emu/e101/osd.mjs, command 0x30).
+format that the OSD engine draws (emulator/e101/osd.mjs, command 0x30).
 """
 
 import struct

@@ -1,6 +1,6 @@
 """stored_values.py DIR: print the stored Picture Mode value of every settings state DIR/*.json.
 
-The value is byte 51880 of the mode bank's RAM image in a state file of tools/emu (found by choosing each entry
+The value is byte 51880 of the mode bank's RAM image in a state file of emulator (found by choosing each entry
 on the pinned build: it reads 100 to 109, 119, 120 there). Byte 76 is the art code of ART mode (setting 281).
 """
 

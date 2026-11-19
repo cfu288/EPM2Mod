@@ -110,7 +110,7 @@ class RepoPaths:
     @property
     def emulator_checks(self) -> tuple[Path, ...]:
         """The scripts that start a firmware image in the emulator, in order."""
-        folder = self.root / "tools" / "emu"
+        folder = self.root / "emulator"
         return (folder / "boot-test", folder / "update-path-test")
 
     @property

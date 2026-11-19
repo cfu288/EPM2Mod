@@ -4,7 +4,7 @@
 # in the ART list; save the settings state; start the new build with that state and take the same screens.
 # Output: build/emu/films-contiguous/stored/{p,art}-NN-{pinned,new}.png (NN = place in the pinned build's list)
 # and sheet-{p,art}-{a,b}.png (upper row = pinned, lower row = new; a = entries 1..6, b = 7..12).
-cd ${0:A:h}/../../.. && . tools/emu/boot/env.sh
+cd ${0:A:h}/../../.. && . emulator/boot/env.sh
 export E101_RTC=${E101_RTC:-2026-11-14T12:00:00}
 old=${1:-builds/peaking-fast.json}; new=${2:-builds/films-contiguous.json}
 pre=build/emu/films-contiguous/state/pinned

@@ -37,7 +37,7 @@ CAMERA_LOG = "docs/camera-log.md"
 MAP_MD = "docs/code-space-map.md"
 MAP_TSV = "docs/code-space-map.tsv"
 SPEC_GLOBS = ["patches/*.json", "experiments/*/patches/*.json",
-              "tools/emu/specs/*.json"]
+              "emulator/specs/*.json"]
 
 BASE = 0x7E421020            # runtime address of block-0 file offset 0
 FLASH0 = 0x402C0020          # flash address (cached alias) of block-0 file offset 0; checked below
@@ -1108,8 +1108,8 @@ def check_sram_callers(specs, out=print):
     """FAIL for each constant call or jump of the code that runs in SRAM whose target is inside an op that changes
     bytes. The function map decodes that code at its flash address, so it does not see these callers, and a function
     that only SRAM code calls looks dead (peaking-direct-3 put code over the sleep routine 0x7E53A55C this way).
-    The decode is in tools/emu/opcheck.py."""
-    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "emu"))
+    The decode is in emulator/opcheck.py."""
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "emulator"))
     import opcheck
     calls, _src, _dst = opcheck.sram_calls()
     fails = 0
@@ -1126,8 +1126,8 @@ def check_sram_callers(specs, out=print):
 
 def check_load_order(specs, out=print):
     """FAIL for each jump or call from code that is loaded early (kernel, segment 1) to code that is loaded later.
-    The check is tools/emu/hookcheck.py; the accepted hooks are in tools/emu/hookcheck-allow.tsv."""
-    here = os.path.join(os.path.dirname(os.path.abspath(__file__)), "emu")
+    The check is emulator/hookcheck.py; the accepted hooks are in emulator/hookcheck-allow.tsv."""
+    here = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "emulator")
     sys.path.insert(0, here)
     import hookcheck
     allow = {int(r[0], 16): "%s, %s" % (r[1], r[2]) for r in read_tsv(os.path.join(here, "hookcheck-allow.tsv"), 3)}

@@ -34,7 +34,7 @@ store). The panel side (one list panel per row, pickers with -7..+7) is in [rows
 A raw search for the ids and tags as 16-bit values in block 0 (`scripts/raw_refs.py`) gave hundreds of hits for
 each id, mostly instruction bytes. It does not prove anything, so the conclusions do not use it.
 
-The emulator needs Node 26; `OM_EMU_NODE=/path/to/node26/bin/node` for `tools/emu/emu-run`.
+The emulator needs Node 26; `OM_EMU_NODE=/path/to/node26/bin/node` for `emulator/emu-run`.
 
 ## Candidates
 

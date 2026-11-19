@@ -1,7 +1,7 @@
-"""Scenario tests S6 and S7 of the focus-peaking builds (NOTES.md section 14). Uses tools/emu.
+"""Scenario tests S6 and S7 of the focus-peaking builds (NOTES.md section 14). Uses emulator.
 
     python3 scen_direct4.py SCENARIO PINNED_BLOCK0 NAME=PATCHED_BLOCK0 [NAME=PATCHED_BLOCK0 ...]
-    SCENARIO: s6 s7 or all. The block-0 files come from tools/emu/patchblock.py ... -o /tmp/scratch/x.block0.bin
+    SCENARIO: s6 s7 or all. The block-0 files come from emulator/patchblock.py ... -o /tmp/scratch/x.block0.bin
 
 S6  Picture Mode change to the Velvia entry (ART 7, picture mode 106) and back, as the quick menu sets it: the
     setting 38017 changes between live-view frames (6 -> 7, 7 -> 8, 8 -> 7, 7 -> 6). After each frame the art code
@@ -17,7 +17,7 @@ S7  The sleep routine "pwr_standby start" 0x7E53A55C, called as the SRAM code ca
 """
 import os, struct, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-sys.path.insert(0, os.path.join(ROOT, "tools", "emu"))
+sys.path.insert(0, os.path.join(ROOT, "emulator"))
 import scenario  # noqa: E402
 from liveview import LiveView, EXPOSE  # noqa: E402
 

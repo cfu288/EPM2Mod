@@ -1,6 +1,6 @@
 #!/bin/zsh
 # screens.sh NEW [OLD]: the emulator checks of a films build (NEW, builds/NAME.json) against the pinned build (OLD).
-# Output: build/emu/films-max/NAME/ (ignored by git). Needs both .BIN files (epm2mod make) and tools/emu/setup.sh.
+# Output: build/emu/films-max/NAME/ (ignored by git). Needs both .BIN files (epm2mod make) and emulator/setup.sh.
 #   1 screens   every list of looks, English: live control strip (P and movie), Picture Mode list, Picture Mode
 #               Settings, ART list, ART BKT list            -> NAME/new/*.png, NAME/pinned/*.png
 #   2 stored    a look chosen on OLD (12 entries in P, 12 in ART mode), the state then loaded by NEW: the screen
@@ -9,14 +9,14 @@
 #               Mode value is printed (state byte 51880 of the mode bank)
 #   4 languages the Picture Mode and ART lists in English, German, Japanese, French -> NAME/lang/
 #   5 crawl     shallow menu crawl in P, ART and movie mode, NEW against OLD -> NAME/crawlcmp-*/
-cd ${0:A:h}/../../.. && . tools/emu/boot/env.sh
+cd ${0:A:h}/../../.. && . emulator/boot/env.sh
 export E101_RTC=${E101_RTC:-2026-11-14T12:00:00}
 new=$1; old=${2:-builds/peaking-fast.json}; name=${new:t:r}
 S=experiments/2026-11-15-films-contiguous/scripts
 O=build/emu/films-max/$name; mkdir -p $O/state $O/stored $O/chosen
 export EMU_OUT=$PWD/$O/out EMU_STATE=$PWD/$O/state
 dold=$(blocks $old) || exit 3; dnew=$(blocks $new) || exit 3
-for m in p art movie; do [[ -f $O/state/pinned-$m.json ]] || tools/emu/mkstate $old $O/state/pinned-$m.json $m; done
+for m in p art movie; do [[ -f $O/state/pinned-$m.json ]] || emulator/mkstate $old $O/state/pinned-$m.json $m; done
 rep() { local o=(); repeat $1 o+=($2); print -r -- $o }
 strip() { local s="shot:$1-00"; for n in {1..$2}; do s+=" key:RIGHT shot:$1-$(printf %02d $n)"; done; print -r -- $s }
 
@@ -71,11 +71,11 @@ grep -L "^done at" $O/chosen/*.out | sed 's/^/RUN FAILED: /'
 python3 ${0:A:h}/stored_values.py $O/chosen
 
 echo "== 4 languages"
-tools/emu/boot/lang-all.sh $new enu deu jpn fra > $O/lang.log 2>&1
-python3 tools/emu/boot/sheets.py $O/out/lang-all/$name $O/lang >> $O/lang.log 2>&1; tail -2 $O/lang.log
+emulator/boot/lang-all.sh $new enu deu jpn fra > $O/lang.log 2>&1
+python3 emulator/boot/sheets.py $O/out/lang-all/$name $O/lang >> $O/lang.log 2>&1; tail -2 $O/lang.log
 
 echo "== 5 crawl"
 for c in p-nocard-shallow art-nocard-shallow movie-nocard-shallow; do
-  tools/emu/boot/crawl-all.sh $c $old $new > $O/crawl-$c.log 2>&1
-  python3 tools/emu/boot/crawlcmp.py $O/out/crawl/$c/${old:t:r} $O/out/crawl/$c/$name $O/crawlcmp-$c | tail -4
+  emulator/boot/crawl-all.sh $c $old $new > $O/crawl-$c.log 2>&1
+  python3 emulator/boot/crawlcmp.py $O/out/crawl/$c/${old:t:r} $O/out/crawl/$c/$name $O/crawlcmp-$c | tail -4
 done

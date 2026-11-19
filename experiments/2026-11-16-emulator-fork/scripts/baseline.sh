@@ -4,7 +4,7 @@ set -u
 OUT=$1; mkdir -p $OUT
 R=${EPM2_REPO:-$(cd "$(dirname "$0")/../../.." && pwd)}
 cd $R
-ER=$R/tools/emu/emu-run
+ER=$R/emulator/emu-run
 # 1. boot reports (raw, not normalised)
 $ER stock stage2-boot.mjs 2000 > $OUT/boot-stock.txt 2>&1; echo "boot-stock exit $?" >> $OUT/exits.txt
 $ER builds/films-12.json stage2-boot.mjs 2000 > $OUT/boot-films12.txt 2>&1; echo "boot-films12 exit $?" >> $OUT/exits.txt

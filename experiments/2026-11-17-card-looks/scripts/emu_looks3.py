@@ -3,7 +3,7 @@
     uv run python experiments/2026-11-17-card-looks/scripts/emu_looks3.py
 
 Needs build/card-looks-3.BIN, the files that mkspec_looks3.py writes into build/card-looks/ and the settings state
-build/emu/state/card-looks-3-p.json (tools/emu/mkstate builds/card-looks-3.json ... p). Sessions share the
+build/emu/state/card-looks-3-p.json (emulator/mkstate builds/card-looks-3.json ... p). Sessions share the
 camera's flash. Each dump is compared with the model: the slot tables, the live (member-0) tables and the records
 that point at them, the names of the 12 entries in the loaded language, the row's texts and its status.
 
@@ -150,7 +150,7 @@ def main():
             env["E101_CARD"] = folder
         else:
             env.pop("E101_CARD", None)
-        out = subprocess.run([os.path.join(ROOT, "tools/emu/emu-run"), BUILD, os.path.join(HERE, "emu_looks.mjs"),
+        out = subprocess.run([os.path.join(ROOT, "emulator/emu-run"), BUILD, os.path.join(HERE, "emu_looks.mjs"),
                               *steps], cwd=ROOT, env=env, capture_output=True, text=True)
         lines = [json.loads(l) for l in out.stdout.splitlines() if l.startswith("{")]
         if out.returncode:

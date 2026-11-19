@@ -1,4 +1,4 @@
-"""Scenario tests of the build peaking-fast (NOTES.md section 17). Uses tools/emu.
+"""Scenario tests of the build peaking-fast (NOTES.md section 17). Uses emulator.
 
     python3 scen_fast.py SCENARIO BASE_BLOCK0 PINNED_BLOCK0 FAST_BLOCK0 [PNG_DIR]
     python3 scen_fast.py s18 FAST_BLOCK0 DEBUG_FAST_BLOCK0
@@ -34,7 +34,7 @@ S18  The timing probe of the build debug-log-peaking-fast (spec log-peaking-time
 import os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
-sys.path.insert(0, os.path.join(ROOT, "tools", "emu"))
+sys.path.insert(0, os.path.join(ROOT, "emulator"))
 from scenario import Scenario  # noqa: E402
 
 # scen_colours.py runs its main() when it is imported. Take its helpers without that last line.

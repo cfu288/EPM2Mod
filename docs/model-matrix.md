@@ -4,8 +4,8 @@ Written 2026-11-18. Labels: **V** = read in firmware or measured, **X** = stated
 **I** = inferred, **?** = unknown.
 
 Sources:
-- `third_party/om-emu/docs/model-survey.md`: 32 firmware files from OM's update server, E100 to E148.
-- `third_party/om-emu/docs/a53-spec.md`: the second processors.
+- `emulator/om-emu/docs/model-survey.md`: 32 firmware files from OM's update server, E100 to E148.
+- `emulator/om-emu/docs/a53-spec.md`: the second processors.
 - `experiments/2026-11-15-feature-survey/mods-and-web.md`: other mods, sweep of 2026-11-15.
 - `experiments/2026-11-11-caduceus-review/05-imaging-pipeline-and-limits.md`: limits of the E-PM2 pipeline.
 

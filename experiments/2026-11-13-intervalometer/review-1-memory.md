@@ -3,7 +3,7 @@
 Scope: only the memory assumptions (load, references, execution, `.data`, flash layout, second core). Code logic of the caves and the menu wiring is not reviewed here.
 
 - **Labels:** **V** = read in the bytes of stock block 0 or of a scratch-built patched block 0. **I** = inferred.
-- **Method:** patched image built with `tools/emu/patchblock.py` into the scratch folder only. Nothing was written under `build/`. No flash, no commit.
+- **Method:** patched image built with `emulator/patchblock.py` into the scratch folder only. Nothing was written under `build/`. No flash, no commit.
 - **Result:** no blocker found. Three residual risks are listed in §7. None of them is a brick risk by itself.
 
 ## 0. Facts used by all points (V)

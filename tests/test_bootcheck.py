@@ -1,10 +1,10 @@
-"""The comparison rule of tools/emu/boot-test, on made-up reports. No emulator is needed."""
+"""The comparison rule of emulator/boot-test, on made-up reports. No emulator is needed."""
 
 import sys
 import unittest
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools" / "emu"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "emulator"))
 import bootcheck  # noqa: E402
 
 REPORT = """stop: {"why":"labtime","pc":2118424173} | lab ms 2000.1 | wall ms 2897 | insns cpu0 30661113 cpu1 2764094

@@ -50,3 +50,6 @@ jobs:
       - run: tools/setup.sh --binutils
       - run: uv run epm2mod fetch-stock
       - run: gen/run.sh --check
+      # the free-space check of the pinned build's specs (make skips it for a camera-tested build); it needs the map
+      - run: uv run python tools/fwmap.py build
+      - run: uv run python tools/freespace.py check $(uv run python -c 'import json; print(" ".join(json.load(open(json.load(open("pinned-build.json"))["build"]))["specs"]))')

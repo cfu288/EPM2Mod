@@ -1075,11 +1075,11 @@ class MakeTests(RepoCase):
         self.assertEqual([p.name for p in elsewhere.iterdir()], ["keep.txt"])
 
     def emulator_check(self, name: str, status: int) -> None:
-        """Install a stand-in for tools/emu/NAME that exits with ``status``."""
+        """Install a stand-in for emulator/NAME that exits with ``status``."""
         script = (
             f"import sys\nprint('{name}: stand-in', sys.argv[1])\nsys.exit({status})\n"
         )
-        self.repo.write(f"tools/emu/{name}", script.encode())
+        self.repo.write(f"emulator/{name}", script.encode())
 
     def test_a_candidate_is_started_in_the_emulator(self) -> None:
         self.repo.free_space_tool(0)

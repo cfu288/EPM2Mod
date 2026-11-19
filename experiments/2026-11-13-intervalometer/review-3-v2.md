@@ -3,7 +3,7 @@
 Adversarial review before a camera flash. Read-only: nothing was built under `build/`, `tools/build.py` was not run, no flash, no commit.
 
 - **Labels:** **V** = read in the bytes / disassembly or run by me. **I** = inferred.
-- **Images (scratch, `tools/emu/patchblock.py`):**
+- **Images (scratch, `emulator/patchblock.py`):**
   - stock block 0, sha256 `1b7c4bb1…71468d`;
   - films = remap7b-code + seven-fixes-1 + seven-movie-1 + seven-structure-extra + seven-films-5 + xp-adaptive-hue-off + seven-labels (the `seven-films-6` list in README.md step 3 and in the last row of docs/camera-log.md), `00d4f31f…380398`;
   - films + v2, `8992f2c2…693d28ec` (the same hash with v2 applied first);
@@ -25,7 +25,7 @@ Adversarial review before a camera flash. Read-only: nothing was built under `bu
 - **Optional fix:** use 0x602BE874 in the four trampolines (4 imm32 changes). The .data initial value there is also 0. This is not needed for the first flash.
 
 ### N2. NOTE: stale text
-- `tools/emu/cases.py`, case `ivl_selector`: the description still says "patched: jmp to T2 0x7F033E40". v2 uses 0x7ECB0DC8.
+- `emulator/cases.py`, case `ivl_selector`: the description still says "patched: jmp to T2 0x7F033E40". v2 uses 0x7ECB0DC8.
 - The spec has no `expected_sha256` (correct until a camera test).
 - The op at 0x7ECB0BA0 starts 4 bytes before the table (4 context bytes of 0xFF). The description's range 0x7ECB0BA4–0x7ECB0EE2 is the content range. Both are correct.
 

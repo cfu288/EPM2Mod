@@ -1,4 +1,4 @@
-"""All six colour stages for every art code that a menu entry can produce. Uses tools/emu (function harness).
+"""All six colour stages for every art code that a menu entry can produce. Uses emulator (function harness).
 
     .venv/bin/python experiments/2026-11-16-films-max/scripts/stage_check.py build/NAME.BIN [--base build/peaking-fast.BIN]
                                                                              [--stock-entries N ...] [--json OUT]
@@ -49,7 +49,7 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(ROOT / "tools" / "emu"))
+sys.path.insert(0, str(ROOT / "emulator"))
 sys.path.insert(0, str(ROOT / "src"))
 
 import numpy as np  # noqa: E402

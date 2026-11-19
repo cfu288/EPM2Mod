@@ -1,14 +1,14 @@
-// emu_looks.mjs STEP...: the card-looks build in the boot lab (run by emu_looks.py through tools/emu/emu-run).
+// emu_looks.mjs STEP...: the card-looks build in the boot lab (run by emu_looks.py through emulator/emu-run).
 // Steps: w:MS, key:NAME[:MS], dump:NAME, shot:NAME (a screenshot into $SHOTS). A dump prints one JSON line: the bytes of every span of $SPANS (the slot
 // tables, in order), the store's first 32 bytes, the flags, and what the task did so far.
 // Env: as play.mjs (E101_STATE, E101_CARD, E101_RTC); SPANS = a JSON file [[address, length], ...]; SYMS = a JSON
 // file of the build's labels (T_TASK, T_STORED, V_BAD, T_END, SAVE, FLAGS, STORE).
 import fs from 'node:fs';
 import { createHash } from 'node:crypto';
-import { createBoot } from '../../../tools/emu/e101/boot.mjs';
-import { KEYS, press, release } from '../../../tools/emu/e101/keys.mjs';
-import { screenshot } from '../../../tools/emu/e101/screen.mjs';
-import { R, PC, SP, PSW, D0, h8 } from '../../../tools/emu/e101/machine.mjs';
+import { createBoot } from '../../../emulator/e101/boot.mjs';
+import { KEYS, press, release } from '../../../emulator/e101/keys.mjs';
+import { screenshot } from '../../../emulator/e101/screen.mjs';
+import { R, PC, SP, PSW, D0, h8 } from '../../../emulator/e101/machine.mjs';
 
 const spans = JSON.parse(fs.readFileSync(process.env.SPANS, 'utf8'));
 const sym = JSON.parse(fs.readFileSync(process.env.SYMS, 'utf8'));

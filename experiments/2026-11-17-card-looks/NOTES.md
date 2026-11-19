@@ -22,7 +22,7 @@ Result: handle returned, 512 bytes read, equal to the file's first 512 bytes, fc
 time; FILECLBK took 0x10001, 0x10005, 0x10002; no error-log entry, no refused MMIO access; MENU works
 after it; the card is unchanged.
 
-    OM_EMU_MODEL=E101 OM_EMU=$PWD/third_party/om-emu BIN=firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN \
+    OM_EMU_MODEL=E101 OM_EMU=$PWD/emulator/om-emu BIN=firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN \
       CARD=/tmp/scratch/card PROBE=/tmp/scratch/probe.bin node experiments/2026-11-17-card-looks/scripts/run.mjs
 
 (probe.bin: `mn10300-elf-as probe.s`, `ld -Ttext=0x13000 --defsym FOPEN=0x7e5c52dc --defsym
@@ -41,7 +41,7 @@ the camera-tested home of the log's file writes), when the GUI enters a menu, pl
 
 sha256 `1297f288a69138d7b10fab1f37553a65fea82d2013ecc141445e194528689cab`. Checks: free space PASS, op check 0
 FAIL, load order: the one allowed failure of the base build only, boot-test PASS, update-path-test PASS.
-Emulator (`tools/emu/emu-run builds/debug-log-card-read.json logplay.mjs ...`, MENU, MENU, PLAY), decoded with
+Emulator (`emulator/emu-run builds/debug-log-card-read.json logplay.mjs ...`, MENU, MENU, PLAY), decoded with
 `epm2mod log`:
 
 | Card | card_read | After it |

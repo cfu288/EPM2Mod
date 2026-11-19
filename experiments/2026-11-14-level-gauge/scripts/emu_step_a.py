@@ -1,4 +1,4 @@
-"""Emulator check of step A (tools/emu driver, single function).
+"""Emulator check of step A (emulator driver, single function).
 
 Runs the stock sub-item list builder (E-PM2 0x7EDE2192, E-PL6 0x7EDE2F8F; a0 = panel object with the
 panel number at +3296, a1 = output list) for a few panels on several block-0 images and prints the list
@@ -10,7 +10,7 @@ Usage: emu_step_a.py NAME=BLOCK0 [NAME=BLOCK0 ...]   (a name that starts with "p
 """
 import os, struct, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-sys.path.insert(0, os.path.join(ROOT, "tools", "emu"))
+sys.path.insert(0, os.path.join(ROOT, "emulator"))
 from omemu import Emu  # noqa: E402
 
 BASE = 0x7E421020

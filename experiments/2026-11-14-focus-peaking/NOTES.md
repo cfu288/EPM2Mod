@@ -353,7 +353,7 @@ Unknowns and the probe for each:
 
 Note for tool users: `tools/disasm.py --fw FILE.BIN` writes a block cache under `build/blocks/`.
 During this work that made one stray file there, which was removed again. Use
-`tools/emu/patchblock.py … -o /tmp/scratch/x.block0.bin` for patched blocks instead.
+`emulator/patchblock.py … -o /tmp/scratch/x.block0.bin` for patched blocks instead.
 
 ## 11. Direct build (asked for as "8. Direct build"; the number 8 is taken above)
 
@@ -495,7 +495,7 @@ with `ucExpose` 3; the frame rate.
 |---|---|
 | `specs/peaking-direct-1.json` | the spec |
 | `scripts/mkspec_direct.py` | writes the spec: `python3 scripts/mkspec_direct.py specs/peaking-direct-1.json /tmp/scratch/asm results/direct-new-code.txt` (needs the mn10300 `as` and `ld`) |
-| `scripts/emu_direct.py` | emulator check: `emu_direct.py BASE_BLOCK0 PATCHED_BLOCK0 NAME` (blocks from `tools/emu/patchblock.py … -o /tmp/scratch/x.block0.bin`) |
+| `scripts/emu_direct.py` | emulator check: `emu_direct.py BASE_BLOCK0 PATCHED_BLOCK0 NAME` (blocks from `emulator/patchblock.py … -o /tmp/scratch/x.block0.bin`) |
 | `scripts/hooksites.py`, `scripts/ramflag_check.py` | hook listing before and after; RAM evidence |
 | `results/direct-*.txt`, `results/emu-direct-*.txt`, `results/ram-flag-evidence.txt` | outputs |
 
@@ -687,7 +687,7 @@ before the stock chooser picks the mode for a capture.
 | `python3 tools/freespace.py check` (ten + this) `--first-code` | as the tool is today: 18 PASS, **4 FAIL**, all four "overlaps ledgered spec patches/peaking-direct-1.json". direct-2 reuses direct-1's bytes, and `patches/peaking-direct-1.json` still counts as a current spec. With direct-1 listed as superseded (scratch copy of `docs/space-superseded.tsv`, the file itself was not changed): **22 PASS, 0 FAIL**; ops 0–2 USABLE-CODE, op 3 accepted by `--first-code` (the ledger does not know yet that code ran at 0x7EBF1F00). `results/direct2-freespace-check.txt` |
 | objdump | `results/direct2-new-code.txt`, `results/direct2-hook-sites.txt` (16 sites, before and after) |
 | emulator `scripts/emu_direct2.py`, stock pair and pinned pair | PASS on both, 14 cases, 1,531 rows. Flag clear: patched = base in every row. Flag set: the model's values. ON: R = 1 from R = 0, 1 and 0xEE with the same registers as the base and L, L2 untouched (a second start while set changes nothing). OFF: R = 0. A: the word 0x602B0DA8 has no effect. M (whole chooser, 192 rows): base modes 0, 1 and 2 all occur; flag set and state 1–3 → mode 1; every other row → the base's mode. `results/emu-direct2-*.txt` |
-| `build/blocks/` | unchanged (patched blocks were written to scratch with `tools/emu/patchblock.py`) |
+| `build/blocks/` | unchanged (patched blocks were written to scratch with `emulator/patchblock.py`) |
 
 Before a build: move or list `patches/peaking-direct-1.json` as superseded (main session; `patches/` and `docs/`
 were not touched here), copy the spec to `patches/`, and use the ten pinned specs + this one.
@@ -751,8 +751,8 @@ Labels: **V** verified (ran in the emulator or read from the bytes), **I** infer
 
 ### 13.1 The method
 
-`tools/emu` can now run whole call chains (`tools/emu/README.md`, "Scenario runs"). The live-view rig
-`tools/emu/liveview.py` runs as real firmware code: the static constructors of segments 1 to 3, 12 module init
+`emulator` can now run whole call chains (`emulator/README.md`, "Scenario runs"). The live-view rig
+`emulator/liveview.py` runs as real firmware code: the static constructors of segments 1 to 3, 12 module init
 functions, and the task bodies MOV_TASK, MOV_SUB_TASK, MOVART_TASK, ART, ART_IMG_CM, ART_IMG_CS, ART_IMG_CF,
 MOVDISP_TASK, MOVCOLOR, MOVCOLOR_SUB from their entries. RAM starts with the firmware's `.data`. One frame event
 runs the mov task loop 0x7E6C33B5 → struct refresh 0x7E6ECCAF → `mov_image_process` 0x7E6C6853 → expose setter →
@@ -773,7 +773,7 @@ pinned + direct-1, pinned + direct-2, pinned + direct-3.
 
 | Scenario | pinned | direct-1 | direct-2 | direct-3 |
 |---|---|---|---|---|
-| **S0** boot order of the hooks (`tools/emu/hookcheck.py`, static) | 1 FAIL: `remap7b-code` hook 0x7E56C6A5 (segment 1) → 0x7ECB08CD (segment 2). Camera-tested and boots; the hooked code runs only when a picture is developed (**I**) | not run | **14 FAIL** of 47: every segment-1 hook jumps to segment 2, and T_G (segment 1) calls `getL` in segment 2 | **0 FAIL** of 47 |
+| **S0** boot order of the hooks (`emulator/hookcheck.py`, static) | 1 FAIL: `remap7b-code` hook 0x7E56C6A5 (segment 1) → 0x7ECB08CD (segment 2). Camera-tested and boots; the hooked code runs only when a picture is developed (**I**) | not run | **14 FAIL** of 47: every segment-1 hook jumps to segment 2, and T_G (segment 1) calls `getL` in segment 2 | **0 FAIL** of 47 |
 | **S1** request clear, Natural and Key Line, 3 frames each | reference | not run | same RAM writes (apart from L and L2, written 0), same device writes in the same order, no stock pc lost outside the hook sites, no stock pc gained | the same |
 | **S2** Natural, request set, art type 1 | picture in every frame | **no picture in any frame**: heap mode 0 → check 0x7E6CADD8 refuses → free all → `art_buff alloc error` → return 1; `mov_art_exec_init` and an ART round trip in every frame | picture in every frame: heap mode 1, 4 buffers granted, line job, passes 1, 7, 8, 9, 10; pass 9 `usGain2` 0x0100, pass 7 `ucExpose` 3 (pinned Key Line: 0xFF00 and 163) | as direct-2 |
 | **S2** the same with art type 0 | – | no picture (same fault) | **no picture in any frame** (new defect, §13.3) | picture in every frame |
@@ -831,7 +831,7 @@ How much of the real path ran:
 | `uv run epm2mod apply specs/peaking-direct-3.json -o /tmp/scratch/a.BIN` | applies on stock, 567 bytes differ, sha256 `689d8b1680c902eded99acd08e29a0a93f4a02979a2aa6bdabc7ff6717ef1d5b` |
 | the same after the ten pinned specs | applies, sha256 `5330c0b80149aabbaaf578dbed6cc6592929f4e2b2f914005593a30262c4c325` (the ten alone: `3e7f793e…`) |
 | `python3 tools/freespace.py check` (ten + this) `--first-code` | 24 PASS, 0 FAIL (`results/direct3-freespace-check.txt`); the three code areas are "first code" |
-| `python3 tools/emu/hookcheck.py specs/peaking-direct-3.json` | 47 transfers, 0 FAIL (`results/direct3-s0-hookcheck.txt`) |
+| `python3 emulator/hookcheck.py specs/peaking-direct-3.json` | 47 transfers, 0 FAIL (`results/direct3-s0-hookcheck.txt`) |
 | Boot from reset in the other session's om-emu copy (`stage2-boot.mjs 2000`, used read-only) | pinned + direct-3: STAGE 2: PASS, the same summary as pinned |
 | S1 to S5 | table above |
 | `scripts/emu_direct2.py` single-function cases | not re-run on direct-3 (the routines are direct-2's text at new addresses; S1 and S2 run all of them but T_F's CLIP branch and T_H's a2 = 0 row) |
@@ -850,7 +850,7 @@ How much of the real path ran:
 
 - A stray `pkill` of this session ended every `debug.mjs --serve` process of the machine once (about 16:50). Another
   session's emulator run may have stopped then.
-- om-emu was not changed. Requests for it are listed in `tools/emu/README.md`.
+- om-emu was not changed. Requests for it are listed in `emulator/README.md`.
 
 ## 14. The crash at Velvia (ART 7) on direct-3, and direct-4
 
@@ -912,7 +912,7 @@ or hang when the camera goes to sleep (**I**: that `sleepForSystem` is the Sleep
 | The 16 hooks, the three RAM bytes and the text of every routine are direct-3's. Calls of `getL` are shorter because it is near | – |
 | Base: the pinned build with `level-adjust-row` | – |
 
-New static check `tools/emu/opcheck.py BUILD.json`: (1) a byte that an earlier spec covers and keeps, changed by a later
+New static check `emulator/opcheck.py BUILD.json`: (1) a byte that an earlier spec covers and keeps, changed by a later
 spec; (2) a call from the SRAM code into an op. direct-3: 7 FAIL (the byte at 0x7E880FE4, four context bytes of
 `interval-frames-240` at 0x7EBF1F00, the two SRAM calls). Pinned and direct-4: 0 FAIL.
 
@@ -923,8 +923,8 @@ spec; (2) a call from the SRAM code into an op. direct-3: 7 FAIL (the byte at 0x
 | `.venv/bin/epm2mod make builds/peaking-direct-4.json` | sha256 `eea187a958de410bca0448367408998099fde177548d0b9010baf510a3452482`; free-space check PASS (first code) |
 | `.venv/bin/epm2mod make` (pinned) | `e93d1589…7b66`, as tested |
 | `tools/freespace.py check` (12 specs) `--first-code` | PASS, 0 FAIL (`results/direct4-freespace-check.txt`) |
-| `tools/emu/hookcheck.py patches/peaking-direct-4.json` | 37 transfers, 0 FAIL (`results/direct4-s0-hookcheck.txt`) |
-| `tools/emu/opcheck.py` | direct-4 0 FAIL, direct-3 7 FAIL (`results/direct4-opcheck.txt`, `direct3-opcheck.txt`) |
+| `emulator/hookcheck.py patches/peaking-direct-4.json` | 37 transfers, 0 FAIL (`results/direct4-s0-hookcheck.txt`) |
+| `emulator/opcheck.py` | direct-4 0 FAIL, direct-3 7 FAIL (`results/direct4-opcheck.txt`, `direct3-opcheck.txt`) |
 | Boot from reset, `stage2-boot.mjs 2000` | STAGE 2: PASS; the summary equals pinned line for line except wall time and idle counts. T_M and `getL` run at 0x7E4C9340 / 0x7E4C9200 at 16.4 ms (boot task, before segment 2 is loaded); the jump at 0x7E880FE0 reads `dc f8 c8 ce ff` |
 | Full-boot emulator, P mode, OK → Picture Mode strip → ART 6, 7, 8, 7, 6 | pinned, direct-3, direct-4: no fault, the strip shows "Velvia". Not a test of the fault (§14.2) |
 | S1 to S5 on direct-4 against the new pinned image | as direct-3 in §13.2: S1 same, S2 picture in every frame (art type 1 and 0), S3 no anomaly, S4 R = 0 at the end, S5 as pinned (`results/scen-direct4-s1.txt` … `s5.txt`) |
@@ -986,7 +986,7 @@ Go back: `epm2flash seven-films-6-interval-240-level-adjust e93d1589b3406ec991e3
 | `specs/peaking-direct-4-gain2.json` | the 2 × gain option |
 | `scripts/mkspec_direct4.py` | generator: `mkspec_direct4.py OUT.json /tmp/scratch/asm [LISTING.txt] [--gain N] [--name NAME]` |
 | `scripts/scen_direct4.py` | S6 and S7: `scen_direct4.py all PINNED_BLOCK0 direct-3=BLOCK0 direct-4=BLOCK0` |
-| `tools/emu/opcheck.py` | the two static checks of §14.4 |
+| `emulator/opcheck.py` | the two static checks of §14.4 |
 | `results/direct4-*.txt`, `results/direct3-opcheck.txt`, `results/scen-s6.txt`, `scen-s7.txt`, `scen-direct4-s*.txt` | outputs |
 
 ## 15. A menu setting for peaking: Off / White / Black (`peaking-menu`)
@@ -1056,8 +1056,8 @@ byte string of `peaking-gain-2x`. Generator: `scripts/mkspec_menu.py`.
 | Check | Result | Label |
 |---|---|---|
 | `.venv/bin/epm2mod make builds/peaking-menu.json` | sha256 `07f25fd8…ce58`; free-space check PASS, 0 FAIL, no `first_code` (`results/menu-freespace-check.txt`) | V |
-| `tools/emu/hookcheck.py` | this spec: 5 transfers, 0 FAIL. All 14 specs: 55 transfers, the 1 known FAIL (0x7E56C6A5, remap7b-code) | V |
-| `tools/emu/opcheck.py builds/peaking-menu.json` | 0 FAIL | V |
+| `emulator/hookcheck.py` | this spec: 5 transfers, 0 FAIL. All 14 specs: 55 transfers, the 1 known FAIL (0x7E56C6A5, remap7b-code) | V |
+| `emulator/opcheck.py builds/peaking-menu.json` | 0 FAIL | V |
 | Boot, `stage2-boot.mjs 2000` | PASS; the report equals the pinned build's except the wall time | V |
 | Menu crawl, P mode, card, clock set, every sub-screen (4,236 screens) against the crawl of `seven-films-6-interval-240-level-adjust` (the pinned build differs from it only in the peaking code; its block 1 is the same file) | outside the Custom Menu rows 1,875 screens, all byte-equal. Custom Menu rows as sets: 1,500 in both; 9 gone = page 2 of group A with 3 rows; 13 new = the same 9 with 4 rows, the cursor on Peaking, the list on Off, White, Black. Firmware error log and crawler notes equal (`results/menu-emu-crawl-p-card-full-vs-leveladj.txt`) | V |
 | The same full crawl of the pinned build itself | finished 2026-11-15: 4,250 screens against 4,236; other units 1,875 equal; Custom Menu 9 lost, 13 new, the same sets as above; error log and notes equal | V |
@@ -1194,8 +1194,8 @@ White (1500) and the row name (1505) are still English only.
 | Check | Result | Label |
 |---|---|---|
 | `.venv/bin/epm2mod make builds/peaking-colours.json` | sha256 `4d6b1f26…56f8`; free-space check PASS, 0 FAIL, no `first_code` (`results/colours-freespace-check.txt`) | V |
-| `tools/emu/opcheck.py builds/peaking-colours.json` | 16 specs, 0 FAIL | V |
-| `tools/emu/hookcheck.py` | this spec: 4 transfers, all kernel → kernel, 0 FAIL | V |
+| `emulator/opcheck.py builds/peaking-colours.json` | 16 specs, 0 FAIL | V |
+| `emulator/hookcheck.py` | this spec: 4 transfers, all kernel → kernel, 0 FAIL | V |
 | Boot, `stage2-boot.mjs 2000` | PASS; the report equals the pinned build's except the wall time (`results/colours-emu-boot.txt`) | V |
 | The list | Off, White, Red, Yellow, Blue; screens `~/opt/om-emu-e101-boot-work/peaking-colours/screens/01` … `09` | V |
 | Each value over a restart | Red, Yellow, Blue, Off, White: each is stored (tag 0x8971 = 2, 4, 5, 1, 3) and read back after a restart, in the tag and in the row (`results/colours-emu-persist.txt`). The emulator carries the bank's RAM image over in place of the power-off save | V for the load, I for the save |
@@ -1319,8 +1319,8 @@ block header; the log of the flashed `debug-log` still decodes with `logs/events
 | Check | Result | Label |
 |---|---|---|
 | `.venv/bin/epm2mod make` for both builds | the two sha256 above; free-space check PASS, 0 FAIL, load order 0 FAIL (`results/fast-freespace-check.txt`) | V |
-| `tools/emu/opcheck.py` | 17 and 20 specs, 0 FAIL (`results/fast-opcheck.txt`) | V |
-| `tools/emu/hookcheck.py` | `peaking-fast` 5 transfers, `log-peaking-time` 6 transfers, all between the kernel range and segment 1, 0 FAIL (`results/fast-s0-hookcheck.txt`) | V |
+| `emulator/opcheck.py` | 17 and 20 specs, 0 FAIL (`results/fast-opcheck.txt`) | V |
+| `emulator/hookcheck.py` | `peaking-fast` 5 transfers, `log-peaking-time` 6 transfers, all between the kernel range and segment 1, 0 FAIL (`results/fast-s0-hookcheck.txt`) | V |
 | Boot, `stage2-boot.mjs 2000` | PASS. `peaking-fast` = pinned and `debug-log-peaking-fast` = `debug-log` but the wall time (`results/fast-emu-boot.txt`). The boot does not run pass 9 | V |
 | **S12** Red, Yellow, Blue on the synthetic frame (`scripts/scen_fast.py`) | every one of the 307,200 pixels equals the block model; the line image is not changed; `usGain2` 0; registers kept. Pinned colours 9,360 pixels, fast 10,800; 1,560 pixels differ (60 coloured only by pinned, 1,500 only by fast). Pictures: `~/opt/om-emu-e101-boot-work/peaking-fast/frames/` | V |
 | Instructions from hook K to the next stock instruction | no lines: 849,172 → 309,923. Synthetic frame: 940,434 → 330,175. White: 19 → 19 | V |
@@ -1525,8 +1525,8 @@ Generator: `mkspec_log.py --peaking-guard`.
 |---|---|---|
 | `epm2mod make` (see the note below the table) for the four builds | all five steps pass: free-space check 0 FAIL, boot-test PASS, update-path-test PASS. sha256: `peaking-fast-2` `8d036edbef0479141735e7e51f741a7a9bfdf3b50ab4d9fa9ea5dfd2dddb592e`, `debug-log-peaking-fast-2` `b5186a7862ecdc5800802a6f7f4c47a2352c1f7c1017c6bf3807c8ed352960e5`, `films-12b` `bd919569f905c24617413431c94e2c7d641ff3ae80ba2534328ec10648b55c56`, `debug-log-films-12b` `df315408eedfc082c72a24e2e3bc6132538fba9d8a6a4aae4cd143415cf1002c` | V |
 | `.venv/bin/epm2mod make` (pinned), run last | `0e8a25b9578b8119b14b4895be7d2a0b70d7315e5e817758699777f0f31d917e`, the tested build; `build/card` holds it | V |
-| `tools/emu/opcheck.py`, four builds | 18, 22, 25 and 29 specs, 0 FAIL | V |
-| `tools/emu/hookcheck.py` on the two new specs | 9 transfers, 0 FAIL: the guard kernel → kernel, the probe segment 2 → segment 2 and → kernel | V |
+| `emulator/opcheck.py`, four builds | 18, 22, 25 and 29 specs, 0 FAIL | V |
+| `emulator/hookcheck.py` on the two new specs | 9 transfers, 0 FAIL: the guard kernel → kernel, the probe segment 2 → segment 2 and → kernel | V |
 | **S19** MF Assist during a development | `peaking-fast` FAIL; the four new builds PASS (§18.4) | V |
 | **S20** a capture while the lines show; then the request still set when live view is back | (a) passes on all images. (b) `peaking-fast` FAIL (as S19); new builds PASS | V |
 | **S21** MF Assist ends, another owner has a block in the pool of mode 1 | `peaking-fast` FAIL: re-divided under the block, the owner's next block refused. New builds PASS: mode 1 kept, the second block given, mode 2 at the next chooser call after the frees, lines again | V |

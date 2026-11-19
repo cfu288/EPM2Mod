@@ -1,8 +1,8 @@
 // pmread.mjs STEP...: prints the value of each firmware read of the stored Picture Mode (prm tag 0x9481) after the
 // boot, so a session can show which value the camera holds. Steps: w:MS, key:NAME.
-import { createBoot } from '../../../tools/emu/e101/boot.mjs';
-import { KEYS, press, release } from '../../../tools/emu/e101/keys.mjs';
-import { R, PC, SP, PSW } from '../../../tools/emu/e101/machine.mjs';
+import { createBoot } from '../../../emulator/e101/boot.mjs';
+import { KEYS, press, release } from '../../../emulator/e101/keys.mjs';
+import { R, PC, SP, PSW } from '../../../emulator/e101/machine.mjs';
 const e = createBoot({ blocksDir: process.env.BLOCKS });
 R[PC] = 0x7E421020 | 0; R[SP] = 0x47001FFC | 0; R[PSW] = 0;
 const ms = () => Number((e.m.devices.clock.t / 1e6).toFixed(1));

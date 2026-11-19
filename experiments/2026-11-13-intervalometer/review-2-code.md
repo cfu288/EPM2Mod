@@ -1,6 +1,6 @@
 # Review 2 (code): `interval-timelapse-insert-awake.json` (2026-11-13)
 
-Adversarial review of the 47-op spec before a camera flash. Nothing was built under `build/`; the patched block 0 was made in scratch with `tools/emu/patchblock.py` (sha256 `92d5e152…fc4b7205`, 818 bytes changed in 73 runs).
+Adversarial review of the 47-op spec before a camera flash. Nothing was built under `build/`; the patched block 0 was made in scratch with `emulator/patchblock.py` (sha256 `92d5e152…fc4b7205`, 818 bytes changed in 73 runs).
 
 - **Labels:** **V** = read in the bytes / disassembly or run by me; **I** = inferred.
 - **Addresses:** E-PM2 v1.6 runtime (0x7E421020 + block-0 offset) unless the E-PL6 1.4 is named.

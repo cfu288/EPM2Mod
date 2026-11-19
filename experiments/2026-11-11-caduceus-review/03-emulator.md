@@ -166,7 +166,7 @@ A port of E101 would also serve E100 and E112, which have the same base and near
   - caduceus-ep7: every patch has an emulator test that runs the real code patched against stock and checks that only
     the intended values change; every package must decode to exactly the emulated image [X: caduceus-ep7/README.md:316-318].
   - caduceus-om3: drives full om-emu E147 play sessions by importing `Player` with its patched image, pressing keys and
-    reading memory [X: caduceus-om3/tools/emulator/session_ed1.mjs:1-30; README.md:132, 153]. That works because E147 is
+    reading memory [X: caduceus-om3/emulatorlator/session_ed1.mjs:1-30; README.md:132, 153]. That works because E147 is
     a ported body.
 - **Lesson from oly_fw_analysis.** A misaligned structure passed their simulator but restarted the camera
   [X: EMULATOR.md:109-114]. om-emu's alignment fault would have caught it [X: mn10300-isa-spec.md:129]. Passing an

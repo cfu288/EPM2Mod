@@ -2,9 +2,9 @@
 """Make a folder of unpacked blocks for the full-boot emulator: stock (or another unpacked folder) + prototype specs.
 
     python3 experiments/2026-11-17-auto-iso-min-shutter/scripts/mkimg.py OUTDIR SPEC.json [SPEC.json ...]
-    tools/emu/emu-run OUTDIR play.mjs ...
+    emulator/emu-run OUTDIR play.mjs ...
 
-Only `bytes` ops; each `expect` is checked. The source folder is `tools/emu/emu-run --blocks stock`
+Only `bytes` ops; each `expect` is checked. The source folder is `emulator/emu-run --blocks stock`
 (or the folder in the environment variable SRC_BLOCKS). Put OUTDIR in a scratch folder, not in the repository.
 """
 import glob, json, os, shutil, subprocess, sys
@@ -15,7 +15,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), 
 def main():
     out, specs = sys.argv[1], sys.argv[2:]
     src = os.environ.get("SRC_BLOCKS") or subprocess.check_output(
-        [sys.executable, os.path.join(ROOT, "tools/emu/emu-run"), "--blocks", "stock"], text=True).strip()
+        [sys.executable, os.path.join(ROOT, "emulator/emu-run"), "--blocks", "stock"], text=True).strip()
     if os.path.exists(out):
         shutil.rmtree(out)
     shutil.copytree(src, out)

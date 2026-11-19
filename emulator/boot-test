@@ -1,0 +1,9 @@
+#!/usr/bin/env python3
+"""boot-test IMAGE: see emulator/bootcheck.py and `boot-test --help`. Exit 0 pass, 1 fail, 2 usage, 3 not set up."""
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import bootcheck  # noqa: E402
+
+sys.exit(bootcheck.main(bootcheck.boot_test, sys.argv[1:]))

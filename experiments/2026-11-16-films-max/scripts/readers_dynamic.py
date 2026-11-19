@@ -4,16 +4,16 @@
 
 BLOCK0 is block 0 of the same build (for the live-view rig). OUTDIR is a scratch folder outside the repository.
 Needs results/readers.tsv (run readers.py first), the settings states of screens.sh
-(build/emu/films-max/NAME/state/pinned-{p,art,movie}.json) and the emulators (tools/emu/setup.sh).
+(build/emu/films-max/NAME/state/pinned-{p,art,movie}.json) and the emulators (emulator/setup.sh).
 
-1. Full boot (tools/emu/boot/play.mjs with scripts/watch_reads.mjs): read watchpoints on the stored Picture Mode
+1. Full boot (emulator/boot/play.mjs with scripts/watch_reads.mjs): read watchpoints on the stored Picture Mode
    and the ART mode code in the settings bank. Sessions: mode P live control strip over all 19 values with OK on
    a new entry, Shooting Menu 1 -> Picture Mode list with OK on a new entry, Picture Mode Settings, INFO and
    PLAY; ART mode: the ART list, OK on a new entry, the ART BKT list; movie mode: the strip with OK on a new
    entry. A reader = the first code address on the stack outside the settings store (0x7E455000-0x7E459000; only the two Picture Mode bytes are
    compared, the ART mode code bytes are several settings that the static list does not try to cover):
    the store reads the byte for every caller.
-2. Live-view rig (tools/emu/liveview.py): read watchpoints on the mov layer's bytes 0x605B1CD2 / 0x605B1CD3 /
+2. Live-view rig (emulator/liveview.py): read watchpoints on the mov layer's bytes 0x605B1CD2 / 0x605B1CD3 /
    0x605B091C / 0xA07507CC (both aliases); three frames for each of the twelve stored values and 119, then three
    with the MF Assist request. A reader = the pc of the reading instruction.
 3. Comparison. A static call site of readers.py (kind A) counts as executed if a stack of step 1 holds its
@@ -35,7 +35,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 HERE = Path(__file__).resolve().parent
 PEAKING = ROOT / "experiments" / "2026-11-14-focus-peaking" / "scripts"
-sys.path.insert(0, str(ROOT / "tools" / "emu"))
+sys.path.insert(0, str(ROOT / "emulator"))
 sys.path.insert(0, str(PEAKING))
 STORE = (0x7E455000, 0x7E459000)
 #: Where block 0 holds code (the rest is tables and text: a table address on the stack is not a caller).
@@ -73,7 +73,7 @@ def full_boot(build: str, out: Path, reuse: bool) -> dict[str, list[dict[str, ob
         if reuse and (out / f"reads-{session}.json").exists():
             run = None
         else:
-            run = subprocess.run([str(ROOT / "tools/emu/emu-run"), build, "play.mjs", str(out / "shots")] + steps, cwd=ROOT, env=env, capture_output=True, text=True)
+            run = subprocess.run([str(ROOT / "emulator/emu-run"), build, "play.mjs", str(out / "shots")] + steps, cwd=ROOT, env=env, capture_output=True, text=True)
         if run is not None and "done at" not in run.stdout:
             print(f"RUN FAILED {session}: {run.stdout[-300:]} {run.stderr[-300:]}")
         records = []

@@ -9,7 +9,7 @@
 #   fx    ART list -> the entry -> RIGHT -> Add Effects -> first effect -> OK   (the entry's effect setting)
 # The entry is found by its place in that build's list. cmp_state.py then compares the saved settings states.
 # Expected: every pair equal. Output: build/emu/films-contiguous/settings/{pinned,new}/OP-NAME.json and .png
-cd ${0:A:h}/../../.. && . tools/emu/boot/env.sh
+cd ${0:A:h}/../../.. && . emulator/boot/env.sh
 export E101_RTC=${E101_RTC:-2026-11-14T12:00:00}
 old=${1:-builds/peaking-fast.json}; new=${2:-builds/films-contiguous.json}
 pre=build/emu/films-contiguous/state/pinned

@@ -1,4 +1,4 @@
-# tools/emu: E-PM2 functions in om-emu, stock against patched
+# emulator: E-PM2 functions in om-emu, stock against patched
 
 This harness runs single E-PM2 v1.6 block-0 functions in [om-emu](https://github.com/flatpanda/om-emu)'s MN10300 machine. It runs each input row on stock block 0 and on a patched block 0, then compares the outputs. It follows the caduceus-ep7 contract: run the real code, patched against stock, and check that only the intended outputs change.
 
@@ -7,7 +7,7 @@ Labels: **V** = ran in the emulator and checked against an independent Python mo
 ## Setup
 
 - **Node 26:** `~/opt/node26/bin/node` (v26.13.1). The system node 22 is too old. Override it with `OM_EMU_NODE`.
-- **om-emu:** `~/opt/om-emu`, with the local E101 changes in `om-emu-E101.patch` (also kept at `~/opt/om-emu-E101.patch`). Override the path with `OM_EMU_DIR`. To set up a fresh copy: `cd ~/opt/om-emu && patch -p1 < .../tools/emu/om-emu-E101.patch`.
+- **om-emu:** `~/opt/om-emu`, with the local E101 changes in `om-emu-E101.patch` (also kept at `~/opt/om-emu-E101.patch`). Override the path with `OM_EMU_DIR`. To set up a fresh copy: `cd ~/opt/om-emu && patch -p1 < .../emulator/om-emu-E101.patch`.
 - **Stock block 0:** `build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin`. This is the descrambled OE payload, sha256 `1b7c4bb1…71468d`; the harness checks it.
 
 ### What the om-emu patch adds
@@ -43,13 +43,13 @@ om-emu refuses an unknown model. Its lab is written for the OM-1 (E143), so the 
 ## Usage
 
 ```sh
-python3 tools/emu/emurun.py list
-python3 tools/emu/emurun.py run rec_limit
-python3 tools/emu/emurun.py diff rec_limit \
-    --patch tools/emu/specs/rec-limit-3600.json
-python3 tools/emu/emurun.py diff curve_select \
+python3 emulator/emurun.py list
+python3 emulator/emurun.py run rec_limit
+python3 emulator/emurun.py diff rec_limit \
+    --patch emulator/specs/rec-limit-3600.json
+python3 emulator/emurun.py diff curve_select \
     --patch patches/film-portra.json --json /tmp/out.json
-python3 tools/emu/patchblock.py patches/film-portra-xp.json \
+python3 emulator/patchblock.py patches/film-portra-xp.json \
     -o /tmp/xp.block0.bin
 ```
 

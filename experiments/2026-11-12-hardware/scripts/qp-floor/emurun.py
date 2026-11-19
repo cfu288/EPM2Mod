@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Run a named E-PM2 function in om-emu on stock block 0 and on a patched block 0, and diff the outputs.
 
-    python3 tools/emu/emurun.py list
-    python3 tools/emu/emurun.py run  CASE [--image BLOCK0]               # one image; checks the Python model
-    python3 tools/emu/emurun.py diff CASE (--patch SPEC... | --image BLOCK0) [--json OUT]
+    python3 emulator/emurun.py list
+    python3 emulator/emurun.py run  CASE [--image BLOCK0]               # one image; checks the Python model
+    python3 emulator/emurun.py diff CASE (--patch SPEC... | --image BLOCK0) [--json OUT]
 
 diff runs every input row of CASE on both images and reports:
   - model: rows whose emulated output differs from the case's Python model (per image; the model reads the

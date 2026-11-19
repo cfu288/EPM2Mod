@@ -84,13 +84,13 @@ candidate `osd-battery` are kept.
   `experiments/2026-11-15-feature-survey/`. Cheap ones: video bitrate and time limit (patches
   written), Light Box (hidden in this firmware), Add Effects on film simulations, more film simulations.
 
-- The load-order check (`python3 tools/emu/hookcheck.py SPEC...`) reports seven failures in the pinned build, all
+- The load-order check (`python3 emulator/hookcheck.py SPEC...`) reports seven failures in the pinned build, all
   from `stock-films-structure`: hooks in segment 1, among them 0x7E56C6A5, that jump to code in segment 2. All
-  seven are in `tools/emu/hookcheck-allow.tsv`, and `python3 tools/freespace.py check` passes with them. For
+  seven are in `emulator/hookcheck-allow.tsv`, and `python3 tools/freespace.py check` passes with them. For
   0x7E56C6A5, the audit shows that the host function is reached only through the image-job table 0x7E789604, and
   it did not run before segment 2 was loaded on a normal start, a quick start and the update path. That is a test
   result, not a proof. A clean fix moves 219 bytes into a dead function of segment 1.
-- Emulator ([tools/emu/boot/README.md](../tools/emu/boot/README.md)), open points:
+- Emulator ([emulator/boot/README.md](../emulator/boot/README.md)), open points:
   - The row Time Lapse Settings is grey when the clock is not set. Start the emulator with
     `E101_RTC=2026-11-14T12:00:00`.
   - Not reached: the screens of a viewfinder, the super control panel. The live control

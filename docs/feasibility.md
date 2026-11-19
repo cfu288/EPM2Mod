@@ -153,32 +153,32 @@ showed a crash at start-up before anyone flashed it. On the camera that is a boo
 also break the update path, which is the only way back.
 
 Check every build that adds a hook with the boot test of the emulator before a flash:
-`tools/emu/boot-test builds/NAME.json` and `tools/emu/update-path-test builds/NAME.json`.
+`emulator/boot-test builds/NAME.json` and `emulator/update-path-test builds/NAME.json`.
 
 ## The emulator
 
 om-emu boots the E-PM2 firmware, stock or patched, from its reset vector on both cores. om-emu is
-the git submodule `third_party/om-emu`: our fork ([github.com/cfu288/om-emu](https://github.com/cfu288/om-emu),
+the git submodule `emulator/om-emu`: our fork ([github.com/cfu288/om-emu](https://github.com/cfu288/om-emu),
 branch `e101`, MIT licence) of upstream om-emu, with the E-PM2's boot lab added in upstream's layout
-(`emu/src/boot/`, `emu/bin/boot.mjs`). Set up once with `tools/emu/setup.sh`. How it works, the
+(`emu/src/boot/`, `emu/bin/boot.mjs`). Set up once with `emulator/setup.sh`. How it works, the
 stand-ins and the limits are in
-[third_party/om-emu/docs/e101-boot-spec.md](../third_party/om-emu/docs/e101-boot-spec.md); our checks
-and scripts in [tools/emu/boot/README.md](../tools/emu/boot/README.md). Upstream lists this camera
+[emulator/om-emu/docs/e101-boot-spec.md](../emulator/om-emu/docs/e101-boot-spec.md); our checks
+and scripts in [emulator/boot/README.md](../emulator/boot/README.md). Upstream lists this camera
 generation as "no work planned".
 
 IMAGE is `stock`, `builds/NAME.json` or a `.BIN` file. No firmware is in the repository.
 
 | Check | Command (from the repository root) | What it proves |
 |---|---|---|
-| Boot test | `tools/emu/boot-test IMAGE` | The image starts like stock: loader copies, both kernels, all tasks, the application. Exit status 0 = pass. It caught a build that would have crashed at every start |
-| Update path | `tools/emu/update-path-test IMAGE` | With OK held and an update file on the card, the image finds the file as stock does |
-| Menu screenshots | `tools/emu/emu-run IMAGE play.mjs OUTDIR STEP...` | The firmware's own menus, drawn by its own code, in English, as PNG files |
-| Screenshot comparison | `tools/emu/boot/shotdiff.sh IMAGE_A IMAGE_B OUTDIR STEP...` | Which screens a patch changes |
-| Menu crawl | `tools/emu/boot/crawl-all.sh CONFIG IMAGE...`, then `crawldiff.py` or `crawlcmp.py` | Every menu screen of two images, compared |
-| Card | `E101_CARD=FOLDER tools/emu/emu-run IMAGE play.mjs ...` | A FAT card from a host folder mounts; the stock file routines work |
+| Boot test | `emulator/boot-test IMAGE` | The image starts like stock: loader copies, both kernels, all tasks, the application. Exit status 0 = pass. It caught a build that would have crashed at every start |
+| Update path | `emulator/update-path-test IMAGE` | With OK held and an update file on the card, the image finds the file as stock does |
+| Menu screenshots | `emulator/emu-run IMAGE play.mjs OUTDIR STEP...` | The firmware's own menus, drawn by its own code, in English, as PNG files |
+| Screenshot comparison | `emulator/boot/shotdiff.sh IMAGE_A IMAGE_B OUTDIR STEP...` | Which screens a patch changes |
+| Menu crawl | `emulator/boot/crawl-all.sh CONFIG IMAGE...`, then `crawldiff.py` or `crawlcmp.py` | Every menu screen of two images, compared |
+| Card | `E101_CARD=FOLDER emulator/emu-run IMAGE play.mjs ...` | A FAT card from a host folder mounts; the stock file routines work |
 
-In this repository, `tools/emu/` has the scenario tests (whole call chains with real initial memory)
-and `tools/emu/hookcheck.py` (the load-order check).
+In this repository, `emulator/` has the scenario tests (whole call chains with real initial memory)
+and `emulator/hookcheck.py` (the load-order check).
 
 Trust it for: start-up, menus, lists, labels, the INFO screens, settings, card mount. Do not trust it
 for: live view, the picture, capture, movies, timing, anything the mechanism or the sensor does. A

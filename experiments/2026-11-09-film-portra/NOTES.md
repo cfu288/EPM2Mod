@@ -1237,7 +1237,7 @@ EXIF ColorMatrix as predicted for both. A vs B: RGB identical in 100 % of 2,194 
   the boot read's range); the hash reading above; behaviour of movie / live view with code 79.
 - A fourth film would need 3 tables (1.5 KB, all 8 variant pointers to one table per channel) in
   the 1.9 KB run, and a clean host entry, which is the harder part (§26.5, docs/art-filter-slots.md).
-- Test tooling: `tools/emu` (om-emu) could run the patched selector functions before a flash, but
+- Test tooling: `emulator` (om-emu) could run the patched selector functions before a flash, but
   om-emu and Node 26 are not installed on this machine.
 
 ### 29.4 Candidate films for a third slot (model-only fits, `fit_film.py`, 2026-11-12)
@@ -1287,7 +1287,7 @@ No black-and-white profiles exist in spektrafilm; the user chose to stay with co
 
 ### 30.1 `three-films-1` on the camera (2026-11-12): the new code works
 - Flashed by the user (the emulator cases `gamma_select` / `matrix_choice` were written in
-  `tools/emu/cases.py` but not run: no permission for those commands; `curve_select` self-check
+  `emulator/cases.py` but not run: no permission for those commands; `curve_select` self-check
   passed, 229 rows). Uploads PB120152–154 → `shots/mock2/{A_portra_xp10_3f1, A_ektachrome_lt3_3f1,
   A_pro400h_pa1}.JPG`.
 - **Portra and Ektachrome: RGB identical to the previous build in 100 % of 6,588 / 6,587 patches.**
@@ -1317,7 +1317,7 @@ No black-and-white profiles exist in spektrafilm; the user chose to stay with co
   three-films-1 by those 20 bytes and the checksum. NOT camera-tested. The Pro 400H values are
   still the model-only fit; a correction refit follows the next measurement.
 
-### 30.3 Emulator runs of the new code (run by the user, 2026-11-12; `tools/emu/cases.py`)
+### 30.3 Emulator runs of the new code (run by the user, 2026-11-12; `emulator/cases.py`)
 Stock block 0 vs block 0 with film-portra-xp10-s3 + film-ektachrome-lt3-s3 + slot3-code +
 film-pro400h-pa1 + xp-adaptive-hue-off.
 - `matrix_choice` (256 art codes): **8 changed, 248 identical, 0 flagged.** 70 / 79: table 1 →
@@ -1421,7 +1421,7 @@ firmware unstable. Write-up: `docs/art-slots-evaluation.md`. Working notes:
   of codes 102, 103, 145, 146, 167, 168, 106 → 0x7E56E94A (Portra's identity copy); chroma entries →
   0x7E5664A0; WB pairs 0 and 1 → 256; effect hash entries 1 and 14 → 0x7E72A665; soft-focus compare
   immediates → 0xFF.
-- **Emulator** (`tools/emu/cases.py`: `gamma_select` now models the pick routine and reads slot
+- **Emulator** (`emulator/cases.py`: `gamma_select` now models the pick routine and reads slot
   stubs; `matrix_choice` models matrix7; `emurun.py` counts the patched run's reads):
   matrix_choice 256 rows, 16 changed, 0 flagged; gamma_select 917 rows, 116 changed, model equal in
   all, 6 flagged = codes 69, 78, 73, 82, 86, 88 with the P+87 flag set (stock: alternative default
