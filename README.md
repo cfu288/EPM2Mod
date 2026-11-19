@@ -2,6 +2,8 @@
 
 Repository containing the current work for creating a custom firmware mod for the Olympus PEN **E-PM2**. We've implemented the ability to swap the default art filters with film simulations like Portra, Ektachrome, etc. You can choose which ones to load with the installer. See them compared on [our site](https://cfu288.github.io/EPM2Mod/films). We also enabled interval shooting (up to 240 shots), added a level gauge, focus peaking, and a lowest shutter speed setting for ISO Auto.
 
+> This project was created with heavy use of AI assistance.
+
 ## Added Features
 
 | Feature | |
@@ -16,7 +18,6 @@ Repository containing the current work for creating a custom firmware mod for th
 
 ## Landscape of Olympus Custom Firmware
 
-The E-PM2 came out in 2012. The [landscape page](docs/reference/landscape.md) lists the other Olympus custom firmware projects we know of.
 
 [![A timeline of Olympus and OM SYSTEM cameras that have custom firmware projects, from the E-PL3 in 2011 to the OM-5 Mark II in 2025](docs/images/landscape.png)](docs/reference/landscape.md)
 
@@ -43,4 +44,3 @@ Do the steps that `install` prints. To use other film simulations, change the na
 
 To go back to the original firmware, see [docs/user/install.md](docs/user/install.md).
 
-> This project was created with heavy use of AI assistance.

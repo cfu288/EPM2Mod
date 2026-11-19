@@ -75,3 +75,20 @@ the other vertical position pixel-equal to gauge-info. Left to right: gauge-info
 same way, gauge-info-2 level, gauge-info-2 held the other way.
 
 ![Left position before and after](results/portrait-left-before-after.png)
+
+## 6. The scale dots and marker (gauge-info-3)
+
+`gauge-info-2` on the camera (owner): the bar moved, but its white indicator dots stayed at the left edge. I missed it in
+my own screenshot (section 5: the green mark beside "800").
+
+| Fact | Evidence | Label |
+|---|---|---|
+| The marks (scale dots, marker) are not placed from the rectangle lists. Their bases are RAM halfwords 0x602BA42C–37: centre x 356, centre y 236, right x 686, bottom y 393, top y 54, **left x 22**. 0x7ED7E0CB writes them per display variant (`mov 22,d0` = `80 16` at 0x7ED7E10A, 0x7ED7E16B, 0x7ED7E1CB). The marks step from the base (e.g. 13 px per dot, 0x7ED7D0C0) | code; .data | V |
+| The PEN-F does the same in 0x60C5CE3F: 355, 235, 635, 395, 55, **left 92** (bar x 88–103) | PEN-F code | V |
+| `data/specs/gauge-bar-left-2.json` = gauge-bar-left's 12 rectangles + the three `mov` bytes 22 → 108. Build `data/builds/gauge-info-3.json`, sha256 `fd0ab8a4b9e90dc201d84d49a924589855f3f0f1715f05885c5bb5a33313f019`. gauge-bar-left stays as the record of what was flashed | spec | V |
+
+Emulator, camera held vertically, the left part of the screen. Top: gauge-info-2 (marks at the old place, over "800").
+Bottom: gauge-info-3 (marks inside the bar). Columns: level, tilted forward, tilted sideways. Landscape and the other
+vertical position are pixel-equal between the two builds; boot-test and update-path-test PASS.
+
+![gauge-info-2 and gauge-info-3, left marks](results/left-marks-2-vs-3.png)
