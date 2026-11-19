@@ -1,0 +1,7 @@
+  MVS   ok: registers and flags as pinned True; stub calls as pinned True; memory outside the log as pinned True; records none
+  DEV   ok: registers as pinned True; stub calls as pinned True; memory outside the log as pinned True; records none
+  MVE   ok: registers as pinned True; stub calls as pinned True; memory outside the log as pinned True; records [('mv_frame', {'total_us': 3, 'dev_ret': {'raw': '0x38FB0001', 'develop_us': 1, 'ret': '0x38FB'}})]
+  ART   ok: registers as pinned True; stub calls as pinned True; memory outside the log as pinned True; records none
+  ENCA  ok: registers as pinned True; stub calls as pinned True; memory outside the log as pinned True; records [('mv_enc', {'enc': {'raw': '0x00000001', 'us': 1, 'kind': 0}, 'art_us': 1})]
+  ENCB  ok: registers as pinned True; stub calls as pinned True; memory outside the log as pinned True; records [('mv_enc', {'enc': {'raw': '0x80000001', 'us': 1, 'kind': 1}, 'art_us': 0})]
+RESULT: PASS

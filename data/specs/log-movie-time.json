@@ -1,0 +1,93 @@
+{
+ "name": "log-movie-time",
+ "description": "Structured log, timing probe of the movie path: event mv_frame (CPU 0), one record per run of mov_image_process for recording 0x7E6C6E46 (one movie frame): the microseconds from its entry to its end, the microseconds of its develop job (img_exec, Bayer to YC) and its return value; event mv_enc (CPU 1), one record per packet of the task MOV_ENCODE: the microseconds in its handler and the microseconds that the task ART_SUB spent since the last record. Five hooks in stock bytes of segment 1, their routines in segment 1, 32 bytes of RAM at 0x7E4FD300. Needs the specs of data/builds/epm2mod-2026.11.19.json before it: every expect is a byte string of that build. It puts the build id 34775ddcf8f5f0af of data/logdict/events.json into the block header. DEBUG builds only. See experiments/2026-11-19-movie-sampling/NOTES.md and docs/reference/logging.md.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "candidate: emulator-checked, not flashed",
+ "_delta_on": "data/builds/epm2mod-2026.11.19.json",
+ "_build_id": "34775ddcf8f5f0af",
+ "_ram": "32 bytes at 0x7E4FD300 (uncached alias 0xBE4FD300), after the log's block buffer; not cleared at start",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x27DC4B",
+   "expect": "78e6ffa028f062fcdce1fa7d7e18ddb678e6ffa028f86202fcdcf3fa7d7e18dda578e6ffa028f86204fcdc05fb7d7e18dd9478e6ffa028f86206fcdc17fb7d7e18dd8378e6ffa028f86208fcdc29fb7d7e18dd7278e6ffa028f8620afcdc3bfb7d7e18dd6178e6ffa028f8620cfcdc4dfb7d7e18dd5078e6ffa028f8620efcdc5ffb7d7e18dd3f78e6ffa028f86212fcdc71fb7d7e18dd2e78e6ffa028f86210fcdc83fb7d7e18dd1d78e6ffa028f84214fcdc95fb7d7edd0d78e6ffa028f84215fcdca7fb7d7eddfd77e6ffa028f84216fcdcb9fb7d7edded77e6ffa028f86218fcdccbfb7d7e18dddc77e6ffa028f8021cfcdcddfb7d7eddcc77e6ffa028f86220fcdceffb7d7e18ddbb77e6ffa028f84222fcdc01fc7d7eddab77e6ffa028f86224fcdc13fc7d7e18dd9a77e6ffa028f86226fcdc25fc7d7e18dd8977e6ffa028f84228fcdc37fc7d7edd7977e6ffa028f8622afcdc49fc7d7e18dd6877e6ffa028f8622cfcdc5bfc7d7e18dd5777e6ffa028f8622efcdc6dfc7d7e18dd4677e6ffa028df200892fcdc7ffc7d7e82f1d8dd3277e6ffa028f86208fcdc91fc",
+   "new": "cf08fca474009098fc8100d34fbe8000fc8104d34fbece08fafe00fe08dcc3810200cf88fca674009098fca500d34fbef109fce1ffffff3ffca604d34fbefccaffff0000c708fcceffff00001cf8c010f212f1e82c0008dd6fa8e2ff0000ce881cfafe0002dc52850200cf08fca574009098fc8508d34fbece08ddcabe0300f088cf88fca508d34fbefca674009098f109fce1ffffff3ffca604d34fbee6fc8904d34fbece88dc86870200cf08fca574009098fc850cd34fbece0898dd17e00800a014cf88fca50cd34fbefca674009098f109fce1ffffff3ffca610d34fbee6fc8910d34fbece88dc07df0800cf08fca574009098fc8518d34fbece0898ddd86803000004cf88fca518d34fbefca674009098f109fce1ffffff3ff8e500fca610d34fbefca014d34fbefc8914d34fbef112f1e82c0108dd8fa7e2ff0000ce88dc02680300cf08fca574009098fc8518d34fbece0898dd8c6803000004cf88fca518d34fbefca674009098f109fce1ffffff3ffce500000080fca610d34fbefca014d34fbefc8914d34fbef112f1e82c0108dd34a7e2ff0000ce88dcaf670300",
+   "_addr": "0x7E69EC6B",
+   "_note": "new code, segment 1 (free part of lss-core's area): T_MVS, T_MVE, T_DEV, T_ART, T_ENCA, T_ENCB (416 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2A5E26",
+   "expect": "fafe00fe08",
+   "new": "dc257efdff",
+   "_addr": "0x7E6C6E46",
+   "_note": "hook (mv_frame): jmp T_MVS. mov_image_process (record) 0x7E6C6E46, entry: `add -512,sp` / `clr d2` (MOV_TASK)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2A61FD",
+   "expect": "1cfafe0002",
+   "new": "dc707afdff",
+   "_addr": "0x7E6C721D",
+   "_note": "hook (mv_frame): jmp T_MVE. mov_image_process (record), end: `exthu d0` / `add 512,sp` before `ret`"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2A6470",
+   "expect": "dd1f370100f088",
+   "new": "dc4578fdffcbcb",
+   "_addr": "0x7E6C7490",
+   "_note": "hook (mv_frame): jmp T_DEV + nop + nop. 0x7E6C7225 (built from 0x7E6C8841): the develop job, `call 0x7E6DABAF` (mov img_exec)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x30BC34",
+   "expect": "98cde900a014",
+   "new": "dcc220f7ffcb",
+   "_addr": "0x7E72CC54",
+   "_note": "hook (mv_enc): jmp T_ART + nop. ART_SUB task loop (CPU 1): `mov a2,a0` / `call 0x7E72CD3E`, the handler of a message"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2B4587",
+   "expect": "98cd99000004",
+   "new": "dcb197fcffcb",
+   "_addr": "0x7E6D55A7",
+   "_note": "hook (mv_enc): jmp T_ENCA + nop. MOV_ENCODE task loop (CPU 1): `mov a2,a0` / `call 0x7E6D5641` (packet command 256)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2B458F",
+   "expect": "98cd9d000004",
+   "new": "dc0198fcffcb",
+   "_addr": "0x7E6D55AF",
+   "_note": "hook (mv_enc): jmp T_ENCB + nop. MOV_ENCODE task loop (CPU 1): `mov a2,a0` / `call 0x7E6D564D` (other commands)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1CEA",
+   "expect": "33ca8d15",
+   "new": "34775ddc",
+   "_addr": "0x7EBF2D0A",
+   "_note": "flush task, block header: build id bytes 0-3 33ca8d15 -> 34775ddc (data/logdict/events.json)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1CF3",
+   "expect": "f4f1c877",
+   "new": "f8f5f0af",
+   "_addr": "0x7EBF2D13",
+   "_note": "flush task, block header: build id bytes 4-7 f4f1c877 -> f8f5f0af (data/logdict/events.json)"
+  }
+ ]
+}

@@ -273,6 +273,14 @@
    "doc": "A run of the film-looks task of card-looks-4 ended (at its T_END). mode: start = keep the built-in tables and apply the stored looks, load = Load, built-in = Built-in, texts = the row texts and names after a language change; store_ok = the store held a valid look file at the last check; status = the text the Load Looks row shows",
    "names": {"status": "card_status"},
    "args": [{"name": "flags", "format": "hex", "fields": [{"name": "busy", "shift": 0, "bits": 8}, {"name": "applied", "shift": 8, "bits": 8}, {"name": "store_ok", "shift": 16, "bits": 8}, {"name": "mode", "shift": 24, "bits": 8, "enum": {"0": "start", "1": "load", "2": "built-in", "3": "texts"}}]},
-            {"name": "status", "format": "hex"}]}
+            {"name": "status", "format": "hex"}]},
+  {"id": 2048, "name": "mv_frame", "level": "debug", "spec": "log-movie-time", "feature": "movie",
+   "doc": "One record per run of mov_image_process for recording 0x7E6C6E46 (MOV_TASK, CPU 0), written at its end: one movie frame. total_us = the microseconds from its entry to its end. develop_us = the microseconds in its develop job (the img_exec call at 0x7E6C7490, Bayer to YC); 65535 = 65.5 ms or more; 0 = no develop call in this run (a skip, or the job went to another task). ret = the value that the function returns (0x38FB = a skip path). The record time is the end; the start is time - total_us. Only in the build debug-log-movie-time (experiments/2026-11-19-movie-sampling)",
+   "args": [{"name": "total_us", "format": "dec"},
+            {"name": "dev_ret", "format": "hex", "fields": [{"name": "develop_us", "shift": 0, "bits": 16, "format": "dec"}, {"name": "ret", "shift": 16, "bits": 16, "format": "hex"}]}]},
+  {"id": 2049, "name": "mv_enc", "level": "debug", "spec": "log-movie-time", "feature": "movie",
+   "doc": "One record per packet that the task MOV_ENCODE (CPU 1, 0x7E6D554A) handles, written when its handler returns. us = the microseconds in the handler. kind 0 = packet command 256 (handler 0x7E6D5641), 1 = any other command (handler 0x7E6D564D); what the commands are is not known. art_us = the microseconds that the task ART_SUB (CPU 1) spent in its handler 0x7E72CD3E since the last mv_enc record: art-filter work on CPU 1. In the first record of a session art_us is not valid (no start value). Only in the build debug-log-movie-time",
+   "args": [{"name": "enc", "format": "hex", "fields": [{"name": "us", "shift": 0, "bits": 31, "format": "dec"}, {"name": "kind", "shift": 31, "bits": 1}]},
+            {"name": "art_us", "format": "dec"}]}
  ]
 }

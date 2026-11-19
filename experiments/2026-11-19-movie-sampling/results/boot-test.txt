@@ -1,0 +1,1 @@
+boot-test: PASS: data/builds/debug-log-movie-time.json boots as stock does (2000 ms of lab time; lines with allowed differences: line 1, line 39, line 40)
