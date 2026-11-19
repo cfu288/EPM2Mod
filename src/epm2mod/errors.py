@@ -11,12 +11,13 @@ Exit statuses (the command line's table): 1 a check found a difference or a
 problem, 2 wrong usage, 3 not found or not recognised, 4 refused (a named flag
 overrides it), 5 not safe (a checksum, a read-back or a download sha256
 differs, firmware for another model), 6 the environment (no network, no
-checkout, a card that is not a camera card, not writable or full), 70 an
-internal error, 130 interrupted.
+checkout, a card that is not a camera card, not writable or full), 7 failed (an
+input is wrong: a build description, a patch spec, a fit, a file that does not
+fit), 70 an internal error, 130 interrupted.
 """
 
 #: The exit status of each kind of failure.
-FAILED, USAGE, NOT_FOUND, REFUSED, NOT_SAFE, ENVIRONMENT = 1, 2, 3, 4, 5, 6
+DIFFERS, USAGE, NOT_FOUND, REFUSED, NOT_SAFE, ENVIRONMENT, FAILED = 1, 2, 3, 4, 5, 6, 7
 #: The exit status of an uncaught exception, and of an interrupted run.
 INTERNAL, INTERRUPTED = 70, 130
 

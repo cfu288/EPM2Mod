@@ -351,7 +351,7 @@ class CommandTests(unittest.TestCase):
             serve.STATIC = Path(folder)
             try:
                 with redirect_stderr(io.StringIO()) as err:
-                    self.assertEqual(cli.main(["serve", "--no-browser"]), 1)
+                    self.assertEqual(cli.main(["serve", "--no-browser"]), 6)
                 self.assertIn("npm run build:app", err.getvalue())
             finally:
                 serve.STATIC = original

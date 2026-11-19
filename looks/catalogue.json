@@ -7,7 +7,7 @@
    "kind": "Colour negative",
    "medium": "negative, on Kodak Portra Endura paper",
    "fit": "looks/fits/portra.npz",
-   "note": "built in (ART 1); camera-corrected"
+   "note": "camera-corrected"
   },
   {
    "id": "ektachrome",
@@ -16,7 +16,7 @@
    "kind": "Slide",
    "medium": "slide",
    "fit": "looks/fits/ektachrome.npz",
-   "note": "built in (ART 2); camera-corrected"
+   "note": "camera-corrected"
   },
   {
    "id": "pro-400h",
@@ -25,7 +25,7 @@
    "kind": "Colour negative",
    "medium": "negative, on Fuji Crystal Archive paper",
    "fit": "looks/fits/pro400h.npz",
-   "note": "built in (ART 3); camera-corrected"
+   "note": "camera-corrected"
   },
   {
    "id": "kodachrome",
@@ -34,7 +34,7 @@
    "kind": "Slide",
    "medium": "slide",
    "fit": "looks/fits/kodachrome64.npz",
-   "note": "built in (ART 4); camera-corrected"
+   "note": "camera-corrected"
   },
   {
    "id": "double-x",
@@ -43,7 +43,7 @@
    "kind": "Black and white",
    "medium": "black-and-white negative, on Kodak 2302 print film",
    "fit": "looks/fits/doublex3.npz",
-   "note": "built in (ART 5); no grain"
+   "note": "no grain"
   },
   {
    "id": "vision3-250d",
@@ -52,7 +52,7 @@
    "kind": "Cinema, daylight",
    "medium": "cinema negative, on Kodak 2383 print film",
    "fit": "looks/fits/vision3250d.npz",
-   "note": "built in (ART 6); camera-corrected"
+   "note": "camera-corrected"
   },
   {
    "id": "velvia",
@@ -61,7 +61,7 @@
    "kind": "Slide",
    "medium": "slide",
    "fit": "looks/fits/velvia100.npz",
-   "note": "built in (ART 7); camera-corrected"
+   "note": "camera-corrected"
   },
   {
    "id": "superia-400",
@@ -70,7 +70,7 @@
    "kind": "Colour negative",
    "medium": "negative, on Fuji Crystal Archive paper",
    "fit": "looks/fits/superia400.npz",
-   "note": "built in (ART 8); camera-corrected"
+   "note": "camera-corrected"
   },
   {
    "id": "provia",
@@ -79,7 +79,7 @@
    "kind": "Slide",
    "medium": "slide",
    "fit": "looks/fits/provia100f.npz",
-   "note": "built in (ART 9)"
+   "note": ""
   },
   {
    "id": "portra-160",
@@ -88,7 +88,7 @@
    "kind": "Colour negative",
    "medium": "negative, on Kodak Portra Endura paper",
    "fit": "looks/fits/portra160.npz",
-   "note": "built in (ART 10)"
+   "note": ""
   },
   {
    "id": "gold-200",
@@ -97,7 +97,7 @@
    "kind": "Colour negative",
    "medium": "negative, on Fuji Crystal Archive paper",
    "fit": "looks/fits/gold200.npz",
-   "note": "built in (ART 11)"
+   "note": ""
   },
   {
    "id": "vision3-500t",
@@ -106,7 +106,7 @@
    "kind": "Cinema, tungsten light",
    "medium": "cinema negative, on Kodak 2383 print film",
    "fit": "looks/fits/vision3500t.npz",
-   "note": "built in (ART 12)"
+   "note": ""
   },
   {
    "id": "ektar-100",

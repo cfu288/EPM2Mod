@@ -19,6 +19,7 @@ This module holds no knowledge of where the data is: it asks the locator (``cata
 from __future__ import annotations
 
 import argparse
+import datetime
 import contextlib
 import io
 import json
@@ -32,11 +33,11 @@ from pathlib import Path
 from typing import Any, NoReturn
 
 from . import __version__, camera_steps, catalogue, readme
-from .builds import BuildDescription
+from .builds import BuildDescription, check_test_date
 from .cardio import Planned, output_path
 from .catalogue import Locator
 from .errors import (
-    FAILED,
+    DIFFERS,
     INTERNAL,
     INTERRUPTED,
     BuildCheckError,
@@ -44,6 +45,7 @@ from .errors import (
     Epm2ModError,
     NotFoundError,
     RepositoryError,
+    UnavailableError,
     UsageError,
 )
 from .eventlog import Dictionary, decode, load_dictionary, name_films
@@ -195,6 +197,10 @@ EXIT_STATUSES: dict[int, tuple[str, str]] = {
         "environment: no network, no checkout, the card is not a camera card, not writable or full",
         "fix the setup, then retry",
     ),
+    7: (
+        "failed: an input is wrong (a build description, a patch spec, a fit, a file that does not fit)",
+        "fix the input",
+    ),
     INTERNAL: ("internal error (an uncaught exception)", "report"),
     INTERRUPTED: ("interrupted (any signal); no file half-written", ""),
 }
@@ -217,7 +223,7 @@ _FILES = {
     "files[].role": "firmware or films",
     "files[].size": "its size in bytes",
     "files[].sha256": "its sha256 (null for a dry run of a build that is not camera-tested)",
-    "files[].replaced": "true if a file of that name was there",
+    "files[].replaced": "true if a different file of that name was there and is replaced",
     "files[].unchanged": "true if that file already held these bytes: it was not written again",
 }
 _STEPS = {
@@ -274,7 +280,7 @@ COMMANDS: dict[str, Command] = {
         Command(
             "install",
             OWNERS,
-            "Make the firmware and write it, and the film file of the --film choices, to the SD card.",
+            "Write EPM2Mod to the SD card, and the film file if --film is given.",
             "the firmware on the card, and the film file if --film is given; then the camera steps",
             False,
             _DOWNLOAD,
@@ -812,7 +818,9 @@ def _inspect(args: argparse.Namespace, ctx: Context) -> int:
             {}
             if ok
             else {
-                "error": _error_json("will_not_work", FAILED, "; ".join(found.problems))
+                "error": _error_json(
+                    "will_not_work", DIFFERS, "; ".join(found.problems)
+                )
             }
         )
         _document(
@@ -829,7 +837,7 @@ def _inspect(args: argparse.Namespace, ctx: Context) -> int:
         )
         for problem in found.problems:
             print(f"will not work: {problem}")
-    return 0 if ok else FAILED
+    return 0 if ok else DIFFERS
 
 
 def _serve(args: argparse.Namespace, ctx: Context) -> int:
@@ -903,6 +911,10 @@ def _builds(args: argparse.Namespace, ctx: Context) -> int:
 def _pin(args: argparse.Namespace, ctx: Context) -> int:
     """Run ``epm2mod pin``."""
     checkout = ctx.checkout()
+    try:
+        check_test_date(args.date, datetime.date.today())
+    except BuildError as error:
+        raise UsageError(str(error)) from None
     record_test(
         checkout,
         checkout.build(args.build),
@@ -938,7 +950,7 @@ def _apply(args: argparse.Namespace, ctx: Context) -> int:
     except (OSError, RuntimeError) as error:
         raise BuildError(f"{out}: cannot be used as a path: {error}") from None
     if is_stock:
-        raise BuildError(f"{out} is the stock firmware file; give another name")
+        raise UsageError(f"{out} is the stock firmware file; give another name")
     if args.dry_run:
         print(f"would write {out} (sha256 {digest})")
         return 0
@@ -974,11 +986,11 @@ def _fetch_stock(args: argparse.Namespace, ctx: Context) -> int:
     return 0
 
 
-def _numpy_needed(error: ModuleNotFoundError) -> BuildError:
+def _numpy_needed(error: ModuleNotFoundError) -> UnavailableError:
     """Return the error to report when numpy is missing, or raise ``error``."""
     if error.name != "numpy":
         raise error
-    return BuildError(
+    return UnavailableError(
         "numpy is needed for the film looks. In a checkout, 'uv run epm2mod "
         "generate' installs it."
     )
@@ -1016,7 +1028,7 @@ def _generate(args: argparse.Namespace, ctx: Context) -> int:
     if stale_specs or stale_documents:
         _hint("run 'epm2mod generate'")
     if stale_specs or stale_documents or problems:
-        return FAILED
+        return DIFFERS
     print("the film-look specs are the generated ones")
     print("the generated parts of the documents are up to date")
     return 0
@@ -1099,7 +1111,7 @@ def _release(args: argparse.Namespace, ctx: Context) -> int:
     if release is None:
         for problem in problems:
             print(f"not ready: {problem}")
-        return FAILED
+        return DIFFERS
     print(release.notes)
     if args.dry_run:
         _hint(f"ready: {release.tag} on {release.commit[:7]}.")

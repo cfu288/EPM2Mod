@@ -223,6 +223,7 @@ dictionaries of the known builds.
 | 4 | refused; a named flag overrides it (`--allow-untested`) | ask the user, then pass the flag |
 | 5 | not safe: a checksum, read-back or download sha256 differs, firmware for another model | stop; never retry with a flag |
 | 6 | environment: no network, no checkout, the card is not a camera card, not writable or full | fix the setup, then retry |
+| 7 | failed: an input is wrong (a build description, a patch spec, a fit, a file that does not fit) | fix the input (added in review: without it, these failures shared 1 with "a check found a difference") |
 | 70 | internal error (an uncaught exception) | report |
 | 130 | interrupted (any signal); no file half-written | |
 

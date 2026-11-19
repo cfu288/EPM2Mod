@@ -7,9 +7,11 @@ A folder with a DCIM folder stands in for the SD card (EPM2MOD_TEST_CARDS lists 
 1. `LAUNCHER install --card CARD --dry-run --json` names the pinned build's sha256 and writes nothing.
 2. `LAUNCHER install --card CARD --json` gets uv and Python, downloads OM's firmware, makes the pinned build and
    writes it to the card (no --film: no film file): its sha256 must be the expected one.
-3. `LAUNCHER inspect --card CARD --json` finds that build and nothing that will not work.
-4. `LAUNCHER cards --json` lists the stand-in card. `LAUNCHER make BUILD` refuses with exit 6: no checkout.
-5. `LAUNCHER serve --no-browser` serves the page, and the API answers with the token and refuses without it.
+3. `LAUNCHER films set --card CARD --film ART2=velvia --json` writes a film file with Velvia in ART 2, and
+   `LAUNCHER install --card CARD --json` again leaves the firmware unchanged.
+4. `LAUNCHER inspect --card CARD --json` finds that build, the film file, and nothing that will not work.
+5. `LAUNCHER cards --json` lists the stand-in card. `LAUNCHER make BUILD` refuses with exit 6: no checkout.
+6. `LAUNCHER serve --no-browser` serves the page, and the API answers with the token and refuses without it.
 """
 
 import json
@@ -60,6 +62,14 @@ if installed["files"][0]["sha256"] != expected:
     sys.exit(f"install: the sha256 is not {expected}")
 if not (card / "DCOLYMP/E1019999.BIN").is_file() or (card / "EPM2LOOK.BIN").exists():
     sys.exit("install: the card does not hold the firmware only")
+films = document("films", "set", "--card", str(card), "--film", "ART2=velvia")
+if [(film["art"], film["name"]) for film in films["films"]] != [(2, "Velvia")]:
+    sys.exit(f"films set: {films['films']}")
+if not (card / "EPM2LOOK.BIN").is_file():
+    sys.exit("films set: no film file on the card")
+again = document("install", "--card", str(card))
+if not again["files"][0]["unchanged"]:
+    sys.exit("install again: the firmware was written again")
 inspected = document("inspect", "--card", str(card))
 if inspected["files"][0]["sha256"] != expected or inspected["problems"]:
     sys.exit(f"inspect: {inspected}")

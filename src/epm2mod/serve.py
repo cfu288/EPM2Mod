@@ -48,7 +48,14 @@ from urllib.parse import urlsplit
 
 from . import cards as card_list
 from .catalogue import Locator
-from .errors import BuildError, CardError, CheckError, DownloadError, Epm2ModError
+from .errors import (
+    BuildError,
+    CardError,
+    CheckError,
+    DownloadError,
+    Epm2ModError,
+    UnavailableError,
+)
 from .fileio import Log
 from .looks import records
 from .pipeline import STEPS, Outcome, install, restore
@@ -455,10 +462,10 @@ def serve(paths: Locator, port: int = 0, browser: bool = True) -> None:
     """Run the local app until the process is stopped.
 
     Raises:
-        BuildError: if the app page is not built.
+        UnavailableError: if the app page is not built.
     """
     if not (STATIC / "index.html").is_file():
-        raise BuildError(
+        raise UnavailableError(
             f"{STATIC}: the app page is not built. In web/: npm ci && npm run build:app"
         )
     app = App(paths)

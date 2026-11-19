@@ -146,7 +146,7 @@ class CatalogueFilm:
         kind: what kind of film it is, in a few words (for example "Slide").
         medium: how the film was simulated.
         fit: path of the fit file, relative to the repository root.
-        note: a remark for the list (where it is built in, its accuracy), or "".
+        note: a remark for the list (its accuracy, or how it was fitted), or "".
     """
 
     id: str

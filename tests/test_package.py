@@ -1287,7 +1287,7 @@ class CommandLineTests(RepoCase):
         self.assertTrue(self.repo.outputs())
         builds.description_path(self.repo.paths, "good").write_text("{broken")
         status, text = self.run_cli("make", "good")
-        self.assertEqual(status, 1, text)
+        self.assertEqual(status, 7, text)
         self.assertEqual(self.repo.outputs(), [])
 
     def test_a_failed_pinned_run_removes_the_image_of_the_earlier_run(self) -> None:
@@ -1297,7 +1297,7 @@ class CommandLineTests(RepoCase):
             saved = good.read_text()
             good.write_text(damage)  # not JSON; then: not a valid description
             status, text = self.run_cli("make", "good")
-            self.assertEqual(status, 1, text)
+            self.assertEqual(status, 7, text)
             self.assertEqual(self.repo.outputs(), [])
             good.write_text(saved)
 
@@ -1441,7 +1441,7 @@ class CommandLineTests(RepoCase):
                 status, text = self.run_cli(
                     "apply", spec_file, "--from", str(stock_file), "-o", str(out)
                 )
-                self.assertEqual(status, 1, text)
+                self.assertEqual(status, 2, text)
                 self.assertEqual(stock_file.read_bytes(), TINY)
 
     def test_generate_without_numpy(self) -> None:
@@ -1451,7 +1451,7 @@ class CommandLineTests(RepoCase):
         with mock.patch.dict(sys.modules, {"numpy": None}):
             sys.modules.pop("epm2mod.looks.generate", None)
             status, text = self.run_cli("generate", "--check")
-        self.assertEqual(status, 1, text)
+        self.assertEqual(status, 6, text)
         self.assertIn("numpy is needed", text)
 
     @unittest.skipUnless(hasattr(signal, "SIGTERM"), "no SIGTERM here")
@@ -1495,11 +1495,11 @@ class CommandLineTests(RepoCase):
 
     def test_errors_are_one_message_and_their_status(self) -> None:
         cases = [
-            (("pin", "new", "--date", "2026-13-40", "--sha256", "0" * 64), 1),
-            (("pin", "new", "--date", "2999-01-01", "--sha256", self.repo.sha256), 1),
+            (("pin", "new", "--date", "2026-13-40", "--sha256", "0" * 64), 2),
+            (("pin", "new", "--date", "2999-01-01", "--sha256", self.repo.sha256), 2),
             (("inspect", str(self.repo.paths.root)), 3),
             (("inspect", "no-such-file"), 3),
-            (("apply", "no-such-spec.json", "--from", "x", "-o", "out.BIN"), 1),
+            (("apply", "no-such-spec.json", "--from", "x", "-o", "out.BIN"), 3),
         ]
         self.addCleanup(os.chdir, os.getcwd())
         os.chdir(self.repo.paths.root)

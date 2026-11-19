@@ -940,12 +940,12 @@ class CommandTests(unittest.TestCase):
             self.assertEqual([line["event"] for line in got], ["boot", "tick"])
             log.write_bytes(b"not a log")
             status, out, err = self.run_cli("log", str(log), "--dict", str(words))
-            self.assertEqual((status, out), (1, ""))
+            self.assertEqual((status, out), (7, ""))
             self.assertIn("no log block found", err)
             status, out, err = self.run_cli(
                 "log", str(Path(folder, "none")), "--dict", str(words)
             )
-            self.assertEqual(status, 1)
+            self.assertEqual(status, 3)
 
     def test_log_prints_a_summary(self) -> None:
         with tempfile.TemporaryDirectory() as folder:

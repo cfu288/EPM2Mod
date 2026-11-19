@@ -93,7 +93,7 @@ class Planned:
             "role": self.role,
             "size": self.content.size,
             "sha256": self.content.sha256,
-            "replaced": self.replaces,
+            "replaced": self.replaces and not self.unchanged,
             "unchanged": self.unchanged,
         }
 

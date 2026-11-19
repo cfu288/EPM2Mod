@@ -22,7 +22,7 @@ import os
 from pathlib import Path
 from typing import Any, Callable
 
-from .errors import Epm2ModError, FileError
+from .errors import Epm2ModError, FileError, NotFoundError
 
 #: A function that takes one line of progress text.
 Log = Callable[[str], None]
@@ -53,10 +53,18 @@ def read_bytes(path: Path, error: type[Epm2ModError] = FileError) -> bytes:
     """Return the content of a file.
 
     Raises:
-        Epm2ModError: of type ``error``, if the file cannot be read.
+        Epm2ModError: of type ``error``, if the file cannot be read; its exit status is not-found (3) if the file
+            does not exist.
     """
     try:
         return path.read_bytes()
+    except FileNotFoundError as reason:
+        missing = error(f"{path}: cannot be read: {describe_os_error(reason)}")
+        missing.exit_status, missing.code = (
+            NotFoundError.exit_status,
+            NotFoundError.code,
+        )
+        raise missing from None
     except OSError as reason:
         raise error(f"{path}: cannot be read: {describe_os_error(reason)}") from None
 

@@ -23,6 +23,7 @@ Run a command with `uv run epm2mod COMMAND` in a checkout, or with the launcher 
 | 4 | refused; a named flag overrides it (--allow-untested) | ask the user, then pass the flag |
 | 5 | not safe: a checksum, read-back or download sha256 differs, firmware for another model | stop; never retry with a flag |
 | 6 | environment: no network, no checkout, the card is not a camera card, not writable or full | fix the setup, then retry |
+| 7 | failed: an input is wrong (a build description, a patch spec, a fit, a file that does not fit) | fix the input |
 | 70 | internal error (an uncaught exception) | report |
 | 130 | interrupted (any signal); no file half-written |  |
 
@@ -76,7 +77,7 @@ epm2mod cards
 
 ### epm2mod install
 
-Make the firmware and write it, and the film file of the --film choices, to the SD card.
+Write EPM2Mod to the SD card, and the film file if --film is given.
 
 ```
 epm2mod install [-h] --card DIR [--film ARTn=FILM] [--build BUILD] [--allow-untested] [--dry-run] [--eject] [--json]
@@ -111,7 +112,7 @@ epm2mod install [-h] --card DIR [--film ARTn=FILM] [--build BUILD] [--allow-unte
 - `files[].role`: firmware or films
 - `files[].size`: its size in bytes
 - `files[].sha256`: its sha256 (null for a dry run of a build that is not camera-tested)
-- `files[].replaced`: true if a file of that name was there
+- `files[].replaced`: true if a different file of that name was there and is replaced
 - `files[].unchanged`: true if that file already held these bytes: it was not written again
 - `removed`: the extra files removed from DCOLYMP
 - `films`: the films of the film file
@@ -198,7 +199,7 @@ epm2mod films set [-h] (--card DIR | -o FILE) --film ARTn=FILM [--dry-run] [--ej
 - `files[].role`: firmware or films
 - `files[].size`: its size in bytes
 - `files[].sha256`: its sha256 (null for a dry run of a build that is not camera-tested)
-- `files[].replaced`: true if a file of that name was there
+- `files[].replaced`: true if a different file of that name was there and is replaced
 - `files[].unchanged`: true if that file already held these bytes: it was not written again
 - `films`: the films of the film file
 - `films[].art`: the ART slot, 1 to 12
@@ -246,7 +247,7 @@ epm2mod restore [-h] (--card DIR | -o FILE) [--dry-run] [--eject] [--json]
 - `files[].role`: firmware or films
 - `files[].size`: its size in bytes
 - `files[].sha256`: its sha256 (null for a dry run of a build that is not camera-tested)
-- `files[].replaced`: true if a file of that name was there
+- `files[].replaced`: true if a different file of that name was there and is replaced
 - `files[].unchanged`: true if that file already held these bytes: it was not written again
 - `removed`: the extra files removed from DCOLYMP
 - `ejected`: true if the card was ejected
@@ -372,7 +373,7 @@ epm2mod make [-h] [-o FILE] [--dry-run] [--json] BUILD
 - `files[].role`: firmware or films
 - `files[].size`: its size in bytes
 - `files[].sha256`: its sha256 (null for a dry run of a build that is not camera-tested)
-- `files[].replaced`: true if a file of that name was there
+- `files[].replaced`: true if a different file of that name was there and is replaced
 - `files[].unchanged`: true if that file already held these bytes: it was not written again
 
 - Exit 3: no build of that name.
@@ -533,7 +534,7 @@ epm2mod films pack [-h] (--card DIR | -o FILE) [--dry-run] [--eject] [--json] LI
 - `files[].role`: firmware or films
 - `files[].size`: its size in bytes
 - `files[].sha256`: its sha256 (null for a dry run of a build that is not camera-tested)
-- `files[].replaced`: true if a file of that name was there
+- `files[].replaced`: true if a different file of that name was there and is replaced
 - `files[].unchanged`: true if that file already held these bytes: it was not written again
 - `films`: the films of the film file
 - `films[].art`: the ART slot, 1 to 12

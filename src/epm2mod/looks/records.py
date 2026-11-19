@@ -37,7 +37,7 @@ class Film:
         film: the film's full name.
         kind: what kind of film it is, in a few words (for example "Slide").
         medium: how the film was simulated.
-        note: a remark for the list (where it is built in, its accuracy), or "".
+        note: a remark for the list (its accuracy, or how it was fitted), or "".
         look: the film's look, in slot 0 under ``name``.
     """
 

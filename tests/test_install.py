@@ -520,7 +520,7 @@ class CommandTests(CardCase):
         self.assertEqual(self.card_files(), [])
 
     def test_the_exit_statuses(self) -> None:
-        self.assertEqual(sorted(cli.EXIT_STATUSES), [0, 1, 2, 3, 4, 5, 6, 70, 130])
+        self.assertEqual(sorted(cli.EXIT_STATUSES), [0, 1, 2, 3, 4, 5, 6, 7, 70, 130])
         other_model = bytearray(self.repo.films_image)
         other_model[2:4] = b"\x10\x00"
         card = str(self.card)
