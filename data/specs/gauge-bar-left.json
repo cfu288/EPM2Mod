@@ -1,0 +1,117 @@
+{
+ "name": "gauge-bar-left",
+ "description": "Level gauge, left position (camera held vertically): the bar, its + and - marks and its icon move 86 px to the right, past the ISO and touch icons, as the PEN-F places it (x 88-103). See experiments/2026-11-19-gauge-info/NOTES.md.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "candidate: emulator-checked, not flashed",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xb779f0",
+   "expect": "0e005f0029008101",
+   "new": "64005f007f008101",
+   "_addr": "0x7ef98a10",
+   "_note": "level gauge bar, 640 wide, left position: x 14-41 -> 100-127"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xb77a30",
+   "expect": "0e005f0029008101",
+   "new": "64005f007f008101",
+   "_addr": "0x7ef98a50",
+   "_note": "level gauge bar, left position: x 14-41 -> 100-127"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xb77a70",
+   "expect": "0e005f0029008101",
+   "new": "64005f007f008101",
+   "_addr": "0x7ef98a90",
+   "_note": "level gauge bar, low, left position: x 14-41 -> 100-127"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xb77ab0",
+   "expect": "2a0070013a007f01",
+   "new": "8000700190007f01",
+   "_addr": "0x7ef98ad0",
+   "_note": "level gauge + mark, 640 wide, left position: x 42-58 -> 128-144"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xb77af0",
+   "expect": "2a0070013a007f01",
+   "new": "8000700190007f01",
+   "_addr": "0x7ef98b10",
+   "_note": "level gauge + mark, left position: x 42-58 -> 128-144"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xb77b30",
+   "expect": "2a0070013a007f01",
+   "new": "8000700190007f01",
+   "_addr": "0x7ef98b50",
+   "_note": "level gauge + mark, low, left position: x 42-58 -> 128-144"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xb77b70",
+   "expect": "2a0061003a007000",
+   "new": "8000610090007000",
+   "_addr": "0x7ef98b90",
+   "_note": "level gauge - mark, 640 wide, left position: x 42-58 -> 128-144"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xb77bb0",
+   "expect": "2a0061003a007000",
+   "new": "8000610090007000",
+   "_addr": "0x7ef98bd0",
+   "_note": "level gauge - mark, left position: x 42-58 -> 128-144"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xb77bf0",
+   "expect": "2a0061003a007000",
+   "new": "8000610090007000",
+   "_addr": "0x7ef98c10",
+   "_note": "level gauge - mark, low, left position: x 42-58 -> 128-144"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xb77c30",
+   "expect": "0a0036002f005800",
+   "new": "6000360085005800",
+   "_addr": "0x7ef98c50",
+   "_note": "level gauge icon, 640 wide, left position: x 10-47 -> 96-133"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xb77c70",
+   "expect": "0a0036002f005800",
+   "new": "6000360085005800",
+   "_addr": "0x7ef98c90",
+   "_note": "level gauge icon, left position: x 10-47 -> 96-133"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xb77cb0",
+   "expect": "0a0036002f005800",
+   "new": "6000360085005800",
+   "_addr": "0x7ef98cd0",
+   "_note": "level gauge icon, low, left position: x 10-47 -> 96-133"
+  }
+ ]
+}

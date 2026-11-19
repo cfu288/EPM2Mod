@@ -1,0 +1,26 @@
+{
+ "what": "CANDIDATE, not camera-tested: gauge-info with the level gauge's left position (camera held vertically) moved right of the ISO and touch icons, as on the PEN-F (see experiments/2026-11-19-gauge-info/NOTES.md)",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
+ "specs": [
+  "data/specs/interval-timelapse-v2.json",
+  "data/specs/interval-frames-240.json",
+  "data/specs/level-gauge-lvinfo-row.json",
+  "data/specs/level-adjust-row.json",
+  "data/specs/peaking-direct-4.json",
+  "data/specs/peaking-gain-2x.json",
+  "data/specs/custom-menu-rows-3.json",
+  "data/specs/peaking-colours.json",
+  "data/specs/peaking-fast.json",
+  "data/specs/peaking-save-guard.json",
+  "data/specs/looks-menu-4.json",
+  "data/specs/stock-films-structure.json",
+  "data/specs/card-looks-5.json",
+  "data/specs/log-menu-2.json",
+  "data/specs/lss-menu.json",
+  "data/specs/lss-core.json",
+  "data/specs/build-label.json",
+  "data/specs/gauge-info.json",
+  "data/specs/gauge-bar-left.json"
+ ],
+ "label": "2026.11.19"
+}

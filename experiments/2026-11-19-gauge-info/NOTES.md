@@ -57,3 +57,21 @@ Not changed: the histogram list (no histogram on the gauge screen), the gauge li
 | Overlap on the real screen: the vertical bar's end icon ends about 3 px above the movie time; the horizontal bar's marks sit above the exposure value | V in the emulator (screenshots) | camera look |
 | Items the emulator never shows (flash, face detection, card count with a card, warnings) follow the same lists | I | camera look |
 | Movie mode keeps the old gauge screen | V by the lists (not changed) | – |
+
+## 5. Camera, and the bar's position when the camera is held vertically
+
+`gauge-info` on the camera (owner, camera log 2026-11-19): the horizontal bar overlaps nothing; the vertical bar fits
+at the right; with the camera held vertically one way the bar moves to the left edge, behind the ISO and touch icons.
+
+| Fact | Evidence | Label |
+|---|---|---|
+| The gauge parts (bar, + mark, − mark, icon; widgets 547–551) take their rectangle `{x1, y1, x2, y2}` from lists with one entry per orientation, 0x7EF989F8–0x7EF98CE8, three display variants (640 wide, 720, 720 low). Entry 3 is the left edge: bar x 14–41, y 95–385 | rect setter 0x7EDC1972 called with these addresses (emulator, `E101_TILT=-1000,0,0`) | V |
+| **The PEN-F has the same lists** (0x60EC85BC… for the monitor, chosen by display type in 0x60C5CE3F; 0x60EC857C… for a 640-wide display). Monitor entries: bottom (229,391)–(490,406), right (631,109)–(646,370), **left (88,109)–(103,370)**, top (229,51)–(490,66). Its bars are 15 px thick (E-PM2: 27) and sit inside the information columns | PEN-F 1.x block 0, read with this session's function map | V |
+| `data/specs/gauge-bar-left.json` (`scripts/mkspec_gauge_bar_left.py`): the 12 left entries move 86 px right (bar x 100–127; the touch icon ends at x 94) | spec; emulator below | V |
+
+Build `data/builds/gauge-info-2.json` (gauge-info + gauge-bar-left), sha256
+`7959020a496c13aea7c05bcbcb670f2482f4df5707d61cf096c1f07d7cfcf0e8`: boot-test and update-path-test PASS; landscape and
+the other vertical position pixel-equal to gauge-info. Left to right: gauge-info held vertically, gauge-info-2 held the
+same way, gauge-info-2 level, gauge-info-2 held the other way.
+
+![Left position before and after](results/portrait-left-before-after.png)
