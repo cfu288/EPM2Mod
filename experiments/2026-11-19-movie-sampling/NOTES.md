@@ -461,3 +461,29 @@ The biggest risk is still the pre-processor: whether it writes a 1938-px line, a
 If the movie mode live view uses the HSHR frame (I: the through-start handler builds the record), most of these show
 on the screen before recording starts. The way back is the camera's current build, `debug-log-movie-bitrate`
 (sha256 `09dd21ca6aa8a100a0b43b9a9d336a8f5523c262e06bb9c0be285c55c7e61375`), or the pinned build.
+
+## 13. Camera run of `debug-log-movie-wide`, 2026-11-19
+
+The owner flashed it and stopped after the first clip: pink bands across the live view. `PB190001.MOV` (10.5 s,
+1920×1080, 25 Mb/s) and the log are in `results/wide/` (frame: `results/wide/camera-frame-1s.png`).
+
+What the frame shows (V, measured on the frame at 1 s):
+
+- The scene is there, curved and stretched, with fine horizontal line structure.
+- Magenta vertical bands repeat every 275–309 px (centres 105, 414, 694, 982, 1257, 1550, 1854).
+- The picture ends at y ≈ 870–930; below it is a band of high-frequency garbage.
+
+Reading (I, strong): **the reader uses the new layout, the writer still the stock one.** A reader with stride 1960
+over rows written at stride 1680 starts each row 280 px further into the written data (the band period, about 280
+px before the distortion warp), and reads 1296 × 1960 / 1680 = 1512 written rows where only 1312 exist: the good
+part ends at 1312 / 1512 × 1080 ≈ 937 rows. So the develop job read a 1938/1960 frame, but the pre-processor's DMA
+still wrote 1662 px at stride 1680 and 1312 rows. A writer-side geometry source was not changed (candidates: the
+sensor-mode records 0x7E7BA370 and the table 0x7E85B3FC with the HSHR record 1680/1662×1312, see
+`../2026-11-12-hardware/03-sensor-pipeline-memory.md` §1).
+
+The rest held (V, log): 344 frames, 29.8 per s, `ret` 0 throughout, no new firmware error; `total_us` 23.5 ms median,
+24.7 ms p95 (22.1 / 23.1 before), close to the 23.1 ms the model of §9.2 predicted for the larger frame. The
+encoder took the 1920 output at 25 Mb/s.
+
+Not yet answered: whether the pre-processor can write 1938-px lines. Next build: find the writer's geometry source and
+change it in step with the reader.

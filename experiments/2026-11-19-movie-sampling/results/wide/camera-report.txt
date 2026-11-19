@@ -1,0 +1,6 @@
+records lost: cpu 1: 114
+clip 1 (session 2): 344 frames in 11.53 s = 29.83 per s
+  period_us    mean 33550  p95 34952  max 96060   periods > 1.5 frames: 2
+  total_us     mean 23457  p95 24656  max 31132   frames > 33367 us: 0
+  develop_us   -   frames with no develop call: 344
+  ret          {'0x0000': 344}
