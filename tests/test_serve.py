@@ -26,10 +26,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from support import ROOT  # noqa: E402
 
-from epm2mod import cli, serve, stock  # noqa: E402
+from epm2mod import camera_steps, cards, cli, pipeline, serve, stock  # noqa: E402
 from epm2mod.builds import pinned_description  # noqa: E402
+from epm2mod.cardio import Content, Planned  # noqa: E402
 from epm2mod.cards import Card  # noqa: E402
 from epm2mod.errors import BuildError  # noqa: E402
+from epm2mod.hashing import sha256_bytes  # noqa: E402
 from epm2mod.looks import lookfile, records  # noqa: E402
 from epm2mod.paths import RepoPaths  # noqa: E402
 
@@ -87,6 +89,18 @@ class Running:
         raise AssertionError("the job did not end")
 
 
+def outcome(files: dict[str, bytes], films: bool) -> pipeline.Outcome:
+    """Return the outcome of a job that made ``files``, by their path on the card."""
+    roles = {"DCOLYMP/E1019999.BIN": "firmware", "EPM2LOOK.BIN": "films"}
+    return pipeline.Outcome(
+        tuple(
+            Planned(Path(name), roles[name], Content.of(data), False)
+            for name, data in files.items()
+        ),
+        steps=tuple(camera_steps.flash_steps(films=films)),
+    )
+
+
 class FakeRunner:
     """A job runner that records its arguments and returns fixed files."""
 
@@ -95,14 +109,15 @@ class FakeRunner:
         self.release = threading.Event()
         self.release.set()
 
-    def __call__(self, paths, description, choices, card, log, step):  # type: ignore[no-untyped-def]
+    def __call__(self, paths, choices, card, log, step):  # type: ignore[no-untyped-def]
         self.calls.append((choices, card))
         log("1/5 stock firmware: ok")
         step(1)
         self.release.wait(10)
         if choices == ["ART3=c200"]:
             raise BuildError("the card is full")
-        return "ab" * 32, {"DCOLYMP/E1019999.BIN": b"firmware", "EPM2LOOK.BIN": b"x"}
+        files = {"DCOLYMP/E1019999.BIN": b"firmware", "EPM2LOOK.BIN": b"x"}
+        return outcome(files, True)
 
 
 class ServerTests(unittest.TestCase):
@@ -175,7 +190,13 @@ class ServerTests(unittest.TestCase):
         )
         self.assertEqual(status, 202, data)
         state = self.server.wait()
-        self.assertEqual((state["error"], state["sha256"]), (None, "ab" * 32))
+        self.assertEqual(
+            (state["error"], state["sha256"]), (None, sha256_bytes(b"firmware"))
+        )
+        self.assertEqual(
+            [step["id"] for step in state["camera_steps"]][-2:],
+            ["load-films", "check-art"],
+        )
         self.assertEqual(state["lines"], ["1/5 stock firmware: ok"])
         self.assertEqual((state["step"], state["steps"]), (1, 5))
         self.assertEqual(self.runner.calls, [(["ART2=velvia"], None)])
@@ -214,7 +235,7 @@ class ServerTests(unittest.TestCase):
             calls.append(card)
             step(1)
             step(2)
-            return "cd" * 32, {"DCOLYMP/E1019999.BIN": b"stock"}
+            return outcome({"DCOLYMP/E1019999.BIN": b"stock"}, False)
 
         self.server.app.run_restore = restore
         status, _ = self.server.request(
@@ -292,7 +313,7 @@ class ServerTests(unittest.TestCase):
 
 class MessageTests(unittest.TestCase):
     def test_common_errors_say_what_to_do(self) -> None:
-        from epm2mod.errors import StockError
+        from epm2mod.errors import CardError, DownloadError
 
         cases = [
             (
@@ -306,10 +327,10 @@ class MessageTests(unittest.TestCase):
                 "card is full",
             ),
             (
-                BuildError("/Volumes/X/DCOLYMP holds other files: A.BIN"),
-                "holds other files",
+                CardError("/Volumes/X: has no DCIM folder. Format the card"),
+                "Format the card in the camera",
             ),
-            (StockError("download failed: timed out"), "internet connection"),
+            (DownloadError("download failed: timed out"), "internet connection"),
         ]
         for error, words in cases:
             self.assertIn(words, serve.plain_message(error))
@@ -340,89 +361,91 @@ def sandbox(folder: Path) -> RepoPaths:
     return RepoPaths(folder)
 
 
+def stand_in_card(folder: Path) -> Path:
+    """Return a folder made to look like a camera card: a DCIM folder in it."""
+    (folder / "DCIM").mkdir(parents=True)
+    return folder
+
+
 @unittest.skipUnless(HAVE_STOCK, "needs the stock firmware")
 class EndToEndTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.folder = tempfile.TemporaryDirectory()
+        self.addCleanup(self.folder.cleanup)
+        top = Path(self.folder.name)
+        (top / "repo").mkdir()
+        self.paths = sandbox(top / "repo")
+        self.app_card = stand_in_card(top / "app-card")
+        self.cli_card = stand_in_card(top / "cli-card")
+        listed = os.pathsep.join(str(card) for card in (self.app_card, self.cli_card))
+        env = mock.patch.dict(
+            os.environ,
+            {cards.TEST_CARDS_ENV: listed, "EPM2MOD_ROOT": str(self.paths.root)},
+        )
+        env.start()
+        self.addCleanup(env.stop)
+
+    def files(self, card: Path) -> list[str]:
+        """Return the files on a card, relative to it."""
+        return sorted(
+            p.relative_to(card).as_posix() for p in card.rglob("*") if p.is_file()
+        )
+
     def test_restore_writes_the_original_firmware(self) -> None:
-        with tempfile.TemporaryDirectory() as folder:
-            (Path(folder) / "repo").mkdir()
-            paths = sandbox(Path(folder) / "repo")
-            card = Path(folder) / "card"
-            (card / "DCOLYMP").mkdir(parents=True)
-            (card / "DCOLYMP" / "E1019999.BIN").write_bytes(b"old build")
-            steps: list[int] = []
-            sha, files = serve.run_restore(paths, card, lambda line: None, steps.append)
-            self.assertEqual((sha, steps), (stock.EPM2_V16.sha256, [1, 2]))
-            on_card = (card / "DCOLYMP" / "E1019999.BIN").read_bytes()
-            self.assertEqual(on_card, stock.read_stock(PATHS, stock.EPM2_V16))
-            self.assertEqual(files["DCOLYMP/E1019999.BIN"], on_card)
-            env = {"EPM2MOD_ROOT": str(paths.root)}
-            with redirect_stdout(io.StringIO()), mock.patch.dict(os.environ, env):
-                self.assertEqual(cli.main(["restore", "-o", folder]), 0)
-                self.assertEqual(cli.main(["restore"]), 1)
-            self.assertEqual((Path(folder) / "E1019999.BIN").read_bytes(), on_card)
+        (self.app_card / "DCOLYMP").mkdir()
+        (self.app_card / "DCOLYMP" / "E1019999.BIN").write_bytes(b"old build")
+        steps: list[int] = []
+        done = serve.run_restore(
+            self.paths, self.app_card, lambda line: None, steps.append
+        )
+        self.assertEqual((done.files[0].content.sha256, steps), (stock.EPM2_V16.sha256, [1, 2]))
+        on_card = (self.app_card / "DCOLYMP" / "E1019999.BIN").read_bytes()
+        self.assertEqual(on_card, stock.read_stock(PATHS, stock.EPM2_V16))
+        self.assertEqual(done.file_data()["DCOLYMP/E1019999.BIN"], on_card)
+        out = Path(self.folder.name)
+        with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            self.assertEqual(cli.main(["restore", "-o", str(out)]), 0)
+            with self.assertRaises(SystemExit):
+                cli.main(["restore"])
+        self.assertEqual((out / "E1019999.BIN").read_bytes(), on_card)
 
     def test_the_app_writes_what_the_command_line_writes(self) -> None:
-        with tempfile.TemporaryDirectory() as folder:
-            (Path(folder) / "repo").mkdir()
-            paths = sandbox(Path(folder) / "repo")
-            app_card = Path(folder) / "app-card"
-            cli_card = Path(folder) / "cli-card"
-            app_card.mkdir()
-            cli_card.mkdir()
-            choices = ["ART2=velvia", "ART6=double-x", "ART12=vision3-500t"]
-            lines: list[str] = []
-            description = pinned_description(paths)
-            steps: list[int] = []
-            sha, files = serve.run_job(
-                paths, description, choices, app_card, lines.append, steps.append
-            )
-            self.assertEqual(steps, [1, 2, 3, 4, 5])
-            self.assertEqual(sha, description.sha256)
-            env = {"EPM2MOD_ROOT": str(paths.root)}
-            with redirect_stdout(io.StringIO()), mock.patch.dict(os.environ, env):
-                for argv in (
-                    ["make", "--card", str(cli_card)],
-                    ["looks", "pack", *choices, "--card", str(cli_card)],
-                ):
-                    self.assertEqual(cli.main(argv), 0, argv)
-            names = ["DCOLYMP/E1019999.BIN", lookfile.CARD_NAME]
-            for name in names:
-                self.assertEqual(
-                    (app_card / name).read_bytes(), (cli_card / name).read_bytes()
-                )
-                self.assertEqual(files[name], (cli_card / name).read_bytes())
+        choices = ["ART2=velvia", "ART6=double-x", "ART12=vision3-500t"]
+        lines: list[str] = []
+        steps: list[int] = []
+        done = serve.run_job(
+            self.paths, choices, self.app_card, lines.append, steps.append
+        )
+        self.assertEqual(steps, [1, 2, 3, 4, 5])
+        self.assertEqual(
+            done.files[0].content.sha256, pinned_description(self.paths).sha256
+        )
+        with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            argv = ["install", "--card", str(self.cli_card), *choices]
+            self.assertEqual(cli.main(argv), 0)
+        names = ["DCOLYMP/E1019999.BIN", lookfile.CARD_NAME]
+        for name in names:
             self.assertEqual(
-                sorted(
-                    str(p.relative_to(app_card))
-                    for p in app_card.rglob("*")
-                    if p.is_file()
-                ),
-                names,
+                (self.app_card / name).read_bytes(), (self.cli_card / name).read_bytes()
             )
+            self.assertEqual(done.file_data()[name], (self.cli_card / name).read_bytes())
+        self.assertEqual(self.files(self.app_card), names)
 
-    def test_make_on_a_card_writes_what_the_app_writes_by_default(self) -> None:
-        with tempfile.TemporaryDirectory() as folder:
-            (Path(folder) / "repo").mkdir()
-            paths = sandbox(Path(folder) / "repo")
-            app_card = Path(folder) / "app-card"
-            cli_card = Path(folder) / "cli-card"
-            app_card.mkdir()
-            cli_card.mkdir()
-            description = pinned_description(paths)
-            default = records.built_in_choices(records.load(paths))
-            serve.run_job(
-                paths, description, default, app_card, lambda line: None, lambda n: None
-            )
-            env = {"EPM2MOD_ROOT": str(paths.root)}
-            with redirect_stdout(io.StringIO()), mock.patch.dict(os.environ, env):
-                self.assertEqual(cli.main(["make", "--card", str(cli_card)]), 0)
-            for name in ("DCOLYMP/E1019999.BIN", lookfile.CARD_NAME):
-                self.assertEqual(
-                    (app_card / name).read_bytes(), (cli_card / name).read_bytes()
-                )
+    def test_install_writes_what_the_app_and_make_write_by_default(self) -> None:
+        default = records.built_in_choices(records.load(self.paths))
+        serve.run_job(
+            self.paths, default, self.app_card, lambda line: None, lambda n: None
+        )
+        with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            self.assertEqual(cli.main(["install", "--card", str(self.cli_card)]), 0)
+            self.assertEqual(cli.main(["make"]), 0)
+        for name in ("DCOLYMP/E1019999.BIN", lookfile.CARD_NAME):
             self.assertEqual(
-                (paths.card / lookfile.CARD_NAME).read_bytes(),
-                (cli_card / lookfile.CARD_NAME).read_bytes(),
+                (self.app_card / name).read_bytes(), (self.cli_card / name).read_bytes()
+            )
+            self.assertEqual(
+                (pipeline.card_folder(self.paths) / name).read_bytes(),
+                (self.cli_card / name).read_bytes(),
             )
 
 

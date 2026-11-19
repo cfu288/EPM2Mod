@@ -18,11 +18,14 @@ import urllib.request
 import xml.etree.ElementTree as ElementTree
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from .errors import StockError
+from .errors import DownloadError, StockError, StockMissingError
 from .fileio import Log, read_bytes, silent, write_bytes
 from .hashing import sha256_bytes
-from .paths import RepoPaths
+
+if TYPE_CHECKING:
+    from .catalogue import Locator
 
 CATALOG_URL = "https://fw01.om-digitalsolutions.net/ww_inform/fcache.do"
 USER_AGENT = "Olympus"
@@ -38,7 +41,7 @@ class StockFirmware:
 
     Attributes:
         file_name: the maker's name of the file.
-        relative_path: where the file is kept, relative to the repository root.
+        relative_path: where a checkout keeps the file, relative to its root.
         size: size in bytes.
         sha256: SHA-256 of the file.
         model_id: the model number in the update catalog.
@@ -80,12 +83,12 @@ _REQUEST = (
 )
 
 
-def stock_path(paths: RepoPaths, stock: StockFirmware = EPM2_V16) -> Path:
-    """Return where the stock firmware file is kept."""
-    return paths.resolve(stock.relative_path)
+def stock_path(paths: Locator, stock: StockFirmware = EPM2_V16) -> Path:
+    """Return where the stock firmware file is kept (the locator decides)."""
+    return paths.stock_file(stock)
 
 
-def read_stock(paths: RepoPaths, stock: StockFirmware = EPM2_V16) -> bytes:
+def read_stock(paths: Locator, stock: StockFirmware = EPM2_V16) -> bytes:
     """Return the bytes of the stock firmware file, after checking their SHA-256.
 
     The check is made on the bytes that are returned, so the caller works on
@@ -96,14 +99,13 @@ def read_stock(paths: RepoPaths, stock: StockFirmware = EPM2_V16) -> bytes:
     """
     path = stock_path(paths, stock)
     if not path.exists():
-        raise StockError(
-            f"{stock.relative_path} is missing: run 'epm2mod fetch-stock' "
-            "(tools/fetch_stock.py)"
+        raise StockMissingError(
+            f"{paths.relative(path)} is missing: run 'epm2mod fetch-stock'"
         )
     data = read_bytes(path, StockError)
     if sha256_bytes(data) != stock.sha256:
         raise StockError(
-            f"{stock.relative_path} is not {stock.file_name} (the sha256 differs). "
+            f"{paths.relative(path)} is not {stock.file_name} (the sha256 differs). "
             "Move it away and run 'epm2mod fetch-stock'."
         )
     return data
@@ -164,27 +166,27 @@ def http_get(request: urllib.request.Request, limit: int) -> bytes:
             for block in iter(lambda: response.read(_READ_SIZE), b""):
                 body += block
                 if len(body) > limit:
-                    raise StockError(
+                    raise DownloadError(
                         f"{request.full_url}: the answer is larger than {limit} bytes"
                     )
     except (OSError, ValueError, http.client.HTTPException) as error:
-        raise StockError(f"{request.full_url}: download failed: {error}") from None
+        raise DownloadError(f"{request.full_url}: download failed: {error}") from None
     return bytes(body)
 
 
 def fetch(
-    paths: RepoPaths,
+    paths: Locator,
     stock: StockFirmware = EPM2_V16,
     log: Log = silent,
 ) -> Path:
-    """Make sure the stock firmware file is in the repository, and return its path.
+    """Make sure the stock firmware file is in the locator's cache, and return its path.
 
     If the file is there and has the right SHA-256, nothing is downloaded. If a
     different file is there, it is left alone and an error is raised. A
     downloaded file is written only after its size and SHA-256 are right.
 
     Args:
-        paths: the repository.
+        paths: the locator, which says where the file is kept.
         stock: which firmware.
         log: where progress lines go.
 
@@ -222,7 +224,7 @@ def fetch(
 
 
 def obtain_stock(
-    paths: RepoPaths,
+    paths: Locator,
     stock: StockFirmware = EPM2_V16,
     log: Log = silent,
 ) -> bytes:

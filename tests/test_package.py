@@ -63,7 +63,6 @@ from epm2mod.paths import RepoPaths, is_repo_relative  # noqa: E402
 PATHS = RepoPaths(ROOT)
 HAVE_STOCK = stock.stock_path(PATHS).is_file()
 TODAY = datetime.date(2026, 11, 20)
-REAL_IS_VOLUME = pipeline.is_volume
 
 
 TINY = make_container(
@@ -150,12 +149,6 @@ class RepoCase(unittest.TestCase):
         self.repo = TinyRepo(Path(folder) / "repo")
         self.card = Path(folder) / "card"
         self.card.mkdir()
-        # The stand-in card is a plain folder; say that it is a mounted volume.
-        patcher = mock.patch.object(
-            pipeline, "is_volume", side_effect=lambda folder: folder == self.card
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
 
     def make(
         self, description: builds.BuildDescription, **kw: Any
@@ -1016,7 +1009,6 @@ class MakeTests(RepoCase):
         self.assertEqual(result.sha256, self.repo.sha256)
         self.assertEqual(result.image.read_bytes(), self.repo.image)
         self.assertEqual(result.card_copy.read_bytes(), self.repo.image)
-        self.assertIsNone(result.on_card)
         self.assertEqual(self.repo.outputs(), ["card/DCOLYMP/E1019999.BIN", "good.BIN"])
         self.assertTrue(any("tested on 2026-11-13" in line for line in lines))
 
@@ -1147,58 +1139,6 @@ class MakeTests(RepoCase):
         self.assertEqual(len(written), 1)
         self.assertEqual(self.repo.outputs(), [])
 
-    def test_an_interrupt_in_the_card_write_leaves_only_the_old_file_there(
-        self,
-    ) -> None:
-        target = pipeline.card_target(self.card, TINY_STOCK)
-        target.parent.mkdir()
-        target.write_bytes(b"older firmware")
-        real_replace = os.replace
-
-        def interrupt_on_card(source: Path, destination: Path) -> None:
-            if Path(destination) == target:
-                raise KeyboardInterrupt
-            real_replace(source, destination)
-
-        with mock.patch("epm2mod.fileio.os.replace", side_effect=interrupt_on_card):
-            with self.assertRaises(KeyboardInterrupt):
-                self.make(self.repo.tested, card=self.card)
-        self.assertEqual([p.name for p in target.parent.iterdir()], [target.name])
-        self.assertEqual(target.read_bytes(), b"older firmware")
-        self.assertEqual(self.repo.outputs(), [])
-
-    def test_a_card_that_cannot_be_examined_is_an_error(self) -> None:
-        denied = PermissionError(13, "Permission denied")
-        with mock.patch.object(Path, "is_dir", side_effect=denied):
-            with self.assertRaisesRegex(BuildError, "cannot be read"):
-                pipeline.check_card(self.card, TINY_STOCK)
-
-    def test_the_card(self) -> None:
-        lines: list[str] = []
-        result = self.make(self.repo.tested, card=self.card, log=lines.append)
-        target = self.card / "DCOLYMP" / "E1019999.BIN"
-        self.assertEqual(result.on_card, target)
-        self.assertEqual(target.read_bytes(), self.repo.image)
-        self.assertEqual([p.name for p in target.parent.iterdir()], ["E1019999.BIN"])
-        (target.parent / "._E1019999.BIN").write_bytes(b"x")
-        self.make(self.repo.tested, card=self.card, log=lines.append)  # again: allowed
-        self.assertTrue(any("._E1019999.BIN" in line for line in lines))
-
-    def test_the_firmware_can_go_to_any_folder(self) -> None:
-        self.assertFalse(REAL_IS_VOLUME(self.card))
-        plain = self.card.parent / "plain-folder"
-        plain.mkdir()
-        lines: list[str] = []
-        with mock.patch.object(pipeline, "is_volume", side_effect=REAL_IS_VOLUME):
-            result = self.make(self.repo.tested, card=plain, log=lines.append)
-        target = pipeline.card_target(plain, TINY_STOCK)
-        self.assertEqual(result.on_card, target)
-        self.assertEqual(target.read_bytes(), result.image.read_bytes())
-        text = "\n".join(lines)
-        self.assertIn("on the card:", text)
-        self.assertIn("Copy the folder DCOLYMP", text)  # not a card: no "Eject"
-        self.assertNotIn("Eject", text)
-
     def test_out_writes_one_file(self) -> None:
         folder = self.card.parent / "elsewhere"
         folder.mkdir()
@@ -1211,108 +1151,29 @@ class MakeTests(RepoCase):
             sorted(p.name for p in folder.iterdir()), ["E1019999.BIN", "mod.bin"]
         )
 
-    def test_a_folder_that_does_not_exist_is_refused(self) -> None:
-        with self.assertRaisesRegex(BuildError, "no such folder"):
-            self.make(self.repo.tested, card=self.card.parent / "mistyped")
-        self.assertEqual(self.repo.outputs(), [])
-
-    def test_a_failed_folder_flush_on_the_card_is_reported_as_it_is(self) -> None:
-        target = pipeline.card_target(self.card, TINY_STOCK)
-        target.parent.mkdir()
-        target.write_bytes(b"older firmware")
-        real_sync = fileio.sync_folder
-
-        def fail_on_card(folder: Path) -> None:
-            if folder == target.parent:
-                raise OSError(errno.EIO, "Input/output error")
-            real_sync(folder)
-
-        with mock.patch("epm2mod.pipeline.sync_folder", side_effect=fail_on_card):
-            with self.assertRaisesRegex(BuildError, "state is not certain") as raised:
-                self.make(self.repo.tested, card=self.card)
-        self.assertNotIn("NOT on the card", str(raised.exception))
-        self.assertEqual(target.read_bytes(), self.repo.image)
-        self.assertEqual(self.repo.outputs(), [])
-
     def test_what_an_interrupted_run_left_is_ours_and_is_replaced(self) -> None:
-        target = pipeline.card_target(self.card, TINY_STOCK)
-        target.parent.mkdir()
-        fileio.part_path(target).write_bytes(b"half a file")
         image = pipeline.image_path(self.repo.paths, "good")
         image.parent.mkdir()
         fileio.part_path(image).write_bytes(b"half a file")
-        self.make(self.repo.tested, card=self.card)
-        self.assertEqual([p.name for p in target.parent.iterdir()], [target.name])
+        self.make(self.repo.tested)
         self.assertEqual(self.repo.outputs(), ["card/DCOLYMP/E1019999.BIN", "good.BIN"])
         fileio.part_path(image).write_bytes(b"half a file")
         pipeline.clear_outputs(self.repo.paths, "good")
         self.assertEqual(self.repo.outputs(), [])
 
-    def test_a_firmware_folder_that_cannot_be_read_is_an_error(self) -> None:
-        folder = pipeline.card_target(self.card, TINY_STOCK).parent
-        folder.mkdir()
-        with mock.patch.object(Path, "iterdir", side_effect=PermissionError(13, "no")):
-            with self.assertRaisesRegex(BuildError, "cannot be read"):
-                pipeline.check_card(self.card, TINY_STOCK)
-
     def test_every_firmware_file_is_read_back(self) -> None:
         with mock.patch(
             "epm2mod.pipeline.write_bytes", wraps=fileio.write_bytes
         ) as write:
-            self.make(self.repo.tested, card=self.card)
+            self.make(self.repo.tested, output=self.card)
         self.assertEqual(write.call_count, 3)
         for call in write.call_args_list:
             self.assertIs(call.kwargs.get("read_back"), True, call)
-        # Only the card write leaves the folder flush to its caller, which
-        # reports a failure of that step in its own words.
-        self.assertEqual(
-            [call.kwargs.get("flush_folder", True) for call in write.call_args_list],
-            [True, True, False],
-        )
 
-    def test_a_card_problem_is_found_before_any_work(self) -> None:
-        folder = self.card / "DCOLYMP"
-        folder.mkdir()
-        (folder / "OTHER.BIN").write_bytes(b"x")
-        for card in (self.card, self.card / "none", folder / "OTHER.BIN"):
-            with mock.patch("epm2mod.pipeline.obtain_stock") as obtain:
-                with self.subTest(card=card.name), self.assertRaises(BuildError):
-                    self.make(self.repo.tested, card=card)
-                obtain.assert_not_called()
-            self.assertEqual(self.repo.outputs(), [])
-        self.assertEqual((folder / "OTHER.BIN").read_bytes(), b"x")
-
-    def test_a_failed_card_write_keeps_the_file_that_was_there(self) -> None:
-        target = pipeline.card_target(self.card, TINY_STOCK)
-        target.parent.mkdir()
-        target.write_bytes(b"older firmware")
-        with mock.patch.object(Path, "read_bytes", return_value=b"other bytes"):
-            with self.assertRaises(BuildError):  # the read-back differs
-                pipeline.copy_to_card(self.repo.image, self.card, TINY_STOCK)
-        self.assertEqual(target.read_bytes(), b"older firmware")
-        self.assertEqual([p.name for p in target.parent.iterdir()], [target.name])
-
-        real_write = fileio.write_bytes
-
-        def fail_on_card(
-            path: Path,
-            data: bytes,
-            error: type[Epm2ModError] = FileError,
-            *,
-            read_back: bool = False,
-            flush_folder: bool = True,
-        ) -> None:
-            if self.card in path.parents:
-                raise error("card full")
-            real_write(
-                path, data, error, read_back=read_back, flush_folder=flush_folder
-            )
-
-        with mock.patch("epm2mod.pipeline.write_bytes", side_effect=fail_on_card):
-            with self.assertRaisesRegex(BuildError, "NOT on the card") as raised:
-                self.make(self.repo.tested, card=self.card)
-        self.assertNotIn("not certain", str(raised.exception))
-        self.assertEqual(target.read_bytes(), b"older firmware")
+    def test_a_dry_run_writes_nothing(self) -> None:
+        result = self.make(self.repo.tested, dry_run=True)
+        self.assertEqual(result.sha256, self.repo.sha256)
+        self.assertEqual(len(result.files), 2)
         self.assertEqual(self.repo.outputs(), [])
 
 
@@ -1369,10 +1230,6 @@ class CommandLineTests(RepoCase):
         clock.start()
         self.addCleanup(clock.stop)
 
-    def build_file(self, name: str) -> str:
-        """Return the absolute path of a build description of the tiny repository."""
-        return str(self.repo.paths.builds / f"{name}.json")
-
     def run_cli(self, *argv: str) -> tuple[int, str]:
         out, err = io.StringIO(), io.StringIO()
         env = {paths_module.ROOT_ENV: str(self.repo.paths.root)}
@@ -1393,30 +1250,40 @@ class CommandLineTests(RepoCase):
         self.assertIn(f"sha256 {self.repo.sha256}", text)
         self.assertEqual(self.repo.outputs(), ["card/DCOLYMP/E1019999.BIN", "good.BIN"])
 
-    def test_make_a_candidate_on_a_card(self) -> None:
+    def test_make_a_candidate_by_its_name(self) -> None:
         self.repo.free_space_tool(0)
-        status, text = self.run_cli(
-            "make", self.build_file("new"), "--card", str(self.card)
-        )
+        out = self.card / "x.BIN"
+        status, text = self.run_cli("make", "new", "-o", str(out))
         self.assertEqual(status, 0, text)
         self.assertIn("NOT camera-tested", text)
-        on_card = pipeline.card_target(self.card, TINY_STOCK)
-        self.assertEqual(on_card.read_bytes(), self.repo.image)
+        self.assertIn("install --card DIR --build new --untested", text)
+        self.assertEqual(out.read_bytes(), self.repo.image)
+
+    def test_a_build_is_named_not_given_as_a_path(self) -> None:
+        for argv in (
+            ("make", "builds/new.json"),
+            ("make", "none"),
+            ("pin", "nope", "--date", "2026-11-10", "--sha256", "0" * 64),
+        ):
+            with self.subTest(argv=argv):
+                status, text = self.run_cli(*argv)
+                self.assertEqual(status, 3, text)
+                self.assertIn("'epm2mod builds' lists them", text)
 
     def test_make_removes_the_old_outputs_before_it_reads_the_description(
         self,
     ) -> None:
-        self.assertEqual(self.run_cli("make", self.build_file("good"))[0], 0)
+        self.assertEqual(self.run_cli("make", "good")[0], 0)
         self.assertTrue(self.repo.outputs())
-        Path(self.build_file("good")).write_text("{broken")
-        status, text = self.run_cli("make", self.build_file("good"))
+        builds.description_path(self.repo.paths, "good").write_text("{broken")
+        status, text = self.run_cli("make", "good")
         self.assertEqual(status, 1, text)
         self.assertEqual(self.repo.outputs(), [])
 
     def test_a_failed_pinned_run_removes_the_image_of_the_earlier_run(self) -> None:
         for damage in ("<<<<<<< HEAD\n", json.dumps(self.repo.candidate.to_json())):
             self.assertEqual(self.run_cli("make")[0], 0)
-            good = Path(self.build_file("good"))
+            good = builds.description_path(self.repo.paths, "good")
             saved = good.read_text()
             good.write_text(damage)  # not JSON; then: not a tested build
             status, text = self.run_cli("make")
@@ -1426,8 +1293,8 @@ class CommandLineTests(RepoCase):
 
     def test_the_wrappers_in_tools_pass_their_arguments_on(self) -> None:
         cases = {
-            "make_firmware.py": ["make", "builds/x.json", "--card", "/card"],
-            "fetch_stock.py": ["fetch-stock", "builds/x.json", "--card", "/card"],
+            "make_firmware.py": ["make", "x", "-o", "/out"],
+            "fetch_stock.py": ["fetch-stock", "x", "-o", "/out"],
         }
         for script, expected in cases.items():
             argv = [script, *expected[1:]]
@@ -1455,23 +1322,28 @@ class CommandLineTests(RepoCase):
 
     def test_an_empty_argument_is_an_error(self) -> None:
         record = ("--date", "2026-11-10", "--sha256", self.repo.sha256)
-        cases: list[tuple[str, ...]] = [
-            ("make", ""),
-            ("make", "--card", ""),
-            ("apply", str(self.repo.paths.resolve("patches/a.json")), "-o", ""),
-            ("apply", str(self.repo.paths.resolve("patches/a.json")), "-o", "/"),
-            ("pin", "", *record),
+        spec_file = str(self.repo.paths.resolve("patches/a.json"))
+        cases: list[tuple[tuple[str, ...], int]] = [
+            (("make", ""), 3),
+            (("make", "-o", ""), 1),
+            (("apply", spec_file, "-o", ""), 1),
+            (("apply", spec_file, "-o", "/"), 1),
+            (("pin", "", *record), 3),
+            (("install", "--card", ""), 2),
         ]
-        for argv in cases:
+        for argv, wanted in cases:
             with self.subTest(argv=argv):
                 status, text = self.run_cli(*argv)
-                self.assertEqual(status, 1, text)
+                self.assertEqual(status, wanted, text)
                 self.assertTrue(text.startswith("epm2mod: "), text)
 
     def test_pin(self) -> None:
-        argv = ("pin", self.build_file("new"), "--date", "2026-11-10", "--sha256")
+        argv = ("pin", "new", "--date", "2026-11-10", "--sha256")
         status, text = self.run_cli(*argv, "0" * 64)
-        self.assertEqual(status, 1, text)
+        self.assertEqual(status, 4, text)
+        self.assertEqual(builds.pinned_description(self.repo.paths).name, "good")
+        status, text = self.run_cli(*argv, self.repo.sha256, "--dry-run")
+        self.assertEqual(status, 0, text)
         self.assertEqual(builds.pinned_description(self.repo.paths).name, "good")
         status, text = self.run_cli(*argv, self.repo.sha256)
         self.assertEqual(status, 0, text)
@@ -1497,8 +1369,11 @@ class CommandLineTests(RepoCase):
         path.unlink()
         with answers(catalog_answer(), TINY[:-1]):
             status, text = self.run_cli("fetch-stock")
-        self.assertEqual(status, 1, text)
+        self.assertEqual(status, 4, text)
         self.assertFalse(path.exists())
+        with answers(OSError):
+            status, text = self.run_cli("fetch-stock")
+        self.assertEqual(status, 5, text)
 
     def test_apply(self) -> None:
         spec_file = str(self.repo.paths.resolve("patches/a.json"))
@@ -1510,10 +1385,18 @@ class CommandLineTests(RepoCase):
         self.assertEqual(out.read_bytes(), self.repo.image)
         self.assertIn("[a]", text)
         self.assertIn(f"sha256 {self.repo.sha256}", text)
+        start = self.repo.write("start.BIN", TINY)
+        stock.stock_path(self.repo.paths, TINY_STOCK).unlink()
+        status, text = self.run_cli("apply", spec_file, "-o", str(out))
+        self.assertEqual(status, 3, text)
+        status, text = self.run_cli(
+            "apply", spec_file, "-o", str(out), "--from", str(start)
+        )
+        self.assertEqual(status, 0, text)
 
     def test_apply_checks_the_sha256_that_a_single_spec_states(self) -> None:
         out = self.repo.paths.root / "x.BIN"
-        for expected, status_wanted in (("0" * 64, 1), (self.repo.sha256, 0)):
+        for expected, status_wanted in (("0" * 64, 4), (self.repo.sha256, 0)):
             raw = {**spec_json("b", [BYTE_OP]), "expected_sha256": expected}
             spec_file = str(self.repo.write_json("patches/b.json", raw))
             status, text = self.run_cli("apply", spec_file, "-o", str(out))
@@ -1592,71 +1475,87 @@ class CommandLineTests(RepoCase):
         self.assertEqual(done.returncode, 0, done.stderr)
         self.assertEqual(done.stdout.strip(), epm2mod.__version__)
 
-    def test_errors_are_one_message_and_status_1(self) -> None:
-        outside = self.repo.write_json("elsewhere.json", self.repo.candidate.to_json())
-        image = self.repo.write("fw.BIN", TINY)
+    def test_errors_are_one_message_and_their_status(self) -> None:
         cases = [
-            ("make", "builds/none.json"),
-            ("make", str(outside)),
-            ("pin", "builds/new.json", "--date", "2026-13-40", "--sha256", "0" * 64),
-            (
-                "pin",
-                "builds/new.json",
-                "--date",
-                "2999-01-01",
-                "--sha256",
-                self.repo.sha256,
-            ),
-            ("info", str(self.repo.paths.root)),
-            ("info", "no-such-file"),
-            ("apply", "no-such-spec.json", "-o", "out.BIN"),
-            ("make", "--card", str(image)),
+            (("pin", "new", "--date", "2026-13-40", "--sha256", "0" * 64), 1),
+            (("pin", "new", "--date", "2999-01-01", "--sha256", self.repo.sha256), 1),
+            (("inspect", str(self.repo.paths.root)), 3),
+            (("inspect", "no-such-file"), 3),
+            (("apply", "no-such-spec.json", "-o", "out.BIN"), 1),
         ]
         self.addCleanup(os.chdir, os.getcwd())
         os.chdir(self.repo.paths.root)
-        for argv in cases:
+        for argv, wanted in cases:
             with self.subTest(argv=argv):
                 status, text = self.run_cli(*argv)
-                self.assertEqual(status, 1, text)
+                self.assertEqual(status, wanted, text)
                 self.assertTrue(text.startswith("epm2mod: "), text)
                 self.assertNotIn("Traceback", text)
         self.assertEqual(self.repo.outputs(), [])
 
     def test_a_wrong_command_line_is_status_2(self) -> None:
-        for argv in ((), ("nope",), ("pin", "builds/new.json")):
+        for argv in (
+            (),
+            ("nope",),
+            ("pin", "new"),
+            ("readme",),
+            ("info", "x"),
+            ("make", "--card", "x"),
+            ("install",),
+            ("restore",),
+        ):
             with self.subTest(argv=argv), self.assertRaises(SystemExit) as raised:
-                self.run_cli(*argv)
+                with contextlib.redirect_stderr(io.StringIO()):
+                    self.run_cli(*argv)
             self.assertEqual(raised.exception.code, 2)
 
     def test_not_in_a_repository(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             with mock.patch.dict(os.environ, {paths_module.ROOT_ENV: folder}):
                 with contextlib.redirect_stderr(io.StringIO()) as err:
-                    self.assertEqual(cli.main(["builds"]), 1)
+                    self.assertEqual(cli.main(["builds"]), 5)
         self.assertIn("is not the repository", err.getvalue())
 
-    def test_info(self) -> None:
+    def test_inspect(self) -> None:
         good = self.repo.write("fw.BIN", TINY)
-        status, text = self.run_cli("info", str(good))
-        self.assertEqual(status, 0)
+        status, text = self.run_cli("inspect", str(good))
+        self.assertEqual(status, 0, text)
         self.assertIn(TINY_STOCK.sha256, text)
+        self.assertIn("model E-PM2, build Olympus original", text)
         damaged = bytearray(TINY)
         damaged[40] ^= 1
-        status, _ = self.run_cli(
-            "info", str(self.repo.write("bad.BIN", bytes(damaged)))
+        status, text = self.run_cli(
+            "inspect", str(self.repo.write("bad.BIN", bytes(damaged)))
         )
-        self.assertEqual(status, 1)
+        self.assertEqual(status, 4, text)
+        self.assertIn("will not work", text)
 
-    def test_the_readme_check_of_this_repository(self) -> None:
+    def test_every_command_has_help_with_examples(self) -> None:
+        for name in cli.COMMANDS:
+            with self.subTest(name=name):
+                out = io.StringIO()
+                with contextlib.redirect_stdout(out), self.assertRaises(SystemExit):
+                    cli.main([*name.split(), "--help"])
+                text = out.getvalue()
+                self.assertIn("examples:", text)
+                self.assertIn("Needs:", text)
+                self.assertIn("Network:", text)
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), self.assertRaises(SystemExit):
+            cli.main(["--help"])
+        for group in cli.GROUPS:
+            self.assertIn(group, out.getvalue())
+
+    def test_the_docs_check_of_this_repository(self) -> None:
         env = {paths_module.ROOT_ENV: str(ROOT)}
         with mock.patch.dict(os.environ, env):
             with contextlib.redirect_stdout(io.StringIO()):
-                self.assertEqual(cli.main(["readme", "--check"]), 0)
+                self.assertEqual(cli.main(["docs"]), 0)
 
 
 class ReadmeTests(unittest.TestCase):
     def test_the_readme_is_up_to_date(self) -> None:
-        self.assertTrue(readme.is_current(PATHS), "run: uv run epm2mod readme")
+        self.assertTrue(readme.is_current(PATHS), "run: uv run epm2mod docs --write")
 
     def test_marker_problems(self) -> None:
         text = readme.generated_text(PATHS)
@@ -1747,19 +1646,27 @@ class ReadmeTests(unittest.TestCase):
         with self.assertRaisesRegex(BuildError, "found 2 times"):
             readme.is_current(paths)
 
-    def test_the_readme_command(self) -> None:
+    def test_the_docs_command(self) -> None:
         paths = self.stale_copy()
 
         def run(*argv: str) -> tuple[int, str]:
             out = io.StringIO()
             env = {paths_module.ROOT_ENV: str(paths.root)}
             with mock.patch.dict(os.environ, env), contextlib.redirect_stdout(out):
-                return cli.main(["readme", *argv]), out.getvalue()
+                with contextlib.redirect_stderr(io.StringIO()):
+                    return cli.main(["docs", *argv]), out.getvalue()
 
-        self.assertEqual(run("--check")[0], 1)
-        self.assertEqual(run(), (0, "documents: updated\n"))
-        self.assertEqual(run(), (0, "documents: no change\n"))
-        self.assertEqual(run("--check")[0], 0)
+        self.assertEqual(run()[0], 1)
+        self.assertEqual(
+            run("--write"),
+            (0, f"wrote {paths.readme}\nwrote {paths.resolve('docs/cli.md')}\n"),
+        )
+        self.assertEqual(run("--write"), (0, "documents: no change\n"))
+        self.assertEqual(run()[0], 0)
+        self.assertEqual(
+            fileio.read_text(paths.resolve("docs/cli.md")),
+            fileio.read_text(ROOT / "docs" / "cli.md"),
+        )
 
 
 class FilmInputsTests(unittest.TestCase):

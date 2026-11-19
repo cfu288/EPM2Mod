@@ -244,6 +244,11 @@ def load_description(path: Path) -> BuildDescription:
     return description_from_json(path.stem, read_json(path, BuildError))
 
 
+def is_build_name(text: str) -> bool:
+    """Return True if ``text`` can be the name of a build."""
+    return _NAME.fullmatch(text) is not None
+
+
 def description_path(paths: RepoPaths, name: str) -> Path:
     """Return the path of the description of the build called ``name``."""
     return paths.builds / f"{name}{_SUFFIX}"

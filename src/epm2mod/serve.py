@@ -1,9 +1,8 @@
-"""The local app (``epm2mod serve``): a page on this computer that makes the firmware and the look file.
+"""The local app (``epm2mod serve``): a page on this computer that makes the firmware and the film file.
 
-The page calls the same functions as the command line, so it makes the same files: ``pipeline.make`` for the
-firmware (``epm2mod make``) and ``records.looks_of_choices`` with ``lookfile.pack`` for the look file
-(``epm2mod looks pack ART2=velvia ...``). The result goes to an SD card from ``cards.cards`` or into a zip laid out
-as on the card.
+The page calls the same functions as the command line, so it makes the same files and shows the same camera steps:
+``pipeline.install`` (``epm2mod install``) and ``pipeline.restore`` (``epm2mod restore``), with the steps of
+``camera_steps``. The result goes to an SD card from ``cards.cards`` or into a zip laid out as on the card.
 
 Who can use it: the server listens on 127.0.0.1 only. Each API call needs the random token of the page's URL in the
 header ``X-EPM2-Token``, and a Host header of ``127.0.0.1:PORT`` or ``localhost:PORT``. Another website can't send
@@ -15,9 +14,10 @@ API (JSON):
 - ``GET /api/build``: the pinned build (name, what, sha256).
 - ``GET /api/cards``: the cards plugged in.
 - ``POST /api/make`` with ``{"firmware": "epm2mod" or "original", "choices": ["ART2=velvia", ...], "card": PATH or
-  null}``: start a job. No choices: no look file. ``original`` is Olympus's own firmware (``pipeline.restore``), with no
-  choices. One job at a time; a wrong request, or one while a job runs, gets 400 and the reason.
-- ``GET /api/job``: the last job: its progress lines, and when it is done, the error or the result.
+  null}``: start a job. No choices: no film file. ``original`` is Olympus's own firmware (``pipeline.restore``), with
+  no choices. One job at a time; a wrong request, or one while a job runs, gets 400 and the reason.
+- ``GET /api/job``: the last job: its progress lines, and when it is done, the error or the result with the camera
+  steps (``camera_steps``).
 - ``GET /api/zip``: the files of the last finished job, as a zip.
 - ``GET /api/ping``: the page is still open. ``POST /api/quit``: stop the server.
 
@@ -47,13 +47,11 @@ from typing import Any
 from urllib.parse import urlsplit
 
 from . import cards as card_list
-from .builds import BuildDescription, pinned_description
-from .errors import BuildError, Epm2ModError, StockError
+from .catalogue import Locator
+from .errors import BuildError, CardError, CheckError, DownloadError, Epm2ModError
 from .fileio import Log
-from .looks import lookfile, records
-from .paths import RepoPaths
-from .pipeline import STEPS, make, restore
-from .stock import CARD_FOLDER, EPM2_V16
+from .looks import records
+from .pipeline import STEPS, Outcome, install, restore
 
 #: The built app page, part of the package.
 STATIC = Path(__file__).resolve().parent / "app"
@@ -67,7 +65,7 @@ _MAX_BODY = 16 * 1024
 
 @dataclass
 class Job:
-    """One run of ``make`` and the look file.
+    """One run of ``install`` or ``restore``.
 
     Attributes:
         number: counts the jobs of this server, from 1.
@@ -80,6 +78,7 @@ class Job:
         sha256: the firmware's SHA-256, when it is made.
         card: the card the files went to, or None.
         files: the files for the card, by their path on the card.
+        camera_steps: the steps on the camera, when the job is done.
     """
 
     number: int
@@ -92,6 +91,7 @@ class Job:
     sha256: str | None = None
     card: str | None = None
     files: dict[str, bytes] = field(default_factory=dict)
+    camera_steps: list[dict[str, Any]] = field(default_factory=list)
 
     def state(self) -> dict[str, Any]:
         """Return what the page shows of the job."""
@@ -106,42 +106,30 @@ class Job:
             "sha256": self.sha256,
             "card": self.card,
             "files": sorted(self.files),
+            "camera_steps": list(self.camera_steps),
         }
 
 
 def run_job(
-    paths: RepoPaths,
-    description: BuildDescription,
+    paths: Locator,
     choices: list[str],
     card: Path | None,
     log: Log,
     step: Callable[[int], None],
-) -> tuple[str, dict[str, bytes]]:
-    """Make the firmware and the look file, and write them to a card if one is given.
+) -> Outcome:
+    """Make the pinned build's firmware and the film file, and write them to a card if one is given (``install``).
 
     Args:
-        paths: the repository (or the unpacked release).
-        description: the build to make.
-        choices: choices like ``ART2=velvia``; none for no look file.
-        card: the top folder of the SD card, or None.
+        paths: the locator.
+        choices: choices like ``ART2=velvia``; none for no film file.
+        card: the top folder of the SD card, or None for the files only.
         log: where progress lines go.
-        step: called with each step of ``make`` as it ends (``pipeline.STEPS``).
-
-    Returns:
-        The firmware's SHA-256, and the files by their path on the card.
+        step: called with each step as it ends (``pipeline.STEPS``).
 
     Raises:
         Epm2ModError: if a step fails (the message is for the user).
     """
-    looks = records.pack_choices(paths, choices)[0] if choices else b""
-    result = make(paths, description, card=card, log=log, stock=EPM2_V16, step=step)
-    files = {f"{CARD_FOLDER}/{result.card_copy.name}": result.card_copy.read_bytes()}
-    if looks:
-        files[lookfile.CARD_NAME] = looks
-        if card is not None:
-            on_card = records.write_to_card(card, looks)
-            log(f"on the card: {on_card}  (written and read back)")
-    return result.sha256, files
+    return install(paths, card, choices, log=log, step=step)
 
 
 def plain_message(error: Epm2ModError) -> str:
@@ -157,29 +145,33 @@ def plain_message(error: Epm2ModError) -> str:
         )
     if "No space left" in text:
         return "The card is full. Make room on it, then select Try again."
-    if "holds other files" in text:
-        return "The card's DCOLYMP folder holds other files. Delete them, then select Try again."
-    if isinstance(error, StockError):
+    if "holds a folder" in text:
+        return "The card's DCOLYMP folder holds a folder. Move it away, then select Try again."
+    if "has no DCIM folder" in text:
+        return "Format the card in the camera first, then select Try again."
+    if isinstance(error, CheckError) and "gives back" in text:
+        return (
+            "The card did not keep the files. Use another card, then select Try again."
+        )
+    if isinstance(error, CardError) and "not an SD card" in text:
+        return "Put the SD card back in this computer, then select Try again."
+    if isinstance(error, DownloadError):
         return "Olympus's firmware could not be downloaded. Check the internet connection, then select Try again."
     return text
 
 
 def run_restore(
-    paths: RepoPaths,
+    paths: Locator,
     card: Path | None,
     log: Log,
     step: Callable[[int], None],
-) -> tuple[str, dict[str, bytes]]:
+) -> Outcome:
     """Get Olympus's original firmware, and write it to a card if one is given (``epm2mod restore``).
-
-    Returns:
-        The firmware's SHA-256, and the file by its path on the card.
 
     Raises:
         Epm2ModError: if a step fails (the message is for the user).
     """
-    data = restore(paths, card, log=log, stock=EPM2_V16, step=step)
-    return EPM2_V16.sha256, {f"{CARD_FOLDER}/E1019999.BIN": data}
+    return restore(paths, card, log=log, step=step)
 
 
 def zip_files(files: dict[str, bytes]) -> bytes:
@@ -196,20 +188,20 @@ class App:
 
     def __init__(
         self,
-        paths: RepoPaths,
+        paths: Locator,
         static: Path = STATIC,
         list_cards: Callable[[], list[card_list.Card]] = card_list.cards,
-        job_runner: Callable[..., tuple[str, dict[str, bytes]]] = run_job,
-        restore_runner: Callable[..., tuple[str, dict[str, bytes]]] = run_restore,
+        job_runner: Callable[..., Outcome] = run_job,
+        restore_runner: Callable[..., Outcome] = run_restore,
     ) -> None:
-        """Make the app for a repository; the token is new and random."""
+        """Make the app for a locator; the token is new and random."""
         self.paths = paths
         self.static = static
         self.list_cards = list_cards
         self.run = job_runner
         self.run_restore = restore_runner
         self.token = secrets.token_urlsafe(24)
-        self.description = pinned_description(paths)
+        self.description = paths.pinned_build()
         self.job: Job | None = None
         self.lock = threading.Lock()
         self.last_seen = time.monotonic()
@@ -299,11 +291,12 @@ class App:
 
         try:
             if job.firmware == "original":
-                job.sha256, job.files = self.run_restore(self.paths, card, log, step)
+                outcome = self.run_restore(self.paths, card, log, step)
             else:
-                job.sha256, job.files = self.run(
-                    self.paths, self.description, choices, card, log, step
-                )
+                outcome = self.run(self.paths, choices, card, log, step)
+            job.sha256 = outcome.files[0].content.sha256
+            job.files = outcome.file_data()
+            job.camera_steps = [item.to_json() for item in outcome.steps]
         except Epm2ModError as error:
             job.error = plain_message(error)
             print(f"error: {error}", flush=True)
@@ -405,8 +398,8 @@ class Handler(BaseHTTPRequestHandler):
         if self._refused():
             return
         if urlsplit(self.path).path == "/api/quit":
-            self._json(HTTPStatus.OK, {"ok": True})
             self.app.quit.set()
+            self._json(HTTPStatus.OK, {"ok": True})
             return
         if urlsplit(self.path).path != "/api/make":
             self._json(HTTPStatus.NOT_FOUND, {"error": "no such call"})
@@ -458,7 +451,7 @@ def page_url(app: App, httpd: ThreadingHTTPServer) -> str:
     return f"http://127.0.0.1:{httpd.server_port}/#token={app.token}"
 
 
-def serve(paths: RepoPaths, port: int = 0, browser: bool = True) -> None:
+def serve(paths: Locator, port: int = 0, browser: bool = True) -> None:
     """Run the local app until the process is stopped.
 
     Raises:

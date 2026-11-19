@@ -38,33 +38,32 @@ git clone https://github.com/cfu288/EPM2Mod.git
 cd EPM2Mod
 ```
 
-1. To build a copy of the firmware, run
+1. Format the card in the camera. This makes the `DCIM` folder. Put the card in the computer. `uv run epm2mod cards` shows the folder of the card (for example `/Volumes/NO NAME` on a Mac or `E:\` on Windows).
+2. Write EPM2Mod and the 12 default film simulations to the card:
 
    ```sh
-   uv run epm2mod make
+   uv run epm2mod install --card /path/to/card
    ```
 
-   This downloads the Olympus firmware, applies the patches and writes `build/card/DCOLYMP/E1019999.BIN`.
-
-   Alternatively, build and install the firmware directly to the SD card (allowing you to skip step 2)
+   This downloads the Olympus firmware, applies the patches, and writes `DCOLYMP/E1019999.BIN` and `EPM2LOOK.BIN` to the card. To choose the film simulations, put a film simulation in each ART slot. ART1 is the first entry of the camera's ART menu (Pop Art), ART12 the last (Watercolor). A slot you leave out keeps its Olympus art filter. The names are in the [film table](docs/guide/film-looks.md#available-film-simulations), or run `uv run epm2mod films`:
 
    ```sh
-   uv run epm2mod make --card /path/to/card
+   uv run epm2mod install --card /path/to/card ART1=portra-400 ART2=ektachrome ART3=pro-400h ART4=kodachrome ART5=double-x ART6=vision3-250d ART7=velvia ART8=superia-400 ART9=provia ART10=portra-160 ART11=gold-200 ART12=vision3-500t
    ```
+3. Do the steps that `install` shows:
 
-   `/path/to/card` is the SD card's folder: `uv run epm2mod cards` lists it (for example `/Volumes/NO NAME` on a Mac or `E:\` on Windows).
+<!-- BEGIN GENERATED: camera-steps -->
+1. Eject the card (Mac: ⏏ in Finder. Windows: right-click → Eject) and take it out.
+2. Put a charged battery and the card in the camera (cover on the bottom).
+3. Hold OK (middle of the arrow pad) and ON/OFF together until the orange lamp on the front stays lit, then let go.
+4. Leave the camera alone until the lamp blinks (1 to 2 minutes).
+5. Turn the camera off and on.
+6. To check: MENU → SETUP → wrench tab → Firmware reads Body : 1.6 EPM2Mod and the release date.
+7. MENU → SETUP → gears tab → J → Load Looks → Load → OK. No gears tab? Wrench tab → Menu Display → Custom Menu → On.
+8. Check: MENU → ART shows film names, such as Portra 400.
+<!-- END GENERATED: camera-steps -->
 
-   Both also write `EPM2LOOK.BIN` with the 12 default film simulations, as the installer does. To choose others, write the look file again after `make`. Put a film simulation in each ART slot: ART1 is the first entry of the camera's ART menu (Pop Art), ART12 the last (Watercolor). The names are in the [film table](docs/guide/film-looks.md#available-film-simulations), or run `uv run epm2mod looks list`. A slot you leave out keeps its Olympus art filter:
-
-   ```sh
-   uv run epm2mod looks pack ART1=portra-400 ART2=ektachrome ART3=pro-400h ART4=kodachrome ART5=double-x ART6=vision3-250d ART7=velvia ART8=superia-400 ART9=provia ART10=portra-160 ART11=gold-200 ART12=vision3-500t --card /path/to/card
-   ```
-2. Format the card in the camera first (that makes the `DCIM` folder). Copy the folder `build/card/DCOLYMP` and the file `build/card/EPM2LOOK.BIN` (the 12 default films) to the top folder of an SD card, beside `DCIM`. `E1019999.BIN` must be the only file in `DCOLYMP`.
-3. Put the card in the camera. With the camera off, hold **OK** and the **ON/OFF** button together. When the orange lamp on the front of the camera (the AF illuminator) lights steadily, let go of both.
-   - While the lamp is steady, the camera is writing the firmware. This takes 1 to 2 minutes. Do not switch the camera off.
-   - When the lamp blinks, the update is done. Switch the camera off and on again.
-   - To check: MENU → SETUP → wrench tab → **Firmware** reads `Body : 1.6  EPM2Mod` and the release date.
-4. To load the film simulations: MENU → SETUP → Custom Menu → J → **Load Looks** → **Load** → OK ([more](docs/guide/card-looks.md)).
+While the lamp is steady, the camera writes the firmware. Do not switch the camera off. All commands and options are in the [command-line reference](docs/cli.md).
 
 To go back to the original firmware, see [docs/install.md](docs/install.md).
 
@@ -72,7 +71,7 @@ To go back to the original firmware, see [docs/install.md](docs/install.md).
 
 - **The camera starts normally instead of writing:** it found no firmware file it accepts. `DCOLYMP/E1019999.BIN` must be in the top folder of the card and be the only file in `DCOLYMP`.
 - **Load Looks shows No file:** `EPM2LOOK.BIN` is not in the top folder of the card.
-- **Load Looks shows Bad file:** the file is damaged or incomplete. Make it again with the installer or `looks pack`. Nothing was changed.
+- **Load Looks shows Bad file:** the file is damaged or incomplete. Make it again with the installer or `epm2mod films set`. Nothing was changed.
 
 ![Nine photos, each developed in the camera with stock Natural and the film simulations](docs/images/film-sim-comparison.jpg)
 

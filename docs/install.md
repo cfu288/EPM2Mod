@@ -1,7 +1,7 @@
 # Install
 
 <!-- BEGIN GENERATED: pinned-build -->
-The installer and `make` build the firmware **`epm2mod-2026.11.19`**: the twelve Olympus art filters unchanged; film looks loaded from the SD card with Custom Menu J, Load Looks, overwrite the entries the file lists; interval shooting with up to 240 frames, a level gauge with calibration, and focus peaking; a Debug Log row in Custom Menu J (Off by default) that writes EPM2LOG.BIN to the card for bug reports; a Lowest S/S Setting row in Custom Menu E (the shutter speed at which ISO Auto starts to rise in P and A); the Firmware screen shows the build's label (Body : 1.6 EPM2Mod 2026.11.19). We tested this build on a real E-PM2 on 2026-11-19 ([camera log](camera-log.md)).
+The installer and `install` write the firmware **`epm2mod-2026.11.19`**: the twelve Olympus art filters unchanged; film looks loaded from the SD card with Custom Menu J, Load Looks, overwrite the entries the file lists; interval shooting with up to 240 frames, a level gauge with calibration, and focus peaking; a Debug Log row in Custom Menu J (Off by default) that writes EPM2LOG.BIN to the card for bug reports; a Lowest S/S Setting row in Custom Menu E (the shutter speed at which ISO Auto starts to rise in P and A); the Firmware screen shows the build's label (Body : 1.6 EPM2Mod 2026.11.19). We tested this build on a real E-PM2 on 2026-11-19 ([camera log](camera-log.md)).
 
 | | sha256 |
 |---|---|

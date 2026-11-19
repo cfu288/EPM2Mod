@@ -1,15 +1,15 @@
 """The release zip (``epm2mod package``): what a user who doesn't code downloads.
 
-The zip holds one folder, ``EPM2Mod-<version>/``, with what ``epm2mod make`` and ``epm2mod serve`` need for the
-pinned build, and nothing else:
+The zip holds one folder, ``EPM2Mod-<version>/``, with what the commands for camera owners (``epm2mod install``,
+``films``, ``restore``, ``inspect``, ``serve``) need for the pinned build, and nothing else:
 
 - the package (``src/epm2mod``, with the built app page ``src/epm2mod/app``);
-- ``pinned-build.json``, the pinned build description and its patch specs;
-- the film records (``looks/film-records.json``);
+- the data (``data_files``): the pinned build description and its patch specs, the film records, and the marker
+  ``paths.RELEASE_MARKER`` with the version, by which ``catalogue.locate`` knows a release folder;
 - the launchers and their README (``release/``), and the licence files.
 
-It never holds firmware: the launchers run the same ``make``, which downloads Olympus's file from OM Digital
-Solutions on the user's computer. A file ending in ``.BIN`` stops the release.
+It never holds firmware: ``install`` downloads Olympus's file from OM Digital Solutions on the user's computer. A
+file ending in ``.BIN`` stops the release.
 
 The launchers get a pinned uv and a Python 3.12 from it into the folder's ``.uv``; the package needs only the
 standard library, so it runs from ``src`` with no install step.
@@ -18,6 +18,7 @@ standard library, so it runs from ``src`` with no install step.
 from __future__ import annotations
 
 import datetime
+import json
 import re
 import zipfile
 from collections.abc import Iterator
@@ -25,7 +26,8 @@ from pathlib import Path
 
 from .builds import pinned_description
 from .errors import BuildError
-from .paths import ROOT_MARKER, RepoPaths
+from .fileio import read_bytes
+from .paths import RELEASE_MARKER, ROOT_MARKER, RepoPaths
 
 #: The launchers, from ``release/``; the first three are run as programs.
 LAUNCHERS = ("start.sh", "Start (Mac).command", "start.ps1")
@@ -38,32 +40,51 @@ LICENCES = ("LICENSE", "NOTICE.md")
 _STAMP = (2026, 1, 1, 0, 0, 0)
 
 
-def release_files(paths: RepoPaths) -> list[tuple[str, Path]]:
-    """Return the files of the release: their path in the folder, and their source.
+def data_files(paths: RepoPaths, version: str) -> list[tuple[str, bytes]]:
+    """Return the data that the release's commands read: their path in the folder, and their content.
+
+    These are the pinned build and its specs, the film records and the release marker, at the paths that
+    ``catalogue.ReleaseLocator`` reads.
+
+    Raises:
+        BuildError: if a file is missing.
+    """
+    description = pinned_description(paths)
+    sources = [
+        (ROOT_MARKER, paths.pinned),
+        (f"builds/{description.name}.json", paths.builds / f"{description.name}.json"),
+        ("looks/film-records.json", paths.film_records),
+    ]
+    sources += [(spec, paths.resolve(spec)) for spec in description.specs]
+    missing = [str(source) for _, source in sources if not source.is_file()]
+    if missing:
+        raise BuildError("missing for the release: " + ", ".join(missing))
+    marker = json.dumps({"version": version}, indent=1) + "\n"
+    files = [(name, read_bytes(source, BuildError)) for name, source in sources]
+    return files + [(RELEASE_MARKER, marker.encode())]
+
+
+def release_files(paths: RepoPaths, version: str) -> list[tuple[str, bytes]]:
+    """Return the files of the release: their path in the folder, and their content.
 
     Raises:
         BuildError: if the app page is not built or a file is missing.
     """
-    description = pinned_description(paths)
     app = paths.root / "src" / "epm2mod" / "app"
     if not (app / "index.html").is_file():
         raise BuildError(
             f"{app}: the app page is not built. In web/: npm ci && npm run build:app"
         )
-    files: list[tuple[str, Path]] = [
-        (ROOT_MARKER, paths.pinned),
-        (f"builds/{description.name}.json", paths.builds / f"{description.name}.json"),
-        ("looks/film-records.json", paths.film_records),
-    ]
-    files += [(spec, paths.resolve(spec)) for spec in description.specs]
-    files += [(name, paths.root / name) for name in LICENCES]
-    files += [
+    sources = [(name, paths.root / name) for name in LICENCES]
+    sources += [
         (name, paths.root / "release" / name) for name in LAUNCHERS + RELEASE_TEXTS
     ]
-    files += list(_package(paths.root / "src"))
-    missing = [str(source) for _, source in files if not source.is_file()]
+    sources += list(_package(paths.root / "src"))
+    missing = [str(source) for _, source in sources if not source.is_file()]
     if missing:
         raise BuildError("missing for the release: " + ", ".join(missing))
+    files = data_files(paths, version)
+    files += [(name, read_bytes(source, BuildError)) for name, source in sources]
     firmware = [name for name, _ in files if name.lower().endswith(".bin")]
     if firmware:
         raise BuildError("a release never holds firmware: " + ", ".join(firmware))
@@ -87,6 +108,23 @@ def today_version() -> str:
     return datetime.datetime.now(datetime.timezone.utc).strftime("%Y.%m.%d")
 
 
+def check_version(version: str) -> None:
+    """Refuse a version that is not a calendar version.
+
+    Raises:
+        BuildError: if it is not.
+    """
+    if not _VERSION.match(version):
+        raise BuildError(
+            f"'{version}': a version is a date, like 2026.11.18 or 2026.11.18-rc.1"
+        )
+
+
+def zip_path(out: Path, version: str) -> Path:
+    """Return the path of the release zip of ``version`` in the folder ``out``."""
+    return out / f"EPM2Mod-{version}.zip"
+
+
 def make_release(paths: RepoPaths, out: Path, version: str) -> Path:
     """Write the release zip ``EPM2Mod-<version>.zip`` into the folder ``out`` and return its path.
 
@@ -94,17 +132,14 @@ def make_release(paths: RepoPaths, out: Path, version: str) -> Path:
         BuildError: if the version is not a calendar version, a file is missing (``release_files``) or the zip
             can't be written.
     """
-    if not _VERSION.match(version):
-        raise BuildError(
-            f"'{version}': a version is a date, like 2026.11.18 or 2026.11.18-rc.1"
-        )
+    check_version(version)
     name = f"EPM2Mod-{version}"
-    target = out / f"{name}.zip"
-    files = release_files(paths)
+    target = zip_path(out, version)
+    files = release_files(paths, version)
     try:
         out.mkdir(parents=True, exist_ok=True)
         with zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED) as archive:
-            for path, source in files:
+            for path, data in files:
                 info = zipfile.ZipInfo(f"{name}/{path}", _STAMP)
                 info.compress_type = zipfile.ZIP_DEFLATED
                 mode = 0o755 if path in LAUNCHERS else 0o644
@@ -112,7 +147,7 @@ def make_release(paths: RepoPaths, out: Path, version: str) -> Path:
                     0o100000 | mode
                 ) << 16  # a regular file and its permissions
                 info.create_system = 3  # Unix, so that unzip tools keep the permissions
-                archive.writestr(info, source.read_bytes())
+                archive.writestr(info, data)
     except OSError as error:
         raise BuildError(f"{target}: {error.strerror or error}") from None
     return target

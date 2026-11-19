@@ -206,6 +206,20 @@ def _windows() -> Iterator[Card]:  # pragma: no cover - needs Windows
             yield card
 
 
+#: Environment variable with folders (separated by ``os.pathsep``) that are listed as cards: for tests, such as the
+#: release smoke test, on a computer with no SD card.
+TEST_CARDS_ENV = "EPM2MOD_TEST_CARDS"
+
+
+def _test_cards() -> Iterator[Card]:
+    """Yield the folders that ``TEST_CARDS_ENV`` names, as cards."""
+    for text in os.environ.get(TEST_CARDS_ENV, "").split(os.pathsep):
+        if text:
+            card = _card(Path(text).absolute(), "TEST")
+            if card is not None:
+                yield card
+
+
 def cards() -> list[Card]:
     """Return the SD cards plugged into this computer, in path order."""
     if sys.platform == "darwin":
@@ -214,6 +228,7 @@ def cards() -> list[Card]:
         found = list(_windows())
     else:
         found = list(_linux())
+    found += _test_cards()
     return sorted(found, key=lambda card: str(card.path))
 
 

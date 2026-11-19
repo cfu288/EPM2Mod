@@ -7,6 +7,7 @@ The tests need the built app page (``npm run build:app`` in web/); ``FromTheZipT
 
 from __future__ import annotations
 
+import json
 import os
 import shutil
 import subprocess
@@ -20,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from support import ROOT  # noqa: E402
 
-from epm2mod import release, stock  # noqa: E402
+from epm2mod import cards, release, stock  # noqa: E402
 from epm2mod.builds import pinned_description  # noqa: E402
 from epm2mod.errors import BuildError  # noqa: E402
 from epm2mod.paths import RepoPaths  # noqa: E402
@@ -51,6 +52,7 @@ class ZipTests(unittest.TestCase):
             self.assertIn(spec, inside)
         for name in (
             "pinned-build.json",
+            "release.json",
             "looks/film-records.json",
             "src/epm2mod/__main__.py",
             "src/epm2mod/app/index.html",
@@ -92,7 +94,7 @@ class ZipTests(unittest.TestCase):
     HAVE_APP and HAVE_STOCK, "needs the built app page and the stock firmware"
 )
 class FromTheZipTests(unittest.TestCase):
-    def test_the_unpacked_release_makes_the_pinned_build(self) -> None:
+    def test_the_unpacked_release_installs_the_pinned_build(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             archive = release.make_release(PATHS, Path(folder), "2026.11.18")
             with zipfile.ZipFile(archive) as unpack:
@@ -101,22 +103,32 @@ class FromTheZipTests(unittest.TestCase):
             local = stock.stock_path(RepoPaths(top))
             local.parent.mkdir(parents=True)
             shutil.copyfile(stock.stock_path(PATHS), local)
+            card = Path(folder) / "card"
+            (card / "DCIM").mkdir(parents=True)
             env = {
                 key: value for key, value in os.environ.items() if key != "EPM2MOD_ROOT"
             }
-            done = subprocess.run(
-                [sys.executable, "-m", "epm2mod", "make"],
-                cwd=top,
-                env={**env, "PYTHONPATH": str(top / "src")},
-                capture_output=True,
-                text=True,
-                check=False,
-            )
+            env.update({"PYTHONPATH": str(top / "src"), cards.TEST_CARDS_ENV: str(card)})
+
+            def run(*argv: str) -> subprocess.CompletedProcess[str]:
+                return subprocess.run(
+                    [sys.executable, "-m", "epm2mod", *argv],
+                    cwd=top,
+                    env=env,
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+
+            done = run("install", "--card", str(card), "--json")
             self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
-            self.assertIn(str(pinned_description(PATHS).sha256), done.stdout)
-            self.assertTrue(
-                (top / "build" / "card" / "DCOLYMP" / "E1019999.BIN").is_file()
-            )
+            files = json.loads(done.stdout)["files"]
+            self.assertEqual(files[0]["sha256"], pinned_description(PATHS).sha256)
+            self.assertTrue((card / "DCOLYMP" / "E1019999.BIN").is_file())
+            self.assertTrue((card / "EPM2LOOK.BIN").is_file())
+            self.assertFalse((top / "build").exists())
+            self.assertEqual(run("inspect", "--card", str(card)).returncode, 0)
+            self.assertEqual(run("make").returncode, 5)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 """The film records: ``looks/film-records.json``.
 
-The one list of films that look files are packed from: by ``epm2mod looks pack``, the local app and the web site
+The one list of films that look files are packed from: by ``epm2mod install`` and ``epm2mod films set``, the local app and the web site
 (which reads the same file). Each film has its look record (1,708 bytes, base64) for slot 0 under the film's name;
 a look file sets the slot and packs the records (``lookfile.pack``). ``slots`` gives the twelve ART entries in menu
 order, with the id of the film each holds when no look is loaded.
@@ -17,13 +17,14 @@ import dataclasses
 import re
 from collections.abc import Sequence
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from ..errors import BuildError, LookFileError
-from ..fileio import read_json, write_bytes
-from ..paths import RepoPaths
-from .lookfile import CARD_NAME, MENU_ENTRIES, Look, decode_record, pack
+from ..errors import BuildError, LookFileError, UsageError
+from ..fileio import read_json
+from .lookfile import MENU_ENTRIES, Look, decode_record, pack
+
+if TYPE_CHECKING:
+    from ..catalogue import Locator
 
 
 @dataclass(frozen=True)
@@ -101,13 +102,13 @@ def _film(item: Any, where: str) -> Film:
     return Film(**{key: item[key] for key in _TEXTS}, look=look)
 
 
-def load(paths: RepoPaths) -> Records:
-    """Return the film records.
+def load(paths: Locator) -> Records:
+    """Return the film records, from the file the locator names.
 
     Raises:
         BuildError: if the file is missing or malformed.
     """
-    path = paths.film_records
+    path = paths.film_records_file()
     raw: Any = read_json(path, BuildError)
     if not isinstance(raw, dict) or set(raw) != {"films", "slots"}:
         raise BuildError(f"{path}: an object with 'films' and 'slots'")
@@ -149,22 +150,25 @@ def looks_of_choices(records: Records, choices: Sequence[str]) -> list[Look]:
     shows the film's own name.
 
     Raises:
-        BuildError: if a choice is malformed, names an unknown film or an ART number twice.
+        UsageError: if a choice is malformed, names an unknown film or an ART number twice. The message of an
+            unknown film lists the valid names.
     """
     looks: list[Look] = []
     seen: set[int] = set()
     for text in choices:
         match = _CHOICE.match(text)
         if match is None:
-            raise BuildError(
+            raise UsageError(
                 f"'{text}': write ART<1-12>=<film>, for example ART2=velvia"
             )
         number, film_id = int(match.group(1)), match.group(2).lower()
-        if not 1 <= number <= len(MENU_ENTRIES) or number in seen:
-            raise BuildError(f"'{text}': ART 1 to {len(MENU_ENTRIES)}, each once")
+        if not 1 <= number <= len(MENU_ENTRIES):
+            raise UsageError(f"'{text}': the ART number is 1 to {len(MENU_ENTRIES)}")
+        if number in seen:
+            raise UsageError(f"'{text}': ART{number} is named twice")
         if film_id not in records.films:
-            raise BuildError(
-                f"'{text}': no film '{film_id}'; 'epm2mod looks list' shows them"
+            raise UsageError(
+                f"'{text}': no film '{film_id}'. The films: " + ", ".join(records.films)
             )
         seen.add(number)
         looks.append(dataclasses.replace(records.films[film_id].look, slot=number - 1))
@@ -176,30 +180,14 @@ def built_in_choices(records: Records) -> list[str]:
     return [f"ART{slot.art}={slot.built_in}" for slot in records.slots]
 
 
-def pack_choices(paths: RepoPaths, choices: Sequence[str]) -> tuple[bytes, list[Look]]:
+def pack_choices(paths: Locator, choices: Sequence[str]) -> tuple[bytes, list[Look]]:
     """Return the look file of choices like ``ART2=velvia``, and its looks.
 
-    The one way the command line (``epm2mod looks pack``) and the local app (``epm2mod serve``) pack a look file
-    from choices.
+    The one way the command line (``epm2mod install``, ``epm2mod films set``) and the local app (``epm2mod serve``)
+    pack a look file from choices.
 
     Raises:
         BuildError: if the records or a choice are wrong.
     """
     looks = looks_of_choices(load(paths), choices)
     return pack(looks), looks
-
-
-def write_to_card(card: Path, data: bytes) -> Path:
-    """Write a look file to the top folder of an SD card and read it back.
-
-    Returns:
-        The path of the file on the card.
-
-    Raises:
-        BuildError: if ``card`` is not a folder or the write fails.
-    """
-    if not card.is_dir():
-        raise BuildError(f"{card}: not a folder (the top folder of the SD card)")
-    target = card / CARD_NAME
-    write_bytes(target, data, BuildError, read_back=True)
-    return target

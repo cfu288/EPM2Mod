@@ -465,17 +465,17 @@ class GeneratorTests(SyntheticCase):
             env = {paths_module.ROOT_ENV: str(self.paths.root)}
             with mock.patch.dict(os.environ, env), contextlib.redirect_stdout(out):
                 with mock.patch.object(cli, "EPM2_V16", self.repo.stock):
-                    return cli.main(["looks", *argv]), out.getvalue()
+                    with contextlib.redirect_stderr(io.StringIO()):
+                        return cli.main(["looks", *argv]), out.getvalue()
 
         self.paths.pinned.write_text("{}")  # marks the top of the repository
-        for check in ((), ("--check",)):
-            status, text = run(*check)
-            self.assertEqual(status, 1, text)
-            self.assertIn("differs from the generated spec", text)
+        status, text = run()
+        self.assertEqual(status, 1, text)
+        self.assertIn("differs from the generated spec", text)
         status, text = run("--write")
         self.assertEqual(status, 0, text)
         self.assertEqual(text.count("wrote patches/"), 3)
-        self.assertEqual(run("--check")[0], 0)
+        self.assertEqual(run()[0], 0)
         self.assertEqual(run("--write"), (0, "no spec changed\n"))
 
 

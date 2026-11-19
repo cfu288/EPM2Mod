@@ -160,7 +160,9 @@ def plan(paths: RepoPaths, final: bool) -> tuple[Plan | None, list[str]]:
     if commit != _git(paths, "rev-parse", "origin/main"):
         problems.append("HEAD is not origin/main: push, or check out main")
     if not readme.is_current(paths):
-        problems.append("the generated documents are out of date: run 'epm2mod readme'")
+        problems.append(
+            "the generated documents are out of date: run 'epm2mod docs --write'"
+        )
     problems += [f"feature list: {p}" for p in readme.feature_problems(paths)]
     problems += _ci_problems(paths, commit)
     tags = _git(paths, "tag", "--list", "v*").split()

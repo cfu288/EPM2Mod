@@ -4,6 +4,11 @@
 package looks for by a fixed name is a property here. Paths that come from data
 (a patch spec named by a build description, a fit file named by the film list)
 are turned into absolute paths with ``RepoPaths.resolve``.
+
+``RepoPaths`` is also the checkout's implementation of the locator
+(``catalogue.Locator``): the methods after the properties are the ones that
+commands use. The release folder has the same layout for the files it holds
+(``catalogue.ReleaseLocator``).
 """
 
 from __future__ import annotations
@@ -11,8 +16,13 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
+from typing import TYPE_CHECKING, ClassVar
 
-from .errors import RepositoryError
+from .errors import NotFoundError, RepositoryError
+
+if TYPE_CHECKING:
+    from .builds import BuildDescription
+    from .stock import StockFirmware
 
 #: The file that marks the top of the repository.
 ROOT_MARKER = "pinned-build.json"
@@ -20,6 +30,8 @@ ROOT_MARKER = "pinned-build.json"
 ROOT_ENV = "EPM2MOD_ROOT"
 #: The folder that holds the patch specs a build may use.
 SPEC_FOLDER = "patches"
+#: The file that marks an unpacked release folder (``epm2mod package`` writes it).
+RELEASE_MARKER = "release.json"
 
 
 @dataclass(frozen=True)
@@ -31,6 +43,9 @@ class RepoPaths:
     """
 
     root: Path
+
+    #: What kind of source this is, for messages and ``--json``.
+    kind: ClassVar[str] = "checkout"
 
     @property
     def pinned(self) -> Path:
@@ -102,6 +117,69 @@ class RepoPaths:
     def firmware_map(self) -> Path:
         """A file the free-space check needs; it is made by ``tools/fwmap.py``."""
         return self.output / "map" / "linear.txt"
+
+    @property
+    def events(self) -> Path:
+        """The event dictionary of the debug log."""
+        return self.root / "logs" / "events.json"
+
+    # The locator (``catalogue.Locator``).
+
+    def where(self) -> str:
+        """Return the source's folder, for messages."""
+        return str(self.root)
+
+    def output_folder(self) -> Path:
+        """Return the folder that commands write their outputs to."""
+        return self.output
+
+    def stock_file(self, stock: StockFirmware) -> Path:
+        """Return where the downloaded stock firmware is kept."""
+        return self.resolve(stock.relative_path)
+
+    def spec_file(self, relative: str) -> Path:
+        """Return the file of a patch spec that a build description names."""
+        return self.resolve(relative)
+
+    def film_records_file(self) -> Path:
+        """Return the file of the film records."""
+        return self.film_records
+
+    def pinned_build(self) -> BuildDescription:
+        """Return the pinned build description."""
+        from .builds import pinned_description
+
+        return pinned_description(self)
+
+    def build(self, name: str) -> BuildDescription:
+        """Return the build description called ``name``.
+
+        Raises:
+            NotFoundError: if there is no description of that name.
+            BuildError: if the description is malformed.
+        """
+        from .builds import description_path, is_build_name, load_description
+
+        path = description_path(self, name) if is_build_name(name) else None
+        if path is None or not path.is_file():
+            raise NotFoundError(
+                f"no build description '{name}'; 'epm2mod builds' lists them"
+            )
+        return load_description(path)
+
+    def all_builds(self) -> list[BuildDescription]:
+        """Return every build description, in name order."""
+        from .builds import all_descriptions
+
+        return all_descriptions(self)
+
+    def event_dictionaries(self) -> list[Path]:
+        """Return the event dictionaries of the debug log: the current one, then those of older builds."""
+        return [self.events, *sorted(self.events.parent.glob("events-*.json"))]
+
+    def checkout(self) -> RepoPaths:
+        """Return the checkout: this one."""
+        return self
 
     def resolve(self, relative: str) -> Path:
         """Return the absolute path of a plain path written relative to the root.

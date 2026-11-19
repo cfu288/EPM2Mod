@@ -17,12 +17,13 @@ def make_container(payloads: list[bytes], tail: bytes = b"TAIL") -> bytes:
     """Return a valid firmware container with the given unscrambled payloads.
 
     Block ``i`` gets the load address ``0x1000 * (i + 1)`` and the kind
-    ``0x0100 + i``.
+    ``0x0100 + i``. Every header names the E-PM2's model, ``10 10``.
     """
     blocks = []
     for index, payload in enumerate(payloads):
         header = bytearray(container.HEADER_SIZE)
         header[0:2] = container.MAGIC
+        header[2:4] = b"\x10\x10"
         struct.pack_into("<I", header, 8, 0x1000 * (index + 1))
         struct.pack_into("<I", header, 12, len(payload))
         struct.pack_into("<H", header, 20, 0x0100 + index)

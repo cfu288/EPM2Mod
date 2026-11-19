@@ -7,9 +7,11 @@ from __future__ import annotations
 
 import io
 import json
+import os
 import sys
+import tempfile
 import unittest
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from typing import Any
 from unittest import mock
@@ -144,11 +146,16 @@ class CommandTests(unittest.TestCase):
         self.assertEqual(
             out.getvalue(), "CARD, 31.9 GB (31.0 GB free), /media/u/CARD\n"
         )
-        out = io.StringIO()
+        err = io.StringIO()
         with mock.patch.object(cards, "cards", return_value=[]):
-            with redirect_stdout(out):
-                self.assertEqual(cli.main(["cards"]), 0)
-        self.assertIn("no SD card found", out.getvalue())
+            with redirect_stdout(io.StringIO()), redirect_stderr(err):
+                self.assertEqual(cli.main(["cards"]), 3)
+        self.assertIn("no SD card found", err.getvalue())
+
+    def test_folders_for_tests_are_listed_as_cards(self) -> None:
+        with tempfile.TemporaryDirectory() as folder:
+            with mock.patch.dict(os.environ, {cards.TEST_CARDS_ENV: folder}):
+                self.assertIn(Path(folder), [card.path for card in cards.cards()])
 
     def test_this_computer_lists_without_an_error(self) -> None:
         for card in cards.cards():
