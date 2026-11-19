@@ -1,0 +1,31 @@
+# The Python package and the repository's data: the tests, the type check, and a cold make of the pinned build,
+# which downloads OM's firmware and must give the camera-tested sha256 that the build description records.
+name: python
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: python-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --quiet uv
+      - run: uv sync --group dev
+      - run: uv run mypy
+      - run: uv run python -m unittest discover -s tests
+      # a tested build: make compares the result with the recorded sha256 and fails on any difference
+      - run: uv run epm2mod make
