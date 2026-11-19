@@ -1,0 +1,9 @@
+base: HSHR record stride/width/height/eff w/eff h = (1680, 1662, 1312, 1646, 1296), centre 831/656, IS crop 1414 x 1114: as the model
+  reached: ['mov_image_process (through)', 'movie request builder', 'through start handler']
+  IMG builders: 0 runs of the HSHR branch (none); steps stored (H, V): none
+  model: H step 3511, V step 4915 -> not reached in the rig
+wide: HSHR record stride/width/height/eff w/eff h = (1960, 1938, 1312, 1920, 1296), centre 969/656, IS crop 1650 x 1114: as the model
+  reached: ['mov_image_process (through)', 'movie request builder', 'through start handler']
+  IMG builders: 0 runs of the HSHR branch (none); steps stored (H, V): none
+  model: H step 4096, V step 4915 -> not reached in the rig
+RESULT: PASS

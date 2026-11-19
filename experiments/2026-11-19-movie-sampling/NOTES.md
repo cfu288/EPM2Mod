@@ -250,6 +250,7 @@ The camera-log entry before the flash: `docs/camera-log/2026-11-19-debug-log-mov
 - `scripts/mkspec_movtime.py`: writes `data/specs/log-movie-time.json`.
 - `scripts/scen_movtime.py`: the hook check of section 5.3.
 - `scripts/movtime_report.py`: the per-clip report.
+- `scripts/mkspec_wide.py`, `scripts/scen_wide.py`: the 1920-wide frame spec and its rig check (section 12).
 - `scripts/geom_scan.py`, `scripts/geom_otherbody.py`, `scripts/geom_calc_r.py`: the desk-check scripts of sections 2
   and 3.
 - `results/`: the check outputs and the listing.
@@ -362,3 +363,101 @@ look incredible, similar to pre mod". Files: `results/bitrate/camera-report.txt`
 
 Conclusion: the bit rate is no longer the limit; the QP behaviour of the encoder and, more, the stretched 1646-px
 frame are. The visible lever left is the 1920-wide frame (§1, §7).
+
+## 12. The 1920-wide frame: build `debug-log-movie-wide` (2026-11-19, not flashed)
+
+Asked by the owner after §11. Step 2 of §7, unconditional for the HSHR frame. The build is `debug-log-movie-bitrate`
+(§10, the camera's current firmware) plus `data/specs/movie-wide-frame.json` (written by `scripts/mkspec_wide.py`).
+The timing probe and the bit-rate spec stay, so the only change against the camera's build is the frame size.
+
+### 12.1 What changes
+
+The HSHR (1080 and 720 movie) Bayer frame becomes 1938 × 1296 (effective 1920 × 1296, stride 1960) in place of
+1662 × 1296 (effective 1646, stride 1680). The sensor window stays 2326 px: calc_r(1938, 78643) = calc_r(1662, 91750)
+(§3.1, V in om-emu). The pre-processor should then shrink by 1.2 in place of 1.4 (I). 14 immediates, each in stock
+bytes; no code, no hook.
+
+| Site | Stock | New | What |
+|---|---|---|---|
+| 0x7E59EE7E, 0x7E59EE8A | 1662, 1646 | 1938, 1920 | TAKE request builder, HSHR case: width, effective width |
+| 0x7E6C4304, 0x7E6C430D, 0x7E6C431F, 0x7E6C42F7 | 1680, 1662, 1646, 831 | 1960, 1938, 1920, 969 | movie mode table, HSHR record: stride, width, effective width, centre x |
+| 0x7E54A2CE, 0x7E54A5E9 | 1646 | 1920 | IMG resize builders, IMG mode 5 divisor |
+| 0x7E698658, 0x7E698694 | 1662, 91750 | 1938, 78643 | AE parameter set HSHR (its sensor window stays 2326 px, so the AE output is the same) |
+| 0x7E85B3DC | {1680, 1662, …, 1646, 1296, 831, 656} | {1960, 1938, …, 1920, 1296, 969, 656} | `art_get_bayer_size` entry 5 |
+| 0x7E6C435A, 0x7E6CB8B3 | 1414 | 1650 | Movie IS crop width (table and code) |
+| 0x7E6CB981 | 91750 | 78643 | Movie IS shift divisor |
+
+Read for this section (V):
+- The only other uses of 1662 and 1646 in block 0 are debug prints and source line numbers (0x7E69DA98, 0x7E6C395D,
+  0x7EEA1876, 0x7EEBD36D). The only data copy of the geometry is the `art_get_bayer_size` table.
+- The camera core has no constant derived from 1662, 1646, 1680 or the packed frame size: a scan for 1920, 2240,
+  2519040 and 2938880 in 0x7E5F0000–0x7E720000 finds only source line numbers and the debug dump 0x7E6D1E50.
+  So the camera core takes the frame from the TAKE request at run time (I). The debug dump keeps 1680 × 1312.
+- The IMG divisor branch (1646) runs only for the Dramatic Tone art codes 96/97/165/166 (0x7E54A1B5–0x7E54A23D).
+  The normal develop path reads the crop from the job (+116/+118), which 0x7E6C7656 copies from the movie mode
+  table (V).
+- The two 91750 in overlay A (0x7F064ECA, 0x7F064F51) belong to the face detector (caller 0x7E6FBFB4), next to
+  101581, a constant step of the detector, not the HSHR ratio. They stay (I).
+
+### 12.2 What is and is not tested
+
+- **1080, Natural, Movie IS off:** the target of the camera test.
+- **720p:** it uses the same HSHR record, so it is 1920 → 1280 (H ×0.667) in place of 1646 → 1280. Keeping 720 stock
+  would need a condition at four sites, so this build does not do it. **720 is untested in this build.**
+- **Movie IS on:** the crop is scaled to 1650 × 1114 and the shift divisor to 1.2. The field of view stays the same
+  (1650 × 1.2 = 1414 × 1.4), and the largest shift fits the margin (323/2/1.2 = 135 px against (1920 − 1650)/2 = 135)
+  (I, arithmetic). Without these two changes, IS on would have given a picture squeezed by 1.2/1.4 and a shift too
+  small by that factor. **Untested; out of the acceptance test.**
+- **Art filters and film simulations in movies:** `art_get_bayer_size` and the Dramatic Tone divisor change with
+  the frame. **Untested.**
+- **Photos:** the STILL and FULL modes and their tables are not touched (V). Playback is not touched (V).
+
+### 12.3 Checks (exit status 0 = pass)
+
+| Check | Result |
+|---|---|
+| `uv run epm2mod make debug-log-movie-wide` | sha256 **9fbc9436d0271b2421069689cd6570dab9eb9dab8d4f0a764e4219ff096037a1**; it runs the checks below in its own pipeline too |
+| `tools/freespace.py check --first-code` (the build's specs) | PASS; `movie-wide-frame`: 14 edits of existing content, no free-area byte (`results/wide/freespace.txt`) |
+| `emulator/opcheck.py` | PASS, 20 specs, 542 byte ops (`results/wide/opcheck.txt`) |
+| `emulator/hookcheck.py` (with the allow list) | PASS, 273 transfers, 0 FAIL; this spec adds no hook (`results/wide/hookcheck.txt`) |
+| `emulator/boot-test`, `emulator/update-path-test` | PASS, PASS (`results/wide/`) |
+| `scripts/scen_wide.py` (the live-view rig: mov layer start, Through Start, Natural, 1080, three frames with the camera record set to HSHR; both images) | PASS (`results/wide/scen-wide.txt`). The HSHR record that the firmware's own through-start handler 0x7E6C410A builds is as the model in both images: 1680/1662/1312/1646/1296, centre 831, IS crop 1414 (stock) and 1960/1938/1312/1920/1296, centre 969, IS crop 1650 (wide); no fault |
+| Test suite | 307 tests OK |
+
+The rig does not reach the IMG resize builders. They run inside img_exec on the camera core's develop path (the
+P+97 byte comes from the camera record, 0x7E6CFFED), and the rig has no camera core. The model for 1080 is an H step
+of ((1920 − 1) << 12)/(1920 − 1) = 4096 (no scaling) in place of 3511, and a V step of 4915 in both (I). Neither the
+rig nor any static check can show the sensor, the pre-processor, pixel data or timing.
+
+No log probe was added. The question that matters, whether the pre-processor writes a 1938-px line, shows in the
+picture itself. The job fields +106/+108/+116 are the values this spec writes, so logging them would prove nothing.
+P+62 (§2) lives in a struct whose address is not known for the develop job, so a probe would need a new hook site
+that no run has tested.
+
+### 12.4 Acceptance criteria
+
+1. 1080 Fine clips record at 30 fps (`mv_frame` period about 33.4 ms, `ret` 0) to the end, with no corrupt frames and
+   no early stop.
+2. Fine horizontal detail is measurably higher than with the 1646 frame: a chart or text clip, compared frame by
+   frame with `results/PB190001.MOV` (§9, the same screen chart, stock frame). Round objects stay round (a wrong
+   scale shows as a stretch).
+3. Frame time under 33 ms in the log (`total_us` p95; §9.2 predicts about 24 ms). Record clips of 15 s or less and
+   open playback after each, or the ring overflows (§9, §11).
+4. Photos and playback work as before. 720p is untested in this build; one 720 clip is information, not a criterion.
+
+### 12.5 The biggest remaining risk, and what each failure looks like
+
+The biggest risk is still the pre-processor: whether it writes a 1938-px line, and with which stride (U, §2).
+
+| Fault | Cause (I) | What the camera shows |
+|---|---|---|
+| The pre-processor cannot output 1938 px | its resizer limit (§2) | a black, frozen or garbled picture in the movie live view or the clip; a recording that stops at once; `fw_error` records in the log |
+| The camera core writes another stride than 1960 (e.g. 1952, if it rounds to 16 px and not to 64 bytes) | the stride is computed at run time (§12.1) | a picture slanted to one side, with colour stripes; each line shifted a little more than the one before |
+| The frame needs more than the 3,673,600-byte Bayer slot | only if the frame is stored at more than 1.43 bytes per pixel; the dump code says 8/7 (§3.1) | bands of another frame or garbage in the picture; a freeze or restart while recording |
+| The develop job is slower than the frame | 17 % more input pixels | `total_us` over 33,367 µs, `ret` 0x38FB (skips), jerky motion |
+| Op 14 (P+62 ≥ 1792, §2) changes the IMG processing | the meaning of P+62 is unknown | a visible difference in tone, noise or sharpness that is not resolution |
+| The horizontal scale is wrong | a site that keeps the 1.4 ratio and was not found | round objects become ovals; the field of view differs from the stock clip |
+
+If the movie mode live view uses the HSHR frame (I: the through-start handler builds the record), most of these show
+on the screen before recording starts. The way back is the camera's current build, `debug-log-movie-bitrate`
+(sha256 `09dd21ca6aa8a100a0b43b9a9d336a8f5523c262e06bb9c0be285c55c7e61375`), or the pinned build.
