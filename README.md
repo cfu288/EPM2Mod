@@ -14,6 +14,12 @@ Repository containing the current work for creating a custom firmware mod for th
 
 [![Nine photos, each developed in the camera with Natural and the film simulations](docs/images/film-sim-comparison.jpg)](https://cfu288.github.io/EPM2Mod/films)
 
+## Landscape of Olympus Custom Firmware
+
+EPM2Mod supports the oldest camera of the Olympus firmware mods that have a release. The E-PM2 was announced in 2012. The [landscape page](docs/reference/landscape.md) lists each project.
+
+[![A timeline of Olympus and OM SYSTEM cameras that have custom firmware projects, from the E-PL3 in 2011 to the OM-5 Mark II in 2025](docs/images/landscape.png)](docs/reference/landscape.md)
+
 ## Dependencies
 
 - [uv](https://docs.astral.sh/uv/getting-started/installation/)
