@@ -1,97 +1,141 @@
-# CLI redesign: spec for approval (2026-11-19)
+# CLI redesign: spec for approval (2026-11-19, revision 2)
 
 Status: **proposal, not built.** Nothing here changes code until the owner approves it.
 
+Revision 2 adds the results of a blind review of revision 1 (a reviewer who saw only the proposed commands and rules)
+and of a coupling review. Revision 1 is in git history.
+
 ## Why
 
-A blind review read only `epm2mod --help` and runs of the read-only commands, as a third party would (summary in the
-session of 2026-11-19). Main findings: user, developer and release commands sit in one flat list; bare `looks` runs a
-developer check; `-o` and `--card` mean different things in different commands; output is not made for scripts;
-`make --card` does not say how to flash; nothing says which commands need the repository or the network.
+A first blind review read only `epm2mod --help` and runs of the read-only commands. Findings: user, developer and
+release commands sit in one flat list; bare `looks` runs a developer check; `-o` and `--card` mean different things in
+different commands; output is not made for scripts; `make --card` does not say how to flash; nothing says which
+commands need the repository or the network. The coupling review found that the CLI, the installer page and the docs
+each hold their own copy of the install logic, the camera steps and the film data paths, and that the release smoke
+test parses `make`'s human-readable output.
 
 ## Owner's decisions
 
 - Balance local development and user clarity: commands stay at the top level (no `dev …` namespace); the help is
-  grouped by audience instead.
-- Renames for clarity are allowed. **No aliases:** a renamed or moved command is changed everywhere in the same
-  commit, and the old name stops working.
+  grouped by audience.
+- Renames are allowed. **No aliases:** a renamed or moved command is changed everywhere in the same commit.
 - The CLI is the preferred user route (the installer is unsigned).
+- A film slot left out keeps its Olympus art filter (no `ARTn=olympus`).
+- No support channel is offered.
 
-## The commands
+## 1. Structure: a library under the CLI
 
-Grouped as `epm2mod --help` will show them.
+Every command's work is a plain function in the package (`install`, `set_films`, `uninstall`, `inspect_card`,
+`inspect_file`, ...). The CLI only parses arguments and formats results; the installer page's server and the tests
+call the same functions. Three single sources:
 
-**For camera owners**
-
-| Command | Does | Was |
+| Source | Holds | Used by |
 |---|---|---|
-| `cards` | List the SD cards in this computer | `cards` |
-| `install --card DIR [ARTn=FILM ...] [--dry-run]` | Make the firmware, write it and the film file to the card, print the camera steps (flash, then Load Looks). No choices: the 12 default films. A slot left out keeps its Olympus art filter | new (`make --card` + `looks pack`) |
-| `films` | List the film simulations: menu name, command-line name, film, type | `looks list` |
-| `films set (--card DIR \| -o PATH) [ARTn=FILM ...] [--dry-run]` | Write only the film file | `looks pack` |
-| `films show FILE` | List the films in a film file and check it | `looks show` |
-| `restore (--card DIR \| -o PATH) [--dry-run]` | Olympus's original firmware, to remove EPM2Mod | `restore` |
-| `installer [--port PORT] [--no-browser]` | Open the installer page | `serve` |
-| `inspect FILE` | Say what a file is: EPM2Mod or Olympus firmware (build, version, sha256) or a film file | `info` |
+| `epm2mod.camera_steps` | The flash steps and the Load Looks path, as data | CLI output, the installer page (from the server), the docs generator |
+| `epm2mod.catalogue` (one data module) | The films, the 12 default choices, the build to install | User commands, the installer page, the docs and site generators. Reads the repository or the files bundled in the release zip, so user commands need no checkout |
+| `epm2mod.cardio` | Card checks, writes, read-back | Every command that writes to a card |
 
-**For developers**
+## 2. The commands
 
-| Command | Does | Was |
-|---|---|---|
-| `make [BUILD] [-o PATH] [--card DIR]` | Make a build (default: the pinned one) into `build/` | `make` |
-| `builds` | List the build descriptions and the pinned one | `builds` |
-| `pin BUILD --date --sha256` | Record a passed camera test; the build becomes the default | `pin` |
-| `apply SPEC ... -o PATH` | Apply patch specs without a build description | `apply` |
-| `fetch-stock` | Download Olympus's firmware and check it | `fetch-stock` |
-| `looks (--check \| --write)` | Compare or write the film patch specs that the fit files generate. Bare `looks` prints its help | `looks` (the check was the default) |
-| `log FILE [--summary]` | Decode `EPM2LOG.BIN` | `log` |
-| `docs [--check]` | Regenerate the generated parts of the documents | `readme` |
+Grouped as `epm2mod --help` shows them. Every `--help` ends with one or two examples.
 
-**For releases**
+**For camera owners** (work from the release zip, no checkout)
 
-| Command | Does | Was |
-|---|---|---|
-| `package [-o DIR] [--version V]` | Write the release zip | `package` |
-| `release [--final] [--yes] [--push]` | Check and tag the next release | `release` |
+| Command | Does |
+|---|---|
+| `cards [--json]` | List the SD cards in this computer. Exit 3 if none |
+| `install --card DIR [ARTn=FILM ...] [--build BUILD --untested] [--dry-run] [--eject] [--json]` | Make the firmware and write it and the film file to the card, then print the camera steps. No choices: the 12 default films. With choices: only the named slots get a film; the others keep their Olympus art filter. `--build` takes another build; a build without a passed camera test needs `--untested` |
+| `films [--json]` | List the film simulations: menu name, command-line name, film, type |
+| `films set (--card DIR \| -o PATH) [ARTn=FILM ...] [--dry-run] [--eject] [--json]` | Write only the film file. Same slot rule as `install` |
+| `uninstall (--card DIR \| -o PATH) [--dry-run] [--eject] [--json]` | Write Olympus's original firmware, to remove EPM2Mod |
+| `inspect (FILE \| --card DIR) [--json]` | Say what a firmware file or film file is (model, build, version, sha256, films). With `--card`: what is on the card, and what will not work (a film file with Olympus firmware, a damaged film file, extra files in `DCOLYMP`). Exit 3 if the file is not one it knows |
+| `gui [--port PORT] [--no-browser]` | Open the installer page |
 
-## Rules for every command
+**For developers** (need a checkout)
 
-1. **Destinations.** `--card DIR` is the top folder of an SD card; the command writes the camera's file names there.
-   `-o PATH` is a file, or a folder that gets the usual file name. A command that writes takes one of them or says
-   its default in its help.
-2. **Output.** Results on stdout, hints and progress on stderr. Exception kept on purpose: `make`'s numbered step
-   lines (`4/5 sha256 …`) stay on stdout, because the release smoke test reads them.
-3. **`--json`** on `cards`, `films`, `films show`, `inspect`, `builds`: one JSON document on stdout.
-4. **Exit codes.** 0 done, 1 failed, 2 wrong usage, 3 nothing found (`cards` with no card).
-5. **`--dry-run`** on `install`, `films set`, `restore`: print what would be written and replaced, write nothing.
-6. **Every card write** ends by printing the camera steps that come next.
-7. **The help of each command** says its default output, and whether it needs the repository (`make`, `pin`,
-   `apply`, `looks`, `docs`, `package`, `release`) or the network (`install`, `make`, `restore`, `fetch-stock`,
-   when Olympus's firmware is not downloaded yet).
+| Command | Does |
+|---|---|
+| `make [BUILD] [-o PATH] [--dry-run] [--json]` | Make a build (default: the pinned one) into `build/`. No `--card`: cards are written by `install --build` |
+| `builds [--json]` | List the build descriptions and the pinned one |
+| `pin BUILD --date YYYY-MM-DD --sha256 HEX [--dry-run]` | Record a passed camera test. Refuses a hash that `make BUILD` does not produce |
+| `apply SPEC ... -o PATH [--from FILE]` | Apply patch specs without a build description. Input: `--from`, default the downloaded Olympus firmware |
+| `fetch-stock [--json]` | Download Olympus's firmware, check it, print where it is kept |
+| `looks [--write]` | Compare (default) or write the film patch specs that the fit files generate. Exit 1 if they differ |
+| `log FILE [--summary]` | Decode `EPM2LOG.BIN` |
+| `docs [--write]` | Compare (default) or write the generated parts of the documents. Exit 1 if they differ |
 
-## Shared code
+**For releases** (need a checkout)
 
-`install` and the installer page both write firmware and a film file to a card. Both call one function in
-`pipeline.py`, so they cannot drift apart. The installer page does not call the CLI; it needs no other change.
+| Command | Does |
+|---|---|
+| `package [-o DIR] [--version V] [--dry-run] [--json]` | Write the release zip |
+| `release [--final] [--yes] [--push]` | Check and tag the next release; without `--yes` only check |
 
-## Migration (one commit, no aliases)
+## 3. Rules for every command
+
+1. **Destinations.** `--card DIR` is the top folder of an SD card; the camera's file names are used. `-o PATH`: an
+   existing folder or a path ending in `/` gets the usual file name; anything else is the file. Each writing command
+   takes one, or its help states its default.
+2. **Output.** Results on stdout; progress, hints and the camera steps on stderr. No exceptions.
+3. **`--json`** on every command that lists, describes or writes: one document on stdout, with a `schema` version,
+   the files written or replaced, their sha256, and the camera steps as data.
+4. **Exit codes.** 0 done; 1 failed; 2 wrong usage; 3 nothing found or not recognised; 4 a check failed (checksum,
+   read-back, model, untested build); 5 environment (no network, no checkout, card not writable or full).
+5. **`--dry-run`** on every writing command: print (or `--json`) what would be written and replaced; write nothing.
+6. **No prompts.** Every command runs unattended. Safety comes from explicit `--card`, `--dry-run`, and refusals
+   that need a named flag (`--untested`).
+7. **Help.** Each command says its default output, whether it needs a checkout, and whether it uses the network
+   (`install`, `uninstall`, `make`, `fetch-stock`, when Olympus's firmware is not downloaded yet).
+8. **Arguments.** `ARTn` is ART1 to ART12, as in the camera's ART menu (ART1 Pop Art ... ART12 Watercolor); a slot
+   named twice is an error; an unknown film name lists the valid ones.
+
+## 4. Card safety (`epm2mod.cardio`)
+
+- Refuse a folder that does not look like a camera card (no `DCIM`, not removable), and a card without enough
+  space.
+- Write to a temporary name, flush to the card, rename; then read back and compare the sha256.
+- Remove macOS `._` files and other extra files from `DCOLYMP` (the folder must hold only the firmware file).
+  Probe: whether the camera ignores `._` files is unknown; one camera test settles it.
+- Refuse firmware whose model is not the E-PM2 (the updater would accept an E-PL5 file).
+- `--eject` ejects the card after a write; the camera steps begin with "eject the card".
+- No backup files on the card: they would break the single-file rule of `DCOLYMP`. Undo is `films set` or
+  `uninstall` again.
+
+## 5. Stability
+
+- User commands and their JSON are a public interface: the schema is versioned; changes are listed under "CLI
+  changes" in the release notes. Renames are breaking changes (no aliases).
+- Developer and release commands carry no promise.
+- A CLI reference page (every command, flag, default, JSON shape, exit code) is generated from the command
+  definitions by `docs --write`; the hand-written docs link to it instead of repeating flags.
+
+## 6. Migration (one change, no aliases)
 
 | Where | Change |
 |---|---|
-| `src/epm2mod/cli.py` | The commands above, help groups, rules 1-7 |
-| `src/epm2mod/pipeline.py`, `serve.py` | The shared install function |
-| `release/start.sh`, `start.ps1` | Default command `serve` → `installer`; the comment's example `make` → `install` |
-| `.github/scripts/release_smoke.py` | Starts the page with `installer`; still runs `make` and `cards` |
-| `.github/workflows/release.yml` | No change (`package`) |
+| `src/epm2mod/cli.py` | The commands and rules above |
+| `src/epm2mod/` new modules | `camera_steps`, `catalogue`, `cardio`; the user functions in `pipeline.py` |
+| `src/epm2mod/serve.py` | Uses the shared functions and `camera_steps`; served under the `gui` command |
+| `release/start.sh`, `start.ps1` | Default command `serve` → `gui`; example `make` → `install` |
+| `.github/scripts/release_smoke.py` | Starts the page with `gui`; reads `make --json`; also runs `install --dry-run --json` and `inspect` from the unpacked zip |
 | `src/epm2mod/release.py`, `releasing.py`, `looks/records.py`, `looks/lookpack.py`, `cards.py`, `eventlog.py`, `readme.py`, `tools/oetool.py` | Messages and docstrings that name old commands |
-| `tests/` (`test_package`, `test_eventlog`, `test_lookfile`, `test_serve`) | New names; tests for `install`, `films`, `inspect`, `--json`, exit code 3, `--dry-run` |
-| `web/apps/local` (`api.ts`, `App.tsx`, tests, `vite.config.ts`, `package.json`) | Mentions of `epm2mod serve` |
-| `web/apps/site` Install page | Command-line tab: `install --card`, `films`, `films set` |
-| README, `docs/guide/*`, `docs/install.md`, `docs/look-file-format.md`, `docs/logging.md`, `docs/conventions.md`, `docs/feasibility.md`, `AGENTS.md`, `looks/README.md`, `web/README.md`, `release/README.txt` | New names |
-| `tools/doc_links.json` | The command-line group |
-| `experiments/*/scripts` that run the CLI (`2026-11-18-log-menu/scripts/run_logmenu.sh`, ...) | New names |
-| Dated experiment notes and `docs/camera-log.md` | **Not changed:** they record what was run that day |
+| `tests/` | New names; tests for every command, `--json` schemas, exit codes 3-5, `--dry-run`, the card checks |
+| `web/apps/local` | Camera steps from the server; mentions of `epm2mod serve` |
+| `web/apps/site` Install page | Command-line tab: `install`, `films`, `films set`, `uninstall`, `inspect --card` |
+| README, `docs/guide/*`, `docs/install.md`, `docs/look-file-format.md`, `docs/logging.md`, `docs/conventions.md`, `docs/feasibility.md`, `AGENTS.md`, `looks/README.md`, `web/README.md`, `release/README.txt` | New names; link the generated CLI reference |
+| `tools/doc_links.json` | The command-line group; the CLI reference as generated |
+| `experiments/*/scripts` that run the CLI | New names |
+| Dated experiment notes, `docs/camera-log.md` | Not changed (history), unless the owner says otherwise |
 
-## Open question for the owner
+## 7. Order of work
 
-- Dated experiment notes and the camera log keep the old command names as history (proposal above). Agree?
+1. Library and single sources (`camera_steps`, `catalogue`, `cardio`, user functions), with tests. No CLI change.
+2. The installer server switches to them (no visible change; its tests pass).
+3. The CLI: new commands, renames, rules; tests; the generated reference.
+4. Callers: launchers, smoke test, docs, site, experiments scripts; the doc-link map.
+5. Camera probe: `._` files in `DCOLYMP` (one flash with a Mac-written card).
+
+## Open questions for the owner
+
+1. Dated experiment notes and the camera log keep the old command names as history. Agree?
+2. `gui` for the installer page, `uninstall` for restore: agree with the names?
