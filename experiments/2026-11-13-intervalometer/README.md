@@ -107,7 +107,7 @@ A static check cannot see an address that the firmware computes while it runs. T
 - **Interval Time cannot be 0.** The firmware uses "timer, 0 ms" to stop the interval timer, so the sequence would stop after the first frame. The menu refuses to store 0 for this reason. For back-to-back frames, use sequential shooting (NOTES §14).
 - **More than 240 frames** in one sequence is not possible with this design. Start a second sequence.
 - **The debug text under the new Frame rows** (names for the `sdk` debug command) is overwritten. The command itself uses a different copy of the names.
-- **Three superseded film specs** in `patches/history/` use the same padding and cannot be combined with v2.
+- **Three superseded film specs** in `patches/` use the same padding and cannot be combined with v2.
 
 ## 7. Risks
 

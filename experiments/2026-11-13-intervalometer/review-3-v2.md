@@ -112,7 +112,7 @@ Adversarial review before a camera flash. Read-only: nothing was built under `bu
 - All film ops are in segment 1 (0x7E546161–0x7E880FE4), in the padding 0x7ECB0888–0x7ECB0B9D, and in block 1. v2's ops are in the MODE defaults, .data, 0x7E98855B, 0x7E997BD5, the GUI segment and the padding after 0x7ECB0BA0.
 - No 4-byte value in the films' new bytes points into a v2 window.
 - No film op touches the value switch, a formatter call site, the tab layout, a page record, the selector or the four GUI handlers.
-- **Three specs in `patches/history/` use the same padding.** They are not in the camera build and must not be combined with v2.
+- **Three specs in `patches/` use the same padding.** They are not in the camera build and must not be combined with v2.
 
 ## Advice for the first flash (I)
 - Build the seven film specs + v2 in the README order. The block-0 hash to expect is `8992f2c2…693d28ec`.

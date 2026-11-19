@@ -36,7 +36,7 @@ SUPERSEDED = "docs/space-superseded.tsv"
 CAMERA_LOG = "docs/camera-log.md"
 MAP_MD = "docs/code-space-map.md"
 MAP_TSV = "docs/code-space-map.tsv"
-SPEC_GLOBS = ["patches/*.json", "patches/history/*.json", "experiments/*/patches/*.json",
+SPEC_GLOBS = ["patches/*.json", "experiments/*/patches/*.json",
               "tools/emu/specs/*.json"]
 
 BASE = 0x7E421020            # runtime address of block-0 file offset 0
@@ -571,7 +571,7 @@ class Spec:
                 continue
             off = int(o["offset"], 0) if isinstance(o["offset"], str) else o["offset"]
             self.ops.append(Op(self, i, off, bytes.fromhex(o["expect"]), bytes.fromhex(o["new"])))
-        self.history = "/history/" in self.path
+        self.history = self.path in history_specs()
 
     def spans(self):
         """The whole range of each op that changes a byte. A byte of the op that is equal to stock is still part of
@@ -592,6 +592,18 @@ class Spec:
                     d = int.from_bytes(n[i + 1:i + 1 + dl], "little", signed=True)
                     out.append((a0 + i, (a0 + i + d) & M32))
         return out
+
+
+_HISTORY = None
+
+
+def history_specs():
+    """Specs that no build uses any more and that nothing replaced one for one: the rows of the superseded ledger
+    whose 'superseded by' column is 'history'. Their bytes count as history in the ledger."""
+    global _HISTORY
+    if _HISTORY is None:
+        _HISTORY = {spec for spec, by, _ in read_tsv(SUPERSEDED, 3) if by == "history"}
+    return _HISTORY
 
 
 def all_specs():
@@ -1356,7 +1368,7 @@ def selftest():
         {"type": "bytes", "block": 0, "offset": hex(0x7F033C00 - BASE), "expect": "ff" * 16, "new": "00" * 16}]))
     t("a fake spec that overlaps seven-films-5 FAILs (alone: ledger overlap)", check_specs(sp, [fake], quiet) == 1)
     lines = []
-    films = [s for s in sp.specs if s.path == "patches/history/four-neutral.json"]      # applies on stock; writes the same tail
+    films = [s for s in sp.specs if s.path == "patches/four-neutral.json"]      # applies on stock; writes the same tail
     t("the same fake spec FAILs after a spec that wrote those bytes (expect mismatch)",
       len(films) == 1 and check_specs(sp, films + [fake], lines.append) >= 1
       and any(x.startswith("FAIL") and "selftest/overlap.json" in x and "expect bytes" in x for x in lines), "\n".join(lines))

@@ -167,7 +167,7 @@ Ledger (bytes that specs change inside an area; `history` and `superseded` do no
 | 0x7E805088-0x7E805CE8 | 3168 | listed: reclaim-space row 9 (text, auto) | NEEDS-DECISION | data | 0 | 3168 | ok | ? | ok | ok | ok | ? | **content**: listed as reclaimed text by the automatic rule only, not checked by hand (reclaim-space row 9); **predecessor**: data before (494e4954204f4b00); bound not proven: nothing shows where the reader of the object before stops; nearest referenced address before: 0x7E805028 (from 0x7E6D7F36); after: 0x7E805CE8 (from 0x7E6D85EE) |
 | 0x7E813170-0x7E813ED0 | 3424 | listed: reclaim-space row 9 (text, auto) | NEEDS-DECISION | data | 0 | 3424 | ok | ? | ok | ok | ok | ? | **content**: listed as reclaimed text by the automatic rule only, not checked by hand (reclaim-space row 9); **predecessor**: data before (6365515743310000); bound not proven: nothing shows where the reader of the object before stops; nearest referenced address before: 0x7E813166 (from 0x7E6FC959); after: 0x7E813ED0 (from 0x7E6FCFE6) |
 | 0x7E86DD60-0x7E86DD80 | 32 | 0xFF run | NEEDS-DECISION | data | 0 | 32 | ok | ok | ok | ok | ok | ? | **predecessor**: data before (c6c6c7c7c8c8c9c9); bound not proven: nothing shows where the reader of the object before stops; nearest referenced address before: 0x7E86DC5F (from 0x7E73116C, 0x7E7311AF); after: 0x7E86DD80 (from 0x7E5586BB) |
-| 0x7E880F5C-0x7E881000 | 164 | 0xFF run | USABLE-CODE | code | 26 | 138 | ok | ok | ok | ok | ok | ok | code evidence: patches/history/slot3-code.json (camera log 2026-11-12 (time not recorded)): jump at 0x7E56C6A5 to 0x7E880F8D |
+| 0x7E880F5C-0x7E881000 | 164 | 0xFF run | USABLE-CODE | code | 26 | 138 | ok | ok | ok | ok | ok | ok | code evidence: patches/slot3-code.json (camera log 2026-11-12 (time not recorded)): jump at 0x7E56C6A5 to 0x7E880F8D |
 
 Ledger (bytes that specs change inside an area; `history` and `superseded` do not reduce the free count):
 
@@ -178,18 +178,18 @@ Ledger (bytes that specs change inside an area; `history` and `superseded` do no
   - `patches/remap7b-code.json` (superseded): 120 B in 0x7E880F5C-0x7E880FD4
   - `patches/seven-films-5.json` (superseded): 18 B in 0x7E880FC2-0x7E880FD4
   - `patches/seven-fixes-1.json` (superseded): 17 B in 0x7E880FD4-0x7E880FE5
-  - `patches/history/film-pro400h-pa1.json` (history): 18 B in 0x7E880FC2-0x7E880FD4
-  - `patches/history/film-pro400h-pa2-s12.json` (history): 18 B in 0x7E880FC2-0x7E880FD4
-  - `patches/history/film-pro400h-pa2.json` (history): 18 B in 0x7E880FC2-0x7E880FD4
-  - `patches/history/four-code.json` (history): 120 B in 0x7E880F5C-0x7E880FD4
-  - `patches/history/remap7-code.json` (history): 120 B in 0x7E880F5C-0x7E880FD4
-  - `patches/history/seven-films-1.json` (history): 18 B in 0x7E880FC2-0x7E880FD4
-  - `patches/history/seven-films-2.json` (history): 18 B in 0x7E880FC2-0x7E880FD4
-  - `patches/history/seven-films-3.json` (history): 18 B in 0x7E880FC2-0x7E880FD4
-  - `patches/history/seven-films-4.json` (history): 18 B in 0x7E880FC2-0x7E880FD4
-  - `patches/history/slot3-code.json` (history): 120 B in 0x7E880F5C-0x7E880FD4
-  - `patches/history/slots12-code.json` (history): 120 B in 0x7E880F5C-0x7E880FD4
-  - `patches/history/slots7-code.json` (history): 120 B in 0x7E880F5C-0x7E880FD4
+  - `patches/film-pro400h-pa1.json` (history): 18 B in 0x7E880FC2-0x7E880FD4
+  - `patches/film-pro400h-pa2-s12.json` (history): 18 B in 0x7E880FC2-0x7E880FD4
+  - `patches/film-pro400h-pa2.json` (history): 18 B in 0x7E880FC2-0x7E880FD4
+  - `patches/four-code.json` (history): 120 B in 0x7E880F5C-0x7E880FD4
+  - `patches/remap7-code.json` (history): 120 B in 0x7E880F5C-0x7E880FD4
+  - `patches/seven-films-1.json` (history): 18 B in 0x7E880FC2-0x7E880FD4
+  - `patches/seven-films-2.json` (history): 18 B in 0x7E880FC2-0x7E880FD4
+  - `patches/seven-films-3.json` (history): 18 B in 0x7E880FC2-0x7E880FD4
+  - `patches/seven-films-4.json` (history): 18 B in 0x7E880FC2-0x7E880FD4
+  - `patches/slot3-code.json` (history): 120 B in 0x7E880F5C-0x7E880FD4
+  - `patches/slots12-code.json` (history): 120 B in 0x7E880F5C-0x7E880FD4
+  - `patches/slots7-code.json` (history): 120 B in 0x7E880F5C-0x7E880FD4
 
 ### 3.4 data-image (0x7E8DA000-0x7E8F3114)
 
@@ -259,17 +259,17 @@ Ledger (bytes that specs change inside an area; `history` and `superseded` do no
   - `patches/seven-films-5.json` (superseded): 72 B in 0x7ECB0988-0x7ECB09D0
   - `patches/seven-movie-1.json` (superseded): 30 B in 0x7ECB0B80-0x7ECB0B9E
   - `patches/stock-films-structure.json` (current): 741 B in 0x7ECB0888-0x7ECB0B6D
-  - `patches/history/check-portra-in-new-slots.json` (history): 72 B in 0x7ECB0988-0x7ECB09D0
-  - `patches/history/film-vision3-250d-pl1.json` (history): 1042 B in 0x7ECB0948-0x7ECB095A, 0x7ECB0B40-0x7ECB0F40
-  - `patches/history/four-code.json` (history): 256 B in 0x7ECB0888-0x7ECB0988
-  - `patches/history/remap7-code.json` (history): 728 B in 0x7ECB0888-0x7ECB0B60
-  - `patches/history/seven-films-1.json` (history): 72 B in 0x7ECB0988-0x7ECB09D0
-  - `patches/history/seven-films-2.json` (history): 72 B in 0x7ECB0988-0x7ECB09D0
-  - `patches/history/seven-films-3.json` (history): 72 B in 0x7ECB0988-0x7ECB09D0
-  - `patches/history/seven-films-4.json` (history): 72 B in 0x7ECB0988-0x7ECB09D0
-  - `patches/history/slots12-code.json` (history): 1456 B in 0x7ECB0888-0x7ECB0E38
-  - `patches/history/slots7-code.json` (history): 696 B in 0x7ECB0888-0x7ECB0B40
-  - `patches/history/slots7-neutral.json` (history): 1024 B in 0x7ECB0B40-0x7ECB0F40
+  - `patches/check-portra-in-new-slots.json` (history): 72 B in 0x7ECB0988-0x7ECB09D0
+  - `patches/film-vision3-250d-pl1.json` (history): 1042 B in 0x7ECB0948-0x7ECB095A, 0x7ECB0B40-0x7ECB0F40
+  - `patches/four-code.json` (history): 256 B in 0x7ECB0888-0x7ECB0988
+  - `patches/remap7-code.json` (history): 728 B in 0x7ECB0888-0x7ECB0B60
+  - `patches/seven-films-1.json` (history): 72 B in 0x7ECB0988-0x7ECB09D0
+  - `patches/seven-films-2.json` (history): 72 B in 0x7ECB0988-0x7ECB09D0
+  - `patches/seven-films-3.json` (history): 72 B in 0x7ECB0988-0x7ECB09D0
+  - `patches/seven-films-4.json` (history): 72 B in 0x7ECB0988-0x7ECB09D0
+  - `patches/slots12-code.json` (history): 1456 B in 0x7ECB0888-0x7ECB0E38
+  - `patches/slots7-code.json` (history): 696 B in 0x7ECB0888-0x7ECB0B40
+  - `patches/slots7-neutral.json` (history): 1024 B in 0x7ECB0B40-0x7ECB0F40
 
 ### 3.6 segment-3 (0x7ECCB800-0x7F034000)
 
@@ -316,16 +316,16 @@ Ledger (bytes that specs change inside an area; `history` and `superseded` do no
 - 0x7F033B7C-0x7F034000: free 0x7F033E98-0x7F034000 (360)
   - `patches/card-looks-5.json` (current): 796 B in 0x7F033B7C-0x7F033E98
   - `patches/seven-films-5.json` (superseded): 1024 B in 0x7F033B7C-0x7F033F7C
-  - `patches/history/check-portra-in-new-slots.json` (history): 1024 B in 0x7F033B7C-0x7F033F7C
-  - `patches/history/film-vision3-250d-pl1.json` (history): 512 B in 0x7F033B7C-0x7F033D7C
-  - `patches/history/four-neutral.json` (history): 1024 B in 0x7F033B7C-0x7F033F7C
-  - `patches/history/remap7-neutral.json` (history): 1024 B in 0x7F033B7C-0x7F033F7C
-  - `patches/history/seven-films-1.json` (history): 1024 B in 0x7F033B7C-0x7F033F7C
-  - `patches/history/seven-films-2.json` (history): 1024 B in 0x7F033B7C-0x7F033F7C
-  - `patches/history/seven-films-3.json` (history): 1024 B in 0x7F033B7C-0x7F033F7C
-  - `patches/history/seven-films-4.json` (history): 1024 B in 0x7F033B7C-0x7F033F7C
-  - `patches/history/slots12-neutral.json` (history): 1024 B in 0x7F033B7C-0x7F033F7C
-  - `patches/history/slots7-neutral.json` (history): 1024 B in 0x7F033B7C-0x7F033F7C
+  - `patches/check-portra-in-new-slots.json` (history): 1024 B in 0x7F033B7C-0x7F033F7C
+  - `patches/film-vision3-250d-pl1.json` (history): 512 B in 0x7F033B7C-0x7F033D7C
+  - `patches/four-neutral.json` (history): 1024 B in 0x7F033B7C-0x7F033F7C
+  - `patches/remap7-neutral.json` (history): 1024 B in 0x7F033B7C-0x7F033F7C
+  - `patches/seven-films-1.json` (history): 1024 B in 0x7F033B7C-0x7F033F7C
+  - `patches/seven-films-2.json` (history): 1024 B in 0x7F033B7C-0x7F033F7C
+  - `patches/seven-films-3.json` (history): 1024 B in 0x7F033B7C-0x7F033F7C
+  - `patches/seven-films-4.json` (history): 1024 B in 0x7F033B7C-0x7F033F7C
+  - `patches/slots12-neutral.json` (history): 1024 B in 0x7F033B7C-0x7F033F7C
+  - `patches/slots7-neutral.json` (history): 1024 B in 0x7F033B7C-0x7F033F7C
   - `experiments/2026-11-13-intervalometer/patches/interval-timelapse-insert-awake.json` (superseded): 746 B in 0x7F033BFC-0x7F033DD8, 0x7F033DDC-0x7F033E17, 0x7F033E1C-0x7F033E36, 0x7F033E3C-0x7F033EF5
   - `experiments/2026-11-13-intervalometer/patches/interval-timelapse-insert.json` (superseded): 535 B in 0x7F033BFC-0x7F033DD8, 0x7F033DDC-0x7F033E17
 

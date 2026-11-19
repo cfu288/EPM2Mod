@@ -29,7 +29,7 @@ Build at the time (2026-11-13): `seven-films-6`. The top-level README has the bu
 flash steps. The patch list, in order: `remap7b-code`, `seven-fixes-1`, `seven-movie-1`,
 `seven-structure-extra`, `seven-films-5`, `xp-adaptive-hue-off`, `seven-labels`.
 
-Earlier and failed patch specs are kept in `patches/history/` as a record; do not build from them
+Earlier and failed patch specs are kept in `patches/` as a record; do not build from them
 without reading the camera log.
 
 What a look is made of: the camera has no "film" feature and no general colour lookup table. Each

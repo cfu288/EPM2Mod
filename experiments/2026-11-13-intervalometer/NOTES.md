@@ -289,7 +289,7 @@ Reviews: [review-1-memory.md](review-1-memory.md), [review-2-code.md](review-2-c
 | Loaded at boot | Usr1 0x7E504BF2–0x7E504C18: SYSFMEM read, source 0x80794800, destination 0xBE8F5800, size `0x7ECB1000 − 0x7E8F5800`. This is before the segment-3 load, so segment-3 GUI code can always read the table, and the two segment-2 hooks no longer jump into a later segment (review 2 S1, review 1 §7.1) |
 | Unreferenced | An any-alignment scan of 0x7ECB0888–0x7ECB1000 (and the 0xBE… alias) finds only the copy-end constant 0x7ECB1000 |
 | Code already runs there | remap7b-code puts code at 0x7ECB0888 (`mov imm,a1; bra; … call 0x7E56B732`). It is in every seven-films build, which are camera-tested (docs/camera-log.md) |
-| Every spec in `patches/` | None of the 8 current specs touches the range or any v2 op window (0 overlaps, including the .data and menu-table ops). **Three superseded specs in `patches/history/` do use the padding** (film-vision3-250d-pl1, slots7-neutral, slots12-code: 0x7ECB0888–0x7ECB0F3F), so v2 cannot be combined with those. Only 0x7ECB0F40–0x7ECB0FFF (192 B) is free of every spec ever written, which is too small. `results/specscan-v2.txt` |
+| Every spec in `patches/` | None of the 8 current specs touches the range or any v2 op window (0 overlaps, including the .data and menu-table ops). **Three superseded specs in `patches/` do use the padding** (film-vision3-250d-pl1, slots7-neutral, slots12-code: 0x7ECB0888–0x7ECB0F3F), so v2 cannot be combined with those. Only 0x7ECB0F40–0x7ECB0FFF (192 B) is free of every spec ever written, which is too small. `results/specscan-v2.txt` |
 
 - **Layout:**
 
@@ -393,7 +393,7 @@ Images: stock, films, stock + v2, films + v2, E-PL6 1.4. Model errors: 0 in ever
 
 | Range | Why it is safe | Other specs |
 |---|---|---|
-| 0x7E4C9100–0x7E4C917F (mcon list) | 0xFF padding 0x7E4C90CA–0x7E4C97FF at the end of the range the **reset stub** loads (0x7E430000–0x7E4C9800, review 1 §0). The only window into it is the copy-end constant. The record is boot-part data, so its list does not depend on a Usr1 segment | untouched by every spec in `patches/` and `patches/history/` |
+| 0x7E4C9100–0x7E4C917F (mcon list) | 0xFF padding 0x7E4C90CA–0x7E4C97FF at the end of the range the **reset stub** loads (0x7E430000–0x7E4C9800, review 1 §0). The only window into it is the copy-end constant. The record is boot-part data, so its list does not depend on a Usr1 segment | untouched by every spec in `patches/` and `patches/` |
 | 0x7EBF1100–0x7EBF1EFF (editor items, 3,584 B) | Inside the unreferenced `sdk` shell name list 0x7EBF1090–0x7EBF3BAC (class A in `experiments/2026-11-13-reclaim-space`; my scan again finds no window into the part used). Segment 2, loaded before the GUI segment. Cost: that debug-shell name text is overwritten | untouched by every spec |
 
 - **Applies on:** stock, and the film set + v2 (scratch build of block 0, sha256 `7d460c4c7288…`).

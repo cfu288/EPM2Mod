@@ -117,7 +117,7 @@ Adversarial review of the 6-op data spec, on top of the film set + `interval-tim
 ## 5. Overlap and containment
 
 - **Diff (V).** films + v2 against films + v2 + this spec differs only inside the six ops: 128 B at 0x7E4C9100, 4 B in the record, the rows 0x7EBF1100–0x7EBF1EFF, 3 B in the row at 0x7EFF5DA0, 5 B in the descriptor.
-- **No overlap (V).** Op ranges, with their 4-byte context, tested against the block-0 byte ops of 59 specs under `patches/`, `patches/history/`, `experiments/` and `tools/emu/specs/`: 0 overlaps. The spec also applies on stock alone.
+- **No overlap (V).** Op ranges, with their 4-byte context, tested against the block-0 byte ops of 59 specs under `patches/`, `patches/`, `experiments/` and `tools/emu/specs/`: 0 overlaps. The spec also applies on stock alone.
 - **No code touched (V).** The six ranges are 0xFF padding, the mcon record table, debug name text, the option-row table and the descriptor table. Films + v2 leaves the reset stub, the Usr1 loader, the mcon code, the 638 class code, the list-page code and all four tables at stock.
 - **Containment (V unless marked).**
 

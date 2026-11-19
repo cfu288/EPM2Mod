@@ -137,7 +137,7 @@ Entry points ran natively in om-emu with read watchpoints on the list of 483, on
 - A is the only home that is valid before mcon init, in every boot path, without overwriting anything, and whose "nothing reads into it" rests on code, not on a string-pool rule.
 - **B is not recommended for the list.** The traces show no early reader, so it would work, but it adds the only load-order assumption (I) of the three and gains nothing.
 - **C is the fallback** if a camera test ever shows a problem with padding in the kernel copy: move only the list (128 B) and the record pointer.
-- The current spec applies on stock (block-0 sha256 `b9b5e4f6…`) and on films + v2 (`7d460c4c…`), and its ranges are disjoint from the 1,593 block-0 ops of the other 61 spec files (`patches/`, `patches/history/`, `experiments/*/patches/`, `tools/emu/specs/`).
+- The current spec applies on stock (block-0 sha256 `b9b5e4f6…`) and on films + v2 (`7d460c4c…`), and its ranges are disjoint from the 1,593 block-0 ops of the other 61 spec files (`patches/`, `patches/`, `experiments/*/patches/`, `tools/emu/specs/`).
 
 ## 6. Limits
 

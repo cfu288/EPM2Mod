@@ -95,7 +95,7 @@ Class: **A** strictly dead (§2); **B** reachable only from a debug shell or a n
 | 14 | 0x7E6E22BA–0x7E6E2D4C | 2,706 | 1 | AVCHD clip-info parser | §5 | B |
 | 15 | 0x7ECB1000–0x7ECCB800 | 108,544 | gap | 0xFF between the two Usr1 loads, not in RAM today | §7 | C |
 
-**Class-A totals** (no overlap with any block-0 byte of the 1,593 patch ops in `patches/`, `patches/history/`,
+**Class-A totals** (no overlap with any block-0 byte of the 1,593 patch ops in `patches/`, `patches/`,
 `experiments/*/patches/`, checked by `scripts/summary.py`):
 
 | Segment | Code | Strings | In runs ≥ 512 B | Other |

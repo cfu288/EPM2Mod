@@ -1,4 +1,4 @@
-# Hand-maintained list of specs outside patches/history/ that a later spec replaces, for tools/freespace.py.
+# Hand-maintained list of specs outside patches/ that a later spec replaces, for tools/freespace.py.
 # Their bytes are shown in the ledger as "superseded" and do not count as used or as an overlap.
 # Columns (tab-separated): spec (path from the repo root), superseded by, evidence.
 experiments/2026-11-13-intervalometer/patches/interval-timelapse-insert-awake.json	patches/interval-timelapse-v2.json	description of v2: "v2 of interval-timelapse-insert-awake.json after two reviews"; v2 moved the code from the segment-3 tail to the segment-2 tail
@@ -30,3 +30,47 @@ patches/films12cl-looks.json	patches/stock-films-structure.json	as remap7b-code
 patches/log-menu.json	patches/log-menu-2.json	log-menu-2 is log-menu for the stock-filters firmware: the same code and runs, chained to card-looks-5's T_GUI and with its card_task probe at card-looks-5's T_END (experiments/2026-11-18-stock-filters/design.md)
 patches/custom-menu-rows-2.json	patches/custom-menu-rows-3.json	custom-menu-rows-3 is custom-menu-rows-2 with one more added row (Lowest S/S Setting in group E): the same operations, its item table one row longer at 0x7EBF1FE0 (16 B earlier, same end), its child list one entry longer in place at 0x7EE3CBF4 and the Debug Log value list 8 B later (experiments/2026-11-17-auto-iso-min-shutter/NOTES.md section 8)
 patches/build-label-proto.json	patches/build-label.json	build-label is the prototype with the placeholder date 0000.00.00 in place of 2026.11.19 in its text; epm2mod make writes the build label there (src/epm2mod/label.py); the other three edits are the same
+# Rows with 'history' in the second column: specs of earlier builds that no build uses now and that no single spec replaced (until 2026-11-19 they sat in patches/).
+patches/check-portra-in-new-slots.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/curve-probe-1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/curve-probe-2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/film-ektachrome-lt2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/film-ektachrome-lt3.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/film-ektachrome-lt3-s3.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/film-ektachrome-lt.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/film-ektachrome-pa2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/film-portra.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/film-portra-xp10.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/film-portra-xp10-s3.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/film-portra-xp2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/film-portra-xp7.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/film-portra-xp8.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/film-portra-xp9.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/film-portra-xp.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/film-pro400h-pa1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/film-pro400h-pa2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/film-pro400h-pa2-s12.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/film-vision3-250d-pl1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/four-code.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/four-neutral.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/label-ektachrome-lt.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/label-portra.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/label-pro400h-pa.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/remap7-code.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/remap7-neutral.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/seven-films-1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/seven-films-2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/seven-films-3.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/seven-films-4.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/sixaxis-portra-1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/sixaxis-portra-2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/sixaxis-portra-3.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/sixaxis-probe-1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/slot3-chroma-linear.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/slot3-code.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/slots12-code.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/slots12-kind.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/slots12-neutral.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/slots7-code.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/slots7-kind.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
+patches/slots7-neutral.json	history	an earlier build's spec, kept for the ledger and the camera log; was in patches/
