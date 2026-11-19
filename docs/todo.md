@@ -75,10 +75,8 @@ and delete the item here.
 Deferred by the owner on 2026-11-17: anti-shock 0 s, silent shutter, on-screen information. The notes and the
 candidate `osd-battery` are kept. The minimum shutter speed was taken up again on 2026-11-18 (GitHub issue #2).
 
-- **Lowest S/S Setting (GitHub issue #2): candidate `builds/lss.json`, not flashed.** Custom Menu E -> Lowest S/S
-  Setting (Auto, 60" ... 1/4000). The exposure code copies the PEN-F 3.1's and matches it in the function harness.
-  Next: one camera run. Exposure compensation in M with Auto ISO: 2 bytes at 0x7E5878AF, not run.
-  Notes: `experiments/2026-11-17-auto-iso-min-shutter/NOTES.md` sections 11 and 12.
+- Exposure compensation in M with Auto ISO: 2 bytes at 0x7E5878AF, not run.
+  Notes: `experiments/2026-11-17-auto-iso-min-shutter/NOTES.md` section 6.
 
 - **Anti-shock 0 s and a silent shutter: not settled.** The E-P5 is no donor: the bodies with 0 s
   program the sensor with another register set. A route of our own: stock shutter order, sensor

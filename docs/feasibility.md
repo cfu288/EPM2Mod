@@ -79,6 +79,9 @@ routines. This file records what the measurements show, so that nobody repeats t
 - ~~Looks loaded from a file on the card~~ **Done on 2026-11-17** (`docs/guide/card-looks.md`): our own task
   reads the file at the first menu, the looks are kept in the EEROM settings bank's unused tail (53,680 bytes,
   empty on this camera, saved by the firmware) and written into the slot tables in RAM at every start.
+- ~~Lowest shutter speed for Auto ISO~~ **Done on 2026-11-19** (`lss-menu`, `lss-core`; GitHub issue #2). A copy of
+  the PEN-F 3.1's logic in 641 B of segment-1 code; it matches the PEN-F's own code in the function harness and was
+  camera-tested in P and A (`experiments/2026-11-17-auto-iso-min-shutter/NOTES.md` sections 11 and 12).
 - ~~Level gauge~~ **Done on 2026-11-14 with three data edits and no code.** The whole feature was in
   the firmware; only a menu row was missing. Lesson: compare with the E-PL6 first. It shares 58,642
   identical functions with this body (the E-P5: 21,940).
