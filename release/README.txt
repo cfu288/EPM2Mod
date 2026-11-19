@@ -20,4 +20,4 @@ Each start downloads Olympus's firmware from OM Digital Solutions if it is not h
 
 Remove: delete this folder.
 
-Project, help and how to go back to Olympus's firmware: https://github.com/cfu288/EPM2Mod
+Project, documentation and how to go back to Olympus's firmware: https://github.com/cfu288/EPM2Mod

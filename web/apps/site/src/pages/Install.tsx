@@ -145,7 +145,8 @@ function CliSteps() {
       <CustomMenu n={4} />
       <Step n={5} title="Load the film simulations">
         <p>
-          MENU → SETUP → Custom Menu → J → Load Looks → Load. Until then, the ART entries are the Olympus art filters.
+          If you gave <code>--film</code>: MENU → SETUP → Custom Menu → J → Load Looks → Load. Until then, the ART
+          entries are the Olympus art filters.
         </p>
       </Step>
     </ol>
@@ -208,19 +209,6 @@ export function Install() {
             <p>Then flash it the same way.</p>
           </div>
         )}
-      </section>
-
-      <section className="min-w-0">
-        <h2 className="section-title border-t-[6px] pt-4 text-lg">If something does not work</h2>
-        <ul className="text-ink-soft mt-3 max-w-2xl list-disc space-y-2 pl-5">
-          <li>
-            The camera starts normally instead of writing: it found no firmware file it accepts. Make the card again.
-          </li>
-          <li>
-            Load Looks shows No file: <code>EPM2LOOK.BIN</code> is not in the top folder of the card.
-          </li>
-          <li>Load Looks shows Bad file: the file is damaged or incomplete. Make it again.</li>
-        </ul>
       </section>
     </div>
   )
