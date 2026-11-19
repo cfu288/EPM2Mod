@@ -1,5 +1,5 @@
 # Text files keep LF line ends on every platform; the README generator and the hashes of
-# looks/films.json depend on it.
+# data/films/films.json depend on it.
 * text=auto eol=lf
 # cmd.exe needs CRLF line ends in batch files
 *.bat text eol=crlf
