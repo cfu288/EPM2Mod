@@ -749,4 +749,4 @@ difference):** stop the wide-frame work. The switch bug is not fixed. Kept as fi
 ## 19. Owner's decision, 2026-11-19
 
 Stop the video work and ship none of it: not the bit rate, not the wide frame, not the recording limit. The camera
-goes back to the pinned build `epm2mod-2026.11.19`. The specs and build descriptions stay as candidates for the record.
+goes back to the pinned build `gauge-info-3` (pinned by another session the same day). The specs and build descriptions stay as candidates for the record.
