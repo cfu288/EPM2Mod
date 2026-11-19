@@ -27,7 +27,7 @@ The fork has a port of om-emu's lab to the E-PM2 (`MODELS.E101`, `src/fw/ports.m
 | File | What it does |
 |---|---|
 | `omemu.py` | Driver. Starts `emu/bin/debug.mjs --serve` with `OM_EMU_MODEL=E101` and speaks its JSON-lines protocol. `Emu.call()` calls a function through a real `call` instruction in scratch RAM, using the callee's register list and frame size from its call sites in the image. Stubs are breakpoints: Python sets the return registers, then the CPU returns through a `retf` that has the frame of the call that reached the stub. Each call records an exec trace, and the caller rejects code that ran outside the case's ranges. The call also checks that sp is balanced on return. |
-| `patchblock.py` | Builds a patched block 0 from `patches/*.json`-style specs, with the same base-hash and expected-byte checks as `tools/build.py` (it imports `build.apply_op` and `oetool.parse`). It prints the changed runtime ranges. Ops on other blocks are checked and reported as not emulated. |
+| `patchblock.py` | Builds a patched block 0 from `patches/*.json`-style specs, with the same base-hash and expected-byte checks as `epm2mod make` (it imports `build.apply_op` and `oetool.parse`). It prints the changed runtime ranges. Ops on other blocks are checked and reported as not emulated. |
 | `cases.py` | Named cases: entry, allowed code ranges, stubs, input rows, outputs, and a Python model of the expected outputs. |
 | `emurun.py` | CLI: `list`, `run CASE` (one image, checked against the model) and `diff CASE --patch SPEC…` or `--image BLOCK0` (stock against patched). Exits 1 on any mismatch, fault, stray code or unexpected change. |
 | `bootmem.py`, `scenario.py`, `osmodel.py`, `liveview.py`, `hookcheck.py` | Scenario runs; see "Scenario runs" below. |

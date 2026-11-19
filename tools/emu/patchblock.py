@@ -3,7 +3,7 @@
 
     python3 tools/emu/patchblock.py patches/film-portra.json [more.json ...] -o OUT.block0.bin
 
-Uses the same spec format and the same checks as tools/build.py (base sha256, every op's expected bytes), through
+Uses the same spec format and the same checks as epm2mod make (base sha256, every op's expected bytes), through
 build.apply_op and oetool.parse. Only block 0 is written; ops on other blocks are still checked and applied, then
 reported as "not emulated". Prints the changed block-0 ranges as runtime addresses.
 """

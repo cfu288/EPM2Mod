@@ -1159,8 +1159,8 @@ def write_map(sp):
       "address that the firmware computes at run time (base + index, heap, memory test) is invisible to it. "
       "A PASS means \"no constant found\", not \"proven unused\".")
     w("- **Before a build:** run `python3 tools/freespace.py check SPEC [SPEC ...]` with the same specs, in the same "
-      "order, that go to `tools/build.py`. It exits non-zero if a spec adds bytes in an area that is not usable, or in "
-      "bytes that another current spec claims. `tools/build.py` does not call it.")
+      "order, that the build description lists. It exits non-zero if a spec adds bytes in an area that is not usable, or "
+      "in bytes that another current spec claims. `epm2mod make` runs it for a build that has no camera test yet.")
     w("- **Sources.** *Derived*: read from the block-0 bytes at a checked site (the tool stops if a site's bytes differ). "
       "*Hand*: `%s` (reclaimed areas), `%s` (proven table bounds), `%s` (explained pointer windows), `%s`. "
       "*Optional decode*: `%s`, `%s` (%s)." % (CANDIDATES, BOUNDS, WAIVERS, SUPERSEDED, LINEAR, FUNCTIONS,

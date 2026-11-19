@@ -17,7 +17,6 @@ import http.client
 import io
 import json
 import os
-import runpy
 import shutil
 import signal
 import struct
@@ -1300,28 +1299,6 @@ class CommandLineTests(RepoCase):
             self.assertEqual(status, 7, text)
             self.assertEqual(self.repo.outputs(), [])
             good.write_text(saved)
-
-    def test_the_wrappers_in_tools_pass_their_arguments_on(self) -> None:
-        cases = {
-            "make_firmware.py": ["make", "x", "-o", "/out"],
-            "fetch_stock.py": ["fetch-stock", "x", "-o", "/out"],
-        }
-        for script, expected in cases.items():
-            argv = [script, *expected[1:]]
-            # A script finds the modules beside it; give run_path the same view.
-            beside = [str(ROOT / "tools"), *sys.path]
-            with mock.patch.object(cli, "main", return_value=7) as main:
-                with (
-                    mock.patch.object(sys, "argv", argv),
-                    mock.patch.object(sys, "path", beside),
-                    mock.patch.dict(sys.modules),
-                ):
-                    with self.assertRaises(SystemExit) as raised:
-                        runpy.run_path(
-                            str(ROOT / "tools" / script), run_name="__main__"
-                        )
-            self.assertEqual(raised.exception.code, 7)
-            main.assert_called_once_with(expected)
 
     def test_make_needs_the_build(self) -> None:
         with self.assertRaises(SystemExit) as raised:

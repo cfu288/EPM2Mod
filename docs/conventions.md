@@ -31,8 +31,7 @@ Examples: `feat(cli)!: revision 3 of the CLI spec`, `docs(camera-log): the build
 | Path | What |
 |---|---|
 | `src/epm2mod/` | The production package. It makes the firmware: container format, patch specs, stock download, build descriptions, build steps, film-spec generator, the look-file packer (`looks/`), card writing (`cards.py`, `cardio.py`), the installer server (`serve.py`), release code (`release.py`, `releasing.py`), the log decoder (`eventlog.py`, `logsummary.py`). Command: `uv run epm2mod --help`, all commands in [cli.md](cli.md). See *Production code and research code*. |
-| `tools/make_firmware.py`, `tools/fetch_stock.py` | The two main commands of the package as stand-alone scripts. `tools/_package.py` lets them import the package without an install. |
-| `tools/build.py`, `tools/oetool.py` | Older command-line forms. They call the package. Older scripts in `tools/` and `experiments/` import them. Do not use them to make firmware for a camera. |
+| `tools/oetool.py` | The older command-line form of the container tool (unpack, pack, patch). It calls the package; `tools/_package.py` lets it import the package without an install. `gen/` and older scripts in `experiments/` import it. Do not use it to make firmware for a camera: use `uv run epm2mod make`. |
 | `tools/freespace.py`, `tools/fwmap.py`, `tools/disasm.py`, `tools/memmap_svg.py`, `tools/emu/` | Analysis tools: the free-space check, the function database of block 0, MN103 disassembly (GNU objdump from `tools/setup.sh`, which builds it from the submodule `third_party/binutils-gdb` into `build/toolchain/`), the memory map figure, the emulator harness. |
 | `tools/checks.py`, `.githooks/doclint.py`, `.claude/hooks/doc_links.py`, `docs/links.json`, `tools/toolchain.py` | `checks.py` runs the off-camera checks of a build: only those its specs call for, in parallel, with a cache. `doclint.py` checks the documents that users read. The pre-commit hook runs it on staged files. `doc_links.py` tells the agent which other files repeat a fact when it edits one of them (the groups are in `doc_links.json`). `toolchain.py` says where the MN103 binutils are. |
 | `third_party/om-emu`, `tools/emu/setup.sh` | The emulator: our om-emu fork (branch `e101`, with the E-PM2's boot lab) as a git submodule, and the command that initialises it. Emulator code goes into the fork, not into this repository. `tools/emu/boot-test` and `tools/emu/update-path-test` are the start-up checks of a build. |
@@ -153,7 +152,7 @@ what is there:
 |---|---|
 | Nothing more than the repository | The package works on a small made-up firmware: container, patch specs, build steps, card copy, download (with a stand-in for the network), every command. The README's generated parts are current. The film specs record the digest of the film list and fit files that are in the repository. |
 | numpy (`uv run` installs it) | The film-spec generator works on a made-up firmware (`tests/test_looks.py`). |
-| The maker's firmware file (`uv run tools/fetch_stock.py`) | Each build description that has a sha256 gives that sha256. The film specs in `patches/` are exactly the generated ones. The stock file survives a parse and a write without a change. |
+| The maker's firmware file (`uv run epm2mod fetch-stock`) | Each build description that has a sha256 gives that sha256. The film specs in `patches/` are exactly the generated ones. The stock file survives a parse and a write without a change. |
 
 Without the maker's firmware file the run skips the last group and says so. Run the full set before
 you pin a build.

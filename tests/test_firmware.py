@@ -1,16 +1,17 @@
-"""Tests of the older command-line tools in tools/ (they call the epm2mod package).
+"""Tests of the container tool in tools/ (it calls the epm2mod package), and of the specs that record a hash.
 
 Run: python3 -m unittest discover -s tests
 
 Tests that need firmware BINs are skipped when the files are absent.
 """
 
-import contextlib, glob, hashlib, io, json, os, pathlib, sys, tempfile, unittest
+import glob, hashlib, json, os, pathlib, sys, unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
+sys.path.insert(0, os.path.join(ROOT, "src"))
 import oetool  # noqa: E402
-import build  # noqa: E402
+from epm2mod.spec import apply_specs, load_spec  # noqa: E402
 
 STOCK = sorted(glob.glob(os.path.join(ROOT, "firmware/stock/E-PM2/*.BIN")))
 
@@ -40,11 +41,11 @@ class TestPatchSpecs(unittest.TestCase):
             s = json.loads(pathlib.Path(spec).read_text(encoding="utf-8"))
             if not s.get("expected_sha256"):
                 continue
-            with self.subTest(spec=os.path.basename(spec)), tempfile.TemporaryDirectory() as folder:
-                out = os.path.join(folder, s["name"] + ".BIN")
-                with contextlib.redirect_stdout(io.StringIO()):
-                    self.assertTrue(build.build([spec], out))
-                self.assertEqual(hashlib.sha256(pathlib.Path(out).read_bytes()).hexdigest(), s["expected_sha256"])
+            with self.subTest(spec=os.path.basename(spec)):
+                stock = [p for p in STOCK if hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest() == s["base_sha256"]]
+                self.assertTrue(stock, "the spec's stock firmware is not present")
+                image = apply_specs(pathlib.Path(stock[0]).read_bytes(), [load_spec(pathlib.Path(spec))]).image
+                self.assertEqual(hashlib.sha256(image).hexdigest(), s["expected_sha256"])
 
 
 if __name__ == "__main__":
