@@ -337,3 +337,28 @@ sha256 `09dd21ca6aa8a100a0b43b9a9d336a8f5523c262e06bb9c0be285c55c7e61375`. Check
 Acceptance criteria: busy handheld 1080 Fine clips near 32 Mb/s with QP mostly at 20–22 (against 22–28 in §9.4);
 1080 Normal near 24 Mb/s; a 60 s busy clip records to the end; every clip plays in the camera and decodes on a
 computer without errors; stills, film simulations and peaking work as before.
+
+## 11. Camera run of `debug-log-movie-bitrate`, 2026-11-19
+
+The owner flashed it, recorded the three clips of §10 handheld, played each in the camera, and took one photo with a
+film simulation. Everything worked: no stop, no freeze, every clip played in the camera. The owner's view: "doesn't
+look incredible, similar to pre mod". Files: `results/bitrate/camera-report.txt`, `camera-qp.txt`, `camera-log.json`.
+
+| Clip | Mode | Declared HRD | Video bit rate | P-frame QP | Compare (§9.4, 20 Mb/s target) |
+|---|---|---|---|---|---|
+| PB190001, 21 s, trees | Full HD Fine | 32.77 Mb/s | 18.7 Mb/s | 20–25, mostly 22 | trees: 20.2 Mb/s, QP mostly 22–26 |
+| PB190002, 21 s, same scene | Full HD Normal | 24.58 Mb/s | 20.6 Mb/s | 20–25, mostly 21–22 | – |
+| PB190003, 61 s, slow pan | Full HD Fine | 32.77 Mb/s | 9.5 Mb/s | 20 (floor) | – |
+
+- **The patch took effect (V):** the SPS declares 32,768,000 and 24,576,000 b/s, and the encoder accepted both.
+- **The encoder did not use the new budget (V):** Fine stayed below 20 Mb/s, at QP 21–22 instead of falling to the
+  floor. Normal (24 M) came out at the same QP and a similar rate. So on this scene the hardware rate control settles
+  near QP 22 whatever the target above 20 M (I); why is not known.
+- **Gain:** busy frames moved from QP 22–26 to 21–22 (fewer frames at 26). That is a small step, consistent with
+  the owner's view.
+- **Calm content stays at the floor:** the pan clip used 9.5 Mb/s at QP 20.
+- **Timing (V):** 22.1 ms per frame as in §9, 29.8 fps, no drops; the encoder's CPU 1 time is unchanged.
+- Records were lost again (the log ring overflows during clips of 20 s and more); each clip still has about 450 frames.
+
+Conclusion: the bit rate is no longer the limit; the QP behaviour of the encoder and, more, the stretched 1646-px
+frame are. The visible lever left is the 1920-wide frame (§1, §7).

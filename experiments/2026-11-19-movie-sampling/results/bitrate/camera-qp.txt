@@ -1,0 +1,12 @@
+== PB190001.MOV
+I-frame QP: min 20 max 28 dist [(20, 13), (21, 17), (22, 11), (28, 1)]
+P-frame QP: min 20 max 25 dist [(20, 162), (21, 78), (22, 320), (23, 27), (25, 1)]
+largest frames (n, key, bytes, qp): [(181, True, 240464, 20), (541, True, 240294, 20), (166, True, 240210, 20), (91, True, 237026, 20), (556, True, 227435, 21)]
+== PB190002.MOV
+I-frame QP: min 20 max 31 dist [(20, 9), (21, 20), (22, 11), (31, 1)]
+P-frame QP: min 20 max 25 dist [(20, 62), (21, 168), (22, 324), (23, 15), (24, 4), (25, 1)]
+largest frames (n, key, bytes, qp): [(466, True, 239719, 20), (31, True, 238644, 20), (151, True, 238597, 20), (571, True, 238370, 20), (16, True, 238348, 20)]
+== PB190003.MOV
+I-frame QP: min 20 max 28 dist [(20, 120), (28, 1)]
+P-frame QP: min 20 max 22 dist [(20, 1684), (21, 9), (22, 1)]
+largest frames (n, key, bytes, qp): [(331, True, 153498, 20), (1, True, 132744, 28), (954, False, 126236, 20), (1269, False, 125034, 20), (361, True, 124468, 20)]
