@@ -3,10 +3,6 @@
 Open work, most recent first. When an item is done, move its result to the camera log or the README
 and delete the item here.
 
-## One-click installer
-
-Test releases up to v2026.11.19-rc.2. Open: the final release.
-
 ## Level gauge
 
 - Level Adjust works (2026-11-14), and the calibration is kept after power off and on (owner). Not yet reported:
