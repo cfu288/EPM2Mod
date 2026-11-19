@@ -67,7 +67,7 @@ Other Olympus generations, and what each can be modded to do: [model-matrix.md](
 
 **Low effort: data edits, one camera check each**
 
-- Add Effects on a film look (glow, vignette, white edge, frame).
+- Add Effects on a film simulation (glow, vignette, white edge, frame).
 - Higher video bitrate and no 29-minute limit (`experiments/2026-11-12-hardware/`, patches written,
   not flashed).
 

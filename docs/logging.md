@@ -1,6 +1,6 @@
 # The structured log
 
-For developers. A debug build of the firmware writes event records to the file `EPM2LOG.BIN` on the SD
+For developers. With Custom Menu J → Debug Log On, the firmware writes event records to the file `EPM2LOG.BIN` on the SD
 card. `epm2mod log` turns the file into a short report, or its events into JSON (`--json`). The design notes, the evidence and the camera test
 are in [experiments/2026-11-15-log/NOTES.md](../experiments/2026-11-15-log/NOTES.md).
 

@@ -24,7 +24,7 @@ git config core.hooksPath .githooks
 
 Suggested scopes: `card-looks`, `web`, `peaking`, `looks`, `camera-log`, and for `exp` the experiment's slug (`exp(cli-redesign)`).
 
-Examples: `feat(patch/movie-limit): raise 29-min cap to 9 h`, `docs(camera-log): record movie-limit flash`.
+Examples: `feat(cli)!: revision 3 of the CLI spec`, `docs(camera-log): the build label works; the Lens line is offset`.
 
 ## Where things go
 

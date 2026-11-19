@@ -255,7 +255,7 @@ Side effects: an entry keeps its Olympus effects until a loaded film simulation 
    `looks/film-records.json` (`web/scripts/export_films.py`). No flash: load it from the card,
    develop `PB130001.ORF` with that look, copy the JPEG back.
 4. Correct: `fit_film2.py --name <name2> --anchor <reading of that JPEG> out/fit_<name>.npz`,
-   rebuild, flash, check again with `check_film.py`.
+   load the corrected film file from the card, check again with `check_film.py`.
 
 The model's fitted constants come from developments of the synthetic test image alone
 (`calib_model.py`, stored in `calib/model2.npz`), so none of this needs the photographed charts of

@@ -18,8 +18,8 @@ Test releases up to v2026.11.19-rc.2. Open: the final release.
 
 - The crash at a focus-ring turn after a shot is fixed in the pinned build (save guard; five clean
   tries on the camera, 2026-11-16). Two small windows stay open (NOTES §18.5). The proven kernel
-  code area is full (18 bytes left with all specs counted): the next early-loaded code needs a new
-  area. The log's build id names the dictionary, not the firmware: put a firmware id in `boot`.
+  code area is nearly full ([code-space map](code-space-map.md)): the next early-loaded code needs a
+  new area. The log's build id names the dictionary, not the firmware: put a firmware id in `boot`.
 - More than 10 frames per second of peaking needs a shorter pass list or the 50 ms frame class
   (NOTES §17).
 - Peaking without the zoom: the trigger is the MF Assist state object, which also asks for the zoom.
@@ -36,7 +36,6 @@ Test releases up to v2026.11.19-rc.2. Open: the final release.
 - Add Effects (glow, vignette, white edge, frame) on a film simulation: a data edit, not yet tried.
 - In-camera look edits and look import (LUT): requirements, limits and open questions in
   `experiments/2026-11-18-look-editor/NOTES.md`.
-- More film entries through the hidden art-filter numbers 110 to 118: not yet tried.
 
 ## Interval shooting
 
