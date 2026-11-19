@@ -20,11 +20,6 @@ EPM2Mod supports the oldest camera of the Olympus firmware mods that have a rele
 
 [![A timeline of Olympus and OM SYSTEM cameras that have custom firmware projects, from the E-PL3 in 2011 to the OM-5 Mark II in 2025](docs/images/landscape.png)](docs/reference/landscape.md)
 
-## Dependencies
-
-- [uv](https://docs.astral.sh/uv/getting-started/installation/)
-- [git](https://git-scm.com/downloads)
-
 ## Install
 
 This firmware is only for an E-PM2. The firmware is unofficial, use it at your own risk. Ensure your battery is full prior to flashing. You can either use the installer or the CLI/command line. CLI is preferred.
@@ -34,6 +29,8 @@ This firmware is only for an E-PM2. The firmware is unofficial, use it at your o
 Download the zip from [Releases](https://github.com/cfu288/EPM2Mod/releases), unzip it, and double-click **Start (Mac).command** or **Start (Windows).bat** (Linux: `./start.sh`). Follow the page that opens. On a Mac, the first start is blocked: allow it in System Settings → Privacy & Security → **Open Anyway**.
 
 ### Using the command line
+
+You need [uv](https://docs.astral.sh/uv/getting-started/installation/) and [git](https://git-scm.com/downloads).
 
 Format the card in the camera and put it in the computer (`uv run epm2mod cards` shows its folder). Then:
 
