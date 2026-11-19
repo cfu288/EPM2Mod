@@ -1,5 +1,10 @@
 # Can every visible art filter become a film slot? Evaluation, 2026-11-12
 
+Superseded. films-12 (2026-11-16) made all 12 entries film slots; since 2026-11-18 the firmware keeps Olympus's
+filters and Load Looks overwrites the entries a film file lists
+([stock-filters design](../experiments/2026-11-18-stock-filters/design.md)). The findings below are as of
+2026-11-12.
+
 Question: can all twelve art filters in the quick menu be rebuilt to accept any film look, the way
 Portra 400 was built, without making the firmware unstable?
 

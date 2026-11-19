@@ -1,5 +1,9 @@
 # Art filter slots: what each menu entry can do as a film-emulation slot
 
+Slot verdicts are as of 2026-11-12. The pinned build keeps the stock filters and loads a film simulation into any
+entry ([stock-filters design](../experiments/2026-11-18-stock-filters/design.md)). §2 (stage and dispatch) is
+current.
+
 E-PM2 firmware 1.6, block 0, runtime base 0x7E421020. Written 2026-11-12 from the work in
 `experiments/2026-11-09-film-portra/NOTES.md` §11–26 and `CODE_DIG.md`.
 
@@ -101,7 +105,7 @@ It then shares one of the two three-record handlers' tables (see 2.3 point 1). *
 With the new code of §5 the matrix is no longer a limit (`matrix3` can test any code and point at any
 table). What limits the count now is gamma-table space, a clean host entry, and stage (f).
 
-## 4. Current assignment (build `three-films-2`, on the camera since 2026-11-12)
+## 4. Assignment in `three-films-2` (2026-11-12)
 
 | Resource | Used by |
 |---|---|
@@ -122,9 +126,9 @@ Tone" → "Ektachrome", "Pop Art" → "Pro400H" (each shared by the entry's type
 ## 5. The third slot, as built (NOTES §29–30), and what a fourth would need
 
 - **Space:** the large 0xFF runs in block 0 are the gaps between the ranges the firmware loads into
-  RAM, so they are never loaded. Inside the loaded ranges there are about 3.5 KB of 0xFF: 164 B at
-  0x7E880F5C (boot segment; 120 B now used), 1,912 B at 0x7ECB0888, 1,156 B at 0x7F033B7C and three
-  runs under 160 B. Enough for code, records and matrices; not for 24 new gamma tables.
+  RAM, so they are never loaded. The free space inside the loaded ranges is in
+  [code-space-map.md §4](code-space-map.md#4-totals-bytes). Enough for code, records and matrices; not for 24 new
+  gamma tables.
 - **Curves:** `gamma3`, a copy of the handler at 0x7E56B82A (49 bytes) with the records of
   Pale&Light, Light Tone and Pop Art II, ending in a jump to the common tail 0x7E56B852. **[C]**
 - **Host entry:** Pop Art I (code 70). The range check was lowered to 70; key 0 then matches hash
@@ -138,13 +142,7 @@ Tone" → "Ektachrome", "Pop Art" → "Pro400H" (each shared by the entry's type
 
 ## 6. Method for a new film in an existing slot
 
-1. Target: `spektrafilm-lut build` for negative film + print; `bake_slide.py` for slide film.
-2. `fit_film.py --lut … --slot … --name …` (calibrated model, no camera).
-0. Before choosing a slot: develop the test RAW with the slot's stock look and check that the
-   model reproduces it (clean slots: about 0.9 ΔE). A worse fit means an unmodelled stage.
-3. Flash; RAW Data Edit `PB130001.ORF` (the second-generation test RAW) with the slot;
-   `analyze_mock2.py` / `check_film.py`.
-4. `fit_film.py … --anchor <read name> <first fit .npz> --robust 3`; flash; check again.
+See [film-emulation.md §8](film-emulation.md#8-adding-or-changing-a-film).
 
 Measured so far (ΔE2000 vs target, 1,120 natural-colour patches): Portra 1.47 → 1.31 after one
 correction; Ektachrome 1.55 on the first, model-only build → 1.39 after one correction.

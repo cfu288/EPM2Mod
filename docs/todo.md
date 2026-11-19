@@ -5,18 +5,12 @@ and delete the item here.
 
 ## One-click installer
 
-- A zip for any platform: double-click, a local page makes the firmware, adds film looks (optional), and writes to
-  an SD card or gives a zip. Olympus's art filters stay the default. Plan and criteria:
-  [installer design](../experiments/2026-11-17-installer/design.md).
-- Not published (owner, 2026-11-17): first a camera test of the firmware with and without film looks, and of every
-  feature, with a build that writes the log: `stock-films` (pinned 2026-11-18) writes it, switched by Custom Menu J ->
-  Debug Log, and keeps Olympus's art filters until films are loaded
-  ([stock-filters design](../experiments/2026-11-18-stock-filters/design.md)).
+Test releases up to v2026.11.19-rc.2. Open: the final release.
 
 ## Level gauge
 
-- Level Adjust works (2026-11-14). Not yet reported: the calibration after power off and on, after
-  a flash of a different build, and Reset.
+- Level Adjust works (2026-11-14). Not yet reported: the calibration after power off and on, and
+  Reset.
 - Not yet reported: the gauge in portrait orientation, and the info menu of an electronic
   viewfinder (the new row re-uses the unused panel 594, "EVF Info Settings").
 
@@ -27,34 +21,22 @@ and delete the item here.
   code area is full (18 bytes left with all specs counted): the next early-loaded code needs a new
   area. The log's build id names the dictionary, not the firmware: put a firmware id in `boot`.
 - More than 10 frames per second of peaking needs a shorter pass list or the 50 ms frame class
-  (NOTES §17). `peaking-fast` is the pinned build (2026-11-15).
+  (NOTES §17).
 - Peaking without the zoom: the trigger is the MF Assist state object, which also asks for the zoom.
   It needs the E-P5 state object paired (NOTES §15.5).
-- The words Peaking, White and Black are English only: the other languages keep the old texts of
-  ids 1500, 1501, 1505, 1506.
-- Make the emulator's boot test a step of `epm2mod make` for every candidate. The commands exist
-  (`tools/emu/boot-test`, `tools/emu/update-path-test`, exit status 0 = pass); `make` does not call
-  them yet.
+- The row name Peaking is English only.
 
-## Film looks
+## Film simulations
 
-- `films-12d` is the pinned build (2026-11-16): twelve films with Double-X, and the peaking save
-  guard. Not yet reported from the camera: movie mode and ART shooting mode in the five new entries,
-  an interval sequence with the ring turning, a flash of the log-free bytes. Open: a selection of an
-  old filter stored before the flash keeps that filter until a Picture Mode is chosen; Filter Type
-  and Add Effects do nothing in the five entries; Double-X is fifth in the list, not last; the
-  second Double-X fit has no chart measurement; stock-strength grain needs about 40 bytes of code.
-- Looks from the SD card (`card-looks-4`, pinned 2026-11-17): not yet seen on the camera: the
-  film name in playback info. Later: live-view tables for movies' own columns if movies need them.
-- Type II of Portra, Pro 400H and Superia is the same as type I, and is not tested on the camera.
+- Grain: stock-strength grain needs about 40 bytes of code.
+- Film files from the card: not yet seen on the camera: the film name in playback info. Later: live-view tables
+  for movies' own columns if movies need them.
 - The published test RAW files (owner name and serial numbers blanked) are not yet developed on the
   camera.
-- Add Effects (glow, vignette, white edge, frame) on a film look: a data edit, not yet tried.
+- Add Effects (glow, vignette, white edge, frame) on a film simulation: a data edit, not yet tried.
 - In-camera look edits and look import (LUT): requirements, limits and open questions in
   `experiments/2026-11-18-look-editor/NOTES.md`.
 - More film entries through the hidden art-filter numbers 110 to 118: not yet tried.
-- The film names in the other 33 languages are in the pinned build; not tested on the camera (the
-  owner does not need them). Unknown: where the texts 1173 and 1186 show.
 
 ## Interval shooting
 
@@ -73,7 +55,7 @@ and delete the item here.
 ## Exposure
 
 Deferred by the owner on 2026-11-17: anti-shock 0 s, silent shutter, on-screen information. The notes and the
-candidate `osd-battery` are kept. The minimum shutter speed was taken up again on 2026-11-18 (GitHub issue #2).
+candidate `osd-battery` are kept.
 
 - Exposure compensation in M with Auto ISO: 2 bytes at 0x7E5878AF, not run.
   Notes: `experiments/2026-11-17-auto-iso-min-shutter/NOTES.md` section 6.
@@ -84,10 +66,9 @@ candidate `osd-battery` are kept. The minimum shutter speed was taken up again o
   wall, Live Time 0.5 s against a normal 0.5 s, to see the reset type and the read-out time.
   Notes: `experiments/2026-11-17-anti-shock/NOTES.md`.
 
-- **On-screen information.** `osd-battery` is a candidate: a battery percentage on the live-view
-  screen. Next in the same label: the lens's focus distance (about 90 bytes), the shutter count
-  (about 40 bytes), a calibration of the percentage scale, and a row in LV-Info to switch it. The
-  segment-2 code area has 722 bytes left, in runs of 120 bytes or less.
+- **On-screen information.** `osd-battery` is a candidate on the old films-12d base: rebase it on the pinned
+  build. It shows a battery percentage on the live-view screen. Next in the same label: the lens's focus distance,
+  the shutter count, a calibration of the percentage scale, and a row in LV-Info to switch it.
   Notes: `experiments/2026-11-17-osd-info/NOTES.md`.
 
 ## Foundations
@@ -97,27 +78,27 @@ candidate `osd-battery` are kept. The minimum shutter speed was taken up again o
   `experiments/2026-11-15-log/evaluation-1.md`. Unknown: if the ring RAM survives a crash restart.
   A ring overflows after about 100 s of peaking without a menu. The camera writes compact binary event
   records to `EPM2LOG.BIN` on the card; `epm2mod log` decodes them with the dictionary
-  `logs/events.json`. A debug build only: the pinned build stays without it. Probes go into the old
+  `logs/events.json`. The pinned build has it: Custom Menu J → Debug Log (Off by default). Probes go into the old
   features too (peaking, picture mode changes, level gauge, interval, film looks, firmware errors).
-  Next after it: read a file, looks from the card, code from the card.
+  Next: code from the card.
 - Feature candidates from the survey of 22 other bodies and of other mods:
   `experiments/2026-11-15-feature-survey/`. Cheap ones: video bitrate and time limit (patches
-  written), Light Box (hidden in this firmware), Add Effects on looks, more looks.
+  written), Light Box (hidden in this firmware), Add Effects on film simulations, more film simulations.
 
-- The load-order check (`python3 tools/emu/hookcheck.py SPEC...`) reports one failure in the pinned
-  build: the hook at 0x7E56C6A5 (`remap7b-code`, segment 1) jumps to code in segment 2. The audit
-  shows that the host function is reached only through the image-job table 0x7E789604, and it did
-  not run before segment 2 was loaded on a normal start, a quick start and the update path. That is
-  a test result, not a proof. A clean fix moves 219 bytes into a dead function of segment 1.
+- The load-order check (`python3 tools/emu/hookcheck.py SPEC...`) reports seven failures in the pinned build, all
+  from `stock-films-structure`: hooks in segment 1, among them 0x7E56C6A5, that jump to code in segment 2. All
+  seven are in `tools/emu/hookcheck-allow.tsv`, and `python3 tools/freespace.py check` passes with them. For
+  0x7E56C6A5, the audit shows that the host function is reached only through the image-job table 0x7E789604, and
+  it did not run before segment 2 was loaded on a normal start, a quick start and the update path. That is a test
+  result, not a proof. A clean fix moves 219 bytes into a dead function of segment 1.
 - Emulator ([tools/emu/boot/README.md](../tools/emu/boot/README.md)), open points:
   - The row Time Lapse Settings is grey when the clock is not set. Start the emulator with
     `E101_RTC=2026-11-14T12:00:00`.
   - Not reached: the screens of a viewfinder, the super control panel. The live control
-    (OK → Picture Mode strip) is reached: use it for the screenshot of the film-looks guide.
+    (OK → Picture Mode strip) is reached.
   - Power-off does not finish. Half-press and full press are not tried. A real JPEG in playback is
     not tried.
   - The background pictures of the menus are in a flash area that is not in the update file, so
     they are grey.
 
-- The probes in [feasibility.md](feasibility.md), section "Unknowns": a file write for a log
-  channel, a file read, tables at a RAM address, a longer load range.
+- The probes in [feasibility.md](feasibility.md), section "Unknowns": the longer load range.

@@ -1,6 +1,6 @@
 # Flashing the E-PM2 from an SD card
 
-This procedure is **confirmed on the E-PM2** (see [camera-log.md](camera-log.md)): body firmware 1.6, two stock reflashes and one modified flash on 2026-11-08.
+This procedure is confirmed on the E-PM2 with stock and modified firmware since 2026-11-08 ([camera log](camera-log.md)).
 
 ## Steps
 
@@ -9,11 +9,11 @@ This procedure is **confirmed on the E-PM2** (see [camera-log.md](camera-log.md)
    - Stock: `firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN`
    - Modified: make it with `uv run epm2mod make NAME` (see [../README.md](../README.md) and [conventions.md](conventions.md), "Making firmware"). The result is `build/<name>.BIN`, and a copy at `build/card/DCOLYMP/E1019999.BIN`. `uv run epm2mod install --card DIR --build NAME` (add `--allow-untested` for a candidate) makes the same file and puts it at `DIR/DCOLYMP/E1019999.BIN` (`DIR`: the card's top folder), and checks the copy. With `-o FILE`, `make` writes one more copy of the file at `FILE`. The flags are in [cli.md](cli.md).
 3. Copy it to the card as **`DCOLYMP/E1019999.BIN`**. It must be the only file in `DCOLYMP`. Check the sha256 on the card against the build output.
-4. With the camera off and the card in, hold **OK** and the **ON/OFF** button together. When the orange lamp on the front (the AF illuminator) lights steadily, let go of both (owner, 2026-11-18).
+4. With the camera off and the card in, hold **OK** and the **ON/OFF** button together. When the orange lamp on the front (the AF illuminator) lights steadily, let go of both.
 5. The lamp shows progress:
    - **Solid orange, about 1–1.5 min:** writing. **Do not touch the camera.**
    - **Blinking:** finished. It keeps blinking until you power off.
-6. Power off, then on normally. Check Setup Menu → Firmware: an EPM2Mod build reads `Body : 1.6  EPM2Mod YYYY.MM.DD`.
+6. Power off, then on normally. Check MENU → SETUP → wrench tab → Firmware: an EPM2Mod build reads `Body : 1.6  EPM2Mod YYYY.MM.DD`.
 7. **Recovery:** flash the stock BIN the same way. Proven on 2026-11-08: it went from modified back to stock.
 
 If the camera boots straight to live view at step 4, the file wasn't recognised and nothing was written. The fallback name is `E1011600.BIN`, but it may be ignored as an equal version.

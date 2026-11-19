@@ -28,7 +28,7 @@ The differences that matter for mods are in the columns below.
 
 | Mod | Needs | VI (E-PM2) | VII | VIII | IX / X |
 |---|---|---|---|---|---|
-| Film looks from tables (tone, saturation, 6-axis) | Data edits | Done, camera-tested | Done (E-M10) | Done (E-P7) | Done (OM-3) |
+| Film simulations from tables (tone, saturation, 6-axis) | Data edits | Done, camera-tested | Done (E-M10) | Done (E-P7) | Done (OM-3) |
 | 12-colour HSL per look | A 12-region stage | Stage exists, stills only, not live view (V) | PEN-F: done | E-P7: done | OM-3: done |
 | Looks or code loaded from the card | File API plus a hook | Done (this project, fenykl) | Done (em10-fw) | Done | Done |
 | Grain, halation, glow (per-pixel CPU work) | CPU time | 1–18 s per still (I). Impossible in movie (V) | ? | Grain 3–5 s per still (X) | Hardware grain, no delay (X) |
@@ -52,12 +52,13 @@ The differences that matter for mods are in the columns below.
 - **Hard limits:** live view never gets the 12-region colour stage, movie gets no per-pixel effect, and the
   hardware rows above.
 - **Best sources of code to port:** the E-PL6 and E-P5 share the sensor and TruePic VI. Of what the E-PL6 has,
-  interval shooting and the level gauge are already rebuilt here. The E-P5 has peaking on a button.
+  interval shooting and the level gauge are already rebuilt here. The E-P5 has peaking on a button. Focus peaking
+  is already rebuilt here.
 
 ## 4. Gaps
 
-- **Free code space and settings memory per body:** measured only for the E-PM2 (about 17.5 KB of candidate code
-  space; a 53,680-byte unused tail in the settings memory, see [feasibility.md](feasibility.md)). The same
+- **Free code space and settings memory per body:** measured only for the E-PM2 (code space:
+  [code-space-map.md §4](code-space-map.md#4-totals-bytes); a 53,680-byte unused tail in the settings memory, see [feasibility.md](feasibility.md)). The same
   free-space scan could run on all 32 firmware files.
 - **RAM per body:** unknown. The 512 MiB for the E-PM2 is the emulator's setting, not a measurement.
 - **CPU clock:** inferred, not measured. A timing probe on the camera would settle it.

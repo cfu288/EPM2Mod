@@ -5,7 +5,7 @@ photos and live view.
 
 ## Usage
 
-Install with the installer, which puts the films on the SD card. Then MENU → SETUP → Custom Menu → J → **Load Looks** →
+Install with the installer, which puts the film simulations on the SD card. Then MENU → SETUP → Custom Menu → J → **Load Looks** →
 **Load** → OK ([more](card-looks.md)).
 
 In P, A, S or M mode, press **OK**, select **Picture Mode**, and scroll right past Custom. The film simulations are also in the **ART** mode list.
@@ -44,8 +44,8 @@ In P, A, S or M mode, press **OK**, select **Picture Mode**, and scroll right pa
 ## Limits
 
 - The simulations change colour and tone only. There is no halation and no grain.
-- The E-PM2 has no colour wheel. Newer Olympus cameras have a table for 12 colours in the image processor. Mods for those cameras let you change each of the 12 colours. The E-PM2 has a table for 6 colours only ([more](../feasibility.md#colour-wheel-and-twelve-colour-editors)).
-- You can choose another film for any of them: [Looks from the SD card](card-looks.md).
+- There is no colour wheel. The camera has a 12-colour stage for photos only (not live view or movies), and EPM2Mod does not change it ([more](../feasibility.md#colour-wheel-and-twelve-colour-editors)).
+- You can choose another film simulation for any of them: [Film simulations from the SD card](card-looks.md).
 - Movies only get part of each simulation.
 - Filter Type and Add Effects are not tested with the film simulations.
 - An ART entry that has a film simulation does not have its Olympus art filter. To get the art filter back, load a file that does not list that entry ([more](card-looks.md)).
