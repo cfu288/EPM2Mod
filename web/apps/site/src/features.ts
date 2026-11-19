@@ -76,4 +76,19 @@ export const features: Feature[] = [
     ],
     screens: [{ src: 'ui/peaking-list.png', alt: 'Custom Menu A with the Peaking list' }],
   },
+  {
+    id: 'lowest-ss',
+    name: 'Lowest shutter speed',
+    summary: 'Choose the shutter speed at which ISO Auto starts to rise, as on the PEN-F.',
+    steps: [
+      'MENU → Custom Menu → E. Exp/▣/ISO → Lowest S/S Setting.',
+      'Press RIGHT, choose a speed with UP/DOWN, and press OK. Auto works as before.',
+      'Faster (1/250) keeps moving subjects sharp; slower (1/8) keeps ISO low for still subjects.',
+      'Works in P and A, with ISO Auto and no flash.',
+    ],
+    screens: [
+      { src: 'ui/lowest-ss-row.png', alt: 'Custom Menu E with the Lowest S/S Setting row' },
+      { src: 'ui/lowest-ss-list.png', alt: 'Lowest S/S Setting set to 1/15' },
+    ],
+  },
 ]

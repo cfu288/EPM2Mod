@@ -16,10 +16,10 @@ If the menu has no Custom Menu tab (gears icon), enable it in **Setup Menu → M
 ## Usage
 
 - **Auto** (default): the camera works as before.
-- **A speed faster than usual** (for example 1/250): the camera holds that speed and raises ISO, up to the High Limit
-  of **ISO-Auto Set**. Then the shutter gets slower.
-- **A speed slower than usual** (for example 1/8): the camera first slows the shutter down to that speed, then raises
-  ISO.
+- **Faster, for moving subjects** (for example 1/250 for children, pets or indoor sports): the camera holds that speed
+  and raises ISO, up to the High Limit of **ISO-Auto Set**. Then the shutter gets slower.
+- **Slower, for still subjects** (for example 1/8 for interiors or dusk, hand-held with the stabiliser or on a
+  tripod): the camera first slows the shutter down to that speed, then raises ISO. There is less noise, but moving things blur.
 
 ## Limits
 

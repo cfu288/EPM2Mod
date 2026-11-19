@@ -11,8 +11,8 @@ export function Home() {
         <div>
           <h1 className="font-display text-5xl font-extrabold tracking-tight sm:text-6xl">EPM2Mod</h1>
           <p className="text-ink-soft mt-6 max-w-md text-lg">
-            Custom firmware for the E-PM2 that adds film simulations, interval shooting, a level gauge, and focus
-            peaking.
+            Custom firmware for the E-PM2 that adds film simulations, interval shooting, a level gauge, focus peaking,
+            and a lowest shutter speed for ISO Auto.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href={href('install')} className="btn bg-ink hover:text-ink py-3 text-white hover:bg-white">

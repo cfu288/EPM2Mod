@@ -47,7 +47,7 @@
   },
   {
    "name": "Feature list",
-   "fact": "What EPM2Mod adds: film simulations, looks from the card, interval shooting, level gauge, focus peaking, debug log",
+   "fact": "What EPM2Mod adds: film simulations, looks from the card, interval shooting, level gauge, focus peaking, debug log, lowest shutter speed",
    "truth": ["pinned-build.json"],
    "copies": ["README.md", "web/apps/site/src/features.ts", "web/apps/site/src/pages/Home.tsx", "web/apps/site/index.html", "web/apps/local/src/App.tsx"]
   },
@@ -68,6 +68,12 @@
    "fact": "Menu paths for the gauge and Level Adjust",
    "truth": ["patches/level*.json"],
    "copies": ["docs/guide/level-gauge.md", "web/apps/site/src/features.ts"]
+  },
+  {
+   "name": "Lowest shutter speed",
+   "fact": "Menu path, values, when it applies (P and A, ISO Auto, no flash)",
+   "truth": ["patches/lss-*.json", "patches/custom-menu-rows-3.json"],
+   "copies": ["docs/guide/lowest-shutter-speed.md", "web/apps/site/src/features.ts"]
   },
   {
    "name": "Debug log",

@@ -231,7 +231,7 @@ function FirmwareStep(props: {
         <Choice
           group="firmware"
           title="EPM2Mod"
-          line="Film simulations, interval shooting, level gauge, focus peaking."
+          line="Film simulations, interval shooting, level gauge, focus peaking, lowest shutter speed."
           checked={props.firmware === 'epm2mod'}
           onChoose={() => {
             props.onFirmware('epm2mod')
