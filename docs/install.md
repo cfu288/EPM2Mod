@@ -13,7 +13,7 @@ The install steps are in the [README](../README.md#install).
 
 ## Checksums
 
-The build script verifies the checksum itself and stops if it does not match. With `--card`, it also verifies the copy on the SD card.
+`install` verifies the checksum itself and stops if it does not match. It also reads each file back from the SD card and compares the checksum. To see what is on the card, run `uv run epm2mod inspect --card /path/to/card`. All commands and options are in the [command-line reference](cli.md).
 
 ## Restore Original Firmware
 
@@ -24,7 +24,7 @@ The build script verifies the checksum itself and stops if it does not match. Wi
    ```
 
    Without a card: `uv run epm2mod restore -o FILE`, then copy the file to the card as `DCOLYMP/E1019999.BIN`.
-2. Flash it the same way as the mod (step 3 of the [README](../README.md#install)).
+2. Do the steps that `restore` shows. They are the same as for the mod (step 3 of the [README](../README.md#install)).
 
 The installer does the same: choose **Olympus original** at the Firmware step.
 

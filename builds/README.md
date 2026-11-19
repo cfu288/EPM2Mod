@@ -5,9 +5,10 @@ been tested on a camera, the sha256 of the result and the date of the test. The 
 file name. Every build starts from the stock E-PM2 v1.6 firmware.
 
 ```bash
-uv run tools/make_firmware.py                      # the pinned build (pinned-build.json names it)
-uv run tools/make_firmware.py builds/NAME.json     # another build
-uv run epm2mod pin builds/NAME.json --date YYYY-MM-DD --sha256 HEX   # after a passed camera test
+uv run epm2mod make                                # the pinned build (pinned-build.json names it)
+uv run epm2mod make NAME                           # another build
+uv run epm2mod install --card DIR --build NAME --untested   # a candidate on the SD card
+uv run epm2mod pin NAME --date YYYY-MM-DD --sha256 HEX      # after a passed camera test
 ```
 
 All firmware that goes on a camera is made this way. The procedure for a new build is in

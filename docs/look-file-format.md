@@ -4,8 +4,8 @@ A look file holds up to twelve film looks, one per art-filter menu entry. The pi
 it from the top folder of the SD card when Load Looks runs, checks it, writes the looks into the entries it lists and keeps a copy in its settings
 memory. The looks then stay after a restart and without the card, until another file is loaded.
 
-Make one with `uv run epm2mod looks pack [ART2=velvia ... | LIST.json] [-o FILE]` (no argument: the twelve default films,
-`looks/card-looks.json`). Check one with `uv run epm2mod looks show FILE [--json]`. Code:
+Make one with `uv run epm2mod films set` (no film argument: the twelve default films, `looks/card-looks.json`).
+Check one with `uv run epm2mod inspect FILE`. The flags are in the [command-line reference](cli.md). Code:
 `src/epm2mod/looks/lookfile.py` (the format), `src/epm2mod/looks/records.py` (from the film records), `src/epm2mod/looks/lookpack.py` (from the fit files). Why the format
 is this way: `experiments/2026-11-17-card-looks/design.md` section 5.
 
@@ -118,7 +118,7 @@ function crc32(bytes) {
 
 ## Test vector
 
-`uv run epm2mod looks pack` (or `looks pack looks/card-looks.json`) gives 20,528 bytes with sha256
+`uv run epm2mod films set -o FILE` gives 20,528 bytes with sha256
 `5d5df335dc14100a3fb7c90265ca07470419f12f52f806cc6b80f1bc09cae7ad`. Its first 32 bytes:
 
 ```

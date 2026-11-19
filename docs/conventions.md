@@ -30,7 +30,7 @@ Examples: `feat(patch/movie-limit): raise 29-min cap to 9 h`, `docs(camera-log):
 
 | Path | What |
 |---|---|
-| `src/epm2mod/` | The production package. It makes the firmware: container format, patch specs, stock download, build descriptions, build steps, film-spec generator. Command: `uv run epm2mod --help`. See *Production code and research code*. |
+| `src/epm2mod/` | The production package. It makes the firmware: container format, patch specs, stock download, build descriptions, build steps, film-spec generator. Command: `uv run epm2mod --help`, all commands in [cli.md](cli.md). See *Production code and research code*. |
 | `tools/make_firmware.py`, `tools/fetch_stock.py` | The two main commands of the package as stand-alone scripts. `tools/_package.py` lets them import the package without an install. |
 | `tools/build.py`, `tools/oetool.py` | Older command-line forms. They call the package. Older scripts in `tools/` and `experiments/` import them. Do not use them to make firmware for a camera. |
 | `tools/freespace.py`, `tools/fwmap.py`, `tools/disasm.py`, `tools/memmap_svg.py`, `tools/emu/` | Analysis tools: the free-space check, the function database of block 0, MN103 disassembly (GNU objdump from `tools/setup.sh`, which builds it from the submodule `third_party/binutils-gdb` into `build/toolchain/`), the memory map figure, the emulator harness. |
@@ -68,8 +68,8 @@ Examples: `feat(patch/movie-limit): raise 29-min cap to 9 h`, `docs(camera-log):
 - **`tools/`** holds stand-alone scripts. `make_firmware.py`, `fetch_stock.py`, `build.py` and
   `oetool.py` are thin commands over the package. The others (`freespace.py`, `fwmap.py`,
   `disasm.py`, `memmap_svg.py`, `emu/`) are analysis tools.
-- **Generated, not written by hand:** the parts of the documents between `GENERATED` markers
-  (`uv run epm2mod readme`), and the three film patch specs (`uv run epm2mod looks --write`, from
+- **Generated, not written by hand:** the parts of the documents between `GENERATED` markers and
+  the CLI reference [cli.md](cli.md) (`uv run epm2mod docs --write`), and the three film patch specs (`uv run epm2mod looks --write`, from
   `looks/films.json` and `looks/fits/`). A build's name is the file name of its description. Tests
   fail if a generated part is out of date.
 - **One environment:** `uv sync` makes `.venv` with the package, the development tools and the
@@ -77,9 +77,10 @@ Examples: `feat(patch/movie-limit): raise 29-min cap to 9 h`, `docs(camera-log):
 
 ## Making firmware
 
-**All firmware that goes on a camera is made with `tools/make_firmware.py` (the same as
-`epm2mod make`) from a build description.** Do not apply specs by hand for a flash. This is the same
-command that the README gives to users, so every flash also tests the install path.
+**All firmware that goes on a camera is made by `epm2mod make` or `epm2mod install` from a build
+description.** Both run the same steps (`pipeline.firmware`). Do not apply specs by hand for a flash.
+Write a candidate to the card with `install`, the command that the README gives to users, so every
+flash also tests the install path.
 
 A build description is a file in `builds/`: what the build is, and the patch specs in order. The
 build's name is the file name. `pinned-build.json` names the description of the last camera-tested
@@ -87,7 +88,7 @@ build.
 
 1. **New build:** write `builds/NAME.json` with `what` and `specs` (files in `patches/`). Leave out
    `sha256` and `camera_tested`. Copy an existing description and change it.
-2. **Make it:** `uv run tools/make_firmware.py builds/NAME.json`. For a build without a recorded
+2. **Make it:** `uv run epm2mod make NAME`. For a build without a recorded
    sha256 the script runs `tools/freespace.py check` first, then prints the sha256 and says that the
    build is a candidate. The check needs the firmware map in `build/map/`, which a fresh clone
    does not have. To make the map: `python3 tools/fwmap.py build`. This needs GNU objdump for the
@@ -99,15 +100,15 @@ build.
    only a flash can show that code runs there. When a build is meant to be that test, add
    `"first_code": true` to its description. The script then accepts the area if it passes every
    static check, and prints a FIRST CODE line. Say in the camera log which area is new.
-3. **Log it** in [camera-log.md](camera-log.md) with that sha256, then flash
-   `build/card/DCOLYMP/E1019999.BIN` (or `build/NAME.BIN`).
+3. **Log it** in [camera-log.md](camera-log.md) with that sha256. Write it to the card with
+   `uv run epm2mod install --card DIR --build NAME --untested`, then flash it.
 4. **If the camera test passes:**
-   `uv run epm2mod pin builds/NAME.json --date YYYY-MM-DD --sha256 THE_SHA256_FROM_THE_LOG`.
+   `uv run epm2mod pin NAME --date YYYY-MM-DD --sha256 THE_SHA256_FROM_THE_LOG`.
    The command makes the build again in memory and records the test only if the result has that
    sha256, so a spec that changed after the flash cannot be recorded as tested. It writes the sha256
    and the date into the description and makes it the pinned build. Then:
-   - run `uv run epm2mod readme`. It refreshes the generated parts of the documents
-     (`docs/install.md`, `docs/guide/film-looks.md`, `builds/README.md`).
+   - run `uv run epm2mod docs --write`. It refreshes the generated parts of the documents
+     (`README.md`, `docs/install.md`, `docs/guide/film-looks.md`, `builds/README.md`, `docs/cli.md`).
    - update what is written by hand: the feature list in `README.md` (one line and a link per
      feature), the feature's guide in `docs/guide/` (how to switch it on and use it, with
      screenshots from the emulator, and its limits).

@@ -4,10 +4,10 @@
   filters and loads films from the card): which film goes in which art-filter menu entry, the name shown in the menu, and the
   fit file of the film. It also names the three patch specs that are generated from this data.
 - `catalogue.json`: every fitted film that a look file for the SD card can hold, with the short id that
-  `epm2mod looks pack ART2=velvia` uses and the name the camera shows (`epm2mod looks list`).
-- `card-looks.json`: the twelve default films, one per ART entry, that the installer and `make` write to the card.
+  `epm2mod install ART2=velvia` and `epm2mod films set ART2=velvia` use and the name the camera shows (`epm2mod films`).
+- `card-looks.json`: the twelve default films, one per ART entry, that the installer and `install` write to the card.
 - `film-records.json`: each film of the catalogue with its look record, and the built-in film of each ART entry.
-  `epm2mod looks pack`, the local app and the web site pack look files from it, without numpy. Made from the fits
+  `epm2mod install`, `epm2mod films set`, the local app and the web site pack look files from it, without numpy. Made from the fits
   by `uv run python web/scripts/export_films.py`; a test fails when it is out of date.
 - `fits/*.npz`: the fitted values of each look. One file holds three tone curves of 1,024 points, a
   saturation gain, six saturation values and six hue values, a 3 × 3 matrix, and two chroma curves.
@@ -42,8 +42,8 @@ uv run epm2mod looks --write
 ```
 
 The command makes the specs of both lists again from the data and the stock firmware. It needs numpy
-(`uv run` installs it) and the stock firmware file (`uv run tools/fetch_stock.py`).
-`uv run epm2mod looks --check` only compares and changes nothing.
+(`uv run` installs it) and the stock firmware file (`uv run epm2mod fetch-stock`).
+`uv run epm2mod looks` without `--write` only compares and changes nothing.
 
 If the operations of a spec change, the command marks the spec "built, NOT camera-tested". A tested
 build that uses the spec then no longer gives its recorded sha256, and `epm2mod make` refuses it.

@@ -16,7 +16,7 @@ goes into `packages/ui` and is exported from its `src/index.ts`. Each app keeps 
   pages: black and white, square buttons that invert on hover, sections under a thick black rule
   (`packages/ui/src/theme.css`). Fonts: Sora (headings) and Arimo (text), the free fonts nearest to that site's Neue
   Machina and Helvetica Neue (glyph overlap); computers with Helvetica Neue use it.
-- `../looks/film-records.json`: the films and their look records, the same file that `epm2mod looks pack` reads. Made
+- `../looks/film-records.json`: the films and their look records, the same file that `epm2mod films set` reads. Made
   by `uv run python web/scripts/export_films.py` from `looks/catalogue.json` (a test of the Python suite fails when it
   is out of date).
 - `packages/ui/src/previews/`: the camera's Picture Mode strip, drawn by the emulator, in two layers: `menu/art<N>.png`
@@ -42,4 +42,4 @@ firmware build are tested in Python (`tests/test_serve.py`).
 To work on the local app against a real server: `uv run epm2mod serve --no-browser --port 8765`, then
 `EPM2MOD_API=http://127.0.0.1:8765 npm run dev:app`, and open the dev address with the server's `#token=...`.
 
-The packed look file is byte-equal to `uv run epm2mod looks pack` (`packages/ui/src/lib/lookfile.test.ts`).
+The packed look file is byte-equal to `uv run epm2mod films set -o FILE` (`packages/ui/src/lib/lookfile.test.ts`).

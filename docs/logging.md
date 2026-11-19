@@ -198,7 +198,7 @@ event `pk_guard`. `patches/log-peaking-guard.json` puts that id into the flush t
    ```sh
    python3 tools/oetool.py unpack build/peaking-colours.BIN /tmp/scratch/pinned
    uv run python experiments/2026-11-15-log/scripts/mkspec_log.py /tmp/scratch/pinned /tmp/scratch/asm
-   uv run epm2mod make builds/debug-log.json
+   uv run epm2mod make debug-log
    python3 tools/emu/opcheck.py builds/debug-log.json
    python3 tools/emu/hookcheck.py patches/log-core.json patches/log-probes.json
    ```
