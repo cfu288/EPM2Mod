@@ -742,6 +742,6 @@ steepness |dx| p99 42.0 (wide) against 44.0 (stock), p99.9 69.0 against 73.1; ve
 by the sensor's 2×2 read-out and the develop job's own filtering, so keeping 1920 samples instead of 1646 adds no
 resolvable detail.
 
-**Decision (owner's criterion of 2026-11-19: stop if this pair shows no visible difference):** the wide-frame work
-stops. The switch bug is not fixed. Kept as findings: the writer/reader geometry (§12–§14), the timing headroom
+**Recommendation (the stop rule proposed to the owner on 2026-11-19: stop if this pair shows no visible
+difference):** stop the wide-frame work. The switch bug is not fixed. Kept as findings: the writer/reader geometry (§12–§14), the timing headroom
 (§9, §15), and that bit rate is no longer the limit (§11).
