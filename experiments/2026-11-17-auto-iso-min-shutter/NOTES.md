@@ -288,15 +288,27 @@ Probes for a debug build (describe only; `logs/events.json` and the generator we
 
 ## 11. Menu row "Lowest S/S Setting" (asked for as "8. Menu row"; the number 8 is taken above)
 
-Date: 2026-11-19. Emulator only. Not flashed. `epm2mod make` refuses the build (free-space check, see "Space").
+Date: 2026-11-19. Emulator only. Not flashed. The row moved before ISO-Auto Set on 2026-11-19 (11.1); `builds/lss.json`
+is made with `epm2mod make` (11.5).
 
 ![Row](results/lss-row-auto.png) ![List](results/lss-list-auto.png) ![1/15](results/lss-row-1-15.png)
 
 ### 11.1 Where the row is
 
-MENU → Custom Menu → **E. Exp/ ▣ /ISO** → **Lowest S/S Setting** (the 7th row, after ISO-Auto Set) → RIGHT opens
-the value box (▲ value ▼, the box of # Slow Limit) → UP/DOWN → OK. Values: Auto, 60, 50 … 1, 1/1.3 … 1/4000. Seconds
-show without a mark (as the stock # Slow Limit list). Default Auto.
+MENU → Custom Menu → **E. Exp/ ▣ /ISO** → **Lowest S/S Setting** (the 6th row, after ISO Step; ISO-Auto Set is now
+the 7th) → RIGHT opens the value box (▲ value ▼, the box of # Slow Limit) → UP/DOWN → OK. Values: Auto, 60, 50 … 1,
+1/1.3 … 1/4000. Seconds show without a mark (as the stock # Slow Limit list). Default Auto.
+
+**Why before ISO-Auto Set (2026-11-19).** In the first candidate the row was the 7th (after ISO-Auto Set), the last
+row of the page. There the value box is moved up to fit the screen, but its white field is not: the text and the
+arrows sit about 20 px above the field, and the field covers the ▼ arrow. The owner saw this on the camera; the
+emulator shows the same (old `results/` screenshot of 2026-11-19, column x = 575 against `slow-limit-250.png`: the
+frame lines and the field start at other offsets). Cause: the # Slow Limit page class 0x7EE01678 places the frame,
+arrows and text by the room left on the screen, the field by the row (I, from the pictures; the class code was not
+read). Fix: the row goes before ISO-Auto Set, so it is the 6th row. In the 6th row every pixel of the box outside the
+text, in columns x = 470, 520, 575 and 660, is at the same offset from the row centre as on # Slow Limit (2nd row of
+F) (V emulator, `results/lss-list-auto.png`, `lss-list-1-15.png` against `slow-limit-250.png`). ISO-Auto Set in the
+7th row has no value box: it opens its own screen (`results/lss-iso-auto-set-screen.png`).
 
 Not in the ISO-Auto Set screen (the PEN-F place), V: that screen is page 143, a page class of its own (0x7EDE6826–
 0x7EDE6DD8) on panel 83 (two fields, shared with pages 126 and 453). The class code knows two fields with ISO index
@@ -328,8 +340,9 @@ descriptor now names setting 653.
   of each of the 10 item-table address loads, 81 bytes of its table, 35 of its child list; V, `spec.py`
   `_check_kept_bytes`). So the row needs a new table spec, as `custom-menu-rows-2` replaced `custom-menu-rows`.
   - item table: 83 rows at **0x7EBF1FE0** (16 B earlier, still ends at 0x7EBF2512 where `stock-films-structure`
-    BK0 starts); row `{4, 1503, 653, order 11, 1504, value list 609, 0}` at index 44; 10 address loads.
-  - child list: 84 entries in place at 0x7EE3CBF4, (609, 653) at index 44. Debug Log's value list moves 8 B to
+    BK0 starts); row `{4, 1503, 653, order 11, 1504, value list 609, 0}` at index 43, before ISO-Auto Set (44);
+    10 address loads.
+  - child list: 84 entries in place at 0x7EE3CBF4, (609, 653) at index 43. Debug Log's value list moves 8 B to
     0x7EE3CE94 (word 0x7F014F94).
   - constants: last index 82, count 83, row-state array 166 B (RAM to 0x606A31BD; next object 0x606A32F0, R);
     rows in group E 13 → 14 (.data 0x7E8EE858). Everything else as `custom-menu-rows-2`.
@@ -347,7 +360,7 @@ descriptor now names setting 653.
     `level-gauge-lvinfo-row`). Other languages show the old EVF texts.
   - No code, no hook.
 
-### 11.4 Space (the open decision)
+### 11.4 Space (decided: the evidence rows of commit bd4f8a5 make the area pass)
 
 The two lists need 1,568 B and 1,368 B in one piece each. After the pinned build no USABLE area has a run that size
 (largest free runs 733 B in segment 3 and 408 B in segment 2; `level-adjust-row`'s dead tables at 0x7EBF3000 are
@@ -357,30 +370,33 @@ gives it NEEDS-DECISION: two pointer hits that it calls unaligned data words (0x
 data) and no proven bound for the string before it (ends with its NUL at 0x7EBB1F4B). `make` fails with exactly
 these two FAIL lines; every other line passes.
 
-Ways on: (a) the owner accepts the area (two rows in `docs/space-pointer-waivers.tsv` and one in
-`docs/space-bounds.tsv`); (b) no decision: build the value → text list in RAM by code at the first GUI state and
-take `level-adjust-row` out of the build (`custom-menu-rows-3` covers all its live bytes), so the items fit in
-0x7EBF2E68–0x7EBF3780.
+Decided way (a): the pointer waiver (OKAO model data) and the bound of the Bluetooth switch table (0x7EBB1F08,
+11 entries) are in `docs/space-pointer-waivers.tsv` and `docs/space-bounds.tsv` since commit bd4f8a5, and the
+free-space check passes. The fallback (b) was: build the value → text list in RAM by code at the first GUI state and
+take `level-adjust-row` out of the build.
 
 ### 11.5 Checks
 
-The image for the emulator was made with `epm2mod.spec.apply_specs` (the code of `make` without the free-space
-check), sha256 `a4a80c8292d9ed7e156a1edc94f1e66f9d062f67d643bb2fd785f67b58658c57`. It is not a flash file.
+Build `builds/lss.json` (row before ISO-Auto Set, with `lss-core`), made with `uv run epm2mod make builds/lss.json`:
+sha256 `2b15214bd38075c4e86e7782d37aa6ba2fca77e3aa4ad6b9a75da95f297e9f5b` (2026-11-19). The first candidate (row after
+ISO-Auto Set) was `1ce469bf…aa8`.
 
 | Check | Result |
 |---|---|
-| `tools/freespace.py check` (all 15 specs) | exit 1: 2 FAIL, both `lss-menu` in the NEEDS-DECISION area; `custom-menu-rows-3` PASS |
-| `tools/emu/boot-test` | exit 0, PASS |
-| `tools/emu/update-path-test` | exit 0, PASS |
-| `tools/emu/hookcheck.py custom-menu-rows-3 lss-menu` | exit 0; 5 transfers, all `custom-menu-rows-2`'s peaking hooks (kernel → kernel); no new hook |
-| Crawl `p-nocard-shallow` against `stock-films` (`crawlcmp.py`) | 269 screens equal outside the Custom Menu rows; rows 82 → 83 screens: 13 lost and 14 new, all cursor positions of group E; firmware errors and notes equal |
-| `shotdiff.sh` D → Info Settings and its 4 sub-lists | 0 of 12 differ (texts 1503/1504 not shown there) |
-| Value list | Auto → 1/4000 in 55 DOWN, the 56th wraps to Auto; MENU cancels (`results/lss-list-1-4000.png`) |
-| 1/15 kept | tag 0x9F11 = 0 before, 31 after OK; 31 after a restart with the RAM banks kept and after a restart from flash only; the row shows 1/15 (`results/lss-row-after-restart.png`) |
+| `epm2mod make` (free-space check inside) | exit 0; check PASS (0 FAIL) |
+| `tools/emu/boot-test builds/lss.json` | exit 0, PASS |
+| `tools/emu/update-path-test builds/lss.json` | exit 0, PASS |
+| `tools/emu/opcheck.py builds/lss.json` | exit 0; 16 specs, 501 byte ops, 0 FAIL |
+| Crawl `p-nocard-shallow`, `crawlcmp.py` against `stock-films` | exit 0; 269 screens equal outside the Custom Menu rows; rows 82 → 83: 13 lost, 14 new, all cursor positions of group E; firmware errors equal |
+| The same against the first `lss` image (row after ISO-Auto Set) | exit 0; 269 equal; rows 83 / 83: 7 lost, 7 new, the cursor positions of the first page of E |
+| `shotdiff.sh` D → Info Settings and its 4 sub-lists (first candidate) | 0 of 12 differ (texts 1503/1504 not shown there) |
+| Value box, 6th row | aligned as # Slow Limit: columns x = 470, 520, 575, 660 equal to `slow-limit-250.png` relative to the row centre (`results/lss-list-auto.png`, `lss-list-1-15.png`, `lss-list-1-4000.png`) |
+| Value list | Auto → 1/4000 in 55 DOWN, the 56th wraps to Auto (OK stores 0) |
+| ISO-Auto Set, 7th row | RIGHT opens its High Limit / Default screen (`results/lss-iso-auto-set-slot7.png`, `lss-iso-auto-set-screen.png`) |
+| 1/15 kept | tag 0x9F11 = 31 after OK; 31 after a restart with the RAM banks kept, then after a restart from flash only; the row shows 1/15 (`results/lss-row-after-restart.png`). A restart from flash only straight after the setting session read 0: the emulator writes the bank to flash later in the next session (I, emulator stand-in; the camera saves at power-off) |
 
 Not checked: the help text (the emulator shows no help text for any row), other languages, the owner's stored
-value of 653 (U; 0 expected), the value box's text sits about 20 px above the box's centre on this bottom row (the
-same box on # Slow Limit, the 2nd row, is centred; cosmetic, I: the box is moved up to fit the screen).
+value of 653 (U; 0 expected).
 
 ## 12. Exposure part "lss-core" (2026-11-19)
 
@@ -460,9 +476,24 @@ free-space PASS; boot-test PASS; update-path-test PASS; hookcheck: all lss-core 
 
 | # | Criterion | How checked | State |
 |---|---|---|---|
-| 1 | Custom Menu E has a row Lowest S/S Setting after ISO-Auto Set; Auto by default | emulator screenshots (section 11) | pass (emulator) |
+| 1 | Custom Menu E has a row Lowest S/S Setting before ISO-Auto Set; Auto by default; its value box is drawn aligned | emulator screenshots (section 11) | pass (emulator) |
 | 2 | The list goes Auto, 60" … 1/4000 in 1/3 EV; the value survives power off | emulator | pass (emulator) |
 | 3 | P and A, ISO Auto, no flash: ISO starts to rise at the chosen speed | harness vs PEN-F; camera | pass (harness); camera not run |
 | 4 | Slower than the stock speed: P first lowers the shutter at base ISO down to it | harness vs PEN-F; camera | pass (harness); camera not run |
 | 5 | Auto, flash on, manual ISO, other modes: exposure as before | harness vs stock; camera | pass (harness); camera not run |
 | 6 | Nothing that works today breaks (start, update, menus, looks, peaking, level gauge, Debug Log) | boot/update tests, menu crawl; camera | pass (emulator); camera not run |
+
+### 12.6 First camera run (build `1ce469bf…aa8`, 2026-11-19; photos PB180001–012, 17 mm f/2.8, −0.3 EV, High Limit 6400)
+
+| Shots | Setting | Camera | Harness, same scene (`bv` −1.0) |
+|---|---|---|---|
+| 1–3 | P, Auto | 1/60 f/2.8 ISO 2500 | 1/65 ISO 2542 |
+| 4–6 | P, 1/250 | 1/160–1/200 ISO 6400 | 1/165 ISO 6400 |
+| 7–9 | P, 1/8 (planned) | 1/160 ISO 6400 | 1/8 ISO 317 |
+| 10–12 | A f/5.6, 1/125 | 1/40 ISO 6400 | ISO at the High Limit: same as stock, no test |
+
+- V: the camera reads setting 653 and the new code changes the exposure (shots 4–6 differ from stock as the harness says).
+- U: shots 7–9 equal shot 4, the result with 1/250. Inferred: the value was still 1/250 (the misaligned box of this
+  build); the owner was asked. Retest in the next run, in P and in A at f/2.8.
+- Fault seen: the value box of the last row (slot 7) was misaligned; fixed by moving the row to slot 6 (section 11.1),
+  build `2b15214b…9f5b`.

@@ -3,10 +3,10 @@
     uv run python experiments/2026-11-17-auto-iso-min-shutter/scripts/mkspec_lss_menu.py
 
 patches/custom-menu-rows-3.json takes the place of custom-menu-rows-2 in builds/stock-films.json. It is
-custom-menu-rows-2 with one row more: "Lowest S/S Setting" in group E after ISO-Auto Set (setting 653, panel 609,
+custom-menu-rows-2 with one row more: "Lowest S/S Setting" in group E before ISO-Auto Set (setting 653, panel 609,
 value -> text list 609). Why a new spec and not a delta: a delta cannot move or grow custom-menu-rows-2's item table,
 because `epm2mod make` refuses a change to a byte that custom-menu-rows-2 covers and keeps (byte 0xBF of the 10
-address loads, and 81 bytes of the table). NOTES.md section 8.
+address loads, and 81 bytes of the table). NOTES.md section 11.
   item table: 83 rows + the end group at 0x7EBF1FE0 (16 B earlier than custom-menu-rows-2's, so it still ends at
     0x7EBF2512, where stock-films-structure's BK0 starts); the 10 address loads point at it;
   child list: 84 entries in place at 0x7EE3CBF4 (8 B longer); Debug Log's value -> text list moves 8 B to 0x7EE3CE94;
@@ -42,7 +42,9 @@ LSS = "lss-menu"
 OLD_ITEMS, ITEMS_TABLE, KIDS = 0x7EBF1FF0, 0x7EBF1FE0, 0x7EE3CBF4
 OLD_ROWS, ROWS = 82, 83
 SETTING, PANEL, LABEL, HELP = 653, 609, 1503, 1504
-AFTER = 43                                       # index of ISO-Auto Set in custom-menu-rows-2's table
+AT = 43                                          # index of ISO-Auto Set in custom-menu-rows-2's table; the new row goes there
+# (before ISO-Auto Set: slot 6 of the page. In slot 7, the last, the # Slow Limit value box draws its field 20 px
+# below its text and arrows; NOTES.md section 11)
 ROW = struct.pack("<HHIHHHH", 4, LABEL, SETTING, 11, HELP, PANEL, 0)   # order 11: unused in group E
 KID = struct.pack("<II", PANEL, SETTING)
 OLD_DLOG_VT, DLOG_VT, DLOG_WORD = 0x7EE3CE8C, KIDS + (ROWS + 1) * 8, 0x7F014F94
@@ -131,20 +133,19 @@ def rows3(specs):
         if a == "0x%08X" % OLD_ITEMS:
             t = bytes.fromhex(x["new"])
             assert len(t) == OLD_ROWS * 16 + 2
-            assert struct.unpack_from("<HHI", t, AFTER * 16) == (4, 155, 2000), "row 43 is not ISO-Auto Set"
-            assert struct.unpack_from("<HH", t, (AFTER + 1) * 16) == (4, 154), "row 44 is not ISO-Auto"
-            cut = (AFTER + 1) * 16
+            assert struct.unpack_from("<HHI", t, AT * 16) == (4, 155, 2000), "row 43 is not ISO-Auto Set"
+            assert struct.unpack_from("<HH", t, (AT + 1) * 16) == (4, 154), "row 44 is not ISO-Auto"
+            cut = AT * 16
             o.add(ITEMS_TABLE, t[:cut] + ROW + t[cut:], "Custom Menu item table, 83 rows + the end group 98: the 82 "
                   "rows of custom-menu-rows-2 and {group 4, text %d 'Lowest S/S Setting', setting %d, order 11, help "
-                  "%d, value list %d, 0} at index %d, after ISO-Auto Set" % (LABEL, SETTING, HELP, PANEL, AFTER + 1))
+                  "%d, value list %d, 0} at index %d, before ISO-Auto Set" % (LABEL, SETTING, HELP, PANEL, AT))
         elif a == "0x%08X" % KIDS:
             k = bytes.fromhex(x["new"])
             assert len(k) == (OLD_ROWS + 1) * 8 and k[-8:] == bytes(8)
-            assert struct.unpack_from("<II", k, AFTER * 8) == (143, 112), "child 43 is not ISO-Auto Set's"
-            cut = (AFTER + 1) * 8
+            assert struct.unpack_from("<II", k, AT * 8) == (143, 112), "child 43 is not ISO-Auto Set's"
+            cut = AT * 8
             o.add(KIDS, k[:cut] + KID + k[cut:], "Custom Menu child list, 84 entries + zero entry, in place (8 B "
-                  "longer): custom-menu-rows-2's list and (panel %d, setting %d) at index %d" % (PANEL, SETTING,
-                                                                                            AFTER + 1))
+                  "longer): custom-menu-rows-2's list and (panel %d, setting %d) at index %d" % (PANEL, SETTING, AT))
         elif note.startswith("item-table address"):
             assert x["new"].endswith(struct.pack("<I", OLD_ITEMS).hex())
             o.add(int(a, 16), bytes.fromhex(x["new"][:4]) + struct.pack("<I", ITEMS_TABLE),
@@ -172,12 +173,12 @@ def rows3(specs):
     assert sum(1 for x in o.ops if x["new"] in [v[0] for v in CONSTS.values()]) == 9
     spec(ROWS3, "The Custom Menu with four added rows: Peaking in A after MF Assist, Load Looks and Debug Log in J "
          "(all three as patches/custom-menu-rows-2.json, whose place this spec takes) and Lowest S/S Setting in E "
-         "after ISO-Auto Set (setting %d, panel %d, value -> text list %d; the list and texts are in "
+         "before ISO-Auto Set (setting %d, panel %d, value -> text list %d; the list and texts are in "
          "patches/lss-menu.json, which a build with this spec needs). No stock row is changed. An 83-row copy of the "
          "item table at 0x%08X (10 address loads re-pointed), the 84-entry child list in place at 0x%08X (Debug Log's "
          "value -> text list moved to 0x%08X), 9 row constants (last index 82, count 83, row-state array 166 B), the "
          "group sizes of A (11), E (14) and J (8). Every expect is a byte string of the specs before "
-         "custom-menu-rows-2 in %s. See experiments/2026-11-17-auto-iso-min-shutter/NOTES.md section 8."
+         "custom-menu-rows-2 in %s. See experiments/2026-11-17-auto-iso-min-shutter/NOTES.md section 11."
          % (SETTING, PANEL, PANEL, ITEMS_TABLE, KIDS, DLOG_VT, BUILD), o.ops,
          _ram="the row-state array of the Custom Menu page grows by 8 bytes (158 -> 166) into 0x606A31B6-BD (the "
               "next addressed object is 0x606A32F0)")
@@ -234,7 +235,7 @@ def lss(specs):
     for tid, s in TEXTS.items():
         o.text(eng, tid, s)
     spec(LSS, "Lowest S/S Setting (GitHub issue #2), the menu part: the list and texts of the row that "
-         "patches/custom-menu-rows-3.json adds to Custom Menu E after ISO-Auto Set. Setting %d (prm tag 0x9F11, MODE "
+         "patches/custom-menu-rows-3.json adds to Custom Menu E before ISO-Auto Set. Setting %d (prm tag 0x9F11, MODE "
          "bank, u8, ROM and full-reset default 0; no stock code reads or writes it, experiments/2026-11-18-look-editor"
          "/settings.md) holds the index 0..55 of: Auto, 60\", 50\", 40\", 30\" ... 1/250 (the stock # Slow Limit "
          "records), 1/320 ... 1/4000. Panel 609 (a list page of the dormant setting 448) gets the 56 items, the "

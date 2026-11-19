@@ -1,5 +1,5 @@
 {
- "what": "Candidate, menu only: builds/stock-films.json with patches/custom-menu-rows-3.json in place of custom-menu-rows-2 (a row Lowest S/S Setting in Custom Menu E after ISO-Auto Set) and patches/lss-menu.json (its 56 values Auto, 60\" ... 1/4000, setting 653, default Auto). No exposure change: the row is stored only.",
+ "what": "Candidate, menu only: builds/stock-films.json with patches/custom-menu-rows-3.json in place of custom-menu-rows-2 (a row Lowest S/S Setting in Custom Menu E before ISO-Auto Set) and patches/lss-menu.json (its 56 values Auto, 60\" ... 1/4000, setting 653, default Auto). No exposure change: the row is stored only.",
  "specs": [
   "patches/interval-timelapse-v2.json",
   "patches/interval-frames-240.json",
