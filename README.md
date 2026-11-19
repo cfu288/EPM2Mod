@@ -14,6 +14,8 @@ Repository containing the current work for creating a custom firmware mod for th
 | [Debug log](docs/guide/debug-log.md) | <img src="docs/images/ui/debug-log-on.png" width="240" alt="Debug Log reads On"> |
 | [Lowest shutter speed for ISO Auto](docs/guide/lowest-shutter-speed.md) | <img src="docs/images/ui/lowest-ss-list.png" width="240" alt="Lowest S/S Setting set to 1/15"> |
 
+[![Nine photos, each developed in the camera with Natural and the film simulations](docs/images/film-sim-comparison.jpg)](https://cfu288.github.io/EPM2Mod/films)
+
 ## Dependencies
 
 - [uv](https://docs.astral.sh/uv/getting-started/installation/)
@@ -70,7 +72,5 @@ To go back to the original firmware, see [docs/install.md](docs/install.md).
 - **The camera starts normally instead of writing:** it found no firmware file it accepts. `DCOLYMP/E1019999.BIN` must be in the top folder of the card and be the only file in `DCOLYMP`.
 - **Load Looks shows No file:** `EPM2LOOK.BIN` is not in the top folder of the card.
 - **Load Looks shows Bad file:** the file is damaged or incomplete. Make it again with the installer or `uv run epm2mod films set`.
-
-[![Nine photos, each developed in the camera with Natural and the film simulations](docs/images/film-sim-comparison.jpg)](https://cfu288.github.io/EPM2Mod/films)
 
 > This project was created with heavy use of AI assistance.
