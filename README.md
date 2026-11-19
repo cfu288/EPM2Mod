@@ -1,20 +1,18 @@
-# EPM2Mod
-
-![Olympus PEN E-PM2](docs/images/epm2.jpg)
+<h1><img src="docs/images/banner.png" alt="EPM2Mod"></h1>
 
 Repository containing the current work for creating a custom firmware mod for the Olympus PEN **E-PM2**. We've implemented the ability to swap the default art filters with film simulations like Portra, Ektachrome, etc. You can choose which ones to load with the installer. See them compared on [our site](https://cfu288.github.io/EPM2Mod/films). We also enabled interval shooting (up to 240 shots), added a level gauge, focus peaking, and a lowest shutter speed setting for ISO Auto.
 
 ## Added Features
 
-| Feature | 
-|---|
-| [Film simulations](docs/guide/film-looks.md) |
-| [Looks from the SD card](docs/guide/card-looks.md) |
-| [Interval shooting](docs/guide/interval-shooting.md) | 
-| [Level gauge](docs/guide/level-gauge.md) | 
-| [Focus peaking](docs/guide/focus-peaking.md) | 
-| [Debug log](docs/guide/debug-log.md) |
-| [Lowest shutter speed for ISO Auto](docs/guide/lowest-shutter-speed.md) |
+| Feature | |
+|---|---|
+| [Film simulations](docs/guide/film-looks.md) | <img src="docs/images/ui/quick-menu-portra.png" width="240" alt="The quick menu with Picture Mode on Portra 400"> |
+| [Looks from the SD card](docs/guide/card-looks.md) | <img src="docs/images/ui/load-looks-loaded.png" width="240" alt="Load Looks reads Loaded"> |
+| [Interval shooting](docs/guide/interval-shooting.md) | <img src="docs/images/ui/time-lapse-settings.png" width="240" alt="The Time Lapse Settings screen"> |
+| [Level gauge](docs/guide/level-gauge.md) | <img src="docs/images/ui/level-gauge.png" width="240" alt="The level gauge in live view"> |
+| [Focus peaking](docs/guide/focus-peaking.md) | <img src="docs/images/ui/peaking-list.png" width="240" alt="Custom Menu A with the Peaking list"> |
+| [Debug log](docs/guide/debug-log.md) | <img src="docs/images/ui/debug-log-on.png" width="240" alt="Debug Log reads On"> |
+| [Lowest shutter speed for ISO Auto](docs/guide/lowest-shutter-speed.md) | <img src="docs/images/ui/lowest-ss-list.png" width="240" alt="Lowest S/S Setting set to 1/15"> |
 
 ## Dependencies
 
