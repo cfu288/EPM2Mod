@@ -3,7 +3,7 @@
  "record_size": 16,
  "time": "raw value of timer channel 9 (0x98900074): a 30-bit counter that counts down, one step per microsecond",
  "levels": ["debug", "info", "warn", "error"],
- "note": "The dictionary of builds/log-menu.json. tables, names and doc are notes: they are not part of the build id. The dictionary of a flashed build is kept as events-<build id>.json (docs/logging.md)",
+ "note": "The dictionary of builds/log-menu.json. tables, names and doc are notes: they are not part of the build id. The dictionary of a flashed build is kept as events-<build id>.json (docs/reference/logging.md)",
  "tables": {
   "bank_status": {"0": "applied", "1": "no record", "2": "bad length or sum"},
   "card_status": {"0": "Off (no action yet)", "0x7EE544B4": "Loading", "0x7EE54480": "Loaded", "0x7EE54490": "No file", "0x7EE544A0": "Bad file", "0x7EE5446C": "Built-in"},
