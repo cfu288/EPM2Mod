@@ -253,3 +253,66 @@ The camera-log entry before the flash: `docs/camera-log/2026-11-19-debug-log-mov
 - `scripts/geom_scan.py`, `scripts/geom_otherbody.py`, `scripts/geom_calc_r.py`: the desk-check scripts of sections 2
   and 3.
 - `results/`: the check outputs and the listing.
+
+## 9. Camera run, 2026-11-19
+
+The owner flashed `debug-log-movie-time` (sha256 `c5fcf714…`) and recorded six clips, all handheld. There was no
+Dramatic Tone entry (the ART menu holds film simulations), so the six clips are sheet clips 1, 2, 3, 4, 5 and 7.
+The clips were matched to the log by their start times: the gaps between log segments (33.9 s, 28.0 s) equal the
+gaps between `PB190003`, `PB190004` and `PB190005` (34 s, 28 s). Files: `results/camera-log.json` (decoded log),
+`results/camera-report.txt` (`scripts/movtime_report.py`), `results/camera-qp.txt` (QP per clip,
+`../2026-11-12-hardware/scripts/qp.py`), `results/camera-clips.txt` (duration, bit rate),
+`results/camera-fov-clips-1-4-5.png`. The MOV files stay on this host, not in git.
+
+| MOV | Sheet clip | Settings | In the log | Bit rate | P-frame QP |
+|---|---|---|---|---|---|
+| PB190001 | 1 | Natural, IS off, chart (a screen) | lost | 15.6 Mb/s | 20 (all) |
+| PB190002 | 2 | Natural, IS off, brick or fabric | last 98 frames | 20.5 Mb/s | 20–38, mostly 22–28 |
+| PB190003 | 3 | Natural, IS off, trees or water | 349 frames | 20.2 Mb/s | 20–30, mostly 22–26 |
+| PB190004 | 4 | Natural, M-IS1, chart | 336 frames | 13.2 Mb/s | 20–24, mostly 20 |
+| PB190005 | 5 | Natural, M-IS2, chart | 336 frames | 11.8 Mb/s | 20–23, mostly 20 |
+| PB190006 | 7 | film simulation, IS off, trees or water | lost | 15.2 Mb/s | 20 or 26 |
+
+**Records were lost** (cpu 0: 709, cpu 1: 1464). The log has no playback state between clips, so the ring was not
+flushed and overflowed (about 100 s per ring, §5). The CPU 1 art-filter load of a film simulation (clip 7) is
+therefore not measured.
+
+### 9.1 Timing (V, camera)
+
+| Clips | Frames | `total_us` median | p95 | Frames over 33,367 µs | `develop_us` |
+|---|---|---|---|---|---|
+| 2, 3 (IS off) | 447 | 22,139–22,149 | 23,083–23,168 | 0 | 0 in every frame |
+| 4, 5 (M-IS1, M-IS2) | 672 | 20,585–20,593 | 21,434–21,713 | 1 each (41 ms, one frame) | 0 in every frame |
+
+- One `mv_frame` per frame, period 33,5xx µs mean: the probe site runs once per recorded frame (§5.1 confirmed, V).
+- `develop_us` is 0 in every frame: the develop job is not the img_exec call at 0x7E6C7490 on this path. By the
+  sheet, `total_us` is the time to use (I: it holds the wait for the develop job on another task).
+- The frame rate held: 29.8 per second, `ret` 0 for every frame, two long periods per clip (start and end).
+- MOV_ENCODE on CPU 1: 0.2–0.3 ms per packet, 0.7–0.8 packets per frame. ART_SUB: 0 in the Natural clips.
+- **IS on is faster, by 1.5 ms per frame.** Both M-IS1 and M-IS2 give the lower time. The E-PM2's movie IS crops
+  1414×1114 from 1646×1296 (§4), 74 % of the pixels, so the time falls with the processed area (I).
+
+### 9.2 Headroom for the 1938-px frame (I)
+
+A line through the two points (2.133 Mpx → 22.1 ms, 1.575 Mpx → 20.6 ms, medians) gives about 16.4 ms fixed and
+2.7 ms per million pixels. A 1938×1296 frame (2.512 Mpx, IS off) would take about 23.1 ms median and about 24 ms at
+p95: 70 % of the 33.4 ms frame, about 9 ms to spare at 30 fps. Two points and the meaning of `total_us` are the
+weak parts. The plan of §1 stays viable; the open risk stays the PRO resizer's output width (§2).
+
+### 9.3 Movie IS mode (U)
+
+Both IS modes show the same lower time, so both seem to crop (I). The field of view (`results/camera-fov-clips-1-4-5.png`)
+cannot separate them: the clips are handheld, at slightly different distances.
+
+### 9.4 Bit rate (V, camera; answers `../2026-11-12-hardware/README.md`)
+
+The handheld busy clips 2 and 3 used the whole budget (20.5 and 20.2 Mb/s) and their QP rose above the floor of 20 in
+most frames (22–28). The still subjects stayed at the floor (11.8–15.6 Mb/s, QP 20). So for busy handheld scenes the
+20 Mb/s target is the binding limit, and a higher bit rate (`patches/movie-bitrate-32.json`) would lower QP there.
+For calm scenes only the QP floor binds.
+
+### 9.5 Next
+
+1. The geometry build of §7 step 2, with the `P+62` probe of step 3. With IS off as the condition, the measured time
+   leaves room.
+2. If the art-filter load matters for the condition: one more clip with a film simulation, with playback after it.
