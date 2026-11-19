@@ -125,7 +125,7 @@ Grouped as `epm2mod --help` shows them. Every `--help` ends with one or two exam
 | README, `docs/guide/*`, `docs/install.md`, `docs/look-file-format.md`, `docs/logging.md`, `docs/conventions.md`, `docs/feasibility.md`, `AGENTS.md`, `looks/README.md`, `web/README.md`, `release/README.txt` | New names; link the generated CLI reference |
 | `tools/doc_links.json` | The command-line group; the CLI reference as generated |
 | `experiments/*/scripts` that run the CLI | New names |
-| Dated experiment notes, `docs/camera-log.md` | Not changed (history), unless the owner says otherwise |
+| Dated experiment notes, `docs/camera-log.md` | Not changed: they are dated records of what was run (owner) |
 
 ## 7. Order of work
 
@@ -135,8 +135,8 @@ Grouped as `epm2mod --help` shows them. Every `--help` ends with one or two exam
 4. Callers: launchers, smoke test, docs, site, experiments scripts; the doc-link map.
 5. Camera probe: `._` files in `DCOLYMP` (one flash with a Mac-written card).
 
-## Open questions for the owner
+## Decisions on the open questions
 
-1. Dated experiment notes and the camera log keep the old command names as history. Agree?
+1. Settled: dated experiment notes and the camera log keep the old command names (owner).
 2. Kept after owner review: `serve` (camera owners never type it; the launchers start it) and `restore` (it puts
    Olympus's firmware back; it does not remove the film file or any films kept in the camera).
