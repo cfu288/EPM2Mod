@@ -1,11 +1,11 @@
-"""The film records: ``data/films/film-records.json``.
+"""The film records (``RepoPaths.film_records``).
 
 The one list of films that look files are packed from: by ``epm2mod install`` and ``epm2mod films set``, the local app and the web site
 (which reads the same file). Each film has its look record (1,708 bytes, base64) for slot 0 under the film's name;
 a look file sets the slot and packs the records (``lookfile.pack``). ``slots`` gives the twelve ART entries in menu
 order, with the Olympus art filter that each entry keeps when the file names no film for it.
 
-``lookpack.web_data`` makes the file from the fit files (``web/scripts/export_films.py``); a test fails when it is
+``lookpack.web_data`` makes the file from the fit files (the web site's export script); a test fails when it is
 out of date. This module needs only the standard library.
 """
 
@@ -65,7 +65,7 @@ class Slot:
 
 @dataclass(frozen=True)
 class Records:
-    """The content of ``data/films/film-records.json``.
+    """The content of the film records.
 
     Attributes:
         films: the films by id, in file order.

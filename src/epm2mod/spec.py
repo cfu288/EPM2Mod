@@ -5,7 +5,7 @@ A patch spec is a JSON file::
     {
       "name": "pixel-hacking",
       "description": "...",
-      "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+      "base": "PATH OF THE STOCK FILE",
       "base_sha256": "...",
       "ops": [ ... ],
       "expected_sha256": "..."        (optional: the result of this spec alone)

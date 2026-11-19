@@ -24,7 +24,7 @@ API (JSON):
 The server stops by itself on ``POST /api/quit`` (the page's Finish), or when no page has called it for
 ``IDLE_SECONDS`` and no job runs (the page was closed).
 
-Every other path is a file of the built app page (``web/``, ``npm run build:app``).
+Every other path is a file of the built app page (``RepoPaths.app``, ``npm run build:app``).
 """
 
 from __future__ import annotations
@@ -59,9 +59,6 @@ from .errors import (
 from .fileio import Log
 from .looks import records
 from .pipeline import STEPS, Outcome, install, restore
-
-#: The built app page, part of the package.
-STATIC = Path(__file__).resolve().parent / "app"
 
 #: How long the server waits for the page before it stops. Browsers slow timers in background tabs to one a minute.
 IDLE_SECONDS = 180.0
@@ -196,14 +193,14 @@ class App:
     def __init__(
         self,
         paths: Locator,
-        static: Path = STATIC,
+        static: Path | None = None,
         list_cards: Callable[[], list[card_list.Card]] = card_list.cards,
         job_runner: Callable[..., Outcome] = run_job,
         restore_runner: Callable[..., Outcome] = run_restore,
     ) -> None:
-        """Make the app for a locator; the token is new and random."""
+        """Make the app for a locator; the token is new and random. ``static``: the app page, default the locator's."""
         self.paths = paths
-        self.static = static
+        self.static = paths.app if static is None else static
         self.list_cards = list_cards
         self.run = job_runner
         self.run_restore = restore_runner
@@ -464,9 +461,9 @@ def serve(paths: Locator, port: int = 0, browser: bool = True) -> None:
     Raises:
         UnavailableError: if the app page is not built.
     """
-    if not (STATIC / "index.html").is_file():
+    if not (paths.app / "index.html").is_file():
         raise UnavailableError(
-            f"{STATIC}: the app page is not built. In web/: npm ci && npm run build:app"
+            f"{paths.app}: the app page is not built: npm ci && npm run build:app"
         )
     app = App(paths)
     httpd = server(app, port)

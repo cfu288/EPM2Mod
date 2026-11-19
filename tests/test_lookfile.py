@@ -24,7 +24,7 @@ from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from support import ROOT  # noqa: E402
+from support import ROOT, write_manifest  # noqa: E402
 
 from epm2mod import cards, cli, stock  # noqa: E402
 from epm2mod.errors import BuildError, LookFileError, UsageError  # noqa: E402
@@ -354,7 +354,7 @@ class ChoiceTests(unittest.TestCase):
         del eleven["slots"][11]
         with tempfile.TemporaryDirectory() as folder:
             (Path(folder) / "data" / "films").mkdir(parents=True)
-            paths = RepoPaths(Path(folder))
+            paths = RepoPaths(write_manifest(Path(folder)))
             for bad in (broken_record, wrong_name, wrong_entry, a_preset, eleven, []):
                 paths.film_records.write_text(json.dumps(bad))
                 with self.assertRaises(BuildError, msg=str(bad)[:60]):

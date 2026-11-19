@@ -7,7 +7,7 @@ This procedure is confirmed on the E-PM2 with stock and modified firmware since 
 1. Charge the battery fully. Use a small card formatted in the camera.
 2. Build or choose a BIN:
    - Stock: `firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN`
-   - Modified: make it with `uv run epm2mod make NAME` (see [../README.md](../../README.md) and [conventions.md](../dev/conventions.md), "Making firmware"). The result is `build/<name>.BIN`, and a copy at `build/card/DCOLYMP/E1019999.BIN`. `uv run epm2mod install --card DIR --build NAME` (add `--allow-untested` for a candidate) makes the same file and puts it at `DIR/DCOLYMP/E1019999.BIN` (`DIR`: the card's top folder), and checks the copy. With `-o FILE`, `make` writes one more copy of the file at `FILE`. The flags are in [cli.md](../reference/cli.md).
+   - Modified: make it with `uv run epm2mod make NAME` (see [../README.md](../../README.md) and [conventions.md](../dev/conventions.md), "Making firmware"). The result is `build/<name>.BIN`, and a copy at `build/DCOLYMP/E1019999.BIN`. `uv run epm2mod install --card DIR --build NAME` (add `--allow-untested` for a candidate) makes the same file and puts it at `DIR/DCOLYMP/E1019999.BIN` (`DIR`: the card's top folder), and checks the copy. With `-o FILE`, `make` writes one more copy of the file at `FILE`. The flags are in [cli.md](../reference/cli.md).
 3. Copy it to the card as **`DCOLYMP/E1019999.BIN`**. It must be the only file in `DCOLYMP`. Check the sha256 on the card against the build output.
 4. With the camera off and the card in, hold **OK** and the **ON/OFF** button together. When the orange lamp on the front (the AF illuminator) lights steadily, let go of both.
 5. The lamp shows progress:

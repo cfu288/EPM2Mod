@@ -1,6 +1,6 @@
 """Start a release (``epm2mod release``): check, name and tag the pinned build.
 
-The tag is the release. ``.github/workflows/release.yml`` sees it, makes the
+The tag is the release. The release workflow sees it, makes the
 zip with ``epm2mod package``, tests it on three systems and publishes it with
 the tag's message as the release notes. This module only decides whether the
 repository is ready, which version comes next, and what the notes say.
@@ -17,16 +17,12 @@ import re
 import shutil
 import subprocess
 from dataclasses import dataclass
-from pathlib import Path
 
 from . import readme
 from .builds import pinned_description
 from .errors import BuildError
 from .fileio import read_text
 from .paths import RepoPaths
-
-#: The workflows whose runs on the release commit must have passed.
-WORKFLOWS = ("release.yml", "web.yml")
 
 
 def next_version(label: str, tags: list[str], final: bool) -> str:
@@ -74,10 +70,15 @@ def release_notes(
     return "\n".join(lines) + "\n"
 
 
-def _git(paths: RepoPaths, *args: str) -> str:
-    """Run git in the repository and return its output, stripped."""
+def _git(paths: RepoPaths, *args: str, given: str | None = None) -> str:
+    """Run git in the repository, with ``given`` on its standard input, and return its output, stripped."""
     done = subprocess.run(
-        ["git", *args], cwd=paths.root, capture_output=True, text=True, check=False
+        ["git", *args],
+        cwd=paths.root,
+        input=given,
+        capture_output=True,
+        text=True,
+        check=False,
     )
     if done.returncode:
         raise BuildError(f"git {' '.join(args)}: {done.stderr.strip()}")
@@ -96,7 +97,7 @@ def _ci_problems(paths: RepoPaths, commit: str) -> list[str]:
     if gh is None:
         return ["the GitHub command gh is not installed: cannot check the CI runs"]
     problems = []
-    for workflow in WORKFLOWS:
+    for workflow in (path.name for path in paths.workflows):
         done = subprocess.run(
             [gh, "run", "list", "--workflow", workflow, "--branch", "main",
              "--event", "push", "--json", "conclusion,status,headSha", "--limit", "1"],
@@ -151,9 +152,9 @@ def plan(paths: RepoPaths, final: bool) -> tuple[Plan | None, list[str]]:
     if pinned.label is None:
         problems.append(f"the pinned build {pinned.name} has no label")
         return None, problems
-    log = paths.resolve("docs/camera-log")
+    log = paths.camera_log
     if not any(pinned.sha256 in read_text(entry) for entry in sorted(log.glob("*.md"))):
-        problems.append(f"docs/camera-log/ has no file for {pinned.sha256[:8]}")
+        problems.append(f"{paths.relative(log)}/ has no file for {pinned.sha256[:8]}")
     if _git(paths, "status", "--porcelain", "--untracked-files=no"):
         problems.append("the working tree has changes: commit or stash them")
     _git(paths, "fetch", "--quiet", "--tags", "origin")
@@ -188,9 +189,8 @@ def plan(paths: RepoPaths, final: bool) -> tuple[Plan | None, list[str]]:
 
 def tag(paths: RepoPaths, release: Plan, push: bool) -> None:
     """Create the annotated tag of ``release``; push it if ``push``."""
-    message = Path(paths.output, f"{release.tag}.notes.md")
-    message.parent.mkdir(parents=True, exist_ok=True)
-    message.write_text(release.notes, encoding="utf-8")
-    _git(paths, "tag", "-a", release.tag, "-F", str(message), release.commit)
+    _git(
+        paths, "tag", "-a", release.tag, "-F", "-", release.commit, given=release.notes
+    )
     if push:
         _git(paths, "push", "origin", release.tag)

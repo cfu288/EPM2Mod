@@ -3,8 +3,8 @@
 A look file holds up to twelve looks, one per art-filter menu entry. The camera
 reads it from the card root (``CARD_NAME``), checks it, writes the looks into
 the slots' tables and keeps a copy in its settings memory, so the looks stay
-after a restart and without the card. The specification is
-``docs/reference/look-file-format.md``. This module writes and reads the format; it does
+after a restart and without the card. The specification is the look file
+format document. This module writes and reads the format; it does
 not need numpy.
 
 Two kinds of look:

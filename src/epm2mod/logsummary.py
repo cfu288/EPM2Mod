@@ -5,8 +5,8 @@ and returns lines of text: the sessions, the markers, the firmware's error
 records, the flushes, the count of each event, and one line per feature of the
 mod (peaking, film looks, shooting, interval shooting, level gauge).
 
-The feature lines read events by their names in the repository's dictionary
-``data/logdict/events.json``. A file that does not have an event gives no line for it.
+The feature lines read events by their names in the project's event
+dictionary. A file that does not have an event gives no line for it.
 The report states what the records say. It does not judge them: the reader
 compares the numbers with what was done on the camera.
 """

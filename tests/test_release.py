@@ -21,10 +21,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from support import ROOT  # noqa: E402
 
-from epm2mod import cards, release, stock  # noqa: E402
+from epm2mod import cards, catalogue, release, stock  # noqa: E402
 from epm2mod.builds import pinned_description  # noqa: E402
 from epm2mod.errors import BuildError  # noqa: E402
-from epm2mod.paths import RepoPaths  # noqa: E402
+from epm2mod.paths import MANIFEST, RELEASE_KEY, RepoPaths  # noqa: E402
+
+#: The files of the release folder that are programs.
+LAUNCHERS = {"start.sh", "Start (Mac).command", "start.ps1"}
 
 PATHS = RepoPaths(ROOT)
 HAVE_APP = (ROOT / "src" / "epm2mod" / "app" / "index.html").is_file()
@@ -52,7 +55,7 @@ class ZipTests(unittest.TestCase):
             self.assertIn(spec, inside)
         for name in (
             "data/pinned-build.json",
-            "release.json",
+            "epm2mod.json",
             "data/films/film-records.json",
             "src/epm2mod/__main__.py",
             "src/epm2mod/app/index.html",
@@ -69,13 +72,30 @@ class ZipTests(unittest.TestCase):
                 mode = (info.external_attr >> 16) & 0o777
                 want = (
                     0o755
-                    if info.filename[len(self.top) :] in release.LAUNCHERS
+                    if info.filename[len(self.top) :] in LAUNCHERS
                     else 0o644
                 )
                 self.assertEqual(mode, want, info.filename)
             batch = archive.read(self.top + "Start (Windows).bat")
         self.assertIn(b"\r\n", batch)
         self.assertNotIn(b"\n", batch.replace(b"\r\n", b""))
+
+    def test_the_manifest_names_the_release_and_what_it_holds(self) -> None:
+        with zipfile.ZipFile(self.zip) as archive:
+            inside = {name[len(self.top) :] for name in archive.namelist()}
+            manifest = json.loads(archive.read(self.top + MANIFEST))
+        self.assertEqual(manifest[RELEASE_KEY], "2026.11.18-rc.1")
+        self.assertEqual(
+            set(manifest) - {RELEASE_KEY},
+            {"pinned", "builds", "specs", "label_spec", "film_records", "cache", "app"},
+        )
+        for key in ("pinned", "film_records", "label_spec"):
+            self.assertIn(manifest[key], inside, key)
+        for key in ("builds", "specs", "app"):
+            self.assertTrue(
+                any(name.startswith(manifest[key] + "/") for name in inside), key
+            )
+        self.assertEqual(manifest["cache"], PATHS.relative(PATHS.cache_folder))
 
     def test_the_version_is_a_date(self) -> None:
         self.assertEqual(self.zip.name, "EPM2Mod-2026.11.18-rc.1.zip")
@@ -99,14 +119,12 @@ class FromTheZipTests(unittest.TestCase):
             with zipfile.ZipFile(archive) as unpack:
                 unpack.extractall(folder)
             top = Path(folder) / "EPM2Mod-2026.11.18"
-            local = stock.stock_path(RepoPaths(top), stock.EPM2_V16)
+            local = stock.stock_path(catalogue.locate(project=top), stock.EPM2_V16)
             local.parent.mkdir(parents=True)
             shutil.copyfile(stock.stock_path(PATHS, stock.EPM2_V16), local)
             card = Path(folder) / "card"
             (card / "DCIM").mkdir(parents=True)
-            env = {
-                key: value for key, value in os.environ.items() if key != "EPM2MOD_ROOT"
-            }
+            env = dict(os.environ)
             env.update({"PYTHONPATH": str(top / "src"), cards.TEST_CARDS_ENV: str(card)})
 
             def run(*argv: str) -> subprocess.CompletedProcess[str]:

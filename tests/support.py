@@ -2,15 +2,26 @@
 
 from __future__ import annotations
 
+import json
 import struct
 import sys
 from pathlib import Path
+from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
 from epm2mod import container  # noqa: E402
+from epm2mod.paths import MANIFEST  # noqa: E402
+
+
+def write_manifest(folder: Path, **changes: Any) -> Path:
+    """Write into ``folder`` the checkout's project manifest with ``changes``; return the folder."""
+    raw = json.loads((ROOT / MANIFEST).read_text(encoding="utf-8")) | changes
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / MANIFEST).write_text(json.dumps(raw, indent=1) + "\n", encoding="utf-8")
+    return folder
 
 
 def make_container(payloads: list[bytes], tail: bytes = b"TAIL") -> bytes:

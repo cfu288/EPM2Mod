@@ -40,8 +40,7 @@ class StockFirmware:
     """The identity of one stock firmware file.
 
     Attributes:
-        file_name: the maker's name of the file.
-        relative_path: where a checkout keeps the file, relative to its root.
+        file_name: the maker's name of the file; the cache folder keeps it by this name.
         size: size in bytes.
         sha256: SHA-256 of the file.
         model_id: the model number in the update catalog.
@@ -50,7 +49,6 @@ class StockFirmware:
     """
 
     file_name: str
-    relative_path: str
     size: int
     sha256: str
     model_id: str
@@ -61,7 +59,6 @@ class StockFirmware:
 #: Olympus PEN E-PM2, body firmware 1.6. Every build starts from this file.
 EPM2_V16 = StockFirmware(
     file_name="OLY_E_101_1600_0000_0000.BIN",
-    relative_path="firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
     size=43319360,
     sha256="34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
     model_id="1010",
@@ -104,7 +101,7 @@ _REQUEST = (
 
 
 def stock_path(paths: Locator, stock: StockFirmware) -> Path:
-    """Return where the stock firmware file is kept (the locator decides)."""
+    """Return where the stock firmware file is: the ``--stock`` file or the cache folder's (the locator decides)."""
     return paths.stock_file(stock)
 
 
@@ -119,11 +116,15 @@ def read_stock(paths: Locator, stock: StockFirmware) -> bytes:
     """
     path = stock_path(paths, stock)
     if not path.exists():
+        if not paths.downloads():
+            raise StockMissingError(f"{path}: no such file")
         raise StockMissingError(
             f"{paths.relative(path)} is missing: run 'epm2mod fetch-stock'"
         )
     data = read_bytes(path, StockError)
     if sha256_bytes(data) != stock.sha256:
+        if not paths.downloads():
+            raise StockError(f"{path} is not {stock.file_name} (the sha256 differs)")
         raise StockError(
             f"{paths.relative(path)} is not {stock.file_name} (the sha256 differs). "
             "Move it away and run 'epm2mod fetch-stock'."
@@ -203,7 +204,9 @@ def fetch(
 
     If the file is there and has the right SHA-256, nothing is downloaded. If a
     different file is there, it is left alone and an error is raised. A
-    downloaded file is written only after its size and SHA-256 are right.
+    downloaded file is written only after its size and SHA-256 are right. With
+    a ``--stock`` file (``Locator.downloads`` is False), nothing is downloaded:
+    the file is only checked.
 
     Args:
         paths: the locator, which says where the file is kept.
@@ -218,7 +221,7 @@ def fetch(
             the firmware, the download fails, or the downloaded file is wrong.
     """
     destination = stock_path(paths, stock)
-    if destination.exists():
+    if destination.exists() or not paths.downloads():
         read_stock(paths, stock)
         log(f"already there and correct: {paths.relative(destination)}")
         return destination
@@ -253,7 +256,7 @@ def obtain_stock(
     Raises:
         StockError: as ``fetch`` and ``read_stock``.
     """
-    if not stock_path(paths, stock).exists():
+    if paths.downloads() and not stock_path(paths, stock).exists():
         log("the stock firmware is not here: downloading it")
         fetch(paths, stock, log)
     return read_stock(paths, stock)

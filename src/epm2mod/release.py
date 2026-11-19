@@ -3,37 +3,35 @@
 The zip holds one folder, ``EPM2Mod-<version>/``, with what the commands for camera owners (``epm2mod install``,
 ``films``, ``restore``, ``inspect``, ``serve``) need for the pinned build, and nothing else:
 
-- the package (``src/epm2mod``, with the built app page ``src/epm2mod/app``);
-- the data (``data_files``): the pinned build description and its patch specs, the film records, and the marker
-  ``paths.RELEASE_MARKER`` with the version, by which ``catalogue.locate`` knows a release folder;
-- the launchers and their README (``release/``), and the licence files.
+- the package (``RepoPaths.package``, with the built app page ``RepoPaths.app``);
+- the data (``data_files``): the pinned build description and its patch specs, the film records, and the release's
+  manifest (``paths.MANIFEST``), which names these locations and holds the version under ``paths.RELEASE_KEY``, by
+  which ``catalogue.locate`` knows a release folder;
+- the files of ``RepoPaths.release_files`` at the top: the launchers, their README and the licence files. A file that
+  is a program in the checkout is a program in the zip.
+
+Every file but those at the top has the path it has in the checkout.
 
 It never holds firmware: ``install`` downloads Olympus's file from OM Digital Solutions on the user's computer. A
 file ending in ``.BIN`` stops the release.
 
-The launchers get a pinned uv and a Python 3.12 from it into the folder's ``.uv``; the package needs only the
-standard library, so it runs from ``src`` with no install step.
+The launchers get a pinned uv and a Python 3.12 from it into the release folder; the package needs only the
+standard library, so it runs from the folder above the package with no install step.
 """
 
 from __future__ import annotations
 
 import json
 import re
+import stat
 import zipfile
 from collections.abc import Iterator
 from pathlib import Path
 
-from .builds import pinned_description
+from .builds import description_path, pinned_description
 from .errors import BuildError
 from .fileio import read_bytes
-from .paths import RELEASE_MARKER, ROOT_MARKER, RepoPaths
-
-#: The launchers, from ``release/``; the first three are run as programs.
-LAUNCHERS = ("start.sh", "Start (Mac).command", "start.ps1")
-#: The other files of ``release/``.
-RELEASE_TEXTS = ("Start (Windows).bat", "README.txt")
-#: The licence files of the repository.
-LICENCES = ("LICENSE", "NOTICE.md")
+from .paths import MANIFEST, RELEASE_KEY, RepoPaths
 
 #: The time stamp of every file in the zip, so that the same files give the same zip.
 _STAMP = (2026, 1, 1, 0, 0, 0)
@@ -42,28 +40,39 @@ _STAMP = (2026, 1, 1, 0, 0, 0)
 def data_files(paths: RepoPaths, version: str) -> list[tuple[str, bytes]]:
     """Return the data that the release's commands read: their path in the folder, and their content.
 
-    These are the pinned build and its specs, the film records and the release marker, at the paths that
-    ``catalogue.ReleaseLocator`` reads.
+    These are the pinned build and its specs, the film records, and the release's manifest, which names the
+    locations that ``catalogue.ReleaseLocator`` reads: the checkout's, and the checkout's cache folder.
 
     Raises:
         BuildError: if a file is missing.
     """
     description = pinned_description(paths)
     sources = [
-        (ROOT_MARKER, paths.pinned),
-        (
-            f"data/builds/{description.name}.json",
-            paths.builds / f"{description.name}.json",
-        ),
-        ("data/films/film-records.json", paths.film_records),
+        paths.pinned,
+        description_path(paths, description.name),
+        paths.film_records,
     ]
-    sources += [(spec, paths.resolve(spec)) for spec in description.specs]
-    missing = [str(source) for _, source in sources if not source.is_file()]
+    sources += [paths.spec_file(spec) for spec in description.specs]
+    missing = [str(source) for source in sources if not source.is_file()]
     if missing:
         raise BuildError("missing for the release: " + ", ".join(missing))
-    marker = json.dumps({"version": version}, indent=1) + "\n"
-    files = [(name, read_bytes(source, BuildError)) for name, source in sources]
-    return files + [(RELEASE_MARKER, marker.encode())]
+    manifest = {RELEASE_KEY: version} | {
+        key: paths.relative(path)
+        for key, path in (
+            ("pinned", paths.pinned),
+            ("builds", paths.builds),
+            ("specs", paths.specs),
+            ("label_spec", paths.label_spec),
+            ("film_records", paths.film_records),
+            ("cache", paths.location("cache")),
+            ("app", paths.app),
+        )
+    }
+    text = json.dumps(manifest, indent=1) + "\n"
+    files = [
+        (paths.relative(source), read_bytes(source, BuildError)) for source in sources
+    ]
+    return files + [(MANIFEST, text.encode())]
 
 
 def release_files(paths: RepoPaths, version: str) -> list[tuple[str, bytes]]:
@@ -72,16 +81,13 @@ def release_files(paths: RepoPaths, version: str) -> list[tuple[str, bytes]]:
     Raises:
         BuildError: if the app page is not built or a file is missing.
     """
-    app = paths.root / "src" / "epm2mod" / "app"
+    app = paths.app
     if not (app / "index.html").is_file():
         raise BuildError(
-            f"{app}: the app page is not built. In web/: npm ci && npm run build:app"
+            f"{app}: the app page is not built: npm ci && npm run build:app"
         )
-    sources = [(name, paths.root / name) for name in LICENCES]
-    sources += [
-        (name, paths.root / "release" / name) for name in LAUNCHERS + RELEASE_TEXTS
-    ]
-    sources += list(_package(paths.root / "src"))
+    sources = [(path.name, path) for path in paths.release_files]
+    sources += list(_package(paths))
     missing = [str(source) for _, source in sources if not source.is_file()]
     if missing:
         raise BuildError("missing for the release: " + ", ".join(missing))
@@ -93,11 +99,20 @@ def release_files(paths: RepoPaths, version: str) -> list[tuple[str, bytes]]:
     return sorted(files)
 
 
-def _package(src: Path) -> Iterator[tuple[str, Path]]:
-    """Yield the files of the package under ``src``: its code, its type marker and the app page."""
-    for source in sorted((src / "epm2mod").rglob("*")):
+def programs(paths: RepoPaths) -> set[str]:
+    """Return the names, at the top of the release folder, of the files that are programs."""
+    return {
+        path.name
+        for path in paths.release_files
+        if path.is_file() and path.stat().st_mode & stat.S_IXUSR
+    }
+
+
+def _package(paths: RepoPaths) -> Iterator[tuple[str, Path]]:
+    """Yield the files of the package: its code, its type marker and the app page."""
+    for source in sorted(paths.package.rglob("*")):
         if source.is_file() and "__pycache__" not in source.parts:
-            yield source.relative_to(src.parent).as_posix(), source
+            yield paths.relative(source), source
 
 
 #: A release's version: calendar date (``2026.11.18``), a number for a second release that day (``.2``), and
@@ -133,13 +148,14 @@ def make_release(paths: RepoPaths, out: Path, version: str) -> Path:
     name = f"EPM2Mod-{version}"
     target = zip_path(out, version)
     files = release_files(paths, version)
+    run = programs(paths)
     try:
         out.mkdir(parents=True, exist_ok=True)
         with zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED) as archive:
             for path, data in files:
                 info = zipfile.ZipInfo(f"{name}/{path}", _STAMP)
                 info.compress_type = zipfile.ZIP_DEFLATED
-                mode = 0o755 if path in LAUNCHERS else 0o644
+                mode = 0o755 if path in run else 0o644
                 info.external_attr = (
                     0o100000 | mode
                 ) << 16  # a regular file and its permissions

@@ -1,4 +1,4 @@
-"""The film list: ``data/films/films.json``."""
+"""The film lists: the first seven films (``RepoPaths.films``), the films beyond them, and a list with a black-and-white film."""
 
 from __future__ import annotations
 
@@ -65,7 +65,7 @@ class Film:
 
 @dataclass(frozen=True)
 class FilmList:
-    """The content of ``data/films/films.json``.
+    """The content of the film list (``RepoPaths.films``).
 
     Attributes:
         films: the films: one per film slot, in menu order.
@@ -121,6 +121,17 @@ def _text(raw: dict[str, Any], key: str, where: str) -> str:
     return value
 
 
+def _spec(paths: RepoPaths, text: object, where: str) -> str:
+    """Return ``text`` if it names a patch spec file in the project's patch spec folder, else raise.
+
+    Raises:
+        BuildError: if it does not.
+    """
+    spec = check_spec_path(text, where)
+    paths.spec_file(spec)
+    return spec
+
+
 def load_films(paths: RepoPaths) -> FilmList:
     """Read and check the film list.
 
@@ -161,9 +172,9 @@ def load_films(paths: RepoPaths) -> FilmList:
     try:
         return FilmList(
             films=tuple(films),
-            films_spec=check_spec_path(specs.get("films"), f"{path} specs"),
-            labels_spec=check_spec_path(specs.get("labels"), f"{path} specs"),
-            structure_spec=check_spec_path(specs.get("structure"), f"{path} specs"),
+            films_spec=_spec(paths, specs.get("films"), f"{path} specs"),
+            labels_spec=_spec(paths, specs.get("labels"), f"{path} specs"),
+            structure_spec=_spec(paths, specs.get("structure"), f"{path} specs"),
         )
     except BuildError as error:
         text = str(error)
@@ -210,7 +221,7 @@ def specs_with_other_inputs(paths: RepoPaths) -> list[str]:
 
 @dataclass(frozen=True)
 class MoreFilmList:
-    """The content of ``data/films/more-films.json``: the films beyond the first seven.
+    """The content of the list of the films beyond the first seven (``RepoPaths.more_films``).
 
     Attributes:
         films: the films: one per extra slot, in menu order.
@@ -299,11 +310,9 @@ def load_more_films(paths: RepoPaths) -> MoreFilmList:
     try:
         return MoreFilmList(
             films=tuple(films),
-            structure_spec=check_spec_path(specs.get("structure"), where),
-            looks_spec=check_spec_path(specs.get("looks"), where),
-            entry_specs=tuple(
-                check_spec_path(entry, where) for entry in specs["entries"]
-            ),
+            structure_spec=_spec(paths, specs.get("structure"), where),
+            looks_spec=_spec(paths, specs.get("looks"), where),
+            entry_specs=tuple(_spec(paths, entry, where) for entry in specs["entries"]),
         )
     except BuildError as error:
         text = str(error)
@@ -313,7 +322,7 @@ def load_more_films(paths: RepoPaths) -> MoreFilmList:
 
 
 def more_inputs_digest(paths: RepoPaths, film_list: MoreFilmList) -> str:
-    """Return one SHA-256 over ``data/films/more-films.json`` and its fit files.
+    """Return one SHA-256 over the list of the films beyond the first seven and its fit files.
 
     Raises:
         BuildError: if a fit file cannot be read.
@@ -327,7 +336,7 @@ def more_inputs_digest(paths: RepoPaths, film_list: MoreFilmList) -> str:
 
 @dataclass(frozen=True)
 class BwFilmList:
-    """The content of ``data/films/films-12-bw.json``.
+    """The content of the film list with a black-and-white film (``RepoPaths.bw_films``).
 
     The list is a variant of ``MoreFilmList``. The entry of the
     black-and-white slot holds a black-and-white film and keeps its stock
@@ -413,15 +422,13 @@ def load_bw_films(paths: RepoPaths) -> BwFilmList:
         if not isinstance(item, dict):
             raise BuildError(f"{here}: must be an object")
         _closed(item, _REFIT_KEYS, here)
-        refits.append(
-            (_text(item, "fit", here), check_spec_path(item.get("spec"), here))
-        )
+        refits.append((_text(item, "fit", here), _spec(paths, item.get("spec"), here)))
     try:
         return BwFilmList(
             mono=_load_film(raw.get("mono"), f"{path} mono"),
             moved_to=_text(raw, "moved_to", str(path)),
-            entry_spec=check_spec_path(specs.get("entry"), where),
-            mono_spec=check_spec_path(specs.get("mono"), where),
+            entry_spec=_spec(paths, specs.get("entry"), where),
+            mono_spec=_spec(paths, specs.get("mono"), where),
             refits=tuple(refits),
         )
     except BuildError as error:
@@ -434,7 +441,7 @@ def load_bw_films(paths: RepoPaths) -> BwFilmList:
 def bw_inputs_digest(paths: RepoPaths, film_list: BwFilmList) -> str:
     """Return one SHA-256 over the data of the list with a black-and-white film.
 
-    The data: ``data/films/films-12-bw.json``, the fit of its film, the list of the
+    The data: the list itself, the fit of its film, the list of the
     films beyond the first seven (its labels name the film that moves), and
     the fits of the refits.
 

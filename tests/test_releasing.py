@@ -12,7 +12,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from support import ROOT  # noqa: E402
+from support import ROOT, write_manifest  # noqa: E402
 
 from epm2mod import readme  # noqa: E402
 from epm2mod.errors import BuildError  # noqa: E402
@@ -54,18 +54,18 @@ class FeatureListTests(unittest.TestCase):
 
     def test_a_guide_missing_from_the_readme_and_the_site_is_found(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
+            root = write_manifest(Path(folder))
             (root / "docs" / "guide").mkdir(parents=True)
             (root / "docs" / "guide" / "level-gauge.md").write_text("# Level gauge\n")
             (root / "docs" / "guide" / "new-thing.md").write_text("# New\n")
             (root / "README.md").write_text("| [Level gauge](docs/guide/level-gauge.md) |\n")
-            site = root / readme.SITE_FEATURES
+            site = RepoPaths(root).site_features
             site.parent.mkdir(parents=True)
             site.write_text("export const features = [{ id: 'film-looks' }]\n")
             problems = readme.feature_problems(RepoPaths(root))
         self.assertIn("README.md does not link docs/guide/new-thing.md", problems)
         self.assertIn("docs/guide/new-thing.md is not in readme.SITE_IDS: add its site id, or None", problems)
-        self.assertIn(f"{readme.SITE_FEATURES} has no feature 'level'", problems)
+        self.assertIn("web/apps/site/src/features.ts has no feature 'level'", problems)
 
 
 if __name__ == "__main__":

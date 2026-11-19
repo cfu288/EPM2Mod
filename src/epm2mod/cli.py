@@ -13,7 +13,9 @@ definitions. The rules that every command follows:
 6. No prompts.
 7. Usage lines, examples and hints name the program as the launcher calls it (``PROG_ENV``).
 
-This module holds no knowledge of where the data is: it asks the locator (``catalogue.locate``) for everything.
+This module holds no knowledge of where the data is: it asks the locator (``catalogue.locate``) for everything. The
+locations come from the project manifest and from the arguments ``--project``, ``--cache``, ``--stock`` and
+``--out-dir``.
 """
 
 from __future__ import annotations
@@ -52,7 +54,7 @@ from .eventlog import Dictionary, decode, load_dictionary, name_films
 from .fileio import read_bytes, read_json, write_bytes
 from .hashing import sha256_bytes
 from .logsummary import summarize
-from .paths import RepoPaths
+from .paths import MANIFEST, RepoPaths
 from .pipeline import (
     FileReport,
     Inspection,
@@ -73,8 +75,7 @@ from .stock import STOCK_FIRMWARE, fetch, read_stock, stock_path
 #: The version of the ``--json`` documents. A removed or renamed key, or a changed type, raises it; an added key
 #: does not, and readers ignore keys they do not know.
 SCHEMA = 2
-#: The environment variable by which a launcher gives the name it is called by (``./start.sh``), for usage lines,
-#: examples and hints.
+#: The environment variable by which a launcher gives the name it is called by, for usage lines, examples and hints.
 PROG_ENV = "EPM2MOD_PROG"
 #: The program's name when no launcher names it.
 PROG = "epm2mod"
@@ -101,17 +102,29 @@ class Context:
         """Keep the function that finds the locator."""
         self._find = find
         self._found: Locator | None = None
+        self._locations: dict[str, Path] = {}
 
     @property
     def locator(self) -> Locator:
-        """The locator of the data (``catalogue.locate``).
+        """The locator of the data (``catalogue.locate``), with the locations that the arguments give.
 
         Raises:
             RepositoryError: if there is no source of the data.
         """
         if self._found is None:
-            self._found = self._find()
+            found = self._find()
+            self._found = (
+                found.with_locations(**self._locations) if self._locations else found
+            )
         return self._found
+
+    def use(self, **locations: str | None) -> None:
+        """Use the locations that the arguments give (``cache``, ``stock``, ``out_dir``; None: the manifest's)."""
+        self._locations = {
+            key: Path(value) for key, value in locations.items() if value is not None
+        }
+        if self._found is not None and self._locations:
+            self._found = self._found.with_locations(**self._locations)
 
     def checkout(self) -> RepoPaths:
         """Return the checkout, for a developer or release command.
@@ -1239,6 +1252,20 @@ def _add_films(parser: argparse.ArgumentParser, name: str, required: bool) -> No
     )
 
 
+def _add_stock(parser: argparse.ArgumentParser) -> None:
+    """Add ``--cache DIR`` and ``--stock FILE``: where Olympus's firmware is."""
+    parser.add_argument(
+        "--cache",
+        metavar="DIR",
+        help="the folder that keeps Olympus's firmware; default: the project's cache folder",
+    )
+    parser.add_argument(
+        "--stock",
+        metavar="FILE",
+        help="use this copy of Olympus's firmware (checked by its sha256); download nothing",
+    )
+
+
 def _add_destination(parser: argparse.ArgumentParser) -> None:
     """Add ``--card DIR`` and ``-o FILE``, one of which is needed."""
     where = parser.add_mutually_exclusive_group(required=True)
@@ -1288,6 +1315,7 @@ def _arguments(
             action="store_true",
             help="allow a build that has no passed camera test",
         )
+        _add_stock(parser)
         _add_dry_run(parser)
         _add_eject(parser)
         _add_json(parser)
@@ -1308,6 +1336,7 @@ def _arguments(
         _add_json(sub)
     elif command == "restore":
         _add_destination(parser)
+        _add_stock(parser)
         _add_dry_run(parser)
         _add_eject(parser)
         _add_json(parser)
@@ -1339,6 +1368,12 @@ def _arguments(
             metavar="FILE",
             help="also write the firmware to FILE; not on an SD card",
         )
+        parser.add_argument(
+            "--out-dir",
+            metavar="DIR",
+            help="the output folder; default: the project's output folder",
+        )
+        _add_stock(parser)
         _add_dry_run(parser)
         _add_json(parser)
     elif command == "builds":
@@ -1381,8 +1416,10 @@ def _arguments(
         parser.add_argument(
             "-v", "--verbose", action="store_true", help="print each change"
         )
+        _add_stock(parser)
         _add_dry_run(parser)
     elif command == "fetch-stock":
+        _add_stock(parser)
         _add_dry_run(parser)
         _add_json(parser)
     elif command == "generate":
@@ -1442,13 +1479,19 @@ def build_parser(name: str, developer: bool) -> argparse.ArgumentParser:
     """
     parser = _Parser(
         prog=name,
-        usage=f"{name} [--version] COMMAND [ARGS]",
+        usage=f"{name} [--version] [--project DIR] COMMAND [ARGS]",
         description="Make EPM2Mod, firmware for the Olympus PEN E-PM2, and put it on an SD card. "
         f"'{name} COMMAND --help' describes a command.",
         epilog=_top_help(name, developer),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("--version", action="version", version=__version__)
+    parser.add_argument(
+        "--project",
+        metavar="DIR",
+        help=f"the project folder, which holds {MANIFEST}; default: the nearest folder at or above "
+        "the current folder that holds one",
+    )
     commands = parser.add_subparsers(
         dest="command",
         required=True,
@@ -1501,9 +1544,25 @@ def interruptible() -> Iterator[None]:
             signal.signal(number, handler)
 
 
+def _project_of(argv: Sequence[str]) -> str | None:
+    """Return the folder that ``--project`` names before the command, or None."""
+    for index, word in enumerate(argv):
+        if word == "--project":
+            return argv[index + 1] if index + 1 < len(argv) else None
+        if word.startswith("--project="):
+            return word.partition("=")[2]
+        if not word.startswith("-"):
+            return None
+    return None
+
+
 def _command_of(argv: Sequence[str]) -> str | None:
     """Return the command that the arguments name (``films set`` for a sub-command), or None."""
-    words = [word for word in argv if not word.startswith("-")]
+    words = [
+        word
+        for index, word in enumerate(argv)
+        if not word.startswith("-") and (index == 0 or argv[index - 1] != "--project")
+    ]
     if not words or words[0] not in HANDLERS:
         return None
     if words[0] == "films" and len(words) > 1 and f"films {words[1]}" in COMMANDS:
@@ -1518,7 +1577,12 @@ def main(argv: Sequence[str] | None = None, context: Context | None = None) -> i
         # A console that cannot show a character must not stop a run half-way.
         if isinstance(stream, io.TextIOWrapper):
             stream.reconfigure(errors="backslashreplace")
-    ctx = context or Context()
+    if context is None:
+        project = _project_of(arguments)
+        context = Context(
+            lambda: catalogue.locate(project=None if project is None else Path(project))
+        )
+    ctx = context
     name = prog()
     as_json = "--json" in arguments
     command = _command_of(arguments)
@@ -1539,6 +1603,11 @@ def main(argv: Sequence[str] | None = None, context: Context | None = None) -> i
         finally:
             _Parser.json_errors = False
         handler: Handler = args.run
+        ctx.use(
+            cache=getattr(args, "cache", None),
+            stock=getattr(args, "stock", None),
+            out_dir=args.out_dir if args.command == "make" else None,
+        )
         with interruptible():
             return handler(args, ctx)
     except Epm2ModError as error:

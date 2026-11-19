@@ -18,6 +18,7 @@ import re
 import shutil
 import sys
 import tempfile
+import tokenize
 import unittest
 from collections.abc import Iterator
 from pathlib import Path
@@ -60,7 +61,7 @@ from epm2mod.errors import (  # noqa: E402
 )
 from epm2mod.hashing import sha256_bytes  # noqa: E402
 from epm2mod.looks import lookfile, records  # noqa: E402
-from epm2mod.paths import ROOT_ENV, RepoPaths  # noqa: E402
+from epm2mod.paths import MANIFEST, RELEASE_KEY, RepoPaths  # noqa: E402
 
 FIRMWARE = "DCOLYMP/E1019999.BIN"
 FILMS_OP = {**BYTE_OP, "offset": "0x20", "expect": "2021", "new": "ccdd"}
@@ -117,15 +118,14 @@ class CardCase(unittest.TestCase):
     ) -> tuple[int, str, str]:
         """Run the command line; return status, stdout and stderr."""
         out, err = io.StringIO(), io.StringIO()
-        env = {ROOT_ENV: str(root or self.repo.paths.root)}
-        if prog is not None:
-            env[cli.PROG_ENV] = prog
+        env = {} if prog is None else {cli.PROG_ENV: prog}
+        project = ["--project", str(root or self.repo.paths.root)]
         with (
             mock.patch.dict(os.environ, env),
             contextlib.redirect_stdout(out),
             contextlib.redirect_stderr(err),
         ):
-            status = cli.main(list(argv))
+            status = cli.main([*project, *argv])
         return status, out.getvalue(), err.getvalue()
 
     def json_of(self, *argv: str, root: Path | None = None) -> dict[str, Any]:
@@ -672,12 +672,12 @@ class CommandTests(CardCase):
         with (
             mock.patch.dict(
                 os.environ,
-                {cli.PROG_ENV: launcher, ROOT_ENV: str(self.repo.paths.root)},
+                {cli.PROG_ENV: launcher},
             ),
             contextlib.redirect_stdout(out),
             self.assertRaises(SystemExit),
         ):
-            cli.main(["install", "--help"])
+            cli.main(["--project", str(self.repo.paths.root), "install", "--help"])
         text = out.getvalue()
         self.assertTrue(text.startswith(f"usage: {launcher} install "), text)
         self.assertIn(f"  {launcher} install --card /path/to/card", text)
@@ -816,15 +816,74 @@ class JsonTests(CardCase):
                 self.assertEqual(keys, wanted)
 
 
+#: The names of the project's folders and files, as the source could write them: a folder followed by a slash, a
+#: file name with the suffix of a project file, or a name that an earlier layout used.
+PROJECT_NAME = re.compile(
+    r"\b(?:data|specs|films|logdict|builds|patches|looks|logs|build|firmware|docs|tools|emulator|release|web|src|app"
+    r"|card|stock|guide|map)/"
+    r"|\b[\w.-]+\.(?:json|md|py|ts|tsx|sh|ps1|bat|command|txt|yml|yaml|tsv|npz)\b"
+    r"|\bEPM2MOD_ROOT\b|\bLICENSE\b|__file__"
+)
+#: What the scan allows: the project manifest's own name, which is how a project is found.
+ALLOWED = {MANIFEST}
+#: Text that the film generator writes into patch specs, which are data: (module, name).
+SPEC_TEXT = {
+    ("looks/extra.py", "data/"),
+    ("looks/extra.py", "specs/"),
+    ("looks/extra.py", "remap7b-code.json"),
+    ("looks/generate.py", "NOTICE.md"),
+}
+
+
+def source_text(path: Path) -> Iterator[tuple[int, str]]:
+    """Yield the line number and the text of each string, docstring and comment of a module."""
+    with path.open("rb") as source:
+        for token in tokenize.tokenize(source.readline):
+            if token.type in (tokenize.STRING, tokenize.COMMENT) or (
+                token.type == getattr(tokenize, "FSTRING_MIDDLE", -1)
+            ):
+                yield token.start[0], token.string
+
+
 class SourceTests(unittest.TestCase):
-    def test_the_command_line_holds_no_repository_folder_or_file(self) -> None:
-        text = (ROOT / "src" / "epm2mod" / "cli.py").read_text(encoding="utf-8")
-        found = re.findall(
-            r"\b(?:builds|patches|looks|logs|build|firmware|docs|tools|release)/"
-            r"|pinned-build\.json|[\"'][^\"'\n(]*\b\w[\w-]*\.json\b",
-            text,
-        )
+    def test_the_package_holds_no_folder_or_file_name_of_the_project(self) -> None:
+        found = []
+        package = ROOT / "src" / "epm2mod"
+        for path in sorted(package.rglob("*.py")):
+            module = path.relative_to(package).as_posix()
+            for number, text in source_text(path):
+                for match in PROJECT_NAME.finditer(text):
+                    name = match.group(0)
+                    if name not in ALLOWED and (module, name) not in SPEC_TEXT:
+                        found.append(f"{module}:{number}: {name}")
         self.assertEqual(found, [])
+
+    def test_the_scan_reads_every_module(self) -> None:
+        package = ROOT / "src" / "epm2mod"
+        modules = {p.relative_to(package).as_posix() for p in package.rglob("*.py")}
+        self.assertIn("cli.py", modules)
+        self.assertIn("looks/records.py", modules)
+        self.assertTrue(all(any(source_text(package / m)) for m in modules))
+
+    def test_the_scan_sees_each_kind_of_name(self) -> None:
+        for text in (
+            "data/specs/a.json",
+            "data/films/films.json",
+            "patches/a.json",
+            "looks/films.json",
+            "README.md",
+            "tools/freespace.py",
+            "pinned-build.json",
+            "release.json",
+            "EPM2MOD_ROOT",
+            "Path(__file__)",
+        ):
+            with self.subTest(text=text):
+                self.assertTrue(PROJECT_NAME.search(text))
+        for text in ("DCOLYMP", "E1019999.BIN", "EPM2LOOK.BIN", "EPM2LOG.BIN", MANIFEST):
+            with self.subTest(text=text):
+                found = [m.group(0) for m in PROJECT_NAME.finditer(text)]
+                self.assertLessEqual(set(found), ALLOWED)
 
 
 class NoCheckoutTests(unittest.TestCase):
@@ -840,20 +899,20 @@ class NoCheckoutTests(unittest.TestCase):
             target.write_bytes(data)
         self.card = Path(folder) / "card"
         (self.card / "DCIM").mkdir(parents=True)
-        env = mock.patch.dict(
-            os.environ, {ROOT_ENV: str(self.top), cards.TEST_CARDS_ENV: str(self.card)}
-        )
+        env = mock.patch.dict(os.environ, {cards.TEST_CARDS_ENV: str(self.card)})
         env.start()
         self.addCleanup(env.stop)
 
     def run_cli(self, *argv: str) -> tuple[int, str, str]:
         out, err = io.StringIO(), io.StringIO()
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
-            status = cli.main(list(argv))
+            status = cli.main(["--project", str(self.top), *argv])
         return status, out.getvalue(), err.getvalue()
 
     def test_the_locator_is_the_release_folder(self) -> None:
-        locator = catalogue.locate()
+        manifest = json.loads((self.top / MANIFEST).read_text(encoding="utf-8"))
+        self.assertEqual(manifest[RELEASE_KEY], "2026.11.19")
+        locator = catalogue.locate(project=self.top)
         self.assertEqual(locator.kind, "release")
         self.assertEqual(locator.pinned_build(), RepoPaths(ROOT).pinned_build())
         with self.assertRaises(RepositoryError):
@@ -925,7 +984,7 @@ class NoCheckoutTests(unittest.TestCase):
     def test_help_lists_the_commands_for_camera_owners_only(self) -> None:
         out = io.StringIO()
         with contextlib.redirect_stdout(out), self.assertRaises(SystemExit):
-            cli.main(["--help"])
+            cli.main(["--project", str(self.top), "--help"])
         text = out.getvalue()
         self.assertIn(cli.OWNERS, text)
         self.assertNotIn(cli.DEVELOPERS, text)
@@ -933,7 +992,7 @@ class NoCheckoutTests(unittest.TestCase):
         self.assertNotIn("  make ", text)
         out = io.StringIO()
         with contextlib.redirect_stdout(out), self.assertRaises(SystemExit):
-            cli.main(["films", "--help"])
+            cli.main(["--project", str(self.top), "films", "--help"])
         self.assertIn("set ", out.getvalue())
         self.assertNotIn("pack", out.getvalue())
 

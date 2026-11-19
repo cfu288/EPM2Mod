@@ -13,12 +13,19 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from support import ROOT  # noqa: E402
 
-from epm2mod.builds import BuildDescription, description_from_json  # noqa: E402
+from epm2mod.builds import (  # noqa: E402
+    BuildDescription,
+    check_label_spec,
+    description_from_json,
+)
 from epm2mod.errors import BuildError  # noqa: E402
-from epm2mod.label import LABEL_SPEC, PLACEHOLDER, with_label  # noqa: E402
+from epm2mod.label import PLACEHOLDER, with_label  # noqa: E402
+from epm2mod.paths import RepoPaths  # noqa: E402
 from epm2mod.spec import BytesOp, load_spec  # noqa: E402
 
-SPEC = load_spec(ROOT / LABEL_SPEC)
+PATHS = RepoPaths(ROOT)
+LABEL_SPEC = PATHS.relative(PATHS.label_spec)
+SPEC = load_spec(PATHS.label_spec)
 
 
 def text_of(spec: object) -> str:
@@ -59,17 +66,26 @@ class LabelTests(unittest.TestCase):
 class DescriptionTests(unittest.TestCase):
     def test_a_label_needs_the_label_spec_and_the_spec_needs_a_label(self) -> None:
         with self.assertRaises(BuildError):
-            BuildDescription(
-                name="x",
-                what="x",
-                specs=("data/specs/lss-core.json",),
-                label="2026.11.19",
-                stock="x",
+            check_label_spec(
+                BuildDescription(
+                    name="x",
+                    what="x",
+                    specs=("data/specs/lss-core.json",),
+                    label="2026.11.19",
+                    stock="x",
+                ),
+                LABEL_SPEC,
             )
         with self.assertRaises(BuildError):
-            BuildDescription(name="x", what="x", specs=(LABEL_SPEC,), stock="x")
-        BuildDescription(
-            name="x", what="x", specs=(LABEL_SPEC,), label="2026.11.19", stock="x"
+            check_label_spec(
+                BuildDescription(name="x", what="x", specs=(LABEL_SPEC,), stock="x"),
+                LABEL_SPEC,
+            )
+        check_label_spec(
+            BuildDescription(
+                name="x", what="x", specs=(LABEL_SPEC,), label="2026.11.19", stock="x"
+            ),
+            LABEL_SPEC,
         )
 
     def test_the_label_goes_through_json(self) -> None:

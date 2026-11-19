@@ -1,13 +1,15 @@
 """The one place that knows where the package's data is: the locator, and the film catalogue.
 
-Commands never build a repository path. They ask a ``Locator`` for each resource: the film records, the build
+Commands never build a project path. They ask a ``Locator`` for each resource: the film records, the build
 descriptions (by name) and the pinned build, the patch specs a build names, the downloaded Olympus firmware, the
-output folder, and the event dictionaries of the debug log. ``locate`` picks the source:
+output folder, and the event dictionaries of the debug log. The locations come from the project manifest
+(``paths.MANIFEST``) and from arguments (``Locator.with_locations``). ``locate`` finds the project and picks the
+source:
 
 - a checkout of the repository (``paths.RepoPaths``): every resource, and ``checkout()`` for the developer and
   release commands;
-- an unpacked release folder (``ReleaseLocator``, marked by ``paths.RELEASE_MARKER``): the files that
-  ``release.data_files`` bundles, with the same layout. ``checkout()`` refuses (exit status 5).
+- an unpacked release folder (``ReleaseLocator``, whose manifest has ``paths.RELEASE_KEY``): the files that
+  ``release.data_files`` bundles. ``checkout()`` refuses (exit status 6).
 
 A third source, such as an installed package (data from ``importlib.resources`` and a cache folder for the user), is
 one more class with the methods of ``Locator`` and one more case in ``locate``. No command changes.
@@ -24,7 +26,7 @@ from typing import TYPE_CHECKING, Protocol
 
 from .builds import BuildDescription
 from .errors import RefusedError, RepositoryError
-from .paths import RELEASE_MARKER, RepoPaths, find_root
+from .paths import RELEASE_KEY, RepoPaths, find_root
 
 if TYPE_CHECKING:
     from .looks.lookfile import Look
@@ -42,17 +44,36 @@ class Locator(Protocol):
     def where(self) -> str:
         """Return the source's folder (or other origin), for messages."""
 
+    def with_locations(
+        self,
+        cache: Path | None = None,
+        stock: Path | None = None,
+        out_dir: Path | None = None,
+    ) -> Locator:
+        """Return this locator with the locations that arguments give: ``--cache``, ``--stock``, ``--out-dir``."""
+
     def output_folder(self) -> Path:
         """Return the folder that commands write their outputs to."""
 
     def stock_file(self, stock: StockFirmware) -> Path:
-        """Return where the downloaded stock firmware is kept."""
+        """Return where the stock firmware is: the ``--stock`` file, or the file in the cache folder."""
+
+    def downloads(self) -> bool:
+        """Return True if the stock firmware may be downloaded into the cache folder (no ``--stock``)."""
 
     def spec_file(self, relative: str) -> Path:
         """Return the file of a patch spec that a build description names."""
 
     def film_records_file(self) -> Path:
         """Return the file of the film records."""
+
+    @property
+    def label_spec(self) -> Path:
+        """The patch spec that shows a build's label on the camera's Firmware screen."""
+
+    @property
+    def app(self) -> Path:
+        """The folder of the built installer page."""
 
     def pinned_build(self) -> BuildDescription:
         """Return the pinned build: the one that ``install`` writes."""
@@ -82,7 +103,7 @@ NO_CHECKOUT = (
 
 
 class ReleaseLocator(RepoPaths):
-    """An unpacked release folder: the pinned build, its specs, the film records, and a cache for the download."""
+    """An unpacked release folder: the pinned build, its specs, the film records, the installer page, and a cache for the download."""
 
     kind = "release"
 
@@ -103,16 +124,16 @@ class ReleaseLocator(RepoPaths):
         raise RepositoryError(NO_CHECKOUT)
 
 
-def locate(start: Path | None = None) -> Locator:
-    """Return the locator of the source that holds ``start`` (default: the current folder, then this package).
+def locate(start: Path | None = None, project: Path | None = None) -> Locator:
+    """Return the locator of the project ``project``, or of the project that holds ``start`` (default: the current folder).
 
     Raises:
-        RepositoryError: if no source is found.
+        RepositoryError: if no project is found.
     """
-    root = find_root(start)
-    if (root / RELEASE_MARKER).is_file():
-        return ReleaseLocator(root)
-    return RepoPaths(root)
+    found = RepoPaths(find_root(start, project))
+    if RELEASE_KEY in found.manifest:
+        return ReleaseLocator(found.root)
+    return found
 
 
 def films(locator: Locator) -> Records:

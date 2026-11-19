@@ -22,10 +22,10 @@ How ``make`` and ``install`` make the firmware (``firmware``):
 2. for a candidate (a build with no recorded SHA-256), the free-space check runs on the spec list;
 3. the patch specs are applied, in memory;
 4. the SHA-256 of the result is compared with the recorded one (tested build) or reported (candidate);
-5. the result is written: by ``make`` to ``NAME.BIN`` and ``card/DCOLYMP/`` in the output folder, by ``install``
+5. the result is written: by ``make`` to ``NAME.BIN`` and ``DCOLYMP/`` in the output folder, by ``install``
    to the card.
 
-What ``make`` guarantees about files: the outputs of an earlier run for the same build, and the whole ``card``
+What ``make`` guarantees about files: the outputs of an earlier run for the same build, and the whole ``DCOLYMP``
 folder of the output folder, are removed before anything else is done. After a failed run they are absent; they
 never hold another build. A file gets its final name only when all of it is written, flushed and read back
 (``fileio.write_bytes``). These guarantees hold when a step fails and when the run is stopped by Ctrl-C or by a
@@ -67,7 +67,7 @@ from .errors import (
 )
 from .fileio import Log, describe_os_error, part_path, read_bytes, silent, write_bytes
 from .hashing import sha256_bytes
-from .label import LABEL_SPEC, with_label
+from .label import with_label
 from .looks import lookfile
 from .paths import RepoPaths
 from .spec import Applied, PatchSpec, apply_specs, load_spec
@@ -95,8 +95,9 @@ def load_specs(paths: Locator, description: BuildDescription) -> list[PatchSpec]
     """
     specs = []
     for relative in description.specs:
-        spec = load_spec(paths.spec_file(relative))
-        if relative == LABEL_SPEC and description.label is not None:
+        path = paths.spec_file(relative)
+        spec = load_spec(path)
+        if path == paths.label_spec and description.label is not None:
             spec = with_label(spec, description.label)
         specs.append(spec)
     return specs
@@ -133,7 +134,7 @@ def build_image(
 def check_free_space(paths: RepoPaths, description: BuildDescription) -> str:
     """Run the free-space check on a build's spec list.
 
-    The check is ``tools/freespace.py check SPEC...``. It fails if two specs
+    The check is the project's free-space tool: ``TOOL check SPEC...``. It fails if two specs
     put bytes in the same place, or a spec puts bytes where the camera does
     not load the firmware, or a spec puts code in an area where no
     camera-tested build runs code yet. The last rule is waived for a
@@ -167,8 +168,8 @@ def check_free_space(paths: RepoPaths, description: BuildDescription) -> str:
         if not paths.firmware_map.exists():
             hint = (
                 f"\nThe firmware map ({paths.relative(paths.firmware_map)}) is "
-                "missing. A new build needs it: see tools/fwmap.py and "
-                "tools/freespace.py."
+                "missing. A new build needs it: see "
+                f"{paths.relative(paths.free_space_tool)}."
             )
         shown = output[-_CHECK_OUTPUT_LIMIT:]
         if len(output) > len(shown):  # start the cut text at a whole line
@@ -185,8 +186,8 @@ _EMULATOR_NOT_SET_UP = 3
 def check_in_emulator(paths: RepoPaths, image: Path) -> list[str]:
     """Start a firmware image in the emulator: the normal start and the update path.
 
-    The checks are ``emulator/boot-test IMAGE`` and
-    ``emulator/update-path-test IMAGE``. An image that does not start as the
+    The checks are the project's emulator checks, each run as ``CHECK IMAGE``: the
+    normal start and the update path. An image that does not start as the
     stock firmware does, or does not find an update file with OK held, could
     leave the camera with no way back.
 
@@ -200,7 +201,7 @@ def check_in_emulator(paths: RepoPaths, image: Path) -> list[str]:
     lines = []
     for tool in paths.emulator_checks:
         skipped = (
-            f"{tool.name}: SKIPPED, the emulator is not set up (emulator/setup.sh). "
+            f"{tool.name}: SKIPPED, the emulator is not set up (see {paths.relative(tool.parent)}). "
             "Do not flash this build before the check has passed."
         )
         if not tool.exists():
@@ -792,7 +793,7 @@ class MakeResult:
     Attributes:
         description: the build that was made.
         image: the firmware file, ``NAME.BIN`` in the output folder.
-        card_copy: the copy under the camera's file name, in the output folder's ``card``.
+        card_copy: the copy under the camera's file name, in the output folder's ``DCOLYMP``.
         sha256: SHA-256 of the firmware file (for a dry run of a candidate: None).
         files: every file written.
     """
@@ -810,8 +811,8 @@ def image_path(paths: Locator, name: str) -> Path:
 
 
 def card_folder(paths: Locator) -> Path:
-    """Return the folder in the output folder that is laid out like the SD card."""
-    return paths.output_folder() / "card"
+    """Return the camera's folder in the output folder, as on the SD card."""
+    return paths.output_folder() / CARD_FOLDER
 
 
 def clear_outputs(paths: Locator, name: str | None) -> None:
@@ -859,17 +860,17 @@ def make(
 ) -> MakeResult:
     """Make a firmware build into the output folder (``epm2mod make``).
 
-    It writes ``NAME.BIN`` and ``card/DCOLYMP/E1019999.BIN`` in the output folder, and one more copy to the file
+    It writes ``NAME.BIN`` and ``DCOLYMP/E1019999.BIN`` in the output folder, and one more copy to the file
     ``output`` if given. It writes no film file.
 
     Raises:
         Epm2ModError: with a message for the user, if any step fails. Then
-            ``NAME.BIN`` and ``card`` do not exist in the output folder. The same holds
+            ``NAME.BIN`` and ``DCOLYMP`` do not exist in the output folder. The same holds
             if the run is interrupted (see the module text).
     """
     image = image_path(paths, description.name)
     stock = description.stock_firmware
-    card_copy = card_folder(paths) / FIRMWARE
+    card_copy = paths.output_folder() / FIRMWARE
     if dry_run:
         load_specs(paths, description)
         content = Content(stock.size, description.sha256)

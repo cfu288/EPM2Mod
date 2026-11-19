@@ -47,6 +47,30 @@ Examples: `feat(cli)!: revision 3 of the CLI spec`, `docs(camera-log): the build
 | `firmware/`, `build/` | Firmware files and build outputs. Git ignores them. `firmware/SHA256SUMS` is in git. |
 | `.local/` | Files of this computer only, never committed: reference manuals, raw photos, drafts. |
 
+## The project manifest
+
+`epm2mod.json` at the top of a project names every file and folder that the `epm2mod` package reads or writes. The
+package holds no other name of the project; a test scans the package for one. The commands use the nearest folder at
+or above the current folder that holds `epm2mod.json`, or the folder that `--project DIR` names. A checkout and the
+release folder each have one.
+
+The manifest is one flat JSON object: a key for each location, and as its value a path relative to the manifest's
+folder (a list of paths for `documents`, `workflows`, `emulator_checks` and `release_files`). The release folder's
+manifest also has `release`, its version, and names only what the commands for camera owners use. Paths in build
+descriptions, patch specs and film lists are data: they are also relative to the manifest's folder.
+
+| Key | Location |
+|---|---|
+| `pinned`, `builds` | The pointer to the pinned build, and the build descriptions |
+| `specs`, `label_spec` | The patch specs (every spec that a build or a film list names is in this folder), and the spec of the build label |
+| `films`, `more_films`, `bw_films`, `card_looks`, `catalogue`, `film_records` | The film data: the film lists of older builds, the developer look list, the catalogue, the film records |
+| `events` | The event dictionary of the Debug Log. The other JSON files in its folder are the dictionaries of older builds |
+| `readme`, `documents`, `cli_reference`, `guides`, `site_features`, `camera_log` | The documents with generated parts, the CLI reference, the feature guides and the site's feature list, the camera log |
+| `free_space_tool`, `emulator_checks`, `firmware_map` | The checks of a candidate build |
+| `output` | The output folder (`make --out-dir DIR` replaces it) |
+| `cache` | The folder that keeps Olympus's firmware (`--cache DIR` replaces it; `--stock FILE` uses a copy) |
+| `app`, `package`, `release_files` | The installer page, the package, and the files at the top of the release zip |
+
 ## Production code and research code
 
 - **`src/epm2mod/` is production code.** It makes the firmware that goes on a camera. Rules:

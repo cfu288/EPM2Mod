@@ -24,7 +24,7 @@ from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from support import ROOT  # noqa: E402
+from support import ROOT, write_manifest  # noqa: E402
 
 from epm2mod import camera_steps, cards, cli, pipeline, serve, stock  # noqa: E402
 from epm2mod.builds import pinned_description  # noqa: E402
@@ -33,7 +33,7 @@ from epm2mod.cards import Card  # noqa: E402
 from epm2mod.errors import BuildError  # noqa: E402
 from epm2mod.hashing import sha256_bytes  # noqa: E402
 from epm2mod.looks import lookfile, records  # noqa: E402
-from epm2mod.paths import RepoPaths  # noqa: E402
+from epm2mod.paths import MANIFEST, RepoPaths  # noqa: E402
 
 PATHS = RepoPaths(ROOT)
 HAVE_STOCK = stock.stock_path(PATHS, stock.EPM2_V16).is_file()
@@ -347,22 +347,19 @@ class MessageTests(unittest.TestCase):
 class CommandTests(unittest.TestCase):
     def test_serve_needs_the_built_page(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
-            original = serve.STATIC
-            serve.STATIC = Path(folder)
-            try:
-                with redirect_stderr(io.StringIO()) as err:
-                    self.assertEqual(cli.main(["serve", "--no-browser"]), 6)
-                self.assertIn("npm run build:app", err.getvalue())
-            finally:
-                serve.STATIC = original
+            (write_manifest(Path(folder), app="app") / "app").mkdir()
+            with redirect_stderr(io.StringIO()) as err:
+                argv = ["--project", folder, "serve", "--no-browser"]
+                self.assertEqual(cli.main(argv), 6)
+            self.assertIn("npm run build:app", err.getvalue())
 
 
 def sandbox(folder: Path) -> RepoPaths:
     """Return a repository whose files are the checkout's, with its own ``build`` folder."""
     for entry in ROOT.iterdir():
-        if entry.name != "build":
+        if entry.name not in ("build", MANIFEST):
             (folder / entry.name).symlink_to(entry)
-    return RepoPaths(folder)
+    return RepoPaths(write_manifest(folder))
 
 
 def stand_in_card(folder: Path) -> Path:
@@ -384,10 +381,14 @@ class EndToEndTests(unittest.TestCase):
         listed = os.pathsep.join(str(card) for card in (self.app_card, self.cli_card))
         env = mock.patch.dict(
             os.environ,
-            {cards.TEST_CARDS_ENV: listed, "EPM2MOD_ROOT": str(self.paths.root)},
+            {cards.TEST_CARDS_ENV: listed},
         )
         env.start()
         self.addCleanup(env.stop)
+
+    def cli(self, *argv: str) -> int:
+        """Run the command line in the sandbox project."""
+        return cli.main(["--project", str(self.paths.root), *argv])
 
     def files(self, card: Path) -> list[str]:
         """Return the files on a card, relative to it."""
@@ -410,9 +411,9 @@ class EndToEndTests(unittest.TestCase):
         self.assertEqual(done.file_data()["DCOLYMP/E1019999.BIN"], on_card)
         out = Path(self.folder.name)
         with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
-            self.assertEqual(cli.main(["restore", "-o", str(out / "x.BIN")]), 0)
+            self.assertEqual(self.cli("restore", "-o", str(out / "x.BIN")), 0)
             with self.assertRaises(SystemExit):
-                cli.main(["restore"])
+                self.cli("restore")
         self.assertEqual((out / "x.BIN").read_bytes(), on_card)
 
     def test_the_app_writes_what_the_command_line_writes(self) -> None:
@@ -429,7 +430,7 @@ class EndToEndTests(unittest.TestCase):
         with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
             films = [word for choice in choices for word in ("--film", choice)]
             argv = ["install", "--card", str(self.cli_card), *films]
-            self.assertEqual(cli.main(argv), 0)
+            self.assertEqual(self.cli(*argv), 0)
         names = ["DCOLYMP/E1019999.BIN", lookfile.CARD_NAME]
         for name in names:
             self.assertEqual(
@@ -444,17 +445,17 @@ class EndToEndTests(unittest.TestCase):
         serve.run_job(self.paths, [], self.app_card, lambda line: None, lambda n: None)
         pinned = pinned_description(self.paths).name
         with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
-            self.assertEqual(cli.main(["install", "--card", str(self.cli_card)]), 0)
-            self.assertEqual(cli.main(["make", pinned]), 0)
+            self.assertEqual(self.cli("install", "--card", str(self.cli_card)), 0)
+            self.assertEqual(self.cli("make", pinned), 0)
         name = "DCOLYMP/E1019999.BIN"
         self.assertEqual(self.files(self.cli_card), [name])
         self.assertEqual(self.files(self.app_card), [name])
-        self.assertEqual(self.files(pipeline.card_folder(self.paths)), [name])
+        self.assertEqual(self.files(self.paths.output), [name, f"{pinned}.BIN"])
         self.assertEqual(
             (self.app_card / name).read_bytes(), (self.cli_card / name).read_bytes()
         )
         self.assertEqual(
-            (pipeline.card_folder(self.paths) / name).read_bytes(),
+            (self.paths.output / name).read_bytes(),
             (self.cli_card / name).read_bytes(),
         )
 

@@ -7,9 +7,9 @@ on:
   push:
     branches: [main]
     tags: ['v*']
-    paths: ['src/**', 'release/**', 'web/**', 'data/builds/**', 'data/specs/**', 'data/pinned-build.json', 'data/films/film-records.json', '.github/workflows/release.yml', '.github/scripts/release_smoke.py']
+    paths: ['src/**', 'release/**', 'web/**', 'data/builds/**', 'data/specs/**', 'epm2mod.json', 'data/pinned-build.json', 'data/films/film-records.json', '.github/workflows/release.yml', '.github/scripts/release_smoke.py']
   pull_request:
-    paths: ['src/**', 'release/**', 'web/**', 'data/builds/**', 'data/specs/**', 'data/pinned-build.json', 'data/films/film-records.json', '.github/workflows/release.yml', '.github/scripts/release_smoke.py']
+    paths: ['src/**', 'release/**', 'web/**', 'data/builds/**', 'data/specs/**', 'epm2mod.json', 'data/pinned-build.json', 'data/films/film-records.json', '.github/workflows/release.yml', '.github/scripts/release_smoke.py']
   workflow_dispatch:
 
 permissions:

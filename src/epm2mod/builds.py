@@ -1,11 +1,11 @@
 """Build descriptions and the pinned build.
 
-A build description is a JSON file in ``data/builds/``::
+A build description is a JSON file in the project's build folder (``RepoPaths.builds``)::
 
     {
       "what": "Seven film looks as art filters",
       "stock": "OLY_E_101_1600_0000_0000.BIN",
-      "specs": ["data/specs/a.json", "data/specs/b.json"],
+      "specs": [SPEC, ...],            (paths of patch specs)
       "sha256": "...",                 (only after a camera test)
       "camera_tested": "2026-11-13",   (only after a camera test)
       "first_code": true               (optional; see below)
@@ -13,19 +13,20 @@ A build description is a JSON file in ``data/builds/``::
 
 The name of a build is the name of its file without ``.json``; it is not
 written inside the file. ``stock`` names the stock firmware the build starts
-from: a key of ``stock.STOCK_FIRMWARE`` (the maker's file name). The specs are files in ``data/specs/``, written relative
-to the repository root, and are applied in the order given. ``sha256`` and
-``camera_tested`` are either both present (a tested build) or both absent (a
-candidate).
+from: a key of ``stock.STOCK_FIRMWARE`` (the maker's file name). The specs are files in the project's patch spec
+folder (``RepoPaths.specs``), written relative to the project folder, and are applied in the order given.
+``sha256`` and ``camera_tested`` are either both present (a tested build) or both absent (a candidate).
 
 ``first_code`` is for a build that runs new code in an area of the firmware
 where no camera-tested build runs code yet. The free-space check refuses such
 a build unless the description says so, because only the flash can show that
 code runs there. The key is either absent or ``true``.
 
-``data/pinned-build.json`` at the top of the repository holds
-``{"build": "data/builds/NAME.json"}``: the description of the last build that
-passed a camera test.
+The project's pinned file (``RepoPaths.pinned``) holds ``{"build": PATH}``, the path of a
+description in the build folder: the description of the last build that passed a camera test.
+
+A build with a ``label`` lists the project's label spec (``RepoPaths.label_spec``), and a build without one does not
+(``check_label_spec``).
 """
 
 from __future__ import annotations
@@ -39,8 +40,8 @@ from typing import Any
 from .errors import BuildError
 from .fileio import read_json, write_json
 from .hashing import is_sha256
-from .label import LABEL_SPEC, check_label
-from .paths import SPEC_FOLDER, RepoPaths, is_repo_relative
+from .label import check_label
+from .paths import RepoPaths, is_repo_relative
 from .stock import StockFirmware, stock_named
 
 _NAME = re.compile(r"[a-z0-9][a-z0-9._-]*")
@@ -73,21 +74,20 @@ def _check_date(value: object, where: str) -> str:
 
 
 def check_spec_path(text: object, where: str) -> str:
-    """Return ``text`` if it names a patch spec file in ``data/specs/``, else raise.
+    """Return ``text`` if it can name a patch spec file, else raise.
 
-    A spec path is relative to the repository root, has forward slashes, no
-    ``.`` or ``..`` parts, starts with ``data/specs/`` and ends with ``.json``.
+    A spec path is relative to the project folder, has forward slashes, no
+    ``.`` or ``..`` parts and ends with ``.json``. That it is in the project's
+    patch spec folder is checked when it is read (``RepoPaths.spec_file``).
     """
     if (
         not isinstance(text, str)
         or not is_repo_relative(text)
-        or not text.startswith(SPEC_FOLDER + "/")
         or not text.endswith(_SUFFIX)
     ):
         raise BuildError(
-            f"{where}: {text!r} is not a patch spec: it must be a .json file in "
-            f"{SPEC_FOLDER}/, written relative to the repository root with "
-            "forward slashes"
+            f"{where}: {text!r} is not a patch spec: it must be a .json file, "
+            "written relative to the project folder with forward slashes"
         )
     return text
 
@@ -157,11 +157,6 @@ class BuildDescription:
             _check_date(self.camera_tested, self.name)
         if self.label is not None:
             check_label(self.label, self.name)
-        if (self.label is None) == (LABEL_SPEC in self.specs):
-            raise BuildError(
-                f"{self.name}: 'label' and the spec {LABEL_SPEC} go together: "
-                "give both or neither"
-            )
 
     @property
     def stock_firmware(self) -> StockFirmware:
@@ -267,6 +262,30 @@ def load_description(path: Path) -> BuildDescription:
     return description_from_json(path.stem, read_json(path, BuildError))
 
 
+def check_label_spec(description: BuildDescription, label_spec: str) -> None:
+    """Refuse a build whose ``label`` and the label spec ``label_spec`` do not go together.
+
+    Raises:
+        BuildError: if the build has a label and does not list the spec, or lists the spec and has no label.
+    """
+    if (description.label is None) == (label_spec in description.specs):
+        raise BuildError(
+            f"{description.name}: 'label' and the spec {label_spec} go together: "
+            "give both or neither"
+        )
+
+
+def load_checked(paths: RepoPaths, path: Path) -> BuildDescription:
+    """Read a build description file of the project and check its label (``check_label_spec``).
+
+    Raises:
+        BuildError: as ``load_description`` and ``check_label_spec``.
+    """
+    description = load_description(path)
+    check_label_spec(description, paths.relative(paths.label_spec))
+    return description
+
+
 def is_build_name(text: str) -> bool:
     """Return True if ``text`` can be the name of a build."""
     return _NAME.fullmatch(text) is not None
@@ -278,51 +297,50 @@ def description_path(paths: RepoPaths, name: str) -> Path:
 
 
 def save_description(paths: RepoPaths, description: BuildDescription) -> Path:
-    """Write a description to ``data/builds/NAME.json`` and return the path."""
+    """Write a description to its file in the build folder and return the path."""
     path = description_path(paths, description.name)
     write_json(path, description.to_json(), BuildError)
     return path
 
 
 def all_descriptions(paths: RepoPaths) -> list[BuildDescription]:
-    """Return every description in ``data/builds/``, sorted by name."""
-    found = [load_description(path) for path in paths.builds.glob("*" + _SUFFIX)]
+    """Return every description in the build folder, sorted by name."""
+    found = [load_checked(paths, path) for path in paths.builds.glob("*" + _SUFFIX)]
     return sorted(found, key=lambda description: description.name)
 
 
 def pinned_path(paths: RepoPaths) -> Path:
-    """Return the path of the description that ``data/pinned-build.json`` names.
+    """Return the path of the description that the pinned file names.
 
     The description itself is not read.
 
     Raises:
         BuildError: if the pointer file is missing or malformed, or does not
-            name a file directly in ``data/builds/``.
+            name a file directly in the build folder.
     """
     raw = read_json(paths.pinned, BuildError)
     target = raw.get("build") if isinstance(raw, dict) and len(raw) == 1 else None
-    prefix = paths.relative(paths.builds) + "/"
     if (
         not isinstance(target, str)
         or not is_repo_relative(target)
-        or not target.startswith(prefix)
-        or "/" in target[len(prefix) :]
+        or paths.resolve(target).parent != paths.builds
     ):
+        builds = paths.relative(paths.builds)
         raise BuildError(
-            f'{paths.pinned}: must be {{"build": "{prefix}NAME{_SUFFIX}"}}'
+            f'{paths.pinned}: must be {{"build": "{builds}/NAME{_SUFFIX}"}}'
         )
     return paths.resolve(target)
 
 
 def pinned_description(paths: RepoPaths) -> BuildDescription:
-    """Return the description that ``data/pinned-build.json`` names.
+    """Return the description that the pinned file names.
 
     Raises:
         BuildError: as ``pinned_path``, and if the description cannot be read
             or is not a tested build.
     """
     path = pinned_path(paths)
-    description = load_description(path)
+    description = load_checked(paths, path)
     if not description.tested:
         raise BuildError(
             f"{paths.pinned}: {paths.relative(path)} is not a camera-tested "

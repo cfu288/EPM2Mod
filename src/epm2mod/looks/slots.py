@@ -3,8 +3,8 @@
 A film slot is an art-filter menu entry whose processing was made colour-only.
 Its look is seven things in block 0 of the firmware. All addresses here are run-time
 addresses of E-PM2 firmware 1.6; ``BLOCK0_BASE`` turns them into payload offsets.
-How they were found: ``docs/dev/art-filter-slots.md`` and
-``experiments/2026-11-09-film-portra/NOTES.md``.
+How they were found: the art-filter slot document and the notes of the
+experiment film-portra (2026-11-09).
 """
 
 from __future__ import annotations
@@ -186,7 +186,7 @@ def slot_for(entry: str) -> Slot:
 # art code that no table and no compare of the firmware knows. The stock
 # filter keeps its value, its art code and all its tables: focus peaking
 # uses the Key Line ones.
-# How this was found: experiments/2026-11-16-films-max/NOTES.md.
+# How this was found: the notes of the experiment films-max (2026-11-16).
 
 #: The stock default handler of the tone-curve hash: an entry with key 0 is empty.
 GAMMA_DEFAULT_HANDLER = 0x7E56B861
@@ -489,7 +489,7 @@ EXTRA_SLOTS: tuple[ExtraSlot, ...] = (
 # grain program runs (live view and movie variants of the look stage).
 # The tone curves per channel cannot be used: the key of code 74 in the
 # tone-curve hash meets the entry that code 70 uses before it meets a free one.
-# How this was found: experiments/2026-11-16-doublex/NOTES.md.
+# How this was found: the notes of the experiment doublex (2026-11-16).
 
 
 @dataclass(frozen=True)

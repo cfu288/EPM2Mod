@@ -1,6 +1,6 @@
 """The build label on the camera's Firmware screen: "Body : 1.6  EPM2Mod 2026.11.19".
 
-A build description with a ``label`` (``YYYY.MM.DD``) lists ``LABEL_SPEC``. That
+A build description with a ``label`` (``YYYY.MM.DD``) lists the project's label spec (``RepoPaths.label_spec``). That
 spec holds the screen's edits and its text with the placeholder date
 ``0000.00.00``; ``with_label`` returns it with the label written in place. The
 text has a fixed length, so the free-space check of the committed spec covers
@@ -16,8 +16,6 @@ from dataclasses import replace
 from .errors import BuildError
 from .spec import BytesOp, PatchSpec
 
-#: The spec that shows the label, relative to the repository root.
-LABEL_SPEC = "data/specs/build-label.json"
 #: The date in the committed spec's text that the label replaces.
 PLACEHOLDER = "0000.00.00"
 

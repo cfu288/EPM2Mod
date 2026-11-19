@@ -31,7 +31,7 @@ from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from support import ROOT, make_container  # noqa: E402
+from support import ROOT, make_container, write_manifest  # noqa: E402
 
 import epm2mod  # noqa: E402
 import epm2mod.looks  # noqa: E402
@@ -57,7 +57,7 @@ from epm2mod.errors import (  # noqa: E402
 )
 from epm2mod.looks import films  # noqa: E402
 from epm2mod.hashing import is_sha256, sha256_bytes  # noqa: E402
-from epm2mod.paths import RepoPaths, is_repo_relative  # noqa: E402
+from epm2mod.paths import MANIFEST, RepoPaths, is_repo_relative  # noqa: E402
 
 PATHS = RepoPaths(ROOT)
 HAVE_STOCK = stock.stock_path(PATHS, stock.EPM2_V16).is_file()
@@ -69,7 +69,6 @@ TINY = make_container(
 )
 TINY_STOCK = stock.StockFirmware(
     file_name="TINY.BIN",
-    relative_path="firmware/TINY.BIN",
     size=len(TINY),
     sha256=sha256_bytes(TINY),
     model_id="1010",
@@ -96,7 +95,7 @@ class TinyRepo:
     """A small repository in a temporary folder: tiny stock, one spec, one build."""
 
     def __init__(self, folder: Path) -> None:
-        self.paths = RepoPaths(folder)
+        self.paths = RepoPaths(write_manifest(folder, cache="firmware"))
         self.write("firmware/TINY.BIN", TINY)
         self.write_json("data/specs/a.json", spec_json("a", [BYTE_OP]))
         applied = spec.apply_specs(
@@ -188,14 +187,6 @@ def answers(*bodies: Any) -> Iterator[mock.MagicMock]:
         "epm2mod.stock.urllib.request.urlopen", side_effect=responses
     ) as opened:
         yield opened
-
-
-@contextlib.contextmanager
-def without_root_variable() -> Iterator[None]:
-    """Run a block with ``EPM2MOD_ROOT`` not set."""
-    with mock.patch.dict(os.environ):
-        os.environ.pop(paths_module.ROOT_ENV, None)
-        yield
 
 
 def catalog_answer(
@@ -601,20 +592,22 @@ class PathAndFileTests(unittest.TestCase):
         )
 
     def test_find_root(self) -> None:
-        with without_root_variable():
-            self.assertEqual(paths_module.find_root(ROOT / "src"), ROOT)
-            with tempfile.TemporaryDirectory() as folder:
-                # Outside a checkout, the checkout that holds the package is used.
-                self.assertEqual(paths_module.find_root(Path(folder)), ROOT)
+        self.assertEqual(paths_module.find_root(ROOT / "src" / "epm2mod"), ROOT)
         with tempfile.TemporaryDirectory() as folder:
-            with mock.patch.dict(os.environ, {paths_module.ROOT_ENV: folder}):
-                with self.assertRaises(RepositoryError):
-                    paths_module.find_root()
-            marker = Path(folder) / paths_module.ROOT_MARKER
-            marker.parent.mkdir(parents=True, exist_ok=True)
-            marker.write_text("{}")
-            with mock.patch.dict(os.environ, {paths_module.ROOT_ENV: folder}):
-                self.assertEqual(paths_module.find_root(), Path(folder).absolute())
+            # Outside a project there is no fallback: not even the package's own checkout.
+            with self.assertRaises(RepositoryError):
+                paths_module.find_root(Path(folder))
+            with self.assertRaises(RepositoryError):
+                paths_module.find_root(project=Path(folder))
+            write_manifest(Path(folder))
+            self.assertEqual(
+                paths_module.find_root(project=Path(folder)), Path(folder).absolute()
+            )
+            (Path(folder) / "sub" / "deeper").mkdir(parents=True)
+            self.assertEqual(
+                paths_module.find_root(Path(folder) / "sub" / "deeper"),
+                Path(folder).absolute(),
+            )
 
     def test_a_failed_write_keeps_the_old_file(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
@@ -809,7 +802,6 @@ class BuildDescriptionTests(unittest.TestCase):
             {**self.GOOD, "specs": ["data/specs/../x/a.json"]},
             {**self.GOOD, "specs": ["./patches/a.json"]},
             {**self.GOOD, "specs": ["patches\\a.json"]},
-            {**self.GOOD, "specs": ["experiments/x/patches/a.json"]},
             {**self.GOOD, "specs": ["data/specs/a.txt"]},
             {**self.GOOD, "specs": [5]},
             {**self.GOOD, "sha256": "a" * 64},
@@ -835,6 +827,12 @@ class BuildDescriptionTests(unittest.TestCase):
             with self.assertRaises(BuildError):
                 candidate.as_tested(sha, date)
 
+    def test_a_spec_outside_the_patch_spec_folder_is_refused(self) -> None:
+        self.assertEqual(PATHS.spec_file("data/specs/a.json"), PATHS.specs / "a.json")
+        for relative in ("experiments/x/patches/a.json", "data/builds/a.json"):
+            with self.subTest(relative=relative), self.assertRaises(BuildError):
+                PATHS.spec_file(relative)
+
     def test_reading_a_description_does_not_use_the_clock(self) -> None:
         record = {**self.GOOD, "sha256": "a" * 64}
         far = {**record, "camera_tested": "2999-01-01"}
@@ -848,7 +846,7 @@ class BuildDescriptionTests(unittest.TestCase):
 
     def test_a_description_file(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
-            paths = RepoPaths(Path(folder))
+            paths = RepoPaths(write_manifest(Path(folder)))
             saved = builds.save_description(
                 paths, builds.description_from_json("my-build", self.GOOD)
             )
@@ -868,7 +866,7 @@ class BuildDescriptionTests(unittest.TestCase):
 
     def test_pin_writes_the_description_and_the_pointer(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
-            paths = RepoPaths(Path(folder))
+            paths = RepoPaths(write_manifest(Path(folder)))
             candidate = builds.description_from_json("b", self.GOOD)
             with self.assertRaises(BuildError):
                 builds.pin(paths, candidate)
@@ -1028,7 +1026,7 @@ class MakeTests(RepoCase):
         self.assertEqual(result.sha256, self.repo.sha256)
         self.assertEqual(result.image.read_bytes(), self.repo.image)
         self.assertEqual(result.card_copy.read_bytes(), self.repo.image)
-        self.assertEqual(self.repo.outputs(), ["card/DCOLYMP/E1019999.BIN", "good.BIN"])
+        self.assertEqual(self.repo.outputs(), ["DCOLYMP/E1019999.BIN", "good.BIN"])
         self.assertTrue(any("tested on 2026-11-13" in line for line in lines))
 
     def test_a_wrong_result_leaves_no_output_and_removes_the_old_one(self) -> None:
@@ -1076,9 +1074,10 @@ class MakeTests(RepoCase):
         elsewhere.mkdir()
         (elsewhere / "keep.txt").write_bytes(b"keep")
         self.repo.paths.output.mkdir()
-        self.repo.paths.card.symlink_to(elsewhere, target_is_directory=True)
+        card = pipeline.card_folder(self.repo.paths)
+        card.symlink_to(elsewhere, target_is_directory=True)
         self.make(self.repo.tested)
-        self.assertFalse(self.repo.paths.card.is_symlink())
+        self.assertFalse(card.is_symlink())
         self.assertEqual([p.name for p in elsewhere.iterdir()], ["keep.txt"])
 
     def emulator_check(self, name: str, status: int) -> None:
@@ -1175,7 +1174,7 @@ class MakeTests(RepoCase):
         image.parent.mkdir()
         fileio.part_path(image).write_bytes(b"half a file")
         self.make(self.repo.tested)
-        self.assertEqual(self.repo.outputs(), ["card/DCOLYMP/E1019999.BIN", "good.BIN"])
+        self.assertEqual(self.repo.outputs(), ["DCOLYMP/E1019999.BIN", "good.BIN"])
         fileio.part_path(image).write_bytes(b"half a file")
         pipeline.clear_outputs(self.repo.paths, "good")
         self.assertEqual(self.repo.outputs(), [])
@@ -1248,10 +1247,8 @@ class CommandLineTests(RepoCase):
 
     def run_cli(self, *argv: str) -> tuple[int, str]:
         out, err = io.StringIO(), io.StringIO()
-        env = {paths_module.ROOT_ENV: str(self.repo.paths.root)}
-        with mock.patch.dict(os.environ, env), contextlib.redirect_stdout(out):
-            with contextlib.redirect_stderr(err):
-                status = cli.main(list(argv))
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            status = cli.main(["--project", str(self.repo.paths.root), *argv])
         return status, out.getvalue() + err.getvalue()
 
     def test_builds(self) -> None:
@@ -1264,7 +1261,7 @@ class CommandLineTests(RepoCase):
         status, text = self.run_cli("make", "good")
         self.assertEqual(status, 0, text)
         self.assertIn(f"sha256 {self.repo.sha256}", text)
-        self.assertEqual(self.repo.outputs(), ["card/DCOLYMP/E1019999.BIN", "good.BIN"])
+        self.assertEqual(self.repo.outputs(), ["DCOLYMP/E1019999.BIN", "good.BIN"])
 
     def test_make_a_candidate_by_its_name(self) -> None:
         self.repo.free_space_tool(0)
@@ -1511,12 +1508,90 @@ class CommandLineTests(RepoCase):
                     self.run_cli(*argv)
             self.assertEqual(raised.exception.code, 2)
 
-    def test_not_in_a_repository(self) -> None:
+    def test_not_in_a_project(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
-            with mock.patch.dict(os.environ, {paths_module.ROOT_ENV: folder}):
+            with contextlib.redirect_stderr(io.StringIO()) as err:
+                self.assertEqual(cli.main(["--project", folder, "builds"]), 6)
+            self.assertIn(f"{folder}: no {MANIFEST} there", err.getvalue())
+            # no --project: the search goes up from the current folder and finds none
+            here = os.getcwd()
+            os.chdir(folder)
+            try:
                 with contextlib.redirect_stderr(io.StringIO()) as err:
-                    self.assertEqual(cli.main(["builds"]), 6)
-        self.assertIn("is not the repository", err.getvalue())
+                    status = cli.main(["builds", "--json"])
+            finally:
+                os.chdir(here)
+            self.assertEqual(status, 6)
+            self.assertIn("give --project DIR", err.getvalue())
+
+    def test_the_project_is_found_above_the_current_folder(self) -> None:
+        inside = self.repo.paths.root / "deep" / "er"
+        inside.mkdir(parents=True)
+        here = os.getcwd()
+        os.chdir(inside)
+        try:
+            with contextlib.redirect_stdout(io.StringIO()) as out:
+                self.assertEqual(cli.main(["builds"]), 0)
+        finally:
+            os.chdir(here)
+        self.assertIn("good (pinned): A tiny build", out.getvalue())
+
+    def test_out_dir_names_the_output_folder(self) -> None:
+        out = self.card.parent / "elsewhere"
+        status, text = self.run_cli("make", "good", "--out-dir", str(out))
+        self.assertEqual(status, 0, text)
+        self.assertEqual((out / "good.BIN").read_bytes(), self.repo.image)
+        self.assertEqual(
+            (out / "DCOLYMP" / "E1019999.BIN").read_bytes(), self.repo.image
+        )
+        self.assertEqual(self.repo.outputs(), [])
+
+    def test_a_renamed_output_folder_in_the_manifest(self) -> None:
+        write_manifest(self.repo.paths.root, cache="firmware", output="made")
+        status, text = self.run_cli("make", "good")
+        self.assertEqual(status, 0, text)
+        made = self.repo.paths.root / "made"
+        self.assertEqual((made / "good.BIN").read_bytes(), self.repo.image)
+        self.assertTrue((made / "DCOLYMP" / "E1019999.BIN").is_file())
+        self.assertFalse((self.repo.paths.root / "build").exists())
+
+    def test_cache_names_the_folder_of_the_stock_firmware(self) -> None:
+        cache = self.card.parent / "cache"
+        status, text = self.run_cli("make", "good", "--cache", str(cache), "--dry-run")
+        self.assertEqual(status, 0, text)
+        with answers(catalog_answer(), TINY):
+            status, text = self.run_cli("fetch-stock", "--cache", str(cache))
+        self.assertEqual(status, 0, text)
+        self.assertIn(f"kept at {cache / TINY_STOCK.file_name}", text)
+        self.assertEqual((cache / TINY_STOCK.file_name).read_bytes(), TINY)
+        stock.stock_path(self.repo.paths, TINY_STOCK).unlink()
+        status, text = self.run_cli("make", "good", "--cache", str(cache))
+        self.assertEqual(status, 0, text)
+
+    def test_stock_uses_a_copy_and_downloads_nothing(self) -> None:
+        copy = self.repo.write("copy.BIN", TINY)
+        stock.stock_path(self.repo.paths, TINY_STOCK).unlink()
+        with answers() as opened:
+            status, text = self.run_cli("make", "good", "--stock", str(copy))
+            self.assertEqual(status, 0, text)
+            status, text = self.run_cli("fetch-stock", "--stock", str(copy))
+            self.assertEqual(status, 0, text)
+            self.assertIn(f"kept at {copy}", text)
+            missing = self.repo.paths.root / "none.BIN"
+            status, text = self.run_cli("make", "good", "--stock", str(missing))
+            self.assertEqual(status, 3, text)
+            wrong = self.repo.write("wrong.BIN", TINY[:-1] + b"\0")
+            for argv in (
+                ("make", "good"),
+                ("fetch-stock",),
+                ("restore", "-o", str(self.card.parent / "x.BIN")),
+            ):
+                with self.subTest(argv=argv):
+                    status, text = self.run_cli(*argv, "--stock", str(wrong))
+                    self.assertEqual(status, 5, text)
+                    self.assertIn("the sha256 differs", text)
+        opened.assert_not_called()
+        self.assertFalse(stock.stock_path(self.repo.paths, TINY_STOCK).exists())
 
     def test_inspect(self) -> None:
         good = self.repo.write("fw.BIN", TINY)
@@ -1549,14 +1624,11 @@ class CommandLineTests(RepoCase):
             self.assertIn(group, out.getvalue())
 
     def test_the_docs_check_of_this_repository(self) -> None:
-        env = {paths_module.ROOT_ENV: str(ROOT)}
         # the specs need the stock firmware; test_looks compares them
-        with (
-            mock.patch.dict(os.environ, env),
-            mock.patch("epm2mod.looks.generate.stale", return_value=[]),
-        ):
+        with mock.patch("epm2mod.looks.generate.stale", return_value=[]):
             with contextlib.redirect_stdout(io.StringIO()):
-                self.assertEqual(cli.main(["generate", "--check"]), 0)
+                argv = ["--project", str(ROOT), "generate", "--check"]
+                self.assertEqual(cli.main(argv), 0)
 
 
 class ReadmeTests(unittest.TestCase):
@@ -1597,7 +1669,7 @@ class ReadmeTests(unittest.TestCase):
     def test_the_builds_table_lists_tested_builds_only(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             repo = TinyRepo(Path(folder))
-            table = readme.builds_block(repo.paths)
+            table = readme.builds_block(repo.paths, repo.paths.root)
         self.assertIn("| `good` (pinned) | A tiny build | 1 | 2026-11-13 |", table)
         self.assertNotIn("new", table)
 
@@ -1609,7 +1681,7 @@ class ReadmeTests(unittest.TestCase):
         """Return a temporary repository whose README has out-of-date blocks."""
         folder = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, folder, True)
-        paths = RepoPaths(Path(folder))
+        paths = RepoPaths(write_manifest(Path(folder)))
         for name in ("builds", "films"):
             shutil.copytree(
                 ROOT / "data" / name,
@@ -1659,14 +1731,14 @@ class ReadmeTests(unittest.TestCase):
 
         def run(*argv: str) -> tuple[int, str]:
             out = io.StringIO()
-            env = {paths_module.ROOT_ENV: str(paths.root)}
-            with mock.patch.dict(os.environ, env), contextlib.redirect_stdout(out):
+            with contextlib.redirect_stdout(out):
                 with (
                     contextlib.redirect_stderr(io.StringIO()),
                     mock.patch("epm2mod.looks.generate.stale", return_value=[]),
                     mock.patch("epm2mod.looks.generate.write", return_value=[]),
                 ):
-                    return cli.main(["generate", *argv]), out.getvalue()
+                    project = ["--project", str(paths.root)]
+                    return cli.main([*project, "generate", *argv]), out.getvalue()
 
         status, text = run("--check")
         self.assertEqual(status, 1)
@@ -1702,7 +1774,7 @@ class FilmInputsTests(unittest.TestCase):
     def test_a_changed_input_is_seen(self) -> None:
         folder = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, folder, True)
-        paths = RepoPaths(Path(folder))
+        paths = RepoPaths(write_manifest(Path(folder)))
         film_list = films.load_films(PATHS)
         shutil.copytree(ROOT / "data" / "films", paths.root / "data" / "films")
         for spec_path in film_list.spec_paths:
@@ -1758,20 +1830,22 @@ class RealFirmwareTests(unittest.TestCase):
     def test_make_and_the_command_line_on_the_pinned_build(self) -> None:
         pinned = builds.pinned_description(PATHS)
         with tempfile.TemporaryDirectory() as folder:
-            paths = RepoPaths(Path(folder))
+            paths = RepoPaths(write_manifest(Path(folder)))
             (paths.root / "firmware").symlink_to(ROOT / "firmware")
             (paths.root / "data").mkdir()
             for name in ("specs", "builds", "films"):
                 (paths.root / "data" / name).symlink_to(ROOT / "data" / name)
             shutil.copy(PATHS.pinned, paths.pinned)
-            out, env = io.StringIO(), {paths_module.ROOT_ENV: folder}
-            with mock.patch.dict(os.environ, env), contextlib.redirect_stdout(out):
-                self.assertEqual(cli.main(["make", pinned.name]), 0)
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                self.assertEqual(
+                    cli.main(["--project", folder, "make", pinned.name]), 0
+                )
             image = paths.output / f"{pinned.name}.BIN"
             self.assertEqual(sha256_bytes(image.read_bytes()), pinned.sha256)
             self.assertIn(f"sha256 {pinned.sha256}", out.getvalue())
             # make writes the firmware only
-            self.assertFalse((paths.card / "EPM2LOOK.BIN").exists())
+            self.assertFalse((paths.output / "EPM2LOOK.BIN").exists())
 
 
 if __name__ == "__main__":

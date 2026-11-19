@@ -13,14 +13,12 @@ from __future__ import annotations
 import contextlib
 import io
 import json
-import os
 import struct
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 from typing import Any
-from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -28,7 +26,6 @@ from support import ROOT  # noqa: E402
 
 from epm2mod import cli, eventlog, logsummary  # noqa: E402
 from epm2mod.errors import LogError  # noqa: E402
-from epm2mod.paths import ROOT_ENV  # noqa: E402
 
 RAW: dict[str, Any] = {
     "format": 1,
@@ -1005,8 +1002,9 @@ class CommandTests(unittest.TestCase):
                     build=flashed,
                 )
             )
-            with mock.patch.dict(os.environ, {ROOT_ENV: str(ROOT)}):
-                status, out, err = self.run_cli("log", str(log), "--json")
+            status, out, err = self.run_cli(
+                "--project", str(ROOT), "log", str(log), "--json"
+            )
             self.assertEqual((status, err), (0, ""))
             got = json.loads(out)["events"]
             self.assertEqual([line.get("marker") for line in got], [None, None])
@@ -1018,8 +1016,9 @@ class CommandTests(unittest.TestCase):
             log.write_bytes(
                 block(0, [record(ids["boot"], 0, 5, 1)], build=words.build_id)
             )
-            with mock.patch.dict(os.environ, {ROOT_ENV: str(ROOT)}):
-                status, out, err = self.run_cli("log", str(log), "--json")
+            status, out, err = self.run_cli(
+                "--project", str(ROOT), "log", str(log), "--json"
+            )
             self.assertEqual(json.loads(out)["events"][0]["args"]["ring_found"], 1)
 
 

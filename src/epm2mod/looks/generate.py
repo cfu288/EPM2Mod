@@ -102,15 +102,15 @@ class GeneratedSpec:
         """The spec's name: its file name without ``.json``."""
         return Path(self.path).stem
 
-    def generated_fields(self, stock: StockFirmware) -> dict[str, Any]:
-        """Return the JSON fields that the generator owns, in file order."""
+    def generated_fields(self, stock: StockFirmware, base: str) -> dict[str, Any]:
+        """Return the JSON fields that the generator owns, in file order; ``base`` is the stock file's path."""
         fields: dict[str, Any] = {"name": self.name}
         if self.attribution is not None:
             fields["attribution"] = self.attribution
         fields.update(
             description=self.description,
             ops=[op_to_json(op) for op in self.ops],
-            base=stock.relative_path,
+            base=base,
             base_sha256=stock.sha256,
             inputs_sha256=self.inputs_sha256,
         )
@@ -427,7 +427,7 @@ def generate(paths: RepoPaths, stock: StockFirmware) -> list[GeneratedSpec]:
 
 def _on_disk(paths: RepoPaths, spec: GeneratedSpec) -> dict[str, Any] | None:
     """Return the JSON of the spec file in the repository, or None if it is absent."""
-    path = paths.resolve(spec.path)
+    path = paths.spec_file(spec.path)
     if not path.exists():
         return None
     raw = read_json(path, BuildError)
@@ -449,9 +449,9 @@ def generate_all(paths: RepoPaths, stock: StockFirmware) -> list[GeneratedSpec]:
     """Generate every film-look patch spec.
 
     Returns:
-        The three specs of the first seven films and, if the repository has
-        ``data/films/more-films.json``, the specs of the films beyond them, and, if
-        it has ``data/films/films-12-bw.json``, the specs of that list.
+        The three specs of the first seven films and, if the project has
+        the list of more films, the specs of the films beyond them, and, if
+        it has the black-and-white film list, the specs of that list.
 
     Raises:
         BuildError: if a film list or a fit file is wrong.
@@ -471,11 +471,17 @@ def generate_all(paths: RepoPaths, stock: StockFirmware) -> list[GeneratedSpec]:
 
 def stale(paths: RepoPaths, stock: StockFirmware) -> list[str]:
     """Return the paths of the spec files whose generated fields are out of date."""
+    base = stock_base(paths, stock)
     return [
         spec.path
         for spec in generate_all(paths, stock)
-        if not _is_current(_on_disk(paths, spec), spec.generated_fields(stock))
+        if not _is_current(_on_disk(paths, spec), spec.generated_fields(stock, base))
     ]
+
+
+def stock_base(paths: RepoPaths, stock: StockFirmware) -> str:
+    """Return the ``base`` of a generated spec: the stock file's path in the cache folder, relative to the project."""
+    return paths.relative(paths.cache_folder / stock.file_name)
 
 
 def write(paths: RepoPaths, stock: StockFirmware) -> list[str]:
@@ -486,8 +492,9 @@ def write(paths: RepoPaths, stock: StockFirmware) -> list[str]:
     ``expected_sha256`` is removed: they described other bytes.
     """
     changed = []
+    base = stock_base(paths, stock)
     for spec in generate_all(paths, stock):
-        fields = spec.generated_fields(stock)
+        fields = spec.generated_fields(stock, base)
         on_disk = _on_disk(paths, spec)
         if _is_current(on_disk, fields):
             continue
@@ -499,6 +506,6 @@ def write(paths: RepoPaths, stock: StockFirmware) -> list[str]:
         if on_disk is None or on_disk.get("ops") != fields["ops"]:
             extra["status"] = NEW_STATUS
             extra.pop("expected_sha256", None)
-        write_json(paths.resolve(spec.path), {**fields, **extra}, BuildError)
+        write_json(paths.spec_file(spec.path), {**fields, **extra}, BuildError)
         changed.append(spec.path)
     return changed

@@ -1,127 +1,238 @@
-"""Where the repository's files are.
+"""Where a project's files are: the project manifest.
 
-``RepoPaths`` holds the layout of a checkout: every folder and file that the
-package looks for by a fixed name is a property here. Paths that come from data
-(a patch spec named by a build description, a fit file named by the film list)
-are turned into absolute paths with ``RepoPaths.resolve``.
+A project folder (a checkout, or the unpacked release zip) holds ``MANIFEST`` at its top. The manifest names each
+file and folder that the package reads or writes, as a path relative to the manifest's folder. The package knows no
+other name of the project: ``RepoPaths`` reads every location from the manifest. Paths that come from data (a patch
+spec named by a build description, a fit file named by a film list) are relative to the same folder and are turned
+into absolute paths with ``RepoPaths.resolve``.
 
-``RepoPaths`` is also the checkout's implementation of the locator
-(``catalogue.Locator``): the methods after the properties are the ones that
-commands use. The release folder has the same layout for the files it holds
+``RepoPaths`` is also the checkout's implementation of the locator (``catalogue.Locator``): the methods after the
+properties are the ones that commands use. A release folder's manifest names fewer locations
 (``catalogue.ReleaseLocator``).
+
+``find_root`` finds the project: the folder that ``--project`` names, else the nearest folder at or above the current
+folder that holds the manifest.
 """
 
 from __future__ import annotations
 
+import dataclasses
 import os
 from dataclasses import dataclass
+from functools import cached_property
 from pathlib import Path, PurePosixPath
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
 
-from .errors import NotFoundError, RepositoryError
+from .errors import BuildError, NotFoundError, RepositoryError
 
 if TYPE_CHECKING:
     from .builds import BuildDescription
     from .stock import StockFirmware
 
-#: The file that marks the top of the repository.
-ROOT_MARKER = "data/pinned-build.json"
-#: Environment variable that names the repository root explicitly.
-ROOT_ENV = "EPM2MOD_ROOT"
-#: The folder that holds the patch specs a build may use.
-SPEC_FOLDER = "data/specs"
-#: The file that marks an unpacked release folder (``epm2mod package`` writes it).
-RELEASE_MARKER = "release.json"
+#: The project manifest, at the top of a project folder.
+MANIFEST = "epm2mod.json"
+#: The manifest key that marks a release folder; its value is the release's version.
+RELEASE_KEY = "release"
 
 
 @dataclass(frozen=True)
 class RepoPaths:
-    """Paths inside one checkout of the repository.
+    """The locations of one project, from its manifest, and the locations that arguments give.
 
     Attributes:
-        root: the top of the repository.
+        root: the project folder: the folder of the manifest.
+        cache: the folder that keeps Olympus's firmware (``--cache``), or None for the manifest's.
+        stock: a copy of Olympus's firmware to use (``--stock``), or None: the file in the cache folder, downloaded
+            when it is not there.
+        out_dir: the output folder (``make --out-dir``), or None for the manifest's.
     """
 
     root: Path
+    cache: Path | None = None
+    stock: Path | None = None
+    out_dir: Path | None = None
 
     #: What kind of source this is, for messages and ``--json``.
     kind: ClassVar[str] = "checkout"
 
+    @cached_property
+    def manifest(self) -> dict[str, Any]:
+        """The manifest's keys and values.
+
+        Raises:
+            RepositoryError: if the manifest is missing or is not a JSON object.
+        """
+        from .fileio import read_json
+
+        path = self.root / MANIFEST
+        if not path.is_file():
+            raise RepositoryError(f"{self.root}: no {MANIFEST} there")
+        raw = read_json(path, RepositoryError)
+        if not isinstance(raw, dict):
+            raise RepositoryError(f"{path}: must be a JSON object")
+        return raw
+
+    def location(self, key: str) -> Path:
+        """Return the location that the manifest names by ``key``.
+
+        Raises:
+            RepositoryError: if the manifest has no such key, or its value is not a plain relative path.
+        """
+        value = self.manifest.get(key)
+        if value is None:
+            raise RepositoryError(f"{self.root / MANIFEST}: no '{key}'")
+        if not isinstance(value, str) or not is_repo_relative(value):
+            raise RepositoryError(
+                f"{self.root / MANIFEST}: '{key}' must be a path relative to its folder"
+            )
+        return self.root / value
+
+    def locations(self, key: str) -> tuple[Path, ...]:
+        """Return the locations that the manifest lists by ``key``.
+
+        Raises:
+            RepositoryError: if the manifest has no such key, or its value is not a list of plain relative paths.
+        """
+        value = self.manifest.get(key)
+        if value is None:
+            raise RepositoryError(f"{self.root / MANIFEST}: no '{key}'")
+        if not isinstance(value, list) or not all(
+            isinstance(item, str) and is_repo_relative(item) for item in value
+        ):
+            raise RepositoryError(
+                f"{self.root / MANIFEST}: '{key}' must be a list of paths relative to its folder"
+            )
+        return tuple(self.root / item for item in value)
+
     @property
     def pinned(self) -> Path:
         """The file that names the pinned build description."""
-        return self.root / ROOT_MARKER
+        return self.location("pinned")
 
     @property
     def builds(self) -> Path:
         """The folder of build descriptions."""
-        return self.root / "data" / "builds"
+        return self.location("builds")
+
+    @property
+    def specs(self) -> Path:
+        """The folder of patch specs: every spec a build or a film list names is in it."""
+        return self.location("specs")
+
+    @property
+    def label_spec(self) -> Path:
+        """The patch spec that shows a build's label on the camera's Firmware screen."""
+        return self.location("label_spec")
 
     @property
     def output(self) -> Path:
         """The folder that built firmware is written to (not in git)."""
-        return self.root / "build"
+        return self.out_dir if self.out_dir is not None else self.location("output")
 
     @property
-    def card(self) -> Path:
-        """A folder laid out like the SD card, ready to copy."""
-        return self.output / "card"
+    def cache_folder(self) -> Path:
+        """The folder that keeps Olympus's firmware."""
+        return self.cache if self.cache is not None else self.location("cache")
 
     @property
     def readme(self) -> Path:
         """The top-level README."""
-        return self.root / "README.md"
+        return self.location("readme")
 
     @property
     def films(self) -> Path:
         """The list of film looks and the menu entries they replace."""
-        return self.root / "data" / "films" / "films.json"
+        return self.location("films")
 
     @property
     def more_films(self) -> Path:
         """The list of the film looks beyond the first seven."""
-        return self.root / "data" / "films" / "more-films.json"
+        return self.location("more_films")
 
     @property
     def bw_films(self) -> Path:
         """The film list with a black-and-white film in the Grainy Film entry."""
-        return self.root / "data" / "films" / "films-12-bw.json"
+        return self.location("bw_films")
 
     @property
     def card_looks(self) -> Path:
         """A developer look list of fit files (the input of ``films pack``)."""
-        return self.root / "data" / "films" / "card-looks.json"
+        return self.location("card_looks")
 
     @property
     def catalogue(self) -> Path:
         """The fitted films that a look file can hold."""
-        return self.root / "data" / "films" / "catalogue.json"
+        return self.location("catalogue")
 
     @property
     def film_records(self) -> Path:
         """The films with their look records, which look files are packed from."""
-        return self.root / "data" / "films" / "film-records.json"
+        return self.location("film_records")
 
     @property
     def free_space_tool(self) -> Path:
         """The script that checks where patch specs put new bytes."""
-        return self.root / "tools" / "freespace.py"
+        return self.location("free_space_tool")
 
     @property
     def emulator_checks(self) -> tuple[Path, ...]:
         """The scripts that start a firmware image in the emulator, in order."""
-        folder = self.root / "emulator"
-        return (folder / "boot-test", folder / "update-path-test")
+        return self.locations("emulator_checks")
 
     @property
     def firmware_map(self) -> Path:
-        """A file the free-space check needs; it is made by ``tools/fwmap.py``."""
-        return self.output / "map" / "linear.txt"
+        """A file the free-space check needs; the firmware map tool makes it."""
+        return self.location("firmware_map")
 
     @property
     def events(self) -> Path:
-        """The event dictionary of the debug log."""
-        return self.root / "data" / "logdict" / "events.json"
+        """The event dictionary of the debug log; the other JSON files in its folder are those of older builds."""
+        return self.location("events")
+
+    @property
+    def documents(self) -> tuple[Path, ...]:
+        """The documents that may hold generated blocks."""
+        return self.locations("documents")
+
+    @property
+    def cli_reference(self) -> Path:
+        """The command-line reference, generated whole."""
+        return self.location("cli_reference")
+
+    @property
+    def guides(self) -> Path:
+        """The folder of the feature guides."""
+        return self.location("guides")
+
+    @property
+    def site_features(self) -> Path:
+        """The site's feature list."""
+        return self.location("site_features")
+
+    @property
+    def camera_log(self) -> Path:
+        """The folder of the camera log: one file for each flash on the camera."""
+        return self.location("camera_log")
+
+    @property
+    def workflows(self) -> tuple[Path, ...]:
+        """The CI workflows whose runs on the release commit must have passed."""
+        return self.locations("workflows")
+
+    @property
+    def app(self) -> Path:
+        """The folder of the built installer page."""
+        return self.location("app")
+
+    @property
+    def package(self) -> Path:
+        """The folder of this package's source, which the release zip holds."""
+        return self.location("package")
+
+    @property
+    def release_files(self) -> tuple[Path, ...]:
+        """The files that the release zip holds at its top: the launchers, their README and the licences."""
+        return self.locations("release_files")
 
     # The locator (``catalogue.Locator``).
 
@@ -129,17 +240,44 @@ class RepoPaths:
         """Return the source's folder, for messages."""
         return str(self.root)
 
+    def with_locations(
+        self,
+        cache: Path | None = None,
+        stock: Path | None = None,
+        out_dir: Path | None = None,
+    ) -> RepoPaths:
+        """Return this locator with the locations that arguments give (None: keep the one it has)."""
+        changes = {"cache": cache, "stock": stock, "out_dir": out_dir}
+        return dataclasses.replace(
+            self, **{key: value for key, value in changes.items() if value is not None}
+        )
+
     def output_folder(self) -> Path:
         """Return the folder that commands write their outputs to."""
         return self.output
 
     def stock_file(self, stock: StockFirmware) -> Path:
-        """Return where the downloaded stock firmware is kept."""
-        return self.resolve(stock.relative_path)
+        """Return where the stock firmware is: the ``--stock`` file, or the file in the cache folder."""
+        if self.stock is not None:
+            return self.stock
+        return self.cache_folder / stock.file_name
+
+    def downloads(self) -> bool:
+        """Return True if the stock firmware may be downloaded into the cache folder (no ``--stock``)."""
+        return self.stock is None
 
     def spec_file(self, relative: str) -> Path:
-        """Return the file of a patch spec that a build description names."""
-        return self.resolve(relative)
+        """Return the file of a patch spec that a build description or a film list names.
+
+        Raises:
+            BuildError: if the spec is not in the patch spec folder.
+        """
+        path = self.resolve(relative)
+        if not path.is_relative_to(self.specs):
+            raise BuildError(
+                f"{relative!r} is not a patch spec: it must be in {self.relative(self.specs)}/"
+            )
+        return path
 
     def film_records_file(self) -> Path:
         """Return the file of the film records."""
@@ -158,14 +296,14 @@ class RepoPaths:
             NotFoundError: if there is no description of that name.
             BuildError: if the description is malformed.
         """
-        from .builds import description_path, is_build_name, load_description
+        from .builds import description_path, is_build_name, load_checked
 
         path = description_path(self, name) if is_build_name(name) else None
         if path is None or not path.is_file():
             raise NotFoundError(
                 f"no build description '{name}'; 'epm2mod builds' lists them"
             )
-        return load_description(path)
+        return load_checked(self, path)
 
     def all_builds(self) -> list[BuildDescription]:
         """Return every build description, in name order."""
@@ -175,7 +313,9 @@ class RepoPaths:
 
     def event_dictionaries(self) -> list[Path]:
         """Return the event dictionaries of the debug log: the current one, then those of older builds."""
-        return [self.events, *sorted(self.events.parent.glob("events-*.json"))]
+        current = self.events
+        older = sorted(p for p in current.parent.glob("*.json") if p != current)
+        return [current, *older]
 
     def checkout(self) -> RepoPaths:
         """Return the checkout: this one."""
@@ -223,43 +363,30 @@ def is_repo_relative(text: str) -> bool:
     return all(part not in (".", "..") for part in path.parts)
 
 
-def find_root(start: Path | None = None) -> Path:
-    """Find the top of the repository.
+def find_root(start: Path | None = None, project: Path | None = None) -> Path:
+    """Find the project folder.
 
-    The root is the folder named by the ``EPM2MOD_ROOT`` environment variable,
-    if it is set. Otherwise it is the nearest parent of ``start`` (default: the
-    current folder) that holds ``data/pinned-build.json``, or else the nearest such
-    parent of this source file.
-
-    Args:
-        start: where to start the search.
-
-    Returns:
-        The root folder.
+    It is ``project`` (``--project``) if given. Otherwise it is the nearest folder at or above ``start`` (default:
+    the current folder) that holds the manifest.
 
     Raises:
-        RepositoryError: if no folder with the marker file is found, or the
-            folder that ``EPM2MOD_ROOT`` names does not hold it.
+        RepositoryError: if ``project`` holds no manifest, or none is found.
     """
-    env = os.environ.get(ROOT_ENV)
-    if env:
-        root = Path(env).absolute()
-        if not (root / ROOT_MARKER).is_file():
-            raise RepositoryError(
-                f"{ROOT_ENV}={env} is not the repository: no {ROOT_MARKER} there"
-            )
+    if project is not None:
+        root = Path(project).absolute()
+        if not (root / MANIFEST).is_file():
+            raise RepositoryError(f"{project}: no {MANIFEST} there")
         return root
-    for origin in (start or Path.cwd(), Path(__file__)):
-        here = origin.absolute()
-        for folder in (here, *here.parents):
-            if (folder / ROOT_MARKER).is_file():
-                return folder
+    here = (start or Path(os.getcwd())).absolute()
+    for folder in (here, *here.parents):
+        if (folder / MANIFEST).is_file():
+            return folder
     raise RepositoryError(
-        f"no {ROOT_MARKER} found above the current folder; "
-        f"run the command inside the repository or set {ROOT_ENV}"
+        f"no {MANIFEST} in {here} or a folder above it: "
+        "run the command in the project folder, or give --project DIR"
     )
 
 
 def repo_paths(start: Path | None = None) -> RepoPaths:
-    """Return the paths of the repository that holds ``start``."""
+    """Return the paths of the project that holds ``start``."""
     return RepoPaths(find_root(start))

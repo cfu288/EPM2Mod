@@ -13,7 +13,6 @@ from __future__ import annotations
 import contextlib
 import io
 import json
-import os
 import shutil
 import struct
 import sys
@@ -26,14 +25,14 @@ from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from support import ROOT, make_container  # noqa: E402
+from support import ROOT, make_container, write_manifest  # noqa: E402
 
 try:
     import numpy as np
 except ImportError:  # pragma: no cover
     raise unittest.SkipTest("numpy is not installed") from None
 
-from epm2mod import builds, cli, container, paths as paths_module  # noqa: E402
+from epm2mod import builds, cli, container  # noqa: E402
 from epm2mod import pipeline, spec, stock  # noqa: E402
 from epm2mod.errors import BuildError, StockError  # noqa: E402
 from epm2mod.fileio import read_json, write_json  # noqa: E402
@@ -112,17 +111,16 @@ class SyntheticRepo:
         if SyntheticRepo.firmware is None:
             SyntheticRepo.firmware = synthetic_firmware()
         data = SyntheticRepo.firmware
-        self.paths = RepoPaths(folder)
+        self.paths = RepoPaths(write_manifest(folder, cache="firmware"))
         self.stock = stock.StockFirmware(
             file_name="SYNTHETIC.BIN",
-            relative_path="firmware/SYNTHETIC.BIN",
             size=len(data),
             sha256=sha256_bytes(data),
             model_id="1010",
             hard_code="OLYE101000000000",
             card_name="E1019999.BIN",
         )
-        stock_file = self.paths.resolve(self.stock.relative_path)
+        stock_file = stock.stock_path(self.paths, self.stock)
         stock_file.parent.mkdir(parents=True)
         stock_file.write_bytes(data)
         self.paths.films.parent.mkdir(parents=True)
@@ -250,7 +248,7 @@ class UnitTests(unittest.TestCase):
         made = generate.GeneratedSpec(
             "data/specs/x-1.json", "text", (op,), "a" * 64, "credit"
         )
-        fields = made.generated_fields(stock.EPM2_V16)
+        fields = made.generated_fields(stock.EPM2_V16, "x")
         self.assertEqual(
             list(fields),
             [
@@ -265,14 +263,14 @@ class UnitTests(unittest.TestCase):
         )
         self.assertEqual(fields["name"], "x-1")
         plain = generate.GeneratedSpec("data/specs/y.json", "text", (op,), "a" * 64)
-        self.assertNotIn("attribution", plain.generated_fields(stock.EPM2_V16))
+        self.assertNotIn("attribution", plain.generated_fields(stock.EPM2_V16, "x"))
 
 
 class FilmListTests(unittest.TestCase):
     def setUp(self) -> None:
         folder = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, folder, True)
-        self.paths = RepoPaths(Path(folder))
+        self.paths = RepoPaths(write_manifest(Path(folder)))
         self.paths.films.parent.mkdir(parents=True)
         self.good = json.loads(PATHS.films.read_text(encoding="utf-8"))
 
@@ -455,7 +453,7 @@ class GeneratorTests(SyntheticCase):
                 program.read(address, 4)
 
     def test_the_stock_firmware_is_needed(self) -> None:
-        self.paths.resolve(self.repo.stock.relative_path).unlink()
+        stock.stock_path(self.paths, self.repo.stock).unlink()
         with self.assertRaises(StockError):
             self.generate()
 
@@ -464,8 +462,7 @@ class GeneratorTests(SyntheticCase):
 
         def run(*argv: str) -> tuple[int, str]:
             out = io.StringIO()
-            env = {paths_module.ROOT_ENV: str(self.paths.root)}
-            with mock.patch.dict(os.environ, env), contextlib.redirect_stdout(out):
+            with contextlib.redirect_stdout(out):
                 with (
                     mock.patch.object(RepoPaths, "pinned_build", return_value=pinned),
                     mock.patch("epm2mod.readme.rewrite", return_value=[]),
@@ -473,9 +470,9 @@ class GeneratorTests(SyntheticCase):
                     mock.patch("epm2mod.readme.feature_problems", return_value=[]),
                     contextlib.redirect_stderr(io.StringIO()),
                 ):
-                    return cli.main(["generate", *argv]), out.getvalue()
+                    project = ["--project", str(self.paths.root)]
+                    return cli.main([*project, "generate", *argv]), out.getvalue()
 
-        self.paths.pinned.write_text("{}")  # marks the top of the repository
         status, text = run("--check")
         self.assertEqual(status, 1, text)
         self.assertIn("differs from the generated spec", text)
@@ -492,7 +489,7 @@ class RealFirmwareLooksTests(unittest.TestCase):
         """Return a temporary repository with its own data/films/ and data/specs/."""
         folder = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, folder, True)
-        paths = RepoPaths(Path(folder))
+        paths = RepoPaths(write_manifest(Path(folder)))
         (paths.root / "firmware").symlink_to(ROOT / "firmware")
         for name in ("films", "builds"):
             shutil.copytree(ROOT / "data" / name, paths.root / "data" / name)
