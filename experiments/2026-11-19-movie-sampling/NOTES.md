@@ -316,3 +316,24 @@ For calm scenes only the QP floor binds.
 1. The geometry build of §7 step 2, with the `P+62` probe of step 3. With IS off as the condition, the measured time
    leaves room.
 2. If the art-filter load matters for the condition: one more clip with a film simulation, with playback after it.
+
+## 10. Bit-rate build `debug-log-movie-bitrate` (2026-11-19, not flashed)
+
+Asked by the owner after §9.4. The build is `debug-log-movie-time` plus `data/specs/movie-bitrate-32.json`: the
+9 ops of `../2026-11-12-hardware/patches/movie-bitrate-32.json` (1080 Fine 32 Mb/s, 1080 Normal 24, 720 Fine 20,
+720 Normal 16, encoder cap 24 → 50 Mb/s, time-limit rates in step; analysis in `../2026-11-12-hardware/06-bitrate-and-limit.md`)
+and one more op for in-camera playback.
+
+**The playback check (V, read for this section).** 0x7EEB9359 checks a decoder parameter block: height 64–1088,
+frame rate 1.00–60.00 fps (`cmp 6000`), type 1–3, and the declared bit rate at most 20,000,000 (`cmp 20000000` at
+0x7EEB93DA), which passes when the field is −1 (unknown). Whether playback fills the field from the clip's HRD
+(32.77 Mb/s) is not traced; raising the constant to 50,000,000 makes it pass either way. Whether the decoder keeps up
+with 32 Mb/s is **U**: the camera test plays each clip.
+
+sha256 `09dd21ca6aa8a100a0b43b9a9d336a8f5523c262e06bb9c0be285c55c7e61375`. Checks: `tools/freespace.py check
+--first-code` PASS (load order 0 FAIL), `emulator/opcheck.py` 0 FAIL, `emulator/boot-test` PASS,
+`emulator/update-path-test` PASS. No hook or code is added.
+
+Acceptance criteria: busy handheld 1080 Fine clips near 32 Mb/s with QP mostly at 20–22 (against 22–28 in §9.4);
+1080 Normal near 24 Mb/s; a 60 s busy clip records to the end; every clip plays in the camera and decodes on a
+computer without errors; stills, film simulations and peaking work as before.
