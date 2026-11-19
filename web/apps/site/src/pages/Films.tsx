@@ -17,24 +17,30 @@ export function Films() {
         <p className="text-ink-soft mt-4">
           Install any of them in place of the 12 art filters Olympus provides by default.
         </p>
-        <table className="mt-6 w-full text-left text-sm">
-          <thead className="text-muted border-ink border-b">
-            <tr>
-              <th className="py-2 pr-4 font-normal">Menu name</th>
-              <th className="py-2 pr-4 font-normal">Film</th>
-              <th className="py-2 font-normal">Type</th>
-            </tr>
-          </thead>
-          <tbody>
-            {films.map((film) => (
-              <tr key={film.id} className="border-rule border-b">
-                <td className="py-2 pr-4 font-bold">{film.name}</td>
-                <td className="py-2 pr-4">{film.film}</td>
-                <td className="text-muted py-2">{film.kind}</td>
+        <div className="mt-6 overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="text-muted border-ink border-b">
+              <tr>
+                <th className="py-2 pr-4 font-normal">Menu name</th>
+                <th className="py-2 pr-4 font-normal">Command-line name</th>
+                <th className="py-2 pr-4 font-normal">Film</th>
+                <th className="py-2 font-normal">Type</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {films.map((film) => (
+                <tr key={film.id} className="border-rule border-b">
+                  <td className="py-2 pr-4 font-bold">{film.name}</td>
+                  <td className="py-2 pr-4">
+                    <code>{film.id}</code>
+                  </td>
+                  <td className="py-2 pr-4">{film.film}</td>
+                  <td className="text-muted py-2">{film.kind}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
     </div>
   )

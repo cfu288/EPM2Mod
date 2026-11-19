@@ -1,6 +1,8 @@
 import { useState, type KeyboardEvent, type ReactNode } from 'react'
 import { ArrowDownTrayIcon } from '@heroicons/react/20/solid'
 import { REPO } from '@epm2mod/ui'
+import { Link } from '../Link'
+import { href } from '../router'
 
 // No release yet: /releases/latest would send people to an empty list. Point it there once one exists.
 const DOWNLOAD = `${REPO}/releases`
@@ -108,7 +110,12 @@ function CliSteps() {
       <Step n={2} title="Make the firmware">
         <Code>{'uv run epm2mod make --card /path/to/card'}</Code>
         <p>
-          To add film simulations, list them with <code>uv run epm2mod looks list</code>, then put them in ART slots:
+          That writes the 12 default film simulations. To choose your own, put a command-line name from the{' '}
+          <Link href={href('films', '#all-films')} className="underline">
+            film simulation list
+          </Link>{' '}
+          in each ART slot. ART1 is the first entry of the camera&apos;s ART menu (Pop Art), ART12 the last
+          (Watercolor). A slot you leave out keeps its Olympus art filter.
         </p>
         <Code>{'uv run epm2mod looks pack ART1=portra-400 ART2=velvia --card /path/to/card'}</Code>
       </Step>

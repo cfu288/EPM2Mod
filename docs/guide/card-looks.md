@@ -5,7 +5,7 @@ camera keeps them, with their names, after power-off and without the card.
 
 ## Make a file
 
-The installer always writes the file, with the 12 default film simulations or your choice. On the command line, change any film simulation in this command (the names are in the [film table](film-looks.md#available-film-simulations) and in `uv run epm2mod looks list`, and
+The installer always writes the file, with the 12 default film simulations or your choice. On the command line, put a film simulation in each ART slot. ART1 is the first entry of the camera's ART menu (Pop Art), ART12 the last (Watercolor). A slot you leave out keeps its Olympus art filter. Change any film simulation in this command (the names are in the [film table](film-looks.md#available-film-simulations) and in `uv run epm2mod looks list`, and
 `uv run epm2mod cards` shows the card's folder):
 
 ```sh

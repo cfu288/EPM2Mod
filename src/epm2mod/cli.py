@@ -589,9 +589,11 @@ def build_parser() -> argparse.ArgumentParser:
         "pack",
         help="write the film choice for the SD card",
         description="Write EPM2LOOK.BIN, which sets the film of each ART number. Give "
-        "ART<n>=<film> for each ART number to change, with names from 'epm2mod looks "
-        "list'. The other ART numbers keep their default film. With no choices: the 12 "
-        "default films. The camera loads the file from Custom Menu J, Load Looks.",
+        "ART<n>=<film> for each ART number that gets a film, with names from 'epm2mod "
+        "looks list'. ART1 is the first entry of the camera's ART menu (Pop Art), ART12 "
+        "the last (Watercolor). An ART number you leave out keeps its Olympus art filter. "
+        "With no choices: the 12 default films. The camera loads the file from Custom "
+        "Menu J, Load Looks.",
     )
     pack_cmd.add_argument(
         "items",
