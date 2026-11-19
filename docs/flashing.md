@@ -13,7 +13,7 @@ This procedure is **confirmed on the E-PM2** (see [camera-log.md](camera-log.md)
 5. The lamp shows progress:
    - **Solid orange, about 1–1.5 min:** writing. **Do not touch the camera.**
    - **Blinking:** finished. It keeps blinking until you power off.
-6. Power off, then on normally. Check Setup menu → Firmware, and confirm the patch.
+6. Power off, then on normally. Check Setup Menu → Firmware: an EPM2Mod build reads `Body : 1.6  EPM2Mod YYYY.MM.DD`.
 7. **Recovery:** flash the stock BIN the same way. Proven on 2026-11-08: it went from modified back to stock.
 
 If the camera boots straight to live view at step 4, the file wasn't recognised and nothing was written. The fallback name is `E1011600.BIN`, but it may be ignored as an equal version.

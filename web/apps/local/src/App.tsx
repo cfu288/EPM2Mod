@@ -441,6 +441,7 @@ function InstallStep(props: {
         </li>
         <li>Leave the camera alone until the lamp blinks (1 to 2 minutes).</li>
         <li>Turn the camera off and on.</li>
+        <li>To check: MENU → SETUP → wrench tab → Firmware reads Body : 1.6 EPM2Mod and the release date.</li>
         {looks && (
           <li>
             MENU → SETUP → gears tab → J → Load Looks → Load → OK. No gears tab? Wrench tab → Menu Display → Custom Menu

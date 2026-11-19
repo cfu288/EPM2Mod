@@ -63,6 +63,7 @@ cd EPM2Mod
 3. Put the card in the camera. With the camera off, hold **OK** and the **ON/OFF** button together. When the orange lamp on the front of the camera (the AF illuminator) lights steadily, let go of both.
    - While the lamp is steady, the camera is writing the firmware. This takes 1 to 2 minutes. Do not switch the camera off.
    - When the lamp blinks, the update is done. Switch the camera off and on again.
+   - To check: MENU → SETUP → wrench tab → **Firmware** reads `Body : 1.6  EPM2Mod` and the release date.
 4. To load the film simulations: MENU → SETUP → Custom Menu → J → **Load Looks** → **Load** → OK ([more](docs/guide/card-looks.md)).
 
 To go back to the original firmware, see [docs/install.md](docs/install.md).

@@ -40,6 +40,7 @@ function Flash({ n }: { n: number }) {
       </p>
       <p>Writing takes 1 to 2 minutes. Do not switch the camera off until the lamp blinks.</p>
       <p>When the lamp blinks, switch the camera off and on again.</p>
+      <p>To check: MENU → SETUP → wrench tab → Firmware reads Body : 1.6 EPM2Mod and the release date.</p>
     </Step>
   )
 }

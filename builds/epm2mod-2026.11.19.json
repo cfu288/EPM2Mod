@@ -19,5 +19,7 @@
   "patches/lss-core.json",
   "patches/build-label.json"
  ],
+ "sha256": "6441130e9cc6cd5f06dc70e35950e05b0401f9a3f606694cf2c806a0bc209f62",
+ "camera_tested": "2026-11-19",
  "label": "2026.11.19"
 }
