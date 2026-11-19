@@ -1,5 +1,5 @@
 {
- "about": "Facts that live in more than one file. When a file of a group is edited, the agent hook (.claude/hooks/doc_links.py) names the other files of that group. 'truth' is where the fact comes from; 'copies' repeat it. Paths are globs from the repository root. tests/test_doc_links.py checks that every glob matches a file.",
+ "about": "Facts that live in more than one file. When a file of a group is edited, the agent hook (.claude/hooks/doc_links.py) names the other files of that group. 'truth' is where the fact comes from; 'copies' repeat it. Paths are globs from the repository root. cli/tests/test_doc_links.py checks that every glob matches a file.",
  "groups": [
   {
    "name": "Load Looks menu path and options",
@@ -9,7 +9,7 @@
     "data/specs/card-looks-*.json"
    ],
    "copies": [
-    "src/epm2mod/camera_steps.py",
+    "cli/src/epm2mod/camera_steps.py",
     "README.md",
     "docs/guide/film-looks.md",
     "docs/user/debug-log.md",
@@ -29,7 +29,7 @@
     "docs/user/debug-log.md",
     "docs/guide/level-gauge.md",
     "web/apps/site/src/pages/Install.tsx",
-    "src/epm2mod/camera_steps.py"
+    "cli/src/epm2mod/camera_steps.py"
    ]
   },
   {
@@ -47,12 +47,12 @@
     "docs/dev/film-emulation.md",
     "data/films/README.md",
     "NOTICE.md",
-    "src/epm2mod/catalogue.py",
+    "cli/src/epm2mod/catalogue.py",
     "web/apps/site/src/pages/Films.tsx",
     "web/apps/site/src/App.test.tsx",
     "web/apps/local/src/preset.ts",
-    "tests/test_lookfile.py",
-    "src/epm2mod/readme.py"
+    "cli/tests/test_lookfile.py",
+    "cli/src/epm2mod/readme.py"
    ],
    "regenerate": [
     "uv run python web/scripts/export_films.py (film-records.json from catalogue.json)",
@@ -63,7 +63,7 @@
    "name": "Flash procedure",
    "fact": "Card in, hold OK and ON/OFF, steady lamp 1 to 2 minutes, blinking lamp = done, restart",
    "truth": [
-    "src/epm2mod/camera_steps.py"
+    "cli/src/epm2mod/camera_steps.py"
    ],
    "copies": [
     "README.md",
@@ -96,7 +96,7 @@
     "web/apps/site/src/features.ts",
     "web/apps/site/src/pages/Install.tsx",
     "web/apps/local/src/App.tsx",
-    "src/epm2mod/readme.py"
+    "cli/src/epm2mod/readme.py"
    ],
    "regenerate": [
     "uv run epm2mod generate (docs/user/install.md and data/builds/README.md blocks)"
@@ -110,7 +110,7 @@
     "release/Start (Windows).bat",
     "release/start.sh",
     "release/start.ps1",
-    "src/epm2mod/release.py"
+    "cli/src/epm2mod/release.py"
    ],
    "copies": [
     "release/README.txt",
@@ -123,9 +123,9 @@
    "name": "Command-line install",
    "fact": "git clone, uv, epm2mod install / films / films set / restore / inspect / cards and their options",
    "truth": [
-    "src/epm2mod/cli.py",
-    "src/epm2mod/pipeline.py",
-    "src/epm2mod/cardio.py"
+    "cli/src/epm2mod/cli.py",
+    "cli/src/epm2mod/pipeline.py",
+    "cli/src/epm2mod/cardio.py"
    ],
    "copies": [
     "docs/reference/cli.md",
@@ -218,8 +218,8 @@
    "name": "Look file format",
    "fact": "EPM2LOOK.BIN header and record layout",
    "truth": [
-    "src/epm2mod/looks/lookfile.py",
-    "src/epm2mod/looks/records.py"
+    "cli/src/epm2mod/looks/lookfile.py",
+    "cli/src/epm2mod/looks/records.py"
    ],
    "copies": [
     "docs/reference/look-file-format.md",

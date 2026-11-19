@@ -25,7 +25,7 @@ async function fakeServer(page: Page) {
       sha256: 'ab'.repeat(32),
       card: body?.card ?? null,
       files: ['DCOLYMP/E1019999.BIN', ...(body?.choices.length ? ['EPM2LOOK.BIN'] : [])],
-      // as src/epm2mod/camera_steps.py makes them, cut to the ones the tests read
+      // as cli/src/epm2mod/camera_steps.py makes them, cut to the ones the tests read
       camera_steps: done
         ? [
             ...(body?.card == null

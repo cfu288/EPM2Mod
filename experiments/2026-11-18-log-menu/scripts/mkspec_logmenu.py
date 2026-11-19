@@ -32,7 +32,7 @@ from pathlib import Path
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 sys.path.insert(0, os.path.join(ROOT, "experiments", "2026-11-15-log", "scripts"))
-sys.path.insert(0, os.path.join(ROOT, "src"))
+sys.path.insert(0, os.path.join(ROOT, "cli", "src"))
 import mkspec_log as L  # noqa: E402
 from epm2mod.container import parse  # noqa: E402
 from epm2mod.spec import BytesOp, load_spec  # noqa: E402

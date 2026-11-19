@@ -1,4 +1,4 @@
-// The calls of `epm2mod serve` (src/epm2mod/serve.py). Each carries the token of the page's address (#token=...).
+// The calls of `epm2mod serve` (cli/src/epm2mod/serve.py). Each carries the token of the page's address (#token=...).
 
 export interface Build {
   name: string
@@ -18,7 +18,7 @@ export interface Card {
 /** EPM2Mod, or Olympus's original firmware (the way back). */
 export type Firmware = 'epm2mod' | 'original'
 
-/** A step on the camera after the files are made (src/epm2mod/camera_steps.py). */
+/** A step on the camera after the files are made (cli/src/epm2mod/camera_steps.py). */
 export interface CameraStep {
   /** What the step does, for example `flash` or `load-films`. */
   id: string

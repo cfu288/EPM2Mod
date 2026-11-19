@@ -1,6 +1,6 @@
 """Tests of the card list, ``epm2mod.cards``.
 
-uv run python -m unittest discover -s tests
+uv run python -m unittest discover -s cli/tests
 """
 
 from __future__ import annotations

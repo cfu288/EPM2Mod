@@ -23,7 +23,7 @@ __pycache__/
 .venv/
 
 # the local app page, built from web/ (npm run build:app); the release zip carries it
-src/epm2mod/app/
+cli/src/epm2mod/app/
 .DS_Store
 
 # om-emu is the submodule emulator/om-emu, our fork (branch e101) with the E-PM2's boot lab.

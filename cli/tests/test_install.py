@@ -1,6 +1,6 @@
 """Tests of the commands for camera owners: ``install``, ``films``, ``films set``, ``restore``, ``inspect``, ``cards``.
 
-    uv run python -m unittest discover -s tests
+    uv run python -m unittest discover -s cli/tests
 
 They run on the tiny firmware of ``test_package`` and need nothing but the repository. ``NoCheckoutTests`` lays
 out a folder as the release zip does (``release.data_files``) and runs every command for camera owners there, to
@@ -848,7 +848,7 @@ def source_text(path: Path) -> Iterator[tuple[int, str]]:
 class SourceTests(unittest.TestCase):
     def test_the_package_holds_no_folder_or_file_name_of_the_project(self) -> None:
         found = []
-        package = ROOT / "src" / "epm2mod"
+        package = ROOT / "cli" / "src" / "epm2mod"
         for path in sorted(package.rglob("*.py")):
             module = path.relative_to(package).as_posix()
             for number, text in source_text(path):
@@ -859,7 +859,7 @@ class SourceTests(unittest.TestCase):
         self.assertEqual(found, [])
 
     def test_the_scan_reads_every_module(self) -> None:
-        package = ROOT / "src" / "epm2mod"
+        package = ROOT / "cli" / "src" / "epm2mod"
         modules = {p.relative_to(package).as_posix() for p in package.rglob("*.py")}
         self.assertIn("cli.py", modules)
         self.assertIn("looks/records.py", modules)

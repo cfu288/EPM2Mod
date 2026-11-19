@@ -67,7 +67,7 @@ it is done.
 
 ## Code and commits
 
-22. `src/epm2mod/` is production code (black, `mypy --strict`, docstrings, tests); `experiments/` is research code. See
+22. `cli/src/epm2mod/` is production code (black, `mypy --strict`, docstrings, tests); `experiments/` is research code. See
     [docs/dev/conventions.md](docs/dev/conventions.md). The command-line reference is [docs/reference/cli.md](docs/reference/cli.md).
 23. **Writing in files:** short plain sentences, terms defined. Use placeholders for machine paths and hosts
     (`/path/to/...`, `USER@HOST`). The pre-commit hook refuses real ones.

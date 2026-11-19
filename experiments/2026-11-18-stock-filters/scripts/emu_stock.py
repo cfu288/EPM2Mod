@@ -30,7 +30,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 CL = os.path.join(ROOT, "experiments", "2026-11-17-card-looks", "scripts")
 sys.path.insert(0, CL)
-sys.path.insert(0, os.path.join(ROOT, "src"))
+sys.path.insert(0, os.path.join(ROOT, "cli", "src"))
 _argv, sys.argv = sys.argv, [sys.argv[0], "--v4"]
 import mkspec_looks as mk  # noqa: E402
 import mkspec_looks3 as m3  # noqa: E402

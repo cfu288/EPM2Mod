@@ -28,7 +28,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "experiments" / "2026-11-14-emulator-audit" / "scripts"))
-sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "cli" / "src"))
 
 import film_names_spec as names  # noqa: E402
 

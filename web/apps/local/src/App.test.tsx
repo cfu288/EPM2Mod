@@ -27,7 +27,7 @@ interface MakeBody {
   card: string | null
 }
 
-/** Camera steps as `epm2mod serve` sends them (src/epm2mod/camera_steps.py), cut to the ones the tests read. */
+/** Camera steps as `epm2mod serve` sends them (cli/src/epm2mod/camera_steps.py), cut to the ones the tests read. */
 function cameraSteps(body: MakeBody) {
   const films = body.choices.length > 0
   const first = body.choices[0]?.split('=')

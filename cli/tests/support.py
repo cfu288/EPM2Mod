@@ -8,9 +8,9 @@ import sys
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parent.parent
-if str(ROOT / "src") not in sys.path:
-    sys.path.insert(0, str(ROOT / "src"))
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT / "cli" / "src") not in sys.path:
+    sys.path.insert(0, str(ROOT / "cli" / "src"))
 
 from epm2mod import container  # noqa: E402
 from epm2mod.paths import MANIFEST  # noqa: E402

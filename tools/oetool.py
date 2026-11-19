@@ -10,7 +10,7 @@
     oetool.py pack   OUTDIR NEW.BIN         -> rebuilds the container, recomputes the checksums
     oetool.py patch  FW.BIN NEW.BIN BLOCK OFFSET HEXBYTES [--expect HEXBYTES] ...
 
-The format and the code are in the `epm2mod` package (src/epm2mod/container.py). This file keeps
+The format and the code are in the `epm2mod` package (cli/src/epm2mod/container.py). This file keeps
 the command and the functions that older scripts in tools/ and experiments/ call. Blocks are
 dicts here: `off`, `header`, `trailer`, `payload` (unscrambled), `ok`, `addr`, `kind`.
 """

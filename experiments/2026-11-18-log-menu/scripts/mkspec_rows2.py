@@ -23,7 +23,7 @@ import sys
 from pathlib import Path
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))
-sys.path.insert(0, os.path.join(ROOT, "src"))
+sys.path.insert(0, os.path.join(ROOT, "cli", "src"))
 from epm2mod.container import parse  # noqa: E402
 from epm2mod.spec import BytesOp, load_spec  # noqa: E402
 

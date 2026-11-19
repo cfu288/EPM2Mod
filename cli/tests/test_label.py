@@ -1,6 +1,6 @@
 """Tests of the build label on the Firmware screen, ``epm2mod.label``.
 
-uv run python -m unittest discover -s tests
+uv run python -m unittest discover -s cli/tests
 """
 
 from __future__ import annotations

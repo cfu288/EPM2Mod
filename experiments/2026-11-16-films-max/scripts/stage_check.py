@@ -50,7 +50,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "emulator"))
-sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "cli" / "src"))
 
 import numpy as np  # noqa: E402
 import omemu  # noqa: E402

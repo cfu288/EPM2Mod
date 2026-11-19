@@ -3,7 +3,7 @@
 #
 # 1. Refuse machine-specific details in the staged changes: home-directory paths, session
 #    scratch paths, user@host targets. Use placeholders (/path/to/..., USER@HOST, /tmp/scratch).
-# 2. For the production code (src/epm2mod and the three test files named below): when a
+# 2. For the production code (cli/src/epm2mod and the three test files named below): when a
 #    staged change adds, changes or deletes one of its files, format the staged files with
 #    black and stage the result, then type-check with mypy.
 #    mypy reads the working tree, so a production file with unstaged changes stops the
@@ -33,7 +33,7 @@ if [ -n "$docs" ]; then
     exit 1
   fi
 fi
-production="src/epm2mod tests/support.py tests/test_package.py tests/test_looks.py"
+production="cli/src/epm2mod cli/tests/support.py cli/tests/test_package.py cli/tests/test_looks.py"
 # shellcheck disable=SC2086
 if git diff --cached --quiet --no-renames --diff-filter=AMD -- $production; then
   exit 0
@@ -55,7 +55,7 @@ git diff --cached --name-only -z --no-renames --diff-filter=AM -- $production |
   xargs -0 -r uv run --quiet black --quiet -- || { echo "pre-commit: black failed" >&2; exit 1; }
 # shellcheck disable=SC2086
 git add -u -- $production || { echo "pre-commit: git add failed" >&2; exit 1; }
-if ! uv run --quiet mypy; then
+if ! uv run --quiet --directory cli mypy; then
   echo "pre-commit: mypy found type errors" >&2
   exit 1
 fi

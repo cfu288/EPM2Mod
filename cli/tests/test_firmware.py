@@ -1,15 +1,15 @@
 """Tests of the container tool in tools/ (it calls the epm2mod package), and of the specs that record a hash.
 
-Run: python3 -m unittest discover -s tests
+Run: uv run python -m unittest discover -s cli/tests
 
 Tests that need firmware BINs are skipped when the files are absent.
 """
 
 import glob, hashlib, json, os, pathlib, sys, unittest
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
-sys.path.insert(0, os.path.join(ROOT, "src"))
+sys.path.insert(0, os.path.join(ROOT, "cli", "src"))
 import oetool  # noqa: E402
 from epm2mod.spec import apply_specs, load_spec  # noqa: E402
 

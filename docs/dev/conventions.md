@@ -30,7 +30,7 @@ Examples: `feat(cli)!: revision 3 of the CLI spec`, `docs(camera-log): the build
 
 | Path | What |
 |---|---|
-| `src/epm2mod/` | The production package. It makes the firmware: container format, patch specs, stock download, build descriptions, build steps, film-spec generator, the look-file packer (`data/films/`), card writing (`cards.py`, `cardio.py`), the installer server (`serve.py`), release code (`release.py`, `releasing.py`), the log decoder (`eventlog.py`, `logsummary.py`). Command: `uv run epm2mod --help`, all commands in [cli.md](../reference/cli.md). See *Production code and research code*. |
+| `cli/src/epm2mod/` | The production package. It makes the firmware: container format, patch specs, stock download, build descriptions, build steps, film-spec generator, the look-file packer (`data/films/`), card writing (`cards.py`, `cardio.py`), the installer server (`serve.py`), release code (`release.py`, `releasing.py`), the log decoder (`eventlog.py`, `logsummary.py`). Command: `uv run epm2mod --help`, all commands in [cli.md](../reference/cli.md). See *Production code and research code*. |
 | `tools/oetool.py` | The older command-line form of the container tool (unpack, pack, patch). It calls the package; `tools/_package.py` lets it import the package without an install. `gen/` and older scripts in `experiments/` import it. Do not use it to make firmware for a camera: use `uv run epm2mod make`. |
 | `tools/freespace.py`, `tools/fwmap.py`, `tools/disasm.py`, `tools/memmap_svg.py`, `emulator/` | Analysis tools: the free-space check, the function database of block 0, MN103 disassembly (GNU objdump from `tools/setup.sh`, which builds it from the submodule `third_party/binutils-gdb` into `build/toolchain/`), the memory map figure, the emulator harness. |
 | `tools/checks.py`, `.githooks/doclint.py`, `.claude/hooks/doc_links.py`, `docs/links.json`, `tools/toolchain.py` | `checks.py` runs the off-camera checks of a build: only those its specs call for, in parallel, with a cache. `doclint.py` checks the documents that users read. The pre-commit hook runs it on staged files. `doc_links.py` tells the agent which other files repeat a fact when it edits one of them (the groups are in `doc_links.json`). `toolchain.py` says where the MN103 binutils are. |
@@ -38,12 +38,12 @@ Examples: `feat(cli)!: revision 3 of the CLI spec`, `docs(camera-log): the build
 | `data/builds/`, `data/pinned-build.json` | One description per firmware build, and the pointer to the last camera-tested build. See *Making firmware*. |
 | `data/specs/` | One JSON spec per mod. Each operation states the bytes that it replaces. Specs never move: superseded and failed ones stay as a record, and `tools/space-ledger/superseded.tsv` marks them (`history` for those of earlier builds; their story is in `data/specs/HISTORY.md`). |
 | `gen/` | The generators whose specs ship, each with its sources. `gen/run.sh --check` (CI) fails when a committed spec is not what its generator makes. See [../gen/README.md](../../gen/README.md). |
-| `web/` | Two apps (React, Vite): `apps/site`, the public site (GitHub Pages, `.github/workflows/web.yml`), and `apps/local`, the installer page, served by `src/epm2mod/serve.py`. `packages/ui` holds what they share. See [../web/README.md](../../web/README.md). |
+| `web/` | Two apps (React, Vite): `apps/site`, the public site (GitHub Pages, `.github/workflows/web.yml`), and `apps/local`, the installer page, served by `cli/src/epm2mod/serve.py`. `packages/ui` holds what they share. See [../web/README.md](../../web/README.md). |
 | `data/films/` | `catalogue.json` (the film simulations), `card-looks.json` (a developer look list of fit files, the input of `epm2mod films pack`), `fits/` (the fitted values) and the generated `film-records.json`. `films.json` and `more-films.json` serve older builds. |
 | `data/logdict/` | The event dictionary of the Debug Log. The log's patch specs and the decoder (`epm2mod log`) read it. See [logging.md](../reference/logging.md). |
 | `docs/` | Knowledge that lasts. Each fact there must have a source or must be reproducible. |
 | `experiments/YYYY-MM-DD-slug/` | Ad-hoc scripts and `NOTES.md`. Put large files in the `out/` subfolder, which git ignores. When a result is reliable, move it into `docs/`, `tools/`, `gen/` or the package. |
-| `tests/` | The unittest suite. See *Tests*. |
+| `cli/` | The Python project of the `epm2mod` package: `cli/pyproject.toml`, the package in `cli/src/epm2mod/`, the unittest suite in `cli/tests/` (see *Tests*). The root `pyproject.toml` is the uv workspace: one environment for the package and the research scripts. |
 | `firmware/`, `build/` | Firmware files and build outputs. Git ignores them. `firmware/SHA256SUMS` is in git. |
 | `.local/` | Files of this computer only, never committed: reference manuals, raw photos, drafts. |
 
@@ -73,7 +73,7 @@ descriptions, patch specs and film lists are data: they are also relative to the
 
 ## Production code and research code
 
-- **`src/epm2mod/` is production code.** It makes the firmware that goes on a camera. Rules:
+- **`cli/src/epm2mod/` is production code.** It makes the firmware that goes on a camera. Rules:
   formatted with black (line length 88), type-checked with `mypy --strict`, a docstring on every
   module, class and function of the package (a test checks this; the test files need docstrings
   on helpers only where the name does not say enough), and a test for each behaviour (see *Tests*). The pre-commit hook
@@ -82,9 +82,9 @@ descriptions, patch specs and film lists are data: they are also relative to the
   Conventional Commits form and removes AI attribution lines. To run the checks by hand:
 
   ```bash
-  uv run black src tests/support.py tests/test_package.py tests/test_looks.py
-  uv run mypy
-  uv run python -m unittest discover -s tests
+  uv run black cli/src cli/tests/support.py cli/tests/test_package.py cli/tests/test_looks.py
+  uv run --directory cli mypy
+  uv run python -m unittest discover -s cli/tests
   ```
 
   The hook has one limit. `git commit PATH` and `git commit -a` do not commit the result of black.
@@ -169,13 +169,13 @@ the pinned build's label.
 
 ## Tests
 
-`uv run python -m unittest discover -s tests` runs all tests. What a test run proves depends on
+`uv run python -m unittest discover -s cli/tests` runs all tests. What a test run proves depends on
 what is there:
 
 | Needs | What the tests prove |
 |---|---|
 | Nothing more than the repository | The package works on a small made-up firmware: container, patch specs, build steps, card copy, download (with a stand-in for the network), every command. The README's generated parts are current. The film specs record the digest of the film list and fit files that are in the repository. |
-| numpy (`uv run` installs it) | The film-spec generator works on a made-up firmware (`tests/test_looks.py`). |
+| numpy (`uv run` installs it) | The film-spec generator works on a made-up firmware (`cli/tests/test_looks.py`). |
 | The maker's firmware file (`uv run epm2mod fetch-stock`) | Each build description that has a sha256 gives that sha256. The film specs in `data/specs/` are exactly the generated ones. The stock file survives a parse and a write without a change. |
 
 Without the maker's firmware file the run skips the last group and says so. Run the full set before

@@ -35,7 +35,7 @@ if [ ! -x "$UV" ] || [ "$("$UV" --version 2>/dev/null | cut -d' ' -f2)" != "$UV_
 fi
 
 # Python 3.12 from uv, kept in this folder; the package needs nothing else (standard library only).
-export UV_CACHE_DIR="$PWD/.uv/cache" UV_PYTHON_INSTALL_DIR="$PWD/.uv/python" PYTHONPATH="$PWD/src"
+export UV_CACHE_DIR="$PWD/.uv/cache" UV_PYTHON_INSTALL_DIR="$PWD/.uv/python" PYTHONPATH="$PWD/cli/src"
 # the name in usage lines, examples and hints: the one a user types here
 export EPM2MOD_PROG=./start.sh
 [ $# -eq 0 ] && set -- serve

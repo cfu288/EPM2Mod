@@ -1,6 +1,6 @@
 """Tests of the link map for the agent hook: ``docs/links.json`` and ``.claude/hooks/doc_links.py``.
 
-    uv run python -m unittest discover -s tests
+    uv run python -m unittest discover -s cli/tests
 """
 
 from __future__ import annotations
@@ -13,7 +13,7 @@ import unittest
 import uuid
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 MAP = ROOT / "docs" / "links.json"
 SCRIPT = ROOT / ".claude" / "hooks" / "doc_links.py"
 
@@ -48,7 +48,7 @@ class DocLinksTests(unittest.TestCase):
         self.assertEqual(run_hook(event), "")
 
     def test_an_unlinked_or_outside_file_gives_nothing(self) -> None:
-        for path in (str(ROOT / "src/epm2mod/stock.py"), "/somewhere/else.txt"):
+        for path in (str(ROOT / "cli/src/epm2mod/stock.py"), "/somewhere/else.txt"):
             with self.subTest(path):
                 self.assertEqual(run_hook({"session_id": "x", "tool_input": {"file_path": path}}), "")
 

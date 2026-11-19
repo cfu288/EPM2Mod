@@ -22,8 +22,8 @@
  "firmware_map": "build/map/linear.txt",
  "output": "build",
  "cache": "firmware/stock/E-PM2",
- "app": "src/epm2mod/app",
- "package": "src/epm2mod",
+ "app": "cli/src/epm2mod/app",
+ "package": "cli/src/epm2mod",
  "release_files": [
   "LICENSE",
   "NOTICE.md",

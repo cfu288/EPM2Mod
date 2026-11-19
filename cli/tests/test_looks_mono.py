@@ -1,6 +1,6 @@
 """Tests of the film list with a black-and-white film, ``epm2mod.looks.mono``.
 
-    uv run python -m unittest discover -s tests
+    uv run python -m unittest discover -s cli/tests
 
 They need numpy. ``RealFirmwareMonoTests`` needs the stock firmware file and
 is skipped without it.

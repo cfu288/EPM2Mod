@@ -1,6 +1,6 @@
 """Tests of the local app, ``epm2mod.serve``.
 
-    uv run python -m unittest discover -s tests
+    uv run python -m unittest discover -s cli/tests
 
 ``EndToEndTests`` needs the stock firmware file and is skipped without it.
 """

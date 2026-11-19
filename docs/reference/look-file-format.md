@@ -6,7 +6,7 @@ memory. The looks then stay after a restart and without the card, until another 
 
 Make one with `uv run epm2mod films set --film ARTn=FILM` (one `--film` per ART slot).
 Check one with `uv run epm2mod inspect FILE`. The flags are in the [command-line reference](cli.md). Code:
-`src/epm2mod/looks/lookfile.py` (the format), `src/epm2mod/looks/records.py` (from the film records), `src/epm2mod/looks/lookpack.py` (from the fit files). Why the format
+`cli/src/epm2mod/looks/lookfile.py` (the format), `cli/src/epm2mod/looks/records.py` (from the film records), `cli/src/epm2mod/looks/lookpack.py` (from the fit files). Why the format
 is this way: `experiments/2026-11-17-card-looks/design.md` section 5.
 
 ## Layout
@@ -126,5 +126,5 @@ function crc32(bytes) {
 00000010: 01 01 60 01 00 00 00 00 00 00 00 00 00 00 00 00
 ```
 
-`tests/test_lookfile.py` checks this file, the layout, the refusals, and that the tables the camera makes from each
+`cli/tests/test_lookfile.py` checks this file, the layout, the refusals, and that the tables the camera makes from each
 look are the bytes of the built-in looks.

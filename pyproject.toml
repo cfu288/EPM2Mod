@@ -1,19 +1,10 @@
+# The workspace: one environment (.venv) for the epm2mod package (cli/) and the research scripts
+# (experiments/, tools/, gen/). `uv sync` installs the package from cli/ and both groups.
 [project]
-name = "epm2mod"
-dynamic = ["version"]
-description = "Build and check custom firmware for the Olympus PEN E-PM2"
-readme = "README.md"
-license = "MIT"
-license-files = ["LICENSE", "NOTICE.md"]
+name = "epm2-tools"
+version = "0"
 requires-python = ">=3.10"
-dependencies = []
-
-[project.optional-dependencies]
-# Needed only to regenerate the film-look patch specs from the fit files.
-looks = ["numpy>=1.24"]
-
-[project.scripts]
-epm2mod = "epm2mod.cli:main"
+dependencies = ["epm2mod"]
 
 [dependency-groups]
 dev = ["black>=24", "mypy>=1.10", "numpy>=1.24"]
@@ -30,27 +21,15 @@ research = [
     "spektrafilm @ git+https://github.com/andreavolpato/spektrafilm@3bb2c2d ; python_version >= '3.13'",
 ]
 
+
 [tool.uv]
+package = false
 # `uv sync` and `uv run` keep both groups installed, so the research scripts and the
 # package share one environment (.venv).
 default-groups = ["dev", "research"]
 
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+[tool.uv.sources]
+epm2mod = { workspace = true }
 
-[tool.hatch.version]
-path = "src/epm2mod/__init__.py"
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/epm2mod"]
-
-[tool.black]
-line-length = 88
-target-version = ["py310"]
-
-[tool.mypy]
-python_version = "3.10"
-strict = true
-files = ["src/epm2mod", "tests/support.py", "tests/test_package.py", "tests/test_looks.py", "tests/test_eventlog.py"]
-mypy_path = ["src", "tests"]
+[tool.uv.workspace]
+members = ["cli"]

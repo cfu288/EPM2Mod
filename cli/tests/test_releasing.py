@@ -1,6 +1,6 @@
 """Tests of starting a release, ``epm2mod.releasing``, and the feature-list check of ``epm2mod.readme``.
 
-    uv run python -m unittest discover -s tests
+    uv run python -m unittest discover -s cli/tests
 """
 
 from __future__ import annotations

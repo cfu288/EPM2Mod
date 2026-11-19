@@ -29,3 +29,6 @@ path that moved. A folder row covers every file in it.
 | `pinned-build.json` | `data/pinned-build.json` | 2026-11-19 |
 | `looks/` | `data/films/` | 2026-11-19 |
 | `logs/` | `data/logdict/` | 2026-11-19 |
+| `src/epm2mod/` | `cli/src/epm2mod/` | 2026-11-19 |
+| `tests/` | `cli/tests/` | 2026-11-19 |
+| `pyproject.toml` (the package) | `cli/pyproject.toml`; the root `pyproject.toml` is the uv workspace | 2026-11-19 |

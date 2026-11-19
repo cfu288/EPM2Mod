@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(REPO / "src"))
+sys.path.insert(0, str(REPO / "cli" / "src"))
 from epm2mod import cli, spec  # noqa: E402
 
 spec._check_kept_bytes = lambda *a, **k: None  # the withdrawn spec predates this check

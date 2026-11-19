@@ -26,7 +26,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
 PEAK = os.path.join(ROOT, "experiments", "2026-11-14-focus-peaking", "scripts")
 sys.path.insert(0, os.path.join(ROOT, "emulator"))
-sys.path.insert(0, os.path.join(ROOT, "src"))
+sys.path.insert(0, os.path.join(ROOT, "cli", "src"))
 import scenario  # noqa: E402
 from scenario import Scenario, diff_pcs, diff_writes, fmt_funcs, patch_ranges  # noqa: E402
 from epm2mod.eventlog import decode, load_dictionary  # noqa: E402

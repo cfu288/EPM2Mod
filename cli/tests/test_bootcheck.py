@@ -4,7 +4,7 @@ import sys
 import unittest
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "emulator"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "emulator"))
 import bootcheck  # noqa: E402
 
 REPORT = """stop: {"why":"labtime","pc":2118424173} | lab ms 2000.1 | wall ms 2897 | insns cpu0 30661113 cpu1 2764094

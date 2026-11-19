@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "cli" / "src"))
 from epm2mod.spec import load_spec, BytesOp  # noqa: E402
 from epm2mod.looks import slots  # noqa: E402
 

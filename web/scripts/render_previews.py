@@ -27,7 +27,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "cli" / "src"))
 from PIL import Image, ImageChops  # noqa: E402
 
 from epm2mod.looks import lookfile, records  # noqa: E402

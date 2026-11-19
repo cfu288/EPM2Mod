@@ -1,6 +1,6 @@
 """Tests of the ``epm2mod`` package.
 
-    uv run python -m unittest discover -s tests
+    uv run python -m unittest discover -s cli/tests
 
 Most tests need nothing but the repository: they build a small firmware
 container and a small repository in a temporary folder. The tests in
@@ -592,7 +592,7 @@ class PathAndFileTests(unittest.TestCase):
         )
 
     def test_find_root(self) -> None:
-        self.assertEqual(paths_module.find_root(ROOT / "src" / "epm2mod"), ROOT)
+        self.assertEqual(paths_module.find_root(ROOT / "cli" / "src" / "epm2mod"), ROOT)
         with tempfile.TemporaryDirectory() as folder:
             # Outside a project there is no fallback: not even the package's own checkout.
             with self.assertRaises(RepositoryError):
@@ -1463,7 +1463,7 @@ class CommandLineTests(RepoCase):
         self.assertEqual(self.repo.outputs(), [])
 
     def test_python_m_epm2mod(self) -> None:
-        env = {**os.environ, "PYTHONPATH": str(ROOT / "src")}
+        env = {**os.environ, "PYTHONPATH": str(ROOT / "cli" / "src")}
         done = subprocess.run(
             [sys.executable, "-m", "epm2mod", "--version"],
             capture_output=True,
@@ -1794,7 +1794,7 @@ class FilmInputsTests(unittest.TestCase):
 class SourceTests(unittest.TestCase):
     def test_every_module_class_and_function_has_a_docstring(self) -> None:
         missing = []
-        for path in sorted((ROOT / "src" / "epm2mod").rglob("*.py")):
+        for path in sorted((ROOT / "cli" / "src" / "epm2mod").rglob("*.py")):
             tree = ast.parse(path.read_text(encoding="utf-8"))
             kinds = (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)
             named = [node for node in ast.walk(tree) if isinstance(node, kinds)]

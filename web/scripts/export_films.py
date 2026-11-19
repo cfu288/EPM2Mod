@@ -3,7 +3,7 @@
     uv run python web/scripts/export_films.py
 
 The CLI (`epm2mod install`, `epm2mod films set`), the local app and the web site all read it. Run this after a change of
-data/films/catalogue.json or a fit; tests/test_lookfile.py fails while the file is out of date.
+data/films/catalogue.json or a fit; cli/tests/test_lookfile.py fails while the file is out of date.
 """
 
 import json
@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "cli" / "src"))
 from epm2mod.looks.lookpack import web_data  # noqa: E402
 from epm2mod.paths import RepoPaths  # noqa: E402
 

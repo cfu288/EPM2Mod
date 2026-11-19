@@ -1,6 +1,6 @@
 """Tests of the film slots beyond the first seven, ``epm2mod.looks.extra``.
 
-    uv run python -m unittest discover -s tests
+    uv run python -m unittest discover -s cli/tests
 
 They need numpy. ``RealFirmwareExtraTests`` needs the stock firmware file and
 is skipped without it.

@@ -21,7 +21,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
 PEAKING = os.path.join(ROOT, "experiments", "2026-11-14-focus-peaking", "scripts")
 sys.path.insert(0, os.path.join(ROOT, "emulator"))
 sys.path.insert(0, PEAKING)
-sys.path.insert(0, os.path.join(ROOT, "src"))
+sys.path.insert(0, os.path.join(ROOT, "cli", "src"))
 
 from liveview import EXPOSE  # noqa: E402
 

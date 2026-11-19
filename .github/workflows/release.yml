@@ -7,9 +7,9 @@ on:
   push:
     branches: [main]
     tags: ['v*']
-    paths: ['src/**', 'release/**', 'web/**', 'data/builds/**', 'data/specs/**', 'epm2mod.json', 'data/pinned-build.json', 'data/films/film-records.json', '.github/workflows/release.yml', '.github/scripts/release_smoke.py']
+    paths: ['cli/src/**', 'release/**', 'web/**', 'data/builds/**', 'data/specs/**', 'epm2mod.json', 'data/pinned-build.json', 'data/films/film-records.json', '.github/workflows/release.yml', '.github/scripts/release_smoke.py']
   pull_request:
-    paths: ['src/**', 'release/**', 'web/**', 'data/builds/**', 'data/specs/**', 'epm2mod.json', 'data/pinned-build.json', 'data/films/film-records.json', '.github/workflows/release.yml', '.github/scripts/release_smoke.py']
+    paths: ['cli/src/**', 'release/**', 'web/**', 'data/builds/**', 'data/specs/**', 'epm2mod.json', 'data/pinned-build.json', 'data/films/film-records.json', '.github/workflows/release.yml', '.github/scripts/release_smoke.py']
   workflow_dispatch:
 
 permissions:
@@ -39,7 +39,7 @@ jobs:
         working-directory: web
       - id: zip
         env:
-          PYTHONPATH: src
+          PYTHONPATH: cli/src
         run: |
           # calendar version: the tag without its v (v2026.11.18-rc.1), or today's date with -dev on a branch
           case "$GITHUB_REF" in

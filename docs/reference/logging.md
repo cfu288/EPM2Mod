@@ -21,7 +21,7 @@ with an Off switch ([log-menu design](../../experiments/2026-11-18-log-menu/desi
 | Probes | `data/specs/log-probes.json` | One hook and one small routine per event of a feature |
 | Timing probe of peaking | `data/specs/log-peaking-time.json` | Event `pk_stats`, one record per 8 runs of Key Line pass 9. Written by `mkspec_log.py --peaking-time`. It also puts the build id of `data/logdict/events.json` into the block header |
 | Probe of the save guard of peaking | `data/specs/log-peaking-guard.json` | Event `pk_guard`, one record per hold of the peaking latch after a shot. Written by `mkspec_log.py --peaking-guard`. It puts the build id of `data/logdict/events.json` into the block header |
-| Decoder | `src/epm2mod/eventlog.py`, `src/epm2mod/logsummary.py`, command `epm2mod log` | Reads the file and the dictionary, prints a summary, or the events as JSON |
+| Decoder | `cli/src/epm2mod/eventlog.py`, `cli/src/epm2mod/logsummary.py`, command `epm2mod log` | Reads the file and the dictionary, prints a summary, or the events as JSON |
 
 ## The record
 

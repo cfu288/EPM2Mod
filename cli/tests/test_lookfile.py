@@ -1,6 +1,6 @@
 """Tests of the look file for the SD card: ``epm2mod.looks.lookfile``, ``records`` and ``lookpack``.
 
-    uv run python -m unittest discover -s tests
+    uv run python -m unittest discover -s cli/tests
 
 ``lookpack`` needs numpy. ``RealFirmwareLookTests`` needs the stock firmware
 file and is skipped without it.
@@ -330,7 +330,7 @@ class ChoiceTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             done = subprocess.run(
                 [sys.executable, "-c", program, str(Path(folder) / lookfile.CARD_NAME)],
-                env={**os.environ, "PYTHONPATH": str(ROOT / "src")},
+                env={**os.environ, "PYTHONPATH": str(ROOT / "cli" / "src")},
                 cwd=ROOT,
                 capture_output=True,
                 text=True,

@@ -16,6 +16,12 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 
+[manifest]
+members = [
+    "epm2-tools",
+    "epm2mod",
+]
+
 [[package]]
 name = "alabaster"
 version = "1.0.0"
@@ -900,15 +906,12 @@ wheels = [
 ]
 
 [[package]]
-name = "epm2mod"
-source = { editable = "." }
+name = "epm2-tools"
+version = "0"
+source = { virtual = "." }
 default-groups = ["dev", "research"]
-
-[package.optional-dependencies]
-looks = [
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+dependencies = [
+    { name = "epm2mod" },
 ]
 
 [package.dev-dependencies]
@@ -938,8 +941,7 @@ research = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "numpy", marker = "extra == 'looks'", specifier = ">=1.24" }]
-provides-extras = ["looks"]
+requires-dist = [{ name = "epm2mod", editable = "cli" }]
 
 [package.metadata.requires-dev]
 dev = [
@@ -958,6 +960,21 @@ research = [
     { name = "scipy" },
     { name = "spektrafilm", marker = "python_full_version >= '3.13'", git = "https://github.com/andreavolpato/spektrafilm?rev=3bb2c2d" },
 ]
+
+[[package]]
+name = "epm2mod"
+source = { editable = "cli" }
+
+[package.optional-dependencies]
+looks = [
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "numpy", marker = "extra == 'looks'", specifier = ">=1.24" }]
+provides-extras = ["looks"]
 
 [[package]]
 name = "executing"

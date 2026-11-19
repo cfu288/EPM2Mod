@@ -6,7 +6,7 @@ Two pages share one package of components and data:
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
 | `packages/ui` (`@epm2mod/ui`) | the ART-menu editor (`MenuEditor`, `useLooks`), the preview (`StripPreview`), the page frame, the film data and the look-file packer | both apps                                                                                                |
 | `apps/site`                   | the public site: Home, Features, Film Simulations, Install                                                                           | GitHub Pages, https://cfu288.github.io/EPM2Mod/ (`.github/workflows/web.yml`, on every change to `main`) |
-| `apps/local`                  | the local app: make the firmware, add film simulations, write to an SD card or download a zip                                        | `epm2mod serve` (`src/epm2mod/serve.py`), from the build in `src/epm2mod/app/` (not in git)              |
+| `apps/local`                  | the local app: make the firmware, add film simulations, write to an SD card or download a zip                                        | `epm2mod serve` (`cli/src/epm2mod/serve.py`), from the build in `cli/src/epm2mod/app/` (not in git)      |
 
 Rules (the lint refuses a break of them): an app imports shared code only from `@epm2mod/ui` and
 `@epm2mod/ui/theme.css`, never from another app and never from a path inside `packages/ui`. Code that both apps need
@@ -31,13 +31,13 @@ Work on it with Node 26 (`.nvmrc`), from `web/`:
 ```sh
 npm ci
 npm run dev        # the site, local server
-npm run build:app  # the local app, into src/epm2mod/app; then: uv run epm2mod serve
+npm run build:app  # the local app, into cli/src/epm2mod/app; then: uv run epm2mod serve
 npm run check      # format, lint, type check, unit tests, both builds
 npm run e2e        # browser tests of both apps (Playwright; once: npx playwright install chromium)
 ```
 
 CI runs `check` and `e2e`. The local app's browser tests answer the API calls themselves; the server and the real
-firmware build are tested in Python (`tests/test_serve.py`).
+firmware build are tested in Python (`cli/tests/test_serve.py`).
 
 To work on the local app against a real server: `uv run epm2mod serve --no-browser --port 8765`, then
 `EPM2MOD_API=http://127.0.0.1:8765 npm run dev:app`, and open the dev address with the server's `#token=...`.

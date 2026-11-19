@@ -1,6 +1,6 @@
 """Tests of the film-spec generator, ``epm2mod.looks``.
 
-    uv run python -m unittest discover -s tests
+    uv run python -m unittest discover -s cli/tests
 
 They need numpy. Most tests use a made-up firmware (``SyntheticRepo``) that has
 tables at the addresses of the film slots, so they run on a clean clone.

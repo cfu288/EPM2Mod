@@ -44,7 +44,7 @@ if ($Have -ne $UvVersion) {
 # Python 3.12 from uv, kept in this folder; the package needs nothing else (standard library only).
 $env:UV_CACHE_DIR = Join-Path $PSScriptRoot '.uv\cache'
 $env:UV_PYTHON_INSTALL_DIR = Join-Path $PSScriptRoot '.uv\python'
-$env:PYTHONPATH = Join-Path $PSScriptRoot 'src'
+$env:PYTHONPATH = Join-Path $PSScriptRoot 'cli/src'
 # the name in usage lines, examples and hints: the one a user types here
 $env:EPM2MOD_PROG = '.\start.ps1'
 # @(...) keeps one argument a list: a lone string would be passed letter by letter

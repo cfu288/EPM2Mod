@@ -1,6 +1,6 @@
 """Tests of the release zip, ``epm2mod.release``.
 
-    uv run python -m unittest discover -s tests
+    uv run python -m unittest discover -s cli/tests
 
 The tests need the built app page (``npm run build:app`` in web/); ``FromTheZipTests`` also needs the stock firmware.
 """
@@ -30,7 +30,7 @@ from epm2mod.paths import MANIFEST, RELEASE_KEY, RepoPaths  # noqa: E402
 LAUNCHERS = {"start.sh", "Start (Mac).command", "start.ps1"}
 
 PATHS = RepoPaths(ROOT)
-HAVE_APP = (ROOT / "src" / "epm2mod" / "app" / "index.html").is_file()
+HAVE_APP = (ROOT / "cli" / "src" / "epm2mod" / "app" / "index.html").is_file()
 HAVE_STOCK = stock.stock_path(PATHS, stock.EPM2_V16).is_file()
 
 
@@ -57,8 +57,8 @@ class ZipTests(unittest.TestCase):
             "data/pinned-build.json",
             "epm2mod.json",
             "data/films/film-records.json",
-            "src/epm2mod/__main__.py",
-            "src/epm2mod/app/index.html",
+            "cli/src/epm2mod/__main__.py",
+            "cli/src/epm2mod/app/index.html",
             "Start (Mac).command",
             "Start (Windows).bat",
         ):
@@ -125,7 +125,7 @@ class FromTheZipTests(unittest.TestCase):
             card = Path(folder) / "card"
             (card / "DCIM").mkdir(parents=True)
             env = dict(os.environ)
-            env.update({"PYTHONPATH": str(top / "src"), cards.TEST_CARDS_ENV: str(card)})
+            env.update({"PYTHONPATH": str(top / "cli" / "src"), cards.TEST_CARDS_ENV: str(card)})
 
             def run(*argv: str) -> subprocess.CompletedProcess[str]:
                 return subprocess.run(

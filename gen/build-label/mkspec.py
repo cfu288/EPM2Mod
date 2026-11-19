@@ -3,7 +3,7 @@
     uv run python gen/build-label/mkspec.py [LABEL] [OUT.json]
 
 LABEL defaults to "EPM2Mod 0000.00.00": the placeholder that epm2mod make replaces with the build's label
-(src/epm2mod/label.py). The version number stays 1.6: block 0's header and prm tag 0xC082 are not touched. Byte
+(cli/src/epm2mod/label.py). The version number stays 1.6: block 0's header and prm tag 0xC082 are not touched. Byte
 edits, no new code (NOTES.md sections 3 and 6):
   1. the Firmware panel's (panel 99) object grows from 936 to 928 + 2 * TEXT_CHARS bytes: its last field, at +928, is
      the value text that the panel formats (4 UTF-16 characters in stock, exactly "1.6" and its end);
@@ -24,7 +24,7 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
-sys.path.insert(0, os.path.join(ROOT, "src"))
+sys.path.insert(0, os.path.join(ROOT, "cli", "src"))
 from epm2mod.container import parse  # noqa: E402
 
 STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
@@ -88,7 +88,7 @@ def main() -> None:
         "name": os.path.splitext(os.path.basename(out))[0],
         "description": ("Build label: the Firmware screen (Setup Menu, Firmware) shows 'Body : 1.6  EPM2Mod YYYY.MM.DD', "
                         "the 'label' of the build description; epm2mod make writes it over the placeholder 0000.00.00 "
-                        "(src/epm2mod/label.py). The version number is not changed (block 0 header +16 = 0x1600, prm "
+                        "(cli/src/epm2mod/label.py). The version number is not changed (block 0 header +16 = 0x1600, prm "
                         "tag 0xC082). Byte edits, no new code: the panel's object grows so that its value text holds "
                         "%d characters; the Body line formats with its own text, in unreferenced debug strings of "
                         "segment 2; the four value texts (Body, Lens, Flash, Acc) are left-aligned in wider boxes that "

@@ -1,6 +1,6 @@
 """Tests of the camera-log decoder (``epm2mod.eventlog`` and ``epm2mod log``).
 
-    uv run python -m unittest discover -s tests
+    uv run python -m unittest discover -s cli/tests
 
 The log files are made here, byte by byte, as the firmware's flush task writes
 them. ``SessionTests`` has the patterns of the first log from a camera

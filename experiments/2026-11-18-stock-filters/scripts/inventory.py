@@ -6,7 +6,7 @@ reads) and stock bytes (stock code or data changed), with the op's note.
 import csv, json, sys
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "cli" / "src"))
 from epm2mod.spec import load_spec, BytesOp, Utf16ReplaceAllOp  # noqa: E402
 
 BASE = 0x7E421020
