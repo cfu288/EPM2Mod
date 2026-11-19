@@ -37,14 +37,16 @@ Examples: `feat(cli)!: revision 3 of the CLI spec`, `docs(camera-log): the build
 | `tools/checks.py`, `.githooks/doclint.py`, `.claude/hooks/doc_links.py`, `docs/links.json`, `tools/toolchain.py` | `checks.py` runs the off-camera checks of a build: only those its specs call for, in parallel, with a cache. `doclint.py` checks the documents that users read. The pre-commit hook runs it on staged files. `doc_links.py` tells the agent which other files repeat a fact when it edits one of them (the groups are in `doc_links.json`). `toolchain.py` says where the MN103 binutils are. |
 | `third_party/om-emu`, `tools/emu/setup.sh` | The emulator: our om-emu fork (branch `e101`, with the E-PM2's boot lab) as a git submodule, and the command that initialises it. Emulator code goes into the fork, not into this repository. `tools/emu/boot-test` and `tools/emu/update-path-test` are the start-up checks of a build. |
 | `builds/`, `pinned-build.json` | One description per firmware build, and the pointer to the last camera-tested build. See *Making firmware*. |
-| `patches/` | One JSON spec per mod. Each operation states the bytes that it replaces. `patches/` holds superseded and failed specs as a record. |
+| `patches/` | One JSON spec per mod. Each operation states the bytes that it replaces. Specs never move: superseded and failed ones stay as a record, and `docs/space-superseded.tsv` marks them (`history` for those of earlier builds; their story is in `patches/HISTORY.md`). |
+| `gen/` | The generators whose specs ship, each with its sources. `gen/run.sh --check` (CI) fails when a committed spec is not what its generator makes. See [../gen/README.md](../gen/README.md). |
 | `web/` | Two apps (React, Vite): `apps/site`, the public site (GitHub Pages, `.github/workflows/web.yml`), and `apps/local`, the installer page, served by `src/epm2mod/serve.py`. `packages/ui` holds what they share. See [../web/README.md](../web/README.md). |
 | `looks/` | `catalogue.json` (the film simulations), `card-looks.json` (a developer look list of fit files, the input of `epm2mod films pack`), `fits/` (the fitted values) and the generated `film-records.json`. `films.json` and `more-films.json` serve older builds. |
 | `logs/` | The event dictionary of the Debug Log. The log's patch specs and the decoder (`epm2mod log`) read it. See [logging.md](logging.md). |
 | `docs/` | Knowledge that lasts. Each fact there must have a source or must be reproducible. |
-| `experiments/YYYY-MM-DD-slug/` | Ad-hoc scripts and `NOTES.md`. Put large files in the `out/` subfolder, which git ignores. When a result is reliable, move it into `docs/`, `tools/` or the package. |
+| `experiments/YYYY-MM-DD-slug/` | Ad-hoc scripts and `NOTES.md`. Put large files in the `out/` subfolder, which git ignores. When a result is reliable, move it into `docs/`, `tools/`, `gen/` or the package. |
 | `tests/` | The unittest suite. See *Tests*. |
 | `firmware/`, `build/` | Firmware files and build outputs. Git ignores them. `firmware/SHA256SUMS` is in git. |
+| `.local/` | Files of this computer only, never committed: reference manuals, raw photos, drafts. |
 
 ## Production code and research code
 

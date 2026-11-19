@@ -7,13 +7,13 @@
         .text
         .global _start
         .equ SETTING, 0x60413225        # setting 653 (tag 0x9F11): 0 Auto, 1 = 60 s ... 55 = 1/4000 (1/3 EV)
-        # LOG2: --defsym in mkspec_lss_core.py # 256 * log2(d0)
-        # PRM: --defsym in mkspec_lss_core.py # settings read (d0 = tag, a0 = 0, d1 = 0)
-        # F_SV: --defsym in mkspec_lss_core.py # per-ISO correction f(Sv) (a0 = mode block, d0 = Sv)
-        # BUILD: --defsym in mkspec_lss_core.py # 8 breakpoints of the program line
-        # AUTO: --defsym in mkspec_lss_core.py # stock auto path
-        # SEG_T: --defsym in mkspec_lss_core.py # stock segment: shutter falls at Sv c16, Av c10
-        # SEG_S: --defsym in mkspec_lss_core.py # stock segment: ISO rises at hold c24, Av c10
+        # LOG2: --defsym in mkspec.py # 256 * log2(d0)
+        # PRM: --defsym in mkspec.py # settings read (d0 = tag, a0 = 0, d1 = 0)
+        # F_SV: --defsym in mkspec.py # per-ISO correction f(Sv) (a0 = mode block, d0 = Sv)
+        # BUILD: --defsym in mkspec.py # 8 breakpoints of the program line
+        # AUTO: --defsym in mkspec.py # stock auto path
+        # SEG_T: --defsym in mkspec.py # stock segment: shutter falls at Sv c16, Av c10
+        # SEG_S: --defsym in mkspec.py # stock segment: ISO rises at hold c24, Av c10
 _start:
 
 # NEWTH(a0 = mode block, d0 = focal length, a2 = argument list of exp_cal_still) -> d0 = tv_th (the STOCK corner)

@@ -181,7 +181,7 @@ a flashed entry with the stock default handler as target is added; the loader sw
 
 ## Build log
 
-- 2026-11-18, item 1 (`scripts/mkspec_structure.py` -> `patches/stock-films-structure.json`, 103 operations; the
+- 2026-11-18, item 1 (`gen/stock-films/structure.py` -> `patches/stock-films-structure.json`, 103 operations; the
   loader's switch lists in `build/stock-films/layout.json`): stubs 861 B at 0x7EE53830 (segment 3, where card-looks-4's
   code ran), the shared tone part, the chroma helper and the matrix chain at 0x7ECB0888, records 1,296 B at 0x7EE541B4.
   Switch lists: Pop Art 11 words, Soft Focus 6, Pale&Light 13, Light Tone 11, Pin Hole 6, Diorama 6, Cross Process 11,
@@ -193,7 +193,7 @@ a flashed entry with the stock default handler as target is added; the loader sw
   loader switches them; their RAM matrix pointer counts only when it holds the exact film address (RAM in the gap
   is not reliably zero at a start: the log ring survived power-offs).
 
-- 2026-11-18, item 2 (`scripts/mkspec_loader.py` -> `patches/card-looks-5.json`, `patches/looks-menu-4.json`): the
+- 2026-11-18, item 2 (`gen/stock-films/loader.py` -> `patches/card-looks-5.json`, `patches/looks-menu-4.json`): the
   card-looks-4 assembly with no snapshot, no live tables and no Built-in; APPLY into each listed entry's RAM block
   (one operation list for all entries, 8 tone tables per channel); MASK and SWITCH (words written as words); the
   Picture Mode remap in T_GUI after a switch. The structure moved to segment 2 (stubs 435 B at 0x7EBF38BC, shared part

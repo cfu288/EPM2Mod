@@ -55,7 +55,7 @@ def main():
     ids = syms["IDS"]
     paths = RepoPaths(Path(ROOT))
 
-    # the operation list relative to a block, as mkspec_loader.py builds it
+    # the operation list relative to a block, as gen/stock-films/loader.py builds it
     off = layout["offsets"]
     defaults = [struct.unpack("<I", get(slots.DEFAULT_RECORD + 4 * i, 4))[0] for i in range(slots.RECORD_TABLES)]
     ops = [(20, 2, off["sat"], 0), (20, 2, off["sat"] + 2, 0), (22, 12, off["six_s"], 0), (34, 12, off["six_h"], 0),

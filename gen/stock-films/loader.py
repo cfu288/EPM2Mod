@@ -1,7 +1,7 @@
 """Write patches/looks-menu-4.json and patches/card-looks-5.json: the loader of film looks for the stock-filters
-firmware (design.md). Research code. Needs build/stock-films/layout.json (mkspec_structure.py).
+firmware (experiments/2026-11-18-stock-filters/design.md). Needs build/stock-films/layout.json (gen/stock-films/structure.py).
 
-    uv run python experiments/2026-11-18-stock-filters/scripts/mkspec_loader.py WORKDIR [LISTING.txt]
+    uv run python gen/stock-films/loader.py WORKDIR [LISTING.txt]
 
 The camera-tested loader of card-looks-4 (experiments/2026-11-17-card-looks/scripts/mkspec_looks3.py), changed:
   * no snapshot, no live-table interpolation, no Built-in (the row is Off / Load: looks-menu-4);
@@ -21,8 +21,8 @@ import struct
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
-CL = os.path.join(ROOT, "experiments", "2026-11-17-card-looks", "scripts")
+ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
+CL = HERE  # mkspec_looks, mkspec_looks3, mkspec_slots: copies of experiments/2026-11-17-card-looks/scripts/
 sys.path.insert(0, CL)
 sys.path.insert(0, os.path.join(ROOT, "src"))
 _argv, sys.argv = sys.argv, [sys.argv[0], "--v4"]

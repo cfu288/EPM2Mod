@@ -424,7 +424,7 @@ LOWSS, +32 slowest. 9 breakpoints in place of 8 (PEN-F 0x605BA4B9; E-PM2 0x7E694
   (0x605BABE3–0x605BACE0): to the nearest 1/3 EV (85/170 grid) — up for P when stage 5 has no length — the change
   limited to ±42 by moving ISO back (1/3 EV step), and the **shutter** takes the rest.
 
-### 12.2 The E-PM2 code (`scripts/lss.s`, generator `scripts/mkspec_lss_core.py`, spec `patches/lss-core.json`)
+### 12.2 The E-PM2 code (`gen/lss-core/lss.s`, generator `gen/lss-core/mkspec.py`, spec `patches/lss-core.json`)
 
 641 B of new code in the exp debug printers 0x7E69E9EA–0x7E69EEAF (segment 1). Five edits, no RAM:
 

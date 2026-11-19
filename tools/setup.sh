@@ -3,6 +3,7 @@
 #
 #   tools/setup.sh            # everything
 #   tools/setup.sh --check    # only say what is present
+#   tools/setup.sh --binutils # only the MN103 binutils (what gen/ needs; CI uses this)
 #
 # 1. The MN103 disassembler, assembler and linker: GNU binutils, built from the submodule
 #    third_party/binutils-gdb into build/toolchain/ (ignored by git). Needs gcc, make, bison and flex.
@@ -18,6 +19,7 @@ PREFIX=$ROOT/build/toolchain
 OBJDUMP=$PREFIX/bin/mn10300-elf-objdump
 WANT=$(tr -d 'v \n' < .nvmrc)
 check_only=0; [ "${1:-}" = "--check" ] && check_only=1
+binutils_only=0; [ "${1:-}" = "--binutils" ] && binutils_only=1
 
 node_ok() { command -v "$1" >/dev/null 2>&1 && [ "$("$1" -p 'process.versions.node.split(".")[0]')" -ge "$WANT" ]; }
 find_node() {
@@ -60,6 +62,7 @@ else
   cd "$ROOT" && rm -rf "$work"
   echo "built: $("$OBJDUMP" --version | head -1)"
 fi
+[ $binutils_only = 1 ] && exit 0
 
 echo "== 2. Node $WANT or newer"
 if node=$(find_node); then

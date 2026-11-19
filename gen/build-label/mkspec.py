@@ -1,6 +1,6 @@
 """Write patches/build-label.json: the Firmware screen shows "Body : 1.6  EPM2Mod <label>". Research code.
 
-    uv run python experiments/2026-11-19-build-label/scripts/mkspec_label.py [LABEL] [OUT.json]
+    uv run python gen/build-label/mkspec.py [LABEL] [OUT.json]
 
 LABEL defaults to "EPM2Mod 0000.00.00": the placeholder that epm2mod make replaces with the build's label
 (src/epm2mod/label.py). The version number stays 1.6: block 0's header and prm tag 0xC082 are not touched. Byte
@@ -23,7 +23,7 @@ import struct
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
+ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 sys.path.insert(0, os.path.join(ROOT, "src"))
 from epm2mod.container import parse  # noqa: E402
 

@@ -1,7 +1,7 @@
 """Write patches/stock-films-structure.json and build/stock-films/layout.json: what the stock-filters firmware
 flashes for film looks (design.md, "One mechanism for all 12 entries"). Research code.
 
-    uv run python experiments/2026-11-18-stock-filters/scripts/mkspec_structure.py WORKDIR [LISTING.txt]
+    uv run python gen/stock-films/structure.py WORKDIR [LISTING.txt]
 
 Flashed, and reached only through a film code or a hidden stored value (so no stock filter changes):
   * one film code per menu entry; for each: a tone stub with three records that point at the entry's RAM block,
@@ -26,7 +26,7 @@ import subprocess
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
+ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 sys.path.insert(0, os.path.join(ROOT, "src"))
 from epm2mod.container import parse  # noqa: E402
 from epm2mod.looks import slots  # noqa: E402

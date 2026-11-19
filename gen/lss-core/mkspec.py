@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Assemble scripts/lss.s and write patches/lss-core.json: the exposure part of "Lowest S/S Setting".
+"""Assemble gen/lss-core/lss.s and write patches/lss-core.json: the exposure part of "Lowest S/S Setting".
 
-    uv run python experiments/2026-11-17-auto-iso-min-shutter/scripts/mkspec_lss_core.py [WORKDIR]
+    uv run python gen/lss-core/mkspec.py [WORKDIR]
 
 Research code (NOTES.md section 9). Four byte edits, all in segment 1:
   1. the code of lss.s over the exp debug printers 0x7E69E9EA-0x7E69EEAF;
@@ -13,7 +13,7 @@ Research code (NOTES.md section 9). Four byte edits, all in segment 1:
 import hashlib, json, os, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
+ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import disasm, oetool  # noqa: E402
 

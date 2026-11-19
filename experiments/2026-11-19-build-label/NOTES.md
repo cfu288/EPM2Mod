@@ -5,7 +5,7 @@ Date: 2026-11-19. Goal: each release shows its name on the camera, for example "
 
 Labels: **V** = verified (code, bytes or emulator), **I** = inferred, **U** = unknown.
 
-Scripts: `scripts/fwplay.mjs` (play steps, plus `HDR=1`, `wstr:`, `hex:`, `wset:`), `scripts/mkspec_label.py`
+Scripts: `scripts/fwplay.mjs` (play steps, plus `HDR=1`, `wstr:`, `hex:`, `wset:`), `gen/build-label/mkspec.py`
 (writes `patches/build-label-proto.json`). Screenshots: `results/`.
 
 ## 1. The Firmware screen
@@ -83,7 +83,7 @@ Lightroom show Software as text and do not parse it; Olympus software (OI.Worksp
 
 ## 4. Prototype
 
-`scripts/mkspec_label.py [LABEL]` writes `patches/build-label-proto.json`. `builds/build-label-proto.json` = the 16
+`gen/build-label/mkspec.py [LABEL]` writes `patches/build-label-proto.json`. `builds/build-label-proto.json` = the 16
 specs of `builds/lss.json` + the proto.
 
 | Check | Result | Label |
@@ -139,7 +139,7 @@ On the camera, with the 17 mm lens, the Lens "1.1" stayed centred in its stock b
 further left (`results/before-align-four-lines.png`, emulator with faked Lens, Flash and Acc versions: Body at x 387,
 Lens 446, Flash 440, Acc 443).
 
-**Method (data only, `patches/build-label.json`, from `scripts/mkspec_label.py`):** the box edit now covers all four
+**Method (data only, `patches/build-label.json`, from `gen/build-label/mkspec.py`):** the box edit now covers all four
 value widgets 10–13 (both copies, 0x7EF938A4–0x7EF938E3): (369, y, 100, 32) → (337, y, 335, 32), screen x 377–712;
 and the four value descriptors' alignment field (0x7EF93C74, 0x7EF93CD0, 0x7EF93D2C, 0x7EF93D88) goes from 0x101
 (centred) to 0x100 (left, the labels' value). The other edits and the placeholder are unchanged.
