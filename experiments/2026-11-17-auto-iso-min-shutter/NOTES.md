@@ -497,3 +497,16 @@ free-space PASS; boot-test PASS; update-path-test PASS; hookcheck: all lss-core 
   build); the owner was asked. Retest in the next run, in P and in A at f/2.8.
 - Fault seen: the value box of the last row (slot 7) was misaligned; fixed by moving the row to slot 6 (section 11.1),
   build `2b15214b…9f5b`.
+
+### 12.7 Second camera run (build `2b15214b…9f5b`, 2026-11-19; photos PB180001–008 of run 2)
+
+The owner: the value box is centred (V, criterion 1). The steps meant for P were taken in A at f/5.6.
+
+| Photos | Setting | Camera | Harness (`bv` −1.5) |
+|---|---|---|---|
+| 1–2 | A f/5.6, Auto | 1/30 ISO 6400 | 1/29 ISO 6400 |
+| 3–6 | A f/5.6, 1/8 | 1/8 ISO 1600 | 1/7 ISO 1600 |
+| 7–8 | A f/2.8, Auto | 1/80 ISO 4000 | 1/73 ISO 4017 |
+
+- V: the slower-than-stock path works on the camera (stage 6, ISO rises at the limit), as the harness predicts.
+- Not yet on the camera: P with a slower limit (stage 5, the shutter falls at base ISO), and the value after power off.
