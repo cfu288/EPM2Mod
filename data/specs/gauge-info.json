@@ -1,0 +1,306 @@
+{
+ "name": "gauge-info",
+ "description": "Level Gauge screen with the shooting information: the producers of the information that the histogram screen shows (layout 8) also run on the Level Gauge screen (layout 22), so ISO, S-IS, the movie time, the frame count and the touch icon stay on the gauge screen. Eleven layout lists get a copy with 22 added in free data space (segment 3); their code points at the copy. See experiments/2026-11-19-gauge-info/NOTES.md.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "candidate: emulator-checked, not flashed",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA25DA0",
+   "expect": "48f17443045818f1e44208fa418e005d148dcdc39ef03ca000c90b580c482202a2c0cc00dff02c42144310fa",
+   "new": "0400000005000000060000000700000008000000090000000a0000000b000000150000001800000016000000",
+   "_addr": "0x7EE46DC0",
+   "_note": "layouts of 0x7ED9E737: [4, 5, 6, 7, 8, 9, 10, 11, 21, 24] and 22"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x979136",
+   "expect": "64ecfc7e",
+   "new": "c06de47e",
+   "_addr": "0x7ED9A156",
+   "_note": "0x7ED9E737: the list at 0x7ee46dc0"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x979145",
+   "expect": "0a",
+   "new": "0b",
+   "_addr": "0x7ED9A165",
+   "_note": "0x7ED9E737: 11 layouts"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA25DCC",
+   "expect": "60a600fad0c400421cf1d7ddc1c70000000000f892244204",
+   "new": "05000000080000000b0000000c0000001100000016000000",
+   "_addr": "0x7EE46DEC",
+   "_note": "layouts of producer 0x7ED9A474: [5, 8, 11, 12, 17] and 22"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x979487",
+   "expect": "bceffc7e",
+   "new": "ec6de47e",
+   "_addr": "0x7ED9A4A7",
+   "_note": "producer 0x7ED9A474: the list at 0x7ee46dec"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x97949C",
+   "expect": "05",
+   "new": "06",
+   "_addr": "0x7ED9A4BC",
+   "_note": "producer 0x7ED9A474: 6 layouts"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA25DE4",
+   "expect": "581ca000c105ccbb0058143d404220212c47083d21284718f1d29f10f16f9508",
+   "new": "050000000600000008000000090000000b0000000c0000001100000016000000",
+   "_addr": "0x7EE46E04",
+   "_note": "layouts of producer 0x7ED9A4EA: [5, 6, 8, 9, 11, 12, 17] and 22"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x979506",
+   "expect": "f8effc7e",
+   "new": "046ee47e",
+   "_addr": "0x7ED9A526",
+   "_note": "producer 0x7ED9A4EA: the list at 0x7ee46e04"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x979525",
+   "expect": "07",
+   "new": "08",
+   "_addr": "0x7ED9A545",
+   "_note": "producer 0x7ED9A4EA: 8 layouts"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA25E04",
+   "expect": "f16d470c5814a004c00600dff0485c10fa24ac00f1e8f060f91490f161f00972a00ac917",
+   "new": "0200000005000000080000000b0000000c00000011000000130000001a00000016000000",
+   "_addr": "0x7EE46E24",
+   "_note": "layouts of ISO, ISO-A (0x7ED9A574, +204 = 1): [2, 5, 8, 11, 12, 17, 19, 26] and 22"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x979624",
+   "expect": "6cf0fc7e",
+   "new": "246ee47e",
+   "_addr": "0x7ED9A644",
+   "_note": "ISO, ISO-A (0x7ED9A574, +204 = 1): the list at 0x7ee46e24"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x979629",
+   "expect": "08",
+   "new": "09",
+   "_addr": "0x7ED9A649",
+   "_note": "ISO, ISO-A (0x7ED9A574, +204 = 1): 9 layouts"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA25E28",
+   "expect": "fa418e00f1ed592098cdfc9ff05014a000c85dca56a016c957f1ecf80014f230",
+   "new": "05000000080000000b0000000c00000011000000130000001a00000016000000",
+   "_addr": "0x7EE46E48",
+   "_note": "layouts of ISO, ISO-A (0x7ED9A574): [5, 8, 11, 12, 17, 19, 26] and 22"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x97962E",
+   "expect": "50f0fc7e",
+   "new": "486ee47e",
+   "_addr": "0x7ED9A64E",
+   "_note": "ISO, ISO-A (0x7ED9A574): the list at 0x7ee46e48"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x979633",
+   "expect": "07",
+   "new": "08",
+   "_addr": "0x7ED9A653",
+   "_note": "ISO, ISO-A (0x7ED9A574): 8 layouts"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA25E48",
+   "expect": "f8ec01c84bf80220a001c944985d085818cdc3b6b010f1ec70f82404f1e05908",
+   "new": "050000000600000008000000090000000b0000000c0000001100000016000000",
+   "_addr": "0x7EE46E68",
+   "_note": "layouts of slot 37 +22 (0x7ED9A887): [5, 6, 8, 9, 11, 12, 17] and 22"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x97994B",
+   "expect": "e0f2fc7e",
+   "new": "686ee47e",
+   "_addr": "0x7ED9A96B",
+   "_note": "slot 37 +22 (0x7ED9A887): the list at 0x7ee46e68"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x979950",
+   "expect": "07",
+   "new": "08",
+   "_addr": "0x7ED9A970",
+   "_note": "slot 37 +22 (0x7ED9A887): 8 layouts"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA25E68",
+   "expect": "5828dd29d30000f02c14a000c8225c0c70a000c8",
+   "new": "05000000080000000b0000001400000016000000",
+   "_addr": "0x7EE46E88",
+   "_note": "layouts of 0x7ED9CFAE (viewer +772), first list: [5, 8, 11, 20] and 22"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x97C032",
+   "expect": "c0f6fc7e",
+   "new": "886ee47e",
+   "_addr": "0x7ED9D052",
+   "_note": "0x7ED9CFAE (viewer +772), first list: the list at 0x7ee46e88"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x97C041",
+   "expect": "04",
+   "new": "05",
+   "_addr": "0x7ED9D061",
+   "_note": "0x7ED9CFAE (viewer +772), first list: 5 layouts"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA25E7C",
+   "expect": "1377f1ecf8000ca1c20d5c0c73f00454",
+   "new": "05000000080000000b00000016000000",
+   "_addr": "0x7EE46E9C",
+   "_note": "layouts of 0x7ED9CFAE (viewer +772), second list: [5, 8, 11] and 22"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x97C053",
+   "expect": "d0f6fc7e",
+   "new": "9c6ee47e",
+   "_addr": "0x7ED9D073",
+   "_note": "0x7ED9CFAE (viewer +772), second list: the list at 0x7ee46e9c"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x97C062",
+   "expect": "03",
+   "new": "04",
+   "_addr": "0x7ED9D082",
+   "_note": "0x7ED9CFAE (viewer +772), second list: 4 layouts"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA25E8C",
+   "expect": "f3e17340638001f892245804591c4042042a02a4c205cc66fff8b824dff04842184314fa",
+   "new": "050000000600000008000000090000000b0000000c000000110000001400000016000000",
+   "_addr": "0x7EE46EAC",
+   "_note": "layouts of producer 0x7ED9AD90: [5, 6, 8, 9, 11, 12, 17, 20] and 22"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x979ED2",
+   "expect": "dcf6fc7e",
+   "new": "ac6ee47e",
+   "_addr": "0x7ED9AEF2",
+   "_note": "producer 0x7ED9AD90: the list at 0x7ee46eac"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x979EE3",
+   "expect": "08",
+   "new": "09",
+   "_addr": "0x7ED9AF03",
+   "_note": "producer 0x7ED9AD90: 9 layouts"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA25EB0",
+   "expect": "60a600fad0c4004220f1d7ddddc60000000000f8922842085820a000",
+   "new": "05000000080000000b0000000c000000130000001400000016000000",
+   "_addr": "0x7EE46ED0",
+   "_note": "layouts of movie time and frame count (0x7ED9EA46): [5, 8, 11, 12, 19, 20] and 22"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x97A486",
+   "expect": "c8f9fc7e",
+   "new": "d06ee47e",
+   "_addr": "0x7ED9B4A6",
+   "_note": "movie time and frame count (0x7ED9EA46): the list at 0x7ee46ed0"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x97A495",
+   "expect": "06",
+   "new": "07",
+   "_addr": "0x7ED9B4B5",
+   "_note": "movie time and frame count (0x7ED9EA46): 7 layouts"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA25ECC",
+   "expect": "c105ccbf0058183d4042242130470c3d212c471cf1d29f10f16f9508f16d47105818a004",
+   "new": "05000000080000000b0000000c0000001300000014000000190000001a00000016000000",
+   "_addr": "0x7EE46EEC",
+   "_note": "layouts of 0x7ED9EA82 (gate 0x7ED9B4C4): [5, 8, 11, 12, 19, 20, 25, 26] and 22"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x97A4CA",
+   "expect": "e0f9fc7e",
+   "new": "ec6ee47e",
+   "_addr": "0x7ED9B4EA",
+   "_note": "0x7ED9EA82 (gate 0x7ED9B4C4): the list at 0x7ee46eec"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x97A4D7",
+   "expect": "08",
+   "new": "09",
+   "_addr": "0x7ED9B4F7",
+   "_note": "0x7ED9EA82 (gate 0x7ED9B4C4): 9 layouts"
+  }
+ ]
+}
