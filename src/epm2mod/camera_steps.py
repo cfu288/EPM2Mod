@@ -16,7 +16,7 @@ from .stock import CARD_FOLDER
 #: The menu path that loads the film file into the camera.
 LOAD_LOOKS = (
     "MENU → SETUP → gears tab → J → Load Looks → Load → OK. "
-    "No gears tab? Wrench tab → Menu Display → Custom Menu → On."
+    "If there is no gears tab, set wrench tab → Menu Display → Custom Menu to On."
 )
 
 
@@ -90,7 +90,7 @@ def flash_steps(
     steps = _start(copy, ejected) + [
         Step(
             "insert",
-            "Put a charged battery and the card in the camera (cover on the bottom).",
+            "Open the cover on the bottom of the camera and put in a charged battery and the card.",
         ),
         Step(
             "flash",
@@ -101,12 +101,12 @@ def flash_steps(
         Step("restart", "Turn the camera off and on."),
         Step(
             "check-firmware",
-            f"To check: MENU → SETUP → wrench tab → Firmware reads {firmware}.",
+            f"Check that MENU → SETUP → wrench tab → Firmware reads {firmware}.",
         ),
     ]
     if films:
         steps.append(Step("load-films", LOAD_LOOKS))
-    steps.append(Step("check-art", f"Check: MENU → ART shows {art_shows}"))
+    steps.append(Step("check-art", f"Check that MENU → ART shows {art_shows}"))
     return steps
 
 
@@ -120,7 +120,7 @@ def film_steps(
     return _start(copy, ejected) + [
         Step("insert", "Put the card in the camera and switch it on."),
         Step("load-films", LOAD_LOOKS),
-        Step("check-art", f"Check: MENU → ART shows {art_shows}"),
+        Step("check-art", f"Check that MENU → ART shows {art_shows}"),
     ]
 
 

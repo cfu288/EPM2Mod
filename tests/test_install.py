@@ -290,7 +290,7 @@ class InstallTests(CardCase):
         self.assertNotIn("load-films", ids)
         self.assertEqual(
             outcome.steps[-1].text,
-            "Check: MENU → ART shows the art filters, such as Pop Art.",
+            "Check that MENU → ART shows the art filters, such as Pop Art.",
         )
         self.assertEqual(self.repo.outputs(), [])  # install writes no output folder
 
@@ -302,7 +302,7 @@ class InstallTests(CardCase):
         )
         self.assertIn("load-films", [step.id for step in outcome.steps])
         self.assertEqual(
-            outcome.steps[-1].text, "Check: MENU → ART shows C200 in ART 2."
+            outcome.steps[-1].text, "Check that MENU → ART shows C200 in ART 2."
         )
 
     def test_wrong_choices_are_usage_errors(self) -> None:
@@ -405,7 +405,7 @@ class FilmsAndRestoreTests(CardCase):
             [step.id for step in outcome.steps][-2:], ["load-films", "check-art"]
         )
         self.assertEqual(
-            outcome.steps[-1].text, "Check: MENU → ART shows Double-X in ART 6."
+            outcome.steps[-1].text, "Check that MENU → ART shows Double-X in ART 6."
         )
         out = self.folder / "films.bin"
         pipeline.set_films(self.repo.paths, ["ART1=velvia"], out=out)
@@ -742,7 +742,7 @@ class CameraStepsTests(unittest.TestCase):
         )
         check = next(step.text for step in steps if step.id == "check-firmware")
         self.assertEqual(
-            check, "To check: MENU → SETUP → wrench tab → Firmware reads Body : 1.6."
+            check, "Check that MENU → SETUP → wrench tab → Firmware reads Body : 1.6."
         )
 
     def test_the_art_check_names_the_first_film_by_slot(self) -> None:

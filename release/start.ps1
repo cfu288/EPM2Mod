@@ -16,14 +16,14 @@ $Assets = @{
 }
 $Machine = $env:PROCESSOR_ARCHITEW6432
 if (-not $Machine) { $Machine = $env:PROCESSOR_ARCHITECTURE }
-if (-not $Assets.ContainsKey($Machine)) { throw "EPM2Mod runs on 64-bit Windows (x64 or ARM); this computer is $Machine." }
+if (-not $Assets.ContainsKey($Machine)) { throw "This start script works on 64-bit Windows (x64 or ARM). This computer is $Machine." }
 $Asset, $Sha = $Assets[$Machine]
 
 $Bin = Join-Path $PSScriptRoot '.uv\bin'
 $Uv = Join-Path $Bin 'uv.exe'
 $Have = if (Test-Path -LiteralPath $Uv) { ((& $Uv --version) -split ' ')[1] } else { '' }
 if ($Have -ne $UvVersion) {
-  [Console]::Error.WriteLine("Getting uv $UvVersion (once)...")
+  [Console]::Error.WriteLine("Downloading uv $UvVersion.")
   New-Item -ItemType Directory -Force -Path $Bin | Out-Null
   $Archive = Join-Path $PSScriptRoot ".uv\$Asset.zip"
   (New-Object System.Net.WebClient).DownloadFile("https://github.com/astral-sh/uv/releases/download/$UvVersion/$Asset.zip", $Archive)

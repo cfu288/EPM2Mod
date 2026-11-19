@@ -251,7 +251,7 @@ class App:
         if firmware not in ("epm2mod", "original"):
             raise BuildError("'firmware' is 'epm2mod' or 'original'")
         if firmware == "original" and choices:
-            raise BuildError("Olympus's original firmware takes no film looks")
+            raise BuildError("Olympus's original firmware takes no film simulations")
         if not isinstance(choices, list) or not all(
             isinstance(choice, str) and records.is_choice(choice) for choice in choices
         ):
@@ -487,4 +487,4 @@ def serve(paths: Locator, port: int = 0, browser: bool = True) -> None:
         httpd.serve_forever()
     finally:
         httpd.server_close()
-    print("EPM2Mod has stopped. You can close this window.", flush=True)
+    print("The installer has closed. You can close this window.", flush=True)

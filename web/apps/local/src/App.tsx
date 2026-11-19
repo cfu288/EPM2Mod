@@ -176,7 +176,9 @@ function StartStep(props: {
                   <ArrowPathIcon aria-hidden="true" className="size-4 animate-spin" />
                   Insert the camera&apos;s SD card.
                 </p>
-                <p className="text-ink-soft">No card slot? Connect the camera by USB and choose Storage on it.</p>
+                <p className="text-ink-soft">
+                  If your computer has no card slot, connect the camera by USB and select Storage on the camera.
+                </p>
               </>
             )}
           </div>
@@ -216,7 +218,7 @@ function FirmwareStep(props: {
         <Choice
           group="firmware"
           title="EPM2Mod"
-          line="Film simulations, interval shooting, level gauge, focus peaking, lowest shutter speed."
+          line="Adds film simulations, interval shooting, a level gauge, focus peaking and a lowest shutter speed for ISO Auto."
           checked={props.firmware === 'epm2mod'}
           onChoose={() => {
             props.onFirmware('epm2mod')
@@ -225,7 +227,7 @@ function FirmwareStep(props: {
         <Choice
           group="firmware"
           title="Olympus original"
-          line="Removes EPM2Mod."
+          line="Puts back Olympus's firmware 1.6."
           checked={props.firmware === 'original'}
           onChoose={() => {
             props.onFirmware('original')
@@ -334,7 +336,7 @@ function BuildStep(props: { job: Job | null; firmware: Firmware; onRetry: () => 
         ? job?.card == null
           ? 'Could not make the zip'
           : 'Could not write to the card'
-        : 'The build stopped'
+        : 'The firmware could not be made'
   return (
     <Step
       title={failed ? failedTitle : title}
@@ -373,8 +375,8 @@ function BuildStep(props: { job: Job | null; firmware: Firmware; onRetry: () => 
         </p>
       ) : (
         <p className="text-ink-soft text-sm">
-          About a minute.
-          {job?.card != null && ' Keep the card in.'}
+          This takes about a minute.
+          {job?.card != null && ' Do not take the card out.'}
         </p>
       )}
     </Step>
@@ -407,7 +409,9 @@ function InstallStep(props: {
         </>
       }
     >
-      <p className="font-bold">{zip ? 'Done.' : `Done: ${what} is on ${props.cardName}.`}</p>
+      <p className="font-bold">
+        {zip ? 'The zip is ready.' : `${what} is on the SD card${props.cardName ? ` ${props.cardName}` : ''}.`}
+      </p>
       {zip && (
         <button type="button" onClick={props.onZip} className={`${primary} w-full`}>
           <ArrowDownTrayIcon aria-hidden="true" className="size-5" />
@@ -420,9 +424,9 @@ function InstallStep(props: {
         ))}
       </ol>
       <p className="text-ink-soft text-sm">
-        Camera started normally? Turn it off and repeat step {flash}.{' '}
+        If the camera starts normally, turn it off and do step {flash} again.{' '}
         <a className="hover:text-ink underline" href={HELP}>
-          Other problem?
+          Install guide
         </a>
       </p>
     </Step>
@@ -622,7 +626,7 @@ export default function App() {
         {step === 'install' && job && (
           <InstallStep
             job={job}
-            cardName={cards.find((c) => c.path === job.card && c.name !== '')?.name ?? 'SD card'}
+            cardName={cards.find((c) => c.path === job.card && c.name !== '')?.name ?? ''}
             onZip={downloadZip}
             onFinish={() => {
               api.quit().then(

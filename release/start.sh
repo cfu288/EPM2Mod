@@ -13,12 +13,12 @@ case "$(uname -s)-$(uname -m)" in
   Darwin-x86_64) ASSET=uv-x86_64-apple-darwin; SHA=63ba17fdda55ad1a230d4b37fc6017ffa10c23688c83818bd3bfdf914c652a02 ;;
   Linux-x86_64) ASSET=uv-x86_64-unknown-linux-gnu; SHA=f29c3e94ffabd7e6f3ba521dba169a9b7ec12100bf3257087f0f24f6123f3645 ;;
   Linux-aarch64 | Linux-arm64) ASSET=uv-aarch64-unknown-linux-gnu; SHA=229e194255c7958d86d56e8790d969a6f74736592133f0dfd0076f754c642c1d ;;
-  *) echo "EPM2Mod runs on macOS and Linux (x86-64 or ARM) here; this computer is $(uname -s) $(uname -m)." >&2; exit 1 ;;
+  *) echo "This start script works on macOS and Linux (x86-64 or ARM). This computer is $(uname -s) $(uname -m)." >&2; exit 1 ;;
 esac
 
 UV=.uv/bin/uv
 if [ ! -x "$UV" ] || [ "$("$UV" --version 2>/dev/null | cut -d' ' -f2)" != "$UV_VERSION" ]; then
-  echo "Getting uv $UV_VERSION (once)..." >&2
+  echo "Downloading uv $UV_VERSION." >&2
   mkdir -p .uv/bin
   ARCHIVE=".uv/$ASSET.tar.gz"
   curl --proto '=https' --tlsv1.2 -fsSL -o "$ARCHIVE" \

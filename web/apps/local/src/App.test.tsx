@@ -42,7 +42,7 @@ function cameraSteps(body: MakeBody) {
       text: 'Hold OK (middle of the arrow pad) and ON/OFF together until the orange lamp on the front stays lit, then let go.',
     },
     ...(films ? [{ id: 'load-films', text: 'MENU → SETUP → gears tab → J → Load Looks → Load → OK.' }] : []),
-    { id: 'check-art', text: `Check: MENU → ART shows ${art}` },
+    { id: 'check-art', text: `Check that MENU → ART shows ${art}` },
   ]
 }
 
@@ -120,9 +120,9 @@ describe('the local app', () => {
       'Hold OK (middle of the arrow pad) and ON/OFF together until the orange lamp on the front stays lit, then let go.',
     )
     expect(steps).toHaveTextContent('MENU → SETUP → gears tab → J → Load Looks → Load → OK.')
-    expect(steps).toHaveTextContent('Check: MENU → ART shows portra-400 in ART 1.')
+    expect(steps).toHaveTextContent('Check that MENU → ART shows portra-400 in ART 1.')
     expect(steps).not.toHaveTextContent('Copy')
-    expect(screen.getByText(/repeat step 2/)).toBeInTheDocument()
+    expect(screen.getByText(/do step 2 again/)).toBeInTheDocument()
     expect(screen.queryByText(/derived from/)).toBeNull()
     await user.click(screen.getByRole('button', { name: 'Finish' }))
     expect(await screen.findByRole('heading', { name: 'The installer is finished' })).toBeInTheDocument()
@@ -208,6 +208,6 @@ describe('the local app', () => {
     const steps = screen.getByRole('list', { name: 'Install steps' })
     expect(steps).toHaveTextContent('Copy DCOLYMP and EPM2LOOK.BIN to the top of the SD card.')
     expect(steps).toHaveTextContent('MENU → SETUP → gears tab → J → Load Looks → Load → OK.')
-    expect(screen.getByText(/repeat step 3/)).toBeInTheDocument()
+    expect(screen.getByText(/do step 3 again/)).toBeInTheDocument()
   })
 })

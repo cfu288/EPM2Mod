@@ -99,7 +99,7 @@ export function SlotList({ items, selected, onMove, onRemove, onSelect }: Props)
   const place = (id: UniqueIdentifier | undefined) => {
     const index = items.findIndex((item) => item.key === id)
     const filmId = items[index]?.filmId
-    return { art: `ART ${String(index + 1)}`, name: filmId ? filmById(filmId).film : 'The empty place' }
+    return { art: `ART ${String(index + 1)}`, name: filmId ? filmById(filmId).film : 'The empty row' }
   }
   const announcements: Announcements = {
     onDragStart: ({ active }) => `Picked up ${place(active.id).name} from ${place(active.id).art}.`,

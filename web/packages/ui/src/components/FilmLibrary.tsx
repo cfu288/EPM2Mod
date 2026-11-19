@@ -9,7 +9,7 @@ interface Props {
 
 /** The films that are not in the menu, each with an Add button. */
 export function FilmLibrary({ films, canAdd, onAdd }: Props) {
-  if (films.length === 0) return <p className="text-muted text-sm">Every film is in the menu.</p>
+  if (films.length === 0) return <p className="text-muted text-sm">Every film simulation is in the menu.</p>
   return (
     <ul className="divide-rule border-rule divide-y border-y">
       {films.map((film) => (
