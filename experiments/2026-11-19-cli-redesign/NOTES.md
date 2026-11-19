@@ -35,6 +35,15 @@ call the same functions. Three single sources:
 | `epm2mod.catalogue` (one data module) | The films, the 12 default choices, the build to install | User commands, the installer page, the docs and site generators. Reads the repository or the files bundled in the release zip, so user commands need no checkout |
 | `epm2mod.cardio` | Card checks, writes, read-back | Every command that writes to a card |
 
+### Running outside the repository later (owner, 2026-11-19)
+
+The CLI must make it easy to stop running from inside the repository. User commands never build repository paths;
+they get the films, the defaults, the build to install and the firmware cache through one locator in the catalogue
+module. Today it has two sources (a checkout, the files in the release zip); a third (an installed package plus a
+user cache folder) must be addable without changing command code. One function decides where output and the cache
+go. Developer and release commands keep using the repository and fail with exit 5 outside one. A test runs every
+user command's `--dry-run --json` against a folder laid out like the release zip, with no checkout.
+
 ## 2. The commands
 
 Grouped as `epm2mod --help` shows them. Every `--help` ends with one or two examples.
