@@ -1,0 +1,64 @@
+{
+ "looks": [
+  {
+   "entry": "Pop Art",
+   "name": "Q OFF",
+   "fit": "data/films/fits/velvia100.npz"
+  },
+  {
+   "entry": "Soft Focus",
+   "name": "Q NAT A",
+   "fit": "data/films/fits/velvia100.npz"
+  },
+  {
+   "entry": "Pale&Light Color",
+   "name": "Q PORTRA",
+   "fit": "data/films/fits/velvia100.npz"
+  },
+  {
+   "entry": "Light Tone",
+   "name": "Q VELVIA",
+   "fit": "data/films/fits/velvia100.npz"
+  },
+  {
+   "entry": "Grainy Film",
+   "name": "Q EKTA",
+   "fit": "data/films/fits/velvia100.npz"
+  },
+  {
+   "entry": "Pin Hole",
+   "name": "Q NAT FLAT",
+   "fit": "data/films/fits/velvia100.npz"
+  },
+  {
+   "entry": "Diorama",
+   "name": "K13",
+   "fit": "experiments/2026-11-20-model-calibration/films/k13.npz"
+  },
+  {
+   "entry": "Cross Process",
+   "name": "K14",
+   "fit": "experiments/2026-11-20-model-calibration/films/k14.npz"
+  },
+  {
+   "entry": "Gentle Sepia",
+   "name": "K15",
+   "fit": "experiments/2026-11-20-model-calibration/films/k15.npz"
+  },
+  {
+   "entry": "Dramatic Tone",
+   "name": "K16",
+   "fit": "experiments/2026-11-20-model-calibration/films/k16.npz"
+  },
+  {
+   "entry": "Key Line",
+   "name": "K17",
+   "fit": "experiments/2026-11-20-model-calibration/films/k17.npz"
+  },
+  {
+   "entry": "Watercolor",
+   "name": "K18",
+   "fit": "experiments/2026-11-20-model-calibration/films/k18.npz"
+  }
+ ]
+}

@@ -63,14 +63,15 @@ def check(emu, image, code, cs, mode, want_table=None):
     return tab, mask, errs
 
 
-def main():
+def verify(build_path, entries, tables, tag):
+    """entries: (art n, entry name, film code, case name or None = table A / B); tables: case -> (sRGB, Adobe)."""
     os.chdir(ROOT)
-    build = json.load(open("data/builds/twelve-region-probe.json"))
+    build = json.load(open(build_path))
     _, probe, _ = patchblock.patched_block0(build["specs"])
     _, base, _ = patchblock.patched_block0(build["specs"][:-1])
     paths = {}
     for name, img in (("base", base), ("probe", probe)):
-        paths[name] = os.path.join(ROOT, "build", f"twelve-{name}.block0.bin")
+        paths[name] = os.path.join(ROOT, "build", f"{tag}-{name}.block0.bin")
         open(paths[name], "wb").write(img)
     bad = 0
     sel = {}
@@ -78,7 +79,7 @@ def main():
         img = open(paths[name], "rb").read()
         with omemu.Emu() as emu:
             emu.load(paths[name])
-            for n, entry, code, tname, film, what in T.ENTRIES:
+            for n, entry, code, tname in entries:
                 for cs in (0, 1):
                     for mode in (2, 4):
                         want = None
@@ -87,8 +88,7 @@ def main():
                                 want = img[TABLE_A - omemu.BASE:TABLE_A - omemu.BASE + T.TABLE_BYTES] if cs == 0 else \
                                     img[TABLE_B - omemu.BASE:TABLE_B - omemu.BASE + T.TABLE_BYTES]
                             else:
-                                tn = T.__dict__  # noqa
-                                want = T.table({"HUEMAP": "MARKER"}.get(tname, tname) if cs else tname)
+                                want = tables[tname][cs]
                         tab, mask, errs = check(emu, img, code, cs, mode, want)
                         sel[(name, code, cs, mode)] = tab
                         if errs:
@@ -112,6 +112,14 @@ def main():
     print(f"stock codes ({len(STOCK_CODES)}): same table pointer on both builds; codes whose table content is a probe "
           f"table in this build: {changed_content}")
     print("RESULT", "PASS" if not bad else f"FAIL ({bad})")
+    return bad
+
+
+def main():
+    bad = verify("data/builds/twelve-region-probe.json",
+                 [(n, entry, code, tname) for n, entry, code, tname, film, what in T.ENTRIES],
+                 {c: (T.table(c), T.table({"HUEMAP": "MARKER"}.get(c, c))) for c in set(e[3] for e in T.ENTRIES) if c},
+                 "twelve")
     sys.exit(1 if bad else 0)
 
 

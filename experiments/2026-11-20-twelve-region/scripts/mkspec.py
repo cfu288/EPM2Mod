@@ -56,7 +56,10 @@ def case_descs(blk, case):
     return [first]
 
 
-def main():
+def make(entries, tables, look_xp1, spec_path, build_path, name, description, what, adobe_names=ADOBE):
+    """entries: (art n, entry name, film code, case name or None = no hash entry); tables: case name -> (sRGB table,
+    Adobe table[, label]), only the cases used; look_xp1: ART 12's film code takes Cross Process I's look. Writes the spec and
+    the build description (base: films-look-exif-artbkt)."""
     os.chdir(ROOT)
     build = json.load(open(BASE_BUILD))
     _, blk, _ = patchblock.patched_block0(build["specs"])        # the base build's block 0
@@ -70,26 +73,29 @@ def main():
 
     # --- tables over the case descriptors' tables
     iso_flat = struct.pack("<12H", *[256] * 12)
-    for name, (case, d_srgb, d_adobe) in CASES.items():
+    for cname, (case, d_srgb, d_adobe) in CASES.items():
+        if cname not in tables:
+            continue
         got = case_descs(blk, case)
         want = [d for d in (d_adobe, d_srgb) if d]
-        assert sorted(got) == sorted(want), (name, [hex(x) for x in got])
-        for d, tname in ((d_srgb, name), (d_adobe, ADOBE.get(name, name))):
+        assert sorted(got) == sorted(want), (cname, [hex(x) for x in got])
+        lab = tables[cname][2] if len(tables[cname]) > 2 else None             # what the table is, when not the case's name
+        for d, tname, tbytes in ((d_srgb, lab or cname, tables[cname][0]), (d_adobe, lab or adobe_names.get(cname, cname), tables[cname][1])):
             if not d:
                 continue
             tab = u32(blk, d)
             refs = [i for i in range(0, len(blk) - 3) if blk[i:i + 4] == struct.pack("<I", tab)]
-            assert [BASE + i for i in refs] == [d], (name, hex(tab), [hex(BASE + i) for i in refs])
+            assert [BASE + i for i in refs] == [d], (cname, hex(tab), [hex(BASE + i) for i in refs])
             for k in range(12):                       # ISO weights flat: the record values reach the engine as written
-                assert blk[u32(blk, d + 4 + 4 * k) - BASE:u32(blk, d + 4 + 4 * k) - BASE + 24] == iso_flat, (name, k)
+                assert blk[u32(blk, d + 4 + 4 * k) - BASE:u32(blk, d + 4 + 4 * k) - BASE + 24] == iso_flat, (cname, k)
             assert blk[tab - BASE:tab - BASE + T.TABLE_BYTES] == stock[tab - BASE:tab - BASE + T.TABLE_BYTES]
-            op(tab, T.table(tname), f"12-region table {tname} (descriptor {d:#x}, case {case:#x}; stock: "
+            op(tab, tbytes, f"12-region table {tname} (descriptor {d:#x}, case {case:#x}; stock: "
                f"{'a copy of table A' if blk[tab - BASE:tab - BASE + T.TABLE_BYTES] == stock[0x7E76C3C8 - BASE:0x7E76C3C8 - BASE + T.TABLE_BYTES] else 'a copy of table B' if blk[tab - BASE:tab - BASE + T.TABLE_BYTES] == stock[0x7E76CF9C - BASE:0x7E76CF9C - BASE + T.TABLE_BYTES] else 'its own table'})")
             checks.append((d, tab, tname))
 
     # --- hash entries for the film codes
     slots = [(u32(blk, HASH + 8 * i), u32(blk, HASH + 8 * i + 4)) for i in range(HASH_N)]
-    for n, entry, code, tname, film, what in T.ENTRIES:
+    for n, entry, code, tname in entries:
         if tname is None:
             continue
         key = code - 8
@@ -99,17 +105,39 @@ def main():
             p = (p + 1) % HASH_N
         slots[p] = (key, CASES[tname][0])
         op(HASH + 8 * p, struct.pack("<II", key, CASES[tname][0]),
-           f"12-region hash slot {p}: code {code} (ART {n}, {entry}) -> case {CASES[tname][0]:#x}: table {tname}")
+           f"12-region hash slot {p}: code {code} (ART {n}, {entry}) -> case {CASES[tname][0]:#x}: table "
+           f"{tables[tname][2] if len(tables[tname]) > 2 else tname}")
     assert sum(1 for k, _ in slots if k == 0) >= 8          # lookups of absent keys still end at an empty slot
 
     # --- ART 12: Cross Process I's look curve
     a = LOOK_JUMP + 4 * (159 - 8)
     assert u32(blk, a) == LKID
-    op(a, struct.pack("<I", XP1_LOOK), "look entry of code 159 (ART 12): Cross Process I's look handler (table "
-       "0x7E75F2F0) in place of LKID (identity table)")
+    if look_xp1:
+        op(a, struct.pack("<I", XP1_LOOK), "look entry of code 159 (ART 12): Cross Process I's look handler (table "
+           "0x7E75F2F0) in place of LKID (identity table)")
 
-    spec = {"name": "twelve-region-probe",
-            "description": "TEST ONLY. Camera probe of the 12-region hue, saturation and lightness stage (builder "
+    spec = {"name": name, "description": description,
+            "base": STOCK,
+            "base_sha256": json.load(open("data/specs/build-label.json"))["base_sha256"],
+            "status": "candidate: emulator-checked, not flashed",
+            "ops": ops}
+    with open(spec_path, "w") as f:
+        json.dump(spec, f, indent=1)
+        f.write("\n")
+    b = {"what": what, "stock": build["stock"], "specs": build["specs"] + [spec_path], "first_code": True,
+         "label": build["label"]}
+    with open(build_path, "w") as f:
+        json.dump(b, f, indent=1)
+        f.write("\n")
+    print(f"{spec_path}: {len(ops)} ops, {sum(len(o['new']) // 2 for o in ops)} bytes")
+    for d, tab, tname in checks:
+        print(f"  descriptor {d:#x} -> table {tab:#x}: {tname}")
+
+
+def main():
+    make([(n, entry, code, tname) for n, entry, code, tname, film, what in T.ENTRIES],
+         {c: (T.table(c), T.table(ADOBE.get(c, c))) for c in CASES}, True, SPEC, BUILD, "twelve-region-probe",
+         "TEST ONLY. Camera probe of the 12-region hue, saturation and lightness stage (builder "
                            "0x7E56E186): each ART entry's film code gets its own 12-region table through the hash "
                            "0x7E78C6E4 (empty slots only), tables written over the stock tables of the descriptors that "
                            "the chosen cases return (byte copies of table A / B, and the stock Key Line still table: "
@@ -117,24 +145,10 @@ def main():
                            "12's film code takes Cross Process I's look curve. Data edits only, no code. Needs "
                            "films-look-exif-artbkt before it (the look entry of code 159 is stock-films-structure-2's). "
                            "See experiments/2026-11-20-twelve-region/NOTES.md.",
-            "base": STOCK,
-            "base_sha256": json.load(open("data/specs/build-label.json"))["base_sha256"],
-            "status": "candidate: emulator-checked, not flashed",
-            "ops": ops}
-    with open(SPEC, "w") as f:
-        json.dump(spec, f, indent=1)
-        f.write("\n")
-    b = {"what": "TEST ONLY, not for use: films-look-exif-artbkt with the 12-region probe tables: each ART entry "
-                 "applies its own 12-region table (a test pattern, not a film simulation), ART 12 has Cross Process I's "
-                 "look curve. For the one camera run of experiments/2026-11-20-twelve-region/NOTES.md; go back to "
-                 "films-look-exif after it",
-         "stock": build["stock"], "specs": build["specs"] + [SPEC], "first_code": True, "label": build["label"]}
-    with open(BUILD, "w") as f:
-        json.dump(b, f, indent=1)
-        f.write("\n")
-    print(f"{SPEC}: {len(ops)} ops, {sum(len(o['new']) // 2 for o in ops)} bytes")
-    for d, tab, tname in checks:
-        print(f"  descriptor {d:#x} -> table {tab:#x}: {tname}")
+         "TEST ONLY, not for use: films-look-exif-artbkt with the 12-region probe tables: each ART entry "
+         "applies its own 12-region table (a test pattern, not a film simulation), ART 12 has Cross Process I's "
+         "look curve. For the one camera run of experiments/2026-11-20-twelve-region/NOTES.md; go back to "
+         "films-look-exif after it")
 
 
 if __name__ == "__main__":
