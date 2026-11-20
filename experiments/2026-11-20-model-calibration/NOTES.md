@@ -190,4 +190,4 @@ in git until confirmed). Predicted (`results/corrections-n1.txt`), median: natur
 
 Production build films-twelve-off, `tools/checks.py --tier full`: free space, op-check, boot-test, update-path-test
 PASS; save-guard S24 / S25 PASS for the build; peaking S6 lists 174 art codes against the reference, as every test
-build of this line (twelve-region-probe, calib-probe, films-twelve-off-artbkt): to be read before pinning.
+build of this line (twelve-region-probe, calib-probe, films-twelve-off-artbkt). The reference there is an older peaking build: run against the pinned films-look-exif (`scen_direct4.py s6`), films-twelve-off gives S6 PASS, 0 FAULT and no art code whose six-axis result differs.
