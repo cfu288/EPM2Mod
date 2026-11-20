@@ -148,3 +148,17 @@ our Portra 400 on Portra Endura: Supra Endura 1.6, Ektacolor Edge 2.2, Endura Pr
 `scripts/sfl_build.py` (headless export), `scripts/cmp.py`, `scripts/profile.py`, `scripts/nearest.py`,
 `scripts/swatch.py`; the LUTs and fits are outputs (not committed): LUTs in a scratch folder, fits in
 `../2026-11-09-film-portra/out/fit_sfl-*.npz` and `out/sfl-*_report.txt`.
+
+## 7. Added to the catalogue (2026-11-20)
+
+Owner: list every viable film as a choice, not as a default, except films very close to one we ship. Added (fits
+copied from `../2026-11-09-film-portra/out/fit_sfl-*.npz`, the `lut` field rewritten to how the target was built):
+Velvia 50, Natura 1600, Pro 160S, Superia Reala, Agfa Vista 100, Vericolor III, Aerocolor IV, Eterna 500, EXR 200T,
+FP-100C. Note in the catalogue: "simulated with Spectral Film LUT". The installer's preset (ART 1–12) is unchanged.
+
+Left out: Vision 320T (ΔE 1.8 from Vision3 500T in the same simulator: another Vision3), Pro 160C (1.7 from Pro 160S,
+1.9 from Superia X-Tra 400), Instax (fit ColorChecker 4.0, outside our range), Portra 400 on Ultra Endura (fit
+ColorChecker 3.2, outside our range; another Portra).
+
+Against the films we ship (spektrafilm), every added film is at least ΔE 4.5 away (part of that is the simulator
+difference, section 3.2). None is camera-checked: each is a first fit (model only), like Provia or Ektar before.

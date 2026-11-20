@@ -47,6 +47,16 @@ Each Load replaces the last one: an ART entry the file leaves out goes back to i
 | Verita 200D | `verita-200d` | Kodak Verita 200D (cinema negative, on Kodak 2383 print film) | Cinema, daylight |
 | Vis 50D | `vision3-50d` | Kodak Vision3 50D (cinema negative, on Kodak 2383 print film) | Cinema, daylight |
 | Vis 200T | `vision3-200t` | Kodak Vision3 200T (cinema negative, on Kodak 2383 print film) | Cinema, tungsten light |
+| Velvia 50 | `velvia-50` | Fuji Velvia 50 (slide) | Slide |
+| Natura 1600 | `natura-1600` | Fuji Natura 1600 (negative, on Fuji Crystal Archive paper) | Colour negative |
+| Pro 160S | `pro-160s` | Fuji Pro 160S (negative, on Fuji Crystal Archive paper) | Colour negative |
+| Superia Reala | `superia-reala` | Fuji Superia Reala (negative, on Fuji Crystal Archive paper) | Colour negative |
+| Agfa Vista 100 | `agfa-vista-100` | Agfa Vista 100 (negative, on Kodak Portra Endura paper) | Colour negative |
+| Vericolor III | `vericolor-iii` | Kodak Vericolor III (negative, on Kodak Portra Endura paper) | Colour negative |
+| Aerocolor IV | `aerocolor-iv` | Kodak Aerocolor IV 2460 (aerial negative, on Kodak Portra Endura paper) | Colour negative |
+| Eterna 500 | `eterna-500` | Fuji Eterna 500 (cinema negative, on Fuji Eterna-CP 3513DI print film) | Cinema, tungsten light |
+| EXR 200T | `exr-200t` | Kodak EXR 200T 5293 (cinema negative, on Kodak 2383 print film) | Cinema, tungsten light |
+| FP-100C | `fp-100c` | Fuji FP-100C (instant peel-apart film) | Instant |
 <!-- END GENERATED: films -->
 
 ## Limits

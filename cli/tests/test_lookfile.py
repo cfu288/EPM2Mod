@@ -274,7 +274,7 @@ class ChoiceTests(unittest.TestCase):
 
     def test_every_film_of_the_records_makes_a_look(self) -> None:
         films = records.load(PATHS)
-        self.assertEqual(len(films.films), 22)
+        self.assertEqual(len(films.films), 32)
         choices = [f"ART{n % 12 + 1}={film}" for n, film in enumerate(films.films)]
         for start in (0, 12):
             looks = records.looks_of_choices(films, choices[start : start + 12])

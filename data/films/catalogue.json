@@ -197,6 +197,96 @@
    "medium": "cinema negative, on Kodak 2383 print film",
    "fit": "data/films/fits/vision3200t.npz",
    "note": ""
+  },
+  {
+   "id": "velvia-50",
+   "name": "Velvia 50",
+   "film": "Fuji Velvia 50",
+   "kind": "Slide",
+   "medium": "slide",
+   "fit": "data/films/fits/velvia-50.npz",
+   "note": "simulated with Spectral Film LUT"
+  },
+  {
+   "id": "natura-1600",
+   "name": "Natura 1600",
+   "film": "Fuji Natura 1600",
+   "kind": "Colour negative",
+   "medium": "negative, on Fuji Crystal Archive paper",
+   "fit": "data/films/fits/natura-1600.npz",
+   "note": "simulated with Spectral Film LUT"
+  },
+  {
+   "id": "pro-160s",
+   "name": "Pro 160S",
+   "film": "Fuji Pro 160S",
+   "kind": "Colour negative",
+   "medium": "negative, on Fuji Crystal Archive paper",
+   "fit": "data/films/fits/pro-160s.npz",
+   "note": "simulated with Spectral Film LUT"
+  },
+  {
+   "id": "superia-reala",
+   "name": "Superia Reala",
+   "film": "Fuji Superia Reala",
+   "kind": "Colour negative",
+   "medium": "negative, on Fuji Crystal Archive paper",
+   "fit": "data/films/fits/superia-reala.npz",
+   "note": "simulated with Spectral Film LUT"
+  },
+  {
+   "id": "agfa-vista-100",
+   "name": "Agfa Vista 100",
+   "film": "Agfa Vista 100",
+   "kind": "Colour negative",
+   "medium": "negative, on Kodak Portra Endura paper",
+   "fit": "data/films/fits/agfa-vista-100.npz",
+   "note": "simulated with Spectral Film LUT"
+  },
+  {
+   "id": "vericolor-iii",
+   "name": "Vericolor III",
+   "film": "Kodak Vericolor III",
+   "kind": "Colour negative",
+   "medium": "negative, on Kodak Portra Endura paper",
+   "fit": "data/films/fits/vericolor-iii.npz",
+   "note": "simulated with Spectral Film LUT"
+  },
+  {
+   "id": "aerocolor-iv",
+   "name": "Aerocolor IV",
+   "film": "Kodak Aerocolor IV 2460",
+   "kind": "Colour negative",
+   "medium": "aerial negative, on Kodak Portra Endura paper",
+   "fit": "data/films/fits/aerocolor-iv.npz",
+   "note": "simulated with Spectral Film LUT"
+  },
+  {
+   "id": "eterna-500",
+   "name": "Eterna 500",
+   "film": "Fuji Eterna 500",
+   "kind": "Cinema, tungsten light",
+   "medium": "cinema negative, on Fuji Eterna-CP 3513DI print film",
+   "fit": "data/films/fits/eterna-500.npz",
+   "note": "simulated with Spectral Film LUT"
+  },
+  {
+   "id": "exr-200t",
+   "name": "EXR 200T",
+   "film": "Kodak EXR 200T 5293",
+   "kind": "Cinema, tungsten light",
+   "medium": "cinema negative, on Kodak 2383 print film",
+   "fit": "data/films/fits/exr-200t.npz",
+   "note": "simulated with Spectral Film LUT"
+  },
+  {
+   "id": "fp-100c",
+   "name": "FP-100C",
+   "film": "Fuji FP-100C",
+   "kind": "Instant",
+   "medium": "instant peel-apart film",
+   "fit": "data/films/fits/fp-100c.npz",
+   "note": "simulated with Spectral Film LUT"
   }
  ]
 }

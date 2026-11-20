@@ -54,10 +54,15 @@ Make a build description with a new name and test it on a camera.
 How the fits were made: `experiments/2026-11-09-film-portra/`, `experiments/2026-11-16-films-max/` and
 `experiments/2026-11-18-more-films/`.
 
-The fit data is derived from [spektrafilm](https://github.com/andreavolpato/spektrafilm) by Andrea
+Except the ten fits listed below, the fit data is derived from [spektrafilm](https://github.com/andreavolpato/spektrafilm) by Andrea
 Volpato, licensed CC BY-SA 4.0. We modified it: we fitted it to the stages of the Olympus E-PM2
 that can be adjusted. See `NOTICE.md`.
 `fits/doublex.npz`, `fits/doublex2.npz` and `fits/doublex3.npz` are derived from the profiles `kodak_doublex` and `kodak_2302` of spektrafilm's `dev` branch
 (commit `6cd00c8d4f30b5b550f50f4bbd3753c9f2a48507`, CC BY-SA 4.0). Modified: fitted to this camera.
 `fits/trix.npz` is derived from the profile `kodak_trix` (Tri-X Reversal 7266) of the same commit, rendered as a
 reversal film with no print (`experiments/2026-11-18-more-films/NOTES.md`). Modified: fitted to this camera.
+
+`fits/velvia-50.npz`, `fits/natura-1600.npz`, `fits/pro-160s.npz`, `fits/superia-reala.npz`, `fits/agfa-vista-100.npz`, `fits/vericolor-iii.npz`, `fits/aerocolor-iv.npz`, `fits/eterna-500.npz`, `fits/exr-200t.npz`, `fits/fp-100c.npz` are derived from film simulations of [Spectral Film LUT](https://github.com/JanLohse/spectral_film_lut) by
+Jan Lohse (version 0.18.14), MIT License, Copyright (c) 2026 Jan Lohse (`third_party/spectral_film_lut/LICENSE`).
+Modified: fitted to this camera (`experiments/2026-11-19-film-sources/NOTES.md`). Their catalogue entries say
+"simulated with Spectral Film LUT".

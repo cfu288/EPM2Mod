@@ -3,7 +3,7 @@
 Plain-language summary, written 2026-11-12. **Since 2026-11-18 the firmware keeps Olympus's 12 art filters and the
 films are loaded from the SD card** ([`guide/film-looks.md`](../guide/film-looks.md), [`install.md`](../user/install.md)). The build
 names and the seven-entry layout below are the history of how the looks were made and measured. The catalogue now
-has 22 films (`data/films/catalogue.json`). The detailed lab notes are in
+has 32 films (`data/films/catalogue.json`); ten of them come from a second simulator, Spectral Film LUT (section 8). The detailed lab notes are in
 `experiments/2026-11-09-film-portra/NOTES.md`; the technical slot reference is
 [`art-filter-slots.md`](art-filter-slots.md); every flash is logged in the [camera log](../camera-log/README.md).
 
@@ -248,7 +248,9 @@ Side effects: an entry keeps its Olympus effects until a loaded film simulation 
 ## 8. Adding or changing a film
 
 1. Make the target: `spektrafilm-lut build …` for a negative with a print paper, `bake_slide.py` for
-   a slide film.
+   a slide film. Or, for a film that spektrafilm does not have, Spectral Film LUT
+   (`experiments/2026-11-19-film-sources/scripts/sfl_build.py`, same input and output). Its films differ from
+   spektrafilm's (ΔE 5–9 for the same film), so the catalogue says which ones come from it.
 2. Fit: `fit_film2.py --lut <target> --name <name>` (second camera model: matrix, three curves,
    per-hue values, saturation and the two chroma curves in one go).
 3. Add the film as data: the fit in `data/films/fits/`, an entry in `data/films/catalogue.json`, then regenerate
