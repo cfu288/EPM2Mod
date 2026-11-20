@@ -1,7 +1,13 @@
 """Write data/specs/stock-films-structure.json and build/stock-films/layout.json: what the stock-filters firmware
 flashes for film looks (design.md, "One mechanism for all 12 entries"). Research code.
 
-    uv run python gen/stock-films/structure.py WORKDIR [LISTING.txt]
+    uv run python gen/stock-films/structure.py [--v2] WORKDIR [LISTING.txt]
+
+--v2 writes data/specs/stock-films-structure-2.json and build/stock-films-2/layout.json instead
+(experiments/2026-11-20-film-name-exif/NOTES.md): the film codes' look entry points at LKID, a stub that loads the
+stock identity look table (the stock handler slots.IDENTITY_LOOK_HANDLER loads Cross Process I's own table), and the
+EXIF case of every entry with a film is the "no art filter" case (ArtFilter Off): flashed for the hidden values,
+switched by the loader for the others.
 
 Flashed, and reached only through a film code or a hidden stored value (so no stock filter changes):
   * one film code per menu entry; for each: a tone stub with three records that point at the entry's RAM block,
@@ -31,7 +37,13 @@ sys.path.insert(0, os.path.join(ROOT, "cli", "src"))
 from epm2mod.container import parse  # noqa: E402
 from epm2mod.looks import slots  # noqa: E402
 
-SPEC = "stock-films-structure"
+V2 = "--v2" in sys.argv
+if V2:
+    sys.argv.remove("--v2")
+SPEC = "stock-films-structure-2" if V2 else "stock-films-structure"
+OUT = "stock-films-2" if V2 else "stock-films"   # build/OUT/layout.json
+LOOK_TAIL = 0x7E56EB0F          # the look stage's tail: a0 = the look table
+EXIF_OFF = 0x7E70DF1B           # rec_art_set_exif_data's default case: no ArtFilter written (Off)
 BASE = 0x7E421020
 STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
 BIN = os.path.join(ROOT, "build", "toolchain", "bin")
@@ -279,6 +291,10 @@ HUE: mov (%#x),a1
 1:  jmp %#x
 2:  jmp %#x""" % (MATPTR + 0x40000000 + INPLACE_PTR[85], FILM_RAM + BLOCK * xp + MATRIX, HUE_SKIP, HUE_APPLY))
     asm.append(".section .hu,\"ax\"\n    jmp HUE\n    nop")
+    if V2:   # the film codes' look: the stock identity table (at the end of .sk: nothing else moves)
+        asm.append(""".section .sk,"ax"
+LKID: mov %#x,a0
+    jmp %#x""" % (slots.IDENTITY_LOOK, LOOK_TAIL))
     extra = [x for x in slots.EXTRA_SLOTS if x.entry in {e[0] for e in ENTRIES if e[4] == "hidden"}]
     bhooks = bracket_hooks(blk, extra)
     slots_at = []
@@ -382,7 +398,8 @@ HUE: mov (%#x),a1
 
     # ---- stage tables of the film codes
     for name, _, _, c, kind in ENTRIES:
-        for (table, first), target, what in ((slots.LOOK_JUMP, slots.IDENTITY_LOOK_HANDLER, "look"),
+        look = sym["LKID"] if V2 else slots.IDENTITY_LOOK_HANDLER
+        for (table, first), target, what in ((slots.LOOK_JUMP, look, "look"),
                                              (slots.SATURATION_JUMP, sym["S%d" % c], "saturation"),
                                              (slots.SIX_AXIS_JUMP, sym["X%d" % c], "six-axis"),
                                              (slots.CHROMA_JUMP, sym["C%d" % c], "chroma")):
@@ -404,13 +421,15 @@ HUE: mov (%#x),a1
             words.append((movie + row, sym["%s%d" % (stub, c)], "live-view movie row of value %d" % value))
         if kind == "hidden":
             words += [(slots.KIND_JUMP + row, slots.KIND_COLOUR_ONLY, "record kind of value %d" % value),
-                      (slots.EXIF_JUMP + row, slots.EXIF_POP_ART, "EXIF case of value %d" % value),
+                      (slots.EXIF_JUMP + row, EXIF_OFF if V2 else slots.EXIF_POP_ART, "EXIF case of value %d" % value),
                       (slots.IS_ART_JUMP + row, slots.IS_ART_YES, "'is art' of value %d" % value)]
             for a, w, note in words:
                 op(a, struct.pack("<I", w), note + " (hidden value: flashed)")
         else:
             if kind == "route":
                 words.append((slots.KIND_JUMP + row, slots.KIND_COLOUR_ONLY, "record kind of value %d" % value))
+            if V2:
+                words.append((slots.EXIF_JUMP + row, EXIF_OFF, "EXIF case of value %d" % value))
             for a, w, note in words:
                 if word(a) != w:
                     switch[name].append((a, struct.pack("<I", w), get(a, 4), note))
@@ -489,7 +508,10 @@ HUE: mov (%#x),a1
             "with tone, saturation, six-axis, chroma and matrix in the entry's RAM block at 0x7E4D1000 + 0x3200 x entry; "
             "the stage entries of the codes that no stock entry reaches, the art-matrix chain, the hidden stored values "
             "111, 112, 114, 115, 118 and their hash keys, and the four job-block compares of 75 / 125. Nothing here is "
-            "reached while no entry has a film: the loader switches the entry's words. Every expect is a stock byte."),
+            "reached while no entry has a film: the loader switches the entry's words. Every expect is a stock byte." +
+            (" Version 2 (experiments/2026-11-20-film-name-exif/NOTES.md): the film codes' look entry -> LKID, the "
+             "stock identity look table 0x7E75B8F0; the EXIF case of an entry with a film -> 0x7E70DF1B (ArtFilter "
+             "Off)." if V2 else "")),
         "base": STOCK, "base_sha256": stock_sha,
         "status": "candidate: emulator-checked, not flashed",
         "ops": ops,
@@ -503,8 +525,8 @@ HUE: mov (%#x),a1
                            "switch": [{"address": a, "film": f.hex(), "stock": s.hex(), "note": note}
                                       for a, f, s, note in switch[n]]}
                           for n, sv, v, c, k in ENTRIES]}
-    os.makedirs(os.path.join(ROOT, "build", "stock-films"), exist_ok=True)
-    json.dump(layout, open(os.path.join(ROOT, "build", "stock-films", "layout.json"), "w"), indent=1)
+    os.makedirs(os.path.join(ROOT, "build", OUT), exist_ok=True)
+    json.dump(layout, open(os.path.join(ROOT, "build", OUT, "layout.json"), "w"), indent=1)
     print("wrote data/specs/%s.json: %d ops; code %d B at %#x, data %d B at %#x" %
           (SPEC, len(ops), len(code), CODE_AREA[0], len(data), rec_base))
     for n, *_ in ENTRIES:

@@ -1,7 +1,11 @@
 """Write data/specs/looks-menu-4.json and data/specs/card-looks-5.json: the loader of film looks for the stock-filters
 firmware (experiments/2026-11-18-stock-filters/design.md). Needs build/stock-films/layout.json (gen/stock-films/structure.py).
 
-    uv run python gen/stock-films/loader.py WORKDIR [LISTING.txt]
+    uv run python gen/stock-films/loader.py [--v2] WORKDIR [LISTING.txt]
+
+--v2 writes data/specs/card-looks-6.json from build/stock-films-2/layout.json (structure.py --v2), with FILMNAME
+(experiments/2026-11-20-film-name-exif/NOTES.md): at each GUI state T_GUI writes the EXIF template's ImageDescription,
+the name of the selected entry's film, or Olympus's text when the entry has no film.
 
 The camera-tested loader of card-looks-4 (experiments/2026-11-17-card-looks/scripts/mkspec_looks3.py), changed:
   * no snapshot, no live-table interpolation, no Built-in (the row is Off / Load: looks-menu-4);
@@ -32,7 +36,14 @@ sys.argv = _argv
 from epm2mod.container import parse  # noqa: E402
 from epm2mod.looks import lookfile, slots  # noqa: E402
 
-SPEC, MENU = "card-looks-5", "looks-menu-4"
+V2 = "--v2" in sys.argv
+if V2:
+    sys.argv.remove("--v2")
+SPEC, MENU = ("card-looks-6" if V2 else "card-looks-5"), "looks-menu-4"
+OUT = "stock-films-2" if V2 else "stock-films"   # build/OUT: layout.json in, syms.json out
+FLAGS_V1, T_END_V1 = 0x7ECB0FCC, 0x7EE5392B   # card-looks-5's FLAGS and T_END: version 6 keeps them
+EXIF_DESC = 0x605BAEC0        # the EXIF template's ImageDescription, 32 B (template 0x605BA918 + 0x5A8)
+EXIF_DESC_STOCK = 0x7E8517C2  # "OLYMPUS DIGITAL CAMERA", which the boot copies there with 0x7E70B0F6
 BASE, BIN = mk.BASE, mk.BIN
 STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
 RUNS = dict(m3.RUNS)
@@ -251,6 +262,88 @@ PMREMAP:                         # GUI task, after a Load: the Picture Mode sett
     rets
 """
 
+FILMNAME_ASM = r"""
+.section .ap,"ax"
+GUIEXTRA:                        # T_GUI, while the task does not run
+    add -8,sp                    # (0,sp): the return slot of the calls below; T_GUI's return address at (8,sp)
+    movbu (REMAP),d0
+    cmp 0,d0
+    beq 1f
+    clr d0
+    movbu d0,(REMAP)
+    calls PMREMAP
+1:  calls FILMNAME
+    add 8,sp
+    rets
+
+FILMNAME:                        # T_GUI (task CA_MAIN): ImageDescription = the selected entry's film name, else stock
+    movm [d2,d3,a2,a3],(sp)
+    add -12,sp
+    mov 0x9481,d0                # the stored Picture Mode
+    mov 0,a0
+    clr d1
+    call 0x7e457c75,[d2,d3],12   # prm_get(tag, 0, 0) -> d0
+FN_PM:
+    add -100,d0
+    cmp 19,d0
+    bcc 8f                       # not 100..118: no film
+    mov FNSLOT,a0
+    movbu (d0,a0),d2             # the entry's slot, 0xff: no film
+    cmp 0xff,d2
+    beq 8f
+    movbu (STOREOK),d0
+    cmp 0,d0
+    beq 8f
+    mov STORE,a2                 # the stored file's record of that slot
+    movbu (5,a2),d3
+    add 32,a2
+1:  cmp 0,d3
+    beq 8f
+    movbu (a2),d0
+    cmp d2,d0
+    beq 2f
+    add 1708,a2
+    add -1,d3
+    bra 1b
+2:  movbu (4,a2),d0
+    cmp 0,d0
+    beq 8f                       # a film without a name: Olympus's text, as the menu keeps the entry's name
+    mov FNBUF,a0                 # 31 spaces and a NUL, then the name (16 B, NUL-padded) over the first 16
+    mov FNNUL,a1
+    mov 32,d0
+    mov 1,d1
+    call 0x7e70b0f6,[d2,d3,a2,a3],20
+    mov a2,a1
+    add 4,a1
+    mov FNBUF,a0
+    mov 16,d0
+    clr d1
+    call 0x7e70b0f6,[d2,d3,a2,a3],20
+    bra 9f
+8:  mov FNBUF,a0                 # Olympus's text, as the boot writes it
+    mov %(stock)#x,a1
+    mov 32,d0
+    mov 1,d1
+    call 0x7e70b0f6,[d2,d3,a2,a3],20
+9:  mov FNBUF,a0                 # into the template as 8 words (a reader never sees a half-written word),
+    mov %(desc)#x,a1             # cached and uncached
+    mov 8,d1
+3:  mov (a0),d0
+    mov d0,(a1)
+    mov d0,(0x40000000,a1)
+    add 4,a0
+    add 4,a1
+    add -1,d1
+    bne 3b
+    add 12,sp
+    movm (sp),[d2,d3,a2,a3]
+    rets
+FNSLOT: .byte %(slots)s
+FNNUL:  .byte 0
+    .balign 4
+FNBUF:  .space 32
+"""
+
 # APPLY: the destination is relative to the entry's RAM block
 APPLY_REPLACE = [
     ("""APPLY:                           # a0 = a valid look file: each record's operations
@@ -312,7 +405,7 @@ def main():
     work = sys.argv[1]
     listing = sys.argv[2] if len(sys.argv) > 2 else None
     os.makedirs(work, exist_ok=True)
-    layout = json.load(open(os.path.join(ROOT, "build", "stock-films", "layout.json")))
+    layout = json.load(open(os.path.join(ROOT, "build", OUT, "layout.json")))
     stock_blk = parse(open(os.path.join(ROOT, STOCK), "rb").read()).blocks[0].payload
     get = lambda a, n: stock_blk[a - BASE:a - BASE + n]
 
@@ -418,6 +511,28 @@ def main():
             "displaced": mk.displaced(stock_block_file(), hook[0], hook[1]),
             "back": hook[0] + hook[1]}
     asm = head % subs + tail % subs + NEW_ASM
+    if V2:
+        # T_GUI calls GUIEXTRA in place of its remap block; FLAGS and T_END stay where card-looks-5 has them
+        # (log-menu-2 hooks T_END and repeats its `movbu d0,(BUSY)`)
+        for a, b in (("""    movbu (REMAP),d0
+    cmp 0,d0
+    beq 4f
+    clr d0
+    movbu d0,(REMAP)
+    calls PMREMAP
+4:  movbu (APPLIED),d0
+""", """    calls GUIEXTRA               # the Picture Mode remap after a Load, then the film's name
+    movbu (APPLIED),d0
+"""), ("    .balign 4\nFLAGS: ", "    .org %d\nFLAGS: " % (FLAGS_V1 - RUNS[".tk"][0]))):
+            assert asm.count(a) == 1, a
+            asm = asm.replace(a, b)
+        # stored Picture Mode - 100 -> the entry's slot while the value means "this entry with its film", else 0xff
+        # (the stock value of a hidden-value entry means the entry has no film)
+        slot_of = [0xFF] * 19
+        for k, e in enumerate(layout["entries"]):
+            slot_of[e["value"] - 100] = k
+        asm += FILMNAME_ASM % {"desc": EXIF_DESC, "stock": EXIF_DESC_STOCK,
+                               "slots": ", ".join("%#x" % v for v in slot_of)}
     RUNS[".x2"] = RUNS[".ap"]
     asm = asm.replace('.section .x1,"ax"', '.section .ap,"ax"').replace('.section .x2,"ax"', '.section .ap,"ax"')
     del RUNS[".x2"]
@@ -436,6 +551,8 @@ def main():
         mk.run(BIN + "/mn10300-elf-objcopy", "-O", "binary", "-j", name, e, sb)
         return open(sb, "rb").read()
 
+    if V2:
+        assert (syms["FLAGS"], syms["T_END"]) == (FLAGS_V1, T_END_V1), (hex(syms["FLAGS"]), hex(syms["T_END"]))
     out = []
 
     def op(addr, new, note):
@@ -466,9 +583,9 @@ def main():
        "CPU0 task table, row of id 0x90 (USRTEST_A, dormant in stock): entry 0x7E501C5B -> T_TASK")
     op(mk.TASK_ENTRY + 4, b"\x0d", "CPU0 task table, row of id 0x90 (USRTEST_A): priority 11 -> 13")
     keep = {k: syms[k] for k in ("T_TASK", "T_GUI", "T_STORED", "T_END", "SAVE", "V_OK", "V_BAD", "APPLY", "FLAGS",
-                                 "NAMES", "MASK", "SWITCH", "PMREMAP")}
+                                 "NAMES", "MASK", "SWITCH", "PMREMAP") + (("FILMNAME", "FN_PM") if V2 else ())}
     json.dump({**keep, "STORE": mk.STORE, "SCRATCH": mk.SCRATCH, "RAM": m3.RAM, "IDS": ids, "STRINGS": strings,
-               "BLOCKS": blocks}, open(os.path.join(ROOT, "build", "stock-films", "syms.json"), "w"))
+               "BLOCKS": blocks}, open(os.path.join(ROOT, "build", OUT, "syms.json"), "w"))
     json.dump({"name": SPEC, "description": (
         "Film looks loaded from the SD card onto the stock art filters (experiments/2026-11-18-stock-filters/"
         "design.md), with the menu row Load Looks (data/specs/looks-menu-4.json: Off / Load). Load reads C:\\\\EPM2LOOK.BIN, "
@@ -477,7 +594,10 @@ def main():
         "list is written, its film words when the file lists it and its stock words otherwise; the Picture Mode "
         "settings 111, 509, 510 follow the stored values of the entries with a hidden value. Every start applies the "
         "stored file. The hook on the GUI state setter's trace call 0x7ECDF6E4, the task USRTEST_A. Every expect is a "
-        "stock byte." % mk.STORE),
+        "stock byte." % mk.STORE + (" Version 6 (experiments/2026-11-20-film-name-exif/NOTES.md): the switch lists of "
+        "data/specs/stock-films-structure-2.json; at each GUI state T_GUI calls FILMNAME, which writes the EXIF "
+        "template's ImageDescription (0x%08X): the film's name when the stored Picture Mode is an entry with a film, "
+        "else Olympus's text." % EXIF_DESC if V2 else "")),
         "base": STOCK, "base_sha256": sha, "status": "candidate: emulator-checked, not flashed",
         "_ram": "the EEROM bank's unused tail: store 0x%08X, scratch 0x%08X; RAM: status, names 0x%08X-0x%08X; the "
                 "entries' blocks 0x%08X-0x%08X; 5 flag bytes in the code" % (mk.STORE, mk.SCRATCH, m3.RAM, m3.RAM + 0x800,
