@@ -86,27 +86,37 @@ in an editor: "for the pixels whose colour falls in this region, shift the hue b
 the lightness by Z". The processor applies it in hardware; the CPU only uploads the table **[R]**.
 
 **Where the tables are and which one a picture gets [R].** Table A 0x7E76C3C8 (sRGB) and B 0x7E76CF9C (Adobe RGB).
-A hash at 0x7E78C6E4 (64 slots, key = art code − 8, 43 used) gives an art code its own table; else the picture
-mode picks a default (0x7E56E5DC). Natural, i-Enhance, Custom, Monotone, Vivid, Portrait and every film code get
-table A; Gentle Sepia, Key Line, Cross Process II and Watercolor have their own; Dramatic Tone has none. The table
-was read before the card path (2026-11-18) existed: which table the current film codes get is to be checked.
+The selector 0x7E56E661 takes the art code (job+79), looks it up in the hash 0x7E78C6E4 (64 slots, key = art code − 8,
+linear probing, key 0 = empty; 43 used), and without a hit takes a default by picture mode (0x7E56A8B7). Natural,
+i-Enhance, Custom, Monotone, Vivid, Portrait get table A; Gentle Sepia, Key Line, Cross Process II and Watercolor have
+their own; Dramatic Tone has another path. On the current build every film code gets table A or a byte copy of it
+(emulator, 2026-11-20). Table B serves the Adobe RGB colour space, which ART locks to sRGB (manual p. 66): films
+never get it. A second builder (0x7E55E2CE) prebuilds a fixed list of tables at start; what uses its output is not
+traced.
 
-**Layout [R].** 12 records of 28 bytes, then 4 × 96 u32 and 6 × 96 u16 (weight curves: how strongly a record acts
-across its window; all ISO weights are flat), then a 12-bit enable mask at +3024. A record:
+**Layout [R].** A descriptor `{table, 12 ISO-weight pointers}` (52 bytes; every ISO weight is flat 256, so the record
+values reach the engine unchanged). The table (3028 bytes): 12 records of 28 bytes; then the curves, 7 per record of
+16 points each (a point = level << 8 | signed slope), stored as two groups of five arrays (records 0–5 and 6–11);
+then a 12-bit enable mask at +3024. The builder (0x7E56E186) writes per record six words to the engine and passes ten
+curve pointers. A record:
 
 | Bytes | Field | Meaning |
 |---|---|---|
-| 0–1, 2–3 | hue start, hue width | an arc of the colour wheel, 32768 = 360° |
+| 0–1, 2–3 | hue start, hue width | an arc of the colour wheel, 32768 = 360° [I] |
 | 4–5, 6–7 | chroma start, width | how saturated a pixel must be |
-| 8–9, 10–11 | luma start, width | how bright a pixel must be, 0–1024 |
+| 8–9, 10–11 | luma start, width | how bright a pixel must be, 0–1024 [I] |
 | 12–13 | hue shift | 32768 = 360° (1365 = 15°) [I] |
-| 14–15 | saturation change | units [I] unknown |
-| 16–17 | lightness change | units [I] unknown |
-| 18–27 | multiplier and shift per window | width × multiplier >> shift = 256: the scale of each window's soft edge [I] |
+| 14–15 | saturation change | units unknown |
+| 16–17 | lightness change | units unknown |
+| 18–19, 26–27 | none | never read by the builder [R] |
+| 20–25 | multiplier and shift of the hue, chroma and luma windows | width × multiplier >> shift = 256 in every stock record [R] |
+
+Curve roles [I, from the stock tables]: c5 luma; c0 and c3 saturation along hue and along chroma; c2 lightness along
+chroma; c4 hue shift along chroma; c1 and c6 lightness and hue shift along hue (which is which is unknown).
 
 **Per pixel [I].** In Y/Cb/Cr after the tone curves (its order against stage 5 is not established): hue = angle of
 (Cb, Cr), chroma = its length, luma = Y. Each enabled record gives a weight from 0 to 1, the product of how far the
-pixel lies inside its hue, chroma and luma windows (soft edges from the weight curves). The weighted hue shifts are
+pixel lies inside its hue, chroma and luma windows (soft edges from the curves). The weighted hue shifts are
 added, chroma is scaled by the weighted saturation changes, the weighted lightness changes are added; the result goes
 back to Y/Cb/Cr.
 
