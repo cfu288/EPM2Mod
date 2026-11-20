@@ -1,0 +1,6 @@
+31 films; camera vs model, mean over the films of the held-out fold, ΔE2000
+                                  natural     hold-out ColorChecker         skin        grays   dense gray near-neutral   gamut edge
+fold 1: model2 (now)               0.65         0.65         0.59         0.57         0.62         0.60         0.68         0.62
+fold 1: refitted                   0.61         0.60         0.48         0.48         0.63         0.60         0.68         0.48   (K x1.0003, saturation/gain x0.9933, limit 124)
+fold 2: model2 (now)               0.73         0.72         0.69         0.71         0.68         0.64         0.73         0.71
+fold 2: refitted                   0.63         0.63         0.50         0.52         0.67         0.63         0.71         0.55   (K x1.0004, saturation/gain x0.9946, limit 124)
