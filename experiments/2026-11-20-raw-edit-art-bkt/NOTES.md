@@ -130,3 +130,136 @@ Why preview again per frame: the EXIF defaults and maybe the developer's mode by
 Effort: one session (decode 0x7EDF7F60, spec, row, harness check of the composer list, emulator screens and hook
 checks), then one camera flash for P1 and the 12-film run; a second flash only if P1 shows the save-only path or a
 fault.
+
+## 8. Candidate films-look-exif-artbkt (2026-11-20)
+
+Build `data/builds/films-look-exif-artbkt.json`: the pinned `films-look-exif` and `data/specs/raw-edit-art-bkt.json`
+(written by `scripts/mkspec_artbkt.py`, assembler source inside). sha256
+`09a17d04cb4e26843ac243e35f49d8a95ba54de939d77694263d4e542f012af4`. Not flashed. The build is `first_code`: no
+camera-tested code runs yet in its area 0x7EBB2AC4 (reclaim-space row 2, segment 2; all static checks pass).
+
+### 8.1 Decoded (section 7's desk unknowns)
+
+| Item | Finding | Label |
+|---|---|---|
+| Callback 0x7EDF7F60 | d0 = command, 47 for a RAW edit job. d1 = status: 3 = progress (a1 = percent: 0, 60, 80, 100), 164 = job done (a1 = result: 0, or 0xF0000001 / 0xF000004F, which the stock shows as dialogs 11 / 7). Called from the GUI task's callback queue (0x7E972C6D, from 0x7E96CBD6), not from inside the component | V emulator |
+| Stock [Current] | List 320 OK row 0: startCurrent(0, callback) (vt+32), and the page leaves with key 0 to page 611 (0x7EDFA754), which calls previewCurrent(d0 = (0x602BA97C), a1 = (0x602BA978)) (vt+16). startCurrent alone starts no preview | V emulator |
+| Then | cb(47, 164, 0) on page 611 → page 616 "Yes / No" with the preview. Yes → page 618 "Busy" (0x7EDFA9C1) → saveCurrent (vt+24) → cb(47, 164, 0) → page 620 "Reset / No". Reset → endCurrent(1) (vt+8), back to the list; No → endCurrent(0), back to playback | V emulator, stock image |
+| The page's key | The OK handler's record at (12,sp) (read by 0x7EDCDAAB), byte +5 = the row at the time of the OK; Custom1 / Custom2 set 4 and store it with 0x7EDCDABF. A fifth row must set its own key: without it, ART BKT started the job and stayed on the list (first build of this session) | V emulator |
+| Picture Mode | The preview reads prm 0x9481 (twice, from 0x7E941C60); at the preview's rec_art_set_exif_data the take's mode byte (+16479) is the frame's value. The save reads no prm 0x9481. So each frame needs its own preview | V emulator |
+| Text | The ART BKT screen's title is id 1699 (re-pointing 1699 in RAM changed it; 710 did not show there) | V emulator |
+| ImageDescription | A RAW Data Edit JPEG carries the source RAW's ImageDescription, not the template that FILMNAME writes: the emulator's Velvia frame was saved while the template read "Velvia 50" and its JPEG has "OLYMPUS DIGITAL CAMERA"; the camera log of films-look-exif says the same | V emulator, V camera |
+
+### 8.2 The code (552 B with data, 0x7EBB2AC4-0x7EBB2CEC)
+
+| Part | What it does |
+|---|---|
+| List 320 | Count 5, items in ITEMS: Current 1760, Custom1 1761, Custom2 1762, ART BKT 1699, No 496 |
+| H1 0x7EDF7DF3 → ROWS | Every OK on the list clears the run. Row 3 (ART BKT): SETUP, key 0, then the stock [Current] path (0x7EDF7E14). Row 4 (No): key 3 and the stock No path. Rows 0-2: stock |
+| SETUP | Saves prm 0x9481 (PM0). Takes a 16 KB block (0x7E507325), calls the ART bracket composer after its On/Off gate (0x7E5A75AE) with take = block − 16446, copies byte 0 of each 18-byte frame (at most 31) to LIST, frees the block. No block: LIST = the current Picture Mode only |
+| H2 0x7EDF812C → CBDONE | A done job (status 164): the displaced call 0x7EDC712F, then STEP if a run is on |
+| STEP | Result ≠ 0: STOP (the stock then shows its error). Frame 0's preview: phase 2, the stock asks Yes / No once. Our preview done: saveCurrent, no Yes / No. A save done: next value from LIST; none: STOP (the stock shows Reset / No); else PMSET, endCurrent(1), startCurrent(0, callback), previewCurrent as page 611 calls it; a non-zero return: STOP |
+| PMSET / STOP | prm_set(0x9481, value) in play_edit_raw_main's form, then FILMNAME. STOP: PMSET(PM0), the run ends |
+
+Hooks: two, both in segment 3, jumping to segment 2 (`emulator/hookcheck.py`: 15 transfers, 0 FAIL, no allow entry).
+
+### 8.3 Emulator runs (`scripts/artbkt.mjs`, logs and pictures in `results/artbkt-*`)
+
+Stand-ins (STANDIN=1, not hardware models): play_cic_decode_raw is skipped (the CIC interrupt never comes), the
+histogram statistics 0x7E575651 return at once (a division by zero on the engine's zero output), and the image-engine
+blocks 0x99000000-0x9AF00000 are plain storage. The pictures are empty; the control flow, the EXIF block and the card
+writes are the firmware's. Card: `PB130001.ORF`, and `EPM2LOOK.BIN` (ART1 Portra 400, ART2 Velvia 50, ART5 Superia
+400, ART11 Gold 200) where a run loads films (Custom Menu J → Load Looks → Load).
+
+| Run | Set-up | Result | Label |
+|---|---|---|---|
+| List | pinned vs candidate, PLAY, OK, OK, DOWN × 5, MENU | The RAW menu and playback screens equal; the list differs only by the ART BKT row; the box grows to 5 rows (`results/artbkt-list-stock-vs-new.png`, `artbkt-list5.png`) | V |
+| flags3 | no films; ART BKT: Soft Focus, Diorama, Watercolor On; mode ART (Picture Mode 100) | LIST [100, 101, 106, 120, 2]: the current value, then the On entries in menu order, then Natural (On in this state). Mode byte per preview 100, 101, 106 | V |
+| A | films loaded; all 12 On; P, Natural | LIST [2, 100, 101, 102, 103, 111, 105, 106, 107, 108, 109, 115, 120]: entries 5 and 11 give their hidden values (stock-films hooks). Template at each save: OLYMPUS DIGITAL CAMERA, Portra 400, Velvia 50 | V |
+| B | films; only ART 2 (Velvia 50) On; P, Natural | LIST [2, 101]. One Yes / No, "Busy" for both frames, 2 JPEGs, Picture Mode back to 2, the stock "Reset / No"; Reset → the 5-row list. Firmware errors: only the stock pair at 40 ms (`artbkt-yesno.png`, `artbkt-busy.png`, `artbkt-reset-no.png`, `artbkt-after-reset.png`) | V |
+| C | films; only ART 3 (no film) On; P | 2 JPEGs. EXIF: frame 0 ArtFilter Off, frame 1 ArtFilter Pale & Light Color; both PictureMode Natural and ImageDescription OLYMPUS DIGITAL CAMERA | V |
+| Error stop | A, flags3 | The emulator fails every third RAW save of a playback session with "REC MEDIA abort" (0x1E001002) and result 0xF0000001, also on the stock image (three [Current] edits by hand) and with 20 MB less free space at the same point (Reserve_Media returns 0 each time): an emulator limit, not a full card. The run stops there: STOP, Picture Mode back, the stock error handling | V (stop path); I (cause) |
+
+A run of all 13 frames cannot be shown in the emulator (the third-save limit).
+
+### 8.4 Checks
+
+| Check | Result |
+|---|---|
+| `uv run epm2mod make films-look-exif-artbkt` (free-space check included) | PASS, FIRST CODE noted; sha256 above |
+| `emulator/hookcheck.py data/specs/raw-edit-art-bkt.json` | 15 transfers, 0 FAIL |
+| `emulator/boot-test`, `emulator/update-path-test` (in make) | PASS, PASS |
+| `gen/run.sh --check` | every generated spec as committed |
+| `uv run python -m unittest discover -s cli/tests`, `uv run epm2mod generate --check` | 307 OK; up to date |
+
+### 8.5 Open (U) and what settles it
+
+| U | Probe |
+|---|---|
+| Each JPEG has its frame's look | Camera run below: compare the pictures |
+| The film name in a RAW Data Edit JPEG | Not given by this build (8.1). Needs a change of the RAW edit's EXIF source: owner's decision |
+| Full card: what the stock reports, and whether the run stops | Camera run below, part 3 |
+| Time per frame | File times and the Debug Log record times |
+| Keys during "Busy"; power-off in a run (the camera keeps the frame's Picture Mode, I) | Not tested |
+| A 13-frame run | Camera run below, part 1 |
+| Code in 0x7EBB2AC4 runs (first code) | Any part of the camera run |
+
+### 8.6 Camera test (one flash)
+
+On this host, before the card trip: nothing to build. On the Mac, card in, mounted at `/Volumes/Untitled`:
+
+1. Delete the photos in `/Volumes/Untitled/DCIM/100OLYMP/`, then copy the test RAW:
+   `mkdir -p /Volumes/Untitled/DCIM/100OLYMP && scp USER@HOST:/path/to/epm2-tools/experiments/2026-11-09-film-portra/testraw/PB130001.ORF /Volumes/Untitled/DCIM/100OLYMP/PB130001.ORF`
+2. Flash: `epm2flash films-look-exif-artbkt 09a17d04cb4e26843ac243e35f49d8a95ba54de939d77694263d4e542f012af4`
+   Go back: `epm2flash films-look-exif af4bcb38df908c3d29b3ef028059a3142cbecc4b66737f7bb2cc2848d6a4bcf4`
+3. Card in the camera, camera off. Hold **OK** and **ON/OFF** together; let go when the orange lamp lights. Wait for
+   it to blink, then switch off and on.
+
+On the camera:
+
+4. MENU → SETUP → Custom Menu → J → **Debug Log** → **On** → OK.
+5. Shooting mode P, Picture Mode Natural: press OK; in the strip, Picture Mode → **Natural** → OK.
+6. ART BKT selection, all 12 On: MENU → the mode screen; LEFT × 4 to **ART** → OK; DOWN to **13 ART BKT**; RIGHT →
+   screen **ART BKT**. Each of the 12 entries must read On (on an Off entry: RIGHT, DOWN to **On**, OK). The rows
+   below Watercolor (i-Enhance, Vivid, ...) must read Off. MENU, MENU.
+7. Back to P: MENU → the mode screen; RIGHT × 4 to **P** (the text reads "Sets the Aperture and Shutter Speed
+   Automatically") → OK.
+
+Part 1, all 12 entries:
+
+8. Press ▶. Show PB130001 (the RAW). OK → menu **RAW** → **RAW Data Edit** → OK.
+9. The list reads Current, Custom1, Custom2, **ART BKT**, No. DOWN × 3 to **ART BKT** → OK.
+10. The preview with **Yes / No** → **Yes** → OK. **Busy** shows while each frame is made. At the end **Reset / No**
+    → **No** → OK. Note the time from Yes to Reset / No.
+11. Press the shutter halfway; press OK: the strip must read Picture Mode **Natural**.
+
+Part 2, three entries: repeat 6 with only **ART 1**, **ART 5** and **ART 12** On (on each other entry: RIGHT, UP to
+**Off**, OK), then 7 to 11.
+
+12. Shoot one JPEG in P (the Picture Mode check of the EXIF).
+
+Part 3, full card (on the Mac, card mounted): `df -m /Volumes/Untitled` gives Available in MB; then
+`dd if=/dev/zero of=/Volumes/Untitled/FILLER.BIN bs=1048576 count=N` with N = Available − 20. Camera: steps 8 to 11
+(three entries still On). Then delete `/Volumes/Untitled/FILLER.BIN`.
+
+13. MENU, then switch off (the log is written). Copy back:
+    `mkdir -p /path/to/epm2-tools/build/fw-test/artbkt && scp -r /Volumes/Untitled/DCIM/100OLYMP /Volumes/Untitled/EPM2LOG.BIN USER@HOST:/path/to/epm2-tools/build/fw-test/artbkt/`
+14. On this host:
+    `exiftool -FileName -DateTimeOriginal -ModifyDate -ArtFilter -PictureMode -ImageDescription build/fw-test/artbkt/100OLYMP/*.JPG`
+    and `uv run epm2mod log build/fw-test/artbkt/EPM2LOG.BIN --json > build/fw-test/artbkt/log.json`.
+
+Expected:
+
+| Part | Files | Per file |
+|---|---|---|
+| 1 | 13 JPEGs, numbered in this order: Natural, then ART 1 to ART 12 in menu order | Natural: ArtFilter Off. An entry with a loaded film: ArtFilter Off and that film's look. An Olympus entry: ArtFilter = its name and its effect. ImageDescription OLYMPUS DIGITAL CAMERA on all (the RAW's) |
+| 2 | 4 JPEGs: Natural, ART 1, ART 5, ART 12 | as part 1 |
+| 3 | fewer than 4; the camera's card-full message | the written files complete; Picture Mode Natural afterwards |
+| 12 | 1 JPEG | PictureMode Natural, ArtFilter Off |
+| Log | `film_stage` records: one new art code per ART frame, in the file order | the record times give the time per frame |
+
+Other results: the list has 4 rows or no ART BKT = the old firmware is on the camera; one JPEG only = the run did not
+go on after the first save (the callback path); the same look in every file = the Picture Mode does not reach the
+development (8.1); Picture Mode other than Natural after the run = the restore failed; a freeze or restart = note the
+part and frame, then the Debug Log tells the last event; a list with a frame missing or extra = the composer's list
+differs from the ART BKT screen.

@@ -1,0 +1,31 @@
+22113.7 PRM_SET 0x9481 = 100 from 7e67f8f2
+63471.6 PRM_SET 0x9481 = 2 from 7e67f8f2
+71411.8 ROWS row 3
+71411.8 SETUP list [2,102] PM0 2 ACT 1 PH 0 K 0
+71413 ERaw state_start_current_mode 
+71415.8 developer: take bdc0c800 mode byte +16479 = 2
+71420.3 developer: take bdc0c800 mode byte +16479 = 2
+71720.5 CB cmd 47 status 164 result 0
+71720.5 CBDONE ACT 1 PH 0 K 0 result 0
+75923.9 ERaw save_current_start (ImageDescription "OLYMPUS DIGITAL CAMERA")
+75926 play_save_raw 
+75926 api_rec_Reserve_Media 
+76616.8 CB cmd 47 status 164 result 0
+76616.8 CBDONE ACT 1 PH 2 K 0 result 0
+76616.8 PRM_SET 0x9481 = 102 from 7ebb2c7e
+76617.1 ERaw end_current_mode_edit 
+76618.2 ERaw state_start_current_mode 
+76620 developer: take bdc0c800 mode byte +16479 = 2
+76624.6 developer: take bdc0c800 mode byte +16479 = 102
+76630.5 developer: take bdc0c800 mode byte +16479 = 102
+76925.6 CB cmd 47 status 164 result 0
+76925.6 CBDONE ACT 1 PH 1 K 1 result 0
+76926 ERaw save_current_start (ImageDescription "OLYMPUS DIGITAL CAMERA")
+76926.5 play_save_raw 
+76926.5 api_rec_Reserve_Media 
+76927.5 developer: take bdc0c800 mode byte +16479 = 102
+77631.8 CB cmd 47 status 164 result 0
+77631.8 CBDONE ACT 1 PH 2 K 1 result 0
+77631.8 STOP ACT 1 PH 2 K 2 PM0 2
+77631.8 PRM_SET 0x9481 = 2 from 7ebb2c7e
+{"end":"done","ms":96422.3,"pc":"7e44966d","files":["/DCIM/100OLYMP/PB130001.ORF 13632500","/DCIM/100OLYMP/PB140002.JPG 4023296","/DCIM/100OLYMP/PB140003.JPG 4023296"],"errlog":["39.7 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9","41.3 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9"],"problem":"none"}

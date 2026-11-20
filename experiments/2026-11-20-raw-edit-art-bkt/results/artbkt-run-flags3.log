@@ -1,0 +1,47 @@
+5574.4 PRM_SET 0x9481 = 100 from 7e67f8f2
+49322.4 ROWS row 3
+49322.4 SETUP list [100,101,106,120,2] PM0 100 ACT 1 PH 0 K 0
+49323.6 ERaw state_start_current_mode
+49326.4 developer: take bdc0c800 mode byte +16479 = 2
+49331 developer: take bdc0c800 mode byte +16479 = 100
+49338.4 developer: take bdc0c800 mode byte +16479 = 100
+49632.3 CB cmd 47 status 164 result 0
+49632.3 CBDONE ACT 1 PH 0 K 0 result 0
+53851 ERaw save_current_start
+53853.3 play_save_raw
+53853.3 api_rec_Reserve_Media
+53853.9 developer: take bdc0c800 mode byte +16479 = 100
+54540.8 CB cmd 47 status 164 result 0
+54540.8 CBDONE ACT 1 PH 2 K 0 result 0
+54540.8 PRM_SET 0x9481 = 101 from 7ebb2c7e
+54541.1 ERaw end_current_mode_edit
+54542.2 ERaw state_start_current_mode
+54544.1 developer: take bdc0c800 mode byte +16479 = 2
+54548.6 developer: take bdc0c800 mode byte +16479 = 101
+54554.5 developer: take bdc0c800 mode byte +16479 = 101
+54837.4 CB cmd 47 status 164 result 0
+54837.4 CBDONE ACT 1 PH 1 K 1 result 0
+54837.7 ERaw save_current_start
+54838.7 play_save_raw
+54838.7 api_rec_Reserve_Media
+54839.4 developer: take bdc0c800 mode byte +16479 = 101
+55528.8 CB cmd 47 status 164 result 0
+55528.8 CBDONE ACT 1 PH 2 K 1 result 0
+55528.8 PRM_SET 0x9481 = 106 from 7ebb2c7e
+55529.1 ERaw end_current_mode_edit
+55530.2 ERaw state_start_current_mode
+55532.1 developer: take bdc0c800 mode byte +16479 = 2
+55536.6 developer: take bdc0c800 mode byte +16479 = 106
+55542.5 developer: take bdc0c800 mode byte +16479 = 106
+55838.4 CB cmd 47 status 164 result 0
+55838.4 CBDONE ACT 1 PH 1 K 2 result 0
+55838.7 ERaw save_current_start
+55839.7 play_save_raw
+55839.7 api_rec_Reserve_Media
+55840.4 developer: take bdc0c800 mode byte +16479 = 106
+56005.9 CB cmd 47 status 164 result f0000001
+56005.9 CBDONE ACT 1 PH 2 K 2 result f0000001
+56005.9 STOP ACT 1 PH 2 K 2 PM0 100
+56005.9 PRM_SET 0x9481 = 100 from 7ebb2c7e
+57173 ERaw end_current_mode_edit
+{"end":"done","ms":84940.4,"pc":"7e44966d","files":["/DCIM/100OLYMP/PB130001.ORF 13632500","/DCIM/100OLYMP/PB140002.JPG 4023296","/DCIM/100OLYMP/PB140003.JPG 4023296","/DCIM/100OLYMP/PB140004.JPG 4023296"],"errlog":["39.7 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9","41.3 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9","56005.2 0x1e001002 from 7e714709(fn 7e7146e0 \"REC MEDIA abort\") args 0x60482ad4 0x604829d0","57175.0 0x10009004 from 7e5b2c7c(fn 7e5b2bce) args 0x7e431a29 0x00000000","57175.0 0x10009004 from 7e5b2c7c(fn 7e5b2bce) args 0x7e431a29 0x6046129e","57175.0 0x10009004 from 7e5b2c7c(fn 7e5b2bce) args 0x7e431a29 0x60137314"],"problem":"none"}

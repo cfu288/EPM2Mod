@@ -1,0 +1,50 @@
+25483.5 ROWS row 3
+25483.5 SETUP list [2,100,101,102,103,111,105,106,107,108,109,115,120] PM0 2 ACT 1 PH 0 K 0
+25484.7 ERaw state_start_current_mode 
+25487.4 developer: take bdc0c800 mode byte +16479 = 2
+25491.9 developer: take bdc0c800 mode byte +16479 = 2
+25792.2 CB cmd 47 status 164 result 0
+25792.2 CBDONE ACT 1 PH 0 K 0 result 0
+30005.5 ERaw save_current_start (ImageDescription "OLYMPUS DIGITAL CAMERA")
+30007.3 play_save_raw 
+30007.3 api_rec_Reserve_Media 
+30695.8 CB cmd 47 status 164 result 0
+30695.8 CBDONE ACT 1 PH 2 K 0 result 0
+30695.8 PRM_SET 0x9481 = 100 from 7ebb2c7e
+30696.1 ERaw end_current_mode_edit 
+30697.3 ERaw state_start_current_mode 
+30699.1 developer: take bdc0c800 mode byte +16479 = 2
+30703.6 developer: take bdc0c800 mode byte +16479 = 100
+30709.5 developer: take bdc0c800 mode byte +16479 = 100
+30997.3 CB cmd 47 status 164 result 0
+30997.3 CBDONE ACT 1 PH 1 K 1 result 0
+30997.7 ERaw save_current_start (ImageDescription "Portra 400")
+30998.4 play_save_raw 
+30998.4 api_rec_Reserve_Media 
+30999.3 developer: take bdc0c800 mode byte +16479 = 100
+31709.8 CB cmd 47 status 164 result 0
+31709.8 CBDONE ACT 1 PH 2 K 1 result 0
+31709.8 PRM_SET 0x9481 = 101 from 7ebb2c7e
+31710.1 ERaw end_current_mode_edit 
+31711.2 ERaw state_start_current_mode 
+31713 developer: take bdc0c800 mode byte +16479 = 2
+31717.5 developer: take bdc0c800 mode byte +16479 = 101
+31723.4 developer: take bdc0c800 mode byte +16479 = 101
+32015 CB cmd 47 status 164 result 0
+32015 CBDONE ACT 1 PH 1 K 2 result 0
+32015.3 ERaw save_current_start (ImageDescription "Velvia 50")
+32016.3 play_save_raw 
+32016.3 api_rec_Reserve_Media 
+32016.9 developer: take bdc0c800 mode byte +16479 = 101
+32723.8 CB cmd 47 status 164 result 0
+32723.8 CBDONE ACT 1 PH 2 K 2 result 0
+32723.8 PRM_SET 0x9481 = 102 from 7ebb2c7e
+32724.1 ERaw end_current_mode_edit 
+32725.2 ERaw state_start_current_mode 
+32727.1 developer: take bdc0c800 mode byte +16479 = 2
+32730.8 CB cmd 47 status 164 result f0000001
+32730.8 CBDONE ACT 1 PH 1 K 3 result f0000001
+32730.8 STOP ACT 1 PH 1 K 3 PM0 2
+32730.8 PRM_SET 0x9481 = 2 from 7ebb2c7e
+33916.9 ERaw end_current_mode_edit 
+{"end":"done","ms":51100.3,"pc":"7e44966d","files":["/DCIM/100OLYMP/PB130001.ORF 13632500","/DCIM/100OLYMP/PB140002.JPG 4023296","/DCIM/100OLYMP/PB140003.JPG 4023296","/DCIM/100OLYMP/PB140004.JPG 4023296"],"errlog":["39.7 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9","41.3 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9"],"problem":"none"}
