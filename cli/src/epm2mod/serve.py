@@ -21,7 +21,7 @@ API (JSON):
 - ``GET /api/zip``: the files of the last finished job, as a zip.
 - ``GET /api/ping``: the page is still open. ``POST /api/quit``: stop the server.
 
-The server stops by itself on ``POST /api/quit`` (the page's Finish), or when no page has called it for
+The server stops by itself on ``POST /api/quit`` (the page's Close the installer), or when no page has called it for
 ``IDLE_SECONDS`` and no job runs (the page was closed).
 
 Every other path is a file of the built app page (``RepoPaths.app``, ``npm run build:app``).
@@ -484,14 +484,14 @@ def serve(paths: Locator, port: int = 0, browser: bool = True) -> None:
     url = page_url(app, httpd)
     print(f"EPM2Mod is open in your browser: {url}", flush=True)
     print(
-        "Leave this window open while you use the page. It stops when you select Finish.",
+        "Leave this window open while you use the page. It stops when you select Close the installer.",
         flush=True,
     )
     if browser:
         webbrowser.open(url)
 
     def watch() -> None:
-        """Stop the server on Finish, or when the page has been gone for ``IDLE_SECONDS``."""
+        """Stop the server on Close the installer, or when the page has been gone for ``IDLE_SECONDS``."""
         while not app.quit.wait(5.0) and not app.idle(time.monotonic()):
             pass
         httpd.shutdown()

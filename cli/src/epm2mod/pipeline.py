@@ -519,7 +519,7 @@ def set_films(
     else:
         files = (Planned(Path(FILMS), "films", content[FILMS], False),)
         removed, ejected = (), False
-        copy = copy_text([FILMS])
+        copy = copy_text([FILMS], "the zip")
     steps = film_steps(art_shows=art_shows, copy=copy, ejected=ejected)
     return Outcome(
         files,
@@ -578,7 +578,7 @@ def restore(
     else:
         files = (Planned(Path(FIRMWARE), "firmware", content, False),)
         removed, ejected = (), False
-        copy = copy_text([CARD_FOLDER])
+        copy = copy_text([CARD_FOLDER], "the zip")
     step(2)
     steps = flash_steps(
         films=False,

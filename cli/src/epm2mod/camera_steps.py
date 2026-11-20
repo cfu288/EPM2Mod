@@ -12,7 +12,7 @@ from typing import Any
 
 #: The menu path that loads the film file into the camera.
 LOAD_LOOKS = (
-    "MENU → SETUP → gears tab → J → Load Looks → Load → OK. "
+    "MENU → SETUP → gears tab → J → Load Looks → Load → OK. The row reads Loaded. "
     "If there is no gears tab, set wrench tab → Menu Display → Custom Menu to On."
 )
 

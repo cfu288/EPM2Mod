@@ -451,7 +451,7 @@ class EndToEndTests(unittest.TestCase):
         zipped = serve.run_films(self.paths, choices, None)
         self.assertEqual(zipped.file_data(), {name: on_card})
         self.assertEqual(
-            zipped.steps[0].text, f"Copy {name} to the top of the SD card."
+            zipped.steps[0].text, f"Copy {name} from the zip to the top of the SD card."
         )
 
     def test_the_app_writes_what_the_command_line_writes(self) -> None:
