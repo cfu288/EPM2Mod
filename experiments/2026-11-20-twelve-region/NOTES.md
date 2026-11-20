@@ -237,3 +237,6 @@ correlation with a PB130001 development 0.68–0.99; the current Picture Mode, t
 in a row, 26 frames, no freeze. Every result of the table above is unchanged; the scene check is now measured: table A's
 change on 299 raw-identical patches of the two RAWs differs by 0.00 codes, so the stage has no scene-adaptive part [C].
 `results/camera-1/analyse.txt` is the run with both RAWs.
+
+**Scope (owner, 2026-11-20).** Parts 2–5 are dropped: the probe serves film-simulation fitting from RAW Data Edit
+only, and ART BKT is a developer tool. Captures, live view, movies, the three-entry and full-card runs are not tested.
