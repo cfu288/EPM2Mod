@@ -91,3 +91,36 @@ Readings: PB130001 developments through `read_mock.py` (layout mock2a), PB200002
   `calib/model2.npz` (`calib_model.py`) with these 24 and the earlier 14 renderings, checked on the films of the
   confirmation round.
 - Then `fit_twelve.py` again with the winning rules, and the 31 predictions.
+
+## 6. Results (2026-11-20, all four files, 104 JPEGs, no fault)
+
+`results/analyse.txt` (Q1-Q4), `results/table-gain.txt` (the fitted tables on their own films). [C] for the camera
+numbers.
+
+**Q4, model2.** On the 24 calibration films the camera matches model2 to 0.75-1.40 ΔE on natural colours (18 of 24
+within 0.8-1.1; worst K05, a mix, 1.40 and grays 1.62; six-axis near its bounds 1.0-1.17), ColorChecker 0.77-1.21.
+That is the films' own range (0.8-1.15): model2 holds across and beyond the fitted ranges; a recalibration would gain
+little. The camera's ColorMatrix equals the expected one in every file.
+
+**The fitted tables on the camera** (PB130001 against the film's target, natural / ColorChecker / skin):
+
+| Film | no table | Natural's table (today) | its fitted table | predicted, today -> table |
+|---|---|---|---|---|
+| Portra 400 | 1.17 / 1.63 / 1.15 | 1.26 / 1.63 / 1.15 | 1.15 / 1.56 / 1.18 | 1.24 -> 1.17 / 1.69 -> 1.58 / 1.17 -> 1.18 |
+| Velvia 100 | 1.34 / 1.96 / 1.53 | 1.44 / 1.91 / 1.56 | 1.34 / 1.89 / 1.38 | 1.44 -> 1.40 / 1.87 -> 1.66 / 1.51 -> 1.23 |
+| Ektachrome | 1.20 / 1.70 / 1.18 | 1.27 / 1.69 / 1.18 | 1.24 / 1.56 / 1.09 | 1.30 -> 1.30 / 1.73 -> 1.47 / 1.23 -> 1.13 |
+
+- The fitted tables gain on the camera about as predicted for Portra; for Velvia and Ektachrome the ColorChecker gain
+  is smaller than predicted (0.02 and 0.13 against 0.21 and 0.26).
+- **Natural's table itself costs the films 0.07-0.10 on natural colours**: switched off, every film is better on
+  natural and hold-out colours, the ColorChecker equal. Most of the natural-colour gain of a fitted table is the
+  removal of Natural's table.
+- No stock 12-region table has every record off (the smallest mask is 0x001, codes 167 / 168): giving films "no
+  table" needs a table of their own in the firmware.
+
+**Q1-Q3, the rules on real tables.** On the four realistic tables (ART 2-5) the fitted rules leave rms 1.1-2.2 codes
+of a 1.5-3.7-code change on the patches the table moves. Saturation adds (residual 1.44) rather than multiplies
+(1.61). Where stage 7 sits is not resolved: before the gain, between gain and chroma curves, after the curves give
+1.44, 1.47, 1.50. Natural's table with flat curves (ART 6) changes the picture by 16-19 codes and the rules miss 12-13
+of it: the curve evaluation (or what a flat curve at 63 means) is wrong in the rules. The constants fitted on real
+tables differ from the probe's (lightness 0.147 against 0.239 per unit, saturation 0.155 against 0.238, hue ×0.73).

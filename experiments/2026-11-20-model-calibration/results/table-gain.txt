@@ -1,0 +1,15 @@
+portra-400:
+   camera, no table (off)   : natural 1.17  hold-out 1.15  ColorChecker 1.63  skin 1.15  grays 0.78
+   camera, Natural's table  : natural 1.26  hold-out 1.26  ColorChecker 1.63  skin 1.15  grays 0.78
+   camera, its fitted table : natural 1.15  hold-out 1.12  ColorChecker 1.56  skin 1.18  grays 0.78
+   predicted (confirmation round -> table): natural 1.24  hold-out 1.26  ColorChecker 1.69  skin 1.17  grays 0.96  ->  natural 1.17  hold-out 1.18  ColorChecker 1.58  skin 1.18  grays 0.95
+velvia:
+   camera, no table (off)   : natural 1.34  hold-out 1.38  ColorChecker 1.96  skin 1.53  grays 0.81
+   camera, Natural's table  : natural 1.44  hold-out 1.47  ColorChecker 1.91  skin 1.56  grays 0.81
+   camera, its fitted table : natural 1.34  hold-out 1.38  ColorChecker 1.89  skin 1.38  grays 0.82
+   predicted (confirmation round -> table): natural 1.44  hold-out 1.49  ColorChecker 1.87  skin 1.51  grays 0.82  ->  natural 1.40  hold-out 1.43  ColorChecker 1.66  skin 1.23  grays 0.82
+ektachrome:
+   camera, no table (off)   : natural 1.20  hold-out 1.19  ColorChecker 1.70  skin 1.18  grays 0.71
+   camera, Natural's table  : natural 1.27  hold-out 1.30  ColorChecker 1.69  skin 1.18  grays 0.72
+   camera, its fitted table : natural 1.24  hold-out 1.25  ColorChecker 1.56  skin 1.09  grays 0.72
+   predicted (confirmation round -> table): natural 1.30  hold-out 1.31  ColorChecker 1.73  skin 1.23  grays 0.85  ->  natural 1.30  hold-out 1.31  ColorChecker 1.47  skin 1.13  grays 0.78

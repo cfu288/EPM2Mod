@@ -1,0 +1,73 @@
+files read: [1, 2, 3, 4]
+Q4  model2 on the calibration films (PB130001; camera vs model, ΔE2000; camera ColorMatrix = expected?)
+    film   what          natural  ColorChecker   skin  grays  matrix
+    ART1 clear reference        0.64          0.59   0.52   0.85  yes
+    K01    mix 1            1.02          0.86   0.88   0.92  yes
+    K02    mix 2            0.92          0.85   0.55   0.83  yes
+    K03    mix 3            0.77          0.78   0.63   0.64  yes
+    K04    mix 4            0.98          0.99   0.95   0.79  yes
+    K05    mix 5            1.40          1.08   0.57   1.62  yes
+    K06    mix 6            1.02          0.88   0.59   1.06  yes
+    ART1 portra-400 reference        0.78          0.72   0.56   0.70  yes
+    K07    mix 7            0.83          0.84   0.48   0.76  yes
+    K08    mix 8            0.82          0.81   0.48   0.68  yes
+    K09    six-axis 1       1.17          1.00   0.68   0.70  yes
+    K10    six-axis 2       0.97          0.81   0.57   0.69  yes
+    K11    six-axis 3       1.13          1.14   0.55   0.75  yes
+    K12    six-axis 4       0.99          0.93   0.56   0.68  yes
+    ART1 velvia reference        0.77          0.67   0.63   0.69  yes
+    K13    six-axis 5       0.99          0.89   0.46   0.66  yes
+    K14    six-axis 6       1.04          1.21   0.90   0.79  yes
+    K15    six-axis 7       1.08          1.07   0.76   0.82  yes
+    K16    six-axis 8       1.07          0.94   0.49   0.73  yes
+    K17    gain 160         0.75          0.77   0.55   0.67  yes
+    K18    gain 230         0.81          0.80   0.52   0.61  yes
+    ART1 ektachrome reference        0.81          0.74   0.78   0.74  yes
+    K19    gain 345         0.92          0.84   0.61   0.74  yes
+    K20    gain 420         1.02          0.95   0.60   0.82  yes
+    K21    matrix 1         0.93          0.85   0.61   0.77  yes
+    K22    matrix 2         0.85          0.82   0.45   0.68  yes
+    K23    matrix 3         0.86          0.81   0.85   0.79  yes
+    K24    matrix 4         0.91          0.79   0.70   0.73  yes
+
+Q1-Q3  tables of ART [2, 3, 4, 5, 6]: change, measured (ART k − ART 1) against predicted; 40 sets of up to 2500 patches
+   stage 7 pre  the gain/curves, saturation add: residual on moved patches rms 5.88 codes; constants chroma 5.96/code, saturation 0.2557, lightness 0.1740, hue x1.060
+   stage 7 pre  the gain/curves, saturation mul: residual on moved patches rms 6.89 codes; constants chroma 5.96/code, saturation 2.3305, lightness 0.1332, hue x1.070
+   stage 7 mid  the gain/curves, saturation add: residual on moved patches rms 5.88 codes; constants chroma 5.96/code, saturation 0.2659, lightness 0.1728, hue x1.066
+   stage 7 mid  the gain/curves, saturation mul: residual on moved patches rms 6.91 codes; constants chroma 5.96/code, saturation 2.3302, lightness 0.1315, hue x1.068
+   stage 7 post the gain/curves, saturation add: residual on moved patches rms 5.85 codes; constants chroma 5.96/code, saturation 0.2214, lightness 0.1661, hue x1.079
+   stage 7 post the gain/curves, saturation mul: residual on moved patches rms 6.85 codes; constants chroma 5.96/code, saturation 1.8834, lightness 0.1270, hue x1.084
+   best: post, add; per set (change rms -> residual rms, moved patches):
+     file 1 (clear): T2 3.7->2.2, T3 2.2->1.1, T4 2.4->1.3, T5 2.4->1.3, T6 17.1->13.1, A2 3.2->2.1, A3 1.8->1.1, A4 2.1->1.3, A5 2.1->1.2, A6 17.5->13.3
+     file 2 (portra-400): T2 3.1->2.2, T3 1.8->1.0, T4 2.3->1.2, T5 2.2->1.3, T6 16.4->12.5, A2 3.1->2.2, A3 1.6->1.1, A4 1.9->1.3, A5 2.0->1.3, A6 17.2->13.3
+     file 3 (velvia): T2 3.4->2.4, T3 1.8->1.1, T4 2.2->1.2, T5 2.2->1.3, T6 16.0->12.1, A2 3.7->2.3, A3 1.7->1.1, A4 2.1->1.2, A5 2.0->1.2, A6 16.7->12.8
+     file 4 (ektachrome): T2 3.2->2.4, T3 1.7->1.0, T4 2.1->1.2, T5 2.1->1.2, T6 18.3->12.1, A2 3.4->2.1, A3 1.5->1.1, A4 1.8->1.3, A5 1.8->1.2, A6 18.9->12.3
+     (T = PB200002, A = PB130001; 2 Natural A, 3 Portra, 4 Velvia, 5 Ektachrome, 6 Natural A flat curves)
+
+Q1-Q3  tables of ART [2, 3, 4, 5]: change, measured (ART k − ART 1) against predicted; 32 sets of up to 2500 patches
+   stage 7 pre  the gain/curves, saturation add: residual on moved patches rms 1.44 codes; constants chroma 5.96/code, saturation 0.1551, lightness 0.1468, hue x0.732
+   stage 7 pre  the gain/curves, saturation mul: residual on moved patches rms 1.61 codes; constants chroma 5.96/code, saturation 1.1234, lightness 0.1455, hue x0.729
+   stage 7 mid  the gain/curves, saturation add: residual on moved patches rms 1.47 codes; constants chroma 5.96/code, saturation 0.1575, lightness 0.1434, hue x0.724
+   stage 7 mid  the gain/curves, saturation mul: residual on moved patches rms 1.63 codes; constants chroma 5.96/code, saturation 1.1118, lightness 0.1424, hue x0.720
+   stage 7 post the gain/curves, saturation add: residual on moved patches rms 1.50 codes; constants chroma 5.96/code, saturation 0.1390, lightness 0.1432, hue x0.732
+   stage 7 post the gain/curves, saturation mul: residual on moved patches rms 1.57 codes; constants chroma 5.96/code, saturation 1.0511, lightness 0.1422, hue x0.730
+   best: pre, add; per set (change rms -> residual rms, moved patches):
+     file 1 (clear): T2 3.7->2.1, T3 2.2->1.1, T4 2.4->1.3, T5 2.4->1.3, A2 3.3->1.9, A3 1.8->1.1, A4 2.1->1.2, A5 2.1->1.2
+     file 2 (portra-400): T2 3.4->1.9, T3 1.8->1.1, T4 2.2->1.2, T5 2.2->1.2, A2 3.3->1.9, A3 1.7->1.1, A4 2.0->1.1, A5 1.9->1.2
+     file 3 (velvia): T2 3.4->2.0, T3 1.8->1.1, T4 2.2->1.2, T5 2.2->1.3, A2 3.5->2.1, A3 1.7->1.1, A4 1.9->1.2, A5 2.0->1.2
+     file 4 (ektachrome): T2 3.2->2.2, T3 1.7->1.1, T4 2.1->1.2, T5 2.1->1.2, A2 3.3->2.2, A3 1.5->1.1, A4 1.8->1.2, A5 1.8->1.1
+     (T = PB200002, A = PB130001; 2 Natural A, 3 Portra, 4 Velvia, 5 Ektachrome, 6 Natural A flat curves)
+
+Q1-Q3  tables of ART [6]: change, measured (ART k − ART 1) against predicted; 8 sets of up to 2500 patches
+   stage 7 pre  the gain/curves, saturation add: residual on moved patches rms 12.88 codes; constants chroma 5.96/code, saturation 0.2618, lightness 0.1874, hue x1.102
+   stage 7 pre  the gain/curves, saturation mul: residual on moved patches rms 14.74 codes; constants chroma 5.96/code, saturation 2.8929, lightness 0.1253, hue x1.197
+   stage 7 mid  the gain/curves, saturation add: residual on moved patches rms 12.88 codes; constants chroma 5.96/code, saturation 0.2723, lightness 0.1873, hue x1.110
+   stage 7 mid  the gain/curves, saturation mul: residual on moved patches rms 14.75 codes; constants chroma 5.96/code, saturation 2.9106, lightness 0.1243, hue x1.209
+   stage 7 post the gain/curves, saturation add: residual on moved patches rms 12.78 codes; constants chroma 5.96/code, saturation 0.2263, lightness 0.1779, hue x1.132
+   stage 7 post the gain/curves, saturation mul: residual on moved patches rms 14.85 codes; constants chroma 5.96/code, saturation 2.2537, lightness 0.1168, hue x1.229
+   best: post, add; per set (change rms -> residual rms, moved patches):
+     file 1 (clear): T6 17.4->13.3, A6 17.4->13.2
+     file 2 (portra-400): T6 16.4->12.4, A6 17.4->13.6
+     file 3 (velvia): T6 16.2->12.3, A6 16.5->13.0
+     file 4 (ektachrome): T6 18.3->12.3, A6 18.4->12.2
+     (T = PB200002, A = PB130001; 2 Natural A, 3 Portra, 4 Velvia, 5 Ektachrome, 6 Natural A flat curves)
