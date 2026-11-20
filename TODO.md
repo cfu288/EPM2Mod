@@ -9,7 +9,7 @@ and delete the item here.
   (the playback EXIF path, `experiments/2026-11-20-film-name-exif/NOTES.md`).
 - The emulator gate `experiments/2026-11-18-stock-filters/scripts/equal_tables.py` does not compare the look table
   (how the Cross Process curve of 2026-11-18 went unseen); add it.
-- RAW Data Edit → ART BKT (one RAW developed in every selected ART entry): being built
+- RAW Data Edit → ART BKT (one RAW developed in every selected ART entry), a developer tool for film-simulation tests, not for release: camera test of the candidate `films-look-exif-artbkt` in progress
   (`experiments/2026-11-20-raw-edit-art-bkt/NOTES.md`).
 
 ## One-click installer

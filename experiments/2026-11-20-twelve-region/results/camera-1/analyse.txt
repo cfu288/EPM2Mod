@@ -1,0 +1,124 @@
+read PB200004.JPG as ART1: 6504 patches; registration {'points': 352, 'used': 305, 'score': 0.8520272374153137, 'rms': 1.2022708125716655, 'max_shift': 70.5518569946289}
+read PB200005.JPG as ART2: 6504 patches; registration {'points': 352, 'used': 305, 'score': 0.8520272374153137, 'rms': 1.2022708125716655, 'max_shift': 70.5518569946289}
+read PB200006.JPG as ART3: 6504 patches; registration {'points': 352, 'used': 305, 'score': 0.8520272374153137, 'rms': 1.2022708125716655, 'max_shift': 70.5518569946289}
+read PB200007.JPG as ART4: 6504 patches; registration {'points': 352, 'used': 305, 'score': 0.8520272374153137, 'rms': 1.2022708125716655, 'max_shift': 70.5518569946289}
+read PB200008.JPG as ART5: 6504 patches; registration {'points': 352, 'used': 305, 'score': 0.8520272374153137, 'rms': 1.2022708125716655, 'max_shift': 70.5518569946289}
+read PB200009.JPG as ART6: 6504 patches; registration {'points': 352, 'used': 305, 'score': 0.8520272374153137, 'rms': 1.2022708125716655, 'max_shift': 70.5518569946289}
+read PB200010.JPG as ART7: 6504 patches; registration {'points': 352, 'used': 305, 'score': 0.8520272374153137, 'rms': 1.2022708125716655, 'max_shift': 70.5518569946289}
+read PB200011.JPG as ART8: 6504 patches; registration {'points': 352, 'used': 305, 'score': 0.8520272374153137, 'rms': 1.2022708125716655, 'max_shift': 70.5518569946289}
+read PB200012.JPG as ART9: 6504 patches; registration {'points': 352, 'used': 305, 'score': 0.8520272374153137, 'rms': 1.2022708125716655, 'max_shift': 70.5518569946289}
+read PB200013.JPG as ART10: 6504 patches; registration {'points': 352, 'used': 305, 'score': 0.8520272374153137, 'rms': 1.2022708125716655, 'max_shift': 70.5518569946289}
+read PB200014.JPG as ART11: 6504 patches; registration {'points': 352, 'used': 305, 'score': 0.8520272374153137, 'rms': 1.2022708125716655, 'max_shift': 70.5518569946289}
+read PB200015.JPG as ART12: 6504 patches; registration {'points': 352, 'used': 305, 'score': 0.8520272374153137, 'rms': 1.2022708125716655, 'max_shift': 70.5518569946289}
+noise (25 identical greys in ART 1, floor 0.3): 0.30 codes
+   classification check (correlation of |change| with each entry's nominal |change|):
+     ART  1 file looks like ART  1 (r nan)
+     ART  2 file looks like ART  2 (r 0.92)
+     ART  3 file looks like ART  3 (r 0.83)
+     ART  4 file looks like ART  4 (r 0.93)
+     ART  5 file looks like ART  6 (r 0.27)  <- CHECK THE MAP
+     ART  6 file looks like ART  6 (r 0.73)
+     ART  7 file looks like ART  7 (r 0.50)
+     ART  8 file looks like ART  8 (r 0.76)
+     ART  9 file looks like ART  9 (r 0.64)
+     ART 10 file looks like ART 10 (r 0.85)
+     ART 11 file looks like ART 10 (r 0.73)
+     ART 12 file looks like ART 10 (r 0.43)
+A  hue convention (ART 3 HUEMAP): record hue = +1 x atan2(Cr, Cb) + 0.13 deg (+- 0.14); residual per window rms 0.49 deg; scale 1.0011 record deg per measured deg (1 = 32768 per turn); magnitude order r = 0.999
+   window widths on the 1-deg ring (10 deg written, trapezoid): [9.0, 9.4, 8.6, 8.4, 9.1, 7.1, 8.7, 8.3, 6.7, 10.1, 11.2, 9.8]
+B  luma units (ART 10 BOX, greys and luma lines): luma_rec = 4.049 x Y8 + -4.6 (slope +- 0.010); edges at Y8 [49.5, 79.2, 176.4, 205.3] for written [196.0, 316.0, 708.0, 828.0]
+   plateaus: band 192-320 dY +19.00, band 704-832 dY -19.00 (8-bit codes)
+B  chroma units (ART 10, record hue 20-160): chroma_rec = 5.961 x radius8 (+- 0.481); edges at radius [6.5, 13.4, 23.6, 39.5, 53.3, 56.5, 56.6, 79.1] for written [25.0, 55.0, 98.0, 158.0, 227.0, 317.0, 405.0, 555.0]
+   first chroma edge by hue (radius8): [(38, np.float64(59.4)), (68, np.float64(59.3)), (98, np.float64(64.3)), (128, np.float64(57.9)), (158, np.float64(13.7))]; spread 18.72 (Euclidean chroma: equal at every hue; |Cb|+|Cr| or max: varies by up to 41 %)
+C  lightness (ART 4 MAG L): dY8 = 0.23887 x L (+- 0.00073; 1/4 = 0.25000 if L is 10-bit luma) over |L| <= 256
+     L  -1023: dY8    +nan +- nan (n 0 unclipped); ratio to linear nan; dY vs Y8 slope +nan (0 = added, not scaled); 100 % of the sector clipped
+     L   -512: dY8 -122.00 +- 0.00 (n 78 unclipped); ratio to linear 0.998; dY vs Y8 slope +0.090 (0 = added, not scaled); 73 % of the sector clipped
+     L   -256: dY8  -61.00 +- 0.00 (n 269 unclipped); ratio to linear 0.998; dY vs Y8 slope +0.035 (0 = added, not scaled); 34 % of the sector clipped
+     L   -128: dY8  -31.00 +- 0.00 (n 227 unclipped); ratio to linear 1.014; dY vs Y8 slope +0.017 (0 = added, not scaled); 24 % of the sector clipped
+     L    -64: dY8  -15.00 +- 0.00 (n 363 unclipped); ratio to linear 0.981; dY vs Y8 slope +0.007 (0 = added, not scaled); 5 % of the sector clipped
+     L    -16: dY8   -4.00 +- 0.00 (n 302 unclipped); ratio to linear 1.047; dY vs Y8 slope +0.001 (0 = added, not scaled); 14 % of the sector clipped
+     L    +16: dY8   +4.00 +- 0.00 (n 348 unclipped); ratio to linear 1.047; dY vs Y8 slope -0.003 (0 = added, not scaled); 2 % of the sector clipped
+     L    +64: dY8  +15.00 +- 0.00 (n 291 unclipped); ratio to linear 0.981; dY vs Y8 slope -0.011 (0 = added, not scaled); 7 % of the sector clipped
+     L   +128: dY8  +31.00 +- 0.00 (n 318 unclipped); ratio to linear 1.014; dY vs Y8 slope -0.018 (0 = added, not scaled); 11 % of the sector clipped
+     L   +256: dY8  +61.00 +- 0.00 (n 196 unclipped); ratio to linear 0.998; dY vs Y8 slope -0.017 (0 = added, not scaled); 31 % of the sector clipped
+     L   +512: dY8 +122.00 +- 0.00 (n 120 unclipped); ratio to linear 0.998; dY vs Y8 slope -0.084 (0 = added, not scaled); 63 % of the sector clipped
+     L  +1023: dY8    +nan +- nan (n 0 unclipped); ratio to linear nan; dY vs Y8 slope +nan (0 = added, not scaled); 99 % of the sector clipped
+C  saturation (ART 5 MAG S): ADDS to chroma: c_out = c_in + ks x S, ks = 0.237796 +- 0.000248 (over |S| <= 256; relative spread multiply 0.571 vs add 0.073: smaller wins)
+     S   -256: chroma ratio 0.000 +- 0.000, difference -31.54 +- 1.15 codes, dY8 -0.03
+     S   -192: chroma ratio 0.000 +- 0.000, difference -25.23 +- 0.71 codes, dY8 -0.02
+     S   -128: chroma ratio 0.000 +- 0.000, difference -27.66 +- 0.29 codes, dY8 -0.04
+     S    -64: chroma ratio 0.392 +- 0.022, difference -15.16 +- 0.04 codes, dY8 -0.04
+     S    -32: chroma ratio 0.702 +- 0.013, difference -7.48 +- 0.03 codes, dY8 +0.08
+     S    +32: chroma ratio 1.278 +- 0.009, difference +7.64 +- 0.04 codes, dY8 -0.02
+     S    +64: chroma ratio 1.530 +- 0.021, difference +15.15 +- 0.03 codes, dY8 +0.03
+     S   +128: chroma ratio 2.086 +- 0.039, difference +30.44 +- 0.04 codes, dY8 -0.00
+     S   +256: chroma ratio 3.651 +- 0.207, difference +60.92 +- 0.05 codes, dY8 +0.04
+     S   +512: chroma ratio nan +- nan, difference +nan +- nan codes, dY8 +nan
+     S  +1024: chroma ratio 0.000 +- 0.000, difference -29.67 +- 1.20 codes, dY8 +0.02
+     S  +2048: chroma ratio 1.000 +- 0.000, difference +0.00 +- 0.00 codes, dY8 +0.00
+C  hue shift (ART 6 MAG H): 154.30 deg per 32768 units (+- 116.51; 360 if 32768 = one turn); positive = the same direction as record hue
+     H  -16384 ( -180.0 deg written): measured -159.18 deg +- 0.48; chroma ratio 1.118; dY8 -1.03
+     H   -5461 (  -60.0 deg written): measured  -43.72 deg +- 0.30; chroma ratio 0.829; dY8 +0.08
+     H   -2730 (  -30.0 deg written): measured  -30.84 deg +- 0.35; chroma ratio 1.199; dY8 -1.44
+     H   -1365 (  -15.0 deg written): measured   +7.54 deg +- 0.84; chroma ratio 0.921; dY8 -0.14
+     H    -455 (   -5.0 deg written): measured  +25.90 deg +- 1.04; chroma ratio 1.003; dY8 -1.08
+     H     -91 (   -1.0 deg written): measured   -3.96 deg +- 0.16; chroma ratio 0.784; dY8 +0.08
+     H     +91 (   +1.0 deg written): measured   +0.20 deg +- 0.14; chroma ratio 1.208; dY8 -1.38
+     H    +455 (   +5.0 deg written): measured   -7.38 deg +- 0.65; chroma ratio 1.029; dY8 -0.63
+     H   +1365 (  +15.0 deg written): measured  +18.92 deg +- 0.12; chroma ratio 1.194; dY8 -1.11
+     H   +2730 (  +30.0 deg written): measured   +1.76 deg +- 1.08; chroma ratio 0.921; dY8 -0.79
+     H   +5461 (  +60.0 deg written): measured  +50.49 deg +- 0.25; chroma ratio 0.846; dY8 -0.06
+     H  +10923 ( +120.0 deg written): measured  +55.20 deg +- 1.81; chroma ratio 1.105; dY8 -1.88
+D  curve slots (ART 7 CURVES): record k has slot c_k as a ramp; the weight each effect shows, fitted against the ramp along each axis (R2; 'flat' = no modulation)
+   c0: H: flat (median |w - shape|: f 1.21 h 1.60 c 1.98 l 1.72); S: hue (median |w - shape|: f 0.52 h 0.03 c 0.35 l 0.27); L: flat (median |w - shape|: f 0.40 h 0.74 c 0.51 l 0.48)
+   c1: H: flat (median |w - shape|: f 0.49 h 0.68 c 0.98 l 0.67); S: flat (median |w - shape|: f 0.02 h 0.43 c 0.79 l 0.42); L: flat (median |w - shape|: f 0.12 h 0.61 c 0.67 l 0.39)
+   c2: H: flat (median |w - shape|: f 1.15 h 1.48 c 1.94 l 1.50); S: flat (median |w - shape|: f 0.03 h 0.42 c 0.79 l 0.36); L: chroma (median |w - shape|: f 0.98 h 0.45 c 0.09 l 0.48)
+   c3: H: flat (median |w - shape|: f 1.26 h 1.71 c 2.09 l 1.70); S: chroma (median |w - shape|: f 0.91 h 0.51 c 0.05 l 0.47); L: flat (median |w - shape|: f 0.20 h 0.68 c 0.50 l 0.46)
+   c4: H: chroma (median |w - shape|: f 0.73 h 0.57 c 0.25 l 0.45); S: flat (median |w - shape|: f 0.08 h 0.34 c 0.71 l 0.28); L: flat (median |w - shape|: f 0.10 h 0.36 c 0.71 l 0.30)
+   c5: H: flat (median |w - shape|: f 0.35 h 0.57 c 0.89 l 0.58); S: luma (median |w - shape|: f 0.51 h 0.25 c 0.33 l 0.02); L: luma (median |w - shape|: f 0.62 h 0.32 c 0.24 l 0.02)
+   c6: H: flat (median |w - shape|: f 1.24 h 1.69 c 2.04 l 1.77); S: flat (median |w - shape|: f 0.02 h 0.43 c 0.77 l 0.51); L: chroma (median |w - shape|: f 0.51 h 0.49 c 0.29 l 0.34)
+E  global fit of the stage model (entries 3-10, 1500 patches each), residual rms (8-bit codes) per hypothesis:
+      8.654  {'sign': 1.0, 'sat': 'mul', 'roles': 'stock', 'window': 'hard'}
+      8.833  {'sign': 1.0, 'sat': 'add', 'roles': 'swapped', 'window': 'hard'}
+      8.949  {'sign': 1.0, 'sat': 'add', 'roles': 'stock', 'window': 'hard'}
+      9.906  {'sign': 1.0, 'sat': 'add', 'roles': 'stock', 'window': 'clamp'}
+   best: h0 = 0.12825 +- nan, kc = 5.7029 +- nan, ky = 4.0483 +- nan, kl = 0.20974 +- nan, ks = 0.0037462 +- nan, kh = 0.0090995 +- nan; {'sign': 1.0, 'sat': 'mul', 'roles': 'stock', 'window': 'hard'}
+F  overlap and mask (ART 8 OVERLAP), measured | the fitted model's prediction (sum of records):
+       4- 56 S +64 twice (alone: MAG S +64; sum: +128): dY8 -0.06+-0.02, chroma x2.035+-0.026, hue +0.39+-0.05 deg (n 776) | dY8 +0.00+-0.00, chroma x1.480+-0.000, hue +0.00+-0.00 deg (n 776)
+      64-116 H +10 and +20 deg (sum 30): dY8 -0.01+-0.01, chroma x1.000+-0.001, hue +28.49+-0.04 deg (n 830) | dY8 +0.00+-0.00, chroma x1.000+-0.000, hue +24.84+-0.00 deg (n 830)
+     124-176 L -64 twice (sum -128): dY8 -30.00+-0.02, chroma x1.000+-0.000, hue +0.00+-0.00 deg (n 906) | dY8 -26.85+-0.00, chroma x1.000+-0.000, hue +0.00+-0.00 deg (n 906)
+     184-206 S -128 only: dY8 -0.07+-0.02, chroma x0.032+-0.003, hue +2.26+-2.46 deg (n 348) | dY8 +0.00+-0.00, chroma x0.520+-0.000, hue +0.00+-0.00 deg (n 348)
+     214-236 S -128 and L +128: dY8 +30.20+-0.05, chroma x0.000+-0.000, hue +1.52+-8.93 deg (n 443) | dY8 +26.85+-0.00, chroma x0.520+-0.000, hue +0.00+-0.00 deg (n 443)
+     244-266 L +128 only: dY8 +30.00+-0.09, chroma x1.000+-0.000, hue +0.00+-0.00 deg (n 297) | dY8 +26.85+-0.00, chroma x1.000+-0.000, hue +0.00+-0.00 deg (n 297)
+     274-296 bit 4 off (S -256) + bit 5 on (L -64): dY8 -15.00+-0.00, chroma x1.000+-0.000, hue +0.00+-0.00 deg (n 324) | dY8 -13.42+-0.00, chroma x1.000+-0.000, hue +0.00+-0.00 deg (n 324)
+     304-326 bit 4 off only: no change expected: dY8 +0.00+-0.00, chroma x1.000+-0.000, hue +0.00+-0.00 deg (n 299) | dY8 +0.00+-0.00, chroma x1.000+-0.000, hue +0.00+-0.00 deg (n 299)
+     332-343 bit 10 off (L +256) + bit 11 on (S +128): dY8 -0.08+-0.03, chroma x1.980+-0.049, hue -0.38+-0.08 deg (n 157) | dY8 +0.00+-0.00, chroma x1.480+-0.000, hue +0.00+-0.00 deg (n 157)
+     348-358 bit 10 off only: no change expected: dY8 +0.00+-0.00, chroma x1.000+-0.000, hue +0.00+-0.00 deg (n 90) | dY8 +0.00+-0.00, chroma x1.000+-0.000, hue +0.00+-0.00 deg (n 90)
+F  window semantics (ART 9 WINDOW):
+      12- 38 W2 inside the written window: dY8 -24.00+-0.00, chroma x1.000+-0.000, hue +0.00+-0.00 deg (n 329)
+      42- 68 W2 beyond the width, p < 256 (effect = no hard edge): dY8 +0.00+-0.00, chroma x1.000+-0.000, hue +0.00+-0.00 deg (n 517)
+      92-108 W3 first half (p up to 256): dY8 -24.00+-0.00, chroma x1.000+-0.000, hue +0.00+-0.00 deg (n 257)
+     112-128 W3 second half (p > 256): dY8 +0.00+-0.00, chroma x1.000+-0.000, hue +0.00+-0.00 deg (n 352)
+     152-178 W4 luma (0,0): S -128 at every luma?: dY8 -0.02+-0.01, chroma x0.000+-0.000, hue -152.53+-1.61 deg (n 514)
+     352-358 W5 before 0: dY8 +24.00+-0.00, chroma x1.000+-0.000, hue +0.00+-0.00 deg (n 48)
+       2-  8 W5 after 0: dY8 +24.00+-0.00, chroma x1.000+-0.000, hue +0.00+-0.00 deg (n 108)
+     252-278 W7 chroma (0,0): S +128 at every chroma?: dY8 +0.00+-0.00, chroma x1.000+-0.000, hue +0.00+-0.00 deg (n 397)
+     292-318 W8 levels 126: L -64 x 2?: dY8 +0.00+-0.00, chroma x1.000+-0.000, hue +0.00+-0.00 deg (n 410)
+     182-198 no record: offset = spill of W1 if windows are not hard: dY8 +0.00+-0.00, chroma x1.000+-0.000, hue +0.00+-0.00 deg (n 275)
+     281-288 no record: offset = spill of W1: dY8 +0.00+-0.00, chroma x1.000+-0.000, hue +0.00+-0.00 deg (n 86)
+     W4 chroma ratio by Y8 quartile: ['28-109: x0.000', '109-121: x0.042', '121-180: x0.000', '180-228: x0.000']
+     W7 chroma ratio by chroma quartile: ['4-15: x1.000', '15-28: x1.000', '28-42: x1.000', '42-78: x1.000']
+     W6 (luma slot levels 32, slopes +16): rms vs a sawtooth along luma (slope used) 4.32, vs flat (levels only) 4.48 codes -> the slope byte is used
+     W1 (flat 63, ends not 0): inside its box dY8 -23.00+-0.00, chroma x1.000+-0.000, hue +0.00+-0.00 deg (n 47); same hues outside the box dY8 +0.00+-0.00, chroma x1.000+-0.000, hue +0.00+-0.00 deg (n 212)
+F  Natural's table A (ART 2 minus ART 1): rms change 1.17 codes, largest 14.8; the fitted model predicts it with rms residual 0.67
+     record 0 (hue 133+60 deg, written H +15.0 deg S +140 L +32): dY8 +0.00+-0.02, chroma x1.000+-0.003, hue +2.28+-0.17 deg (n 417)
+     record 1 (hue 339+64 deg, written H +5.0 deg S -16 L +0): dY8 +0.00+-0.02, chroma x0.940+-0.002, hue +1.92+-0.12 deg (n 408)
+     record 2 (hue 270+40 deg, written H -5.0 deg S +72 L -64): dY8 -1.79+-0.16, chroma x1.111+-0.007, hue -0.39+-0.06 deg (n 246)
+     record 3 (hue 77+40 deg, written H -5.0 deg S +0 L -10): dY8 +0.00+-0.00, chroma x1.000+-0.000, hue +0.00+-0.00 deg (n 257)
+     record 7 (hue 281+26 deg, written H +9.0 deg S -128 L +0): dY8 -1.52+-0.14, chroma x1.112+-0.006, hue -0.31+-0.07 deg (n 191)
+     record 8 (hue 151+44 deg, written H -8.0 deg S +80 L +64): dY8 +0.77+-0.05, chroma x0.964+-0.006, hue +8.95+-0.57 deg (n 353)
+     record 9 (hue 147+69 deg, written H +18.0 deg S -8 L +0): dY8 +0.53+-0.03, chroma x1.000+-0.004, hue +5.01+-0.33 deg (n 533)
+F  order against saturation gain x1.5 and chroma curves (ART 11 vs ART 10's table on 5472 affected patches; maps from 1032 unaffected): rms residual after 4.563, mid 5.048, before6 4.099 -> before6
+     ART 11 CB slope outside +-25 (each side): 0.749 (first stored curve 0.5 x 1.5 = 0.75; second 0.75 x 1.5 = 1.125)
+     ART 11 CR slope outside +-25 (each side): 1.145 (first stored curve 0.5 x 1.5 = 0.75; second 0.75 x 1.5 = 1.125)
+F  order against the look curve (Cross Process I) (ART 12 vs ART 10's table on 5207 affected patches; maps from 1297 unaffected): rms residual after 7.964, before5 5.067 -> before5

@@ -200,3 +200,34 @@ size, white balance, three embedded JPEGs), so the files are sound [C]. Both car
 files of one number in one folder as one picture, and two RAWs under one number are not a valid picture [I]. Every
 earlier run had one RAW per number. Fix: the new RAW goes on the card as **PB200002.ORF** (the repository file keeps
 its name); in steps 8 and 9 read PB200002 for PB200001. The analysis maps by order, not by name.
+
+## 8. Camera run 1 (2026-11-20): PB200002 developed with ART BKT
+
+With the RAW renamed (§7) both RAWs showed in playback [C]. The owner copied back 13 JPEGs (PB200003–PB200015). All 13
+come from PB200002 (luma correlation with a PB130001 development 0.03–0.07, with each other 0.56–1.00); the 13
+developments of PB130001 are not on the card. EXIF of all 13: Picture Mode Natural, ArtFilter Off, ImageDescription
+Olympus's text, one ColorMatrix. Parts 2–5 not yet run. Output: `results/camera-1/analyse.txt` (map in
+`results/camera-1/map.json`, the sheet's order). The classification check agrees with the order except ART 5 (looks
+like ART 6, r 0.27) and ART 11, 12 (look like ART 10, whose table they reuse); stage C reads ART 5 as the MAG S entry
+it is, so the order stands.
+
+Measured [C], RAW Data Edit, pipe A:
+
+| Question | Result |
+|---|---|
+| Does the stage act in RAW Data Edit, per ART entry? | Yes: every probe table changes its development; ART 1 (all records off) and ART 2 (table A) differ by rms 1.17 codes, as table A predicts (model residual 0.67) |
+| Hue | record hue = +1 × atan2(Cr, Cb) + 0.13° (± 0.14°); 32768 = 360° (scale 1.001) |
+| Luma window | luma = 4.05 × Y8 − 4.6: the 10-bit luma, 0–1024 |
+| Chroma window | about 6.0 × the 8-bit Cb/Cr radius (± 0.5); the first edge at hue 158° is off (13.7 against 58–64 elsewhere): metric not settled |
+| Window edges | hard: a pixel inside gets the full change, outside none; a window position past 256 of the multiplier has no effect |
+| Lightness change | added to Y: 0.239 × L 8-bit codes (L/4, 10-bit), linear up to ±512, then clipped; not scaled by Y |
+| Saturation change | added to the chroma radius: 0.238 codes per unit (S/4); S −128 and below remove all colour; S +1024 acts as a negative value and +2048 as 0 (an 11-bit signed field [I]) |
+| Hue shift | not understood: written −5° gives +25.9°, +30° gives +1.8°, +60° gives +50.5°; no linear rule (154 ± 117° per 32768) |
+| Overlapping records | effects add (L −64 twice = −30 codes; H +10° and +20° = +28.5°) |
+| Enable mask | a record with its bit off has no effect; bits 4, 5, 10, 11 as written |
+| Curve slots | c0 saturation along hue; c2 and c6 lightness along chroma; c3 saturation along chroma; c4 hue along chroma; c5 saturation and lightness along luma; c1 no visible role |
+| Order | before the look curve (residual 5.1 against 8.0 after) and before the saturation gain and chroma curves (4.1 against 4.6 after: a small margin) |
+| Whole-stage model | best residual 8.7 codes over entries 3–10: the hue-shift rule is missing |
+
+Open: the hue-shift rule; the chroma metric; captures, live view and movies (parts 2, 3); ART BKT with PB130001, three
+entries and a full card (parts 1 second half, 4, 5).
