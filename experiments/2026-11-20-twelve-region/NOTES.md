@@ -240,3 +240,12 @@ change on 299 raw-identical patches of the two RAWs differs by 0.00 codes, so th
 
 **Scope (owner, 2026-11-20).** Parts 2–5 are dropped: the probe serves film-simulation fitting from RAW Data Edit
 only, and ART BKT is a developer tool. Captures, live view, movies, the three-entry and full-card runs are not tested.
+
+**Hue shift, second look (2026-11-20).** The analysis's stage C mixes two things in ART 6 (MAG H): the whole
+development also moves greys by dCb −5.82, dCr −0.93 (164 grey patches, chroma < 2), which no other entry does
+(MAG L and MAG S move greys only in Y or as their sector's change). Cause unknown. With that offset removed from the
+output, on patches of chroma > 20 (8-bit radius), median measured shift for written: −1° → −2.0, +1° → +1.4,
+−5° → −1.1, +5° → +4.4, −15° → −12.3, +15° → +16.7, −30° → −31.4, +30° → +22.1, ±60° → +50.1 / −50.3, +120° → +102,
+−180° → −159. Up to ±30° the shift follows 32768 = 360° within about 3° and keeps chroma (×0.99–1.02); larger shifts
+fall short and change chroma (×0.88–1.16). Sectors 240–330 have a second population (quartiles spanning −22° to
++107°) not explained yet. For fitting: hue shifts limited to ±30° [C for the median, I for the rule].
