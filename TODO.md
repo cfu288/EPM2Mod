@@ -20,8 +20,8 @@ and delete the item here.
 
 ## One-click installer
 
-Test releases up to v2026.11.19-rc.4 (2026-11-20: rc.4 replaces the withdrawn final release v2026.11.19, same
-commit). Open: the final release.
+Test releases up to v2026.11.20-rc.1 (films-look-exif; v2026.11.19-rc.4 replaced the withdrawn final release
+v2026.11.19, same commit). Open: the final release.
 
 ## Level gauge
 

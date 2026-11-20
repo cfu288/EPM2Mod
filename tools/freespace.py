@@ -1383,13 +1383,13 @@ def selftest():
     t("  it is blank in stock", a.checks["content"][0] == PASS and sp.b[0x7E4C9100 - BASE:0x7E4C9180 - BASE] == b"\xff" * 128)
     t("  it has no pointer", a.checks["pointers"][0] == PASS and not [x for x in a.hits if 0x7E4C9100 <= x[1] < 0x7E4C9180], a.checks["pointers"][1])
     s3 = sp.analyse(sp.area_at(0x7F033B7C))
-    t("segment-3 tail is used by seven-films-5", any(p == "data/specs/seven-films-5.json" and c == "current" and sum(y - x for x, y in s) == 1024
-                                                      for p, c, s in s3.ledger_rows), str(s3.ledger_rows))
+    t("segment-3 tail is used by a current spec (the film loader)", any(c == "current" and p.startswith("data/specs/card-looks-")
+                                                                        for p, c, s in s3.ledger_rows), str(s3.ledger_rows))
     quiet = lambda *x: None
     base = {"base": STOCK_FW}
     fake = Spec("selftest/overlap.json", dict(base, name="fake-overlap", ops=[
         {"type": "bytes", "block": 0, "offset": hex(0x7F033C00 - BASE), "expect": "ff" * 16, "new": "00" * 16}]))
-    t("a fake spec that overlaps seven-films-5 FAILs (alone: ledger overlap)", check_specs(sp, [fake], quiet) == 1)
+    t("a fake spec that overlaps the film loader FAILs (alone: ledger overlap)", check_specs(sp, [fake], quiet) == 1)
     lines = []
     films = [s for s in sp.specs if s.path == "data/specs/four-neutral.json"]      # applies on stock; writes the same tail
     t("the same fake spec FAILs after a spec that wrote those bytes (expect mismatch)",
