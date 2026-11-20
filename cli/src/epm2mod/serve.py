@@ -13,9 +13,9 @@ API (JSON):
 
 - ``GET /api/build``: the pinned build (name, what, sha256).
 - ``GET /api/cards``: the cards plugged in.
-- ``POST /api/make`` with ``{"firmware": "epm2mod" or "original", "choices": ["ART2=velvia", ...], "card": PATH or
+- ``POST /api/make`` with ``{"firmware": "epm2mod", "original" or "films", "choices": ["ART2=velvia", ...], "card": PATH or
   null}``: start a job. No choices: no film file. ``original`` is Olympus's own firmware (``pipeline.restore``), with
-  no choices. One job at a time; a wrong request, or one while a job runs, gets 400 and the reason.
+  no choices. ``films`` is the film file only (``pipeline.set_films``). One job at a time; a wrong request, or one while a job runs, gets 400 and the reason.
 - ``GET /api/job``: the last job: its progress lines, and when it is done, the error or the result with the camera
   steps (``camera_steps``).
 - ``GET /api/zip``: the files of the last finished job, as a zip.
@@ -58,7 +58,7 @@ from .errors import (
 )
 from .fileio import Log
 from .looks import records
-from .pipeline import STEPS, Outcome, install, restore
+from .pipeline import STEPS, Outcome, install, restore, set_films
 
 #: How long the server waits for the page before it stops. Browsers slow timers in background tabs to one a minute.
 IDLE_SECONDS = 180.0
@@ -73,7 +73,7 @@ class Job:
 
     Attributes:
         number: counts the jobs of this server, from 1.
-        firmware: ``epm2mod`` or ``original``.
+        firmware: ``epm2mod``, ``original``, or ``films`` (only the film file).
         steps: the number of steps of the job.
         lines: the progress lines so far.
         step: the last step of ``make`` that ended, 0 to ``pipeline.STEPS``.
@@ -178,6 +178,15 @@ def run_restore(
     return restore(paths, card, log=log, step=step)
 
 
+def run_films(paths: Locator, choices: list[str], card: Path | None) -> Outcome:
+    """Make only the film file, and write it to a card if one is given (``epm2mod films set``).
+
+    Raises:
+        Epm2ModError: if a step fails (the message is for the user).
+    """
+    return set_films(paths, choices, card=card)
+
+
 def zip_files(files: dict[str, bytes]) -> bytes:
     """Return a zip of the files, by their path on the card."""
     out = io.BytesIO()
@@ -197,6 +206,7 @@ class App:
         list_cards: Callable[[], list[card_list.Card]] = card_list.cards,
         job_runner: Callable[..., Outcome] = run_job,
         restore_runner: Callable[..., Outcome] = run_restore,
+        films_runner: Callable[..., Outcome] = run_films,
     ) -> None:
         """Make the app for a locator; the token is new and random. ``static``: the app page, default the locator's."""
         self.paths = paths
@@ -204,6 +214,7 @@ class App:
         self.list_cards = list_cards
         self.run = job_runner
         self.run_restore = restore_runner
+        self.run_films = films_runner
         self.token = secrets.token_urlsafe(24)
         self.description = paths.pinned_build()
         self.job: Job | None = None
@@ -248,8 +259,8 @@ class App:
                 "the request needs exactly 'firmware', 'choices' and 'card'"
             )
         firmware, choices, card = body["firmware"], body["choices"], body["card"]
-        if firmware not in ("epm2mod", "original"):
-            raise BuildError("'firmware' is 'epm2mod' or 'original'")
+        if firmware not in ("epm2mod", "original", "films"):
+            raise BuildError("'firmware' is 'epm2mod', 'original' or 'films'")
         if firmware == "original" and choices:
             raise BuildError("Olympus's original firmware takes no film simulations")
         if not isinstance(choices, list) or not all(
@@ -272,7 +283,7 @@ class App:
             job = Job(
                 (self.job.number + 1) if self.job else 1,
                 firmware=firmware,
-                steps=STEPS if firmware == "epm2mod" else 2,
+                steps={"epm2mod": STEPS, "original": 2, "films": 1}[firmware],
                 card=card,
             )
             self.job = job
@@ -296,6 +307,9 @@ class App:
         try:
             if job.firmware == "original":
                 outcome = self.run_restore(self.paths, card, log, step)
+            elif job.firmware == "films":
+                outcome = self.run_films(self.paths, choices, card)
+                step(1)
             else:
                 outcome = self.run(self.paths, choices, card, log, step)
             job.sha256 = outcome.files[0].content.sha256
@@ -487,4 +501,4 @@ def serve(paths: Locator, port: int = 0, browser: bool = True) -> None:
         httpd.serve_forever()
     finally:
         httpd.server_close()
-    print("The installer has closed. You can close this window.", flush=True)
+    print("The installer has closed.", flush=True)

@@ -253,6 +253,27 @@ class ServerTests(unittest.TestCase):
         )
         self.assertEqual((calls, self.runner.calls), ([None], []))
 
+    def test_films_only_runs_the_film_file_job(self) -> None:
+        calls: list[tuple[list[str], Path | None]] = []
+
+        def films(paths, choices, card):  # type: ignore[no-untyped-def]
+            calls.append((choices, card))
+            return outcome({"EPM2LOOK.BIN": b"looks"}, True)
+
+        self.server.app.run_films = films
+        status, _ = self.server.request(
+            "POST",
+            "/api/make",
+            {"firmware": "films", "choices": ["ART2=velvia"], "card": None},
+        )
+        self.assertEqual(status, 202)
+        state = self.server.wait()
+        self.assertEqual(
+            (state["firmware"], state["step"], state["steps"], state["files"]),
+            ("films", 1, 1, ["EPM2LOOK.BIN"]),
+        )
+        self.assertEqual((calls, self.runner.calls), ([(["ART2=velvia"], None)], []))
+
     def test_ping_keeps_it_alive_and_quit_stops_it(self) -> None:
         app = self.server.app
         app.last_seen = 0.0
@@ -415,6 +436,23 @@ class EndToEndTests(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 self.cli("restore")
         self.assertEqual((out / "x.BIN").read_bytes(), on_card)
+
+    def test_films_only_writes_what_films_set_writes(self) -> None:
+        choices = ["ART2=velvia", "ART6=double-x"]
+        done = serve.run_films(self.paths, choices, self.app_card)
+        with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            films = [word for choice in choices for word in ("--film", choice)]
+            argv = ["films", "set", "--card", str(self.cli_card), *films]
+            self.assertEqual(self.cli(*argv), 0)
+        name = lookfile.CARD_NAME
+        on_card = (self.cli_card / name).read_bytes()
+        self.assertEqual((self.app_card / name).read_bytes(), on_card)
+        self.assertEqual(self.files(self.app_card), [name])
+        zipped = serve.run_films(self.paths, choices, None)
+        self.assertEqual(zipped.file_data(), {name: on_card})
+        self.assertEqual(
+            zipped.steps[0].text, f"Copy {name} to the top of the SD card."
+        )
 
     def test_the_app_writes_what_the_command_line_writes(self) -> None:
         choices = ["ART2=velvia", "ART6=double-x", "ART12=vision3-500t"]

@@ -485,7 +485,8 @@ def set_films(
     """Write only the film file, to a card or a file (``epm2mod films set``, ``films pack``).
 
     ``choices`` as for ``install``. ``looks``, if given, are written in place of the choices (``films pack``: a look
-    list of fit files, for developers). Exactly one of ``card`` and ``out`` is given.
+    list of fit files, for developers). With neither ``card`` nor ``out``, the file is only returned (the installer
+    page's zip).
 
     Raises:
         Epm2ModError: with a message for the user, if a step fails.
@@ -502,8 +503,7 @@ def set_films(
             card, content, dry_run, eject, is_card
         )
         copy = None
-    else:
-        assert out is not None
+    elif out is not None:
         files, removed, ejected = (
             (planned_file(out, "films", content[FILMS]),),
             (),
@@ -516,6 +516,10 @@ def set_films(
             if out.name == lookfile.CARD_NAME
             else (f"Copy {out.name} to the top of the SD card as {lookfile.CARD_NAME}.")
         )
+    else:
+        files = (Planned(Path(FILMS), "films", content[FILMS], False),)
+        removed, ejected = (), False
+        copy = copy_text([FILMS])
     steps = film_steps(art_shows=art_shows, copy=copy, ejected=ejected)
     return Outcome(
         files,
