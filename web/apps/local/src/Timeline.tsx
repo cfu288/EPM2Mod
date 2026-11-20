@@ -4,12 +4,13 @@ interface Props {
   steps: readonly string[]
   /** The step shown now, from 0. */
   current: number
-  /** Go back to an earlier step; null while that is not allowed. */
-  onBack: ((step: number) => void) | null
+  /** Whether a step other than the current one can be opened now: an earlier one, or a later one already reached. */
+  canGo: (step: number) => boolean
+  onGo: (step: number) => void
 }
 
-/** The installer's steps in a row: done ones with a tick (and a link back), the current one filled. */
-export function Timeline({ steps, current, onBack }: Props) {
+/** The installer's steps in a row: done ones with a tick, the current one filled; the ones it can open are buttons. */
+export function Timeline({ steps, current, canGo, onGo }: Props) {
   return (
     <nav aria-label="Steps">
       <p className="mb-3 text-sm font-bold sm:hidden">
@@ -17,12 +18,13 @@ export function Timeline({ steps, current, onBack }: Props) {
       </p>
       <ol className="flex items-center">
         {steps.map((label, index) => {
-          const done = index < current
+          // a later step that can be opened was done before the user went back
+          const done = index < current || (index > current && canGo(index))
           const mark = (
             <>
               <span
                 className={`flex size-7 shrink-0 items-center justify-center border text-xs ${
-                  index <= current ? 'border-ink bg-ink text-white' : 'border-rule text-muted'
+                  done || index === current ? 'border-ink bg-ink text-white' : 'border-rule text-muted'
                 }`}
               >
                 {done ? <CheckIcon aria-hidden="true" className="size-4" /> : index + 1}
@@ -38,11 +40,12 @@ export function Timeline({ steps, current, onBack }: Props) {
               aria-current={index === current ? 'step' : undefined}
               className="flex flex-1 items-center gap-x-2 last:flex-none"
             >
-              {done && onBack ? (
+              {index !== current && canGo(index) ? (
                 <button
                   type="button"
+                  aria-label={label}
                   onClick={() => {
-                    onBack(index)
+                    onGo(index)
                   }}
                   className="flex items-center gap-x-2"
                 >

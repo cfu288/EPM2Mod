@@ -15,8 +15,8 @@ export interface Card {
   label: string
 }
 
-/** EPM2Mod, or Olympus's original firmware (the way back). */
-export type Firmware = 'epm2mod' | 'original'
+/** EPM2Mod, Olympus's original firmware (the way back), or only the film file for a camera that runs EPM2Mod. */
+export type Firmware = 'epm2mod' | 'original' | 'films'
 
 /** A step on the camera after the files are made (cli/src/epm2mod/camera_steps.py). */
 export interface CameraStep {

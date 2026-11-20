@@ -1,23 +1,11 @@
-import { useEffect, useId, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useId, useReducer, useState, type ReactNode } from 'react'
 import { ArrowDownTrayIcon, ArrowPathIcon } from '@heroicons/react/20/solid'
 import { choicesOf, FilmCredit, MenuEditor, PageFrame, StripPreview, useLooks, type Looks } from '@epm2mod/ui'
 import { api, type Build, type Card, type Firmware, type Job } from './api'
+import { FLOWS, initial, labels, onTimeline, reduce, startReady } from './flow'
 import { presetSlots } from './preset'
 import { Timeline } from './Timeline'
 
-type StepId = 'start' | 'firmware' | 'films' | 'build' | 'install'
-const LABELS: Record<StepId, string> = {
-  start: 'Start',
-  firmware: 'Firmware',
-  films: 'Film simulations',
-  build: 'Build',
-  install: 'Install',
-}
-/** The steps of each choice of firmware: Olympus's own has no film looks. */
-const FLOWS: Record<Firmware, StepId[]> = {
-  epm2mod: ['start', 'firmware', 'films', 'build', 'install'],
-  original: ['start', 'firmware', 'build', 'install'],
-}
 const ZIP_NAME = 'EPM2Mod-card.zip'
 
 const HELP = 'https://github.com/cfu288/EPM2Mod/blob/main/docs/user/install.md'
@@ -29,6 +17,7 @@ const DEFAULT_CHOICES = choicesOf(presetSlots())
 /** What the user sees while the job runs, and the step of the job (`steps` of `epm2mod serve`) that ends each one. */
 function stages(job: Job | null, firmware: Firmware) {
   const write = job?.card == null ? 'Prepare the zip' : 'Write to the SD card'
+  if (firmware === 'films') return [{ label: write, step: 1 }]
   if (firmware === 'original')
     return [
       { label: "Download Olympus's firmware and check it", step: 1 },
@@ -127,7 +116,7 @@ function StartStep(props: {
 }) {
   return (
     <Step
-      title="Install firmware"
+      title="Where to put the files"
       actions={
         <button type="button" disabled={!props.ready} onClick={props.onNext} className={primary}>
           Next
@@ -204,7 +193,7 @@ function FirmwareStep(props: {
 }) {
   return (
     <Step
-      title="Choose the firmware"
+      title="Choose what to install"
       actions={
         <>
           <BackButton onClick={props.onBack} />
@@ -226,6 +215,15 @@ function FirmwareStep(props: {
         />
         <Choice
           group="firmware"
+          title="Film simulations only"
+          line="For a camera that already runs EPM2Mod."
+          checked={props.firmware === 'films'}
+          onChoose={() => {
+            props.onFirmware('films')
+          }}
+        />
+        <Choice
+          group="firmware"
           title="Olympus original"
           line="Puts back Olympus's firmware 1.6."
           checked={props.firmware === 'original'}
@@ -240,13 +238,15 @@ function FirmwareStep(props: {
 
 function FilmsStep(props: {
   zip: boolean
+  /** Only the film file is written: the editor opens at once, for a camera that has film simulations already. */
+  only: boolean
   looks: Looks
   customizing: boolean
   onCustomize: (on: boolean) => void
   onBuild: (custom: boolean) => void
   onBack: () => void
 }) {
-  if (!props.customizing)
+  if (!props.customizing && !props.only)
     return (
       <Step
         title="Film simulations"
@@ -281,12 +281,13 @@ function FilmsStep(props: {
   const { looks } = props
   return (
     <Step
-      title="Customize the film simulations"
+      title={props.only ? 'Choose the film simulations' : 'Customize the film simulations'}
       actions={
         <>
           <BackButton
             onClick={() => {
-              props.onCustomize(false)
+              if (props.only) props.onBack()
+              else props.onCustomize(false)
             }}
           />
           <button
@@ -310,6 +311,7 @@ function FilmsStep(props: {
         </>
       }
     >
+      {props.only && <p>This list replaces the film simulations on the camera.</p>}
       <div className="sticky top-0 z-10 -mx-4 bg-white px-4 py-2">
         <div className="max-w-md">
           <StripPreview art={looks.selected + 1} filmId={looks.items[looks.selected]?.filmId ?? null} />
@@ -328,14 +330,14 @@ function BuildStep(props: { job: Job | null; firmware: Firmware; onRetry: () => 
   const doneCount = list.filter(
     (stage) => job !== null && job.step >= stage.step && (stage.step < job.steps || (job.done && !failed)),
   ).length
-  const title = props.firmware === 'original' ? 'Getting the original firmware' : 'Building'
+  const title = { original: 'Getting the original firmware', epm2mod: 'Building', films: 'Writing' }[props.firmware]
   const failedTitle =
-    doneCount === 0
-      ? 'Could not download the firmware'
-      : doneCount === list.length - 1
-        ? job?.card == null
-          ? 'Could not make the zip'
-          : 'Could not write to the card'
+    doneCount === list.length - 1
+      ? job?.card == null
+        ? 'Could not make the zip'
+        : 'Could not write to the card'
+      : doneCount === 0
+        ? 'Could not download the firmware'
         : 'The firmware could not be made'
   return (
     <Step
@@ -375,8 +377,8 @@ function BuildStep(props: { job: Job | null; firmware: Firmware; onRetry: () => 
         </p>
       ) : (
         <p className="text-ink-soft text-sm">
-          This takes about a minute.
-          {job?.card != null && ' Do not take the card out.'}
+          {props.firmware !== 'films' && 'This takes about a minute. '}
+          {job?.card != null && 'Do not take the card out.'}
         </p>
       )}
     </Step>
@@ -393,24 +395,27 @@ function InstallStep(props: {
 }) {
   const { job } = props
   const zip = job.card === null
-  const what = job.firmware === 'original' ? "Olympus's original firmware" : 'EPM2Mod'
+  const films = job.firmware === 'films'
+  const what = { original: "Olympus's original firmware is", epm2mod: 'EPM2Mod is', films: 'The film simulations are' }[
+    job.firmware
+  ]
   const flash = job.camera_steps.findIndex((step) => step.id === 'flash') + 1
   return (
     <Step
-      title="Install on the camera"
+      title={films ? 'Load on the camera' : 'Install on the camera'}
       actions={
         <>
           <button type="button" onClick={props.onRestart} className={secondary}>
             Start over
           </button>
           <button type="button" onClick={props.onFinish} className={primary}>
-            Finish
+            Close the installer
           </button>
         </>
       }
     >
       <p className="font-bold">
-        {zip ? 'The zip is ready.' : `${what} is on the SD card${props.cardName ? ` ${props.cardName}` : ''}.`}
+        {zip ? 'The zip is ready.' : `${what} on the SD card${props.cardName ? ` ${props.cardName}` : ''}.`}
       </p>
       {zip && (
         <button type="button" onClick={props.onZip} className={`${primary} w-full`}>
@@ -424,7 +429,9 @@ function InstallStep(props: {
         ))}
       </ol>
       <p className="text-ink-soft text-sm">
-        If the camera starts normally, turn it off and do step {flash} again.{' '}
+        {films
+          ? 'If there is no Load Looks row, install EPM2Mod first.'
+          : `If the camera starts normally, turn it off and do step ${String(flash)} again.`}{' '}
         <a className="hover:text-ink underline" href={HELP}>
           Install guide
         </a>
@@ -435,41 +442,37 @@ function InstallStep(props: {
 
 export default function App() {
   const looks = useLooks(presetSlots)
-  const [step, setStep] = useState<StepId>('start')
-  const [firmware, setFirmware] = useState<Firmware>('epm2mod')
-  const [customizing, setCustomizing] = useState(false)
+  const [state, dispatch] = useReducer(reduce, initial)
   const [build, setBuild] = useState<Build | null>(null)
   const [cards, setCards] = useState<Card[]>([])
-  const [zip, setZip] = useState(false)
-  const [card, setCard] = useState('')
-  const [job, setJob] = useState<Job | null>(null)
-  const [problem, setProblem] = useState<string | null>(null)
-  const [lastCustom, setLastCustom] = useState(false)
-  const [finished, setFinished] = useState(false)
+  const { step, firmware, zip, card, job, problem } = state
   const running = job !== null && !job.done
   const flow = FLOWS[firmware]
+  const fail = (error: unknown) => {
+    dispatch({ type: 'problem', problem: message(error) })
+  }
+  const go = (to: (typeof flow)[number]) => {
+    dispatch({ type: 'go', step: to })
+  }
 
-  const refreshCards = () => {
+  const refreshCards = useCallback(() => {
     api.cards().then(
       (found) => {
         setCards(found)
-        // a card is chosen for the user only when it is the only one
-        setCard((current) =>
-          found.some((c) => c.path === current) ? current : found.length === 1 ? (found[0]?.path ?? '') : '',
-        )
+        dispatch({ type: 'cards', cards: found })
       },
       (error: unknown) => {
-        setProblem(message(error))
+        dispatch({ type: 'problem', problem: message(error) })
       },
     )
-  }
+  }, [])
 
   useEffect(() => {
     api.build().then(setBuild, (error: unknown) => {
-      setProblem(message(error))
+      dispatch({ type: 'problem', problem: message(error) })
     })
     refreshCards()
-  }, [])
+  }, [refreshCards])
 
   // tell the server the page is open; it stops a few minutes after the page is closed
   useEffect(() => {
@@ -489,20 +492,14 @@ export default function App() {
     return () => {
       window.clearInterval(timer)
     }
-  }, [searching])
+  }, [searching, refreshCards])
 
   useEffect(() => {
     if (!running) return
     const timer = window.setInterval(() => {
-      api.job().then(
-        (next) => {
-          setJob(next)
-          if (next?.done && next.error === null) setStep('install')
-        },
-        (error: unknown) => {
-          setProblem(message(error))
-        },
-      )
+      api.job().then((next) => {
+        dispatch({ type: 'job', job: next })
+      }, fail)
     }, 500)
     return () => {
       window.clearInterval(timer)
@@ -510,43 +507,31 @@ export default function App() {
   }, [running])
 
   const startBuild = (custom: boolean) => {
-    setProblem(null)
-    setLastCustom(custom)
     // the firmware has Olympus's art filters: every EPM2Mod install gets a look file, loaded with Load Looks
-    const wanted = firmware === 'epm2mod' ? (custom ? choicesOf(looks.items) : DEFAULT_CHOICES) : []
-    setJob(null)
-    setStep('build')
+    const wanted = firmware === 'original' ? [] : custom ? choicesOf(looks.items) : DEFAULT_CHOICES
+    dispatch({ type: 'make', custom })
     api.make(firmware, wanted, zip ? null : card).then(
       (started) => {
-        setJob(started)
-        if (started.done && started.error === null) setStep('install')
+        dispatch({ type: 'job', job: started })
       },
       (error: unknown) => {
-        setProblem(message(error))
-        setStep('start')
+        dispatch({ type: 'refused', problem: message(error) })
       },
     )
   }
 
   const downloadZip = () => {
-    api.zip().then(
-      (blob) => {
-        save(blob, ZIP_NAME)
-      },
-      (error: unknown) => {
-        setProblem(message(error))
-      },
-    )
+    api.zip().then((blob) => {
+      save(blob, ZIP_NAME)
+    }, fail)
   }
 
-  const canGoBack = step === 'start' || step === 'firmware' || step === 'films'
-
-  if (finished)
+  if (state.finished)
     return (
       <PageFrame subtitle="Installer">
         <main className="mx-auto max-w-3xl px-4 py-10">
           <Step title="The installer is finished">
-            <p>Close this tab and the window that started the installer.</p>
+            <p>You can close this tab.</p>
           </Step>
         </main>
       </PageFrame>
@@ -556,15 +541,16 @@ export default function App() {
     <PageFrame subtitle="Installer">
       <main className="mx-auto max-w-3xl space-y-10 px-4 py-10">
         <Timeline
-          steps={flow.map((id) => LABELS[id])}
+          steps={labels(firmware)}
           current={flow.indexOf(step)}
-          onBack={
-            canGoBack
-              ? (index) => {
-                  setStep(flow[index] ?? 'start')
-                }
-              : null
-          }
+          canGo={(index) => {
+            const to = flow[index]
+            return to !== undefined && onTimeline(state, to)
+          }}
+          onGo={(index) => {
+            const to = flow[index]
+            if (to) go(to)
+          }}
         />
 
         {problem && (
@@ -576,38 +562,47 @@ export default function App() {
         {step === 'start' && (
           <StartStep
             zip={zip}
-            onZip={setZip}
+            onZip={(on) => {
+              dispatch({ type: 'zip', zip: on })
+            }}
             cards={cards}
             card={card}
-            onCard={setCard}
-            onNext={() => {
-              setStep('firmware')
+            onCard={(path) => {
+              dispatch({ type: 'card', card: path })
             }}
-            ready={build !== null && (zip || card !== '')}
+            onNext={() => {
+              go('firmware')
+            }}
+            ready={build !== null && startReady(state)}
           />
         )}
         {step === 'firmware' && (
           <FirmwareStep
             firmware={firmware}
-            onFirmware={setFirmware}
+            onFirmware={(next) => {
+              dispatch({ type: 'firmware', firmware: next })
+            }}
             onBack={() => {
-              setStep('start')
+              go('start')
             }}
             onNext={() => {
               if (firmware === 'original') startBuild(false)
-              else setStep('films')
+              else go('films')
             }}
           />
         )}
         {step === 'films' && (
           <FilmsStep
             zip={zip}
+            only={firmware === 'films'}
             looks={looks}
-            customizing={customizing}
-            onCustomize={setCustomizing}
+            customizing={state.customizing}
+            onCustomize={(on) => {
+              dispatch({ type: 'customize', on })
+            }}
             onBuild={startBuild}
             onBack={() => {
-              setStep('firmware')
+              go('firmware')
             }}
           />
         )}
@@ -616,10 +611,10 @@ export default function App() {
             job={job}
             firmware={firmware}
             onRetry={() => {
-              startBuild(lastCustom)
+              startBuild(state.lastCustom)
             }}
             onBack={() => {
-              setStep(firmware === 'original' ? 'firmware' : 'films')
+              go(firmware === 'original' ? 'firmware' : 'films')
             }}
           />
         )}
@@ -629,19 +624,14 @@ export default function App() {
             cardName={cards.find((c) => c.path === job.card && c.name !== '')?.name ?? ''}
             onZip={downloadZip}
             onFinish={() => {
-              api.quit().then(
-                () => {
-                  setFinished(true)
-                },
-                (error: unknown) => {
-                  setProblem(message(error))
-                },
-              )
+              api.quit().then(() => {
+                // the browser opened this tab, so it lets the page close it; the message is for a browser that does not
+                window.close()
+                dispatch({ type: 'finished' })
+              }, fail)
             }}
             onRestart={() => {
-              setJob(null)
-              setCustomizing(false)
-              setStep('start')
+              dispatch({ type: 'restart' })
             }}
           />
         )}
