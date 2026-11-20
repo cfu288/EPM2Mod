@@ -34,7 +34,7 @@ Other Olympus generations, and what each can be modded to do: [model-matrix.md](
 | No radio, no viewfinder, no microphone jack | Hardware | Manual |
 | No 4K, no RAW video | Hardware | Sensor modes in the firmware (table 0x7E7BA370); card path about 25 to 28 MB/s (measured on the E-M5) |
 | 1080p at 30 fps only; the 60, 120 and 240 fps modes drop most lines | Hardware, as far as known | Sensor mode table; no sensor register map found |
-| No 3D lookup table; the hue stage has six axes | Image processor | Firmware search; measured stages |
+| No 3D lookup table; per-colour control is a six-axis stage, and for stills a 12-region stage ([colour-pipeline.md](colour-pipeline.md)) | Image processor | Firmware search; measured stages (the 12-region stage read, not yet camera-tested) |
 | No colour wheel in live view or movies: the 12-region hue, saturation and lightness stage runs for stills only | Image processor | Stage at 0x7E76C3C8, pipe A only ([caduceus review 05 §4](../../experiments/2026-11-11-caduceus-review/05-imaging-pipeline-and-limits.md#4-the-12-region-stage)) |
 | A film simulation is a set of tables chosen by art-filter number | Firmware design | Read from the firmware. The tables are in RAM, and a Load writes them (camera-tested 2026-11-17) |
 | 128 rows in one menu list | Firmware | Camera-tested |
@@ -122,7 +122,7 @@ Checked 2026-11-18 against the four public mods that have one, after users asked
 **What this means for the E-PM2 (TruePic VI).** TruePic VI has a 12-region hue, saturation and lightness stage
 for stills. Table A is at 0x7E76C3C8 and table B at 0x7E76CF9C: 12 records of 28 bytes each, with an enable mask
 at +3024 (builder 0x7E56E186). The stage runs in pipe A only: stills and RAW Data Edit. Live view and standard
-movie use pipe B, which has no 12-region stage. Every film code falls back to Natural's table A. EPM2Mod does not
+movie use pipe B, which has no 12-region stage. Every film code falls back to Natural's table A (read before the card path existed; a camera test is being built). EPM2Mod does not
 write this table. Evidence: [caduceus review 05 §4](../../experiments/2026-11-11-caduceus-review/05-imaging-pipeline-and-limits.md#4-the-12-region-stage).
 A 12-colour editor for stills is possible in principle. It is not built. It would not show in live view or
 movies. The stage, its table and Natural's values in detail: [colour-pipeline.md](colour-pipeline.md).

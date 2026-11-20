@@ -1,64 +1,27 @@
-# Film looks on the Olympus E-PM2: what we built, how we measured it, what we learned
+# Film simulations: how they are made and measured
 
-Plain-language summary, written 2026-11-12. **Since 2026-11-18 the firmware keeps Olympus's 12 art filters and the
-films are loaded from the SD card** ([`guide/film-looks.md`](../guide/film-looks.md), [`install.md`](../user/install.md)). The build
-names and the seven-entry layout below are the history of how the looks were made and measured. The catalogue now
-has 32 films (`data/films/catalogue.json`); ten of them come from a second simulator, Spectral Film LUT (section 8). The detailed lab notes are in
-`experiments/2026-11-09-film-portra/NOTES.md`; the technical slot reference is
-[`art-filter-slots.md`](art-filter-slots.md); every flash is logged in the [camera log](../camera-log/README.md).
+A film simulation is a set of numbers for the camera's own colour stages (matrix, six-axis, tone curves, saturation,
+chroma curves), fitted so that the camera's JPEG matches a simulation of the film. The firmware keeps Olympus's 12
+art filters; a film file on the SD card puts a film into the ART entries it lists
+([guide](../guide/film-looks.md)). The stages and how a film reaches them: [colour-pipeline.md](colour-pipeline.md).
+The lab notes: `experiments/2026-11-09-film-portra/NOTES.md` (method, model) and
+`experiments/2026-11-20-film-camera-round/NOTES.md` (the latest round); every flash is in the
+[camera log](../camera-log/README.md).
 
-## 1. What we built
+The catalogue has 32 films (`data/films/catalogue.json`). 22 are fitted to simulations of **spektrafilm**
+(CC BY-SA 4.0), 10 to **Spectral Film LUT** (MIT); the second simulator renders the same film differently (ΔE 5–9),
+so its films carry the note "simulated with Spectral Film LUT" (`experiments/2026-11-19-film-sources/NOTES.md`).
+No grain, halation or other texture: only colour and tone.
 
-A modified firmware (version 1.6 base) in which seven of the camera's twelve art filters are replaced
-by film looks. They are ordinary menu entries: pick one and the camera writes the JPEG with that
-look. Live view shows it too.
+## 1. What "accurate" means
 
-| Menu entry (top to bottom) | Was | Film look |
-|---|---|---|
-| **Portra** | Pop Art | Kodak Portra 400 negative, printed on Kodak Portra Endura paper |
-| **Ektachrome** | Soft Focus | Kodak Ektachrome 100 slide film |
-| **Pro 400H** | Pale&Light Color | Fuji Pro 400H negative, printed on Fuji Crystal Archive paper |
-| **Kodachrome** | Light Tone | Kodak Kodachrome 64 slide film |
-| Grainy Film | (unchanged) | |
-| **Vis 250D** | Pin Hole | Kodak Vision3 250D cinema negative, printed on Kodak 2383 print film |
-| **Velvia** | Diorama | Fuji Velvia 100 slide film |
-| **Superia 400** | Cross Process | Fuji Superia X-tra 400 negative, printed on Fuji Crystal Archive paper |
-| Gentle Sepia, Dramatic Tone, Key Line, Watercolor | (unchanged) | |
+**The target.** For each film, a 3-D table that says which output colour each input colour should give: the
+simulator's rendering of the film (a negative printed on its paper or print film, a slide viewed directly), with
+V-Log/V-Gamut input and sRGB output. It is a simulation, not a scan of real film: everything below measures how
+close the camera comes to the simulation, not how close the simulation is to the film.
 
-Build at the time (2026-11-13): `seven-films-6`. The top-level README has the build and
-flash steps. The patch list, in order: `remap7b-code`, `seven-fixes-1`, `seven-movie-1`,
-`seven-structure-extra`, `seven-films-5`, `xp-adaptive-hue-off`, `seven-labels`.
-
-Earlier and failed patch specs are kept in `data/specs/` as a record; do not build from them
-without reading the camera log.
-
-What a look is made of: the camera has no "film" feature and no general colour lookup table. Each
-look is assembled from the adjustable parts the camera already has: a colour-mixing matrix,
-separate brightness curves for red, green and blue, twelve per-colour saturation and hue values, an
-overall saturation setting and a brightness curve. We replace the numbers in those parts.
-
-Not included: film grain, halation (the glow around bright lights) or any other texture. Only
-colour and tone.
-
-## 2. What "accurate" means here
-
-### The target
-For each film we need a reference that says "this input colour should come out as that output
-colour". We take it from **spektrafilm**, an open-source program that simulates film from
-measured film data (how each layer responds to light, how the dyes look, how the print paper
-responds). It gives a table covering all colours. That table is the target.
-
-- Negatives (Portra, Pro 400H) are simulated as film printed on photographic paper.
-- Slide film (Ektachrome) is simulated as the slide viewed directly. The stock tool only does
-  negative-plus-paper, so we run it with the slide scanned directly instead (`bake_slide.py`).
-
-The target is a simulation, not a scan of real film. Everything below measures how well the camera
-matches the simulation. It says nothing about how faithful the simulation is to the real film.
-
-### The score
-For one colour patch, we compare the colour the camera produced with the colour the target says it
-should be. The difference is expressed in **ΔE** ("delta E", the CIEDE2000 formula), a standard
-measure of how different two colours look to a person. The usual rule of thumb:
+**The score.** For each colour patch, the difference between the camera's colour and the target's in **ΔE**
+(CIEDE2000):
 
 | ΔE | What it looks like |
 |---|---|
@@ -67,205 +30,109 @@ measure of how different two colours look to a person. The usual rule of thumb:
 | 2 to 3 | visible at a glance side by side |
 | 5 and up | clearly a different colour |
 
-A score such as "natural colours 1.3" is the average ΔE over all patches in that group.
+A group's score ("natural colours 1.2") is the mean over its patches.
 
-## 3. How we measure: one synthetic test photo
+## 2. How a film is measured: a synthetic test RAW
 
-We do not photograph charts. Photographing introduces errors of its own (lighting, lens, patch
-finding, white balance drift), and those errors were as large as what we were trying to measure.
+Photographing charts brings errors as large as what is measured (light, lens, patch finding, white balance). We give
+the camera a **synthetic RAW** instead: a file in its own raw format with every pixel value known
+(`experiments/2026-11-09-film-portra/testraw/`, made by `make_mock2.py` with our encoder `orfcodec.py` and a real
+photo's header, owner name and serial blanked).
 
-Instead we give the camera a **synthetic RAW file**: a file in the camera's own raw format that we
-generate ourselves, in which every pixel value is known exactly.
+1. Put the film on the card (a film file, `epm2mod films set` or `films pack`) and the RAW in `DCIM/100OLYMP/`.
+2. On the camera: Load Looks; for each ART entry, choose it as Picture Mode, then RAW Data Edit → [Current] on the RAW.
+   The camera writes a JPEG as it would for a photo with that film.
+3. `read_mock.py` finds each patch (it undoes the camera's lens distortion correction) and reads its colour, and the
+   white balance and colour matrix the camera applied (EXIF).
+4. `check_film.py` scores the JPEG against the target and against the model's prediction.
 
-1. **Make the file** (`make_mock2.py`). It contains 6,912 flat colour patches, 96 across and 72
-   down. The camera's raw compression is reproduced by our own encoder (`orfcodec.py`), and the
-   file borrows its header from a real photo so the camera accepts it.
-2. **Develop it in the camera.** The camera has a built-in function, RAW Data Edit, that re-develops
-   a raw file on the card using the current settings. Select a film look, run RAW Data Edit on the
-   test file, and the camera writes a JPEG exactly as it would for a real photo with that look.
-3. **Read the JPEG** (`read_mock.py`). The program finds each patch (it corrects for the lens
-   distortion correction the camera applies) and reads its colour. It also reads, from the JPEG's
-   metadata, the white balance and colour matrix the camera actually applied.
-4. **Score it** against the target, patch by patch (`analyze_mock2.py`, `check_film.py`).
+The file never changes, so builds can be compared directly; two developments with one build give the same colours
+(2026-11-20: pixel-equal).
 
-Because the file never changes, results from different firmware builds can be compared directly,
-and two developments of it with the same build give the same colours.
-
-### What is in the test file
 `PB130001.ORF`, the main image:
 
 | Group | Patches | Why |
 |---|---|---|
 | Natural colours | 3,535 | ordinary colours at ordinary brightness; the best single summary |
 | Hold-out colours | 1,000 | ordinary colours the fitting never uses; an honesty check |
-| Gray ramps | 644 | neutral tones from black to clipping; shows tints in shadows and highlights |
-| Near-neutrals | 576 | almost-gray colours, where small tints are easy to see |
-| ColorChecker at five exposures | 336 | the standard 24-colour chart, from two stops under to two stops over |
+| Gray ramps | 644 | neutral tones from black to clipping; tints in shadows and highlights |
+| Near-neutrals | 576 | almost-gray colours, where small tints show |
+| ColorChecker at five exposures | 336 | the 24-colour chart, two stops under to two stops over |
 | Skin series | 45 | skin tones from dark to bright |
-| Bright edge-of-gamut colours | 300 | extreme colours, to see where the camera misbehaves |
-| Coarse colour cube, markers, repeats | about 480 | coverage, patch location, uniformity check |
+| Edge-of-gamut colours | 300 | extreme colours |
+| Coarse colour cube, markers, repeats | about 480 | coverage, patch location, uniformity |
 
-`PB130002.ORF`, the "blue scene" image: two thirds sky and sea blue, one third patches repeated
-from the main image. Some camera processing depends on what is in the whole picture. If a look is
-free of that, the repeated patches must come out the same in both images.
+`PB130002.ORF` is two thirds sky and sea blue and one third repeats of the main patches: some processing depends on
+the whole picture, and a film free of it gives the repeats the same colours in both files.
 
-### How a look is fitted
-1. A **model** of the camera (a program that predicts the JPEG colour for any input and any
-   settings) is fitted to the target with no camera involved. The model is calibrated against the
-   camera's own stock modes on the test file and predicts them to about 0.9 ΔE.
-2. Flash, develop the test file, measure.
-3. **One correction round:** refit, this time predicting each patch as "what the camera measured,
-   plus the change the model expects". Only the change relies on the model. Flash and measure again.
+What it cannot test: real light and spectra (the patches are written as camera raw values under one light), the
+processing of real scenes (flat patches: no noise reduction, sharpening or local contrast), live view and movies.
 
-Two flashes per film is normally enough.
+## 3. How a film is fitted
 
-## 4. Results
+1. **Model fit.** A model of the camera (`model2.py`: it predicts the JPEG of any raw input for given stage values)
+   is fitted to the target with no camera involved: `fit_film2.py --lut TARGET --name NAME`. The model's constants
+   come from developments of the test RAW alone (`calib/model2.npz`); it predicts the stock picture modes to about
+   0.9 ΔE.
+2. **Camera reading.** Develop the test RAW with the film, read it.
+3. **Correction.** Refit, predicting each patch as "what the camera measured, plus the change the model expects":
+   `fit_film2.py --name NAME2 --anchor READING FIT.npz`. Only the change relies on the model. Develop again and score.
 
-Camera versus target, average ΔE, measured with the test file:
+One correction is normally enough: a second round was predicted to gain 0.1 or less for the films corrected so far.
 
-| Group | Portra | Ektachrome | Pro 400H | Kodachrome | Vis 250D | Velvia | Superia 400 | Camera's Natural mode vs the same targets |
-|---|---|---|---|---|---|---|---|---|
-| Natural colours | 1.26 | 1.27 | 1.15 | 1.06 | 1.19 | 1.44 | 1.36 | 3.9 to 6.0 |
-| Hold-out colours | 1.26 | 1.30 | 1.19 | 1.08 | 1.20 | 1.47 | 1.39 | about the same |
-| Skin series | 1.15 | 1.18 | 1.01 | 0.80 | 1.00 | 1.56 | 1.65 | 4.3 to 6.2 |
-| Grays | 0.78 | 0.72 | 0.67 | 0.68 | 0.73 | 0.81 | 0.75 | 2.8 to 4.7 |
-| Near-neutrals | 1.00 | 0.91 | 0.91 | 0.85 | 0.93 | 0.99 | 0.98 | 3.1 to 5.1 |
-| ColorChecker, five exposures | 1.63 | 1.69 | 1.51 | 1.36 | 1.63 | 1.91 | 1.96 | 5.6 to 7.8 |
-| Out-of-range colours | 14.1 | 13.9 | 15.0 | 15.8 | 12.7 | 16.8 | 12.0 | 14 to 22 |
+## 4. Results (2026-11-20, all 32 films on `films-look-exif`)
 
-These are from build `seven-films-5`. Each film went through a model-only first fit and two to
-four correction rounds as the method grew: plain correction, then the chroma curves, then the
-second camera model.
+Camera against target, ΔE2000, range over the films of each batch (`experiments/2026-11-20-film-camera-round/NOTES.md`
+§7):
+
+| Films | Natural colours | ColorChecker × 5 | Skin | Camera against model (natural) |
+|---|---|---|---|---|
+| 7 corrected in 2026-11 (Portra 400, Ektachrome, Pro 400H, Kodachrome, Vis 250D, Velvia, Superia 400) | 1.07–1.44 | 1.41–1.96 | 0.80–1.56 | 0.85–1.15 |
+| 12 spektrafilm films corrected 2026-11-20 | 1.12–1.44 | 1.56–2.54 | 0.85–1.78 | 0.81–1.03 |
+| Vis 200T, Tri-X, 10 Spectral Film LUT films, corrected 2026-11-20 | 0.80–1.24 | 1.48–2.40 | 0.32–1.38 | 0.17–0.97 |
+
+Stock Natural against the same targets: 3.9–6.0 on natural colours. Double-X is scored in black and white: the camera
+matches its model to 0.11, and the fit is 0.07 L* from its target.
 
 How to read this:
 
-- **Ordinary colours, skin and grays are at "visible only side by side" or better** for all seven.
-- **Strongly saturated chart colours are the weak spot** (individual patches 3 to 10 off, worst when
-  overexposed). This is a limit of the camera's adjustable parts, not of the tuning: the model
-  predicted most of it.
-- **Out-of-range colours** (colours so saturated that one channel goes negative after the camera's
-  colour matrix: the deepest yellows, cyans, greens, magentas) stay far off, 12 to 17. We now know
-  why. The camera carries the negative value through its brightness curves, which darkens the
-  colour, and limits how strong colour may get. The model reproduces this to about 1, so the fit
-  does what can be done; the rest is a hard limit of the camera. Stock Natural is no better (14 to 22).
-- **There is a floor of about 0.8** on natural colours and about 0.9 on grays. The JPEG stores 256
-  levels per channel and the camera rounds at several steps, so its output scatters by about one
-  level around anything we ask for. Grays are already at that floor.
-- **For scale:** exposing a tenth of a stop differently moves the picture by about 1.2; auto white
-  balance drifting 2 % between shots, about 0.7.
-- **Scene independence:** in the blue-scene test all 2,194 repeated patches matched the main image,
-  for the three looks tested this way (Portra, Ektachrome, Pro 400H).
+- **Ordinary colours, skin and grays are at "visible only side by side" or better** for every film.
+- **Saturated chart colours are the weak spot** (single patches 3 to 10 off, worst when overexposed): the six-axis
+  stage cannot treat neighbouring hues or dark and bright colours separately. The 12-region stage could; it is being
+  tested ([colour-pipeline.md](colour-pipeline.md) §3).
+- **Edge-of-gamut colours stay 11 to 17 off** for every film (stock Natural 14 to 22): after the colour matrix one
+  channel goes negative, the tone curves darken it and the camera caps chroma. A limit of the camera.
+- **Floor:** about 0.8 on natural colours and 0.9 on grays (8-bit JPEG and the camera's rounding).
+- **For scale:** a tenth of a stop of exposure moves the picture about 1.2; auto white balance drifting 2 % about 0.7.
+- **Scene independence:** in the blue-scene test all 2,194 repeated patches matched the main image (Portra,
+  Ektachrome, Pro 400H, 2026-11-12).
+- **Weakest:** Portra 800 +1 and +2 (ColorChecker 2.2 and 2.5; their catalogue note says "less accurate"), and
+  among the Spectral Film LUT films Natura 1600, FP-100C, Vericolor III and Agfa Vista 100 (ColorChecker 2.3–2.4).
 
-Against other open-source projects that rewrite a camera's own colour tables, the best
-camera-measured figure we found was 1.32 (a Ricoh GR III project, on a different and harder chart).
-The test sets differ, so this is only a rough comparison.
+## 5. Limits and open points
 
-## 5. How the camera turns a menu entry into a look
-
-A menu entry is just a number, the filter code (Pop Art is 70, Light Tone 72, Cross Process 85).
-Nothing else is stored per entry. Six separate steps in the camera's image processing each look at
-that number and choose their own settings:
-
-| Step | What it does | How it chooses per filter |
-|---|---|---|
-| Colour matrix | mixes the three colour channels | four fixed comparisons in code, two matrices |
-| Per-colour values | saturation and hue for six colour ranges | lookup table |
-| Red, green, blue curves | brightness curve per channel | lookup table; only two entries give three *different* curves |
-| Brightness curve | one curve on overall brightness | lookup table |
-| Saturation | one overall strength | lookup table |
-| Chroma curves | how weak and strong colours are treated | lookup table |
-
-Three things follow from this:
-
-1. **Entries are not interchangeable.** What an entry can do depends on which settings the stock
-   firmware wired up for its number in each of the six steps.
-2. **Re-pointing is easy, new parts are not.** A lookup can be pointed at another filter's settings,
-   but then the two filters share them. A separate look needs its own set at every step.
-3. **Other code reacts to the same number.** Some filters add effects after the colour processing.
-
-## 6. What we found about each filter
-
-| Menu entry | Finding | Use as a film slot (survey of 2026-11-12) |
-|---|---|---|
-| Cross Process | Has separate red, green, blue curves built in. Also had a routine that shifts blue and cyan depending on how blue the scene is; we switched it off. | **Portra 400** |
-| Light Tone | No hidden processing: the model reproduces its stock look to 0.94 ΔE. Has one type only, so the menu entry is the slot. | **Ektachrome** |
-| Pop Art | Its code number could not get separate curves or its own matrix without new code. It also has S-shaped chroma curves that erase faint colour and boost strong colour; we replaced them with straight lines. | **Pro400H** (needed 120 bytes of new code) |
-| Pale&Light | Shifts the white balance by itself, and has chroma curves that compress strong colour. The white balance change has not been located. | Not usable yet |
-| Soft Focus | Adds blur in a separate effect program (visible on the test file). | No |
-| Pin Hole, Diorama | Add vignette or blur the same way. | Only if the effect can be switched off |
-| Grainy Film, Gentle Sepia | Monochrome, with grain or toning. | No |
-| Dramatic Tone, Key Line, Watercolor | Effect programs. | No |
-
-Other findings:
-
-- **Types.** Some filters have a second type (Pop Art II, Pale&Light II, Cross Process II), chosen in
-  ART mode with the right arrow. The quick menu only shows the twelve filters, so only the first
-  type of each is practical as a slot.
-- **The stock firmware has parts for exactly two full film looks:** two sets of separate
-  red/green/blue curves and two matrices. Portra and Ektachrome use them.
-- **The third look needed new code**, the first in this project: one routine that gives Pop Art three
-  separate curves, and one that chooses the matrix for all three films. It fits in 164 unused bytes
-  that the camera loads into memory. Its curve tables are borrowed from Pale&Light, Light Tone and
-  Pop Art II.
-- **Slots four to seven** use a second piece of new code that gives any listed filter number its
-  own three curves and matrix. Pale&Light was converted in place. Soft Focus, Pin Hole and Diorama
-  are *effect* filters (blur, vignette, tilt-shift), and removing an effect in place froze live
-  view three times. What worked was leaving the effect filters alone and pointing their **menu
-  entries** at other, colour-only filter numbers. The menu-entry-to-number table exists three
-  times (stills, and twice in the live-view code); all three must agree or live view freezes.
-  A test build with the same film in all the new slots produced pixel-identical files, so the
-  seven slots are interchangeable.
-- **Free space is scarce.** The firmware file has large empty areas, but they are gaps the camera
-  never loads into memory. The loaded free space is in [code-space-map.md §4](../reference/code-space-map.md#4-totals-bytes).
-- **The camera rounds the colour matrix** in a specific way before using it, and records the result
-  in each JPEG's metadata. Reproducing that rule lets us predict the recorded matrix exactly, which
-  is a quick check that a build did what we intended.
-- **The camera's "neutral" brightness curve is not neutral:** it compresses highlights. Every look
-  that keeps it has to allow for that.
-- **Menu labels** in the firmware can be replaced only by text no longer than the original ("Velvia" for "Diorama"), which is why some names are abbreviated. A loaded film file's names take up to 16 characters.
-
-Side effects: an entry keeps its Olympus effects until a loaded film simulation overwrites the entry.
-
-## 7. Limits and open points
-
-- The looks match a **simulation** of each film; nobody has compared them with real film here.
+- The films match a **simulation**; nobody has compared them with real film here.
 - No grain or halation.
-- Per-colour control uses the six-axis stage (red, yellow, green, cyan, blue, magenta). A 12-region stage exists
-  for stills only, and every film uses Natural's table there
-  ([`feasibility.md`](feasibility.md#colour-wheel-and-twelve-colour-editors); every stage of the pipeline with its
-  data: [`colour-pipeline.md`](colour-pipeline.md)).
-- White balance presets: Shade (7500 K) and Incandescent (3000 K) were measured, and the film simulations hold
-  (`experiments/2026-11-09-film-portra/NOTES.md` section 44).
-- Live view and movie mode work in all seven entries. A movie gets only part of each look: the
-  film's matrix, saturation and per-hue values, but the film's brightness curves only in Kodachrome
-  and Superia 400. The other five have film curves for stills only (not enough table space).
-- Twice the camera froze and restarted at the moment RAW Data Edit was about to save. The cause of the
-  Diorama case was found and fixed (`seven-fixes-1`). **Open problem:** the restart in another entry. See the
-  camera log.
-- Deep shadows are a little darker than the film targets ask for (the lifted blacks of negative
-  film are not fully reproduced).
-- All 12 entries take a film simulation (Load Looks).
+- Live view and movies show the film (camera-tested 2026-11-18) through stages 1 to 6 only; how close they are to the
+  photo is not measured.
+- White balance presets Shade (7500 K) and Incandescent (3000 K) were measured, and the films hold
+  (`experiments/2026-11-09-film-portra/NOTES.md` §44).
+- RAW Data Edit froze and restarted the camera twice (2026-11-12): one cause was found and fixed (`seven-fixes-1`);
+  the other is open (camera log).
+- Deep shadows are a little darker than negative-film targets ask for (lifted blacks are not fully reproduced).
+- A photo records the film's name in ImageDescription; RAW Data Edit keeps the RAW's own name.
 
-## 8. Adding or changing a film
+## 6. Adding or changing a film
 
-1. Make the target: `spektrafilm-lut build …` for a negative with a print paper, `bake_slide.py` for
-   a slide film. Or, for a film that spektrafilm does not have, Spectral Film LUT
-   (`experiments/2026-11-19-film-sources/scripts/sfl_build.py`, same input and output). Its films differ from
-   spektrafilm's (ΔE 5–9 for the same film), so the catalogue says which ones come from it.
-2. Fit: `fit_film2.py --lut <target> --name <name>` (second camera model: matrix, three curves,
-   per-hue values, saturation and the two chroma curves in one go).
-3. Add the film as data: the fit in `data/films/fits/`, an entry in `data/films/catalogue.json`, then regenerate
-   `data/films/film-records.json` (`web/scripts/export_films.py`). No flash: load it from the card,
-   develop `PB130001.ORF` with that look, copy the JPEG back.
-4. Correct: `fit_film2.py --name <name2> --anchor <reading of that JPEG> out/fit_<name>.npz`,
-   load the corrected film file from the card, check again with `check_film.py`.
-
-The model's fitted constants come from developments of the synthetic test image alone
-(`calib_model.py`, stored in `calib/model2.npz`), so none of this needs the photographed charts of
-the early stages.
-
-Before using a new menu entry as a slot, develop the test file with its **stock** look first and
-check that the model reproduces it to about 0.9 ΔE. A worse match means the entry has processing
-we do not know about, which is how Pop Art's chroma curves would have been caught before a flash.
+1. **Target:** `spektrafilm-lut build --film F --print P --input vlog --output srgb --resolution 33` for a negative
+   with its print (`bake_slide.py` for a slide), or Spectral Film LUT for a film spektrafilm does not have
+   (`experiments/2026-11-19-film-sources/scripts/sfl_build.py`, same input and output).
+2. **Fit:** `fit_film2.py --lut TARGET --name NAME --edge-weight 0.25`.
+3. **Try it on the camera without the catalogue:** `uv run epm2mod films pack LIST -o EPM2LOOK.BIN` from a look list
+   of fit files; develop the test RAW with it; read and score it.
+4. **Correct** from that reading (§3) and check again.
+5. **Add it:** the fit in `data/films/fits/` (a new file name when a firmware spec already uses the old one), an entry
+   in `data/films/catalogue.json`, then `uv run python web/scripts/export_films.py`, `web/scripts/render_previews.py`
+   (the name picture of the menu strip) and `uv run epm2mod generate`.
 
 To return to the original firmware, flash `firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN`.

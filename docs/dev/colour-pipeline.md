@@ -7,8 +7,8 @@ tables, not exercised on the camera; **[I]** inferred. Notes of earlier experime
 
 ## 1. The stages
 
-Order **[C]** for stages 1 to 6 (each was changed on its own and measured, `art-filter-slots.md` §2.2; the look
-stage again on 2026-11-20, `../../experiments/2026-11-20-film-camera-round/NOTES.md`).
+Order **[C]** for stages 1 to 6 (each was changed on its own and measured, `../../experiments/2026-11-09-film-portra/NOTES.md`
+§27–30; the look stage again on 2026-11-20, `../../experiments/2026-11-20-film-camera-round/NOTES.md`).
 
 | # | Stage | Data it uses | What it does to a pixel | What a film writes there |
 |---|---|---|---|---|
@@ -25,7 +25,61 @@ Live view and standard movie use a second path (pipe B) without stage 7 **[R]** 
 `../../experiments/2026-11-11-caduceus-review/05-imaging-pipeline-and-limits.md` §2 L3). RAW Data Edit uses
 pipe A **[I]** (an older note). There is no 3-D lookup table anywhere in the colour uploads **[R]** (L1).
 
-## 2. The 12-region stage
+## 2. From a menu entry to the stages
+
+**The art code [R].** A menu entry is only a stored Picture Mode value (100–120). `art_GetFilterType` (0x7E71BD94,
+jump table 0x7E854A24) turns value and type (I, II, III) into one byte, the art code, stored in the job parameters at
++79. Each stage looks that byte up in its own way:
+
+| Stage | Dispatch [R] |
+|---|---|
+| 2, art matrix | four compares in code (0x7E56C6A5): codes 70, 79 → 0x7E768F46; 102, 103 → 0x7E768F58; otherwise none |
+| 3, six-axis | jump table 0x7E78C254, index code − 9 |
+| 4, tone curves | hash 0x7E78C154 (32 entries, key = code − 70; key 0 means empty, so code 70 cannot have an entry; codes 71–170 only) → a handler that loads a record of 8 tables per channel. Only two stock handlers give R, G and B different tables (0x7E56B7F8, 0x7E56B82A) |
+| 5, look curve | jump table 0x7E78C8E4, index code − 8 |
+| 6, saturation; chroma curves | jump tables 0x7E78C514 and 0x7E78AEA4, index code − 69 |
+| 7, 12-region | hash 0x7E78C6E4 (key code − 8), else a default by picture mode |
+
+Other code also switches on the art code: the effect filters' pixel program after development (ART task 0x7E729E25),
+Cross Process's scene-adaptive hue routine (0x7E5460F0), Pale&Light's white-balance change.
+
+**How a film gets there today [R; camera-tested as a whole 2026-11-18 and 2026-11-20].** `stock-films-structure-2`
+(`gen/stock-films/structure.py --v2`) gives each ART entry one film code; the loader (`card-looks-6`) switches the
+entry's routing words when a film file lists it and writes the film's tables into the entry's RAM block
+(0x7E4D1000 + 0x3200 × entry: tone tables for stills and live view, saturation, six-axis, chroma, matrix). An entry
+the file leaves out gets its stock words back.
+
+| Entry | Stored value | Film code | Kind |
+|---|---|---|---|
+| Pop Art | 100 | 79 | in place (the stock code's words are switched) |
+| Soft Focus | 101 | 75 | routed (the value's routing words point at a film code) |
+| Pale&Light Color | 102 | 71 | in place |
+| Light Tone | 103 | 72 | in place |
+| Grainy Film | 104 → 111 | 94 | hidden value |
+| Pin Hole | 105 | 92 | routed |
+| Diorama | 106 | 125 | routed |
+| Cross Process | 107 | 85 | in place |
+| Gentle Sepia | 108 → 112 | 98 | hidden value |
+| Dramatic Tone | 109 → 114 | 144 | hidden value |
+| Key Line | 119 → 115 | 156 | hidden value |
+| Watercolor | 120 → 118 | 159 | hidden value |
+
+Each film code gets a tone stub with its own three records (so R, G and B differ), saturation, six-axis and chroma
+stubs that point at the RAM block, a matrix chain, and the identity look through the stub `LKID` (until
+`films-look-exif`, 2026-11-20, the look entry pointed at Cross Process I's handler and table: every film got its
+S-curve). Design and evidence: `../../experiments/2026-11-18-stock-filters/design.md` (its RAM address
+0x7E4D8000 / 0x2000 is out of date; the generator has 0x7E4D1000 / 0x3200).
+
+**Facts a fit relies on [C].**
+
+- The camera rounds the product of its colour matrix and the art matrix in a fixed way and writes the result to the
+  EXIF ColorMatrix of each JPEG; the fit predicts it exactly, which checks that a build did what it should.
+- The base tone table that the curves start from is not neutral: it compresses highlights. A film's curves allow for
+  it.
+- With the 5300 K preset and with Auto WB the camera uses the same colour matrix; the WB gains differ and are read
+  from the EXIF (2026-11-20).
+
+## 3. The 12-region stage
 
 **What it is.** A list of up to 12 selective colour adjustments, of the kind an HSL or selective-colour panel makes
 in an editor: "for the pixels whose colour falls in this region, shift the hue by X, change the saturation by Y and
@@ -86,7 +140,7 @@ Kodachrome darkens reds, portrait negatives soften orange skin and keep reds. Th
 (1.4–2.5 ΔE) sits in those colours. Whether per-film 12-region tables reduce it is not measured; the camera test of
 `../../experiments/2026-11-20-twelve-region/` establishes the stage on this camera first.
 
-## 3. Limits that no table changes
+## 4. Limits that no table changes
 
 - A floor of about 0.8 ΔE on natural colours: 8-bit JPEG and the camera's rounding **[C]**.
 - Colours outside the gamut after the colour matrix (a negative channel) are darkened by the tone curves and capped
