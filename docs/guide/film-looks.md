@@ -7,8 +7,8 @@ view.
 ## Usage
 
 1. Put the film file on the card with the installer, or on the command line with `--film`
-   ([install](../../README.md#using-the-command-line)). To change only the film simulations later:
-   `uv run epm2mod films set --card /path/to/card --film ART2=velvia`.
+   ([install](../../README.md#using-the-command-line)). To change only the film simulations later, choose **Film
+   simulations only** in the installer, or run `uv run epm2mod films set --card /path/to/card --film ART2=velvia`.
 2. MENU → SETUP → Custom Menu → J → **Load Looks** → **Load** → OK. The row reads Loading, then **Loaded**.
 
    <img src="../images/ui/load-looks-list.png" width="320" alt="Load Looks with Off and Load">

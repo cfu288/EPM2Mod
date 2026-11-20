@@ -185,6 +185,20 @@ export function Install() {
       </div>
 
       <section className="min-w-0">
+        <h2 className="section-title border-t-[6px] pt-4 text-lg">Change the film simulations</h2>
+        {way === 'installer' ? (
+          <p className="text-ink-soft mt-3">
+            Start the installer again and pick Film simulations only. Then load them with Load Looks, without a flash.
+          </p>
+        ) : (
+          <div className="text-ink-soft mt-3 max-w-2xl space-y-2">
+            <Code>{'uv run epm2mod films set --card /path/to/card --film ART2=velvia'}</Code>
+            <p>Then load them with Load Looks, without a flash.</p>
+          </div>
+        )}
+      </section>
+
+      <section className="min-w-0">
         <h2 className="section-title border-t-[6px] pt-4 text-lg">Remove EPM2Mod</h2>
         {way === 'installer' ? (
           <p className="text-ink-soft mt-3">
