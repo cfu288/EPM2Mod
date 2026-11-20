@@ -7,7 +7,8 @@ and delete the item here.
 
 - Films loaded from the card get extra contrast in the current firmware: every film's tone is about 5 L* darker in the
   shadows and 6 L* brighter in the highlights than its fit (all 25 films developed with the test RAW on 2026-11-20;
-  the earlier build with compiled films did not). Cause being traced; then one flash and one development to check.
+  the earlier build with compiled films did not). Cause: the films' look step loads Cross Process I's table
+  (`experiments/2026-11-20-film-camera-round/NOTES.md`). Fix being built; then one flash and one development to check.
 - After that fix: correct the 25 films from their 2026-11-20 developments (`shots/newfilms1/`, `shots/newfilms2/` in
   `experiments/2026-11-09-film-portra/`).
 
