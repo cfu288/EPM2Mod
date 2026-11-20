@@ -60,3 +60,21 @@ Camera check: one development of the test RAW with one film after the flash; pas
 
 The 25 readings stay valid: the corrections of these films use them with the anchor build modelled with the Cross
 Process look, or after a second development on the fixed build.
+
+## 6. Corrections from these readings (2026-11-20)
+
+`fit_film2.py` has a new option `--anchor-look ADDR`: the anchor build is modelled with the look table at ADDR (here
+0x7E75F2F0, Cross Process I, the card path before `films-look-exif`); the new fit renders with the identity look. The
+model with that look reproduces the readings within 0.3 L* per lightness bin (section 3), as a clean round does.
+
+All 24 films: `fit_film2.py --name film-<fit>-x1 --edge-weight 0.25 --anchor N1_|N2_<film> data/films/fits/<fit>.npz
+--anchor-look 0x7E75F2F0` (the Spectral Film LUT films with `--lut out/lut/sfl/<target>.cube`: their fits store a text
+in place of the LUT path). Fits in `../2026-11-09-film-portra/out/fit_film-*-x1.npz` (not in git until confirmed).
+Predicted on `films-look-exif` (weighted / ColorChecker / natural): spektrafilm films 0.65–1.14 / 1.49–2.47 /
+0.83–1.43, Spectral Film LUT films 0.82–1.16 / 1.70–2.37 / 0.99–1.24 (the seven corrected films measured 0.86–1.09 /
+1.36–1.96 / 1.06–1.44 in the F5 round).
+
+Confirmation round on `films-look-exif` (look lists in `build/films-confirm/`): A = the 12 films of batch 1, corrected;
+B = Vis 200T, Tri-X and the ten Spectral Film LUT films, corrected; C = the seven corrected films and Double-X as
+shipped (their first development through the fixed card path; Portra 400 was checked on 2026-11-20: camera vs model
+0.86, F5 0.87).

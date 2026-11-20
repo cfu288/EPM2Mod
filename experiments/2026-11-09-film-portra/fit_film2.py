@@ -17,7 +17,7 @@ import fit_xp9 as f
 from mocklib import *
 import chroma as C, model2 as M2
 ap = argparse.ArgumentParser(); ap.add_argument("--lut"); ap.add_argument("--name", required=True); ap.add_argument("--anchor", nargs=2); ap.add_argument("--robust", type=float, default=3.0)
-ap.add_argument("--edge-weight", type=float, default=0.0); ap.add_argument("--image", default="A_natural", help="reading that supplies the sample set when there is no anchor")
+ap.add_argument("--anchor-look", help="look table address the anchor build used, e.g. 0x7E75F2F0 (Cross Process I: the card path before films-look-exif); default the identity look"); ap.add_argument("--edge-weight", type=float, default=0.0); ap.add_argument("--image", default="A_natural", help="reading that supplies the sample set when there is no anchor")
 a = ap.parse_args(argv[1:])
 Am = load(a.anchor[0] if a.anchor else a.image); za = np.load(a.anchor[1]) if a.anchor else None
 lut = a.lut or str(za["lut"]); cube, size = fl.load_cube(lut)
@@ -27,7 +27,8 @@ wa = np.where(Am["weight"] > 0, Am["weight"], np.where(k == 8, 20.0, np.where(k 
 sel = (Am["ok"] if a.anchor else np.isfinite(Am["u"][:, 0])) & (wa > 0); u, ks, ws = Am["u"][sel], k[sel], wa[sel]; tl = tgt(Am["vs"][sel])
 if a.anchor:
     Js = J[sel]; unc = (Js.min(1) > 2) & (Js.max(1) < 253); ch_a = M2.chroma_of(za)
-    base = M2.render(u, za["G"], M2.gain_of(za), za["S"], za["H"], za["P"], None, clip=False)      # the anchor build, before its chroma curves
+    alook = fl.table(int(a.anchor_look, 16)) if a.anchor_look else None                          # the anchor build's look stage
+    base = M2.render(u, za["G"], M2.gain_of(za), za["S"], za["H"], za["P"], None, clip=False, look=alook)      # the anchor build, before its chroma curves
     uncurve = lambda X: X
     if ch_a is not None:
         _c = np.linspace(0, 255, 2041); _cb, _cr = C.ev_bytes(_c, *ch_a[0]), C.ev_bytes(_c, *ch_a[1])
@@ -73,7 +74,7 @@ allok = Am["ok"] if a.anchor else np.isfinite(Am["u"][:, 0]); Tall = tgt(Am["vs"
 def full(G, gain, S, H, P, ch):                   # every patch of the image, model alone or anchored
     mo = M2.render(Am["u"], G, gain, S, H, P, None, clip=False)
     if a.anchor:
-        ua = (J.min(1) > 2) & (J.max(1) < 253) & Am["ok"]; mo = np.where(ua[:, None], uncurve(np.nan_to_num(J)) + mo - M2.render(Am["u"], za["G"], M2.gain_of(za), za["S"], za["H"], za["P"], None, clip=False), mo)
+        ua = (J.min(1) > 2) & (J.max(1) < 253) & Am["ok"]; mo = np.where(ua[:, None], uncurve(np.nan_to_num(J)) + mo - M2.render(Am["u"], za["G"], M2.gain_of(za), za["S"], za["H"], za["P"], None, clip=False, look=alook), mo)
     return np.clip(C.apply(mo, ch[0], ch[1], stored=True), 0, 255)
 def line(tag, X):
     dd = de(lab(X), Tall); g = lambda kk: dd[allok & (k == kk)].mean(); wsel = allok & (wa > 0)
