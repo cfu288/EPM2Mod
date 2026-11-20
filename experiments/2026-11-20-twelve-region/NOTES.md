@@ -249,3 +249,24 @@ output, on patches of chroma > 20 (8-bit radius), median measured shift for writ
 −180° → −159. Up to ±30° the shift follows 32768 = 360° within about 3° and keeps chroma (×0.99–1.02); larger shifts
 fall short and change chroma (×0.88–1.16). Sectors 240–330 have a second population (quartiles spanning −22° to
 +107°) not explained yet. For fitting: hue shifts limited to ±30° [C for the median, I for the rule].
+
+## 9. Per-film tables fitted on the computer (2026-11-20)
+
+`scripts/fit_twelve.py`: for each colour film (31; Double-X skipped), its camera reading on films-look-exif
+(confirmation round, `../2026-11-20-film-camera-round/NOTES.md` §7) is taken back through its chroma curves and
+saturation gain, a table is applied with the §8 rules, and the gain and curves again; least squares picks 12 records
+(hue tents every 30°, 60° wide; chroma ramp from 5 so greys stay; a 5-knot luma curve each; hue shift within ±30°).
+Predictions, not measurements. Results in `results/fit-twelve/` (`summary.txt`: averages and visibly-off patches;
+`breakdown.txt`: median over the films of the lightness, chroma and hue parts per subgroup).
+
+- Every film improves on average: ColorChecker by 0.1–0.4, natural colours 0–0.13, hold-out the same as natural.
+- The gain is mostly hue (natural |dH*| 0.83 → 0.74; cyans 1.25 → 0.84) and ColorChecker lightness (|dL*| about
+  1.0 → 0.8 at −1 and 0 EV). Chroma error, the largest part on the ColorChecker (|dC*| about 2 at every exposure,
+  too saturated by 1.3 at −1 EV), barely moves.
+- Trades: natural reds get darker (|dL*| 0.48 → 0.65, better in 6 of 25 films), blues lose chroma (mean dC* −0.16 →
+  −0.58); 40–170 patches per film cross from below to above ΔE 2.
+
+Check of the rules against a real table: Natural's table A (ART 2 minus ART 1 of camera run 1) predicted with the
+fit's rules leaves rms 1.77 codes of a 2.73-code change on the 1,116 patches it moves (correlation 0.79); with a
+multiplying saturation 1.60. The rules explain a real table only in part, so the predicted gains (about 0.1 ΔE)
+are within the rules' uncertainty.
