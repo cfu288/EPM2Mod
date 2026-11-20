@@ -1,0 +1,4 @@
+camera vs model2, natural     : Natural's table 0.86 (0.17-1.15)  ->  no table 0.72 (0.17-0.82); closer for 30/31 films
+camera vs model2, ColorChecker: Natural's table 0.84 (0.26-1.01)  ->  no table 0.65 (0.26-0.85); closer for 30/31 films
+camera vs model2, skin        : Natural's table 0.61 (0.13-1.04)  ->  no table 0.60 (0.13-1.04); closer for 5/31 films
+camera vs model2, grays       : Natural's table 0.66 (0.11-1.27)  ->  no table 0.65 (0.11-0.87); closer for 12/31 films

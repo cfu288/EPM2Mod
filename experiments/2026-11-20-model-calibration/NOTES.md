@@ -175,3 +175,19 @@ confirmation round); batch A also holds PB200002's developments (skipped). `scri
 Natural colours improve for 27 films without any refit; the ColorChecker and grays move both ways (Portra 800 +2
 ColorChecker +0.11, Vis 250D grays +0.11). The fits were corrected with Natural's table on; the next step corrects
 each film from this round's reading.
+
+`scripts/camera_vs_model.py` (`results/camera-vs-model.txt`): with no 12-region table the camera matches model2
+better: natural colours 0.86 -> 0.72, ColorChecker 0.84 -> 0.65 (median over 31 films, closer for 30) [C].
+
+## 9. Corrections and the convergence film files (2026-11-20)
+
+`fit_film2.py --name film-<fit>-n1 --edge-weight 0.25 --anchor OFF_<id> <catalogue fit>` for the 31 colour films
+(identity look, no 12-region table: the build of §8). Fits in `../2026-11-09-film-portra/out/fit_film-*-n1.npz` (not
+in git until confirmed). Predicted (`results/corrections-n1.txt`), median: natural 1.12 -> 1.03, hold-out 1.14 ->
+1.04, ColorChecker 1.76 -> 1.68, skin 1.14 -> 1.11, grays 0.84 -> 0.63. Film files for the convergence round
+(`scripts/pack_round2.py`, the entries of `build/films-confirm/`, Double-X as before): `build/films-off2/A`
+(`edff5bbd…`), `B` (`35204e92…`), `C` (`a7bad80d…`).
+
+Production build films-twelve-off, `tools/checks.py --tier full`: free space, op-check, boot-test, update-path-test
+PASS; save-guard S24 / S25 PASS for the build; peaking S6 lists 174 art codes against the reference, as every test
+build of this line (twelve-region-probe, calib-probe, films-twelve-off-artbkt): to be read before pinning.
