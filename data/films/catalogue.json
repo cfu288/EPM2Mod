@@ -78,8 +78,8 @@
    "film": "Fujifilm Provia 100F",
    "kind": "Slide",
    "medium": "slide",
-   "fit": "data/films/fits/provia100f.npz",
-   "note": ""
+   "fit": "data/films/fits/provia100f-c1.npz",
+   "note": "camera-corrected"
   },
   {
    "id": "portra-160",
@@ -87,8 +87,8 @@
    "film": "Kodak Portra 160",
    "kind": "Colour negative",
    "medium": "negative, on Kodak Portra Endura paper",
-   "fit": "data/films/fits/portra160.npz",
-   "note": ""
+   "fit": "data/films/fits/portra160-c1.npz",
+   "note": "camera-corrected"
   },
   {
    "id": "gold-200",
@@ -96,8 +96,8 @@
    "film": "Kodak Gold 200",
    "kind": "Colour negative",
    "medium": "negative, on Fuji Crystal Archive paper",
-   "fit": "data/films/fits/gold200.npz",
-   "note": ""
+   "fit": "data/films/fits/gold200-c1.npz",
+   "note": "camera-corrected"
   },
   {
    "id": "vision3-500t",
@@ -105,8 +105,8 @@
    "film": "Kodak Vision3 500T",
    "kind": "Cinema, tungsten light",
    "medium": "cinema negative, on Kodak 2383 print film",
-   "fit": "data/films/fits/vision3500t.npz",
-   "note": ""
+   "fit": "data/films/fits/vision3500t-c1.npz",
+   "note": "camera-corrected"
   },
   {
    "id": "ektar-100",
@@ -114,8 +114,8 @@
    "film": "Kodak Ektar 100",
    "kind": "Colour negative",
    "medium": "negative, on Kodak Portra Endura paper",
-   "fit": "data/films/fits/ektar100.npz",
-   "note": ""
+   "fit": "data/films/fits/ektar100-c1.npz",
+   "note": "camera-corrected"
   },
   {
    "id": "portra-800",
@@ -123,8 +123,8 @@
    "film": "Kodak Portra 800",
    "kind": "Colour negative",
    "medium": "negative, on Kodak Portra Endura paper",
-   "fit": "data/films/fits/portra800.npz",
-   "note": ""
+   "fit": "data/films/fits/portra800-c1.npz",
+   "note": "camera-corrected"
   },
   {
    "id": "portra-800-push1",
@@ -132,7 +132,7 @@
    "film": "Kodak Portra 800, pushed 1 stop",
    "kind": "Colour negative, approximate colours",
    "medium": "negative, on Kodak Portra Endura paper",
-   "fit": "data/films/fits/portra800push1.npz",
+   "fit": "data/films/fits/portra800push1-c1.npz",
    "note": "less accurate than the others"
   },
   {
@@ -141,7 +141,7 @@
    "film": "Kodak Portra 800, pushed 2 stops",
    "kind": "Colour negative, approximate colours",
    "medium": "negative, on Kodak Portra Endura paper",
-   "fit": "data/films/fits/portra800push2.npz",
+   "fit": "data/films/fits/portra800push2-c1.npz",
    "note": "less accurate than the others"
   },
   {
@@ -150,8 +150,8 @@
    "film": "Kodak Tri-X Reversal 7266",
    "kind": "Black and white",
    "medium": "black-and-white reversal film",
-   "fit": "data/films/fits/trix.npz",
-   "note": ""
+   "fit": "data/films/fits/trix-c1.npz",
+   "note": "camera-corrected"
   },
   {
    "id": "c200",
@@ -159,8 +159,8 @@
    "film": "Fujifilm C200",
    "kind": "Colour negative",
    "medium": "negative, on Fuji Crystal Archive paper",
-   "fit": "data/films/fits/c200.npz",
-   "note": ""
+   "fit": "data/films/fits/c200-c1.npz",
+   "note": "camera-corrected"
   },
   {
    "id": "ultramax-400",
@@ -168,8 +168,8 @@
    "film": "Kodak UltraMax 400",
    "kind": "Colour negative",
    "medium": "negative, on Kodak Portra Endura paper",
-   "fit": "data/films/fits/ultramax400.npz",
-   "note": ""
+   "fit": "data/films/fits/ultramax400-c1.npz",
+   "note": "camera-corrected"
   },
   {
    "id": "verita-200d",
@@ -177,8 +177,8 @@
    "film": "Kodak Verita 200D",
    "kind": "Cinema, daylight",
    "medium": "cinema negative, on Kodak 2383 print film",
-   "fit": "data/films/fits/verita200d.npz",
-   "note": ""
+   "fit": "data/films/fits/verita200d-c1.npz",
+   "note": "camera-corrected"
   },
   {
    "id": "vision3-50d",
@@ -186,8 +186,8 @@
    "film": "Kodak Vision3 50D",
    "kind": "Cinema, daylight",
    "medium": "cinema negative, on Kodak 2383 print film",
-   "fit": "data/films/fits/vision350d.npz",
-   "note": ""
+   "fit": "data/films/fits/vision350d-c1.npz",
+   "note": "camera-corrected"
   },
   {
    "id": "vision3-200t",
@@ -195,8 +195,8 @@
    "film": "Kodak Vision3 200T",
    "kind": "Cinema, tungsten light",
    "medium": "cinema negative, on Kodak 2383 print film",
-   "fit": "data/films/fits/vision3200t.npz",
-   "note": ""
+   "fit": "data/films/fits/vision3200t-c1.npz",
+   "note": "camera-corrected"
   },
   {
    "id": "velvia-50",
@@ -205,7 +205,7 @@
    "kind": "Slide",
    "medium": "slide",
    "fit": "data/films/fits/velvia-50.npz",
-   "note": "simulated with Spectral Film LUT"
+   "note": "simulated with Spectral Film LUT; camera-corrected"
   },
   {
    "id": "natura-1600",
@@ -214,7 +214,7 @@
    "kind": "Colour negative",
    "medium": "negative, on Fuji Crystal Archive paper",
    "fit": "data/films/fits/natura-1600.npz",
-   "note": "simulated with Spectral Film LUT"
+   "note": "simulated with Spectral Film LUT; camera-corrected"
   },
   {
    "id": "pro-160s",
@@ -223,7 +223,7 @@
    "kind": "Colour negative",
    "medium": "negative, on Fuji Crystal Archive paper",
    "fit": "data/films/fits/pro-160s.npz",
-   "note": "simulated with Spectral Film LUT"
+   "note": "simulated with Spectral Film LUT; camera-corrected"
   },
   {
    "id": "superia-reala",
@@ -232,7 +232,7 @@
    "kind": "Colour negative",
    "medium": "negative, on Fuji Crystal Archive paper",
    "fit": "data/films/fits/superia-reala.npz",
-   "note": "simulated with Spectral Film LUT"
+   "note": "simulated with Spectral Film LUT; camera-corrected"
   },
   {
    "id": "agfa-vista-100",
@@ -241,7 +241,7 @@
    "kind": "Colour negative",
    "medium": "negative, on Kodak Portra Endura paper",
    "fit": "data/films/fits/agfa-vista-100.npz",
-   "note": "simulated with Spectral Film LUT"
+   "note": "simulated with Spectral Film LUT; camera-corrected"
   },
   {
    "id": "vericolor-iii",
@@ -250,7 +250,7 @@
    "kind": "Colour negative",
    "medium": "negative, on Kodak Portra Endura paper",
    "fit": "data/films/fits/vericolor-iii.npz",
-   "note": "simulated with Spectral Film LUT"
+   "note": "simulated with Spectral Film LUT; camera-corrected"
   },
   {
    "id": "aerocolor-iv",
@@ -259,7 +259,7 @@
    "kind": "Colour negative",
    "medium": "aerial negative, on Kodak Portra Endura paper",
    "fit": "data/films/fits/aerocolor-iv.npz",
-   "note": "simulated with Spectral Film LUT"
+   "note": "simulated with Spectral Film LUT; camera-corrected"
   },
   {
    "id": "eterna-500",
@@ -268,7 +268,7 @@
    "kind": "Cinema, tungsten light",
    "medium": "cinema negative, on Fuji Eterna-CP 3513DI print film",
    "fit": "data/films/fits/eterna-500.npz",
-   "note": "simulated with Spectral Film LUT"
+   "note": "simulated with Spectral Film LUT; camera-corrected"
   },
   {
    "id": "exr-200t",
@@ -277,7 +277,7 @@
    "kind": "Cinema, tungsten light",
    "medium": "cinema negative, on Kodak 2383 print film",
    "fit": "data/films/fits/exr-200t.npz",
-   "note": "simulated with Spectral Film LUT"
+   "note": "simulated with Spectral Film LUT; camera-corrected"
   },
   {
    "id": "fp-100c",
@@ -286,7 +286,7 @@
    "kind": "Instant",
    "medium": "instant peel-apart film",
    "fit": "data/films/fits/fp-100c.npz",
-   "note": "simulated with Spectral Film LUT"
+   "note": "simulated with Spectral Film LUT; camera-corrected"
   }
  ]
 }

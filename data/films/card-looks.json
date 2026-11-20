@@ -43,22 +43,22 @@
   {
    "entry": "Gentle Sepia",
    "name": "Provia",
-   "fit": "data/films/fits/provia100f.npz"
+   "fit": "data/films/fits/provia100f-c1.npz"
   },
   {
    "entry": "Dramatic Tone",
    "name": "Portra 160",
-   "fit": "data/films/fits/portra160.npz"
+   "fit": "data/films/fits/portra160-c1.npz"
   },
   {
    "entry": "Key Line",
    "name": "Gold 200",
-   "fit": "data/films/fits/gold200.npz"
+   "fit": "data/films/fits/gold200-c1.npz"
   },
   {
    "entry": "Watercolor",
    "name": "Vis 500T",
-   "fit": "data/films/fits/vision3500t.npz"
+   "fit": "data/films/fits/vision3500t-c1.npz"
   }
  ]
 }

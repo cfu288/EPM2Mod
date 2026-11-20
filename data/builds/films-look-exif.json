@@ -1,5 +1,5 @@
 {
- "what": "CANDIDATE, not camera-tested: gauge-info-3 with two film simulation fixes (experiments/2026-11-20-film-name-exif/NOTES.md): a loaded film uses the identity look table, not Cross Process I's S-curve; a photo taken with a loaded film records ArtFilter Off and the film's name in ImageDescription (Olympus's text otherwise). The rest as gauge-info-3: The twelve Olympus art filters unchanged; film simulations loaded from the SD card with Custom Menu J, Load Looks, overwrite the entries the file lists; interval shooting with up to 240 frames, a level gauge with calibration that keeps the shooting information of the histogram screen (as the PEN-F does), and focus peaking; a Debug Log row in Custom Menu J (Off by default) that writes EPM2LOG.BIN to the card for developers; a Lowest S/S Setting row in Custom Menu E (the shutter speed at which ISO Auto starts to rise in P and A); the Firmware screen shows the build's label (Body : 1.6  EPM2Mod 2026.11.20)",
+ "what": "The twelve Olympus art filters unchanged; film simulations loaded from the SD card with Custom Menu J, Load Looks, overwrite the entries the file lists, and a photo taken with one records the film's name (EXIF ImageDescription); interval shooting with up to 240 frames, a level gauge with calibration that keeps the shooting information of the histogram screen (as the PEN-F does), and focus peaking; a Debug Log row in Custom Menu J (Off by default) that writes EPM2LOG.BIN to the card for developers; a Lowest S/S Setting row in Custom Menu E (the shutter speed at which ISO Auto starts to rise in P and A); the Firmware screen shows the build's label (Body : 1.6  EPM2Mod 2026.11.20)",
  "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "data/specs/interval-timelapse-v2.json",
@@ -22,5 +22,7 @@
   "data/specs/gauge-info.json",
   "data/specs/gauge-bar-left-2.json"
  ],
+ "sha256": "af4bcb38df908c3d29b3ef028059a3142cbecc4b66737f7bb2cc2848d6a4bcf4",
+ "camera_tested": "2026-11-20",
  "label": "2026.11.20"
 }

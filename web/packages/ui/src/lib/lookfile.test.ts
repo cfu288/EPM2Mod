@@ -26,13 +26,13 @@ async function sha256(bytes: Uint8Array): Promise<string> {
 
 describe('the look file', () => {
   it('packs twelve films to the bytes of `epm2mod films pack data/films/card-looks.json` (docs/reference/look-file-format.md)', async () => {
-    expect(await sha256(lookFile(twelve()))).toBe('5d5df335dc14100a3fb7c90265ca07470419f12f52f806cc6b80f1bc09cae7ad')
+    expect(await sha256(lookFile(twelve()))).toBe('98d0ce5ca04b2ecf33ce5737c07a3cd332ac6c2dc937a04eb4cb1fb0aa050748')
   })
 
-  it('packs twelve slots as `epm2mod films set` does with the same choices', async () => {
+  it('packs a mix of films as `epm2mod films set` does with the same choices', async () => {
     const mix: Record<number, string> = { 1: 'velvia', 5: 'double-x', 11: 'vision3-500t' }
     const items = twelve().map((item, i) => ({ ...item, filmId: mix[i] ?? item.filmId }))
-    expect(await sha256(lookFile(items))).toBe('13599e2d1ad67ee54bf591473199f5a1af18be55661c7a20fb4698855ed4ef1a')
+    expect(await sha256(lookFile(items))).toBe('853401300d08dab8c87d4d6eac711881975dbe23afb8344bcf60a77e3f1b190e')
   })
 
   it('writes the header fields and a CRC-32 of bytes 16 to the end', () => {

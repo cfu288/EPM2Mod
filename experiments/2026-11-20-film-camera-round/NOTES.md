@@ -78,3 +78,22 @@ Confirmation round on `films-look-exif` (look lists in `build/films-confirm/`): 
 B = Vis 200T, Tri-X and the ten Spectral Film LUT films, corrected; C = the seven corrected films and Double-X as
 shipped (their first development through the fixed card path; Portra 400 was checked on 2026-11-20: camera vs model
 0.86, F5 0.87).
+
+## 7. Confirmation round on films-look-exif (2026-11-20)
+
+The owner loaded the three look lists of `build/films-confirm/` and developed `PB130001.ORF` in each entry (WB Auto,
+as before). Files mapped by ColorMatrix (equal to each fit's in every file). `check_film.py`, camera vs target
+(natural / ColorChecker / skin) and camera vs model (natural):
+
+| Batch | camera vs target | camera vs model |
+|---|---|---|
+| A, 12 corrected spektrafilm films | 1.12–1.44 / 1.56–2.54 / 0.85–1.78 | 0.81–1.03 |
+| B, Vis 200T, Tri-X, 10 Spectral Film LUT films (corrected) | 0.80–1.24 / 1.48–2.40 / 0.32–1.38 | 0.17–0.97 |
+| C, the seven corrected films, as shipped | 1.07–1.44 / 1.41–1.96 / 0.80–1.56 | 0.85–1.15 |
+| F5 round (compiled build, the same seven) | 1.06–1.44 / 1.36–1.96 / 0.80–1.65 | about 0.9 |
+
+Double-X (batch C): camera vs model 0.11; its fit is 0.07 L* from the Double-X target in its own scoring
+(`../2026-11-17-card-looks/design.md`); `check_film.py`'s colour score does not apply to it (F12d, camera-tested
+earlier, scores 15 there too). All 32 films are within the range of the corrected films: the 24 corrected fits went
+into `data/films/catalogue.json` (spektrafilm films as new `*-c1.npz` files, so that the compiled film specs keep
+their inputs; the Spectral Film LUT fits in place).

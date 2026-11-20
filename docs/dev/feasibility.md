@@ -83,6 +83,11 @@ Other Olympus generations, and what each can be modded to do: [model-matrix.md](
 - ~~Level gauge~~ **Done on 2026-11-14 with three data edits and no code.** The whole feature was in
   the firmware; only a menu row was missing. Lesson: compare with the E-PL6 first. It shares 58,642
   identical functions with this body (the E-P5: 21,940).
+- ~~Film simulations as fitted, and their names in the photo~~ **Done on 2026-11-20** (`films-look-exif`). Since
+  2026-11-18 the card path had given every film Cross Process I's look curve (ΔL* −5 … +6); the films now use the
+  identity look, and all 32 films were developed on the camera and corrected where needed. A photo with a film
+  records ArtFilter Off and the film's name in ImageDescription (`experiments/2026-11-20-film-camera-round/NOTES.md`,
+  `experiments/2026-11-20-film-name-exif/NOTES.md`).
 - ~~Shooting information on the level gauge screen~~ **Done on 2026-11-19** (`gauge-info`, `gauge-bar-left-2`; GitHub
   issue #1). Data edits only: eleven layout lists of the live-view producers get the gauge's layout, and the bar's
   position when the camera is held vertically moves inward, as the PEN-F places it

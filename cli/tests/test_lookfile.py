@@ -47,7 +47,7 @@ except ImportError:  # pragma: no cover
 
 #: The look file of ``data/films/card-looks.json`` (the twelve looks of the pinned
 #: films, all colour looks): the test vector of docs/reference/look-file-format.md.
-CARD_LOOKS_SHA256 = "5d5df335dc14100a3fb7c90265ca07470419f12f52f806cc6b80f1bc09cae7ad"
+CARD_LOOKS_SHA256 = "98d0ce5ca04b2ecf33ce5737c07a3cd332ac6c2dc937a04eb4cb1fb0aa050748"
 
 CURVE = tuple(min(1023, k + k // 2) for k in range(1024))
 GREY = (77, 150, 29) * 3

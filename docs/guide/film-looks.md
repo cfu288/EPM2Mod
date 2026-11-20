@@ -20,6 +20,9 @@ view.
 
 Each Load replaces the last one: an ART entry the file leaves out goes back to its Olympus art filter.
 
+A photo taken with a film simulation records the film's name in its metadata (EXIF Image Description, the caption in
+Lightroom) and its art filter as Off. RAW Data Edit keeps the name that the RAW file has.
+
 ## Available Film Simulations
 
 <!-- BEGIN GENERATED: films -->
