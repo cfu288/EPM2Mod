@@ -125,7 +125,7 @@ at +3024 (builder 0x7E56E186). The stage runs in pipe A only: stills and RAW Dat
 movie use pipe B, which has no 12-region stage. Every film code falls back to Natural's table A. EPM2Mod does not
 write this table. Evidence: [caduceus review 05 §4](../../experiments/2026-11-11-caduceus-review/05-imaging-pipeline-and-limits.md#4-the-12-region-stage).
 A 12-colour editor for stills is possible in principle. It is not built. It would not show in live view or
-movies.
+movies. The stage, its table and Natural's values in detail: [colour-pipeline.md](colour-pipeline.md).
 
 **What is possible here:**
 

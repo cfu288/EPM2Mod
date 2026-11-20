@@ -232,7 +232,8 @@ Side effects: an entry keeps its Olympus effects until a loaded film simulation 
 - No grain or halation.
 - Per-colour control uses the six-axis stage (red, yellow, green, cyan, blue, magenta). A 12-region stage exists
   for stills only, and every film uses Natural's table there
-  ([`feasibility.md`](feasibility.md#colour-wheel-and-twelve-colour-editors)).
+  ([`feasibility.md`](feasibility.md#colour-wheel-and-twelve-colour-editors); every stage of the pipeline with its
+  data: [`colour-pipeline.md`](colour-pipeline.md)).
 - White balance presets: Shade (7500 K) and Incandescent (3000 K) were measured, and the film simulations hold
   (`experiments/2026-11-09-film-portra/NOTES.md` section 44).
 - Live view and movie mode work in all seven entries. A movie gets only part of each look: the
