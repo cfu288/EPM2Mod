@@ -1,8 +1,10 @@
 """Film files of the convergence round: build/films-off2/<A|B|C>/EPM2LOOK.BIN, the films of build/films-confirm/ in the
 same entries, each with its correction from the films-twelve-off round (fit_film2 --anchor OFF_<id>:
-out/fit_film-<fit>-n1.npz in the film-portra experiment; Double-X as before). Research code.
+out/fit_film-<fit>-<SUFFIX>.npz in the film-portra experiment; Double-X as before). Research code.
 
-    uv run python experiments/2026-11-20-model-calibration/scripts/pack_round2.py
+    uv run python experiments/2026-11-20-model-calibration/scripts/pack_round2.py [SUFFIX]
+
+SUFFIX: the correction's name suffix, n1 (model2) or n2 (the refit model3, the default).
 """
 import json, os, subprocess, sys
 
@@ -16,12 +18,15 @@ ENTRIES = ["Pop Art", "Soft Focus", "Pale&Light Color", "Light Tone", "Grainy Fi
 CAT = {x["id"]: x for x in json.load(open(os.path.join(ROOT, "data", "films", "catalogue.json")))["films"]}
 
 
+SUFFIX = sys.argv[1] if len(sys.argv) > 1 else "n2"
+
+
 def corrected(fid):
     if fid == "double-x":
         return CAT[fid]["fit"]
     n = os.path.basename(CAT[fid]["fit"])[:-4]
     n = n[:-3] if n.endswith("-c1") else n
-    p = os.path.join("experiments", "2026-11-09-film-portra", "out", f"fit_film-{n}-n1.npz")
+    p = os.path.join("experiments", "2026-11-09-film-portra", "out", f"fit_film-{n}-{SUFFIX}.npz")
     assert os.path.exists(os.path.join(ROOT, p)), p
     return p
 

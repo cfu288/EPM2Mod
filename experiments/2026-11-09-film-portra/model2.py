@@ -11,7 +11,7 @@ import os
 import numpy as np
 import mocklib as m
 import chroma as C
-_c = np.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), "calib", "model2.npz"))     # calib_model.py: fitted on renderings of the synthetic test image only
+_c = np.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), "calib", os.environ.get("MODEL2_CALIB", "model2.npz")))     # calib_model.py: fitted on renderings of the synthetic test image only
 XV, K, SAT_PER_GAIN, CLAMP, OFFSET = _c["Xv"], float(_c["K"]), float(_c["sat_per_gain"]), float(_c["clamp"]), 0.0
 def odd_interp(x, xp, fp): return np.sign(x) * np.interp(np.abs(x), xp, fp)
 def pre(v, G=m.IDG, sat=1.078, look=None, clamp=None):
