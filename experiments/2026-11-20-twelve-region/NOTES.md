@@ -192,3 +192,11 @@ Then: write the stage into `colour-pipeline.md` as [C], and fit per-film tables 
 | Order residuals are 2.6-6.6 codes even for the true order: the in-entry maps of stage 5/6 are interpolated across the BOX bands | The true order still won by 1.4-4.7 codes in both simulations | V (simulation) |
 | W6 (slope byte) margin is small: 3.5 vs 4.5 codes in simulation | Decided also by E's residual | V (simulation) |
 | Scene modes and stock Key Line stills use probe tables in this build | Not used in the test; the build goes back after it | V |
+
+## 7. First attempt (2026-11-20): neither RAW in playback
+
+With PB200001.ORF and PB130001.ORF in `DCIM/100OLYMP/` the camera showed neither. Both files decode alike (rawpy: same
+size, white balance, three embedded JPEGs), so the files are sound [C]. Both carry the DCF file number 0001; DCF counts
+files of one number in one folder as one picture, and two RAWs under one number are not a valid picture [I]. Every
+earlier run had one RAW per number. Fix: the new RAW goes on the card as **PB200002.ORF** (the repository file keeps
+its name); in steps 8 and 9 read PB200002 for PB200001. The analysis maps by order, not by name.
