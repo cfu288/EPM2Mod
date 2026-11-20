@@ -207,7 +207,7 @@ function FirmwareStep(props: {
         <Choice
           group="firmware"
           title="EPM2Mod"
-          line="Adds film simulations, interval shooting, a level gauge, focus peaking and a lowest shutter speed for ISO Auto."
+          line="Install the EPM2Mod firmware and film simulations."
           checked={props.firmware === 'epm2mod'}
           onChoose={() => {
             props.onFirmware('epm2mod')
@@ -216,7 +216,7 @@ function FirmwareStep(props: {
         <Choice
           group="firmware"
           title="Film simulations only"
-          line="For a camera that already runs EPM2Mod."
+          line="Install film simulations (only if EPM2Mod is already installed)."
           checked={props.firmware === 'films'}
           onChoose={() => {
             props.onFirmware('films')
@@ -225,7 +225,7 @@ function FirmwareStep(props: {
         <Choice
           group="firmware"
           title="Olympus original"
-          line="Puts back Olympus's firmware 1.6."
+          line="Revert to the stock firmware."
           checked={props.firmware === 'original'}
           onChoose={() => {
             props.onFirmware('original')
