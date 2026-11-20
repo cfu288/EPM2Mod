@@ -1,8 +1,12 @@
 """The camera round on films-twelve-off-artbkt (NOTES.md §8): each film with no 12-region table against its target,
 and against the same film's confirmation-round reading (Natural's table, films-look-exif). Research code.
 
-    OMP_NUM_THREADS=4 uv run --with colour-science python experiments/2026-11-20-model-calibration/scripts/round_off.py DIR BATCH
-    -> out/mock/read_OFF_<film id>.npz in the film-portra experiment, results/round-off-<BATCH>.txt
+    OMP_NUM_THREADS=4 uv run --with colour-science python experiments/2026-11-20-model-calibration/scripts/round_off.py DIR BATCH [TAG REF]
+    -> out/mock/read_<TAG>_<film id>.npz in the film-portra experiment, results/round-<tag>-<BATCH>.txt
+
+TAG (default OFF) names the readings; REF (default the confirmation round) is the reading set it is compared with:
+the convergence round is `DIR B OFF2 OFF`, scored against the first round and against each correction's prediction
+(results/corrections-n2.txt).
 
 DIR holds one batch's 13 JPEGs of PB130001 (ART BKT: the current Picture Mode, then ART 1-12). BATCH is A, B or C,
 the film file of build/films-confirm/ (its look list: FILMS below; C fills ART 1-8).
@@ -27,7 +31,7 @@ FILMS = {"A": ["provia", "portra-160", "gold-200", "vision3-500t", "ektar-100", 
 CONFIRM = {"A": "CA", "B": "CB", "C": "CC"}
 
 
-def main(d, batch):
+def main(d, batch, tagset="OFF", ref=None):
     files = sorted(glob.glob(os.path.join(d, "*.JPG")))
     if len(files) == 26:          # both test RAWs developed: keep the 13 of PB130001 (layout mock2a), by registration
         sets = [files[:13], files[13:]]
@@ -48,17 +52,20 @@ def main(d, batch):
             lines.append(f"  ART {art:2d} {fid:17s} black and white: not scored here"); continue
         path = files[art]                                        # files[0] is the current Picture Mode
         dd, stats, info, _ = rm.read(path, tag="mock2a")
-        tag = f"OFF_{fid}"
+        tag = f"{tagset}_{fid}"
         np.savez(os.path.join(FP, "out", "mock", f"read_{tag}.npz"), **{k: v for k, v in dd.items() if k != "layout"})
         fit = rd[fid][1]
-        now, off = FT.Film(fid, rd[fid][0], fit), FT.Film(fid, tag, fit)
+        if ref is not None:      # the fit of this round: the correction the film file was packed from
+            import pack_round2
+            fit = os.path.join(ROOT, pack_round2.corrected(fid))
+        now, off = FT.Film(fid, rd[fid][0] if ref is None else f"{ref}_{fid}", fit), FT.Film(fid, tag, fit)
         cm = (dd["M"] * 256).round().astype(int).ravel().tolist()
-        lines.append(f"  ART {art:2d} {fid:17s} table A {f(now.score(now.J))}  ->  none {f(off.score(off.J))}   "
+        lines.append(f"  ART {art:2d} {fid:17s} {'table A' if ref is None else ref} {f(now.score(now.J))}  ->  {'none' if ref is None else tagset} {f(off.score(off.J))}   "
                      f"({os.path.basename(path)}, ColorMatrix {cm})")
         print(lines[-1], flush=True)
     os.makedirs(os.path.join(EXP, "results"), exist_ok=True)
-    open(os.path.join(EXP, "results", f"round-off-{batch}.txt"), "w").write("\n".join(lines) + "\n")
+    open(os.path.join(EXP, "results", f"round-{tagset.lower()}-{batch}.txt"), "w").write("\n".join(lines) + "\n")
 
 
 if __name__ == "__main__":
-    main(argv[1], argv[2])
+    main(argv[1], argv[2], *(argv[3:5] if len(argv) > 4 else ()))
