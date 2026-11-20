@@ -44,7 +44,7 @@ Other code also switches on the art code: the effect filters' pixel program afte
 Cross Process's scene-adaptive hue routine (0x7E5460F0), Pale&Light's white-balance change.
 
 **How a film gets there today [R; camera-tested as a whole 2026-11-18 and 2026-11-20].** `stock-films-structure-2`
-(`gen/stock-films/structure.py --v2`) gives each ART entry one film code; the loader (`card-looks-6`) switches the
+(`gen/stock-films/structure.py` at the commit that made it) gives each ART entry one film code; the loader (`card-looks-6`) switches the
 entry's routing words when a film file lists it and writes the film's tables into the entry's RAM block
 (0x7E4D1000 + 0x3200 × entry: tone tables for stills and live view, saturation, six-axis, chroma, matrix). An entry
 the file leaves out gets its stock words back.

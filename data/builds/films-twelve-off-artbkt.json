@@ -1,0 +1,28 @@
+{
+ "what": "TEST ONLY, not for use: films-twelve-off with the ART BKT row in RAW Data Edit (developer tool, experiments/2026-11-20-raw-edit-art-bkt/NOTES.md section 8), for the camera round of experiments/2026-11-20-model-calibration/NOTES.md section 7; go back to the pinned build after it",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
+ "specs": [
+  "data/specs/interval-timelapse-v2.json",
+  "data/specs/interval-frames-240.json",
+  "data/specs/level-gauge-lvinfo-row.json",
+  "data/specs/level-adjust-row.json",
+  "data/specs/peaking-direct-4.json",
+  "data/specs/peaking-gain-2x.json",
+  "data/specs/custom-menu-rows-3.json",
+  "data/specs/peaking-colours.json",
+  "data/specs/peaking-fast.json",
+  "data/specs/peaking-save-guard.json",
+  "data/specs/looks-menu-4.json",
+  "data/specs/stock-films-structure-3.json",
+  "data/specs/card-looks-7.json",
+  "data/specs/log-menu-2.json",
+  "data/specs/lss-menu.json",
+  "data/specs/lss-core.json",
+  "data/specs/build-label.json",
+  "data/specs/gauge-info.json",
+  "data/specs/gauge-bar-left-2.json",
+  "data/specs/raw-edit-art-bkt.json"
+ ],
+ "first_code": true,
+ "label": "2026.11.20"
+}

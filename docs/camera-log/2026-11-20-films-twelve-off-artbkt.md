@@ -1,0 +1,5 @@
+# 2026-11-20: data/builds/films-twelve-off-artbkt.json
+
+| Date (UTC) | Build | sha256 | Result |
+|---|---|---|---|
+| 2026-11-20 | `data/builds/films-twelve-off-artbkt.json`, a test build (not for use): films-twelve-off (films-look-exif with `stock-films-structure-3` and `card-looks-7`: a film simulation gets no 12-region table, Olympus's filters keep theirs; `experiments/2026-11-20-model-calibration/NOTES.md` §7) + `raw-edit-art-bkt` (developer tool). Film files `build/films-confirm/A`, `B`, `C` (`cd167803…`, `73adaa85…`, `2bd6c3a0…`); test RAW PB130001 | `07217bd989129eb2d155d4b6033eea66d65a629e208338d8eab2146ebf4ef3be` | **Candidate, not flashed.** Emulator: film-only codes get the off table (mask 0); in-place codes table A with no film, the off table with a film; stock codes their pinned tables; free space PASS. |

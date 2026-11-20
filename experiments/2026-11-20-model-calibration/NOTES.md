@@ -124,3 +124,54 @@ of a 1.5-3.7-code change on the patches the table moves. Saturation adds (residu
 1.44, 1.47, 1.50. Natural's table with flat curves (ART 6) changes the picture by 16-19 codes and the rules miss 12-13
 of it: the curve evaluation (or what a flat curve at 63 means) is wrong in the rules. The constants fitted on real
 tables differ from the probe's (lightness 0.147 against 0.239 per unit, saturation 0.155 against 0.238, hue ×0.73).
+
+## 7. No 12-region table for the film simulations (2026-11-20)
+
+From §6: Natural's table costs every film 0.07-0.10 on natural colours. `gen/stock-films/structure.py` (version 3,
+`data/specs/stock-films-structure-3.json`) and `loader.py` (version 7, `data/specs/card-looks-7.json`):
+
+- OFFCASE (9 B at the end of the shared code area, 0x7ECB0B78): `mov OFFDESC,a0; retf [d2,d3,a2,a3],20`, as the stock
+  cases of the selector's worker 0x7E56E495. OFFDESC (56 B, segment 3, 0x7EE40728): table = OFFZERO − 3024, the 12
+  flat ISO-weight pointers of the stock descriptor 0x7E78BA8C, then OFFZERO = 0. Only the table's enable mask (the u16
+  at +3024) is 0; its records are whatever bytes lie there. A record whose bit is off has no effect [C] (probe OVERLAP
+  entry: S −256 and L +256 with their bits off changed nothing), so the stage leaves the picture as it is.
+- The eight film-only codes (75, 92, 94, 98, 125, 144, 156, 159) get a 12-region hash entry -> OFFCASE.
+- The four in-place codes (79, 71, 72, 85), shared with Olympus's filters, get an entry that holds the worker's default
+  case 0x7E56E5DC (where an absent key goes too; it reads only d0, d1 and the stack, which the lookup loop leaves as
+  they are [R]); the loader switches the case word to OFFCASE while the entry has a film. Filling and emptying the slots
+  instead does not work: no placement order keeps every lookup chain clear of a switched slot.
+- Builds: `films-twelve-off` (the production candidate: films-look-exif with these two specs) and
+  `films-twelve-off-artbkt` (the test build, with ART BKT).
+
+The generators now make only this version; the earlier versions stay as committed spec files (a pinned build names
+them). `tools/freespace.py check` no longer counts a later version's bytes against the earlier one (a build holds one
+version), so the pinned build's check stays PASS while the successor waits.
+
+| Check | Result |
+|---|---|
+| `gen/run.sh` | the older committed specs unchanged; versions 3 / 7 byte-identical to the flag-based generator's |
+| `scripts/emucheck_off.py` (om-emu, the selector on the image, and on the image with the loader's switch words in their film state) | PASS: film-only codes mask 0 in both states; in-place codes table A (as pinned) with no film, mask 0 with a film; 43 stock codes x 2 colour spaces x 2 modes the pinned tables in both states |
+| `tools/freespace.py check` | PASS for films-twelve-off and for the pinned films-look-exif |
+
+`tools/checks.py --tier full` on films-twelve-off-artbkt: free space, op-check, boot-test, update-path-test PASS;
+save-guard "FAIL" and the peaking REVIEWs as twelve-region-probe and calib-probe (both flashed without fault): S24 / S25
+PASS for the build, the S6 list the same 174 codes.
+
+## 8. Camera round on films-twelve-off-artbkt (2026-11-20)
+
+The owner loaded `build/films-confirm/A`, `B`, `C` in turn and developed PB130001 with ART BKT (WB Auto, as the
+confirmation round); batch A also holds PB200002's developments (skipped). `scripts/round_off.py`,
+`results/round-off-<A|B|C>.txt`: each film against its target, Natural's table (confirmation round, films-look-exif)
+-> no table (this build) [C]. Median over the 31 colour films, with the change per film:
+
+| Group | Natural's table | no table | change, median (range) | better / worse |
+|---|---|---|---|---|
+| Natural colours | 1.19 | 1.12 | −0.06 (−0.16 … +0.02) | 27 / 2 |
+| Hold-out | 1.23 | 1.14 | −0.06 (−0.18 … +0.03) | 27 / 2 |
+| ColorChecker | 1.82 | 1.76 | −0.01 (−0.14 … +0.11) | 17 / 12 |
+| Skin | 1.14 | 1.14 | 0.00 (−0.03 … +0.11) | 4 / 2 |
+| Grays | 0.84 | 0.84 | 0.00 (−0.02 … +0.11) | 5 / 12 |
+
+Natural colours improve for 27 films without any refit; the ColorChecker and grays move both ways (Portra 800 +2
+ColorChecker +0.11, Vis 250D grays +0.11). The fits were corrected with Natural's table on; the next step corrects
+each film from this round's reading.

@@ -1051,6 +1051,14 @@ def check_specs(sp, specs, out=print, first_code=False):
     img = bytearray(sp.b)
     owner = []                                   # (lo, hi, spec) changed by the specs applied so far
     given = {s.path for s in specs}
+    # later versions of a given spec (superseded ledger, followed to the end): a build holds one version, so a later
+    # version's bytes are not a claim against the earlier one (a pinned build keeps its check while its successor waits)
+    later = set()
+    for g in given:
+        x = g
+        while x in sp.superseded and sp.superseded[x][0] not in later | {"history"}:
+            x = sp.superseded[x][0]
+            later.add(x)
     targets = [t for s in specs for _, t in s.rel_targets()]
     fails = 0
     for s in specs:
@@ -1093,7 +1101,7 @@ def check_specs(sp, specs, out=print, first_code=False):
                     problems.append("a relative jump or call of the given specs targets these bytes, but the area allows data only"
                                     " (no camera-tested code runs here yet; --first-code accepts this for a build whose flash is that test)")
                 for path, cls, segs in a.ledger_rows:
-                    if path in given or not any(x < hi and y > lo for x, y in segs):
+                    if path in given or path in later or not any(x < hi and y > lo for x, y in segs):
                         continue
                     if cls == "current" and not sp.is_overlay(path, o, lo, hi):
                         problems.append("overlaps ledgered spec %s" % path)
@@ -1398,6 +1406,14 @@ def selftest():
         {"type": "bytes", "block": 0, "offset": hex(spot - BASE), "expect": "ff" * 8, "new": "11" * 8}]))
     t("a fake spec in free loaded padding passes when its area is usable",
       (check_specs(sp, [fake3], quiet) == 0) == (a.verdict in ("USABLE-DATA", "USABLE-CODE", "USED")))
+    pair = [(x, by) for x, (by, _) in sp.superseded.items() if by != "history" and x.startswith("data/specs/")
+            and any(q.path == x for q in sp.specs) and any(q.path == by for q in sp.specs)]
+    if pair:   # an earlier version and its successor, both in data/specs/: the earlier one is still checked alone
+        x, by = pair[-1]
+        lines = []
+        old = [q for q in sp.specs if q.path == x]
+        t("%s passes beside its later version %s (a build holds one version)" % (x, by),
+          check_specs(sp, old, lines.append) == 0 or not any("overlaps ledgered spec " + by in l for l in lines), "\n".join(lines[:3]))
     bad = dict(SITES)
     try:
         match_site(sp.b, "selftest", bad["boot_load_seg1"][0] + 1, bad["boot_load_seg1"][1])

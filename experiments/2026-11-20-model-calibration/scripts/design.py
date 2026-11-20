@@ -9,7 +9,7 @@ ART 1-6 carry test tables (data edits through mkspec.make, as twelve-region-prob
 (Natural's table A, as every film today). In each film file ART 1-6 hold one film (file 1 the transparent "clear"
 film of the probe, files 2-4 Portra 400, Velvia 100, Ektachrome), ART 7-12 six calibration films.
 """
-import json, os, struct, subprocess, sys
+import json, os, subprocess, sys
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))

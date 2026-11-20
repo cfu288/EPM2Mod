@@ -5,7 +5,7 @@ experiment (see NOTES.md §6).
 
     OMP_NUM_THREADS=4 uv run --with colour-science python experiments/2026-11-20-model-calibration/scripts/table_gain.py
 """
-import sys, os, json, numpy as np
+import sys, os, json
 sys.path.insert(0, "experiments/2026-11-20-twelve-region/scripts"); sys.argv = ["x"]
 import fit_twelve as FT
 cat = {f["id"]: f for f in json.load(open("data/films/catalogue.json"))["films"]}
