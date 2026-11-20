@@ -9,8 +9,16 @@ and delete the item here.
   (the playback EXIF path, `experiments/2026-11-20-film-name-exif/NOTES.md`).
 - The emulator gate `experiments/2026-11-18-stock-filters/scripts/equal_tables.py` does not compare the look table
   (how the Cross Process curve of 2026-11-18 went unseen); add it.
-- RAW Data Edit → ART BKT (one RAW developed in every selected ART entry), a developer tool for film-simulation tests, not for release: camera test of the candidate `films-look-exif-artbkt` in progress
-  (`experiments/2026-11-20-raw-edit-art-bkt/NOTES.md`).
+- RAW Data Edit → ART BKT (one RAW developed in every selected ART entry), a developer tool for film-simulation tests,
+  not for release: works on the camera (calibration run and the films-twelve-off round, 2026-11-20); kept in test
+  builds only (`experiments/2026-11-20-raw-edit-art-bkt/NOTES.md`).
+- No 12-region table for the film simulations (films-twelve-off): correct each film from the 2026-11-20 round, confirm
+  with one ART BKT round, pin (`experiments/2026-11-20-model-calibration/NOTES.md` §7-8).
+- Each film simulation's measured numbers (camera against its target: natural colours, ColorChecker, skin; date and
+  build) in a per-film table in `docs/dev/film-emulation.md`, after the confirmation round.
+- Recalibrate `model2` for the camera without the 12-region stage (its constants were fitted with Natural's table on;
+  camera against model improves 0.86 -> 0.72 on natural colours without it), from the 2026-11-20 table-off readings.
+- Per-film 12-region tables: only after the stage rules predict a real table (`experiments/2026-11-20-model-calibration/NOTES.md` §6).
 
 ## One-click installer
 
