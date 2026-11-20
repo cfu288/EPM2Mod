@@ -50,8 +50,7 @@ experiment on the card as PB200002.ORF (file numbers must differ, `../2026-11-20
 |---|---|
 | `scripts/emucheck.py` (the probe's verify on this build) | PASS: ART 1 the off table (mask 0), 3-5 the fitted tables, 6 the flat table, 2 and 7-12 table A, for both colour spaces and two picture modes; 43 stock codes keep their table pointers |
 | twelve-region-probe spec after the `mkspec.make` refactor | byte-identical (sha256 0fe89ba5…); its emucheck output identical to `results/emucheck.txt` there |
-EOF
-echo ok| `uv run epm2mod make calib-probe` | sha256 `5a575639033c6d104cf3aeb5faafb0f6809a8327f5d3850b1b139b4955e57d3b` |
+| `uv run epm2mod make calib-probe` | sha256 `5a575639033c6d104cf3aeb5faafb0f6809a8327f5d3850b1b139b4955e57d3b` |
 | `tools/checks.py --tier full` | free space, op-check, boot-test, update-path-test PASS; save-guard "FAIL", peaking-s1-s5 and s6-s7 REVIEW exactly as twelve-region-probe (flashed 2026-11-20 without fault): the same RESULT lines, the S6 list against the reference the same 174 codes (`../2026-11-20-twelve-region/NOTES.md` §4) |
 
 ## 4. Camera sheet (one flash, four film files)
