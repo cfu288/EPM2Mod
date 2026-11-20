@@ -122,3 +122,4 @@ F  order against saturation gain x1.5 and chroma curves (ART 11 vs ART 10's tabl
      ART 11 CB slope outside +-25 (each side): 0.749 (first stored curve 0.5 x 1.5 = 0.75; second 0.75 x 1.5 = 1.125)
      ART 11 CR slope outside +-25 (each side): 1.145 (first stored curve 0.5 x 1.5 = 0.75; second 0.75 x 1.5 = 1.125)
 F  order against the look curve (Cross Process I) (ART 12 vs ART 10's table on 5207 affected patches; maps from 1297 unaffected): rms residual after 7.964, before5 5.067 -> before5
+F  scene content: table A's change on 299 raw-identical patches in PB200001 and PB130001: difference rms 0.00 codes, mean +0.00 (0 within the noise = no scene-adaptive part)

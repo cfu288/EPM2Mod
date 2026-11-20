@@ -231,3 +231,9 @@ Measured [C], RAW Data Edit, pipe A:
 
 Open: the hue-shift rule; the chroma metric; captures, live view and movies (parts 2, 3); ART BKT with PB130001, three
 entries and a full card (parts 1 second half, 4, 5).
+
+**Second copy (2026-11-20).** The card also held PB200016–PB200028: ART BKT's 13 developments of PB130001 (luma
+correlation with a PB130001 development 0.68–0.99; the current Picture Mode, then ART 1–12) [C]. So ART BKT ran twice
+in a row, 26 frames, no freeze. Every result of the table above is unchanged; the scene check is now measured: table A's
+change on 299 raw-identical patches of the two RAWs differs by 0.00 codes, so the stage has no scene-adaptive part [C].
+`results/camera-1/analyse.txt` is the run with both RAWs.
