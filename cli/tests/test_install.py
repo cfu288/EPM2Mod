@@ -436,10 +436,15 @@ class InspectTests(CardCase):
         report = pipeline.inspect_file(self.repo.paths, built).files[0]
         self.assertEqual(report.build, "films")
         films = self.repo.write(
-            "f.BIN", records.pack_choices(self.repo.paths, ["ART2=velvia"])[0]
+            "f.BIN",
+            records.pack_choices(self.repo.paths, ["ART2=velvia", "ART5=double-x"])[0],
         )
         report = pipeline.inspect_file(self.repo.paths, films).files[0]
-        self.assertEqual(report.films[0]["art"], 2)
+        # Double-X is a colour record with saturation gain 0: the picture is black and white
+        self.assertEqual(
+            [(film["art"], film["kind"]) for film in report.films],
+            [(2, "colour"), (5, "black-and-white")],
+        )
         with self.assertRaises(NotFoundError):
             pipeline.inspect_file(self.repo.paths, self.repo.write("x", b"nothing"))
         with self.assertRaises(NotFoundError):
@@ -880,7 +885,13 @@ class SourceTests(unittest.TestCase):
         ):
             with self.subTest(text=text):
                 self.assertTrue(PROJECT_NAME.search(text))
-        for text in ("DCOLYMP", "E1019999.BIN", "EPM2LOOK.BIN", "EPM2LOG.BIN", MANIFEST):
+        for text in (
+            "DCOLYMP",
+            "E1019999.BIN",
+            "EPM2LOOK.BIN",
+            "EPM2LOG.BIN",
+            MANIFEST,
+        ):
             with self.subTest(text=text):
                 found = [m.group(0) for m in PROJECT_NAME.finditer(text)]
                 self.assertLessEqual(set(found), ALLOWED)

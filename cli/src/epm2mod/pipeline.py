@@ -592,6 +592,16 @@ def restore(
     )
 
 
+def _picture(look: lookfile.Look) -> str:
+    """Return what a look makes: ``colour`` or ``black-and-white``.
+
+    A black-and-white film is a colour record with saturation gain 0 (the look file format), so the record's kind
+    alone does not say it.
+    """
+    colour = isinstance(look, lookfile.ColourLook) and look.gain != 0
+    return "colour" if colour else "black-and-white"
+
+
 @dataclass(frozen=True)
 class FileReport:
     """What ``inspect`` found in one file.
@@ -709,9 +719,7 @@ def _films_report(path: Path, data: bytes) -> FileReport:
         {
             "art": look.slot + 1,
             "name": look.name,
-            "kind": (
-                "colour" if isinstance(look, lookfile.ColourLook) else "black-and-white"
-            ),
+            "kind": _picture(look),
         }
         for look in looks
     )
