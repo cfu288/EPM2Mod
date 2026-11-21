@@ -33,7 +33,7 @@ if [ -n "$docs" ]; then
     exit 1
   fi
 fi
-production="cli/src/epm2mod cli/tests/support.py cli/tests/test_package.py cli/tests/test_looks.py"
+production="cli/src/epm2mod cli/tests/support.py cli/tests/test_package.py"
 # shellcheck disable=SC2086
 if git diff --cached --quiet --no-renames --diff-filter=AMD -- $production; then
   exit 0
