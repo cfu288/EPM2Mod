@@ -831,15 +831,6 @@ PROJECT_NAME = re.compile(
 )
 #: What the scan allows: the project manifest's own name, which is how a project is found.
 ALLOWED = {MANIFEST}
-#: Text that the film generator writes into patch specs, which are data: (module, name).
-SPEC_TEXT = {
-    ("looks/extra.py", "data/"),
-    ("looks/extra.py", "specs/"),
-    ("looks/extra.py", "remap7b-code.json"),
-    ("looks/generate.py", "NOTICE.md"),
-}
-
-
 def source_text(path: Path) -> Iterator[tuple[int, str]]:
     """Yield the line number and the text of each string, docstring and comment of a module."""
     with path.open("rb") as source:
@@ -859,7 +850,7 @@ class SourceTests(unittest.TestCase):
             for number, text in source_text(path):
                 for match in PROJECT_NAME.finditer(text):
                     name = match.group(0)
-                    if name not in ALLOWED and (module, name) not in SPEC_TEXT:
+                    if name not in ALLOWED:
                         found.append(f"{module}:{number}: {name}")
         self.assertEqual(found, [])
 

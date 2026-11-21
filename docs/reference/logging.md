@@ -94,7 +94,7 @@ Without the option, one line is one record:
   the boot task runs at 101 ms.
 - `time_us` starts near 0 at power-on. Both CPUs read the same timer.
 - `names` gives the name of a value where the dictionary has a table for it: GUI states, shooting callbacks,
-  art codes (with the film of `data/films/films.json`, for the older seven-film builds only), matrix tables, the peaking colour. The key is the argument, or
+  art codes, matrix tables, the peaking colour. The key is the argument, or
   `argument.field`. `args` always holds the number.
 - `recovered: true`: the record was still in RAM after a restart and the next session wrote it. It has the
   session number of the session that logged it. These are the last events before a crash. The decoder finds
@@ -131,8 +131,7 @@ To filter, use `jq`: `jq -c '.events[] | select(.level == "error")' /tmp/scratch
 - `tables` maps a table name to `{value: text}`. A value is decimal (`"259"`), hexadecimal (`"0x5B00"`) or a
   group of 256 values (`"0x5Bxx"`, used when the value has no entry of its own).
 - `names` of an event maps an argument (`"state"`) or a field (`"latch.C"`) to a table name.
-- `film_entries` says which art code belongs to which menu entry of `data/films/films.json`, for the older seven-film
-  builds only. `epm2mod log` then shows the film: `Velvia (Diorama)`.
+- `film_entries` is no longer read. The dictionaries of the older seven-film builds have it.
 - A name that is inferred says so in its text. Correct a name, a `doc` text or a table at any time: the build
   id stays, and old log files decode with the new names.
 

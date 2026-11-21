@@ -55,7 +55,6 @@ from epm2mod.errors import (  # noqa: E402
     SpecError,
     StockError,
 )
-from epm2mod.looks import films  # noqa: E402
 from epm2mod.hashing import is_sha256, sha256_bytes  # noqa: E402
 from epm2mod.paths import MANIFEST, RepoPaths, is_repo_relative  # noqa: E402
 
@@ -1425,16 +1424,6 @@ class CommandLineTests(RepoCase):
                 self.assertEqual(status, 2, text)
                 self.assertEqual(stock_file.read_bytes(), TINY)
 
-    def test_generate_without_numpy(self) -> None:
-        saved = vars(epm2mod.looks).pop("generate", None)
-        if saved is not None:
-            self.addCleanup(setattr, epm2mod.looks, "generate", saved)
-        with mock.patch.dict(sys.modules, {"numpy": None}):
-            sys.modules.pop("epm2mod.looks.generate", None)
-            status, text = self.run_cli("generate", "--check")
-        self.assertEqual(status, 6, text)
-        self.assertIn("numpy is needed", text)
-
     @unittest.skipUnless(hasattr(signal, "SIGTERM"), "no SIGTERM here")
     def test_a_termination_signal_is_an_interrupt(self) -> None:
         before = signal.getsignal(signal.SIGTERM)
@@ -1624,11 +1613,9 @@ class CommandLineTests(RepoCase):
             self.assertIn(group, out.getvalue())
 
     def test_the_docs_check_of_this_repository(self) -> None:
-        # the specs need the stock firmware; test_looks compares them
-        with mock.patch("epm2mod.looks.generate.stale", return_value=[]):
-            with contextlib.redirect_stdout(io.StringIO()):
-                argv = ["--project", str(ROOT), "generate", "--check"]
-                self.assertEqual(cli.main(argv), 0)
+        with contextlib.redirect_stdout(io.StringIO()):
+            argv = ["--project", str(ROOT), "generate", "--check"]
+            self.assertEqual(cli.main(argv), 0)
 
 
 class ReadmeTests(unittest.TestCase):
@@ -1732,11 +1719,7 @@ class ReadmeTests(unittest.TestCase):
         def run(*argv: str) -> tuple[int, str]:
             out = io.StringIO()
             with contextlib.redirect_stdout(out):
-                with (
-                    contextlib.redirect_stderr(io.StringIO()),
-                    mock.patch("epm2mod.looks.generate.stale", return_value=[]),
-                    mock.patch("epm2mod.looks.generate.write", return_value=[]),
-                ):
+                with contextlib.redirect_stderr(io.StringIO()):
                     project = ["--project", str(paths.root)]
                     return cli.main([*project, "generate", *argv]), out.getvalue()
 
@@ -1747,48 +1730,16 @@ class ReadmeTests(unittest.TestCase):
             run(),
             (
                 0,
-                f"no spec changed\nwrote {paths.readme}\n"
+                f"wrote {paths.readme}\n"
                 f"wrote {paths.resolve('docs/reference/cli.md')}\n",
             ),
         )
-        self.assertEqual(run(), (0, "no spec changed\ndocuments: no change\n"))
+        self.assertEqual(run(), (0, "documents: no change\n"))
         self.assertEqual(run("--check")[0], 0)
         self.assertEqual(
             fileio.read_text(paths.resolve("docs/reference/cli.md")),
             fileio.read_text(ROOT / "docs" / "reference" / "cli.md"),
         )
-
-
-class FilmInputsTests(unittest.TestCase):
-    """Checks of the film-look specs that need neither numpy nor the stock firmware."""
-
-    def test_the_film_specs_were_generated_from_the_data_in_the_repository(
-        self,
-    ) -> None:
-        self.assertEqual(
-            films.specs_with_other_inputs(PATHS),
-            [],
-            "run: uv run epm2mod generate",
-        )
-
-    def test_a_changed_input_is_seen(self) -> None:
-        folder = tempfile.mkdtemp()
-        self.addCleanup(shutil.rmtree, folder, True)
-        paths = RepoPaths(write_manifest(Path(folder)))
-        film_list = films.load_films(PATHS)
-        shutil.copytree(ROOT / "data" / "films", paths.root / "data" / "films")
-        for spec_path in film_list.spec_paths:
-            target = paths.resolve(spec_path)
-            target.parent.mkdir(exist_ok=True)
-            shutil.copy(PATHS.resolve(spec_path), target)
-        self.assertEqual(films.specs_with_other_inputs(paths), [])
-        fit = paths.resolve(film_list.films[0].fit)
-        fit.write_bytes(fit.read_bytes() + b"\0")
-        self.assertEqual(
-            films.specs_with_other_inputs(paths), list(film_list.spec_paths)
-        )
-        paths.resolve(film_list.labels_spec).unlink()
-        self.assertEqual(len(films.specs_with_other_inputs(paths)), 3)
 
 
 class SourceTests(unittest.TestCase):

@@ -1,8 +1,5 @@
 # Film simulation data
 
-- `films.json`: for the older builds that replace art filters in the firmware (the pinned build keeps Olympus's
-  filters and loads films from the card): which film goes in which art-filter menu entry, the name shown in the menu, and the
-  fit file of the film. It also names the three patch specs that are generated from this data.
 - `catalogue.json`: every fitted film that a look file for the SD card can hold, with the short id that
   `epm2mod install --film ART2=velvia` and `epm2mod films set --film ART2=velvia` use and the name the camera shows (`epm2mod films`).
 - `card-looks.json`: a developer look list of fit files, one per ART entry, the input of `epm2mod films pack`.
@@ -15,45 +12,8 @@
   curve for the three channels (`experiments/2026-11-17-card-looks/design.md`).
   `fits/*-n2.npz` are the fits the catalogue uses: corrected for the camera without the 12-region stage
   (`films-twelve-off`) and measured on it (2026-11-21, `experiments/2026-11-20-model-calibration/NOTES.md` §9-11).
-  `fits/*-c1.npz` (the camera round of 2026-11-20) and the older file of the same film stay because firmware specs of
-  older builds are generated from them.
-
-- `more-films.json`: the films beyond the first seven (used by the older builds `films-12` to `films-12d`): which film goes in
-  which of the five other art-filter entries, its menu name and its fit file, and the names of the specs
-  that are generated from it: `films12-structure` (code and table entries), `films12-looks` (the looks)
-  and one `films12-entry-*` spec per menu entry. Leave an entry spec out of a build and that entry is the
-  stock art filter again. `fits/` also holds fits that no firmware list uses (C200, Portra 800, UltraMax 400,
-  Verita 200D, Vision3 50D and 200T, Portra 800 pushed 1 and 2 stops, Tri-X); every fit is in `catalogue.json`.
-
-- `films-12-bw.json`: a variant of `more-films.json` with a black-and-white film (used by the older builds
-  `films-12-bw`, `films-12c` and `films-12d`). The entry Grainy Film keeps its stored value, its art codes and its grain program and holds
-  Kodak Double-X 5222 on 2302 print film; the colour film of that entry in `more-films.json` moves to the entry
-  named in `moved_to`. It makes two specs, both deltas on the specs of `more-films.json`:
-  `films12bw-doublex` (the look) and `films12bw-entry-gentle-sepia`. `fits/doublex.npz` holds the art matrix
-  `A` (how colours turn into grey), the tone curve `D`, and the two tables made from it: `T` (the grain
-  program's contrast table) and `L` (the look table for live view and movies). Its names spec is
-  `data/specs/films12bw-names.json` (`experiments/2026-11-16-doublex/scripts/names_bw.py`); the notes in that
-  folder say how the camera makes the entry monochrome and how the fit was made.
-  `refits` lists later fits of the film, made after a camera measurement (`fits/doublex2.npz`): each makes a
-  spec (`films12bw-doublex2`) that goes after `films12bw-doublex` in a build and changes the grain table only.
-
-The menu names of `more-films.json` in all 34 languages are a spec of their own, `data/specs/films12-names.json`.
-`experiments/2026-11-16-films-max/scripts/names_spec.py` makes it; the notes in that folder say how the
-slots work and how the fits were made.
-
-Do not edit the generated film patch specs in `data/specs/` by hand. Change the data here, then run:
-
-```bash
-uv run epm2mod generate
-```
-
-The command makes the specs of both lists again from the data and the stock firmware. It needs numpy
-(`uv run` installs it) and the stock firmware file (`uv run epm2mod fetch-stock`).
-`uv run epm2mod generate --check` only compares and changes nothing.
-
-If the operations of a spec change, the command marks the spec "built, NOT camera-tested". A tested
-build that uses the spec then no longer gives its recorded sha256, and `epm2mod make` refuses it.
-Make a build description with a new name and test it on a camera.
+  `fits/*-c1.npz` (the camera round of 2026-11-20) and the older file of the same film are earlier fits; the specs of
+  older builds in `data/specs/` were made from them.
 
 How the fits were made: `experiments/2026-11-09-film-portra/`, `experiments/2026-11-16-films-max/` and
 `experiments/2026-11-18-more-films/`.

@@ -50,7 +50,7 @@ from .errors import (
     UnavailableError,
     UsageError,
 )
-from .eventlog import Dictionary, decode, load_dictionary, name_films
+from .eventlog import Dictionary, decode, load_dictionary
 from .fileio import read_bytes, read_json, write_bytes
 from .hashing import sha256_bytes
 from .logsummary import summarize
@@ -503,8 +503,7 @@ COMMANDS: dict[str, Command] = {
         Command(
             "generate",
             DEVELOPERS,
-            "Write the film patch specs that the fit files make, the generated parts of the documents and the CLI "
-            "reference.",
+            "Write the generated parts of the documents and the CLI reference.",
             "the files it wrote; with --check, the files that differ",
             True,
             "",
@@ -1004,45 +1003,27 @@ def _numpy_needed(error: ModuleNotFoundError) -> UnavailableError:
     if error.name != "numpy":
         raise error
     return UnavailableError(
-        "numpy is needed for the film looks. In a checkout, 'uv run epm2mod "
-        "generate' installs it."
+        "numpy is needed to read fit files. In a checkout, 'uv run' installs it."
     )
 
 
 def _generate(args: argparse.Namespace, ctx: Context) -> int:
-    """Run ``epm2mod generate``: write (or, with ``--check``, compare) the film patch specs and the documents."""
+    """Run ``epm2mod generate``: write (or, with ``--check``, compare) the generated parts of the documents."""
     checkout = ctx.checkout()
-    try:
-        from .looks import generate
-    except ModuleNotFoundError as error:
-        raise _numpy_needed(error) from None
-    stock = checkout.pinned_build().stock_firmware
     if not args.check:
-        changed = generate.write(checkout, stock)
-        print("\n".join(f"wrote {path}" for path in changed) or "no spec changed")
-        if changed:
-            _hint(
-                "If the operations of a spec changed, the spec is now marked 'NOT "
-                "camera-tested' and a tested build that uses it no longer gives its "
-                "recorded sha256. 'epm2mod make' tells you."
-            )
         written = readme.rewrite(checkout)
         print("\n".join(f"wrote {path}" for path in written) or "documents: no change")
         return 0
-    stale_specs = generate.stale(checkout, stock)
-    for spec_path in stale_specs:
-        print(f"{spec_path}: differs from the generated spec")
     problems = readme.feature_problems(checkout)
     for problem in problems:
         print(f"feature list: {problem}")
     stale_documents = readme.stale(checkout)
     for path in stale_documents:
         print(f"{path}: the generated parts are out of date")
-    if stale_specs or stale_documents:
+    if stale_documents:
         _hint("run 'epm2mod generate'")
-    if stale_specs or stale_documents or problems:
+    if stale_documents or problems:
         return DIFFERS
-    print("the film-look specs are the generated ones")
     print("the generated parts of the documents are up to date")
     return 0
 
@@ -1055,8 +1036,6 @@ def _dictionaries(args: argparse.Namespace, checkout: RepoPaths) -> list[Diction
     """
     sources = [Path(args.dict)] if args.dict else checkout.event_dictionaries()
     words = load_dictionary(read_json(sources[0]))
-    if checkout.films.is_file():
-        words = name_films(words, read_json(checkout.films))
     found = [words]
     for other in sources[1:]:
         found.append(load_dictionary(read_json(other), inherit=words))

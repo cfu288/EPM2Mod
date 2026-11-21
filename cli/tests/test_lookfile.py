@@ -38,7 +38,7 @@ HAVE_STOCK = stock.stock_path(PATHS, stock.EPM2_V16).is_file()
 try:
     import numpy as np
 
-    from epm2mod.looks import generate, lookpack, slots
+    from epm2mod.looks import lookpack, slots
     from epm2mod.container import parse
 
     HAVE_NUMPY = True
@@ -370,25 +370,36 @@ class ChoiceTests(unittest.TestCase):
 @unittest.skipUnless(HAVE_NUMPY and HAVE_STOCK, "needs numpy and the stock firmware")
 class RealFirmwareLookTests(unittest.TestCase):
     def test_the_camera_makes_the_tables_of_the_built_in_looks(self) -> None:
-        container = parse(stock.read_stock(PATHS, stock.EPM2_V16))
-        program = generate.Program(container.blocks[generate.PROGRAM_BLOCK].payload)
+        payload = parse(stock.read_stock(PATHS, stock.EPM2_V16)).blocks[0].payload
+
+        def read(address: int, size: int) -> bytes:
+            return payload[address - slots.BLOCK0_BASE :][:size]
+
         defaults = [
-            program.read(table, slots.TABLE_BYTES)
-            for table in program.record(slots.DEFAULT_RECORD)
+            read(table, slots.TABLE_BYTES)
+            for table in struct.unpack(
+                f"<{slots.RECORD_TABLES}I",
+                read(slots.DEFAULT_RECORD, 4 * slots.RECORD_TABLES),
+            )
         ]
         grid = np.arange(slots.CURVE_POINTS, dtype=np.float64)
         items = json.loads(PATHS.card_looks.read_text())["looks"]
         for item, look in zip(items, lookpack.load_list(PATHS, PATHS.card_looks)):
-            fit = generate.load_fit(PATHS.resolve(item["fit"]))
+            fit = lookpack.load_fit(PATHS.resolve(item["fit"]))
             assert isinstance(look, ColourLook)
             for channel, curve in enumerate(look.curves):
                 for default in defaults:
                     values = np.frombuffer(default, "<u2").astype(np.float64)
-                    built = generate.pack_table(
-                        np.interp(values, grid, fit["G"][channel])
+                    # the float table: the fit's curve at the default table, rounded, kept rising, 10 bits
+                    table = np.interp(values, grid, fit["G"][channel])
+                    built = np.clip(
+                        np.round(np.maximum.accumulate(table)),
+                        0,
+                        slots.CURVE_POINTS - 1,
+                    ).astype("<u2")
+                    self.assertEqual(
+                        lookpack.camera_table(curve, default), built.tobytes()
                     )
-                    self.assertEqual(lookpack.camera_table(curve, default), built)
-
 
 if __name__ == "__main__":
     unittest.main()

@@ -68,7 +68,6 @@ CAMERA: dict[str, Any] = {
         "art": {"3": "no art filter", "167": "Diorama entry", "70": "Pop Art I"},
         "colour": {"2": "Red"},
     },
-    "film_entries": {"table": "art", "codes": {"167": "Diorama", "70": "Pop Art"}},
     "events": [
         {
             "id": 1,
@@ -651,26 +650,10 @@ class NameTests(unittest.TestCase):
 
     def test_tables_and_names_are_not_part_of_the_build_id(self) -> None:
         bare = json.loads(json.dumps(CAMERA))
-        del bare["tables"], bare["film_entries"]
+        del bare["tables"]
         for event in bare["events"]:
             event.pop("names", None)
         self.assertEqual(eventlog.load_dictionary(bare).build_id, CAMERA_ID)
-
-    def test_the_film_list_names_the_slots(self) -> None:
-        films = {"films": [{"entry": "Diorama", "label": "Velvia"}, {"entry": "X"}]}
-        words = eventlog.name_films(CAMERA_WORDS, films)
-        self.assertEqual(words.build_id, CAMERA_ID)
-        got = list(
-            eventlog.decode(
-                block(0, [record(6, 0, 1, 167), record(6, 1, 2, 70)], build=CAMERA_ID),
-                words,
-            )
-        )
-        self.assertEqual(got[0]["names"]["art"], "Velvia (Diorama)")
-        self.assertEqual(got[1]["names"]["art"], "Pop Art I")
-        with self.assertRaises(LogError):
-            eventlog.name_films(CAMERA_WORDS, [])
-        self.assertIs(eventlog.name_films(WORDS, films), WORDS)
 
     def test_refusals(self) -> None:
         def changed(**keys: Any) -> dict[str, Any]:
@@ -689,12 +672,7 @@ class NameTests(unittest.TestCase):
             (changed(tables={"screen": {"five": "x"}}), "must be a number with a name"),
             (changed(tables={"screen": {"5": ""}}), "must be a number with a name"),
             (changed(tables={"screen": {"-5": "x"}}), "must be a number with a name"),
-            (changed(tables={}, film_entries={}), "names the table"),
-            (
-                changed(film_entries={"table": "none", "codes": {"1": "x"}}),
-                "names no table",
-            ),
-            (changed(film_entries=[]), "'film_entries' must be an object"),
+            (changed(tables={}), "names the table"),
             (named({"state": "screen"}), "which is no argument"),
             (named({"gui_state": 5}), "'names' must map"),
             (named({"gui_state": "none"}), "names the table 'none'"),
@@ -713,7 +691,7 @@ class OlderBuildTests(unittest.TestCase):
         """Return ``CAMERA`` with an old argument name and without tables."""
         raw = json.loads(json.dumps(CAMERA))
         raw["events"][0]["args"][0]["name"] = "session"
-        del raw["tables"], raw["film_entries"]
+        del raw["tables"]
         return eventlog.load_dictionary(raw, inherit=CAMERA_WORDS)
 
     def test_a_block_is_decoded_with_the_dictionary_of_its_build(self) -> None:
@@ -981,12 +959,6 @@ class CommandTests(unittest.TestCase):
                 self.assertLess(event["id"], 256, event["name"])
             else:
                 self.assertGreaterEqual(event["id"], 256, event["name"])
-        # the film slots of the dictionary are entries of the film list
-        films = json.loads((ROOT / "data" / "films" / "films.json").read_text(encoding="utf-8"))
-        entries = {film["entry"] for film in films["films"]}
-        self.assertEqual(set(words.film_entries.values()), entries)
-        named = eventlog.name_films(words, films)
-        self.assertEqual(named.tables["art"].name(167), "Velvia (Diorama)")
 
     def test_log_reads_a_file_of_the_flashed_build(self) -> None:
         # The build that was on the camera on 2026-11-15 has the build id
@@ -1010,7 +982,7 @@ class CommandTests(unittest.TestCase):
             self.assertEqual([line.get("marker") for line in got], [None, None])
             self.assertEqual(got[0]["args"]["session"], 1)
             self.assertEqual(got[1]["event"], "film_stage")
-            self.assertEqual(got[1]["names"], {"art": "Velvia (Diorama)"})
+            self.assertEqual(got[1]["names"], {"art": "Diorama entry (stock: Cross Process II)"})
             # a block of the current dictionary in the same file
             words, ids = repository_words()
             log.write_bytes(

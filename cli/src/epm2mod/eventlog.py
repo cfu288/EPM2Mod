@@ -47,7 +47,7 @@ import hashlib
 import json
 import struct
 from collections.abc import Iterator, Mapping
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field
 from typing import Any
 
 from .errors import LogError
@@ -170,17 +170,11 @@ class Dictionary:
         build_id: the 8 bytes that a firmware built from this dictionary writes
             into each block header.
         tables: the name tables by name.
-        film_table: the table whose keys are art codes of film-look slots, or
-            an empty text.
-        film_entries: art code to the menu entry of the slot, as the film list
-            (``RepoPaths.films``) names it.
     """
 
     events: dict[int, Event]
     build_id: bytes
     tables: dict[str, Table] = field(default_factory=dict)
-    film_table: str = ""
-    film_entries: dict[int, str] = field(default_factory=dict)
 
 
 def _show(value: int, how: str, bits: int) -> Any:
@@ -318,21 +312,12 @@ def load_dictionary(raw: Any, inherit: Dictionary | None = None) -> Dictionary:
     if not isinstance(entries, list):
         raise LogError("the event dictionary has no 'events' list")
     tables: dict[str, Table] = dict(inherit.tables) if inherit else {}
-    film_table = inherit.film_table if inherit else ""
-    film_entries = dict(inherit.film_entries) if inherit else {}
     if "tables" in raw:
         if not isinstance(raw["tables"], dict):
             raise LogError("the event dictionary: 'tables' must be an object")
         tables = {
             name: _table(body, f"table {name}") for name, body in raw["tables"].items()
         }
-        films = raw.get("film_entries", {})
-        if not isinstance(films, dict) or not isinstance(films.get("codes", {}), dict):
-            raise LogError("the event dictionary: 'film_entries' must be an object")
-        film_table = str(films.get("table", ""))
-        film_entries = _table(films.get("codes", {}), "film_entries").exact
-        if film_entries and film_table not in tables:
-            raise LogError("the event dictionary: 'film_entries' names no table")
     events: dict[int, Event] = {}
     names: set[str] = set()
     for entry in entries:
@@ -354,36 +339,7 @@ def load_dictionary(raw: Any, inherit: Dictionary | None = None) -> Dictionary:
             if table not in tables:
                 raise LogError(f"{where}: {key!r} names the table {table!r}: not there")
         events[number] = Event(number, name, level, parsed, tuple(named.items()))
-    return Dictionary(events, build_id(entries), tables, film_table, film_entries)
-
-
-def name_films(words: Dictionary, films: Any) -> Dictionary:
-    """Return the dictionary with the film labels of the film list (``RepoPaths.films``).
-
-    The dictionary knows which art code belongs to which menu entry. The film
-    list knows which film is in which menu entry. The names of these art codes
-    become ``label (entry)``, for example ``Velvia (Diorama)``. Entries that the
-    film list does not have keep their names.
-
-    Raises:
-        LogError: the film list is not an object with a ``films`` list.
-    """
-    rows = films.get("films") if isinstance(films, dict) else None
-    if not isinstance(rows, list):
-        raise LogError("the film list must be an object with a 'films' list")
-    labels = {
-        row.get("entry"): row.get("label") for row in rows if isinstance(row, dict)
-    }
-    table = words.tables.get(words.film_table)
-    if table is None:
-        return words
-    exact = dict(table.exact)
-    for code, entry in words.film_entries.items():
-        if isinstance(labels.get(entry), str):
-            exact[code] = f"{labels[entry]} ({entry})"
-    tables = dict(words.tables)
-    tables[words.film_table] = Table(exact, table.groups)
-    return replace(words, tables=tables)
+    return Dictionary(events, build_id(entries), tables)
 
 
 @dataclass

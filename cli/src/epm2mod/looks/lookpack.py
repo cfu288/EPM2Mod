@@ -19,16 +19,19 @@ from __future__ import annotations
 
 import base64
 import struct
+import zipfile
+import zlib
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import numpy as np
+from numpy.typing import NDArray
 
 from ..errors import BuildError, LookFileError
 from ..fileio import read_json
 from ..paths import RepoPaths, is_repo_relative
-from .generate import Fit, _array, chroma_record, load_fit, whole_numbers
 from .lookfile import (
     CURVE_MAX,
     encode_record,
@@ -41,6 +44,102 @@ from .lookfile import (
 )
 
 _I16 = (-0x8000, 0x7FFF)
+
+
+#: A fit file: arrays by name.
+Fit = Mapping[str, NDArray[Any]]
+_CHROMA_KNOTS = 16
+#: How many slope bytes each chroma curve stores: Cb, then Cr.
+_CHROMA_SLOPES = {"Cb": 17, "Cr": 16}
+_CHROMA_SLOPE_ARRAY = 17
+
+
+def _array(fit: Fit, key: str, where: str) -> NDArray[Any]:
+    """Return an array of a fit file, or raise if it is not there."""
+    try:
+        return fit[key]
+    except KeyError:
+        raise BuildError(f"{where}: the fit has no '{key}'") from None
+
+
+def whole_numbers(
+    values: NDArray[Any], count: int, low: int, high: int, what: str, where: str
+) -> list[int]:
+    """Return ``count`` whole numbers in ``low..high`` from a fit array.
+
+    Raises:
+        BuildError: if the array has another size, holds a value that is not a
+            finite whole number, or holds a value outside the range.
+    """
+    try:
+        array = np.asarray(values, dtype=np.float64).ravel()
+    except (TypeError, ValueError):
+        raise BuildError(f"{where}: {what} must be numbers") from None
+    if (
+        array.size != count
+        or not np.all(np.isfinite(array))
+        or not np.array_equal(array, np.round(array))
+    ):
+        raise BuildError(f"{where}: {what} must be {count} whole numbers")
+    numbers = [int(value) for value in array]
+    if any(not low <= number <= high for number in numbers):
+        raise BuildError(f"{where}: {what} must be in {low}..{high}")
+    return numbers
+
+
+def chroma_record(fit: Fit, where: str) -> bytes:
+    """Return the 97-byte chroma-curve record of a fit.
+
+    The record is x[16], y[16], slope[17] for Cb, then x[16], y[16], slope[16]
+    for Cr. The first stored curve is Cb (measured: NOTES section 44).
+    """
+    parts: list[int] = []
+    for name, slopes in _CHROMA_SLOPES.items():
+        knots = _array(fit, name, where)
+        if knots.ndim != 2 or knots.shape[0] < 2:
+            raise BuildError(f"{where}: '{name}' must hold an x row and a y row")
+        slope_key = f"{name}_slope17"
+        stored = whole_numbers(
+            _array(fit, slope_key, where),
+            _CHROMA_SLOPE_ARRAY,
+            0,
+            255,
+            f"'{slope_key}'",
+            where,
+        )
+        parts += whole_numbers(knots[0], _CHROMA_KNOTS, 0, 255, f"'{name}' x", where)
+        parts += whole_numbers(knots[1], _CHROMA_KNOTS, 0, 255, f"'{name}' y", where)
+        parts += stored[:slopes]
+    return bytes(parts)
+
+
+def load_fit(path: Path) -> dict[str, NDArray[Any]]:
+    """Return the arrays of a fit file.
+
+    Raises:
+        BuildError: if the file is missing or is not a numpy ``.npz`` archive
+            of plain arrays.
+    """
+    try:
+        with path.open("rb") as handle:
+            loaded = np.load(handle)
+            if not isinstance(loaded, np.lib.npyio.NpzFile):
+                raise BuildError(f"{path}: is not a numpy .npz archive")
+            with loaded as archive:
+                arrays = {key: archive[key] for key in archive.files}
+        for key, value in arrays.items():
+            if not isinstance(value, np.ndarray):
+                raise BuildError(f"{path}: '{key}' is not a numpy array")
+        return arrays
+    except (
+        OSError,
+        ValueError,
+        EOFError,
+        NotImplementedError,
+        zipfile.BadZipFile,
+        zlib.error,
+    ) as error:
+        raise BuildError(f"{path}: cannot be read as a fit file: {error}") from None
 
 
 def colour_look(fit: Fit, slot: int, name: str, where: str) -> ColourLook:
@@ -220,8 +319,7 @@ def web_data(paths: RepoPaths) -> dict[str, Any]:
 def camera_table(curve: tuple[int, ...], default: bytes) -> bytes:
     """Return the tone table the camera makes from a curve and a default table.
 
-    Entry k is the curve at the default table's entry k, kept rising: what
-    ``generate.pack_table`` gives for the same curve.
+    Entry k is the curve at the default table's entry k, kept rising.
     """
     values = struct.unpack(f"<{TABLE_ENTRIES}H", default)
     out, top = [], 0

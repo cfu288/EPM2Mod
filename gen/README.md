@@ -19,4 +19,4 @@ generator makes. A generator makes only the current version of its specs; a vers
 Run them all: `gen/run.sh`. It needs the MN103 binutils (`tools/setup.sh --binutils`) and Olympus's firmware
 (`uv run epm2mod fetch-stock`).
 
-`data/specs/peaking-gain-2x.json` is one byte written by hand. The film-look specs of the older builds come from the package (`uv run epm2mod generate`). Every other spec that no folder here writes was made by an experiment script; its notes in `experiments/` are the record.
+`data/specs/peaking-gain-2x.json` is one byte written by hand. Every other spec that no folder here writes was made by an experiment script; its notes in `experiments/` are the record.

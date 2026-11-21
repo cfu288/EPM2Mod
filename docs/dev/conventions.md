@@ -39,7 +39,7 @@ Examples: `feat(cli)!: revision 3 of the CLI spec`, `docs(camera-log): the build
 | `data/specs/` | One JSON spec per mod. Each operation states the bytes that it replaces. Specs never move: superseded and failed ones stay as a record, and `tools/space-ledger/superseded.tsv` marks them (`history` for those of earlier builds; their story is in `data/specs/HISTORY.md`). |
 | `gen/` | The generators whose specs ship, each with its sources. `gen/run.sh --check` (CI) fails when a committed spec is not what its generator makes. See [../gen/README.md](../../gen/README.md). |
 | `web/` | Two apps (React, Vite): `apps/site`, the public site (GitHub Pages, `.github/workflows/web.yml`), and `apps/local`, the installer page, served by `cli/src/epm2mod/serve.py`. `packages/ui` holds what they share. See [../web/README.md](../../web/README.md). |
-| `data/films/` | `catalogue.json` (the film simulations), `card-looks.json` (a developer look list of fit files, the input of `epm2mod films pack`), `fits/` (the fitted values) and the generated `film-records.json`. `films.json` and `more-films.json` serve older builds. |
+| `data/films/` | `catalogue.json` (the film simulations), `card-looks.json` (a developer look list of fit files, the input of `epm2mod films pack`), `fits/` (the fitted values) and the generated `film-records.json`. |
 | `data/logdict/` | The event dictionary of the Debug Log. The log's patch specs and the decoder (`epm2mod log`) read it. See [logging.md](../reference/logging.md). |
 | `docs/` | Knowledge that lasts. Each fact there must have a source or must be reproducible. |
 | `experiments/YYYY-MM-DD-slug/` | Ad-hoc scripts and `NOTES.md`. Put large files in the `out/` subfolder, which git ignores. When a result is reliable, move it into `docs/`, `tools/`, `gen/` or the package. |
@@ -82,7 +82,7 @@ descriptions, patch specs and film lists are data: they are also relative to the
   Conventional Commits form and removes AI attribution lines. To run the checks by hand:
 
   ```bash
-  uv run black cli/src cli/tests/support.py cli/tests/test_package.py cli/tests/test_looks.py
+  uv run black cli/src cli/tests/support.py cli/tests/test_package.py
   uv run --directory cli mypy
   uv run python -m unittest discover -s cli/tests
   ```
@@ -97,8 +97,7 @@ descriptions, patch specs and film lists are data: they are also relative to the
   (`freespace.py`, `fwmap.py`, `disasm.py`, `memmap_svg.py`) are analysis tools. `checks.py` runs the off-camera
   checks of a build and `toolchain.py` finds the MN103 binutils. The emulator harness is in `emulator/`.
 - **Generated, not written by hand:** the parts of the documents between `GENERATED` markers and
-  the CLI reference [cli.md](../reference/cli.md) and the film patch specs of the older builds (from `data/films/films.json`,
-  `data/films/more-films.json` and `data/films/fits/`): `uv run epm2mod generate` writes them. `data/films/film-records.json`
+  the CLI reference [cli.md](../reference/cli.md): `uv run epm2mod generate` writes them. `data/films/film-records.json`
   comes from `data/films/catalogue.json` and the fits: `uv run python web/scripts/export_films.py` writes it. A build's
   name is the file name of its description. Tests
   fail if a generated part is out of date.
@@ -173,8 +172,8 @@ what is there:
 | Needs | What the tests prove |
 |---|---|
 | Nothing more than the repository | The package works on a small made-up firmware: container, patch specs, build steps, card copy, download (with a stand-in for the network), every command. The README's generated parts are current. The film specs record the digest of the film list and fit files that are in the repository. |
-| numpy (`uv run` installs it) | The film-spec generator works on a made-up firmware (`cli/tests/test_looks.py`). |
-| The maker's firmware file (`uv run epm2mod fetch-stock`) | Each build description that has a sha256 gives that sha256. The film specs in `data/specs/` are exactly the generated ones. The stock file survives a parse and a write without a change. |
+| numpy (`uv run` installs it) | Look files packed from the fit files are the ones the film records hold (`cli/tests/test_lookfile.py`). |
+| The maker's firmware file (`uv run epm2mod fetch-stock`) | Each build description that has a sha256 gives that sha256. The stock file survives a parse and a write without a change. |
 
 Without the maker's firmware file the run skips the last group and says so. Run the full set before
 you pin a build.

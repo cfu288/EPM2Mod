@@ -567,7 +567,7 @@ epm2mod films pack LIST --card /path/to/card
 
 ### epm2mod generate
 
-Write the film patch specs that the fit files make, the generated parts of the documents and the CLI reference.
+Write the generated parts of the documents and the CLI reference.
 
 ```
 epm2mod generate [-h] [--check]

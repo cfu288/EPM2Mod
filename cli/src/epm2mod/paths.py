@@ -140,21 +140,6 @@ class RepoPaths:
         return self.location("readme")
 
     @property
-    def films(self) -> Path:
-        """The list of film looks and the menu entries they replace."""
-        return self.location("films")
-
-    @property
-    def more_films(self) -> Path:
-        """The list of the film looks beyond the first seven."""
-        return self.location("more_films")
-
-    @property
-    def bw_films(self) -> Path:
-        """The film list with a black-and-white film in the Grainy Film entry."""
-        return self.location("bw_films")
-
-    @property
     def card_looks(self) -> Path:
         """A developer look list of fit files (the input of ``films pack``)."""
         return self.location("card_looks")

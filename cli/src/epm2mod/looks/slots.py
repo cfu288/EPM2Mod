@@ -24,23 +24,12 @@ CURVE_POINTS = 1024
 #: film curve applied after one of them.
 DEFAULT_RECORD = 0x7E78B39C
 RECORD_TABLES = 8
-#: Index, in a record, of the table that still pictures use.
-STILLS_TABLE = 1
 
 #: The stock "identity" look table, copied over the look tables of three slots.
 IDENTITY_LOOK = 0x7E75B8F0
-#: The look tables of Cross Process I, Light Tone and Pop Art I.
-LOOK_TABLES = (0x7E75F2F0, 0x7E75EAF0, 0x7E75E6F0)
 
 #: Hash table that selects the tone-curve handler by art code; entries are 8 bytes.
 GAMMA_HASH = 0x7E78C154
-#: The handler that uses three records (one per channel).
-THREE_RECORD_HANDLER = 0x7E56B82A
-#: Entries of the Light Tone codes (72 and 81) in ``GAMMA_HASH``.
-LIGHT_TONE_ENTRIES = (2, 11)
-
-#: A matrix that earlier specs put in the slots they create: the identity, as 9 x int16.
-IDENTITY_MATRIX = (256, 0, 0, 0, 256, 0, 0, 0, 256)
 
 
 @dataclass(frozen=True)
@@ -94,86 +83,6 @@ class Slot:
     chroma: int
 
 
-#: The seven film slots, in menu order.
-SLOTS: tuple[Slot, ...] = (
-    Slot(
-        entry="Pop Art",
-        tone=Tables((0x7E74F1BC, 0x7E74F5BC, 0x7E7505BC)),
-        saturation=0x7E7696A0,
-        six_axis=(0x7E769486, 0x7E769492),
-        matrix=0x7E880FC2,
-        matrix_is_new=True,
-        chroma=0x7E74B8BA,
-    ),
-    Slot(
-        entry="Soft Focus",
-        tone=Tables((0x7E75FAF0, 0x7E75F8F0, 0x7E7616F0)),
-        saturation=0x7E7696BC,
-        six_axis=(0x7E76952E, 0x7E76953A),
-        matrix=0x7ECB099A,
-        matrix_is_new=True,
-        chroma=0x7E74BBCA,
-    ),
-    Slot(
-        entry="Pale&Light Color",
-        tone=Tables((0x7F033B7C, 0x7F033D7C, 0x7E75E8F0)),
-        saturation=0x7E7696A4,
-        six_axis=(0x7E76949E, 0x7E7694AA),
-        matrix=0x7ECB0988,
-        matrix_is_new=True,
-        chroma=0x7E74B91C,
-    ),
-    Slot(
-        entry="Light Tone",
-        tone=Records((0x7E78B49C, 0x7E78B4BC, 0x7E78B4DC)),
-        saturation=0x7E7696A8,
-        six_axis=(0x7E7694B6, 0x7E7694C2),
-        matrix=0x7E768F58,
-        matrix_is_new=False,
-        chroma=0x7E74B97E,
-    ),
-    Slot(
-        entry="Pin Hole",
-        tone=Tables((0x7E74EFBC, 0x7E751FBC, 0x7E7521BC)),
-        saturation=0x7E7696B8,
-        six_axis=(0x7E769516, 0x7E769522),
-        matrix=0x7ECB09AC,
-        matrix_is_new=True,
-        chroma=0x7E74BB68,
-    ),
-    Slot(
-        entry="Diorama",
-        tone=Tables((0x7E754FBC, 0x7E7551BC, 0x7E757FBC)),
-        saturation=0x7E7696EC,
-        six_axis=(0x7E769622, 0x7E76962E),
-        matrix=0x7ECB09BE,
-        matrix_is_new=True,
-        chroma=0x7E74BE16,
-    ),
-    Slot(
-        entry="Cross Process",
-        tone=Records((0x7E78B41C, 0x7E78B43C, 0x7E78B45C)),
-        saturation=0x7E7696B4,
-        six_axis=(0x7E7694FE, 0x7E76950A),
-        matrix=0x7E768F46,
-        matrix_is_new=False,
-        chroma=0x7E74BAA4,
-    ),
-)
-
-
-def slot_for(entry: str) -> Slot:
-    """Return the slot of a menu entry.
-
-    Raises:
-        KeyError: if the entry is not a film slot.
-    """
-    for slot in SLOTS:
-        if slot.entry == entry:
-            return slot
-    raise KeyError(entry)
-
-
 # --------------------------------------------------------------------------
 # The film slots beyond the first seven.
 #
@@ -194,10 +103,6 @@ GAMMA_DEFAULT_HANDLER = 0x7E56B861
 GAMMA_HASH_ENTRIES = 32
 #: The key of an art code in the tone-curve hash is the code minus this.
 GAMMA_KEY_BASE = 70
-#: The shared part of the tone-curve stubs (in an earlier spec): a1 = three record addresses.
-GAMMA_COMMON = 0x7ECB08A6
-#: The look-curve handler that loads the identity table.
-IDENTITY_LOOK_HANDLER = 0x7E56E94A
 
 #: Jump tables that the image library reads with (art code - first code).
 LOOK_JUMP = (0x7E78C8E4, 8)
@@ -205,16 +110,10 @@ SATURATION_JUMP = (0x7E78C514, 69)
 SIX_AXIS_JUMP = (0x7E78C254, 9)
 CHROMA_JUMP = (0x7E78AEA4, 69)
 
-#: The last jump of the art-matrix compare chain of an earlier spec ("no film
-#: code": back to the stock code), and the two places the chain goes to.
-MATRIX_CHAIN_EXIT = 0x7ECB094C
-MATRIX_CHAIN_EXIT_BYTES = bytes.fromhex("dc1fbe8bff")
 MATRIX_USE = 0x7E56C764
-MATRIX_NONE = 0x7E56C76B
 
 #: Tables with one entry per stored Picture Mode value 100 to 120.
 FIRST_ART_VALUE = 100
-LAST_ART_VALUE = 120
 #: art_GetFilterType: its jump table, and where a stub goes with the code in d2.
 FILTER_TYPE_JUMP = 0x7E854A24
 FILTER_TYPE_TAIL = 0x7E71BEA3
@@ -228,7 +127,6 @@ KIND_JUMP = 0x7E8522AC
 KIND_COLOUR_ONLY = 0x7E70DBF4
 #: The EXIF writer's case per Picture Mode, and the case of Pop Art.
 EXIF_JUMP = 0x7E852300
-EXIF_POP_ART = 0x7E70DC9F
 #: "Is this Picture Mode an art filter" of the shooting application, and its "yes".
 IS_ART_JUMP = 0x7EBBAA10
 IS_ART_YES = 0x7E9416F4
@@ -251,13 +149,6 @@ VALUE_LIST_STEP = 64
 #: bytes per entry, the stored value in the first byte; the first entry is value 100.
 ART_VALUE_LISTS = (0x7E818EFA, 0x7E82405E, 0x7E82417E)
 ART_VALUE_LIST_STEP = 8
-#: The presets of the shooting modes: 12-byte rows of (mode code, kind, list
-#: address, count) up to a row with code 0; a list holds (setting, value)
-#: pairs of 32-bit words. The preset of an ART filter (kind 1) sets setting
-#: 111, the Picture Mode, to the stored value of the filter's menu entry.
-MODE_PRESETS = 0x7E834794
-MODE_PRESET_ROW = 12
-ART_PRESET_KIND = 1
 PICTURE_MODE_SETTING = 111
 #: Place of the first art entry (Pop Art) in a Picture Mode value list.
 FIRST_ART_PLACE = 7
@@ -266,7 +157,6 @@ FIRST_ART_PLACE = 7
 #: area 0x7EBF1090-0x7EBF3BAD in segment 2 (camera-tested code and data are in
 #: that area), next to what the pinned build and the debug log keep there.
 EXTRA_DATA_AREA = (0x7EBF38BC, 0x7EBF3BAD)
-EXTRA_CODE_AREA = (0x7EBF2E80, 0x7EBF3000)
 
 
 @dataclass(frozen=True)
@@ -490,42 +380,3 @@ EXTRA_SLOTS: tuple[ExtraSlot, ...] = (
 # The tone curves per channel cannot be used: the key of code 74 in the
 # tone-curve hash meets the entry that code 70 uses before it meets a free one.
 # How this was found: the notes of the experiment doublex (2026-11-16).
-
-
-@dataclass(frozen=True)
-class MonoSlot:
-    """Where a black-and-white film keeps its numbers in the Grainy Film entry.
-
-    Attributes:
-        entry: the stock name of the menu entry.
-        art_codes: the art code of still pictures and the code of the movie tables.
-        grain_table: address of the grain program's contrast table.
-        grain_load: address of the instruction that loads ``grain_table``.
-        live_look: address of the look table for live view and movies.
-        live_load: address of the instruction that loads ``live_look``.
-        spare_tables: per later fit of the film, (address of a table for its
-            grain table, address of the stock instruction that loads that
-            table). The tables are stock look tables of art codes that no
-            menu entry reaches since the first seven film slots.
-    """
-
-    entry: str
-    art_codes: tuple[int, int]
-    grain_table: int
-    grain_load: int
-    live_look: int
-    live_load: int
-    spare_tables: tuple[tuple[int, int], ...]
-
-
-#: The black-and-white slot. It has the entry of the first extra slot.
-MONO_SLOT = MonoSlot(
-    entry=EXTRA_SLOTS[0].entry,
-    art_codes=(74, 83),
-    grain_table=0x7E75EEF0,
-    grain_load=0x7E56EF83,
-    live_look=0x7E7620F0,
-    live_load=0x7E56E91F,
-    # the look table of Pin Hole I (codes 73 and 82)
-    spare_tables=((0x7E75ECF0, 0x7E56E90E),),
-)
