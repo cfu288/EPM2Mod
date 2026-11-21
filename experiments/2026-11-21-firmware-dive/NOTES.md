@@ -88,6 +88,10 @@ needs UART or USB).
   pipe B art effects, gamma post-processing 0x7E56AEAF, and a third block 0x7E5625DC. For the film codes the first
   seven give blocks byte-equal to Natural (V, one synthetic job); the last two are U.
 - Movies: pipe B differs from pipe A only by the 12-region stage, which films no longer use (I).
+- Open, from the block check added to `filmcheck.py` the same day (V emulator, camera U): when the job's u16 at
+  P+62 is 0x1000 or more, or bit 11 of P+20 is set, a film code's look word is Natural's table for that job, not the
+  identity table. If P+62 is the ISO value (I), a film simulation at high ISO carries Natural's look curve for that
+  ISO. Bit 16 of P+20 switches the art code off in every stage, on stock too.
 
 ## 5. Menus
 
