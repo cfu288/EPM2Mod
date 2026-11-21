@@ -588,6 +588,7 @@ def restore(
         art_shows=catalogue.art_check(()),
         copy=copy,
         ejected=ejected,
+        reset=True,
     )
     return Outcome(
         files, removed, tuple(steps), dry_run, card, ejected, eject_error=eject_error

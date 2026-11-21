@@ -24,7 +24,7 @@ The install steps are in the [README](../../README.md#install).
    ```
 
    Without a card: `uv run epm2mod restore -o FILE`, then copy the file to the card as `DCOLYMP/E1019999.BIN`.
-2. Do the steps that `restore` prints.
+2. Do the steps that `restore` prints. One step resets the camera's settings, because the settings that EPM2Mod added stay in the camera after the original firmware is installed.
 
 The installer does the same: choose **Olympus original** at the Firmware step.
 

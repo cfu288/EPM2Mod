@@ -414,9 +414,10 @@ class FilmsAndRestoreTests(CardCase):
     def test_restore_writes_the_stock_firmware_of_the_pinned_build(self) -> None:
         steps: list[int] = []
         outcome = pipeline.restore(self.repo.paths, self.card, step=steps.append)
+        self.assertIn("reset-settings", [item.id for item in outcome.steps])
         self.assertEqual((self.card / FIRMWARE).read_bytes(), TINY)
         self.assertEqual(steps, [1, 2])
-        self.assertIn("Firmware reads Body : 1.6.", outcome.steps[-2].text)
+        self.assertIn("Firmware reads Body : 1.6.", outcome.steps[-3].text)
         self.assertNotIn("load-films", [step.id for step in outcome.steps])
         out = self.folder / "o"
         out.mkdir()
@@ -479,6 +480,7 @@ class CommandTests(CardCase):
         self.assertEqual(document["films"], [])
         ids = [step["id"] for step in document["camera_steps"]]
         self.assertNotIn("load-films", ids)
+        self.assertNotIn("reset-settings", ids)
         document = self.json_of(
             "install", "--card", str(self.card), "--film", "ART1=velvia"
         )
@@ -831,6 +833,8 @@ PROJECT_NAME = re.compile(
 )
 #: What the scan allows: the project manifest's own name, which is how a project is found.
 ALLOWED = {MANIFEST}
+
+
 def source_text(path: Path) -> Iterator[tuple[int, str]]:
     """Yield the line number and the text of each string, docstring and comment of a module."""
     with path.open("rb") as source:

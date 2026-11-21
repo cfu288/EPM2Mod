@@ -10,6 +10,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+#: The menu path that resets the camera's settings, for the steps after Olympus's original firmware is installed.
+RESET = (
+    "Reset the settings that EPM2Mod added: MENU → camera 1 tab → Reset/Myset → set Reset to Full → OK → Yes → OK. "
+    "This also resets your own settings."
+)
+
 #: The menu path that loads the film file into the camera.
 LOAD_LOOKS = (
     "MENU → SETUP → gears tab → J → Load Looks → Load → OK. The row reads Loaded. "
@@ -23,7 +29,7 @@ class Step:
 
     Attributes:
         id: what the step does, for a program: ``copy``, ``eject``, ``insert``, ``flash``, ``wait``, ``restart``,
-            ``check-firmware``, ``load-films``, ``check-art``.
+            ``check-firmware``, ``reset-settings``, ``load-films``, ``check-art``.
         text: what the user reads.
     """
 
@@ -74,6 +80,7 @@ def flash_steps(
     art_shows: str,
     copy: str | None = None,
     ejected: bool = False,
+    reset: bool = False,
 ) -> list[Step]:
     """Return the steps that install a firmware file on the camera.
 
@@ -83,6 +90,7 @@ def flash_steps(
         art_shows: what the ART menu shows at the end (``catalogue.art_check``).
         copy: the text of a first step that copies the files to the card, or None if they are on the card.
         ejected: True if the card was ejected already.
+        reset: True for Olympus's original firmware: then a step resets the settings that EPM2Mod stored.
     """
     steps = _start(copy, ejected) + [
         Step(
@@ -101,6 +109,8 @@ def flash_steps(
             f"Check that MENU → SETUP → wrench tab → Firmware reads {firmware}.",
         ),
     ]
+    if reset:
+        steps.append(Step("reset-settings", RESET))
     if films:
         steps.append(Step("load-films", LOAD_LOOKS))
     steps.append(Step("check-art", f"Check that MENU → ART shows {art_shows}"))
