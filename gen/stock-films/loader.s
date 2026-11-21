@@ -13,7 +13,8 @@
 .equ BLOCKS,   %(blocks)#x       # 12 u32: each entry's RAM block
 .equ PMSET,    %(pmset)#x        # u16 info ids, 0 at the end
 .equ PMMAP,    %(pmmap)#x        # 5 x {u8 stock value, u8 hidden value, u16 0, u32 the entry's byte in list 111}
-.equ TXTTAB,   %(txttab)#x       # 4 x {u16 id, u16 0, u32 text}: the row's texts
+.equ TXTTAB,   %(txttab)#x       # %(txtn)d x {u16 id, u16 0, u32 text}: the texts of the rows Load Looks, Peaking and
+                                 # Lowest S/S Setting, for every menu language
 .equ TXT_LABEL, %(txt_label)#x
 .equ S_LOADED, %(s_loaded)#x
 .equ S_NOFILE, %(s_nofile)#x
@@ -27,7 +28,7 @@
 .equ RNAMES,   RAMU + 0x100      # 36 x 48 B: the names
 .equ FLAGS_U,  FLAGS + 0x40000000
 .equ BUSY,     FLAGS_U           # the task runs
-.equ APPLIED,  FLAGS_U + 1       # mode 0 was started in this session
+.equ APPLIED,  FLAGS_U + 1       # mode 0 was started in this session (at its first GUI state)
 .equ STOREOK,  FLAGS_U + 2       # the store held a valid look file at the last check
 .equ MODE,     FLAGS_U + 3       # 0 start, 1 load, 3 texts and names
 .equ REMAP,    FLAGS_U + 4       # 1: the task switched entries; T_GUI maps the Picture Mode settings
@@ -93,7 +94,7 @@ T_GUI:                           # the "state =" trace call of the GUI state set
     movm (sp),[d2,d3,other]
 %(displaced)s
     jmp %(back)#x
-    .org %(flags_org)d
+    .balign 4                    # the log's probe at T_END reads the first four flags as one word
 FLAGS: .byte 0, 0, 0, 0, 0
     .balign 4
 PATH:  .asciz "C:\\EPM2LOOK.BIN"
@@ -108,8 +109,8 @@ T_TASK:                          # task USRTEST_A (id 0x90), started by T_GUI; i
     beq T_NAMES
     cmp 0,d0
     bne T_LOAD
-    clr d0                       # mode 0, the first GUI state: the stored looks
-    mov d0,(RSTAT)
+    clr d0                       # mode 0, the first GUI state: the stored looks again, as C_START applied them
+    mov d0,(RSTAT)               # (the same bytes), then the texts and names. The store is checked each time.
     bra T_STORED
 T_LOAD:
     mov PATH,a0
@@ -140,10 +141,29 @@ T_LOADED:
     mov S_LOADED,d0
     mov d0,(RSTAT)
 T_STORED:
+    calls STORED
+    movbu (MODE),d0              # after a Load only: the Picture Mode settings take the switched values (at a start
+    cmp 1,d0                     # they hold them already: saved after the Load)
+    bne T_NAMES
+    movbu d0,(REMAP)
+T_NAMES:
+    calls NAMES
+T_END:
+    clr d0
+    movbu d0,(BUSY)
+    ret [d2,d3,a2,a3],48
+
+C_START:                         # the last entry of segment 3's constructor table (task Usr1, after the copies of
+    movm [other],(sp)            # segments 2 and 3, before the application init): the stored looks, then the
+    calls STORED                 # entry's own constructor with every register and MDR as the walker gave them
+    movm (sp),[other]
+    jmp %(ctor)#x
+
+STORED:                          # the store's look file, when it is valid: every listed entry's tables and switch
+    add -4,sp                    # list; else every entry's stock words. No card, no GUI, no text
     mov STORE,a0
     mov (8,a0),d0
     calls VERIFY
-    movbu d0,(STOREOK)           # 0 valid: reversed below
     cmp 0,d0
     bne 1f
     mov 1,d0
@@ -156,23 +176,14 @@ T_STORED:
 1:  clr d0
     movbu d0,(STOREOK)
 2:  calls SWITCH                 # film words for those entries, stock words for the others
-    movbu (MODE),d0              # after a Load only: the Picture Mode settings take the switched values (at a start
-    cmp 1,d0                     # they hold them already: saved after the Load)
-    bne 3f
-    movbu d0,(REMAP)
-3:
     clr d0                       # make the look stages recompute, as the boot init 0x7E560AC0 does
     mov d0,(%(rw0)#x)
     mov d0,(%(rw1)#x)
     mov 0xff,d0
     movbu d0,(%(rb0)#x)
     movbu d0,(%(rb1)#x)
-T_NAMES:
-    calls NAMES
-T_END:
-    clr d0
-    movbu d0,(BUSY)
-    ret [d2,d3,a2,a3],48
+    add 4,sp
+    rets
 
 NAMES:                           # the row's texts and the entries' names in the loaded language's table
     movm [d2,d3,a2,a3],(sp)
@@ -197,7 +208,7 @@ NAMES:                           # the row's texts and the entries' names in the
     add -1,d3
     bne 1b
     mov TXTTAB,a0
-    mov 3,d3
+    mov %(txtn)d,d3
 3:  movhu (a0),d0
     asl2 d0
     mov (4,a0),d1

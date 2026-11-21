@@ -1,10 +1,12 @@
-"""Write data/specs/log-menu-2.json: the structured log in the release firmware, switched by the
+"""Write data/specs/log-menu-3.json: the structured log in the release firmware, switched by the
 Custom Menu row Debug Log (setting 447; data/specs/custom-menu-rows-2.json). design.md in this folder.
 
     uv run python gen/log-menu/mkspec.py WORKDIR [LISTING.txt]
     WORKDIR: a scratch folder outside the repository
 
 A copy of experiments/2026-11-18-log-menu/scripts/mkspec_logmenu.py as run with --stock-films (design.md there).
+It runs after gen/stock-films/loader.py: it reads the film loader's labels from the key `_symbols` of the loader's
+spec, and the bytes it hooks from the build's other specs.
 
 The code is the camera-tested log of mkspec_log.py (log-core, log-probes,
 log-peaking-time, log-peaking-guard), assembled again in one spec on the pinned build, with these changes:
@@ -18,9 +20,13 @@ log-peaking-time, log-peaking-guard), assembled again in one spec on the pinned 
     the hook at 0x7ECDF6E4 jumps here.
   * the flush task is USRTEST_B (id 0x91): card-looks keeps USRTEST_A.
   * a probe at card-looks' T_END: card_task.
+  * T_CTOR takes the place of card-looks' C_START in the last entry of segment 3's constructor table (task Usr1,
+    after the segment copies): the record seg_loaded, card-looks' STORED, the record film_applied, then the entry's
+    own constructor.
   * placement: the kernel routines of log-core, log-probes and log-peaking-time in one run 0x7E4C9514-0x7E4C9800;
-    T_GUI, T_GRD, T_CTASK and the texts in 0x7EBF2600-0x7EBF2890 (custom-menu-rows' child list was there).
-Every expect is a byte string of data/builds/stock-films.json's specs before this one.
+    T_GUI, T_GRD, T_CTASK and the texts in 0x7EBF2600-0x7EBF27FC (custom-menu-rows' child list was there; the ART
+    bracket routines of stock-films-structure follow); T_CTOR in the free run 0x7EBF2E68-0x7EBF2E9A.
+Every expect is a byte string of the other specs of data/builds/films-start-texts.json.
 """
 
 import hashlib
@@ -39,13 +45,14 @@ import mkspec_log as L  # noqa: E402
 from epm2mod.container import parse  # noqa: E402
 from epm2mod.spec import BytesOp, load_spec  # noqa: E402
 
-SPEC = "log-menu-2"
-BUILD = "stock-films"                       # the log for data/builds/stock-films.json (experiments/2026-11-18-stock-filters)
+SPEC = "log-menu-3"
+BUILD = "films-start-texts"                 # the log for data/builds/films-start-texts.json
 # The dictionary's id: the first 8 bytes of a sha256 of the event list (L.build_id). The firmware writes it into each
-# block of EPM2LOG.BIN and `epm2mod log` picks the dictionary by it. It is the id of the event list that log-menu-2
-# was camera-tested with, kept as data/logdict/events-33ca8d15f4f1c877.json; data/logdict/events.json has grown since.
-# Change it (and the spec's name) only for a new version of this spec, built with a newer event list.
-BUILD_ID = "33ca8d15f4f1c877"
+# block of EPM2LOG.BIN and `epm2mod log` picks the dictionary by it. It is the id of data/logdict/events.json with
+# seg_loaded and film_applied. When events.json grows again, this generator reads the list from
+# data/logdict/events-BUILD_ID.json. Change the id (and the spec's name) only for a new version of this spec, built
+# with a newer event list.
+BUILD_ID = "afe27672d672fc95"
 BASE = L.BASE
 STOCK = L.STOCK
 BIN = L.BIN
@@ -54,15 +61,14 @@ AREAS = {
            "hooks in segment 1 and the kernel, and the timing probe of peaking (T_TIME0, T_TIME0B, T_TICK)"),
     ".t0": (0x7E4C90EA, 0x7E4C90FC, "kernel range, the 0xFF run after T_HIT of peaking-fast: T_TIME0 (as "
             "log-peaking-time)"),
-    ".uc": (0x7EBF2BE4, 0x7EBF2E80, "segment 2: the flush task and the file name"),
+    ".uc": (0x7EBF2BE4, 0x7EBF2DF8, "segment 2: the flush task and the file name"),
     ".up": (0x7EBF3780, 0x7EBF38BC, "segment 2: routines of the hooks in segments 2 and 3"),
-    ".ug": (0x7EBF2600, 0x7EBF2890, "segment 2: T_GUI, T_GRD, T_CTASK, the row's texts"),
+    ".ug": (0x7EBF2600, 0x7EBF27FC, "segment 2: T_GUI, T_GRD, T_CTASK, the row's texts"),
+    ".us": (0x7EBF2E68, 0x7EBF2E9A, "segment 2: T_CTOR (the run ends before the routine of movie-ab at 0x7EBF2E9F)"),
 }
 TASK_ENTRY, TASK_ENTRY_OLD = 0x7E439C9C, 0x7E501CE7      # CPU0 task table, row of id 0x91 (USRTEST_B): the entry word
 TASK_ID = 0x91
-# The loader's labels that every version of card-looks since 5 keeps (gen/stock-films/loader.py); main() checks them
-# against the bytes of card-looks-5 (the base image) and of card-looks-6 (the pinned build). T_GUI is read from the hook.
-CL = {"T_END": 0x7EE5392B, "FLAGS": 0x7ECB0FCC}
+CTOR_ENTRY = 0x7F033AC8 + 4 * 44                         # segment 3's constructor table, its last entry
 CL_RSTAT = 0x7E4D0000 + 0x40000000                        # card-looks' status word (uncached)
 LANG, LANG_SPAN = 0xBFF3D000, 0x43000
 LABEL, HELP = 1507, 1508                         # unused built-in EVF texts (1499, 1501, 1502 are peaking-colours')
@@ -221,6 +227,22 @@ T_CTASK:                         # card-looks' T_END: its task ends (USRTEST_A)
 %(displaced_CTASK)s
     jmp %(back_CTASK)s
 
+.section .us,"ax"
+T_CTOR:                          # the last entry of segment 3's constructor table (task Usr1, after the copies of
+    movm [other],(sp)            # segments 2 and 3, before the application init). As card-looks' C_START, with the
+    clr d1                       # two records; the log's switch is not read yet, so they go to the ring
+    mov 0,a0
+    mov %(seg_loaded)d,d0
+    call log_put,[],0
+    call %(cl_stored)#x,[],0     # card-looks' STORED: the stored looks (it returns with rets)
+    movbu (CL_FLAGS+2),d1        # 1: the store held a valid look file and it was applied
+    mov 0,a0
+    mov %(film_applied)d,d0
+    call log_put,[],0
+    movm (sp),[other]            # every register and MDR as the walker gave them
+    jmp %(ctor)#x                # the entry's own constructor
+
+.section .ug,"ax"
     .balign 2
 S_LABEL: .short %(s_label)s
 S_HELP:  .short %(s_help)s
@@ -231,8 +253,19 @@ def u16(text):
     return ", ".join("0x%04x" % c for c in text.encode("utf-16-le")[::2]) + ", 0"
 
 
+def dictionary():
+    """The event list with the id BUILD_ID: data/logdict/events.json, or the kept copy once that file has grown."""
+    for name in ("events.json", "events-%s.json" % BUILD_ID):
+        path = os.path.join(ROOT, "data", "logdict", name)
+        if os.path.exists(path):
+            d = json.load(open(path))
+            if L.build_id(d["events"]).hex() == BUILD_ID:
+                return d
+    raise SystemExit("no event list in data/logdict/ has the id %s" % BUILD_ID)
+
+
 def base_image(work):
-    """Block 0 of data/builds/stock-films.json without this spec, written to WORK/block0_0100.bin."""
+    """Block 0 of the build without this spec, written to WORK/block0_0100.bin."""
     specs = [s for s in json.load(open(os.path.join(ROOT, "data", "builds", BUILD + ".json")))["specs"]
              if not s.startswith("data/specs/log-menu")]
     blk = bytearray(parse(open(os.path.join(ROOT, STOCK), "rb").read()).blocks[0].payload)
@@ -253,19 +286,23 @@ def main():
     specs, blk, blk_path = base_image(work)
     stock = parse(open(os.path.join(ROOT, STOCK), "rb").read()).blocks[0].payload
     get = lambda a, n: blk[a - BASE:a - BASE + n]
-    d = json.load(open(os.path.join(ROOT, "data/logdict/events-%s.json" % BUILD_ID)))
+    d = dictionary()
     ev = {e["name"]: e["id"] for e in d["events"]}
     bid = L.build_id(d["events"])
-    assert bid.hex() == BUILD_ID, "data/logdict/events-%s.json has the id %s" % (BUILD_ID, bid.hex())
-    cl = dict(CL)
+    # the film loader's labels, from its spec; each is checked against the bytes of the image
+    (loader,) = [x for x in specs if os.path.basename(x).startswith("card-looks")]
+    cl = {k: int(v, 16) for k, v in json.load(open(os.path.join(ROOT, loader)))["_symbols"].items()}
     t_end = bytes.fromhex("00fc82") + struct.pack("<I", cl["FLAGS"] + 0x40000000)
-    assert get(cl["T_END"], CTASK_SITE) == t_end
-    six = [o for o in load_spec(Path(ROOT, "data/specs/card-looks-6.json")).ops if isinstance(o, BytesOp) and
-           o.block == 0 and o.offset <= cl["T_END"] - BASE < o.offset + len(o.new)]
-    assert [o.new[cl["T_END"] - BASE - o.offset:][:CTASK_SITE] for o in six] == [t_end], "card-looks-6: T_END or FLAGS moved"
+    assert cl["FLAGS"] % 4 == 0, "T_CTASK reads FLAGS as a word: it must be at a multiple of 4"
+    assert get(cl["T_END"], CTASK_SITE) == t_end, "%s: T_END is not `clr d0` / `movbu d0,(BUSY)`" % loader
     gui_site = L.HOOKS["GUI"][1]
     assert get(gui_site, 1) == b"\xdc", "the hook does not jump to card-looks' T_GUI"
-    cl["T_GUI"] = gui_site + struct.unpack("<i", get(gui_site + 1, 4))[0]
+    assert cl["T_GUI"] == gui_site + struct.unpack("<i", get(gui_site + 1, 4))[0]
+    assert get(CTOR_ENTRY, 4) == struct.pack("<I", cl["C_START"]), "the constructor entry is not C_START"
+    ctor = struct.unpack_from("<I", stock, CTOR_ENTRY - BASE)[0]
+    c_start = bytes.fromhex("cf08faff") + struct.pack("<h", cl["STORED"] - cl["C_START"] - 2) + bytes.fromhex("ce08dc") \
+        + struct.pack("<i", ctor - cl["C_START"] - 8)
+    assert get(cl["C_START"], len(c_start)) == c_start, "C_START is not movm / calls STORED / movm / jmp the constructor"
 
     # name: (site, bytes, events, what); the stock-site hooks of mkspec_log, the timing and guard sites, T_END
     hooks = {n: (site, k, e, w) for n, (_, site, k, e, w) in L.HOOKS.items()}
@@ -283,7 +320,8 @@ def main():
                bid0=struct.unpack("<i", bid[:4])[0], bid1=struct.unpack("<i", bid[4:])[0],
                every=L.TIME_EVERY - 1, lang_neg=(-LANG) & 0xFFFFFFFF, lang_span=LANG_SPAN, label_off=4 * LABEL,
                help_off=4 * HELP, task=TASK_ID, cl_gui=cl["T_GUI"], cl_flags=cl["FLAGS"] + 0x40000000,
-               cl_rstat=CL_RSTAT, lang=LANG, s_label=u16(TXT_LABEL), s_help=u16(TXT_HELP))
+               cl_rstat=CL_RSTAT, lang=LANG, s_label=u16(TXT_LABEL), s_help=u16(TXT_HELP),
+               cl_stored=cl["STORED"], ctor=ctor)
     val["n_time"] = L.TIME_EVERY
     for name, (site, n, _, _) in hooks.items():
         if name != "GUI":
@@ -350,6 +388,8 @@ def main():
         assert len(h) == n and h[0] == 0xDC, (name, h.hex())
         op(site, h, "hook %s (%s): jmp %s%s. %s" % (name, events, label.get(name, "T_" + name), " + nop" * (n - 5),
                                                     what))
+    op(CTOR_ENTRY, struct.pack("<I", sym["T_CTOR"]), "segment 3's constructor table 0x7F033AC8, entry 44 (the last): "
+       "card-looks' C_START -> T_CTOR (seg_loaded, card-looks' STORED, film_applied, then the constructor 0x%08X)" % ctor)
     assert struct.unpack_from("<I", blk, TASK_ENTRY - BASE)[0] == TASK_ENTRY_OLD
     op(TASK_ENTRY, struct.pack("<I", sym["FLUSH"]), "CPU0 task table, row of id 0x91 (USRTEST_B, dormant in stock): "
        "entry 0x%08X -> FLUSH 0x%08X" % (TASK_ENTRY_OLD, sym["FLUSH"]))
@@ -364,10 +404,13 @@ def main():
             "On, the flush task (the dormant task USRTEST_B) appends the records to C:\\\\EPM2LOG.BIN when the GUI "
             "enters a menu, playback or power-off state and neither the card nor card-looks' task is busy (stops at "
             "4 MiB). Events: boot, firmware errors, GUI states, log_setting, the probes of log-probes (peaking, "
-            "picture mode, level gauge, interval shooting, film looks, shooting callbacks), pk_stats, pk_guard and "
-            "card_task (each run of card-looks' task). The code of log-core, log-probes, log-peaking-time and "
+            "picture mode, level gauge, interval shooting, film looks, shooting callbacks), pk_stats, pk_guard, "
+            "card_task (each run of card-looks' task), and seg_loaded and film_applied: the last entry of segment 3's "
+            "constructor table points at T_CTOR, which writes the two records around card-looks' STORED (task Usr1, "
+            "after the segment copies) and then runs the entry's constructor. The code of log-core, log-probes, log-peaking-time and "
             "log-peaking-guard, placed again; the hook of the GUI state setter jumps to this T_GUI, which ends with "
-            "a jump to card-looks' T_GUI. The event ids are in data/logdict/events.json (build id %s). See "
+            "a jump to card-looks' T_GUI. The film loader's labels come from the key _symbols of its spec. The event "
+            "ids are in data/logdict/events.json (build id %s). See "
             "experiments/2026-11-18-log-menu/design.md and docs/reference/logging.md." % bid.hex()),
         "base": STOCK, "base_sha256": stock_sha,
         "_build_id": bid.hex(),

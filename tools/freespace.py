@@ -1059,6 +1059,15 @@ def check_specs(sp, specs, out=print, first_code=False):
         while x in sp.superseded and sp.superseded[x][0] not in later | {"history"}:
             x = sp.superseded[x][0]
             later.add(x)
+    # earlier versions of a given spec, by the same ledger: a current spec that edits an earlier version in place (a
+    # debug build on the earlier version) cannot be in a build with the later one, so it is not a claim against it
+    earlier = []
+    for e in sp.specs:
+        x = e.path
+        while x in sp.superseded and x not in given:
+            x = sp.superseded[x][0]
+        if x in given and e.path not in given:
+            earlier.append(e)
     targets = [t for s in specs for _, t in s.rel_targets()]
     fails = 0
     for s in specs:
@@ -1103,7 +1112,9 @@ def check_specs(sp, specs, out=print, first_code=False):
                 for path, cls, segs in a.ledger_rows:
                     if path in given or path in later or not any(x < hi and y > lo for x, y in segs):
                         continue
-                    if cls == "current" and not sp.is_overlay(path, o, lo, hi):
+                    if cls == "current" and not sp.is_overlay(path, o, lo, hi) and not any(
+                            sp.is_overlay(path, q, lo, hi) for e in earlier for q in e.ops
+                            if q.clo is not None and BASE + q.off <= lo and hi <= BASE + q.off + len(q.new)):
                         problems.append("overlaps ledgered spec %s" % path)
                 notes = []
                 if first and first_code:
@@ -1415,6 +1426,29 @@ def selftest():
         old = [q for q in sp.specs if q.path == x]
         t("%s passes beside its later version %s (a build holds one version)" % (x, by),
           check_specs(sp, old, lines.append) == 0 or not any("overlaps ledgered spec " + by in l for l in lines), "\n".join(lines[:3]))
+    # an edit in place of an earlier version (an overlay on it) is no claim against the later version, but the
+    # overlay's own bytes in free space still are
+    versions = set(sp.superseded) | {v for v, _ in sp.superseded.values()}
+    for x, by in reversed(pair):
+        new = [q for q in sp.specs if q.path == by]
+        edits = [e for e in sp.specs if e.path not in versions and any(
+            sp.is_overlay(e.path, o, BASE + o.off, BASE + o.off + len(o.new)) for q in sp.specs if q.path == x
+            for o in q.ops if o.clo is not None)]
+        if not edits:
+            continue
+        lines = []
+        check_specs(sp, new, lines.append)
+        t("%s is not blocked by %s, an edit in place of its earlier version %s" % (by, edits[0].path, x),
+          not any("overlaps ledgered spec " + edits[0].path in l for l in lines), "\n".join(lines[:3]))
+        own = next(((lo, e) for e in edits for a in map(sp.analyse, sp.areas) for p, c, s in a.ledger_rows
+                    if p == e.path and c == "current" for lo, hi in s
+                    if hi - lo >= 8 and sp.b[lo - BASE:lo - BASE + 8] == b"\xff" * 8), None)
+        if own:
+            fake4 = Spec("selftest/own.json", dict(base, name="fake-own", ops=[
+                {"type": "bytes", "block": 0, "offset": hex(own[0] - BASE), "expect": "ff" * 8, "new": "22" * 8}]))
+            t("a fake spec in %s's own free-space bytes still FAILs beside %s" % (own[1].path, by),
+              check_specs(sp, new + [fake4], quiet) >= 1)
+        break
     bad = dict(SITES)
     try:
         match_site(sp.b, "selftest", bad["boot_load_seg1"][0] + 1, bad["boot_load_seg1"][1])

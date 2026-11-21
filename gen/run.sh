@@ -15,13 +15,14 @@ uv run python gen/interval/mkspec_frames240.py
 uv run python gen/level-gauge/mkspec_step_a.py
 uv run python gen/level-gauge/mkspec_step_b.py
 uv run python gen/peaking/mkspec_direct4.py "$work/peaking-direct4"
-uv run python gen/log-menu/mkspec.py "$work/log-menu"
 uv run python gen/lss-menu/mkspec.py
 uv run python gen/peaking/mkspec_colours.py "$work/peaking-colours"
 uv run python gen/peaking/mkspec_fast.py "$work/peaking-fast"
 uv run python gen/peaking/mkspec_guard.py "$work/peaking-guard"
 uv run python gen/gauge-info/mkspec_gauge_info.py
 uv run python gen/gauge-info/mkspec_gauge_bar_left.py
+# last: it reads the film loader's labels from the loader's spec, and the bytes it hooks from the build's other specs
+uv run python gen/log-menu/mkspec.py "$work/log-menu"
 if [ "${1:-}" = "--check" ]; then
   git diff --exit-code --stat -- data/specs/ || { echo "gen/run.sh: a committed spec differs from its generator's output" >&2; exit 1; }
   echo "gen/run.sh: every generated spec is as committed"

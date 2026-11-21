@@ -1,4 +1,4 @@
-"""Write data/specs/looks-menu-4.json and data/specs/card-looks-7.json: the loader of film simulations for the
+"""Write data/specs/looks-menu-4.json and data/specs/card-looks-8.json: the loader of film simulations for the
 stock-filters firmware (experiments/2026-11-18-stock-filters/design.md). Needs build/stock-films/layout.json
 (gen/stock-films/structure.py).
 
@@ -6,12 +6,17 @@ stock-filters firmware (experiments/2026-11-18-stock-filters/design.md). Needs b
 
 The assembly is loader.s; this file places the tables, fills the fields of loader.s, assembles and links it, and
 writes the two specs. What the code does:
+  * C_START, the last entry of segment 3's constructor table (task Usr1, after the segment copies): applies the
+    stored file (STORED), then runs the entry's own constructor;
   * T_GUI, at the GUI state setter's trace call: starts the task USRTEST_A for a Load, and after a Load maps the
     Picture Mode settings (PMREMAP) and writes the film's name into the EXIF template (FILMNAME);
   * the task: reads C:\\EPM2LOOK.BIN, checks it (VERIFY), keeps it in the EEROM bank's unused tail, writes each listed
     entry's tables into the entry's RAM block (APPLY) and each entry's switch list (SWITCH): the film bytes when the
-    file lists the entry, else the stock bytes; every start applies the stored file;
-  * the menu texts: a loaded entry shows its film's name; the row shows Loaded, No file or Bad file.
+    file lists the entry, else the stock bytes. At the first GUI state of a session it writes the texts and names,
+    and applies the stored file only if C_START found none;
+  * the menu texts: a loaded entry shows its film's name; the row shows Loaded, No file or Bad file. The texts of the
+    rows Peaking and Lowest S/S Setting are written the same way (TEXTS), so they show in every menu language.
+The spec's key `_symbols` holds the labels that gen/log-menu/mkspec.py hooks.
 A camera-tested version stays as its committed spec file (a build names it); this file makes only the current one.
 """
 
@@ -29,9 +34,10 @@ sys.path.insert(0, os.path.join(ROOT, "cli", "src"))
 from epm2mod.container import parse  # noqa: E402
 from epm2mod.looks import lookfile, slots  # noqa: E402
 
-SPEC, MENU = "card-looks-7", "looks-menu-4"
+SPEC, MENU = "card-looks-8", "looks-menu-4"
 OUT = "stock-films"   # build/OUT: layout.json in, syms.json out
-FLAGS_V1, T_END_V1 = 0x7ECB0FCC, 0x7EE5392B   # card-looks-5's FLAGS and T_END: every later version keeps them
+CTOR_ENTRY, CTOR = 0x7F033AC8 + 4 * 44, 0x7EEC05FF   # segment 3's constructor table (45 entries; walker 0x7E44B6B0,
+# called by Usr1 at 0x7E504D81 with d0 = 3): its last entry. It stores a pointer and 0 in two globals
 EXIF_DESC = 0x605BAEC0        # the EXIF template's ImageDescription, 32 B (template 0x605BA918 + 0x5A8)
 EXIF_DESC_STOCK = 0x7E8517C2  # "OLYMPUS DIGITAL CAMERA", which the boot copies there with 0x7E70B0F6
 BASE = slots.BLOCK0_BASE
@@ -62,6 +68,13 @@ assert TAIL[0] <= STORE and STORE + lookfile.MAX_FILE_BYTES <= SCRATCH and SCRAT
 LANG = 0xBFF3D000           # the loaded language's blob; its first word: the address of its pointer array
 LANG_SPAN = 0x43000
 T_LABEL, T_LOAD, T_HELP, T_STATUS, T_OFF = 1498, 1496, 1497, 1495, 1371      # string ids of the row's texts
+# Texts of other specs' rows whose ids the specs set in the English blob only (block 1): the loader writes them into
+# the loaded language's table with its own. The colour names 1499, 1501, 1502 and Off are the language's own words.
+TEXTS = ((1505, "Peaking"),                                                   # peaking-menu: the row's label
+         (1506, "Show lines in that color \r\non sharp edges while\r\nMF Assist magnifies."),   # peaking-colours
+         (1500, "White"),                                                     # peaking-menu: no stock text is "White"
+         (1503, "Lowest S/S Setting"),                                        # lss-menu: label and help
+         (1504, "Choose the shutter speed at\r\nwhich the camera raises\r\nISO in P and A."))
 RAM = 0x7E4D0000            # the RAM gap (cached address); the code uses the uncached alias
 ENGLISH = (0x38B758, 0xBFBC4E20)   # pointer array of the English blob in block 1, and its load bias
 
@@ -206,8 +219,9 @@ def main():
                       ("help", "Load film looks from\r\nEPM2LOOK.BIN on the card."), ("loaded", "Loaded"),
                       ("nofile", "No file"), ("bad", "Bad file"), ("work", "Loading"), ("builtin", "")):
         strings[key] = place(u16s(text))
-    txttab = place(b"".join(struct.pack("<HHI", tid, 0, strings[k]) for tid, k in
-                            ((T_LABEL, "label"), (T_LOAD, "load"), (T_HELP, "help"))))
+    rows = [(T_LABEL, strings["label"]), (T_LOAD, strings["load"]), (T_HELP, strings["help"])]
+    rows += [(tid, place(u16s(text))) for tid, text in TEXTS]
+    txttab = place(b"".join(struct.pack("<HHI", tid, 0, at) for tid, at in rows))
     pmset = place(struct.pack("<%dH" % (len(PMSETTINGS) + 1), *PMSETTINGS, 0))
     pm = b""
     for e in [e for e in layout["entries"] if e["kind"] == "hidden"]:
@@ -224,6 +238,7 @@ def main():
     hook = HOOK
     subs = {"store": STORE, "scratch": SCRATCH, "maxread": MAXREAD, "slottab": slottab, "crct": crct,
             "nameids": nameids, "swtab": swtab, "blocks": blocks_at, "pmset": pmset, "pmmap": pmmap, "txttab": txttab,
+            "txtn": len(rows), "ctor": CTOR,
             "txt_label": strings["label"], "s_loaded": strings["loaded"], "s_nofile": strings["nofile"],
             "s_bad": strings["bad"], "s_builtin": strings["builtin"], "s_work": strings["work"], "lang": LANG,
             "lang_neg": (-LANG) & 0xFFFFFFFF, "lang_span": LANG_SPAN, "label_off": 4 * T_LABEL,
@@ -231,9 +246,6 @@ def main():
             "rw1": REFRESH_WORDS[1], "rb0": REFRESH_BYTES[0], "rb1": REFRESH_BYTES[1],
             "displaced": displaced(stock_block_file(), hook[0], hook[1]),
             "back": hook[0] + hook[1],
-            # FLAGS and T_END stay where card-looks-5 has them (log-menu-2 hooks T_END and repeats its
-            # `movbu d0,(BUSY)`)
-            "flags_org": FLAGS_V1 - RUNS[".tk"][0],
             "desc": EXIF_DESC, "stock": EXIF_DESC_STOCK, "slots": ", ".join("%#x" % v for v in slot_of)}
     asm = open(os.path.join(HERE, "loader.s")).read() % subs
     args = ["--defsym=s_%s=0x%s" % (x, x) for x in sorted(set(re.findall(r"(?:jmp|call)\s+0x([0-9a-f]{8})", asm)))]
@@ -251,7 +263,6 @@ def main():
         run(BIN + "/mn10300-elf-objcopy", "-O", "binary", "-j", name, e, sb)
         return open(sb, "rb").read()
 
-    assert (syms["FLAGS"], syms["T_END"]) == (FLAGS_V1, T_END_V1), (hex(syms["FLAGS"]), hex(syms["T_END"]))
     out = []
 
     def op(addr, new, note):
@@ -281,10 +292,14 @@ def main():
     op(TASK_ENTRY, struct.pack("<I", syms["T_TASK"]),
        "CPU0 task table, row of id 0x90 (USRTEST_A, dormant in stock): entry 0x7E501C5B -> T_TASK")
     op(TASK_ENTRY + 4, b"\x0d", "CPU0 task table, row of id 0x90 (USRTEST_A): priority 11 -> 13")
+    assert get(CTOR_ENTRY, 8) == struct.pack("<I", CTOR) + b"\xff" * 4, "not the last entry of the constructor table"
+    op(CTOR_ENTRY, struct.pack("<I", syms["C_START"]), "segment 3's constructor table 0x7F033AC8, entry 44 (the last): "
+       "0x%08X -> C_START, which applies the stored looks and then jumps to 0x%08X" % (CTOR, CTOR))
     keep = {k: syms[k] for k in ("T_TASK", "T_GUI", "T_STORED", "T_END", "SAVE", "V_OK", "V_BAD", "APPLY", "FLAGS",
-                                 "NAMES", "MASK", "SWITCH", "PMREMAP", "FILMNAME", "FN_PM")}
+                                 "NAMES", "MASK", "SWITCH", "PMREMAP", "FILMNAME", "FN_PM", "C_START", "STORED")}
+    hooked = {k: "0x%08X" % syms[k] for k in ("T_GUI", "T_END", "FLAGS", "C_START", "STORED")}
     json.dump({**keep, "STORE": STORE, "SCRATCH": SCRATCH, "RAM": RAM, "IDS": ids, "STRINGS": strings,
-               "BLOCKS": blocks}, open(os.path.join(ROOT, "build", OUT, "syms.json"), "w"))
+               "BLOCKS": blocks, "TXTTAB": [list(r) for r in rows]}, open(os.path.join(ROOT, "build", OUT, "syms.json"), "w"))
     json.dump({"name": SPEC, "description": (
         "Film looks loaded from the SD card onto the stock art filters (experiments/2026-11-18-stock-filters/"
         "design.md), with the menu row Load Looks (data/specs/looks-menu-4.json: Off / Load). Load reads C:\\\\EPM2LOOK.BIN, "
@@ -298,8 +313,15 @@ def main():
         "template's ImageDescription (0x%08X): the film's name when the stored Picture Mode is an entry with a film, "
         "else Olympus's text." % EXIF_DESC) + (" Version 7 (experiments/2026-11-20-model-calibration/"
         "NOTES.md §6): the switch lists of data/specs/stock-films-structure-3.json, where an in-place entry with a film "
-        "also gets no 12-region table.")),
+        "also gets no 12-region table.") + (" Version 8 (experiments/2026-11-21-firmware-dive/plan.md): the last entry "
+        "of segment 3's constructor table (0x%08X) points at C_START, which applies the stored file in task Usr1 after "
+        "the segment copies and then runs the entry's constructor 0x%08X; the task at the first GUI state writes the "
+        "texts and names, and applies the stored file only if C_START found none. The text table also holds the "
+        "English texts of the rows Peaking (ids 1505, 1506, 1500) and Lowest S/S Setting (1503, 1504), so both rows "
+        "show them in every menu language. FLAGS and T_END are no longer at fixed addresses: `_symbols` gives the "
+        "labels that data/specs/log-menu-3.json hooks." % (CTOR_ENTRY, CTOR))),
         "base": STOCK, "base_sha256": sha,
+        "_symbols": hooked,
         "_ram": "the EEROM bank's unused tail: store 0x%08X, scratch 0x%08X; RAM: status, names 0x%08X-0x%08X; the "
                 "entries' blocks 0x%08X-0x%08X; 5 flag bytes in the code" % (STORE, SCRATCH, RAM, RAM + 0x800,
                                                                          blocks[0], blocks[-1] + layout["block"]),
