@@ -34,7 +34,7 @@ Other Olympus generations, and what each can be modded to do: [model-matrix.md](
 | No radio, no viewfinder, no microphone jack | Hardware | Manual |
 | No 4K, no RAW video | Hardware | Sensor modes in the firmware (table 0x7E7BA370); card path about 25 to 28 MB/s (measured on the E-M5) |
 | 1080p at 30 fps only; the 60, 120 and 240 fps modes drop most lines | Hardware, as far as known | Sensor mode table; no sensor register map found |
-| No 3D lookup table; per-colour control is a six-axis stage, and for stills a 12-region stage ([colour-pipeline.md](colour-pipeline.md)) | Image processor | Firmware search; measured stages (the 12-region stage read, not yet camera-tested) |
+| No 3D lookup table; per-colour control is a six-axis stage, and for stills a 12-region stage ([colour-pipeline.md](colour-pipeline.md)) | Image processor | Firmware search; measured stages (the 12-region stage camera-tested 2026-11-20 with test tables) |
 | No colour wheel in live view or movies: the 12-region hue, saturation and lightness stage runs for stills only | Image processor | Stage at 0x7E76C3C8, pipe A only ([caduceus review 05 §4](../../experiments/2026-11-11-caduceus-review/05-imaging-pipeline-and-limits.md#4-the-12-region-stage)) |
 | A film simulation is a set of tables chosen by art-filter number | Firmware design | Read from the firmware. The tables are in RAM, and a Load writes them (camera-tested 2026-11-17) |
 | 128 rows in one menu list | Firmware | Camera-tested |
@@ -83,6 +83,10 @@ Other Olympus generations, and what each can be modded to do: [model-matrix.md](
 - ~~Level gauge~~ **Done on 2026-11-14 with three data edits and no code.** The whole feature was in
   the firmware; only a menu row was missing. Lesson: compare with the E-PL6 first. It shares 58,642
   identical functions with this body (the E-P5: 21,940).
+- ~~Film simulations without Natural's 12-region table~~ **Done on 2026-11-21** (`films-twelve-off`). The film codes get a
+  12-region table with every record off; Olympus's filters keep theirs. All 31 colour films were corrected from a camera
+  round on the build and measured again: every one is closer to its target on natural colours, hold-out colours and the
+  ColorChecker (median natural colours 1.19 -> 1.04; per film: [film-emulation.md](film-emulation.md) §4).
 - ~~Film simulations as fitted, and their names in the photo~~ **Done on 2026-11-20** (`films-look-exif`). Since
   2026-11-18 the card path had given every film Cross Process I's look curve (ΔL* −5 … +6); the films now use the
   identity look, and all 32 films were developed on the camera and corrected where needed. A photo with a film
@@ -122,8 +126,10 @@ Checked 2026-11-18 against the four public mods that have one, after users asked
 **What this means for the E-PM2 (TruePic VI).** TruePic VI has a 12-region hue, saturation and lightness stage
 for stills. Table A is at 0x7E76C3C8 and table B at 0x7E76CF9C: 12 records of 28 bytes each, with an enable mask
 at +3024 (builder 0x7E56E186). The stage runs in pipe A only: stills and RAW Data Edit. Live view and standard
-movie use pipe B, which has no 12-region stage. Every film code falls back to Natural's table A (read before the card path existed; a camera test is being built). EPM2Mod does not
-write this table. Evidence: [caduceus review 05 §4](../../experiments/2026-11-11-caduceus-review/05-imaging-pipeline-and-limits.md#4-the-12-region-stage).
+movie use pipe B, which has no 12-region stage. Since `films-twelve-off` (2026-11-21) the film simulations get a table
+with every record off; before, they got Natural's table A, which cost them 0.07–0.10 ΔE on natural colours
+(`experiments/2026-11-20-model-calibration/NOTES.md` §6). EPM2Mod writes no table of its own: the probe's rules
+predict a real table only in part. Evidence: [caduceus review 05 §4](../../experiments/2026-11-11-caduceus-review/05-imaging-pipeline-and-limits.md#4-the-12-region-stage).
 A 12-colour editor for stills is possible in principle. It is not built. It would not show in live view or
 movies. The stage, its table and Natural's values in detail: [colour-pipeline.md](colour-pipeline.md).
 

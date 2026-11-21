@@ -10,12 +10,9 @@ and delete the item here.
 - RAW Data Edit → ART BKT (one RAW developed in every selected ART entry), a developer tool for film-simulation tests,
   not for release: works on the camera (calibration run and the films-twelve-off round, 2026-11-20); kept in test
   builds only (`experiments/2026-11-20-raw-edit-art-bkt/NOTES.md`).
-- No 12-region table for the film simulations (films-twelve-off): correct each film from the 2026-11-20 round, confirm
-  with one ART BKT round, pin (`experiments/2026-11-20-model-calibration/NOTES.md` §7-8).
-- Each film simulation's measured numbers (camera against its target: natural colours, ColorChecker, skin; date and
-  build) in a per-film table in `docs/dev/film-emulation.md`, after the confirmation round.
-- Recalibrate `model2` for the camera without the 12-region stage (its constants were fitted with Natural's table on;
-  camera against model improves 0.86 -> 0.72 on natural colours without it), from the 2026-11-20 table-off readings.
+- One more correction round from the 2026-11-21 readings, weighted for skin and grays: 12 films lost 0.07–0.24 on skin
+  against films-look-exif, and grays improved less than model3 predicted (0.75 against 0.63)
+  (`experiments/2026-11-20-model-calibration/NOTES.md` §11).
 - Per-film 12-region tables: only after the stage rules predict a real table (`experiments/2026-11-20-model-calibration/NOTES.md` §6).
 
 ## One-click installer

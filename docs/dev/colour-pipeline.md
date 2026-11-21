@@ -18,7 +18,7 @@ Order **[C]** for stages 1 to 6 (each was changed on its own and measured, `../.
 | 4 | Tone curves (0x7E56B790) | per channel a table of 256 × u16 (8 tables per record) | brightness and contrast per channel; colour casts that depend on brightness | the film's three curves |
 | 5 | Look curve on luma (0x7E56E837) | 256 × u16 | one more brightness curve on luma | the identity table 0x7E75B8F0 |
 | 6 | Saturation gain (0x7E56DC71), chroma curves (0x7E5662D9) | a gain pair; two curves of points and slopes on Cb and Cr | how strongly colour shows, as a function of its strength | the film's gain and two curves (where the chroma curves sit among stages 5 and 6 is [I]) |
-| 7 | 12-region hue, saturation and lightness (builder 0x7E56E186) | a table of 3028 bytes (§2) | selective changes to colours that fall in up to 12 regions | **nothing yet**: every film code gets Natural's table A **[R]** |
+| 7 | 12-region hue, saturation and lightness (builder 0x7E56E186) | a table of 3028 bytes (§3) | selective changes to colours that fall in up to 12 regions | **no table**: every film code gets a table with every record off (`stock-films-structure-3`); Olympus's filters keep theirs **[C]** |
 | 8 | JPEG | camera settings | sharpening, noise reduction, 8-bit Y/Cb/Cr | nothing |
 
 Live view and standard movie use a second path (pipe B) without stage 7 **[R]** (code and emulator,
@@ -43,8 +43,8 @@ jump table 0x7E854A24) turns value and type (I, II, III) into one byte, the art 
 Other code also switches on the art code: the effect filters' pixel program after development (ART task 0x7E729E25),
 Cross Process's scene-adaptive hue routine (0x7E5460F0), Pale&Light's white-balance change.
 
-**How a film gets there today [R; camera-tested as a whole 2026-11-18 and 2026-11-20].** `stock-films-structure-2`
-(`gen/stock-films/structure.py` at the commit that made it) gives each ART entry one film code; the loader (`card-looks-6`) switches the
+**How a film gets there today [R; camera-tested as a whole 2026-11-18, 2026-11-20 and 2026-11-21].** `stock-films-structure-3`
+(`gen/stock-films/structure.py`) gives each ART entry one film code; the loader (`card-looks-7`) switches the
 entry's routing words when a film file lists it and writes the film's tables into the entry's RAM block
 (0x7E4D1000 + 0x3200 × entry: tone tables for stills and live view, saturation, six-axis, chroma, matrix). An entry
 the file leaves out gets its stock words back.
@@ -67,7 +67,8 @@ the file leaves out gets its stock words back.
 Each film code gets a tone stub with its own three records (so R, G and B differ), saturation, six-axis and chroma
 stubs that point at the RAM block, a matrix chain, and the identity look through the stub `LKID` (until
 `films-look-exif`, 2026-11-20, the look entry pointed at Cross Process I's handler and table: every film got its
-S-curve). Design and evidence: `../../experiments/2026-11-18-stock-filters/design.md` (its RAM address
+S-curve), and a 12-region table with every record off (§3; until `films-twelve-off`, 2026-11-21, Natural's table
+A). Design and evidence: `../../experiments/2026-11-18-stock-filters/design.md` (its RAM address
 0x7E4D8000 / 0x2000 is out of date; the generator has 0x7E4D1000 / 0x3200).
 
 **Facts a fit relies on [C].**
@@ -89,8 +90,9 @@ the lightness by Z". The processor applies it in hardware; the CPU only uploads 
 The selector 0x7E56E661 takes the art code (job+79), looks it up in the hash 0x7E78C6E4 (64 slots, key = art code − 8,
 linear probing, key 0 = empty; 43 used), and without a hit takes a default by picture mode (0x7E56A8B7). Natural,
 i-Enhance, Custom, Monotone, Vivid, Portrait get table A; Gentle Sepia, Key Line, Cross Process II and Watercolor have
-their own; Dramatic Tone has another path. On the current build every film code gets table A or a byte copy of it
-(emulator, 2026-11-20). Table B serves the Adobe RGB colour space, which ART locks to sRGB (manual p. 66): films
+their own; Dramatic Tone has another path. On `films-twelve-off` every film code gets OFFDESC, whose table has
+enable mask 0, so no region acts (an in-place code only while its entry has a film; otherwise the stock filter keeps
+its table); before it, every film code got table A (emulator and camera, 2026-11-20 and 2026-11-21). Table B serves the Adobe RGB colour space, which ART locks to sRGB (manual p. 66): films
 never get it. A second builder (0x7E55E2CE) prebuilds a fixed list of tables at start; what uses its output is not
 traced.
 
@@ -102,23 +104,24 @@ curve pointers. A record:
 
 | Bytes | Field | Meaning |
 |---|---|---|
-| 0–1, 2–3 | hue start, hue width | an arc of the colour wheel, 32768 = 360° [I] |
-| 4–5, 6–7 | chroma start, width | how saturated a pixel must be |
-| 8–9, 10–11 | luma start, width | how bright a pixel must be, 0–1024 [I] |
-| 12–13 | hue shift | 32768 = 360° (1365 = 15°) [I] |
-| 14–15 | saturation change | units unknown |
-| 16–17 | lightness change | units unknown |
+| 0–1, 2–3 | hue start, hue width | an arc of the colour wheel: hue = atan2(Cr, Cb), 32768 = 360° [C] |
+| 4–5, 6–7 | chroma start, width | how saturated a pixel must be: about 6 units per 8-bit Cb/Cr radius [C, one hue off] |
+| 8–9, 10–11 | luma start, width | how bright a pixel must be: 4.05 × 8-bit Y [C] |
+| 12–13 | hue shift | 32768 = 360° within about 3° up to ±30° [C]; larger shifts fall short |
+| 14–15 | saturation change | added to the chroma radius, about 0.24 codes per unit on the probe's tables [C] |
+| 16–17 | lightness change | added to Y, about 0.24 codes per unit (L / 4) on the probe's tables [C] |
 | 18–19, 26–27 | none | never read by the builder [R] |
 | 20–25 | multiplier and shift of the hue, chroma and luma windows | width × multiplier >> shift = 256 in every stock record [R] |
 
 Curve roles [I, from the stock tables]: c5 luma; c0 and c3 saturation along hue and along chroma; c2 lightness along
 chroma; c4 hue shift along chroma; c1 and c6 lightness and hue shift along hue (which is which is unknown).
 
-**Per pixel [I].** In Y/Cb/Cr after the tone curves (its order against stage 5 is not established): hue = angle of
-(Cb, Cr), chroma = its length, luma = Y. Each enabled record gives a weight from 0 to 1, the product of how far the
-pixel lies inside its hue, chroma and luma windows (soft edges from the curves). The weighted hue shifts are
-added, chroma is scaled by the weighted saturation changes, the weighted lightness changes are added; the result goes
-back to Y/Cb/Cr.
+**Per pixel** (camera probe, `../../experiments/2026-11-20-twelve-region/NOTES.md` §8). In Y/Cb/Cr after the tone
+curves and before the look curve [C] (before or after the saturation gain: not resolved): hue = angle of (Cb, Cr),
+chroma = its length, luma = Y [C]. A pixel is inside a record's windows or not: the edges are hard [C]; inside, the
+curves weight the effect [I]. The weighted changes of overlapping records add [C]; a record whose bit in the mask is
+off has no effect [C]. Saturation adds to the chroma radius, lightness to Y [C on the probe's tables; real tables fit
+smaller constants, an open point].
 
 **Natural's table A [R]** (mask 0x38F: records 0–3 and 7–9 on). Colour names assume hue = atan2(Cr, Cb) (record 2's
 arc is centred on 289.5°; pure cyan is at 288.7°) [I]:
@@ -133,7 +136,9 @@ arc is centred on 289.5°; pure cyan is at 288.7°) [I]:
 | 8 | 151–195° | yellow, bright | 102–646 | 744–1020 | −8° | +80 | +64 |
 | 9 | 147–216° | pale yellow-green | 5–101 | 83–1106 | +18° | −8 | 0 |
 
-Every film currently carries these: warmer, stronger yellows; darker, stronger cyans; paler bright skies.
+Until `films-twelve-off` every film carried these: warmer, stronger yellows; darker, stronger cyans; paler bright skies.
+On the camera they cost the films 0.07–0.10 ΔE on natural colours
+(`../../experiments/2026-11-20-model-calibration/NOTES.md` §6).
 
 **Six-axis and 12-region compared**
 
@@ -147,8 +152,9 @@ Every film currently carries these: warmer, stronger yellows; darker, stronger c
 
 A film's colour signature is often a selective change that six fixed axes cannot make: Velvia darkens blue skies,
 Kodachrome darkens reds, portrait negatives soften orange skin and keep reds. The ColorChecker residual of the films
-(1.4–2.5 ΔE) sits in those colours. Whether per-film 12-region tables reduce it is not measured; the camera test of
-`../../experiments/2026-11-20-twelve-region/` establishes the stage on this camera first.
+(1.3–2.5 ΔE) sits in those colours. Three fitted per-film tables, tried on the camera, gained about 0.1 on the
+ColorChecker; the rules of this section explain a real table only in part (Natural's: 1.8 of a 2.7-code change left
+over), so per-film tables wait for better rules (`../../experiments/2026-11-20-model-calibration/NOTES.md` §6).
 
 ## 4. Limits that no table changes
 

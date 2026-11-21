@@ -191,7 +191,7 @@ describe('the local app', () => {
   it('keeps its default film simulations: the look file of the repository tool', async () => {
     expect(PRESET).toHaveLength(12)
     expect(await sha256(lookFile(presetSlots()))).toBe(
-      '98d0ce5ca04b2ecf33ce5737c07a3cd332ac6c2dc937a04eb4cb1fb0aa050748',
+      'f0e433aed9ca93a143582aa06decf57b6c172a8ac6ed77b2da9f92669d3b93e4',
     )
   })
 

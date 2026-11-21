@@ -1,12 +1,12 @@
 # Install
 
 <!-- BEGIN GENERATED: pinned-build -->
-The installer and `install` write the firmware **`films-look-exif`**: the twelve Olympus art filters unchanged; film simulations loaded from the SD card with Custom Menu J, Load Looks, overwrite the entries the file lists, and a photo taken with one records the film's name (EXIF ImageDescription); interval shooting with up to 240 frames, a level gauge with calibration that keeps the shooting information of the histogram screen (as the PEN-F does), and focus peaking; a Debug Log row in Custom Menu J (Off by default) that writes EPM2LOG.BIN to the card for developers; a Lowest S/S Setting row in Custom Menu E (the shutter speed at which ISO Auto starts to rise in P and A); the Firmware screen shows the build's label (Body : 1.6 EPM2Mod 2026.11.20). We tested this build on a real E-PM2 on 2026-11-20 ([camera log](../camera-log/)).
+The installer and `install` write the firmware **`films-twelve-off`**: the twelve Olympus art filters unchanged; film simulations loaded from the SD card with Custom Menu J, Load Looks, overwrite the entries the file lists, without Natural's selective colour changes on top, and a photo taken with one records the film's name (EXIF ImageDescription); interval shooting with up to 240 frames, a level gauge with calibration that keeps the shooting information of the histogram screen (as the PEN-F does), and focus peaking; a Debug Log row in Custom Menu J (Off by default) that writes EPM2LOG.BIN to the card for developers; a Lowest S/S Setting row in Custom Menu E (the shutter speed at which ISO Auto starts to rise in P and A); the Firmware screen shows the build's label (Body : 1.6 EPM2Mod 2026.11.20). We tested this build on a real E-PM2 on 2026-11-21 ([camera log](../camera-log/)).
 
 | | sha256 |
 |---|---|
 | Stock firmware, `OLY_E_101_1600_0000_0000.BIN` | `34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300` |
-| Pinned build, `films-look-exif` | `af4bcb38df908c3d29b3ef028059a3142cbecc4b66737f7bb2cc2848d6a4bcf4` |
+| Pinned build, `films-twelve-off` | `600041b3d24c67116004f7869d001a9b342599f0c081cf444afc572fcfac09ec` |
 <!-- END GENERATED: pinned-build -->
 
 The install steps are in the [README](../../README.md#install).

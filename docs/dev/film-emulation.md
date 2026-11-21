@@ -72,49 +72,87 @@ processing of real scenes (flat patches: no noise reduction, sharpening or local
 
 1. **Model fit.** A model of the camera (`model2.py`: it predicts the JPEG of any raw input for given stage values)
    is fitted to the target with no camera involved: `fit_film2.py --lut TARGET --name NAME`. The model's constants
-   come from developments of the test RAW alone (`calib/model2.npz`); it predicts the stock picture modes to about
-   0.9 ΔE.
+   come from developments of the test RAW alone: `calib/model3.npz`, fitted on the 31 colour films developed on the
+   camera without the 12-region stage (`experiments/2026-11-20-model-calibration/NOTES.md` §10); on films it was not
+   fitted to it predicts the camera to 0.6–0.7 ΔE on natural colours.
 2. **Camera reading.** Develop the test RAW with the film, read it.
 3. **Correction.** Refit, predicting each patch as "what the camera measured, plus the change the model expects":
    `fit_film2.py --name NAME2 --anchor READING FIT.npz`. Only the change relies on the model. Develop again and score.
 
-One correction is normally enough: a second round was predicted to gain 0.1 or less for the films corrected so far.
+One correction is normally enough: in the round of 2026-11-21 every film landed within 0.02 of its prediction on natural
+colours.
 
-## 4. Results (2026-11-20, all 32 films on `films-look-exif`)
+## 4. Results (2026-11-21, all 32 films on `films-twelve-off`)
 
-Camera against target, ΔE2000, range over the films of each batch (`experiments/2026-11-20-film-camera-round/NOTES.md`
-§7):
+Each film's camera development of `PB130001.ORF` against its target, ΔE2000, mean over the group
+(`experiments/2026-11-20-model-calibration/NOTES.md` §11). The film simulations get no 12-region table on this build
+([colour-pipeline.md](colour-pipeline.md) §1); each fit was corrected from a camera reading on it.
 
-| Films | Natural colours | ColorChecker × 5 | Skin | Camera against model (natural) |
-|---|---|---|---|---|
-| 7 corrected in 2026-11 (Portra 400, Ektachrome, Pro 400H, Kodachrome, Vis 250D, Velvia, Superia 400) | 1.07–1.44 | 1.41–1.96 | 0.80–1.56 | 0.85–1.15 |
-| 12 spektrafilm films corrected 2026-11-20 | 1.12–1.44 | 1.56–2.54 | 0.85–1.78 | 0.81–1.03 |
-| Vis 200T, Tri-X, 10 Spectral Film LUT films, corrected 2026-11-20 | 0.80–1.24 | 1.48–2.40 | 0.32–1.38 | 0.17–0.97 |
+| Film simulation | Target | Natural colours | ColorChecker × 5 | Skin | Grays |
+|---|---|---|---|---|---|
+| Portra 400 | spektrafilm | 1.08 | 1.53 | 1.21 | 0.85 |
+| Ektachrome | spektrafilm | 1.13 | 1.65 | 1.32 | 0.72 |
+| Pro 400H | spektrafilm | 1.00 | 1.39 | 1.02 | 0.64 |
+| Kodachrome | spektrafilm | 0.95 | 1.28 | 0.88 | 0.84 |
+| Double-X | spektrafilm | — | — | — | — |
+| Vis 250D | spektrafilm | 0.97 | 1.53 | 1.15 | 0.71 |
+| Velvia | spektrafilm | 1.29 | 1.81 | 1.56 | 0.74 |
+| Superia 400 | spektrafilm | 1.21 | 1.95 | 1.56 | 0.75 |
+| Provia | spektrafilm | 1.02 | 1.58 | 0.89 | 0.70 |
+| Portra 160 | spektrafilm | 1.04 | 1.49 | 1.07 | 0.82 |
+| Gold 200 | spektrafilm | 1.07 | 1.53 | 1.24 | 0.71 |
+| Vis 500T | spektrafilm | 0.97 | 1.51 | 0.96 | 0.63 |
+| Ektar 100 | spektrafilm | 1.05 | 1.76 | 0.99 | 0.79 |
+| Portra 800 | spektrafilm | 0.96 | 1.54 | 1.27 | 0.78 |
+| Portra 800 +1 | spektrafilm | 1.16 | 2.11 | 1.39 | 0.87 |
+| Portra 800 +2 | spektrafilm | 1.36 | 2.53 | 1.78 | 0.92 |
+| Tri-X | spektrafilm | 0.74 | 1.42 | 0.37 | 0.38 |
+| C200 | spektrafilm | 1.15 | 1.72 | 1.47 | 0.71 |
+| UltraMax 400 | spektrafilm | 1.04 | 1.54 | 1.09 | 0.88 |
+| Verita 200D | spektrafilm | 0.98 | 1.73 | 1.19 | 0.68 |
+| Vis 50D | spektrafilm | 1.03 | 1.60 | 1.08 | 0.64 |
+| Vis 200T | spektrafilm | 1.04 | 1.58 | 0.98 | 0.67 |
+| Velvia 50 | Spectral Film LUT | 1.05 | 1.79 | 1.02 | 0.60 |
+| Natura 1600 | Spectral Film LUT | 1.04 | 2.17 | 1.07 | 0.89 |
+| Pro 160S | Spectral Film LUT | 0.99 | 1.78 | 0.92 | 0.89 |
+| Superia Reala | Spectral Film LUT | 1.11 | 1.94 | 1.04 | 0.84 |
+| Agfa Vista 100 | Spectral Film LUT | 1.09 | 2.04 | 1.33 | 0.88 |
+| Vericolor III | Spectral Film LUT | 1.04 | 2.20 | 1.19 | 0.84 |
+| Aerocolor IV | Spectral Film LUT | 0.89 | 1.72 | 0.93 | 0.82 |
+| Eterna 500 | Spectral Film LUT | 0.92 | 1.52 | 0.80 | 0.63 |
+| EXR 200T | Spectral Film LUT | 0.99 | 2.03 | 1.17 | 0.56 |
+| FP-100C | Spectral Film LUT | 1.04 | 2.31 | 1.05 | 0.79 |
 
-Stock Natural against the same targets: 3.9–6.0 on natural colours. Double-X is scored in black and white: the camera
+Median over the 31 colour films: natural colours 1.04 (0.74–1.36), hold-out colours 1.06, ColorChecker 1.72
+(1.28–2.53), skin 1.08, grays 0.75. On `films-look-exif` (Natural's 12-region table on every film) the same films gave
+1.19, 1.23, 1.82, 1.14 and 0.84; every film is closer to its target on natural colours, hold-out colours and the
+ColorChecker. Stock Natural against the same targets: 3.9–6.0 on natural colours. Double-X is scored in black and white: the camera
 matches its model to 0.11, and the fit is 0.07 L* from its target.
 
 How to read this:
 
 - **Ordinary colours, skin and grays are at "visible only side by side" or better** for every film.
 - **Saturated chart colours are the weak spot** (single patches 3 to 10 off, worst when overexposed): the six-axis
-  stage cannot treat neighbouring hues or dark and bright colours separately. The 12-region stage could; it is being
-  tested ([colour-pipeline.md](colour-pipeline.md) §3).
+  stage cannot treat neighbouring hues or dark and bright colours separately. The camera's 12-region stage could, but
+  a table for it cannot yet be predicted well enough to fit one per film
+  (`experiments/2026-11-20-model-calibration/NOTES.md` §6).
 - **Edge-of-gamut colours stay 11 to 17 off** for every film (stock Natural 14 to 22): after the colour matrix one
   channel goes negative, the tone curves darken it and the camera caps chroma. A limit of the camera.
-- **Floor:** about 0.8 on natural colours and 0.9 on grays (8-bit JPEG and the camera's rounding).
+- **Floor:** about 0.7 on natural colours (8-bit JPEG and the camera's rounding): the camera matches the model to
+  0.6–0.7 on films it was not fitted to.
 - **For scale:** a tenth of a stop of exposure moves the picture about 1.2; auto white balance drifting 2 % about 0.7.
 - **Scene independence:** in the blue-scene test all 2,194 repeated patches matched the main image (Portra,
   Ektachrome, Pro 400H, 2026-11-12).
-- **Weakest:** Portra 800 +1 and +2 (ColorChecker 2.2 and 2.5; their catalogue note says "less accurate"), and
-  among the Spectral Film LUT films Natura 1600, FP-100C, Vericolor III and Agfa Vista 100 (ColorChecker 2.3–2.4).
+- **Weakest:** Portra 800 +2 (ColorChecker 2.53, skin 1.78) and Portra 800 +1 (2.11; their catalogue note says
+  "less accurate"), and among the Spectral Film LUT films Natura 1600, FP-100C, Vericolor III and Agfa Vista 100
+  (ColorChecker 2.0–2.3).
 
 ## 5. Limits and open points
 
 - The films match a **simulation**; nobody has compared them with real film here.
 - No grain or halation.
-- Live view and movies show the film (camera-tested 2026-11-18) through stages 1 to 6 only; how close they are to the
-  photo is not measured.
+- Live view and movies show the film (camera-tested 2026-11-18) through stages 1 to 6, as the photo now does (no
+  12-region table for the films); how close they are to the photo is not measured.
 - White balance presets Shade (7500 K) and Incandescent (3000 K) were measured, and the films hold
   (`experiments/2026-11-09-film-portra/NOTES.md` §44).
 - RAW Data Edit froze and restarted the camera twice (2026-11-12): one cause was found and fixed (`seven-fixes-1`);

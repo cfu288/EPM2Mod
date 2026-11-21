@@ -3,22 +3,22 @@
   {
    "entry": "Pop Art",
    "name": "Portra 400",
-   "fit": "data/films/fits/portra.npz"
+   "fit": "data/films/fits/portra-n2.npz"
   },
   {
    "entry": "Soft Focus",
    "name": "Ektachrome",
-   "fit": "data/films/fits/ektachrome.npz"
+   "fit": "data/films/fits/ektachrome-n2.npz"
   },
   {
    "entry": "Pale&Light Color",
    "name": "Pro 400H",
-   "fit": "data/films/fits/pro400h.npz"
+   "fit": "data/films/fits/pro400h-n2.npz"
   },
   {
    "entry": "Light Tone",
    "name": "Kodachrome",
-   "fit": "data/films/fits/kodachrome64.npz"
+   "fit": "data/films/fits/kodachrome64-n2.npz"
   },
   {
    "entry": "Grainy Film",
@@ -28,37 +28,37 @@
   {
    "entry": "Pin Hole",
    "name": "Vis 250D",
-   "fit": "data/films/fits/vision3250d.npz"
+   "fit": "data/films/fits/vision3250d-n2.npz"
   },
   {
    "entry": "Diorama",
    "name": "Velvia",
-   "fit": "data/films/fits/velvia100.npz"
+   "fit": "data/films/fits/velvia100-n2.npz"
   },
   {
    "entry": "Cross Process",
    "name": "Superia 400",
-   "fit": "data/films/fits/superia400.npz"
+   "fit": "data/films/fits/superia400-n2.npz"
   },
   {
    "entry": "Gentle Sepia",
    "name": "Provia",
-   "fit": "data/films/fits/provia100f-c1.npz"
+   "fit": "data/films/fits/provia100f-n2.npz"
   },
   {
    "entry": "Dramatic Tone",
    "name": "Portra 160",
-   "fit": "data/films/fits/portra160-c1.npz"
+   "fit": "data/films/fits/portra160-n2.npz"
   },
   {
    "entry": "Key Line",
    "name": "Gold 200",
-   "fit": "data/films/fits/gold200-c1.npz"
+   "fit": "data/films/fits/gold200-n2.npz"
   },
   {
    "entry": "Watercolor",
    "name": "Vis 500T",
-   "fit": "data/films/fits/vision3500t-c1.npz"
+   "fit": "data/films/fits/vision3500t-n2.npz"
   }
  ]
 }

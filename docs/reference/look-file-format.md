@@ -119,10 +119,10 @@ function crc32(bytes) {
 ## Test vector
 
 `uv run epm2mod films pack data/films/card-looks.json -o FILE` gives 20,528 bytes with sha256
-`98d0ce5ca04b2ecf33ce5737c07a3cd332ac6c2dc937a04eb4cb1fb0aa050748`. Its first 32 bytes:
+`f0e433aed9ca93a143582aa06decf57b6c172a8ac6ed77b2da9f92669d3b93e4`. Its first 32 bytes:
 
 ```
-00000000: 45 50 4c 4b 01 0c ac 06 30 50 00 00 ef 34 52 af 
+00000000: 45 50 4c 4b 01 0c ac 06 30 50 00 00 30 01 d0 72
 00000010: 01 01 60 01 00 00 00 00 00 00 00 00 00 00 00 00
 ```
 
