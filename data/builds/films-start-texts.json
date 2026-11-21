@@ -1,5 +1,5 @@
 {
- "what": "CANDIDATE, not camera-tested: films-twelve-off with the stored film simulations applied when the firmware's segments are loaded, before the first screen, and again at the first screen as films-twelve-off does; the Custom Menu rows Peaking and Lowest S/S Setting with their own texts in every menu language (in English, as before); and two Debug Log records at power-on, seg_loaded and film_applied (experiments/2026-11-21-firmware-dive/plan.md)",
+ "what": "The twelve Olympus art filters unchanged; film simulations loaded from the SD card with Custom Menu J, Load Looks, overwrite the entries the file lists, without Natural's selective colour changes on top, are applied at power-on before the first picture, and a photo taken with one records the film's name (EXIF ImageDescription); interval shooting with up to 240 frames, a level gauge with calibration that keeps the shooting information of the histogram screen (as the PEN-F does), and focus peaking; a Debug Log row in Custom Menu J (Off by default) that writes EPM2LOG.BIN to the card for developers; a Lowest S/S Setting row in Custom Menu E (the shutter speed at which ISO Auto starts to rise in P and A); the added menu rows read the same in every menu language; the Firmware screen shows the build's label (Body : 1.6  EPM2Mod 2026.11.20)",
  "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "data/specs/interval-timelapse-v2.json",
@@ -22,6 +22,8 @@
   "data/specs/gauge-info.json",
   "data/specs/gauge-bar-left-2.json"
  ],
+ "sha256": "d8eef426227be0f7fc4925626f519afe33178e12205fad97d6701a56bcb39ba0",
+ "camera_tested": "2026-11-21",
  "first_code": true,
  "label": "2026.11.20"
 }

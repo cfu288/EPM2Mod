@@ -17,6 +17,6 @@ Turn the focus ring. The lines appear in the zoomed view and disappear when the 
 ## Limits
 
 - The lines only appear in the zoomed view of MF Assist.
-- The **Peaking** menu row is only named correctly when the camera language is English.
+- The texts **Peaking** and **White** are English in every menu language.
 
 For implementation details, see the [focus peaking notes](../../experiments/2026-11-14-focus-peaking/NOTES.md).

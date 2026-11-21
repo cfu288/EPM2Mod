@@ -5,7 +5,7 @@ card. `epm2mod log` turns the file into a short report, or its events into JSON 
 are in [experiments/2026-11-15-log/NOTES.md](../../experiments/2026-11-15-log/NOTES.md).
 
 The pinned build has the log in the firmware, switched by the Custom Menu row **Debug Log**
-(MENU → SETUP → Custom Menu → J → Debug Log → On; Off by default; [setup](../user/debug-log.md)): `data/specs/log-menu-2.json`, the code of the four specs below
+(MENU → SETUP → Custom Menu → J → Debug Log → On; Off by default; [setup](../user/debug-log.md)): `data/specs/log-menu-3.json`, the code of the four specs below
 with an Off switch ([log-menu design](../../experiments/2026-11-18-log-menu/design.md)). It was first pinned in
 `data/builds/log-menu.json`.
 
@@ -16,7 +16,7 @@ with an Off switch ([log-menu design](../../experiments/2026-11-18-log-menu/desi
 | Dictionary | `data/logdict/events.json` | The id, name, level and argument formats of each event, and name tables for values. The camera stores no text |
 | Dictionaries of flashed builds | `data/logdict/events-BUILDID.json` | The event list of a build that was on a camera, kept when `events.json` changes |
 | Generator | `experiments/2026-11-15-log/scripts/mkspec_log.py` | Reads the dictionary and writes the two patch specs |
-| Generator of the release log | `experiments/2026-11-18-log-menu/scripts/mkspec_logmenu.py` | Writes `data/specs/log-menu-2.json` (with `--stock-films`). It imports `mkspec_log.py` |
+| Generator of the release log | `gen/log-menu/mkspec.py` | Writes `data/specs/log-menu-3.json`. It imports `gen/log-menu/mkspec_log.py` and reads the film loader's symbols from `data/specs/card-looks-8.json` |
 | Log core | `data/specs/log-core.json` | `log_put`, `log_chg`, `log_cnt`, the flush task, and the events boot, firmware error and GUI state |
 | Probes | `data/specs/log-probes.json` | One hook and one small routine per event of a feature |
 | Timing probe of peaking | `data/specs/log-peaking-time.json` | Event `pk_stats`, one record per 8 runs of Key Line pass 9. Written by `mkspec_log.py --peaking-time`. It also puts the build id of `data/logdict/events.json` into the block header |
@@ -142,7 +142,7 @@ with the old id. So, before the change, copy the event list to `data/logdict/eve
 that the file name is the build id of its content, and that the two patch specs carry the build id of one of the
 dictionaries in `data/logdict/`.
 
-The current build id is the one of `data/logdict/events.json` (`33ca8d15f4f1c877`, carried by `data/specs/log-menu-2.json`).
+The current build id is the one of `data/logdict/events.json` (`afe27672d672fc95`, carried by `data/specs/log-menu-3.json`).
 `data/logdict/events-*.json` hold the dictionaries of older flashed builds.
 
 ## How to add an event and a probe
@@ -188,8 +188,8 @@ The current build id is the one of `data/logdict/events.json` (`33ca8d15f4f1c877
    python3 emulator/hookcheck.py data/specs/log-core.json data/specs/log-probes.json
    ```
 
-   `experiments/2026-11-18-log-menu/scripts/mkspec_logmenu.py` (with `--stock-films`) imports `mkspec_log.py`
-   and writes `data/specs/log-menu-2.json`, the log of the pinned build. Then run the emulator checks of the notes. The generator refuses a site that is not on an instruction
+   `gen/log-menu/mkspec.py` imports `gen/log-menu/mkspec_log.py`
+   and writes `data/specs/log-menu-3.json`, the log of the pinned build. Then run the emulator checks of the notes. The generator refuses a site that is not on an instruction
    boundary, a pc-relative instruction other than `call`, and a branch target inside the replaced bytes.
 5. A change of an id, name, level or argument gives a new build id. If the old build was flashed, keep its
    event list first (section "The dictionary, name tables and older builds"). The `doc` texts, `names` and

@@ -87,9 +87,7 @@ candidate `osd-battery` are kept.
 ## Foundations
 
 - From the firmware review of 2026-11-21 (`experiments/2026-11-21-firmware-dive/NOTES.md`). The owner's rule
-  (2026-11-21): what is flashed and works is not moved. So two items are work, and the rest are rules for new work.
-  - Defect: in every language but English the Peaking row and the Lowest S/S Setting row show unrelated Olympus
-    texts (§5). Set their texts at run time, as Load Looks does.
+  (2026-11-21): what is flashed and works is not moved. The two work items are done in `films-start-texts` (wrong menu texts outside English; the race margin). The rest are rules for new work.
   - Measured on the camera with `films-start-texts` (2026-11-21): the segment copies end 1.28 s before the first
     colour stage job (three lever starts in P), so the 7 film hooks from segment 1 into segment 2 have that margin.
     Not measured: a start with the shutter held, and wake from sleep. Nothing is moved.
