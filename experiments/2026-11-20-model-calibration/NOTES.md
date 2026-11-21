@@ -191,3 +191,14 @@ in git until confirmed). Predicted (`results/corrections-n1.txt`), median: natur
 Production build films-twelve-off, `tools/checks.py --tier full`: free space, op-check, boot-test, update-path-test
 PASS; save-guard S24 / S25 PASS for the build; peaking S6 lists 174 art codes against the reference, as every test
 build of this line (twelve-region-probe, calib-probe, films-twelve-off-artbkt). The reference there is an older peaking build: run against the pinned films-look-exif (`scen_direct4.py s6`), films-twelve-off gives S6 PASS, 0 FAULT and no art code whose six-axis result differs.
+
+## 10. model3 and the corrections for the convergence round (2026-11-21)
+
+`scripts/calib_off.py` refits model2's constants (six-axis directions, K, saturation per gain, chroma limit) on the
+table-off readings of §8. Two folds (half the films each), camera against model on the films of the other fold
+(`results/calib-off.txt`): natural colours 0.65 / 0.73 -> 0.61 / 0.63, ColorChecker 0.59 / 0.69 -> 0.48 / 0.50,
+skin 0.57 / 0.71 -> 0.48 / 0.52, grays unchanged. Refit on all 31: `../2026-11-09-film-portra/calib/model3.npz`
+(model2.npz stays; `MODEL2_CALIB=model3.npz` selects the new one). The 31 corrections again with model3
+(`fit_film-<fit>-n2`, `results/corrections-n2.txt`), predicted medians: natural 1.12 -> 1.04, hold-out 1.14 -> 1.05,
+ColorChecker 1.76 -> 1.71, skin 1.14 -> 1.09, grays 0.84 -> 0.63. Film files of the convergence round
+(`scripts/pack_round2.py n2`): `build/films-off2/A` (`7f7debd8…`), `B` (`38d6f853…`), `C` (`af9f153a…`).
