@@ -86,25 +86,20 @@ candidate `osd-battery` are kept.
 
 ## Foundations
 
-- From the firmware review of 2026-11-21 (`experiments/2026-11-21-firmware-dive/NOTES.md`), not decided, in the
-  order of what they would settle:
-  - A defect: in every language but English the Peaking row and the Lowest S/S Setting row show unrelated Olympus
-    texts (§5). Setting their texts at run time, as Load Looks does, fixes both.
-  - The 7 film hooks in segment 1 that jump to segment 2 are safe by timing only: live view can start before the
-    segment copies end (§2). First the margin, from the firmware's own boot marks in the Debug Log, with no new
-    code. A fix should not add code to the kernel range: look at making the hooks harmless until segment 2 is
-    loaded.
-  - Space, in the order of what a mistake costs. First the 123,745 B of debug-shell handlers in segment 2 (§1): a
-    mistake there breaks a normal start and a card update recovers it. Last the 32,752 blank bytes in the kernel
-    range and the kernel copy's end word: both are in memory on the update start, where a mistake has no way back
-    ([feasibility](docs/dev/feasibility.md), "Where code may go"). Use them only for code that must be loaded early
-    and has no other home.
-  - A start point after the segment copies with no jump over code, through segment 3's constructor table (§2). It
-    could apply the stored film simulations before the first frame.
-  - Smaller: 1,906 dead bytes of menu tables (§5); 15 tone tables per entry in place of 24 (§4); the 30 ART BKT
-    hooks as 6 (§4).
-  - A card folder `PARAMDT` overrides settings on stock firmware in the emulator (§7): camera probes without a flash,
-    if it works on the camera. Its worst case is not bounded: start with one harmless tag.
+- From the firmware review of 2026-11-21 (`experiments/2026-11-21-firmware-dive/NOTES.md`). The owner's rule
+  (2026-11-21): what is flashed and works is not moved. So two items are work, and the rest are rules for new work.
+  - Defect: in every language but English the Peaking row and the Lowest S/S Setting row show unrelated Olympus
+    texts (§5). Set their texts at run time, as Load Looks does.
+  - Measure, change nothing: the 7 film hooks in segment 1 that jump to segment 2 are safe by timing only (§2).
+    Write the firmware's own boot marks to the Debug Log to get the margin. Only a small margin justifies a change.
+  - For new work:
+    - new code goes in segment 2 or 3; when the proven room there runs out, prove a slice of the 123,745 B of
+      debug-shell handlers in segment 2 (§1). The kernel range gets nothing new unless an early hook forces it;
+    - code that must run at start uses an entry of segment 3's constructor table, not a jump over code (§2);
+    - new menu texts are set at run time (§5);
+    - a new film-table layout uses 15 tone tables per entry, not 24 (§4);
+    - to try on the camera before a build: the card folder `PARAMDT` overrides settings on stock firmware in the
+      emulator (§7). Its worst case is not bounded: start with one harmless tag.
 
 - Structured log: works on the camera (2026-11-15). Evaluation of the first log and the next
   probes (power-on factor, real restart count, per-CPU gates, peaking loop time, flush end):
