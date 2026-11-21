@@ -18,9 +18,27 @@
    "block": 0,
    "offset": "0x88ffb8",
    "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-   "new": "fccc21c00000900004dd946c7affc00ca001c80ffcddd01c5b600400dce18381ffdcb58381ffcb",
+   "new": "fccc21c00000900004dd946c7affc00ca001c907dca82bf4fffcddd01c5b600400dcdc8381ffcb",
    "_addr": "0x7ecb0fd8",
    "_note": "new code, segment 2: T_MF2 (the focus mode) (39 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7d2b74",
+   "expect": "617373776f72640074303900743130002531732c202564",
+   "new": "fcacf0674fbefac80151c807dc0e588dffdc4cd40b00cb",
+   "_addr": "0x7ebf3b94",
+   "_note": "new code, segment 2: T_MF3 (GUI state 0x5101: no lines) (23 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7d1f00",
+   "expect": "4c696e65496e666f00693132",
+   "new": "fc83f0674fbedc35f7ffffcb",
+   "_addr": "0x7ebf2f20",
+   "_note": "new code, segment 2: T_GS (keeps the GUI state) (12 B)"
   },
   {
    "type": "bytes",
@@ -30,6 +48,15 @@
    "new": "dcdd777e00cbcbcbcbcb",
    "_addr": "0x7e4c93a4",
    "_note": "T_R (custom-menu-rows-3): `movbu (R),d0 / cmp 0,d0 / beq` -> `jmp T_MF` + nop"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x8be6c4",
+   "expect": "dc772ff1ff",
+   "new": "dc3c38f1ff",
+   "_addr": "0x7ecdf6e4",
+   "_note": "the GUI state setter's hook (log-menu-3): `jmp T_GUI` -> `jmp T_GS`, which jumps on to T_GUI"
   }
  ]
 }

@@ -61,3 +61,27 @@ pinned build's free-space check failed with this spec in `data/specs/`. T_MF is 
 0x7ECB0B81, the test of R) and T_MF2 (39 B, 0x7ECB0FD8, the focus mode), each ending in a nop; the build is the
 pinned films-start-texts + `peaking-mf`, sha256 `18aaffabd7b7f15c9d75738f6b5206407b3887c119906e32f15fb3215552194f`.
 `scripts/emu_tr.py` PASS on it (12 cases, against the pinned build); the pinned build's free-space check PASS.
+
+## 7. The record-view fix (2026-11-21)
+
+The camera's log of §5 (session 155): with the MF trigger L stays 1 through the half-press, the capture and the record
+view; with MF Assist, `pk_mf_end` and L = 0 come at the half-press, before GUI state 0x5101 [C]. GUI state 0x5100 =
+live view; 0x5101 from about 10 ms after shoot callback 210 (half-press) through capture (214, 209, 233) and the
+record view, until after 211; then 0x5000 and 0x5100; 0x57xx = menus [C, log].
+
+No fixed global holds the GUI state (the setter 0x7ECDF5E9 stores it at dst + 76 of a heap object; U for a pointer).
+At the setter's hook 0x7ECDF6E4, d0 = the new state, on every call [R]. So:
+- **T_GS** (12 B, 0x7EBF2F20): the hook's `jmp` (log-menu-3's T_GUI) now goes to T_GS, which stores d0 as a u16 at
+  0xBE4F67F0 (uncached; the last film RAM block's unused tail, +0x31F0: the loader writes up to +0x30B2) and jumps on
+  to T_GUI. Written at every GUI state change, with Debug Log On or Off.
+- **T_MF3** (23 B, 0x7EBF3B94): in MF, no lines while that word is 0x5101, as MF Assist ends at the half-press.
+  Only 0x5101 is tested (the meaning of 0x5103 and 0x5105 is not known).
+- T_MF2 (39 B) now jumps to T_MF3 when the focus mode is MF.
+
+The firmware's TAKE_FUNC_RECVIEW flag (word 0x602B0DD0, which stock MF Assist checks before it starts) would cover
+the record view only, and when the latch runs in that window is not known: not used.
+
+| Check | Result |
+|---|---|
+| build, free space (the build and the pinned build) | sha256 `6a47806dfafce15d281358eae2beffe397132e5999c50b28c69b2a2467efcf39`; PASS, PASS |
+| `scripts/emu_tr.py` | PASS: 24 latch cases (GUI 0x5100: as §4; GUI 0x5101: R = 0 and MF give no lines, R = 1 as pinned) and T_GS for 0x5100, 0x5101, 0x5705 (word written, registers kept, on to T_GUI) |
