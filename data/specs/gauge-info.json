@@ -3,7 +3,6 @@
  "description": "Level Gauge screen with the shooting information: the producers of the information that the histogram screen shows (layout 8) also run on the Level Gauge screen (layout 22), so ISO, S-IS, the movie time, the frame count and the touch icon stay on the gauge screen. Eleven layout lists get a copy with 22 added in free data space (segment 3); their code points at the copy. See experiments/2026-11-19-gauge-info/NOTES.md.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "ops": [
   {
    "type": "bytes",

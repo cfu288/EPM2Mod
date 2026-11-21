@@ -433,7 +433,7 @@ def main():
                "added by data/specs/custom-menu-rows-2.json): Off / Load. As data/specs/looks-menu-3.json without Built-in. "
                "Its value is the dormant setting 449 (prm tag 0xD7B1); Off is 1, Load 0. When Off the row shows text "
                "1495, which the loader points at the result of the last load.",
-               "base": STOCK, "base_sha256": sha, "status": "candidate: emulator-checked, not flashed", "ops": mops},
+               "base": STOCK, "base_sha256": sha, "ops": mops},
               open(os.path.join(ROOT, "data", "specs", MENU + ".json"), "w"), indent=1)
     open(os.path.join(ROOT, "data", "specs", MENU + ".json"), "a").write("\n")
 
@@ -599,7 +599,7 @@ def main():
         "else Olympus's text." % EXIF_DESC) + (" Version 7 (experiments/2026-11-20-model-calibration/"
         "NOTES.md §6): the switch lists of data/specs/stock-films-structure-3.json, where an in-place entry with a film "
         "also gets no 12-region table.")),
-        "base": STOCK, "base_sha256": sha, "status": "candidate: emulator-checked, not flashed",
+        "base": STOCK, "base_sha256": sha,
         "_ram": "the EEROM bank's unused tail: store 0x%08X, scratch 0x%08X; RAM: status, names 0x%08X-0x%08X; the "
                 "entries' blocks 0x%08X-0x%08X; 5 flag bytes in the code" % (mk.STORE, mk.SCRATCH, m3.RAM, m3.RAM + 0x800,
                                                                          blocks[0], blocks[-1] + layout["block"]),

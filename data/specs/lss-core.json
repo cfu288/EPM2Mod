@@ -3,7 +3,6 @@
  "description": "Lowest S/S Setting, exposure part, as the PEN-F 3.1 does it: in P and A with ISO Auto and no flash, the shutter speed where ISO starts to rise is the chosen speed (setting 653, tag 0x9F11, RAM byte 0x60413225: 0 Auto, 1..55 = 60 s .. 1/4000 in 1/3 EV). Slower than the stock speed, P first lowers the shutter at base ISO down to it. Code in the exp debug printers (segment 1). See experiments/2026-11-17-auto-iso-min-shutter/NOTES.md section 9.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: harness-checked, not flashed",
  "_symbols": {
   "GATE": "0X7E69EA48",
   "NEWAUTO": "0X7E69EA99",

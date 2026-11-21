@@ -370,7 +370,6 @@ def main():
             "a jump to card-looks' T_GUI. The event ids are in data/logdict/events.json (build id %s). See "
             "experiments/2026-11-18-log-menu/design.md and docs/reference/logging.md." % bid.hex()),
         "base": STOCK, "base_sha256": stock_sha,
-        "status": "candidate: emulator-checked, not flashed",
         "_build_id": bid.hex(),
         "_ram": "the log's rings and state 0x7E4F9000-0x7E4FD2C0 (uncached alias); LOGON is PST+2",
         "ops": ops,

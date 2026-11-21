@@ -283,7 +283,6 @@ def main() -> None:
         "base": STOCK,
         "base_sha256": sha256_bytes(stock_file),
         "ops": ops,
-        "status": "emulator-checked 2026-11-14 (all 34 languages), not camera-tested",
     }
     Path(args.out).write_text(json.dumps(spec, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"{args.out}: {len(ops)} ops")

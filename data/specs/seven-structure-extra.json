@@ -40,6 +40,5 @@
  ],
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "inputs_sha256": "d3ee9b0e73c0fe97cc85c4ab075bf6d4c3ae8c8a634ca84b5f158474bda54cd6",
- "status": "camera-tested 2026-11-12, last as part of build/seven-films-5.BIN (sha256 0443a38804061afaf17a12906a6969101d9f54ffe006e0aeca0d21d68f9b29ae); see docs/camera-log/"
+ "inputs_sha256": "d3ee9b0e73c0fe97cc85c4ab075bf6d4c3ae8c8a634ca84b5f158474bda54cd6"
 }

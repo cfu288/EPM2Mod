@@ -3,7 +3,6 @@
  "description": "Focus peaking in colour: the list of Custom Menu A > Peaking becomes Off / White / Red / Yellow / Blue (setting 458: 1 Off, 3 White, 2 Red, 4 Yellow, 5 Blue; 3 stays the value after a full reset; Black is gone, a camera that was set to Black shows Red). White is the pinned build's pass. For a colour, new code in Key Line pass 9 writes the colour over the pixels of the picture where the line image is 64 or more, and the combine job gets usGain2 = 0. The colour names are the stock texts of the B&W filter list in all 34 languages. A delta on data/builds/peaking-menu-names.json: every expect is a byte string of that build. See experiments/2026-11-14-focus-peaking/NOTES.md section 16.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "_delta_on": "data/builds/peaking-menu-names.json (sha256 4ea4ffd773d6f05d16867f55b9fef4bce5d53fc8659a9b16362f7ac771a6bc30)",
  "_ram": "no new RAM; the new code uses 24 bytes of the ART task's stack",
  "ops": [

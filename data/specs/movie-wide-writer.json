@@ -3,7 +3,6 @@
  "description": "1080 movie frame 1920 wide, the writer side (with data/specs/movie-wide-frame.json, the reader side): record 7 (mode code 517, HSHR) of the TAKE sensor-mode request table 0x7E793184, which 0x7E5A897F copies into the camera-core request. The written line becomes 1960 px (was 1680) and the pre-processor's horizontal resize step 1.2 (4915 in Q12, was 5734 = 1.4), with the second Bayer phase 1433 (was 1843); the input stays 2352 px (1680 x 1.4 = 1960 x 1.2). The line count 1312 and the window start 44/11 stay. DEBUG builds only. See experiments/2026-11-19-movie-sampling/NOTES.md section 14.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "ops": [
   {
    "type": "bytes",

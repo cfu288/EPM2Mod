@@ -3,7 +3,6 @@
  "description": "Lowest S/S Setting (GitHub issue #2), the menu part: the list and texts of the row that data/specs/custom-menu-rows-3.json adds to Custom Menu E before ISO-Auto Set. Setting 653 (prm tag 0x9F11, MODE bank, u8, ROM and full-reset default 0; no stock code reads or writes it, experiments/2026-11-18-look-editor/settings.md) holds the index 0..55 of: Auto, 60\", 50\", 40\", 30\" ... 1/250 (the stock # Slow Limit records), 1/320 ... 1/4000. Panel 609 (a list page of the dormant setting 448) gets the 56 items, the page class of # Slow Limit (the generic list page wraps after 40 items) and a value -> text list, both in the Bluetooth debug strings 0x7EBB1F4C-0x7EBB304C (segment 2, reclaim-space row 2). English texts 1503 (label) and 1504 (help) of the unreachable panel 594 'EVF Info Settings'. No code.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "_interface": "setting 653 = prm tag 0x9F11 (MODE bank, u8), RAM 0x60413225 in the emulator; value = index: 0 Auto, i = 1..55 -> Tv (Q8) = trunc((i - 19) * 256 / 3), 1 = 60 s, 19 = 1 s, 55 = 1/4000",
  "ops": [
   {

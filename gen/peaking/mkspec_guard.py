@@ -180,7 +180,6 @@ def main():
                        "is a byte string of that build. See experiments/2026-11-14-focus-peaking/NOTES.md section 18.",
         "base": STOCK,
         "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
-        "status": "candidate: emulator-checked, not flashed",
         "_delta_on": "data/builds/peaking-fast.json (sha256 %s)" % PINNED_SHA,
         "_ram": "no new RAM. L (0x602BE8C4) and its copy L2 can now hold 2 = held by the guard; reads the heap mode "
                 "0x605157CC and the two pool objects named at 0x602AC458 / 0x602AC45C",

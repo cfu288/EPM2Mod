@@ -133,7 +133,6 @@ def main():
                        "/ factory shell only). Checked in the emulator, NOT camera-tested. See "
                        "experiments/2026-11-14-level-gauge/NOTES.md section 12.",
         "base": STOCK, "base_sha256": STOCK_SHA, "ops": ops,
-        "status": "candidate: emulator-checked 2026-11-14, not flashed",
     }
     json.dump(spec, open(OUT, "w"), indent=1)
     changed = sum(sum(x != y for x, y in zip(bytes.fromhex(o["expect"]), bytes.fromhex(o["new"]))) for o in ops)

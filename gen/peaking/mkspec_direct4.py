@@ -338,7 +338,6 @@ def main():
                        % ("" if gain == 256 else "; line gain %d in place of 256" % gain),
         "base": STOCK,
         "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
-        "status": "draft; emulator-checked (single functions and scenario tests)",
         "_ram": "three new bytes 0x602BE8C4 (L), 0x602BE8C5 (R), 0x602BE8C6 (L2): slot 20 of the menu value-list "
                 "table 0x602BE874, never indexed; reads the mov state number 0x605B03D0",
         "ops": ops,

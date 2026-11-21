@@ -565,7 +565,6 @@ OFFZERO: .long 0""" % (TWELVE_MASK_AT, ", ".join("%#x" % a for a in iso)))
              "reaches get a hash entry 0x7E78C6E4 -> OFFCASE; the in-place codes' entries hold the default case, "
              "switched to OFFCASE by the loader.")),
         "base": STOCK, "base_sha256": stock_sha,
-        "status": "candidate: emulator-checked, not flashed",
         "ops": ops,
     }, open(os.path.join(ROOT, "data", "specs", SPEC + ".json"), "w"), indent=1)
     open(os.path.join(ROOT, "data", "specs", SPEC + ".json"), "a").write("\n")

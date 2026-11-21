@@ -3,7 +3,6 @@
  "description": "Structured log, probe 2 of looks loaded from the card: at the first flush of a session (the GUI enters a menu, playback or the power-off state) the flush task reads the first 32 bytes of C:\\EPM2LOOK.BIN and writes card_read (bytes read, -1 when the file did not open; bytes 0-3). When the file has 26 bytes or more and starts with LOOK, its bytes 8-25 (9 x s16) are written into the art matrix of codes 71 and 80 (Pro 400H) at 0x7ECB0988, through the cached address and its uncached alias, and card_look gives the number of values written and values 0 and 1 read back from RAM. The colour stage that reads the table runs on CPU 1. Then the flush runs as before. One hook at the flush task's entry (log-core's code) and two routines in free runs of segment 2. In place of log-card-read, on the specs of data/builds/debug-log-films-12d.json. It puts the build id f412b3f66f1c1b6b of data/logdict/events.json into the block header. DEBUG builds only. See experiments/2026-11-17-card-looks/NOTES.md.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "_delta_on": "data/builds/debug-log-films-12d.json",
  "_build_id": "f412b3f66f1c1b6b",
  "_ram": "1 byte of the log's state block (PST+104); the flush task's block buffer for the read",

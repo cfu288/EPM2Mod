@@ -3,7 +3,6 @@
  "description": "DRAFT, not camera-tested. Replaces peaking-direct-3: the same routines at new addresses (direct-3 broke the six-axis handler of the Velvia entry and the sleep routine, NOTES section 14). Focus peaking in live view while the MF Assist state object is On: white edge lines (Key Line's line image, added) over a plain picture. The image-work heap is put in the art mode while the lines show. Photos are not changed. See experiments/2026-11-14-focus-peaking/NOTES.md sections 12 to 14.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "draft; emulator-checked (single functions and scenario tests)",
  "_ram": "three new bytes 0x602BE8C4 (L), 0x602BE8C5 (R), 0x602BE8C6 (L2): slot 20 of the menu value-list table 0x602BE874, never indexed; reads the mov state number 0x605B03D0",
  "ops": [
   {

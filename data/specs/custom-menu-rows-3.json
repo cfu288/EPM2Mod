@@ -3,7 +3,6 @@
  "description": "The Custom Menu with four added rows: Peaking in A after MF Assist, Load Looks and Debug Log in J (all three as data/specs/custom-menu-rows-2.json, whose place this spec takes) and Lowest S/S Setting in E before ISO-Auto Set (setting 653, panel 609, value -> text list 609; the list and texts are in data/specs/lss-menu.json, which a build with this spec needs). No stock row is changed. An 83-row copy of the item table at 0x7EBF1FE0 (10 address loads re-pointed), the 84-entry child list in place at 0x7EE3CBF4 (Debug Log's value -> text list moved to 0x7EE3CE94), 9 row constants (last index 82, count 83, row-state array 166 B), the group sizes of A (11), E (14) and J (8). Every expect is a byte string of the specs before custom-menu-rows-2 in data/builds/stock-films.json. See experiments/2026-11-17-auto-iso-min-shutter/NOTES.md section 11.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "_ram": "the row-state array of the Custom Menu page grows by 8 bytes (158 -> 166) into 0x606A31B6-BD (the next addressed object is 0x606A32F0)",
  "ops": [
   {

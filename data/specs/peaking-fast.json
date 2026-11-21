@@ -3,7 +3,6 @@
  "description": "Focus peaking in colour, a faster colour loop. The pinned loop looks at every row and writes each line pixel byte by byte. The new loop T_FAST looks at every second row with 2 word reads per group of 4 pixels, and writes the colour over the whole group in that row and the next one with 6 word writes: the lines are drawn in blocks of 4 x 2 pixels. About 3 times fewer instructions and bus reads for a frame without lines, and about 10 times fewer bus accesses for the lines. White and Off do not change. A delta on data/builds/peaking-colours.json: every expect is a byte string of that build. See experiments/2026-11-14-focus-peaking/NOTES.md section 17.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "_delta_on": "data/builds/peaking-colours.json (sha256 4d6b1f26ed92d66b62b4d7dc32d26168e33fd8b153a7655d6c0d9a58267456f8)",
  "_ram": "no new RAM; 16 more bytes of the ART task's stack (40 in all)",
  "_symbols": {

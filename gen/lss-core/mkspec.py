@@ -85,7 +85,6 @@ def main():
                        "at base ISO down to it. Code in the exp debug printers (segment 1). "
                        "See experiments/2026-11-17-auto-iso-min-shutter/NOTES.md section 9.",
         "base": STOCK, "base_sha256": hashlib.sha256(raw).hexdigest(),
-        "status": "candidate: harness-checked, not flashed",
         "_symbols": {k: "%#X" % v for k, v in sorted(syms.items()) if k in ("NEWTH", "GATE", "NEWAUTO", "SEG6", "STOCK")},
         "ops": [
             op(AREA, code, f"new code, {len(code)} B of {AREA_END - AREA} (exp debug printers, segment 1)"),

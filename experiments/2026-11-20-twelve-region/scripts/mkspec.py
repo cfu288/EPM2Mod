@@ -119,7 +119,6 @@ def make(entries, tables, look_xp1, spec_path, build_path, name, description, wh
     spec = {"name": name, "description": description,
             "base": STOCK,
             "base_sha256": json.load(open("data/specs/build-label.json"))["base_sha256"],
-            "status": "candidate: emulator-checked, not flashed",
             "ops": ops}
     with open(spec_path, "w") as f:
         json.dump(spec, f, indent=1)

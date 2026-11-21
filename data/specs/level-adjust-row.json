@@ -301,6 +301,5 @@
    "_addr": "0x7E8EE862",
    "_note": ".data image (RAM 0x602BE3A2): rows in group 9 (Utility), 5 -> 6 (= E-PL6)"
   }
- ],
- "status": "candidate: emulator-checked 2026-11-14, not flashed"
+ ]
 }

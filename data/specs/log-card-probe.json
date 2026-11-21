@@ -3,7 +3,6 @@
  "description": "Structured log, the probe harness of looks loaded from the card: at the first flush of a session (the GUI enters a menu, playback or the power-off state) the flush task reads up to 2 KB of C:\\EPM2LOOK.BIN (card_read). A file that starts with LKP1 holds a count, flags and records {u32 address, u16 length, u16 0, bytes, padded to 4}; a record is written (cached address and uncached alias) only when it lies inside one of the tables of the Pale&Light Color slot (Pro 400H: three tone tables, saturation pair, six-axis records, art matrix, chroma record), and card_rec logs each record (address, length | status << 16: 0 written, 1 refused). Flag bit 0 stores 0 into the IMG library's builder words 0xA07500B4 / 0xA07500B8 and 0xFF into the gamma states' art-code bytes, as the boot init does, so the look stages recompute. card_done gives the records written and the flags. Then the flush runs as before. In place of log-card-look, on the specs of data/builds/debug-log-films-12d.json. It puts the build id 368b6bae84a618c0 of data/logdict/events.json into the block header. DEBUG builds only. See experiments/2026-11-17-card-looks/design.md section 8.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "_delta_on": "data/builds/debug-log-films-12d.json",
  "_build_id": "368b6bae84a618c0",
  "_ram": "1 byte of the log's state block (PST+104); the flush task's block buffer for the read",

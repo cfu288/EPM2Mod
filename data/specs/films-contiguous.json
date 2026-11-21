@@ -3,7 +3,6 @@
  "description": "The seven film looks next to each other in every list of looks: the entry Grainy Film moves from the fifth place to the eighth, behind Superia 400. Only the order of list entries changes (the Picture Mode value lists of info 111, 509 and 510, the rows of Shooting Menu 1 -> Picture Mode, of ART BKT and of Picture Mode Settings, the ART list records with the eight tables that the ART list page keeps by place, and the ART mode value list). The number pictures ART 5 to ART 8, the icon escapes of string ids 601, 602, 603 and 582 and the texts ART5 to ART8 (ids 1653 to 1656) in all 34 languages move with them, so Vis 250D, Velvia and Superia 400 show ART 5, 6, 7 and Grainy Film shows ART 8. No stored value, art code or picture table changes: a saved Picture Mode still selects the same look. A delta on data/builds/peaking-fast.json: every expect is a byte string of that build. Made by experiments/2026-11-15-films-contiguous/scripts/make_spec.py.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "_delta_on": "data/builds/peaking-fast.json (sha256 0e8a25b9578b8119b14b4895be7d2a0b70d7315e5e817758699777f0f31d917e)",
  "ops": [
   {

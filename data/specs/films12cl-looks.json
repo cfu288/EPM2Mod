@@ -4,7 +4,6 @@
  "description": "The films of the pinned build in twelve colour slots: Kodak Double-X 5222 as a colour look (saturation 0, the art matrix sets the grey mix, one tone curve; data/films/fits/doublex3.npz) in the tables of the first extra slot, which Grainy Film selects with data/specs/films12-entry-grainy-film.json, and Fujifilm Provia 100F in the tables of the second, which Gentle Sepia selects with data/specs/films12-entry-gentle-sepia.json; Kodak Portra 160, Kodak Gold 200 and Kodak Vision3 500T as in data/specs/films12-looks.json, whose place this spec takes. No grain program. See experiments/2026-11-17-card-looks/design.md section 9.5.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "camera-tested 2026-11-17 (data/builds/card-looks-4.json, pinned)",
  "ops": [
   {
    "type": "bytes",

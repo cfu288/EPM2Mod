@@ -3,7 +3,6 @@
  "description": "Structured log, probe of the save guard of peaking: event pk_guard. The guard of data/specs/peaking-save-guard.json writes 2 to the latch byte L while it holds the lines back. The probe reads L at each focus-ring event while MF Assist is on (the handler rcvStartMFAssistIn_MFAssistOn of the MF Assist state object) and writes one record per hold: the heap mode, and the units in use in the pool of the heap modes 0 and 2, which is the reason for the hold. A hold with no ring event after its start gives no pk_guard record; pk_latch shows every hold (L = 2). One hook in stock bytes of segment 2 and its routine in segment 2; no byte of the peaking code changes. Needs log-core, log-probes and log-peaking-time before it: every expect is a byte string of that build. It puts the build id da49b2f5e7e62ca7 of data/logdict/events.json into the block header. DEBUG builds only. See experiments/2026-11-14-focus-peaking/NOTES.md section 18 and docs/reference/logging.md.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "_delta_on": "data/builds/debug-log-peaking-fast-2.json without this spec",
  "_build_id": "da49b2f5e7e62ca7",
  "_ram": "1 byte of the log's state block (PST+100)",

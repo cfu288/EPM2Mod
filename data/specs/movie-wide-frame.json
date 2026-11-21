@@ -3,7 +3,6 @@
  "description": "1080 movie frame 1920 wide: the HSHR (1080 and 720 movie) Bayer frame becomes 1938 x 1296 with an effective 1920 x 1296 and a stride of 1960, in place of 1662 x 1296, 1646 x 1296 and 1680. The pre-processor then shrinks the 2326-px sensor line by 1.2 instead of 1.4, and 1080 needs no horizontal upscale. Changed: the TAKE request, the movie mode table, the IMG resize builders, the AE set (its sensor window stays 2326 px), art_get_bayer_size entry 5, and the Movie IS crop (1414 -> 1650) and shift divisor (1.4 -> 1.2). Immediates only. Not conditional: 720p uses the same frame. DEBUG builds only. See experiments/2026-11-19-movie-sampling/NOTES.md section 12.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "ops": [
   {
    "type": "bytes",

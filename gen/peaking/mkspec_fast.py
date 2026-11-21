@@ -174,7 +174,6 @@ def main():
                        "section 17.",
         "base": STOCK,
         "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
-        "status": "candidate: emulator-checked, not flashed",
         "_delta_on": "data/builds/peaking-colours.json (sha256 %s)" % PINNED_SHA,
         "_ram": "no new RAM; 16 more bytes of the ART task's stack (40 in all)",
         "_symbols": {k: "0x%08X" % sym[k] for k in ("T_FAST", "T_FAST_END", "T_HIT")},

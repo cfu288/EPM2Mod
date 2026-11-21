@@ -31,6 +31,5 @@
    "_addr": "0x7EFFB040",
    "_note": "panel 192 record: child-list pointer 0x7EFF9224 (3 entries, no room for a 4th) -> 0x7EFFA244"
   }
- ],
- "status": "camera-tested 2026-11-14 (build seven-films-6-interval-240-level): the row shows, the gauge shows in live view and works"
+ ]
 }

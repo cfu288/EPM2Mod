@@ -114,8 +114,7 @@ class Ops:
 
 def spec(name, description, ops, **extra):
     d = {"name": name, "description": description, "base": STOCK,
-         "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
-         "status": "candidate: emulator-checked, not flashed"}
+         "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest()}
     d.update(extra)
     d["ops"] = ops
     with open(os.path.join(ROOT, "data", "specs", name + ".json"), "w") as fh:

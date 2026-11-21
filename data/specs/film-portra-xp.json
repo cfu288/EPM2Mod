@@ -1,7 +1,6 @@
 {
  "name": "film-portra-xp",
  "description": "Cross Process I rebuilt as a film look fitted to lut_v034_portra400_portraendura.cube (fit_look.py, NOTES \u00a714): per-channel base gammas (24 tables), identity look curve, saturation gain 245.",
- "status": "built, NOT camera-tested",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
  "ops": [

@@ -3,7 +3,6 @@
  "description": "Film looks on the stock filters, the flashed part (experiments/2026-11-18-stock-filters/design.md): one film code per art-filter entry (Pop Art 79, Soft Focus 75, Pale&Light 71, Light Tone 72, Grainy Film 94, Pin Hole 92, Diorama 125, Cross Process 85, Gentle Sepia 98, Dramatic Tone 144, Key Line 156, Watercolor 159) with tone, saturation, six-axis, chroma and matrix in the entry's RAM block at 0x7E4D1000 + 0x3200 x entry; the stage entries of the codes that no stock entry reaches, the art-matrix chain, the hidden stored values 111, 112, 114, 115, 118 and their hash keys, and the four job-block compares of 75 / 125. Nothing here is reached while no entry has a film: the loader switches the entry's words. Every expect is a stock byte. Version 2 (experiments/2026-11-20-film-name-exif/NOTES.md): the film codes' look entry -> LKID, the stock identity look table 0x7E75B8F0; the EXIF case of an entry with a film -> 0x7E70DF1B (ArtFilter Off). Version 3 (experiments/2026-11-20-model-calibration/NOTES.md \u00a76): no 12-region table for the film codes: OFFCASE returns a descriptor whose table has enable mask 0; the eight codes no stock entry reaches get a hash entry 0x7E78C6E4 -> OFFCASE; the in-place codes' entries hold the default case, switched to OFFCASE by the loader.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "ops": [
   {
    "type": "bytes",

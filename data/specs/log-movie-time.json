@@ -3,7 +3,6 @@
  "description": "Structured log, timing probe of the movie path: event mv_frame (CPU 0), one record per run of mov_image_process for recording 0x7E6C6E46 (one movie frame): the microseconds from its entry to its end, the microseconds of its develop job (img_exec, Bayer to YC) and its return value; event mv_enc (CPU 1), one record per packet of the task MOV_ENCODE: the microseconds in its handler and the microseconds that the task ART_SUB spent since the last record. Five hooks in stock bytes of segment 1, their routines in segment 1, 32 bytes of RAM at 0x7E4FD300. Needs the specs of data/builds/epm2mod-2026.11.19.json before it: every expect is a byte string of that build. It puts the build id 34775ddcf8f5f0af of data/logdict/events.json into the block header. DEBUG builds only. See experiments/2026-11-19-movie-sampling/NOTES.md and docs/reference/logging.md.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "_delta_on": "data/builds/epm2mod-2026.11.19.json",
  "_build_id": "34775ddcf8f5f0af",
  "_ram": "32 bytes at 0x7E4FD300 (uncached alias 0xBE4FD300), after the log's block buffer; not cleared at start",

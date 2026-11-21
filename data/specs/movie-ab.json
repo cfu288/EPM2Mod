@@ -3,7 +3,6 @@
  "description": "1080 movie frame by record mode: Full HD Fine (setting 34145 = 6 and 33105[7] = 1) uses the 1920-wide Bayer frame of movie-wide-frame.json and movie-wide-writer.json (written lines of 1960 px at a 1.2 resize, 1938 x 1296, 1920 effective); every other record mode, 720 included, keeps the stock frame. The choice is made where the frame is set up (the TAKE request builder's HSHR case, the writer request for mode code 517, the movie mode table of Through Start) and stored in one RAM byte that the later readers (Movie IS crop and shift, the IMG divisors, art_get_bayer_size) read. Event mv_set records each choice. Eight hooks in stock bytes; the set-up routines and the IS shift in segment 1; the IS crop, the IMG divisors and art_get_bayer_size in segment 2 (they run only in movie frames with Movie IS and in art jobs; emulator/hookcheck-allow.tsv). Needs data/builds/debug-log-movie-bitrate.json's specs before it. It puts the build id 67901828e4565aeb of data/logdict/events.json into the block header. DEBUG builds only. See experiments/2026-11-19-movie-sampling/NOTES.md section 16.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "_delta_on": "data/builds/debug-log-movie-bitrate.json",
  "_build_id": "67901828e4565aeb",
  "_ram": "1 byte at 0x7E4FD31C (uncached 0xBE4FD31C), byte 28 of log-movie-time's 32 bytes",

@@ -3,7 +3,6 @@
  "description": "Focus peaking waits while another owner has blocks in the image-work heap. (1) The latch: when the heap is not in mode 1 and the pool of the modes 0 and 2 has a block in use (a photo that is being developed and saved), the latch byte L gets 2 in place of 1: MF Assist magnifies at once, as with Peaking Off, and the lines start in the first frame in which the pool is empty. (2) The heap-mode hook: when peaking ends and the pool of mode 1 still has a block in use, the heap stays in mode 1 until a later call finds the pool empty. Before, the heap was re-divided under those blocks, the art buffers were refused in every frame, and the camera restarted (firmware error 0x34000002, camera log of 2026-11-16). A delta on data/builds/peaking-fast.json: every expect is a byte string of that build. See experiments/2026-11-14-focus-peaking/NOTES.md section 18.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "_delta_on": "data/builds/peaking-fast.json (sha256 0e8a25b9578b8119b14b4895be7d2a0b70d7315e5e817758699777f0f31d917e)",
  "_ram": "no new RAM. L (0x602BE8C4) and its copy L2 can now hold 2 = held by the guard; reads the heap mode 0x605157CC and the two pool objects named at 0x602AC458 / 0x602AC45C",
  "_symbols": {

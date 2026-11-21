@@ -3,7 +3,6 @@
  "description": "TEST ONLY. Camera probe of the 12-region hue, saturation and lightness stage (builder 0x7E56E186): each ART entry's film code gets its own 12-region table through the hash 0x7E78C6E4 (empty slots only), tables written over the stock tables of the descriptors that the chosen cases return (byte copies of table A / B, and the stock Key Line still table: scene modes and stock Key Line use the probe tables in this build); ART 12's film code takes Cross Process I's look curve. Data edits only, no code. Needs films-look-exif-artbkt before it (the look entry of code 159 is stock-films-structure-2's). See experiments/2026-11-20-twelve-region/NOTES.md.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "ops": [
   {
    "type": "bytes",

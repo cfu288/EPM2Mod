@@ -3,7 +3,6 @@
  "description": "An ART BKT row in RAW Data Edit (Current, Custom1, Custom2, ART BKT, No). It develops the RAW once per frame of the camera's ART BKT selection, as an ART bracket shot lists them: the current Picture Mode first, then each entry that is On. Frame 0 is a stock [Current] edit with its Yes / No; each later frame is a stock [Current] edit started and saved by the callback, with the stored Picture Mode (prm 0x9481) and the EXIF film name (FILMNAME) set first. The Picture Mode comes back at the end and at any error. Needs card-looks-6 (FILMNAME) and the stock-films composer hooks. See experiments/2026-11-20-raw-edit-art-bkt/NOTES.md section 8.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "_symbols": {
   "ACT": "0X7EBB2CC8",
   "CBDONE": "0X7EBB2B86",

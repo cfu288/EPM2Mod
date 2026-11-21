@@ -1,7 +1,6 @@
 {
  "name": "film-portra",
  "description": "Portrait look curves (Contrast -2..+2) refitted to lut_v034_portra400_portraendura.cube (experiments/2026-11-09-film-portra/fit_look.py). Tone only; saturation unchanged.",
- "status": "built, NOT camera-tested",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
  "ops": [

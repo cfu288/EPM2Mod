@@ -3,7 +3,6 @@
  "description": "TEST ONLY. Camera calibration of the colour model: ART 1-6's film codes get 12-region test tables through the hash 0x7E78C6E4 (empty slots only), written over the stock tables of the descriptors that the chosen cases return (scene modes and stock filters that share those cases use them in this build): ART 1 all records off, ART 3-5 the fitted tables of Portra 400, Velvia 100 and Ektachrome, ART 6 Natural's table A with flat curves; ART 2 and 7-12 keep the default (table A). Data edits only, no code. Needs films-look-exif-artbkt before it. See experiments/2026-11-20-model-calibration/NOTES.md.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "ops": [
   {
    "type": "bytes",

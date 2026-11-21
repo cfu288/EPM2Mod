@@ -3,7 +3,6 @@
  "description": "Battery charge as a percentage on the live-view information screen (top left). A new text label on the live-view panel, made by the panel's own builder from a new resource record, and one routine at the end of the panel's two refresh functions: it reads the battery voltage with the stock A/D routine under the stock semaphore, at most once in 2 s, and writes (count - 680) * 5 / 8 percent, 0 to 100, into the label. The scale is inferred from the E-PL3 and needs one camera check. A delta on data/builds/films-12d.json: every expect is a byte string of that build. See experiments/2026-11-17-osd-info/NOTES.md.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "_delta_on": "data/builds/films-12d.json (sha256 2cdd18e7004821b2e443ec4f08db06ab9a0d4f0f700ab53db8c4bbc1dad93e32)",
  "_ram": "T_LAST 0x602BE8C8 (u32) and RAW 0x602BE8CC (u16): slots 21 and 22 of the 37-slot table 0x602BE874, free by the same static argument as slot 20 (focus-peaking NOTES 11.3). Child slot 0 of the live-view panel object (panel + 792) holds the label",
  "_symbols": {

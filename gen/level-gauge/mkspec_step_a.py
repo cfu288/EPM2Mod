@@ -71,8 +71,6 @@ def main():
                        "('EVF Info Settings'), which no E-PM2 menu reaches. See "
                        "experiments/2026-11-14-level-gauge/NOTES.md.",
         "base": STOCK, "base_sha256": STOCK_SHA, "ops": ops,
-        "status": "camera-tested 2026-11-14 (build seven-films-6-interval-240-level): the row shows, the gauge shows "
-                  "in live view and works",
     }
     with open(OUT, "w") as f:
         json.dump(spec, f, indent=1)

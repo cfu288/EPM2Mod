@@ -296,7 +296,6 @@ def main():
                        "Mode comes back at the end and at any error. Needs card-looks-6 (FILMNAME) and the stock-films "
                        "composer hooks. See experiments/2026-11-20-raw-edit-art-bkt/NOTES.md section 8.",
         "base": STOCK, "base_sha256": hashlib.sha256(raw).hexdigest(),
-        "status": "candidate: emulator-checked, not flashed",
         "_symbols": {k: "%#X" % v for k, v in sorted(syms.items()) if k[0].isalpha() and v >= AREA},
         "ops": [
             op(AREA, code, f"new code and data, {len(code)} B of {AREA_END - AREA} (reclaim-space row 2, segment 2)"),

@@ -3,7 +3,6 @@
  "description": "The list, texts and status of the menu row 'Load Looks' (Custom Menu J, added by data/specs/custom-menu-rows-2.json): Off / Load. As data/specs/looks-menu-3.json without Built-in. Its value is the dormant setting 449 (prm tag 0xD7B1); Off is 1, Load 0. When Off the row shows text 1495, which the loader points at the result of the last load.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "ops": [
   {
    "type": "bytes",

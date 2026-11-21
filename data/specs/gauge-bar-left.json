@@ -3,7 +3,6 @@
  "description": "Level gauge, left position (camera held vertically): the bar, its + and - marks and its icon move 86 px to the right, past the ISO and touch icons, as the PEN-F places it (x 88-103). See experiments/2026-11-19-gauge-info/NOTES.md.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "ops": [
   {
    "type": "bytes",

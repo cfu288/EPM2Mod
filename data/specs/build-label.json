@@ -3,7 +3,6 @@
  "description": "Build label: the Firmware screen (Setup Menu, Firmware) shows 'Body : 1.6  EPM2Mod YYYY.MM.DD', the 'label' of the build description; epm2mod make writes it over the placeholder 0000.00.00 (cli/src/epm2mod/label.py). The version number is not changed (block 0 header +16 = 0x1600, prm tag 0xC082). Byte edits, no new code: the panel's object grows so that its value text holds 48 characters; the Body line formats with its own text, in unreferenced debug strings of segment 2; the four value texts (Body, Lens, Flash, Acc) are left-aligned in wider boxes that start at one x, so they line up as in stock. See experiments/2026-11-19-build-label/NOTES.md.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "ops": [
   {
    "type": "bytes",

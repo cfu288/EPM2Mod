@@ -3,7 +3,6 @@
  "description": "The Custom Menu with three added rows: Peaking in A after MF Assist, Load Looks in J after Eye-Fi (both as data/specs/custom-menu-rows.json, whose place this spec takes) and Debug Log in J after Load Looks (setting 447, the stock Off / On list panel 608; Off is 0, the setting's default). No stock row is changed. An 82-row copy of the item table at 0x7EBF1FF0 (10 address loads re-pointed), an 82-entry child list in segment 3 data at 0x7EE3CBF4 (11 page records re-pointed), 9 row constants (last index 81, count 82, row-state array 164 B), the group sizes of A (11) and J (8), and a value -> text list for panel 608. The row's texts 1507 and 1508 are pointed at English strings by data/specs/log-menu.json. Every expect is a byte string of the specs before custom-menu-rows in data/builds/card-looks-4.json. See experiments/2026-11-18-log-menu/design.md.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "_ram": "the row-state array of the Custom Menu page grows by 6 bytes (158 -> 164) into 0x606A31B6-BB (the next addressed object is 0x606A32F0)",
  "ops": [
   {

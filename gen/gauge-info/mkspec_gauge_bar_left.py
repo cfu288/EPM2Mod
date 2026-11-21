@@ -86,7 +86,6 @@ def main() -> None:
         "See experiments/2026-11-19-gauge-info/NOTES.md.",
         "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
         "base_sha256": hashlib.sha256(raw).hexdigest(),
-        "status": "candidate: emulator-checked, not flashed",
         "ops": ops,
     }
     OUT.write_text(json.dumps(spec, indent=1) + "\n")

@@ -267,7 +267,6 @@ def main():
                        "experiments/2026-11-14-focus-peaking/NOTES.md section 16.",
         "base": STOCK,
         "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
-        "status": "candidate: emulator-checked, not flashed",
         "_delta_on": "data/builds/peaking-menu-names.json (sha256 %s)" % PINNED_SHA,
         "_ram": "no new RAM; the new code uses 24 bytes of the ART task's stack",
         "ops": ops,

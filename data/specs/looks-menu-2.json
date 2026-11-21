@@ -3,7 +3,6 @@
  "description": "The menu row 'Load Looks' in Custom Menu J, in the place of Touch Screen Settings (the E-PM2 has no touch screen). Its value is the dormant setting 449 (prm tag 0xD7B1, MODE bank, one byte, read by no stock code; the firmware writes 1 into it at every start); its list is the stock Off / On panel 610. Three items: Off (1), Load (0), Built-in (2). When it is Off the row shows text 1495, which the loader of data/specs/card-looks-3.json points at the result of the last action (Off, Loaded, No file, Bad file, Built-in). The loader starts at Load or Built-in and sets the row back to Off. An edit of one row and one child entry of the tables of data/specs/peaking-menu.json, the list of panel 610, and English texts of built-in EVF panels (block 1). See experiments/2026-11-17-card-looks/design.md section 10.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "ops": [
   {
    "type": "bytes",

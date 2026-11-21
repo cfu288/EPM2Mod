@@ -96,7 +96,6 @@ def main() -> None:
                         % TEXT_CHARS),
         "base": STOCK,
         "base_sha256": hashlib.sha256(data).hexdigest(),
-        "status": "candidate: emulator-checked, not flashed",
         "ops": label_ops(bytes(block0), label),
     }
     with open(out, "w") as f:

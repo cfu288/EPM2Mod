@@ -3,7 +3,6 @@
  "description": "Focus peaking gets a setting: Custom Menu A, row 'Peaking' after MF Assist, with Off / White / Black. Off: MF Assist magnifies as on the build without peaking. White: as the pinned build (gain 512). Black: Key Line's own gain 0xFF00, the E-P5 value for black lines. The value is the dormant setting 458 (prm tag 0x8971, MODE bank; 1 Off, 2 Black, 3 White; 3 is its value after a full reset, and every value but 1 and 2 gives White); its list is the dormant panel 607. A delta on data/builds/peaking-gain-2x.json: every expect is a byte string of that build. See experiments/2026-11-14-focus-peaking/NOTES.md section 15.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "_delta_on": "data/builds/peaking-gain-2x.json (sha256 ce1037cda6c9ff87e600272383dfe97b649a5ef24d6928e319b581191b4ca2c8)",
  "_ram": "one new byte 0x602BE8C7 (C), the fourth byte of the unused slot 20 of table 0x602BE874 that holds L, R, L2; the row-state array of the Custom Menu page grows by 2 bytes into 0x606A31B6-B7",
  "ops": [

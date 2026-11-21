@@ -3,7 +3,6 @@
  "description": "Structured log, core: log_put / log_chg / log_cnt write 16-byte records {u16 id, u16 sequence, u32 time, u32 arg0, u32 arg1} into one RAM ring per CPU (512 records each, in RAM that no load or clear touches, 0x7E4F9000-0x7E4FD2C0 through the uncached alias). They never call the file system. Events: boot, firmware error (the recorder 0x7E426D4B), GUI state. The dormant task USRTEST_A becomes the flush task: when the GUI enters a menu, playback or power-off state and the card is not being written, it appends the new records to C:\\EPM2LOG.BIN in 512-byte blocks (stops at 4 MiB). DEBUG builds only. The event ids are in data/logdict/events.json (build id d1ddd46b4dac2414). A delta on data/builds/peaking-colours.json: every expect is a byte string of that build. See experiments/2026-11-15-log/NOTES.md and docs/reference/logging.md.",
  "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
  "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
- "status": "candidate: emulator-checked, not flashed",
  "_delta_on": "data/builds/peaking-colours.json (sha256 4d6b1f26ed92d66b62b4d7dc32d26168e33fd8b153a7655d6c0d9a58267456f8)",
  "_build_id": "d1ddd46b4dac2414",
  "ops": [
