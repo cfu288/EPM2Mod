@@ -14,6 +14,12 @@ and delete the item here.
   against films-look-exif, and grays improved less than model3 predicted (0.75 against 0.63)
   (`experiments/2026-11-20-model-calibration/NOTES.md` §11).
 - Per-film 12-region tables: only after the stage rules predict a real table (`experiments/2026-11-20-model-calibration/NOTES.md` §6).
+- To consider with the next film feature that needs a flash, not decided: film codes 185 to 255 with one range test
+  per colour stage, in place of table and hash entries per code. Each stage has one dispatch site that stills and
+  live view share, and codes above 184 take the default branch today (read in the disassembly, 2026-11-21). It
+  removes the in-place kind of entry and its special cases (white-balance pair, adaptive-hue hook, matrix pointer);
+  the hidden-value kind, the ART BKT hooks and the settings remap stay. Cost: 5 or 6 new hooks in segment 1 and a
+  full film re-test on the camera. Check first in the emulator: `emulator/filmcheck.py` with one entry on code 200.
 
 ## One-click installer
 
