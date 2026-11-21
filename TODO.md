@@ -91,6 +91,12 @@ candidate `osd-battery` are kept.
   `data/logdict/events.json`. The pinned build has it: Custom Menu J → Debug Log (Off by default). Probes go into the old
   features too (peaking, picture mode changes, level gauge, interval, film looks, firmware errors).
   Next: code from the card.
+- To explore, not decided: a loader, as [OMKit](https://github.com/necrostaz/omkit) has for the OM-5 Mark II. One
+  small flashed hook starts a task that reads code from the card into RAM and runs it, so a new feature is a file copy
+  and not a flash; holding OK at power-on skips it. Unknown on the E-PM2: a start-up point late enough, and free RAM
+  that may hold code. Smallest probe, one flash: our task reads a file into RAM we own, jumps to it, and writes one
+  line to the Debug Log. Cost to weigh: a feature loaded this way needs the card in the camera. OMKit also builds C
+  with GCC for this processor and wraps the firmware's calls in one driver layer.
 - Feature candidates from the survey of 22 other bodies and of other mods:
   `experiments/2026-11-15-feature-survey/`. Cheap ones: video bitrate and time limit (patches
   written), Light Box (hidden in this firmware), Add Effects on film simulations, more film simulations.
