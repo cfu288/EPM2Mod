@@ -12,8 +12,9 @@
   curve for the three channels (`experiments/2026-11-17-card-looks/design.md`).
   `fits/*-n2.npz` are the fits the catalogue uses: corrected for the camera without the 12-region stage
   (`films-twelve-off`) and measured on it (2026-11-21, `experiments/2026-11-20-model-calibration/NOTES.md` §9-11).
-  `fits/*-c1.npz` (the camera round of 2026-11-20) and the older file of the same film are earlier fits; the specs of
-  older builds in `data/specs/` were made from them.
+  The other files are earlier fits that a spec, a test or a list still names (the specs of older builds in
+  `data/specs/` were made from them); earlier fits that nothing names were removed on 2026-11-21
+  (`docs/dev/moved-paths.md`).
 
 How the fits were made: `experiments/2026-11-09-film-portra/`, `experiments/2026-11-16-films-max/` and
 `experiments/2026-11-18-more-films/`.

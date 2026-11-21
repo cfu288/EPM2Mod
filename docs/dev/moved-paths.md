@@ -34,3 +34,4 @@ path that moved. A folder row covers every file in it.
 | `pyproject.toml` (the package) | `cli/pyproject.toml`; the root `pyproject.toml` is the uv workspace | 2026-11-19 |
 | `docs/dev/art-filter-slots.md` | removed (the compiled-slot design of 2026-11-12); the stage dispatch and today's routing are in `docs/dev/colour-pipeline.md` §2; the old text is in git at d7dc900 | 2026-11-20 |
 | `docs/dev/art-slots-evaluation.md` | removed (a dated evaluation of 2026-11-12, superseded by films-12 and the card path); the text is in git at d7dc900 | 2026-11-20 |
+| `data/films/fits/`: 33 fits no list names (the films' fits before 2026-11-21 and their `-c1` corrections, e.g. `portra.npz`, `portra160-c1.npz`) | removed; the catalogue uses `*-n2.npz` (`data/films/README.md`); the files are in git at d38cf0a | 2026-11-21 |
