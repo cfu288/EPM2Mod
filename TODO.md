@@ -86,6 +86,22 @@ candidate `osd-battery` are kept.
 
 ## Foundations
 
+- From the firmware review of 2026-11-21 (`experiments/2026-11-21-firmware-dive/NOTES.md`), not decided, in the
+  order of what they would settle:
+  - A defect: in every language but English the Peaking row and the Lowest S/S Setting row show unrelated Olympus
+    texts (§5). Setting their texts at run time, as Load Looks does, fixes both.
+  - The 7 film hooks in segment 1 that jump to segment 2 are safe by timing only: live view can start before the
+    segment copies end (§2). First the margin, from the firmware's own boot marks in the Debug Log; then move the
+    two routines into early-loaded space.
+  - Space: 32,752 blank bytes in the kernel range pass every emulator check (§1). One flash with a pattern and a
+    checksum in the Debug Log settles it, and with it the room for the item above.
+  - A start point after the segment copies with no jump over code, through segment 3's constructor table (§2). It
+    could apply the stored film simulations before the first frame.
+  - Smaller: 1,906 dead bytes of menu tables (§5); 15 tone tables per entry in place of 24 (§4); the 30 ART BKT
+    hooks as 6 (§4).
+  - A card folder `PARAMDT` overrides settings on stock firmware in the emulator (§7): camera probes without a flash,
+    if it works on the camera. Its worst case is not bounded: start with one harmless tag.
+
 - Structured log: works on the camera (2026-11-15). Evaluation of the first log and the next
   probes (power-on factor, real restart count, per-CPU gates, peaking loop time, flush end):
   `experiments/2026-11-15-log/evaluation-1.md`. Unknown: if the ring RAM survives a crash restart.

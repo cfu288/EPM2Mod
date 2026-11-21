@@ -24,6 +24,6 @@ If the menu has no Custom Menu tab (gears icon), enable it in **MENU â†’ SETUP â
 
 - Only in **P** and **A**, with **ISO Auto** and **no flash**. Otherwise the setting has no effect.
 - Values: Auto, 60" to 1/4000 in 1/3 EV steps.
-- The row's texts are English in every menu language.
+- The row is only named correctly when the camera language is English.
 
 For implementation details, see the [notes](../../experiments/2026-11-17-auto-iso-min-shutter/NOTES.md) (sections 11 and 12).
