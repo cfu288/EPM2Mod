@@ -1,0 +1,26 @@
+{
+ "name": "peaking-mf",
+ "description": "Focus peaking whenever the focus mode in use is MF (prm 0xC021 = 1), with any lens and without the magnified view; the focus-ring trigger (MF Assist) as before. T_R's test of R goes through T_MF in segment 2. experiments/2026-11-21-peaking-mf/NOTES.md.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7d1e48",
+   "expect": "006930310072656164794578656375746553656c6641646a7573740069303200693033006765744d6f6465006930340067",
+   "new": "fca8c5e82b60a000c923fccc21c00000900004ddfa4d86ffc00cfcddd01c5b6004a001c80800dc47658dffdc1b658dffcb",
+   "_addr": "0x7ebf2e68",
+   "_note": "new code, segment 2: T_MF (49 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xa8384",
+   "expect": "fca8c5e82b60a000c829",
+   "new": "dcc49a7200cbcbcbcbcb",
+   "_addr": "0x7e4c93a4",
+   "_note": "T_R (custom-menu-rows-3): `movbu (R),d0 / cmp 0,d0 / beq` -> `jmp T_MF` + nop"
+  }
+ ]
+}
