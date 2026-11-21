@@ -86,3 +86,12 @@ the record view only, and when the latch runs in that window is not known: not u
 | build, free space (the build and the pinned build) | sha256 `6a47806dfafce15d281358eae2beffe397132e5999c50b28c69b2a2467efcf39`; PASS, PASS |
 | `scripts/emu_tr.py` | PASS: 24 latch cases (GUI 0x5100: as §4; GUI 0x5101: R = 0 and MF give no lines, R = 1 as pinned) and T_GS for 0x5100, 0x5101, 0x5705 (word written, registers kept, on to T_GUI) |
 | `tools/checks.py --tier full`, hookcheck | free space, op-check, boot-test, update-path-test PASS; save-guard S24 / S25 PASS; S4 R = 0, S5 as pinned, S7 PASS; S6 against the pinned films-start-texts PASS (`scen_direct4.py s6`); hookcheck: 2 transfers (the GUI hook to T_GS, T_GS to T_GUI), 0 FAIL |
+
+## 8. Camera result of the record-view fix (2026-11-21, sha256 `6a47806d…`, on films-start-texts) [C]
+
+MF, Peaking White, MF Assist Off: lines in live view the whole time without zoom; at the half-press they stop; the
+record-view preview has none; the photo is normal; afterwards they come back. S-AF: none. Digital Tele-converter 2x:
+lines. Movie mode: no lines, recording or not (the latch's movie condition, unchanged). S-AF+MF: no lines, because
+MF Assist was Off (the log has no `pk_mf_start` in the session) and S-AF+MF is S-AF in prm 0xC021 (criterion 3).
+Log (session 161): at each GUI state 0x5101, L 1 -> 0 in the same frame (six times), back to 1 at 0x5000 / 0x5100;
+once L = 2 for 0.07 s after a shot (T_GUARD), then 1.
