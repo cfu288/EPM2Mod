@@ -64,3 +64,25 @@ segment 1, the data image or blocks 1 to 3 (V, byte diff).
 - `hookcheck.py` does not see `T_CTOR`: the table word is a data pointer. Its three targets were read by hand: the
   log's record routine (kernel area), `STORED` (segment 3) and 0x7EEC05FF, all after both segment copies.
 - `docs/reference/logging.md` describes the pinned build's log spec and id. It changes when this build is pinned.
+
+## Camera result (2026-11-21)
+
+Flashed by the owner. `docs/camera-log/2026-11-21-films-start-texts.md` has the row. Labels here: C camera.
+
+| Event, three starts with 12 film simulations stored | Time after power-on |
+|---|---|
+| `seg_loaded` (the segment copies have ended) | 362 to 365 ms |
+| `film_applied`, `store_ok 1` | 430 to 433 ms |
+| first `film_stage` (CPU 1) | 1,646 to 1,647 ms |
+| first GUI state | 1,703 to 1,763 ms |
+| the loader's task at the first GUI state | 2,161 to 2,577 ms |
+
+- **S1 holds (C).** The stored file is applied 1.2 s before the first colour stage job. In films-twelve-off the
+  loader ran at about 2.2 s, after the first stage job at about 1.7 s.
+- **The settings bank is in memory at the constructor (C)**: `store_ok 1` in every start.
+- **R1 (C): the margin of the 7 film hooks from segment 1 into segment 2 is 1.28 s** in these three starts, lever
+  start, mode P. Not measured: a start with the shutter held, a start from sleep.
+- The apply takes 68 ms on the camera (17 ms in the emulator).
+- **T1, T2 in Chinese (C):** no unrelated Olympus text. Peaking, White and Load Looks are English, as built. The
+  owner counts that as incomplete: a translation is a new piece of work.
+- Three photos after power-on have the film simulation's look and name.

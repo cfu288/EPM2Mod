@@ -90,8 +90,9 @@ candidate `osd-battery` are kept.
   (2026-11-21): what is flashed and works is not moved. So two items are work, and the rest are rules for new work.
   - Defect: in every language but English the Peaking row and the Lowest S/S Setting row show unrelated Olympus
     texts (§5). Set their texts at run time, as Load Looks does.
-  - Measure, change nothing: the 7 film hooks in segment 1 that jump to segment 2 are safe by timing only (§2).
-    Write the firmware's own boot marks to the Debug Log to get the margin. Only a small margin justifies a change.
+  - Measured on the camera with `films-start-texts` (2026-11-21): the segment copies end 1.28 s before the first
+    colour stage job (three lever starts in P), so the 7 film hooks from segment 1 into segment 2 have that margin.
+    Not measured: a start with the shutter held, and wake from sleep. Nothing is moved.
   - For new work:
     - new code goes in segment 2 or 3; when the proven room there runs out, prove a slice of the 123,745 B of
       debug-shell handlers in segment 2 (§1). The kernel range gets nothing new unless an early hook forces it;
