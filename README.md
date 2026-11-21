@@ -45,7 +45,3 @@ Do the steps that `install` prints. To use other film simulations, change the na
 
 To go back to the original firmware, see [docs/user/install.md](docs/user/install.md).
 
-## Contributing
-
-To set up a checkout, make a build of your own and check it, see [CONTRIBUTING.md](CONTRIBUTING.md).
-
