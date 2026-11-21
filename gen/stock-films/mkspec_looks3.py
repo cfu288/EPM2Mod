@@ -25,14 +25,11 @@ RAM: the gap 0x7E4D0000-0x7E4F0000 (block-0 bytes that no load or clear touches;
 a reclaimed code area of segment 3 (0x7EE53830: first code there; this build's flash is its test).
 """
 
-import hashlib
 import json
 import os
 import re
 import struct
-import subprocess
 import sys
-from pathlib import Path
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
@@ -40,14 +37,11 @@ sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(ROOT, "cli", "src"))
 
 import mkspec_looks as mk  # noqa: E402
-import mkspec_slots  # noqa: E402
 from epm2mod.container import parse  # noqa: E402
-from epm2mod.looks import lookfile, lookpack, slots  # noqa: E402
-from epm2mod.paths import RepoPaths  # noqa: E402
+from epm2mod.looks import lookfile, slots  # noqa: E402
 
 V4 = "--v4" in sys.argv          # card-looks-4: the Custom Menu of data/specs/custom-menu-rows.json (an added row)
 SPEC = "card-looks-4" if V4 else "card-looks-3"
-MENU_SPEC = "data/specs/looks-menu-3.json" if V4 else "data/specs/looks-menu-2.json"
 BASE = mk.BASE
 BIN = mk.BIN
 RUNS = dict(mk.RUNS)
@@ -59,7 +53,6 @@ LANG = 0xBFF3D000           # the loaded language's blob; its first word: the ad
 LANG_SPAN = 0x43000
 T_LABEL, T_LOAD, T_HELP, T_BUILTIN, T_STATUS, T_OFF = 1498, 1496, 1497, 1503, 1495, 1371
 RAM = 0x7E4D0000            # the RAM gap (cached address); the code uses the uncached alias
-RAM_END = 0x7E4F0000
 ENGLISH = (0x38B758, 0xBFBC4E20)   # pointer array of the English blob in block 1, and its load bias
 
 # English texts of block 1 by id (stock firmware), to find the ids that show an entry's name
@@ -87,43 +80,6 @@ def name_ids():
         assert 2 <= len(found) <= 3, (entry, found)
         ids.append(found)
     return ids
-
-
-def live_records(b):
-    """For each slot, the three tone records (cached addresses) whose member 1 is the slot's stills table; 0 for the
-    two slots with records of their own (all eight tables of a record are written by APPLY already)."""
-    w = lambda a: struct.unpack_from("<I", b, a - BASE)[0]
-    where = {s.entry: s for s in slots.SLOTS}
-    extra = {s.entry: s.look for s in slots.EXTRA_SLOTS}
-    where.update({e: extra[e] for e in ("Grainy Film", "Gentle Sepia", "Dramatic Tone", "Key Line", "Watercolor")})
-    out = []
-    for entry in lookfile.MENU_ENTRIES:
-        s = where[entry]
-        if not isinstance(s.tone, slots.Tables):
-            out.append([0, 0, 0])
-            continue
-        recs = []
-        for t in s.tone.addresses:
-            hits = [BASE + i for i in range(0, len(b) - 32, 4) if b[i:i + 4] == struct.pack("<I", t)]
-            cand = [h - 4 for h in hits if all(w(h - 4 + 4 * k) == t for k in (1, 3, 5, 7))]
-            assert len(cand) == 1, (entry, hex(t), [hex(c) for c in cand])
-            recs.append(cand[0])
-        out.append(recs)
-    return out
-
-
-def interp(t1, d1, d0):
-    """INTERP in Python: the member-0 table from the stills table t1 (made at the default d1) and the default d0."""
-    out, j = [], 0
-    for x in d0:
-        while j < 255 and d1[j + 1] <= x:
-            j += 1
-        if j == 255 or x <= d1[j]:
-            out.append(t1[j])
-        else:
-            dx = d1[j + 1] - d1[j]
-            out.append(t1[j] + ((t1[j + 1] - t1[j]) * (x - d1[j]) + dx // 2) // dx)
-    return out
 
 
 def u16s(s):
@@ -617,201 +573,3 @@ def tail_asm():
     """VERIFY, V_REC, APPLY, A_TONE, A_PUT of the card-looks-2 loader (mkspec_looks.ASM), unchanged."""
     s = mk.ASM
     return s[s.index('.section .vf,"ax"'):]
-
-
-def main():
-    paths = RepoPaths(Path(ROOT))
-    work = os.path.join(ROOT, "build", "card-looks")
-    os.makedirs(work, exist_ok=True)
-    base_specs = (mkspec_slots.LAYOUT4 if V4 else mkspec_slots.LAYOUT) + [MENU_SPEC]
-    fw = os.path.join(work, "base-%s.BIN" % ("4" if V4 else "3"))
-    subprocess.run(["uv", "run", "epm2mod", "apply", *base_specs, "--from", "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN", "-o", fw], cwd=ROOT, check=True,
-                   capture_output=True)
-    b = mk.block0(fw)
-    blk_path = os.path.join(work, "base-%s.block0.bin" % ("4" if V4 else "3"))
-    open(blk_path, "wb").write(b)
-    table = mk.slot_ops(b, True)
-    kinds = [k for k, _ in table]
-    spans = [(a, 2 * n if d else n) for _, ops in table for _, n, a, d in ops]
-    snapn = sum(n for _, n in spans)
-    ids = name_ids()
-    recs = live_records(b)
-    rlive = (RAM + 0x800 + snapn + 0xFFF) & ~0xFFF
-    assert rlive + 36 * 4 * 512 <= RAM_END, hex(rlive + 36 * 4 * 512)
-
-    # the model: the built-in looks give the base's bytes; the live tables are within 7 codes of exact
-    looks = lookpack.load_list(paths, paths.card_looks)
-    data = lookfile.pack(looks)
-    assert mk.model_verify(data, kinds)
-    same = bytearray(b)
-    mk.model_apply(same, data, table)
-    assert same == b
-    w = lambda a: struct.unpack_from("<I", b, a - BASE)[0]
-    tbl = lambda a: list(struct.unpack_from("<256H", b, a - BASE))
-    dr = [w(slots.DEFAULT_RECORD + 4 * i) for i in range(8)]
-    worst = 0
-    for s, look in enumerate(looks):
-        for ch, rec in enumerate(recs[s]):
-            if not rec:
-                continue
-            t1 = tbl(w(rec + 4))
-            for m in range(4):
-                approx = interp(t1, tbl(dr[1]), tbl(dr[2 * m]))
-                exact, top = [], 0
-                for x in tbl(dr[2 * m]):
-                    top = max(top, look.curves[ch][min(x, 1023)])
-                    exact.append(top)
-                worst = max(worst, max(abs(p - q) for p, q in zip(approx, exact)))
-    assert worst <= 8, worst
-    print("model: built-in looks give the base's bytes; live tables within %d codes of exact; snapshot %d B" % (
-        worst, snapn))
-
-    # data: the slot table (as card-looks-2) and, after it in the second area, the tables of this loader
-    areas, slottab, crct = mk.data_area(table)
-    d1 = DATA[1][0] + len(areas[1])
-    d1 = (d1 + 3) & ~3
-    extra = bytearray()
-    at = lambda: d1 + len(extra)
-    pad = lambda: extra.extend(bytes(-len(extra) % 4))
-    nameids = at()
-    for s in range(12):
-        extra += struct.pack("<3H", *(ids[s] + [0] * (3 - len(ids[s]))))
-    pad()
-    liverec = at()
-    for s in range(12):
-        extra += struct.pack("<3I", *recs[s])
-    strings = {}
-    for key, text in (("label", "Load Looks"), ("load", "Load"),
-                      ("help", "Load film looks from\r\nEPM2LOOK.BIN on the card."), ("builtin", "Built-in"),
-                      ("loaded", "Loaded"), ("nofile", "No file"), ("bad", "Bad file"), ("work", "Loading")):
-        pad()
-        strings[key] = at()
-        extra += u16s(text)
-    pad()
-    txttab = at()
-    for tid, key in ((T_LABEL, "label"), (T_LOAD, "load"), (T_HELP, "help"), (T_BUILTIN, "builtin")):
-        extra += struct.pack("<HHI", tid, 0, strings[key])
-    areas[1] = bytes(areas[1]) + bytes(d1 - DATA[1][0] - len(areas[1])) + bytes(extra)
-    assert DATA[1][0] + len(areas[1]) <= DATA[1][1], "the data do not fit"
-
-    subs = {"store": mk.STORE, "scratch": mk.SCRATCH, "maxread": mk.MAXREAD, "slottab": slottab, "crct": crct,
-            "nameids": nameids, "liverec": liverec, "txttab": txttab, "txt_label": strings["label"],
-            "s_loaded": strings["loaded"], "s_nofile": strings["nofile"], "s_bad": strings["bad"],
-            "s_builtin": strings["builtin"], "s_work": strings["work"], "defrec": slots.DEFAULT_RECORD, "lang": LANG,
-            "lang_neg": (-LANG) & 0xFFFFFFFF, "lang_span": LANG_SPAN, "label_off": 4 * T_LABEL,
-            "off_off": 4 * T_OFF, "status_off": 4 * T_STATUS, "ram": RAM, "snapn": snapn, "rlive": rlive,
-            "rw0": mk.REFRESH_WORDS[0], "rw1": mk.REFRESH_WORDS[1], "rb0": mk.REFRESH_BYTES[0],
-            "rb1": mk.REFRESH_BYTES[1], "displaced": mk.displaced(blk_path, mk.HOOK[0], mk.HOOK[1]),
-            "back": mk.HOOK[0] + mk.HOOK[1]}
-    asm = ASM_HEAD % subs + tail_asm() % subs
-    args = ["--defsym=s_%s=0x%s" % (x, x) for x in sorted(set(re.findall(r"(?:jmp|call)\s+0x([0-9a-f]{8})", asm)))]
-    asm = re.sub(r"((?:jmp|call)\s+)0x([0-9a-f]{8})", r"\1s_\2", asm)
-    asm += '\n.section .hs,"ax"\n    jmp T_GUI\n'
-    args += ["--section-start=.hs=%#x" % mk.HOOK[0]] + ["--section-start=%s=%#x" % (k, a) for k, (a, _) in RUNS.items()]
-    s, o, e, sb = (os.path.join(work, "looks3." + x) for x in ("s", "o", "elf", "bin"))
-    open(s, "w").write(asm)
-    mk.run(BIN + "/mn10300-elf-as", "-o", o, s)
-    mk.run(BIN + "/mn10300-elf-ld", *args, "-e", "%#x" % RUNS[".x1"][0], "-o", e, o)
-    syms = {m.group(2): int(m.group(1), 16) for m in
-            re.finditer(r"^([0-9a-f]{8}) \w\s+\S+\s+\S+\s+(\w+)$", mk.run(BIN + "/mn10300-elf-objdump", "-t", e), re.M)}
-
-    def sect(name):
-        mk.run(BIN + "/mn10300-elf-objcopy", "-O", "binary", "-j", name, e, sb)
-        return open(sb, "rb").read()
-
-    stock = mk.block0(os.path.join(ROOT, STOCK))
-    ops = []
-
-    def op(addr, new, note):
-        expect = bytes(b[addr - BASE: addr - BASE + len(new)])
-        assert expect != new, note
-        ops.append({"type": "bytes", "block": 0, "offset": "0x%X" % (addr - BASE), "expect": expect.hex(),
-                    "new": new.hex(), "_addr": "0x%08X" % addr, "_note": note})
-
-    total = 0
-    for name, (lo, hi) in RUNS.items():
-        code = sect(name)
-        if not code:
-            continue
-        assert lo + len(code) <= hi, "%s: %d B do not fit %d B" % (name, len(code), hi - lo)
-        assert b[lo - BASE: hi - BASE] == stock[lo - BASE: hi - BASE], "%s: the run is in use" % name
-        if code[-1] == b[lo - BASE + len(code) - 1]:
-            code += b"\xcb"
-        op(lo, code, "new code, %s (%d B)" % ("segment 3, reclaimed code area: first code" if name == ".x1"
-                                             else "segment 2", len(code)))
-        total += len(code)
-        print("%s: %4d B at %#x, %4d B free after" % (name, len(code), lo, hi - lo - len(code)))
-    for k, blob in enumerate(areas):
-        lo = DATA[k][0]
-        assert b[lo - BASE: lo - BASE + len(blob)] == stock[lo - BASE: lo - BASE + len(blob)]
-        op(lo, bytes(blob), "data, segment 3 (%d B): %s" % (len(blob), "the slot table (12 pointers, the CRC-32 "
-           "nibble table, operation lists)" if k == 0 else "operation lists, name ids, tone records, texts"))
-        print("data %d: %4d B at %#x" % (k, len(blob), lo))
-    h = sect(".hs")
-    assert len(h) == mk.HOOK[1] and h[0] == 0xDC and bytes(b[mk.HOOK[0] - BASE: mk.HOOK[0] - BASE + 5]) == mk.HOOK[2]
-    op(mk.HOOK[0], h, "hook: jmp T_GUI. GUI state setter 0x7ECDF5E9, its last trace call (task CA_MAIN)")
-    assert mk.word(b, mk.TASK_ENTRY) == mk.TASK_ENTRY_STOCK
-    op(mk.TASK_ENTRY, struct.pack("<I", syms["T_TASK"]),
-       "CPU0 task table, row of id 0x90 (USRTEST_A, dormant in stock): entry 0x7E501C5B -> T_TASK")
-    prio = mk.TASK_ENTRY + 4
-    assert b[prio - BASE: prio - BASE + 4] == struct.pack("<I", 11)
-    op(prio, b"\x0d", "CPU0 task table, row of id 0x90 (USRTEST_A): priority 11 -> 13, the lowest that stock tasks "
-       "use (one does; 91 have 11): the start-up work of the loader (the built-in tables, the live tables) waits for "
-       "the firmware's own tasks")
-    print("code %d B; T_TASK %#x, T_GUI %#x; RAM: snapshot %#x-%#x, live tables %#x-%#x" % (
-        total, syms["T_TASK"], syms["T_GUI"], RAM + 0x800, RAM + 0x800 + snapn, rlive, rlive + 36 * 4 * 512))
-    keep = {k: syms[k] for k in ("T_TASK", "T_GUI", "T_STORED", "T_END", "SAVE", "V_OK", "V_BAD", "APPLY", "FLAGS",
-                                 "NAMES", "LIVE", "COPYALL")}
-    json.dump({**keep, "STORE": mk.STORE, "SCRATCH": mk.SCRATCH, "RAM": RAM, "RLIVE": rlive, "SNAPN": snapn,
-               "IDS": ids, "RECS": recs, "STRINGS": strings}, open(os.path.join(work, "syms-%s.json" % ("4" if V4 else "3")), "w"))
-    json.dump([[a, n] for a, n in spans], open(os.path.join(work, "spans-%s.json" % ("4" if V4 else "3")), "w"))
-
-    spec = {
-        "name": SPEC,
-        "description": (
-            "Film looks loaded from the SD card with the menu row 'Load Looks' (data/specs/looks-menu-2.json), kept in "
-            "the camera, for twelve colour slots. Load (setting 449 = 0) reads C:\\\\EPM2LOOK.BIN into the EEROM "
-            "bank's unused tail, checks it (magic, version, lengths, CRC-32, camera and firmware, slots and kinds), "
-            "keeps it in the store at 0x%08X (bank save when a byte changed), puts back the built-in tables and "
-            "applies its looks: every table of each listed entry, the names of the looks in the menu (the string ids "
-            "of each entry in the loaded language's table in RAM), and member-0 tables (live view) for the ten "
-            "slots with three tables. Built-in (2) empties the store and puts back the built-in tables, kept at the "
-            "first GUI state of the session in RAM 0x7E4D0800. When Off the row shows the result: Off, Loaded, No "
-            "file, Bad file, Built-in. The row's texts are written into every language's table. Every start applies "
-            "the stored looks. The hook on the GUI state setter's trace call 0x7ECDF6E4, the task USRTEST_A, the "
-            "code runs of card-looks-2 and new code in the reclaimed code area 0x7EE53830 of segment 3. Every "
-            "expect is a byte string of the specs of data/builds/card-looks-3.json before it. See "
-            "experiments/2026-11-17-card-looks/design.md section 10." % mk.STORE).replace(
-            "data/specs/looks-menu-2.json", MENU_SPEC).replace("data/builds/card-looks-3.json", "data/builds/%s.json" % SPEC),
-        "base": STOCK,
-        "base_sha256": hashlib.sha256(open(os.path.join(ROOT, STOCK), "rb").read()).hexdigest(),
-        "status": "candidate: emulator-checked, not flashed",
-        "_ram": "the EEROM bank's unused tail: store 0x%08X, scratch 0x%08X; the RAM gap: status, names 0x%08X-"
-                "0x%08X, built-in tables 0x%08X-0x%08X, live tables 0x%08X-0x%08X; 4 flag bytes in the code"
-                % (mk.STORE, mk.SCRATCH, RAM, RAM + 0x800, RAM + 0x800, RAM + 0x800 + snapn, rlive,
-                   rlive + 36 * 4 * 512),
-        "ops": ops,
-    }
-    with open(os.path.join(ROOT, "data", "specs", SPEC + ".json"), "w") as f:
-        json.dump(spec, f, indent=1)
-        f.write("\n")
-    desc = {
-        "what": "Film simulations in the twelve art filter entries, each of which takes any look; film looks "
-                "loaded from the SD card with the menu row Load Looks in Custom Menu J, shown under their own names and kept in "
-                "the camera; interval shooting with up to 240 frames, a level gauge with calibration, and focus "
-                "peaking",
-        "specs": base_specs + ["data/specs/%s.json" % SPEC],
-        "first_code": True,
-    }
-    with open(os.path.join(ROOT, "data", "builds", SPEC + ".json"), "w") as f:
-        json.dump(desc, f, indent=1)
-        f.write("\n")
-    print("wrote data/specs/%s.json (%d ops) and data/builds/%s.json" % (SPEC, len(ops), SPEC))
-    argv = [a for a in sys.argv[1:] if a != "--v4"]
-    if argv:
-        txt = mk.run(BIN + "/mn10300-elf-objdump", "-d", *sum((["-j", k] for k in RUNS), []), "-j", ".hs", e)
-        open(argv[0], "w").write(re.sub(r"/[^\s:]*looks3\.elf", "looks3.elf", txt))
-
-
-if __name__ == "__main__":
-    main()
