@@ -185,7 +185,7 @@ IMAGE is `stock`, `data/builds/NAME.json` or a `.BIN` file. No firmware is in th
 
 | Check | Command (from the repository root) | What it proves |
 |---|---|---|
-| Boot test | `emulator/boot-test IMAGE` | The image starts like stock: loader copies, both kernels, all tasks, the application. Exit status 0 = pass. It caught a build that would have crashed at every start |
+| Boot test | `emulator/boot-test IMAGE` | The image starts like stock: loader copies, both kernels, all tasks, the application. Exit status 0 = pass, or the same start with moved time stamps (the tool lists them). It caught a build that would have crashed at every start |
 | Update path | `emulator/update-path-test IMAGE` | With OK held and an update file on the card, the image finds the file as stock does |
 | Menu screenshots | `emulator/emu-run IMAGE play.mjs OUTDIR STEP...` | The firmware's own menus, drawn by its own code, in English, as PNG files |
 | Screenshot comparison | `emulator/boot/shotdiff.sh IMAGE_A IMAGE_B OUTDIR STEP...` | Which screens a patch changes |

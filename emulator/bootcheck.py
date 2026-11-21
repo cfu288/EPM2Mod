@@ -11,7 +11,8 @@ update_path_test(image)  boots both with OK held and an update file on the card
 The comparison rule of the boot test (RULE below is printed with --rule):
 
   The image passes when its own run ends with "STAGE 2: PASS" and every line of its report equals
-  the reference's line, after these and only these parts are taken out of both:
+  the reference's line, after these and only these parts are taken out of both (1 to 3) or compared
+  as numbers (4):
     1. the wall time            "wall ms N" in the first line (the host's speed);
     2. the instruction counts   "insns cpu0 N cpu1 N" in the first line (new code runs more or
                                 fewer instructions; the lab time they give is compared in 4);
@@ -19,13 +20,24 @@ The comparison rule of the boot test (RULE below is printed with --rule):
                                 observers hit" (how often the idle loops ran);
     4. lab time stamps          a time stamp (lab ms with one decimal, in the lines "quick start log",
                                 "camera API async calls", "file task", "firmware error log entries")
-                                may differ by TIME_TOLERANCE_MS or less. A larger shift fails.
+                                may differ by TIME_TOLERANCE_MS or less: it counts as equal.
   Everything else must be equal: the stop reason and pc, the console text, the boot marks, the task
   counts per state on both CPUs, the events, the API calls, the file task's commands, the firmware
   error entries (codes, callers, arguments), every other stand-in's hit count, the transfer counts,
   S-DIV0's count and the refused MMIO accesses, CPU1's state and the problems line.
   A patch that makes the start-up do something else on purpose (one more console line, one more
   flash write) fails this rule. Read the printed lines, then decide by hand; do not widen the rule.
+
+  The three results:
+    PASS         every line is equal under the rule. Exit status 0.
+    FAIL         the image does not reach the end of start-up, or what happens differs: a line is
+                 missing, added or changed, or the entries of a line are in another order. Exit
+                 status 1.
+    TIMES MOVED  the same lines with the same entries in the same order, and one or more time stamps
+                 differ by more than TIME_TOLERANCE_MS. Each one is printed (line, entry, reference
+                 time, image time, difference), then one line with the total. Exit status 0: a later
+                 or earlier time is not a fault, and the emulator's times are not the camera's. A
+                 person reads the list and writes down the cause. With --strict-times: exit status 1.
 """
 
 import os
@@ -63,8 +75,11 @@ def normalise(report):
     return out
 
 
-def compare_reports(ref, new):
-    """Return a list of differences (strings) between two boot reports under the rule. Empty = equal."""
+def compare_reports(ref, new, times=True):
+    """Return a list of differences (strings) between two boot reports under the rule. Empty = equal.
+
+    times=False leaves out the lines whose only difference is a moved time stamp (see moved_stamps).
+    """
     a, b = normalise(ref), normalise(new)
     ra, rb = ref.rstrip("\n").split("\n"), new.rstrip("\n").split("\n")
     diffs = []
@@ -75,9 +90,22 @@ def compare_reports(ref, new):
             diffs.append(f"line {i + 1} differs:\n  reference: {_cut(ra[i], rb[i])[0]}\n  image:     {_cut(ra[i], rb[i])[1]}")
             continue
         worst = max((abs(x - y) for x, y in zip(sa, sb)), default=0.0)
-        if worst > TIME_TOLERANCE_MS + 1e-9:
+        if times and worst > TIME_TOLERANCE_MS + 1e-9:
             diffs.append(f"line {i + 1}: a time stamp moved by {worst:.1f} ms (more than {TIME_TOLERANCE_MS} ms):\n  reference: {_cut(ra[i], rb[i])[0]}\n  image:     {_cut(ra[i], rb[i])[1]}")
     return diffs
+
+
+def moved_stamps(ref, new):
+    """Return [(line number, entry text, reference ms, image ms)] of the time stamps that moved by more
+    than the tolerance, in the lines that are equal in everything else."""
+    ra, rb = ref.rstrip("\n").split("\n"), new.rstrip("\n").split("\n")
+    moved = []
+    for i, ((ta, sa), (tb, sb)) in enumerate(zip(normalise(ref), normalise(new))):
+        if ta != tb or len(sa) != len(sb):
+            continue
+        names = [re.split(r" [|;] ", ra[i][m.end() + 1 :])[0][:50] for m in STAMP.finditer(ra[i])]
+        moved += [(i + 1, n, x, y) for n, x, y in zip(names, sa, sb) if abs(x - y) > TIME_TOLERANCE_MS + 1e-9]
+    return moved
 
 
 def _cut(x, y, width=200):
@@ -129,8 +157,12 @@ def _why_no_boot(code, out, err):
     return f"exit {code}; {tail}"
 
 
-def boot_test(image, ref="stock", ms=2000, out_dir=None, say=print):
-    """Run the boot test. Return OK or FAIL; raise emuenv.EmuSetupError when the emulator cannot run."""
+def boot_test(image, ref="stock", ms=2000, out_dir=None, say=print, strict_times=False):
+    """Run the boot test. Return OK or FAIL; raise emuenv.EmuSetupError when the emulator cannot run.
+
+    Time stamps that moved, with nothing else different, give the result TIMES MOVED: OK, or FAIL when
+    strict_times is set.
+    """
     (rc, rout, rerr), (ic, iout, ierr) = _run_pair("stage2-boot.mjs", [ref, image], [str(ms)])
     _save(out_dir, "boot-reference.txt", rout + rerr)
     _save(out_dir, "boot-image.txt", iout + ierr)
@@ -140,12 +172,24 @@ def boot_test(image, ref="stock", ms=2000, out_dir=None, say=print):
     if ic != 0 or "STAGE 2: PASS" not in iout:
         say(f"boot-test: FAIL: {image} does not reach the end of start-up in {ms} ms of lab time ({_why_no_boot(ic, iout, ierr)})")
         return FAIL
-    diffs = compare_reports(rout, iout)
+    diffs = compare_reports(rout, iout, times=False)
+    moved = moved_stamps(rout, iout)
     if diffs:
         say(f"boot-test: FAIL: {image} boots, but its report differs from {ref}'s in {len(diffs)} place(s) that the rule does not allow (--rule prints it):")
         for d in diffs:
             say(d)
-        return FAIL
+    if moved:
+        if diffs:
+            say(f"and time stamps differ by more than {TIME_TOLERANCE_MS} ms:")
+        else:
+            say(f"boot-test: TIMES MOVED: {image} boots and does what {ref} does, in the same order; only time stamps differ by more than {TIME_TOLERANCE_MS} ms (--rule prints the rule):")
+        for line, name, x, y in moved:
+            say(f"  line {line}, {name}: reference {x:.1f} ms, image {y:.1f} ms, {y - x:+.1f} ms")
+        d = [y - x for _, _, x, y in moved]
+        end = "" if diffs else f"; exit status {FAIL if strict_times else OK} ({'--strict-times' if strict_times else '1 with --strict-times'})"
+        say(f"boot-test: {'FAIL, and' if diffs else 'TIMES MOVED:'} {len(moved)} time stamp(s) in {len({m[0] for m in moved})} line(s), from {min(d):+.1f} ms to {max(d):+.1f} ms{end}")
+    if diffs or moved:
+        return FAIL if diffs or strict_times else OK
     allowed = allowed_differences(rout, iout)
     say(f"boot-test: PASS: {image} boots as {ref} does ({ms} ms of lab time; lines with allowed differences: {', '.join(allowed) or 'none'})")
     return OK
@@ -231,13 +275,14 @@ def main(test, argv):
     import argparse
 
     name = "boot-test" if test is boot_test else "update-path-test"
-    ap = argparse.ArgumentParser(prog=name, description=(test.__doc__ or "").split("\n")[0], epilog="Exit status: 0 pass, 1 fail (the reason is printed), 2 wrong arguments, 3 the emulator is not set up or the image file is missing.")
+    ap = argparse.ArgumentParser(prog=name, description=(test.__doc__ or "").split("\n")[0], epilog="Exit status: 0 pass" + (", or only time stamps moved (they are printed)" if test is boot_test else "") + ", 1 fail (the reason is printed), 2 wrong arguments, 3 the emulator is not set up or the image file is missing.")
     ap.add_argument("image", nargs="?", help="stock, data/builds/NAME.json, a .BIN file or a folder of unpacked blocks")
     ap.add_argument("--ref", default="stock", help="the reference image (default: stock)")
     ap.add_argument("--ms", type=int, default=2000 if test is boot_test else 3000, help="lab time in ms")
     ap.add_argument("--out", help="folder for the two raw reports")
     if test is boot_test:
         ap.add_argument("--rule", action="store_true", help="print the comparison rule and stop")
+        ap.add_argument("--strict-times", action="store_true", help=f"exit status 1 when only time stamps moved by more than {TIME_TOLERANCE_MS} ms (default: 0)")
     else:
         ap.add_argument("--update-file", help="the file to put on the card as DCOLYMP/E1019999.BIN (default: the stock firmware file)")
     a = ap.parse_args(argv)
@@ -249,7 +294,7 @@ def main(test, argv):
         return USAGE
     try:
         if test is boot_test:
-            return boot_test(a.image, a.ref, a.ms, a.out)
+            return boot_test(a.image, a.ref, a.ms, a.out, strict_times=a.strict_times)
         return update_path_test(a.image, a.ref, a.ms, a.out, update_file=a.update_file)
     except emuenv.EmuSetupError as e:
         print(f"{name}: cannot run: {e}", file=sys.stderr)

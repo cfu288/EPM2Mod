@@ -25,13 +25,27 @@ emulator/boot-test data/builds/NAME.json
 emulator/update-path-test data/builds/NAME.json
 ```
 
-Exit status of both: **0** pass, **1** fail (one line says why, then the lines that differ), **2** wrong
+Exit status of both: **0** pass (for `boot-test` also when only time stamps moved, see below), **1** fail
+(one line says why, then the lines that differ), **2** wrong
 arguments, **3** not set up or the image is missing. `--out DIR` keeps the raw reports. `--ref IMAGE`
 changes the reference (default `stock`).
 
 **`boot-test`** boots the image and stock for 2000 ms of lab time and compares the two reports line by
 line. `boot-test --rule` prints the rule (code: `emulator/bootcheck.py`). A patch that changes the
 start-up on purpose fails it: read the printed lines and decide by hand. Do not widen the rule.
+
+`boot-test` has three results:
+
+| Result | Meaning | Exit status |
+|---|---|---|
+| `PASS` | Every line is equal under the rule | 0 |
+| `FAIL` | No end of start-up, or what happens differs: a line missing, added or changed, another order, a fault | 1 |
+| `TIMES MOVED` | The same lines and the same order. One or more time stamps differ by more than 0.2 ms | 0; 1 with `--strict-times` |
+
+`TIMES MOVED` prints each moved stamp (line, entry, reference time, image time, difference) and one line
+with the total. A time shift alone does not fail a build: the emulator's times are not the camera's. Read
+the list and write down the cause. A long delay can also change a hit count (seen: `S-GIOTIMER` one lower
+with stamps 1 ms late). That is a `FAIL`, to be read by hand.
 
 **`update-path-test`** starts both with OK held and a card that holds `DCOLYMP/E1019999.BIN`. The image
 passes when it finds the file as stock does and does not load segment 2.

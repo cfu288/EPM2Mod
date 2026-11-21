@@ -120,11 +120,15 @@ candidate `osd-battery` are kept.
   written), Light Box (hidden in this firmware), Add Effects on film simulations, more film simulations.
 
 - The load-order check (`python3 emulator/hookcheck.py SPEC...`) reports seven failures in the pinned build, all
-  from `stock-films-structure`: hooks in segment 1, among them 0x7E56C6A5, that jump to code in segment 2. All
-  seven are in `emulator/hookcheck-allow.tsv`, and `python3 tools/freespace.py check` passes with them. For
-  0x7E56C6A5, the audit shows that the host function is reached only through the image-job table 0x7E789604, and
-  it did not run before segment 2 was loaded on a normal start, a quick start and the update path. That is a test
-  result, not a proof. A clean fix moves 219 bytes into a dead function of segment 1.
+  from `stock-films-structure-3`: hooks in segment 1 that jump to code in segment 2 (two in the colour stage,
+  0x7E56C6A5 and 0x7E546160; five in the ART BKT frame composer). All seven are in
+  `emulator/hookcheck-allow.tsv`, and `python3 tools/freespace.py check` passes with them. They are accepted on
+  camera evidence: no start or update has failed since 2026-11-12 (0x7E56C6A5) and 2026-11-18 (the other six).
+  They are safe by timing only. The colour stage runs at power-on for live view, live view starts while Usr1
+  copies segment 2, and nothing waits for the copy (`experiments/2026-11-21-firmware-dive/NOTES.md` §2). The
+  emulator test of 2026-11-14 has no live view. The margin is not known: the build `films-start-texts` measures
+  it (criterion R1 of `experiments/2026-11-21-firmware-dive/plan.md`). A clean fix for 0x7E56C6A5
+  moves 219 bytes into a dead function of segment 1.
 - Emulator ([emulator/boot/README.md](emulator/boot/README.md)), open points:
   - The row Time Lapse Settings is grey when the clock is not set. Start the emulator with
     `E101_RTC=2026-11-14T12:00:00`.
