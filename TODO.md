@@ -91,10 +91,14 @@ candidate `osd-battery` are kept.
   - A defect: in every language but English the Peaking row and the Lowest S/S Setting row show unrelated Olympus
     texts (§5). Setting their texts at run time, as Load Looks does, fixes both.
   - The 7 film hooks in segment 1 that jump to segment 2 are safe by timing only: live view can start before the
-    segment copies end (§2). First the margin, from the firmware's own boot marks in the Debug Log; then move the
-    two routines into early-loaded space.
-  - Space: 32,752 blank bytes in the kernel range pass every emulator check (§1). One flash with a pattern and a
-    checksum in the Debug Log settles it, and with it the room for the item above.
+    segment copies end (§2). First the margin, from the firmware's own boot marks in the Debug Log, with no new
+    code. A fix should not add code to the kernel range: look at making the hooks harmless until segment 2 is
+    loaded.
+  - Space, in the order of what a mistake costs. First the 123,745 B of debug-shell handlers in segment 2 (§1): a
+    mistake there breaks a normal start and a card update recovers it. Last the 32,752 blank bytes in the kernel
+    range and the kernel copy's end word: both are in memory on the update start, where a mistake has no way back
+    ([feasibility](docs/dev/feasibility.md), "Where code may go"). Use them only for code that must be loaded early
+    and has no other home.
   - A start point after the segment copies with no jump over code, through segment 3's constructor table (§2). It
     could apply the stored film simulations before the first frame.
   - Smaller: 1,906 dead bytes of menu tables (§5); 15 tone tables per entry in place of 24 (§4); the 30 ART BKT

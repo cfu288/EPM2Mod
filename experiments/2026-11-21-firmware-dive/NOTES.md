@@ -10,6 +10,11 @@ result: it has no live view, no capture, no sleep, no NMI, and its flash copies 
 
 Proven code space left: 528 B (code-space map §4). The pinned build's 24,046 changed bytes sit in 88 runs.
 
+Rank by what a mistake costs, not by size (`docs/dev/feasibility.md`, "Where code may go"). The kernel range and
+segment 1 are in memory on the update start; segments 2 and 3 are not. A wrong "free" verdict in segment 2 or 3 is
+recovered by a card update. In the kernel range it may not be. So of the areas below, the `sdk` handlers come first,
+and G2 and the load-range words are a last resort for code that must be loaded early.
+
 - **G2, 0x7E440010–0x7E448000, 32,752 B of 0xFF, in the kernel range the reset code copies.**
   - V emulator (two independent scripts; data watch in all four aliases and an executed-pc check, both cores): no
     access in stock boot, the update path, and menus and playback.
