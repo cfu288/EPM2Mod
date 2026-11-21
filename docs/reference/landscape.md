@@ -2,7 +2,7 @@
 
 ![A timeline of Olympus and OM SYSTEM cameras that have custom firmware projects, from the E-PL3 in 2011 to the OM-5 Mark II in 2025](../images/landscape.png)
 
-The list holds the Olympus custom firmware projects we know of: those on GitHub, in the [OM Firmware Atlas](https://github.com/xulfr/om-firmware-atlas) and in a [43rumors roundup](https://www.43rumors.com/new-mft-hacking-roundup-e-pm2-gains-focus-peaking-e-p7-gets-150mbps-4k-and-more-om-3-upgrades/), on 2026-11-19.
+The list holds the Olympus custom firmware projects we know of: those on GitHub, in the [OM Firmware Atlas](https://github.com/xulfr/om-firmware-atlas) and in a [43rumors roundup](https://www.43rumors.com/new-mft-hacking-roundup-e-pm2-gains-focus-peaking-e-p7-gets-150mbps-4k-and-more-om-3-upgrades/), on 2026-11-21.
 
 | Announced | Camera | Projects |
 |---|---|---|
@@ -16,7 +16,7 @@ The list holds the Olympus custom firmware projects we know of: those on GitHub,
 | 2022 | OM-5 | [db firmware](https://github.com/azqeurio/om-c-firmware/releases) |
 | 2024 | OM-1 Mark II | [db firmware](https://github.com/azqeurio/om-c-firmware/releases) |
 | 2025 | OM-3 | [Caduceus](https://github.com/androidfanman/caduceus-om3/releases), [db firmware](https://github.com/azqeurio/om-c-firmware/releases) |
-| 2025 | OM-5 Mark II | [Caduceus](https://github.com/xulfr/caduceus-om5/releases), [db firmware](https://github.com/azqeurio/om-c-firmware/releases) |
+| 2025 | OM-5 Mark II | [Caduceus](https://github.com/xulfr/caduceus-om5/releases), [db firmware](https://github.com/azqeurio/om-c-firmware/releases), [OMKit](https://github.com/necrostaz/omkit/releases) |
 
 Sources for the years: [E-PL3](https://petapixel.com/2011/06/30/olympus-announces-three-new-pens-the-e-p3-e-pl3-and-e-pm1/), [E-PM2](https://www.bgr.com/general/olympus-pen-e-pl5-and-e-pm2-release-date-october/), [PEN-F](https://old.imaging-resource.com/news/2016/01/27/brains-meets-beauty-new-olympus-pen-f-offers-premium-design-with-a-healthy), [E-M1X](https://www.sansmirror.com/newsviews-2/newsviews/2019-mirrorless-camera/jan-mar-2019-mirrorless/olympus-introduces-pro-e.html), [E-M5 Mark III](https://newsshooter.com/2019/10/17/olympus-releases-om-d-e-m5-mark-iii), [E-P7](https://old.imaging-resource.com/news/2021/06/09/olympus-announces-pen-e-p7-camera-for-international-markets), [OM-1](https://petapixel.com/2022/02/14/om-digital-unveils-om-1-camera-with-a-new-sensor-and-quad-pixel-af), [OM-5](https://www.photographyblog.com/news/om_system_om_5), [OM-1 Mark II](https://www.capturemag.com.au/news/om-system-announces-om-1-mark-ii), [OM-3](https://petapixel.com/2025/02/05/om-system-om-3-is-a-stylish-more-fun-om-1-ii-with-nearly-all-the-performance), [OM-5 Mark II](https://petapixel.com/2025/06/16/the-om-system-om-5-mark-ii-is-a-refined-compact-travel-camera).
 
