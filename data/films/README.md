@@ -13,8 +13,10 @@
   saturation gain, six saturation values and six hue values, a 3 × 3 matrix, and two chroma curves.
   `fits/doublex3.npz` is Double-X as a colour look: saturation gain 0, the art matrix sets the grey mix, one tone
   curve for the three channels (`experiments/2026-11-17-card-looks/design.md`).
-  `fits/*-c1.npz` are the fits corrected from the camera round of 2026-11-20; the catalogue uses them, and the older
-  file of the same film stays because firmware specs of older builds are generated from it.
+  `fits/*-n2.npz` are the fits the catalogue uses: corrected for the camera without the 12-region stage
+  (`films-twelve-off`) and measured on it (2026-11-21, `experiments/2026-11-20-model-calibration/NOTES.md` §9-11).
+  `fits/*-c1.npz` (the camera round of 2026-11-20) and the older file of the same film stay because firmware specs of
+  older builds are generated from them.
 
 - `more-films.json`: the films beyond the first seven (used by the older builds `films-12` to `films-12d`): which film goes in
   which of the five other art-filter entries, its menu name and its fit file, and the names of the specs
