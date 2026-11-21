@@ -85,3 +85,4 @@ the record view only, and when the latch runs in that window is not known: not u
 |---|---|
 | build, free space (the build and the pinned build) | sha256 `6a47806dfafce15d281358eae2beffe397132e5999c50b28c69b2a2467efcf39`; PASS, PASS |
 | `scripts/emu_tr.py` | PASS: 24 latch cases (GUI 0x5100: as §4; GUI 0x5101: R = 0 and MF give no lines, R = 1 as pinned) and T_GS for 0x5100, 0x5101, 0x5705 (word written, registers kept, on to T_GUI) |
+| `tools/checks.py --tier full`, hookcheck | free space, op-check, boot-test, update-path-test PASS; save-guard S24 / S25 PASS; S4 R = 0, S5 as pinned, S7 PASS; S6 against the pinned films-start-texts PASS (`scen_direct4.py s6`); hookcheck: 2 transfers (the GUI hook to T_GS, T_GS to T_GUI), 0 FAIL |
