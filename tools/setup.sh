@@ -11,6 +11,8 @@
 #    present and no such Node, "nvm install" gets it.
 # 3. The emulator working tree: emulator/setup.sh.
 #
+# It also switches on the commit hooks in .githooks/ for this clone.
+#
 # Nothing is installed outside the repository, but a Node version through nvm.
 set -euo pipefail
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
@@ -29,6 +31,9 @@ find_node() {
   if [ -n "$newest" ] && node_ok "$newest"; then echo "$newest"; return; fi
   return 1
 }
+
+# The commit hooks (.githooks): the message format, no machine paths, the writing rules, black and mypy.
+[ $check_only = 1 ] || git config core.hooksPath .githooks
 
 echo "== 1. MN103 binutils"
 if [ -x "$OBJDUMP" ]; then

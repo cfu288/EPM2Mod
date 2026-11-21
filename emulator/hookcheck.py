@@ -12,8 +12,8 @@ happened: the hook of peaking-direct-2 in the heap mode chooser 0x7E714833 (segm
 What it does: for every block-0 op that starts with a jump or call (a hook), and for every op that such a jump
 reaches (new code), it lists each jmp / call / branch with its source and target segment. A transfer from the
 pre-reset range, the kernel or segment 1 to anything loaded later, or to a range that no boot copy loads, FAILS,
-unless --allow names the instruction's address with a reason (for example proof that the function cannot run
-before Usr1). Exit status 1 on any FAIL.
+unless emulator/hookcheck-allow.tsv or --allow names the instruction's address with a reason (for example proof
+that the function cannot run before Usr1). Exit status 1 on any FAIL.
 
 Limits: only control transfers with a constant target are seen (not `jmp (a0)`, not data pointers, not RAM
 reads of late data). The classes come from tools/freespace.py's load model. It says nothing about the order of
@@ -103,7 +103,11 @@ def main():
     ap.add_argument("specs", nargs="+")
     ap.add_argument("--allow", nargs="*", default=[], metavar="0xADDR=reason")
     a = ap.parse_args()
-    allow = {int(x.split("=", 1)[0], 16): x.split("=", 1)[1] for x in a.allow}
+    allow = {}
+    for line in open(os.path.join(HERE, "hookcheck-allow.tsv"), encoding="utf-8"):      # the accepted hooks
+        if line.strip() and not line.startswith("#"):
+            allow[int(line.split("\t")[0], 16)] = "see emulator/hookcheck-allow.tsv"
+    allow.update({int(x.split("=", 1)[0], 16): x.split("=", 1)[1] for x in a.allow})
     sys.exit(0 if check(a.specs, allow) else 1)
 
 

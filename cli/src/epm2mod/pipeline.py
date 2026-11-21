@@ -171,9 +171,11 @@ def check_free_space(paths: RepoPaths, description: BuildDescription) -> str:
                 "missing. A new build needs it: see "
                 f"{paths.relative(paths.free_space_tool)}."
             )
-        shown = output[-_CHECK_OUTPUT_LIMIT:]
-        if len(output) > len(shown):  # start the cut text at a whole line
-            shown = shown.partition("\n")[2]
+        # The failures can be anywhere in a long report: show them, then the summary.
+        lines = output.splitlines()
+        failed = [line for line in lines[:-1] if line.startswith("FAIL")]
+        shown = "\n".join(failed + lines[-1:]) if failed else output
+        shown = shown[-_CHECK_OUTPUT_LIMIT:]
         raise BuildError(
             f"{shown}\n" f"the free-space check failed: nothing was built{hint}"
         )

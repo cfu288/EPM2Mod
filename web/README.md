@@ -16,7 +16,7 @@ goes into `packages/ui` and is exported from its `src/index.ts`. Each app keeps 
   pages: black and white, square buttons that invert on hover, sections under a thick black rule
   (`packages/ui/src/theme.css`). Fonts: Sora (headings) and Arimo (text), the free fonts nearest to that site's Neue
   Machina and Helvetica Neue (glyph overlap); computers with Helvetica Neue use it.
-- `../looks/film-records.json`: the film simulations and their look records, the same file that `epm2mod films set` reads. Made
+- `../data/films/film-records.json`: the film simulations and their look records, the same file that `epm2mod films set` reads. Made
   by `uv run python web/scripts/export_films.py` from `data/films/catalogue.json` (a test of the Python suite fails when it
   is out of date).
 - `packages/ui/src/previews/`: the camera's Picture Mode strip, drawn by the emulator, in two layers: `menu/art<N>.png`

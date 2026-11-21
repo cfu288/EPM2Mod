@@ -1,4 +1,4 @@
-# Hand-maintained list of specs outside data/specs/ that a later spec replaces, for tools/freespace.py.
+# Hand-maintained list of specs that a later spec replaces, for tools/freespace.py.
 # Their bytes are shown in the ledger as "superseded" and do not count as used or as an overlap.
 # Columns (tab-separated): spec (path from the repo root), superseded by, evidence.
 experiments/2026-11-13-intervalometer/patches/interval-timelapse-insert-awake.json	data/specs/interval-timelapse-v2.json	description of v2: "v2 of interval-timelapse-insert-awake.json after two reviews"; v2 moved the code from the segment-3 tail to the segment-2 tail

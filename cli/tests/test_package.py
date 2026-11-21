@@ -1046,6 +1046,17 @@ class MakeTests(RepoCase):
             self.repo.outputs(), ["good.BIN"]
         )  # no card folder, no new.BIN
 
+    def test_a_failed_check_shows_its_fail_lines(self) -> None:
+        script = (
+            "import sys\nprint('FAIL  the reason')\n"
+            "for n in range(200): print('PASS ', 'x' * 60)\n"
+            "print('check: FAIL (1 FAIL)')\nsys.exit(7)\n"
+        )
+        self.repo.write("tools/freespace.py", script.encode())
+        with self.assertRaises(BuildError) as caught:
+            self.make(self.repo.candidate)
+        self.assertIn("FAIL  the reason\ncheck: FAIL (1 FAIL)", str(caught.exception))
+
     def test_a_candidate_runs_the_free_space_check(self) -> None:
         lines: list[str] = []
         self.repo.free_space_tool(0)

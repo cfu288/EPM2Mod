@@ -116,11 +116,12 @@ build's name is the file name. `data/pinned-build.json` names the description of
 build.
 
 1. **New build:** write `data/builds/NAME.json` with `what` and `specs` (files in `data/specs/`). Leave out
-   `sha256` and `camera_tested`. Copy an existing description and change it.
+   `sha256` and `camera_tested`. Copy the pinned build's description and change it: the free-space check
+   knows the specs of the pinned build, and it refuses most older builds.
 2. **Make it:** `uv run epm2mod make NAME`. For a build without a recorded
    sha256 the script runs `tools/freespace.py check` first, then prints the sha256 and says that the
    build is a candidate. The check needs the firmware map in `build/map/`, which a fresh clone
-   does not have. To make the map: `python3 tools/fwmap.py build`. This needs GNU objdump for the
+   does not have. To make the map: `uv run python tools/fwmap.py build` (about 1 minute, 470 MB). This needs GNU objdump for the
    MN103 processor (`tools/setup.sh`, which builds it from the submodule `third_party/binutils-gdb` into `build/toolchain/`).
 
    A tested build does not need the map: its result is compared with the recorded sha256.
