@@ -1,0 +1,789 @@
+"""The parts of experiments/2026-11-15-log/scripts/mkspec_log.py that gen/log-menu/mkspec.py imports: the camera-tested
+log's assembly (log-core, log-probes, log-peaking-time, log-peaking-guard), its hook sites and its helpers. A copy:
+the functions that wrote the older log specs are left out, and the paths are this repository's.
+"""
+import hashlib, json, os, re, struct, subprocess, sys
+
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.join(ROOT, "tools"))
+import toolchain  # noqa: E402
+
+BASE = 0x7E421020
+STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
+PINNED = "data/builds/peaking-colours.json"
+PINNED_SHA = "4d6b1f26ed92d66b62b4d7dc32d26168e33fd8b153a7655d6c0d9a58267456f8"
+BIN = toolchain.binutils_dir()
+
+# Code areas (tools/freespace.py area: both USABLE-CODE, camera-tested code in each).
+AREAS = {
+    ".kc": (0x7E4C9514, 0x7E4C9630, "log-core", "kernel range: log_put, log_chg, log_cnt, T_ERR, T_BOOT"),
+    ".kp": (0x7E4C9630, 0x7E4C9800, "log-probes", "kernel range: routines of the hooks in segment 1 and the kernel"),
+    ".uc": (0x7EBF2C00, 0x7EBF3000, "log-core", "segment 2: flush task, T_GUI, file name"),
+    ".up": (0x7EBF3780, 0x7EBF3BAD, "log-probes", "segment 2: routines of the hooks in segments 2 and 3"),
+}
+TASK_ENTRY = 0x7E439C80          # CPU0 task table 0x7E438CD0, row of id 0x90 (USRTEST_A): the entry word
+TASK_ENTRY_OLD = 0x7E501C5B
+RING_RECORDS = 512
+BLOCK_RECORDS = 30               # (512 - 32) / 16: one block is one sector of the file
+
+SYMS = """
+.equ MAGIC,  0x314c5045      # "EPL1": the ring header is valid
+.equ RING0,  0xbe4f9000      # CPU0 ring: 32-byte header + 512 records of 16 bytes (uncached alias of 0x7E4F9000)
+.equ RING1,  0xbe4fb020      # CPU1 ring, same layout
+.equ PST,    0xbe4fd040      # state of the flush and of the probes, 128 bytes, cleared at every start
+.equ BUSY,   PST+0           # u8: the flush task was started and has not ended
+.equ RESULT, PST+1           # u8: result of the last flush (0 ok, 1 no file, 2 write failed, 3 file full, 4 not saved)
+.equ TRIG,   PST+4           # GUI state that started the flush
+.equ SHGUI,  PST+8           # last GUI state logged
+.equ IVN,    PST+12          # frames counted since iv_start
+.equ G_LATCH, PST+16         # gates: {u32 last arg0, u8 budget}
+.equ G_HEAP,  PST+24
+.equ G_PK9,   PST+32
+.equ G_ART,   PST+40
+.equ G_STAGE, PST+48
+.equ G_MATRIX, PST+56
+.equ G_CURVE, PST+64
+.equ EXPECT, PST+80          # file size that the last flush should have left, 0 = nothing to check
+.equ TIMER,  0x98900074      # timer channel 9, counts down in microseconds (stock now_us 0x7E4262CD)
+.equ CPUNO,  0x8050          # CPU number register (stock boot mark 0x7E426511 chooses its buffer by it)
+.equ PKW,    0x602be8c4      # peaking bytes L, R, L2, C (focus-peaking NOTES 11.3, 15.3)
+.equ LVW,    0x605b1cd4      # live-view struct +4: byte +5 is the art filter type
+.equ IVST,   0x602b0cdc      # intervalShootingState word
+.equ PWRF,   0x604154e6      # u16 power-on factor (getter 0x7E45D407)
+.equ WAKE,   0x604154e9      # u8 wake reason (getter 0x7E45D893)
+.equ LVX,    0x603f4c22      # level gauge working set, entry 0: x, y, z, temperature (level-gauge NOTES 12.1)
+.equ BUF,    PST+128         # one 512-byte block for fileif_fwrite
+.equ FCAP,   0x400000        # stop appending when the file has 4 MiB
+"""
+
+CORE_K = """
+.section .kc,"ax"
+# d0 = event id, d1 = arg0, a0 = arg1. Every register and the flags are kept. No call, no wait.
+log_chg:                         # a1 -> gate: log when arg0 differs from the last one, or the gate has budget
+    movm [d2,d3,a2,a3],(sp)
+    mov psw,d2
+    mov (a1),d3
+    cmp d1,d3
+    mov d1,(a1)
+    bne lp_body
+    bra lc_budget
+log_cnt:                         # a1 -> gate: log while the gate has budget
+    movm [d2,d3,a2,a3],(sp)
+    mov psw,d2
+lc_budget:
+    movbu (4,a1),d3
+    cmp 0,d3
+    beq lp_done
+    add -1,d3
+    movbu d3,(4,a1)
+    bra lp_body
+log_put:
+    movm [d2,d3,a2,a3],(sp)
+    mov psw,d2
+lp_body:
+    and 0xf7ff,psw               # interrupts off on this CPU (kernel idiom 0x7E43292A)
+    nop
+    nop
+    mov RING0,a2
+    mov (CPUNO),d3
+    cmp 0,d3
+    beq 1f
+    mov RING1,a2                 # one ring per CPU: no lock between the CPUs
+1:  mov (a2),d3
+    cmp MAGIC,d3
+    beq 2f
+    mov MAGIC,d3                 # RAM was clear (or never used): start an empty ring
+    mov d3,(a2)
+    clr d3
+    mov d3,(4,a2)
+    mov d3,(8,a2)
+    mov d3,(12,a2)
+    mov d3,(16,a2)
+2:  mov (4,a2),d3                # w: records written since the ring was started
+    mov d3,a3
+    inc d3
+    mov d3,(4,a2)
+    mov a3,d3
+    and %(mask)d,d3
+    asl 4,d3
+    add d3,a2
+    movhu d0,(32,a2)             # id
+    mov a3,d3
+    movhu d3,(34,a2)             # sequence number
+    mov (TIMER),d3
+    mov d3,(36,a2)
+    mov d1,(40,a2)
+    mov a0,(44,a2)
+lp_done:
+    mov d2,psw
+    nop
+    nop
+    movm (sp),[d2,d3,a2,a3]
+    retf [],0
+
+T_ERR:                           # entry of the error recorder 0x7E426D4B(d0 = code, (48,sp) = count, (52,sp).. = arguments)
+    movm [other],(sp)
+    mov d0,d1
+    mov mdr,d0
+    mov d0,a0
+    mov %(fw_error)d,d0
+    call log_put,[],0
+    mov (80,sp),d1
+    mov (84,sp),a0
+    mov %(fw_error_args)d,d0
+    call log_put,[],0
+    movm (sp),[other]
+%(displaced_ERR)s
+    jmp %(back_ERR)s
+
+T_BOOT:                          # entry of Usr0 0x7E503DD4 (boot task, CPU0)
+    movm [d2,other],(sp)
+    mov psw,d2                   # this routine changes the flags: keep them
+    mov PST,a0
+    clr d0
+    mov 32,d1
+1:  mov d0,(a0)
+    inc4 a0
+    add -1,d1
+    bne 1b
+    movbu (WAKE),d1
+    asl 16,d1
+    movhu (PWRF),d0
+    or d0,d1
+    mov d1,a0
+    clr d1                       # session 0: the ring was not in RAM
+    mov (RING0),d0
+    cmp MAGIC,d0
+    bne 2f
+    mov (RING0+16),d1
+    inc d1
+    mov d1,(RING0+16)
+2:  mov %(boot)d,d0
+    call log_put,[],0
+    mov d2,psw
+    nop
+    nop
+    movm (sp),[d2,other]
+%(displaced_BOOT)s
+    jmp %(back_BOOT)s
+"""
+
+CORE_U = """
+.section .uc,"ax"
+FLUSH:                           # task USRTEST_A (id 0x90, priority 11, stack 0x800): started by T_GUI, runs once
+    movm [d2,d3,a2,a3],(sp)
+    add -64,sp                   # (36,sp) (40,sp) file size words, (44,sp) size, (48,sp) loop count, (52,sp) tries, (56,sp) blocks
+    clr d0
+    mov d0,(36,sp)
+    mov d0,(40,sp)
+    mov PATH,a0
+    mov sp,a1
+    add 36,a1
+    mov a1,d0
+    add 4,d0
+    call 0x7e5c54fd,[],20        # fileif_filesize_get(a0 = path, a1, d0 -> two words) -> 0 when the size was read
+    mov d0,d3
+    mov (36,sp),d0
+    mov (40,sp),d1
+    add d1,d0                    # the size (one of the two words is the high word, 0 for this file)
+    mov d0,(44,sp)
+    mov (EXPECT),d1              # the size that the last flush should have left (0: nothing to check)
+    cmp 0,d1
+    beq 2f
+    mov 1,d2
+    cmp 0,d3
+    bne f_result                 # the size cannot be read now: try again at the next flush
+    cmp d1,d0
+    bcc 1f
+    mov 4,d0                     # the file did not keep the blocks of the last flush (fclose does not report
+    movbu d0,(RESULT)            # a failed directory update): write its records again
+    mov RING0,a2
+    mov (20,a2),d0
+    mov d0,(8,a2)
+    mov RING1,a2
+    mov (a2),d0
+    cmp MAGIC,d0
+    bne 1f
+    mov (20,a2),d0
+    mov d0,(8,a2)
+1:  clr d0
+    mov d0,(EXPECT)
+2:  movbu (RESULT),d0
+    mov d0,a0                    # result of the flush before this one
+    mov %(flush)d,d0
+    mov (TRIG),d1
+    call log_put,[],0
+    mov 3,d2
+    mov (44,sp),d0
+    cmp FCAP,d0
+    bcc f_result
+    clr d0
+    mov d0,(56,sp)               # blocks written in this flush
+    mov PATH,a0
+    mov MODE,a1
+    call 0x7e5c52dc,[],20        # fileif_fopen(path, "a") -> a0 = handle or 0
+    mov a0,a3
+    mov 1,d2
+    cmp 0,a3
+    beq f_result                 # no card, card full or write-protected: nothing to do
+    mov RING0,a2
+f_ring:
+    mov (a2),d0
+    cmp MAGIC,d0
+    bne f_next
+    mov (4,a2),d2                # w
+    mov (8,a2),d3                # f: records already in the file
+    mov d2,d0
+    sub d3,d0
+    cmp %(n)d,d0
+    bls 8f
+    add -%(n)d,d0                # the ring wrapped over records that were not flushed
+    mov (12,a2),d1
+    add d0,d1
+    mov d1,(12,a2)               # drop count
+    mov d2,d3
+    add -%(n)d,d3
+    mov d3,(8,a2)
+8:  mov d3,(20,a2)               # f before this flush: the next flush puts it back if the file did not keep the blocks
+f_block:                         # one block = one 512-byte sector: header, up to %(per)d records, zeros
+    cmp d2,d3
+    beq f_next
+    mov BUF,a0
+    clr d0
+    mov 128,d1
+1:  mov d0,(a0)
+    inc4 a0
+    add -1,d1
+    bne 1b
+    mov BUF,a0
+    mov 0x474c5045,d0            # "EPLG"
+    mov d0,(a0)
+    mov 0x20001001,d0            # version 1, record size 16, cpu 0, header size 32
+    mov d0,(4,a0)
+    cmp RING0,a2
+    beq 2f
+    mov 1,d0
+    movbu d0,(6,a0)
+2:  mov %(bid0)d,d0              # build id: sha256 of the event list of data/logdict/events.json, first 8 bytes
+    mov d0,(8,a0)
+    mov %(bid1)d,d0
+    mov d0,(12,a0)
+    mov d3,(16,a0)               # number of the first record of the block (its low 16 bits = its sequence number)
+    mov d2,d0
+    sub d3,d0
+    cmp %(per)d,d0
+    bls 3f
+    mov %(per)d,d0
+3:  mov d0,(20,a0)               # records in the block
+    mov d0,(48,sp)
+    mov (12,a2),d1
+    mov d1,(24,a0)
+    mov (16,a2),d1
+    mov d1,(28,a0)
+    add 32,a0
+4:  mov d3,d0                    # copy one record from the ring
+    and %(mask)d,d0
+    asl 4,d0
+    mov a2,a1
+    add d0,a1
+    mov (32,a1),d0
+    mov d0,(a0)
+    mov (36,a1),d0
+    mov d0,(4,a0)
+    mov (40,a1),d0
+    mov d0,(8,a0)
+    mov (44,a1),d0
+    mov d0,(12,a0)
+    add 16,a0
+    inc d3
+    mov (48,sp),d0
+    add -1,d0
+    mov d0,(48,sp)
+    bne 4b
+    mov 3,d0
+    mov d0,(52,sp)               # at most 3 tries
+5:  mov BUF,a0
+    mov 1,d0
+    mov 512,d1
+    mov a3,a1
+    call 0x7e5c5339,[],24        # fileif_fwrite(a0 = buffer, d0 = 1, d1 = bytes, a1 = handle) -> bytes written
+    cmp 512,d0
+    beq 7f
+    cmp 0,d0
+    bne f_fail                   # a part of the block was written (card full): stop
+    mov (52,sp),d0
+    add -1,d0
+    mov d0,(52,sp)
+    beq f_fail
+    mov 100,d0
+    call 0x7e449605,[d2],8       # OlyTaDl: sleep 100 ms, then write the same block again
+    bra 5b
+7:  mov d3,(8,a2)                # the block is in the file
+    mov (56,sp),d0
+    inc d0
+    mov d0,(56,sp)
+    bra f_block
+f_next:
+    cmp RING0,a2
+    bne 6f
+    mov RING1,a2
+    bra f_ring
+6:  clr d2
+    bra f_close
+f_fail:
+    mov 2,d2                     # the records of this block stay in the ring for the next flush
+f_close:
+    mov a3,a0
+    call 0x7e5c5308,[],12        # fileif_fclose
+    mov (56,sp),d0
+    cmp 0,d0
+    beq f_result
+    asl 9,d0
+    mov (44,sp),d1
+    add d1,d0
+    mov d0,(EXPECT)              # the next flush checks that the file has this size
+f_result:
+    movbu d2,(RESULT)
+    clr d0
+    movbu d0,(BUSY)
+    ret [d2,d3,a2,a3],80
+PATH:
+    .asciz "C:\\\\EPM2LOG.BIN"
+MODE:
+    .asciz "a"
+
+T_GUI:                           # the "state =" trace of the GUI state setter 0x7ECDF5E9, d0 = new state (task CA_MAIN)
+    movm [d2,other],(sp)
+    mov psw,d2                   # this routine changes the flags: keep them
+    mov d0,d1
+    mov (SHGUI),d0
+    cmp d0,d1
+    beq 9f
+    mov d1,(SHGUI)
+    mov d0,a0
+    mov %(gui_state)d,d0
+    call log_put,[],0
+    mov d1,d0
+    lsr 8,d0
+    cmp 0x57,d0                  # 0x57xx: the menus
+    beq 5f
+    lsr 4,d0
+    cmp 2,d0                     # 0x2xxx: power off, sleep
+    beq 5f
+    cmp 3,d0                     # 0x3xxx: playback
+    bne 9f
+5:  movbu (BUSY),d0
+    cmp 0,d0
+    bne 9f
+    mov d1,(TRIG)
+    call 0x7ecd360a,[d2],8       # the GUI's isMediaWriting(): 1 while the card is written
+    cmp 0,d0
+    bne 9f
+    mov 1,d0
+    movbu d0,(BUSY)
+    mov 0x90,d0
+    call 0x7e449541,[d2,d3],12   # OlyTaSt(USRTEST_A)
+9:  mov d2,psw
+    nop
+    nop
+    movm (sp),[d2,other]
+%(displaced_GUI)s
+    jmp %(back_GUI)s
+"""
+
+LATCH = "    mov (PKW),d1\n"
+PROBES_K = """
+.section .kp,"ax"
+T_LATCH:                         # entry of the live-view expose setter 0x7E6C610B (mov task, every frame)
+    movm [other],(sp)
+    mov (PKW),d1
+    mov (LVW),a0
+    mov G_LATCH,a1
+    mov %(pk_latch)d,d0
+    call log_chg,[],0
+    movm (sp),[other]
+%(displaced_LATCH)s
+    jmp %(back_LATCH)s
+
+T_HEAP:                          # entry of the image-work heap mode setter 0x7E578C60(d0 = mode)
+    movm [other],(sp)
+    mov d0,d1
+    mov mdr,d0
+    mov d0,a0
+    mov G_HEAP,a1
+    mov %(pk_heap_mode)d,d0
+    call log_chg,[],0
+    movm (sp),[other]
+%(displaced_HEAP)s
+    jmp %(back_HEAP)s
+
+T_PK9:                           # Key Line pass 9 0x7E7266D9 after the gain is chosen (ART task): d0 = usGain2
+    movm [other],(sp)
+    movbu (G_PK9+4),d1
+    cmp 0,d1
+    beq 1f
+    mov d0,d1
+    asl 16,d1
+    mov (44,sp),a0               # pass 9's second argument
+    mov (32,a0),a0               # Key Line context
+    mov (20,a0),a1               # line image
+    movbu (1,a1),d0
+    or d0,d1
+    mov (16,a0),a1               # picture
+    mov d1,a0
+    mov a1,d1
+    mov G_PK9,a1
+    mov %(pk_pass9)d,d0
+    call log_cnt,[],0
+1:  movm (sp),[other]
+%(displaced_PK9)s
+    jmp %(back_PK9)s
+
+T_ART:                           # six-axis stage: dispatch by art code, d3 = art code, d0 = 4 x (code - 9)
+    movm [other],(sp)
+    mov d3,d1
+    mov 0x7e78c254,a0
+    mov (d0,a0),a0
+    mov G_ART,a1
+    mov %(art_sixaxis)d,d0
+    call log_chg,[],0
+    movm (sp),[other]
+%(displaced_ART)s
+    jmp %(back_ART)s
+
+T_STAGE:                         # colour-matrix stage before the art-matrix choice, a3 = job parameters
+    movm [other],(sp)
+    movbu (79,a3),d1
+    mov (20,a3),a0
+    mov G_STAGE,a1
+    mov %(film_stage)d,d0
+    call log_chg,[],0
+    movm (sp),[other]
+%(displaced_STAGE)s
+    jmp %(back_STAGE)s
+
+T_MATRIX:                        # art matrix apply, a1 = table
+    movm [other],(sp)
+    mov a1,d1
+    mov d3,a0
+    mov G_MATRIX,a1
+    mov %(film_matrix)d,d0
+    call log_chg,[],0
+    movm (sp),[other]
+%(displaced_MATRIX)s
+    jmp %(back_MATRIX)s
+
+T_CURVE:                         # tone-curve selector 0x7E56E837: dispatch by art code, d1 = 4 x (code - 8)
+    movm [other],(sp)
+    mov 0x7e78c8e4,a0
+    mov (d1,a0),a0
+    movbu (52,sp),d1             # the art code: the selector's (20,sp)
+    mov G_CURVE,a1
+    mov %(film_curve)d,d0
+    call log_chg,[],0
+    movm (sp),[other]
+%(displaced_CURVE)s
+    jmp %(back_CURVE)s
+
+T_ADJ:                           # entry of api_adj_Set_Slope_Adjust 0x7E676261(d0 = mode, d1 = rotate)
+    movm [other],(sp)
+    mov d1,a0
+    mov d0,d1
+    mov %(lv_adjust)d,d0
+    call log_put,[],0
+    movm (sp),[other]
+%(displaced_ADJ)s
+    jmp %(back_ADJ)s
+
+T_LVV:                           # entry of the accelerometer table reload 0x7E459A5F
+    movm [other],(sp)
+    movhu (LVX+36),d1
+    asl 16,d1
+    movhu (LVX+24),d0
+    or d0,d1
+    mov d1,a0
+    movhu (LVX+12),d1
+    asl 16,d1
+    movhu (LVX),d0
+    or d0,d1
+    mov %(lv_values)d,d0
+    call log_put,[],0
+    movm (sp),[other]
+%(displaced_LVV)s
+    jmp %(back_LVV)s
+"""
+
+PROBES_U = """
+.section .up,"ax"
+T_MFON:                          # CmpSts_MfAssist::entryMfAssistOn, a2 = state object
+    movm [other],(sp)
+    mov 3,d0
+    movbu d0,(G_PK9+4)           # log the next 3 passes 9
+    mov (PKW),d1
+    mov a2,a0
+    mov %(pk_mf_start)d,d0
+    call log_put,[],0
+    movm (sp),[other]
+%(displaced_MFON)s
+    jmp %(back_MFON)s
+
+T_MFOFF:                         # CmpSts_MfAssist::entryMfAssistOff
+    movm [other],(sp)
+    mov (PKW),d1
+    mov a2,a0
+    mov %(pk_mf_end)d,d0
+    call log_put,[],0
+    movm (sp),[other]
+%(displaced_MFOFF)s
+    jmp %(back_MFOFF)s
+
+T_CBS:                           # entry of the shooting callback 0x7E995A0B(a0 = this, d0 = CBS number, d1 = result)
+    movm [other],(sp)
+    mov d1,a0
+    mov d0,d1
+    mov 1,d0
+    movbu d0,(G_ART+4)           # one record of each pipeline probe after this callback
+    movbu d0,(G_STAGE+4)
+    movbu d0,(G_MATRIX+4)
+    movbu d0,(G_CURVE+4)
+    mov %(shoot_cbs)d,d0
+    call log_put,[],0
+    movm (sp),[other]
+%(displaced_CBS)s
+    jmp %(back_CBS)s
+
+T_IVSET:                         # setIntervalShootingState, at its trace call: d2 = bits
+    movm [other],(sp)
+    mov d2,d1
+    mov (IVST),a0
+    mov %(iv_state_set)d,d0
+    call log_put,[],0
+    movm (sp),[other]
+%(displaced_IVSET)s
+    jmp %(back_IVSET)s
+
+T_IVCLR:                         # clearIntervalShootingState, at its trace call: d2 = bits
+    movm [other],(sp)
+    mov d2,d1
+    mov (IVST),a0
+    mov %(iv_state_clear)d,d0
+    call log_put,[],0
+    movm (sp),[other]
+%(displaced_IVCLR)s
+    jmp %(back_IVCLR)s
+
+T_IVSTART:                       # startIntervalShooting, at its last trace call: d2 = result
+    movm [other],(sp)
+    mov 0,a0
+    mov a0,(IVN)
+    mov d2,d1
+    mov (IVST),a0
+    mov %(iv_start)d,d0
+    call log_put,[],0
+    movm (sp),[other]
+%(displaced_IVSTART)s
+    jmp %(back_IVSTART)s
+
+T_IVEND:                         # endIntervalShooting, at its last trace call: d2 = result
+    movm [other],(sp)
+    mov d2,d1
+    mov (IVN),a0
+    mov %(iv_end)d,d0
+    call log_put,[],0
+    movm (sp),[other]
+%(displaced_IVEND)s
+    jmp %(back_IVEND)s
+
+T_IVFRAME:                       # entry of recordingDone_interval 0x7EA997E5
+    movm [other],(sp)
+    mov (IVN),a0
+    inc a0                       # an address register: the flags stay
+    mov a0,(IVN)
+    mov a0,d1
+    mov (IVST),a0
+    mov %(iv_frame)d,d0
+    call log_put,[],0
+    movm (sp),[other]
+%(displaced_IVFRAME)s
+    jmp %(back_IVFRAME)s
+"""
+
+# name: (spec, site, replaced bytes, events, what)
+HOOKS = {
+    "ERR":     ("log-core", 0x7E426D4B, 8, "fw_error fw_error_args", "error recorder 0x7E426D4B, entry (pre-reset range; both CPUs)"),
+    "BOOT":    ("log-core", 0x7E503DD4, 6, "boot", "Usr0 0x7E503DD4, entry (boot task)"),
+    "GUI":     ("log-core", 0x7ECDF6E4, 5, "gui_state", "GUI state setter 0x7ECDF5E9, its last trace call (task CA_MAIN)"),
+    "LATCH":   ("log-probes", 0x7E6C610B, 6, "pk_latch", "live-view expose setter 0x7E6C610B, entry (mov task)"),
+    "HEAP":    ("log-probes", 0x7E578C60, 6, "pk_heap_mode", "image-work heap mode setter 0x7E578C60, entry"),
+    "PK9":     ("log-probes", 0x7E72676D, 7, "pk_pass9", "Key Line pass 9 0x7E7266D9, after T_K (ART task)"),
+    "ART":     ("log-probes", 0x7E56D2BF, 6, "art_sixaxis", "six-axis stage, dispatch by art code"),
+    "STAGE":   ("log-probes", 0x7E56C68B, 7, "film_stage", "colour-matrix stage, before the art-matrix choice"),
+    "MATRIX":  ("log-probes", 0x7E56C764, 6, "film_matrix", "colour-matrix stage, art matrix apply"),
+    "CURVE":   ("log-probes", 0x7E56E860, 6, "film_curve", "tone-curve selector 0x7E56E837, dispatch by art code"),
+    "ADJ":     ("log-probes", 0x7E676261, 10, "lv_adjust", "api_adj_Set_Slope_Adjust 0x7E676261, entry"),
+    "LVV":     ("log-probes", 0x7E459A5F, 5, "lv_values", "accelerometer table reload 0x7E459A5F, entry"),
+    "MFON":    ("log-probes", 0x7EB7D47D, 6, "pk_mf_start", "CmpSts_MfAssist::entryMfAssistOn, after T_ON and the trace call"),
+    "MFOFF":   ("log-probes", 0x7EB7D44C, 5, "pk_mf_end", "CmpSts_MfAssist::entryMfAssistOff, after T_OFF and the trace call"),
+    "CBS":     ("log-probes", 0x7E995A0B, 8, "shoot_cbs", "shooting callback 0x7E995A0B, entry"),
+    "IVSET":   ("log-probes", 0x7E969E2F, 5, "iv_state_set", "setIntervalShootingState 0x7E969E1E, trace call"),
+    "IVCLR":   ("log-probes", 0x7E9698FD, 5, "iv_state_clear", "clearIntervalShootingState 0x7E9698EC, trace call"),
+    "IVSTART": ("log-probes", 0x7E988670, 7, "iv_start", "startIntervalShooting 0x7E98849B, last trace call"),
+    "IVEND":   ("log-probes", 0x7E982E8E, 7, "iv_end", "endIntervalShooting 0x7E982DF3, last trace call"),
+    "IVFRAME": ("log-probes", 0x7EA997E5, 7, "iv_frame", "recordingDone_interval 0x7EA997E5, entry"),
+}
+# The timing probe of peaking (focus-peaking NOTES section 17). Its own spec: log-core and log-probes stay the
+# flashed ones. Its two hooks are in stock bytes of Key Line pass 9 0x7E7266D9 (segment 1), before and after the
+# hooks K (peaking) and PK9 (log-probes), so it changes no byte of another spec's code.
+TIME_SPEC = "log-peaking-time"
+TIME_AREAS = {".tk": (0x7E4C97BD, 0x7E4C9800, "T_TICK"),      # free runs of the kernel range: the end of the area
+              ".t0": (0x7E4C90EA, 0x7E4C90FC, "T_TIME0"),     # of log-probes, after T_HIT of peaking-fast, and
+              ".t1": (0x7E4C9621, 0x7E4C9630, "T_TIME0B")}    # between log-core and log-probes
+TIME_SITES = {                # site: (bytes, routine, what)
+    0x7E72675C: (5, "T_TIME0", "Key Line pass 9, `mov 2,d0` / `movbu d0,(37,a3)` (ucMode), before hook K"),
+    0x7E726774: (5, "T_TICK", "Key Line pass 9, `mov 16,d0` / `movbu d0,(36,a3)` (ucBit), after the gain is stored"),
+}
+TIME_ASM = """
+.equ T_ST, PST+88            # {u32 timer value at T_TIME0, u32 sum, u8 passes}
+.section .t0,"ax"
+T_TIME0:                     # every Key Line pass 9 (the art filter, White, a colour), before the gain is chosen.
+                             # d0 is set by the replaced instruction; the flags are not in use
+    mov (TIMER),d0
+    mov d0,(T_ST)
+    jmp T_TIME0B
+.section .t1,"ax"
+T_TIME0B:
+%(displaced_a)s
+    jmp %(back_a)s
+
+.section .tk,"ax"
+T_TICK:                      # the same pass, after hook K (T_K, and the colour loop for Red, Yellow, Blue) and the
+                             # probe PK9. d1, a0, a1 are free here: the stock code loads them again before it
+                             # uses them (0x7E726779-0x7E726784), and d0 after the replaced instructions. MDR is
+                             # free: the function calls on and returns with ret
+%(displaced_b)s
+    mov T_ST,a1
+    mov (a1),d1
+    mov (TIMER),d0
+    sub d0,d1                # the timer counts down: microseconds from T_TIME0 to here
+    mov (4,a1),d0
+    add d0,d1
+    mov d1,(4,a1)            # sum over the passes
+    movbu (8,a1),d0
+    inc d0
+    movbu d0,(8,a1)
+    and %(every)d,d0
+    bne 2f                   # one record per %(n)d passes
+    mov d0,(4,a1)
+    movhu (34,a3),d0         # usGain2 of this pass
+    mov d0,a0
+    mov %(pk_stats)d,d0
+    call log_put,[],0
+2:  jmp %(back_b)s
+"""
+TIME_EVERY = 8
+
+
+
+# The probe of the save guard of peaking (focus-peaking NOTES section 18). Its own spec, as the timing probe.
+# The guard (data/specs/peaking-save-guard.json) writes 2 to the latch byte L while it holds the lines back. The
+# kernel range of the debug builds has no free run left, and a hook inside the guard's own bytes would make the
+# free-space check of every build without the log fail. So the probe is in stock bytes of segment 2: the handler
+# that the MF Assist state object runs for each focus-ring event while MF Assist is on. It reads L there.
+GUARD_SPEC = "log-peaking-guard"
+GUARD_AREA = (0x7EBF2510, 0x7EBF2600)        # segment 2, the listed area 0x7EBF1090-0x7EBF3BAD, used by no spec
+GUARD_SITE = (0x7EB7DE46, 7, "CmpSts_MfAssist::rcvStartMFAssistIn_MFAssistOn 0x7EB7DE46, entry: `mov a0,a3` / "
+                             "`mov imm32,d0` (a focus-ring event while MF Assist is on; GUI task, segment 2)")
+GUARD_ASM = """
+.equ HMODE,  0x605157cc      # u16 heap mode, u16 mode at the last allocation
+.equ POOL02, 0x602ac45c      # pointer to the pool of the heap modes 0 and 2
+.equ GRD_ST, PST+100         # u8: a record was written for this hold
+.section .gu,"ax"
+T_GRD:
+    movm [d2,other],(sp)
+    mov psw,d2
+    movbu (PKW),d0           # L: 2 = the guard holds the lines back
+    cmp 2,d0
+    beq 1f
+    clr d0
+    movbu d0,(GRD_ST)
+    bra 9f
+1:  movbu (GRD_ST),d0
+    cmp 0,d0
+    bne 9f                   # one record per hold
+    mov 1,d0
+    movbu d0,(GRD_ST)
+    mov (POOL02),a0
+    movhu (16,a0),d0
+    movhu (76,a0),d1
+    sub d1,d0
+    mov d0,a0                # arg1: units in use in the pool that is in the way
+    mov (HMODE),d1           # arg0
+    mov %(pk_guard)d,d0
+    call log_put,[],0
+9:  mov d2,psw
+    nop
+    nop
+    movm (sp),[d2,other]
+%(displaced)s
+    jmp %(back)s
+"""
+
+
+
+PCREL = re.compile(r"^(b[a-z]{1,2}|jmp|calls|call|ret|retf|rets|rti|l[a-z]{2}|setlb|trap)$")
+
+
+def run(*a):
+    return subprocess.run(a, check=True, capture_output=True, text=True).stdout
+
+
+def build_id(events):
+    """First 8 bytes of the sha256 of the id, name, level and args of every event (the decoder computes the same
+    value; the other keys are notes)."""
+    text = json.dumps([{k: e.get(k) for k in ("id", "name", "level", "args")} for e in events], sort_keys=True,
+                      separators=(",", ":"))
+    return hashlib.sha256(text.encode()).digest()[:8]
+
+
+def displaced(blk_path, site, n):
+    """The replaced instructions as assembler text: a `call` by its target, everything else as bytes."""
+    txt = run(BIN + "/mn10300-elf-objdump", "-D", "-b", "binary", "-m", "mn10300", "--adjust-vma=%#x" % BASE,
+              "--start-address=%#x" % site, "--stop-address=%#x" % (site + n + 8), blk_path)
+    out, addr = [], site
+    rows = []
+    for l in txt.splitlines():
+        m = re.match(r"^\s*([0-9a-f]{8}):\t((?:[0-9a-f]{2} )+)\s*(?:\t(\S+)\s*(.*))?$", l)
+        if m:
+            rows.append([int(m.group(1), 16), bytes.fromhex(m.group(2).replace(" ", "")), m.group(3), (m.group(4) or "").strip()])
+    insns = []
+    for a, b, mn, ops in rows:               # objdump wraps long instructions: join the continuation rows
+        if mn is None:
+            insns[-1][1] += b
+        else:
+            insns.append([a, b, mn, ops])
+    for a, b, mn, ops in insns:
+        if a >= site + n:
+            break
+        assert a == addr, "0x%X: not on an instruction boundary" % site
+        if mn == "call":
+            m = re.match(r"^0x([0-9a-f]{8}),(\[[^\]]*\]),(\d+)$", ops)
+            assert m, ops
+            out.append("    call 0x%s,%s,%s            # replaced instruction" % m.groups())
+        else:
+            assert not PCREL.match(mn), "0x%X: %s is pc-relative" % (a, mn)
+            out.append("    .byte %s    # replaced: %s %s" % (", ".join("0x%02x" % x for x in b), mn, ops))
+        addr += len(b)
+    assert addr == site + n, "0x%X: %d bytes do not end on an instruction boundary" % (site, n)
+    return "\n".join(out)
+
+
+def branch_targets_inside(ranges, blk, work):
+    """Addresses inside the replaced ranges (not their first byte) that a 4-byte word of block 0 holds. (The source
+    script also searched the listings build/map/functions.txt and linear.txt, which are not committed.)"""
+    inner = sorted({a for site, n in ranges for a in range(site + 1, site + n)})
+    hits = []
+    for a in inner:
+        i = blk.find(struct.pack("<I", a))
+        if i >= 0:
+            hits.append("word 0x%08X at 0x%X" % (a, BASE + i))
+    return hits
