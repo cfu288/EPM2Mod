@@ -1,0 +1,9 @@
+batch C: camera on films-twelve-off (no 12-region table) against films-look-exif (Natural's table), PB130001 against the film's target, ΔE2000 (natural / hold-out / ColorChecker / skin / grays)
+  ART  1 portra-400        OFF 1.16 / 1.18 / 1.67 / 1.17 / 0.96  ->  OFF2 1.08 / 1.12 / 1.53 / 1.21 / 0.85   (PB210003.JPG, ColorMatrix [312, -16, -40, -56, 304, 8, 4, -128, 380])
+  ART  2 ektachrome        OFF 1.23 / 1.25 / 1.76 / 1.23 / 0.85  ->  OFF2 1.13 / 1.14 / 1.65 / 1.32 / 0.72   (PB210004.JPG, ColorMatrix [312, -8, -48, -24, 292, -12, 20, -104, 340])
+  ART  3 pro-400h          OFF 1.09 / 1.09 / 1.46 / 1.03 / 0.72  ->  OFF2 1.00 / 1.00 / 1.39 / 1.02 / 0.64   (PB210005.JPG, ColorMatrix [310, -8, -46, -64, 360, -40, -2, -120, 378])
+  ART  4 kodachrome        OFF 1.07 / 1.09 / 1.48 / 0.80 / 0.80  ->  OFF2 0.95 / 0.96 / 1.28 / 0.88 / 0.84   (PB210006.JPG, ColorMatrix [292, -8, -28, -54, 332, -22, 16, -72, 312])
+  ART  5 double-x          black and white: not scored here
+  ART  6 vision3-250d      OFF 1.21 / 1.22 / 1.75 / 1.31 / 1.05  ->  OFF2 0.97 / 0.94 / 1.53 / 1.15 / 0.71   (PB210008.JPG, ColorMatrix [310, -8, -46, -40, 304, -8, 8, -128, 376])
+  ART  7 velvia            OFF 1.36 / 1.40 / 1.93 / 1.55 / 0.82  ->  OFF2 1.29 / 1.30 / 1.81 / 1.56 / 0.74   (PB210009.JPG, ColorMatrix [324, -40, -28, -34, 320, -30, 12, -84, 328])
+  ART  8 superia-400       OFF 1.28 / 1.30 / 2.01 / 1.54 / 0.82  ->  OFF2 1.21 / 1.22 / 1.95 / 1.56 / 0.75   (PB210010.JPG, ColorMatrix [318, -12, -50, -84, 408, -68, -22, -116, 394])

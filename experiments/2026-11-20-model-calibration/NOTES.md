@@ -202,3 +202,21 @@ skin 0.57 / 0.71 -> 0.48 / 0.52, grays unchanged. Refit on all 31: `../2026-11-0
 (`fit_film-<fit>-n2`, `results/corrections-n2.txt`), predicted medians: natural 1.12 -> 1.04, hold-out 1.14 -> 1.05,
 ColorChecker 1.76 -> 1.71, skin 1.14 -> 1.09, grays 0.84 -> 0.63. Film files of the convergence round
 (`scripts/pack_round2.py n2`): `build/films-off2/A` (`7f7debd8…`), `B` (`38d6f853…`), `C` (`af9f153a…`).
+
+## 11. Convergence round (2026-11-21)
+
+The film files of §10 on films-twelve-off-artbkt, ART BKT on PB130001, WB Auto (`results/round-off2-<A|B|C>.txt`;
+the first A run had file B loaded and was scored as B). 31 colour films, camera against target, median (range) [C]:
+
+| Group | pinned (Natural's table) | no table, round 1 | corrected, this round | predicted | better than pinned | camera − prediction, median / max |
+|---|---|---|---|---|---|---|
+| Natural colours | 1.19 | 1.12 | 1.04 (0.74–1.36) | 1.04 | 31 / 31 | 0.01 / 0.02 |
+| Hold-out | 1.23 | 1.14 | 1.06 (0.74–1.37) | 1.05 | 31 / 31 | 0.01 / 0.04 |
+| ColorChecker | 1.82 | 1.76 | 1.72 (1.28–2.53) | 1.71 | 31 / 31 | 0.02 / 0.08 |
+| Skin | 1.14 | 1.14 | 1.08 (0.37–1.78) | 1.09 | 11 / 31 | 0.04 / 0.22 |
+| Grays | 0.84 | 0.84 | 0.75 (0.38–0.92) | 0.63 | 24 / 31 | 0.10 / 0.27 |
+
+The corrections converged: on natural colours every film lands within 0.02 of its prediction (model3). Skin is
+worse than pinned by more than 0.05 for 12 films (Verita 200D 0.95 -> 1.19, Vis 200T 0.79 -> 0.98, Ektar 100 0.85 ->
+0.99, Gold 200 1.10 -> 1.24, and 8 by 0.07–0.09), better for others (EXR 200T 1.49 -> 1.17, Eterna 500 1.10 -> 0.80).
+Grays improve for 24 films, none worse by more than 0.05, but less than model3 predicted (0.75 against 0.63).
