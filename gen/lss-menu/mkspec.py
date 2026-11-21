@@ -26,6 +26,8 @@ import sys
 from pathlib import Path
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+from blob import Blob  # noqa: E402
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 sys.path.insert(0, os.path.join(ROOT, "cli", "src"))
 from epm2mod.container import parse  # noqa: E402
@@ -225,12 +227,7 @@ def lss(specs):
           "Frame list 638 (128 items)" % (GENERIC, SPIN))
     assert o.get(VT_WORD, 4) == bytes(4)
     o.add(VT_WORD, struct.pack("<I", NAMES), "value -> text list 609: null -> 0x%08X" % NAMES)
-    import importlib.util
-    m = importlib.util.spec_from_file_location("fns", os.path.join(
-        HERE, "film_names_spec.py"))       # a copy of experiments/2026-11-14-emulator-audit/scripts/film_names_spec.py
-    fns = importlib.util.module_from_spec(m)
-    m.loader.exec_module(fns)
-    eng = next(b for b in (fns.Blob(o.b1, e) for e in range(1, 35)) if b.code.upper().startswith("EN"))
+    eng = next(b for b in (Blob(o.b1, e) for e in range(1, 35)) if b.code.upper().startswith("EN"))
     for tid, s in TEXTS.items():
         o.text(eng, tid, s)
     spec(LSS, "Lowest S/S Setting (GitHub issue #2), the menu part: the list and texts of the row that "

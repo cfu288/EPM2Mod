@@ -10,8 +10,6 @@ import toolchain  # noqa: E402
 
 BASE = 0x7E421020
 STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
-PINNED = "data/builds/peaking-colours.json"
-PINNED_SHA = "4d6b1f26ed92d66b62b4d7dc32d26168e33fd8b153a7655d6c0d9a58267456f8"
 BIN = toolchain.binutils_dir()
 
 # Code areas (tools/freespace.py area: both USABLE-CODE, camera-tested code in each).
@@ -631,13 +629,6 @@ HOOKS = {
     "IVEND":   ("log-probes", 0x7E982E8E, 7, "iv_end", "endIntervalShooting 0x7E982DF3, last trace call"),
     "IVFRAME": ("log-probes", 0x7EA997E5, 7, "iv_frame", "recordingDone_interval 0x7EA997E5, entry"),
 }
-# The timing probe of peaking (focus-peaking NOTES section 17). Its own spec: log-core and log-probes stay the
-# flashed ones. Its two hooks are in stock bytes of Key Line pass 9 0x7E7266D9 (segment 1), before and after the
-# hooks K (peaking) and PK9 (log-probes), so it changes no byte of another spec's code.
-TIME_SPEC = "log-peaking-time"
-TIME_AREAS = {".tk": (0x7E4C97BD, 0x7E4C9800, "T_TICK"),      # free runs of the kernel range: the end of the area
-              ".t0": (0x7E4C90EA, 0x7E4C90FC, "T_TIME0"),     # of log-probes, after T_HIT of peaking-fast, and
-              ".t1": (0x7E4C9621, 0x7E4C9630, "T_TIME0B")}    # between log-core and log-probes
 TIME_SITES = {                # site: (bytes, routine, what)
     0x7E72675C: (5, "T_TIME0", "Key Line pass 9, `mov 2,d0` / `movbu d0,(37,a3)` (ucMode), before hook K"),
     0x7E726774: (5, "T_TICK", "Key Line pass 9, `mov 16,d0` / `movbu d0,(36,a3)` (ucBit), after the gain is stored"),
@@ -683,14 +674,6 @@ T_TICK:                      # the same pass, after hook K (T_K, and the colour 
 TIME_EVERY = 8
 
 
-
-# The probe of the save guard of peaking (focus-peaking NOTES section 18). Its own spec, as the timing probe.
-# The guard (data/specs/peaking-save-guard.json) writes 2 to the latch byte L while it holds the lines back. The
-# kernel range of the debug builds has no free run left, and a hook inside the guard's own bytes would make the
-# free-space check of every build without the log fail. So the probe is in stock bytes of segment 2: the handler
-# that the MF Assist state object runs for each focus-ring event while MF Assist is on. It reads L there.
-GUARD_SPEC = "log-peaking-guard"
-GUARD_AREA = (0x7EBF2510, 0x7EBF2600)        # segment 2, the listed area 0x7EBF1090-0x7EBF3BAD, used by no spec
 GUARD_SITE = (0x7EB7DE46, 7, "CmpSts_MfAssist::rcvStartMFAssistIn_MFAssistOn 0x7EB7DE46, entry: `mov a0,a3` / "
                              "`mov imm32,d0` (a focus-ring event while MF Assist is on; GUI task, segment 2)")
 GUARD_ASM = """
@@ -727,7 +710,6 @@ T_GRD:
 %(displaced)s
     jmp %(back)s
 """
-
 
 
 PCREL = re.compile(r"^(b[a-z]{1,2}|jmp|calls|call|ret|retf|rets|rti|l[a-z]{2}|setlb|trap)$")
