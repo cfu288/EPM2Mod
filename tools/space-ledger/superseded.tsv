@@ -31,50 +31,10 @@ data/specs/log-menu.json	data/specs/log-menu-2.json	log-menu-2 is log-menu for t
 data/specs/custom-menu-rows-2.json	data/specs/custom-menu-rows-3.json	custom-menu-rows-3 is custom-menu-rows-2 with one more added row (Lowest S/S Setting in group E): the same operations, its item table one row longer at 0x7EBF1FE0 (16 B earlier, same end), its child list one entry longer in place at 0x7EE3CBF4 and the Debug Log value list 8 B later (experiments/2026-11-17-auto-iso-min-shutter/NOTES.md section 8)
 data/specs/build-label-proto.json	data/specs/build-label.json	build-label is the prototype with the placeholder date 0000.00.00 in place of 2026.11.19 in its text; epm2mod make writes the build label there (cli/src/epm2mod/label.py); the other three edits are the same
 # Rows with 'history' in the second column: specs of earlier builds that no build uses now and that no single spec replaced (until 2026-11-19 they sat in data/specs/).
-data/specs/check-portra-in-new-slots.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/curve-probe-1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/curve-probe-2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/film-ektachrome-lt2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/film-ektachrome-lt3.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/film-ektachrome-lt3-s3.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/film-ektachrome-lt.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/film-ektachrome-pa2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/film-portra.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/film-portra-xp10.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/film-portra-xp10-s3.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/film-portra-xp2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/film-portra-xp7.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/film-portra-xp8.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/film-portra-xp9.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/film-portra-xp.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/film-pro400h-pa1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/film-pro400h-pa2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/film-pro400h-pa2-s12.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/film-vision3-250d-pl1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/four-code.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/four-neutral.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/label-ektachrome-lt.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/label-portra.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/label-pro400h-pa.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/remap7-code.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/remap7-neutral.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/seven-films-1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/seven-films-2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/seven-films-3.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/seven-films-4.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/sixaxis-portra-1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/sixaxis-portra-2.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/sixaxis-portra-3.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/sixaxis-probe-1.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/slot3-chroma-linear.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/slot3-code.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/slots12-code.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/slots12-kind.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/slots12-neutral.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/slots7-code.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/slots7-kind.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
-data/specs/slots7-neutral.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
 data/specs/stock-films-structure.json	data/specs/stock-films-structure-2.json	stock-films-structure-2 is stock-films-structure with the film codes' look entry on the stub LKID (the identity look table) at the end of the same shared area, and the EXIF case Off for the entries with a film: the same code runs and data area (experiments/2026-11-20-film-name-exif/NOTES.md)
 data/specs/card-looks-5.json	data/specs/card-looks-6.json	card-looks-6 is card-looks-5 with the switch lists of stock-films-structure-2 and FILMNAME, called from T_GUI: the same hook, task, code runs and data areas; FLAGS and T_END stay where card-looks-5 has them (experiments/2026-11-20-film-name-exif/NOTES.md)
 data/specs/stock-films-structure-2.json	data/specs/stock-films-structure-3.json	stock-films-structure-3 is stock-films-structure-2 with no 12-region table for the film codes: OFFCASE at the end of the same shared area, its descriptor in segment 3 at 0x7EE40728, the 12-region hash entries; the same code runs and data area (experiments/2026-11-20-model-calibration/NOTES.md section 7)
 data/specs/card-looks-6.json	data/specs/card-looks-7.json	card-looks-7 is card-looks-6 with the switch lists of stock-films-structure-3: the same hook, task, code runs and data areas (experiments/2026-11-20-model-calibration/NOTES.md section 7)
+data/specs/slot3-code.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/film-portra.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/
+data/specs/film-portra-xp.json	history	an earlier build's spec, kept for the ledger and the camera log; was in data/specs/

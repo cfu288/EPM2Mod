@@ -1391,7 +1391,8 @@ def selftest():
         {"type": "bytes", "block": 0, "offset": hex(0x7F033C00 - BASE), "expect": "ff" * 16, "new": "00" * 16}]))
     t("a fake spec that overlaps the film loader FAILs (alone: ledger overlap)", check_specs(sp, [fake], quiet) == 1)
     lines = []
-    films = [s for s in sp.specs if s.path == "data/specs/four-neutral.json"]      # applies on stock; writes the same tail
+    loader = [p for p, c, _ in s3.ledger_rows if c == "current" and p.startswith("data/specs/card-looks-")]
+    films = [s for s in sp.specs if s.path in loader]      # the film loader: applies on stock; writes the same tail
     t("the same fake spec FAILs after a spec that wrote those bytes (expect mismatch)",
       len(films) == 1 and check_specs(sp, films + [fake], lines.append) >= 1
       and any(x.startswith("FAIL") and "selftest/overlap.json" in x and "expect bytes" in x for x in lines), "\n".join(lines))
