@@ -7,8 +7,6 @@ and delete the item here.
 
 - RAW Data Edit keeps the source RAW's ImageDescription, so a RAW re-developed with another film carries the old name
   (the playback EXIF path, `experiments/2026-11-20-film-name-exif/NOTES.md`).
-- The emulator gate `experiments/2026-11-18-stock-filters/scripts/equal_tables.py` does not compare the look table
-  (how the Cross Process curve of 2026-11-18 went unseen); add it.
 - RAW Data Edit → ART BKT (one RAW developed in every selected ART entry), a developer tool for film-simulation tests,
   not for release: works on the camera (calibration run and the films-twelve-off round, 2026-11-20); kept in test
   builds only (`experiments/2026-11-20-raw-edit-art-bkt/NOTES.md`).
