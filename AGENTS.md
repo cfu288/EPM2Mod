@@ -71,7 +71,5 @@ it is done.
     [docs/dev/conventions.md](docs/dev/conventions.md). The command-line reference is [docs/reference/cli.md](docs/reference/cli.md).
 23. **Writing in files:** short plain sentences, terms defined. Use placeholders for machine paths and hosts
     (`/path/to/...`, `USER@HOST`). The pre-commit hook refuses real ones.
-24. **Commit and push your work** to `origin main` without asking. Do not force-push or rewrite history unless the
-    owner says so.
-25. **Another session may work here at the same time.** Do not change or delete files you did not make without a
+24. **Another session may work here at the same time.** Do not change or delete files you did not make without a
     reason, and say so when you change a shared file.
