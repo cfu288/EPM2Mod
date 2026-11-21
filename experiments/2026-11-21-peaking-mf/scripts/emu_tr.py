@@ -58,7 +58,8 @@ def run(path, name):
 
 def main():
     os.chdir(ROOT)
-    pin, mf = run(image("films-twelve-off", "pinned"), "pinned"), run(image("peaking-mf", "probe"), "probe")
+    pinned = os.path.basename(json.load(open(os.path.join(ROOT, "data", "pinned-build.json")))["build"])[:-5]
+    pin, mf = run(image(pinned, "pinned"), "pinned"), run(image("peaking-mf", "probe"), "probe")
     ok = True
     for (r, v, fname), got in sorted(mf.items()):
         ref = pin[(1 if (r or fname == "MF") else 0, v, fname)]

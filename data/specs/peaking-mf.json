@@ -7,18 +7,27 @@
   {
    "type": "bytes",
    "block": 0,
-   "offset": "0x7d1e48",
-   "expect": "006930310072656164794578656375746553656c6641646a7573740069303200693033006765744d6f6465006930340067",
-   "new": "fca8c5e82b60a000c923fccc21c00000900004ddfa4d86ffc00cfcddd01c5b6004a001c80800dc47658dffdc1b658dffcb",
-   "_addr": "0x7ebf2e68",
-   "_note": "new code, segment 2: T_MF (49 B)"
+   "offset": "0x88fb61",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffff",
+   "new": "fca8c5e82b60a000c807dc238881ffdc48040000cb",
+   "_addr": "0x7ecb0b81",
+   "_note": "new code, segment 2: T_MF (the test of R) (21 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x88ffb8",
+   "expect": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "new": "fccc21c00000900004dd946c7affc00ca001c80ffcddd01c5b600400dce18381ffdcb58381ffcb",
+   "_addr": "0x7ecb0fd8",
+   "_note": "new code, segment 2: T_MF2 (the focus mode) (39 B)"
   },
   {
    "type": "bytes",
    "block": 0,
    "offset": "0xa8384",
    "expect": "fca8c5e82b60a000c829",
-   "new": "dcc49a7200cbcbcbcbcb",
+   "new": "dcdd777e00cbcbcbcbcb",
    "_addr": "0x7e4c93a4",
    "_note": "T_R (custom-menu-rows-3): `movbu (R),d0 / cmp 0,d0 / beq` -> `jmp T_MF` + nop"
   }

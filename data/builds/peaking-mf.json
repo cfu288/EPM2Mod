@@ -1,5 +1,5 @@
 {
- "what": "TEST ONLY, not for use: films-twelve-off where focus peaking also shows whenever the focus mode is MF, with any lens and without the magnified view (experiments/2026-11-21-peaking-mf/NOTES.md)",
+ "what": "TEST ONLY, not for use: the pinned build where focus peaking also shows whenever the focus mode is MF, with any lens and without the magnified view (experiments/2026-11-21-peaking-mf/NOTES.md)",
  "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "data/specs/interval-timelapse-v2.json",
@@ -14,8 +14,8 @@
   "data/specs/peaking-save-guard.json",
   "data/specs/looks-menu-4.json",
   "data/specs/stock-films-structure-3.json",
-  "data/specs/card-looks-7.json",
-  "data/specs/log-menu-2.json",
+  "data/specs/card-looks-8.json",
+  "data/specs/log-menu-3.json",
   "data/specs/lss-menu.json",
   "data/specs/lss-core.json",
   "data/specs/build-label.json",

@@ -45,3 +45,19 @@ after the boot task loaded segment 2 [R]; boot-test and update-path-test check t
 | `emulator/hookcheck.py` | 0 transfers for `peaking-mf`: the patched site is code of another spec (T_R), not stock code, so the static boot-order check does not see the jump to segment 2. The run-time argument of §3 and the boot / update-path tests stand for it |
 | `tools/checks.py --tier full` | free space, op-check, boot-test, update-path-test PASS; save-guard S24 / S25 PASS for the build (the "FAIL" is the reference's, as every build of this line); peaking S4 R = 0 at the end, S5 as pinned, S7 PASS |
 | `scen_direct4.py s6` against the pinned films-twelve-off | PASS: 0 FAULT, no art code whose six-axis result differs |
+
+## 5. Camera result of the first probe (2026-11-21, sha256 `7ddccc78…`, on films-twelve-off) [C]
+
+Peaking White, MF Assist Off, focus mode MF: white lines in the normal live view, no zoom (criterion 1, with a lens
+that has contacts; no manual lens at hand). Digital Tele-converter on: lines (2). S-AF, C-AF: no lines (3). S-AF+MF
+with MF Assist On: the focus ring zooms with lines, as before (3). Movie: no lines in any focus mode (4). Live view
+smooth enough (5). After a shot the saved picture has no lines, but **the short preview after the shot shows them**:
+with the MF trigger nothing ends peaking at the shot, whereas MF Assist's internal ZoomOff did.
+
+## 6. Moved for CI (2026-11-21)
+
+The other session pinned films-start-texts the same day; its `log-menu-3` uses the run 0x7EBF2E68 too, so the
+pinned build's free-space check failed with this spec in `data/specs/`. T_MF is now two parts: T_MF (21 B,
+0x7ECB0B81, the test of R) and T_MF2 (39 B, 0x7ECB0FD8, the focus mode), each ending in a nop; the build is the
+pinned films-start-texts + `peaking-mf`, sha256 `18aaffabd7b7f15c9d75738f6b5206407b3887c119906e32f15fb3215552194f`.
+`scripts/emu_tr.py` PASS on it (12 cases, against the pinned build); the pinned build's free-space check PASS.
