@@ -101,8 +101,9 @@ descriptions, patch specs and film lists are data: they are also relative to the
   comes from `data/films/catalogue.json` and the fits: `uv run python web/scripts/export_films.py` writes it. A build's
   name is the file name of its description. Tests
   fail if a generated part is out of date.
-- **One environment:** `uv sync` makes `.venv` with the package, the development tools and the
-  packages that the research scripts import (`pyproject.toml`, groups `dev` and `research`).
+- **One environment:** `uv sync` makes `.venv` with the package and the development tools (`pyproject.toml`,
+  group `dev`). The scripts in `experiments/` need more packages: `uv sync --group research` adds them, and a
+  later `uv sync` without the option removes them.
 
 ## Making firmware
 

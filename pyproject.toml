@@ -1,5 +1,5 @@
-# The workspace: one environment (.venv) for the epm2mod package (cli/) and the research scripts
-# (experiments/, tools/, gen/). `uv sync` installs the package from cli/ and both groups.
+# The workspace: one environment (.venv) for the epm2mod package (cli/) and the scripts (tools/, gen/, emulator/,
+# experiments/). `uv sync` installs the package from cli/ and the dev group.
 [project]
 name = "epm2-tools"
 version = "0"
@@ -7,8 +7,8 @@ requires-python = ">=3.10"
 dependencies = ["epm2mod"]
 
 [dependency-groups]
-dev = ["black>=24", "mypy>=1.10", "numpy>=1.24"]
-# What the scripts under experiments/ import. Not needed to build firmware.
+dev = ["black>=24", "mypy>=1.10", "numpy>=1.24", "pillow"]
+# What the scripts under experiments/ import: `uv sync --group research`. Not needed to build or check firmware.
 research = [
     "numpy>=1.24",
     "scipy",
@@ -24,9 +24,7 @@ research = [
 
 [tool.uv]
 package = false
-# `uv sync` and `uv run` keep both groups installed, so the research scripts and the
-# package share one environment (.venv).
-default-groups = ["dev", "research"]
+default-groups = ["dev"]
 
 [tool.uv.sources]
 epm2mod = { workspace = true }
