@@ -68,7 +68,7 @@ def run(path, name):
 
 def main():
     os.chdir(ROOT)
-    pinned = os.path.basename(json.load(open(os.path.join(ROOT, "data", "pinned-build.json")))["build"])[:-5]
+    pinned = "films-start-texts"     # the base of peaking-mf (the pinned build until peaking-mf was pinned)
     pin, mf = run(image(pinned, "pinned"), "pinned"), run(image("peaking-mf", "probe"), "probe")
     ok = True
     for key, got in sorted((k, v) for k, v in mf.items() if k[0] != "gs"):

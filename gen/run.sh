@@ -19,6 +19,7 @@ uv run python gen/lss-menu/mkspec.py
 uv run python gen/peaking/mkspec_colours.py "$work/peaking-colours"
 uv run python gen/peaking/mkspec_fast.py "$work/peaking-fast"
 uv run python gen/peaking/mkspec_guard.py "$work/peaking-guard"
+uv run python gen/peaking/mkspec_mf.py "$work/peaking-mf"
 uv run python gen/gauge-info/mkspec_gauge_info.py
 uv run python gen/gauge-info/mkspec_gauge_bar_left.py
 # last: it reads the film loader's labels from the loader's spec, and the bytes it hooks from the build's other specs

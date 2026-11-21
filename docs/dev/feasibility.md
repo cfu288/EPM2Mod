@@ -101,7 +101,8 @@ Other Olympus generations, and what each can be modded to do: [model-matrix.md](
 
 **High effort: port or write**
 
-- Focus peaking, from the E-P5: done 2026-11-14 (`experiments/2026-11-14-focus-peaking/NOTES.md`).
+- Focus peaking, from the E-P5: done 2026-11-14 (`experiments/2026-11-14-focus-peaking/NOTES.md`); in MF without the
+  zoom, with any lens (GitHub issue #4): done 2026-11-21 (`peaking-mf`, `experiments/2026-11-21-peaking-mf/NOTES.md`).
 - Colour grain, halation.
 - A custom editor screen.
 - Live Composite.

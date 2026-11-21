@@ -54,11 +54,11 @@ export const features: Feature[] = [
   {
     id: 'peaking',
     name: 'Focus peaking',
-    summary: 'Easier manual focus.',
+    summary: 'Easier manual focus, with any lens.',
     steps: [
-      'MENU → SETUP → Custom Menu → A → MF Assist → On.',
-      'Set the focus mode to MF and turn the focus ring.',
+      'Set the focus mode to MF: the lines show in live view.',
       'To change the colour: MENU → SETUP → Custom Menu → A → Peaking.',
+      'To also zoom in when you turn the focus ring: MENU → SETUP → Custom Menu → A → MF Assist → On.',
     ],
     screens: [{ src: 'ui/peaking-list.png', alt: 'Custom Menu A with the Peaking list' }],
   },

@@ -41,8 +41,7 @@ v2026.11.19, same commit). Open: the final release.
   new area. The log's build id names the dictionary, not the firmware: put a firmware id in `boot`.
 - More than 10 frames per second of peaking needs a shorter pass list or the 50 ms frame class
   (NOTES §17).
-- Peaking without the zoom: the trigger is the MF Assist state object, which also asks for the zoom.
-  It needs the E-P5 state object paired (NOTES §15.5).
+- Peaking in movie mode (no lines there, recording or not: the latch's movie condition).
 - The row name Peaking is English only.
 
 ## Film simulations
