@@ -78,13 +78,13 @@ epm2mod cards
 
 ### epm2mod install
 
-Write EPM2Mod to the SD card, and the film file if --film is given.
+Write EPM2Mod to the SD card, and the look pack if --film is given.
 
 ```
 epm2mod install [-h] --card DIR [--film ARTn=FILM] [--build BUILD] [--allow-untested] [--cache DIR] [--stock FILE] [--dry-run] [--eject] [--json]
 ```
 
-- Output: the firmware on the card, and the film file if --film is given; then the camera steps.
+- Output: the firmware on the card, and the look pack if --film is given; then the camera steps.
 - Needs: no checkout. Network: when Olympus's firmware is not downloaded yet.
 
 | Argument | What | Default |
@@ -118,7 +118,7 @@ epm2mod install [-h] --card DIR [--film ARTn=FILM] [--build BUILD] [--allow-unte
 - `files[].replaced`: true if a different file of that name was there and is replaced
 - `files[].unchanged`: true if that file already held these bytes: it was not written again
 - `removed`: the extra files removed from DCOLYMP
-- `films`: the films of the film file
+- `films`: the films of the look pack
 - `films[].art`: the ART slot, 1 to 12
 - `films[].name`: the name the camera shows
 - `ejected`: true if the card was ejected
@@ -175,13 +175,13 @@ epm2mod films
 
 ### epm2mod films set
 
-Write only the film file.
+Write only the look pack.
 
 ```
 epm2mod films set [-h] (--card DIR | -o FILE) --film ARTn=FILM [--dry-run] [--eject] [--json]
 ```
 
-- Output: the film file on the card or at FILE; then the camera steps.
+- Output: the look pack on the card or at FILE; then the camera steps.
 - Needs: no checkout. Network: never.
 
 | Argument | What | Default |
@@ -204,7 +204,7 @@ epm2mod films set [-h] (--card DIR | -o FILE) --film ARTn=FILM [--dry-run] [--ej
 - `files[].sha256`: its sha256 (null for a dry run of a build that is not camera-tested)
 - `files[].replaced`: true if a different file of that name was there and is replaced
 - `files[].unchanged`: true if that file already held these bytes: it was not written again
-- `films`: the films of the film file
+- `films`: the films of the look pack
 - `films[].art`: the ART slot, 1 to 12
 - `films[].name`: the name the camera shows
 - `ejected`: true if the card was ejected
@@ -273,7 +273,7 @@ epm2mod restore -o E1019999.BIN
 
 ### epm2mod inspect
 
-Say what a firmware file, a film file or an SD card holds.
+Say what a firmware file, a look pack or an SD card holds.
 
 ```
 epm2mod inspect [-h] [--card DIR] [--json] [FILE]
@@ -284,7 +284,7 @@ epm2mod inspect [-h] [--card DIR] [--json] [FILE]
 
 | Argument | What | Default |
 |---|---|---|
-| `FILE` | a firmware file or a film file |  |
+| `FILE` | a firmware file or a look pack |  |
 | `--card DIR` | the top folder of the SD card |  |
 | `--json` | print one JSON document (schema 2) on stdout |  |
 
@@ -300,7 +300,7 @@ epm2mod inspect [-h] [--card DIR] [--json] [FILE]
 - `files[].build`: the build a firmware file is (a build name, or Olympus original), or null
 - `files[].version`: the firmware's version, or null
 - `files[].checksums_ok`: for a firmware file, true if every block's checksum is right, else null
-- `files[].films`: the films of a film file
+- `files[].films`: the films of a look pack
 - `files[].films[].art`: the ART slot
 - `files[].films[].name`: the name the camera shows
 - `files[].films[].kind`: colour or black-and-white
@@ -519,13 +519,13 @@ epm2mod fetch-stock
 
 ### epm2mod films pack
 
-Write a film file from a look list of fit files, for films that are not in the catalogue yet.
+Write a look pack from a look list of fit files, for films that are not in the catalogue yet.
 
 ```
 epm2mod films pack [-h] (--card DIR | -o FILE) [--dry-run] [--eject] [--json] LIST
 ```
 
-- Output: the film file on the card or at FILE; then the camera steps.
+- Output: the look pack on the card or at FILE; then the camera steps.
 - Needs: a checkout. Network: never.
 
 | Argument | What | Default |
@@ -548,7 +548,7 @@ epm2mod films pack [-h] (--card DIR | -o FILE) [--dry-run] [--eject] [--json] LI
 - `files[].sha256`: its sha256 (null for a dry run of a build that is not camera-tested)
 - `files[].replaced`: true if a different file of that name was there and is replaced
 - `files[].unchanged`: true if that file already held these bytes: it was not written again
-- `films`: the films of the film file
+- `films`: the films of the look pack
 - `films[].art`: the ART slot, 1 to 12
 - `films[].name`: the name the camera shows
 - `ejected`: true if the card was ejected

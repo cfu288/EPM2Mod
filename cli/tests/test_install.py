@@ -461,7 +461,7 @@ class InspectTests(CardCase):
         text = "\n".join(found.problems)
         self.assertIn("damaged", text)
         self.assertIn("holds other files", text)
-        self.assertIn("does not load the film file", text)
+        self.assertIn("does not load the look pack", text)
 
 
 class CommandTests(CardCase):
@@ -1000,7 +1000,9 @@ class NoCheckoutTests(unittest.TestCase):
         with contextlib.redirect_stdout(out), self.assertRaises(SystemExit):
             cli.main(["--project", str(self.top), "films", "--help"])
         self.assertIn("set ", out.getvalue())
-        self.assertNotIn("pack", out.getvalue())
+        self.assertNotIn(
+            "    pack ", out.getvalue()
+        )  # the command; "look pack" is in the help text
 
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@
 
 A film simulation is a set of numbers for the camera's own colour stages (matrix, six-axis, tone curves, saturation,
 chroma curves), fitted so that the camera's JPEG matches a simulation of the film. The firmware keeps Olympus's 12
-art filters; a film file on the SD card puts a film into the ART entries it lists
+art filters; a look pack on the SD card puts a film into the ART entries it lists
 ([guide](../guide/film-looks.md)). The stages and how a film reaches them: [colour-pipeline.md](colour-pipeline.md).
 The lab notes: `experiments/2026-11-09-film-portra/NOTES.md` (method, model) and
 `experiments/2026-11-20-film-camera-round/NOTES.md` (the latest round); every flash is in the
@@ -39,7 +39,7 @@ the camera a **synthetic RAW** instead: a file in its own raw format with every 
 (`experiments/2026-11-09-film-portra/testraw/`, made by `make_mock2.py` with our encoder `orfcodec.py` and a real
 photo's header, owner name and serial blanked).
 
-1. Put the film on the card (a film file, `epm2mod films set` or `films pack`) and the RAW in `DCIM/100OLYMP/`.
+1. Put the film on the card (a look pack, `epm2mod films set` or `films pack`) and the RAW in `DCIM/100OLYMP/`.
 2. On the camera: Load Looks; for each ART entry, choose it as Picture Mode, then RAW Data Edit → [Current] on the RAW.
    The camera writes a JPEG as it would for a photo with that film.
 3. `read_mock.py` finds each patch (it undoes the camera's lens distortion correction) and reads its colour, and the

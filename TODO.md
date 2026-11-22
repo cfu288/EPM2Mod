@@ -47,7 +47,7 @@ v2026.11.19, same commit). Open: the final release.
 ## Film simulations
 
 - Grain: stock-strength grain needs about 40 bytes of code.
-- Film files from the card: not yet seen on the camera: the film name in playback info. Later: live-view tables
+- Look packs from the card: not yet seen on the camera: the film name in playback info. Later: live-view tables
   for movies' own columns if movies need them.
 - The published test RAW files (owner name and serial numbers blanked) are not yet developed on the
   camera.

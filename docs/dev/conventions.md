@@ -183,7 +183,7 @@ what is there:
 | Needs | What the tests prove |
 |---|---|
 | Nothing more than the repository | The package works on a small made-up firmware: container, patch specs, build steps, card copy, download (with a stand-in for the network), every command. The README's generated parts are current. The film specs record the digest of the film list and fit files that are in the repository. |
-| numpy (`uv run` installs it) | Look files packed from the fit files are the ones the film records hold (`cli/tests/test_lookfile.py`). |
+| numpy (`uv run` installs it) | Look packs made from the fit files are the ones the film records hold (`cli/tests/test_lookfile.py`). |
 | The maker's firmware file (`uv run epm2mod fetch-stock`) | Each build description that has a sha256 gives that sha256. The stock file survives a parse and a write without a change. |
 
 Without the maker's firmware file the run skips the last group and says so. Run the full set before

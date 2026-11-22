@@ -716,7 +716,7 @@ def _films_report(path: Path, data: bytes) -> FileReport:
             "films",
             len(data),
             digest,
-            problem=f"the film file is damaged: {error}. The camera shows Bad file",
+            problem=f"the look pack is damaged: {error}. The camera shows Bad file",
         )
     films = tuple(
         {
@@ -745,7 +745,7 @@ def inspect_file(paths: Locator, path: Path) -> Inspection:
             report = _firmware_report(paths, path, data)
         except ContainerError:
             raise NotFoundError(
-                f"{path}: is not a firmware file or a film file"
+                f"{path}: is not a firmware file or a look pack"
             ) from None
     return Inspection((report,), (report.problem,) if report.problem else ())
 
@@ -773,7 +773,7 @@ def inspect_card(paths: Locator, card: Path) -> Inspection:
     if films_file.is_file():
         reports.append(_films_report(films_file, read_bytes(films_file)))
     if not reports and not problems:
-        raise NotFoundError(f"{card}: holds no firmware file and no film file")
+        raise NotFoundError(f"{card}: holds no firmware file and no look pack")
     problems += [
         f"{report.path}: {report.problem}" for report in reports if report.problem
     ]
@@ -792,7 +792,7 @@ def inspect_card(paths: Locator, card: Path) -> Inspection:
         and kinds["firmware"].build == "Olympus original"
     ):
         problems.append(
-            f"{films_file}: Olympus's original firmware does not load the film file: install EPM2Mod first"
+            f"{films_file}: Olympus's original firmware does not load the look pack: install EPM2Mod first"
         )
     return Inspection(tuple(reports), tuple(problems), card)
 

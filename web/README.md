@@ -42,4 +42,4 @@ firmware build are tested in Python (`cli/tests/test_serve.py`).
 To work on the local app against a real server: `uv run epm2mod serve --no-browser --port 8765`, then
 `EPM2MOD_API=http://127.0.0.1:8765 npm run dev:app`, and open the dev address with the server's `#token=...`.
 
-The packed look file is byte-equal to `uv run epm2mod films set -o FILE` with the same `--film` choices (`packages/ui/src/lib/lookfile.test.ts`).
+The look pack is byte-equal to `uv run epm2mod films set -o FILE` with the same `--film` choices (`packages/ui/src/lib/lookfile.test.ts`).

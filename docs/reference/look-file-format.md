@@ -1,6 +1,6 @@
-# The look file (EPM2LOOK.BIN), version 1
+# The look pack (EPM2LOOK.BIN), version 1
 
-A look file holds up to twelve film looks, one per art-filter menu entry. The pinned build reads
+A look pack holds up to twelve film simulations, one per art-filter menu entry. The pinned build reads
 it from the top folder of the SD card when Load Looks runs, checks it, writes the looks into the entries it lists and keeps a copy in its settings
 memory. The looks then stay after a restart and without the card, until another file is loaded.
 

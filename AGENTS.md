@@ -38,7 +38,9 @@ it is done.
     screenshot beside it.
 11. **Say why, not only what.** A feature line says what it does for the photographer.
 12. **Words:** "film simulations" (never "films", "looks" or "film looks" for them; "Load Looks", file names and
-    command names are exempt). Use the camera's names for menus and settings.
+    command names are exempt). A **look pack** is the file EPM2LOOK.BIN: the film simulations for the 12 ART entries,
+    which the camera reads with Load Looks ("film file" and "look file" are its old names). Use the camera's names for
+    menus and settings.
 13. **No support channel.** The firmware is unofficial and used at the user's own risk: do not point users to the
     owner, issues or bug reports.
 14. **Write for the reader's layer.** Wording follows what is true for the tool the reader uses (the installer page,

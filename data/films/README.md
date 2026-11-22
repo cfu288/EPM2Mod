@@ -1,10 +1,10 @@
 # Film simulation data
 
-- `catalogue.json`: every fitted film that a look file for the SD card can hold, with the short id that
+- `catalogue.json`: every fitted film that a look pack for the SD card can hold, with the short id that
   `epm2mod install --film ART2=velvia` and `epm2mod films set --film ART2=velvia` use and the name the camera shows (`epm2mod films`).
 - `card-looks.json`: a developer look list of fit files, one per ART entry, the input of `epm2mod films pack`.
 - `film-records.json`: each film of the catalogue with its look record, and the Olympus art filter of each ART entry.
-  `epm2mod install`, `epm2mod films set`, the local app and the web site pack look files from it, without numpy. Made from the fits
+  `epm2mod install`, `epm2mod films set`, the local app and the web site make look packs from it, without numpy. Made from the fits
   by `uv run python web/scripts/export_films.py`; a test fails when it is out of date.
 - `fits/*.npz`: the fitted values of each look. One file holds three tone curves of 1,024 points, a
   saturation gain, six saturation values and six hue values, a 3 × 3 matrix, and two chroma curves.

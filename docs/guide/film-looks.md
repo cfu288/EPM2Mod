@@ -1,12 +1,12 @@
 # Film Simulations
 
-The camera comes with the Olympus art filters. A film file on the SD card puts a film simulation in each ART entry it
-lists. The camera keeps them, with their names, after power-off and without the card. They work for photos and live
+The camera comes with the Olympus art filters. A **look pack** (the file EPM2LOOK.BIN on the SD card) puts a film
+simulation in each ART entry it lists. The camera keeps them, with their names, after power-off and without the card. They work for photos and live
 view.
 
 ## Usage
 
-1. Put the film file on the card with the installer, or on the command line with `--film`
+1. Put the look pack on the card with the installer, or on the command line with `--film`
    ([install](../../README.md#using-the-command-line)). To change only the film simulations later, choose **Film
    simulations only** in the installer, or run `uv run epm2mod films set --card /path/to/card --film ART2=velvia`.
 2. MENU → SETUP → Custom Menu → J → **Load Looks** → **Load** → OK. The row reads Loading, then **Loaded**.
@@ -70,5 +70,5 @@ Lightroom) and its art filter as Off. RAW Data Edit keeps the name that the RAW 
 - Filter Type and Add Effects are not tested with the film simulations.
 - The Load Looks row's texts are English in every menu language.
 
-How the simulations were made and measured: [film emulation](../dev/film-emulation.md). The file format:
+How the simulations were made and measured: [film emulation](../dev/film-emulation.md). The look pack's format:
 [look-file-format.md](../reference/look-file-format.md).

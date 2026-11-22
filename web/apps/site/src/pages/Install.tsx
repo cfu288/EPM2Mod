@@ -93,7 +93,8 @@ function InstallerSteps() {
       <CustomMenu n={5} />
       <Step n={6} title="Load the film simulations">
         <p>
-          MENU → SETUP → Custom Menu → J → Load Looks → Load. Until then, the ART entries are the Olympus art filters.
+          The card also holds a look pack: the film simulations you chose for the 12 ART entries. Load it: MENU → SETUP
+          → Custom Menu → J → Load Looks → Load. Until then, the ART entries are the Olympus art filters.
         </p>
       </Step>
     </ol>
@@ -133,7 +134,8 @@ function CliSteps() {
       <CustomMenu n={4} />
       <Step n={5} title="Load the film simulations">
         <p>
-          MENU → SETUP → Custom Menu → J → Load Looks → Load. Until then, the ART entries are the Olympus art filters.
+          The card also holds a look pack: the film simulations you chose for the 12 ART entries. Load it: MENU → SETUP
+          → Custom Menu → J → Load Looks → Load. Until then, the ART entries are the Olympus art filters.
         </p>
       </Step>
     </ol>
@@ -188,12 +190,13 @@ export function Install() {
         <h2 className="section-title border-t-[6px] pt-4 text-lg">Change the film simulations</h2>
         {way === 'installer' ? (
           <p className="text-ink-soft mt-3">
-            Start the installer again and pick Film simulations only. Then load them with Load Looks, without a flash.
+            Start the installer again and pick Film simulations only: it writes a new look pack. Load it with Load
+            Looks, without flashing the firmware again.
           </p>
         ) : (
           <div className="text-ink-soft mt-3 max-w-2xl space-y-2">
             <Code>{'uv run epm2mod films set --card /path/to/card --film ART2=velvia'}</Code>
-            <p>Then load them with Load Looks, without a flash.</p>
+            <p>It writes a new look pack. Load it with Load Looks, without flashing the firmware again.</p>
           </div>
         )}
       </section>

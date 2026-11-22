@@ -254,7 +254,7 @@ _BUILD = {
     "build.label": "the label on the camera's Firmware screen, or null",
 }
 _FILMS = {
-    "films": "the films of the film file",
+    "films": "the films of the look pack",
     "films[].art": "the ART slot, 1 to 12",
     "films[].name": "the name the camera shows",
 }
@@ -293,8 +293,8 @@ COMMANDS: dict[str, Command] = {
         Command(
             "install",
             OWNERS,
-            "Write EPM2Mod to the SD card, and the film file if --film is given.",
-            "the firmware on the card, and the film file if --film is given; then the camera steps",
+            "Write EPM2Mod to the SD card, and the look pack if --film is given.",
+            "the firmware on the card, and the look pack if --film is given; then the camera steps",
             False,
             _DOWNLOAD,
             (
@@ -342,8 +342,8 @@ COMMANDS: dict[str, Command] = {
         Command(
             "films set",
             OWNERS,
-            "Write only the film file.",
-            "the film file on the card or at FILE; then the camera steps",
+            "Write only the look pack.",
+            "the look pack on the card or at FILE; then the camera steps",
             False,
             "",
             (
@@ -373,7 +373,7 @@ COMMANDS: dict[str, Command] = {
         Command(
             "inspect",
             OWNERS,
-            "Say what a firmware file, a film file or an SD card holds.",
+            "Say what a firmware file, a look pack or an SD card holds.",
             "a report per file (model, build, version, sha256, films) and what will not work",
             False,
             "",
@@ -389,7 +389,7 @@ COMMANDS: dict[str, Command] = {
                 "files[].build": "the build a firmware file is (a build name, or Olympus original), or null",
                 "files[].version": "the firmware's version, or null",
                 "files[].checksums_ok": "for a firmware file, true if every block's checksum is right, else null",
-                "files[].films": "the films of a film file",
+                "files[].films": "the films of a look pack",
                 "files[].films[].art": "the ART slot",
                 "files[].films[].name": "the name the camera shows",
                 "files[].films[].kind": "colour or black-and-white",
@@ -492,8 +492,8 @@ COMMANDS: dict[str, Command] = {
         Command(
             "films pack",
             DEVELOPERS,
-            "Write a film file from a look list of fit files, for films that are not in the catalogue yet.",
-            "the film file on the card or at FILE; then the camera steps",
+            "Write a look pack from a look list of fit files, for films that are not in the catalogue yet.",
+            "the look pack on the card or at FILE; then the camera steps",
             True,
             "",
             ("epm2mod films pack LIST --card /path/to/card",),
@@ -1321,7 +1321,7 @@ def _arguments(
         _add_json(parser)
     elif command == "inspect":
         parser.add_argument(
-            "file", nargs="?", metavar="FILE", help="a firmware file or a film file"
+            "file", nargs="?", metavar="FILE", help="a firmware file or a look pack"
         )
         parser.add_argument(
             "--card", metavar="DIR", help="the top folder of the SD card"
