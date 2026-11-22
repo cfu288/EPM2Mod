@@ -31,7 +31,8 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
           cache-dependency-path: web/package-lock.json
-      - run: npm ci
+      # no install scripts: a dependency can not run code at install time (none needs one)
+      - run: npm ci --ignore-scripts
       - run: npm run check
       - run: npx playwright install --with-deps chromium
       - run: npm run e2e

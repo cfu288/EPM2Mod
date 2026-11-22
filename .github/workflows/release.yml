@@ -41,7 +41,8 @@ jobs:
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.12'
-      - run: npm ci && npm run build:app
+      # no install scripts: a dependency can not run code at install time (none needs one)
+      - run: npm ci --ignore-scripts && npm run build:app
         working-directory: web
       - id: zip
         env:
