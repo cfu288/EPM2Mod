@@ -92,7 +92,9 @@ jobs:
       - if: runner.os == 'Windows'
         shell: pwsh
         run: Expand-Archive -LiteralPath "zip/$env:NAME.zip" -DestinationPath unpacked
-      - run: python .github/scripts/release_smoke.py "unpacked/$NAME" "$SHA256"
+      # bash on Windows too: in PowerShell, $NAME is not the environment variable
+      - shell: bash
+        run: python .github/scripts/release_smoke.py "unpacked/$NAME" "$SHA256"
 
   # The Mac download: the zip's folder in EPM2Mod.app, in a disk image (release/mac/make-dmg.sh). A tag signs it with
   # the Developer ID certificate and has Apple notarize it, so it opens without Open Anyway; a branch signs it ad hoc.
