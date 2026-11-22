@@ -66,15 +66,6 @@ describe('Films', () => {
     expect(pressed('Scene')).toHaveAccessibleName('Scene 9')
   })
 
-  it('falls back to Natural on a scene without the film', async () => {
-    const user = userEvent.setup()
-    render(<App />)
-    await user.click(screen.getByRole('button', { name: 'Gold 200' }))
-    await user.click(screen.getByRole('button', { name: 'Scene 2' }))
-    expect(pressed('Film simulation')).toHaveTextContent('Natural')
-    expect(within(carousel()).getByRole('img', { name: 'Scene 2 in Natural' })).toBeInTheDocument()
-  })
-
   it('shows the installer first and the command line on a click', async () => {
     const user = userEvent.setup()
     window.history.replaceState(null, '', `${import.meta.env.BASE_URL}install`)

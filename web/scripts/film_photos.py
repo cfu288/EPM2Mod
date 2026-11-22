@@ -1,64 +1,76 @@
-"""Make the photos of the site's film comparison: one scene per RAW, one photo per look the camera developed it with.
+"""Make the photos of the site's film comparison: one scene per RAW, one photo per film simulation.
 
     uv run python web/scripts/film_photos.py
 
-Reads the camera JPEGs of experiments/2026-11-09-film-portra/shots: the eight scenes of filmsimcompare/, each in
-Natural and the first seven films, and the gallery RAW in every look of the twelve-film build (PB160NNN.JPG). A
-scene is the files with one capture time (RAW Data Edit keeps the RAW's); the look is the Olympus ArtFilter tag.
-The camera writes "Pop Art" for the five newer looks, so those files are named by number (as make_readme_sheet.py
-does).
+Reads the camera JPEGs in .local/site-photos/ (local only: RAW Data Edit -> ART BKT on the site RAWs of
+.local/raws/site/, one folder per film file; batches.json lists each file's films in ART order). A run of ART BKT
+writes the Natural frame, then one frame per ART entry in menu order, so a frame is named by its place in the run: the
+EXIF says Natural for all of them. A scene is the files with one capture time (RAW Data Edit keeps the RAW's).
+batch-1b holds batch 1's run of PA280187; trix-n3 holds Tri-X alone, developed again after its fit was corrected.
 
 Writes web/apps/site/public/films/<scene>/<look>.webp (1600 px on the long side, no metadata), a 320 px thumb.webp
-of the Natural photo, and web/apps/site/src/filmPhotos.json: the scenes in order, each with its looks in film order.
+of the Natural photo, and web/apps/site/src/filmPhotos.json: the scenes in order, each with its looks in catalogue
+order.
 """
 import json
-import struct
+import subprocess
 from pathlib import Path
 
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, ImageStat
 
 ROOT = Path(__file__).resolve().parents[2]
-SHOTS = ROOT / "experiments/2026-11-09-film-portra/shots"
+SHOTS = ROOT / ".local/site-photos"
 OUT = ROOT / "web/apps/site/public/films"
 MANIFEST = ROOT / "web/apps/site/src/filmPhotos.json"
 LONG_SIDE = 1600
 THUMB = 320
 
-# ArtFilter value -> the look the first build put there (data/films/film-records.json slots, Off = Natural).
-BY_FILTER = {0: "natural", 2: "portra-400", 1: "ektachrome", 3: "pro-400h", 4: "kodachrome", 5: "vision3-250d",
-             9: "velvia", 10: "superia-400"}
-GALLERY = {131: "natural", 119: "portra-400", 120: "ektachrome", 121: "pro-400h", 122: "kodachrome",
-           135: "double-x", 123: "vision3-250d", 124: "velvia", 125: "superia-400", 127: "provia",
-           128: "portra-160", 129: "gold-200", 130: "vision3-500t"}
-ORDER = ["natural", "portra-400", "ektachrome", "pro-400h", "kodachrome", "double-x", "vision3-250d", "velvia",
-         "superia-400", "provia", "portra-160", "gold-200", "vision3-500t"]
+# Capture time of each site RAW, in the site's scene order (.local/raws/README.md); PA280249 is not on the site.
+SCENES = ["2026:03:29 14:45:20", "2026:03:25 21:24:32", "2026:03:26 14:45:35", "2026:03:26 15:02:02",
+          "2026:03:26 16:49:58", "2026:03:26 18:25:36", "2026:05:29 16:06:33", "2026:10:28 16:56:28",
+          "2026:10:30 19:33:23"]
+# folder -> the film file whose ART order its runs follow (None: every frame is Tri-X)
+RUNS = {"batch-1": "1", "batch-1b": "1", "batch-2": "2", "batch-3": "3", "trix-n3": None}
+ORDER = ["natural"] + [f["id"] for f in json.loads((ROOT / "data/films/catalogue.json").read_text())["films"]]
 
 
-def _ifd(buf: bytes, off: int):
-    for i in range(struct.unpack_from("<H", buf, off)[0]):
-        yield struct.unpack_from("<HHII", buf, off + 2 + 12 * i)
+def capture_times(folder: Path) -> dict[str, list[Path]]:
+    """The folder's JPEGs grouped by EXIF DateTimeOriginal, each group in file order."""
+    files = sorted(folder.glob("*.JPG"))
+    out = subprocess.run(["exiftool", "-q", "-T", "-DateTimeOriginal", *map(str, files)], capture_output=True,
+                         text=True, check=True).stdout.splitlines()
+    groups: dict[str, list[Path]] = {}
+    for path, time in zip(files, out, strict=True):
+        groups.setdefault(time, []).append(path)
+    return groups
 
 
-def art_filter(maker_note: bytes) -> int:
-    """The ArtFilter of an Olympus maker note (CameraSettings 0x2020, tag 0x0529); offsets count from its start."""
-    if maker_note[:8] != b"OLYMPUS\0":
-        raise ValueError("not an Olympus maker note")
-    for tag, _, _, value in _ifd(maker_note, 12):
-        if tag == 0x2020:
-            for tag2, _, _, value2 in _ifd(maker_note, value):
-                if tag2 == 0x0529:
-                    return struct.unpack_from("<H", maker_note, value2)[0]
-    raise ValueError("no ArtFilter")
+def monochrome(path: Path) -> bool:
+    im = Image.open(path)
+    im.draft("RGB", (400, 300))
+    mean = ImageStat.Stat(im.convert("RGB")).mean
+    return max(mean) - min(mean) < 2
 
 
 def scenes() -> list[dict[str, Path]]:
-    by_time: dict[str, dict[str, Path]] = {}
-    for path in sorted((SHOTS / "filmsimcompare").glob("*.JPG")):
-        exif = Image.open(path).getexif().get_ifd(0x8769)
-        by_time.setdefault(exif[0x9003], {})[BY_FILTER[art_filter(exif[0x927C])]] = path
-    gallery = {look: SHOTS / f"PB160{n}.JPG" for n, look in GALLERY.items()}
-    # the gallery scene first: it has all thirteen looks
-    return [gallery] + [by_time[t] for t in sorted(by_time)]
+    batches = json.loads((SHOTS / "batches.json").read_text())
+    looks: dict[str, dict[str, Path]] = {t: {} for t in SCENES}
+    for folder, batch in RUNS.items():
+        for time, frames in capture_times(SHOTS / folder).items():
+            if time not in looks:
+                continue
+            if batch is None:
+                looks[time]["tri-x"] = frames[0]          # replaces batch 2's Tri-X (the old fit); repeats are equal
+                continue
+            films = batches[batch]
+            assert len(frames) == 13, f"{folder} {time}: {len(frames)} frames, ART BKT gives 13"
+            looks[time].setdefault("natural", frames[0])
+            for film, frame in zip(films, frames[1:]):
+                looks[time].setdefault(film, frame)
+    for time, scene in looks.items():
+        assert set(scene) == set(ORDER), f"{time}: missing {set(ORDER) - set(scene)}"
+        assert monochrome(scene["double-x"]) and monochrome(scene["tri-x"]), f"{time}: a black-and-white film in colour"
+    return [looks[t] for t in SCENES]
 
 
 def main() -> None:
