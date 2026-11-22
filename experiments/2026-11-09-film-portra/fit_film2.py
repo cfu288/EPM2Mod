@@ -20,8 +20,8 @@ ap = argparse.ArgumentParser(); ap.add_argument("--lut"); ap.add_argument("--nam
 ap.add_argument("--anchor-look", help="look table address the anchor build used, e.g. 0x7E75F2F0 (Cross Process I: the card path before films-look-exif); default the identity look"); ap.add_argument("--edge-weight", type=float, default=0.0); ap.add_argument("--image", default="A_natural", help="reading that supplies the sample set when there is no anchor")
 a = ap.parse_args(argv[1:])
 Am = load(a.anchor[0] if a.anchor else a.image); za = np.load(a.anchor[1]) if a.anchor else None
-lut = a.lut or str(za["lut"]); cube, size = fl.load_cube(lut)
-tgt = lambda v: lab(np.clip(fl.apply_cube(cube, size, fl.encode(np.maximum(v, 0) / fl.V_GRAY * 0.18, "vlog")), 0, 1) * 255)
+lut = a.lut or str(za["lut"]); cube, size = fl.load_cube(lut); in_gain = fl.input_gain(lut)
+tgt = lambda v: lab(np.clip(fl.apply_cube(cube, size, fl.encode(np.maximum(v, 0) / fl.V_GRAY * 0.18 / in_gain, "vlog")), 0, 1) * 255)
 J, k = Am["jpg"], Am["kind"]; KN = f.KN
 wa = np.where(Am["weight"] > 0, Am["weight"], np.where(k == 8, 20.0, np.where(k == 3, 4.0, np.where(k == 2, 20.0, np.where(k == 10, a.edge_weight, 0.0)))))
 sel = (Am["ok"] if a.anchor else np.isfinite(Am["u"][:, 0])) & (wa > 0); u, ks, ws = Am["u"][sel], k[sel], wa[sel]; tl = tgt(Am["vs"][sel])

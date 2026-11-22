@@ -86,7 +86,8 @@ colours.
 
 Each film's camera development of `PB130001.ORF` against its target, ΔE2000, mean over the group
 (`experiments/2026-11-20-model-calibration/NOTES.md` §11). The film simulations get no 12-region table on this build
-([colour-pipeline.md](colour-pipeline.md) §1); each fit was corrected from a camera reading on it.
+([colour-pipeline.md](colour-pipeline.md) §1); each fit was corrected from a camera reading on it. Tri-X: measured again on
+2026-11-22 (`trix-n3`), after its target was corrected by two stops (the same NOTES, §12).
 
 | Film simulation | Target | Natural colours | ColorChecker × 5 | Skin | Grays |
 |---|---|---|---|---|---|
@@ -106,7 +107,7 @@ Each film's camera development of `PB130001.ORF` against its target, ΔE2000, me
 | Portra 800 | spektrafilm | 0.96 | 1.54 | 1.27 | 0.78 |
 | Portra 800 +1 | spektrafilm | 1.16 | 2.11 | 1.39 | 0.87 |
 | Portra 800 +2 | spektrafilm | 1.36 | 2.53 | 1.78 | 0.92 |
-| Tri-X | spektrafilm | 0.74 | 1.42 | 0.37 | 0.38 |
+| Tri-X | spektrafilm | 0.98 | 1.89 | 0.56 | 0.32 |
 | C200 | spektrafilm | 1.15 | 1.72 | 1.47 | 0.71 |
 | UltraMax 400 | spektrafilm | 1.04 | 1.54 | 1.09 | 0.88 |
 | Verita 200D | spektrafilm | 0.98 | 1.73 | 1.19 | 0.68 |
@@ -123,7 +124,7 @@ Each film's camera development of `PB130001.ORF` against its target, ΔE2000, me
 | EXR 200T | Spectral Film LUT | 0.99 | 2.03 | 1.17 | 0.56 |
 | FP-100C | Spectral Film LUT | 1.04 | 2.31 | 1.05 | 0.79 |
 
-Median over the 31 colour films: natural colours 1.04 (0.74–1.36), hold-out colours 1.06, ColorChecker 1.72
+Median over the 31 colour films: natural colours 1.04 (0.89–1.36), hold-out colours 1.06, ColorChecker 1.72
 (1.28–2.53), skin 1.08, grays 0.75. On `films-look-exif` (Natural's 12-region table on every film) the same films gave
 1.19, 1.23, 1.82, 1.14 and 0.84; every film is closer to its target on natural colours, hold-out colours and the
 ColorChecker. Stock Natural against the same targets: 3.9–6.0 on natural colours. Double-X is scored in black and white: the camera

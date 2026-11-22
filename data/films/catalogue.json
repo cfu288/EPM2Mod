@@ -150,7 +150,7 @@
    "film": "Kodak Tri-X Reversal 7266",
    "kind": "Black and white",
    "medium": "black-and-white reversal film",
-   "fit": "data/films/fits/trix-n2.npz",
+   "fit": "data/films/fits/trix-n3.npz",
    "note": "camera-corrected"
   },
   {

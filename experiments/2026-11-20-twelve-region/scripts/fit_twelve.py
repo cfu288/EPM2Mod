@@ -48,9 +48,10 @@ class Film:
     def __init__(self, fid, tag, fit):
         self.id, self.z = fid, np.load(fit)
         A = load(tag)
-        cube, size = fl.load_cube(os.path.join(FP, str(self.z["lut"])) if not os.path.isabs(str(self.z["lut"])) else str(self.z["lut"]))
+        lut = os.path.join(FP, str(self.z["lut"])) if not os.path.isabs(str(self.z["lut"])) else str(self.z["lut"])
+        cube, size = fl.load_cube(lut); in_gain = fl.input_gain(lut)
         self.kind, self.ok = A["kind"], A["ok"]
-        self.T = lab(np.clip(fl.apply_cube(cube, size, fl.encode(np.maximum(A["vs"], 0) / fl.V_GRAY * 0.18, "vlog")), 0, 1) * 255)
+        self.T = lab(np.clip(fl.apply_cube(cube, size, fl.encode(np.maximum(A["vs"], 0) / fl.V_GRAY * 0.18 / in_gain, "vlog")), 0, 1) * 255)
         k = self.kind
         self.w = np.where(A["weight"] > 0, A["weight"], np.where(k == 8, 20.0, np.where(k == 3, 4.0, np.where(k == 2, 20.0, np.where(k == 10, 0.25, 0.0)))))
         self.J = np.nan_to_num(A["jpg"])

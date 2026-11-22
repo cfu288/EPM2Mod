@@ -220,3 +220,24 @@ The corrections converged: on natural colours every film lands within 0.02 of it
 worse than pinned by more than 0.05 for 12 films (Verita 200D 0.95 -> 1.19, Vis 200T 0.79 -> 0.98, Ektar 100 0.85 ->
 0.99, Gold 200 1.10 -> 1.24, and 8 by 0.07–0.09), better for others (EXR 200T 1.49 -> 1.17, Eterna 500 1.10 -> 0.80).
 Grays improve for 24 films, none worse by more than 0.05, but less than model3 predicted (0.75 against 0.63).
+
+## 12. Tri-X two stops dark: the dev bundle's input gain (2026-11-22)
+
+The site photos (ART BKT on the ten site RAWs, films-start-texts-artbkt) show Tri-X at about a third of Natural's
+brightness in every scene (mean 24–63 against 82–135). On PB130001 (`/path/to/off2/B/PB210004.JPG`) the grey ramp is
+the same: where Natural gives 126, Tri-X gives 31; Tri-X reaches 126 at four times the raw value [C].
+
+| Item | Finding | Label |
+|---|---|---|
+| Cause | The dev6cd00c8 bundles (Double-X, Tri-X) scale their input by `input_exposure.gain` = 0.25 (`bundle.json`). `monolib.target` divides by it (the first fits: `trix.npz` 18 % grey 116.7 = the cube at scene 0.72). `fit_film2.py`, `check_film.py` and `fit_twelve.Film` did not, so the corrections `trix-c1` and `trix-n2` were fitted, and scored, against a target two stops dark: the cube gives 27.5 at scene 0.18 | V |
+| Other films | Every other bundle reads gain 1.0 (v0.3.4 cubes; the Spectral Film LUT cubes have no bundle). Double-X keeps its black-and-white fit (monolib), which divides | V |
+| Fix | `fit_look.input_gain(cube)`, used by the three scripts | V |
+| Refit | `MODEL2_CALIB=model3.npz fit_film2.py --name film-trix-n3 --edge-weight 0.25 --anchor OFF2_tri-x out/fit_film-trix-n2.npz` (`out/film-trix-n3_report.txt`). Against the corrected target: the camera reading of n2 22.73 natural / 14.56 grays; n3 predicted 0.96 natural, 1.02 hold-out, 1.85 ColorChecker, 0.53 skin, 0.31 grays. A model-only fit (`film-trix-m3`) predicts 1.25 / 2.61 / 1.78 / 0.50. The catalogue's Tri-X is now `data/films/fits/trix-n3.npz` | V predicted; U camera |
+
+Tri-X's row in `docs/dev/film-emulation.md` (0.74 / 1.42 / 0.37 / 0.38) was scored against the dark target. Camera
+check: `build/site-photos/EPM2LOOK-4.BIN` (Tri-X in ART 2), ART BKT on PB130001 and the site RAWs, then
+`check_film.py` on the PB130001 frame.
+
+Camera (2026-11-22, films-start-texts-artbkt, `EPM2LOOK-4.BIN`): PB130001 in Tri-X n3 (`build/fw-test/site-photos/trix-n3/PB220250.JPG`)
+against the corrected target 0.98 natural, 1.89 ColorChecker, 0.56 skin, 0.32 grays; against the model 0.23 / 0.35 /
+0.28 / 0.15; ColorMatrix as expected [C]. The ten site RAWs: Tri-X 84–122 mean against Natural's 86–132 (n2: 24–63).

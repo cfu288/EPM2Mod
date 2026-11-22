@@ -24,7 +24,7 @@ Volpato, licensed CC BY-SA 4.0. We modified it: we fitted it to the stages of th
 that can be adjusted. See `NOTICE.md`.
 `fits/doublex.npz`, `fits/doublex2.npz` and `fits/doublex3.npz` are derived from the profiles `kodak_doublex` and `kodak_2302` of spektrafilm's `dev` branch
 (commit `6cd00c8d4f30b5b550f50f4bbd3753c9f2a48507`, CC BY-SA 4.0). Modified: fitted to this camera.
-`fits/trix.npz` is derived from the profile `kodak_trix` (Tri-X Reversal 7266) of the same commit, rendered as a
+`fits/trix-n3.npz` is derived from the profile `kodak_trix` (Tri-X Reversal 7266) of the same commit, rendered as a
 reversal film with no print (`experiments/2026-11-18-more-films/NOTES.md`). Modified: fitted to this camera.
 
 `fits/velvia-50.npz`, `fits/natura-1600.npz`, `fits/pro-160s.npz`, `fits/superia-reala.npz`, `fits/agfa-vista-100.npz`, `fits/vericolor-iii.npz`, `fits/aerocolor-iv.npz`, `fits/eterna-500.npz`, `fits/exr-200t.npz`, `fits/fp-100c.npz` are derived from film simulations of [Spectral Film LUT](https://github.com/JanLohse/spectral_film_lut) by

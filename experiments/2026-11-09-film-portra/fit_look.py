@@ -148,6 +148,15 @@ def load_cube(path):
     return np.array(rows).reshape(size, size, size, 3), size      # index [b, g, r]
 
 
+def input_gain(path):
+    """The gain a cube's builder applied to its input (bundle.json input_exposure.gain, the dev builds: 0.25), else 1.
+
+    A target divides scene values by it, so that scene 18 % grey stays the film's mid grey (as monolib.target does).
+    """
+    bundle = os.path.join(os.path.dirname(path), "bundle.json")
+    return float(json.load(open(bundle)).get("input_exposure", {}).get("gain", 1.0)) if os.path.exists(bundle) else 1.0
+
+
 def apply_cube(cube, size, rgb):
     p = np.clip(rgb, 0, 1) * (size - 1)
     i0 = np.minimum(p.astype(int), size - 2); f = p - i0
