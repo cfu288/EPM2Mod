@@ -1,0 +1,172 @@
+
+pana.elf:     file format elf32-mn10300
+
+
+Disassembly of section .s7e5234d7:
+
+7e5234d7 <.s7e5234d7>:
+7e5234d7:	dc 94 b7 17 	jmp	7e69ec6b <T_PS>
+7e5234db:	00 
+7e5234dc:	cb          	nop	
+
+Disassembly of section .s7e523495:
+
+7e523495 <.s7e523495>:
+7e523495:	dc 14 b8 17 	jmp	7e69eca9 <T_PF>
+7e523499:	00 
+7e52349a:	cb          	nop	
+
+Disassembly of section .s7e523a5b:
+
+7e523a5b <.s7e523a5b>:
+7e523a5b:	dc 75 b2 17 	jmp	7e69ecd0 <T_PKA>
+7e523a5f:	00 
+7e523a60:	cb          	nop	
+7e523a61:	cb          	nop	
+7e523a62:	cb          	nop	
+
+Disassembly of section .s7e521343:
+
+7e521343 <.s7e521343>:
+7e521343:	dc ad d9 17 	jmp	7e69ecf0 <T_PKB>
+7e521347:	00 
+7e521348:	cb          	nop	
+7e521349:	cb          	nop	
+7e52134a:	cb          	nop	
+
+Disassembly of section .pn:
+
+7e69ec6b <T_PS>:
+7e69ec6b:	fc 83 ce 88 	movhu	d0,(604f88ce <L_STAT>)
+7e69ec6f:	4f 60 
+7e69ec71:	cf 88       	movm	[d2,other],(sp)
+7e69ec73:	1c          	exthu	d0
+7e69ec74:	fc ad 8c 65 	movhu	(604f658c <AV_EFF>),d1
+7e69ec78:	4f 60 
+7e69ec7a:	f8 c1 10    	asl	16,d1
+7e69ec7d:	f2 11       	or	d0,d1
+7e69ec7f:	fc aa 64 7f 	movbu	(604f7f64 <L_FLAG>),d2
+7e69ec83:	4f 60 
+7e69ec85:	f8 c2 10    	asl	16,d2
+7e69ec88:	fc ac 88 88 	movhu	(604f8888 <L_FUNC>),d0
+7e69ec8c:	4f 60 
+7e69ec8e:	f2 12       	or	d0,d2
+7e69ec90:	f1 e8       	mov	d2,a0
+7e69ec92:	fc dd a8 d0 	mov	-1102065496,a1
+7e69ec96:	4f be 
+7e69ec98:	2c 00 09    	mov	2304,d0
+7e69ec9b:	dd 79 a8 e2 	call	7e4c9514 <log_chg>,[],0
+7e69ec9f:	ff 00 00 
+7e69eca2:	ce 88       	movm	(sp),[d2,other]
+7e69eca4:	dc 39 48 e8 	jmp	7e5234dd <s_7e5234dd>
+7e69eca8:	ff 
+
+7e69eca9 <T_PF>:
+7e69eca9:	fc 83 88 88 	movhu	d0,(604f8888 <L_FUNC>)
+7e69ecad:	4f 60 
+7e69ecaf:	cf 08       	movm	[other],(sp)
+7e69ecb1:	1c          	exthu	d0
+7e69ecb2:	81          	mov	d0,d1
+7e69ecb3:	fc a0 b0 67 	mov	(604f67b0 <LENSID>),a0
+7e69ecb7:	4f 60 
+7e69ecb9:	fc dd b0 d0 	mov	-1102065488,a1
+7e69ecbd:	4f be 
+7e69ecbf:	2c 01 09    	mov	2305,d0
+7e69ecc2:	dd 52 a8 e2 	call	7e4c9514 <log_chg>,[],0
+7e69ecc6:	ff 00 00 
+7e69ecc9:	ce 08       	movm	(sp),[other]
+7e69eccb:	dc d0 47 e8 	jmp	7e52349b <s_7e52349b>
+7e69eccf:	ff 
+
+7e69ecd0 <T_PKA>:
+7e69ecd0:	cf 08       	movm	[other],(sp)
+7e69ecd2:	98          	mov	a2,a0
+7e69ecd3:	fc dd b8 d0 	mov	-1102065480,a1
+7e69ecd7:	4f be 
+7e69ecd9:	2c 02 09    	mov	2306,d0
+7e69ecdc:	cd 36 00 f0 	call	7e69ed12 <pk_core>,[d2,d3,a2,a3],28
+7e69ece0:	1c 
+7e69ece1:	ce 08       	movm	(sp),[other]
+7e69ece3:	98          	mov	a2,a0
+7e69ece4:	dd 81 92 e6 	call	7e507f65 <s_7e507f65>,[],0
+7e69ece8:	ff 00 00 
+7e69eceb:	dc 78 4d e8 	jmp	7e523a63 <s_7e523a63>
+7e69ecef:	ff 
+
+7e69ecf0 <T_PKB>:
+7e69ecf0:	cf 08       	movm	[other],(sp)
+7e69ecf2:	98          	mov	a2,a0
+7e69ecf3:	20 fd       	add	-3,a0
+7e69ecf5:	fc dd bc d0 	mov	-1102065476,a1
+7e69ecf9:	4f be 
+7e69ecfb:	2c 04 09    	mov	2308,d0
+7e69ecfe:	cd 14 00 f0 	call	7e69ed12 <pk_core>,[d2,d3,a2,a3],28
+7e69ed02:	1c 
+7e69ed03:	ce 08       	movm	(sp),[other]
+7e69ed05:	98          	mov	a2,a0
+7e69ed06:	dd 5f 92 e6 	call	7e507f65 <s_7e507f65>,[],0
+7e69ed0a:	ff 00 00 
+7e69ed0d:	dc 3e 26 e8 	jmp	7e52134b <s_7e52134b>
+7e69ed11:	ff 
+
+7e69ed12 <pk_core>:
+7e69ed12:	42 04       	mov	d0,(4,sp)
+7e69ed14:	dd 69 92 e6 	call	7e507f7d <s_7e507f7d>,[d2],4
+7e69ed18:	ff 80 04 
+7e69ed1b:	82          	mov	d0,d2
+7e69ed1c:	41          	inc	a0
+7e69ed1d:	dd 60 92 e6 	call	7e507f7d <s_7e507f7d>,[d2],4
+7e69ed21:	ff 80 04 
+7e69ed24:	83          	mov	d0,d3
+7e69ed25:	41          	inc	a0
+7e69ed26:	dd 57 92 e6 	call	7e507f7d <s_7e507f7d>,[d2],4
+7e69ed2a:	ff 80 04 
+7e69ed2d:	f1 e2       	mov	d0,a2
+7e69ed2f:	41          	inc	a0
+7e69ed30:	dd 4d 92 e6 	call	7e507f7d <s_7e507f7d>,[d2],4
+7e69ed34:	ff 80 04 
+7e69ed37:	f1 e3       	mov	d0,a3
+7e69ed39:	88          	mov	d2,d0
+7e69ed3a:	81          	mov	d0,d1
+7e69ed3b:	e0          	add	d0,d0
+7e69ed3c:	e4          	add	d1,d0
+7e69ed3d:	ec          	add	d3,d0
+7e69ed3e:	81          	mov	d0,d1
+7e69ed3f:	e0          	add	d0,d0
+7e69ed40:	e4          	add	d1,d0
+7e69ed41:	f1 d9       	mov	a2,d1
+7e69ed43:	e4          	add	d1,d0
+7e69ed44:	81          	mov	d0,d1
+7e69ed45:	e0          	add	d0,d0
+7e69ed46:	e4          	add	d1,d0
+7e69ed47:	f1 dd       	mov	a3,d1
+7e69ed49:	e4          	add	d1,d0
+7e69ed4a:	75          	mov	(a1),d1
+7e69ed4b:	a1          	cmp	d0,d1
+7e69ed4c:	c8 3c       	beq	7e69ed88 <.L9^B1>
+7e69ed4e:	42 08       	mov	d0,(8,sp)
+7e69ed50:	fa 05 48 02 	mov	(584,a1),d1
+7e69ed54:	fc a4 74 00 	mov	(98900074 <BUF+0xda402fb4>),d0
+7e69ed58:	90 98 
+7e69ed5a:	f1 01       	sub	d0,d1
+7e69ed5c:	fc e1 ff ff 	and	1073741823,d1
+7e69ed60:	ff 3f 
+7e69ed62:	fc c9 20 a1 	cmp	500000,d1
+7e69ed66:	07 00 
+7e69ed68:	c4 20       	bcs	7e69ed88 <.L9^B1>
+7e69ed6a:	fa 11 48 02 	mov	d0,(584,a1)
+7e69ed6e:	58 08       	mov	(8,sp),d0
+7e69ed70:	61          	mov	d0,(a1)
+7e69ed71:	58 04       	mov	(4,sp),d0
+7e69ed73:	89          	mov	d2,d1
+7e69ed74:	f1 ec       	mov	d3,a0
+7e69ed76:	dd bb a7 e2 	call	7e4c9531 <log_put>,[],0
+7e69ed7a:	ff 00 00 
+7e69ed7d:	40          	inc	d0
+7e69ed7e:	f1 d9       	mov	a2,d1
+7e69ed80:	9c          	mov	a3,a0
+7e69ed81:	dd b0 a7 e2 	call	7e4c9531 <log_put>,[],0
+7e69ed85:	ff 00 00 
+
+7e69ed88 <.L9^B1>:
+7e69ed88:	df f0 1c    	ret	[d2,d3,a2,a3],28

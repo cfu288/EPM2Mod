@@ -1,0 +1,2 @@
+boot-test: PASS: data/builds/pana-ring-probe.json boots as stock does (2000 ms of lab time; lines with allowed differences: line 1, line 35, line 39, line 40)
+boot-test exit 0

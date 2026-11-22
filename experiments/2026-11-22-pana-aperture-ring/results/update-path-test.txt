@@ -1,0 +1,2 @@
+update-path-test: PASS: data/builds/pana-ring-probe.json finds the update file as stock does (39 console lines equal up to the body-controller step, segment 2 not loaded, no fault)
+update-path-test exit 0

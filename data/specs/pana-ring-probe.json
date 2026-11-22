@@ -1,0 +1,82 @@
+{
+ "name": "pana-ring-probe",
+ "description": "Structured log, probe of what a Panasonic lens sends (GitHub issue #3, aperture ring): event pana_stat at set_stat_pana 0x7E5234D7, a record when l_stat_pana or the lens's av_effect changes (with l_func_flag_pana and the Panasonic flag byte 0x604F7F64); event pana_func at set_func_flag_pana 0x7E523495, a record when l_func_flag_pana changes (with the lens id word 0x604F67B0). Both through log-menu-3's log_chg, gates at 0x7E4FD0A8 and 0x7E4FD0B0 in the log's state block. Events pana_pk84_0/1 (status parser 0x7E523915, command 84: stat and the 14 bytes after it) and pana_pk34_0/1 (parser 0x7E52128F, command 34: the 3 skipped bytes, stat and the 11 bytes after it): a record pair when the 16 bytes change, at most one pair per 0.5 s per command, keys at 0x7E4FD0B8 and 0x7E4FD0BC, times at 0x7E4FD300 and 0x7E4FD304. Four hooks in stock bytes of segment 1, their routines in segment 1. Needs the specs of data/builds/peaking-mf.json before it: every expect is a byte string of that build. It puts the build id 8bf70fea0397b1f2 of data/logdict/events.json into the block header. DEBUG builds only. See experiments/2026-11-22-pana-aperture-ring/NOTES.md and docs/reference/logging.md.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "candidate: emulator-checked, not flashed",
+ "_delta_on": "data/builds/peaking-mf.json",
+ "_build_id": "8bf70fea0397b1f2",
+ "_ram": "24 bytes at 0x7E4FD0A8 (uncached alias 0xBE4FD0A8, PST+104 to PST+127): two log gates and two window keys in the log's state block, cleared at every start by log-menu-3's T_BOOT; 8 bytes at 0x7E4FD300 (uncached 0xBE4FD300, after the log's block buffer, log-movie-time's RAM before): the timer value of the last record pair per command, not cleared at start",
+ "_symbols": {
+  "T_PS": "0x7E69EC6B",
+  "T_PF": "0x7E69ECA9",
+  "T_PKA": "0x7E69ECD0",
+  "T_PKB": "0x7E69ECF0",
+  "pk_core": "0x7E69ED12"
+ },
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x27DC4B",
+   "expect": "78e6ffa028f062fcdce1fa7d7e18ddb678e6ffa028f86202fcdcf3fa7d7e18dda578e6ffa028f86204fcdc05fb7d7e18dd9478e6ffa028f86206fcdc17fb7d7e18dd8378e6ffa028f86208fcdc29fb7d7e18dd7278e6ffa028f8620afcdc3bfb7d7e18dd6178e6ffa028f8620cfcdc4dfb7d7e18dd5078e6ffa028f8620efcdc5ffb7d7e18dd3f78e6ffa028f86212fcdc71fb7d7e18dd2e78e6ffa028f86210fcdc83fb7d7e18dd1d78e6ffa028f84214fcdc95fb7d7edd0d78e6ffa028f84215fcdca7fb7d7eddfd77e6ffa028f84216fcdcb9fb7d7edded77e6ffa028f86218fcdccbfb7d7e18dddc77e6ffa028f8021cfcdcddfb7d7eddcc77e6ffa028f86220fcdceffb7d7e18ddbb77e6ffa028f84222fcdc01fc7d7eddab77e6ffa028",
+   "new": "fc83ce884f60cf881cfcad8c654f60f8c110f211fcaa647f4f60f8c210fcac88884f60f212f1e8fcdda8d04fbe2c0009dd79a8e2ff0000ce88dc3948e8fffc8388884f60cf081c81fca0b0674f60fcddb0d04fbe2c0109dd52a8e2ff0000ce08dcd047e8ffcf0898fcddb8d04fbe2c0209cd3600f01cce0898dd8192e6ff0000dc784de8ffcf089820fdfcddbcd04fbe2c0409cd1400f01cce0898dd5f92e6ff0000dc3e26e8ff4204dd6992e6ff80048241dd6092e6ff80048341dd5792e6ff8004f1e241dd4d92e6ff8004f1e38881e0e4ec81e0e4f1d9e481e0e4f1dde475a1c83c4208fa054802fca474009098f101fce1ffffff3ffcc920a10700c420fa114802580861580489f1ecddbba7e2ff000040f1d99cddb0a7e2ff0000dff01c",
+   "_addr": "0x7E69EC6B",
+   "_note": "new code, segment 1 (free part of lss-core's area): T_PS, T_PF, T_PKA, T_PKB, pk_core (288 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x1024B7",
+   "expect": "fc83ce884f60",
+   "new": "dc94b71700cb",
+   "_addr": "0x7E5234D7",
+   "_note": "hook (pana_stat): jmp T_PS + nop. set_stat_pana 0x7E5234D7, entry: `movhu d0,(0x604f88ce)` (the next instruction, btst, sets the flags)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x102475",
+   "expect": "fc8388884f60",
+   "new": "dc14b81700cb",
+   "_addr": "0x7E523495",
+   "_note": "hook (pana_func): jmp T_PF + nop. set_func_flag_pana 0x7E523495, entry: `movhu d0,(0x604f8888)` (then exthu d0, btst)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x102A3B",
+   "expect": "98dd0945feff0000",
+   "new": "dc75b21700cbcbcb",
+   "_addr": "0x7E523A5B",
+   "_note": "hook (pana_pk84_0/1): jmp T_PKA + nop + nop + nop. status parser 0x7E523915 (command 84), the read of stat: `mov a2,a0` / `call 0x7E507F65` (a2 = stat in the packet; then exthu d0, call set_stat_pana)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x100323",
+   "expect": "98dd216cfeff0000",
+   "new": "dcadd91700cbcbcb",
+   "_addr": "0x7E521343",
+   "_note": "hook (pana_pk34_0/1): jmp T_PKB + nop + nop + nop. status parser 0x7E52128F (command 34), the read of stat after `add 3,a2`: `mov a2,a0` / `call 0x7E507F65` (a2 = stat in the packet; then exthu d0, call set_stat_pana)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1CEA",
+   "expect": "afe27672",
+   "new": "8bf70fea",
+   "_addr": "0x7EBF2D0A",
+   "_note": "flush task, block header: build id bytes 0-3 afe27672 -> 8bf70fea (data/logdict/events.json)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1CF3",
+   "expect": "d672fc95",
+   "new": "0397b1f2",
+   "_addr": "0x7EBF2D13",
+   "_note": "flush task, block header: build id bytes 4-7 d672fc95 -> 0397b1f2 (data/logdict/events.json)"
+  }
+ ]
+}
