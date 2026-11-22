@@ -21,6 +21,13 @@ const lookFilm = (id: string) => (id === NATURAL ? 'Natural' : filmById(id).film
 const looksOf = (scene: number) => Object.keys(scenes[scene]?.looks ?? {})
 const wrap = (i: number, n: number) => (i + n) % n
 
+/** A key as a keycap: a thicker bottom edge. */
+const Key = ({ children }: { children: string }) => (
+  <kbd className="border-ink-soft text-ink inline-flex h-6 min-w-6 items-center justify-center rounded-xs border border-b-[3px] bg-white px-1 font-sans text-xs">
+    {children}
+  </kbd>
+)
+
 /** Photos on two axes: left and right change the look, up and down change the scene. */
 export function FilmCarousel() {
   const [scene, setScene] = useState(0)
@@ -155,7 +162,14 @@ export function FilmCarousel() {
           <p>
             <span className="font-display text-2xl font-extrabold">{lookFilm(look)}</span>
           </p>
-          <p className="text-muted hidden text-sm sm:block">← → film simulation · ↑ ↓ scene</p>
+          <p className="text-muted hidden items-center gap-1 text-sm sm:flex">
+            <Key>←</Key>
+            <Key>→</Key>
+            <span className="mr-3 ml-1">film simulation</span>
+            <Key>↑</Key>
+            <Key>↓</Key>
+            <span className="ml-1">scene</span>
+          </p>
         </div>
 
         <div role="group" aria-label="Film simulation" className="mt-4 flex flex-wrap gap-1">
