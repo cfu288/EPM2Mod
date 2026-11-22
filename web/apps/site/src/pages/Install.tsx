@@ -60,7 +60,7 @@ function InstallerSteps() {
   return (
     <ol>
       <Step n={1} title="Download">
-        <p>Get the EPM2Mod zip and unzip it.</p>
+        <p>Mac: get the EPM2Mod .dmg. Windows and Linux: get the zip and unzip it.</p>
         <a href={DOWNLOAD} className="btn bg-ink hover:text-ink mt-2 py-3 text-white hover:bg-white">
           Download from GitHub
           <ArrowDownTrayIcon aria-hidden="true" className="size-5" />
@@ -70,8 +70,8 @@ function InstallerSteps() {
         <dl className="grid grid-cols-[6rem_1fr] gap-y-2">
           <dt className="font-bold">Mac</dt>
           <dd>
-            Double-click <code>Start (Mac).command</code>. The first time, macOS blocks it: open System Settings →
-            Privacy &amp; Security, scroll down, select Open Anyway next to it, then Open.
+            Open the .dmg and double-click EPM2Mod. To keep it, drag it to Applications first. When macOS asks, select
+            Open.
           </dd>
           <dt className="font-bold">Windows</dt>
           <dd>

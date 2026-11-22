@@ -28,7 +28,7 @@ This firmware is only for an E-PM2. The firmware is unofficial, use it at your o
 
 ### Using the installer
 
-Download the zip from [Releases](https://github.com/cfu288/EPM2Mod/releases), unzip it, and double-click **Start (Mac).command** or **Start (Windows).bat** (Linux: `./start.sh`). Follow the page that opens. On a Mac, the first start is blocked: allow it in System Settings → Privacy & Security → **Open Anyway**.
+Download from [Releases](https://github.com/cfu288/EPM2Mod/releases): the `.dmg` for a Mac, the zip for Windows and Linux. On a Mac, open the `.dmg` and double-click **EPM2Mod** (drag it to Applications to keep it), then select **Open** when macOS asks. On Windows, unzip and double-click **Start (Windows).bat** (Linux: `./start.sh`). Follow the page that opens.
 
 ### Using the command line
 

@@ -104,9 +104,11 @@
   },
   {
    "name": "Installer launch steps",
-   "fact": "Start (Mac).command / Start (Windows).bat / start.sh, Gatekeeper Open Anyway, the first start downloads Python",
+   "fact": "EPM2Mod.app in the .dmg (Mac) / Start (Windows).bat / start.sh, the first start downloads Python",
    "truth": [
     "release/Start (Mac).command",
+    "release/mac/launch.sh",
+    "release/mac/make-dmg.sh",
     "release/Start (Windows).bat",
     "release/start.sh",
     "release/start.ps1",

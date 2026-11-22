@@ -1,6 +1,6 @@
 # The release zip for users who don't code (epm2mod package; a tag from epm2mod release publishes it): built once, then unpacked and started with each
 # system's launcher on Linux, macOS and Windows, which makes the pinned build from OM's firmware. A tag v* also
-# publishes the zip as a GitHub release.
+# publishes the zip and the Mac disk image (job dmg) as a GitHub release.
 name: release
 
 on:
@@ -84,8 +84,63 @@ jobs:
         run: Expand-Archive -LiteralPath "zip/${{ needs.build.outputs.name }}.zip" -DestinationPath unpacked
       - run: python .github/scripts/release_smoke.py "unpacked/${{ needs.build.outputs.name }}" "${{ needs.build.outputs.sha256 }}"
 
+  # The Mac download: the zip's folder in EPM2Mod.app, in a disk image (release/mac/make-dmg.sh). A tag signs it with
+  # the Developer ID certificate and has Apple notarize it, so it opens without Open Anyway; a branch signs it ad hoc.
+  dmg:
+    needs: build
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: release/mac
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-zip
+          path: zip
+      - if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          MAC_CERT_P12: ${{ secrets.MAC_CERT_P12 }}
+          MAC_CERT_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        # a keychain for this run only, as the default one, so that codesign and notarytool find the certificate and
+        # the notarization login (profile epm2mod)
+        run: |
+          KC="$RUNNER_TEMP/sign.keychain-db"
+          KCPASS=$(openssl rand -hex 16)
+          security create-keychain -p "$KCPASS" "$KC"
+          security set-keychain-settings -lut 21600 "$KC"
+          security unlock-keychain -p "$KCPASS" "$KC"
+          security default-keychain -s "$KC"
+          security list-keychains -d user -s "$KC"
+          printf %s "$MAC_CERT_P12" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          curl -fsSL -o "$RUNNER_TEMP/DeveloperIDG2CA.cer" https://www.apple.com/certificateauthority/DeveloperIDG2CA.cer
+          security import "$RUNNER_TEMP/DeveloperIDG2CA.cer" -k "$KC"
+          security import "$RUNNER_TEMP/cert.p12" -k "$KC" -P "$MAC_CERT_PASSWORD" -T /usr/bin/codesign
+          rm -f "$RUNNER_TEMP/cert.p12"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KCPASS" "$KC" > /dev/null
+          xcrun notarytool store-credentials epm2mod --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD"
+          echo "EPM2MOD_SIGN_IDENTITY=Developer ID Application" >> "$GITHUB_ENV"
+          echo "EPM2MOD_NOTARY_PROFILE=epm2mod" >> "$GITHUB_ENV"
+      - run: release/mac/make-dmg.sh "zip/${{ needs.build.outputs.name }}.zip" dist
+      # the app's start, from the disk image: copy to Application Support, uv, Python, the package's --version
+      - run: |
+          hdiutil attach -nobrowse -readonly -mountpoint "$RUNNER_TEMP/dmg" dist/*.dmg
+          "$RUNNER_TEMP/dmg/EPM2Mod.app/Contents/Resources/launch.sh" --version \
+            || { cat "$HOME/Library/Application Support/EPM2Mod/start.log"; exit 1; }
+          cat "$HOME/Library/Application Support/EPM2Mod/start.log"
+          hdiutil detach "$RUNNER_TEMP/dmg"
+      - if: always() && startsWith(github.ref, 'refs/tags/v')
+        run: security delete-keychain "$RUNNER_TEMP/sign.keychain-db" || true
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-dmg
+          path: dist/*.dmg
+          if-no-files-found: error
+
   publish:
-    needs: [build, smoke]
+    needs: [build, smoke, dmg]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
@@ -98,6 +153,10 @@ jobs:
         with:
           name: release-zip
           path: zip
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-dmg
+          path: dmg
       - env:
           GH_TOKEN: ${{ github.token }}
         # a tag with a hyphen (v2026.11.18-rc.1) is a pre-release: for testing, not yet for everyone
@@ -112,6 +171,6 @@ jobs:
           fi
           pre=""
           case "${{ github.ref_name }}" in *-*) pre="--prerelease" ;; esac
-          gh release create "${{ github.ref_name }}" zip/*.zip $pre --repo "${{ github.repository }}" \
+          gh release create "${{ github.ref_name }}" zip/*.zip dmg/*.dmg $pre --repo "${{ github.repository }}" \
             --title "EPM2Mod ${GITHUB_REF_NAME#v}" \
             --notes-file notes.md
