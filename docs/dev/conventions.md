@@ -166,6 +166,15 @@ A release is a tag; GitHub makes, tests and publishes it (`.github/workflows/rel
 `uv run epm2mod package --release-version V` makes the same zip locally, without publishing. It refuses a version that does not start with
 the pinned build's label.
 
+The tag also publishes `EPM2Mod-V.dmg` for Macs (job `dmg`, `release/mac/make-dmg.sh`): EPM2Mod.app with the zip's
+folder in it, signed with the owner's Developer ID Application certificate and notarized by Apple, so macOS opens it
+without Open Anyway. The signing secrets are in the GitHub environment `release`, which only tags `v*` may use:
+`MAC_CERT_P12` (the certificate and its key as a base64 `.p12`), `MAC_CERT_PASSWORD`, `APPLE_ID`, `APPLE_TEAM_ID` and
+`APPLE_APP_PASSWORD`. If the certificate expires or the Apple Developer membership lapses, the job fails on the tag and
+nothing is published. Renew it, then set the secrets again with `gh secret set NAME --env release`. On a Mac,
+`release/mac/make-dmg.sh ZIP` makes the disk image locally, signed ad hoc unless `EPM2MOD_SIGN_IDENTITY` and
+`EPM2MOD_NOTARY_PROFILE` are set.
+
 ## Tests
 
 `uv run python -m unittest discover -s cli/tests` runs all tests. What a test run proves depends on
