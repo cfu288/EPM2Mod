@@ -1,6 +1,10 @@
 # The release zip for users who don't code (epm2mod package; a tag from epm2mod release publishes it): built once, then unpacked and started with each
 # system's launcher on Linux, macOS and Windows, which makes the pinned build from OM's firmware. A tag v* also
 # publishes the zip and the Mac disk image (job dmg) as a GitHub release.
+#
+# Secrets: the Mac signing secrets are in the environment "release", which only tags v* may use, and only the dmg
+# job's signing step reads them. Actions are pinned by commit; values from the tag reach the shell through env, never
+# as ${{ }} in a script.
 name: release
 
 on:
@@ -26,13 +30,15 @@ jobs:
       name: ${{ steps.zip.outputs.name }}
       sha256: ${{ steps.zip.outputs.sha256 }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
-          cache: npm
-          cache-dependency-path: web/package-lock.json
-      - uses: actions/setup-python@v7
+          # no cache: a cache that another run wrote could change what a tag signs and publishes
+          package-manager-cache: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.12'
       - run: npm ci && npm run build:app
@@ -50,7 +56,7 @@ jobs:
           name=$(basename dist/*.zip .zip)
           echo "name=$name" >> "$GITHUB_OUTPUT"
           echo "sha256=$(python -c 'from epm2mod.builds import pinned_description; from epm2mod.paths import repo_paths; print(pinned_description(repo_paths()).sha256)')" >> "$GITHUB_OUTPUT"
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-zip
           path: dist/*.zip
@@ -63,37 +69,46 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
+    env:
+      NAME: ${{ needs.build.outputs.name }}
+      SHA256: ${{ needs.build.outputs.sha256 }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           sparse-checkout: .github/scripts
-      - uses: actions/setup-python@v7
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.12'
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: release-zip
           path: zip
       # unpack as each system's own tool does
       - if: runner.os == 'Linux'
-        run: unzip -q "zip/${{ needs.build.outputs.name }}.zip" -d unpacked
+        run: unzip -q "zip/$NAME.zip" -d unpacked
       - if: runner.os == 'macOS'
-        run: ditto -x -k "zip/${{ needs.build.outputs.name }}.zip" unpacked
+        run: ditto -x -k "zip/$NAME.zip" unpacked
       - if: runner.os == 'Windows'
         shell: pwsh
-        run: Expand-Archive -LiteralPath "zip/${{ needs.build.outputs.name }}.zip" -DestinationPath unpacked
-      - run: python .github/scripts/release_smoke.py "unpacked/${{ needs.build.outputs.name }}" "${{ needs.build.outputs.sha256 }}"
+        run: Expand-Archive -LiteralPath "zip/$env:NAME.zip" -DestinationPath unpacked
+      - run: python .github/scripts/release_smoke.py "unpacked/$NAME" "$SHA256"
 
   # The Mac download: the zip's folder in EPM2Mod.app, in a disk image (release/mac/make-dmg.sh). A tag signs it with
   # the Developer ID certificate and has Apple notarize it, so it opens without Open Anyway; a branch signs it ad hoc.
   dmg:
     needs: build
     runs-on: macos-latest
+    # the signing secrets: on a tag only (the environment allows tags v* and nothing else)
+    environment: ${{ startsWith(github.ref, 'refs/tags/v') && 'release' || '' }}
+    env:
+      NAME: ${{ needs.build.outputs.name }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           sparse-checkout: release/mac
-      - uses: actions/download-artifact@v8
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: release-zip
           path: zip
@@ -104,36 +119,41 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+          # Apple's Developer ID G2 intermediate certificate (https://www.apple.com/certificateauthority/)
+          CA_SHA256: f16cd3c54c7f83cea4bf1a3e6a0819c8aaa8e4a1528fd144715f350643d2df3a
         # a keychain for this run only, as the default one, so that codesign and notarytool find the certificate and
-        # the notarization login (profile epm2mod)
+        # the notarization login (profile epm2mod); deleted before anything from the zip runs
         run: |
           KC="$RUNNER_TEMP/sign.keychain-db"
           KCPASS=$(openssl rand -hex 16)
+          echo "::add-mask::$KCPASS"
           security create-keychain -p "$KCPASS" "$KC"
           security set-keychain-settings -lut 21600 "$KC"
           security unlock-keychain -p "$KCPASS" "$KC"
           security default-keychain -s "$KC"
           security list-keychains -d user -s "$KC"
+          curl -fsSL -o "$RUNNER_TEMP/ca.cer" https://www.apple.com/certificateauthority/DeveloperIDG2CA.cer
+          echo "$CA_SHA256  $RUNNER_TEMP/ca.cer" | shasum -a 256 -c -
+          security import "$RUNNER_TEMP/ca.cer" -k "$KC"
           printf %s "$MAC_CERT_P12" | base64 --decode > "$RUNNER_TEMP/cert.p12"
-          curl -fsSL -o "$RUNNER_TEMP/DeveloperIDG2CA.cer" https://www.apple.com/certificateauthority/DeveloperIDG2CA.cer
-          security import "$RUNNER_TEMP/DeveloperIDG2CA.cer" -k "$KC"
           security import "$RUNNER_TEMP/cert.p12" -k "$KC" -P "$MAC_CERT_PASSWORD" -T /usr/bin/codesign
           rm -f "$RUNNER_TEMP/cert.p12"
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KCPASS" "$KC" > /dev/null
           xcrun notarytool store-credentials epm2mod --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD"
           echo "EPM2MOD_SIGN_IDENTITY=Developer ID Application" >> "$GITHUB_ENV"
           echo "EPM2MOD_NOTARY_PROFILE=epm2mod" >> "$GITHUB_ENV"
-      - run: release/mac/make-dmg.sh "zip/${{ needs.build.outputs.name }}.zip" dist
-      # the app's start, from the disk image: copy to Application Support, uv, Python, the package's --version
+      # make-dmg.sh copies the zip's files into the app and signs it; it runs none of them
+      - run: release/mac/make-dmg.sh "zip/$NAME.zip" dist
+      - if: always() && startsWith(github.ref, 'refs/tags/v')
+        run: security delete-keychain "$RUNNER_TEMP/sign.keychain-db" || true
+      # the app's start, from the disk image (the keychain is gone): copy to Application Support, uv, Python, --version
       - run: |
           hdiutil attach -nobrowse -readonly -mountpoint "$RUNNER_TEMP/dmg" dist/*.dmg
           "$RUNNER_TEMP/dmg/EPM2Mod.app/Contents/Resources/launch.sh" --version \
             || { cat "$HOME/Library/Application Support/EPM2Mod/start.log"; exit 1; }
           cat "$HOME/Library/Application Support/EPM2Mod/start.log"
           hdiutil detach "$RUNNER_TEMP/dmg"
-      - if: always() && startsWith(github.ref, 'refs/tags/v')
-        run: security delete-keychain "$RUNNER_TEMP/sign.keychain-db" || true
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-dmg
           path: dist/*.dmg
@@ -144,33 +164,35 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write # create the GitHub release and upload its files
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           sparse-checkout: release
-      - uses: actions/download-artifact@v8
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: release-zip
           path: zip
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: release-dmg
           path: dmg
       - env:
           GH_TOKEN: ${{ github.token }}
+          SHA256: ${{ needs.build.outputs.sha256 }}
         # a tag with a hyphen (v2026.11.18-rc.1) is a pre-release: for testing, not yet for everyone
         run: |
           # the notes that epm2mod release wrote into the annotated tag (what is in it, what changed), then how to install
-          ref=$(gh api "repos/${{ github.repository }}/git/ref/tags/${{ github.ref_name }}" --jq '.object.type + " " + .object.sha')
-          case "$ref" in tag\ *) gh api "repos/${{ github.repository }}/git/tags/${ref#tag }" --jq .message > tagnotes.md ;; *) : > tagnotes.md ;; esac
+          ref=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$GITHUB_REF_NAME" --jq '.object.type + " " + .object.sha')
+          case "$ref" in tag\ *) gh api "repos/$GITHUB_REPOSITORY/git/tags/${ref#tag }" --jq .message > tagnotes.md ;; *) : > tagnotes.md ;; esac
           if grep -q '^EPM2Mod ' tagnotes.md; then
             { cat tagnotes.md; echo; cat release/NOTES.md; } > notes.md
           else
-            { cat release/NOTES.md; echo; echo "Firmware sha256 \`${{ needs.build.outputs.sha256 }}\`."; } > notes.md
+            { cat release/NOTES.md; echo; echo "Firmware sha256 \`$SHA256\`."; } > notes.md
           fi
           pre=""
-          case "${{ github.ref_name }}" in *-*) pre="--prerelease" ;; esac
-          gh release create "${{ github.ref_name }}" zip/*.zip dmg/*.dmg $pre --repo "${{ github.repository }}" \
+          case "$GITHUB_REF_NAME" in *-*) pre="--prerelease" ;; esac
+          gh release create "$GITHUB_REF_NAME" zip/*.zip dmg/*.dmg $pre --repo "$GITHUB_REPOSITORY" \
             --title "EPM2Mod ${GITHUB_REF_NAME#v}" \
             --notes-file notes.md
