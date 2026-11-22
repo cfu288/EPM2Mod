@@ -166,6 +166,11 @@ A release is a tag; GitHub makes, tests and publishes it (`.github/workflows/rel
 `uv run epm2mod package --release-version V` makes the same zip locally, without publishing. It refuses a version that does not start with
 the pinned build's label.
 
+A test release can hold another build, such as a debug build for one tester. After its camera test, record the test
+with `uv run epm2mod pin NAME --no-pin --date YYYY-MM-DD --sha256 HEX`, which leaves the pinned build as it is. Then
+`uv run epm2mod release --build NAME --push` makes the same checks for that build and tags `vLABEL-NAME.N`. The
+version names the build, and the zip installs that build. It is always a pre-release, never Latest.
+
 The tag also publishes `EPM2Mod-V.dmg` for Macs (job `dmg`, `release/mac/make-dmg.sh`): EPM2Mod.app with the zip's
 folder in it, signed with the owner's Developer ID Application certificate and notarized by Apple, so macOS opens it
 without Open Anyway. The signing secrets are in the GitHub environment `release`, which only tags `v*` may use:

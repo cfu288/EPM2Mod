@@ -1,11 +1,11 @@
 """The release zip (``epm2mod package``): what a user who doesn't code downloads.
 
 The zip holds one folder, ``EPM2Mod-<version>/``, with what the commands for camera owners (``epm2mod install``,
-``films``, ``restore``, ``inspect``, ``serve``) need for the pinned build, and nothing else:
+``films``, ``restore``, ``inspect``, ``serve``) need for the release's build (``release_build``), and nothing else:
 
 - the package (``RepoPaths.package``, with the built app page ``RepoPaths.app``);
-- the data (``data_files``): the pinned build description and its patch specs, the film records, and the release's
-  manifest (``paths.MANIFEST``), which names these locations and holds the version under ``paths.RELEASE_KEY``, by
+- the data (``data_files``): the build description and its patch specs, the pointer that pins it, the film records,
+  and the release's manifest (``paths.MANIFEST``), which names these locations and holds the version under ``paths.RELEASE_KEY``, by
   which ``catalogue.locate`` knows a release folder;
 - the files of ``RepoPaths.release_files`` at the top: the launchers, their README and the licence files. A file that
   is a program in the checkout is a program in the zip.
@@ -28,7 +28,7 @@ import zipfile
 from collections.abc import Iterator
 from pathlib import Path
 
-from .builds import description_path, pinned_description
+from .builds import BuildDescription, description_path, pinned_description
 from .errors import BuildError
 from .fileio import read_bytes
 from .paths import MANIFEST, RELEASE_KEY, RepoPaths
@@ -40,18 +40,16 @@ _STAMP = (2026, 1, 1, 0, 0, 0)
 def data_files(paths: RepoPaths, version: str) -> list[tuple[str, bytes]]:
     """Return the data that the release's commands read: their path in the folder, and their content.
 
-    These are the pinned build and its specs, the film records, and the release's manifest, which names the
-    locations that ``catalogue.ReleaseLocator`` reads: the checkout's, and the checkout's cache folder.
+    These are the build of ``version`` (``release_build``) and its specs, a pinned file that names that build, the
+    film records, and the release's manifest, which names the locations that ``catalogue.ReleaseLocator`` reads: the
+    checkout's, and the checkout's cache folder.
 
     Raises:
-        BuildError: if a file is missing.
+        BuildError: if a file is missing, or as ``release_build``.
     """
-    description = pinned_description(paths)
-    sources = [
-        paths.pinned,
-        description_path(paths, description.name),
-        paths.film_records,
-    ]
+    description = release_build(paths, version)
+    build = description_path(paths, description.name)
+    sources = [build, paths.film_records]
     sources += [paths.spec_file(spec) for spec in description.specs]
     missing = [str(source) for source in sources if not source.is_file()]
     if missing:
@@ -69,10 +67,14 @@ def data_files(paths: RepoPaths, version: str) -> list[tuple[str, bytes]]:
         )
     }
     text = json.dumps(manifest, indent=1) + "\n"
+    pointer = json.dumps({"build": paths.relative(build)}, indent=1) + "\n"
     files = [
         (paths.relative(source), read_bytes(source, BuildError)) for source in sources
     ]
-    return files + [(MANIFEST, text.encode())]
+    return files + [
+        (MANIFEST, text.encode()),
+        (paths.relative(paths.pinned), pointer.encode()),
+    ]
 
 
 def release_files(paths: RepoPaths, version: str) -> list[tuple[str, bytes]]:
@@ -116,8 +118,12 @@ def _package(paths: RepoPaths) -> Iterator[tuple[str, Path]]:
 
 
 #: A release's version: calendar date (``2026.11.18``), a number for a second release that day (``.2``), and
-#: ``-rc.N`` for a pre-release or ``-dev`` for a test build.
-_VERSION = re.compile(r"^\d{4}\.\d{2}\.\d{2}(\.\d+)?(-rc\.\d+|-dev)?$")
+#: ``-rc.N`` for a pre-release, ``-dev`` for a test build, or ``-NAME.N`` for a test release of the build NAME in
+#: place of the pinned one. NAME is never ``rc`` or ``dev``.
+_VERSION = re.compile(
+    r"^\d{4}\.\d{2}\.\d{2}(\.\d+)?"
+    r"(-rc\.\d+|-dev|-(?!(?:rc|dev)\.)(?P<build>[a-z0-9][a-z0-9-]*)\.[1-9]\d*)?$"
+)
 
 
 def check_version(version: str) -> None:
@@ -126,10 +132,40 @@ def check_version(version: str) -> None:
     Raises:
         BuildError: if it is not.
     """
-    if not _VERSION.match(version):
+    version_build(version)
+
+
+def version_build(version: str) -> str | None:
+    """Return the name of the build that ``version`` names (``2026.11.20-NAME.1``), or None for the pinned build.
+
+    Raises:
+        BuildError: if ``version`` is not a calendar version.
+    """
+    match = _VERSION.match(version)
+    if match is None:
         raise BuildError(
-            f"'{version}': a version is a date, like 2026.11.18 or 2026.11.18-rc.1"
+            f"'{version}': a version is a date, like 2026.11.18, 2026.11.18-rc.1 "
+            "or 2026.11.18-NAME.1 for the build NAME"
         )
+    return match.group("build")
+
+
+def release_build(paths: RepoPaths, version: str) -> BuildDescription:
+    """Return the build that the release ``version`` holds: the build it names, or the pinned build.
+
+    Raises:
+        BuildError: if the version is not a calendar version, or the build has no camera test.
+        NotFoundError: if there is no build of the name the version gives.
+    """
+    name = version_build(version)
+    if name is None:
+        return pinned_description(paths)
+    description = paths.build(name)
+    if not description.tested:
+        raise BuildError(
+            f"{name} has no camera test: record it with 'epm2mod pin {name} --no-pin'"
+        )
+    return description
 
 
 def zip_path(out: Path, version: str) -> Path:

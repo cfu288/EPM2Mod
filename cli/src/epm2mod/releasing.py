@@ -7,7 +7,8 @@ repository is ready, which version comes next, and what the notes say.
 
 The version is the pinned build's label, the date its Firmware screen shows:
 ``2026.11.19`` for a final release, ``2026.11.19-rc.N`` for a test release, N
-one more than the highest existing for that date.
+one more than the highest existing for that date. A test release of another
+camera-tested build (``--build NAME``) is ``LABEL-NAME.N``, with that build's label.
 """
 
 from __future__ import annotations
@@ -23,15 +24,23 @@ from .builds import pinned_description
 from .errors import BuildError
 from .fileio import read_text
 from .paths import RepoPaths
+from .release import check_version
+
+#: The tags of the pinned build's releases (final, second of a day, rc), as git globs. A test release of a named
+#: build (``vLABEL-NAME.N``) matches none, so the next release's changes are counted from the last of these.
+RELEASE_TAGS = ("v????.??.??", "v????.??.??.*", "v????.??.??-rc.*")
 
 
-def next_version(label: str, tags: list[str], final: bool) -> str:
+def next_version(
+    label: str, tags: list[str], final: bool, build: str | None = None
+) -> str:
     """Return the next calendar version for a build labelled ``label``.
 
     Args:
         label: the build's label, like ``2026.11.19``.
         tags: the existing tag names, like ``v2026.11.19-rc.1``.
         final: True for a release for everyone, False for a test release.
+        build: the name of the build of a test release that is not the pinned build.
 
     Raises:
         BuildError: if the final release of that date is already tagged.
@@ -41,12 +50,13 @@ def next_version(label: str, tags: list[str], final: bool) -> str:
         if f"v{day}" in tags:
             raise BuildError(f"v{day} is already tagged")
         return day
+    kind = build or "rc"
     numbers = [
         int(m.group(1))
         for tag in tags
-        if (m := re.fullmatch(rf"v{re.escape(day)}-rc\.(\d+)", tag))
+        if (m := re.fullmatch(rf"v{re.escape(day)}-{re.escape(kind)}\.(\d+)", tag))
     ]
-    return f"{day}-rc.{max(numbers, default=0) + 1}"
+    return f"{day}-{kind}.{max(numbers, default=0) + 1}"
 
 
 def release_notes(
@@ -56,7 +66,7 @@ def release_notes(
 
     Args:
         version: the calendar version.
-        what: the pinned build's description.
+        what: the build's description.
         sha256: the firmware file's SHA-256.
         previous: the tag of the release before, if any.
         changes: the subjects of the feat and fix commits since ``previous``.
@@ -142,19 +152,25 @@ class Plan:
     notes: str
 
 
-def plan(paths: RepoPaths, final: bool) -> tuple[Plan | None, list[str]]:
-    """Check the repository and return the release to make, or the problems."""
+def plan(
+    paths: RepoPaths, final: bool, build: str | None = None
+) -> tuple[Plan | None, list[str]]:
+    """Check the repository and return the release to make, or the problems.
+
+    ``build`` names the build of a test release in place of the pinned build.
+    """
     problems: list[str] = []
-    pinned = pinned_description(paths)
-    if pinned.sha256 is None or pinned.camera_tested is None:
-        problems.append(f"the pinned build {pinned.name} has no camera test")
+    chosen = pinned_description(paths) if build is None else paths.build(build)
+    which = "the pinned build" if build is None else "the build"
+    if chosen.sha256 is None or chosen.camera_tested is None:
+        problems.append(f"{which} {chosen.name} has no camera test")
         return None, problems
-    if pinned.label is None:
-        problems.append(f"the pinned build {pinned.name} has no label")
+    if chosen.label is None:
+        problems.append(f"{which} {chosen.name} has no label")
         return None, problems
     log = paths.camera_log
-    if not any(pinned.sha256 in read_text(entry) for entry in sorted(log.glob("*.md"))):
-        problems.append(f"{paths.relative(log)}/ has no file for {pinned.sha256[:8]}")
+    if not any(chosen.sha256 in read_text(entry) for entry in sorted(log.glob("*.md"))):
+        problems.append(f"{paths.relative(log)}/ has no file for {chosen.sha256[:8]}")
     if _git(paths, "status", "--porcelain", "--untracked-files=no"):
         problems.append("the working tree has changes: commit or stash them")
     _git(paths, "fetch", "--quiet", "--tags", "origin")
@@ -169,21 +185,23 @@ def plan(paths: RepoPaths, final: bool) -> tuple[Plan | None, list[str]]:
     problems += _ci_problems(paths, commit)
     tags = _git(paths, "tag", "--list", "v*").split()
     try:
-        version = next_version(pinned.label, tags, final)
+        version = next_version(chosen.label, tags, final, build)
+        check_version(version)
     except BuildError as error:
         return None, problems + [str(error)]
     if problems:
         return None, problems
     try:
+        matches = [arg for pattern in RELEASE_TAGS for arg in ("--match", pattern)]
         previous: str | None = _git(
-            paths, "describe", "--tags", "--abbrev=0", "--match", "v*", "HEAD"
+            paths, "describe", "--tags", "--abbrev=0", *matches, "HEAD"
         )
     except BuildError:
         previous = None
     since = f"{previous}..HEAD" if previous else "HEAD"
     subjects = _git(paths, "log", "--format=%s", since).splitlines()
     changes = [s for s in subjects if re.match(r"(feat|fix)\b", s)]
-    notes = release_notes(version, pinned.what, pinned.sha256, previous, changes)
+    notes = release_notes(version, chosen.what, chosen.sha256, previous, changes)
     return Plan(f"v{version}", commit, notes), []
 
 

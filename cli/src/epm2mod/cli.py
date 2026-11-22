@@ -545,7 +545,11 @@ COMMANDS: dict[str, Command] = {
             "the release notes and a tag; with --dry-run, the release notes",
             True,
             "the network for the checks of CI and with --push",
-            ("epm2mod release --dry-run", "epm2mod release --final --push"),
+            (
+                "epm2mod release --dry-run",
+                "epm2mod release --final --push",
+                "epm2mod release --build NAME --push",
+            ),
             {},
             {1: "the repository is not ready for a release"},
         ),
@@ -934,6 +938,7 @@ def _pin(args: argparse.Namespace, ctx: Context) -> int:
         args.date,
         log=lambda line: print(named(line, prog())),
         dry_run=args.dry_run,
+        keep_pinned=args.no_pin,
     )
     return 0
 
@@ -1056,19 +1061,19 @@ def _log(args: argparse.Namespace, ctx: Context) -> int:
 
 def _package(args: argparse.Namespace, ctx: Context) -> int:
     """Run ``epm2mod package``: write the release zip."""
-    from .release import check_version, make_release, release_files, zip_path
+    from .release import make_release, release_build, release_files, zip_path
 
     checkout = ctx.checkout()
     version = args.release_version
-    check_version(version)
-    label = checkout.pinned_build().label
+    build = release_build(checkout, version)
+    label = build.label
     if (
         label is not None
         and not version.startswith(label)
         and not version.endswith("-dev")
     ):
         raise BuildError(
-            f"the version {version} does not match the pinned build's label {label}: "
+            f"the version {version} does not match the label {label} of {build.name}: "
             "start the release with 'epm2mod release'"
         )
     folder = Path(args.out_dir) if args.out_dir else checkout.output_folder()
@@ -1099,7 +1104,11 @@ def _release(args: argparse.Namespace, ctx: Context) -> int:
     from .releasing import plan, tag
 
     checkout = ctx.checkout()
-    release, problems = plan(checkout, final=args.final)
+    if args.build is not None and args.final:
+        raise UsageError(
+            "--build makes a test release: a final release holds the pinned build"
+        )
+    release, problems = plan(checkout, final=args.final, build=args.build)
     if release is None:
         for problem in problems:
             print(f"not ready: {problem}")
@@ -1373,6 +1382,11 @@ def _arguments(
             metavar="HEX",
             help="the sha256 of the flashed file, from the camera log",
         )
+        parser.add_argument(
+            "--no-pin",
+            action="store_true",
+            help="record the camera test; leave the pinned build as it is",
+        )
         _add_dry_run(parser)
     elif command == "apply":
         parser.add_argument(
@@ -1427,7 +1441,8 @@ def _arguments(
             "--release-version",
             required=True,
             metavar="V",
-            help="the calendar version, like 2026.11.18 or 2026.11.18-rc.1",
+            help="the calendar version, like 2026.11.18 or 2026.11.18-rc.1; "
+            "2026.11.18-NAME.1 holds the build NAME in place of the pinned one",
         )
         _add_dry_run(parser)
         _add_json(parser)
@@ -1436,6 +1451,11 @@ def _arguments(
             "--final",
             action="store_true",
             help="a release for everyone (vYYYY.MM.DD); default: a test release (-rc.N)",
+        )
+        parser.add_argument(
+            "--build",
+            metavar="NAME",
+            help="a test release of this camera-tested build in place of the pinned one (-NAME.N)",
         )
         parser.add_argument(
             "--dry-run",

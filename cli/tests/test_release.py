@@ -19,11 +19,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from support import ROOT  # noqa: E402
+from support import ROOT, write_manifest  # noqa: E402
 
-from epm2mod import cards, catalogue, release, stock  # noqa: E402
+from epm2mod import builds, cards, catalogue, release, stock  # noqa: E402
 from epm2mod.builds import pinned_description  # noqa: E402
-from epm2mod.errors import BuildError  # noqa: E402
+from epm2mod.errors import BuildError, NotFoundError  # noqa: E402
 from epm2mod.paths import MANIFEST, RELEASE_KEY, RepoPaths  # noqa: E402
 
 #: The files of the release folder that are programs.
@@ -107,6 +107,77 @@ class ZipTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as other:
             again = release.make_release(PATHS, Path(other), "2026.11.18-rc.1")
             self.assertEqual(again.read_bytes(), self.zip.read_bytes())
+
+
+class VersionTests(unittest.TestCase):
+    def test_a_version_may_name_the_build_it_holds(self) -> None:
+        cases = {
+            "2026.11.20": None,
+            "2026.11.20.2": None,
+            "2026.11.20-rc.3": None,
+            "2026.11.20-dev": None,
+            "2026.11.20-pana-ring-probe.1": "pana-ring-probe",
+            "2026.11.20-rc-probe.2": "rc-probe",
+            "2026.11.20.2-x2.10": "x2",
+        }
+        for version, build in cases.items():
+            self.assertEqual(release.version_build(version), build, version)
+
+    def test_a_bad_build_name_or_number_is_refused(self) -> None:
+        for bad in (
+            "2026.11.20-dev.1",  # dev and rc are never build names
+            "2026.11.20-rc.x",
+            "2026.11.20-Probe.1",
+            "2026.11.20-probe_x.1",
+            "2026.11.20-a.b.1",
+            "2026.11.20--probe.1",
+            "2026.11.20-probe",
+            "2026.11.20-probe.0",
+        ):
+            with self.assertRaises(BuildError, msg=bad):
+                release.check_version(bad)
+
+
+class NamedBuildTests(unittest.TestCase):
+    """The data of a release whose version names a build, in a repository with no pinned build."""
+
+    def setUp(self) -> None:
+        folder = tempfile.TemporaryDirectory()
+        self.addCleanup(folder.cleanup)
+        self.paths = RepoPaths(write_manifest(Path(folder.name)))
+        for path in (self.paths.film_records, self.paths.specs / "a.json"):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("{}")
+        self.probe = builds.BuildDescription(
+            "probe", "A probe", ("data/specs/a.json",), "ab" * 32, "2026-11-20",
+            stock=stock.EPM2_V16.file_name,
+        )  # fmt: skip
+        builds.save_description(self.paths, self.probe)
+        untested = builds.BuildDescription(
+            "untested", "No test", ("data/specs/a.json",), stock=stock.EPM2_V16.file_name
+        )  # fmt: skip
+        builds.save_description(self.paths, untested)
+
+    def test_the_release_holds_the_named_build_and_pins_it(self) -> None:
+        self.assertFalse(self.paths.pinned.exists())
+        files = dict(release.data_files(self.paths, "2026.11.20-probe.1"))
+        self.assertIn("data/builds/probe.json", files)
+        self.assertIn("data/specs/a.json", files)
+        self.assertNotIn("data/builds/untested.json", files)
+        pointer = json.loads(files[self.paths.relative(self.paths.pinned)])
+        self.assertEqual(pointer, {"build": "data/builds/probe.json"})
+        builds.pin(self.paths, self.probe)  # the same build, pinned: the same files
+        pinned = dict(release.data_files(self.paths, "2026.11.20"))
+        self.assertEqual(
+            {k: v for k, v in files.items() if k != MANIFEST},
+            {k: v for k, v in pinned.items() if k != MANIFEST},
+        )
+
+    def test_an_untested_or_unknown_build_is_refused(self) -> None:
+        with self.assertRaises(BuildError):
+            release.data_files(self.paths, "2026.11.20-untested.1")
+        with self.assertRaises(NotFoundError):
+            release.data_files(self.paths, "2026.11.20-none.1")
 
 
 @unittest.skipUnless(

@@ -56,7 +56,7 @@ jobs:
           python -m epm2mod package --out-dir dist --release-version "$version"
           name=$(basename dist/*.zip .zip)
           echo "name=$name" >> "$GITHUB_OUTPUT"
-          echo "sha256=$(python -c 'from epm2mod.builds import pinned_description; from epm2mod.paths import repo_paths; print(pinned_description(repo_paths()).sha256)')" >> "$GITHUB_OUTPUT"
+          echo "sha256=$(python -c 'import sys; from epm2mod.release import release_build; from epm2mod.paths import repo_paths; print(release_build(repo_paths(), sys.argv[1]).sha256)' "$version")" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-zip

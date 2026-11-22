@@ -5,16 +5,19 @@
 
 from __future__ import annotations
 
+import contextlib
+import io
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from support import ROOT, write_manifest  # noqa: E402
 
-from epm2mod import readme  # noqa: E402
+from epm2mod import builds, cli, readme, releasing, stock  # noqa: E402
 from epm2mod.errors import BuildError  # noqa: E402
 from epm2mod.paths import RepoPaths  # noqa: E402
 from epm2mod.releasing import next_version, release_notes  # noqa: E402
@@ -34,6 +37,64 @@ class NextVersionTests(unittest.TestCase):
     def test_a_final_release_is_tagged_once(self) -> None:
         with self.assertRaises(BuildError):
             next_version("2026.11.19", ["v2026.11.19"], final=True)
+
+    def test_a_named_build_counts_its_own_releases(self) -> None:
+        tags = ["v2026.11.20-rc.5", "v2026.11.20-probe.2", "v2026.11.20-probe-2.7", "v2026.11.19-probe.9"]
+        self.assertEqual(next_version("2026.11.20", tags, final=False, build="probe"), "2026.11.20-probe.3")
+        self.assertEqual(next_version("2026.11.20", tags, final=False, build="other"), "2026.11.20-other.1")
+        self.assertEqual(next_version("2026.11.20", tags, final=False), "2026.11.20-rc.6")
+
+
+class PlanTests(unittest.TestCase):
+    """``release --build``: the checks and the notes for a named build, with git, the documents and CI faked."""
+
+    def setUp(self) -> None:
+        folder = tempfile.TemporaryDirectory()
+        self.addCleanup(folder.cleanup)
+        self.paths = RepoPaths(write_manifest(Path(folder.name)))
+        label_spec = self.paths.relative(self.paths.label_spec)
+        for name, sha, date in (("probe", "ab" * 32, "2026-11-20"), ("untested", None, None)):
+            builds.save_description(self.paths, builds.BuildDescription(
+                name, f"The {name} build", ("data/specs/a.json", label_spec), sha, date,
+                label="2026.11.20", stock=stock.EPM2_V16.file_name,
+            ))  # fmt: skip
+        self.paths.camera_log.mkdir(parents=True)
+        (self.paths.camera_log / "2026-11-20-probe.md").write_text("sha256 " + "ab" * 32 + "\n")
+        answers = {
+            "status": "", "fetch": "", "rev-parse": "c0ffee", "describe": "v2026.11.20-rc.5",
+            "tag": "v2026.11.20-rc.5 v2026.11.20-probe.1", "log": "feat: a probe\nchore: x",
+        }  # fmt: skip
+        for fake in (
+            mock.patch.object(releasing, "_git", lambda paths, *args, given=None: answers[args[0]]),
+            mock.patch.object(releasing, "_ci_problems", return_value=[]),
+            mock.patch.object(readme, "is_current", return_value=True),
+            mock.patch.object(readme, "feature_problems", return_value=[]),
+        ):
+            fake.start()
+            self.addCleanup(fake.stop)
+
+    def test_a_named_build_is_a_test_release_with_its_notes(self) -> None:
+        self.assertFalse(self.paths.pinned.exists())  # the pinned build is not needed
+        release, problems = releasing.plan(self.paths, final=False, build="probe")
+        self.assertEqual(problems, [])
+        assert release is not None
+        self.assertEqual((release.tag, release.commit), ("v2026.11.20-probe.2", "c0ffee"))
+        self.assertIn("Firmware: The probe build.", release.notes)
+        self.assertIn("- feat: a probe\n", release.notes)
+        self.assertIn("Firmware sha256 `" + "ab" * 32 + "`.", release.notes)
+
+    def test_an_untested_build_is_not_released(self) -> None:
+        self.assertEqual(
+            releasing.plan(self.paths, final=False, build="untested"),
+            (None, ["the build untested has no camera test"]),
+        )
+
+    def test_a_named_build_is_never_a_final_release(self) -> None:
+        argv = ["--project", str(self.paths.root), "release", "--build", "probe", "--final", "--dry-run"]
+        err = io.StringIO()
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+            self.assertEqual(cli.main(argv), 2)
+        self.assertIn("--build makes a test release", err.getvalue())
 
 
 class ReleaseNotesTests(unittest.TestCase):
@@ -70,3 +131,16 @@ class FeatureListTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ReleaseTagTests(unittest.TestCase):
+    def test_named_build_tags_are_not_releases_of_the_pinned_build(self):
+        from fnmatch import fnmatchcase
+
+        def matches(tag):
+            return any(fnmatchcase(tag, pattern) for pattern in releasing.RELEASE_TAGS)
+
+        for tag in ("v2026.11.19", "v2026.11.19.2", "v2026.11.20-rc.5"):
+            self.assertTrue(matches(tag), tag)
+        for tag in ("v2026.11.20-pana-ring-probe.1", "v2026.11.20-dev"):
+            self.assertFalse(matches(tag), tag)

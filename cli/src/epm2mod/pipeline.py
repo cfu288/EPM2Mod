@@ -52,7 +52,7 @@ from pathlib import Path
 from typing import Any
 
 from . import cardio, catalogue
-from .builds import BuildDescription, check_test_date, pin
+from .builds import BuildDescription, check_test_date, pin, save_description
 from .camera_steps import Step, copy_text, film_steps, firmware_reads, flash_steps
 from .cardio import FILMS, FIRMWARE, Content, Planned, planned_file
 from .catalogue import Locator
@@ -926,8 +926,9 @@ def record_test(
     log: Log = silent,
     today: datetime.date | None = None,
     dry_run: bool = False,
+    keep_pinned: bool = False,
 ) -> BuildDescription:
-    """Record a passed camera test and make the build the pinned one.
+    """Record a passed camera test and make the build the pinned one (``keep_pinned``: only record it).
 
     ``sha256`` is the SHA-256 of the firmware file that was on the camera, as
     written in the camera log before the flash. The build is made again in
@@ -945,6 +946,7 @@ def record_test(
         log: where progress lines go.
         today: the current date; for tests.
         dry_run: True to check everything and write nothing.
+        keep_pinned: True to save the test record and leave the pinned build as it is.
 
     Returns:
         The description with the test record.
@@ -959,11 +961,16 @@ def record_test(
     stock_data = read_stock(paths, tested.stock_firmware)
     _, digest = build_image(tested, load_specs(paths, tested), stock_data)
     if dry_run:
-        log(f"would pin: {tested.name}, camera-tested {date}, sha256 {digest}")
+        verb = "record" if keep_pinned else "pin"
+        log(f"would {verb}: {tested.name}, camera-tested {date}, sha256 {digest}")
         return tested
-    pin(paths, tested)
+    if keep_pinned:
+        save_description(paths, tested)
+    else:
+        pin(paths, tested)
+    done = "recorded" if keep_pinned else "pinned"
     log(
-        f"pinned: {tested.name}, camera-tested {date}, sha256 {digest}. "
+        f"{done}: {tested.name}, camera-tested {date}, sha256 {digest}. "
         "Run 'epm2mod generate', write the result in the camera log, and commit."
     )
     return tested

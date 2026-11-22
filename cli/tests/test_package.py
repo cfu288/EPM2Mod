@@ -1354,6 +1354,20 @@ class CommandLineTests(RepoCase):
             ("new", self.repo.sha256, "2026-11-10"),
         )
 
+    def test_pin_no_pin_records_the_test_and_keeps_the_pinned_build(self) -> None:
+        pointer = self.repo.paths.pinned.read_bytes()
+        argv = ("pin", "new", "--date", "2026-11-10", "--sha256", self.repo.sha256)
+        status, text = self.run_cli(*argv, "--no-pin")
+        self.assertEqual(status, 0, text)
+        self.assertIn("recorded: new", text)
+        self.assertEqual(self.repo.paths.pinned.read_bytes(), pointer)
+        recorded = self.repo.paths.build("new")
+        self.assertEqual(
+            (recorded.sha256, recorded.camera_tested), (self.repo.sha256, "2026-11-10")
+        )
+        status, text = self.run_cli(*argv[:3], "2026-11-11", *argv[4:], "--no-pin")
+        self.assertEqual(status, 7, text)  # a test record is never rewritten
+
     def test_fetch_stock(self) -> None:
         path = stock.stock_path(self.repo.paths, TINY_STOCK)
         path.unlink()

@@ -432,7 +432,7 @@ epm2mod builds
 Record a passed camera test and pin the build.
 
 ```
-epm2mod pin [-h] --date YYYY-MM-DD --sha256 HEX [--dry-run] BUILD
+epm2mod pin [-h] --date YYYY-MM-DD --sha256 HEX [--no-pin] [--dry-run] BUILD
 ```
 
 - Output: the build description with the test record, and the pointer to the pinned build.
@@ -443,6 +443,7 @@ epm2mod pin [-h] --date YYYY-MM-DD --sha256 HEX [--dry-run] BUILD
 | `BUILD` | the name of the tested build |  |
 | `--date YYYY-MM-DD` | the day of the camera test |  |
 | `--sha256 HEX` | the sha256 of the flashed file, from the camera log |  |
+| `--no-pin` | record the camera test; leave the pinned build as it is |  |
 | `--dry-run` | print what would be written and replaced; write nothing |  |
 
 - Exit 5: the build does not give that sha256.
@@ -635,7 +636,7 @@ epm2mod package [-h] [--out-dir DIR] --release-version V [--dry-run] [--json]
 | Argument | What | Default |
 |---|---|---|
 | `--out-dir DIR` | the folder for the zip; default: the output folder |  |
-| `--release-version V` | the calendar version, like 2026.11.18 or 2026.11.18-rc.1 |  |
+| `--release-version V` | the calendar version, like 2026.11.18 or 2026.11.18-rc.1; 2026.11.18-NAME.1 holds the build NAME in place of the pinned one |  |
 | `--dry-run` | print what would be written and replaced; write nothing |  |
 | `--json` | print one JSON document (schema 2) on stdout |  |
 
@@ -657,7 +658,7 @@ epm2mod package --release-version 2026.11.19-dev
 Check and tag the next release; with --dry-run, only check.
 
 ```
-epm2mod release [-h] [--final] [--dry-run] [--push]
+epm2mod release [-h] [--final] [--build NAME] [--dry-run] [--push]
 ```
 
 - Output: the release notes and a tag; with --dry-run, the release notes.
@@ -666,6 +667,7 @@ epm2mod release [-h] [--final] [--dry-run] [--push]
 | Argument | What | Default |
 |---|---|---|
 | `--final` | a release for everyone (vYYYY.MM.DD); default: a test release (-rc.N) |  |
+| `--build NAME` | a test release of this camera-tested build in place of the pinned one (-NAME.N) |  |
 | `--dry-run` | only check and show; create no tag |  |
 | `--push` | push the tag, which starts the publishing |  |
 
@@ -676,4 +678,5 @@ Examples:
 ```sh
 epm2mod release --dry-run
 epm2mod release --final --push
+epm2mod release --build NAME --push
 ```
