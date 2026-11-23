@@ -66,6 +66,27 @@ describe('Films', () => {
     expect(pressed('Scene')).toHaveAccessibleName('Scene 9')
   })
 
+  it('likes a film simulation, marks its button and keeps it after a reload', async () => {
+    const user = userEvent.setup()
+    localStorage.clear()
+    const { unmount } = render(<App />)
+    const filmButton = () =>
+      within(within(carousel()).getByRole('group', { name: 'Film simulation' })).getByRole('button', {
+        name: /Portra 400/,
+      })
+    expect(filmButton()).not.toHaveTextContent('liked')
+    await user.click(within(carousel()).getByRole('button', { name: 'Like Portra 400' }))
+    expect(within(carousel()).getByRole('button', { name: 'Like Portra 400' })).toHaveAttribute('aria-pressed', 'true')
+    expect(filmButton()).toHaveTextContent('liked')
+
+    unmount()
+    render(<App />)
+    expect(filmButton()).toHaveTextContent('liked')
+    await user.click(within(carousel()).getByRole('button', { name: 'Like Portra 400' }))
+    expect(filmButton()).not.toHaveTextContent('liked')
+    localStorage.clear()
+  })
+
   it('shows the installer first and the command line on a click', async () => {
     const user = userEvent.setup()
     window.history.replaceState(null, '', `${import.meta.env.BASE_URL}install`)

@@ -18,7 +18,7 @@ test('the film carousel shows a loaded photo and follows the arrow keys', async 
   const photo = carousel.getByRole('img', { name: 'Scene 1 in Portra 400' })
   await expect(photo).toHaveJSProperty('complete', true)
   await expect(photo).not.toHaveJSProperty('naturalWidth', 0)
-  await carousel.getByRole('button', { name: 'Portra 400' }).focus()
+  await carousel.getByRole('button', { name: 'Portra 400', exact: true }).focus()
   await page.keyboard.press('ArrowRight')
   await page.keyboard.press('ArrowDown')
   await expect(carousel.getByRole('img', { name: 'Scene 2 in Ektachrome' })).toBeVisible()
