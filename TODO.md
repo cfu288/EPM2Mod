@@ -21,11 +21,6 @@ and delete the item here.
   the hidden-value kind, the ART BKT hooks and the settings remap stay. Cost: 5 or 6 new hooks in segment 1 and a
   full film re-test on the camera. Check first in the emulator: `emulator/filmcheck.py` with one entry on code 200.
 
-## One-click installer
-
-Test releases up to v2026.11.20-rc.1 (films-look-exif; v2026.11.19-rc.4 replaced the withdrawn final release
-v2026.11.19, same commit). Open: the final release.
-
 ## Level gauge
 
 - Level Adjust works (2026-11-14), and the calibration is kept after power off and on (owner). Not yet reported:
