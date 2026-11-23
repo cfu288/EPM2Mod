@@ -1,9 +1,8 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { choicesOf, lookFile } from '@epm2mod/ui'
+import { choicesOf, lookFile, PRESET, presetSlots } from '@epm2mod/ui'
 import App from './App'
 import type { Job } from './api'
-import { PRESET, presetSlots } from './preset'
 
 const BUILD = { name: 'card-looks-4', what: 'Film simulations', sha256: 'ab'.repeat(32) }
 const DEFAULT = choicesOf(presetSlots())

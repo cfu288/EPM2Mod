@@ -19,4 +19,6 @@ export {
   SLOT_COUNT,
   type SlotItem,
 } from './lib/selection'
+export { PRESET, presetSlots } from './lib/preset'
+export { save } from './lib/save'
 export { useLooks, type Looks } from './lib/useLooks'

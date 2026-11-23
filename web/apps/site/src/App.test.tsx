@@ -37,11 +37,6 @@ describe('App', () => {
       expect(window.location.pathname).toBe(`${import.meta.env.BASE_URL}${path}`)
     }
   })
-
-  it('has no ART-menu editor or look-file download', () => {
-    render(<App />)
-    expect(screen.queryByText(/EPM2LOOK/)).toBeNull()
-  })
 })
 
 describe('Films', () => {
@@ -87,6 +82,35 @@ describe('Films', () => {
     localStorage.clear()
   })
 
+  it('puts a liked film simulation first in the look pack and downloads it', async () => {
+    const user = userEvent.setup()
+    localStorage.clear()
+    const saved: Blob[] = []
+    URL.createObjectURL = (blob: Blob) => {
+      saved.push(blob)
+      return 'blob:pack'
+    }
+    URL.revokeObjectURL = () => undefined
+    render(<App />)
+    const pack = () => screen.getByRole('region', { name: 'Create a Look Pack' })
+    expect(within(pack()).queryByRole('button', { name: /^Move ART/ })).toBeNull()
+    await user.click(within(pack()).getByRole('button', { name: 'Choose film simulations' }))
+    expect(await within(pack()).findByRole('button', { name: /^Move ART 1,/ })).toHaveAccessibleName(
+      'Move ART 1, Kodak Portra 400',
+    )
+
+    await user.click(within(carousel()).getByRole('button', { name: 'Ektar 100' }))
+    await user.click(within(carousel()).getByRole('button', { name: 'Like Ektar 100' }))
+    expect(await within(pack()).findByRole('button', { name: /^Move ART 1,/ })).toHaveAccessibleName(
+      'Move ART 1, Kodak Ektar 100',
+    )
+    expect(within(pack()).getAllByText(', liked')).toHaveLength(1)
+
+    await user.click(within(pack()).getByRole('button', { name: 'Download EPM2LOOK.BIN' }))
+    expect(saved).toHaveLength(1)
+    localStorage.clear()
+  })
+
   it('shows the installer first and the command line on a click', async () => {
     const user = userEvent.setup()
     window.history.replaceState(null, '', `${import.meta.env.BASE_URL}install`)
@@ -99,8 +123,11 @@ describe('Films', () => {
     expect(window.location.hash).toBe('#command-line')
   })
 
-  it('lists all 32 film simulations', () => {
+  it('lists all 32 film simulations in the look pack: 12 in the ART menu, the rest to add', async () => {
     render(<App />)
-    expect(within(screen.getByRole('table')).getAllByRole('row')).toHaveLength(33)
+    const pack = screen.getByRole('region', { name: 'Create a Look Pack' })
+    await userEvent.click(within(pack).getByRole('button', { name: 'Choose film simulations' }))
+    expect(await within(pack).findAllByRole('button', { name: /^Move ART/ })).toHaveLength(12)
+    expect(within(pack).getAllByRole('button', { name: /^Add / })).toHaveLength(20)
   })
 })

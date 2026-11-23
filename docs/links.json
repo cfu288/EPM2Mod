@@ -50,7 +50,7 @@
     "cli/src/epm2mod/catalogue.py",
     "web/apps/site/src/pages/Films.tsx",
     "web/apps/site/src/App.test.tsx",
-    "web/apps/local/src/preset.ts",
+    "web/packages/ui/src/lib/preset.ts",
     "cli/tests/test_lookfile.py",
     "cli/src/epm2mod/readme.py"
    ],

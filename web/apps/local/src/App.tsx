@@ -1,9 +1,18 @@
 import { useCallback, useEffect, useId, useReducer, useState, type ReactNode } from 'react'
 import { ArrowDownTrayIcon, ArrowPathIcon } from '@heroicons/react/20/solid'
-import { choicesOf, FilmCredit, MenuEditor, PageFrame, StripPreview, useLooks, type Looks } from '@epm2mod/ui'
+import {
+  choicesOf,
+  FilmCredit,
+  MenuEditor,
+  PageFrame,
+  presetSlots,
+  save,
+  StripPreview,
+  useLooks,
+  type Looks,
+} from '@epm2mod/ui'
 import { api, type Build, type Card, type Firmware, type Job } from './api'
 import { FLOWS, initial, labels, onTimeline, reduce, startReady } from './flow'
-import { presetSlots } from './preset'
 import { Timeline } from './Timeline'
 
 const ZIP_NAME = 'EPM2Mod-card.zip'
@@ -29,15 +38,6 @@ function stages(job: Job | null, firmware: Firmware) {
     { label: 'Check the result', step: 4 },
     { label: write, step: 5 },
   ]
-}
-
-function save(blob: Blob, name: string) {
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = name
-  link.click()
-  URL.revokeObjectURL(url)
 }
 
 const message = (error: unknown) => (error instanceof Error ? error.message : String(error))

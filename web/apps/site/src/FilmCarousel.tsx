@@ -24,24 +24,6 @@ const lookFilm = (id: string) => (id === NATURAL ? 'Natural' : filmById(id).film
 const looksOf = (scene: number) => Object.keys(scenes[scene]?.looks ?? {})
 const wrap = (i: number, n: number) => (i + n) % n
 
-/** The liked film simulations live only in this browser. */
-const LIKES = 'epm2mod-liked-films'
-const readLikes = (): string[] => {
-  try {
-    const value: unknown = JSON.parse(localStorage.getItem(LIKES) ?? '[]')
-    return Array.isArray(value) ? value.filter((id): id is string => typeof id === 'string') : []
-  } catch {
-    return []
-  }
-}
-const saveLikes = (ids: string[]) => {
-  try {
-    localStorage.setItem(LIKES, JSON.stringify(ids))
-  } catch {
-    // private mode or blocked storage: the likes last until the page closes
-  }
-}
-
 /** A key as a keycap: a thicker bottom edge. */
 const Key = ({ children }: { children: string }) => (
   <kbd className="border-ink-soft text-ink inline-flex h-6 min-w-6 items-center justify-center rounded-xs border border-b-[3px] bg-white px-1 font-sans text-xs">
@@ -49,11 +31,15 @@ const Key = ({ children }: { children: string }) => (
   </kbd>
 )
 
+interface Props {
+  liked: readonly string[]
+  onLike: (id: string) => void
+}
+
 /** Photos on two axes: left and right change the look, up and down change the scene. */
-export function FilmCarousel() {
+export function FilmCarousel({ liked, onLike }: Props) {
   const [scene, setScene] = useState(0)
   const [look, setLook] = useState('portra-400')
-  const [liked, setLiked] = useState(readLikes)
   const [popped, setPopped] = useState<string | null>(null) // the film simulation just liked, while it animates
   const swipe = useRef<{ x: number; y: number } | null>(null)
   const root = useRef<HTMLDivElement>(null)
@@ -62,10 +48,8 @@ export function FilmCarousel() {
   const current = scenes[scene]
 
   const toggleLike = (id: string) => {
-    const next = liked.includes(id) ? liked.filter((x) => x !== id) : [...liked, id]
-    setLiked(next)
-    saveLikes(next)
-    setPopped(next.includes(id) ? id : null)
+    onLike(id)
+    setPopped(liked.includes(id) ? null : id)
   }
 
   const moveLook = (step: number) => {

@@ -1,21 +1,27 @@
 import { PlusIcon } from '@heroicons/react/20/solid'
 import type { Film } from '../lib/films'
+import { LikedMark } from './LikedMark'
 
 interface Props {
   films: readonly Film[]
   canAdd: boolean
   onAdd: (film: Film) => void
+  /** The ids of the films to mark with a heart. */
+  liked?: readonly string[]
 }
 
 /** The films that are not in the menu, each with an Add button. */
-export function FilmLibrary({ films, canAdd, onAdd }: Props) {
+export function FilmLibrary({ films, canAdd, onAdd, liked = [] }: Props) {
   if (films.length === 0) return <p className="text-muted text-sm">Every film simulation is in the menu.</p>
   return (
     <ul className="divide-rule border-rule divide-y border-y">
       {films.map((film) => (
         <li key={film.id} className="flex items-center gap-x-3 py-3 pr-2 pl-2">
           <span className="min-w-0 flex-auto">
-            <span className="block truncate">{film.film}</span>
+            <span className="block truncate">
+              {film.film}
+              {liked.includes(film.id) && <LikedMark />}
+            </span>
             <span className="text-muted block truncate text-xs">{film.kind}</span>
           </span>
           <button

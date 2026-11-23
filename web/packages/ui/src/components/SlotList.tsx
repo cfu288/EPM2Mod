@@ -19,16 +19,18 @@ import { CSS } from '@dnd-kit/utilities'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/20/solid'
 import { filmById, slots } from '../lib/films'
 import type { SlotItem } from '../lib/selection'
+import { LikedMark } from './LikedMark'
 
 interface RowProps {
   item: SlotItem
   index: number
   selected: boolean
+  liked: boolean
   onSelect: () => void
   onRemove: () => void
 }
 
-function SlotRow({ item, index, selected, onSelect, onRemove }: RowProps) {
+function SlotRow({ item, index, selected, liked, onSelect, onRemove }: RowProps) {
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
     id: item.key,
   })
@@ -59,7 +61,10 @@ function SlotRow({ item, index, selected, onSelect, onRemove }: RowProps) {
       {film ? (
         <>
           <span className="min-w-0 flex-auto">
-            <span className="block truncate">{film.film}</span>
+            <span className="block truncate">
+              {film.film}
+              {liked && <LikedMark />}
+            </span>
             <span className={`block truncate text-xs ${sub}`}>{film.kind}</span>
           </span>
           <button
@@ -88,10 +93,12 @@ interface Props {
   onMove: (from: number, to: number) => void
   onRemove: (index: number) => void
   onSelect: (index: number) => void
+  /** The ids of the films to mark with a heart. */
+  liked?: readonly string[]
 }
 
 /** The camera's ART menu, ART 1 to 12: drag (or the keyboard) to reorder, remove a film. */
-export function SlotList({ items, selected, onMove, onRemove, onSelect }: Props) {
+export function SlotList({ items, selected, onMove, onRemove, onSelect, liked = [] }: Props) {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -130,6 +137,7 @@ export function SlotList({ items, selected, onMove, onRemove, onSelect }: Props)
               item={item}
               index={index}
               selected={index === selected}
+              liked={item.filmId !== null && liked.includes(item.filmId)}
               onSelect={() => {
                 onSelect(index)
               }}

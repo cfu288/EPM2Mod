@@ -1,9 +1,7 @@
-/* a brick red, muted to sit with the black-and-white page */
 .like-heart {
-  color: #a8473f;
+  color: var(--color-like);
 }
 
-/* on a like: the heart bounces and three short lines burst from its top, then fade */
 .like-pop {
   animation: like-bounce 280ms cubic-bezier(0.3, 1.6, 0.5, 1);
 }
@@ -16,7 +14,7 @@
   height: 0.45rem;
   margin-left: -1px;
   border-radius: 1px;
-  background: #a8473f;
+  background: var(--color-like);
   opacity: 0;
   transform-origin: 50% 1.15rem; /* the centre of the heart */
   animation: like-burst 320ms ease-out;

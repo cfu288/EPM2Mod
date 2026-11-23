@@ -4,7 +4,7 @@ import { FilmLibrary } from './FilmLibrary'
 import { SlotList } from './SlotList'
 
 /** The two sections that choose the films of the ART menu: the twelve rows in order, and the films to add. */
-export function MenuEditor({ looks }: { looks: Looks }) {
+export function MenuEditor({ looks, liked }: { looks: Looks; liked?: readonly string[] }) {
   const filled = looks.items.filter((item) => item.filmId !== null).length
   return (
     <div className="space-y-14">
@@ -23,6 +23,7 @@ export function MenuEditor({ looks }: { looks: Looks }) {
             onMove={looks.move}
             onRemove={looks.remove}
             onSelect={looks.select}
+            liked={liked}
           />
         </div>
       </section>
@@ -37,7 +38,7 @@ export function MenuEditor({ looks }: { looks: Looks }) {
           <p className="text-ink-soft mt-2 text-sm">Add puts a film simulation into ART {looks.empty + 1}.</p>
         )}
         <div className="mt-4">
-          <FilmLibrary films={looks.unused} canAdd={looks.empty >= 0} onAdd={looks.add} />
+          <FilmLibrary films={looks.unused} canAdd={looks.empty >= 0} onAdd={looks.add} liked={liked} />
         </div>
       </section>
     </div>

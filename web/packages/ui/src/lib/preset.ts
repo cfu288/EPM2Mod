@@ -1,6 +1,6 @@
-import type { SlotItem } from '@epm2mod/ui'
+import type { SlotItem } from './selection'
 
-/** The default film simulations of the installer page, ART 1 to 12. The page sends them as 12 choices. */
+/** The default film simulations, ART 1 to 12: the installer page sends them as 12 choices, and the site fills a look pack with them. */
 export const PRESET: readonly string[] = [
   'portra-400',
   'ektachrome',

@@ -1,46 +1,46 @@
-import { films } from '@epm2mod/ui'
+import { lazy, Suspense, useState } from 'react'
 import { FilmCarousel } from '../FilmCarousel'
+import { useLikes } from '../likes'
+
+// the editor and its drag and drop load on the first click
+const LookPack = lazy(() => import('../LookPack').then((module) => ({ default: module.LookPack })))
 
 export function Films() {
+  const [liked, like] = useLikes()
+  const [packOpen, setPackOpen] = useState(false)
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
       <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">Film Simulations</h1>
 
       <div className="mt-10">
-        <FilmCarousel />
+        <FilmCarousel liked={liked} onLike={like} />
       </div>
 
-      <section aria-labelledby="all-films" className="mt-20">
-        <h2 id="all-films" className="section-title">
-          Available film simulations
+      <section aria-labelledby="look-pack" className="mt-20">
+        <h2 id="look-pack" className="section-title">
+          Create a Look Pack
         </h2>
-        <p className="text-ink-soft mt-4">
-          Install any of them in place of the 12 art filters Olympus provides by default.
-        </p>
-        <div className="mt-6 overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="text-muted border-ink border-b">
-              <tr>
-                <th className="py-2 pr-4 font-normal">Menu name</th>
-                <th className="py-2 pr-4 font-normal">Command-line name</th>
-                <th className="py-2 pr-4 font-normal">Film</th>
-                <th className="py-2 font-normal">Type</th>
-              </tr>
-            </thead>
-            <tbody>
-              {films.map((film) => (
-                <tr key={film.id} className="border-rule border-b">
-                  <td className="py-2 pr-4 font-bold">{film.name}</td>
-                  <td className="py-2 pr-4">
-                    <code>{film.id}</code>
-                  </td>
-                  <td className="py-2 pr-4">{film.film}</td>
-                  <td className="text-muted py-2">{film.kind}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {packOpen ? (
+          <Suspense fallback={<p className="text-muted mt-6">Loading…</p>}>
+            {/* a like or unlike rebuilds the pack */}
+            <LookPack key={liked.join()} liked={liked} />
+          </Suspense>
+        ) : (
+          <div className="mt-6 space-y-5">
+            <p className="text-ink-soft max-w-2xl">
+              Choose the film simulations for your camera&apos;s ART menu and download them as a look pack.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setPackOpen(true)
+              }}
+              className="btn bg-ink hover:text-ink justify-center px-6 py-3 text-base text-white hover:bg-white"
+            >
+              Choose film simulations
+            </button>
+          </div>
+        )}
       </section>
     </div>
   )
