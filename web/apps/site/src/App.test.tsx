@@ -74,6 +74,11 @@ describe('Films', () => {
     expect(within(carousel()).getByRole('button', { name: 'Like Portra 400' })).toHaveAttribute('aria-pressed', 'true')
     expect(filmButton()).toHaveTextContent('liked')
 
+    await user.keyboard('l')
+    expect(filmButton()).not.toHaveTextContent('liked')
+    await user.keyboard('l')
+    expect(filmButton()).toHaveTextContent('liked')
+
     unmount()
     render(<App />)
     expect(filmButton()).toHaveTextContent('liked')

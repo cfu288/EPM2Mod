@@ -85,6 +85,9 @@ export function FilmCarousel({ liked, onLike }: Props) {
       ArrowDown: () => {
         goScene(scene + 1)
       },
+      l: () => {
+        if (look !== NATURAL) toggleLike(look)
+      },
     }
   })
 
@@ -102,6 +105,7 @@ export function FilmCarousel({ liked, onLike }: Props) {
     const key = (event: KeyboardEvent) => {
       const active = document.activeElement
       if (!el.contains(active) && !(over && (!active || active === document.body))) return
+      if (event.ctrlKey || event.metaKey || event.altKey) return // leave the browser's shortcuts (Ctrl+L, Alt+←)
       const step = keys.current[event.key]
       if (!step) return
       event.preventDefault()
@@ -211,7 +215,9 @@ export function FilmCarousel({ liked, onLike }: Props) {
             <span className="mr-3 ml-1">film simulation</span>
             <Key>↑</Key>
             <Key>↓</Key>
-            <span className="ml-1">scene</span>
+            <span className="mr-3 ml-1">scene</span>
+            <Key>L</Key>
+            <span className="ml-1">like</span>
           </p>
         </div>
 
