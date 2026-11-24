@@ -39,18 +39,16 @@ This does not turn on bracketing for shooting: the Bracketing screen still reads
 4. Select **No** and press **OK** to go back to playback.
 
 You get one JPEG in the current Picture Mode, then one per row that is On, in the order of the ART BKT screen. Each
-JPEG takes the next file number, so the files sort in that order.
+JPEG takes the next file number, so the files sort in that order. Each JPEG records its film simulation's name in its
+metadata (EXIF Image Description), so you can tell the files apart in a photo viewer. **[E]**
 
 ## Limits
 
-- Each JPEG keeps the RAW's Image Description, so it does not record its own film simulation's name: tell the files
-  apart by their order. *(Only if D2 = b; with D2 = a: "Each JPEG records its film simulation's name in its metadata
-  (EXIF Image Description)." [U])*
 - 12 entries take about 35 seconds. There is no cancel. **[U: no cancel]**
 - If the card fills up, the camera stops and keeps the JPEGs it made. **[U]**
 - The Olympus art filters Dramatic Tone, Key Line and Watercolor: **[U: whether they act; drop or keep this line
   after the test]**
 - Switching the camera off during Busy: **[U: what happens to the Picture Mode]**
-- With no row On, ART BKT makes one JPEG, as Current does. **[U]**
+- With no row On, ART BKT makes one JPEG, as Current does. **[E]**
 
 For implementation details, see the [notes](../../experiments/2026-11-20-raw-edit-art-bkt/NOTES.md).
