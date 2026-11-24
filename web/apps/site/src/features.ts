@@ -76,4 +76,18 @@ export const features: Feature[] = [
       { src: 'ui/lowest-ss-list.png', alt: 'Lowest S/S Setting set to 1/15' },
     ],
   },
+  {
+    id: 'spot-metering',
+    name: 'Spot metering at the AF point',
+    summary: 'The right exposure for an off-centre subject, without recomposing.',
+    steps: [
+      'MENU → SETUP → Custom Menu → E. Exp/▣/ISO → Spot Metering.',
+      'Select Spot, Spot Hilight or Spot Shadow, press RIGHT, choose On, and press OK.',
+      'Set metering to that spot mode, then tap the subject or move a single AF target.',
+    ],
+    screens: [
+      { src: 'ui/spot-metering-row.png', alt: 'Custom Menu E with the Spot Metering row' },
+      { src: 'ui/spot-metering-page.png', alt: 'The Spot Metering page with Spot, Spot Hilight and Spot Shadow' },
+    ],
+  },
 ]
