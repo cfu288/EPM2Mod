@@ -14,9 +14,9 @@ Other Olympus generations, and what each can be modded to do: [model-matrix.md](
 - **A bad flash has always been recoverable here.** Five builds failed (three froze live view: `slots7-code`,
   `slots7-kind`, `remap7-code`, and two crashed: `peaking-direct-1`, `peaking-direct-3`). A normal card update
   recovered each.
-- **New code works.** Nine patch specs with new machine code are in the pinned build and passed
+- **New code works.** Ten patch specs with new machine code are in the pinned build and passed
   camera tests (`interval-timelapse-v2`, `peaking-direct-4`, `peaking-colours`, `peaking-fast`,
-  `peaking-save-guard`, `stock-films-structure`, `card-looks-5`, `log-menu-2`, `lss-core`).
+  `peaking-save-guard`, `stock-films-structure`, `card-looks-5`, `log-menu-2`, `lss-core`, `spot-core-2`).
 - **Others went much further on the same family.** The Caduceus mods for the OM-3 and the E-P7 add an
   on-camera editor, files loaded from the card and new menu entries. Their first camera-tested
   editor was 8.2 KB of code. They report one boot loop on each body, both recovered by a normal card
@@ -47,7 +47,8 @@ Other Olympus generations, and what each can be modded to do: [model-matrix.md](
 | Processor | Two MN103 cores, uITRON; hardware face detector; GPU | Verified from the firmware |
 | RAM | 512 MiB | Inferred from address use |
 | Accelerometer | 3-axis, with a driver task and a roll/pitch interface | Verified |
-| Code space proven on the camera | 320 bytes, and since 2026-11-14 the area at 0x7EBF1F00 (the first area that had only passed the static checks: code ran there at the first attempt), and the blank run in the kernel range at 0x7E4C9200 (420 bytes of focus-peaking code; 0x7E4C90CA–0x7E4C9800 is the area) | Verified |
+| Code space proven on the camera | 320 bytes, and since 2026-11-14 the area at 0x7EBF1F00 (the first area that had only passed the static checks: code ran there at the first attempt), and the blank run in the kernel range at 0x7E4C9200 (420 bytes of focus-peaking code; 0x7E4C90CA–0x7E4C9800 is the area). In segment 1, the reclaimed `exp` debug printers: `lss-core` (641 B) and since 2026-11-24 `spot-core-2` (291 B at 0x7E69ED8B–0x7E69EEAE; 1 B of that free area is left) | Verified |
+| Spot metering window | The spot BV is a fixed 4×4 window of the 18×18 BV grid. A 5-byte hook moves the grid pointer so the window lies under the AF point: the selected AF target (prm 0x88B2) or the touch frame (the special AF frame of TAKE_FOCUS, x and y −100..+100). The grid covers the middle 93.75 % of the AF frame | Camera-tested 2026-11-24 (`spot-af-2`: touched points on bright and dark areas, the four corners, the smallest and largest touch frame, the arrow-key targets, the bottom-left target) |
 | Code space that passes every static check | [code-space-map.md §4](../reference/code-space-map.md#4-totals-bytes) | Verified by scan; needs a camera probe |
 | More candidates | 7.2 KB dead 3D helpers; 124 KB debug handlers; 579 KB 3D and slideshow stack; 1.59 MB of the main block that is never loaded | Static only |
 | Data space | Blank tails in blocks 1, 2 and 3: 11.1 MB, 130 KB, 677 KB (flash only) | Verified bytes; updater behaviour unknown |
@@ -96,6 +97,9 @@ Other Olympus generations, and what each can be modded to do: [model-matrix.md](
   issue #1). Data edits only: eleven layout lists of the live-view producers get the gauge's layout, and the bar's
   position when the camera is held vertically moves inward, as the PEN-F places it
   (`experiments/2026-11-19-gauge-info/NOTES.md`).
+- ~~Spot metering at the AF target~~ **Done on 2026-11-24** (`spot-core-2`, `spot-menu`), as the E-M5 II does it: a
+  5-byte hook in segment 1 and 291 B of code move the spot window to the touched point or the selected AF target
+  (`experiments/2026-11-24-af-spot-metering/NOTES.md`).
 - The other E-PL6 additions (small AF target, ISO LOW), ported as interval shooting was.
 - A simple on-camera editor made from existing menu lists.
 

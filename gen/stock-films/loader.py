@@ -1,4 +1,4 @@
-"""Write data/specs/looks-menu-4.json and data/specs/card-looks-8.json: the loader of film simulations for the
+"""Write data/specs/looks-menu-4.json and data/specs/card-looks-9.json: the loader of film simulations for the
 stock-filters firmware (experiments/2026-11-18-stock-filters/design.md). Needs build/stock-films/layout.json
 (gen/stock-films/structure.py).
 
@@ -15,7 +15,8 @@ writes the two specs. What the code does:
     file lists the entry, else the stock bytes. At the first GUI state of a session it writes the texts and names,
     and applies the stored file only if C_START found none;
   * the menu texts: a loaded entry shows its film's name; the row shows Loaded, No file or Bad file. The texts of the
-    rows Peaking and Lowest S/S Setting are written the same way (TEXTS), so they show in every menu language.
+    rows Peaking, Lowest S/S Setting and Spot Metering are written the same way (TEXTS), so they show in every menu
+    language.
 The spec's key `_symbols` holds the labels that gen/log-menu/mkspec.py hooks.
 A camera-tested version stays as its committed spec file (a build names it); this file makes only the current one.
 """
@@ -34,7 +35,7 @@ sys.path.insert(0, os.path.join(ROOT, "cli", "src"))
 from epm2mod.container import parse  # noqa: E402
 from epm2mod.looks import lookfile, slots  # noqa: E402
 
-SPEC, MENU = "card-looks-8", "looks-menu-4"
+SPEC, MENU = "card-looks-9", "looks-menu-4"
 OUT = "stock-films"   # build/OUT: layout.json in, syms.json out
 CTOR_ENTRY, CTOR = 0x7F033AC8 + 4 * 44, 0x7EEC05FF   # segment 3's constructor table (45 entries; walker 0x7E44B6B0,
 # called by Usr1 at 0x7E504D81 with d0 = 3): its last entry. It stores a pointer and 0 in two globals
@@ -74,7 +75,9 @@ TEXTS = ((1505, "Peaking"),                                                   # 
          (1506, "Show lines in that color \r\non sharp edges while\r\nMF Assist magnifies."),   # peaking-colours
          (1500, "White"),                                                     # peaking-menu: no stock text is "White"
          (1503, "Lowest S/S Setting"),                                        # lss-menu: label and help
-         (1504, "Choose the shutter speed at\r\nwhich the camera raises\r\nISO in P and A."))
+         (1504, "Choose the shutter speed at\r\nwhich the camera raises\r\nISO in P and A."),
+         (1494, "Spot Metering"),                                             # spot-menu: label and help (unused
+         (1509, "Spot modes set to On meter\r\nat the selected AF target\r\nin single-target AF."))   # EVF texts)
 RAM = 0x7E4D0000            # the RAM gap (cached address); the code uses the uncached alias
 ENGLISH = (0x38B758, 0xBFBC4E20)   # pointer array of the English blob in block 1, and its load bias
 
@@ -319,7 +322,10 @@ def main():
         "texts and names, and applies the stored file only if C_START found none. The text table also holds the "
         "English texts of the rows Peaking (ids 1505, 1506, 1500) and Lowest S/S Setting (1503, 1504), so both rows "
         "show them in every menu language. FLAGS and T_END are no longer at fixed addresses: `_symbols` gives the "
-        "labels that data/specs/log-menu-3.json hooks." % (CTOR_ENTRY, CTOR))),
+        "labels that data/specs/log-menu-3.json hooks." % (CTOR_ENTRY, CTOR)) + (" Version 9 (experiments/"
+        "2026-11-24-af-spot-metering/NOTES.md, build spot-af): the text table also points the ids 1494 and 1509 "
+        "(unused built-in EVF texts) at the label and help of the row Spot Metering (data/specs/spot-menu.json) in "
+        "the loaded language.")),
         "base": STOCK, "base_sha256": sha,
         "_symbols": hooked,
         "_ram": "the EEROM bank's unused tail: store 0x%08X, scratch 0x%08X; RAM: status, names 0x%08X-0x%08X; the "

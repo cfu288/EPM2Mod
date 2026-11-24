@@ -1,0 +1,77 @@
+variant A: maps 0x7E7DA620 (18x18) 0x7E7DA8E8 (4x4); weights spot/ave/cntr/arnd 0x7E7DA8A8 0x7E7DA60C 0x7E7DA908 0x7E7DA90E; flat grid spot 256
+  cells that move the spot BV (row, col: delta Q8):
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0   26   26    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0   26  460  460   26    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0   26  460  460   26    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0   26   26    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+variant B: maps 0x7E7DA764 (18x18) 0x7E7DA8F8 (4x4); weights spot/ave/cntr/arnd 0x7E7DA8C8 0x7E7DA616 0x7E7DA912 0x7E7DA918; flat grid spot 256
+  cells that move the spot BV (row, col: delta Q8):
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0  512  512    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0  512  512    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+      0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+proposed window per AF target (prm 0x88B2 value k, area = row*7+col):
+  area  0 k  0: window rows 2-5 cols 1-4 delta  -96 zones [768, 256] ok
+  area  1 k  5: window rows 2-5 cols 3-6 delta  -94 zones [768, 256] ok
+  area  2 k 10: window rows 2-5 cols 5-8 delta  -92 zones [768, 256] ok
+  area  3 k 15: window rows 2-5 cols 7-10 delta  -90 zones [768, 256] ok
+  area  4 k 20: window rows 2-5 cols 9-12 delta  -88 zones [768, 256] ok
+  area  5 k 25: window rows 2-5 cols 11-14 delta  -86 zones [768, 256] ok
+  area  6 k 30: window rows 2-5 cols 13-16 delta  -84 zones [768, 256] ok
+  area  7 k  1: window rows 4-7 cols 1-4 delta  -60 zones [768, 256] ok
+  area  8 k  6: window rows 4-7 cols 3-6 delta  -58 zones [768, 256] ok
+  area  9 k 11: window rows 4-7 cols 5-8 delta  -56 zones [768, 256] ok
+  area 10 k 16: window rows 4-7 cols 7-10 delta  -54 zones [768, 256] ok
+  area 11 k 21: window rows 4-7 cols 9-12 delta  -52 zones [768, 256] ok
+  area 12 k 26: window rows 4-7 cols 11-14 delta  -50 zones [768, 256] ok
+  area 13 k 31: window rows 4-7 cols 13-16 delta  -48 zones [768, 256] ok
+  area 14 k  2: window rows 7-10 cols 1-4 delta   -6 zones [768, 256] ok
+  area 15 k  7: window rows 7-10 cols 3-6 delta   -4 zones [768, 256] ok
+  area 16 k 12: window rows 7-10 cols 5-8 delta   -2 zones [768, 256] ok
+  area 17 k 17: window rows 7-10 cols 7-10 delta    0 zones [768, 256] ok
+  area 18 k 22: window rows 7-10 cols 9-12 delta    2 zones [768, 256] ok
+  area 19 k 27: window rows 7-10 cols 11-14 delta    4 zones [768, 256] ok
+  area 20 k 32: window rows 7-10 cols 13-16 delta    6 zones [768, 256] ok
+  area 21 k  3: window rows 10-13 cols 1-4 delta   48 zones [768, 256] ok
+  area 22 k  8: window rows 10-13 cols 3-6 delta   50 zones [768, 256] ok
+  area 23 k 13: window rows 10-13 cols 5-8 delta   52 zones [768, 256] ok
+  area 24 k 18: window rows 10-13 cols 7-10 delta   54 zones [768, 256] ok
+  area 25 k 23: window rows 10-13 cols 9-12 delta   56 zones [768, 256] ok
+  area 26 k 28: window rows 10-13 cols 11-14 delta   58 zones [768, 256] ok
+  area 27 k 33: window rows 10-13 cols 13-16 delta   60 zones [768, 256] ok
+  area 28 k  4: window rows 12-15 cols 1-4 delta   84 zones [768, 256] ok
+  area 29 k  9: window rows 12-15 cols 3-6 delta   86 zones [768, 256] ok
+  area 30 k 14: window rows 12-15 cols 5-8 delta   88 zones [768, 256] ok
+  area 31 k 19: window rows 12-15 cols 7-10 delta   90 zones [768, 256] ok
+  area 32 k 24: window rows 12-15 cols 9-12 delta   92 zones [768, 256] ok
+  area 33 k 29: window rows 12-15 cols 11-14 delta   94 zones [768, 256] ok
+  area 34 k 34: window rows 12-15 cols 13-16 delta   96 zones [768, 256] ok
+PASS

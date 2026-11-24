@@ -205,6 +205,17 @@
    ]
   },
   {
+   "name": "Spot metering",
+   "fact": "Menu path, the three rows, where the spot follows the AF point and where it stays at the centre",
+   "truth": [
+    "data/specs/spot-*.json",
+    "data/specs/custom-menu-rows-4.json"
+   ],
+   "copies": [
+    "docs/guide/spot-metering.md"
+   ]
+  },
+  {
    "name": "Debug log",
    "fact": "The Debug Log row, the file EPM2LOG.BIN, its size cap",
    "truth": [
