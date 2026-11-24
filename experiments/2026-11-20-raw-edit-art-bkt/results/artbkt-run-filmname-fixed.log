@@ -1,0 +1,65 @@
+10.7 PRM_SET 0x9481 = 2 from 7e67f8f2
+229.5 PRM_SET 0x9481 = 7 from 7e67f8f2
+STEP w:500 1500.1
+STEP key:PLAY 2000.1
+STEP w:1500 2520.1
+STEP key:OK 4020.1
+STEP w:800 4540.1
+STEP key:OK 5340.1
+STEP w:1500 5860.1
+STEP key:DOWN 7360.1
+STEP w:300 7880.1
+STEP key:DOWN 8180.1
+STEP w:300 8700.1
+STEP key:DOWN 9000.1
+STEP w:300 9520.1
+STEP key:OK 9820.1
+9844.9 ROWS row 3
+9844.9 SETUP list [7,100,101,102,103,104,105,106,107,108,109,119,120] PM0 7 ACT 1 PH 0 K 0
+9846.1 ERaw state_start_current_mode 
+9849 developer: take bdc0c800 mode byte +16479 = 7
+9853.4 developer: take bdc0c800 mode byte +16479 = 7
+10310.4 CB cmd 47 status 164 result 0
+10310.4 CBDONE ACT 1 PH 0 K 0 result 0
+STEP w:8000 10340.1
+STEP shot:yesno 18340.1
+STEP key:OK 18340.1
+18367.3 ERaw save_current_start (ImageDescription "OLYMPUS DIGITAL CAMERA")
+18369.6 play_save_raw 
+18369.6 api_rec_Reserve_Media 
+STEP w:15000 18860.1
+19225 CB cmd 47 status 164 result 0
+19225 CBDONE ACT 1 PH 2 K 0 result 0
+19225 PRM_SET 0x9481 = 100 from 7ebb2c7e
+19225.2 ERaw end_current_mode_edit 
+19226.4 ERaw state_start_current_mode 
+19228.2 developer: take bdc0c800 mode byte +16479 = 2
+19232.7 developer: take bdc0c800 mode byte +16479 = 100
+19238.6 developer: take bdc0c800 mode byte +16479 = 100
+19536.1 CB cmd 47 status 164 result 0
+19536.1 CBDONE ACT 1 PH 1 K 1 result 0
+19536.4 ERaw save_current_start (ImageDescription "OLYMPUS DIGITAL CAMERA")
+19537.4 play_save_raw 
+19537.4 api_rec_Reserve_Media 
+19538 developer: take bdc0c800 mode byte +16479 = 100
+20239 CB cmd 47 status 164 result 0
+20239 CBDONE ACT 1 PH 2 K 1 result 0
+20239 PRM_SET 0x9481 = 101 from 7ebb2c7e
+20239.2 ERaw end_current_mode_edit 
+20240.4 ERaw state_start_current_mode 
+20242.2 developer: take bdc0c800 mode byte +16479 = 2
+20246.7 developer: take bdc0c800 mode byte +16479 = 101
+20252.6 developer: take bdc0c800 mode byte +16479 = 101
+20537.1 CB cmd 47 status 164 result 0
+20537.1 CBDONE ACT 1 PH 1 K 2 result 0
+20537.4 ERaw save_current_start (ImageDescription "OLYMPUS DIGITAL CAMERA")
+20538.4 play_save_raw 
+20538.4 api_rec_Reserve_Media 
+20538.9 developer: take bdc0c800 mode byte +16479 = 101
+20704.1 CB cmd 47 status 164 result f0000001
+20704.1 CBDONE ACT 1 PH 2 K 2 result f0000001
+20704.1 STOP ACT 1 PH 2 K 2 PM0 7
+20704.1 PRM_SET 0x9481 = 7 from 7ebb2c7e
+21888.4 ERaw end_current_mode_edit 
+STEP shot:end 33860.1
+{"end":"done","ms":33860.1,"pc":"7e44966d","files":["/DCIM/100OLYMP/PB130001.ORF 13632500","/DCIM/100OLYMP/PB140002.JPG 4023296","/DCIM/100OLYMP/PB140003.JPG 4023296","/DCIM/100OLYMP/PB140004.JPG 4023296"],"errlog":["39.9 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9","41.5 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9","20703.4 0x1e001002 from 7e714709(fn 7e7146e0 \"REC MEDIA abort\") args 0x60482ad4 0x604829d0","21890.4 0x10009004 from 7e5b2c7c(fn 7e5b2bce) args 0x7e431a29 0x00000000","21890.5 0x10009004 from 7e5b2c7c(fn 7e5b2bce) args 0x7e431a29 0x6046129e","21890.5 0x10009004 from 7e5b2c7c(fn 7e5b2bce) args 0x7e431a29 0x60137314"],"problem":"none"}
