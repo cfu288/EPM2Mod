@@ -1,0 +1,66 @@
+{
+ "name": "slow-boot-probe",
+ "description": "Structured log, probe of the slow cold start (GitHub issue #6, experiments/2026-11-24-slow-boot/NOTES.md): event lv_first, once per start, at the first run of the live-view struct refresh 0x7E6ECCAF, before peaking's latch T_A (whose T_R jumps to peaking-mf's T_MF in segment 2). arg0 = the word 0x7ECB0B84 of T_MF, arg1 = the word 0x7F033B74 of segment 3's constructor table, both read through the uncached alias: they tell whether the copies of segments 2 and 3 have reached them. The peaking hook 0x7E6ECF91 jumps to T_LV (segment 1, free part of lss-core's area), which jumps on to T_A; a flag at PST+104 (0x7E4FD0A8, cleared at every start by log-menu-3's T_BOOT). Event start_kind: segment 3's last constructor entry points at T_PW (segment 2), which logs the power-on factor, the wake reason and the quick start's state after the segment copies, then jumps to log-menu-3's T_CTOR (seg_loaded follows). Needs the specs of data/builds/peaking-mf.json before it. It puts the build id 3bb92179960f6978 of data/logdict/events.json into the block header. DEBUG builds only.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "status": "candidate: emulator-checked, not flashed",
+ "_delta_on": "data/builds/peaking-mf.json",
+ "_build_id": "3bb92179960f6978",
+ "_ram": "1 byte at 0x7E4FD0A8 (uncached alias 0xBE4FD0A8, PST+104) in the log's state block, cleared at every start by log-menu-3's T_BOOT",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x27DC4B",
+   "expect": "78e6ffa028f062fcdce1fa7d7e18ddb678e6ffa028f86202fcdcf3fa7d7e18dda578e6ffa028f86204fcdc05fb7d7e18dd9478e6ffa028",
+   "new": "cf88f2e6fca8a8d04fbea000c9208001fc82a8d04fbefca5840bcbbefca0743b03bf2c000adda1a8e2ff0000f2fbcbcbce88dc6ea5e2ff",
+   "_addr": "0x7E69EC6B",
+   "_note": "new code, segment 1 (free part of lss-core's area): T_LV (55 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1E7F",
+   "expect": "4974656d4e756d62657200693035006765744d656e754974656d006930360067657444656661756c7449",
+   "new": "cf08fca9e9544160f8c110fcace6544160f211fca078214f602c010add76668dff0000ce08dca4ffffff",
+   "_addr": "0x7EBF2E9F",
+   "_note": "new code, segment 2 (movie-ab's run, history): T_PW (42 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x2CBF71",
+   "expect": "dc7ac2ddff",
+   "new": "dcda1cfbff",
+   "_addr": "0x7E6ECF91",
+   "_note": "peaking hook at the end of the live-view struct refresh: `jmp T_A` -> `jmp T_LV` (T_LV logs lv_first once per start, then jumps to T_A)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xC12B58",
+   "expect": "682ebf7e",
+   "new": "9f2ebf7e",
+   "_addr": "0x7F033B78",
+   "_note": "segment 3's last constructor entry: log-menu-3's T_CTOR -> T_PW (logs start_kind, then jumps to T_CTOR)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1CEA",
+   "expect": "afe27672",
+   "new": "3bb92179",
+   "_addr": "0x7EBF2D0A",
+   "_note": "flush task, block header: build id bytes 0-3 afe27672 -> 3bb92179 (data/logdict/events.json)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7D1CF3",
+   "expect": "d672fc95",
+   "new": "960f6978",
+   "_addr": "0x7EBF2D13",
+   "_note": "flush task, block header: build id bytes 4-7 d672fc95 -> 960f6978 (data/logdict/events.json)"
+  }
+ ]
+}

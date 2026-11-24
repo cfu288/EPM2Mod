@@ -314,6 +314,14 @@
   {"id": 2309, "name": "pana_pk34_1", "level": "debug", "spec": "pana-ring-probe", "feature": "lens",
    "doc": "Bytes 8-15; see pana_pk34_0",
    "args": [{"name": "b8_11", "format": "hex", "fields": [{"name": "b8", "shift": 0, "bits": 8, "format": "hex"}, {"name": "b9", "shift": 8, "bits": 8, "format": "hex"}, {"name": "b10", "shift": 16, "bits": 8, "format": "hex"}, {"name": "b11", "shift": 24, "bits": 8, "format": "hex"}]},
-            {"name": "b12_15", "format": "hex", "fields": [{"name": "b12", "shift": 0, "bits": 8, "format": "hex"}, {"name": "b13", "shift": 8, "bits": 8, "format": "hex"}, {"name": "b14", "shift": 16, "bits": 8, "format": "hex"}, {"name": "b15", "shift": 24, "bits": 8, "format": "hex"}]}]}
+            {"name": "b12_15", "format": "hex", "fields": [{"name": "b12", "shift": 0, "bits": 8, "format": "hex"}, {"name": "b13", "shift": 8, "bits": 8, "format": "hex"}, {"name": "b14", "shift": 16, "bits": 8, "format": "hex"}, {"name": "b15", "shift": 24, "bits": 8, "format": "hex"}]}]},
+
+  {"id": 2560, "name": "lv_first", "level": "info", "spec": "slow-boot-probe", "feature": "slow-boot",
+   "doc": "Build slow-boot-probe (GitHub issue #6): the first run in a start of the live-view struct refresh 0x7E6ECCAF (mov task), seen at its peaking hook 0x7E6ECF91 before the latch T_A runs. seg2 = the word at 0x7ECB0B84, inside peaking-mf's T_MF among the last bytes of segment 2 that Usr1 copies: 0xA0602BE8 when that part of segment 2 is in RAM. seg3 = the word at 0x7F033B74 of segment 3's constructor table: 0x7EEBF5E1 when segment 3 is in RAM. Other values: the copy has not reached them (RAM left from before, or decayed after a long power-off)",
+   "args": [{"name": "seg2", "format": "hex"}, {"name": "seg3", "format": "hex"}]},
+  {"id": 2561, "name": "start_kind", "level": "info", "spec": "slow-boot-probe", "feature": "slow-boot",
+   "doc": "Build slow-boot-probe (GitHub issue #6): segment 3's last constructor entry (task Usr1, after the copies of segments 2 and 3; it comes just before seg_loaded). poweron: the power-on factor (u16 0x604154E6) and the wake reason (u8 0x604154E9), read after the firmware set them (0x7E45D1F3, from Usr0; the boot record reads them before). fast: the quick start's state word 0x604F2178 (0 idle)",
+   "args": [{"name": "poweron", "format": "hex", "fields": [{"name": "factor", "shift": 0, "bits": 16}, {"name": "wake", "shift": 16, "bits": 8}]},
+            {"name": "fast", "format": "hex"}]}
  ]
 }

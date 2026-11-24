@@ -1,0 +1,5 @@
+boot records: 1 769 2561 1801 1802; start_kind at 2, seg_loaded at 3
+1 segments loaded: stop hook:T_A at 0x7e4c920b; records 1 id 2560 seg2 0xa0602be8 seg3 0x7eebf5e1; registers changed: none
+2 again: stop hook:T_A at 0x7e4c920b; records 0; registers changed: none
+3 flag cleared, T_MF word 0xFFFFFFFF: stop hook:T_A at 0x7e4c920b; records 1 id 2560 seg2 0xffffffff seg3 0x7eebf5e1; registers changed: none
+PASS

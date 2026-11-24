@@ -1,0 +1,9 @@
+sess body kind found  boot_ms  heap_ms   gui_ms    lv_ms  errs build    poweron    first screens
+   1    A cold     1     101      208     1767     2276     0 afe27672 0x00000000 1001 1002 1003 5000
+   2    A kept     2     101      207     1768     2278     0 afe27672 0x00000000 1001 1002 1003 5000
+   3    A cold     1     101      207     1768     2247     0 afe27672 0x00000000 1001 1002 1003 5000
+   4    A cold     1     101      207     1767     2247     0 afe27672 0x00000000 1001 1002 1003 5000
+
+medians of sessions that reached live view (ms): body kind build n gui lv
+A cold afe27672 3 gui 1767 (1767-1768) lv 2247 (2247-2276)
+A kept afe27672 1 gui 1768 (1768-1768) lv 2278 (2278-2278)
