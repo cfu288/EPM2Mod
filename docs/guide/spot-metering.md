@@ -26,8 +26,7 @@ Rows set to **Off** (the default) meter at the centre, as before.
 
 ## Limits
 
-- At the centre, as before: in **All Targets** with no point tapped, in **C-AF+TR**, in movies and in the magnified
-  view.
+- In **All Targets** with no point tapped, the camera meters at the centre, as before.
 - Faces are ignored: with **Face Priority** on, the camera meters at the AF point, not at the face.
 - The row is greyed out in **iAUTO**.
 - The **Spot Metering** row's name is English in every menu language.
