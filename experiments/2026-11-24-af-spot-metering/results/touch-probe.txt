@@ -1,0 +1,147 @@
+## steps: w:500 tf key:MAGNIFY tf key:RIGHT key:RIGHT tf key:UP tf key:MAGNIFY tf
+[tf] TF 0x60515fac af_type(+12)=1 active: en=0 mag=100 x=0 y=0 | request: en=0 mag=100 x=0 y=0 | clip 0x60515E24=0 x=0 y=0
+[key:MAGNIFY] CapThr setMagnifyAfFrame: d0=1 d1=68 a0=12784 (0x602731f0) a1=2124646245 | 7e67f8f2(fn 7e67f899) < 7e6ff8b5(fn 7e6ff833) < 7e67f896(fn 7e67f882) < 7e6ff9cb(fn 7e6ff997) < 7e6ff46c(fn 7e6ff3ed)
+[key:MAGNIFY] api_rec_Set_MagnifyAF_Frame: d0=1 d1=1000 a0=10604 (0x6046296c) a1=1615210784 | 7ea1aab2(fn 7ea1a8e5 "[CapThr]Trigger setMagnifyAfFrame [0x%08x] flg[%d]|CapThr_Th") < 7e67f8f2(fn 7e67f899) < 7e67f896(fn 7e67f882) < 7e6ff9cb(fn 7e6ff997) < 7e6ff46
+[key:MAGNIFY] special frame request (d0 enable, d1 x, a0 y, a1 mag): d0=1 d1=0 a0=0 (0x0) a1=1000 | 7ea1e4b3(fn 7ea1e48c "CapThr_ThroughImage::adjustCoordinates start|CapThr_ThroughI") < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1aab2(fn 7ea1a8e
+[key:MAGNIFY] TakeFcs special_af setter: d0=1 d1=0 a0=0 (0x0) a1=1000 | 7ea1eec6(fn 7ea1ee49 "CapThr_ThroughImage::getModeCoordinates _MovieTeleconClipCoo") < 7e59940c(fn 7e5993d4) < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1aab2(fn 7ea1a8e5 "[
+[tf] TF 0x60515fac af_type(+12)=1 active: en=1 mag=1000 x=0 y=0 | request: en=1 mag=1000 x=0 y=0 | clip 0x60515E24=0 x=0 y=0
+[key:RIGHT] CapThr setMagnifyAfFrame: d0=1 d1=3 a0=12784 (0x602731f0) a1=2124646245 | 7e6ff46c(fn 7e6ff3ed) < 7e9670f5(fn 7e9670e9) < 7ea200cf(fn 7ea20033 "CapThr_ThroughImage::setModeCoordinates _MovieTeleconClipCoo") < 7ea1fc91(fn 7ea1fc77) < 7ea19dd5(fn 7ea
+[key:RIGHT] api_rec_Set_MagnifyAF_Frame: d0=1 d1=1000 a0=13648 (0x600c3550) a1=1611412724 | 7ea1b007(fn 7ea1a8e5 "[CapThr]Trigger setMagnifyAfFrame [0x%08x] flg[%d]|CapThr_Th") < 7e6ff46c(fn 7e6ff3ed) < 7e9670f5(fn 7e9670e9) < 7ea200cf(fn 7ea20033 "CapThr_Thro
+[key:RIGHT] special frame request (d0 enable, d1 x, a0 y, a1 mag): d0=1 d1=3 a0=0 (0x0) a1=1000 | 7ea1e4b3(fn 7ea1e48c "CapThr_ThroughImage::adjustCoordinates start|CapThr_ThroughI") < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1b007(fn 7ea1a8e5 
+[key:RIGHT] TakeFcs special_af setter: d0=1 d1=3 a0=0 (0x0) a1=1000 | 7ea1eec6(fn 7ea1ee49 "CapThr_ThroughImage::getModeCoordinates _MovieTeleconClipCoo") < 7e59940c(fn 7e5993d4) < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1b007(fn 7ea1a8e5 "[Ca
+[key:RIGHT] CapThr setMagnifyAfFrame: d0=1 d1=3 a0=12784 (0x602731f0) a1=2124646245 | 7e6ff46c(fn 7e6ff3ed) < 7e9670f5(fn 7e9670e9) < 7ea200cf(fn 7ea20033 "CapThr_ThroughImage::setModeCoordinates _MovieTeleconClipCoo") < 7ea1fc91(fn 7ea1fc77) < 7ea19dd5(fn 7ea
+[key:RIGHT] api_rec_Set_MagnifyAF_Frame: d0=1 d1=1000 a0=13648 (0x600c3550) a1=1611412724 | 7ea1b007(fn 7ea1a8e5 "[CapThr]Trigger setMagnifyAfFrame [0x%08x] flg[%d]|CapThr_Th") < 7e6ff46c(fn 7e6ff3ed) < 7e9670f5(fn 7e9670e9) < 7ea200cf(fn 7ea20033 "CapThr_Thro
+[key:RIGHT] special frame request (d0 enable, d1 x, a0 y, a1 mag): d0=1 d1=7 a0=0 (0x0) a1=1000 | 7ea1e4b3(fn 7ea1e48c "CapThr_ThroughImage::adjustCoordinates start|CapThr_ThroughI") < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1b007(fn 7ea1a8e5 
+[key:RIGHT] TakeFcs special_af setter: d0=1 d1=7 a0=0 (0x0) a1=1000 | 7ea1eec6(fn 7ea1ee49 "CapThr_ThroughImage::getModeCoordinates _MovieTeleconClipCoo") < 7e59940c(fn 7e5993d4) < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1b007(fn 7ea1a8e5 "[Ca
+[tf] TF 0x60515fac af_type(+12)=1 active: en=1 mag=1000 x=7 y=0 | request: en=1 mag=1000 x=7 y=0 | clip 0x60515E24=0 x=0 y=0
+[key:UP] CapThr setMagnifyAfFrame: d0=1 d1=0 a0=12784 (0x602731f0) a1=2124646245 | 7e6ff46c(fn 7e6ff3ed) < 7e9670f5(fn 7e9670e9) < 7ea200cf(fn 7ea20033 "CapThr_ThroughImage::setModeCoordinates _MovieTeleconClipCoo") < 7ea1fd56(fn 7ea1fd3c) < 7ea19dd5(fn 7ea19d
+[key:UP] api_rec_Set_MagnifyAF_Frame: d0=1 d1=1000 a0=13648 (0x600c3550) a1=1611412724 | 7ea1b007(fn 7ea1a8e5 "[CapThr]Trigger setMagnifyAfFrame [0x%08x] flg[%d]|CapThr_Th") < 7e6ff46c(fn 7e6ff3ed) < 7e9670f5(fn 7e9670e9) < 7ea200cf(fn 7ea20033 "CapThr_Through
+[key:UP] special frame request (d0 enable, d1 x, a0 y, a1 mag): d0=1 d1=7 a0=-6 (0xfffffffa) a1=1000 | 7ea1e4b3(fn 7ea1e48c "CapThr_ThroughImage::adjustCoordinates start|CapThr_ThroughI") < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1b007(fn 7ea1
+[key:UP] TakeFcs special_af setter: d0=1 d1=7 a0=-6 (0xfffffffa) a1=1000 | 7ea1eec6(fn 7ea1ee49 "CapThr_ThroughImage::getModeCoordinates _MovieTeleconClipCoo") < 7e59940c(fn 7e5993d4) < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1b007(fn 7ea1a8e5
+[tf] TF 0x60515fac af_type(+12)=1 active: en=1 mag=1000 x=7 y=-6 | request: en=1 mag=1000 x=7 y=-6 | clip 0x60515E24=0 x=0 y=0
+[key:MAGNIFY] CapThr setMagnifyAfFrame: d0=0 d1=3844 a0=12784 (0x602731f0) a1=2124646245 | 7e9676cf(fn 7e9676bd) < 7eba7316(fn 7eba7308) < 7eba6d32(fn 7eba6ce5) < 7eba66ea(fn 7eba66d4) < 7e99a61c(fn 7e99a50a "TRA RES [0x%08X] << [%d]%s|TRA RES [0x%08X] << [%d]
+[key:MAGNIFY] api_rec_Set_MagnifyAF_Frame: d0=0 d1=0 a0=10600 (0x60462968) a1=2126698990 | 7ea1ac3d(fn 7ea1a8e5 "[CapThr]Trigger setMagnifyAfFrame [0x%08x] flg[%d]|CapThr_Th") < 7e9676cf(fn 7e9676bd) < 7eba7316(fn 7eba7308) < 7eba6d32(fn 7eba6ce5) < 7e99a61c(f
+[key:MAGNIFY] special frame request (d0 enable, d1 x, a0 y, a1 mag): d0=0 d1=0 a0=0 (0x0) a1=0 | 7ea19d0c(fn 7ea19cd2 "[%s]ln.%d isThroughCtrlExecuting() return %d\n|CapThr_Throug") < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1ac3d(fn 7ea1a8e5 "
+[key:MAGNIFY] TakeFcs special_af setter: d0=0 d1=0 a0=0 (0x0) a1=0 | 7e59940c(fn 7e5993d4) < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1ac3d(fn 7ea1a8e5 "[CapThr]Trigger setMagnifyAfFrame [0x%08x] flg[%d]|CapThr_Th") < 7e9676cf(fn 7e9676bd) < 7e
+[tf] TF 0x60515fac af_type(+12)=1 active: en=0 mag=100 x=0 y=0 | request: en=0 mag=100 x=0 y=0 | clip 0x60515E24=0 x=0 y=0
+done at lab ms 4600 | firmware errors 2
+## steps: w:300 touch:600:100 key:MAGNIFY tf tag:88b2 tag:84d1
+[key:MAGNIFY] touch (600, 100) injected, ctx 0x600c3704
+[key:MAGNIFY] gui touchStartZoomFrame/touchTargetAf: d0=0 d1=0 a0=-15825 (0x7ecdc22f) a1=1611413252 | 7ecdf598(fn 7ecdf538 " func add = |end event-func\n") < 7ece640e(fn 7ece6408) < 7ece2329(fn 7ece2252 "CHILD STATE EXECUTE|STATE EXECUTE|command ShootingCommon
+[key:MAGNIFY] CapThr setMagnifyAfFrame: d0=1 d1=68 a0=12784 (0x602731f0) a1=2124646245 | 7e67f8f2(fn 7e67f899) < 7e6ff8b5(fn 7e6ff833) < 7e67f896(fn 7e67f882) < 7e6ff9cb(fn 7e6ff997) < 7e6ff46c(fn 7e6ff3ed)
+[key:MAGNIFY] api_rec_Set_MagnifyAF_Frame: d0=1 d1=1000 a0=10604 (0x6046296c) a1=1615210784 | 7ea1aab2(fn 7ea1a8e5 "[CapThr]Trigger setMagnifyAfFrame [0x%08x] flg[%d]|CapThr_Th") < 7e67f8f2(fn 7e67f899) < 7e67f896(fn 7e67f882) < 7e6ff9cb(fn 7e6ff997) < 7e6ff46
+[key:MAGNIFY] special frame request (d0 enable, d1 x, a0 y, a1 mag): d0=1 d1=0 a0=0 (0x0) a1=1000 | 7ea1e4b3(fn 7ea1e48c "CapThr_ThroughImage::adjustCoordinates start|CapThr_ThroughI") < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1aab2(fn 7ea1a8e
+[key:MAGNIFY] TakeFcs special_af setter: d0=1 d1=0 a0=0 (0x0) a1=1000 | 7ea1eec6(fn 7ea1ee49 "CapThr_ThroughImage::getModeCoordinates _MovieTeleconClipCoo") < 7e59940c(fn 7e5993d4) < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1aab2(fn 7ea1a8e5 "[
+[key:MAGNIFY] gui moveZoomFrameTouch: d0=0 d1=1 a0=14084 (0x600c3704) a1=1613451528 | 7ecdb36d(fn 7ecdb326 "setZoomStateStartZoomOlyApi") < 7ecdca2c(fn 7ecdca0d "touchStartZoomFrameOlyApi") < 7ecdc26a(fn 7ecdc22f "touchStartZoomFrame|touchTargetAf") < 7ece640e
+[key:MAGNIFY] OlyHfwOpeShoot::moveZoomFrame: d0=9 d1=137 a0=-20316 (0x601ab0a4) a1=1611412872 | 7e96d20e(fn 7e96d205) < 7e96d051(fn 7e96d049) < 7e9cc6ef(fn 7e9cc66d "%1s(%d, %d, %d)") < 7ecdb012(fn 7ecdafd4 "moveZoomFrameTouch|moveZoomFrame|moveZoomFrame ctrlF
+[key:MAGNIFY] CapThr setMagnifyAfFrame: d0=1 d1=9 a0=12784 (0x602731f0) a1=2124646245 | 7e9670f5(fn 7e9670e9) < 7ea19dbf(fn 7ea19d63) < 7ea38772(fn 7ea38765) < 7e97a1f0(fn 7e97a1ca) < 7e98721b(fn 7e98716a "OlyHfwOpeShoot::moveZoomFrame start ctrl = %d, touch =
+[key:MAGNIFY] api_rec_Set_MagnifyAF_Frame: d0=1 d1=1000 a0=13572 (0x600c3504) a1=0 | 7ea1b007(fn 7ea1a8e5 "[CapThr]Trigger setMagnifyAfFrame [0x%08x] flg[%d]|CapThr_Th") < 7e9670f5(fn 7e9670e9) < 7ea19dbf(fn 7ea19d63) < 7ea38772(fn 7ea38765) < 7e97a1f0(fn 7e97
+[key:MAGNIFY] special frame request (d0 enable, d1 x, a0 y, a1 mag): d0=1 d1=70 a0=-59 (0xffffffc5) a1=1000 | 7ea1e546(fn 7ea1e48c "CapThr_ThroughImage::adjustCoordinates start|CapThr_ThroughI") < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1b007(
+[key:MAGNIFY] TakeFcs special_af setter: d0=1 d1=70 a0=-59 (0xffffffc5) a1=1000 | 7ea200cf(fn 7ea20033 "CapThr_ThroughImage::setModeCoordinates _MovieTeleconClipCoo") < 7e59940c(fn 7e5993d4) < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1b007(fn 7
+[tf] TF 0x60515fac af_type(+12)=1 active: en=1 mag=1000 x=70 y=-59 | request: en=1 mag=1000 x=70 y=-59 | clip 0x60515E24=0 x=0 y=0
+[tag:88b2] tag 0x88b2 = 17
+[tag:84d1] tag 0x84d1 = 2
+done at lab ms 2320 | firmware errors 2
+## steps: w:300 touch:0:0 key:MAGNIFY tf tag:88b2 tag:84d1
+[key:MAGNIFY] touch (0, 0) injected, ctx 0x600c3704
+[key:MAGNIFY] gui touchStartZoomFrame/touchTargetAf: d0=0 d1=0 a0=-15825 (0x7ecdc22f) a1=1611413252 | 7ecdf598(fn 7ecdf538 " func add = |end event-func\n") < 7ece640e(fn 7ece6408) < 7ece2329(fn 7ece2252 "CHILD STATE EXECUTE|STATE EXECUTE|command ShootingCommon
+[key:MAGNIFY] CapThr setMagnifyAfFrame: d0=1 d1=68 a0=12784 (0x602731f0) a1=2124646245 | 7e67f8f2(fn 7e67f899) < 7e6ff8b5(fn 7e6ff833) < 7e67f896(fn 7e67f882) < 7e6ff9cb(fn 7e6ff997) < 7e6ff46c(fn 7e6ff3ed)
+[key:MAGNIFY] api_rec_Set_MagnifyAF_Frame: d0=1 d1=1000 a0=10604 (0x6046296c) a1=1615210784 | 7ea1aab2(fn 7ea1a8e5 "[CapThr]Trigger setMagnifyAfFrame [0x%08x] flg[%d]|CapThr_Th") < 7e67f8f2(fn 7e67f899) < 7e67f896(fn 7e67f882) < 7e6ff9cb(fn 7e6ff997) < 7e6ff46
+[key:MAGNIFY] special frame request (d0 enable, d1 x, a0 y, a1 mag): d0=1 d1=0 a0=0 (0x0) a1=1000 | 7ea1e4b3(fn 7ea1e48c "CapThr_ThroughImage::adjustCoordinates start|CapThr_ThroughI") < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1aab2(fn 7ea1a8e
+[key:MAGNIFY] TakeFcs special_af setter: d0=1 d1=0 a0=0 (0x0) a1=1000 | 7ea1eec6(fn 7ea1ee49 "CapThr_ThroughImage::getModeCoordinates _MovieTeleconClipCoo") < 7e59940c(fn 7e5993d4) < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1aab2(fn 7ea1a8e5 "[
+[key:MAGNIFY] gui moveZoomFrameTouch: d0=0 d1=1 a0=14084 (0x600c3704) a1=1613451528 | 7ecdb36d(fn 7ecdb326 "setZoomStateStartZoomOlyApi") < 7ecdca2c(fn 7ecdca0d "touchStartZoomFrameOlyApi") < 7ecdc26a(fn 7ecdc22f "touchStartZoomFrame|touchTargetAf") < 7ece640e
+[key:MAGNIFY] OlyHfwOpeShoot::moveZoomFrame: d0=9 d1=137 a0=-20316 (0x601ab0a4) a1=1611412872 | 7e96d20e(fn 7e96d205) < 7e96d051(fn 7e96d049) < 7e9cc6ef(fn 7e9cc66d "%1s(%d, %d, %d)") < 7ecdb012(fn 7ecdafd4 "moveZoomFrameTouch|moveZoomFrame|moveZoomFrame ctrlF
+[key:MAGNIFY] CapThr setMagnifyAfFrame: d0=1 d1=9 a0=12784 (0x602731f0) a1=2124646245 | 7e9670f5(fn 7e9670e9) < 7ea19dbf(fn 7ea19d63) < 7ea38772(fn 7ea38765) < 7e97a1f0(fn 7e97a1ca) < 7e98721b(fn 7e98716a "OlyHfwOpeShoot::moveZoomFrame start ctrl = %d, touch =
+[key:MAGNIFY] api_rec_Set_MagnifyAF_Frame: d0=1 d1=1000 a0=13572 (0x600c3504) a1=0 | 7ea1b007(fn 7ea1a8e5 "[CapThr]Trigger setMagnifyAfFrame [0x%08x] flg[%d]|CapThr_Th") < 7e9670f5(fn 7e9670e9) < 7ea19dbf(fn 7ea19d63) < 7ea38772(fn 7ea38765) < 7e97a1f0(fn 7e97
+[key:MAGNIFY] special frame request (d0 enable, d1 x, a0 y, a1 mag): d0=1 d1=-70 a0=-70 (0xffffffba) a1=1000 | 7ea1e546(fn 7ea1e48c "CapThr_ThroughImage::adjustCoordinates start|CapThr_ThroughI") < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1b007
+[key:MAGNIFY] TakeFcs special_af setter: d0=1 d1=-70 a0=-70 (0xffffffba) a1=1000 | 7ea200cf(fn 7ea20033 "CapThr_ThroughImage::setModeCoordinates _MovieTeleconClipCoo") < 7e59940c(fn 7e5993d4) < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1b007(fn 
+[tf] TF 0x60515fac af_type(+12)=1 active: en=1 mag=1000 x=-70 y=-70 | request: en=1 mag=1000 x=-70 y=-70 | clip 0x60515E24=0 x=0 y=0
+[tag:88b2] tag 0x88b2 = 17
+[tag:84d1] tag 0x84d1 = 2
+done at lab ms 2320 | firmware errors 2
+## steps: w:300 touch:719:479 key:MAGNIFY tf tag:88b2 tag:84d1
+[key:MAGNIFY] touch (719, 479) injected, ctx 0x600c3704
+[key:MAGNIFY] gui touchStartZoomFrame/touchTargetAf: d0=0 d1=0 a0=-15825 (0x7ecdc22f) a1=1611413252 | 7ecdf598(fn 7ecdf538 " func add = |end event-func\n") < 7ece640e(fn 7ece6408) < 7ece2329(fn 7ece2252 "CHILD STATE EXECUTE|STATE EXECUTE|command ShootingCommon
+[key:MAGNIFY] CapThr setMagnifyAfFrame: d0=1 d1=68 a0=12784 (0x602731f0) a1=2124646245 | 7e67f8f2(fn 7e67f899) < 7e6ff8b5(fn 7e6ff833) < 7e67f896(fn 7e67f882) < 7e6ff9cb(fn 7e6ff997) < 7e6ff46c(fn 7e6ff3ed)
+[key:MAGNIFY] api_rec_Set_MagnifyAF_Frame: d0=1 d1=1000 a0=10604 (0x6046296c) a1=1615210784 | 7ea1aab2(fn 7ea1a8e5 "[CapThr]Trigger setMagnifyAfFrame [0x%08x] flg[%d]|CapThr_Th") < 7e67f8f2(fn 7e67f899) < 7e67f896(fn 7e67f882) < 7e6ff9cb(fn 7e6ff997) < 7e6ff46
+[key:MAGNIFY] special frame request (d0 enable, d1 x, a0 y, a1 mag): d0=1 d1=0 a0=0 (0x0) a1=1000 | 7ea1e4b3(fn 7ea1e48c "CapThr_ThroughImage::adjustCoordinates start|CapThr_ThroughI") < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1aab2(fn 7ea1a8e
+[key:MAGNIFY] TakeFcs special_af setter: d0=1 d1=0 a0=0 (0x0) a1=1000 | 7ea1eec6(fn 7ea1ee49 "CapThr_ThroughImage::getModeCoordinates _MovieTeleconClipCoo") < 7e59940c(fn 7e5993d4) < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1aab2(fn 7ea1a8e5 "[
+[key:MAGNIFY] gui moveZoomFrameTouch: d0=0 d1=1 a0=14084 (0x600c3704) a1=1613451528 | 7ecdb36d(fn 7ecdb326 "setZoomStateStartZoomOlyApi") < 7ecdca2c(fn 7ecdca0d "touchStartZoomFrameOlyApi") < 7ecdc26a(fn 7ecdc22f "touchStartZoomFrame|touchTargetAf") < 7ece640e
+[key:MAGNIFY] OlyHfwOpeShoot::moveZoomFrame: d0=9 d1=137 a0=-20316 (0x601ab0a4) a1=1611412872 | 7e96d20e(fn 7e96d205) < 7e96d051(fn 7e96d049) < 7e9cc6ef(fn 7e9cc66d "%1s(%d, %d, %d)") < 7ecdb012(fn 7ecdafd4 "moveZoomFrameTouch|moveZoomFrame|moveZoomFrame ctrlF
+[key:MAGNIFY] CapThr setMagnifyAfFrame: d0=1 d1=9 a0=12784 (0x602731f0) a1=2124646245 | 7e9670f5(fn 7e9670e9) < 7ea19dbf(fn 7ea19d63) < 7ea38772(fn 7ea38765) < 7e97a1f0(fn 7e97a1ca) < 7e98721b(fn 7e98716a "OlyHfwOpeShoot::moveZoomFrame start ctrl = %d, touch =
+[key:MAGNIFY] api_rec_Set_MagnifyAF_Frame: d0=1 d1=1000 a0=13572 (0x600c3504) a1=0 | 7ea1b007(fn 7ea1a8e5 "[CapThr]Trigger setMagnifyAfFrame [0x%08x] flg[%d]|CapThr_Th") < 7e9670f5(fn 7e9670e9) < 7ea19dbf(fn 7ea19d63) < 7ea38772(fn 7ea38765) < 7e97a1f0(fn 7e97
+[key:MAGNIFY] special frame request (d0 enable, d1 x, a0 y, a1 mag): d0=1 d1=70 a0=70 (0x46) a1=1000 | 7ea1e546(fn 7ea1e48c "CapThr_ThroughImage::adjustCoordinates start|CapThr_ThroughI") < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1b007(fn 7ea1
+[key:MAGNIFY] TakeFcs special_af setter: d0=1 d1=70 a0=70 (0x46) a1=1000 | 7ea200cf(fn 7ea20033 "CapThr_ThroughImage::setModeCoordinates _MovieTeleconClipCoo") < 7e59940c(fn 7e5993d4) < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1b007(fn 7ea1a8e5
+[tf] TF 0x60515fac af_type(+12)=1 active: en=1 mag=1000 x=70 y=70 | request: en=1 mag=1000 x=70 y=70 | clip 0x60515E24=0 x=0 y=0
+[tag:88b2] tag 0x88b2 = 17
+[tag:84d1] tag 0x84d1 = 2
+done at lab ms 2320 | firmware errors 2
+## steps: w:300 touch:0:479 key:MAGNIFY tf tag:88b2 tag:84d1
+[key:MAGNIFY] touch (0, 479) injected, ctx 0x600c3704
+[key:MAGNIFY] gui touchStartZoomFrame/touchTargetAf: d0=0 d1=0 a0=-15825 (0x7ecdc22f) a1=1611413252 | 7ecdf598(fn 7ecdf538 " func add = |end event-func\n") < 7ece640e(fn 7ece6408) < 7ece2329(fn 7ece2252 "CHILD STATE EXECUTE|STATE EXECUTE|command ShootingCommon
+[key:MAGNIFY] CapThr setMagnifyAfFrame: d0=1 d1=68 a0=12784 (0x602731f0) a1=2124646245 | 7e67f8f2(fn 7e67f899) < 7e6ff8b5(fn 7e6ff833) < 7e67f896(fn 7e67f882) < 7e6ff9cb(fn 7e6ff997) < 7e6ff46c(fn 7e6ff3ed)
+[key:MAGNIFY] api_rec_Set_MagnifyAF_Frame: d0=1 d1=1000 a0=10604 (0x6046296c) a1=1615210784 | 7ea1aab2(fn 7ea1a8e5 "[CapThr]Trigger setMagnifyAfFrame [0x%08x] flg[%d]|CapThr_Th") < 7e67f8f2(fn 7e67f899) < 7e67f896(fn 7e67f882) < 7e6ff9cb(fn 7e6ff997) < 7e6ff46
+[key:MAGNIFY] special frame request (d0 enable, d1 x, a0 y, a1 mag): d0=1 d1=0 a0=0 (0x0) a1=1000 | 7ea1e4b3(fn 7ea1e48c "CapThr_ThroughImage::adjustCoordinates start|CapThr_ThroughI") < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1aab2(fn 7ea1a8e
+[key:MAGNIFY] TakeFcs special_af setter: d0=1 d1=0 a0=0 (0x0) a1=1000 | 7ea1eec6(fn 7ea1ee49 "CapThr_ThroughImage::getModeCoordinates _MovieTeleconClipCoo") < 7e59940c(fn 7e5993d4) < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1aab2(fn 7ea1a8e5 "[
+[key:MAGNIFY] gui moveZoomFrameTouch: d0=0 d1=1 a0=14084 (0x600c3704) a1=1613451528 | 7ecdb36d(fn 7ecdb326 "setZoomStateStartZoomOlyApi") < 7ecdca2c(fn 7ecdca0d "touchStartZoomFrameOlyApi") < 7ecdc26a(fn 7ecdc22f "touchStartZoomFrame|touchTargetAf") < 7ece640e
+[key:MAGNIFY] OlyHfwOpeShoot::moveZoomFrame: d0=9 d1=137 a0=-20316 (0x601ab0a4) a1=1611412872 | 7e96d20e(fn 7e96d205) < 7e96d051(fn 7e96d049) < 7e9cc6ef(fn 7e9cc66d "%1s(%d, %d, %d)") < 7ecdb012(fn 7ecdafd4 "moveZoomFrameTouch|moveZoomFrame|moveZoomFrame ctrlF
+[key:MAGNIFY] CapThr setMagnifyAfFrame: d0=1 d1=9 a0=12784 (0x602731f0) a1=2124646245 | 7e9670f5(fn 7e9670e9) < 7ea19dbf(fn 7ea19d63) < 7ea38772(fn 7ea38765) < 7e97a1f0(fn 7e97a1ca) < 7e98721b(fn 7e98716a "OlyHfwOpeShoot::moveZoomFrame start ctrl = %d, touch =
+[key:MAGNIFY] api_rec_Set_MagnifyAF_Frame: d0=1 d1=1000 a0=13572 (0x600c3504) a1=0 | 7ea1b007(fn 7ea1a8e5 "[CapThr]Trigger setMagnifyAfFrame [0x%08x] flg[%d]|CapThr_Th") < 7e9670f5(fn 7e9670e9) < 7ea19dbf(fn 7ea19d63) < 7ea38772(fn 7ea38765) < 7e97a1f0(fn 7e97
+[key:MAGNIFY] special frame request (d0 enable, d1 x, a0 y, a1 mag): d0=1 d1=-70 a0=70 (0x46) a1=1000 | 7ea1e546(fn 7ea1e48c "CapThr_ThroughImage::adjustCoordinates start|CapThr_ThroughI") < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1b007(fn 7ea
+[key:MAGNIFY] TakeFcs special_af setter: d0=1 d1=-70 a0=70 (0x46) a1=1000 | 7ea200cf(fn 7ea20033 "CapThr_ThroughImage::setModeCoordinates _MovieTeleconClipCoo") < 7e59940c(fn 7e5993d4) < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1b007(fn 7ea1a8e
+[tf] TF 0x60515fac af_type(+12)=1 active: en=1 mag=1000 x=-70 y=70 | request: en=1 mag=1000 x=-70 y=70 | clip 0x60515E24=0 x=0 y=0
+[tag:88b2] tag 0x88b2 = 17
+[tag:84d1] tag 0x84d1 = 2
+done at lab ms 2320 | firmware errors 2
+## steps: w:300 touch:719:0 key:MAGNIFY tf tag:88b2 tag:84d1
+[key:MAGNIFY] touch (719, 0) injected, ctx 0x600c3704
+[key:MAGNIFY] gui touchStartZoomFrame/touchTargetAf: d0=0 d1=0 a0=-15825 (0x7ecdc22f) a1=1611413252 | 7ecdf598(fn 7ecdf538 " func add = |end event-func\n") < 7ece640e(fn 7ece6408) < 7ece2329(fn 7ece2252 "CHILD STATE EXECUTE|STATE EXECUTE|command ShootingCommon
+[key:MAGNIFY] CapThr setMagnifyAfFrame: d0=1 d1=68 a0=12784 (0x602731f0) a1=2124646245 | 7e67f8f2(fn 7e67f899) < 7e6ff8b5(fn 7e6ff833) < 7e67f896(fn 7e67f882) < 7e6ff9cb(fn 7e6ff997) < 7e6ff46c(fn 7e6ff3ed)
+[key:MAGNIFY] api_rec_Set_MagnifyAF_Frame: d0=1 d1=1000 a0=10604 (0x6046296c) a1=1615210784 | 7ea1aab2(fn 7ea1a8e5 "[CapThr]Trigger setMagnifyAfFrame [0x%08x] flg[%d]|CapThr_Th") < 7e67f8f2(fn 7e67f899) < 7e67f896(fn 7e67f882) < 7e6ff9cb(fn 7e6ff997) < 7e6ff46
+[key:MAGNIFY] special frame request (d0 enable, d1 x, a0 y, a1 mag): d0=1 d1=0 a0=0 (0x0) a1=1000 | 7ea1e4b3(fn 7ea1e48c "CapThr_ThroughImage::adjustCoordinates start|CapThr_ThroughI") < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1aab2(fn 7ea1a8e
+[key:MAGNIFY] TakeFcs special_af setter: d0=1 d1=0 a0=0 (0x0) a1=1000 | 7ea1eec6(fn 7ea1ee49 "CapThr_ThroughImage::getModeCoordinates _MovieTeleconClipCoo") < 7e59940c(fn 7e5993d4) < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1aab2(fn 7ea1a8e5 "[
+[key:MAGNIFY] gui moveZoomFrameTouch: d0=0 d1=1 a0=14084 (0x600c3704) a1=1613451528 | 7ecdb36d(fn 7ecdb326 "setZoomStateStartZoomOlyApi") < 7ecdca2c(fn 7ecdca0d "touchStartZoomFrameOlyApi") < 7ecdc26a(fn 7ecdc22f "touchStartZoomFrame|touchTargetAf") < 7ece640e
+[key:MAGNIFY] OlyHfwOpeShoot::moveZoomFrame: d0=9 d1=137 a0=-20316 (0x601ab0a4) a1=1611412872 | 7e96d20e(fn 7e96d205) < 7e96d051(fn 7e96d049) < 7e9cc6ef(fn 7e9cc66d "%1s(%d, %d, %d)") < 7ecdb012(fn 7ecdafd4 "moveZoomFrameTouch|moveZoomFrame|moveZoomFrame ctrlF
+[key:MAGNIFY] CapThr setMagnifyAfFrame: d0=1 d1=9 a0=12784 (0x602731f0) a1=2124646245 | 7e9670f5(fn 7e9670e9) < 7ea19dbf(fn 7ea19d63) < 7ea38772(fn 7ea38765) < 7e97a1f0(fn 7e97a1ca) < 7e98721b(fn 7e98716a "OlyHfwOpeShoot::moveZoomFrame start ctrl = %d, touch =
+[key:MAGNIFY] api_rec_Set_MagnifyAF_Frame: d0=1 d1=1000 a0=13572 (0x600c3504) a1=0 | 7ea1b007(fn 7ea1a8e5 "[CapThr]Trigger setMagnifyAfFrame [0x%08x] flg[%d]|CapThr_Th") < 7e9670f5(fn 7e9670e9) < 7ea19dbf(fn 7ea19d63) < 7ea38772(fn 7ea38765) < 7e97a1f0(fn 7e97
+[key:MAGNIFY] special frame request (d0 enable, d1 x, a0 y, a1 mag): d0=1 d1=70 a0=-70 (0xffffffba) a1=1000 | 7ea1e546(fn 7ea1e48c "CapThr_ThroughImage::adjustCoordinates start|CapThr_ThroughI") < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1b007(
+[key:MAGNIFY] TakeFcs special_af setter: d0=1 d1=70 a0=-70 (0xffffffba) a1=1000 | 7ea200cf(fn 7ea20033 "CapThr_ThroughImage::setModeCoordinates _MovieTeleconClipCoo") < 7e59940c(fn 7e5993d4) < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1b007(fn 7
+[tf] TF 0x60515fac af_type(+12)=1 active: en=1 mag=1000 x=70 y=-70 | request: en=1 mag=1000 x=70 y=-70 | clip 0x60515E24=0 x=0 y=0
+[tag:88b2] tag 0x88b2 = 17
+[tag:84d1] tag 0x84d1 = 2
+done at lab ms 2320 | firmware errors 2
+## steps: w:300 touch:360:240 key:MAGNIFY tf tag:88b2 tag:84d1
+[key:MAGNIFY] touch (360, 240) injected, ctx 0x600c3704
+[key:MAGNIFY] gui touchStartZoomFrame/touchTargetAf: d0=0 d1=0 a0=-15825 (0x7ecdc22f) a1=1611413252 | 7ecdf598(fn 7ecdf538 " func add = |end event-func\n") < 7ece640e(fn 7ece6408) < 7ece2329(fn 7ece2252 "CHILD STATE EXECUTE|STATE EXECUTE|command ShootingCommon
+[key:MAGNIFY] CapThr setMagnifyAfFrame: d0=1 d1=68 a0=12784 (0x602731f0) a1=2124646245 | 7e67f8f2(fn 7e67f899) < 7e6ff8b5(fn 7e6ff833) < 7e67f896(fn 7e67f882) < 7e6ff9cb(fn 7e6ff997) < 7e6ff46c(fn 7e6ff3ed)
+[key:MAGNIFY] api_rec_Set_MagnifyAF_Frame: d0=1 d1=1000 a0=10604 (0x6046296c) a1=1615210784 | 7ea1aab2(fn 7ea1a8e5 "[CapThr]Trigger setMagnifyAfFrame [0x%08x] flg[%d]|CapThr_Th") < 7e67f8f2(fn 7e67f899) < 7e67f896(fn 7e67f882) < 7e6ff9cb(fn 7e6ff997) < 7e6ff46
+[key:MAGNIFY] special frame request (d0 enable, d1 x, a0 y, a1 mag): d0=1 d1=0 a0=0 (0x0) a1=1000 | 7ea1e4b3(fn 7ea1e48c "CapThr_ThroughImage::adjustCoordinates start|CapThr_ThroughI") < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1aab2(fn 7ea1a8e
+[key:MAGNIFY] TakeFcs special_af setter: d0=1 d1=0 a0=0 (0x0) a1=1000 | 7ea1eec6(fn 7ea1ee49 "CapThr_ThroughImage::getModeCoordinates _MovieTeleconClipCoo") < 7e59940c(fn 7e5993d4) < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1aab2(fn 7ea1a8e5 "[
+[key:MAGNIFY] gui moveZoomFrameTouch: d0=0 d1=1 a0=14084 (0x600c3704) a1=1613451528 | 7ecdb36d(fn 7ecdb326 "setZoomStateStartZoomOlyApi") < 7ecdca2c(fn 7ecdca0d "touchStartZoomFrameOlyApi") < 7ecdc26a(fn 7ecdc22f "touchStartZoomFrame|touchTargetAf") < 7ece640e
+[key:MAGNIFY] OlyHfwOpeShoot::moveZoomFrame: d0=9 d1=137 a0=-20316 (0x601ab0a4) a1=1611412872 | 7e96d20e(fn 7e96d205) < 7e96d051(fn 7e96d049) < 7e9cc6ef(fn 7e9cc66d "%1s(%d, %d, %d)") < 7ecdb012(fn 7ecdafd4 "moveZoomFrameTouch|moveZoomFrame|moveZoomFrame ctrlF
+[key:MAGNIFY] CapThr setMagnifyAfFrame: d0=1 d1=9 a0=12784 (0x602731f0) a1=2124646245 | 7e9670f5(fn 7e9670e9) < 7ea19dbf(fn 7ea19d63) < 7ea38772(fn 7ea38765) < 7e97a1f0(fn 7e97a1ca) < 7e98721b(fn 7e98716a "OlyHfwOpeShoot::moveZoomFrame start ctrl = %d, touch =
+[key:MAGNIFY] api_rec_Set_MagnifyAF_Frame: d0=1 d1=1000 a0=13572 (0x600c3504) a1=1611412648 | 7ea1b007(fn 7ea1a8e5 "[CapThr]Trigger setMagnifyAfFrame [0x%08x] flg[%d]|CapThr_Th") < 7e9670f5(fn 7e9670e9) < 7ea19dbf(fn 7ea19d63) < 7ea38772(fn 7ea38765) < 7e97a1f
+[key:MAGNIFY] special frame request (d0 enable, d1 x, a0 y, a1 mag): d0=1 d1=0 a0=0 (0x0) a1=1000 | 7ea1e4b3(fn 7ea1e48c "CapThr_ThroughImage::adjustCoordinates start|CapThr_ThroughI") < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1b007(fn 7ea1a8e
+[key:MAGNIFY] TakeFcs special_af setter: d0=1 d1=0 a0=0 (0x0) a1=1000 | 7ea1eec6(fn 7ea1ee49 "CapThr_ThroughImage::getModeCoordinates _MovieTeleconClipCoo") < 7e59940c(fn 7e5993d4) < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1b007(fn 7ea1a8e5 "[
+[tf] TF 0x60515fac af_type(+12)=1 active: en=1 mag=1000 x=0 y=0 | request: en=1 mag=1000 x=0 y=0 | clip 0x60515E24=0 x=0 y=0
+[tag:88b2] tag 0x88b2 = 17
+[tag:84d1] tag 0x84d1 = 2
+done at lab ms 2320 | firmware errors 2
+## steps: w:300 touch:600:100:tap key:MAGNIFY tf tag:88b2 tag:84d1
+[key:MAGNIFY] touch (600, 100) tap injected, ctx 0x600c3704
+[key:MAGNIFY] gui touchStartZoomFrame/touchTargetAf: d0=0 d1=0 a0=-15825 (0x7ecdc22f) a1=1611413252 | 7ecdf598(fn 7ecdf538 " func add = |end event-func\n") < 7ece640e(fn 7ece6408) < 7ece2329(fn 7ece2252 "CHILD STATE EXECUTE|STATE EXECUTE|command ShootingCommon
+[key:MAGNIFY] CapThr setMagnifyAfFrame: d0=1 d1=68 a0=12784 (0x602731f0) a1=2124646245 | 7e67f8f2(fn 7e67f899) < 7e6ff8b5(fn 7e6ff833) < 7e67f896(fn 7e67f882) < 7e6ff9cb(fn 7e6ff997) < 7e6ff46c(fn 7e6ff3ed)
+[key:MAGNIFY] api_rec_Set_MagnifyAF_Frame: d0=1 d1=1000 a0=10604 (0x6046296c) a1=1615210784 | 7ea1aab2(fn 7ea1a8e5 "[CapThr]Trigger setMagnifyAfFrame [0x%08x] flg[%d]|CapThr_Th") < 7e67f8f2(fn 7e67f899) < 7e67f896(fn 7e67f882) < 7e6ff9cb(fn 7e6ff997) < 7e6ff46
+[key:MAGNIFY] special frame request (d0 enable, d1 x, a0 y, a1 mag): d0=1 d1=0 a0=0 (0x0) a1=1000 | 7ea1e4b3(fn 7ea1e48c "CapThr_ThroughImage::adjustCoordinates start|CapThr_ThroughI") < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1aab2(fn 7ea1a8e
+[key:MAGNIFY] TakeFcs special_af setter: d0=1 d1=0 a0=0 (0x0) a1=1000 | 7ea1eec6(fn 7ea1ee49 "CapThr_ThroughImage::getModeCoordinates _MovieTeleconClipCoo") < 7e59940c(fn 7e5993d4) < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1aab2(fn 7ea1a8e5 "[
+[key:MAGNIFY] gui moveZoomFrameTouch: d0=0 d1=1 a0=14084 (0x600c3704) a1=1613451528 | 7ecdb36d(fn 7ecdb326 "setZoomStateStartZoomOlyApi") < 7ecdca2c(fn 7ecdca0d "touchStartZoomFrameOlyApi") < 7ecdc27e(fn 7ecdc22f "touchStartZoomFrame|touchTargetAf") < 7ece640e
+[key:MAGNIFY] OlyHfwOpeShoot::moveZoomFrame: d0=9 d1=141 a0=-20316 (0x601ab0a4) a1=1611412872 | 7e96d20e(fn 7e96d205) < 7e96d051(fn 7e96d049) < 7e9cc6ef(fn 7e9cc66d "%1s(%d, %d, %d)") < 7ecdb012(fn 7ecdafd4 "moveZoomFrameTouch|moveZoomFrame|moveZoomFrame ctrlF
+[key:MAGNIFY] CapThr setMagnifyAfFrame: d0=1 d1=9 a0=12784 (0x602731f0) a1=2124646245 | 7e9670f5(fn 7e9670e9) < 7ea19dbf(fn 7ea19d63) < 7ea38772(fn 7ea38765) < 7e97a1f0(fn 7e97a1ca) < 7e98721b(fn 7e98716a "OlyHfwOpeShoot::moveZoomFrame start ctrl = %d, touch =
+[key:MAGNIFY] api_rec_Set_MagnifyAF_Frame: d0=1 d1=1000 a0=13572 (0x600c3504) a1=0 | 7ea1b007(fn 7ea1a8e5 "[CapThr]Trigger setMagnifyAfFrame [0x%08x] flg[%d]|CapThr_Th") < 7e9670f5(fn 7e9670e9) < 7ea19dbf(fn 7ea19d63) < 7ea38772(fn 7ea38765) < 7e97a1f0(fn 7e97
+[key:MAGNIFY] special frame request (d0 enable, d1 x, a0 y, a1 mag): d0=1 d1=70 a0=-59 (0xffffffc5) a1=1000 | 7ea1e546(fn 7ea1e48c "CapThr_ThroughImage::adjustCoordinates start|CapThr_ThroughI") < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1b007(
+[key:MAGNIFY] TakeFcs special_af setter: d0=1 d1=70 a0=-59 (0xffffffc5) a1=1000 | 7ea200cf(fn 7ea20033 "CapThr_ThroughImage::setModeCoordinates _MovieTeleconClipCoo") < 7e59940c(fn 7e5993d4) < 7e68ad35(fn 7e68acfe "api_rec_Set_MagnifyAF_Frame") < 7ea1b007(fn 7
+[key:MAGNIFY] OlyHfwOpeShoot::touchTargetAf: d0=0 d1=142 a0=-20316 (0x601ab0a4) a1=1611412908 | 7e9670f5(fn 7e9670e9) < 7ea19dbf(fn 7ea19d63) < 7ea38772(fn 7ea38765) < 7e97a1f0(fn 7e97a1ca) < 7e9670f5(fn 7e9670e9)
+[tf] TF 0x60515fac af_type(+12)=17 active: en=1 mag=1000 x=70 y=-59 | request: en=1 mag=1000 x=70 y=-59 | clip 0x60515E24=0 x=0 y=0
+[tag:88b2] tag 0x88b2 = 17
+[tag:84d1] tag 0x84d1 = 2
+done at lab ms 2320 | firmware errors 2

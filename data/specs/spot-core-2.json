@@ -1,0 +1,34 @@
+{
+ "name": "spot-core-2",
+ "description": "Spot metering at the AF target, exposure part, as the E-M5 II 4.1 does it: with metering Spot, Spot HI or Spot SH (prm 0x80A1 = 1, prm 0x9699 = 0/1/2) and that variant On (settings 593 / 660 / 621 = prm 0x94D1 / 0x9F91 / 0x9821, u8, 0 = Off), no C-AF+TR (prm 0x6761 = 0), the live-view sensor modes HS, HSSC (not its HS3D crop) or MSSC and no clip (magnified) view, the 4x4 spot window of the 18x18 BV grid moves to the special AF frame when it is on (a touch on the screen or the MAGNIFY key's frame: TAKE_FOCUS +54, x/y at +58/+60), else in single-target AF (prm 0x84D1 = 0) to the selected AF target (prm 0x88B2, 0..34); the window is kept inside the grid. Elsewhere, and with the tele-converter map B, it stays at the centre. Code in the exp debug printers (segment 1). See experiments/2026-11-24-af-spot-metering/NOTES.md.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "_symbols": {
+  "CELL": "0X7E69EE80",
+  "GETP": "0X7E69EE97",
+  "GO": "0X7E69EE10",
+  "STUB": "0X7E69ED8B",
+  "TAGS": "0X7E69EEA8"
+ },
+ "_interface": "settings 593 (prm 0x94D1), 660 (prm 0x9F91), 621 (prm 0x9821): MODE bank, u8, ROM and full-reset default 0; 1 = the variant meters at the AF target. data/specs/spot-menu.json gives them the rows of the page Spot Metering",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x27dd6b",
+   "expect": "f86224fcdc13fc7d7e18dd9a77e6ffa028f86226fcdc25fc7d7e18dd8977e6ffa028f84228fcdc37fc7d7edd7977e6ffa028f8622afcdc49fc7d7e18dd6877e6ffa028f8622cfcdc5bfc7d7e18dd5777e6ffa028f8622efcdc6dfc7d7e18dd4677e6ffa028df200892fcdc7ffc7d7e82f1d8dd3277e6ffa028f86208fcdc91fc7d7e18dd2177e6ffa028f8620afcdca0fc7d7e18dd1077e6ffa028f86204fcdcaffc7d7e18ddff76e6ffa028f86206fcdcbefc7d7e18ddee76e6ffa028f86202fcdccdfc7d7e18dddd76e6ffa028f0621618fcdcdcfc7d7eddcc76e6ffa028fa42c800fcdcebfc7d7eddbb76e6ffa02888fcdcfafc7d7eddad76e6ffa028fa42c900fcdc09fd7d7edd9c76e6ffa028fa62ca00fcdc18fd7d7e18dd8a76e6ffa028dfa0",
+   "new": "9297fcccf8a87d7ef1a3c87bfca454725a60a002c571a001c90ddddb3800002008a000c962dd1084eeff0000a000c9572ca180cdd9000004a001c94b2c9996cdcd000004a003c63fe0fcdca8ee697ef480cdbb000004c82f2c6167cdb1000004c925fca0a85f5160f84036a000c9262cd184cd9a000004c90e2cb288cd90000004a023c4325804989ddd4e1cfffff038df7014f8603c1828642dbc03f244fac0b8fcf1e1f8603a1828642dbd03f244fac018fcca2504f2f68505f274f2e1f1e02c8070f244fcc028910000f1e1f1d12c6054f244fac0cc74cd1d000000f1e0f1d4cd140000008512f244f150fac07bffe0f162ca92f2d02d1027f26428fea000c20300a00ec304800edf00001c900004ddda8ddbffc00c1ca000df0004d194919f2198",
+   "_addr": "0X7E69ED8B",
+   "_note": "new code, 291 B of 292 (exp debug printers, segment 1)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x26f900",
+   "expect": "cd4201f038",
+   "new": "dc6be40000",
+   "_addr": "0X7E690920",
+   "_note": "zone builder 0x7E6908CE: `call 0x7E690A62,[d2,d3,a2,a3],56` -> jmp STUB (STUB makes the call and returns with the builder's frame)"
+  }
+ ]
+}

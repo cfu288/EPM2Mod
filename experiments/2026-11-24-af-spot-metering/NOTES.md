@@ -452,3 +452,79 @@ The owner flashed `spot-af` (sha256 `64421e1b…`) on 2026-11-24. Results as the
 
 So the stub reads the right target for the arrow keys (prm 0x88B2), and a touch does not set prm 0x88B2 to the touched
 point (I, from the result). The next step is to find where a touch stores its point (U in E1).
+
+## Build spot-af-2 (2026-11-24)
+
+Static reading, the full-boot emulator and the function harness. Nothing was flashed. Labels as above.
+
+### Where a touch puts the AF point
+
+| Finding | Label |
+|---|---|
+| A touch does not write prm 0x88B2. Driven through the GUI's touch handler (below), prm 0x88B2 stays 17 for every point | V emulator; agrees with camera run 1 |
+| The GUI's touch handler 0x7ECDC22F ("touchStartZoomFrame", "touchTargetAf") calls touchStartZoomFrameOlyApi 0x7ECDCA0D → moveZoomFrameTouch 0x7ECDAFD4 → OlyApi slot 140, OlyHfwOpeShoot::moveZoomFrame 0x7E98716A (ctrl 9, the touch x, y) → CapThr setMagnifyAfFrame 0x7EA1A8E5 → api_rec_Set_MagnifyAF_Frame 0x7E68ACFE → 0x7E5993D4 → the TAKE_FOCUS setter 0x7E59356C. A tap event (id 0x2000011) also calls touchTargetAf (slot 220), which starts an AF lock | V emulator (every call seen in this order) |
+| The store is the **special AF frame** of TAKE_FOCUS (TF = *(u32 *)0x60515FA8 = 0x60515FAC): requested +62 on (u8), +64 mag, +66 x, +68 y; active +54 on, +56 mag, +58 x, +60 y (s16). The setter writes the requested set and copies it to the active set when af_type (+12) is 1, 7 or 23; 0x7E592F61 copies it without that test. Off writes on 0, mag 100, x 0, y 0 | V static (0x7E59356C), V emulator |
+| x and y run −100..+100 over the AF frame. Touches at the screen corners gave ±70 with mag 1000 (10x): the frame stays on the screen. (600, 100) gave (70, −59), the centre (0, 0) | V emulator |
+| The AF geometry 0x7E593894 takes, in this order: the AF result frame, the clip (magnified) view (0x7E5871C0, byte 0x60515E24), **the special frame** (+54 on: x = (x + 100) × 319 / 200, y = (y + 100) × 239 / 200 in a 320 × 240 frame), the all-targets mode, the selected target. So the special frame wins over prm 0x88B2 and also works in all-targets AF | V static |
+| The touch frame does not magnify live view: the clip byte stays 0, and the frame is drawn over the normal view (`results/touch-probe.txt`; screenshot not kept). The MAGNIFY key's first press makes the same frame (same calls, x, y moved by the arrow keys); its second press turned the frame off in the emulator (the magnified view itself is not modelled) | V emulator for the frame, U for the magnified view on the camera |
+| After a tap the frame stays on and af_type becomes 17 (the AF lock) | V emulator |
+| The touch panel itself, the touch coordinates of the real panel and the frame sizes the camera offers | U (the emulator has no touch panel: `scripts/touch_probe.mjs` replaces the MAGNIFY key's GUI handler by the touch handler on the same context, with x at +8 and y at +12) |
+
+### What was built
+
+`data/builds/spot-af-2.json`: spot-af with `data/specs/spot-core-2.json` (generator `gen/spot-core/`, now writes `-2`)
+in place of `spot-core.json`. Made with `uv run epm2mod make spot-af-2` (free-space check inside): **sha256
+`86e8fdcaaeb1ff52410981adef1cb576486adcd14318261a8411079cf256a5be`**, `build/spot-af-2.BIN`.
+
+The stub (`gen/spot-core/spot.s`), same hook, 291 B at 0x7E69ED8B–0x7E69EEAE (1 B left of the 292):
+
+1. As spot-af: map B (tele-converter), the sensor modes HS / HSSC without the HS3D crop / MSSC, metering Spot, the
+   variant's setting On, no C-AF+TR. New: no clip (magnified) view, by the AF geometry's own test 0x7E5871C0.
+2. New: when the special frame is on (TF +54), the window goes to its x, y: X = (x + 100) × 3.19, Y = (y + 100) × 2.39
+   in the 640 × 480 AF frame, as the AF geometry maps it. This comes before the AF target mode test, as in the AF
+   geometry and the donor (donor.md section 3: the magnified frame links without af_enable).
+3. Else, as spot-af: single-target AF and k < 35.
+4. The window's top-left cell from a point X, Y: c0 = (3X − 10)/100 − 2, r0 = (4Y − 8.4)/100 − 2 (round(c − 2) with the
+   grid field of E5), each kept in 0..14 so the window stays in the grid. The AF target table of spot-af is replaced by
+   the same arithmetic on the target centres (X = 103 + 72 col, Y = 95 + 72 row); it gives spot-af's 35 windows.
+5. A touch frame cancelled on the camera (on = 0) falls back to the AF target or the centre.
+
+`tools/space-ledger/superseded.tsv`: one row, `spot-core` → `spot-core-2`. `gen/README.md`: the spot-core row names
+`spot-core-2`.
+
+### Debug Log events: not in this build
+
+Asked for: an event when the window changes (source, row/col, AF target, touch x/y) and one when the special frame
+changes, both through log-menu-3's `log_chg` (gates at PST+72 and 0xBE4FD320). Written and assembled: the stub with
+both events is 378 B; with the window event only, about 315 B. The area has 292 B, and spot-af-2 without events needs
+291 B. Segment 1 has no other free code area: the free-space map lists only NEEDS-DECISION areas, and a hook in
+segment 1 must call only kernel or segment-1 code (`docs/dev/feasibility.md`). Ways to get the bytes, each a decision
+for the owner:
+
+| Option | Bytes | What it needs |
+|---|---|---|
+| The exp debug-printer dispatcher 0x7E69E92A–0x7E69E96F | 69 | Its only caller (0x7E69E858, shell command "exp still info") is replaced by nops in `lss-core`, which every build has (V, lss-core.json). `tools/freespace.py` marks it NEEDS-DECISION (operands: that call in stock bytes), so the check needs a rule or a ledger entry for "a call that a spec of the build removes". With it there are 361 B in two parts: the window event fits; the 378-B draft with both events needs 17 B less |
+| pana-ring-probe's code area 0x7E69EC6B–0x7E69ED8B | 288 | Ledgered as current (a debug probe, GitHub issue 3): the two specs could then not be in one build |
+| Reclaim another `exp` shell printer, as auto-iso-min-shutter did | a few hundred | A new space study of the shell's command table |
+
+### Checks
+
+| Check | Result |
+|---|---|
+| `epm2mod make spot-af-2` (free-space check inside) | exit 0, check PASS (0 FAIL) |
+| `tools/checks.py data/builds/spot-af-2.json` (quick tier) | free space, op check (22 specs, 591 byte ops), boot-test, update-path-test: 4 PASS, exit 0 |
+| `emulator/hookcheck.py data/specs/spot-core-2.json` | exit 0: hook segment 1 → segment 1; calls to 0x7E6A2680, 0x7E5871C0, 0x7E690A62 (segment 1) and 0x7E457C75 (kernel) |
+| `emulator/boot-test`, `emulator/update-path-test` on spot-af-2 | PASS, exit 0 |
+| `shotdiff.sh` spot-af against spot-af-2, P state: Custom Menu, E page 1, the Spot Metering row, its page, the three pickers | 0 of 8 differ, exit 0 |
+| Harness `scripts/spot_stub.py` (now on `gen/spot-core/spot.s`) | PASS (`results/spot-stub-2.txt`): 315 AF-target cases (35 k × Spot/HI/SH × HS/HSSC/MSSC) give spot-af's windows; 1,685 special-frame points (−100..+100 every 5 on both axes, the corners, the emulator's points) give the expected window, every point inside the window's centre 2 × 2 unless the window is kept at the grid edge; the special frame wins over k = 0, 0xFFFF and the all-targets mode; the stock centre for: all Off, another variant On, HI/SH value 3, ESP, centre-weighted, C-AF+TR (frame on and off), all targets without the frame, k = 35 / 0xFFFF, the sensor modes HSHR, LSSC, CLIP, 9, 0xFFFF, the HS3D crop, the clip view in HS and MSSC, map B; the bytes equal `spot-core-2.json` and the built image |
+| Touch probe `scripts/touch_probe.mjs` on spot-af-2 (`results/touch-probe.txt`) | The MAGNIFY frame and touches at (600, 100), the four corners, the centre, and a tap: the special frame as in the table above; prm 0x88B2 unchanged |
+
+### Still unknown, for the camera run
+
+1. That a touch on the camera sets the special frame (V in the emulator through the GUI handler; the panel is not
+   modelled) and that the spot then follows it, in live view and in the photo.
+2. The window at the corners: the touch range at 10x reaches the grid edge (windows at rows / columns 0 and 14).
+3. Other frame sizes (mag 300..1400): the window does not depend on mag (V harness); the touch range does (U).
+4. The magnified view after the touch frame: the stub keeps the centre if the sensor mode is CLIP or the clip byte is
+   set (I).
+5. The arrow-key targets: spot-af's windows (V harness), camera-tested in run 1.

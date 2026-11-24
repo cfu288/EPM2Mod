@@ -1,0 +1,45 @@
+stub 291 bytes at 0x7E69ED8B-0x7E69EEAE (free to 0x7E69EEAF: fits)
+1. AF targets: 315 cases (35 k x Spot/HI/SH x HS/HSSC/MSSC) against build spot-af's windows
+2. special frame: 1685 points, 1697 cases; top-left rows 0..14, columns 0..14; 593 points near the edge where the window is kept inside the grid
+   (-100, -100) -> window rows 0-3, columns 0-3 (kept in the grid)
+   ( 100,  100) -> window rows 14-17, columns 14-17 (kept in the grid)
+   ( -70,  -70) -> window rows 0-3, columns 0-3
+   (  70,   70) -> window rows 14-17, columns 14-17
+   (   0,    0) -> window rows 7-10, columns 7-10
+   (  70,  -59) -> window rows 1-4, columns 14-17
+3. special frame (70, -59) with AF target 0 set: ok (asked ['CLIP', 32929, 38553, 38097, 26465])
+3. special frame (70, -59) with all-targets AF mode: ok (asked ['CLIP', 32929, 38553, 38097, 26465])
+3. special frame (70, -59) with k = 0xFFFF: ok (asked ['CLIP', 32929, 38553, 38097, 26465])
+4. keep centre, all off, special frame on: ok (asked ['CLIP', '0x80a1', '0x9699', '0x94d1'])
+4. keep centre, only HI on, Spot used, special frame on: ok (asked ['CLIP', '0x80a1', '0x9699', '0x94d1'])
+4. keep centre, only Spot on, SH used, special frame on: ok (asked ['CLIP', '0x80a1', '0x9699', '0x9821'])
+4. keep centre, HI/SH value 3: ok (asked ['CLIP', '0x80a1', '0x9699'])
+4. keep centre, ESP, special frame on: ok (asked ['CLIP', '0x80a1'])
+4. keep centre, centre-weighted, special frame on: ok (asked ['CLIP', '0x80a1'])
+4. keep centre, C-AF+TR, special frame on: ok (asked ['CLIP', '0x80a1', '0x9699', '0x94d1', '0x6761'])
+4. keep centre, C-AF+TR, special frame off: ok (asked ['CLIP', '0x80a1', '0x9699', '0x94d1', '0x6761'])
+4. keep centre, all targets, special frame off: ok (asked ['CLIP', '0x80a1', '0x9699', '0x94d1', '0x6761', '0x84d1'])
+4. keep centre, k = 35: ok (asked ['CLIP', '0x80a1', '0x9699', '0x94d1', '0x6761', '0x84d1', '0x88b2'])
+4. keep centre, k = 0xFFFF: ok (asked ['CLIP', '0x80a1', '0x9699', '0x94d1', '0x6761', '0x84d1', '0x88b2'])
+4. keep centre, movie HSHR (4), special frame on: ok (asked [])
+4. keep centre, movie HSHR (4), special frame off: ok (asked [])
+4. keep centre, LSSC (3), special frame on: ok (asked [])
+4. keep centre, LSSC (3), special frame off: ok (asked [])
+4. keep centre, CLIP (5), special frame on: ok (asked [])
+4. keep centre, CLIP (5), special frame off: ok (asked [])
+4. keep centre, mode 9, special frame on: ok (asked [])
+4. keep centre, mode 9, special frame off: ok (asked [])
+4. keep centre, MODE_NON 0xFFFF, special frame on: ok (asked [])
+4. keep centre, MODE_NON 0xFFFF, special frame off: ok (asked [])
+4. keep centre, HSSC with the HS3D crop, special frame on: ok (asked ['HS3D'])
+4. keep centre, HSSC with the HS3D crop, special frame off: ok (asked ['HS3D'])
+4. keep centre, clip (magnified) view in HS, special frame on: ok (asked ['CLIP'])
+4. keep centre, clip (magnified) view in HS, special frame off: ok (asked ['CLIP'])
+4. keep centre, clip view in MSSC, special frame on: ok (asked ['CLIP'])
+4. keep centre, clip view in MSSC, special frame off: ok (asked ['CLIP'])
+4. only 0x94D1 on, hisht 0, special frame: moved ok
+4. only 0x9F91 on, hisht 1, special frame: moved ok
+4. only 0x9821 on, hisht 2, special frame: moved ok
+4. variant B (tele-converter map), special frame on: centre ok (asked [])
+data/specs/spot-core-2.json holds these bytes: yes
+PASS
