@@ -435,3 +435,20 @@ row in E shows no value on the right (as ISO-Auto Set). The help text was not se
 6. Movie and the digital tele-converter keep the centre (V harness only).
 7. Which HSSC case is the HS3D crop (0x7E6A2680 = 1) (U).
 8. The help text in a non-English language, and the three rows after power-off on the camera.
+
+## Camera run 1 (2026-11-24)
+
+The owner flashed `spot-af` (sha256 `64421e1b…`) on 2026-11-24. Results as the owner reported them (V camera):
+
+| Check | Result |
+|---|---|
+| Spot row Off, AF target on a bright and on a dark area | The same shutter speed: stock (pass) |
+| Spot On, AF target chosen with the arrow keys | The exposure follows the target (pass) |
+| Spot On, AF point set by a touch on the screen | **Fail.** The spot does not follow the touched point; it meters elsewhere. The owner: "the touch target does not control the spot, which is the biggest use case" |
+| Spot HI, Spot SH | Work |
+| ESP (with a film simulation) | Works |
+| Face priority on | Meters at the AF point, not at the face (pass) |
+| The menu row, the settings after power-off, the bottom-left alignment check | Not reported |
+
+So the stub reads the right target for the arrow keys (prm 0x88B2), and a touch does not set prm 0x88B2 to the touched
+point (I, from the result). The next step is to find where a touch stores its point (U in E1).
