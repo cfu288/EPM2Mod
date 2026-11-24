@@ -22,6 +22,8 @@ uv run python gen/peaking/mkspec_guard.py "$work/peaking-guard"
 uv run python gen/peaking/mkspec_mf.py "$work/peaking-mf"
 uv run python gen/gauge-info/mkspec_gauge_info.py
 uv run python gen/gauge-info/mkspec_gauge_bar_left.py
+uv run python gen/spot-core/mkspec.py "$work/spot-core"
+uv run python gen/spot-menu/mkspec.py
 # last: it reads the film loader's labels from the loader's spec, and the bytes it hooks from the build's other specs
 uv run python gen/log-menu/mkspec.py "$work/log-menu"
 if [ "${1:-}" = "--check" ]; then

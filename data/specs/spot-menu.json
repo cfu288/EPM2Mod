@@ -1,0 +1,135 @@
+{
+ "name": "spot-menu",
+ "description": "Spot metering at the AF target, the menu part: page 594 'Spot Metering', opened by the Custom Menu E row that data/specs/custom-menu-rows-4.json adds, with three On/Off rows: Spot (setting 593, prm 0x94D1), Spot Hilight (660, 0x9F91), Spot Shadow (621, 0x9821); MODE bank, u8, ROM and full-reset default 0 (Off); no stock code reads or writes them, and no mode-controller table but the full reset names them (bank lists, mode presets and restore lists do not: experiments/2026-11-18-look-editor/out/scan.tsv). data/specs/spot-core.json reads them. The rows use the stock texts 171, 106, 107 and the generic list pages 198, 584, 659 with the Off/On items of list 200; the On/Off value records of the settings 446, 448, 449 name the three settings. The title (and the row's label) is text 1494, the row's help 1509: unused built-in EVF texts that data/specs/card-looks-9.json points at the English texts in every menu language. No code. See experiments/2026-11-24-af-spot-metering/NOTES.md, E3, E4 and \"Build spot-af\".",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "_interface": "settings 593 / 660 / 621 = prm 0x94D1 / 0x9F91 / 0x9821 (MODE bank, u8): 0 Off, 1 On",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBCF3DC",
+   "expect": "5202df05be01000002000000070001004c030000",
+   "new": "5202d605510200000200000007000100ab000000",
+   "_addr": "0x7EFF03FC",
+   "_note": "sub-item row of page 594: title 1503, setting 446, text 844 -> title 1494 'Spot Metering', setting 593, text 171"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBCF3F0",
+   "expect": "5202df05bf01000002000000070001004a030000",
+   "new": "5202d6059402000002000000070001006a000000",
+   "_addr": "0x7EFF0410",
+   "_note": "sub-item row of page 594: title 1503, setting 447, text 842 -> title 1494 'Spot Metering', setting 660, text 106"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBCF418",
+   "expect": "5202df05c101000002000000070001004d030000",
+   "new": "5202d6056d02000002000000070001006b000000",
+   "_addr": "0x7EFF0438",
+   "_note": "sub-item row of page 594: title 1503, setting 449, text 845 -> title 1494 'Spot Metering', setting 621, text 107"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xA1BEC4",
+   "expect": "ffc008815810ddd9496cff00004210f80a38f80e18f80208f82a285920dde749",
+   "new": "c6000000510200004802000094020000930200006d0200000000000000000000",
+   "_addr": "0x7EE3CEE4",
+   "_note": "child list of page 594: (list, setting) (198, 593), (584, 660), (659, 621) and a zero entry (segment 3, reclaim-space row 6, after Debug Log's value -> text list)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBDC7F8",
+   "expect": "44a2ff7e",
+   "new": "e4cee37e",
+   "_addr": "0x7EFFD818",
+   "_note": "page record of 594: child list 0x7EFFA244 -> 0x7EE3CEE4"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBEB2DC",
+   "expect": "010102000000000001000000888c007f",
+   "new": "510202000000000001000000c08c007f",
+   "_addr": "0x7F00C2FC",
+   "_note": "list descriptor of 198 (no table names the list): setting 257, 2 items at 0x7F008C88 -> setting 593, the Off/On items 0x7F008CC0 of list 200"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBEACCC",
+   "expect": "ba01020000000000010000008862007f",
+   "new": "940202000000000001000000c08c007f",
+   "_addr": "0x7F00BCEC",
+   "_note": "list descriptor of 584 (no table names the list): setting 442, 2 items at 0x7F006288 -> setting 660, the Off/On items 0x7F008CC0 of list 200"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBEB79C",
+   "expect": "09020200000000000100000054bc007f",
+   "new": "6d0202000000000001000000c08c007f",
+   "_addr": "0x7F00C7BC",
+   "_note": "list descriptor of 659 (no table names the list): setting 521, 2 items at 0x7F00BC54 -> setting 621, the Off/On items 0x7F008CC0 of list 200"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBD3AC0",
+   "expect": "be010000",
+   "new": "51020000",
+   "_addr": "0x7EFF4AE0",
+   "_note": "On/Off value record {setting, value, 2, text}: setting 446 -> 593"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBD3AE0",
+   "expect": "be010000",
+   "new": "51020000",
+   "_addr": "0x7EFF4B00",
+   "_note": "On/Off value record {setting, value, 2, text}: setting 446 -> 593"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBD3B40",
+   "expect": "c0010000",
+   "new": "94020000",
+   "_addr": "0x7EFF4B60",
+   "_note": "On/Off value record {setting, value, 2, text}: setting 448 -> 660"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBD3B60",
+   "expect": "c0010000",
+   "new": "94020000",
+   "_addr": "0x7EFF4B80",
+   "_note": "On/Off value record {setting, value, 2, text}: setting 448 -> 660"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBD3B80",
+   "expect": "c1010000",
+   "new": "6d020000",
+   "_addr": "0x7EFF4BA0",
+   "_note": "On/Off value record {setting, value, 2, text}: setting 449 -> 621"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBD3BA0",
+   "expect": "c1010000",
+   "new": "6d020000",
+   "_addr": "0x7EFF4BC0",
+   "_note": "On/Off value record {setting, value, 2, text}: setting 449 -> 621"
+  }
+ ]
+}

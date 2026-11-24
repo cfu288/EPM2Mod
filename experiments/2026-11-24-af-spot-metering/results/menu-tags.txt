@@ -1,0 +1,16 @@
+Emulator tag reads (experiments/2026-11-24-af-spot-metering/scripts/menu_tagplay.mjs), 2026-11-24.
+Pinned image data/builds/peaking-mf.json, state from emulator/mkstate ... p.
+
+LV-Info toggle (menu-lvinfo-toggle.png): Custom Menu D > Info Settings > LV-Info > Highlight&Shadow > Off -> On > OK
+  tag 0x9161 (20 x u8; byte 0 = info 244 histogram, 1 = 245 Highlight&Shadow, 2 = 246 Image Only)
+  before: 1 0 1 1   after: 1 1 1 1
+
+Probe shared-picker (menu-probe-shared-picker.png; menu_probe_image.py shared-picker): Highlight&Shadow's child entry
+points at list 200 (descriptor setting 244). The picker opens on On (244's value), DOWN wraps to Off, OK:
+  before: 1 0 1 1   after: 0 0 1 1   -> the picker writes its descriptor's setting, not the child entry's.
+
+Probe spot-page (menu-probe-spot-page.png; menu_probe_image.py spot-page): page 594 with rows 606 / 660 / 621
+  start: 0x9681 = 0, 0x9F91 = 0, 0x9821 = 0 (RAM 0x6041316C, 0x6041322D, 0x60413196)
+  Spot Hilight -> On, OK: 0x9681 = 0, 0x9F91 = 1, 0x9821 = 0
+  Spot -> On, OK:         0x9681 = 1, 0x9F91 = 1, 0x9821 = 0
+  next boot from the saved state (twice): 1, 1, 0

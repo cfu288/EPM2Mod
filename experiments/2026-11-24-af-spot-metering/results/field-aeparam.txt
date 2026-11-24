@@ -1,0 +1,27 @@
+
+0x7E697C05: returned d0=0x0, 12012 insns, 1444 pcs, 0 stub calls, 0 writes, 44 mmio
+mode records 0x605A704C (7 bytes each):
+  mode 0: 00 00 01 00 00 01 01
+  mode 1: 00 00 00 00 00 00 00
+  mode 2: 00 00 00 00 00 00 00
+  mode 3: 00 00 00 00 00 00 00
+  mode 4: 00 00 00 00 00 00 00
+  mode 5: 00 00 00 00 00 00 00
+  mode 6: 00 00 01 00 00 01 01
+  mode 7: 00 00 01 00 00 01 01
+ae_param records:
+  HSHR (mode 0) [0] @0x605A7148: hs   128 vs    52 hdiv  18 vdiv  14 hw   60 vw   88 obhs     8 obhw    6 yshift 17 target 0x2  -> field 1080 x 1232 from (128, 52)
+  STILL (mode 7) [0] @0x605A7160: hs   248 vs   150 hdiv  18 vdiv  18 hw  120 vw  180 obhs    14 obhw   12 yshift 17 target 0x7  -> field 2160 x 3240 from (248, 150)
+  HS / HS3D / mode 5 (index 0 = HS, 1 = HS3D) [0] @0x605A7178: hs    82 vs    36 hdiv  18 vdiv  18 hw   80 vw   36 obhs     6 obhw    8 yshift 17 target 0x0  -> field 1440 x 648 from (82, 36)
+  HS / HS3D / mode 5 (index 0 = HS, 1 = HS3D) [1] @0x605A7190: hs   486 vs   260 hdiv  18 vdiv  18 hw   32 vw   10 obhs     6 obhw    8 yshift 17 target 0x0  -> field 576 x 180 from (486, 260)
+  MSSC (mode 3) [0] @0x605A71A8: hs    82 vs    24 hdiv  18 vdiv  18 hw   80 vw   18 obhs     6 obhw    8 yshift 17 target 0x0  -> field 1440 x 324 from (82, 24)
+  LSSC (mode 4) [0] @0x605A71C0: hs    82 vs    26 hdiv  18 vdiv  18 hw   80 vw    8 obhs     6 obhw    8 yshift 17 target 0x0  -> field 1440 x 144 from (82, 26)
+  CLIP (mode 6, index 0..4) [0] @0x605A71D8: hs  1868 vs   178 hdiv  18 vdiv  18 hw   30 vw   44 obhs    14 obhw   10 yshift 17 target 0x0  -> field 540 x 792 from (1868, 178)
+  CLIP (mode 6, index 0..4) [1] @0x605A71F0: hs  1670 vs    66 hdiv  18 vdiv  18 hw   24 vw   34 obhs    14 obhw   12 yshift 17 target 0x0  -> field 432 x 612 from (1670, 66)
+  CLIP (mode 6, index 0..4) [2] @0x605A7208: hs  1814 vs   156 hdiv  18 vdiv  18 hw   16 vw   24 obhs    14 obhw    8 yshift 17 target 0x0  -> field 288 x 432 from (1814, 156)
+  CLIP (mode 6, index 0..4) [3] @0x605A7220: hs  1886 vs   210 hdiv  18 vdiv  18 hw   12 vw   18 obhs    14 obhw    6 yshift 17 target 0x0  -> field 216 x 324 from (1886, 210)
+  CLIP (mode 6, index 0..4) [4] @0x605A7238: hs  1958 vs   264 hdiv  18 vdiv  18 hw    8 vw   12 obhs    14 obhw    4 yshift 17 target 0x0  -> field 144 x 216 from (1958, 264)
+AE grid in the 640x480 AF frame (x0..x1, y0..y1; cell pitch in frame units):
+  HS/HSSC  readout image 1536x691 at (34,15); AE 18x18 blocks of 80x36 at (82,36) -> x 20.0..620.0, y 14.6..464.7; pitch 33.33 x 25.01
+  MSSC     readout image 1536x345 at (34,13); AE 18x18 blocks of 80x18 at (82,24) -> x 20.0..620.0, y 15.3..466.1; pitch 33.33 x 25.04
+  LSSC     readout image 1536x172 at (34,11); AE 18x18 blocks of 80x8 at (82,26) -> x 20.0..620.0, y 41.9..443.7; pitch 33.33 x 22.33

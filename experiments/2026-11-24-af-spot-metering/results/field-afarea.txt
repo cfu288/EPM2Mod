@@ -1,0 +1,102 @@
+area  0 frame (103,95): AF window hs 195 vs 100 hw 173 vw 104, centre (281.5,152.0) model (281.2,151.8) ok; AE cell col 2.49 row 3.22 (NOTES 2.90, 3.56)
+area  1 frame (175,95): AF window hs 368 vs 100 hw 173 vw 104, centre (454.5,152.0) model (454.0,151.8) ok; AE cell col 4.66 row 3.22 (NOTES 4.92, 3.56)
+area  2 frame (247,95): AF window hs 541 vs 100 hw 173 vw 104, centre (627.5,152.0) model (626.8,151.8) ok; AE cell col 6.82 row 3.22 (NOTES 6.95, 3.56)
+area  3 frame (319,95): AF window hs 714 vs 100 hw 173 vw 104, centre (800.5,152.0) model (799.6,151.8) ok; AE cell col 8.98 row 3.22 (NOTES 8.97, 3.56)
+area  4 frame (391,95): AF window hs 886 vs 100 hw 173 vw 104, centre (972.5,152.0) model (972.4,151.8) ok; AE cell col 11.13 row 3.22 (NOTES 11.00, 3.56)
+area  5 frame (463,95): AF window hs 1059 vs 100 hw 173 vw 104, centre (1145.5,152.0) model (1145.2,151.8) ok; AE cell col 13.29 row 3.22 (NOTES 13.02, 3.56)
+area  6 frame (535,95): AF window hs 1232 vs 100 hw 173 vw 104, centre (1318.5,152.0) model (1318.0,151.8) ok; AE cell col 15.46 row 3.22 (NOTES 15.05, 3.56)
+area  7 frame (103,167): AF window hs 195 vs 203 hw 173 vw 104, centre (281.5,255.0) model (281.2,255.4) ok; AE cell col 2.49 row 6.08 (NOTES 2.90, 6.26)
+area  8 frame (175,167): AF window hs 368 vs 203 hw 173 vw 104, centre (454.5,255.0) model (454.0,255.4) ok; AE cell col 4.66 row 6.08 (NOTES 4.92, 6.26)
+area  9 frame (247,167): AF window hs 541 vs 203 hw 173 vw 104, centre (627.5,255.0) model (626.8,255.4) ok; AE cell col 6.82 row 6.08 (NOTES 6.95, 6.26)
+area 10 frame (319,167): AF window hs 714 vs 203 hw 173 vw 104, centre (800.5,255.0) model (799.6,255.4) ok; AE cell col 8.98 row 6.08 (NOTES 8.97, 6.26)
+area 11 frame (391,167): AF window hs 886 vs 203 hw 173 vw 104, centre (972.5,255.0) model (972.4,255.4) ok; AE cell col 11.13 row 6.08 (NOTES 11.00, 6.26)
+area 12 frame (463,167): AF window hs 1059 vs 203 hw 173 vw 104, centre (1145.5,255.0) model (1145.2,255.4) ok; AE cell col 13.29 row 6.08 (NOTES 13.02, 6.26)
+area 13 frame (535,167): AF window hs 1232 vs 203 hw 173 vw 104, centre (1318.5,255.0) model (1318.0,255.4) ok; AE cell col 15.46 row 6.08 (NOTES 15.05, 6.26)
+area 14 frame (103,239): AF window hs 195 vs 307 hw 173 vw 104, centre (281.5,359.0) model (281.2,359.1) ok; AE cell col 2.49 row 8.97 (NOTES 2.90, 8.96)
+area 15 frame (175,239): AF window hs 368 vs 307 hw 173 vw 104, centre (454.5,359.0) model (454.0,359.1) ok; AE cell col 4.66 row 8.97 (NOTES 4.92, 8.96)
+area 16 frame (247,239): AF window hs 541 vs 307 hw 173 vw 104, centre (627.5,359.0) model (626.8,359.1) ok; AE cell col 6.82 row 8.97 (NOTES 6.95, 8.96)
+area 17 frame (319,239): AF window hs 714 vs 307 hw 173 vw 104, centre (800.5,359.0) model (799.6,359.1) ok; AE cell col 8.98 row 8.97 (NOTES 8.97, 8.96)
+area 18 frame (391,239): AF window hs 886 vs 307 hw 173 vw 104, centre (972.5,359.0) model (972.4,359.1) ok; AE cell col 11.13 row 8.97 (NOTES 11.00, 8.96)
+area 19 frame (463,239): AF window hs 1059 vs 307 hw 173 vw 104, centre (1145.5,359.0) model (1145.2,359.1) ok; AE cell col 13.29 row 8.97 (NOTES 13.02, 8.96)
+area 20 frame (535,239): AF window hs 1232 vs 307 hw 173 vw 104, centre (1318.5,359.0) model (1318.0,359.1) ok; AE cell col 15.46 row 8.97 (NOTES 15.05, 8.96)
+area 21 frame (103,311): AF window hs 195 vs 411 hw 173 vw 104, centre (281.5,463.0) model (281.2,462.7) ok; AE cell col 2.49 row 11.86 (NOTES 2.90, 11.66)
+area 22 frame (175,311): AF window hs 368 vs 411 hw 173 vw 104, centre (454.5,463.0) model (454.0,462.7) ok; AE cell col 4.66 row 11.86 (NOTES 4.92, 11.66)
+area 23 frame (247,311): AF window hs 541 vs 411 hw 173 vw 104, centre (627.5,463.0) model (626.8,462.7) ok; AE cell col 6.82 row 11.86 (NOTES 6.95, 11.66)
+area 24 frame (319,311): AF window hs 714 vs 411 hw 173 vw 104, centre (800.5,463.0) model (799.6,462.7) ok; AE cell col 8.98 row 11.86 (NOTES 8.97, 11.66)
+area 25 frame (391,311): AF window hs 886 vs 411 hw 173 vw 104, centre (972.5,463.0) model (972.4,462.7) ok; AE cell col 11.13 row 11.86 (NOTES 11.00, 11.66)
+area 26 frame (463,311): AF window hs 1059 vs 411 hw 173 vw 104, centre (1145.5,463.0) model (1145.2,462.7) ok; AE cell col 13.29 row 11.86 (NOTES 13.02, 11.66)
+area 27 frame (535,311): AF window hs 1232 vs 411 hw 173 vw 104, centre (1318.5,463.0) model (1318.0,462.7) ok; AE cell col 15.46 row 11.86 (NOTES 15.05, 11.66)
+area 28 frame (103,383): AF window hs 195 vs 514 hw 173 vw 104, centre (281.5,566.0) model (281.2,566.4) ok; AE cell col 2.49 row 14.72 (NOTES 2.90, 14.36)
+area 29 frame (175,383): AF window hs 368 vs 514 hw 173 vw 104, centre (454.5,566.0) model (454.0,566.4) ok; AE cell col 4.66 row 14.72 (NOTES 4.92, 14.36)
+area 30 frame (247,383): AF window hs 541 vs 514 hw 173 vw 104, centre (627.5,566.0) model (626.8,566.4) ok; AE cell col 6.82 row 14.72 (NOTES 6.95, 14.36)
+area 31 frame (319,383): AF window hs 714 vs 514 hw 173 vw 104, centre (800.5,566.0) model (799.6,566.4) ok; AE cell col 8.98 row 14.72 (NOTES 8.97, 14.36)
+area 32 frame (391,383): AF window hs 886 vs 514 hw 173 vw 104, centre (972.5,566.0) model (972.4,566.4) ok; AE cell col 11.13 row 14.72 (NOTES 11.00, 14.36)
+area 33 frame (463,383): AF window hs 1059 vs 514 hw 173 vw 104, centre (1145.5,566.0) model (1145.2,566.4) ok; AE cell col 13.29 row 14.72 (NOTES 13.02, 14.36)
+area 34 frame (535,383): AF window hs 1232 vs 514 hw 173 vw 104, centre (1318.5,566.0) model (1318.0,566.4) ok; AE cell col 15.46 row 14.72 (NOTES 15.05, 14.36)
+4x4 window top-left (r0, c0) per AF area on the measured field, and the NOTES values:
+  area  0: r0  1 c0  0 delta -115   NOTES r0  2 c0  1  <- differs
+  area  1: r0  1 c0  3 delta -112   NOTES r0  2 c0  3  <- differs
+  area  2: r0  1 c0  5 delta -110   NOTES r0  2 c0  5  <- differs
+  area  3: r0  1 c0  7 delta -108   NOTES r0  2 c0  7  <- differs
+  area  4: r0  1 c0  9 delta -106   NOTES r0  2 c0  9  <- differs
+  area  5: r0  1 c0 11 delta -104   NOTES r0  2 c0 11  <- differs
+  area  6: r0  1 c0 13 delta -102   NOTES r0  2 c0 13  <- differs
+  area  7: r0  4 c0  0 delta  -61   NOTES r0  4 c0  1  <- differs
+  area  8: r0  4 c0  3 delta  -58   NOTES r0  4 c0  3
+  area  9: r0  4 c0  5 delta  -56   NOTES r0  4 c0  5
+  area 10: r0  4 c0  7 delta  -54   NOTES r0  4 c0  7
+  area 11: r0  4 c0  9 delta  -52   NOTES r0  4 c0  9
+  area 12: r0  4 c0 11 delta  -50   NOTES r0  4 c0 11
+  area 13: r0  4 c0 13 delta  -48   NOTES r0  4 c0 13
+  area 14: r0  7 c0  0 delta   -7   NOTES r0  7 c0  1  <- differs
+  area 15: r0  7 c0  3 delta   -4   NOTES r0  7 c0  3
+  area 16: r0  7 c0  5 delta   -2   NOTES r0  7 c0  5
+  area 17: r0  7 c0  7 delta    0   NOTES r0  7 c0  7
+  area 18: r0  7 c0  9 delta    2   NOTES r0  7 c0  9
+  area 19: r0  7 c0 11 delta    4   NOTES r0  7 c0 11
+  area 20: r0  7 c0 13 delta    6   NOTES r0  7 c0 13
+  area 21: r0 10 c0  0 delta   47   NOTES r0 10 c0  1  <- differs
+  area 22: r0 10 c0  3 delta   50   NOTES r0 10 c0  3
+  area 23: r0 10 c0  5 delta   52   NOTES r0 10 c0  5
+  area 24: r0 10 c0  7 delta   54   NOTES r0 10 c0  7
+  area 25: r0 10 c0  9 delta   56   NOTES r0 10 c0  9
+  area 26: r0 10 c0 11 delta   58   NOTES r0 10 c0 11
+  area 27: r0 10 c0 13 delta   60   NOTES r0 10 c0 13
+  area 28: r0 13 c0  0 delta  101   NOTES r0 12 c0  1  <- differs
+  area 29: r0 13 c0  3 delta  104   NOTES r0 12 c0  3  <- differs
+  area 30: r0 13 c0  5 delta  106   NOTES r0 12 c0  5  <- differs
+  area 31: r0 13 c0  7 delta  108   NOTES r0 12 c0  7  <- differs
+  area 32: r0 13 c0  9 delta  110   NOTES r0 12 c0  9  <- differs
+  area 33: r0 13 c0 11 delta  112   NOTES r0 12 c0 11  <- differs
+  area 34: r0 13 c0 13 delta  114   NOTES r0 12 c0 13  <- differs
+full print of area 0:
+  Spot: area_no           =0
+  Spot: cent_spot_x       =741
+  Spot: cent_spot_y       =683
+  Spot: cent_still_x      =741
+  Spot: cent_still_y      =683
+  Spot: cent_af_x         =247
+  Spot: cent_af_y         =137
+  Spot: bayer_af_w        =1536
+  Spot: bayer_af_h        =691
+  Spot: still_img_w       =4606
+  Spot: still_img_h       =3451
+  Spot: offset_hs         =34
+  Spot: offset_vs         =15
+  Spot: single_area[0].hs =195
+  Spot: single_area[0].vs =100
+  Spot: single_area[0].hw =173
+  Spot: single_area[0].vw =104
+  Spot: single_area[1].hs =109
+  Spot: single_area[1].vs =48
+  Spot: single_area[1].hw =173
+  Spot: single_area[1].vw =208
+  Spot: single_area[2].hs =281
+  Spot: single_area[2].vs =48
+  Spot: single_area[2].hw =173
+  Spot: single_area[2].vw =208
+  Spot: single_area[3].hs =195
+  Spot: single_area[3].vs =100
+  Spot: single_area[3].hw =173
+  Spot: single_area[3].vw =104
+PASS
