@@ -528,3 +528,27 @@ for the owner:
 4. The magnified view after the touch frame: the stub keeps the centre if the sensor mode is CLIP or the clip byte is
    set (I).
 5. The arrow-key targets: spot-af's windows (V harness), camera-tested in run 1.
+
+## Camera run 2 (2026-11-24)
+
+The owner flashed `spot-af-2` (sha256 `86e8fdca…`) on 2026-11-24 and did the test sheet. The owner's result:
+"everything seems to work" (V camera, as reported; no single check was reported as failing).
+
+| Check on the sheet | Result |
+|---|---|
+| Custom Menu E, the Spot Metering row, its page and the three values | Pass |
+| Spot metering, the AF point set by a touch on a lamp and on a dark area, with photos | Pass: the spot follows the touched point (the fail of run 1 is fixed) |
+| Touches at the four corners | Pass |
+| The smallest and the largest touch frame | Pass |
+| AF targets set with the arrow keys | Pass |
+| The bottom-left AF target (k = 4, the grid alignment of E5) | Pass |
+| The three values after power-off | Pass |
+
+Not on the sheet, so still as before: C-AF+TR, movie, the magnified view and the Digital Tele-converter keep the
+stock centre (V harness only); ESP and face priority were camera-tested in run 1 on spot-af, whose code for them
+spot-af-2 keeps.
+
+**Pinned** with `uv run epm2mod pin spot-af-2 --date 2026-11-24 --sha256 86e8fdca…`. The build carries the label
+2026.11.20, the label of the published release v2026.11.20, so its Firmware screen reads the same as that release.
+The label is not changed here: a release of this feature needs a new label, and with it a new build and a new camera
+test (`docs/dev/conventions.md`, "Releases").
