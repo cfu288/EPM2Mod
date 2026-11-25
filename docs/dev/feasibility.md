@@ -164,7 +164,8 @@ movies. The stage, its table and Natural's values in detail: [colour-pipeline.md
 ## Where code may go
 
 The firmware loads in steps. The kernel and segment 1 are in RAM first. Segments 2 and 3 are copied
-later, by the task Usr1, and on the update path they are not copied at all.
+later, by the task Usr1, and on the update path they are not copied at all. The full account, the exact rule,
+the space left and the open risks: [load-order.md](load-order.md).
 
 **A hook in the kernel or in segment 1 must jump only to code in the kernel or in segment 1**, unless
 you have proof that the hooked function runs only after Usr1. The build `peaking-direct-2` broke this
