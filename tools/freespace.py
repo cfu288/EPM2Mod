@@ -1171,10 +1171,13 @@ def check_sram_callers(specs, out=print):
     """FAIL for each constant call or jump of the code that runs in SRAM whose target is inside an op that changes
     bytes. The function map decodes that code at its flash address, so it does not see these callers, and a function
     that only SRAM code calls looks dead (peaking-direct-3 put code over the sleep routine 0x7E53A55C this way).
-    The decode is in emulator/opcheck.py."""
+    The code is decoded at its SRAM address: its calls are pc-relative to that address."""
     sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "emulator"))
-    import opcheck
-    calls, _src, _dst = opcheck.sram_calls()
+    import bootmem
+    import hookcheck
+    m = bootmem.model()
+    load = next(x for x in m.loads if x.name == "sram-image")
+    calls = [c for c in hookcheck.transfers(m.f["boot_sram_copy"]["dst"], m.b[load.lo - BASE:load.hi - BASE]) if c[1] in ("jmp", "call")]
     fails = 0
     for ia, mn, tgt in calls:
         for s in specs:
@@ -1188,17 +1191,16 @@ def check_sram_callers(specs, out=print):
 
 
 def check_load_order(specs, out=print):
-    """FAIL for each jump or call from code that is loaded early (kernel, segment 1) to code that is loaded later.
-    The check is emulator/hookcheck.py; the accepted hooks are in emulator/hookcheck-allow.tsv."""
+    """FAIL for each jump or call from code that is loaded early (kernel, segment 1) to code that is loaded later, when
+    the pinned build does not have it. The check is emulator/hookcheck.py."""
     here = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "emulator")
     sys.path.insert(0, here)
     import hookcheck
     lines = []
-    ok = hookcheck.check([rel(s.path) for s in specs], hookcheck.read_allow(), lines.append)
+    ok = hookcheck.check([rel(s.path) for s in specs], lines.append)
     for line in lines[:-1]:
-        if line.startswith("FAIL"):
-            out(line[:200])
-    out("%s  load order: %s" % ("PASS" if ok else "FAIL", lines[-1]))
+        out(line[:200])
+    out("%s  %s" % ("PASS" if ok else "FAIL", lines[-1]))
     return 0 if ok else 1
 
 
@@ -1207,8 +1209,7 @@ def check_load_order(specs, out=print):
 CHECKS = ["loaded", "content", "pointers", "operands", "written", "predecessor"]
 
 
-def write_map(sp, out=None):
-    md_path, tsv_path = [pathlib.Path(out, pathlib.Path(p).name) if out else pathlib.Path(rel(p)) for p in (MAP_MD, MAP_TSV)]
+def write_map(sp):
     m = sp.m
     areas = sp.analyse_all()
     md = []
@@ -1391,9 +1392,9 @@ def write_map(sp, out=None):
     w("| `%s` | %d | spec, superseded by, evidence |" % (SUPERSEDED, len(sp.superseded)))
     w("")
     w("The full evidence text of every check is in `%s`." % MAP_TSV)
-    md_path.write_text("\n".join(md) + "\n", encoding="utf-8")
+    pathlib.Path(rel(MAP_MD)).write_text("\n".join(md) + "\n", encoding="utf-8")
 
-    with open(tsv_path, "w", encoding="utf-8") as fh:
+    with open(rel(MAP_TSV), "w", encoding="utf-8") as fh:
         fh.write("\t".join(["start", "end", "size", "region", "source", "kind", "verdict", "failing", "allowed_use",
                             "used_bytes", "free_bytes", "free_runs", "history_bytes"]
                            + [x for k in CHECKS for x in (k, k + "_evidence")] + ["code_evidence", "ledger", "note"]) + "\n")
@@ -1510,7 +1511,7 @@ def main():
     ap.add_argument("--no-decode", action="store_true", help="do not use build/map (decode-dependent checks become UNKNOWN)")
     ap.add_argument("--no-other-blocks", action="store_true", help="map: do not count windows in blocks 1-3 and the tail")
     sub = ap.add_subparsers(dest="cmd", required=True)
-    sub.add_parser("map").add_argument("--out", help="write the two files into this folder (default: docs/reference)")
+    sub.add_parser("map")
     c = sub.add_parser("check")
     c.add_argument("specs", nargs="+")
     c.add_argument("--first-code", action="store_true",
@@ -1524,7 +1525,7 @@ def main():
     given = [os.path.relpath(os.path.abspath(p), ROOT) for p in a.specs] if a.cmd == "check" else []
     sp = Space(a.min_run, not a.no_decode, other_blocks=(a.cmd == "map" and not a.no_other_blocks), extra_specs=given)
     if a.cmd == "map":
-        tot = write_map(sp, a.out)
+        tot = write_map(sp)
         print("wrote %s and %s (%d areas)" % (MAP_MD, MAP_TSV, len(sp.areas)))
         for reg, t in tot.items():
             print("  %-12s %s" % (reg, "  ".join("%s %d" % kv for kv in sorted(t.items()))))

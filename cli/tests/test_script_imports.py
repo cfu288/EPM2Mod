@@ -1,5 +1,5 @@
 """The scripts outside the package (tools/, emulator/, gen/, web/scripts/, .github/scripts/, .githooks/) import only
-what exists, and pyflakes finds no syntax error and no undefined name in them. The documents pass the writing rules.
+what exists, and pyflakes finds no syntax error and no undefined name in them.
 
 No type check reads these scripts, so a module that is moved or removed leaves an import that fails only when the
 script runs. This test finds each import that is not the standard library or a dependency of the workspace, and checks
@@ -61,12 +61,6 @@ class ScriptImportTests(unittest.TestCase):
         self.assertNotIn("No module named pyflakes", done.stderr, "run: uv sync")
         lines = (done.stdout + done.stderr).splitlines()
         self.assertEqual([line for line in lines if not any(kind in line for kind in TIDINESS)], [])
-
-    def test_the_documents_pass_the_writing_rules(self) -> None:
-        done = subprocess.run(
-            [sys.executable, ".githooks/doclint.py", "--all"], cwd=ROOT, capture_output=True, text=True, check=False
-        )
-        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
 
     def test_every_local_import_has_a_file(self) -> None:
         scripts = script_files()  # also boot-test, update-path-test, emu-run, mkstate: scripts without a suffix

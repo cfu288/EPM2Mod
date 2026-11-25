@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""S0: boot-order check of a build's patched code. Static, no emulator.
+"""Load-order check of a build's patched code. Static, no emulator.
 
     python3 emulator/hookcheck.py data/builds/NAME.json
     python3 emulator/hookcheck.py SPEC.json [SPEC.json ...]        # all specs of a build, in the build's order
@@ -14,21 +14,18 @@ earlier spec) to 0x7ECB0B81 (segment 2) ran at the first live-view refresh of a 
 What it does: it makes the build's block 0 (stock with the specs applied in order) and decodes the built bytes of
 every op that lies in the pre-reset range, the kernel or segment 1. Ops that overlap are decoded as one run, so a
 jump that a later spec writes into an earlier spec's code is seen. An op that changes only the target of a stock
-jump or call is decoded from that instruction's start. Each jmp / call / branch that leaves its run is listed. A
-transfer to anything loaded later, or to a range that no boot copy loads, FAILS, unless
-emulator/hookcheck-allow.tsv names the instruction's address and this target, with a reason (for example proof that
-the function cannot run before Usr1). The same address with another target FAILS. Exit status 1 on any FAIL.
+jump or call is decoded from that instruction's start. A word that points into early-loaded code or data in stock and
+into late-loaded space in the build counts too (`pointer`: a case of a switch table, a table address).
 
-A word of an op that points into early-loaded code or data in stock and into
-late-loaded space in the build is listed as a `pointer` (a case of a switch table, a table address) and FAILS in the
-same way.
+A transfer (its address and its target) to anything loaded later, or to a range that no boot copy loads, is a FAIL
+when the pinned build does not have it. Exit status 1 on any FAIL. Nothing else is printed but the count. The
+transfers that the pinned build has are in docs/dev/load-order.md, section 5: they are known risks, not proven safe.
 
 Limits: only control transfers with a constant target and changed stock pointers are seen (not `jmp (a0)`, not a
-pointer in new code or a new table, not RAM reads of late data). A data op in early-loaded space is decoded as code too: a FAIL there is a false alarm, to be
-named in the allow list. The classes come from tools/freespace.py's load model. It says nothing about the order of
-tasks after the copies.
+pointer in new code or a new table, not RAM reads of late data). A data op in early-loaded space is decoded as code
+too. The classes come from tools/freespace.py's load model. It says nothing about the order of tasks after the copies.
 """
-import argparse, json, os, re, subprocess, sys, tempfile
+import argparse, functools, json, os, re, subprocess, sys, tempfile
 import pathlib
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -55,7 +52,8 @@ def segment(a):
     return "not loaded" if BASE <= a < m.end else "outside block 0"
 
 
-def transfers(addr, code):
+@functools.lru_cache(maxsize=None)
+def transfers(addr, code):  # cached: a build and the pinned build share most of their ops
     """[(insn address, mnemonic, target)] of the constant-target transfers in code at addr."""
     fd, p = tempfile.mkstemp(suffix=".bin")
     os.write(fd, code)
@@ -71,41 +69,6 @@ def transfers(addr, code):
         if m:
             res.append((int(m.group(1), 16), m.group(2), int(m.group(3), 16)))
     return res
-
-
-CLASSES = ("proof", "inferred", "timing")
-#: The build descriptions, beside the pinned one, that use entries of the allow list. A test holds that every entry
-#: is used by the pinned build or one of these; an entry that none uses is removed.
-USED_BY = ("data/builds/debug-log-movie-ab.json",)
-
-
-class Allowed(str):
-    """Why a transfer is accepted (the text that check() prints), with the row of the allow list: its number in the
-    file (row), its class (cls) and its reason."""
-
-    def __new__(cls, text, row=0, klass="", reason=""):
-        self = super().__new__(cls, text)
-        self.row, self.cls, self.reason = row, klass, reason
-        return self
-
-
-def read_allow(path=None):
-    """{(address, target): Allowed} of emulator/hookcheck-allow.tsv. The first column of a row lists its words as
-    ADDRESS>TARGET, separated by spaces. An entry accepts that one transfer: another target at the address FAILS."""
-    allow = {}
-    path = path or os.path.join(HERE, "hookcheck-allow.tsv")
-    for number, line in enumerate(pathlib.Path(path).read_text(encoding="utf-8").splitlines(keepends=True), 1):
-        if line.strip() and not line.startswith("#"):
-            words, _date, cls, reason = line.rstrip("\n").split("\t")
-            if cls not in CLASSES:
-                sys.exit("hookcheck-allow.tsv: line %d: the class is %r, not one of %s" % (number, cls, ", ".join(CLASSES)))
-            for word in words.split():
-                address, _, target = word.partition(">")
-                key = (int(address, 16), int(target, 16))
-                if key in allow:
-                    sys.exit("hookcheck-allow.tsv: line %d: %s is listed twice" % (number, word))
-                allow[key] = Allowed("%s, line %d of emulator/hookcheck-allow.tsv" % (cls, number), number, cls, reason)
-    return allow
 
 
 def spec_list(paths):
@@ -156,39 +119,35 @@ def transfers_of(spec_paths):
     return found
 
 
-def check(spec_paths, allow=None, out=print, used=None):
-    """List the transfers that leave the build's patched early-loaded code. True when none FAILS.
-    allow: {(address, target): reason}, as read_allow() returns. A transfer to late-loaded space passes only when its
-    address and its target are both those of an entry. The entries that match nothing in the build are counted in the
-    last line: they belong to other builds, or they are stale.
-    used: a list that gets (address, target, the entry) of each accepted transfer."""
-    allow = allow or {}
-    found = transfers_of(spec_paths)
-    listed = {}
-    for address, target in allow:
-        listed.setdefault(address, []).append(target)
-    fails, matched = 0, set()
-    for ia, (mn, tgt, name) in sorted(found.items()):
-        s, t = segment(ia), segment(tgt)
-        bad = t not in EARLY
-        why = allow.get((ia, tgt)) if bad else None
-        fails += bad and not why
-        note = ""
-        if why:
-            matched.add((ia, tgt))
-            note = "  allowed: " + why
-            if used is not None:
-                used.append((ia, tgt, why))
-        elif bad and ia in listed:
-            note = "  the allow list accepts this address only for the target %s" % ", ".join("0x%08X" % x for x in listed[ia])
-        out("%-5s 0x%08X (%s) %s -> 0x%08X (%s)%s  [%s]" % (
-            ("ALLOWED" if why else "FAIL") if bad else "ok", ia, s, mn, tgt, t, note, name))
-    unused = sorted(set(allow) - matched)
-    out("S0 boot-order check: %d transfers, %d FAIL, %d allowed%s; %d entries of the allow list match nothing in this build%s" % (
-        len(found), fails, len(matched), "" if fails else
-        " (every transfer from early-loaded code stays in early-loaded code, or is in the allow list)", len(unused),
-        ": " + " ".join("%08X>%08X" % x for x in unused[:8]) + (" ..." if len(unused) > 8 else "") if unused else ""))
-    return fails == 0
+def late(spec_paths):
+    """{(address, target): (mnemonic or "pointer", spec names)} of the build's transfers to code that is not in RAM
+    when the early-loaded code runs."""
+    found = transfers_of(spec_paths) if spec_paths else {}
+    return {(a, tgt): (mn, name) for a, (mn, tgt, name) in found.items() if segment(tgt) not in EARLY}
+
+
+def pinned_specs():
+    """The specs of the pinned build. None is pinned: no specs, so a build is compared with the stock firmware."""
+    pointer = pathlib.Path(os.path.dirname(HERE), "data", "pinned-build.json")
+    return spec_list([json.loads(pointer.read_text(encoding="utf-8"))["build"]]) if pointer.exists() else []
+
+
+def compare(spec_paths):
+    """(late() of the build, the sorted (address, target) of it that the pinned build does not have)."""
+    mine, known = late(spec_paths), late(pinned_specs())
+    return mine, sorted(set(mine) - set(known))
+
+
+def check(spec_paths, out=print):
+    """True when the build has no transfer (address and target) to late-loaded code that the pinned build has not.
+    Each new one is a FAIL line; the last line is the summary."""
+    mine, new = compare(spec_paths)
+    for ia, tgt in new:
+        mn, name = mine[ia, tgt]
+        out("FAIL  0x%08X (%s) %s -> 0x%08X (%s): not in the pinned build  [%s]" % (ia, segment(ia), mn, tgt, segment(tgt), name))
+    out("load-order check: %d transfers from early-loaded to late-loaded code, %d of them not in the pinned build%s" % (
+        len(mine), len(new), ". The rule and the ways out: docs/dev/load-order.md, section 2" if new else ""))
+    return not new
 
 
 def main():
@@ -196,7 +155,7 @@ def main():
     ap.add_argument("specs", nargs="+", help="a build description, or the specs of a build in its order")
     a = ap.parse_args()
     try:
-        sys.exit(0 if check(a.specs, read_allow()) else 1)
+        sys.exit(0 if check(a.specs) else 1)
     except toolchain.ToolchainError as error:
         sys.exit("hookcheck: cannot run: %s" % error)
 

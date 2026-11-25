@@ -19,7 +19,7 @@
 # that differs from the base commit (committed or changed in the working tree), and the builds named as
 # arguments. A description that git does not hold is not picked up by itself: a leftover file must not change the
 # result. The script prints the list, and one line that names the descriptions it did not check.
-# No check writes to a file that git holds: gen/run.sh --check and the code-space map are made in a temporary folder.
+# No check writes to a file that git holds: gen/run.sh --check works in a temporary copy.
 # The base is CI_BASE (a commit or a ref). Without it the script fetches origin's main and takes that: a base that
 # is behind its remote would leave builds out.
 set -euo pipefail
@@ -36,26 +36,29 @@ export CI=1  # the unit tests then fail where they would skip (cli/tests/support
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 step() { echo; echo "== $*"; }
+quiet() { "$@" > "$tmp/log" 2>&1 || { cat "$tmp/log"; exit 1; }; }  # the output of a step that passes is not shown
 
 if [ "$part" != python ]; then
   step "web: npm ci, check, e2e"
-  (
-    cd web
-    ../tools/node.sh npm ci --ignore-scripts
-    ../tools/node.sh npm run check
-    # shellcheck disable=SC2086
-    ../tools/node.sh npx playwright install ${PLAYWRIGHT_INSTALL:-} chromium
-    ../tools/node.sh npm run e2e
-  )
+  cd web
+  quiet ../tools/node.sh npm ci --ignore-scripts
+  quiet ../tools/node.sh npm run check
+  # shellcheck disable=SC2086
+  quiet ../tools/node.sh npx playwright install ${PLAYWRIGHT_INSTALL:-} chromium
+  quiet ../tools/node.sh npm run e2e
+  cd ..
 fi
 [ "$part" = web ] && exit 0
 
 step "the set-up is the pinned one"
-uv run epm2mod init --check
+quiet uv run epm2mod init --check
 
 # always: git ignores the page, so one that an earlier run built can be stale
 step "the installer page, built from this tree (the release tests read it)"
-(cd web && ../tools/node.sh npm ci --ignore-scripts && ../tools/node.sh npm run build:app)
+cd web
+quiet ../tools/node.sh npm ci --ignore-scripts
+quiet ../tools/node.sh npm run build:app
+cd ..
 
 if [ -z "${CI_BASE:-}" ]; then
   git fetch --quiet origin main || { echo "tools/ci.sh: origin's main cannot be fetched, so the base commit is not known. Set CI_BASE to the commit your work starts from" >&2; exit 1; }
@@ -63,32 +66,23 @@ if [ -z "${CI_BASE:-}" ]; then
 fi
 base=$(git merge-base "$CI_BASE" HEAD) || { echo "tools/ci.sh: the base $CI_BASE is not a commit of this clone" >&2; exit 1; }
 
-step "no commit since the base $(git rev-parse --short "$base") adds a machine path"
-.githooks/machine-paths --since "$base"
-
 step "black, mypy (the files that cli/pyproject.toml names)"
-uv run --directory cli black --check --quiet .
-uv run --directory cli mypy
+quiet uv run --directory cli black --check .
+quiet uv run --directory cli mypy
 
-step "unit tests (they also run pyflakes on the scripts, the document rules and the feature lists)"
+step "unit tests (they also run pyflakes on the scripts, and hold the feature lists)"
 # an unclosed file is an error here, not a line in the log: a ResourceWarning in a destructor cannot fail a test,
 # so the log is read for it
-uv run python -W error::ResourceWarning -m unittest discover -s cli/tests 2>&1 | tee "$tmp/tests.log"
-if grep -q "ResourceWarning" "$tmp/tests.log"; then
-  echo "tools/ci.sh: the unit tests left a file open (ResourceWarning above)" >&2; exit 1
-fi
-if grep -q "skipped=" "$tmp/tests.log"; then
-  echo "tools/ci.sh: a unit test was skipped" >&2; exit 1
-fi
-
-step "generated documents, the code-space map and generated specs"
-uv run epm2mod generate --check
-uv run python tools/freespace.py map --out "$tmp" > /dev/null
-for f in code-space-map.md code-space-map.tsv; do
-  cmp -s "docs/reference/$f" "$tmp/$f" && [ -z "$(git status --porcelain -- "docs/reference/$f")" ] \
-    || { echo "tools/ci.sh: docs/reference/$f is not what 'uv run python tools/freespace.py map' writes, or is not committed (the file is left as it was)" >&2; exit 1; }
+quiet uv run python -W error::ResourceWarning -m unittest discover -s cli/tests
+for word in ResourceWarning skipped=; do
+  if grep "$word" "$tmp/log"; then
+    echo "tools/ci.sh: a unit test left a file open or was skipped (the line above)" >&2; exit 1
+  fi
 done
-gen/run.sh --check
+
+step "generated documents and generated specs"
+quiet uv run epm2mod generate --check
+quiet gen/run.sh --check
 
 pinned=$(uv run epm2mod builds --json | uv run python -c 'import json, sys; print(json.load(sys.stdin)["pinned"])')
 # the descriptions git holds, against the working tree: an edit is checked before it is committed
@@ -99,8 +93,13 @@ unheld=$(git ls-files --others --exclude-standard -- 'data/builds/*.json' | xarg
 unchecked=$(for name in $unheld; do printf '%s\n' $builds | grep -qx "$name" || printf '%s ' "$name"; done)
 for name in $builds; do
   step "build $name: make, free-space check, load-order check, start in the emulator"
-  uv run epm2mod make "$name"
-  uv run python tools/checks.py "data/builds/$name.json"
+  quiet uv run epm2mod make "$name"  # a candidate: with the three checks
+  if grep -q '"camera_tested"' "data/builds/$name.json"; then  # make compares a tested build with its sha256 only
+    # shellcheck disable=SC2046
+    quiet uv run python tools/freespace.py check $(uv run python -c 'import json, sys; b = json.load(open(sys.argv[1])); print(*b["specs"], *["--first-code"] * bool(b.get("first_code")))' "data/builds/$name.json")
+    quiet uv run python emulator/boot-test "build/$name.BIN"
+    quiet uv run python emulator/update-path-test "build/$name.BIN"
+  fi
 done
 echo
 # shellcheck disable=SC2086

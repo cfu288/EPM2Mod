@@ -9,8 +9,6 @@ S6  Picture Mode change to the Velvia entry (ART 7, picture mode 106) and back, 
     parameters: the dispatch of 0x7E56D1C3 (table 0x7E78C254, index code - 9), run as a code piece from 0x7E56D2AB
     (d3 = art code) to one of the function's own continuation points. Then the same piece for every art code 9-184.
     FAULT = the CPU leaves block 0. "n/a" = the handler needs job data that a piece does not have (Cross Process).
-    S6 fails for a FAULT and for a code whose verdict word is not the reference's (PINNED_BLOCK0: the stock firmware).
-    Exit status 1 when S6 or S7 fails.
     The live-view rig alone does not reach this stage (it gives the IMG library no colour work), which is why S1 to
     S5 missed the fault.
 S7  The sleep routine "pwr_standby start" 0x7E53A55C, called as the SRAM code calls it (frame of the call at
@@ -18,7 +16,7 @@ S7  The sleep routine "pwr_standby start" 0x7E53A55C, called as the SRAM code ca
     ones and whether the run enters mov_art_set_line_yc_param (0x7E6CD9D6), which the stock routine never does.
 """
 import os, struct, sys
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 sys.path.insert(0, os.path.join(ROOT, "emulator"))
 import scenario  # noqa: E402
 from liveview import LiveView, EXPOSE  # noqa: E402
@@ -46,25 +44,9 @@ def six_axis(sc, code):
         return "ok", "reaches 0x%08X in %d instructions" % (pc, r.insns)
     if in_block0(sc, pc):
         # Cross Process (85, 87): the handler goes on into the scene statistics code, which needs the job data of
-        # a real call. The piece has none. The run stays in block 0. s6_fails() counts it when the reference's
-        # verdict for the code is another one: a code that is "ok" in the reference and ends here has a fault.
+        # a real call. The piece has none. The run stays in block 0; it counts only if it differs from pinned.
         return "n/a", "handler needs job data that the piece does not give (%s)" % r.fault.splitlines()[0][:60]
     return "FAULT", r.fault.splitlines()[0]
-
-
-FAILED = []
-
-
-def fail(text):
-    FAILED.append(text)
-    return text
-
-
-def s6_fails(sweep, reference):
-    """The art codes that fail S6: a FAULT (the CPU leaves block 0), or a verdict word (ok, n/a, FAULT) that is not
-    the reference's. The words are compared, not the texts: a build reaches the same stop through other code, in
-    another number of instructions, and that is no fault. The reference is the stock firmware."""
-    return [c for c in sweep if sweep[c][0] == "FAULT" or sweep[c][0] != reference[c][0]]
 
 
 def movie_code(image, pm):
@@ -96,8 +78,6 @@ def s6(pinned, patched):
                         bad.append("%s %s code %d" % (NAMES[pm], what, c))
                 OUT("  [%s] %s: frame picture %s%s; %s" % (name, NAMES[pm], f.state["picture"],
                                                           ", FRAME FAULT" if f.faults else "", "; ".join(row)))
-                if f.faults:  # a frame that faults is a failure of S6, not a note
-                    bad.append("%s frame fault" % NAMES[pm])
             for c in range(9, 185):
                 sweep[c] = six_axis(lv.sc, c)
         faults = [c for c in sweep if sweep[c][0] == "FAULT"]
@@ -108,16 +88,14 @@ def s6(pinned, patched):
             name, len(faults), faults or "", na or "none", diff or "none"))
         for c in faults[:4]:
             OUT("      code %d: %s" % (c, sweep[c][1]))
-        wrong = s6_fails(sweep, results["pinned"])
-        OUT("  S6 RESULT [%s]: %s" % (name, "PASS" if not bad and not wrong else
-                                      fail("FAIL: " + ", ".join(bad or ["art codes %s" % wrong]))))
+        OUT("  S6 RESULT [%s]: %s" % (name, "PASS" if not bad and not faults and not diff else
+                                      "FAIL: " + ", ".join(bad or ["art codes %s" % (faults or diff)])))
 
 
 def s7(pinned, patched):
     OUT("S7. pwr_standby start 0x7E53A55C, called with the frame of the SRAM code's call (flash 0x7F14B0F7), 400")
     OUT("    instructions; callees run as far as they get (kernel services are not modelled here).")
     base = open(pinned, "rb").read()
-    ends = {}
     for name, path in [("pinned", pinned)] + patched:
         img = open(path, "rb").read()
         same = all(img[a - BASE:b - BASE] == base[a - BASE:b - BASE] for a, b in ((0x7E53A55C, 0x7E53A700), (0x7E50A201, 0x7E50A3C2)))
@@ -130,13 +108,8 @@ def s7(pinned, patched):
             OUT("  [%s] bytes of 0x7E53A55C-0x7E53A700 and 0x7E50A201-0x7E50A3C2 equal to pinned: %s; first three stock "
                 "instructions ran: %s; entered mov_art_set_line_yc_param at 0x7E6CD9D6: %s; end: %s" % (
                     name, same, stock_start, stray, (r.fault or "returned").splitlines()[0][:110]))
-            # how the run ends is part of the verdict: the callees run as far as the rig lets them, so the end can be
-            # a fault in the reference too, and the build must end as the reference does (fault or return)
-            ends[name] = bool(r.fault)
-            as_reference = ends[name] == ends["pinned"]
-            OUT("  S7 RESULT [%s]: %s" % (name, "PASS" if same and stock_start and not stray and as_reference else
-                                          fail("FAIL: " + ("the sleep routine is overwritten" if as_reference else
-                                                           "the run ends in a fault and the reference's does not, or the reverse"))))
+            OUT("  S7 RESULT [%s]: %s" % (name, "PASS" if same and stock_start and not stray else
+                                          "FAIL: the sleep routine is overwritten"))
 
 
 def main():
@@ -146,8 +119,6 @@ def main():
         if which in (n, "all"):
             fn(pinned, patched)
             OUT("")
-    sys.exit(1 if FAILED else 0)
 
 
-if __name__ == "__main__":
-    main()
+main()

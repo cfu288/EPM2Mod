@@ -2,7 +2,8 @@
 # Checks before a commit. Enable once per clone: git config core.hooksPath .githooks (uv run epm2mod init does it).
 # Needs uv. Parts 1 to 4 refuse the commit. Part 5 only warns.
 #
-# 1. Machine-specific details in the staged changes (.githooks/machine-paths).
+# 1. Machine-specific details in the staged changes: home folders, session scratch paths, user@host targets. Use
+#    placeholders (/path/to/..., USER@HOST, /tmp/scratch). It is a reminder, not a proof: CI does not run it.
 # 2. Staged documents that users read: the writing rules (.githooks/doclint.py --help).
 # 3. Staged files of web/: prettier, when web/node_modules is there (else CI checks them).
 # 4. The Python project cli/: when a staged change adds, changes or deletes one of its files, black formats the
@@ -15,8 +16,14 @@
 #    it cannot (the firmware or the objdump is missing), it says "not linted" and the commit goes on.
 root=$(git rev-parse --show-toplevel) || exit 1
 cd "$root" || exit 1
-if ! git diff --cached -U0 --no-color --no-renames --diff-filter=AM -- . ':(exclude).githooks' | .githooks/machine-paths; then
-  echo "pre-commit: commit refused" >&2
+pattern='(^|[^A-Za-z0-9._-])(/home|/Users)/[A-Za-z0-9._-]+|/tmp/claude-[0-9]+|-home-[a-z0-9]+-|[A-Za-z0-9._-]+@[A-Za-z0-9-]+:[/~]|(ssh|scp|rsync|sftp)( -[^ ]+)* [A-Za-z0-9._-]+@[A-Za-z0-9.-]+'
+# the placeholders are taken out first: a line with one of them and a real path is still refused
+allow='USER@HOST:?|git@github\.com:?|(/home|/Users)/user(/|$|[^A-Za-z0-9._-])'
+hits=$(git diff --cached -U0 --no-color --no-renames --diff-filter=AM -- . ':(exclude).githooks' |
+  grep -E '^\+' | grep -v -E '^\+\+\+ ' | sed -E "s#$allow##g" | grep -E "$pattern" | head -5)
+if [ -n "$hits" ]; then
+  echo "pre-commit: machine-specific paths or hosts in the staged changes (use /path/to, USER@HOST, /tmp/scratch); commit refused:" >&2
+  printf '%s\n' "$hits" | cut -c1-160 >&2
   exit 1
 fi
 if ! command -v uv >/dev/null 2>&1; then

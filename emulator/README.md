@@ -30,7 +30,7 @@ The fork has a port of om-emu's lab to the E-PM2 (`MODELS.E101`, `src/fw/ports.m
 | `patchblock.py` | Builds a patched block 0 from `data/specs/*.json`-style specs, with the same base-hash and expected-byte checks as `epm2mod make` (it calls the package's `apply_specs`). It prints the changed runtime ranges. Ops on other blocks are checked and reported as not emulated. |
 | `cases.py` | Named cases: entry, allowed code ranges, stubs, input rows, outputs, and a Python model of the expected outputs. |
 | `emurun.py` | CLI: `list`, `run CASE` (one image, checked against the model) and `diff CASE --patch SPEC…` or `--image BLOCK0` (stock against patched). Exits 1 on any mismatch, fault, stray code or unexpected change. |
-| `bootmem.py`, `scenario.py`, `osmodel.py`, `liveview.py`, `hookcheck.py` | Scenario runs; see "Scenario runs" below. |
+| `bootmem.py`, `scenario.py`, `osmodel.py`, `liveview.py`, `hookcheck.py`, `scenarios/scen_guard.py` | Scenario runs; see "Scenario runs" below. |
 | `specs/rec-limit-3600.json` | Emulator test input only, not a camera patch: changes the recording-limit imm16 1740 to 3600 (2 bytes). |
 | `filmcheck.py` | The film check: `uv run python emulator/filmcheck.py data/builds/NAME.json`, after `gen/stock-films/structure.py` has written the layout of that build. As flashed, every Olympus art code selects in each colour stage (tone, look, matrix, six-axis, saturation, chroma, 12-region) what it selects on stock. With every entry loaded, each film code selects its RAM block, the identity look and a 12-region table with no record on. It also builds the blocks that the firmware packs for a job (gamma buffer, block A and the third block of a still, block B of live view) for six synthetic jobs: as flashed they are byte-equal to stock for every Olympus code, and a loaded film's blocks differ from Natural's only in the bytes of those seven stages, so a stage that nobody listed shows too. The script's docstring says what is not covered. Exit status 1 on any mismatch; about 35 s. Run it before you offer a build that changes the film structure or the loader. |
 | `emuenv.py` | Where om-emu, Node and the unpacked images are; used by every Python tool here. |
@@ -109,9 +109,7 @@ cases above did not change.
 | `scenario.py` | `Scenario`: calls (`call`, `call_site`, `piece`), tasks with their own stack (`task`, `run`), stubs, probes, the settings getter, device accesses, write watches, pc sets, call trees, backtraces. Helpers `diff_pcs`, `diff_writes`, `patch_ranges`, `print_calls`. |
 | `osmodel.py` | A Python model of the uITRON services behind the `Oly*` wrappers: event flags, queues, data queues, semaphores, sleep, software timers. `schedule()` runs the ready tasks until all wait. |
 | `liveview.py` | `LiveView`: a rig for the mov layer and the art tasks. It runs the static constructors, 12 module init functions and 10 task bodies from their real entries, sends "Through Start", and then steps frame events. It tracks the image-work heap (alloc, free, mode, re-partition), firmware error reports and addresses given to devices. |
-| `hookcheck.py` | S0, a static check with no emulator. It makes the build's block 0 and decodes the built bytes of every op in the kernel or segment 1, and lists every jump that leaves them and every changed table pointer, with the load segment of its source and target. A transfer from the kernel or segment 1 to segment 2 or 3 FAILS (that code is not in RAM yet when the boot task runs, and never on the update path). Give it a build description, or all specs of a build in order. |
-| `opcheck.py` | Two static checks of a whole build: a byte that one spec covers and keeps and a later spec changes, and a call from the code that runs in SRAM into an op. |
-| `hookcheck-allow.tsv` | The jumps and pointers that `hookcheck.py` would fail and that are accepted, each with its evidence. |
+| `hookcheck.py` | The load-order check: static, no emulator. It makes the build's block 0, decodes the built bytes of every op in the kernel or segment 1, and FAILS on each transfer or changed table pointer (address and target) to segment 2 or 3 that the pinned build does not have. That code is not in RAM yet when the boot task runs, and never on the update path. Give it a build description, or all specs of a build in order. |
 
 ### How to write a scenario
 
@@ -131,7 +129,8 @@ print(f.summary()); print(f.path()); print(f.events); print(f.faults)
 Run the same steps on a second image and compare: `diff_writes(a.writes, b.writes)` gives the bytes whose final
 value differs, and `diff_pcs(a.pcs, b.pcs, new_code, hook_sites)` gives the stock code that ran only in one image
 and the new code that ran (`patch_ranges(base_bytes, patched_bytes)` gives the two range lists).
-`emulator/scenarios/scen_peaking.py` is a full example (S1 to S5).
+`emulator/scenarios/scen_guard.py` is a full example. It is the one scenario check that is kept: run it by hand before a
+build that changes peaking is offered for a flash (its first lines give the commands).
 
 For code outside live view use `Scenario` directly:
 
@@ -171,6 +170,6 @@ For code outside live view use `Scenario` directly:
 - **Stray code.** Code outside a case's ranges is an error. Unmodelled MMIO faults (lab-stub deny). A misaligned access faults, as om-emu enforces.
 - **No proof of safety.** Passing these tests does not prove a patch is safe on the camera. They show only that the tested function, with these inputs and stubs, changes only the intended outputs. Caches, timing, other readers of the same bytes, and everything the stubs replace are not tested.
 
-`python3 tools/freespace.py check SPEC...` runs the load-order check and the SRAM-caller check too, and
+`uv run python tools/freespace.py check SPEC...` runs the load-order check and the SRAM-caller check too, and
 `epm2mod make` runs that command for every build that is not camera-tested. `epm2mod make` itself refuses a
 spec that changes a byte another spec covers and keeps.

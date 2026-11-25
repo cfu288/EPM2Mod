@@ -1,12 +1,14 @@
-"""Scenario tests of the save guard (NOTES.md section 18). Uses emulator/liveview.py.
+"""The save guard of focus peaking, run by hand before a build that changes peaking is offered for a flash. About 10
+minutes. No other check runs it. Background: experiments/2026-11-14-focus-peaking/NOTES.md section 18.
 
-    python3 scen_guard.py SCENARIO NAME=BLOCK0 [NAME=BLOCK0 ...]
-    SCENARIO: s19 ... s26 or all. Each image runs alone; one RESULT line per image says PASS or FAIL.
-    An image whose NAME starts with "pinned" is the reference, a build without the guard (use "pinned-fast", not
-    "pinned": scen_peaking.py gives an image of that exact name no request). It gets a REFERENCE line and is judged
-    for what it must show (REFERENCE_SHOWS_FAULT): the fault of 2026-11-16 where the scenario is for it, none
-    elsewhere. Exit status 1 when an image fails, the reference too.
-    The block-0 files are `block0_0100.bin` of `python3 tools/oetool.py unpack build/NAME.BIN /tmp/scratch/NAME`.
+    uv run epm2mod make peaking-fast && uv run epm2mod make NAME
+    uv run python emulator/scenarios/scen_guard.py all pinned-fast=BLOCK0 NAME=BLOCK0
+    BLOCK0 is block0_0100.bin in the folder that `emulator/emu-run --blocks build/NAME.BIN` prints.
+
+    Instead of `all`: one of s19 ... s26. Each image runs alone; one RESULT line per image says PASS or FAIL. An image
+    whose NAME starts with "pinned" is the reference, the camera-tested build peaking-fast without the guard. It must
+    show the fault of 2026-11-16 where the scenario is for it (REFERENCE_SHOWS_FAULT) and none elsewhere. Exit status
+    1 when an image fails, the reference too.
 
 What is modelled (the rig runs no capture: no TAKE_*, REC_* task, no development job):
   - "a photo is being developed": the real heap allocator 0x7E578D43 is called the way the still code calls it
@@ -35,13 +37,7 @@ S26  The event pk_guard, for each image that has the probe (a jump at the ring h
 import os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(ROOT, "emulator"))
-with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scen_peaking.py")) as _f:
-    _src = _f.read()
-assert _src.rstrip().endswith("\nmain()")
-_sp = {"__file__": os.path.join(os.path.dirname(os.path.abspath(__file__)), "scen_peaking.py"), "__name__": "scen_peaking"}
-exec(compile(_src.rstrip()[:-len("main()")], "scen_peaking.py", "exec"), _sp)
-open_lv, request, anomalies = (_sp[k] for k in ("open_lv", "request", "anomalies"))
-from liveview import CMD_THROUGH_END, CMD_THROUGH_START, HEAP_MODE, HEAP_FLAGS  # noqa: E402
+from liveview import CMD_THROUGH_END, CMD_THROUGH_START, HEAP_FLAGS, HEAP_MODE, LiveView  # noqa: E402
 
 L, R, L2, C = 0x602BE8C4, 0x602BE8C5, 0x602BE8C6, 0x602BE8C7
 TAG, WHITE, RED = 0x8971, 3, 2
@@ -52,6 +48,46 @@ ALLOC, ALLOC_SITE, FREE, FREE_SITE = 0x7E578D43, 0x7E70BE3B, 0x7E578EBC, 0x7E70B
 CHOOSER, CHOOSER_SITE, SET_MODE, SET_MODE_SITE = 0x7E714833, 0x7E68AE4A, 0x7E578C60, 0x7E948E91
 ART_CMD, ART_STATE = 0x7E72A14B, 0x605C1930
 OUT = print
+
+
+def open_lv(path, name, pm):
+    lv = LiveView(path, name=name)
+    lv.settings[38017] = pm           # Picture Mode
+    lv.settings[17601] = 1            # art filter type I
+    lv.seen = {"gain2": []}
+    lv.sc.probe(0x7E72676D, lambda sc, g: lv.seen["gain2"].append(g["d0"] & 0xFFFF), "pass 9 gain")
+    return lv
+
+
+def request(lv, on):
+    """Set or clear the peaking request as the build's own hook does (CmpSts_MfAssist::entryMfAssistOn / Off)."""
+    a = 0x7EB7D46C if on else 0x7EB7D43B
+    r = lv.sc.piece(a, [a + 7], {"a0": 0x7D500000})
+    assert not r.fault and lv.sc.r8(R) == (1 if on else 0), r.fault
+
+
+def anomalies(lv, f):
+    """Things a healthy frame does not show."""
+    out = []
+    s = f.state
+    if f.faults:
+        out.append("fault")
+    if s["alloc_error"]:
+        out.append("art buffers refused (alloc error)")
+    if f.label.startswith("frame") and not s["picture"]:
+        out.append("no picture")
+    for k, d in f.events:
+        if k == "heap re-partition" and not d.startswith("0 live"):
+            out.append("heap re-partitioned under live blocks (%s)" % d.split(":")[0])
+        if k == "heap free" and "NOT A LIVE" in d:
+            out.append("free of a block that is not live")
+        if k == "error report":
+            out.append("firmware error report " + d)
+    if f.stale:
+        out.append("%d device writes of addresses in freed blocks" % len(f.stale))
+    if s["art_record"] == 0x2A3 and s["heap_mode"] != 1 and f.label.startswith("frame"):
+        out.append("art record is Key Line but heap mode is %d" % s["heap_mode"])
+    return out
 
 
 class Run:
@@ -86,7 +122,7 @@ class Run:
         if any(c == 4 and st != 2 for c, st in cmds) or any(c == 3 and st != 0 for c, st in cmds):
             bad.append("an art command met the wrong session state")
         gains = sorted(set(self.lv.seen["gain2"]))
-        self.lv.seen["gain2"], self.lv.seen["expose7"] = [], []
+        self.lv.seen["gain2"] = []
         lines = bool(gains) and f.state["art_record"] == 0x2A3
         if expect_lines is not None and lines != expect_lines:
             bad.append("lines %s, expected %s" % (lines, expect_lines))

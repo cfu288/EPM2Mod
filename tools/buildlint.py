@@ -4,14 +4,12 @@
     python3 tools/buildlint.py data/builds/NAME.json        (the command: uv run epm2mod lint NAME)
 
 It prints WARN lines and one summary line. A WARN line is for a person to read before a flash and in a review;
-it does not say that the build is wrong. The hard checks are tools/checks.py and tools/ci.sh. CI does not run
-this report. Exit status: 0, also with warnings; 2 when the report cannot be made (the reason is printed).
+it does not say that the build is wrong. The hard checks are in tools/ci.sh. CI does not run this report. Exit status: 0, also with warnings; 2 when the report cannot be made (the reason is printed).
 
 The warnings (the rule and the numbers behind them: docs/dev/load-order.md):
 
-1. Every entry of emulator/hookcheck-allow.tsv that the build uses and that is not a proof (class inferred or
-   timing), by row, each address listed. And each transfer that the load-order check FAILS: lint does not hide
-   what the hard checks refuse.
+1. The transfers from early-loaded to late-loaded code: those that the pinned build does not have, each listed (the
+   hard check refuses them), and the count of those that it has, with the document that says what is known of them.
 2. Early-loaded space (kernel range, segment 1, pre-reset): the bytes that the build's specs use in each free-space
    area, and what is left there. A hook into an early-loaded function needs its routine in this space.
 3. `first_code` in the description: code in an area where none has run on a camera.
@@ -32,7 +30,6 @@ sys.path[:0] = [os.path.join(ROOT, "tools"), os.path.join(ROOT, "emulator")]
 BASE = 0x7E421020
 M32 = 0xFFFFFFFF
 SHOWN = 6  # words of warning 4 that are printed
-EVIDENCE = 150  # characters of an allow-list row's reason that are printed
 LATE = ("segment-2", "segment-3", "usr1-third")
 
 
@@ -42,29 +39,21 @@ def lint(description):
     import hookcheck
     import patchblock
 
-    raw = json.loads(pathlib.Path(description, encoding="utf-8").read_text(encoding="utf-8"))
+    raw = json.loads(pathlib.Path(description).read_text(encoding="utf-8"))
     specs = [os.path.join(ROOT, s) for s in raw["specs"]]
     early = lambda a: hookcheck.segment(a) in hookcheck.EARLY  # noqa: E731
     warnings = []
 
-    # 1. the allow-list rows
-    used, lines = [], []
-    if not hookcheck.check(specs, hookcheck.read_allow(), out=lines.append, used=used):
-        fails = [line for line in lines if line.startswith("FAIL")]
-        warnings.append("load order, FAIL: %d transfers from early-loaded to late-loaded code that the allow list "
-                        "does not accept. The hard checks refuse this build:%s" % (len(fails), "".join("\n        " + line for line in fails)))
-    rows = {}
-    accepted = {address for address, _target, _entry in used}
-    for address, _target, entry in used:
-        rows.setdefault((entry.cls, entry.row), (entry.reason, []))[1].append(address)
-    for cls, text in (("timing", "safe by timing only, an open risk"), ("inferred", "safe by inference, not by proof")):
-        mine = [("line %d: %s" % (row, " ".join("%08X" % a for a in sorted(addresses))), len(addresses), reason)
-                for (c, row), (reason, addresses) in sorted(rows.items()) if c == cls]
-        if mine:
-            warnings.append("load order, %s: %d transfers from early-loaded to late-loaded code, by %d rows of "
-                            "emulator/hookcheck-allow.tsv:%s" % (text, sum(r[1] for r in mine), len(mine), "".join(
-                                "\n        %s (%d): %s" % (row, count, reason[:EVIDENCE] + ("..." if len(reason) > EVIDENCE else ""))
-                                for row, count, reason in mine)))
+    # 1. the load order
+    mine, new = hookcheck.compare(specs)
+    if new:
+        warnings.append("load order: the pinned build does not have these transfers from early-loaded to late-loaded code, "
+                        "and the hard check refuses them: " + "; ".join("0x%08X -> 0x%08X" % pair for pair in new))
+    old = [mine[pair][0] for pair in mine if pair not in new]
+    if old:
+        pointers = old.count("pointer")
+        warnings.append("load order: %d transfers from early-loaded to late-loaded code that the pinned build has too "
+                        "(%d jumps and calls, %d pointers): docs/dev/load-order.md, section 5" % (len(old), len(old) - pointers, pointers))
 
     # 2. early-loaded space
     space = freespace.Space(use_linear=False, extra_specs=[os.path.relpath(s, ROOT) for s in specs])
@@ -87,12 +76,12 @@ def lint(description):
     # 4. words that are late-loaded addresses
     stock, image, _ = patchblock.patched_block0(specs)
     aliases = space.m.aliases()
-    hits = []
+    listed, hits = {address for address, _ in mine}, []
     for lo, hi in spans:
         if not early(lo):
             continue
         for a in range(lo - 3, hi):  # every word that overlaps the bytes, as emulator/hookcheck.py
-            if a in accepted:  # a word that the allow list accepts with this target: warning 1 has it
+            if a in listed:  # warning 1 has it
                 continue
             word, old = (int.from_bytes(b[a - BASE:a - BASE + 4], "little") for b in (image, stock))
             if word == old:
