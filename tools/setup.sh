@@ -2,16 +2,19 @@
 # Set up what the analysis tools and the build checks need, inside this repository. Safe to run again.
 #
 #   tools/setup.sh            # everything
-#   tools/setup.sh --check    # only say what is present
+#   tools/setup.sh --check    # only say what is present. Exit status 1 when an item of 1 to 5 is missing
 #   tools/setup.sh --binutils # only the MN103 binutils (what gen/ needs; CI uses this)
 #
 # 1. The MN103 disassembler, assembler and linker: GNU binutils, built from the submodule
-#    third_party/binutils-gdb into build/toolchain/ (ignored by git). Needs gcc, make, bison and flex.
-# 2. Node (the major version in .nvmrc) for the emulator: taken from PATH, else from nvm. With nvm
-#    present and no such Node, "nvm install" gets it.
+#    third_party/binutils-gdb into build/toolchain/ (ignored by git). Needs gcc, make, m4, bison and flex.
+# 2. Node (the major version in .nvmrc) for the emulator and the web apps: tools/node.sh finds it on PATH or in
+#    nvm. With nvm present and no such Node, "nvm install" gets it.
 # 3. The emulator working tree: emulator/setup.sh.
+# 4. Olympus's firmware: uv run epm2mod fetch-stock (a download from the maker, 43 MB).
+# 5. The firmware map, for the free-space check: tools/fwmap.py build (1 minute, 470 MB).
 #
-# It also switches on the commit hooks in .githooks/ for this clone.
+# It also switches on the commit hooks in .githooks/ for this clone. --check reports them, and the two things the
+# web apps need (web/README.md), which this script does not install.
 #
 # Nothing is installed outside the repository, but a Node version through nvm.
 set -euo pipefail
@@ -22,15 +25,8 @@ OBJDUMP=$PREFIX/bin/mn10300-elf-objdump
 WANT=$(tr -d 'v \n' < .nvmrc)
 check_only=0; [ "${1:-}" = "--check" ] && check_only=1
 binutils_only=0; [ "${1:-}" = "--binutils" ] && binutils_only=1
-
-node_ok() { command -v "$1" >/dev/null 2>&1 && [ "$("$1" -p 'process.versions.node.split(".")[0]')" -ge "$WANT" ]; }
-find_node() {
-  if node_ok node; then command -v node; return; fi
-  local newest
-  newest=$(ls -d "${NVM_DIR:-$HOME/.nvm}"/versions/node/v*/bin/node 2>/dev/null | sort -V | tail -1 || true)
-  if [ -n "$newest" ] && node_ok "$newest"; then echo "$newest"; return; fi
-  return 1
-}
+missing=0
+miss() { echo "MISSING: $1"; missing=1; }
 
 # The commit hooks (.githooks): the message format, no machine paths, the writing rules, black and mypy.
 [ $check_only = 1 ] || git config core.hooksPath .githooks
@@ -39,7 +35,7 @@ echo "== 1. MN103 binutils"
 if [ -x "$OBJDUMP" ]; then
   echo "present: $("$OBJDUMP" --version | head -1)"
 elif [ $check_only = 1 ]; then
-  echo "MISSING: run tools/setup.sh"
+  miss "run tools/setup.sh"
 else
   for tool in gcc make m4; do command -v $tool >/dev/null || { echo "error: $tool is needed to build binutils" >&2; exit 1; }; done
   if ! command -v bison >/dev/null || ! command -v flex >/dev/null; then
@@ -70,16 +66,52 @@ fi
 [ $binutils_only = 1 ] && exit 0
 
 echo "== 2. Node $WANT or newer"
-if node=$(find_node); then
+if node=$(tools/node.sh sh -c 'command -v node' 2>/dev/null); then
   echo "present: $node ($("$node" --version))"
+  if [ "$node" != "$(command -v node || true)" ]; then
+    echo "note: the node on PATH is $(node --version 2>/dev/null || echo absent). Run node and npm through tools/node.sh, or: nvm use $WANT"
+  fi
 elif [ $check_only = 1 ]; then
-  echo "MISSING: run tools/setup.sh (it uses nvm), or install Node $WANT"
+  miss "run tools/setup.sh (it uses nvm), or install Node $WANT"
 elif [ -s "${NVM_DIR:-$HOME/.nvm}/nvm.sh" ]; then
   set +u; . "${NVM_DIR:-$HOME/.nvm}/nvm.sh"; nvm install "$WANT"; set -u
-  node=$(find_node) && echo "installed: $node"
+  echo "installed: $(tools/node.sh node --version)"
 else
-  echo "error: no Node $WANT or newer, and no nvm. Install Node $WANT (https://nodejs.org) and run this again." >&2; exit 1
+  tools/node.sh true  # stops with the message that names the version
 fi
 
 echo "== 3. Emulator working tree"
-if [ $check_only = 1 ]; then emulator/setup.sh --check || true; else emulator/setup.sh; fi
+if [ $check_only = 1 ]; then emulator/setup.sh --check || missing=1; else emulator/setup.sh; fi
+
+echo "== 4. Olympus's firmware"
+if uv run --quiet epm2mod fetch-stock --dry-run 2>/dev/null | grep -q '^kept at'; then
+  echo "present"
+elif [ $check_only = 1 ]; then
+  miss "run: uv run epm2mod fetch-stock"
+else
+  uv run --quiet epm2mod fetch-stock
+fi
+
+echo "== 5. Firmware map"
+if [ -s build/map/linear.txt ]; then
+  echo "present: build/map"
+elif [ $check_only = 1 ]; then
+  miss "run: uv run python tools/fwmap.py build"
+else
+  uv run --quiet python tools/fwmap.py build
+fi
+[ $check_only = 1 ] || exit 0
+
+echo "== Commit hooks"
+if [ "$(git config core.hooksPath || true)" = .githooks ]; then
+  echo "on"
+else
+  echo "off: run tools/setup.sh, or: git config core.hooksPath .githooks"
+fi
+echo "== Web apps (only for work in web/; this script does not install them)"
+if [ -d web/node_modules ]; then
+  echo "present: web/node_modules"
+else
+  echo "absent: web/node_modules. Run: cd web && ../tools/node.sh npm ci && ../tools/node.sh npx playwright install chromium"
+fi
+exit $missing

@@ -6,17 +6,17 @@ How to go from a clone to a firmware build of your own that passes every check. 
 
 ## Set up
 
-You need [uv](https://docs.astral.sh/uv/getting-started/installation/), git, gcc and make. Linux or macOS. Keep
-3 GB of disk free.
+You need [uv](https://docs.astral.sh/uv/getting-started/installation/), git, gcc, make, m4, bison and flex, and
+[nvm](https://github.com/nvm-sh/nvm) or Node of the version in `.nvmrc`. Linux or macOS. Keep 3 GB of disk free.
 
 ```sh
 git clone https://github.com/cfu288/EPM2Mod.git && cd EPM2Mod
-uv run epm2mod fetch-stock                       # downloads Olympus's firmware and checks it
-tools/setup.sh                                   # the MN103 assembler, the emulator, the commit hooks
-uv run python tools/fwmap.py build               # the firmware map, for the free-space check (1 minute, 470 MB)
+tools/setup.sh           # the MN103 assembler, Node, the emulator, Olympus's firmware, the firmware map, the commit hooks
+tools/setup.sh --check   # says what is present, and the command for each thing that is missing
 ```
 
-`tools/setup.sh` puts everything inside the repository, but a Node version through nvm.
+`tools/setup.sh` takes about 3 minutes. It puts everything inside the repository, but a Node version through nvm.
+On Debian and Ubuntu it gets a missing bison or flex by itself.
 
 ## Check your clone
 
