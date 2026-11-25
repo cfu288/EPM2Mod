@@ -21,9 +21,6 @@ if [ $check = 1 ]; then
   for d in build/toolchain build/map build/blocks firmware; do
     if [ -e "$d" ]; then mkdir -p "$(dirname "$work/tree/$d")" && ln -s "$root/$d" "$work/tree/$d"; fi
   done
-  # git answers for the copy (the pinned binutils commit) and does not write the index of the real checkout
-  echo "gitdir: $(git rev-parse --absolute-git-dir)" > "$work/tree/.git"
-  export GIT_OPTIONAL_LOCKS=0
   touch -t 200001010000 "$work/started" "$work/tree"/data/specs/*.json  # a newer spec is one that a generator wrote
   cd "$work/tree"
 fi

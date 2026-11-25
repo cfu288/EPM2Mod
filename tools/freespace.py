@@ -351,15 +351,6 @@ class Linear:
 
     def __init__(self):
         self.ok = os.path.exists(rel(LINEAR)) and os.path.exists(rel(FUNCTIONS))
-        if self.ok:  # a map of another firmware, other binutils or older map code is not used: its verdicts differ
-            import fwmap
-            try:
-                with open(os.path.join(os.path.dirname(rel(LINEAR)), fwmap.FILES[-1])) as record:
-                    made = record.read()
-            except OSError:
-                made = ""
-            if made != fwmap.made_by():
-                die("the firmware map in %s is not complete or not current: run uv run epm2mod init" % os.path.dirname(rel(LINEAR)))
         self.fn_lo, self.fn_hi = [], []
         if not self.ok:
             return

@@ -8,8 +8,7 @@
 #
 # Needs a clone that is set up: uv run epm2mod init. The python part starts with `epm2mod init --check` and stops
 # when the set-up is not the pinned one (the objdump's source commit, the emulator's commit, Node, Olympus's
-# firmware, the firmware map). EPM2_BINUTILS, OM_EMU_DIR and OM_EMU_NODE replace pinned tools: with one of them
-# set, the checks that use the tool fail here.
+# firmware, the firmware map), or when EPM2_BINUTILS, OM_EMU_DIR or OM_EMU_NODE replaces a pinned tool.
 # Exit status 0: every check passed. A check that cannot run is a failure, not a skip, and no build is exempt.
 # No check reads a file that a clone does not have: two generators can compare their tables with the E-PL6
 # firmware, and they do so only when that file is given as their argument, which gen/run.sh never does.

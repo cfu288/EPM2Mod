@@ -229,8 +229,7 @@ pull request says so and the owner decides.
 
 A hard check takes the names of its inputs from git and from its arguments, and their contents from the working
 tree: an edit that is not committed yet is checked, and a file that is only in the working tree is not an input,
-unless the check is given it (a candidate's description and its new specs). It takes nothing from the shell that
-started it:
+unless the check is given it (a candidate's description and its new specs).
 
 - the free-space ledger and the camera-tested areas come from `git ls-files`, plus the specs
   of the build that is checked (a candidate's new spec is not in git yet);
@@ -238,18 +237,14 @@ started it:
   "(not in git)", and names one that cannot be read;
 - no check writes to a file that git holds: `gen/run.sh --check` works in a temporary copy, so a hand edit to a
   generated file fails the check and stays;
-- the emulator gets no option from the environment: `emuenv.tool_env` drops `E101_*`, `BOOTMS`, `WATCH`, `NO_OK` and
-  the like (`emulator/emu-run`, a person's tool, keeps them);
-- `EPM2_BINUTILS`, `OM_EMU_DIR` and `OM_EMU_NODE` are refused when `CI` is set and said on stderr otherwise;
-- left as they are, because they only say where a file goes: `EMU_IMAGES` (unpacked images, checked by their
-  sha256), `EMU_TMP`, `NVM_DIR`; and `CI_BASE`, which is an argument of `tools/ci.sh`.
+- `epm2mod init --check` refuses `EPM2_BINUTILS`, `OM_EMU_DIR` and `OM_EMU_NODE` when `CI` is set. `tools/ci.sh` starts with it.
 
 What decides a check's result is pinned where it can be:
 
 | Tool | Pinned by |
 |---|---|
-| Node | `.nvmrc`, a full version, matched exactly by `tools/node.sh` (the emulator, the web checks, CI). A test holds `web/package.json` `engines` to it |
-| The MN103 objdump | Built from the submodule `third_party/binutils-gdb`. `epm2mod init` records the source commit in `build/toolchain/source-commit` and reports the build as missing when it is another one. An objdump on PATH is never used; `EPM2_BINUTILS` is said on stderr in each run |
+| Node | `.nvmrc`, a full version, matched exactly by `tools/node.sh` (the emulator, the web checks, CI) |
+| The MN103 objdump | Built from the submodule `third_party/binutils-gdb`. `epm2mod init` records the source commit in `build/toolchain/source-commit` and reports the build as missing when it is another one. An objdump on PATH is never used |
 | The emulator | The submodule `emulator/om-emu`; `epm2mod init --check` compares its commit |
 | Python packages, npm packages | `uv.lock` (`uv sync --locked` in CI), `web/package-lock.json` (`npm ci`) |
 | Python | `.python-version`, a full version: `uv run` uses it on every computer and CI installs the same one |

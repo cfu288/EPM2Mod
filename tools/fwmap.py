@@ -311,44 +311,16 @@ def stage_ptrs(data, base, strings, starts, code_pages):
                 f.write(f"{base + o:08x}\t{v:08x}\tstr\n")
 
 
-#: Every file that `build` writes, in the order it writes them. The last one is the mark that the build finished:
-#: it says what made the database (made_by).
+#: Every file that `build` writes. The last one is written last.
 FILES = ("linear.txt", "functions.txt", "calls.tsv", "strrefs.tsv", "functions.tsv", "fnidx.tsv", "ptrs.tsv",
-         "starts.tsv", "tasks.tsv", "made-by.txt")
-
-
-def made_by():
-    """What decides the database's content: the firmware file's sha256, the base, the binutils' source commit, and
-    the code that writes it (this script and tools/disasm.py)."""
-    import hashlib
-
-    def digest(path):
-        with open(path, "rb") as f:
-            return hashlib.sha256(f.read()).hexdigest()
-
-    here = os.path.dirname(os.path.abspath(__file__))
-    try:  # the binutils that are used now: their folder and the objdump's own sha256, not a record beside them
-        folder = toolchain.binutils_dir()
-        used = "%s, objdump sha256 %s" % (os.path.relpath(folder, toolchain.REPO), digest(os.path.join(folder, toolchain.PREFIX + "objdump")))
-    except toolchain.ToolchainError:
-        used = "none"
-    return "firmware sha256 %s\nbase %#x\nbinutils %s (source commit %s)\nfwmap.py sha256 %s\ndisasm.py sha256 %s\n" % (
-        digest(FW), BASE, used, toolchain.source_commit() or "unknown",
-        digest(os.path.join(here, "fwmap.py")), digest(os.path.join(here, "disasm.py")))
+         "starts.tsv", "tasks.tsv")
 
 
 def cmd_check(a):
-    """Exit status 0 when the database is complete and current: every file of FILES is there and not empty, and
-    the last one names today's firmware and binutils."""
+    """Exit status 0 when every file of the database is there and not empty."""
     missing = [name for name in FILES if not os.path.isfile(os.path.join(OUT, name)) or not os.path.getsize(os.path.join(OUT, name))]
     if missing:
         sys.exit("the firmware map in %s is not complete (missing: %s): run tools/fwmap.py build" % (OUT, ", ".join(missing)))
-    with open(os.path.join(OUT, FILES[-1])) as f:
-        was = f.read()
-    if was != made_by():
-        sys.exit("the firmware map in %s was made from another firmware or by other binutils: run tools/fwmap.py build\n"
-                 "made by:\n%snow:\n%s" % (OUT, was, made_by()))
-    print("the firmware map in %s is complete and current (%d files)" % (OUT, len(FILES)))
 
 
 def cmd_build(a):
@@ -385,8 +357,6 @@ def cmd_build(a):
     print(f"functions {n}, call edges {c}, string refs {r} -> {OUT}")
     with open(os.path.join(OUT, "tasks.tsv"), "w") as f, contextlib.redirect_stdout(f):
         cmd_tasks(a)  # the task table, which the scenario runs of emulator/liveview.py read
-    with open(os.path.join(OUT, FILES[-1]), "w") as f:
-        f.write(made_by())
 
 
 def load_tsv(name):

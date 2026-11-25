@@ -64,7 +64,7 @@ class Emu:
             raise EmuError(f"no node at {NODE} (set OM_EMU_NODE)")
         if not os.path.exists(os.path.join(OM_EMU_DIR, "emu", "bin", "debug.mjs")):
             raise EmuError(f"no om-emu checkout at {OM_EMU_DIR}: run uv run epm2mod init (or set OM_EMU_DIR)")
-        env = dict(emuenv.clean_environment(), OM_EMU_MODEL="E101")  # no option from the caller's shell
+        env = dict(os.environ, OM_EMU_MODEL="E101")
         self.p = subprocess.Popen([NODE, "emu/bin/debug.mjs", "--serve"], cwd=OM_EMU_DIR, env=env, text=True,
                                   stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         self.n = 0

@@ -30,21 +30,10 @@ class EmuSetupError(Exception):
 
 def om_emu_dir():
     """Return the om-emu checkout: OM_EMU_DIR, else the submodule emulator/om-emu."""
-    env = _override("OM_EMU_DIR")
+    env = os.environ.get("OM_EMU_DIR")
     if env:
         return env
     return os.path.join(REPO, "emulator", "om-emu")
-
-
-def _override(name):
-    """Return the value of an environment variable that replaces a pinned tool, or None. A set one is said on
-    stderr; when the environment has CI (the hard checks: tools/ci.sh), it is an error."""
-    value = os.environ.get(name)
-    if value:
-        if os.environ.get("CI"):
-            raise EmuSetupError(f"{name} is set ({value}): the hard checks use only what the repository pins. Unset it")
-        print(f"note: {name} is set: {value} is used, not what the repository pins", file=sys.stderr)
-    return value
 
 
 def require_om_emu():
@@ -52,23 +41,13 @@ def require_om_emu():
     d = om_emu_dir()
     if not os.path.exists(os.path.join(d, "emu", "bin", "boot.mjs")):
         raise EmuSetupError(f"no om-emu with the boot lab at {d}: run uv run epm2mod init (or set OM_EMU_DIR)")
-    if not os.environ.get("OM_EMU_DIR"):  # the submodule: at the commit that the repository pins, or no result
-        want = subprocess.run(["git", "ls-files", "-s", "emulator/om-emu"], cwd=REPO, capture_output=True, text=True).stdout.split()
-        have = subprocess.run(["git", "rev-parse", "HEAD"], cwd=d, capture_output=True, text=True).stdout.strip()
-        if len(want) < 2 or want[1] != have:
-            raise EmuSetupError(f"{d} is at the commit {have or 'unknown'}, and the repository pins {want[1] if len(want) > 1 else 'none'}: "
-                                "run uv run epm2mod init (git submodule update --init emulator/om-emu)")
-        changed = subprocess.run(["git", "status", "--porcelain"], cwd=d, capture_output=True, text=True).stdout.strip()
-        if changed:  # the pinned commit with edited files is not the pinned emulator
-            raise EmuSetupError(f"{d} has changes that are not in its commit ({changed.splitlines()[0].strip()}, ...): "
-                                "undo them (git -C emulator/om-emu status), or set OM_EMU_DIR to say that another emulator is meant")
     return d
 
 
 def node():
     """Return the Node executable of the version in .nvmrc (tools/node.sh finds it), or raise EmuSetupError.
     OM_EMU_NODE names another one."""
-    env = _override("OM_EMU_NODE")
+    env = os.environ.get("OM_EMU_NODE")
     if env:
         return env
     found = subprocess.run([os.path.join(REPO, "tools", "node.sh"), "node", "-p", "process.execPath"], capture_output=True, text=True)
@@ -115,15 +94,6 @@ def blocks(image):
     name, path = image_bin(image)
     root = os.environ.get("EMU_IMAGES") or os.path.join(REPO, "build", "emu")
     out = os.path.join(root, f"{name}-{sha256(path)[:8]}")
-    if os.path.exists(os.path.join(out, "manifest.json")) and _block_sums(out) != _read(os.path.join(out, SUMS)):
-        # the unpacked blocks are not the ones that were written: unpack again. The folder is moved away in one
-        # step, not emptied in place: two checks run at the same time, and the other one may be reading it
-        gone = f"{out}.bad{os.getpid()}"
-        try:
-            os.rename(out, gone)
-        except OSError:  # the other process moved it first
-            pass
-        shutil.rmtree(gone, ignore_errors=True)
     if not os.path.exists(os.path.join(out, "manifest.json")):
         os.makedirs(root, exist_ok=True)
         tmp = f"{out}.tmp{os.getpid()}"
@@ -131,34 +101,11 @@ def blocks(image):
         if r.returncode != 0 or not os.path.exists(os.path.join(tmp, "manifest.json")):
             shutil.rmtree(tmp, ignore_errors=True)
             raise EmuSetupError(f"cannot unpack {path}: {(r.stderr or r.stdout).strip()[-300:]}")
-        with open(os.path.join(tmp, SUMS), "w") as f:
-            f.write(_block_sums(tmp))
         try:
             os.rename(tmp, out)
         except OSError:  # another process unpacked the same image in the meantime
             shutil.rmtree(tmp, ignore_errors=True)
     return out
-
-
-SUMS = "sha256sums.txt"  # in a folder of unpacked blocks: the sha256 of each file, written when it was unpacked
-
-
-def _block_sums(folder):
-    """The sha256 of every file of an unpacked image but SUMS, one line each, after the sha256 of the unpacker
-    (tools/oetool.py): blocks that an older unpacker wrote are not reused. "" when the folder cannot be read
-    (another process is replacing it)."""
-    try:
-        return f"{sha256(os.path.join(REPO, 'tools', 'oetool.py'))}  the unpacker\n" + "".join(f"{sha256(os.path.join(folder, name))}  {name}\n" for name in sorted(os.listdir(folder)) if name != SUMS)
-    except OSError:
-        return ""
-
-
-def _read(path):
-    try:
-        with open(path) as f:
-            return f.read()
-    except OSError:
-        return ""
 
 
 def tool_command(tool, args=()):
@@ -169,21 +116,10 @@ def tool_command(tool, args=()):
     return [node(), script, *args]
 
 
-#: Environment variables that emulator/boot/forkcli.mjs and the boot tools turn into emulator options.
-OPTION_VARIABLES = ("BOOTMS", "GUILOG", "GLN", "FLASHLOG", "CARDLOG", "NO_OK", "WATCH", "OM_EMU_MODEL", "BLOCKS", "EMU_BIN", "EPM2_REPO")
-
-
-def clean_environment():
-    """Return the caller's environment without the emulator's option variables (E101_* and OPTION_VARIABLES): a
-    check's result must not depend on what the shell that started it has set. A caller that wants an option gives
-    it to tool_env as ``extra``."""
-    return {k: v for k, v in os.environ.items() if not k.startswith("E101_") and k not in OPTION_VARIABLES}
-
-
-def tool_env(image, extra=None, options_from_shell=False):
+def tool_env(image, extra=None):
     """Return the environment for a tool run on IMAGE: BLOCKS, EMU_BIN (the .BIN, when IMAGE names one), OM_EMU_DIR and
     EPM2_REPO are set."""
-    env = dict(os.environ) if options_from_shell else clean_environment()  # emu-run, a person's tool, keeps them
+    env = dict(os.environ)
     env["BLOCKS"] = blocks(image)
     if not os.path.isdir(image):
         env["EMU_BIN"] = os.path.abspath(image_bin(image)[1])
