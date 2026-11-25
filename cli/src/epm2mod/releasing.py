@@ -14,22 +14,14 @@ A test release of another camera-tested build (``--build NAME``) is
 
 The camera's Firmware screen shows the same date: the release holds the
 camera-tested build with its label set to the day of the release
-(``release.stamp``). What covers the image that is released:
-
-- ``release.check_only_the_label_differs``: it differs from the tested image
-  only in the date's bytes (text in late-loaded segment 2) and the checksum;
-- the two start-up checks run on that image, in the emulator;
-- the free-space check, with the load-order check, runs on the build's specs.
-  It reads the specs, not the image, and the specs are those of the tested
-  build: it shows that they still pass today's rules, not more.
-
-The notes give both sha256.
+(``release.stamp``). That image is checked before it is released: it differs
+from the tested one only in the date (``release.check_only_the_label_differs``),
+and it passes the free-space and start-up checks. The notes give both sha256.
 """
 
 from __future__ import annotations
 
 import datetime
-import json
 import re
 import subprocess
 import tempfile
@@ -40,7 +32,6 @@ from . import readme
 from .builds import pinned_description
 from .errors import BuildError, Epm2ModError
 from .fileio import write_bytes
-from .label import check_label
 from .paths import RepoPaths
 from .pipeline import check_free_space, check_in_emulator
 from .release import check_version, stamp
@@ -84,7 +75,6 @@ def release_notes(
     sha256: str,
     previous: str | None,
     changes: list[str],
-    unchanged: bool = False,
     tested: tuple[str, str] | None = None,
 ) -> str:
     """Return the release notes: what is in the build and what changed.
@@ -96,7 +86,6 @@ def release_notes(
         sha256: the firmware file's SHA-256.
         previous: the tag of the release before, if any.
         changes: the subjects of the feat and fix commits since ``previous``.
-        unchanged: True if the release ``previous`` holds the same camera-tested firmware.
         tested: the sha256 and the label of the camera-tested build, if the release holds it with another label.
     """
     firmware = f"Firmware: EPM2Mod {label}, sha256 `{sha256}`."
@@ -105,24 +94,12 @@ def release_notes(
             f" Camera-tested as sha256 `{tested[0]}` (label {tested[1]}); "
             "differs only in the Firmware-screen date."
         )
-    if unchanged and previous:
-        firmware += f" The camera-tested firmware is unchanged since {previous}."
     lines = [f"EPM2Mod {version}", "", firmware, "", f"{what}.", ""]
     if changes:
         lines += [f"Changes since {previous}:" if previous else "Changes:", ""]
         lines += [f"- {change}" for change in changes]
         lines.append("")
     return "\n".join(lines)
-
-
-def _pinned_sha256_at(paths: RepoPaths, tag: str) -> str | None:
-    """Return the sha256 of the build that was pinned at ``tag``, or None if it cannot be read."""
-    try:
-        pinned = paths.relative(paths.pinned)
-        build = json.loads(_git(paths, "show", f"{tag}:{pinned}"))["build"]
-        return str(json.loads(_git(paths, "show", f"{tag}:{build}"))["sha256"])
-    except (BuildError, ValueError, KeyError, TypeError):
-        return None
 
 
 def _git(paths: RepoPaths, *args: str) -> str:
@@ -148,14 +125,12 @@ class Plan:
         commit: the commit to tag.
         notes: the release notes.
         sha256: the sha256 of the firmware that the release installs.
-        day: the day of the release, which is in the version and on the Firmware screen.
     """
 
     tag: str
     commit: str
     notes: str
     sha256: str
-    day: str
 
 
 def plan(
@@ -163,22 +138,14 @@ def plan(
     final: bool,
     build: str | None = None,
     day: str | None = None,
-    today: str | None = None,
 ) -> tuple[Plan | None, list[str]]:
     """Check the repository and return the release to make, or the problems.
 
     ``build`` names the build of a test release in place of the pinned build.
-    ``day`` is the day of the release (default: today in UTC), like ``2026.11.25``. It decides the version and the
-    image, so a release that follows a dry run is made with the day of the dry run.
-    It is not after ``today`` (default: today in UTC) and not before the day of the newest release tag.
+    ``day`` is the day of the release, like ``2026.11.25`` (default: today in UTC).
     """
-    if today is None:
-        today = datetime.datetime.now(datetime.timezone.utc).strftime("%Y.%m.%d")
     if day is None:
-        day = today
-    check_label(day, "the day of the release")
-    if day > today:
-        raise BuildError(f"the day of the release {day} is after today ({today}, UTC)")
+        day = datetime.datetime.now(datetime.timezone.utc).strftime("%Y.%m.%d")
     problems: list[str] = []
     chosen = pinned_description(paths) if build is None else paths.build(build)
     which = "the pinned build" if build is None else "the build"
@@ -200,13 +167,6 @@ def plan(
         )
     problems += [f"feature list: {p}" for p in readme.feature_problems(paths)]
     tags = _git(paths, "tag", "--list", "v*").split()
-    days = [
-        m.group(1) for tag in tags if (m := re.match(r"v(\d{4}\.\d{2}\.\d{2})\b", tag))
-    ]
-    if days and day < max(days):
-        problems.append(
-            f"the day of the release {day} is before the newest release tag's day ({max(days)})"
-        )
     try:
         version = next_version(day, tags, final, build)
         check_version(version)
@@ -238,9 +198,6 @@ def plan(
     since = f"{previous}..HEAD" if previous else "HEAD"
     subjects = _git(paths, "log", "--format=%s", since).splitlines()
     changes = [s for s in subjects if re.match(r"(feat|fix)\b", s)]
-    unchanged = previous is not None and (
-        _pinned_sha256_at(paths, previous) == chosen.sha256
-    )
     notes = release_notes(
         version,
         released.label,
@@ -248,7 +205,6 @@ def plan(
         released.sha256,
         previous,
         changes,
-        unchanged,
         tested,
     )
-    return Plan(f"v{version}", commit, notes, released.sha256, day), []
+    return Plan(f"v{version}", commit, notes, released.sha256), []

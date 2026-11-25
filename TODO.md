@@ -12,7 +12,6 @@ From the ninth review of the clean-up (2026-11-25). First decide if the check is
 - The pull request title check does not run when the title is edited.
 - `epm2mod init` accepts an edited binutils source as the pinned one.
 - Untracked files under `cli/`, `tools/`, `emulator/` and `gen/` take part in local checks.
-- The proposals of [check-audit.md](docs/dev/check-audit.md), section Proposals, wait for the owner.
 
 ## Film simulations
 

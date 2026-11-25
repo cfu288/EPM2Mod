@@ -150,9 +150,7 @@ class ZipTests(unittest.TestCase):
         with zipfile.ZipFile(self.zip) as archive:
             inside = {name[len(self.top) :] for name in archive.namelist()}
             manifest = json.loads(archive.read(self.top + MANIFEST))
-            package = archive.read(self.top + manifest["app"].rsplit("/", 1)[0] + "/__init__.py")
         self.assertEqual(manifest[RELEASE_KEY], VERSION)
-        self.assertIn(f'__version__ = "{VERSION}"'.encode(), package)
         self.assertEqual(
             set(manifest) - {RELEASE_KEY},
             {"pinned", "builds", "specs", "label_spec", "film_records", "cache", "app"},

@@ -293,36 +293,11 @@ class RepoPaths:
             )
         return load_checked(self, path)
 
-    def tracked(self, folder: Path) -> set[Path] | None:
-        """Return the files under ``folder`` that git holds, or None if the project is not a git checkout.
-
-        What goes into a release or a generated document is what git holds: a
-        file that is only in the working tree would give this computer
-        another result.
-        """
-        import subprocess
-
-        try:
-            done = subprocess.run(
-                ["git", "ls-files", "-z", "--", self.relative(folder)],
-                cwd=self.root,
-                capture_output=True,
-                text=True,
-                check=False,
-            )
-        except OSError:
-            return None
-        if done.returncode != 0:
-            return None
-        return {self.root / name for name in done.stdout.split("\0") if name}
-
     def all_builds(self) -> list[BuildDescription]:
         """Return every build description, in name order."""
         from .builds import all_descriptions
 
-        # a description that git does not hold and that cannot be read is left out, not an error: a draft in the
-        # folder must not stop the commands that only look the builds up
-        return all_descriptions(self, problems=[])
+        return all_descriptions(self)
 
     def event_dictionaries(self) -> list[Path]:
         """Return the event dictionaries of the debug log: the current one, then those of older builds."""

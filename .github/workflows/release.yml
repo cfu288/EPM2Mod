@@ -2,12 +2,7 @@
 # from main. A merge does not release, and a pushed tag starts nothing: this workflow creates the tag.
 #
 # 1. plan: the hard checks (tools/ci.sh) run on the commit. Then `epm2mod release` checks that the build has a camera
-#    test and names the version and the notes. The day is the input `day`, or today (UTC): give the day that a dry
-#    run printed to release what the dry run checked. The plan makes the image that is released: the pinned build
-#    with that day as its label (refused if it differs from the camera-tested image outside the date), or the
-#    tested image as it is when its label is that day already. The start-up checks run on that image in both
-#    cases. The free-space and load-order checks read the build's specs, not the image: the date-only guard is what
-#    covers the stamped bytes.
+#    test, makes the image with today (UTC) as its label, checks it, and names the version and the notes.
 # 2. package: the zip, its start on three systems, the signed and notarized Mac disk image (package.yml). The
 #    environment "release" holds the signing secrets and restricts them to its branches and tags.
 # 3. publish, not with dry_run: the tag and the GitHub release, in one step.
@@ -27,10 +22,6 @@ on:
         default: ''
       notes:
         description: Text to put above the generated release notes.
-        type: string
-        default: ''
-      day:
-        description: The day of the release as YYYY.MM.DD. It is in the version and on the Firmware screen. Empty is today (UTC). After a dry run, give the day that the dry run printed.
         type: string
         default: ''
       dry_run:
@@ -77,13 +68,11 @@ jobs:
         env:
           KIND: ${{ inputs.kind }}
           BUILD: ${{ inputs.build }}
-          DAY: ${{ inputs.day }}
           NOTES: ${{ inputs.notes }}
         run: |
           set -- release --json
           [ "$KIND" = final ] && set -- "$@" --final
           [ -n "$BUILD" ] && set -- "$@" --build "$BUILD"
-          [ -n "$DAY" ] && set -- "$@" --day "$DAY"
           uv run epm2mod "$@" > plan.json || true
           python - <<'EOF'
           import json, os, sys
@@ -98,7 +87,6 @@ jobs:
           with open("notes.md", "w", encoding="utf-8") as notes:
               notes.write((extra + "\n\n" if extra else "") + plan["notes"] + "\n" + install)
           print(open("notes.md", encoding="utf-8").read())
-          print(f"The day of this plan is {plan['day']}. To release what this run checked: -f day={plan['day']}")
           EOF
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:

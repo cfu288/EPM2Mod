@@ -81,7 +81,7 @@ class PlanTests(unittest.TestCase):
     def test_a_named_build_is_a_test_release_with_its_notes(self) -> None:
         self.checked: list[str] = []
         self.assertFalse(self.paths.pinned.exists())  # the pinned build is not needed
-        release, problems = releasing.plan(self.paths, final=False, build="probe", day="2026.11.25", today="2026.11.25")
+        release, problems = releasing.plan(self.paths, final=False, build="probe", day="2026.11.25")
         self.assertEqual(problems, [])
         assert release is not None
         self.assertEqual((release.tag, release.commit), ("v2026.11.25-probe.2", "c0ffee"))
@@ -96,26 +96,13 @@ class PlanTests(unittest.TestCase):
         self.checked = []
         with mock.patch.object(releasing, "stamp", lambda paths, build, day: (build, b"image")):
             release, problems = releasing.plan(
-                self.paths, final=False, build="probe", day="2026.11.25", today="2026.11.26"
+                self.paths, final=False, build="probe", day="2026.11.25"
             )
         self.assertEqual(problems, [])
         assert release is not None
-        self.assertEqual((release.sha256, release.day), ("ab" * 32, "2026.11.25"))
+        self.assertEqual(release.sha256, "ab" * 32)
         self.assertNotIn("Camera-tested as", release.notes)
         self.assertEqual(self.checked, ["2026.11.20", "probe.BIN"])  # the start-up and load-order checks ran
-
-    def test_the_day_is_a_real_date_not_after_today_and_not_before_the_newest_tag(self) -> None:
-        def plan(day: str) -> list[str]:
-            return releasing.plan(self.paths, final=False, build="probe", day=day, today="2026.11.26")[1]
-
-        with self.assertRaises(BuildError):
-            plan("2026.13.01")
-        with self.assertRaisesRegex(BuildError, "after today"):
-            plan("2026.11.27")
-        self.checked = []
-        self.assertEqual(plan("2026.11.26"), [])
-        self.assertEqual(plan("2026.11.25"), [])  # the day of the newest tag
-        self.assertEqual(plan("2026.11.24"), ["the day of the release 2026.11.24 is before the newest release tag's day (2026.11.25)"])
 
     def test_a_failed_start_up_check_stops_the_release(self) -> None:
         def failed(paths: RepoPaths, image: Path) -> list[str]:
@@ -123,17 +110,17 @@ class PlanTests(unittest.TestCase):
 
         self.checked = []
         with mock.patch.object(releasing, "check_in_emulator", failed):
-            release, problems = releasing.plan(self.paths, final=False, build="probe", day="2026.11.25", today="2026.11.25")
+            release, problems = releasing.plan(self.paths, final=False, build="probe", day="2026.11.25")
         self.assertIsNone(release)
         self.assertEqual(len(problems), 1)
         self.assertIn("TIMES MOVED", problems[0])
 
     def test_the_hint_is_the_command_for_the_release_that_was_planned(self) -> None:
         self.checked = []
-        argv = ["--project", str(self.paths.root), "release", "--build", "probe", "--day", "2026.11.25"]
+        argv = ["--project", str(self.paths.root), "release", "--build", "probe"]
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()) as err:
             self.assertEqual(cli.main(argv), 0, err.getvalue())
-        self.assertIn("release -f kind=rc -f build=probe -f day=2026.11.25 -f dry_run=false", err.getvalue())
+        self.assertIn("release -f kind=rc -f build=probe -f dry_run=false", err.getvalue())
 
     def test_an_untested_build_is_not_released(self) -> None:
         self.assertEqual(
@@ -156,10 +143,6 @@ class ReleaseNotesTests(unittest.TestCase):
         self.assertIn("Firmware: EPM2Mod 2026.11.20, sha256 `" + "ab" * 32 + "`.\n", notes)
         self.assertIn("\nFilm looks.\n", notes)
         self.assertIn("Changes since v2026.11.25-rc.1:\n\n- feat: x\n", notes)
-
-    def test_the_notes_say_when_the_firmware_is_the_same_as_before(self) -> None:
-        notes = release_notes("2026.11.26-rc.1", "2026.11.20", "Looks", "ab" * 32, "v2026.11.25-rc.1", [], unchanged=True)
-        self.assertIn("`. The camera-tested firmware is unchanged since v2026.11.25-rc.1.\n", notes)
 
     def test_the_notes_of_a_stamped_build_give_both_sha256(self) -> None:
         notes = release_notes("2026.11.26-rc.1", "2026.11.26", "Looks", "cd" * 32, None, [], tested=("ab" * 32, "2026.11.20"))

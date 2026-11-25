@@ -156,14 +156,11 @@ to main does not release. Nobody pushes a tag: the workflow creates it, and a ta
 
 ```sh
 uv run epm2mod release                                   # the local preview: ready or not, the version, the notes
-gh workflow run release.yml -f kind=rc                                    # a dry run: everything but the tag and the publication
-gh workflow run release.yml -f kind=rc -f day=YYYY.MM.DD -f dry_run=false  # the release, with the day that the dry run printed
+gh workflow run release.yml -f kind=rc                      # a dry run: everything but the tag and the publication
+gh workflow run release.yml -f kind=rc -f dry_run=false     # the release
 ```
 
-The day decides the version and the image. Without `day` it is today in UTC, so a release started after midnight
-UTC would not be the one a dry run checked the day before: pass the day.
-
-1. **The version is the day of the release** (the input `day`, `epm2mod release --day`; default today in UTC): `vYYYY.MM.DD-rc.N`. N is 1 for the first release of a day and
+1. **The version is the day of the release** (UTC): `vYYYY.MM.DD-rc.N`. N is 1 for the first release of a day and
    one more than the highest existing tag of that day after that. Every release is a pre-release (`-rc.N`) for now;
    `kind=final` (`epm2mod release --final`) gives a plain `vYYYY.MM.DD`. A test release of a camera-tested build that
    is not pinned (`-f build=NAME`, `epm2mod release --build NAME`) is `vYYYY.MM.DD-NAME.N`; record its test first
@@ -171,15 +168,12 @@ UTC would not be the one a dry run checked the day before: pass the day.
 2. **The Firmware screen shows the same date.** A build's `"label"` (with the spec `data/specs/build-label.json`) is
    the date on its Firmware screen ("Body : 1.6  EPM2Mod 2026.11.19"). The release holds the pinned, camera-tested
    build with the label set to the day of the release (`release.stamp`). So the label of the description does not
-   have to be the release's day. When it is that day already, the tested image is released as it is; the checks of
-   item 3 run on it all the same.
+   have to be the release's day.
 3. **The stamped image is not the image that was on the camera.** The tool releases it only when all of this holds,
    and stops when one does not:
    - it differs from the camera-tested image (the pinned sha256) only in the 20 bytes of the date and in the
      checksum of block 0 (`release.check_only_the_label_differs`; the date has a fixed length, so nothing moves);
-   - the free-space check, which holds the load-order check, passes on the build's specs. It reads the specs and
-     not the image, and the specs are the tested build's: this shows that they pass today's rules. The stamped
-     bytes are text in late-loaded segment 2, which the first rule covers;
+   - the free-space check, with the load-order check, passes on the build's specs;
    - `emulator/boot-test` and `emulator/update-path-test` pass on it.
    The release notes give both: "Firmware: EPM2Mod LABEL, sha256 RELEASED. Camera-tested as sha256 TESTED (label
    L); differs only in the Firmware-screen date." The zip's manifest records the tested sha256 and label under
@@ -187,8 +181,7 @@ UTC would not be the one a dry run checked the day before: pass the day.
    The description in `data/builds/` is not changed.
 4. **`epm2mod release` checks** that the build has a camera test (`epm2mod pin` recorded it), the tree is clean and at
    `origin/main`, and the generated documents and the feature lists are current. It writes the notes: the firmware
-   line, the build's description, the feat and fix commits since the last release, and "The camera-tested firmware is
-   unchanged since vX" when it is.
+   line, the build's description, and the feat and fix commits since the last release.
 5. **The workflow** runs the hard checks (`tools/ci.sh`) on the commit, then that command (job `plan`), makes the zip
    and the Mac disk image and starts them on three systems (`package.yml`), and then creates the tag and the GitHub
    release in one step (`gh release create`), unless `dry_run` is true, the default.
@@ -210,49 +203,25 @@ Mac, `release/mac/make-dmg.sh ZIP` makes the disk image locally, signed ad hoc u
 
 ## Checks
 
-Each check is in one layer. What each one protects against, and what it caught: [check-audit.md](check-audit.md).
+Each check is in one layer.
 
 | Layer | What | Where |
 |---|---|---|
-| Commit hooks | Fast, on staged files: machine paths, the document rules, prettier, black, mypy, the commit message. And one soft part: `epm2mod lint` of each staged build description, which prints warnings and never refuses. `epm2mod init --check` reports if the hooks are on; no other check depends on them | `.githooks/` |
-| Hard checks | Deterministic, no warnings: `tools/ci.sh`. `epm2mod init --check` (the set-up is the pinned one, and a variable that replaces a pinned tool is refused), black, mypy, the unit tests (they hold pyflakes on the scripts and the feature lists), the generated documents and the generated specs (a spec that git does not hold fails), the web checks. Then, for the pinned build, each build description that git holds and that differs from the base commit (committed or changed in the working tree) and each build named as an argument (`tools/ci.sh python NAME`, for a description that git does not hold yet): `epm2mod make`, and the checks that `make` runs on a candidate. A check that cannot run fails. A step that passes prints its name only; one that fails prints its output | CI (`python.yml`, `web.yml`) runs this script after the set-up, and `release.yml` runs it on the released commit. Run it before a pull request |
-| Checks of a candidate | `epm2mod make NAME`: the free-space check (with the load-order check and the callers in SRAM), `boot-test` and `update-path-test`. A start whose time stamps moved (TIMES MOVED) fails | a candidate is not made without them |
-| Soft report | `uv run epm2mod lint NAME` (`tools/buildlint.py`): transfers from early-loaded to late-loaded code (the new ones by address, the pinned build's as a count), the early-loaded space it uses, first code, words in new early-loaded bytes that can be late-loaded addresses, the cold start for the camera test. Exit status 0 with any number of warnings, 6 when the report cannot be made | by hand and from the commit hook. Never in CI |
+| Commit hooks | Staged files: machine paths, the document rules, prettier, black, mypy, the commit message. `epm2mod lint` of each staged build description only warns | `.githooks/` |
+| Hard checks | No warnings: `tools/ci.sh` (its first lines say what it makes and checks) | CI runs it (`python.yml`, `web.yml`), and `release.yml` on the released commit. Run it before a pull request |
+| Checks of a candidate | The free-space check (with the load-order check), `boot-test` and `update-path-test`. A start whose time stamps moved (TIMES MOVED) fails | `epm2mod make NAME`: a candidate is not made without them |
+| Soft report | Load-order transfers that the pinned build does not have, first code, the cold start for the camera test. Exit status 0 with any number of warnings | `uv run epm2mod lint NAME`, by hand and from the commit hook. Never in CI |
 | By hand | `emulator/scenarios/scen_guard.py`, before a build that changes peaking is offered for a flash; `emulator/filmcheck.py`, before one that changes the film structure or the loader; `uv run python tools/freespace.py map`, when the code-space map is needed | the script's first lines |
 
 The load-order check compares a build with the pinned build, by address and target: a transfer from early-loaded to
-late-loaded code that the pinned build does not have fails. It keeps no list of accepted transfers. The rule and the
-known transfers: [load-order.md](load-order.md), sections 2 and 5.
+late-loaded code that the pinned build does not have fails. The rule and the known transfers:
+[load-order.md](load-order.md), sections 2 and 5. When a newer check refuses a camera-tested build that a pull request
+must touch, the pull request says so and the owner decides.
 
-No build is exempt from a check. When a newer check refuses a camera-tested build that a pull request must touch, the
-pull request says so and the owner decides.
-
-A hard check takes the names of its inputs from git and from its arguments, and their contents from the working
-tree: an edit that is not committed yet is checked, and a file that is only in the working tree is not an input,
-unless the check is given it (a candidate's description and its new specs).
-
-- the free-space ledger and the camera-tested areas come from `git ls-files`, plus the specs
-  of the build that is checked (a candidate's new spec is not in git yet);
-- the generated build table, the feature guides and the release zip take the files that git holds. `epm2mod builds` also lists a description that git does not hold, marked
-  "(not in git)", and names one that cannot be read;
-- no check writes to a file that git holds: `gen/run.sh --check` works in a temporary copy, so a hand edit to a
-  generated file fails the check and stays;
-- `epm2mod init --check` refuses `EPM2_BINUTILS`, `OM_EMU_DIR` and `OM_EMU_NODE` when `CI` is set. `tools/ci.sh` starts with it.
-
-What decides a check's result is pinned where it can be:
-
-| Tool | Pinned by |
-|---|---|
-| Node | `.nvmrc`, a full version, matched exactly by `tools/node.sh` (the emulator, the web checks, CI) |
-| The MN103 objdump | Built from the submodule `third_party/binutils-gdb`. `epm2mod init` records the source commit in `build/toolchain/source-commit` and reports the build as missing when it is another one. An objdump on PATH is never used |
-| The emulator | The submodule `emulator/om-emu`; `epm2mod init --check` compares its commit |
-| Python packages, npm packages | `uv.lock` (`uv sync --locked` in CI), `web/package-lock.json` (`npm ci`) |
-| Python | `.python-version`, a full version: `uv run` uses it on every computer and CI installs the same one |
-| uv, actions and runner images in CI | uv by version and wheel hash (`.github/uv-requirements.txt`), actions by commit, images by release (`ubuntu-24.04`) |
-
-Not pinned: bison, flex and texinfo, which build the objdump in CI (`apt-get` gives the image's versions and Ubuntu
-keeps no old ones to name; the built objdump's version line is in the run's log); the patch level of the runner
-images; a contributor's own gcc.
+What decides a check's result is pinned: Node (`.nvmrc`, `tools/node.sh`), Python (`.python-version`), the packages
+(`uv.lock`, `web/package-lock.json`), the MN103 objdump and the emulator (submodules; `epm2mod init --check` compares
+their commits), and uv, the actions and the runner images in CI. bison, flex and texinfo, which build the objdump in
+CI, come from the runner's Ubuntu release.
 
 Production tools and checks do not import or run anything under `experiments/`. A check script or an input that a
 tool needs moves to `emulator/`, `tools/` or `data/`.

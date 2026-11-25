@@ -21,8 +21,7 @@ firmware computes at run time (base + index, heap, memory test) is invisible to 
 This tool never writes under build/ and never changes firmware. It writes docs/code-space-map.*
 only in `map`.
 """
-import argparse, bisect, hashlib, json, mmap, os, re, struct, subprocess, sys
-import pathlib
+import argparse, bisect, glob, hashlib, json, mmap, os, re, struct, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STOCK_FW = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
@@ -76,11 +75,11 @@ def canon(a):
 def load_block0():
     p = rel(STOCK_BLOCK0)
     if os.path.exists(p):
-        data = pathlib.Path(p).read_bytes()
+        data = open(p, "rb").read()
     else:                                   # fall back to the container; nothing is written
         sys.path.insert(0, rel("tools"))
         import oetool
-        data = oetool.parse(pathlib.Path(rel(STOCK_FW)).read_bytes())[0][0]["payload"]
+        data = oetool.parse(open(rel(STOCK_FW), "rb").read())[0][0]["payload"]
     if hashlib.sha256(data).hexdigest() != STOCK_BLOCK0_SHA256:
         die("stock block 0 has sha256 %s, expected %s" % (hashlib.sha256(data).hexdigest(), STOCK_BLOCK0_SHA256))
     return data
@@ -91,8 +90,7 @@ def container_flash_base():
     p = rel(STOCK_FW)
     if not os.path.exists(p):
         return None
-    with open(p, "rb") as f:
-        hd = f.read(32)
+    hd = open(p, "rb").read(32)
     if hd[:2] != b"OE":
         die("stock firmware does not start with an OE block header")
     return struct.unpack_from("<I", hd, 8)[0] + 32
@@ -533,7 +531,7 @@ def read_tsv(path, ncol):
     p = rel(path)
     if not os.path.exists(p):
         return rows
-    for n, line in enumerate(pathlib.Path(p).read_text(encoding="utf-8").splitlines(keepends=True), 1):
+    for n, line in enumerate(open(p, encoding="utf-8"), 1):
         line = line.rstrip("\n")
         if not line.strip() or line.startswith("#"):
             continue
@@ -564,7 +562,7 @@ class Op:
 class Spec:
     def __init__(self, path, d=None):
         self.path = path.replace(os.sep, "/")
-        d = d if d is not None else json.loads(pathlib.Path(rel(path)).read_text(encoding="utf-8"))
+        d = d if d is not None else json.load(open(rel(path)))
         self.name = d.get("name", os.path.basename(path)[:-5])
         self.ops, self.other = [], 0
         for i, o in enumerate(d["ops"]):
@@ -608,29 +606,11 @@ def history_specs():
     return _HISTORY
 
 
-def tracked(patterns):
-    """The files of the repository that git holds and that match the patterns, as paths relative to the root. The
-    names come from git; the contents are the working tree's (an edit that is not committed yet is checked). A
-    file that is only in the working tree is not an input of a check: it would give this computer another result."""
-    done = subprocess.run(["git", "ls-files", "-z", "--", *patterns], cwd=ROOT, capture_output=True, text=True)
-    if done.returncode != 0:
-        die("git ls-files failed (%s): the ledger is made from the files that git holds" % done.stderr.strip())
-    return sorted(p for p in done.stdout.split("\0") if p)
-
-
-def all_specs(extra=()):
-    """The specs of the ledger: those that git holds (SPEC_GLOBS), and ``extra``, the specs that are being checked
-    (a candidate's new spec is not in git yet)."""
-    paths = tracked(SPEC_GLOBS)
-    paths += [p for p in extra if p not in paths]
-    specs = []
-    for p in paths:
-        try:
-            specs.append(Spec(p))
-        except (OSError, ValueError, KeyError, TypeError) as error:  # ValueError: not JSON
-            die("the spec %s cannot be read (%s: %s). The ledger holds every spec that git names, as it is in the "
-                "working tree: repair the file or restore it (git checkout -- %s)" % (p, type(error).__name__, error, p))
-    return specs
+def all_specs():
+    paths = []
+    for g in SPEC_GLOBS:
+        paths += sorted(glob.glob(rel(g)))
+    return [Spec(os.path.relpath(p, ROOT)) for p in paths]
 
 
 def camera_tested():
@@ -638,8 +618,8 @@ def camera_tested():
     the earliest such row."""
     out = {}
     lines = []
-    for p in tracked([CAMERA_LOG + "*.md"]):
-        lines += pathlib.Path(rel(p)).read_text(encoding="utf-8").splitlines()
+    for p in sorted(glob.glob(os.path.join(rel(CAMERA_LOG), "*.md"))):
+        lines += open(p, encoding="utf-8").read().splitlines()
     for line in lines:
         c = [x.strip() for x in line.split("|")]
         if len(c) < 6 or not c[4].startswith("**OK"):
@@ -666,13 +646,13 @@ class Area:
 
 
 class Space:
-    def __init__(self, min_run=32, use_linear=True, other_blocks=False, extra_specs=()):
+    def __init__(self, min_run=32, use_linear=True, other_blocks=False):
         self.b = load_block0()
         self.others = []
         if other_blocks and os.path.exists(rel(STOCK_FW)):
             sys.path.insert(0, rel("tools"))
             import oetool
-            blocks, tail = oetool.parse(pathlib.Path(rel(STOCK_FW)).read_bytes())
+            blocks, tail = oetool.parse(open(rel(STOCK_FW), "rb").read())
             self.others = [("block %d" % i, Windows(x["payload"])) for i, x in enumerate(blocks) if i] + [("tail", Windows(tail))]
         self.m = Model(self.b)
         self.lin = Linear() if use_linear else None
@@ -680,7 +660,7 @@ class Space:
             self.lin = None
         self.win = Windows(self.b)
         self.min_run = min_run
-        self.specs = all_specs(extra_specs)
+        self.specs = all_specs()
         self.tested = camera_tested()
         self.superseded = {}
         for spec, by, ev in read_tsv(SUPERSEDED, 3):
@@ -1383,7 +1363,7 @@ def write_map(sp):
     w("| `%s` | %d | spec, superseded by, evidence |" % (SUPERSEDED, len(sp.superseded)))
     w("")
     w("The full evidence text of every check is in `%s`." % MAP_TSV)
-    pathlib.Path(rel(MAP_MD)).write_text("\n".join(md) + "\n", encoding="utf-8")
+    open(rel(MAP_MD), "w", encoding="utf-8").write("\n".join(md) + "\n")
 
     with open(rel(MAP_TSV), "w", encoding="utf-8") as fh:
         fh.write("\t".join(["start", "end", "size", "region", "source", "kind", "verdict", "failing", "allowed_use",
@@ -1513,8 +1493,7 @@ def main():
     a = ap.parse_args()
     if a.cmd == "selftest":
         return selftest()
-    given = [os.path.relpath(os.path.abspath(p), ROOT) for p in a.specs] if a.cmd == "check" else []
-    sp = Space(a.min_run, not a.no_decode, other_blocks=(a.cmd == "map" and not a.no_other_blocks), extra_specs=given)
+    sp = Space(a.min_run, not a.no_decode, other_blocks=(a.cmd == "map" and not a.no_other_blocks))
     if a.cmd == "map":
         tot = write_map(sp)
         print("wrote %s and %s (%d areas)" % (MAP_MD, MAP_TSV, len(sp.areas)))

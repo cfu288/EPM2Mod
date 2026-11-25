@@ -242,22 +242,15 @@ Built:
   `emulator/hookcheck.py`) on a candidate, and `tools/ci.sh` runs it on a tested build. V tool.
 - **A comparison with the pinned build, not a list.** A candidate fails for a transfer that the pinned build does not
   have. Issue #6 is the test: `spot-af-2`, the build with the jump 0x7E4C93A4 to 0x7ECB0B81, fails with that one line.
-  `epm2mod lint NAME` prints the new ones and the count of the old ones. V tool.
+  V tool.
 - **Pointers that an op rewrites, in whole or in part.** `hookcheck.py` looks at every 4-byte word that overlaps a
   patched early-loaded run: a stock pointer to early-loaded space that points to late-loaded space in the build
   fails, also when the op covers only some of its bytes. V tool (a test holds it).
-- **Words in new early-loaded bytes that can be late-loaded addresses,** in the four address forms: `epm2mod lint`
-  lists them (22 for `cold-start-fix`). It takes every byte position, so a hit can be chance. This is a warning,
-  not a check: nobody has gone through the 22. U which of them are pointers.
-- **Free early-loaded space as numbers:** `epm2mod lint` prints, for each free-space area the build uses in
-  early-loaded space, the bytes used and left (22 B and 228 B for `cold-start-fix`; the 138 B tail of segment 1 is
-  not printed, because that build has no bytes there).
 - **A cold start in the camera test:** `epm2mod lint` says so for a candidate that changes early-loaded bytes.
 
 Not built:
 
-- **Jumps through a register and reads of late-loaded data from new code.** No static check sees them beyond the
-  word list above.
+- **Jumps through a register and reads of late-loaded data from new code.** No static check sees them.
 - **A cold-RAM run of each hook** in the function harness, as the trial in §5. It needs real state per hook to
   cover more than one path.
 - **Callers, not only hooks.** A list of the early-loaded functions that Usr0, USR_FAST and live view can reach

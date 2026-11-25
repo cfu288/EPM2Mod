@@ -36,12 +36,7 @@ from pathlib import Path
 from typing import Any, NoReturn
 
 from . import __version__, camera_steps, catalogue, readme
-from .builds import (
-    BuildDescription,
-    all_descriptions,
-    check_test_date,
-    description_path,
-)
+from .builds import BuildDescription, check_test_date, description_path
 from .cardio import Planned, output_path
 from .catalogue import Locator
 from .errors import (
@@ -452,8 +447,6 @@ COMMANDS: dict[str, Command] = {
                     if key != "build"
                 },
                 "builds[].specs": "the number of its patch specs",
-                "builds[].in_git": "false for a description that is only in the working tree",
-                "unreadable": "the descriptions that git does not hold and that cannot be read, with the reason",
             },
         ),
         Command(
@@ -472,8 +465,8 @@ COMMANDS: dict[str, Command] = {
             "lint",
             DEVELOPERS,
             "Print what in a build may be harmful and is not proven safe.",
-            "WARN lines: transfers to late-loaded code that are safe by timing or inference only, the "
-            "early-loaded space the build uses, first code. Warnings do not change the exit status",
+            "WARN lines: jumps from early-loaded to late-loaded code, first code, a needed cold start. "
+            "Warnings do not change the exit status",
             True,
             "",
             ("epm2mod lint NAME",),
@@ -593,8 +586,6 @@ COMMANDS: dict[str, Command] = {
                 "commit": "the commit that the release is made from (null if not ready)",
                 "notes": "the release notes (null if not ready)",
                 "sha256": "the sha256 of the firmware that the release installs (null if not ready)",
-                "day": "the day of the release; give it as --day to plan the same release on a later day "
-                "(null if not ready)",
             },
             {1: "the repository is not ready for a release"},
         ),
@@ -950,36 +941,22 @@ def _builds(args: argparse.Namespace, ctx: Context) -> int:
     """Run ``epm2mod builds``."""
     checkout = ctx.checkout()
     pinned = checkout.pinned_build().name
-    problems: list[str] = []
-    found = all_descriptions(checkout, problems=problems)
-    held = checkout.tracked(checkout.builds)
-    in_git = {
-        build.name: held is None or description_path(checkout, build.name) in held
-        for build in found
-    }
+    found = checkout.all_builds()
     if args.json:
         _document(
             args.command_name,
             True,
             pinned=pinned,
             builds=[
-                {
-                    **(_build_json(build) or {}),
-                    "specs": len(build.specs),
-                    "in_git": in_git[build.name],
-                }
+                {**(_build_json(build) or {}), "specs": len(build.specs)}
                 for build in found
             ],
-            unreadable=problems,
         )
         return 0
     for build in found:
         state = f"tested {build.camera_tested}" if build.tested else "candidate"
         mark = " (pinned)" if build.name == pinned else ""
-        mark += "" if in_git[build.name] else " (not in git)"
         print(f"{build.name}{mark}: {build.what} [{state}, {len(build.specs)} specs]")
-    for problem in problems:
-        _hint(f"cannot be read: {problem}")
     return 0
 
 
@@ -1193,7 +1170,7 @@ def _release(args: argparse.Namespace, ctx: Context) -> int:
         raise UsageError(
             "--build makes a test release: a final release holds the pinned build"
         )
-    release, problems = plan(checkout, final=args.final, build=args.build, day=args.day)
+    release, problems = plan(checkout, final=args.final, build=args.build)
     if args.json:
         _document(
             args.command_name,
@@ -1205,7 +1182,6 @@ def _release(args: argparse.Namespace, ctx: Context) -> int:
             commit=release and release.commit,
             notes=release and release.notes,
             sha256=release and release.sha256,
-            day=release and release.day,
         )
     elif release is None:
         for problem in problems:
@@ -1216,7 +1192,7 @@ def _release(args: argparse.Namespace, ctx: Context) -> int:
             f"ready: {release.tag} on {release.commit[:7]}. To release it: "
             f"gh workflow run release -f kind={'final' if args.final else 'rc'} "
             + (f"-f build={args.build} " if args.build else "")
-            + f"-f day={release.day} -f dry_run=false"
+            + "-f dry_run=false"
         )
     return DIFFERS if release is None else 0
 
@@ -1558,13 +1534,6 @@ def _arguments(
             "--build",
             metavar="NAME",
             help="a test release of this camera-tested build in place of the pinned one (-NAME.N)",
-        )
-        parser.add_argument(
-            "--day",
-            metavar="YYYY.MM.DD",
-            help="the day of the release, which is in the version and on the Firmware screen; "
-            "default: today in UTC. Give the day of the dry run to make the release that it showed. "
-            "Not after today, and not before the day of the newest release tag",
         )
         _add_json(parser)
 

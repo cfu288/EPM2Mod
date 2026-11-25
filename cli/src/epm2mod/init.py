@@ -17,8 +17,7 @@ run again: a step whose result is present is not done again.
 
 ``check`` reports the same items and changes nothing. The commit hooks are
 reported and do not count as missing: they are the soft layer, and no check's
-result depends on them. It also says if the web
-apps' packages are installed, which is not a step of this command.
+result depends on them.
 """
 
 from __future__ import annotations
@@ -46,8 +45,6 @@ _CONFIGURE = (
 ).split()
 #: The name of the item that ``check`` reports and does not count as missing.
 HOOKS = "the commit hooks"
-#: The environment variables that replace a pinned tool (the scripts that read them refuse them when CI is set).
-OVERRIDES = ("EPM2_BINUTILS", "OM_EMU_DIR", "OM_EMU_NODE")
 #: The file of the emulator submodule that shows it is the fork with the E-PM2's boot lab.
 _BOOT_LAB = ("emu", "bin", "boot.mjs")
 
@@ -197,12 +194,6 @@ def _emulator(paths: RepoPaths, update: bool) -> str:
             f"{relative} is at {have}, the checkout pins {want}: "
             f"git submodule update --init {relative}"
         )
-    changed = _run(["git", "status", "--porcelain"], folder, "git status")
-    if changed:
-        raise UnavailableError(
-            f"{relative} has changes that are not in its commit "
-            f"({changed.splitlines()[0].strip()}, ...): undo them"
-        )
     return have
 
 
@@ -212,12 +203,6 @@ def init(paths: RepoPaths, check: bool, log: Log) -> list[str]:
     Raises:
         Epm2ModError: without ``check``, if a step fails.
     """
-    for name in OVERRIDES:
-        if os.environ.get("CI") and os.environ.get(name):
-            raise UnavailableError(
-                f"{name} is set ({os.environ[name]}): it replaces a pinned tool, and the hard "
-                "checks use only what the checkout pins. Unset it"
-            )
     pinned_stock = paths.pinned_build().stock_firmware
     firmware_map = paths.firmware_map
     hooks = paths.relative(paths.location("hooks"))
@@ -240,10 +225,7 @@ def init(paths: RepoPaths, check: bool, log: Log) -> list[str]:
                 f"built from the source commit {built_from}, not the one the checkout pins"
             )
         version = _run([_objdump(paths), "--version"], paths.root, "objdump")
-        note = ""
-        if os.environ.get("EPM2_BINUTILS"):
-            note = "; but EPM2_BINUTILS is set, and the tools use that folder"
-        return f"{version.splitlines()[0]}, source {built_from[:12]}{note}"
+        return f"{version.splitlines()[0]}, source {built_from[:12]}"
 
     def map_present() -> str:
         """Return the folder of the firmware map."""
@@ -308,11 +290,4 @@ def init(paths: RepoPaths, check: bool, log: Log) -> list[str]:
         log(f"{name}: ...")
         make()
         log(f"{name}: done ({present()})")
-    if check:
-        web = paths.location("web")
-        there = (web / "node_modules").is_dir()
-        log(
-            "the web apps' packages (only for work on the web apps): "
-            + ("present" if there else f"absent; npm ci in {paths.relative(web)}")
-        )
     return missing

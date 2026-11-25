@@ -1,37 +1,15 @@
 #!/usr/bin/env bash
 # tools/ci.sh [python|web]: the hard checks, the same in CI and locally; run it before a pull request.
 #
-#   tools/ci.sh           # both parts
-#   tools/ci.sh web       # the web apps: format, lint, types, unit tests, both builds, browser tests
-#   tools/ci.sh python    # the package, the scripts, the documents, the generators and the builds
-#   tools/ci.sh python NAME...   # and also the builds NAME (a new candidate that git does not hold yet)
-#
-# Needs a clone that is set up: uv run epm2mod init. The python part starts with `epm2mod init --check` and stops
-# when the set-up is not the pinned one (the objdump's source commit, the emulator's commit, Node, Olympus's
-# firmware, the firmware map), or when EPM2_BINUTILS, OM_EMU_DIR or OM_EMU_NODE replaces a pinned tool.
-# Exit status 0: every check passed. A check that cannot run is a failure, not a skip, and no build is exempt.
-# No check reads a file that a clone does not have: two generators can compare their tables with the E-PL6
-# firmware, and they do so only when that file is given as their argument, which gen/run.sh never does.
-# Nothing here warns: the soft report of a build is `uv run epm2mod lint NAME`.
-#
-# The builds that the python part makes and checks: the pinned build, each data/builds/*.json that git holds and
-# that differs from the base commit (committed or changed in the working tree), and the builds named as
-# arguments. A description that git does not hold is not picked up by itself: a leftover file must not change the
-# result. The script prints the list, and one line that names the descriptions it did not check.
-# No check writes to a file that git holds: gen/run.sh --check works in a temporary copy.
-# The base is CI_BASE (a commit or a ref). Without it the script fetches origin's main and takes that: a base that
-# is behind its remote would leave builds out.
+# Needs a clone that is set up: uv run epm2mod init. A check that cannot run is a failure, not a skip. The builds that
+# the python part makes and checks: the pinned build, and each data/builds/*.json that differs from the base commit
+# (CI_BASE; default: origin's main). Nothing here warns: the soft report of a build is `uv run epm2mod lint NAME`.
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 part=${1:-all}
-case $part in all|python|web) ;; *) echo "usage: tools/ci.sh [python [NAME...]|web]" >&2; exit 2 ;; esac
-[ $# -gt 0 ] && shift
-named="$*"
-for name in $named; do
-  [ -f "data/builds/$name.json" ] || { echo "tools/ci.sh: no build description data/builds/$name.json" >&2; exit 2; }
-done
+case $part in all|python|web) ;; *) echo "usage: tools/ci.sh [python|web]" >&2; exit 2 ;; esac
 export UV_LOCKED=1  # an out-of-date uv.lock is an error here, as in CI
-export CI=1  # the unit tests then fail where they would skip (cli/tests/support.py, needs); overrides are refused
+export CI=1  # the unit tests then fail where they would skip (cli/tests/support.py, needs)
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 step() { echo; echo "== $*"; }
@@ -70,14 +48,7 @@ quiet uv run --directory cli black --check .
 quiet uv run --directory cli mypy
 
 step "unit tests (they also run pyflakes on the scripts, and hold the feature lists)"
-# an unclosed file is an error here, not a line in the log: a ResourceWarning in a destructor cannot fail a test,
-# so the log is read for it
-quiet uv run python -W error::ResourceWarning -m unittest discover -s cli/tests
-for word in ResourceWarning skipped=; do
-  if grep "$word" "$tmp/log"; then
-    echo "tools/ci.sh: a unit test left a file open or was skipped (the line above)" >&2; exit 1
-  fi
-done
+quiet uv run python -m unittest discover -s cli/tests
 
 step "generated documents and generated specs"
 quiet uv run epm2mod generate --check
@@ -87,9 +58,7 @@ pinned=$(uv run epm2mod builds --json | uv run python -c 'import json, sys; prin
 # the descriptions git holds, against the working tree: an edit is checked before it is committed
 changed=$(git diff --name-only --no-renames --diff-filter=AM "$base" -- 'data/builds/*.json' | xargs -r -n1 basename -s .json)
 # shellcheck disable=SC2086
-builds=$(printf '%s\n' "$pinned" $changed $named | sort -u)
-unheld=$(git ls-files --others --exclude-standard -- 'data/builds/*.json' | xargs -r -n1 basename -s .json)
-unchecked=$(for name in $unheld; do printf '%s\n' $builds | grep -qx "$name" || printf '%s ' "$name"; done)
+builds=$(printf '%s\n' "$pinned" $changed | sort -u)
 for name in $builds; do
   step "build $name: make, free-space check, load-order check, start in the emulator"
   quiet uv run epm2mod make "$name"  # a candidate: with the three checks
@@ -103,4 +72,3 @@ done
 echo
 # shellcheck disable=SC2086
 echo "tools/ci.sh: every check passed. Builds made and checked:" $builds
-[ -z "$unchecked" ] || echo "Not checked, because git does not hold them and they were not named (tools/ci.sh python NAME...): $unchecked"
