@@ -1207,7 +1207,8 @@ def check_load_order(specs, out=print):
 CHECKS = ["loaded", "content", "pointers", "operands", "written", "predecessor"]
 
 
-def write_map(sp):
+def write_map(sp, out=None):
+    md_path, tsv_path = [pathlib.Path(out, pathlib.Path(p).name) if out else pathlib.Path(rel(p)) for p in (MAP_MD, MAP_TSV)]
     m = sp.m
     areas = sp.analyse_all()
     md = []
@@ -1390,9 +1391,9 @@ def write_map(sp):
     w("| `%s` | %d | spec, superseded by, evidence |" % (SUPERSEDED, len(sp.superseded)))
     w("")
     w("The full evidence text of every check is in `%s`." % MAP_TSV)
-    pathlib.Path(rel(MAP_MD)).write_text("\n".join(md) + "\n", encoding="utf-8")
+    md_path.write_text("\n".join(md) + "\n", encoding="utf-8")
 
-    with open(rel(MAP_TSV), "w", encoding="utf-8") as fh:
+    with open(tsv_path, "w", encoding="utf-8") as fh:
         fh.write("\t".join(["start", "end", "size", "region", "source", "kind", "verdict", "failing", "allowed_use",
                             "used_bytes", "free_bytes", "free_runs", "history_bytes"]
                            + [x for k in CHECKS for x in (k, k + "_evidence")] + ["code_evidence", "ledger", "note"]) + "\n")
@@ -1509,7 +1510,7 @@ def main():
     ap.add_argument("--no-decode", action="store_true", help="do not use build/map (decode-dependent checks become UNKNOWN)")
     ap.add_argument("--no-other-blocks", action="store_true", help="map: do not count windows in blocks 1-3 and the tail")
     sub = ap.add_subparsers(dest="cmd", required=True)
-    sub.add_parser("map")
+    sub.add_parser("map").add_argument("--out", help="write the two files into this folder (default: docs/reference)")
     c = sub.add_parser("check")
     c.add_argument("specs", nargs="+")
     c.add_argument("--first-code", action="store_true",
@@ -1523,7 +1524,7 @@ def main():
     given = [os.path.relpath(os.path.abspath(p), ROOT) for p in a.specs] if a.cmd == "check" else []
     sp = Space(a.min_run, not a.no_decode, other_blocks=(a.cmd == "map" and not a.no_other_blocks), extra_specs=given)
     if a.cmd == "map":
-        tot = write_map(sp)
+        tot = write_map(sp, a.out)
         print("wrote %s and %s (%d areas)" % (MAP_MD, MAP_TSV, len(sp.areas)))
         for reg, t in tot.items():
             print("  %-12s %s" % (reg, "  ".join("%s %d" % kv for kv in sorted(t.items()))))

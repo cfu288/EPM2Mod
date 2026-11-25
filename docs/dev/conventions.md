@@ -288,8 +288,8 @@ started it:
 - the generated build table, the feature guides, the camera-log files of the release plan and the release zip
   take the files that git holds. `epm2mod builds` also lists a description that git does not hold, marked
   "(not in git)", and names one that cannot be read;
-- no check writes to a file that git holds: `gen/run.sh --check` and the code-space map comparison keep a copy,
-  compare, and put the copy back, so a hand edit to a generated file fails the check and stays;
+- no check writes to a file that git holds: `gen/run.sh --check` and the code-space map are made in a temporary folder
+  and compared, so a hand edit to a generated file fails the check and stays;
 - the emulator gets no option from the environment: `emuenv.tool_env` drops `E101_*`, `BOOTMS`, `WATCH`, `NO_OK` and
   the like (`emulator/emu-run`, a person's tool, keeps them);
 - `EPM2_BINUTILS`, `OM_EMU_DIR` and `OM_EMU_NODE` are refused when `CI` is set and said on stderr otherwise;

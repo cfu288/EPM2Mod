@@ -19,7 +19,7 @@
 # that differs from the base commit (committed or changed in the working tree), and the builds named as
 # arguments. A description that git does not hold is not picked up by itself: a leftover file must not change the
 # result. The script prints the list, and one line that names the descriptions it did not check.
-# No check writes to a file that git holds: gen/run.sh --check and the code-space map compare and put back.
+# No check writes to a file that git holds: gen/run.sh --check and the code-space map are made in a temporary folder.
 # The base is CI_BASE (a commit or a ref). Without it the script fetches origin's main and takes that: a base that
 # is behind its remote would leave builds out.
 set -euo pipefail
@@ -32,6 +32,8 @@ for name in $named; do
   [ -f "data/builds/$name.json" ] || { echo "tools/ci.sh: no build description data/builds/$name.json" >&2; exit 2; }
 done
 export CI=1  # the unit tests then fail where they would skip (cli/tests/support.py, needs); overrides are refused
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
 step() { echo; echo "== $*"; }
 
 if [ "$part" != python ]; then
@@ -70,26 +72,18 @@ uv run --directory cli mypy
 step "unit tests (they also run pyflakes on the scripts, the document rules and the feature lists)"
 # an unclosed file is an error here, not a line in the log: a ResourceWarning in a destructor cannot fail a test,
 # so the log is read for it
-uv run python -W error::ResourceWarning -m unittest discover -s cli/tests 2>&1 | tee "${TMPDIR:-/tmp}/epm2mod-tests.$$"
-if grep -q "ResourceWarning" "${TMPDIR:-/tmp}/epm2mod-tests.$$"; then
-  rm -f "${TMPDIR:-/tmp}/epm2mod-tests.$$"
+uv run python -W error::ResourceWarning -m unittest discover -s cli/tests 2>&1 | tee "$tmp/tests.log"
+if grep -q "ResourceWarning" "$tmp/tests.log"; then
   echo "tools/ci.sh: the unit tests left a file open (ResourceWarning above)" >&2; exit 1
 fi
-rm -f "${TMPDIR:-/tmp}/epm2mod-tests.$$"
 
 step "generated documents, the code-space map and generated specs"
 uv run epm2mod generate --check
-# the code-space map: freespace.py writes the two files, so they are kept, compared and put back
-kept=$(mktemp -d)
-cp -p docs/reference/code-space-map.md docs/reference/code-space-map.tsv "$kept/"
-uv run python tools/freespace.py map > /dev/null && same=1 || same=0
+uv run python tools/freespace.py map --out "$tmp" > /dev/null
 for f in code-space-map.md code-space-map.tsv; do
-  cmp -s "docs/reference/$f" "$kept/$f" || same=0
-  cp -p "$kept/$f" "docs/reference/$f"
+  cmp -s "docs/reference/$f" "$tmp/$f" && [ -z "$(git status --porcelain -- "docs/reference/$f")" ] \
+    || { echo "tools/ci.sh: docs/reference/$f is not what 'uv run python tools/freespace.py map' writes, or is not committed (the file is left as it was)" >&2; exit 1; }
 done
-rm -rf "$kept"
-[ $same = 1 ] && [ -z "$(git status --porcelain -- docs/reference/code-space-map.md docs/reference/code-space-map.tsv)" ] \
-  || { echo "tools/ci.sh: docs/reference/code-space-map.md is not what 'uv run python tools/freespace.py map' writes, or is not committed (the file is left as it was)" >&2; exit 1; }
 gen/run.sh --check
 
 pinned=$(uv run epm2mod builds --json | uv run python -c 'import json, sys; print(json.load(sys.stdin)["pinned"])')

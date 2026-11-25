@@ -463,13 +463,17 @@ class GeneratorCheckTests(unittest.TestCase):
         edited = (json.dumps(raw | {"description": raw["description"] + " HAND EDIT"}, indent=1) + "\n").encode()
         spec.write_bytes(edited)
         try:
+            before = spec.stat()
             done = subprocess.run([str(ROOT / "gen" / "run.sh"), "--check"], cwd=ROOT, capture_output=True, text=True)
             kept = spec.read_bytes()
+            after = spec.stat()
         finally:
             spec.write_bytes(good)
         self.assertEqual(done.returncode, 1, done.stderr[-400:])
         self.assertIn("not what its generator writes (the file is left as it was): data/specs/lss-menu.json", done.stderr)
         self.assertEqual(kept, edited)
+        # not written and put back either: a killed check would lose the edit
+        self.assertEqual((after.st_mtime_ns, after.st_ctime_ns), (before.st_mtime_ns, before.st_ctime_ns))
 
 
 class WorkingFolderTests(unittest.TestCase):
