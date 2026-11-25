@@ -25,7 +25,7 @@ import sys
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BOOT = os.path.join(REPO, "emulator", "boot")
 STOCK_BIN = os.path.join(REPO, "firmware", "stock", "E-PM2", "OLY_E_101_1600_0000_0000.BIN")
-NODE_MAJOR = 26
+NODE_MAJOR = int(open(os.path.join(REPO, ".nvmrc")).read().strip().lstrip("v").split(".")[0])  # the one place that names it
 
 
 class EmuSetupError(Exception):
