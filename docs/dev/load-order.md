@@ -80,15 +80,19 @@ It also covers a data read: early code that reads a table in late-loaded space r
 | anywhere | pre-reset, kernel range, segment 1 | **Always safe** for the load order. V static: these are in RAM before any code that can use them |
 | segment 2, segment 3 | segment 2, segment 3, or early-loaded space | **Always safe**: late code runs only after its own copy. One limit: segment-2 code that runs from the constructor walk after the segment-2 copy must not use segment 3. I |
 | early-loaded | late-loaded, where the code shows that the path starts only from late-loaded code | **Safe by proof.** Example: the entry words of the tasks 0x90 and 0x91 (kernel data) point into segments 3 and 2; only T_GUI in segment 2 starts those tasks. V static |
-| early-loaded | late-loaded, where the path needs something the application does (a capture, a movie frame) | **Safe by inference.** The reading of the code can be wrong; say so in the allow list. I |
+| early-loaded | late-loaded, where the path needs something the application does (a capture, a movie frame) | **Safe by inference.** The reading of the code can be wrong; write it in §5. I |
 | early-loaded | late-loaded, on a path that Usr0, the quick start or live view can take | **Unsafe.** It works on a start that kept RAM and on bodies with a late live view, and restarts the camera on others. On a path that Usr0 takes it is a crash at every start and on the update path |
 | early-loaded | late-loaded, accepted because the camera's logs show the code runs later | **Safe by timing only.** This is the unsafe row with a measured margin. The margin is from two bodies and from starts in P. Treat each such row as an open risk (§5) |
 | anywhere | overlays, not-loaded space | Unsafe unless the code loads the overlay first. No spec does this. V |
 
 How to stay on the safe side: put new code in segment 2 or 3 and hook it from segment 2 or 3. When the hooked
 function is early-loaded, put the routine in early-loaded space too. Code that must run at start uses an entry of
-segment 3's constructor table. `emulator/hookcheck.py` lists every constant transfer of a build's patched
-early-loaded bytes; `emulator/hookcheck-allow.tsv` holds the accepted ones with their evidence.
+segment 3's constructor table.
+
+The hard check, `emulator/hookcheck.py`, computes every constant transfer (address and target) from a build's patched
+early-loaded bytes to late-loaded code, and fails on each one that the pinned build does not have. There is no list of
+accepted transfers: what is known of the pinned build's 87 is in §5. A new one that is safe by proof fails too: change
+the hook, or take the case to the owner.
 
 ### Worked example 1: `peaking-direct-2` (withdrawn 2026-11-14)
 
@@ -193,21 +197,21 @@ All of the mod's RAM is in the gap between the kernel range and segment 1 (0x7E4
 | `slots7-code`, `slots7-kind`, `remap7-code` (2026-11-12): live view froze in three filters | live view's own art tables disagreed with `art_GetFilterType` | camera | `emulator/filmcheck.py` and `liveview.py`, written after |
 | `peaking-direct-1` (2026-11-14): slow, two crashes | heap not in mode 1 | camera | a scenario run (S-series), written after |
 | `peaking-direct-2` (2026-11-14): crash at every start | example 1 | `boot-test`, before any flash | |
-| `peaking-direct-3` (2026-11-14): crash on one film entry | a spec overwrote one byte of another spec's handler | camera | `emulator/opcheck.py`, written after |
+| `peaking-direct-3` (2026-11-14): crash on one film entry | a spec overwrote one byte of another spec's handler | camera | `epm2mod make` refuses it since (a byte that an earlier spec covers and keeps) |
 | Restart at a focus-ring turn after a shot (2026-11-16) | heap re-divided under a still block in use | a user report and the log's ring | a scenario with a capture; the emulator takes no pictures |
 | ART BKT crash at frame 1 (`films-start-texts-artbkt`, 2026-11-21) | recorded on the branch `feat/artbkt-production`, not on this one | camera | `emulator/artbkt-test` on that branch |
-| Slow cold start (issue #6) | example 2 | users, on other bodies | the built-image `hookcheck.py`; a cold start on a body that shows it |
+| Slow cold start (issue #6) | example 2 | users, on other bodies | the built-image `hookcheck.py`, against the build before it; a cold start on a body that shows it |
 | Wrong menu texts outside English; a wrong look curve on the card path | English-only text patches; a handler that was not the identity | emulator crawls; a camera round | |
 
 No restart loop and no failed update are recorded. V, `docs/camera-log/`.
 
 ## 5. Open risks
 
-`emulator/hookcheck.py data/builds/cold-start-fix.json`: 190 transfers leave patched early-loaded code, 87 go to
-late-loaded space, 0 FAIL. Each of the 87 is an entry of the allow list with a class (proof, inferred, timing).
-`uv run epm2mod lint cold-start-fix` prints how many the build has of each class that is not a proof, and their
-addresses; a test holds that the three classes add up to every accepted transfer. All but the two task entries
-are from `stock-films-structure-3`. V tool.
+`emulator/hookcheck.py data/builds/cold-start-fix.json`: 87 transfers go from early-loaded to late-loaded code, 12
+jumps and calls and 75 pointers. V tool. Two are safe by proof: the entry words of the tasks 0x90 and 0x91 (0x7E439C80
+to 0x7EE53830, 0x7E439C9C to 0x7EBF2BE4), dormant in stock and started only by T_GUI in segment 2. The other 85 are
+from `stock-films-structure-3`: 75 safe by timing only, 10 by inference, in the table below. The evidence word by word
+is in git: `git show f41e8fd:emulator/hookcheck-allow.tsv` (the list of accepted transfers until 2026-11-25).
 
 | Risk | What is known | Probe |
 |---|---|---|
@@ -221,8 +225,8 @@ are from `stock-films-structure-3`. V tool.
 
 One more emulator result of 2026-11-25 (V emulator, a trial script, not kept): each of the 70 jumps and calls
 that enter changed bytes from early-loaded code was run from its own address, with late-loaded RAM as built, as
-0xFF and as random bytes. `cold-start-fix`: no run reached late-loaded space but the 13 that end at an
-allow-listed jump; the three fills gave the same result in every run; 42 of 57 ran to a return. `spot-af-2` and
+0xFF and as random bytes. `cold-start-fix`: no run reached late-loaded space but the 13 that end at one
+of the known jumps; the three fills gave the same result in every run; 42 of 57 ran to a return. `spot-af-2` and
 `peaking-mf`: three entries reached 0x7ECB0B81, among them the real hook 0x7E6ECF91. The registers and RAM of
 these runs are not the camera's, so a clean run covers one path only.
 
@@ -234,11 +238,11 @@ State: 2026-11-25, after the engineering clean-up. The rules for the checks are 
 Built:
 
 - **The load-order check runs on every build a branch changes.** `tools/ci.sh` makes the pinned build and each
-  build description that differs from the base commit, and `tools/checks.py` runs `freespace.py check` (which calls
-  `emulator/hookcheck.py`) on each. V tool.
-- **A class per allow-list entry** (proof, inferred, timing) in `emulator/hookcheck-allow.tsv`. An entry is one
-  address with one target. `uv run epm2mod lint NAME` prints every entry of class inferred or timing that a build
-  uses, with its evidence. V tool.
+  build description that differs from the base commit. `epm2mod make` runs `freespace.py check` (which calls
+  `emulator/hookcheck.py`) on a candidate, and `tools/ci.sh` runs it on a tested build. V tool.
+- **A comparison with the pinned build, not a list.** A candidate fails for a transfer that the pinned build does not
+  have. Issue #6 is the test: `spot-af-2`, the build with the jump 0x7E4C93A4 to 0x7ECB0B81, fails with that one line.
+  `epm2mod lint NAME` prints the new ones and the count of the old ones. V tool.
 - **Pointers that an op rewrites, in whole or in part.** `hookcheck.py` looks at every 4-byte word that overlaps a
   patched early-loaded run: a stock pointer to early-loaded space that points to late-loaded space in the build
   fails, also when the op covers only some of its bytes. V tool (a test holds it).

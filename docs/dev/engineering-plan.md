@@ -13,14 +13,16 @@ commit, not today's.
 | Step 3, `--allow-unchecked` | No flag: `make` stops (exit status 6) when a start-up check cannot run |
 | Step 6, a cache for the stock firmware | Not done: Olympus's firmware is downloaded in each run and stored nowhere |
 | Step 8, a file of waived builds | Not done: no build is exempt |
-| Step 10 | Also dropped: the checks of the superseded spec families films12 and log-core |
-| Step 11, `epm2mod check`, the cache of `tools/checks.py` | No `check` command. `tools/checks.py` keeps no results. The allow list names each word with its target |
+| Step 8 | Also `epm2mod make` holds the checks: `tools/checks.py` and its tiers are gone |
+| Step 9, the local hooks' rules in CI | The document rules and the machine-path pattern stay in the commit hook only |
+| Step 10 | The scenario checks are not checks any more: S1 to S7 are records in `experiments/`, the save guard is run by hand |
+| Step 11, `epm2mod check`, the class column | No `check` command, no allow list: the load-order check compares with the pinned build |
 | Step 13, `epm2mod release --dry-run`, the version from the label | `epm2mod release` only plans (`--json`, `--day`); `--dry-run` and `--push` are gone. The version is the day of the release, and the release holds the pinned build with that day as its label |
 | Layer 4, "Everything else follows from the commit" | The version and the image also follow from the day: the input `day` of `release.yml` |
+| Step 13, wait for the CI runs (R5) | `release.yml` runs `tools/ci.sh` on the commit itself; the plan does not read GitHub runs or the camera log's text |
 
-Open: the workflows have not run on GitHub yet; the environment `release` must allow `main`. The full tier of
-`tools/checks.py` was hidden behind SKIP before the work. What it showed on the pinned build, and how each result
-was settled, is in [conventions.md](conventions.md), section Checks.
+Open: the workflows have not run on GitHub yet; the environment `release` must allow `main`. Every check, its evidence
+and its verdict: [check-audit.md](check-audit.md).
 
 **The plan as written.** Nothing in it was done at that time. Date: 2026-11-25. Audited commit: `3b68278` (main). The fresh-clone test ran on `ccbad1a`, one merge
 earlier; the files it used did not change in between.

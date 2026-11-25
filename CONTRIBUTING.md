@@ -49,7 +49,6 @@ A feature is one or more patch specs in `data/specs/` and a build description in
 
    ```sh
    uv run epm2mod make NAME
-   uv run python tools/checks.py data/builds/NAME.json
    uv run epm2mod lint NAME
    ```
 

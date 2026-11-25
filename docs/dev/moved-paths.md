@@ -37,3 +37,6 @@ path that moved. A folder row covers every file in it.
 | `data/films/fits/`: 33 fits no list names (the films' fits before 2026-11-21 and their `-c1` corrections, e.g. `portra.npz`, `portra160-c1.npz`) | removed; the catalogue uses `*-n2.npz` (`data/films/README.md`); the files are in git at d38cf0a | 2026-11-21 |
 | `experiments/2026-11-21-peaking-mf/scripts/mkspec.py` | `gen/peaking/mkspec_mf.py` (writes only the spec; the build description is `data/builds/peaking-mf.json`) | 2026-11-21 |
 | `tools/setup.sh`, `emulator/setup.sh` | removed: `uv run epm2mod init` | 2026-11-25 |
+| `tools/checks.py`, `emulator/opcheck.py` | removed: `uv run epm2mod make NAME` holds these checks of a candidate, `tools/ci.sh` runs them on a tested build | 2026-11-25 |
+| `emulator/hookcheck-allow.tsv` | removed: the check compares with the pinned build; the evidence is in git at f41e8fd and in `docs/dev/load-order.md` section 5 | 2026-11-25 |
+| `experiments/2026-11-14-focus-peaking/scripts/scen_guard.py` | `emulator/scenarios/scen_guard.py` | 2026-11-25 |
