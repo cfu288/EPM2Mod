@@ -302,6 +302,7 @@ def s2(pinned, patched):
                     if not f.state["picture"]:
                         OUT("  S2 RESULT [pinned, art type %d]: %s" % (art_type, fail("the reference gives no picture: the scenario proves nothing")))
                     continue
+                before = anomalies(lv, f)  # the last frame before the request
                 OUT("  [%s] request on: %s" % (name, request(lv, True)))
                 bad = []
                 for _ in range(4):
@@ -309,10 +310,14 @@ def s2(pinned, patched):
                     show(lv, f)
                     bad.append(anomalies(lv, f))
                 OUT("  [%s] request off: %s" % (name, request(lv, False)))
+                after = []
                 for _ in range(2):
                     f = lv.frame()
                     show(lv, f)
-                if all("no picture" in b for b in bad):
+                    after.append(anomalies(lv, f))
+                if before or any(after):  # the frames without the request are judged too: a fault there is a fault
+                    verdict = fail("anomalies in the frames without the request: before %s, after %s" % (before, after))
+                elif all("no picture" in b for b in bad):
                     verdict = "NO PICTURE in every frame while the request is set"
                     if all(any("refused" in x for x in b) for b in bad):
                         verdict += ": the heap refuses the art buffers in every frame (the camera fault of direct-1)"
@@ -404,6 +409,7 @@ def s4(pinned, patched):
                          ("startMfAssist entry again", "piece", (0x7E9889EB, 0x7E9889F2)),
                          ("internal zoom-off handler 0x7EB7DEB9 (capture, movie start)", 0x7EB7DEB9, (0xF0, 48))]
             sc.w32(MFA, 0)
+            faulted = []
             for what, entry, frame in steps:
                 if is_d1(name) and "startMfAssist" in what:
                     sc.w32(MFA, 1)                                           # the stock code sets the word in the same call
@@ -414,8 +420,17 @@ def s4(pinned, patched):
                 w = ["0x%08X=%d" % (a, v) for a, s, v, pc in r.writes]
                 OUT("  [%s] %-62s %s; writes to the flag bytes: %s; after: R=%d word=%d" % (
                     name, what, "FAULT " + r.fault if r.fault else "ran %d pcs" % len(r.pcs), w or "none", sc.r8(R), sc.r32(MFA)))
-            OUT("  S4 RESULT [%s]: R at the end = %d%s" % (name, sc.r8(R), "" if name == "pinned" else
-                                                           " (0 = not left set)" if sc.r8(R) == 0 else fail(" (LEFT SET after an internal zoom-off)")))
+                if r.fault:
+                    faulted.append(what)
+            # R right after the zoom-off step is not judged: it is 1 there in a good build too, and the Off state that
+            # follows clears it. A step that faults is: the handler did not run to its end.
+            if name == "pinned":  # the reference: printed, not counted
+                left = "; steps that faulted: %s" % (faulted or "none")
+            else:
+                left = " (0 = not left set)" if sc.r8(R) == 0 else fail(" (LEFT SET after an internal zoom-off)")
+                if faulted:
+                    left += "; " + fail("a step ended in a fault: %s" % "; ".join(faulted))
+            OUT("  S4 RESULT [%s]: R at the end = %d%s" % (name, sc.r8(R), left))
 
 
 # ------------------------------------------------------------------------------------------------ S5
@@ -427,13 +442,13 @@ def s5(pinned, patched):
     for name, path in [("pinned", pinned)] + patched:
         with open_lv(path, name, NATURAL) as lv:
             lv.start()
-            lv.frame()
-            lv.frame()
+            ran = [lv.frame(), lv.frame()]
             if name != "pinned":
                 request(lv, True)
-                lv.frame()
-                show(lv, lv.frame())
+                ran += [lv.frame(), lv.frame()]
+                show(lv, ran[-1])
             f = lv.command(CMD_THROUGH_END, label="Through End")
+            ran.append(f)
             show(lv, f, events=("heap free", "heap set mode", "heap re-partition", "error report"))
             live, state = len(lv.blocks), lv.sc.r32(MOV_STATE)
             got = []
@@ -447,7 +462,11 @@ def s5(pinned, patched):
             sc.write(D, struct.pack("<H", 1)); sc.write(D + 0x40, bytes(64))
             g = sc.piece(0x7E726761, [0x7E726770], {"a3": D + 0x40, "a2": D})
             gain = sc.r16(D + 0x40 + 34)
-            res = (state, live, got, gain)
+            # every fault is part of the result: of a frame, of the chooser's call, of the pass-9 piece
+            faults = ["frame fault in %s" % x.label for x in ran if x.faults]
+            faults += ["chooser: " + r.fault.splitlines()[0]] if r.fault else []
+            faults += ["pass 9 piece: " + g.fault.splitlines()[0]] if g.fault else []
+            res = (state, live, got, gain, tuple(faults))
             if name == "pinned":
                 base = res
             OUT("  [%s] after Through End: mov state %d, live heap blocks %d, %s; chooser asks for heap mode %s (%s, new-code "

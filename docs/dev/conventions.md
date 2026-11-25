@@ -223,6 +223,9 @@ Three layers. Each check is in one of them.
 build is offered for a flash. Every check ends PASS or FAIL by the exit status of its script: no scenario that ran
 ends without a verdict. The references:
 
+- in every scenario, each step's fault goes into the verdict: a frame that faults, a call or a code piece that
+  ends in a fault, an anomaly of a frame. Nothing is printed and then left out. A reference's own result is
+  printed and compared with, not counted;
 - the peaking scenarios (S1 to S7) compare with the stock firmware. With the request clear a build must do what
   stock does; writes to the mod's own RAM (0x7E4C9800 to 0x7E4FE000) are not a difference. S6 compares the verdict
   of each art code (ok, not judged, fault), not the number of instructions;
@@ -275,8 +278,10 @@ The quick tier runs `boot-test --strict-times`: time stamps that moved are a FAI
 `emulator/hookcheck-allow.tsv` accepts a transfer by its address and its target together, one word per entry. The
 same address with another target fails. The check's last line counts the entries that match nothing in the build.
 
-A hard check takes its inputs from the files that git holds and from its arguments. It does not take them from the
-shell that started it or from files that are only in the working tree:
+A hard check takes the names of its inputs from git and from its arguments, and their contents from the working
+tree: an edit that is not committed yet is checked, and a file that is only in the working tree is not an input,
+unless the check is given it (a candidate's description and its new specs). It takes nothing from the shell that
+started it:
 
 - the free-space ledger, the code-space map and the camera-tested areas come from `git ls-files`, plus the specs
   of the build that is checked (a candidate's new spec is not in git yet);

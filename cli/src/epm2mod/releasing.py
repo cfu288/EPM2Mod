@@ -269,7 +269,9 @@ def plan(
         problems.append(f"{which} {chosen.name} has no label")
         return None, problems
     log = paths.camera_log
-    if not any(chosen.sha256 in read_text(entry) for entry in sorted(log.glob("*.md"))):
+    held = paths.tracked(log)  # a log file that git does not hold is not on main
+    entries = [e for e in sorted(log.glob("*.md")) if held is None or e in held]
+    if not any(chosen.sha256 in read_text(entry) for entry in entries):
         problems.append(f"{paths.relative(log)}/ has no file for {chosen.sha256[:8]}")
     if _git(paths, "status", "--porcelain", "--untracked-files=no"):
         problems.append("the working tree has changes: commit or stash them")

@@ -83,6 +83,9 @@ class BuiltBytes(unittest.TestCase):
         for address, _target, entry in used:
             self.assertEqual("%08X" % address in listed, entry.cls != "proof", hex(address))
         self.assertEqual(len(listed), sum(entry.cls != "proof" for _, _, entry in used))
+        # the three classes add up to every accepted transfer (docs/dev/load-order.md, section 5, says so)
+        classes = [entry.cls for _, _, entry in used]
+        self.assertEqual(sum(classes.count(c) for c in hookcheck.CLASSES), len(used))
 
     def test_every_allow_entry_is_used_by_a_build_description(self) -> None:
         unused = set(hookcheck.read_allow())

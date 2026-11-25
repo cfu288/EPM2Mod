@@ -616,7 +616,8 @@ def history_specs():
 
 
 def tracked(patterns):
-    """The files of the repository that git holds and that match the patterns, as paths relative to the root. A
+    """The files of the repository that git holds and that match the patterns, as paths relative to the root. The
+    names come from git; the contents are the working tree's (an edit that is not committed yet is checked). A
     file that is only in the working tree is not an input of a check: it would give this computer another result."""
     done = subprocess.run(["git", "ls-files", "-z", "--", *patterns], cwd=ROOT, capture_output=True, text=True)
     if done.returncode != 0:
@@ -629,7 +630,14 @@ def all_specs(extra=()):
     (a candidate's new spec is not in git yet)."""
     paths = tracked(SPEC_GLOBS)
     paths += [p for p in extra if p not in paths]
-    return [Spec(p) for p in paths]
+    specs = []
+    for p in paths:
+        try:
+            specs.append(Spec(p))
+        except (OSError, ValueError, KeyError, TypeError) as error:  # ValueError: not JSON
+            die("the spec %s cannot be read (%s: %s). The ledger holds every spec that git names, as it is in the "
+                "working tree: repair the file or restore it (git checkout -- %s)" % (p, type(error).__name__, error, p))
+    return specs
 
 
 def camera_tested():

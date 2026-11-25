@@ -9,6 +9,9 @@ cd "$(dirname "$0")/.."
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 touch "$work/started"  # the specs that are newer than this file after the run are the ones the generators write
+# A file system that keeps whole seconds would give a spec written in the same second the time of this file, and
+# find -newer would leave it out. So the first generator starts in a later second.
+sleep 1.1
 uv run python gen/lss-core/mkspec.py "$work/lss-core"
 uv run python gen/build-label/mkspec.py
 uv run python gen/stock-films/structure.py "$work/structure"

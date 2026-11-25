@@ -134,6 +134,16 @@ class PlanTests(unittest.TestCase):
         # the run of an ancestor (git merge-base is faked to agree) counts for the workflow with a paths filter only
         self.assertEqual(problems, ["every.yml: it runs for every commit, and its newest run is for 0ldc0de, not for this commit"])
 
+    def test_a_camera_log_file_that_git_does_not_hold_does_not_count(self) -> None:
+        self.checked = []
+        entry = self.paths.camera_log / "2026-11-20-probe.md"
+        for held, ready in (({entry}, True), (set(), False), (None, True)):  # None: not a git checkout
+            with mock.patch.object(type(self.paths), "tracked", lambda paths, folder: held):
+                release, problems = releasing.plan(self.paths, final=False, build="probe", day="2026.11.25", today="2026.11.25")
+            self.assertEqual(release is not None, ready, problems)
+            if not ready:
+                self.assertIn("has no file for", problems[0])
+
     def test_a_start_whose_times_moved_stops_the_release(self) -> None:
         def moved(paths: RepoPaths, image: Path, strict_times: bool = False) -> list[str]:
             if strict_times:  # what pipeline.check_in_emulator does for boot-test's exit status 1

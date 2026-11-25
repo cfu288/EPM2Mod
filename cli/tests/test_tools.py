@@ -302,6 +302,38 @@ class ScenarioVerdictTests(unittest.TestCase):
         self.assertTrue(is_return(image, base + 21))  # retf
         self.assertEqual(names["S1_SKIPPED"], (0x7E56C6AB,))  # the one branch, stated with its reason
 
+    def test_s4_fails_a_step_that_faults_on_the_real_pinned_image(self) -> None:
+        # The reviewer's mutation: the zoom-off handler 0x7EB7DEB9 of the pinned build jumps to address 0. The last
+        # step still clears R, so only the fault of the step shows it. A real run in the emulator, 30 seconds.
+        sys.path.insert(0, str(ROOT / "emulator"))
+        import patchblock
+
+        specs = [str(ROOT / s) for s in json.loads((ROOT / pinned_build_path()).read_text())["specs"]]
+        stock, image, _ = patchblock.patched_block0(specs)
+        at = 0x7EB7DEB9 - 0x7E421020
+        mutated = image[:at] + b"\xdc" + ((0 - 0x7EB7DEB9) & 0xFFFFFFFF).to_bytes(4, "little") + image[at + 5 :]
+        script = str(ROOT / "emulator" / "scenarios" / "scen_peaking.py")
+        with tempfile.TemporaryDirectory() as folder:
+            files = {}
+            for name, data in (("stock", stock), ("good", image), ("mutated", mutated)):
+                files[name] = Path(folder) / f"{name}.block0.bin"
+                files[name].write_bytes(data)
+            for name, status in (("good", 0), ("mutated", 1)):
+                command = [sys.executable, script, "s4", str(files["stock"]), f"{name}={files[name]}"]
+                done = subprocess.run(command, capture_output=True, text=True)
+                self.assertEqual(done.returncode, status, done.stdout[-600:] + done.stderr[-600:])
+            self.assertIn("FAIL: a step ended in a fault: internal zoom-off handler", done.stdout)
+
+    def test_no_scenario_prints_a_fault_that_it_does_not_count(self) -> None:
+        peaking = (ROOT / "emulator" / "scenarios" / "scen_peaking.py").read_text()
+        direct4 = (ROOT / "emulator" / "scenarios" / "scen_direct4.py").read_text()
+        # S2: the frames before and after the request; S4: each step; S5: frames, chooser, piece; S6: frames; S7: the end
+        for text in ("anomalies in the frames without the request", "a step ended in a fault", "frame fault in %s",
+                     '"chooser: " + r.fault', '"pass 9 piece: " + g.fault'):
+            self.assertIn(text, peaking, text)
+        for text in ('bad.append("%s frame fault" % NAMES[pm])', "ends[name] == ends[\"pinned\"]"):
+            self.assertIn(text, direct4, text)
+
     def test_each_failure_text_of_the_peaking_scenarios_sets_the_exit_status(self) -> None:
         source = (ROOT / "emulator" / "scenarios" / "scen_peaking.py").read_text()
         self.assertTrue(source.rstrip().endswith("sys.exit(1 if FAILED else 0)\n\n\nmain()"))
@@ -328,6 +360,18 @@ class LedgerInputTests(unittest.TestCase):
             self.assertIn(name, [spec.path for spec in freespace.all_specs(extra=[name])])  # a candidate's own spec
         finally:
             copy.unlink()
+
+    def test_a_spec_that_cannot_be_read_stops_the_check_with_its_name(self) -> None:
+        import freespace
+
+        broken = ROOT / "data" / "specs" / "zz-broken-for-a-test.json"
+        broken.write_text("{ not json")
+        try:
+            with self.assertRaises(freespace.SiteError) as caught:
+                freespace.all_specs(extra=["data/specs/" + broken.name])
+        finally:
+            broken.unlink()
+        self.assertIn("zz-broken-for-a-test.json cannot be read", str(caught.exception))
 
     def test_the_map_records_the_objdump_that_made_it(self) -> None:
         import fwmap
@@ -405,6 +449,18 @@ class StrictTimesTests(unittest.TestCase):
         with mock.patch.object(checks, "current_image", return_value=Path("image.BIN")):
             plan = {check.name: check for check in checks.plan(build, "quick")}
         self.assertIn("--strict-times", plan["boot-test"].command)
+
+    def test_a_description_from_another_place_is_refused(self) -> None:
+        # a copy with fewer specs would have its specs checked against the image of data/builds/NAME.json
+        own = ROOT / pinned_build_path()
+        with tempfile.TemporaryDirectory() as folder:
+            copy = Path(folder) / own.name
+            raw = json.loads(own.read_text())
+            copy.write_text(json.dumps(raw | {"specs": raw["specs"][:1]}))
+            with mock.patch.object(checks, "current_image", return_value=Path("image.BIN")):
+                with self.assertRaisesRegex(ValueError, "not a build description of this project"):
+                    checks.plan(copy, "quick")
+                self.assertEqual(len(checks.plan(own, "quick")), 4)
 
     def test_every_peaking_build_gets_the_save_guard_scenario(self) -> None:
         # also a peaking build without the guard's spec: the build that the scenario must fail

@@ -120,6 +120,11 @@ def plan(description: Path, tier: str) -> list[Check]:
     Raises:
         ValueError: if the description cannot be read, or an image is absent or stale (``current_image``).
     """
+    own = ROOT / "data" / "builds" / description.name
+    if description.resolve() != own.resolve():
+        # the image and the emulator checks are those of data/builds/NAME.json: specs from another file would be
+        # checked against another build's image
+        raise ValueError(f"{description} is not a build description of this project (data/builds/{description.name})")
     raw = json.loads(description.read_text(encoding="utf-8"))
     specs = [str(s) for s in raw["specs"]]
     image = current_image(description.stem)

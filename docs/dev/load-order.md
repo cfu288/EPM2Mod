@@ -204,8 +204,10 @@ No restart loop and no failed update are recorded. V, `docs/camera-log/`.
 ## 5. Open risks
 
 `emulator/hookcheck.py data/builds/cold-start-fix.json`: 190 transfers leave patched early-loaded code, 87 go to
-late-loaded space, 0 FAIL. 2 are safe by proof (the task entries). 85 are from `stock-films-structure-3` and are
-in the allow list as safe by timing only. V tool.
+late-loaded space, 0 FAIL. Each of the 87 is an entry of the allow list with a class (proof, inferred, timing).
+`uv run epm2mod lint cold-start-fix` prints how many the build has of each class that is not a proof, and their
+addresses; a test holds that the three classes add up to every accepted transfer. All but the two task entries
+are from `stock-films-structure-3`. V tool.
 
 | Risk | What is known | Probe |
 |---|---|---|

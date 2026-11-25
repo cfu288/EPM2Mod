@@ -96,6 +96,8 @@ def s6(pinned, patched):
                         bad.append("%s %s code %d" % (NAMES[pm], what, c))
                 OUT("  [%s] %s: frame picture %s%s; %s" % (name, NAMES[pm], f.state["picture"],
                                                           ", FRAME FAULT" if f.faults else "", "; ".join(row)))
+                if f.faults:  # a frame that faults is a failure of S6, not a note
+                    bad.append("%s frame fault" % NAMES[pm])
             for c in range(9, 185):
                 sweep[c] = six_axis(lv.sc, c)
         faults = [c for c in sweep if sweep[c][0] == "FAULT"]
@@ -115,6 +117,7 @@ def s7(pinned, patched):
     OUT("S7. pwr_standby start 0x7E53A55C, called with the frame of the SRAM code's call (flash 0x7F14B0F7), 400")
     OUT("    instructions; callees run as far as they get (kernel services are not modelled here).")
     base = open(pinned, "rb").read()
+    ends = {}
     for name, path in [("pinned", pinned)] + patched:
         img = open(path, "rb").read()
         same = all(img[a - BASE:b - BASE] == base[a - BASE:b - BASE] for a, b in ((0x7E53A55C, 0x7E53A700), (0x7E50A201, 0x7E50A3C2)))
@@ -127,8 +130,13 @@ def s7(pinned, patched):
             OUT("  [%s] bytes of 0x7E53A55C-0x7E53A700 and 0x7E50A201-0x7E50A3C2 equal to pinned: %s; first three stock "
                 "instructions ran: %s; entered mov_art_set_line_yc_param at 0x7E6CD9D6: %s; end: %s" % (
                     name, same, stock_start, stray, (r.fault or "returned").splitlines()[0][:110]))
-            OUT("  S7 RESULT [%s]: %s" % (name, "PASS" if same and stock_start and not stray else
-                                          fail("FAIL: the sleep routine is overwritten")))
+            # how the run ends is part of the verdict: the callees run as far as the rig lets them, so the end can be
+            # a fault in the reference too, and the build must end as the reference does (fault or return)
+            ends[name] = bool(r.fault)
+            as_reference = ends[name] == ends["pinned"]
+            OUT("  S7 RESULT [%s]: %s" % (name, "PASS" if same and stock_start and not stray and as_reference else
+                                          fail("FAIL: " + ("the sleep routine is overwritten" if as_reference else
+                                                           "the run ends in a fault and the reference's does not, or the reverse"))))
 
 
 def main():
