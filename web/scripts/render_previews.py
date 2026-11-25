@@ -15,7 +15,7 @@ The web app puts the name of the film in a row over the strip of that row's posi
 order the user sets. The script checks that the films' strips differ only inside NAME and that a film's name does
 not change with the position; otherwise the split would be wrong and it stops.
 
-Needs the emulator (emulator/setup.sh), build/card-looks-4.BIN and the state build/emu/state/card-looks-4-p.json
+Needs the emulator (uv run epm2mod init), build/card-looks-4.BIN and the state build/emu/state/card-looks-4-p.json
 (emulator/mkstate data/builds/card-looks-4.json build/emu/state/card-looks-4-p.json p).
 """
 import os

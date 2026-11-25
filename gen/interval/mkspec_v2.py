@@ -1,7 +1,7 @@
 # gen/interval/mkspec_v2.py [E-PL6.BIN.lzma]: build data/specs/interval-timelapse-v2.json (a copy of
 # experiments/2026-11-13-intervalometer/scripts/mkspec_v2.py = mkspec_insert.py + awake_part.py, relocated to the
-# segment-2 padding, + guard_part.py). The E-PL6 1.4 firmware is not committed: without it the comparisons with the
-# E-PL6's bytes are skipped.
+# segment-2 padding, + guard_part.py). The E-PL6 1.4 firmware is not committed: the comparisons with the E-PL6's bytes
+# run only when its file is given as the argument. gen/run.sh does not give it.
 # (E-PL6 1.4 menu wiring reproduced on the E-PM2 v1.6: a 37-row top table, the .data tab layout and value
 # lists renumbered, page 3's child list with {628, 482}, the value switch and every row constant renumbered)
 import json, lzma, os, struct, sys
@@ -10,9 +10,8 @@ sys.path.insert(0,os.path.join(ROOT,'cli','src'))
 from epm2mod.container import parse
 B=0x7E421020; K=0x1E6304C0                       # .data ROM image = RAM + K
 D=bytearray(parse(open(os.path.join(ROOT,'firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN'),'rb').read()).blocks[0].payload)
-PL6=sys.argv[1] if len(sys.argv)>1 else os.path.join(ROOT,'experiments/2026-11-08-feature-map/out/firmware/OLY_E_112_1400_0000_0000.BIN.lzma')
-P=parse(lzma.open(PL6).read()).blocks[0].payload if os.path.exists(PL6) else None
-if P is None: print('no E-PL6 firmware at',PL6,': the comparisons with the E-PL6 are skipped')
+PL6=sys.argv[1] if len(sys.argv)>1 else None   # no default place: the result must not depend on a file a clone does not have
+P=parse(lzma.open(PL6).read()).blocks[0].payload if PL6 else None
 OUT=os.path.join(ROOT,'data/specs/interval-timelapse-v2.json')
 rd=lambda X,a,n: bytes(X[a-B:a-B+n])
 u32=lambda X,a: struct.unpack_from('<I',X,a-B)[0]

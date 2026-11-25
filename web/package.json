@@ -5,7 +5,7 @@
   "description": "The web parts of EPM2Mod: the shared package (packages/ui), the public site (apps/site) and the local app (apps/local)",
   "type": "module",
   "engines": {
-    "node": ">=24.15"
+    "node": "26.7.0"
   },
   "workspaces": [
     "packages/ui",
@@ -18,13 +18,13 @@
     "build": "npm run build -w @epm2mod/site -w @epm2mod/local",
     "build:site": "npm run build -w @epm2mod/site",
     "build:app": "npm run build -w @epm2mod/local",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc -b packages/ui apps/site apps/local",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "npm run test --workspaces",
-    "check": "npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build",
-    "e2e": "npm run e2e -w @epm2mod/site -w @epm2mod/local"
+    "test": "node need-node.mjs && npm run test --workspaces",
+    "check": "node need-node.mjs && npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build",
+    "e2e": "node need-node.mjs && npm run e2e -w @epm2mod/site -w @epm2mod/local"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

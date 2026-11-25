@@ -31,6 +31,7 @@ from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import support  # noqa: E402
 from support import ROOT, make_container, write_manifest  # noqa: E402
 
 import epm2mod  # noqa: E402
@@ -54,6 +55,7 @@ from epm2mod.errors import (  # noqa: E402
     RepositoryError,
     SpecError,
     StockError,
+    UnavailableError,
 )
 from epm2mod.hashing import is_sha256, sha256_bytes  # noqa: E402
 from epm2mod.paths import MANIFEST, RepoPaths, is_repo_relative  # noqa: E402
@@ -138,6 +140,17 @@ class TinyRepo:
             f"sys.exit({status})\n"
         )
         self.write("tools/freespace.py", script.encode())
+        if status == 0:  # a candidate that passes it is then started in the emulator
+            for tool in self.paths.emulator_checks:
+                if not tool.exists():
+                    self.emulator_check(tool.name, 0)
+
+    def emulator_check(self, name: str, status: int) -> None:
+        """Install a stand-in for emulator/NAME that exits with ``status``."""
+        script = (
+            f"import sys\nprint('{name}: stand-in', sys.argv[1])\nsys.exit({status})\n"
+        )
+        self.write(f"emulator/{name}", script.encode())
 
     def outputs(self) -> list[str]:
         """Return the files under build/, relative to it."""
@@ -1090,37 +1103,38 @@ class MakeTests(RepoCase):
         self.assertFalse(card.is_symlink())
         self.assertEqual([p.name for p in elsewhere.iterdir()], ["keep.txt"])
 
-    def emulator_check(self, name: str, status: int) -> None:
-        """Install a stand-in for emulator/NAME that exits with ``status``."""
-        script = (
-            f"import sys\nprint('{name}: stand-in', sys.argv[1])\nsys.exit({status})\n"
-        )
-        self.repo.write(f"emulator/{name}", script.encode())
-
     def test_a_candidate_is_started_in_the_emulator(self) -> None:
         self.repo.free_space_tool(0)
         lines: list[str] = []
         self.make(self.repo.candidate, log=lines.append)
-        self.assertIn("boot-test: SKIPPED", "\n".join(lines))  # no emulator here
-        self.emulator_check("boot-test", 0)
-        self.emulator_check("update-path-test", 3)
-        lines.clear()
-        self.make(self.repo.candidate, log=lines.append)
         text = "\n".join(lines)
         self.assertIn("boot-test: stand-in", text)
+        self.assertIn("update-path-test: stand-in", text)
         self.assertIn("new.BIN", text)
-        self.assertIn("update-path-test: SKIPPED", text)
+
+    def test_a_candidate_is_not_made_when_a_start_up_check_cannot_run(self) -> None:
+        self.repo.free_space_tool(0)
+        self.repo.emulator_check("update-path-test", 3)  # 3: not set up
+        with self.assertRaises(UnavailableError) as caught:
+            self.make(self.repo.candidate)
+        self.assertIn("update-path-test cannot run", str(caught.exception))
+        self.assertEqual(self.repo.outputs(), [])
+        self.repo.paths.emulator_checks[0].unlink()  # no emulator folder at all
+        with self.assertRaises(UnavailableError) as caught:
+            self.make(self.repo.candidate)
+        self.assertIn("boot-test cannot run", str(caught.exception))
+        self.assertEqual(self.repo.outputs(), [])
 
     def test_a_candidate_that_fails_in_the_emulator_is_removed(self) -> None:
         self.repo.free_space_tool(0)
-        self.emulator_check("boot-test", 1)
+        self.repo.emulator_check("boot-test", 1)
         with self.assertRaises(BuildError) as caught:
             self.make(self.repo.candidate)
         self.assertIn("boot-test failed", str(caught.exception))
         self.assertEqual(self.repo.outputs(), [])
 
     def test_a_tested_build_is_not_started_in_the_emulator(self) -> None:
-        self.emulator_check("boot-test", 1)
+        self.repo.emulator_check("boot-test", 1)
         self.make(self.repo.tested)  # no error: its sha256 is the check
 
     def test_a_first_code_build_tells_the_free_space_check_so(self) -> None:
@@ -1281,6 +1295,55 @@ class CommandLineTests(RepoCase):
         self.assertIn("NOT camera-tested", text)
         self.assertIn("install --card DIR --build new --allow-untested", text)
         self.assertEqual(out.read_bytes(), self.repo.image)
+
+    def test_lint_warnings_do_not_fail_and_a_report_that_cannot_be_made_does(
+        self,
+    ) -> None:
+        for status, expected in (
+            (0, 0),
+            (2, 6),
+        ):  # 2: the tool could not make its report
+            script = f"import sys\nsys.exit({status})"  # silent: its output would go to the test run's log
+            self.repo.write("tools/buildlint.py", script.encode())
+            code, text = self.run_cli("lint", "new")
+            self.assertEqual(code, expected, text)
+        self.assertIn("new is not linted", text)
+        self.assertEqual(self.run_cli("lint", "none")[0], 3)
+
+    def test_init_check_reports_an_incomplete_map_and_a_toolchain_of_another_source(
+        self,
+    ) -> None:
+        from epm2mod import init
+
+        paths = self.repo.paths
+        objdump = init._objdump(paths)
+        objdump.parent.mkdir(parents=True)
+        objdump.write_text("#!/bin/sh\necho 'GNU objdump (stand-in)'\n")
+        objdump.chmod(0o755)
+        paths.firmware_map.parent.mkdir(parents=True, exist_ok=True)
+        paths.firmware_map.write_text("x")  # the first file of the map only
+
+        def missing(map_status: int, built_from: str) -> list[str]:
+            self.repo.write(
+                "tools/fwmap.py", f"import sys\nsys.exit({map_status})".encode()
+            )
+            init._source_record(paths).write_text(built_from + "\n")
+            lines: list[str] = []
+            with mock.patch.object(init, "_pinned_commit", return_value="abc"):
+                return init.init(paths, True, lines.append)
+
+        both = missing(1, "def")
+        self.assertIn("the firmware map", both)
+        self.assertIn("MN103 binutils", both)
+        neither = missing(0, "abc")
+        self.assertNotIn("the firmware map", neither)
+        self.assertNotIn("MN103 binutils", neither)
+        # the commit hooks are off here (no git checkout): reported, and not counted as missing
+        self.assertNotIn(init.HOOKS, both + neither)
+        said: list[str] = []
+        with mock.patch.object(init, "_pinned_commit", return_value="abc"):
+            init.init(paths, True, said.append)
+        self.assertIn(f"{init.HOOKS}: off (to switch them on: epm2mod init)", said)
 
     def test_a_build_is_named_not_given_as_a_path(self) -> None:
         for argv in (
@@ -1784,7 +1847,7 @@ class SourceTests(unittest.TestCase):
         self.assertEqual(missing, [])
 
 
-@unittest.skipUnless(HAVE_STOCK, "stock firmware not present")
+@support.needs(HAVE_STOCK, support.STOCK_NEEDED)
 class RealFirmwareTests(unittest.TestCase):
     def test_the_stock_file_round_trips(self) -> None:
         data = stock.read_stock(PATHS, stock.EPM2_V16)

@@ -27,6 +27,7 @@ import io
 import json
 import os
 import signal
+import subprocess
 import sys
 import traceback
 from collections.abc import Callable, Iterator, Sequence
@@ -35,7 +36,7 @@ from pathlib import Path
 from typing import Any, NoReturn
 
 from . import __version__, camera_steps, catalogue, readme
-from .builds import BuildDescription, check_test_date
+from .builds import BuildDescription, check_test_date, description_path
 from .cardio import Planned, output_path
 from .catalogue import Locator
 from .errors import (
@@ -190,7 +191,7 @@ EXIT_STATUSES: dict[int, tuple[str, str]] = {
     0: ("done (also: an empty cards list)", ""),
     1: (
         'a check found a difference or a problem (generate --check, inspect "will not work", '
-        "release --dry-run not ready)",
+        "release not ready)",
         "show it; like diff and grep",
     ),
     2: ("wrong usage", "fix the command"),
@@ -449,6 +450,32 @@ COMMANDS: dict[str, Command] = {
             },
         ),
         Command(
+            "init",
+            DEVELOPERS,
+            "Set up a checkout: the MN103 binutils, Node, the emulator, Olympus's firmware, "
+            "the firmware map, the commit hooks.",
+            "a line per item; with --check, what is present and what is missing, and nothing is changed",
+            True,
+            "for what is missing: Olympus's firmware, the git submodules, a Node version through nvm",
+            ("epm2mod init", "epm2mod init --check"),
+            {},
+            {1: "with --check: an item is missing"},
+        ),
+        Command(
+            "lint",
+            DEVELOPERS,
+            "Print what in a build may be harmful and is not proven safe.",
+            "WARN lines: jumps from early-loaded to late-loaded code, first code, a needed cold start. "
+            "Warnings do not change the exit status",
+            True,
+            "",
+            ("epm2mod lint NAME",),
+            {},
+            {
+                6: "the report cannot be made (Olympus's firmware or the MN103 objdump is missing)"
+            },
+        ),
+        Command(
             "pin",
             DEVELOPERS,
             "Record a passed camera test and pin the build.",
@@ -541,16 +568,25 @@ COMMANDS: dict[str, Command] = {
         Command(
             "release",
             RELEASES,
-            "Check and tag the next release; with --dry-run, only check.",
-            "the release notes and a tag; with --dry-run, the release notes",
+            "Check that the repository is ready for the next release, and name it.",
+            "the release notes and the tag's name. It creates no tag: the release workflow on GitHub "
+            "runs this command, then makes, tests, tags and publishes the release",
             True,
-            "the network for the checks of CI and with --push",
+            "the network, for the tags and main of origin",
             (
-                "epm2mod release --dry-run",
-                "epm2mod release --final --push",
-                "epm2mod release --build NAME --push",
+                "epm2mod release",
+                "epm2mod release --final",
+                "epm2mod release --build NAME",
             ),
-            {},
+            {
+                "ready": "true if the release can be made",
+                "problems": "why not, if it cannot",
+                "tag": "the tag of the release, like v2026.11.19-rc.1 (null if not ready)",
+                "release_version": "the release's version: the tag without its v (null if not ready)",
+                "commit": "the commit that the release is made from (null if not ready)",
+                "notes": "the release notes (null if not ready)",
+                "sha256": "the sha256 of the firmware that the release installs (null if not ready)",
+            },
             {1: "the repository is not ready for a release"},
         ),
     )
@@ -924,6 +960,42 @@ def _builds(args: argparse.Namespace, ctx: Context) -> int:
     return 0
 
 
+def _init(args: argparse.Namespace, ctx: Context) -> int:
+    """Run ``epm2mod init``: set up the checkout, or with ``--check`` report what is missing."""
+    from .init import init
+
+    missing = init(ctx.checkout(), args.check, print)
+    if missing:
+        _hint("missing: " + ", ".join(missing) + ". To set them up: epm2mod init")
+    return DIFFERS if missing else 0
+
+
+def _lint(args: argparse.Namespace, ctx: Context) -> int:
+    """Run ``epm2mod lint``: the project's lint tool, ``TOOL DESCRIPTION``.
+
+    Warnings do not fail the command. A report that cannot be made does (exit status 6): no warning is not the
+    same as no report.
+    """
+    checkout = ctx.checkout()
+    checkout.build(
+        args.build
+    )  # an unknown or malformed build is an error, not a warning
+    tool = checkout.lint_tool
+    path = description_path(checkout, args.build)
+    try:
+        done = subprocess.run(
+            [sys.executable, str(tool), str(path)], cwd=checkout.root, check=False
+        )
+    except OSError as error:
+        raise UnavailableError(f"the lint cannot run: {error}") from None
+    if done.returncode != 0:
+        raise UnavailableError(
+            f"{args.build} is not linted: {checkout.relative(tool)} could not make its report "
+            "(run 'epm2mod init --check')"
+        )
+    return 0
+
+
 def _pin(args: argparse.Namespace, ctx: Context) -> int:
     """Run ``epm2mod pin``."""
     checkout = ctx.checkout()
@@ -1061,21 +1133,11 @@ def _log(args: argparse.Namespace, ctx: Context) -> int:
 
 def _package(args: argparse.Namespace, ctx: Context) -> int:
     """Run ``epm2mod package``: write the release zip."""
-    from .release import make_release, release_build, release_files, zip_path
+    from .release import make_release, release_description, release_files, zip_path
 
     checkout = ctx.checkout()
     version = args.release_version
-    build = release_build(checkout, version)
-    label = build.label
-    if (
-        label is not None
-        and not version.startswith(label)
-        and not version.endswith("-dev")
-    ):
-        raise BuildError(
-            f"the version {version} does not match the label {label} of {build.name}: "
-            "start the release with 'epm2mod release'"
-        )
+    release_description(checkout, version)  # refuses a bad version
     folder = Path(args.out_dir) if args.out_dir else checkout.output_folder()
     contents = [name for name, _ in release_files(checkout, version)]
     if args.dry_run:
@@ -1100,8 +1162,8 @@ def _package(args: argparse.Namespace, ctx: Context) -> int:
 
 
 def _release(args: argparse.Namespace, ctx: Context) -> int:
-    """Run ``epm2mod release``: check the repository, then tag the next release (``--dry-run``: only check)."""
-    from .releasing import plan, tag
+    """Run ``epm2mod release``: check the repository and show the next release. The release workflow makes it."""
+    from .releasing import plan
 
     checkout = ctx.checkout()
     if args.build is not None and args.final:
@@ -1109,24 +1171,30 @@ def _release(args: argparse.Namespace, ctx: Context) -> int:
             "--build makes a test release: a final release holds the pinned build"
         )
     release, problems = plan(checkout, final=args.final, build=args.build)
-    if release is None:
+    if args.json:
+        _document(
+            args.command_name,
+            True,
+            ready=release is not None,
+            problems=problems,
+            tag=release and release.tag,
+            release_version=release and release.tag[1:],
+            commit=release and release.commit,
+            notes=release and release.notes,
+            sha256=release and release.sha256,
+        )
+    elif release is None:
         for problem in problems:
             print(f"not ready: {problem}")
-        return DIFFERS
-    print(release.notes)
-    if args.dry_run:
-        _hint(f"ready: {release.tag} on {release.commit[:7]}.")
-        return 0
-    tag(checkout, release, push=args.push)
-    print(
-        f"tagged {release.tag}"
-        + (
-            " and pushed it"
-            if args.push
-            else "; push it with: git push origin " + release.tag
+    else:
+        print(release.notes)
+        _hint(
+            f"ready: {release.tag} on {release.commit[:7]}. To release it: "
+            f"gh workflow run release -f kind={'final' if args.final else 'rc'} "
+            + (f"-f build={args.build} " if args.build else "")
+            + "-f dry_run=false"
         )
-    )
-    return 0
+    return DIFFERS if release is None else 0
 
 
 #: The handler of each command.
@@ -1139,6 +1207,8 @@ HANDLERS: dict[str, Handler] = {
     "serve": _serve,
     "make": _make,
     "builds": _builds,
+    "init": _init,
+    "lint": _lint,
     "pin": _pin,
     "apply": _apply,
     "fetch-stock": _fetch_stock,
@@ -1366,6 +1436,14 @@ def _arguments(
         _add_json(parser)
     elif command == "builds":
         _add_json(parser)
+    elif command == "init":
+        parser.add_argument(
+            "--check",
+            action="store_true",
+            help="change nothing; say what is present and what is missing, and exit 1 if an item is missing",
+        )
+    elif command == "lint":
+        parser.add_argument("build", metavar="BUILD", help="the name of a build")
     elif command == "pin":
         parser.add_argument(
             "build", metavar="BUILD", help="the name of the tested build"
@@ -1457,16 +1535,7 @@ def _arguments(
             metavar="NAME",
             help="a test release of this camera-tested build in place of the pinned one (-NAME.N)",
         )
-        parser.add_argument(
-            "--dry-run",
-            action="store_true",
-            help="only check and show; create no tag",
-        )
-        parser.add_argument(
-            "--push",
-            action="store_true",
-            help="push the tag, which starts the publishing",
-        )
+        _add_json(parser)
 
 
 def build_parser(name: str, developer: bool) -> argparse.ArgumentParser:

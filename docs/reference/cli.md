@@ -18,7 +18,7 @@ Run a command with `uv run epm2mod COMMAND` in a checkout, or with the launcher 
 | Exit status | Means | What a caller does |
 |---|---|---|
 | 0 | done (also: an empty cards list) |  |
-| 1 | a check found a difference or a problem (generate --check, inspect "will not work", release --dry-run not ready) | show it; like diff and grep |
+| 1 | a check found a difference or a problem (generate --check, inspect "will not work", release not ready) | show it; like diff and grep |
 | 2 | wrong usage | fix the command |
 | 3 | not found: no such path, file not recognised, unknown build | fix the name or path |
 | 4 | refused; a named flag overrides it (--allow-untested) | ask the user, then pass the flag |
@@ -427,6 +427,53 @@ Examples:
 epm2mod builds
 ```
 
+### epm2mod init
+
+Set up a checkout: the MN103 binutils, Node, the emulator, Olympus's firmware, the firmware map, the commit hooks.
+
+```
+epm2mod init [-h] [--check]
+```
+
+- Output: a line per item; with --check, what is present and what is missing, and nothing is changed.
+- Needs: a checkout. Network: for what is missing: Olympus's firmware, the git submodules, a Node version through nvm.
+
+| Argument | What | Default |
+|---|---|---|
+| `--check` | change nothing; say what is present and what is missing, and exit 1 if an item is missing |  |
+
+- Exit 1: with --check: an item is missing.
+
+Examples:
+
+```sh
+epm2mod init
+epm2mod init --check
+```
+
+### epm2mod lint
+
+Print what in a build may be harmful and is not proven safe.
+
+```
+epm2mod lint [-h] BUILD
+```
+
+- Output: WARN lines: jumps from early-loaded to late-loaded code, first code, a needed cold start. Warnings do not change the exit status.
+- Needs: a checkout. Network: never.
+
+| Argument | What | Default |
+|---|---|---|
+| `BUILD` | the name of a build |  |
+
+- Exit 6: the report cannot be made (Olympus's firmware or the MN103 objdump is missing).
+
+Examples:
+
+```sh
+epm2mod lint NAME
+```
+
 ### epm2mod pin
 
 Record a passed camera test and pin the build.
@@ -655,28 +702,37 @@ epm2mod package --release-version 2026.11.19-dev
 
 ### epm2mod release
 
-Check and tag the next release; with --dry-run, only check.
+Check that the repository is ready for the next release, and name it.
 
 ```
-epm2mod release [-h] [--final] [--build NAME] [--dry-run] [--push]
+epm2mod release [-h] [--final] [--build NAME] [--json]
 ```
 
-- Output: the release notes and a tag; with --dry-run, the release notes.
-- Needs: a checkout. Network: the network for the checks of CI and with --push.
+- Output: the release notes and the tag's name. It creates no tag: the release workflow on GitHub runs this command, then makes, tests, tags and publishes the release.
+- Needs: a checkout. Network: the network, for the tags and main of origin.
 
 | Argument | What | Default |
 |---|---|---|
 | `--final` | a release for everyone (vYYYY.MM.DD); default: a test release (-rc.N) |  |
 | `--build NAME` | a test release of this camera-tested build in place of the pinned one (-NAME.N) |  |
-| `--dry-run` | only check and show; create no tag |  |
-| `--push` | push the tag, which starts the publishing |  |
+| `--json` | print one JSON document (schema 2) on stdout |  |
+
+`--json` keys beside the keys of every document:
+
+- `ready`: true if the release can be made
+- `problems`: why not, if it cannot
+- `tag`: the tag of the release, like v2026.11.19-rc.1 (null if not ready)
+- `release_version`: the release's version: the tag without its v (null if not ready)
+- `commit`: the commit that the release is made from (null if not ready)
+- `notes`: the release notes (null if not ready)
+- `sha256`: the sha256 of the firmware that the release installs (null if not ready)
 
 - Exit 1: the repository is not ready for a release.
 
 Examples:
 
 ```sh
-epm2mod release --dry-run
-epm2mod release --final --push
-epm2mod release --build NAME --push
+epm2mod release
+epm2mod release --final
+epm2mod release --build NAME
 ```

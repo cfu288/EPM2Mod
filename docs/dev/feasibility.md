@@ -164,7 +164,8 @@ movies. The stage, its table and Natural's values in detail: [colour-pipeline.md
 ## Where code may go
 
 The firmware loads in steps. The kernel and segment 1 are in RAM first. Segments 2 and 3 are copied
-later, by the task Usr1, and on the update path they are not copied at all.
+later, by the task Usr1, and on the update path they are not copied at all. The full account, the exact rule,
+the space left and the open risks: [load-order.md](load-order.md).
 
 **A hook in the kernel or in segment 1 must jump only to code in the kernel or in segment 1**, unless
 you have proof that the hooked function runs only after Usr1. The build `peaking-direct-2` broke this
@@ -180,7 +181,7 @@ Check every build that adds a hook with the boot test of the emulator before a f
 om-emu boots the E-PM2 firmware, stock or patched, from its reset vector on both cores. om-emu is
 the git submodule `emulator/om-emu`: our fork ([github.com/cfu288/om-emu](https://github.com/cfu288/om-emu),
 branch `e101`, MIT licence) of upstream om-emu, with the E-PM2's boot lab added in upstream's layout
-(`emu/src/boot/`, `emu/bin/boot.mjs`). Set up once with `emulator/setup.sh`. How it works, the
+(`emu/src/boot/`, `emu/bin/boot.mjs`). Set up once with `uv run epm2mod init`. How it works, the
 stand-ins and the limits are in
 [emulator/om-emu/docs/e101-boot-spec.md](../../emulator/om-emu/docs/e101-boot-spec.md); our checks
 and scripts in [emulator/boot/README.md](../../emulator/boot/README.md). Upstream lists this camera
@@ -190,7 +191,7 @@ IMAGE is `stock`, `data/builds/NAME.json` or a `.BIN` file. No firmware is in th
 
 | Check | Command (from the repository root) | What it proves |
 |---|---|---|
-| Boot test | `emulator/boot-test IMAGE` | The image starts like stock: loader copies, both kernels, all tasks, the application. Exit status 0 = pass, or the same start with moved time stamps (the tool lists them). It caught a build that would have crashed at every start |
+| Boot test | `emulator/boot-test IMAGE` | The image starts like stock: loader copies, both kernels, all tasks, the application. Exit status 0 = pass; a start with moved time stamps fails (the tool lists them). It caught a build that would have crashed at every start |
 | Update path | `emulator/update-path-test IMAGE` | With OK held and an update file on the card, the image finds the file as stock does |
 | Menu screenshots | `emulator/emu-run IMAGE play.mjs OUTDIR STEP...` | The firmware's own menus, drawn by its own code, in English, as PNG files |
 | Screenshot comparison | `emulator/boot/shotdiff.sh IMAGE_A IMAGE_B OUTDIR STEP...` | Which screens a patch changes |

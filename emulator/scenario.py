@@ -33,7 +33,7 @@ Parts:
                 backtrace (return addresses found on the stack: a word is listed when the instruction before it
                 is a call; plus MDR, the last return address).
 """
-import bisect, json, os, re, struct, tempfile
+import bisect, json, os, re, struct, sys, tempfile
 import omemu, bootmem
 from omemu import Emu, EmuError, BASE, TRAMP, PADS, SP0
 
@@ -41,7 +41,10 @@ SETTINGS_GETTER = 0x7E457C75
 RAM = [(0x40000000, 0x7D000000), (0x7D200000, 0x7E421020), (0x80000000, 0xBD000000), (0xBD200000, 0x100000000)]
 """Write-watch ranges for "all memory but the harness scratch (trampoline, pads, stack) and block 0 itself"."""
 RAM_AND_IMAGE = [(0x40000000, 0x7D000000), (0x7D200000, 0x100000000)]
-os.environ.setdefault("OM_OBJDUMP", os.path.join(omemu.ROOT, "build", "toolchain", "bin", "mn10300-elf-objdump"))   # for the disasm op
+sys.path.insert(0, os.path.join(omemu.ROOT, "tools"))
+import toolchain  # noqa: E402
+
+os.environ["OM_OBJDUMP"] = toolchain.binutils("objdump")  # om-emu's name for it: always the project's objdump   # for the disasm op
 MAP_DIR = os.path.join(omemu.ROOT, "build", "map")
 
 

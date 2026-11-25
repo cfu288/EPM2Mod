@@ -48,7 +48,10 @@ LOOK_TAIL = 0x7E56EB0F          # the look stage's tail: a0 = the look table
 EXIF_OFF = 0x7E70DF1B           # rec_art_set_exif_data's default case: no ArtFilter written (Off)
 BASE = 0x7E421020
 STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
-BIN = os.path.join(ROOT, "build", "toolchain", "bin")
+sys.path.insert(0, os.path.join(ROOT, "tools"))
+import toolchain  # noqa: E402
+
+BIN = toolchain.binutils_dir()
 
 # Menu entries in menu order: (stock name, stock value, stored value with a film, film code, kind)
 # kind: "inplace" = the entry's own stock code (its stage entries are switched), "route" = a code no stock entry

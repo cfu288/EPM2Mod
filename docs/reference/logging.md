@@ -184,7 +184,6 @@ The current build id is the one of `data/logdict/events.json` (`afe27672d672fc95
    python3 tools/oetool.py unpack build/epm2mod-2026.11.19.BIN /tmp/scratch/pinned
    uv run python experiments/2026-11-15-log/scripts/mkspec_log.py /tmp/scratch/pinned /tmp/scratch/asm
    uv run epm2mod make debug-log
-   python3 emulator/opcheck.py data/builds/debug-log.json
    python3 emulator/hookcheck.py data/specs/log-core.json data/specs/log-probes.json
    ```
 

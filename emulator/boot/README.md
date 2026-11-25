@@ -12,10 +12,10 @@ our scripts.
 ## Set up
 
 ```sh
-emulator/setup.sh          # initialises emulator/om-emu at the pinned commit
+uv run epm2mod init          # initialises emulator/om-emu at the pinned commit
 ```
 
-Node 26 or newer (`tools/setup.sh`; override: `OM_EMU_NODE`). No firmware is in the repository: an
+Node of the version in `.nvmrc` (`uv run epm2mod init`; override: `OM_EMU_NODE`). No firmware is in the repository: an
 IMAGE argument is `stock`, `data/builds/NAME.json` (its file `build/NAME.BIN`) or a `.BIN` file.
 
 ## The two checks
@@ -25,7 +25,7 @@ emulator/boot-test data/builds/NAME.json
 emulator/update-path-test data/builds/NAME.json
 ```
 
-Exit status of both: **0** pass (for `boot-test` also when only time stamps moved, see below), **1** fail
+Exit status of both: **0** pass, **1** fail
 (one line says why, then the lines that differ), **2** wrong
 arguments, **3** not set up or the image is missing. `--out DIR` keeps the raw reports. `--ref IMAGE`
 changes the reference (default `stock`).
@@ -40,11 +40,10 @@ start-up on purpose fails it: read the printed lines and decide by hand. Do not 
 |---|---|---|
 | `PASS` | Every line is equal under the rule | 0 |
 | `FAIL` | No end of start-up, or what happens differs: a line missing, added or changed, another order, a fault | 1 |
-| `TIMES MOVED` | The same lines and the same order. One or more time stamps differ by more than 0.2 ms | 0; 1 with `--strict-times` |
+| `TIMES MOVED` | The same lines and the same order. One or more time stamps differ by more than 0.2 ms | 1 |
 
 `TIMES MOVED` prints each moved stamp (line, entry, reference time, image time, difference) and one line
-with the total. A time shift alone does not fail a build: the emulator's times are not the camera's. Read
-the list and write down the cause. A long delay can also change a hit count (seen: `S-GIOTIMER` one lower
+with the total. None of the 59 build descriptions that can be made shows it (2026-11-25). A long delay can also change a hit count (seen: `S-GIOTIMER` one lower
 with stamps 1 ms late). That is a `FAIL`, to be read by hand.
 
 **`update-path-test`** starts both with OK held and a card that holds `DCOLYMP/E1019999.BIN`. The image

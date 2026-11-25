@@ -18,8 +18,8 @@ between "Warning Level" and "Touch Screen Settings". This spec makes the same in
 The old tables stay where they are, without a reader. Data and immediates only; no new code.
 
 Usage: uv run python gen/level-gauge/mkspec_step_b.py [E-PL6.BIN.lzma]
-With the E-PL6 1.4 firmware every new record and constant is also asserted equal to the E-PL6's. It is not committed:
-without it (default place: experiments/2026-11-08-feature-map/out/firmware/) these comparisons are skipped.
+With the E-PL6 1.4 firmware as the argument every new record and constant is also asserted equal to the E-PL6's. The
+file is not committed and has no default place: gen/run.sh does not give it, so it never makes these comparisons.
 """
 import json, lzma, os, struct, sys
 
@@ -57,16 +57,13 @@ CONSTS = (
     (0x7EDE9DCC, "aa4e", "aa4f", "DOWN: cmp row count 78 -> 79"),
 )
 PL6_SHIFT = 0xE9A
-PL6 = os.path.join(ROOT, "experiments/2026-11-08-feature-map/out/firmware/OLY_E_112_1400_0000_0000.BIN.lzma")
 OUT = os.path.join(ROOT, "data/specs/level-adjust-row.json")
 
 
 def main():
     blk = parse(open(os.path.join(ROOT, STOCK), "rb").read()).blocks[0].payload
-    path = sys.argv[1] if len(sys.argv) > 1 else PL6
-    pl6 = parse(lzma.open(path).read()).blocks[0].payload if os.path.exists(path) else None
-    if pl6 is None:
-        print("no E-PL6 firmware at", path, ": the comparisons with the E-PL6 are skipped")
+    path = sys.argv[1] if len(sys.argv) > 1 else None  # no default place: gen/run.sh never compares with the E-PL6
+    pl6 = parse(lzma.open(path).read()).blocks[0].payload if path else None
     get = lambda a, n: blk[a - BASE:a - BASE + n]
     ops = []
 

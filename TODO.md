@@ -3,6 +3,16 @@
 Open work, most recent first. When an item is done, move its result to the camera log or the README
 and delete the item here.
 
+## Engineering checks
+
+From the ninth review of the clean-up (2026-11-25). First decide if the check is worth having.
+
+- CI does not check a build when only one of its specs changes. The test of the build selection matches text only.
+- The pre-commit hook reads the working tree, not the staged content, for documents and web files.
+- The pull request title check does not run when the title is edited.
+- `epm2mod init` accepts an edited binutils source as the pinned one.
+- Untracked files under `cli/`, `tools/`, `emulator/` and `gen/` take part in local checks.
+
 ## Film simulations
 
 - RAW Data Edit keeps the source RAW's ImageDescription, so a RAW re-developed with another film carries the old name
@@ -112,13 +122,8 @@ candidate `osd-battery` are kept.
   `experiments/2026-11-15-feature-survey/`. Cheap ones: video bitrate and time limit (patches
   written), Light Box (hidden in this firmware), Add Effects on film simulations, more film simulations.
 
-- The load-order check (`uv run python emulator/hookcheck.py data/builds/NAME.json`) checks the built bytes since
-  2026-11-25. In the pinned build `spot-af-2` it fails with one jump: peaking-mf's `jmp` from T_R (kernel range) to
-  T_MF (segment 2), the cause of the slow cold start (GitHub issue #6). The candidate `cold-start-fix` has T_MF in
-  segment 1 (`docs/camera-log/2026-11-25-cold-start-fix.md`); until it is pinned, CI's free-space check of the pinned
-  build fails.
-- The same check lists 87 other transfers from segment 1 or the kernel into segments 2 and 3, all in
-  `emulator/hookcheck-allow.tsv` with their evidence. Two are task entries that only segment-2 code starts (proof).
+- The load-order check (`uv run python emulator/hookcheck.py data/builds/NAME.json`) counts 87 transfers from segment 1
+  or the kernel into segments 2 and 3 in the pinned build ([load-order.md](docs/dev/load-order.md), section 5). Two are task entries that only segment-2 code starts (proof).
   The other 85 are from `stock-films-structure-3` and safe by timing only: the two colour-stage hooks 0x7E56C6A5 and
   0x7E546160, ten hooks of the ART BKT frame composer, and 73 table words (the colour stage's cases of the film
   codes, and the live-view rows of the hidden art values 111 to 118). Nothing waits for the segment-2 copy

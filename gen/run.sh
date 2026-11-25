@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # gen/run.sh [--check]: run every generator of gen/, in order. They write their patch specs into data/specs/.
 # --check: then fail if a committed spec differs from what its generator makes (CI runs this).
-# Needs: the MN103 binutils (tools/setup.sh --binutils) and Olympus's firmware (uv run epm2mod fetch-stock).
+# Needs: the MN103 binutils (uv run epm2mod init) and Olympus's firmware (uv run epm2mod fetch-stock).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 work=$(mktemp -d)

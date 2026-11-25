@@ -36,7 +36,7 @@ SUPERSEDED = "tools/space-ledger/superseded.tsv"
 CAMERA_LOG = "docs/camera-log/"
 MAP_MD = "docs/reference/code-space-map.md"
 MAP_TSV = "docs/reference/code-space-map.tsv"
-SPEC_GLOBS = ["data/specs/*.json", "experiments/*/patches/*.json",
+SPEC_GLOBS = ["data/specs/*.json", "tools/space-ledger/specs/*.json",
               "emulator/specs/*.json"]
 
 BASE = 0x7E421020            # runtime address of block-0 file offset 0
@@ -1142,10 +1142,13 @@ def check_sram_callers(specs, out=print):
     """FAIL for each constant call or jump of the code that runs in SRAM whose target is inside an op that changes
     bytes. The function map decodes that code at its flash address, so it does not see these callers, and a function
     that only SRAM code calls looks dead (peaking-direct-3 put code over the sleep routine 0x7E53A55C this way).
-    The decode is in emulator/opcheck.py."""
+    The code is decoded at its SRAM address: its calls are pc-relative to that address."""
     sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "emulator"))
-    import opcheck
-    calls, _src, _dst = opcheck.sram_calls()
+    import bootmem
+    import hookcheck
+    m = bootmem.model()
+    load = next(x for x in m.loads if x.name == "sram-image")
+    calls = [c for c in hookcheck.transfers(m.f["boot_sram_copy"]["dst"], m.b[load.lo - BASE:load.hi - BASE]) if c[1] in ("jmp", "call")]
     fails = 0
     for ia, mn, tgt in calls:
         for s in specs:
@@ -1159,17 +1162,16 @@ def check_sram_callers(specs, out=print):
 
 
 def check_load_order(specs, out=print):
-    """FAIL for each jump or call from code that is loaded early (kernel, segment 1) to code that is loaded later.
-    The check is emulator/hookcheck.py; the accepted hooks are in emulator/hookcheck-allow.tsv."""
+    """FAIL for each jump or call from code that is loaded early (kernel, segment 1) to code that is loaded later, when
+    the pinned build does not have it. The check is emulator/hookcheck.py."""
     here = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "emulator")
     sys.path.insert(0, here)
     import hookcheck
     lines = []
-    ok = hookcheck.check([rel(s.path) for s in specs], hookcheck.read_allow(), lines.append)
+    ok = hookcheck.check([rel(s.path) for s in specs], lines.append)
     for line in lines[:-1]:
-        if line.startswith("FAIL"):
-            out(line[:200])
-    out("%s  load order: %s" % ("PASS" if ok else "FAIL", lines[-1]))
+        out(line[:200])
+    out("%s  %s" % ("PASS" if ok else "FAIL", lines[-1]))
     return 0 if ok else 1
 
 

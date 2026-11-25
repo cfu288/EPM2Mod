@@ -33,6 +33,9 @@ if TYPE_CHECKING:
 MANIFEST = "epm2mod.json"
 #: The manifest key that marks a release folder; its value is the release's version.
 RELEASE_KEY = "release"
+#: The key of a release's manifest that names the camera-tested build (its sha256 and label) when the release
+#: holds that build with another label.
+TESTED_KEY = "camera_tested_as"
 
 
 @dataclass(frozen=True)
@@ -160,6 +163,11 @@ class RepoPaths:
         return self.location("free_space_tool")
 
     @property
+    def lint_tool(self) -> Path:
+        """The script that prints the soft report of a build: what may be harmful and is not proven safe."""
+        return self.location("lint_tool")
+
+    @property
     def emulator_checks(self) -> tuple[Path, ...]:
         """The scripts that start a firmware image in the emulator, in order."""
         return self.locations("emulator_checks")
@@ -198,11 +206,6 @@ class RepoPaths:
     def camera_log(self) -> Path:
         """The folder of the camera log: one file for each flash on the camera."""
         return self.location("camera_log")
-
-    @property
-    def workflows(self) -> tuple[Path, ...]:
-        """The CI workflows whose runs on the release commit must have passed."""
-        return self.locations("workflows")
 
     @property
     def app(self) -> Path:
