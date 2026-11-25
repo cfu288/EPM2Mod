@@ -110,9 +110,9 @@ cases above did not change.
 | `scenario.py` | `Scenario`: calls (`call`, `call_site`, `piece`), tasks with their own stack (`task`, `run`), stubs, probes, the settings getter, device accesses, write watches, pc sets, call trees, backtraces. Helpers `diff_pcs`, `diff_writes`, `patch_ranges`, `print_calls`. |
 | `osmodel.py` | A Python model of the uITRON services behind the `Oly*` wrappers: event flags, queues, data queues, semaphores, sleep, software timers. `schedule()` runs the ready tasks until all wait. |
 | `liveview.py` | `LiveView`: a rig for the mov layer and the art tasks. It runs the static constructors, 12 module init functions and 10 task bodies from their real entries, sends "Through Start", and then steps frame events. It tracks the image-work heap (alloc, free, mode, re-partition), firmware error reports and addresses given to devices. |
-| `hookcheck.py` | S0, a static check with no emulator: lists every jump of a spec's hooks and new code with the load segment of its source and target. A jump from the kernel or segment 1 to segment 2 or 3 FAILS (that code is not in RAM yet when the boot task runs, and never on the update path). |
+| `hookcheck.py` | S0, a static check with no emulator. It makes the build's block 0 and decodes the built bytes of every op in the kernel or segment 1, and lists every jump that leaves them and every changed table pointer, with the load segment of its source and target. A transfer from the kernel or segment 1 to segment 2 or 3 FAILS (that code is not in RAM yet when the boot task runs, and never on the update path). Give it a build description, or all specs of a build in order. |
 | `opcheck.py` | Two static checks of a whole build: a byte that one spec covers and keeps and a later spec changes, and a call from the code that runs in SRAM into an op. |
-| `hookcheck-allow.tsv` | The hooks that `hookcheck.py` would fail and that are accepted, each with its evidence. |
+| `hookcheck-allow.tsv` | The jumps and pointers that `hookcheck.py` would fail and that are accepted, each with its evidence. |
 
 ### How to write a scenario
 
@@ -152,7 +152,7 @@ For code outside live view use `Scenario` directly:
 - **Settings are what the scenario says.** The store that the camera fills from its EEPROM is not there. A wrong value gives a wrong path. In the live-view rig all ids but the ones set read 0, and the mov layer prints `[mov]img_ctrl_size err` in every frame because no geometry was given.
 - **Stubbed whole:** the white-balance module, the CPU cache control, the soft-float multiply 0x7E5018E8 (done in Python).
 - **Division by zero:** om-emu traps; the MN103 sets the V flag and goes on. The harness goes on and counts them (`Result.notes`).
-- **`hookcheck.py` sees only whole `jmp`/`call` instructions at the start of an op and the code they reach.** A patched displacement inside an instruction is not seen.
+- **`hookcheck.py` sees only `jmp`/`call`/branch instructions with a constant target in the built bytes of the ops, and stock pointers that an op changes.** A pointer in new code or in a new table, and a register jump, are not seen. A data op in early-loaded space is decoded as code too.
 - **Not started:** capture (TAKE_*, REC_* tasks), the GUI, the C++ state framework. `IMG0_LOCAL` spins on a hardware semaphore and is left out.
 
 ### Requests for om-emu

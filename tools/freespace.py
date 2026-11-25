@@ -1164,11 +1164,10 @@ def check_load_order(specs, out=print):
     here = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "emulator")
     sys.path.insert(0, here)
     import hookcheck
-    allow = {int(r[0], 16): "%s, %s" % (r[1], r[2]) for r in read_tsv(os.path.join(here, "hookcheck-allow.tsv"), 3)}
     lines = []
-    ok = hookcheck.check([rel(s.path) for s in specs], allow, lines.append)
+    ok = hookcheck.check([rel(s.path) for s in specs], hookcheck.read_allow(), lines.append)
     for line in lines[:-1]:
-        if not line.startswith("ok"):
+        if line.startswith("FAIL"):
             out(line[:200])
     out("%s  load order: %s" % ("PASS" if ok else "FAIL", lines[-1]))
     return 0 if ok else 1
