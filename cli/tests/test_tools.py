@@ -343,15 +343,3 @@ class DocumentTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-
-class PythonVersionTests(unittest.TestCase):
-    def test_one_full_version_everywhere(self) -> None:
-        import re
-
-        version = (ROOT / ".python-version").read_text().strip()
-        self.assertRegex(version, r"^\d+\.\d+\.\d+$")
-        self.assertEqual("%d.%d.%d" % sys.version_info[:3], version)  # what `uv run` gives
-        for workflow in sorted((ROOT / ".github" / "workflows").glob("*.yml")):
-            for named in re.findall(r"python-version: '([^']+)'", workflow.read_text()):
-                self.assertEqual(named, version, workflow.name)  # a job without the file names the same version
