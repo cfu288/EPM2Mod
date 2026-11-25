@@ -26,7 +26,9 @@ goes into `packages/ui` and is exported from its `src/index.ts`. Each app keeps 
 - `apps/site/public/404.html` and the script in `apps/site/index.html`: the GitHub Pages redirect back to the page for
   any path.
 
-Work on it with Node 26 (`.nvmrc`), from `web/`:
+Work on it with the Node version in `.nvmrc`, from `web/`. On another Node `npm ci`, `check`, `test` and `e2e` stop
+and name the version. `../tools/node.sh COMMAND` runs a command with the
+Node of `.nvmrc` from nvm, for example `../tools/node.sh npm run check`.
 
 ```sh
 npm ci
@@ -38,6 +40,11 @@ npm run e2e        # browser tests of both apps (Playwright; once: npx playwrigh
 
 CI runs `check` and `e2e`. The local app's browser tests answer the API calls themselves; the server and the real
 firmware build are tested in Python (`cli/tests/test_serve.py`).
+
+Two sets of committed pictures need files that are not in the repository, so only the owner can make them again:
+the film photos (`web/scripts/film_photos.py` reads raw photos from `.local/raws/` and `.local/site-photos/`) and the
+Picture Mode previews (`web/scripts/render_previews.py` needs the build `card-looks-4` and an emulator state that
+the owner made by hand). A change that needs new pictures says so in its pull request.
 
 To work on the local app against a real server: `uv run epm2mod serve --no-browser --port 8765`, then
 `EPM2MOD_API=http://127.0.0.1:8765 npm run dev:app`, and open the dev address with the server's `#token=...`.

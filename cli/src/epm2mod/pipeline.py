@@ -64,12 +64,13 @@ from .errors import (
     ContainerError,
     LookFileError,
     NotFoundError,
+    UnavailableError,
 )
 from .fileio import Log, describe_os_error, part_path, read_bytes, silent, write_bytes
 from .hashing import sha256_bytes
 from .label import with_label
 from .looks import lookfile
-from .paths import RepoPaths
+from .paths import TESTED_KEY, RepoPaths
 from .spec import Applied, PatchSpec, apply_specs, load_spec
 from .stock import CARD_FOLDER, obtain_stock, read_stock
 
@@ -168,8 +169,7 @@ def check_free_space(paths: RepoPaths, description: BuildDescription) -> str:
         if not paths.firmware_map.exists():
             hint = (
                 f"\nThe firmware map ({paths.relative(paths.firmware_map)}) is "
-                "missing. A new build needs it: see "
-                f"{paths.relative(paths.free_space_tool)}."
+                "missing. A new build needs it: run 'epm2mod init'."
             )
         # The failures can be anywhere in a long report: show them, then the summary.
         lines = output.splitlines()
@@ -194,21 +194,21 @@ def check_in_emulator(paths: RepoPaths, image: Path) -> list[str]:
     leave the camera with no way back.
 
     Returns:
-        One line for each check: its result, or that it was skipped because
-        the emulator is not set up on this computer.
+        One line for each check: its result.
 
     Raises:
+        UnavailableError: if a check cannot run (the emulator is not set up).
+            A build that was not started in the emulator is not made.
         BuildError: if a check fails.
     """
     lines = []
     for tool in paths.emulator_checks:
-        skipped = (
-            f"{tool.name}: SKIPPED, the emulator is not set up (see {paths.relative(tool.parent)}). "
-            "Do not flash this build before the check has passed."
+        not_run = UnavailableError(
+            f"{tool.name} cannot run: the emulator is not set up "
+            "(run 'epm2mod init'). The build was not made."
         )
         if not tool.exists():
-            lines.append(skipped)
-            continue
+            raise not_run
         try:
             done = subprocess.run(
                 [sys.executable, str(tool), str(image)],
@@ -222,14 +222,13 @@ def check_in_emulator(paths: RepoPaths, image: Path) -> list[str]:
             raise BuildError(f"{tool.name} cannot run: {error}") from None
         output = (done.stdout + done.stderr).strip()
         if done.returncode == _EMULATOR_NOT_SET_UP:
-            lines.append(skipped)
-        elif done.returncode != 0:
+            raise UnavailableError(f"{output[-_CHECK_OUTPUT_LIMIT:]}\n{not_run}")
+        if done.returncode != 0:
             raise BuildError(
                 f"{output[-_CHECK_OUTPUT_LIMIT:]}\n"
                 f"{tool.name} failed: the build was removed. Do not flash it."
             )
-        else:
-            lines.append(output.splitlines()[-1] if output else f"{tool.name}: PASS")
+        lines.append(output.splitlines()[-1] if output else f"{tool.name}: PASS")
     return lines
 
 
@@ -276,10 +275,21 @@ def firmware(
     )
     step(3)
     if checkout is None:
-        log(
-            f"4/5 sha256 {digest}: this is the build that was tested on "
-            f"{description.camera_tested}"
-        )
+        tested_as = getattr(paths, "manifest", {}).get(TESTED_KEY)
+        if isinstance(
+            tested_as, dict
+        ):  # a release that holds the tested build with the release's date
+            log(
+                f"4/5 sha256 {digest}: this is the build of this release. It is the build that "
+                f"was tested on {description.camera_tested} (sha256 {tested_as.get('sha256')}, "
+                f"label {tested_as.get('label')}) with another date on the Firmware screen; "
+                "nothing else differs"
+            )
+        else:
+            log(
+                f"4/5 sha256 {digest}: this is the build that was tested on "
+                f"{description.camera_tested}"
+            )
     else:
         log(
             f"4/5 sha256 {digest}\n    CANDIDATE: this build is NOT camera-tested. "

@@ -5,15 +5,18 @@ Run: uv run python -m unittest discover -s cli/tests
 Tests that need firmware BINs are skipped when the files are absent.
 """
 
-import glob, hashlib, json, os, pathlib, sys, unittest
+import hashlib, json, os, pathlib, subprocess, sys, unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 sys.path.insert(0, os.path.join(ROOT, "cli", "src"))
 import oetool  # noqa: E402
+import support  # noqa: E402
 from epm2mod.spec import apply_specs, load_spec  # noqa: E402
 
-STOCK = sorted(glob.glob(os.path.join(ROOT, "firmware/stock/E-PM2/*.BIN")))
+#: The one stock file that the project uses. Other firmware files in the folder are not read: a test does not
+#: depend on what happens to be on the computer.
+STOCK = [p for p in [os.path.join(ROOT, "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN")] if os.path.exists(p)]
 
 
 class TestScramble(unittest.TestCase):
@@ -23,9 +26,9 @@ class TestScramble(unittest.TestCase):
         self.assertNotEqual(oetool.encode(data), data)
 
 
-@unittest.skipUnless(STOCK, "stock firmware not present")
+@support.needs(STOCK, support.STOCK_NEEDED)
 class TestStock(unittest.TestCase):
-    def test_round_trip_all_versions(self):
+    def test_round_trip(self):
         for path in STOCK:
             with self.subTest(path=os.path.basename(path)):
                 raw = pathlib.Path(path).read_bytes()
@@ -34,10 +37,11 @@ class TestStock(unittest.TestCase):
                 self.assertEqual(oetool.build(blocks, tail), raw)
 
 
-@unittest.skipUnless(STOCK, "stock firmware not present")
+@support.needs(STOCK, support.STOCK_NEEDED)
 class TestPatchSpecs(unittest.TestCase):
     def test_specs_with_expected_hash_reproduce(self):
-        for spec in glob.glob(os.path.join(ROOT, "data/specs/*.json")):
+        listed = subprocess.run(["git", "ls-files", "--", "data/specs/*.json"], cwd=ROOT, capture_output=True, text=True, check=True)
+        for spec in (os.path.join(ROOT, name) for name in listed.stdout.split()):  # not the working tree's extra files
             s = json.loads(pathlib.Path(spec).read_text(encoding="utf-8"))
             if not s.get("expected_sha256"):
                 continue

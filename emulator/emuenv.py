@@ -1,9 +1,9 @@
 """Paths and images for the emulator tools. Python standard library only.
 
     OM_EMU_DIR    the om-emu checkout: the fork with the E-PM2's boot lab. Default: the submodule
-                  emulator/om-emu (emulator/setup.sh initialises it).
-    OM_EMU_NODE   Node 26 or newer. Default: `node` on PATH when it is new enough, else
-                  the newest Node that nvm has (tools/setup.sh installs one).
+                  emulator/om-emu (uv run epm2mod init initialises it).
+    OM_EMU_NODE   a Node executable. Default: the Node of the version in .nvmrc, from PATH or nvm
+                  (tools/node.sh; uv run epm2mod init installs it).
     EMU_IMAGES    where unpacked images go. Default: build/emu (ignored by git).
 
 An IMAGE argument of the tools is one of:
@@ -14,7 +14,6 @@ An IMAGE argument of the tools is one of:
 No firmware is in the repository: the tools unpack an image into EMU_IMAGES/NAME-SHA8/ when needed.
 """
 
-import glob
 import hashlib
 import json
 import os
@@ -25,9 +24,6 @@ import sys
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BOOT = os.path.join(REPO, "emulator", "boot")
 STOCK_BIN = os.path.join(REPO, "firmware", "stock", "E-PM2", "OLY_E_101_1600_0000_0000.BIN")
-NODE_MAJOR = 26
-
-
 class EmuSetupError(Exception):
     """The emulator cannot run: no working tree, no Node, no image. The text says what to do."""
 
@@ -44,29 +40,20 @@ def require_om_emu():
     """Return om_emu_dir(), or raise EmuSetupError when there is no om-emu with the boot lab at that place."""
     d = om_emu_dir()
     if not os.path.exists(os.path.join(d, "emu", "bin", "boot.mjs")):
-        raise EmuSetupError(f"no om-emu with the boot lab at {d}: run emulator/setup.sh (or set OM_EMU_DIR)")
+        raise EmuSetupError(f"no om-emu with the boot lab at {d}: run uv run epm2mod init (or set OM_EMU_DIR)")
     return d
 
 
-def _node_major(exe):
-    try:
-        out = subprocess.run([exe, "--version"], capture_output=True, text=True, timeout=20).stdout
-        return int(out.strip().lstrip("v").split(".")[0])
-    except (OSError, ValueError, subprocess.SubprocessError):
-        return 0
-
-
 def node():
-    """Return a Node executable of version 26 or newer, or raise EmuSetupError."""
+    """Return the Node executable of the version in .nvmrc (tools/node.sh finds it), or raise EmuSetupError.
+    OM_EMU_NODE names another one."""
     env = os.environ.get("OM_EMU_NODE")
     if env:
         return env
-    nvm = os.environ.get("NVM_DIR") or os.path.expanduser("~/.nvm")
-    from_nvm = sorted(glob.glob(os.path.join(nvm, "versions", "node", "v*", "bin", "node")), key=_node_major, reverse=True)
-    for exe in [shutil.which("node")] + from_nvm:
-        if exe and os.path.exists(exe) and _node_major(exe) >= NODE_MAJOR:
-            return exe
-    raise EmuSetupError(f"no Node {NODE_MAJOR} or newer on PATH or in nvm: run tools/setup.sh, or set OM_EMU_NODE")
+    found = subprocess.run([os.path.join(REPO, "tools", "node.sh"), "node", "-p", "process.execPath"], capture_output=True, text=True)
+    if found.returncode != 0:
+        raise EmuSetupError((found.stderr.strip() or "tools/node.sh failed") + " (or set OM_EMU_NODE)")
+    return found.stdout.strip()
 
 
 def sha256(path):
@@ -137,7 +124,7 @@ def tool_env(image, extra=None):
     if not os.path.isdir(image):
         env["EMU_BIN"] = os.path.abspath(image_bin(image)[1])
     env["OM_EMU_DIR"] = require_om_emu()
-    env.setdefault("EPM2_REPO", REPO)
+    env["EPM2_REPO"] = REPO
     if extra:
         env.update(extra)
     return env

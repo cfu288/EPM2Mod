@@ -7,7 +7,7 @@ requires-python = ">=3.10"
 dependencies = ["epm2mod"]
 
 [dependency-groups]
-dev = ["black>=24", "mypy>=1.10", "numpy>=1.24", "pillow"]
+dev = ["black>=24", "mypy>=1.10", "numpy>=1.24", "pillow", "pyflakes"]
 # What the scripts under experiments/ import: `uv sync --group research`. Not needed to build or check firmware.
 research = [
     "numpy>=1.24",

@@ -898,8 +898,8 @@ class NoCheckoutTests(unittest.TestCase):
     def setUp(self) -> None:
         folder = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, folder, True)
-        self.top = Path(folder) / "EPM2Mod-2026.11.19"
-        for name, data in release.data_files(RepoPaths(ROOT), "2026.11.19"):
+        self.top = Path(folder) / "EPM2Mod-2026.11.19-dev"
+        for name, data in release.data_files(RepoPaths(ROOT), "2026.11.19-dev"):
             target = self.top / name
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(data)
@@ -917,7 +917,7 @@ class NoCheckoutTests(unittest.TestCase):
 
     def test_the_locator_is_the_release_folder(self) -> None:
         manifest = json.loads((self.top / MANIFEST).read_text(encoding="utf-8"))
-        self.assertEqual(manifest[RELEASE_KEY], "2026.11.19")
+        self.assertEqual(manifest[RELEASE_KEY], "2026.11.19-dev")
         locator = catalogue.locate(project=self.top)
         self.assertEqual(locator.kind, "release")
         self.assertEqual(locator.pinned_build(), RepoPaths(ROOT).pinned_build())

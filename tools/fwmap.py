@@ -6,6 +6,7 @@
     python3 tools/fwmap.py str 'firmup'          # strings matching a regex, with the functions that use them
     python3 tools/fwmap.py range 0x7E6C3000 0x7E6CB000   # functions in a range with their first strings
     python3 tools/fwmap.py xref 0x7E80E86F       # code and data references to an address
+    python3 tools/fwmap.py check                 # exit 0 when every file of the database is there
     python3 tools/fwmap.py tasks                 # uITRON task table (v1.6 offsets)
     python3 tools/fwmap.py --fw OTHER.BIN --base 0x7E101020 --out DIR build   # another body (any command)
 
@@ -31,16 +32,16 @@ and the base is 0x...020) whose bytes are mostly NUL-terminated printable string
 small integers and addresses (pointer tables, vtables), are "data" pages.
 Calls decoded inside data pages are discarded.
 """
-import argparse, bisect, collections, os, re, subprocess, sys
+import argparse, bisect, collections, contextlib, os, re, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import disasm  # noqa: E402  (objdump path, block cache, BASE)
+import toolchain  # noqa: E402
 
 OUT = os.path.join(ROOT, "build", "map")
 FW = disasm.DEFAULT_FW   # --fw, --base and --out override these three for other bodies or versions
 BASE = disasm.BASE
-BIN = os.path.join(disasm.ROOT, "build", "toolchain", "bin")  # made by tools/setup.sh
 PAGE = 0x1000
 INSN = re.compile(r"^\s*([0-9a-f]+):\t(?:[0-9a-f ]+\t)?(\S+)\s*(.*)$")  # raw bytes column optional
 SYM = re.compile(r"^([0-9a-f]{8}) <(\w+)>:$")
@@ -196,6 +197,7 @@ def stage_elf(path, base, size, starts):
             f.write(f"\t.globl {name}\n\t.type {name},@function\n{name}:\n"
                     f"\t.incbin \"{path}\",{lo - base:#x},{hi - lo:#x}\n\t.size {name},{hi - lo:#x}\n")
     obj, elf = os.path.join(OUT, "fn.o"), os.path.join(OUT, "fn.elf")
+    BIN = toolchain.binutils_dir()
     subprocess.check_call([f"{BIN}/mn10300-elf-as", "-o", obj, asm])
     subprocess.check_call([f"{BIN}/mn10300-elf-ld", "-Ttext", f"{base:#x}", "-e", f"{base:#x}", "-o", elf, obj])
     dis = os.path.join(OUT, "functions.txt")
@@ -309,8 +311,23 @@ def stage_ptrs(data, base, strings, starts, code_pages):
                 f.write(f"{base + o:08x}\t{v:08x}\tstr\n")
 
 
+#: Every file that `build` writes. The last one is written last.
+FILES = ("linear.txt", "functions.txt", "calls.tsv", "strrefs.tsv", "functions.tsv", "fnidx.tsv", "ptrs.tsv",
+         "starts.tsv", "tasks.tsv")
+
+
+def cmd_check(a):
+    """Exit status 0 when every file of the database is there and not empty."""
+    missing = [name for name in FILES if not os.path.isfile(os.path.join(OUT, name)) or not os.path.getsize(os.path.join(OUT, name))]
+    if missing:
+        sys.exit("the firmware map in %s is not complete (missing: %s): run tools/fwmap.py build" % (OUT, ", ".join(missing)))
+
+
 def cmd_build(a):
     os.makedirs(OUT, exist_ok=True)
+    for name in FILES:  # every file is written again: a file of an earlier build is not reused, and a build
+        if os.path.exists(os.path.join(OUT, name)):  # that stops half-way leaves no mark
+            os.remove(os.path.join(OUT, name))
     base = BASE
     path, data = block()
     strings, data_pages = string_index(data)
@@ -338,6 +355,8 @@ def cmd_build(a):
     n, c, r = stage_index(dis, base, len(data), strings, data_pages, data, call_only)
     stage_ptrs(data, base, strings, starts, code_pages)
     print(f"functions {n}, call edges {c}, string refs {r} -> {OUT}")
+    with open(os.path.join(OUT, "tasks.tsv"), "w") as f, contextlib.redirect_stdout(f):
+        cmd_tasks(a)  # the task table, which the scenario runs of emulator/liveview.py read
 
 
 def load_tsv(name):
@@ -482,6 +501,7 @@ def main():
     ap.add_argument("--out", default=OUT, help="database directory")
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("build")
+    sub.add_parser("check")
     sub.add_parser("tasks")
     p = sub.add_parser("fn")
     p.add_argument("addr")
@@ -499,7 +519,7 @@ def main():
     a = ap.parse_args()
     FW, BASE, OUT = os.path.abspath(a.fw), int(a.base, 0), os.path.abspath(a.out)
     {"build": cmd_build, "fn": cmd_fn, "str": cmd_str, "range": cmd_range, "xref": cmd_xref,
-     "tasks": cmd_tasks}[a.cmd](a)
+     "tasks": cmd_tasks, "check": cmd_check}[a.cmd](a)
 
 
 if __name__ == "__main__":

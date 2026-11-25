@@ -1,10 +1,14 @@
-"""Scenario tests of the save guard (NOTES.md section 18). Uses emulator/liveview.py.
+"""The save guard of focus peaking, run by hand before a build that changes peaking is offered for a flash. About 20
+minutes. No other check runs it. Background: experiments/2026-11-14-focus-peaking/NOTES.md section 18.
 
-    python3 scen_guard.py SCENARIO NAME=BLOCK0 [NAME=BLOCK0 ...]
-    SCENARIO: s19 ... s26 or all. Each image runs alone; one line per image says PASS or FAIL.
-    An image whose NAME starts with "pinned" is judged as a build without the guard (use "pinned-fast", not "pinned":
-    scen_peaking.py gives an image of that exact name no request).
-    The block-0 files are `block0_0100.bin` of `python3 tools/oetool.py unpack build/NAME.BIN /tmp/scratch/NAME`.
+    uv run epm2mod make peaking-fast && uv run epm2mod make NAME
+    uv run python emulator/scenarios/scen_guard.py all pinned-fast=BLOCK0 NAME=BLOCK0
+    BLOCK0 is block0_0100.bin in the folder that `emulator/emu-run --blocks build/NAME.BIN` prints.
+
+    Instead of `all`: one of s19 ... s26. Each image runs alone; one RESULT line per image says PASS or FAIL. An image
+    whose NAME starts with "pinned" is the reference, the camera-tested build peaking-fast without the guard. It must
+    show the fault of 2026-11-16 where the scenario is for it (REFERENCE_SHOWS_FAULT) and none elsewhere. Exit status
+    1 when an image fails, the reference too.
 
 What is modelled (the rig runs no capture: no TAKE_*, REC_* task, no development job):
   - "a photo is being developed": the real heap allocator 0x7E578D43 is called the way the still code calls it
@@ -26,19 +30,14 @@ S22  A movie ends (movie flag 0x605B039C) while a block is in use and the reques
 S23  Three frames of an interval sequence with the request set all the time.
 S24  Back from playback / RAW Data Edit: the heap mode set directly (0x7E578C60, as 0x7E948E91 does), a block in use.
 S25  Sleep and wake (Through End, Through Start) with the request set and no block in use: lines at once.
-S26  The event pk_guard of the debug builds (images whose NAME starts with "debug"; others are skipped): holds as in
+S26  The event pk_guard, for each image that has the probe (a jump at the ring handler 0x7EB7DE46; not by name): holds as in
      S19 with focus-ring events (the first two instructions of the handler 0x7EB7DE46, where the probe is); the
      records with id 262 are read from the CPU0 ring in the emulator's memory.
 """
 import os, sys
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(ROOT, "emulator"))
-_src = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scen_peaking.py")).read()
-assert _src.rstrip().endswith("\nmain()")
-_sp = {"__file__": os.path.join(os.path.dirname(os.path.abspath(__file__)), "scen_peaking.py"), "__name__": "scen_peaking"}
-exec(compile(_src.rstrip()[:-len("main()")], "scen_peaking.py", "exec"), _sp)
-open_lv, request, anomalies = (_sp[k] for k in ("open_lv", "request", "anomalies"))
-from liveview import CMD_THROUGH_END, CMD_THROUGH_START, HEAP_MODE, HEAP_FLAGS  # noqa: E402
+from liveview import CMD_THROUGH_END, CMD_THROUGH_START, HEAP_FLAGS, HEAP_MODE, LiveView  # noqa: E402
 
 L, R, L2, C = 0x602BE8C4, 0x602BE8C5, 0x602BE8C6, 0x602BE8C7
 TAG, WHITE, RED = 0x8971, 3, 2
@@ -49,6 +48,46 @@ ALLOC, ALLOC_SITE, FREE, FREE_SITE = 0x7E578D43, 0x7E70BE3B, 0x7E578EBC, 0x7E70B
 CHOOSER, CHOOSER_SITE, SET_MODE, SET_MODE_SITE = 0x7E714833, 0x7E68AE4A, 0x7E578C60, 0x7E948E91
 ART_CMD, ART_STATE = 0x7E72A14B, 0x605C1930
 OUT = print
+
+
+def open_lv(path, name, pm):
+    lv = LiveView(path, name=name)
+    lv.settings[38017] = pm           # Picture Mode
+    lv.settings[17601] = 1            # art filter type I
+    lv.seen = {"gain2": []}
+    lv.sc.probe(0x7E72676D, lambda sc, g: lv.seen["gain2"].append(g["d0"] & 0xFFFF), "pass 9 gain")
+    return lv
+
+
+def request(lv, on):
+    """Set or clear the peaking request as the build's own hook does (CmpSts_MfAssist::entryMfAssistOn / Off)."""
+    a = 0x7EB7D46C if on else 0x7EB7D43B
+    r = lv.sc.piece(a, [a + 7], {"a0": 0x7D500000})
+    assert not r.fault and lv.sc.r8(R) == (1 if on else 0), r.fault
+
+
+def anomalies(lv, f):
+    """Things a healthy frame does not show."""
+    out = []
+    s = f.state
+    if f.faults:
+        out.append("fault")
+    if s["alloc_error"]:
+        out.append("art buffers refused (alloc error)")
+    if f.label.startswith("frame") and not s["picture"]:
+        out.append("no picture")
+    for k, d in f.events:
+        if k == "heap re-partition" and not d.startswith("0 live"):
+            out.append("heap re-partitioned under live blocks (%s)" % d.split(":")[0])
+        if k == "heap free" and "NOT A LIVE" in d:
+            out.append("free of a block that is not live")
+        if k == "error report":
+            out.append("firmware error report " + d)
+    if f.stale:
+        out.append("%d device writes of addresses in freed blocks" % len(f.stale))
+    if s["art_record"] == 0x2A3 and s["heap_mode"] != 1 and f.label.startswith("frame"):
+        out.append("art record is Key Line but heap mode is %d" % s["heap_mode"])
+    return out
 
 
 class Run:
@@ -83,7 +122,7 @@ class Run:
         if any(c == 4 and st != 2 for c, st in cmds) or any(c == 3 and st != 0 for c, st in cmds):
             bad.append("an art command met the wrong session state")
         gains = sorted(set(self.lv.seen["gain2"]))
-        self.lv.seen["gain2"], self.lv.seen["expose7"] = [], []
+        self.lv.seen["gain2"] = []
         lines = bool(gains) and f.state["art_record"] == 0x2A3
         if expect_lines is not None and lines != expect_lines:
             bad.append("lines %s, expected %s" % (lines, expect_lines))
@@ -143,9 +182,28 @@ class Run:
             self.bad.append("held frame: L or the heap mode is not as the guard should leave it")
 
 
+#: What the fault looks like in the rig: the heap divided again under a block in use, and the art buffers refused.
+FAULT_SIGNS = ("heap re-partitioned under live blocks", "art buffers refused")
+#: The scenarios in which a build without the guard shows the fault (run of peaking-fast, 2026-11-25).
+REFERENCE_SHOWS_FAULT = {"S19": True, "S20": True, "S21": True, "S22": True, "S23": True, "S24": True, "S25": False, "S26": False}
+
+
 def verdict(tag, runs):
     ok = True
     for name, bad in runs:
+        if name.startswith("pinned"):
+            # The reference: a build without the guard. It is judged for what it must show: in the scenarios of
+            # REFERENCE_SHOWS_FAULT it must show the fault the guard is for (else the scenario no longer finds that
+            # fault, or the reference is not a build without the guard), and in the others it must show none.
+            must = REFERENCE_SHOWS_FAULT[tag]
+            shows = any(sign in text for text in bad for sign in FAULT_SIGNS)
+            right = shows if must else not bad  # another anomaly is not the fault that the guard is for
+            what = ("shows the fault, as it must" if shows and must else "shows an anomaly that is not the guard's fault" if must
+                    else "shows a fault it must not show") if bad else "no fault here" + (", and it must show one" if must else "")
+            OUT("  %s REFERENCE [%s], a build without the guard: %s: %s%s" % (
+                tag, name, "PASS" if right else "FAIL", what, ": " + "; ".join(sorted(set(bad)))[:700] if bad else ""))
+            ok &= right
+            continue
         OUT("  %s RESULT [%s]: %s" % (tag, name, "PASS" if not bad else "FAIL: " + "; ".join(sorted(set(bad)))[:700]))
         ok &= not bad
     return ok
@@ -319,6 +377,13 @@ def ring(sc, event):
 RING_SITE, RING_NEXT = 0x7EB7DE46, 0x7EB7DE4D      # rcvStartMFAssistIn_MFAssistOn: the hook of the probe
 
 
+def has_guard_probe(path):
+    """True when the block-0 image has the Debug Log's hook at the focus-ring handler (stock has `mov a0,a3` there)."""
+    with open(path, "rb") as f:
+        f.seek(RING_SITE - 0x7E421020)
+        return f.read(1) == b"\xdc"  # jmp imm32
+
+
 def ring_event(r):
     """A focus-ring event while MF Assist is on: the first two instructions of the handler, where the probe is."""
     regs = {"a0": 0x7D500000, "d0": 0x11111111, "d1": 0x22222222, "a1": 0x7D500040, "d2": 0x33333333, "d3": 0x44444444,
@@ -332,8 +397,12 @@ def ring_event(r):
 
 
 def s26(images):
+    # for the images that have the probe, whatever their name: the hook GRD of the Debug Log at the ring handler
+    images = [(n, p) for n, p in images if not n.startswith("pinned") and has_guard_probe(p)]
     OUT("S26. Event pk_guard (id 262): (heap mode, mode at the last allocation, units in use) of each record.")
-    images = [(n, p) for n, p in images if n.startswith("debug")]
+    if not images:
+        OUT("  S26: no image has the probe (a jump at 0x%08X): nothing to judge" % RING_SITE)
+        return True
 
     def go(r):
         r.ask(True)
@@ -382,4 +451,5 @@ def main():
     sys.exit(0 if ok else 1)
 
 
-main()
+if __name__ == "__main__":
+    main()

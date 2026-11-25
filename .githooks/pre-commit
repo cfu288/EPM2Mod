@@ -1,62 +1,71 @@
 #!/bin/sh
-# Checks before a commit. Enable once per clone: git config core.hooksPath .githooks
+# Checks before a commit. Enable once per clone: git config core.hooksPath .githooks (uv run epm2mod init does it).
+# Needs uv. Parts 1 to 4 refuse the commit. Part 5 only warns.
 #
-# 1. Refuse machine-specific details in the staged changes: home-directory paths, session
-#    scratch paths, user@host targets. Use placeholders (/path/to/..., USER@HOST, /tmp/scratch).
-# 2. For the production code (cli/src/epm2mod and the three test files named below): when a
-#    staged change adds, changes or deletes one of its files, format the staged files with
-#    black and stage the result, then type-check with mypy.
-#    mypy reads the working tree, so a production file with unstaged changes stops the
-#    commit. This part needs uv; without uv the commit is refused (git commit --no-verify
-#    skips the hook).
-#    Limit: `git commit PATH...` and `git commit -a` commit from a temporary index. The
-#    hook then checks the right files, but a file that black reformats is committed as it
-#    was. Run `git add` first and commit without paths.
-pattern='/home/[A-Za-z0-9._-]+/|/Users/[A-Za-z0-9._-]+/|/tmp/claude-[0-9]+|-home-[a-z0-9]+-|[A-Za-z0-9._-]+@[A-Za-z0-9-]+:[/~]'
-allow='USER@HOST:|git@github\.com:|/home/user/|/Users/user/'
-hits=$(git diff --cached -U0 --no-color --no-renames --diff-filter=AM -- . ':(exclude).githooks' | grep -E '^\+' | grep -v -E '^\+\+\+ ' | grep -E "$pattern" | grep -v -E "$allow" | head -5)
+# 1. Machine-specific details in the staged changes: home folders, session scratch paths, user@host targets. Use
+#    placeholders (/path/to/..., USER@HOST, /tmp/scratch). It is a reminder, not a proof: CI does not run it.
+# 2. Staged documents that users read: the writing rules (.githooks/doclint.py --help).
+# 3. Staged files of web/: prettier, when web/node_modules is there (else CI checks them).
+# 4. The Python project cli/: when a staged change adds, changes or deletes one of its files, black formats the
+#    staged files that cli/pyproject.toml covers and stages the result, then mypy checks the types.
+#    mypy reads the working tree, so a file of cli/ with unstaged changes stops the commit.
+#    Limit: `git commit PATH...` and `git commit -a` commit from a temporary index. The hook then checks the right
+#    files, but a file that black reformats is committed as it was. Run `git add` first and commit without paths.
+# 5. Soft, never refuses: for each staged build description, the report of `epm2mod lint` (what in the build may
+#    be harmful and is not proven safe). It makes the build in memory from Olympus's firmware and the specs. When
+#    it cannot (the firmware or the objdump is missing), it says "not linted" and the commit goes on.
+root=$(git rev-parse --show-toplevel) || exit 1
+cd "$root" || exit 1
+pattern='(^|[^A-Za-z0-9._-])(/home|/Users)/[A-Za-z0-9._-]+|/tmp/claude-[0-9]+|-home-[a-z0-9]+-|[A-Za-z0-9._-]+@[A-Za-z0-9-]+:[/~]|(ssh|scp|rsync|sftp)( -[^ ]+)* [A-Za-z0-9._-]+@[A-Za-z0-9.-]+'
+# the placeholders are taken out first: a line with one of them and a real path is still refused
+allow='USER@HOST:?|git@github\.com:?|(/home|/Users)/user(/|$|[^A-Za-z0-9._-])'
+hits=$(git diff --cached -U0 --no-color --no-renames --diff-filter=AM -- . ':(exclude).githooks' |
+  grep -E '^\+' | grep -v -E '^\+\+\+ ' | sed -E "s#$allow##g" | grep -E "$pattern" | head -5)
 if [ -n "$hits" ]; then
-  echo "pre-commit: machine-specific paths or hosts in the staged changes (use /path/to, USER@HOST, /tmp/scratch):" >&2
+  echo "pre-commit: machine-specific paths or hosts in the staged changes (use /path/to, USER@HOST, /tmp/scratch); commit refused:" >&2
   printf '%s\n' "$hits" | cut -c1-160 >&2
   exit 1
 fi
+if ! command -v uv >/dev/null 2>&1; then
+  echo "pre-commit: uv not found (https://docs.astral.sh/uv/); commit refused" >&2
+  exit 1
+fi
 
-root=$(git rev-parse --show-toplevel) || exit 1
-cd "$root" || exit 1
-# 3. Documents that users read: Simplified Technical English and the project's own rules
-#    (python3 .githooks/doclint.py --help). Needs python3 only.
 docs=$(git diff --cached --name-only --no-renames --diff-filter=AM -- '*.md')
 if [ -n "$docs" ]; then
   # shellcheck disable=SC2086
-  if ! python3 .githooks/doclint.py $docs >&2; then
+  if ! uv run --quiet python .githooks/doclint.py $docs >&2; then
     echo "pre-commit: the documents break the writing rules above; commit refused" >&2
     exit 1
   fi
 fi
-production="cli/src/epm2mod cli/tests/support.py cli/tests/test_package.py"
-# shellcheck disable=SC2086
-if git diff --cached --quiet --no-renames --diff-filter=AMD -- $production; then
-  exit 0
+
+if [ -d web/node_modules ] && ! git diff --cached --quiet --no-renames --diff-filter=AM -- web; then
+  if ! git diff --cached --name-only -z --no-renames --diff-filter=AM -- web | sed -z 's|^web/||' |
+    (cd web && xargs -0 -r ../tools/node.sh npx --no-install prettier --check --ignore-unknown >&2); then
+    echo "pre-commit: prettier: run 'npm run format' in web/ and stage the result; commit refused" >&2
+    exit 1
+  fi
 fi
-if ! command -v uv >/dev/null 2>&1; then
-  echo "pre-commit: uv not found, so black and mypy cannot check the production code; commit refused" >&2
-  exit 1
+
+if ! git diff --cached --quiet --no-renames --diff-filter=AMD -- cli; then
+  if ! git diff --quiet -- cli; then
+    echo "pre-commit: files of cli/ have unstaged changes; stage or stash them first:" >&2
+    git diff --name-only -- cli >&2
+    exit 1
+  fi
+  git diff --cached --name-only -z --no-renames --diff-filter=AM -- cli |
+    grep -z '\.py$' |
+    xargs -0 -r uv run --quiet black --quiet -- || { echo "pre-commit: black failed" >&2; exit 1; }
+  git add -u -- cli || { echo "pre-commit: git add failed" >&2; exit 1; }
+  if ! uv run --quiet --directory cli mypy; then
+    echo "pre-commit: mypy found type errors" >&2
+    exit 1
+  fi
 fi
-# shellcheck disable=SC2086
-if ! git diff --quiet -- $production; then
-  echo "pre-commit: production files have unstaged changes; stage or stash them first:" >&2
-  # shellcheck disable=SC2086
-  git diff --name-only -- $production >&2
-  exit 1
-fi
-# shellcheck disable=SC2086
-git diff --cached --name-only -z --no-renames --diff-filter=AM -- $production |
-  grep -z '\.py$' |
-  xargs -0 -r uv run --quiet black --quiet -- || { echo "pre-commit: black failed" >&2; exit 1; }
-# shellcheck disable=SC2086
-git add -u -- $production || { echo "pre-commit: git add failed" >&2; exit 1; }
-if ! uv run --quiet --directory cli mypy; then
-  echo "pre-commit: mypy found type errors" >&2
-  exit 1
-fi
+
+for description in $(git diff --cached --name-only --no-renames --diff-filter=AM -- 'data/builds/*.json'); do
+  name=$(basename "$description" .json)
+  uv run --quiet epm2mod lint "$name" >&2 || true
+done
 exit 0

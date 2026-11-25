@@ -6,28 +6,26 @@ How to go from a clone to a firmware build of your own that passes every check. 
 
 ## Set up
 
-You need [uv](https://docs.astral.sh/uv/getting-started/installation/), git, gcc and make. Linux or macOS. Keep
-3 GB of disk free.
+You need [uv](https://docs.astral.sh/uv/getting-started/installation/), git, gcc, make, m4, bison and flex, and
+[nvm](https://github.com/nvm-sh/nvm) or Node of the version in `.nvmrc`. Linux or macOS. Keep 3 GB of disk free.
 
 ```sh
 git clone https://github.com/cfu288/EPM2Mod.git && cd EPM2Mod
-uv run epm2mod fetch-stock                       # downloads Olympus's firmware and checks it
-tools/setup.sh                                   # the MN103 assembler, the emulator, the commit hooks
-uv run python tools/fwmap.py build               # the firmware map, for the free-space check (1 minute, 470 MB)
+uv run epm2mod init           # the MN103 assembler, Node, the emulator, Olympus's firmware, the firmware map, the commit hooks
+uv run epm2mod init --check   # changes nothing: says what is present and what is missing
 ```
 
-`tools/setup.sh` puts everything inside the repository, but a Node version through nvm.
+`uv run epm2mod init` takes about 3 minutes. It puts everything inside the repository, but a Node version through nvm.
+On Debian and Ubuntu it gets a missing bison or flex by itself.
 
 ## Check your clone
 
-These are the commands that CI runs. A fresh clone passes each of them.
-
 ```sh
-uv run python -m unittest discover -s cli/tests
-uv run --directory cli mypy
-uv run epm2mod generate --check
-gen/run.sh --check
+tools/ci.sh python   # what CI runs: format, types, tests, generators, the pinned build and each build you changed
+tools/ci.sh web      # only for a change in web/
 ```
+
+A fresh clone passes. A check that cannot run fails and names the command that makes what it needs.
 
 ## Add a patch
 
@@ -46,11 +44,13 @@ A feature is one or more patch specs in `data/specs/` and a build description in
 
    ```sh
    uv run epm2mod make NAME
-   uv run python tools/checks.py data/builds/NAME.json
-   uv run python emulator/hookcheck.py data/builds/NAME.json
+   uv run epm2mod lint NAME
    ```
 
-   `make` runs the free-space check and starts the result in the emulator. A build that fails is not written.
+   `make` runs the free-space check, which holds the load-order check, and starts the result in the emulator. A
+   build that fails, or that cannot be started in the emulator, is not written. `lint` prints what may be harmful
+   and is not proven safe; read each warning, it does not fail. The rule behind the load-order warnings is in
+   [docs/dev/load-order.md](docs/dev/load-order.md).
 
 The free-space check keeps a ledger of the bytes that every spec in `data/specs/` uses. Two specs that change the
 same byte fail with "overlaps ledgered spec", unless `tools/space-ledger/superseded.tsv` says that one replaces
