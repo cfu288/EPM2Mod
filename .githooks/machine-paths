@@ -1,0 +1,13 @@
+#!/bin/sh
+# machine-paths: read a diff (git diff -U0) on standard input and refuse added lines with machine-specific details:
+# home-directory paths, session scratch paths, user@host targets. Use placeholders (/path/to/..., USER@HOST,
+# /tmp/scratch). The pre-commit hook gives it the staged changes, tools/ci.sh the changes of a branch.
+# Exit status 1 when a line is refused.
+pattern='/home/[A-Za-z0-9._-]+/|/Users/[A-Za-z0-9._-]+/|/tmp/claude-[0-9]+|-home-[a-z0-9]+-|[A-Za-z0-9._-]+@[A-Za-z0-9-]+:[/~]'
+allow='USER@HOST:|git@github\.com:|/home/user/|/Users/user/'
+hits=$(grep -E '^\+' | grep -v -E '^\+\+\+ ' | grep -E "$pattern" | grep -v -E "$allow" | head -5)
+if [ -n "$hits" ]; then
+  echo "machine-specific paths or hosts in the changes (use /path/to, USER@HOST, /tmp/scratch):" >&2
+  printf '%s\n' "$hits" | cut -c1-160 >&2
+  exit 1
+fi
