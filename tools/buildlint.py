@@ -66,7 +66,7 @@ def lint(description):
                                 for row, count, reason in mine)))
 
     # 2. early-loaded space
-    space = freespace.Space(use_linear=False)
+    space = freespace.Space(use_linear=False, extra_specs=[os.path.relpath(s, ROOT) for s in specs])
     spans = freespace.merge([span for s in specs for span in freespace.Spec(os.path.relpath(s, ROOT)).spans()])
     changes_early = any(early(lo) for lo, _ in spans)
     for area in space.areas:

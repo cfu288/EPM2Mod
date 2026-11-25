@@ -145,6 +145,8 @@ class Run:
             self.bad.append("held frame: L or the heap mode is not as the guard should leave it")
 
 
+#: What the fault looks like in the rig: the heap divided again under a block in use, and the art buffers refused.
+FAULT_SIGNS = ("heap re-partitioned under live blocks", "art buffers refused")
 #: The scenarios in which a build without the guard shows the fault (run of peaking-fast, 2026-11-25).
 REFERENCE_SHOWS_FAULT = {"S19": True, "S20": True, "S21": True, "S22": True, "S23": True, "S24": True, "S25": False, "S26": False}
 
@@ -157,10 +159,12 @@ def verdict(tag, runs):
             # REFERENCE_SHOWS_FAULT it must show the fault the guard is for (else the scenario no longer finds that
             # fault, or the reference is not a build without the guard), and in the others it must show none.
             must = REFERENCE_SHOWS_FAULT[tag]
-            right = bool(bad) == must
-            OUT("  %s REFERENCE [%s], a build without the guard: %s: %s" % (
-                tag, name, "PASS" if right else "FAIL", ("shows the fault, as it must" if must else "shows a fault it must not show") + ": " +
-                "; ".join(sorted(set(bad)))[:700] if bad else "no fault here" + ("" if not must else ", and it must show one")))
+            shows = any(sign in text for text in bad for sign in FAULT_SIGNS)
+            right = shows if must else not bad  # another anomaly is not the fault that the guard is for
+            what = ("shows the fault, as it must" if shows and must else "shows an anomaly that is not the guard's fault" if must
+                    else "shows a fault it must not show") if bad else "no fault here" + (", and it must show one" if must else "")
+            OUT("  %s REFERENCE [%s], a build without the guard: %s: %s%s" % (
+                tag, name, "PASS" if right else "FAIL", what, ": " + "; ".join(sorted(set(bad)))[:700] if bad else ""))
             ok &= right
             continue
         OUT("  %s RESULT [%s]: %s" % (tag, name, "PASS" if not bad else "FAIL: " + "; ".join(sorted(set(bad)))[:700]))
@@ -349,8 +353,10 @@ def ring_event(r):
 
 
 def s26(images):
-    OUT("S26. Event pk_guard (id 262): (heap mode, mode at the last allocation, units in use) of each record.")
     images = [(n, p) for n, p in images if n.startswith("debug")]
+    if not images:  # only for the debug builds: nothing is printed and nothing is judged for another image
+        return True
+    OUT("S26. Event pk_guard (id 262): (heap mode, mode at the last allocation, units in use) of each record.")
 
     def go(r):
         r.ask(True)

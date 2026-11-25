@@ -263,6 +263,17 @@ The quick tier runs `boot-test --strict-times`: time stamps that moved are a FAI
 `emulator/hookcheck-allow.tsv` accepts a transfer by its address and its target together, one word per entry. The
 same address with another target fails. The check's last line counts the entries that match nothing in the build.
 
+A hard check takes its inputs from the files that git holds and from its arguments. It does not take them from the
+shell that started it or from files that are only in the working tree:
+
+- the free-space ledger, the code-space map and the camera-tested areas come from `git ls-files`, plus the specs
+  of the build that is checked (a candidate's new spec is not in git yet);
+- the emulator gets no option from the environment: `emuenv.tool_env` drops `E101_*`, `BOOTMS`, `WATCH`, `NO_OK` and
+  the like (`emulator/emu-run`, a person's tool, keeps them);
+- `EPM2_BINUTILS`, `OM_EMU_DIR` and `OM_EMU_NODE` are refused when `CI` is set and said on stderr otherwise;
+- left as they are, because they only say where a file goes: `EMU_IMAGES` (unpacked images, checked by their
+  sha256), `EMU_TMP`, `NVM_DIR`; and `CI_BASE`, which is an argument of `tools/ci.sh`.
+
 What decides a check's result is pinned where it can be:
 
 | Tool | Pinned by |

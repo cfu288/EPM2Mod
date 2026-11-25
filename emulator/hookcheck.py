@@ -109,16 +109,13 @@ def read_allow(path=None):
 
 def spec_list(paths):
     """The spec paths: a build description (a JSON file with "specs") stands for its specs."""
-    res = []
+    root, res = os.path.dirname(HERE), []
     for p in paths:
-        res += json.load(open(_rooted(p))).get("specs") or [p]
-    return [_rooted(p) for p in res]
-
-
-def _rooted(path):
-    """A path as given, or under the repository root when it is relative and not there under the working folder:
-    the result does not depend on where the command runs."""
-    return path if os.path.isabs(path) or os.path.exists(path) else os.path.join(os.path.dirname(HERE), path)
+        given = p if os.path.isabs(p) or os.path.exists(p) else os.path.join(root, p)  # an argument: as the caller wrote it
+        inside = json.load(open(given)).get("specs")
+        # the specs that a description names are paths of the repository, wherever the command runs
+        res += [os.path.join(root, s) for s in inside] if inside else [given]
+    return res
 
 
 def transfers_of(spec_paths):

@@ -327,8 +327,13 @@ def made_by():
             return hashlib.sha256(f.read()).hexdigest()
 
     here = os.path.dirname(os.path.abspath(__file__))
-    return "firmware sha256 %s\nbase %#x\nbinutils source commit %s\nfwmap.py sha256 %s\ndisasm.py sha256 %s\n" % (
-        digest(FW), BASE, toolchain.source_commit() or os.environ.get("EPM2_BINUTILS", "unknown"),
+    try:  # the binutils that are used now: their folder and the objdump's own sha256, not a record beside them
+        folder = toolchain.binutils_dir()
+        used = "%s, objdump sha256 %s" % (os.path.relpath(folder, toolchain.REPO), digest(os.path.join(folder, toolchain.PREFIX + "objdump")))
+    except toolchain.ToolchainError:
+        used = "none"
+    return "firmware sha256 %s\nbase %#x\nbinutils %s (source commit %s)\nfwmap.py sha256 %s\ndisasm.py sha256 %s\n" % (
+        digest(FW), BASE, used, toolchain.source_commit() or "unknown",
         digest(os.path.join(here, "fwmap.py")), digest(os.path.join(here, "disasm.py")))
 
 

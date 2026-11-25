@@ -131,7 +131,7 @@ print(f.summary()); print(f.path()); print(f.events); print(f.faults)
 Run the same steps on a second image and compare: `diff_writes(a.writes, b.writes)` gives the bytes whose final
 value differs, and `diff_pcs(a.pcs, b.pcs, new_code, hook_sites)` gives the stock code that ran only in one image
 and the new code that ran (`patch_ranges(base_bytes, patched_bytes)` gives the two range lists).
-`experiments/2026-11-14-focus-peaking/scripts/scen_peaking.py` is a full example (S1 to S5).
+`emulator/scenarios/scen_peaking.py` is a full example (S1 to S5).
 
 For code outside live view use `Scenario` directly:
 

@@ -21,7 +21,7 @@ firmware computes at run time (base + index, heap, memory test) is invisible to 
 This tool never writes under build/ and never changes firmware. It writes docs/code-space-map.*
 only in `map`.
 """
-import argparse, bisect, glob, hashlib, json, mmap, os, re, struct, sys
+import argparse, bisect, hashlib, json, mmap, os, re, struct, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STOCK_FW = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
@@ -615,11 +615,21 @@ def history_specs():
     return _HISTORY
 
 
-def all_specs():
-    paths = []
-    for g in SPEC_GLOBS:
-        paths += sorted(glob.glob(rel(g)))
-    return [Spec(os.path.relpath(p, ROOT)) for p in paths]
+def tracked(patterns):
+    """The files of the repository that git holds and that match the patterns, as paths relative to the root. A
+    file that is only in the working tree is not an input of a check: it would give this computer another result."""
+    done = subprocess.run(["git", "ls-files", "-z", "--", *patterns], cwd=ROOT, capture_output=True, text=True)
+    if done.returncode != 0:
+        die("git ls-files failed (%s): the ledger is made from the files that git holds" % done.stderr.strip())
+    return sorted(p for p in done.stdout.split("\0") if p)
+
+
+def all_specs(extra=()):
+    """The specs of the ledger: those that git holds (SPEC_GLOBS), and ``extra``, the specs that are being checked
+    (a candidate's new spec is not in git yet)."""
+    paths = tracked(SPEC_GLOBS)
+    paths += [p for p in extra if p not in paths]
+    return [Spec(p) for p in paths]
 
 
 def camera_tested():
@@ -627,8 +637,8 @@ def camera_tested():
     the earliest such row."""
     out = {}
     lines = []
-    for p in sorted(glob.glob(os.path.join(rel(CAMERA_LOG), "*.md"))):
-        lines += open(p, encoding="utf-8").read().splitlines()
+    for p in tracked([CAMERA_LOG + "*.md"]):
+        lines += open(rel(p), encoding="utf-8").read().splitlines()
     for line in lines:
         c = [x.strip() for x in line.split("|")]
         if len(c) < 6 or not c[4].startswith("**OK"):
@@ -655,7 +665,7 @@ class Area:
 
 
 class Space:
-    def __init__(self, min_run=32, use_linear=True, other_blocks=False):
+    def __init__(self, min_run=32, use_linear=True, other_blocks=False, extra_specs=()):
         self.b = load_block0()
         self.others = []
         if other_blocks and os.path.exists(rel(STOCK_FW)):
@@ -669,7 +679,7 @@ class Space:
             self.lin = None
         self.win = Windows(self.b)
         self.min_run = min_run
-        self.specs = all_specs()
+        self.specs = all_specs(extra_specs)
         self.tested = camera_tested()
         self.superseded = {}
         for spec, by, ev in read_tsv(SUPERSEDED, 3):
@@ -1500,7 +1510,8 @@ def main():
     a = ap.parse_args()
     if a.cmd == "selftest":
         return selftest()
-    sp = Space(a.min_run, not a.no_decode, other_blocks=(a.cmd == "map" and not a.no_other_blocks))
+    given = [os.path.relpath(os.path.abspath(p), ROOT) for p in a.specs] if a.cmd == "check" else []
+    sp = Space(a.min_run, not a.no_decode, other_blocks=(a.cmd == "map" and not a.no_other_blocks), extra_specs=given)
     if a.cmd == "map":
         tot = write_map(sp)
         print("wrote %s and %s (%d areas)" % (MAP_MD, MAP_TSV, len(sp.areas)))

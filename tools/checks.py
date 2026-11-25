@@ -184,7 +184,7 @@ def run(check: Check, image: Path) -> Result:
 def summary(check: Check, result: Result) -> str:
     """Return the lines of a check's output that say its result."""
     lines = result.output.splitlines()
-    marked = [line.strip()[:400] for line in lines if " RESULT" in line or " REFERENCE [" in line or line.startswith("FAIL")]
+    marked = [line.strip() for line in lines if " RESULT" in line or " REFERENCE [" in line or line.startswith("FAIL")]
     if marked or result.status == "FAIL":  # every result line of a scenario, none cut off
         if result.status == "FAIL" and not any("FAIL" in line for line in marked):
             marked += [line.strip() for line in lines[-4:]]  # no line says why: the end of the output, with the exit status

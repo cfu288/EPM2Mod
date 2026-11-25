@@ -26,7 +26,7 @@ def main(argv):
         print(__doc__)
         return 0 if argv else 2
     image, tool, args = argv[0], argv[1], argv[2:]
-    return subprocess.run(emuenv.tool_command(tool, args), env=emuenv.tool_env(image)).returncode
+    return subprocess.run(emuenv.tool_command(tool, args), env=emuenv.tool_env(image, options_from_shell=True)).returncode
 
 
 if __name__ == "__main__":

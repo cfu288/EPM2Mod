@@ -140,6 +140,18 @@ class EmulatorPinTests(unittest.TestCase):
                 with mock.patch.dict(os.environ, {name: "/x/elsewhere", "CI": ""}):
                     self.assertEqual(call(), "/x/elsewhere")
 
+    def test_emulator_options_do_not_come_from_the_callers_shell(self) -> None:
+        sys.path.insert(0, str(ROOT / "emulator"))
+        import emuenv
+
+        shell = {"E101_FAST": "1", "E101_STATE": "/x/state.json", "WATCH": "0x1", "NO_OK": "1", "BOOTMS": "9", "KEPT": "yes"}
+        with mock.patch.dict(os.environ, shell):
+            clean = emuenv.clean_environment()
+        self.assertEqual({name for name in shell if name in clean}, {"KEPT"})
+        self.assertIn("PATH", clean)
+        source = (ROOT / "emulator" / "emuenv.py").read_text()
+        self.assertIn("env = dict(os.environ) if options_from_shell else clean_environment()", source)
+
     def test_an_edited_submodule_is_refused(self) -> None:
         sys.path.insert(0, str(ROOT / "emulator"))
         import emuenv
@@ -187,10 +199,11 @@ class PrintedFailTests(unittest.TestCase):
         self.assertEqual(status("  S6 RESULT [build]: PASS"), "PASS")  # PASS or FAIL: no third result
 
     def test_every_result_line_is_shown(self) -> None:
-        lines = [f"  S{n} RESULT [b]: PASS" for n in range(1, 40)] + ["x" * 9000]
+        lines = [f"  S{n} RESULT [b]: PASS" for n in range(1, 39)] + ["  S39 RESULT [b]: PASS " + "y" * 1000, "x" * 9000]
         check = checks.Check("s", "full", (sys.executable, "-c", f"print({chr(10).join(lines)!r})"))
         shown = checks.summary(check, checks.run(check, Path("image.BIN")))
         self.assertEqual(shown.count("RESULT"), 39)
+        self.assertIn("y" * 1000, shown)  # and whole
 
     def test_a_failure_without_a_failed_result_line_shows_how_it_ended(self) -> None:
         check = checks.Check("s", "full", (sys.executable, "-c", "print('S1 RESULT [b]: PASS'); raise SystemExit('boom')"))
@@ -232,6 +245,10 @@ class ScenarioVerdictTests(unittest.TestCase):
             self.assertFalse(scen_guard.verdict("S19", [("pinned-fast", []), ("build", [])]))
             self.assertFalse(scen_guard.verdict("S19", [("pinned-fast", ["art buffers refused"]), ("build", ["no picture"])]))
             self.assertFalse(scen_guard.verdict("S25", [("pinned-fast", ["a fault"]), ("build", [])]))
+            # an anomaly that is not the guard's fault does not count as "the reference shows the fault"
+            self.assertFalse(scen_guard.verdict("S19", [("pinned-fast", ["start: no picture"]), ("build", [])]))
+            self.assertTrue(scen_guard.verdict("S21", [("pinned-fast", ["ring stopped: heap re-partitioned under live blocks (1)"]), ("build", [])]))
+            self.assertTrue(scen_guard.s26([("pinned-fast", "x"), ("build", "y")]))  # only for debug images: no line, no run
         self.assertTrue(all(isinstance(v, bool) for v in scen_guard.REFERENCE_SHOWS_FAULT.values()))
 
     def test_each_failure_text_of_the_peaking_scenarios_sets_the_exit_status(self) -> None:
@@ -240,7 +257,55 @@ class ScenarioVerdictTests(unittest.TestCase):
         for text in ("DIFFERENCES FOUND", "anomalies: ", " (LEFT SET", "DIFFERS from pinned"):
             self.assertIn('fail("' + text, source, text)  # the failure text goes through fail(), which counts it
         self.assertIn("verdict = fail(verdict)", source)  # S2, no picture
+        self.assertNotIn("os.environ", source)  # the scope of a scenario is not taken from the environment
         self.assertIn('fail("" if name != "pinned" else None)', source)  # S3, an anomaly
+
+
+@support.needs(HAVE_STOCK, support.STOCK_NEEDED)
+class LedgerInputTests(unittest.TestCase):
+    def test_the_ledger_is_made_from_the_files_git_holds_and_the_specs_given(self) -> None:
+        import freespace
+
+        copy = ROOT / "data" / "specs" / "zz-untracked-copy-for-a-test.json"
+        copy.write_bytes((ROOT / "data" / "specs" / "spot-core-2.json").read_bytes())
+        try:
+            name = "data/specs/" + copy.name
+            self.assertNotIn(name, [spec.path for spec in freespace.all_specs()])
+            self.assertIn("data/specs/spot-core-2.json", [spec.path for spec in freespace.all_specs()])
+            self.assertIn(name, [spec.path for spec in freespace.all_specs(extra=[name])])  # a candidate's own spec
+        finally:
+            copy.unlink()
+
+    def test_the_map_records_the_objdump_that_made_it(self) -> None:
+        import fwmap
+
+        with tempfile.TemporaryDirectory() as folder:
+            (Path(folder) / (toolchain.PREFIX + "objdump")).write_text("another objdump")
+            pinned = fwmap.made_by()
+            with mock.patch.object(toolchain, "binutils_dir", return_value=folder):
+                other = fwmap.made_by()
+        self.assertNotEqual(pinned, other)
+        self.assertIn("objdump sha256", pinned)
+
+
+class WorkingFolderTests(unittest.TestCase):
+    def test_a_descriptions_specs_are_the_repositorys_wherever_the_check_runs(self) -> None:
+        sys.path.insert(0, str(ROOT / "emulator"))
+        import hookcheck
+
+        description = ROOT / pinned_build_path()
+        with tempfile.TemporaryDirectory() as folder:
+            decoy = Path(folder) / "data" / "specs"
+            decoy.mkdir(parents=True)
+            for spec in json.loads(description.read_text())["specs"]:
+                (Path(folder) / spec).write_text("{}")  # a file of the same relative path in the working folder
+            os.chdir(folder)
+            try:
+                specs = hookcheck.spec_list([str(description)])
+            finally:
+                os.chdir(ROOT)
+        self.assertTrue(specs)
+        self.assertTrue(all(Path(spec).is_relative_to(ROOT) for spec in specs), specs[:2])
 
 
 class FirmwareMapUseTests(unittest.TestCase):

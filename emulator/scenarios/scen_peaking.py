@@ -223,7 +223,7 @@ def s1(pinned, patched):
 # ------------------------------------------------------------------------------------------------ S2
 def s2(pinned, patched):
     OUT("S2. Picture Mode Natural, two frames, then the request is set, four frames, request cleared, two frames.")
-    for art_type in [int(x) for x in os.environ.get("ART_TYPES", "1,0").split(",")]:
+    for art_type in (1, 0):  # both, always: the scope of a check is not taken from the environment
         OUT(" --- art type setting 17601[0] = %d %s" % (art_type, "(type I)" if art_type == 1 else "(no art type: what the camera holds in Natural is UNKNOWN)"))
         for name, path in [("pinned", pinned)] + patched:
             with open_lv(path, name, NATURAL, art_type) as lv:

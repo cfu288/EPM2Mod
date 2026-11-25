@@ -168,15 +168,26 @@ def tool_command(tool, args=()):
     return [node(), script, *args]
 
 
-def tool_env(image, extra=None):
+#: Environment variables that emulator/boot/forkcli.mjs and the boot tools turn into emulator options.
+OPTION_VARIABLES = ("BOOTMS", "GUILOG", "GLN", "FLASHLOG", "CARDLOG", "NO_OK", "WATCH", "OM_EMU_MODEL", "BLOCKS", "EMU_BIN", "EPM2_REPO")
+
+
+def clean_environment():
+    """Return the caller's environment without the emulator's option variables (E101_* and OPTION_VARIABLES): a
+    check's result must not depend on what the shell that started it has set. A caller that wants an option gives
+    it to tool_env as ``extra``."""
+    return {k: v for k, v in os.environ.items() if not k.startswith("E101_") and k not in OPTION_VARIABLES}
+
+
+def tool_env(image, extra=None, options_from_shell=False):
     """Return the environment for a tool run on IMAGE: BLOCKS, EMU_BIN (the .BIN, when IMAGE names one), OM_EMU_DIR and
     EPM2_REPO are set."""
-    env = dict(os.environ)
+    env = dict(os.environ) if options_from_shell else clean_environment()  # emu-run, a person's tool, keeps them
     env["BLOCKS"] = blocks(image)
     if not os.path.isdir(image):
         env["EMU_BIN"] = os.path.abspath(image_bin(image)[1])
     env["OM_EMU_DIR"] = require_om_emu()
-    env.setdefault("EPM2_REPO", REPO)
+    env["EPM2_REPO"] = REPO
     if extra:
         env.update(extra)
     return env
