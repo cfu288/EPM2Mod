@@ -26,7 +26,7 @@ import re
 from collections.abc import Callable
 from pathlib import Path
 
-from .builds import all_descriptions, pinned_description
+from .builds import all_descriptions, description_path, pinned_description
 from .errors import BuildError
 from .fileio import read_text, write_text
 from .looks import records
@@ -81,7 +81,15 @@ def pinned_block(paths: RepoPaths, folder: Path) -> str:
 def builds_block(paths: RepoPaths, folder: Path) -> str:
     """Return the table of all tested builds, the pinned one first."""
     pinned = pinned_description(paths)
-    tested = [build for build in all_descriptions(paths) if build.tested]
+    held = paths.tracked(
+        paths.builds
+    )  # the table is a committed document: the descriptions that git holds
+    tested = [
+        build
+        for build in all_descriptions(paths)
+        if build.tested
+        and (held is None or description_path(paths, build.name) in held)
+    ]
     tested.sort(key=lambda build: (build.name != pinned.name, build.name))
     rows = [
         f"| `{build.name}`{' (pinned)' if build.name == pinned.name else ''} "

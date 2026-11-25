@@ -28,7 +28,7 @@ S22  A movie ends (movie flag 0x605B039C) while a block is in use and the reques
 S23  Three frames of an interval sequence with the request set all the time.
 S24  Back from playback / RAW Data Edit: the heap mode set directly (0x7E578C60, as 0x7E948E91 does), a block in use.
 S25  Sleep and wake (Through End, Through Start) with the request set and no block in use: lines at once.
-S26  The event pk_guard of the debug builds (images whose NAME starts with "debug"; others are skipped): holds as in
+S26  The event pk_guard, for each image that has the probe (a jump at the ring handler 0x7EB7DE46; not by name): holds as in
      S19 with focus-ring events (the first two instructions of the handler 0x7EB7DE46, where the probe is); the
      records with id 262 are read from the CPU0 ring in the emulator's memory.
 """
@@ -340,6 +340,13 @@ def ring(sc, event):
 RING_SITE, RING_NEXT = 0x7EB7DE46, 0x7EB7DE4D      # rcvStartMFAssistIn_MFAssistOn: the hook of the probe
 
 
+def has_guard_probe(path):
+    """True when the block-0 image has the Debug Log's hook at the focus-ring handler (stock has `mov a0,a3` there)."""
+    with open(path, "rb") as f:
+        f.seek(RING_SITE - 0x7E421020)
+        return f.read(1) == b"\xdc"  # jmp imm32
+
+
 def ring_event(r):
     """A focus-ring event while MF Assist is on: the first two instructions of the handler, where the probe is."""
     regs = {"a0": 0x7D500000, "d0": 0x11111111, "d1": 0x22222222, "a1": 0x7D500040, "d2": 0x33333333, "d3": 0x44444444,
@@ -353,10 +360,12 @@ def ring_event(r):
 
 
 def s26(images):
-    images = [(n, p) for n, p in images if n.startswith("debug")]
-    if not images:  # only for the debug builds: nothing is printed and nothing is judged for another image
-        return True
+    # for the images that have the probe, whatever their name: the hook GRD of the Debug Log at the ring handler
+    images = [(n, p) for n, p in images if not n.startswith("pinned") and has_guard_probe(p)]
     OUT("S26. Event pk_guard (id 262): (heap mode, mode at the last allocation, units in use) of each record.")
+    if not images:
+        OUT("  S26: no image has the probe (a jump at 0x%08X): nothing to judge" % RING_SITE)
+        return True
 
     def go(r):
         r.ask(True)

@@ -144,10 +144,11 @@ SUMS = "sha256sums.txt"  # in a folder of unpacked blocks: the sha256 of each fi
 
 
 def _block_sums(folder):
-    """The sha256 of every file of an unpacked image but SUMS, one line each; "" when the folder cannot be read
+    """The sha256 of every file of an unpacked image but SUMS, one line each, after the sha256 of the unpacker
+    (tools/oetool.py): blocks that an older unpacker wrote are not reused. "" when the folder cannot be read
     (another process is replacing it)."""
     try:
-        return "".join(f"{sha256(os.path.join(folder, name))}  {name}\n" for name in sorted(os.listdir(folder)) if name != SUMS)
+        return f"{sha256(os.path.join(REPO, 'tools', 'oetool.py'))}  the unpacker\n" + "".join(f"{sha256(os.path.join(folder, name))}  {name}\n" for name in sorted(os.listdir(folder)) if name != SUMS)
     except OSError:
         return ""
 

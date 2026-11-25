@@ -250,6 +250,18 @@ differences, found on `cold-start-fix` in ART Key Line on 2026-11-25, all V emul
   routine saved: 0x7E4C9514 writes 0x605B1CF0 to that stack word after the stock write and before the block is
   allocated. V: a write log of the stack word in stock and in the build. No defined stock state changes.
 
+- **A 0 written to the flag bytes of peaking** (L, R, L2 at 0x602BE8C4 to 0x602BE8C6): the build clears them with
+  the request clear. Any other value there fails.
+- **A stock return after a hook site** that the hooked routine does itself (only a return opcode is accepted), and
+  one branch, 0x7E56C6AB: the hook at 0x7E56C6A5 of `stock-films-structure-3` sends the colour-matrix compare chain
+  to its own routine, which comes back at 0x7E56C6AD or 0x7E56C6B8 and never at that branch.
+
+The residue word is checked by its writer and its values: each write is the copy at 0x7E6CDA36, as often as in
+stock, with stock's value or 0x605B1CF0. S1 fails when the reference gives no picture or does not reach pass 9.
+
+S26 (the `pk_guard` event) runs for every image that has the Debug Log's probe at the focus-ring handler, by content
+and not by name; it passes on `cold-start-fix`.
+
 Not known: what reads word 37 of the copied block. Stock gives it stack residue too, and the device writes of
 these frames are the same with either value. The rig's frames do not read the Debug Log setting, so the result is
 the same for Off and On as far as the rig goes; the probes run in both cases.

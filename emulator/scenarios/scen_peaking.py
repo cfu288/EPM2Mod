@@ -11,7 +11,10 @@ PINNED_BLOCK0 is the reference: tools/checks.py gives the stock firmware, so "pi
 S1 compares what must not change with the request clear: the device accesses (every write: the output), the RAM
 that the stock firmware defines, the stock instructions that run, the mov state. What the mod does on purpose is
 stated and checked exactly: writes to its own RAM (MOD_RAM), reads of the log's timer from its own code, stock
-instructions that its patches overwrote, and the words of S1_RESIDUE. Any other difference fails.
+instructions that its patches overwrote, a stock return after a hook site, the instructions of S1_SKIPPED, a 0
+written to the flag bytes L, R and L2, and the words of S1_RESIDUE with their writer and values. Any other
+difference fails. S1 also fails when the reference gives no picture or does not reach pass 9 in Key Line, and S2
+when the reference gives no picture: a comparison with nothing proves nothing.
 
 Exit status 1 when a scenario fails for a patched image: S1 "DIFFERENCES FOUND", S2 "NO PICTURE ..." or "anomalies",
 S3 an anomaly, S4 "LEFT SET", S5 "DIFFERS from pinned". Each such RESULT line starts its text with FAIL.
@@ -44,7 +47,62 @@ LOG_TIMER = 0x98900074  # timer channel 9, the time of the Debug Log's records (
 #   copy: in the stock firmware it holds what an earlier callee left on the stack (frame 1: a stack address,
 #   0x7D0EFBD4; frame 2: 0 from 0x7E6CFFB6). With the Debug Log's probes the last residue is a register that
 #   log_chg saved (0x7E4C9514 writes 0x605B1CF0 there). Found 2026-11-25 with a write log of the stack word.
-S1_RESIDUE = (0x602A4954,)
+#   The expectation is exact (stated_ram): each write to the word is the 4-byte write of the copy 0x7E6CDA36, as
+#   often as in the reference, and its value is the reference's or the saved register 0x605B1CF0.
+S1_RESIDUE = {0x602A4954: (0x7E6CDA36, 0x605B1CF0)}
+# Stock instructions that do not run in the build although they are not overwritten, each with its reason:
+#   0x7E56C6AB, the branch after the compare chain of the colour-matrix stage. The hook at 0x7E56C6A5 (6 bytes,
+#   stock-films-structure-3) sends the chain to the routine CHAIN, which comes back at 0x7E56C6AD or 0x7E56C6B8
+#   (gen/stock-films/structure.py, MATRIX_STOCK_REST, MATRIX_STOCK_70), never at this branch.
+S1_SKIPPED = (0x7E56C6AB,)
+BASE = 0x7E421020
+
+
+def is_return(image, pc):
+    """True when the stock instruction at pc is a return: ret (0xDF), retf (0xDE) or rets (0xF0 0xFC)."""
+    at = pc - BASE
+    return image[at] in (0xDF, 0xDE) or image[at:at + 2] == b"\xf0\xfc"
+
+
+def _fold(a):
+    return a & 0x3FFFFFFF | 0x40000000 if a & 0x80000000 else a
+
+
+def stated_ram(dw, wa, wb):
+    """Take out of the differing bytes dw what the request-clear build may do to stock RAM, each checked exactly:
+    - the flag bytes L, R and L2: the build may write 0 to them (the request is clear), nothing else;
+    - the words of S1_RESIDUE: see there.
+    Every byte that is left is a difference."""
+    dw = dict(dw)
+    for a in (L, R, L2):
+        if dw.get(a) == (None, 0):
+            del dw[a]
+    for word, (copy, residue) in S1_RESIDUE.items():
+        base = [(s, v, pc) for a, s, v, pc in wa if _fold(a) < word + 4 and _fold(a) + s > word]
+        mine = [(s, v, pc) for a, s, v, pc in wb if _fold(a) < word + 4 and _fold(a) + s > word]
+        exact = len(base) == len(mine) and all(m[0] == 4 and m[2] == copy and b[2] == copy and m[1] in (b[1], residue)
+                                               for b, m in zip(base, mine))
+        if exact:
+            for a in range(word, word + 4):
+                dw.pop(a, None)
+    return dw
+
+
+def _self_check_ram():
+    """stated_ram on made-up write logs: the reviewer's mutations C and E still differ."""
+    word, copy = 0x602A4954, 0x7E6CDA36
+    stock = [(0xA02A4954, 4, 0, copy)]
+    diff = lambda value: {word + i: (0, (value >> 8 * i) & 0xFF) for i in range(4) if (value >> 8 * i) & 0xFF}  # noqa: E731
+    assert stated_ram(diff(0x605B1CF0), stock, [(0xA02A4954, 4, 0x605B1CF0, copy)]) == {}
+    assert stated_ram(diff(0x11223344), stock, [(0xA02A4954, 4, 0x11223344, copy)])  # another value
+    assert stated_ram(diff(0x605B1CF0), stock, [(0xA02A4954, 4, 0x605B1CF0, 0x7E4C9000)])  # another writer
+    assert stated_ram(diff(0x605B1CF0), stock, stock + [(0x602A4954, 4, 0x605B1CF0, copy)])  # one write more
+    assert stated_ram({L2: (None, 0)}, [], []) == {}
+    assert stated_ram({L2: (None, 0x44)}, [], [])  # a flag byte set with the request clear
+    assert stated_ram({L2 + 1: (None, 0)}, [], [])  # a neighbour of the flag bytes
+
+
+_self_check_ram()
 
 
 def device_same(base, patched, new):
@@ -179,6 +237,9 @@ def s1(pinned, patched):
                 lv.start()
                 fs = [lv.frames[-1]] + [lv.frame() for _ in range(3)]
                 runs[name] = (fs, [flags(lv)], open(path, "rb").read())
+                if pm == KEY_LINE and name == "pinned" and not lv.seen["gain2"]:
+                    ok_all = False
+                    OUT("  Key Line: pass 9 did not run in the reference: the rig does not reach the art passes")
                 if name == "pinned":
                     for f in fs:
                         show(lv, f, events=())
@@ -191,18 +252,23 @@ def s1(pinned, patched):
                 wa, wb = fb.writes, fp.writes
                 same_seq = [(a, s, v) for a, s, v, _ in wa] == [(a, s, v) for a, s, v, _ in wb]
                 # Not a difference: the mod's own RAM, the gap between the kernel range and segment 1 that the stock
-                # firmware never writes (the Debug Log's state block is there: docs/dev/load-order.md, section 4, RAM),
-                # and S1_RESIDUE.
-                dw = diff_writes(wa, wb, skip=[(L, L2 + 1), MOD_RAM] + [(a, a + 4) for a in S1_RESIDUE])
+                # firmware never writes (the Debug Log's state block is there: docs/dev/load-order.md, section 4, RAM).
+                dw = diff_writes(wa, wb, skip=[MOD_RAM])
+                dw = stated_ram(dw, wa, wb)
                 flagw = sorted(set((a, v) for a, s, v, _ in wb if L <= a <= L2))
                 d = diff_pcs(fb.pcs, fp.pcs, new, hooks)
-                # a stock `ret` right after a hook site that the routine replaces with its own `ret` (hooks A, B)
-                rets = [p for p in d["only_base"] if any(hi <= p < hi + 3 for lo, hi in hooks)]
+                # a stock return right after a hook site, which the routine replaces with its own return (hooks A, B),
+                # and the stock instructions of S1_SKIPPED
+                rets = [p for p in d["only_base"] if p in S1_SKIPPED or
+                        any(hi <= p < hi + 3 for lo, hi in hooks) and is_return(base_img, p)]
                 # a stock instruction that the patch overwrote cannot run: where two hooks touch, the changed run is
                 # long enough to count as new code, and the stock pcs in it are not "outside hook sites"
                 d["only_base"] = [p for p in d["only_base"] if p not in rets and not any(lo <= p < hi for lo, hi in new)]
                 dev = device_same(fb.mmio, fp.mmio, new)
                 ok = not dw and not d["only_base"] and not d["only_patched_stock"] and fb.state == fp.state and not fp.faults and dev
+                if k and not fb.state["picture"]:  # a frame without a picture in the reference compares nothing
+                    ok = False
+                    OUT("  %-8s the reference gives no picture in %s: the comparison proves nothing" % (pm_name, fb.label))
                 ok_all &= ok
                 OUT("  %-8s %-9s %-13s %s: %d writes (pinned %d), same order and values: %s; bytes that differ: %d; "
                     "flag bytes written: %s" % (pm_name, name, fb.label, "SAME" if ok else "DIFFERENT", len(wb), len(wa),
@@ -233,6 +299,8 @@ def s2(pinned, patched):
                 show(lv, f)
                 if name == "pinned":
                     stubbed_note(lv)
+                    if not f.state["picture"]:
+                        OUT("  S2 RESULT [pinned, art type %d]: %s" % (art_type, fail("the reference gives no picture: the scenario proves nothing")))
                     continue
                 OUT("  [%s] request on: %s" % (name, request(lv, True)))
                 bad = []

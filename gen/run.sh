@@ -8,6 +8,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
+touch "$work/started"  # the specs that are newer than this file after the run are the ones the generators write
 uv run python gen/lss-core/mkspec.py "$work/lss-core"
 uv run python gen/build-label/mkspec.py
 uv run python gen/stock-films/structure.py "$work/structure"
@@ -29,8 +30,13 @@ uv run python gen/spot-menu/mkspec.py
 # last: it reads the film loader's labels from the loader's spec, and the bytes it hooks from the build's other specs
 uv run python gen/log-menu/mkspec.py "$work/log-menu"
 if [ "${1:-}" = "--check" ]; then
-  # status, not diff: a spec that a generator writes and git does not hold is a difference too
-  changed=$(git status --porcelain --untracked-files=all -- data/specs/)
+  # Only the specs that the generators wrote in this run: a spec written by hand, or one of a candidate that git
+  # does not hold yet, is not this check's business. Status, not diff: a generated spec that git does not hold is
+  # a difference too.
+  written=$(find data/specs -name '*.json' -newer "$work/started" | sort)
+  [ -n "$written" ] || { echo "gen/run.sh: the generators wrote no spec" >&2; exit 1; }
+  # shellcheck disable=SC2086
+  changed=$(git status --porcelain --untracked-files=all -- $written)
   [ -z "$changed" ] || { printf '%s\n' "$changed" >&2; echo "gen/run.sh: a spec is not committed as its generator writes it (changed, or not in git)" >&2; exit 1; }
-  echo "gen/run.sh: every generated spec is as committed"
+  echo "gen/run.sh: every generated spec is as committed ($(printf '%s\n' "$written" | wc -l) specs)"
 fi

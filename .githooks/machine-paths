@@ -10,7 +10,7 @@
 # Exit status 1 when a line is refused.
 # a home folder with or without something after it; a scratch path; a login target (user@host with a path, or as
 # the first argument after the options of ssh, scp, rsync or sftp)
-pattern='(^|[^A-Za-z0-9._/-])(/home|/Users)/[A-Za-z0-9._-]+|/tmp/claude-[0-9]+|-home-[a-z0-9]+-|[A-Za-z0-9._-]+@[A-Za-z0-9-]+:[/~]|(ssh|scp|rsync|sftp)( -[^ ]+)* [A-Za-z0-9._-]+@[A-Za-z0-9.-]+'
+pattern='(^|[^A-Za-z0-9._-])(/home|/Users)/[A-Za-z0-9._-]+|/tmp/claude-[0-9]+|-home-[a-z0-9]+-|[A-Za-z0-9._-]+@[A-Za-z0-9-]+:[/~]|(ssh|scp|rsync|sftp)( -[^ ]+)* [A-Za-z0-9._-]+@[A-Za-z0-9.-]+'
 # the placeholders, each as a whole name: /home/user and /home/user/x pass, /home/username does not
 allow='USER@HOST:?|git@github\.com:?|(/home|/Users)/user(/|$|[^A-Za-z0-9._-])'
 if [ "${1:-}" = "--since" ]; then

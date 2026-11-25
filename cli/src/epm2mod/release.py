@@ -138,9 +138,17 @@ def programs(paths: RepoPaths) -> set[str]:
 
 
 def _package(paths: RepoPaths) -> Iterator[tuple[str, Path]]:
-    """Yield the files of the package: its code, its type marker and the app page."""
+    """Yield the files of the package: its code and its type marker as git holds them, and the built app page.
+
+    The app page is built, so git does not hold it. Every other file of the package folder that git does not hold
+    (a draft, an editor's copy) stays out of the zip.
+    """
+    held = paths.tracked(paths.package)
     for source in sorted(paths.package.rglob("*")):
-        if source.is_file() and "__pycache__" not in source.parts:
+        if not source.is_file() or "__pycache__" in source.parts:
+            continue
+        built = paths.app in source.parents
+        if held is None or built or source in held:
             yield paths.relative(source), source
 
 

@@ -43,6 +43,7 @@ class MachinePathTests(unittest.TestCase):
     def test_a_real_path_is_refused_also_beside_an_allowed_token(self) -> None:
         bare = REAL.rstrip("/")  # a home folder with nothing after it
         for line in (f"+ see {REAL}notes", f"+ scp {REAL}secret USER@HOST:/x", f"+ a /home/user/x b {REAL}y", f"+cd {bare}",
+                     f"+ see file://{REAL}x", f"+ url=/{bare}",
                      "+ssh alice" + "@box", "+ sftp -q bob" + "@host.example", "+ /home/user" + "name/x"):
             with self.subTest(line=line):
                 self.assertTrue(self.refused(line))
@@ -185,6 +186,9 @@ class UnpackedImageTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder, mock.patch.dict(os.environ, {"EMU_IMAGES": folder}):
             block = Path(emuenv.blocks("stock")) / "block0_0100.bin"
             good = block.read_bytes()
+            sums = (block.parent / emuenv.SUMS).read_text()
+            self.assertTrue(sums.splitlines()[0].endswith("the unpacker"))  # blocks of an older unpacker are not reused
+            self.assertIn(emuenv.sha256(str(ROOT / "tools" / "oetool.py")), sums)
             block.write_bytes(bytes([good[0] ^ 1]) + good[1:])
             self.assertEqual((Path(emuenv.blocks("stock")) / "block0_0100.bin").read_bytes(), good)
 
@@ -248,8 +252,55 @@ class ScenarioVerdictTests(unittest.TestCase):
             # an anomaly that is not the guard's fault does not count as "the reference shows the fault"
             self.assertFalse(scen_guard.verdict("S19", [("pinned-fast", ["start: no picture"]), ("build", [])]))
             self.assertTrue(scen_guard.verdict("S21", [("pinned-fast", ["ring stopped: heap re-partitioned under live blocks (1)"]), ("build", [])]))
-            self.assertTrue(scen_guard.s26([("pinned-fast", "x"), ("build", "y")]))  # only for debug images: no line, no run
+        # S26 is for the images that have the probe, whatever their name
+        with tempfile.TemporaryDirectory() as folder:
+            at = scen_guard.RING_SITE - 0x7E421020
+            with_probe, without = Path(folder) / "debug-named.bin", Path(folder) / "plain.bin"
+            with_probe.write_bytes(bytes(at) + b"\xdc" + bytes(8))
+            without.write_bytes(bytes(at) + b"\xf1" + bytes(8))
+            self.assertTrue(scen_guard.has_guard_probe(str(with_probe)))
+            self.assertFalse(scen_guard.has_guard_probe(str(without)))
+            said: list[str] = []
+            with mock.patch.object(scen_guard, "OUT", said.append):
+                self.assertTrue(scen_guard.s26([("pinned-fast", str(with_probe)), ("debug-csf", str(without))]))
+            self.assertIn("no image has the probe", said[-1])  # said, and the name "debug-csf" does not select it
         self.assertTrue(all(isinstance(v, bool) for v in scen_guard.REFERENCE_SHOWS_FAULT.values()))
+
+    def peaking(self) -> dict[str, object]:
+        """Return the names of scen_peaking.py without its run (the script ends with a bare main())."""
+        path = ROOT / "emulator" / "scenarios" / "scen_peaking.py"
+        names: dict[str, object] = {"__file__": str(path), "__name__": "scen_peaking"}
+        exec(compile(path.read_text().rstrip()[: -len("main()")], str(path), "exec"), names)
+        return names
+
+    def test_s1_states_its_exceptions_exactly(self) -> None:
+        names = self.peaking()
+        stated_ram, flag2 = names["stated_ram"], names["L2"]
+        word, copy = 0x602A4954, 0x7E6CDA36
+        stock = [(0xA02A4954, 4, 0, copy)]
+
+        def differs(value: int) -> dict[int, tuple[int, int]]:
+            return {word + i: (0, (value >> 8 * i) & 0xFF) for i in range(4) if (value >> 8 * i) & 0xFF}
+
+        assert callable(stated_ram) and isinstance(flag2, int)
+        self.assertEqual(stated_ram(differs(0x605B1CF0), stock, [(0xA02A4954, 4, 0x605B1CF0, copy)]), {})
+        # mutation C: mod code writes 0x11223344 to the residue word
+        self.assertTrue(stated_ram(differs(0x11223344), stock, stock + [(word, 4, 0x11223344, 0x7E4C9000)]))
+        self.assertTrue(stated_ram(differs(0x11223344), stock, [(0xA02A4954, 4, 0x11223344, copy)]))
+        # mutation E: the flag byte L2 set to 0x44 with the request clear
+        self.assertTrue(stated_ram({flag2: (None, 0x44)}, [], []))
+        self.assertEqual(stated_ram({flag2: (None, 0)}, [], []), {})
+
+    def test_only_a_stock_return_is_excused_after_a_hook_site(self) -> None:
+        names = self.peaking()
+        is_return, base = names["is_return"], 0x7E421020
+        assert callable(is_return)
+        image = bytes(16) + b"\xdf" + b"\xc8\x11" + b"\xf0\xfc" + b"\xde"
+        self.assertTrue(is_return(image, base + 16))  # ret
+        self.assertFalse(is_return(image, base + 17))  # beq, as at 0x7E56C6AB
+        self.assertTrue(is_return(image, base + 19))  # rets
+        self.assertTrue(is_return(image, base + 21))  # retf
+        self.assertEqual(names["S1_SKIPPED"], (0x7E56C6AB,))  # the one branch, stated with its reason
 
     def test_each_failure_text_of_the_peaking_scenarios_sets_the_exit_status(self) -> None:
         source = (ROOT / "emulator" / "scenarios" / "scen_peaking.py").read_text()
@@ -259,6 +310,8 @@ class ScenarioVerdictTests(unittest.TestCase):
         self.assertIn("verdict = fail(verdict)", source)  # S2, no picture
         self.assertNotIn("os.environ", source)  # the scope of a scenario is not taken from the environment
         self.assertIn('fail("" if name != "pinned" else None)', source)  # S3, an anomaly
+        self.assertIn('fail("the reference gives no picture', source)  # S2: no vacuous pass
+        self.assertIn("the reference gives no picture in %s: the comparison proves nothing", source)  # S1
 
 
 @support.needs(HAVE_STOCK, support.STOCK_NEEDED)
@@ -286,6 +339,30 @@ class LedgerInputTests(unittest.TestCase):
                 other = fwmap.made_by()
         self.assertNotEqual(pinned, other)
         self.assertIn("objdump sha256", pinned)
+
+
+class TrackedFilesTests(unittest.TestCase):
+    def test_the_build_table_lists_the_descriptions_git_holds(self) -> None:
+        pinned = ROOT / pinned_build_path()
+        copy = pinned.with_name("zz-untracked-copy-for-a-test.json")
+        copy.write_bytes(pinned.read_bytes())  # a tested description that is only in the working tree
+        try:
+            self.assertNotIn(copy.stem, readme.builds_block(PATHS, ROOT))
+            self.assertIn(pinned.stem, readme.builds_block(PATHS, ROOT))
+        finally:
+            copy.unlink()
+
+    def test_the_zip_holds_the_package_files_git_holds(self) -> None:
+        from epm2mod import release
+
+        draft = PATHS.package / "zz_untracked_draft_for_a_test.py"
+        draft.write_text("x = 1\n")
+        try:
+            names = [name for name, _ in release._package(PATHS)]
+        finally:
+            draft.unlink()
+        self.assertNotIn(PATHS.relative(draft), names)
+        self.assertIn(PATHS.relative(PATHS.package / "cli.py"), names)
 
 
 class WorkingFolderTests(unittest.TestCase):
