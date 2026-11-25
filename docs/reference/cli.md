@@ -711,7 +711,7 @@ epm2mod release [-h] [--final] [--build NAME] [--day YYYY.MM.DD] [--json]
 ```
 
 - Output: the release notes and the tag's name. It creates no tag: the release workflow on GitHub runs this command, then makes, tests, tags and publishes the release.
-- Needs: a checkout. Network: the network for the checks of CI.
+- Needs: a checkout. Network: the network, for the tags and main of origin.
 
 | Argument | What | Default |
 |---|---|---|

@@ -120,7 +120,7 @@ jobs:
   dmg:
     needs: build
     runs-on: macos-15
-    # the signing secrets: for a release only. The environment asks for the owner's approval
+    # the signing secrets: for a release only. The environment only restricts which branches and tags may use them
     environment: ${{ inputs.sign && 'release' || '' }}
     env:
       NAME: ${{ needs.build.outputs.name }}
@@ -164,7 +164,9 @@ jobs:
           echo "EPM2MOD_SIGN_IDENTITY=Developer ID Application" >> "$GITHUB_ENV"
           echo "EPM2MOD_NOTARY_PROFILE=epm2mod" >> "$GITHUB_ENV"
       # make-dmg.sh copies the zip's files into the app and signs it; it runs none of them
-      - run: release/mac/make-dmg.sh "zip/$NAME.zip" dist
+      - name: Make the disk image; for a release sign it and wait for Apple's notarization (at most 45 minutes)
+        timeout-minutes: 45 # Apple's service can hang (6 hours on 2026-11-25); the normal time is a few minutes
+        run: release/mac/make-dmg.sh "zip/$NAME.zip" dist
       - if: always() && inputs.sign
         run: security delete-keychain "$RUNNER_TEMP/sign.keychain-db" || true
       # the app's start, from the disk image (the keychain is gone): copy to Application Support, uv, Python, --version

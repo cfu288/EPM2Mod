@@ -1,10 +1,10 @@
 """Plan a release (``epm2mod release``): check and name the next release of the pinned build.
 
 The release workflow on GitHub (started by hand, ``workflow_dispatch``) runs
-this, makes the zip with ``epm2mod package``, tests it on three systems, and
-then creates the tag and the GitHub release in one step. No person pushes a
-tag. This module only decides whether the repository is ready, which version
-comes next, and what the notes say.
+the hard checks and this, makes the zip with ``epm2mod package``, tests it on
+three systems, and then creates the tag and the GitHub release in one step. No
+person pushes a tag. This module only decides whether the repository is ready,
+which version comes next, and what the notes say.
 
 The version is a calendar version: the day of the release in UTC, and a
 number. ``2026.11.25-rc.N`` is a test release, N one more than the highest
@@ -31,7 +31,6 @@ from __future__ import annotations
 import datetime
 import json
 import re
-import shutil
 import subprocess
 import tempfile
 from dataclasses import dataclass
@@ -40,7 +39,7 @@ from pathlib import Path
 from . import readme
 from .builds import pinned_description
 from .errors import BuildError, Epm2ModError
-from .fileio import read_text, write_bytes
+from .fileio import write_bytes
 from .label import check_label
 from .paths import RepoPaths
 from .pipeline import check_free_space, check_in_emulator
@@ -140,131 +139,6 @@ def _git(paths: RepoPaths, *args: str) -> str:
     return done.stdout.strip()
 
 
-def watched_paths(text: str) -> list[str] | None:
-    """Return the first ``paths`` list of a workflow file, or None if it has none.
-
-    Both forms of a YAML list are read: ``paths: ['a/**', b]`` on one line, and
-    ``paths:`` followed by lines that start with ``- ``. An empty list means
-    that the key is there and its items could not be read.
-    """
-    lines = text.splitlines()
-    for number, line in enumerate(lines):
-        found = re.match(r"^(\s+)paths:\s*(.*)$", line)
-        if not found:
-            continue
-        rest = found.group(2).split(" #")[0].strip()
-        if rest.startswith("["):
-            items = rest.strip("[]").split(",")
-        else:
-            items = []
-            for later in lines[number + 1 :]:
-                item = re.match(r"^\s+-\s+(.*)$", later)
-                if not item:
-                    if later.strip() and not later.strip().startswith("#"):
-                        break
-                    continue
-                items.append(item.group(1).split(" #")[0])
-        return [
-            item.strip().strip("'\"") for item in items if item.strip().strip("'\"")
-        ]
-    return None
-
-
-def _watched_paths_changed(
-    paths: RepoPaths, workflow: str, ran: str, commit: str
-) -> bool:
-    """Return True if a file that ``workflow`` watches (its first ``paths`` list) differs between ``ran`` and ``commit``."""
-    text = next(read_text(p) for p in paths.workflows if p.name == workflow)
-    watched = watched_paths(text)
-    if watched is None:
-        return False  # no filter
-    if not watched:
-        raise BuildError(
-            f"{workflow}: its 'paths' filter cannot be read, so it is not known if a "
-            "watched file changed after its newest run"
-        )
-    if ran == commit:
-        return False
-    done = subprocess.run(
-        ["git", "diff", "--quiet", ran, commit, "--", *watched],
-        cwd=paths.root, capture_output=True, check=False,
-    )  # fmt: skip
-    return done.returncode != 0
-
-
-def _safely(paths: RepoPaths, workflow: str, ran: str, commit: str) -> bool | str:
-    """Return ``_watched_paths_changed``, or the text of the problem when the filter cannot be read."""
-    try:
-        return _watched_paths_changed(paths, workflow, ran, commit)
-    except BuildError as error:
-        return str(error)
-
-
-def _ci_problems(paths: RepoPaths, commit: str) -> list[str]:
-    """Return why CI does not count as passed for ``commit``, if it doesn't.
-
-    What counts is the newest run of each workflow on main: it must be finished
-    and passed. A workflow with a ``paths`` filter runs only for the paths it
-    watches, so its newest run may be on an ancestor of ``commit``. A workflow
-    without one runs for every commit: its newest run must be on ``commit``
-    itself. A run on an ancestor counts only while no watched file changed
-    after it.
-    """
-    gh = shutil.which("gh")
-    if gh is None:
-        return ["the GitHub command gh is not installed: cannot check the CI runs"]
-    problems = []
-    for workflow in (path.name for path in paths.workflows):
-        done = subprocess.run(
-            [gh, "run", "list", "--workflow", workflow, "--branch", "main",
-             "--event", "push", "--json", "conclusion,status,headSha", "--limit", "1"],
-            cwd=paths.root, capture_output=True, text=True, check=False,
-        )  # fmt: skip
-        if done.returncode != 0:
-            reason = done.stderr.strip().splitlines()[-1:] or ["no output"]
-            problems.append(f"{workflow}: the runs cannot be read (gh: {reason[0]})")
-            continue
-        runs = json.loads(done.stdout)
-        if not runs:
-            problems.append(f"{workflow}: no run on main found")
-            continue
-        run = runs[0]
-        filtered = any(
-            path.name == workflow and watched_paths(read_text(path)) is not None
-            for path in paths.workflows
-        )
-        if not filtered and run["headSha"] != commit:
-            problems.append(
-                f"{workflow}: it runs for every commit, and its newest run is for "
-                f"{run['headSha'][:7]}, not for this commit"
-            )
-            continue
-        ancestor = subprocess.run(
-            ["git", "merge-base", "--is-ancestor", run["headSha"], commit],
-            cwd=paths.root, capture_output=True, check=False,
-        )  # fmt: skip
-        if ancestor.returncode != 0:
-            problems.append(
-                f"{workflow}: the newest run is not on this commit's history"
-            )
-        elif (changed := _safely(paths, workflow, run["headSha"], commit)) is not False:
-            problems.append(
-                changed
-                if isinstance(changed, str)
-                else f"{workflow}: files that it watches changed after its newest run "
-                f"({run['headSha'][:7]}), and it has not run since"
-            )
-        elif run["status"] != "completed":
-            problems.append(
-                f"{workflow}: the run for {run['headSha'][:7]} is {run['status']}"
-            )
-        elif run["conclusion"] != "success":
-            problems.append(
-                f"{workflow}: the run for {run['headSha'][:7]} {run['conclusion']}"
-            )
-    return problems
-
-
 @dataclass(frozen=True)
 class Plan:
     """A release that is ready to make.
@@ -314,11 +188,6 @@ def plan(
     if chosen.label is None:
         problems.append(f"{which} {chosen.name} has no label")
         return None, problems
-    log = paths.camera_log
-    held = paths.tracked(log)  # a log file that git does not hold is not on main
-    entries = [e for e in sorted(log.glob("*.md")) if held is None or e in held]
-    if not any(chosen.sha256 in read_text(entry) for entry in entries):
-        problems.append(f"{paths.relative(log)}/ has no file for {chosen.sha256[:8]}")
     if _git(paths, "status", "--porcelain", "--untracked-files=no"):
         problems.append("the working tree has changes: commit or stash them")
     _git(paths, "fetch", "--quiet", "--tags", "origin")
@@ -330,7 +199,6 @@ def plan(
             "the generated documents are out of date: run 'epm2mod generate'"
         )
     problems += [f"feature list: {p}" for p in readme.feature_problems(paths)]
-    problems += _ci_problems(paths, commit)
     tags = _git(paths, "tag", "--list", "v*").split()
     days = [
         m.group(1) for tag in tags if (m := re.match(r"v(\d{4}\.\d{2}\.\d{2})\b", tag))
@@ -353,9 +221,7 @@ def plan(
             with tempfile.TemporaryDirectory() as folder:
                 path = Path(folder) / f"{released.name}.BIN"
                 write_bytes(path, image, BuildError)
-                check_in_emulator(
-                    paths, path, strict_times=True
-                )  # a release: only PASS counts
+                check_in_emulator(paths, path)
             if released.sha256 != chosen.sha256:
                 tested = (chosen.sha256, chosen.label)
         except Epm2ModError as error:

@@ -1,15 +1,15 @@
 # A release: started by hand (Actions, "Run workflow", or `gh workflow run release.yml -f kind=rc -f dry_run=false`),
 # from main. A merge does not release, and a pushed tag starts nothing: this workflow creates the tag.
 #
-# 1. plan: `epm2mod release` checks that main is ready (camera test, camera log, generated documents, the newest
-#    python, web and package runs on main) and names the version and the notes. The day is the input `day`, or
-#    today (UTC): give the day that a dry run printed to release what the dry run checked. The plan makes the
-#    image that is released: the pinned build with that day as its label (refused if it differs from the
-#    camera-tested image outside the date), or the tested image as it is when its label is that day already.
-#    The start-up checks run on that image in both cases. The free-space and load-order checks read the build's
-#    specs, not the image: the date-only guard is what covers the stamped bytes.
+# 1. plan: the hard checks (tools/ci.sh) run on the commit. Then `epm2mod release` checks that the build has a camera
+#    test and names the version and the notes. The day is the input `day`, or today (UTC): give the day that a dry
+#    run printed to release what the dry run checked. The plan makes the image that is released: the pinned build
+#    with that day as its label (refused if it differs from the camera-tested image outside the date), or the
+#    tested image as it is when its label is that day already. The start-up checks run on that image in both
+#    cases. The free-space and load-order checks read the build's specs, not the image: the date-only guard is what
+#    covers the stamped bytes.
 # 2. package: the zip, its start on three systems, the signed and notarized Mac disk image (package.yml). The
-#    environment "release" holds the signing secrets and asks for the owner's approval.
+#    environment "release" holds the signing secrets and restricts them to its branches and tags.
 # 3. publish, not with dry_run: the tag and the GitHub release, in one step.
 name: release
 
@@ -48,9 +48,6 @@ concurrency:
 jobs:
   plan:
     runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-      actions: read # gh run list, for the state of CI on main
     outputs:
       tag: ${{ steps.plan.outputs.tag }}
       release_version: ${{ steps.plan.outputs.release_version }}
@@ -72,9 +69,12 @@ jobs:
       - run: python -m pip install --quiet --require-hashes -r .github/uv-requirements.txt && uv sync --locked
       - run: sudo apt-get install -y --no-install-recommends bison flex texinfo
       - run: uv run epm2mod init
+      - run: tools/ci.sh
+        env:
+          CI_BASE: ${{ github.sha }} # nothing changed since: the pinned build is made and checked
+          PLAYWRIGHT_INSTALL: --with-deps
       - id: plan
         env:
-          GH_TOKEN: ${{ github.token }}
           KIND: ${{ inputs.kind }}
           BUILD: ${{ inputs.build }}
           DAY: ${{ inputs.day }}

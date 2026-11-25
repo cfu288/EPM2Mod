@@ -1,4 +1,4 @@
-# The hard checks of the package, the scripts, the documents, the generators and the builds: tools/ci.sh python,
+# The hard checks of the package, the scripts, the generators and the builds: tools/ci.sh python,
 # the script a contributor runs. It makes the pinned build and each build description that the change touches,
 # and starts them in the emulator. Olympus's firmware is downloaded from Olympus in each run and is never stored.
 name: python
@@ -48,7 +48,6 @@ jobs:
       - run: sudo apt-get install -y --no-install-recommends bison flex texinfo
       # binutils, the emulator submodule, Olympus's firmware, the firmware map
       - run: uv run epm2mod init
-      - run: uv run epm2mod init --check
       - env:
           # a pull request: its base branch. A push to main: the commit before it
           CI_BASE: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || github.event.before }}

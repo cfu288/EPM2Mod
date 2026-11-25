@@ -13,7 +13,6 @@
  "guides": "docs/guide",
  "site_features": "web/apps/site/src/features.ts",
  "camera_log": "docs/camera-log",
- "workflows": [".github/workflows/python.yml", ".github/workflows/web.yml", ".github/workflows/package.yml"],
  "free_space_tool": "tools/freespace.py",
  "lint_tool": "tools/buildlint.py",
  "emulator_checks": ["emulator/boot-test", "emulator/update-path-test"],

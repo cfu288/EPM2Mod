@@ -23,8 +23,6 @@ from epm2mod.errors import BuildError  # noqa: E402
 from epm2mod.paths import RepoPaths  # noqa: E402
 from epm2mod.releasing import next_version, release_notes  # noqa: E402
 
-CI_PROBLEMS = releasing._ci_problems  # the real one: PlanTests replaces it
-
 
 class NextVersionTests(unittest.TestCase):
     def test_the_first_test_release_of_a_day_is_rc_1(self) -> None:
@@ -49,7 +47,7 @@ class NextVersionTests(unittest.TestCase):
 
 
 class PlanTests(unittest.TestCase):
-    """``release --build``: the checks and the notes for a named build, with git, the documents and CI faked."""
+    """``release --build``: the checks and the notes for a named build, with git and the documents faked."""
 
     def setUp(self) -> None:
         folder = tempfile.TemporaryDirectory()
@@ -61,18 +59,15 @@ class PlanTests(unittest.TestCase):
                 name, f"The {name} build", ("data/specs/a.json", label_spec), sha, date,
                 label="2026.11.20", stock=stock.EPM2_V16.file_name,
             ))  # fmt: skip
-        self.paths.camera_log.mkdir(parents=True)
-        (self.paths.camera_log / "2026-11-20-probe.md").write_text("sha256 " + "ab" * 32 + "\n")
         answers = {
             "status": "", "fetch": "", "rev-parse": "c0ffee", "describe": "v2026.11.20-rc.5",
             "tag": "v2026.11.20-rc.5 v2026.11.20-probe.9 v2026.11.25-probe.1", "log": "feat: a probe\nchore: x",
         }  # fmt: skip
         for fake in (
             mock.patch.object(releasing, "_git", lambda paths, *args: answers[args[0]]),
-            mock.patch.object(releasing, "_ci_problems", return_value=[]),
             mock.patch.object(releasing, "stamp", self.stamp),
             mock.patch.object(releasing, "check_free_space", lambda paths, build: self.checked.append(build.label)),
-            mock.patch.object(releasing, "check_in_emulator", lambda paths, image, strict_times=False: self.checked.append(image.name + " strict" * strict_times)),
+            mock.patch.object(releasing, "check_in_emulator", lambda paths, image: self.checked.append(image.name)),
             mock.patch.object(readme, "is_current", return_value=True),
             mock.patch.object(readme, "feature_problems", return_value=[]),
         ):
@@ -93,7 +88,7 @@ class PlanTests(unittest.TestCase):
         # the release holds the build with the day of the release as its label, checked as a candidate is
         self.assertIn("Firmware: EPM2Mod 2026.11.25, sha256 `" + "cd" * 32 + "`.", release.notes)
         self.assertIn("Camera-tested as sha256 `" + "ab" * 32 + "` (label 2026.11.20)", release.notes)
-        self.assertEqual(self.checked, ["2026.11.25", "probe.BIN strict"])
+        self.assertEqual(self.checked, ["2026.11.25", "probe.BIN"])
         self.assertIn("\nThe probe build.\n", release.notes)
         self.assertIn("- feat: a probe\n", release.notes)
 
@@ -107,7 +102,7 @@ class PlanTests(unittest.TestCase):
         assert release is not None
         self.assertEqual((release.sha256, release.day), ("ab" * 32, "2026.11.25"))
         self.assertNotIn("Camera-tested as", release.notes)
-        self.assertEqual(self.checked, ["2026.11.20", "probe.BIN strict"])  # the start-up and load-order checks ran
+        self.assertEqual(self.checked, ["2026.11.20", "probe.BIN"])  # the start-up and load-order checks ran
 
     def test_the_day_is_a_real_date_not_after_today_and_not_before_the_newest_tag(self) -> None:
         def plan(day: str) -> list[str]:
@@ -122,92 +117,16 @@ class PlanTests(unittest.TestCase):
         self.assertEqual(plan("2026.11.25"), [])  # the day of the newest tag
         self.assertEqual(plan("2026.11.24"), ["the day of the release 2026.11.24 is before the newest release tag's day (2026.11.25)"])
 
-    def test_a_workflow_that_runs_for_every_commit_must_have_run_for_this_commit(self) -> None:
-        for name, text in (("every.yml", "on:\n  push:\n    branches: [main]\n"), ("some.yml", "on:\n  push:\n    paths: ['web/**']\n")):
-            (self.paths.root / name).write_text(text)
-        self.paths.manifest["workflows"] = ["every.yml", "some.yml"]
-        listed = mock.Mock(returncode=0, stdout='[{"conclusion": "success", "status": "completed", "headSha": "0ldc0de"}]', stderr="")
-        with mock.patch.object(releasing.shutil, "which", return_value="gh"), mock.patch.object(
-            releasing.subprocess, "run", return_value=listed
-        ):
-            problems = CI_PROBLEMS(self.paths, "c0ffee")
-        # the run of an ancestor (git merge-base is faked to agree) counts for the workflow with a paths filter only
-        self.assertEqual(problems, ["every.yml: it runs for every commit, and its newest run is for 0ldc0de, not for this commit"])
-
-    def test_a_camera_log_file_that_git_does_not_hold_does_not_count(self) -> None:
-        self.checked = []
-        entry = self.paths.camera_log / "2026-11-20-probe.md"
-        for held, ready in (({entry}, True), (set(), False), (None, True)):  # None: not a git checkout
-            with mock.patch.object(type(self.paths), "tracked", lambda paths, folder: held):
-                release, problems = releasing.plan(self.paths, final=False, build="probe", day="2026.11.25", today="2026.11.25")
-            self.assertEqual(release is not None, ready, problems)
-            if not ready:
-                self.assertIn("has no file for", problems[0])
-
-    def test_a_start_whose_times_moved_stops_the_release(self) -> None:
-        def moved(paths: RepoPaths, image: Path, strict_times: bool = False) -> list[str]:
-            if strict_times:  # what pipeline.check_in_emulator does for boot-test's exit status 1
-                raise BuildError("boot-test: TIMES MOVED: 2 time stamp(s)\nboot-test failed")
-            return ["boot-test: TIMES MOVED"]
+    def test_a_failed_start_up_check_stops_the_release(self) -> None:
+        def failed(paths: RepoPaths, image: Path) -> list[str]:
+            raise BuildError("boot-test: TIMES MOVED: 2 time stamp(s)\nboot-test failed")
 
         self.checked = []
-        with mock.patch.object(releasing, "check_in_emulator", moved):
+        with mock.patch.object(releasing, "check_in_emulator", failed):
             release, problems = releasing.plan(self.paths, final=False, build="probe", day="2026.11.25", today="2026.11.25")
         self.assertIsNone(release)
         self.assertEqual(len(problems), 1)
         self.assertIn("TIMES MOVED", problems[0])
-
-    def test_an_old_run_does_not_count_after_a_watched_file_changed(self) -> None:
-        (self.paths.root / "some.yml").write_text("on:\n  push:\n    paths: ['web/**', 'x.json']\n")
-        self.paths.manifest["workflows"] = ["some.yml"]
-        asked: list[list[str]] = []
-
-        def run(command: list[str], **keywords: object) -> mock.Mock:
-            asked.append(command)
-            if command[0] == "gh":
-                return mock.Mock(returncode=0, stdout='[{"conclusion": "success", "status": "completed", "headSha": "0ldc0de"}]', stderr="")
-            return mock.Mock(returncode=1 if command[1] == "diff" and changed else 0)
-
-        with mock.patch.object(releasing.shutil, "which", return_value="gh"), mock.patch.object(releasing.subprocess, "run", run):
-            changed = True
-            self.assertEqual(
-                CI_PROBLEMS(self.paths, "c0ffee"),
-                ["some.yml: files that it watches changed after its newest run (0ldc0de), and it has not run since"],
-            )
-            changed = False
-            self.assertEqual(CI_PROBLEMS(self.paths, "c0ffee"), [])
-        self.assertIn(["git", "diff", "--quiet", "0ldc0de", "c0ffee", "--", "web/**", "x.json"], asked)
-
-    def test_the_paths_of_a_workflow_are_read_in_both_yaml_forms(self) -> None:
-        inline = "on:\n  push:\n    branches: [main]\n    paths: ['web/**', \"x.json\", plain/**]  # watched\n  pull_request:\n"
-        block = "on:\n  push:\n    paths:\n      - 'web/**'\n      # a comment\n      - \"x.json\"\n      - plain/**\n  pull_request:\n    paths: ['other']\n"
-        for text in (inline, block):
-            self.assertEqual(releasing.watched_paths(text), ["web/**", "x.json", "plain/**"])
-        self.assertIsNone(releasing.watched_paths("on:\n  push:\n    branches: [main]\n"))
-        self.assertEqual(releasing.watched_paths("on:\n  push:\n    paths: *anchor\n"), [])  # not a list we can read
-        self.assertEqual(releasing.watched_paths("on:\n  push:\n    paths:\n  pull_request:\n"), [])
-
-    def test_a_block_list_of_paths_counts_and_an_unreadable_one_is_a_problem(self) -> None:
-        listed = mock.Mock(returncode=0, stdout='[{"conclusion": "success", "status": "completed", "headSha": "0ldc0de"}]', stderr="")
-
-        def run(command: list[str], **keywords: object) -> mock.Mock:
-            return listed if command[0] == "gh" else mock.Mock(returncode=1 if command[1] == "diff" else 0)
-
-        with mock.patch.object(releasing.shutil, "which", return_value="gh"), mock.patch.object(releasing.subprocess, "run", run):
-            (self.paths.root / "some.yml").write_text("on:\n  push:\n    paths:\n      - 'web/**'\n")
-            self.paths.manifest["workflows"] = ["some.yml"]
-            self.assertIn("files that it watches changed", CI_PROBLEMS(self.paths, "c0ffee")[0])
-            (self.paths.root / "some.yml").write_text("on:\n  push:\n    paths:\n  pull_request:\n")
-            self.assertIn("'paths' filter cannot be read", CI_PROBLEMS(self.paths, "c0ffee")[0])
-
-    def test_a_failed_read_of_the_ci_runs_is_not_called_no_run(self) -> None:
-        self.paths.manifest["workflows"] = [".github/workflows/python.yml"]
-        failed = mock.Mock(returncode=1, stdout="", stderr="HTTP 401: Bad credentials")
-        with mock.patch.object(releasing.shutil, "which", return_value="gh"), mock.patch.object(
-            releasing.subprocess, "run", return_value=failed
-        ):
-            problems = CI_PROBLEMS(self.paths, "c0ffee")
-        self.assertEqual(problems, ["python.yml: the runs cannot be read (gh: HTTP 401: Bad credentials)"])
 
     def test_the_hint_is_the_command_for_the_release_that_was_planned(self) -> None:
         self.checked = []

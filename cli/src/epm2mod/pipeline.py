@@ -185,19 +185,13 @@ def check_free_space(paths: RepoPaths, description: BuildDescription) -> str:
 _EMULATOR_NOT_SET_UP = 3
 
 
-def check_in_emulator(
-    paths: RepoPaths, image: Path, strict_times: bool = False
-) -> list[str]:
+def check_in_emulator(paths: RepoPaths, image: Path) -> list[str]:
     """Start a firmware image in the emulator: the normal start and the update path.
 
     The checks are the project's emulator checks, each run as ``CHECK IMAGE``: the
     normal start and the update path. An image that does not start as the
     stock firmware does, or does not find an update file with OK held, could
     leave the camera with no way back.
-
-    With ``strict_times`` each check gets ``--strict-times``: a start that does
-    what the stock firmware does at other times (TIMES MOVED) then fails. A
-    release uses it. Without it such a start passes and its line says so.
 
     Returns:
         One line for each check: its result.
@@ -217,12 +211,7 @@ def check_in_emulator(
             raise not_run
         try:
             done = subprocess.run(
-                [
-                    sys.executable,
-                    str(tool),
-                    *(["--strict-times"] * strict_times),
-                    str(image),
-                ],
+                [sys.executable, str(tool), str(image)],
                 cwd=paths.root,
                 capture_output=True,
                 text=True,

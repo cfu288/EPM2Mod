@@ -208,11 +208,6 @@ class RepoPaths:
         return self.location("camera_log")
 
     @property
-    def workflows(self) -> tuple[Path, ...]:
-        """The CI workflows whose runs on the release commit must have passed."""
-        return self.locations("workflows")
-
-    @property
     def app(self) -> Path:
         """The folder of the built installer page."""
         return self.location("app")

@@ -579,7 +579,7 @@ COMMANDS: dict[str, Command] = {
             "the release notes and the tag's name. It creates no tag: the release workflow on GitHub "
             "runs this command, then makes, tests, tags and publishes the release",
             True,
-            "the network for the checks of CI",
+            "the network, for the tags and main of origin",
             (
                 "epm2mod release",
                 "epm2mod release --final",
