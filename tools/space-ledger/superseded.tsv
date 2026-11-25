@@ -1,8 +1,8 @@
 # Hand-maintained list of specs that a later spec replaces, for tools/freespace.py.
 # Their bytes are shown in the ledger as "superseded" and do not count as used or as an overlap.
 # Columns (tab-separated): spec (path from the repo root), superseded by, evidence.
-experiments/2026-11-13-intervalometer/patches/interval-timelapse-insert-awake.json	data/specs/interval-timelapse-v2.json	description of v2: "v2 of interval-timelapse-insert-awake.json after two reviews"; v2 moved the code from the segment-3 tail to the segment-2 tail
-experiments/2026-11-13-intervalometer/patches/interval-timelapse-insert.json	experiments/2026-11-13-intervalometer/patches/interval-timelapse-insert-awake.json	insert-awake is the same spec plus the keep-awake hold (same segment-3 tail bytes)
+tools/space-ledger/specs/interval-timelapse-insert-awake.json	data/specs/interval-timelapse-v2.json	description of v2: "v2 of interval-timelapse-insert-awake.json after two reviews"; v2 moved the code from the segment-3 tail to the segment-2 tail
+tools/space-ledger/specs/interval-timelapse-insert.json	tools/space-ledger/specs/interval-timelapse-insert-awake.json	insert-awake is the same spec plus the keep-awake hold (same segment-3 tail bytes)
 data/specs/log-card-read.json	data/specs/log-card-look.json	log-card-look is probe 2 in place of probe 1 (log-card-read, camera-tested 2026-11-17): the same hook at the flush task entry, the same base, its T_CRD in the same run 0x7EBF2888 (experiments/2026-11-17-card-looks/NOTES.md)
 data/specs/log-card-look.json	data/specs/log-card-probe.json	log-card-probe is the probe harness in place of probe 2 (log-card-look, camera-tested 2026-11-17): the same hook and base, its T_CRD and T_HDR in the same runs 0x7EBF2888 and 0x7EBF2B90 (experiments/2026-11-17-card-looks/design.md section 8)
 data/specs/log-card-probe.json	data/specs/log-card-keep.json	log-card-keep is the persistence probe after the probe harness (log-card-probe, flashed first): the same hook and base, its code in the same free runs of segment 2 (experiments/2026-11-17-card-looks/design.md section 8)

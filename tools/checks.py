@@ -3,18 +3,23 @@
 
     python3 tools/checks.py data/builds/NAME.json [--tier quick|full] [--jobs N] [--no-cache] [--list]
 
-quick   the static checks, the emulator start and update path, and the colour-stage check of the film entries.
-        Run it after each change. A few minutes at most.
-full    quick, and the scenario runs (live view of the film entries, the peaking save guard, the peaking and log
-        scenarios). Run it once before a build is offered for a flash.
+quick   the static checks, the emulator start and the update path. Every result is PASS or FAIL: tools/ci.sh
+        runs this tier. Run it after each change. Under a minute.
+full    quick, and the scenario runs of emulator/scenarios/ (the peaking save guard, the peaking scenarios).
+        About 20 minutes. Run it once before a build is offered for a flash.
 
 The image build/NAME.BIN must exist (`epm2mod make NAME`). A check runs again only when its inputs
 changed: the image, the patch specs, the check's own script and the files under tools/. Results are kept in
-build/check-cache/ (ignored by git). A check that needs an image that is absent (a reference build) is skipped
-with the reason.
+build/check-cache/ (ignored by git). A scenario compares with the camera-tested build peaking-fast: when
+build/peaking-fast.BIN is absent, the run stops and names the command that makes it.
 
-Results: PASS, FAIL, REVIEW (the script has no exit status: read its RESULT lines, printed here), SKIP.
+Results: PASS, FAIL, and in the full tier WARN: a scenario script that has no exit status. Read its RESULT lines,
+printed here. Nothing is skipped: a check that cannot run is a FAIL.
 Exit status: 0 when no check failed, 1 when one failed, 2 for a usage error.
+
+The scenario checks of the superseded spec families films12 and log-core (colour stages, live view of the film
+entries, log scenarios) were here until 2026-11-25. No build after stock-films uses those specs; their scripts are in
+experiments/ (2026-11-16-films-max, 2026-11-16-doublex, 2026-11-15-log) as a record.
 """
 
 from __future__ import annotations
@@ -32,10 +37,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 CACHE = ROOT / "build" / "check-cache"
-PEAKING = ROOT / "experiments" / "2026-11-14-focus-peaking" / "scripts"
-FILMS = ROOT / "experiments" / "2026-11-16-films-max" / "scripts"
-DOUBLEX = ROOT / "experiments" / "2026-11-16-doublex" / "scripts"
-LOG = ROOT / "experiments" / "2026-11-15-log" / "scripts"
+PEAKING = ROOT / "emulator" / "scenarios"
 TIERS = ("quick", "full")
 OUTPUT_TAIL = 4000  # characters of a check's output that are kept
 
@@ -47,10 +49,9 @@ class Check:
     Attributes:
         name: short name, shown in the report.
         tier: "quick" or "full".
-        command: the command line, run in the repository root. Empty when the check is skipped.
+        command: the command line, run in the repository root.
         inputs: files whose content decides the result, besides the command line itself.
         judged: True when the exit status says pass or fail; False for a script that only prints results.
-        skip: why the check cannot run, or "".
     """
 
     name: str
@@ -58,7 +59,6 @@ class Check:
     command: tuple[str, ...] = ()
     inputs: tuple[Path, ...] = ()
     judged: bool = True
-    skip: str = ""
 
 
 @dataclasses.dataclass(frozen=True)
@@ -103,11 +103,13 @@ def plan(description: Path, tier: str) -> list[Check]:
     tools = tool_files()
     py = sys.executable
     has = lambda part: any(part in s for s in specs)  # noqa: E731
-    reference = lambda name: ROOT / "build" / f"{name}.BIN"  # noqa: E731
 
-    def needs(*images: Path) -> str:
-        missing = [str(p.relative_to(ROOT)) for p in images if not p.exists()]
-        return f"needs {', '.join(missing)} (epm2mod make)" if missing else ""
+    def reference(name: str) -> Path:
+        """Return the image of the camera-tested build NAME that a scenario compares with."""
+        path = ROOT / "build" / f"{name}.BIN"
+        if not path.exists():  # not made here: make also writes the card folder build/DCOLYMP
+            raise ValueError(f"{path.relative_to(ROOT)} is absent: run 'epm2mod make {name}', then make {description.stem} again")
+        return path
 
     first_code = ["--first-code"] if raw.get("first_code") else []
     checks = [
@@ -116,38 +118,20 @@ def plan(description: Path, tier: str) -> list[Check]:
         Check("boot-test", "quick", (py, "emulator/boot-test", str(image)), (image,) + tools),
         Check("update-path-test", "quick", (py, "emulator/update-path-test", str(image)), (image,) + tools),
     ]
-    films12, black_and_white = has("films12-structure"), has("films12bw-doublex")
-    if black_and_white:
-        base = reference("films-12")
-        refit = ["--refit", "1"] if has("films12bw-doublex2") else []
-        script = DOUBLEX / "stage_check_bw.py"
-        checks.append(Check("colour-stages", "quick", (py, str(script), str(image), "--films12", str(base), *refit),
-                            (image, base, script, FILMS / "stage_check.py") + tools, skip=needs(base)))
-    elif films12:
-        base, script = reference("peaking-fast"), FILMS / "stage_check.py"
-        checks.append(Check("colour-stages", "quick", (py, str(script), str(image), "--base", str(base)),
-                            (image, base, script) + tools, skip=needs(base)))
     if tier == "quick":
         return checks
 
     peaking = has("data/specs/peaking-")
     name = description.stem
-    if films12:
-        script = FILMS / "scen_films.py"
-        checks.append(Check("films-live-view", "full", (py, str(script), "{block0}"), (image, script) + tools))
     if has("peaking-save-guard"):
         base, script = reference("peaking-fast"), PEAKING / "scen_guard.py"
         checks.append(Check("save-guard", "full", (py, str(script), "all", "pinned-fast={block0:peaking-fast}", f"{name}={{block0}}"),
-                            (image, base, script) + tools, skip=needs(base)))
+                            (image, base, script) + tools))
     if peaking:
         base = reference("peaking-fast")
         for label, script in (("peaking-s1-s5", PEAKING / "scen_peaking.py"), ("peaking-s6-s7", PEAKING / "scen_direct4.py")):
             checks.append(Check(label, "full", (py, str(script), "all", "{block0:peaking-fast}", f"{name}={{block0}}"),
-                                (image, base, script) + tools, judged=False, skip=needs(base)))
-    if has("log-core"):
-        base, script = reference("peaking-colours"), LOG / "scen_log.py"
-        checks.append(Check("log-scenarios", "full", (py, str(script), "all", "{block0:peaking-colours}", "{block0}"),
-                            (image, base, script) + tools, judged=False, skip=needs(base)))
+                                (image, base, script) + tools, judged=False))
     return checks
 
 
@@ -176,8 +160,6 @@ def resolve(command: tuple[str, ...], image: Path) -> list[str]:
 
 def run(check: Check, image: Path, use_cache: bool) -> Result:
     """Run one check, or take its result from the cache."""
-    if check.skip:
-        return Result("SKIP", 0.0, check.skip)
     record = CACHE / f"{check.name}-{cache_key(check)}.json"
     if use_cache and record.exists():
         saved = json.loads(record.read_text(encoding="utf-8"))
@@ -191,7 +173,7 @@ def run(check: Check, image: Path, use_cache: bool) -> Result:
     if code != 0:
         status = "FAIL"
     else:
-        status = "PASS" if check.judged else "REVIEW"
+        status = "PASS" if check.judged else "WARN"
     result = Result(status, round(time.monotonic() - started, 1), output[-OUTPUT_TAIL:])
     CACHE.mkdir(parents=True, exist_ok=True)
     record.write_text(json.dumps(dataclasses.asdict(result)), encoding="utf-8")
@@ -201,9 +183,7 @@ def run(check: Check, image: Path, use_cache: bool) -> Result:
 def summary(check: Check, result: Result) -> str:
     """Return the lines of a check's output that say its result."""
     lines = result.output.splitlines()
-    if result.status == "SKIP":
-        return result.output
-    if result.status == "REVIEW" or result.status == "FAIL":
+    if result.status == "WARN" or result.status == "FAIL":
         marked = [line.strip() for line in lines if "RESULT" in line or line.startswith("FAIL")]
         return "\n      ".join(marked[-12:] or lines[-3:])
     return lines[-1].strip() if lines else ""
@@ -226,7 +206,7 @@ def main(argv: list[str]) -> int:
         return 2
     if args.list:
         for check in checks:
-            print(f"{check.tier:5s} {check.name:18s} {'SKIP: ' + check.skip if check.skip else ' '.join(check.command)[:140]}")
+            print(f"{check.tier:5s} {check.name:18s} {' '.join(check.command)[:140]}")
         return 0
     image = ROOT / "build" / (description.stem + ".BIN")
     started = time.monotonic()
@@ -237,7 +217,7 @@ def main(argv: list[str]) -> int:
         failed += result.status == "FAIL"
         took = "cached" if result.cached else f"{result.seconds:.0f} s"
         print(f"{result.status:6s} {check.name:18s} {took:>7s}  {summary(check, result)}")
-    counts = {s: sum(r.status == s for r in results) for s in ("PASS", "FAIL", "REVIEW", "SKIP")}
+    counts = {s: sum(r.status == s for r in results) for s in ("PASS", "FAIL", "WARN")}
     print(f"{description.stem}, tier {args.tier}: " + ", ".join(f"{n} {s}" for s, n in counts.items() if n) + f"; {time.monotonic() - started:.0f} s")
     return 1 if failed else 0
 

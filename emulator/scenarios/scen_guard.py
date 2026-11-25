@@ -31,7 +31,7 @@ S26  The event pk_guard of the debug builds (images whose NAME starts with "debu
      records with id 262 are read from the CPU0 ring in the emulator's memory.
 """
 import os, sys
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(ROOT, "emulator"))
 _src = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scen_peaking.py")).read()
 assert _src.rstrip().endswith("\nmain()")

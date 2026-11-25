@@ -16,7 +16,7 @@ S7  The sleep routine "pwr_standby start" 0x7E53A55C, called as the SRAM code ca
     ones and whether the run enters mov_art_set_line_yc_param (0x7E6CD9D6), which the stock routine never does.
 """
 import os, struct, sys
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(ROOT, "emulator"))
 import scenario  # noqa: E402
 from liveview import LiveView, EXPOSE  # noqa: E402

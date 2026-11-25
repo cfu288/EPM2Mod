@@ -31,7 +31,7 @@ and the base is 0x...020) whose bytes are mostly NUL-terminated printable string
 small integers and addresses (pointer tables, vtables), are "data" pages.
 Calls decoded inside data pages are discarded.
 """
-import argparse, bisect, collections, os, re, subprocess, sys
+import argparse, bisect, collections, contextlib, os, re, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
@@ -40,7 +40,7 @@ import disasm  # noqa: E402  (objdump path, block cache, BASE)
 OUT = os.path.join(ROOT, "build", "map")
 FW = disasm.DEFAULT_FW   # --fw, --base and --out override these three for other bodies or versions
 BASE = disasm.BASE
-BIN = os.path.join(disasm.ROOT, "build", "toolchain", "bin")  # made by tools/setup.sh
+BIN = os.path.join(disasm.ROOT, "build", "toolchain", "bin")  # made by uv run epm2mod init
 PAGE = 0x1000
 INSN = re.compile(r"^\s*([0-9a-f]+):\t(?:[0-9a-f ]+\t)?(\S+)\s*(.*)$")  # raw bytes column optional
 SYM = re.compile(r"^([0-9a-f]{8}) <(\w+)>:$")
@@ -338,6 +338,8 @@ def cmd_build(a):
     n, c, r = stage_index(dis, base, len(data), strings, data_pages, data, call_only)
     stage_ptrs(data, base, strings, starts, code_pages)
     print(f"functions {n}, call edges {c}, string refs {r} -> {OUT}")
+    with open(os.path.join(OUT, "tasks.tsv"), "w") as f, contextlib.redirect_stdout(f):
+        cmd_tasks(a)  # the task table, which the scenario runs of emulator/liveview.py read
 
 
 def load_tsv(name):

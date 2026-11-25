@@ -36,7 +36,7 @@ SUPERSEDED = "tools/space-ledger/superseded.tsv"
 CAMERA_LOG = "docs/camera-log/"
 MAP_MD = "docs/reference/code-space-map.md"
 MAP_TSV = "docs/reference/code-space-map.tsv"
-SPEC_GLOBS = ["data/specs/*.json", "experiments/*/patches/*.json",
+SPEC_GLOBS = ["data/specs/*.json", "tools/space-ledger/specs/*.json",
               "emulator/specs/*.json"]
 
 BASE = 0x7E421020            # runtime address of block-0 file offset 0

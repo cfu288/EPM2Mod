@@ -8,7 +8,7 @@
 Every scenario runs the pinned image and each patched image through the same steps and prints what differs.
 """
 import os, struct, sys
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(ROOT, "emulator"))
 import scenario  # noqa: E402
 from scenario import RAM_AND_IMAGE, diff_pcs, diff_writes, fmt_funcs, patch_ranges  # noqa: E402
