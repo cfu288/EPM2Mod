@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import json
+import os
 import struct
 import sys
+import unittest
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT / "cli" / "src") not in sys.path:
@@ -14,6 +16,31 @@ if str(ROOT / "cli" / "src") not in sys.path:
 
 from epm2mod import container  # noqa: E402
 from epm2mod.paths import MANIFEST  # noqa: E402
+
+STOCK_NEEDED = "needs Olympus's firmware (uv run epm2mod fetch-stock)"
+APP_NEEDED = "needs the built app page (cd web && npm ci && npm run build:app)"
+OBJDUMP_NEEDED = "needs the MN103 objdump (tools/setup.sh --binutils)"
+
+
+def needs(present: object, what: str) -> Callable[[type], type]:
+    """Return a class decorator for tests that need a file which git does not hold.
+
+    With the file absent the tests are skipped, and ``what`` (the input and
+    the command that makes it) is the reason. When the environment has ``CI``
+    they fail instead: a run that must prove everything does not skip.
+    """
+    if present:
+        return lambda cls: cls
+    if not os.environ.get("CI"):
+        return unittest.skip(what)
+
+    def fail(cls: type) -> type:
+        def test_input(self: unittest.TestCase) -> None:
+            self.fail(f"{cls.__name__} cannot run: {what}")
+
+        return type(cls.__name__, (unittest.TestCase,), {"test_input": test_input})
+
+    return fail
 
 
 def write_manifest(folder: Path, **changes: Any) -> Path:

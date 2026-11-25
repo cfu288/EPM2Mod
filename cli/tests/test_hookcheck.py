@@ -8,12 +8,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "emulator"))
 import hookcheck  # noqa: E402
+import support  # noqa: E402
 
 BUILD = json.loads((ROOT / "data" / "builds" / "spot-af-2.json").read_text())
 NEEDS = [ROOT / "firmware" / "stock" / "E-PM2" / BUILD["stock"], Path(hookcheck.OBJDUMP)]
 
 
-@unittest.skipUnless(all(p.exists() for p in NEEDS), "needs Olympus's firmware and build/toolchain's objdump")
+@support.needs(NEEDS[0].exists(), support.STOCK_NEEDED)
+@support.needs(NEEDS[1].exists(), support.OBJDUMP_NEEDED)
 class BuiltBytes(unittest.TestCase):
     def test_a_jump_that_a_later_spec_writes_into_an_earlier_specs_code_fails(self) -> None:
         # GitHub issue #6: peaking-mf wrote `jmp T_MF` (segment 2) over the start of T_R, kernel-range code of

@@ -24,6 +24,7 @@ from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import support  # noqa: E402
 from support import ROOT, write_manifest  # noqa: E402
 
 from epm2mod import camera_steps, cards, cli, pipeline, serve, stock  # noqa: E402
@@ -389,7 +390,7 @@ def stand_in_card(folder: Path) -> Path:
     return folder
 
 
-@unittest.skipUnless(HAVE_STOCK, "needs the stock firmware")
+@support.needs(HAVE_STOCK, support.STOCK_NEEDED)
 class EndToEndTests(unittest.TestCase):
     def setUp(self) -> None:
         self.folder = tempfile.TemporaryDirectory()

@@ -31,6 +31,7 @@ from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import support  # noqa: E402
 from support import ROOT, make_container, write_manifest  # noqa: E402
 
 import epm2mod  # noqa: E402
@@ -1797,7 +1798,7 @@ class SourceTests(unittest.TestCase):
         self.assertEqual(missing, [])
 
 
-@unittest.skipUnless(HAVE_STOCK, "stock firmware not present")
+@support.needs(HAVE_STOCK, support.STOCK_NEEDED)
 class RealFirmwareTests(unittest.TestCase):
     def test_the_stock_file_round_trips(self) -> None:
         data = stock.read_stock(PATHS, stock.EPM2_V16)

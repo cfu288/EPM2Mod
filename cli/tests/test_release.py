@@ -19,6 +19,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import support  # noqa: E402
 from support import ROOT, write_manifest  # noqa: E402
 
 from epm2mod import builds, cards, catalogue, release, stock  # noqa: E402
@@ -34,7 +35,7 @@ HAVE_APP = (ROOT / "cli" / "src" / "epm2mod" / "app" / "index.html").is_file()
 HAVE_STOCK = stock.stock_path(PATHS, stock.EPM2_V16).is_file()
 
 
-@unittest.skipUnless(HAVE_APP, "needs the built app page (npm run build:app)")
+@support.needs(HAVE_APP, support.APP_NEEDED)
 class ZipTests(unittest.TestCase):
     def setUp(self) -> None:
         self.folder = tempfile.TemporaryDirectory()
@@ -180,9 +181,8 @@ class NamedBuildTests(unittest.TestCase):
             release.data_files(self.paths, "2026.11.20-none.1")
 
 
-@unittest.skipUnless(
-    HAVE_APP and HAVE_STOCK, "needs the built app page and the stock firmware"
-)
+@support.needs(HAVE_APP, support.APP_NEEDED)
+@support.needs(HAVE_STOCK, support.STOCK_NEEDED)
 class FromTheZipTests(unittest.TestCase):
     def test_the_unpacked_release_installs_the_pinned_build(self) -> None:
         with tempfile.TemporaryDirectory() as folder:

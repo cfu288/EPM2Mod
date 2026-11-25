@@ -195,8 +195,11 @@ what is there:
 | numpy (`uv run` installs it) | Look packs made from the fit files are the ones the film records hold (`cli/tests/test_lookfile.py`). |
 | The maker's firmware file (`uv run epm2mod fetch-stock`) | Each build description that has a sha256 gives that sha256. The stock file survives a parse and a write without a change. |
 
-Without the maker's firmware file the run skips the last group and says so. Run the full set before
-you pin a build.
+| The built installer page (`cd web && npm ci && npm run build:app`) | The release zip holds the page and installs from it. |
+
+Without one of these files the run skips its tests, and each skip names the command that makes the file
+(`cli/tests/support.py`, `needs`). When the environment has `CI`, the same tests fail: CI does not skip. Run the
+full set before you pin a build. A test that is skipped because it is a bad test is deleted.
 
 ## Camera-testing rule
 

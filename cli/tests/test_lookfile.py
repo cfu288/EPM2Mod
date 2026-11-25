@@ -24,6 +24,7 @@ from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import support  # noqa: E402
 from support import ROOT, write_manifest  # noqa: E402
 
 from epm2mod import cards, cli, stock  # noqa: E402
@@ -187,7 +188,7 @@ class FileTests(unittest.TestCase):
             lookfile.pack([colour(slot) for slot in range(12)] + [mono(4)])
 
 
-@unittest.skipUnless(HAVE_NUMPY, "numpy is not installed")
+@support.needs(HAVE_NUMPY, "needs numpy (uv sync)")
 class PackTests(unittest.TestCase):
     def test_the_look_list_of_the_pinned_build(self) -> None:
         looks = lookpack.load_list(PATHS, PATHS.card_looks)
@@ -367,7 +368,8 @@ class ChoiceTests(unittest.TestCase):
             self.assertIn("ART12     Watercolor", out.getvalue())
 
 
-@unittest.skipUnless(HAVE_NUMPY and HAVE_STOCK, "needs numpy and the stock firmware")
+@support.needs(HAVE_NUMPY, "needs numpy (uv sync)")
+@support.needs(HAVE_STOCK, support.STOCK_NEEDED)
 class RealFirmwareLookTests(unittest.TestCase):
     def test_the_camera_makes_the_tables_of_the_built_in_looks(self) -> None:
         payload = parse(stock.read_stock(PATHS, stock.EPM2_V16)).blocks[0].payload

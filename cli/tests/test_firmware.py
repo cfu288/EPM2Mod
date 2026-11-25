@@ -11,6 +11,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 sys.path.insert(0, os.path.join(ROOT, "cli", "src"))
 import oetool  # noqa: E402
+import support  # noqa: E402
 from epm2mod.spec import apply_specs, load_spec  # noqa: E402
 
 STOCK = sorted(glob.glob(os.path.join(ROOT, "firmware/stock/E-PM2/*.BIN")))
@@ -23,7 +24,7 @@ class TestScramble(unittest.TestCase):
         self.assertNotEqual(oetool.encode(data), data)
 
 
-@unittest.skipUnless(STOCK, "stock firmware not present")
+@support.needs(STOCK, support.STOCK_NEEDED)
 class TestStock(unittest.TestCase):
     def test_round_trip_all_versions(self):
         for path in STOCK:
@@ -34,7 +35,7 @@ class TestStock(unittest.TestCase):
                 self.assertEqual(oetool.build(blocks, tail), raw)
 
 
-@unittest.skipUnless(STOCK, "stock firmware not present")
+@support.needs(STOCK, support.STOCK_NEEDED)
 class TestPatchSpecs(unittest.TestCase):
     def test_specs_with_expected_hash_reproduce(self):
         for spec in glob.glob(os.path.join(ROOT, "data/specs/*.json")):
