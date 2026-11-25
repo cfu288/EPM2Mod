@@ -231,11 +231,23 @@ ends without a verdict. The references:
   S25, or the check fails, because a scenario whose reference shows no fault proves nothing.
 
 Open, 2026-11-25: on the pinned build `cold-start-fix` the full tier ends 6 PASS, 1 FAIL. The FAIL is S1 (frames
-with the peaking request clear, against stock) in ART Key Line; Natural is the same as stock. What differs in Key
-Line: stock instructions of pass 9 (0x7E7266D9) that the adjacent hooks of `peaking-direct-4` and `log-menu-3` (PK9,
-TICK) replace, the Debug Log's new code at 0x7ECAD443, the device accesses, and one RAM word (0x602A4954). V
-emulator. Whether the device accesses and the RAM word are only the log's probes is U: until someone reads them,
-the result stays a FAIL and is not written off as expected.
+with the peaking request clear, against stock) in ART Key Line; Natural is the same as stock. What the emulator
+shows for Key Line, three frames, all V emulator:
+
+- **The output is the same.** Every write to a device register is the same, in the same order, with the same value
+  (2,542 writes in frame 1, 2,305 in frame 2). Each frame gives a picture, and the mov state is equal.
+- **Device reads:** the build makes two or three more per frame, all of the word 0x98900074, from the mod's code in
+  the kernel range (0x7E4C90EA, 0x7E4C9598, 0x7E4C97C2). Stock does not read that word in these frames. That it is
+  the timer the Debug Log stamps its records with is I.
+- **Instructions:** the stock instructions that the hooks of `peaking-direct-4` and `log-menu-3` (PK9, TICK) replace
+  in pass 9, and the mod's new code.
+- **One word of stock state differs:** 0x602A4954. The stock instruction 0x7E6CDA36 writes it, in the function
+  that `peaking-direct-4` hooks at 0x7E6CD9CF and 0x7E6CDAC6. In frame 1 both write 0x7D0EFBD4. In frame 2 stock
+  writes 0 and the build writes 0x605B1CF0. What reads the word, and which spec first made it differ, is U.
+
+The Debug Log setting made no difference in this rig: the frames do not read it. So the result is for the state
+the rig starts in. Because stock state differs and its reader is not known, S1 stays a FAIL. It is not written off
+as expected, and it is not shown to be a fault a user can see: the output of these frames is the same.
 
 `tools/checks.py` keeps no results and makes the build again in memory first: it stops when `build/NAME.BIN` is not
 what the description and its specs make now. No build is exempt from a check. When a newer check refuses a

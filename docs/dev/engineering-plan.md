@@ -20,7 +20,7 @@ commit, not today's.
 
 Open: the workflows have not run on GitHub yet; the environment `release` must allow `main`. The full tier fails
 on the pinned build in one scenario, S1 with ART Key Line (see conventions.md, Checks): not yet decided if that is a
-fault of the firmware or an expected difference. The full tier of
+fault of the firmware or an expected difference: the device output is the same, one word of stock state is not. The full tier of
 `tools/checks.py` was hidden behind SKIP before the work; what it showed on the pinned build and what became of it
 is in [conventions.md](conventions.md), section Checks.
 
