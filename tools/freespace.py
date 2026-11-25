@@ -22,6 +22,7 @@ This tool never writes under build/ and never changes firmware. It writes docs/c
 only in `map`.
 """
 import argparse, bisect, hashlib, json, mmap, os, re, struct, subprocess, sys
+import pathlib
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STOCK_FW = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
@@ -75,11 +76,11 @@ def canon(a):
 def load_block0():
     p = rel(STOCK_BLOCK0)
     if os.path.exists(p):
-        data = open(p, "rb").read()
+        data = pathlib.Path(p).read_bytes()
     else:                                   # fall back to the container; nothing is written
         sys.path.insert(0, rel("tools"))
         import oetool
-        data = oetool.parse(open(rel(STOCK_FW), "rb").read())[0][0]["payload"]
+        data = oetool.parse(pathlib.Path(rel(STOCK_FW)).read_bytes())[0][0]["payload"]
     if hashlib.sha256(data).hexdigest() != STOCK_BLOCK0_SHA256:
         die("stock block 0 has sha256 %s, expected %s" % (hashlib.sha256(data).hexdigest(), STOCK_BLOCK0_SHA256))
     return data
@@ -90,7 +91,8 @@ def container_flash_base():
     p = rel(STOCK_FW)
     if not os.path.exists(p):
         return None
-    hd = open(p, "rb").read(32)
+    with open(p, "rb") as f:
+        hd = f.read(32)
     if hd[:2] != b"OE":
         die("stock firmware does not start with an OE block header")
     return struct.unpack_from("<I", hd, 8)[0] + 32
@@ -540,7 +542,7 @@ def read_tsv(path, ncol):
     p = rel(path)
     if not os.path.exists(p):
         return rows
-    for n, line in enumerate(open(p, encoding="utf-8"), 1):
+    for n, line in enumerate(pathlib.Path(p).read_text(encoding="utf-8").splitlines(keepends=True), 1):
         line = line.rstrip("\n")
         if not line.strip() or line.startswith("#"):
             continue
@@ -571,7 +573,7 @@ class Op:
 class Spec:
     def __init__(self, path, d=None):
         self.path = path.replace(os.sep, "/")
-        d = d if d is not None else json.load(open(rel(path)))
+        d = d if d is not None else json.loads(pathlib.Path(rel(path)).read_text(encoding="utf-8"))
         self.name = d.get("name", os.path.basename(path)[:-5])
         self.ops, self.other = [], 0
         for i, o in enumerate(d["ops"]):
@@ -646,7 +648,7 @@ def camera_tested():
     out = {}
     lines = []
     for p in tracked([CAMERA_LOG + "*.md"]):
-        lines += open(rel(p), encoding="utf-8").read().splitlines()
+        lines += pathlib.Path(rel(p)).read_text(encoding="utf-8").splitlines()
     for line in lines:
         c = [x.strip() for x in line.split("|")]
         if len(c) < 6 or not c[4].startswith("**OK"):
@@ -679,7 +681,7 @@ class Space:
         if other_blocks and os.path.exists(rel(STOCK_FW)):
             sys.path.insert(0, rel("tools"))
             import oetool
-            blocks, tail = oetool.parse(open(rel(STOCK_FW), "rb").read())
+            blocks, tail = oetool.parse(pathlib.Path(rel(STOCK_FW)).read_bytes())
             self.others = [("block %d" % i, Windows(x["payload"])) for i, x in enumerate(blocks) if i] + [("tail", Windows(tail))]
         self.m = Model(self.b)
         self.lin = Linear() if use_linear else None
@@ -1388,7 +1390,7 @@ def write_map(sp):
     w("| `%s` | %d | spec, superseded by, evidence |" % (SUPERSEDED, len(sp.superseded)))
     w("")
     w("The full evidence text of every check is in `%s`." % MAP_TSV)
-    open(rel(MAP_MD), "w", encoding="utf-8").write("\n".join(md) + "\n")
+    pathlib.Path(rel(MAP_MD)).write_text("\n".join(md) + "\n", encoding="utf-8")
 
     with open(rel(MAP_TSV), "w", encoding="utf-8") as fh:
         fh.write("\t".join(["start", "end", "size", "region", "source", "kind", "verdict", "failing", "allowed_use",

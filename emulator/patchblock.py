@@ -8,6 +8,7 @@ an earlier spec keeps), through the package's apply_specs. Only block 0 is writt
 checked and applied, then reported as "not emulated". Prints the changed block-0 ranges as runtime addresses.
 """
 import argparse, hashlib, os, sys
+import pathlib
 from pathlib import Path
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -21,7 +22,7 @@ BASE = 0x7E421020
 
 def patched_block0(spec_paths):
     specs = [load_spec(Path(p)) for p in spec_paths]
-    raw = open(os.path.join(ROOT, specs[0].base), "rb").read()
+    raw = pathlib.Path(os.path.join(ROOT, specs[0].base)).read_bytes()
     try:
         image = apply_specs(raw, specs).image
     except SpecError as error:
@@ -49,7 +50,7 @@ def main():
     ap.add_argument("-o", "--out", required=True)
     a = ap.parse_args()
     stock, new, other = patched_block0(a.specs)
-    open(a.out, "wb").write(new)
+    pathlib.Path(a.out).write_bytes(new)
     rs = ranges(stock, new)
     print(f"wrote {a.out}  sha256={hashlib.sha256(new).hexdigest()}")
     print(f"{sum(e - s for s, e in rs)} bytes differ in {len(rs)} runs:")

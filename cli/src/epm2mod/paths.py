@@ -325,7 +325,9 @@ class RepoPaths:
         """Return every build description, in name order."""
         from .builds import all_descriptions
 
-        return all_descriptions(self)
+        # a description that git does not hold and that cannot be read is left out, not an error: a draft in the
+        # folder must not stop the commands that only look the builds up
+        return all_descriptions(self, problems=[])
 
     def event_dictionaries(self) -> list[Path]:
         """Return the event dictionaries of the debug log: the current one, then those of older builds."""

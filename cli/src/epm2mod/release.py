@@ -129,12 +129,33 @@ def release_files(paths: RepoPaths, version: str) -> list[tuple[str, bytes]]:
 
 
 def programs(paths: RepoPaths) -> set[str]:
-    """Return the names, at the top of the release folder, of the files that are programs."""
-    return {
-        path.name
-        for path in paths.release_files
-        if path.is_file() and path.stat().st_mode & stat.S_IXUSR
-    }
+    """Return the names, at the top of the release folder, of the files that are programs.
+
+    The mode is the one that git holds (100755), so a checkout on a file system without executable bits gives the
+    same zip. A project that is not a git checkout takes it from the file.
+    """
+    import subprocess
+
+    names = set()
+    for path in paths.release_files:
+        if not path.is_file():
+            continue
+        try:
+            done = subprocess.run(
+                ["git", "ls-files", "-s", "--", paths.relative(path)],
+                cwd=paths.root, capture_output=True, text=True, check=False,
+            )  # fmt: skip
+            mode = (
+                done.stdout.split()[0] if done.returncode == 0 and done.stdout else ""
+            )
+        except OSError:
+            mode = ""
+        executable = (
+            mode == "100755" if mode else bool(path.stat().st_mode & stat.S_IXUSR)
+        )
+        if executable:
+            names.add(path.name)
+    return names
 
 
 def _package(paths: RepoPaths) -> Iterator[tuple[str, Path]]:

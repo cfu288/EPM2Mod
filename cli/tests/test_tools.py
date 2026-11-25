@@ -5,6 +5,8 @@
 
 from __future__ import annotations
 
+import contextlib
+import io
 import json
 import os
 import subprocess
@@ -396,6 +398,47 @@ class TrackedFilesTests(unittest.TestCase):
         finally:
             copy.unlink()
 
+    def test_a_draft_in_the_working_tree_does_not_change_a_check_or_stop_a_listing(self) -> None:
+        from epm2mod import cli
+
+        draft_guide = PATHS.guides / "zz-draft-for-a-test.md"
+        malformed = PATHS.builds / "zz-malformed-for-a-test.json"
+        draft_guide.write_text("# A draft\n")
+        malformed.write_text("{ not a description")
+        try:
+            self.assertEqual(readme.feature_problems(PATHS), [])  # the draft is not a guide yet
+            self.assertTrue(readme.is_current(PATHS))  # generate --check
+            out, err = io.StringIO(), io.StringIO()
+            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                self.assertEqual(cli.main(["--project", str(ROOT), "builds", "--json"]), 0)
+            listed = json.loads(out.getvalue())
+            self.assertEqual(len(listed["unreadable"]), 1)
+            self.assertIn(malformed.name, listed["unreadable"][0])
+            self.assertTrue(all(build["in_git"] for build in listed["builds"]))
+        finally:
+            draft_guide.unlink()
+            malformed.unlink()
+
+    def test_a_program_of_the_release_is_one_by_gits_mode(self) -> None:
+        from epm2mod import release
+
+        launcher = next(p for p in PATHS.release_files if p.name == "start.sh")
+        mode = launcher.stat().st_mode
+        launcher.chmod(0o644)  # a file system without executable bits
+        try:
+            self.assertIn("start.sh", release.programs(PATHS))
+        finally:
+            launcher.chmod(mode)
+        self.assertNotIn("README.txt", release.programs(PATHS))
+
+    def test_ci_does_not_pick_up_descriptions_that_git_does_not_hold(self) -> None:
+        script = (ROOT / "tools" / "ci.sh").read_text()
+        builds = next(line for line in script.splitlines() if line.startswith("builds="))
+        self.assertIn("$pinned", builds)
+        self.assertIn("$named", builds)
+        self.assertNotIn("unheld", builds)
+        self.assertIn("Not checked, because git does not hold them", script)
+
     def test_the_zip_holds_the_package_files_git_holds(self) -> None:
         from epm2mod import release
 
@@ -407,6 +450,26 @@ class TrackedFilesTests(unittest.TestCase):
             draft.unlink()
         self.assertNotIn(PATHS.relative(draft), names)
         self.assertIn(PATHS.relative(PATHS.package / "cli.py"), names)
+
+
+@support.needs(HAVE_STOCK, support.STOCK_NEEDED)
+@support.needs(OBJDUMP.exists(), support.OBJDUMP_NEEDED)
+class GeneratorCheckTests(unittest.TestCase):
+    def test_the_check_keeps_a_hand_edit_to_a_generated_spec_and_fails(self) -> None:
+        # The reviewer's mutation. Before, the generators wrote over the edit and the check passed.
+        spec = ROOT / "data" / "specs" / "lss-menu.json"
+        good = spec.read_bytes()
+        raw = json.loads(good)
+        edited = (json.dumps(raw | {"description": raw["description"] + " HAND EDIT"}, indent=1) + "\n").encode()
+        spec.write_bytes(edited)
+        try:
+            done = subprocess.run([str(ROOT / "gen" / "run.sh"), "--check"], cwd=ROOT, capture_output=True, text=True)
+            kept = spec.read_bytes()
+        finally:
+            spec.write_bytes(good)
+        self.assertEqual(done.returncode, 1, done.stderr[-400:])
+        self.assertIn("not what its generator writes (the file is left as it was): data/specs/lss-menu.json", done.stderr)
+        self.assertEqual(kept, edited)
 
 
 class WorkingFolderTests(unittest.TestCase):

@@ -36,7 +36,12 @@ from pathlib import Path
 from typing import Any, NoReturn
 
 from . import __version__, camera_steps, catalogue, readme
-from .builds import BuildDescription, check_test_date, description_path
+from .builds import (
+    BuildDescription,
+    all_descriptions,
+    check_test_date,
+    description_path,
+)
 from .cardio import Planned, output_path
 from .catalogue import Locator
 from .errors import (
@@ -447,6 +452,8 @@ COMMANDS: dict[str, Command] = {
                     if key != "build"
                 },
                 "builds[].specs": "the number of its patch specs",
+                "builds[].in_git": "false for a description that is only in the working tree",
+                "unreadable": "the descriptions that git does not hold and that cannot be read, with the reason",
             },
         ),
         Command(
@@ -943,22 +950,36 @@ def _builds(args: argparse.Namespace, ctx: Context) -> int:
     """Run ``epm2mod builds``."""
     checkout = ctx.checkout()
     pinned = checkout.pinned_build().name
-    found = checkout.all_builds()
+    problems: list[str] = []
+    found = all_descriptions(checkout, problems=problems)
+    held = checkout.tracked(checkout.builds)
+    in_git = {
+        build.name: held is None or description_path(checkout, build.name) in held
+        for build in found
+    }
     if args.json:
         _document(
             args.command_name,
             True,
             pinned=pinned,
             builds=[
-                {**(_build_json(build) or {}), "specs": len(build.specs)}
+                {
+                    **(_build_json(build) or {}),
+                    "specs": len(build.specs),
+                    "in_git": in_git[build.name],
+                }
                 for build in found
             ],
+            unreadable=problems,
         )
         return 0
     for build in found:
         state = f"tested {build.camera_tested}" if build.tested else "candidate"
         mark = " (pinned)" if build.name == pinned else ""
+        mark += "" if in_git[build.name] else " (not in git)"
         print(f"{build.name}{mark}: {build.what} [{state}, {len(build.specs)} specs]")
+    for problem in problems:
+        _hint(f"cannot be read: {problem}")
     return 0
 
 

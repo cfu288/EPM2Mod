@@ -420,6 +420,8 @@ epm2mod builds [-h] [--json]
 - `builds[].camera_tested`: the date of that test, or null
 - `builds[].label`: the label on the camera's Firmware screen, or null
 - `builds[].specs`: the number of its patch specs
+- `builds[].in_git`: false for a description that is only in the working tree
+- `unreadable`: the descriptions that git does not hold and that cannot be read, with the reason
 
 Examples:
 

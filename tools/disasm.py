@@ -10,7 +10,7 @@ Notes:
   Use --before to start earlier, and trust output only after the first clean line.
 - The runtime base (BASE) is verified by string pointers in the movie routine (see docs/reference/firmware-format.md).
 """
-import argparse, os, subprocess, sys
+import argparse, os, pathlib, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
@@ -29,9 +29,9 @@ def objdump_path():
 def block_file(fw, blk, cache_dir=None):
     cache = os.path.join(cache_dir or os.path.join(ROOT, "build", "blocks"), f"{os.path.basename(fw)}.block{blk}.bin")
     if not os.path.exists(cache) or os.path.getmtime(cache) < os.path.getmtime(fw):
-        blocks, _ = oetool.parse(open(fw, "rb").read())
+        blocks, _ = oetool.parse(pathlib.Path(fw).read_bytes())
         os.makedirs(os.path.dirname(cache), exist_ok=True)
-        open(cache, "wb").write(blocks[blk]["payload"])
+        pathlib.Path(cache).write_bytes(blocks[blk]["payload"])
     return cache
 
 

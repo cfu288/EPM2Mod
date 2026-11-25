@@ -15,7 +15,9 @@ run again: a step whose result is present is not done again.
 5. The firmware map, for the free-space check (1 minute, 470 MB).
 6. The commit hooks of the checkout.
 
-``check`` reports the same items and changes nothing. It also says if the web
+``check`` reports the same items and changes nothing. The commit hooks are
+reported and do not count as missing: they are the soft layer, and no check's
+result depends on them. It also says if the web
 apps' packages are installed, which is not a step of this command.
 """
 
@@ -42,6 +44,8 @@ _CONFIGURE = (
     "--target=mn10300-elf --disable-nls --disable-werror --disable-gdb "
     "--disable-gdbserver --disable-sim --disable-gprofng --disable-gold"
 ).split()
+#: The name of the item that ``check`` reports and does not count as missing.
+HOOKS = "the commit hooks"
 #: The environment variables that replace a pinned tool (the scripts that read them refuse them when CI is set).
 OVERRIDES = ("EPM2_BINUTILS", "OM_EMU_DIR", "OM_EMU_NODE")
 #: The file of the emulator submodule that shows it is the fork with the E-PM2's boot lab.
@@ -280,7 +284,7 @@ def init(paths: RepoPaths, check: bool, log: Log) -> list[str]:
         ),
         ("the firmware map", map_present, make_map),
         (
-            "the commit hooks",
+            HOOKS,
             hooks_present,
             lambda: _run(
                 ["git", "config", "core.hooksPath", hooks], paths.root, "git config"
@@ -293,6 +297,10 @@ def init(paths: RepoPaths, check: bool, log: Log) -> list[str]:
             log(f"{name}: present ({present()})")
             continue
         except Epm2ModError as error:
+            if check and name == HOOKS:
+                # reported, not counted: no check's result depends on the hooks
+                log(f"{name}: off (to switch them on: epm2mod init)")
+                continue
             if check:
                 log(f"{name}: MISSING ({str(error).splitlines()[0]})")
                 missing.append(name)

@@ -178,6 +178,28 @@ class PlanTests(unittest.TestCase):
             self.assertEqual(CI_PROBLEMS(self.paths, "c0ffee"), [])
         self.assertIn(["git", "diff", "--quiet", "0ldc0de", "c0ffee", "--", "web/**", "x.json"], asked)
 
+    def test_the_paths_of_a_workflow_are_read_in_both_yaml_forms(self) -> None:
+        inline = "on:\n  push:\n    branches: [main]\n    paths: ['web/**', \"x.json\", plain/**]  # watched\n  pull_request:\n"
+        block = "on:\n  push:\n    paths:\n      - 'web/**'\n      # a comment\n      - \"x.json\"\n      - plain/**\n  pull_request:\n    paths: ['other']\n"
+        for text in (inline, block):
+            self.assertEqual(releasing.watched_paths(text), ["web/**", "x.json", "plain/**"])
+        self.assertIsNone(releasing.watched_paths("on:\n  push:\n    branches: [main]\n"))
+        self.assertEqual(releasing.watched_paths("on:\n  push:\n    paths: *anchor\n"), [])  # not a list we can read
+        self.assertEqual(releasing.watched_paths("on:\n  push:\n    paths:\n  pull_request:\n"), [])
+
+    def test_a_block_list_of_paths_counts_and_an_unreadable_one_is_a_problem(self) -> None:
+        listed = mock.Mock(returncode=0, stdout='[{"conclusion": "success", "status": "completed", "headSha": "0ldc0de"}]', stderr="")
+
+        def run(command: list[str], **keywords: object) -> mock.Mock:
+            return listed if command[0] == "gh" else mock.Mock(returncode=1 if command[1] == "diff" else 0)
+
+        with mock.patch.object(releasing.shutil, "which", return_value="gh"), mock.patch.object(releasing.subprocess, "run", run):
+            (self.paths.root / "some.yml").write_text("on:\n  push:\n    paths:\n      - 'web/**'\n")
+            self.paths.manifest["workflows"] = ["some.yml"]
+            self.assertIn("files that it watches changed", CI_PROBLEMS(self.paths, "c0ffee")[0])
+            (self.paths.root / "some.yml").write_text("on:\n  push:\n    paths:\n  pull_request:\n")
+            self.assertIn("'paths' filter cannot be read", CI_PROBLEMS(self.paths, "c0ffee")[0])
+
     def test_a_failed_read_of_the_ci_runs_is_not_called_no_run(self) -> None:
         self.paths.manifest["workflows"] = [".github/workflows/python.yml"]
         failed = mock.Mock(returncode=1, stdout="", stderr="HTTP 401: Bad credentials")

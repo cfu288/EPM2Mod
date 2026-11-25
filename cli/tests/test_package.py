@@ -1312,9 +1312,7 @@ class CommandLineTests(RepoCase):
             (0, 0),
             (2, 6),
         ):  # 2: the tool could not make its report
-            script = (
-                f"import sys\nprint('WARN  stand-in', sys.argv[1])\nsys.exit({status})"
-            )
+            script = f"import sys\nsys.exit({status})"  # silent: its output would go to the test run's log
             self.repo.write("tools/buildlint.py", script.encode())
             code, text = self.run_cli("lint", "new")
             self.assertEqual(code, expected, text)
@@ -1349,6 +1347,12 @@ class CommandLineTests(RepoCase):
         neither = missing(0, "abc")
         self.assertNotIn("the firmware map", neither)
         self.assertNotIn("MN103 binutils", neither)
+        # the commit hooks are off here (no git checkout): reported, and not counted as missing
+        self.assertNotIn(init.HOOKS, both + neither)
+        said: list[str] = []
+        with mock.patch.object(init, "_pinned_commit", return_value="abc"):
+            init.init(paths, True, said.append)
+        self.assertIn(f"{init.HOOKS}: off (to switch them on: epm2mod init)", said)
         for (
             name
         ) in (

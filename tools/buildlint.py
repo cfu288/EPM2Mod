@@ -23,6 +23,7 @@ The warnings (the rule and the numbers behind them: docs/dev/load-order.md):
 Needs Olympus's firmware and the MN103 objdump (uv run epm2mod init). Not the firmware map.
 """
 import json
+import pathlib
 import os
 import sys
 
@@ -41,7 +42,7 @@ def lint(description):
     import hookcheck
     import patchblock
 
-    raw = json.load(open(description, encoding="utf-8"))
+    raw = json.loads(pathlib.Path(description, encoding="utf-8").read_text(encoding="utf-8"))
     specs = [os.path.join(ROOT, s) for s in raw["specs"]]
     early = lambda a: hookcheck.segment(a) in hookcheck.EARLY  # noqa: E731
     warnings = []

@@ -21,9 +21,14 @@ On Debian and Ubuntu it gets a missing bison or flex by itself.
 ## Check your clone
 
 ```sh
-tools/ci.sh python   # what CI runs: format, types, tests, generators, the pinned build and each build you changed
-tools/ci.sh web      # only for a change in web/
+tools/ci.sh python        # what CI runs: format, types, tests, generators, the pinned build and each build you changed
+tools/ci.sh python NAME   # the same, and the build NAME: for a new description that is not in git yet
+tools/ci.sh web           # only for a change in web/
 ```
+
+"Each build you changed" is each `data/builds/*.json` that git holds and that differs from main. A description that
+git does not hold yet is checked when you name it, or after `git add`. The script ends with a line that names the
+descriptions it did not check. It changes no file that git holds.
 
 A fresh clone passes. A check that cannot run fails and names the command that makes what it needs.
 

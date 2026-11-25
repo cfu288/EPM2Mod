@@ -140,20 +140,64 @@ def _git(paths: RepoPaths, *args: str) -> str:
     return done.stdout.strip()
 
 
+def watched_paths(text: str) -> list[str] | None:
+    """Return the first ``paths`` list of a workflow file, or None if it has none.
+
+    Both forms of a YAML list are read: ``paths: ['a/**', b]`` on one line, and
+    ``paths:`` followed by lines that start with ``- ``. An empty list means
+    that the key is there and its items could not be read.
+    """
+    lines = text.splitlines()
+    for number, line in enumerate(lines):
+        found = re.match(r"^(\s+)paths:\s*(.*)$", line)
+        if not found:
+            continue
+        rest = found.group(2).split(" #")[0].strip()
+        if rest.startswith("["):
+            items = rest.strip("[]").split(",")
+        else:
+            items = []
+            for later in lines[number + 1 :]:
+                item = re.match(r"^\s+-\s+(.*)$", later)
+                if not item:
+                    if later.strip() and not later.strip().startswith("#"):
+                        break
+                    continue
+                items.append(item.group(1).split(" #")[0])
+        return [
+            item.strip().strip("'\"") for item in items if item.strip().strip("'\"")
+        ]
+    return None
+
+
 def _watched_paths_changed(
     paths: RepoPaths, workflow: str, ran: str, commit: str
 ) -> bool:
     """Return True if a file that ``workflow`` watches (its first ``paths`` list) differs between ``ran`` and ``commit``."""
     text = next(read_text(p) for p in paths.workflows if p.name == workflow)
-    listed = re.search(r"^\s+paths:\s*\[(.*)\]", text, re.M)
-    watched = re.findall(r"'([^']+)'", listed.group(1)) if listed else []
-    if not watched or ran == commit:
+    watched = watched_paths(text)
+    if watched is None:
+        return False  # no filter
+    if not watched:
+        raise BuildError(
+            f"{workflow}: its 'paths' filter cannot be read, so it is not known if a "
+            "watched file changed after its newest run"
+        )
+    if ran == commit:
         return False
     done = subprocess.run(
         ["git", "diff", "--quiet", ran, commit, "--", *watched],
         cwd=paths.root, capture_output=True, check=False,
     )  # fmt: skip
     return done.returncode != 0
+
+
+def _safely(paths: RepoPaths, workflow: str, ran: str, commit: str) -> bool | str:
+    """Return ``_watched_paths_changed``, or the text of the problem when the filter cannot be read."""
+    try:
+        return _watched_paths_changed(paths, workflow, ran, commit)
+    except BuildError as error:
+        return str(error)
 
 
 def _ci_problems(paths: RepoPaths, commit: str) -> list[str]:
@@ -186,7 +230,7 @@ def _ci_problems(paths: RepoPaths, commit: str) -> list[str]:
             continue
         run = runs[0]
         filtered = any(
-            path.name == workflow and re.search(r"^\s+paths:", read_text(path), re.M)
+            path.name == workflow and watched_paths(read_text(path)) is not None
             for path in paths.workflows
         )
         if not filtered and run["headSha"] != commit:
@@ -203,9 +247,11 @@ def _ci_problems(paths: RepoPaths, commit: str) -> list[str]:
             problems.append(
                 f"{workflow}: the newest run is not on this commit's history"
             )
-        elif _watched_paths_changed(paths, workflow, run["headSha"], commit):
+        elif (changed := _safely(paths, workflow, run["headSha"], commit)) is not False:
             problems.append(
-                f"{workflow}: files that it watches changed after its newest run "
+                changed
+                if isinstance(changed, str)
+                else f"{workflow}: files that it watches changed after its newest run "
                 f"({run['headSha'][:7]}), and it has not run since"
             )
         elif run["status"] != "completed":

@@ -26,7 +26,7 @@ import re
 from collections.abc import Callable
 from pathlib import Path
 
-from .builds import all_descriptions, description_path, pinned_description
+from .builds import all_descriptions, pinned_description
 from .errors import BuildError
 from .fileio import read_text, write_text
 from .looks import records
@@ -81,14 +81,9 @@ def pinned_block(paths: RepoPaths, folder: Path) -> str:
 def builds_block(paths: RepoPaths, folder: Path) -> str:
     """Return the table of all tested builds, the pinned one first."""
     pinned = pinned_description(paths)
-    held = paths.tracked(
-        paths.builds
-    )  # the table is a committed document: the descriptions that git holds
+    # the table is a committed document: the descriptions that git holds
     tested = [
-        build
-        for build in all_descriptions(paths)
-        if build.tested
-        and (held is None or description_path(paths, build.name) in held)
+        build for build in all_descriptions(paths, held_only=True) if build.tested
     ]
     tested.sort(key=lambda build: (build.name != pinned.name, build.name))
     rows = [
@@ -382,7 +377,10 @@ def feature_problems(paths: RepoPaths) -> list[str]:
     Every guide in the guide folder must be linked from the README and be named
     in ``SITE_IDS``; every site id there must be in the site's feature list.
     """
-    guides = sorted(paths.guides.glob("*.md"))
+    held = paths.tracked(
+        paths.guides
+    )  # a draft that git does not hold is not a guide yet
+    guides = [g for g in sorted(paths.guides.glob("*.md")) if held is None or g in held]
     readme_text = read_text(paths.readme)
     readme_name = paths.relative(paths.readme)
     site_path = paths.site_features

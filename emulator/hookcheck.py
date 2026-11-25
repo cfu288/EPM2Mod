@@ -29,6 +29,7 @@ named in the allow list. The classes come from tools/freespace.py's load model. 
 tasks after the copies.
 """
 import argparse, json, os, re, subprocess, sys, tempfile
+import pathlib
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -93,7 +94,7 @@ def read_allow(path=None):
     ADDRESS>TARGET, separated by spaces. An entry accepts that one transfer: another target at the address FAILS."""
     allow = {}
     path = path or os.path.join(HERE, "hookcheck-allow.tsv")
-    for number, line in enumerate(open(path, encoding="utf-8"), 1):
+    for number, line in enumerate(pathlib.Path(path).read_text(encoding="utf-8").splitlines(keepends=True), 1):
         if line.strip() and not line.startswith("#"):
             words, _date, cls, reason = line.rstrip("\n").split("\t")
             if cls not in CLASSES:
@@ -112,7 +113,7 @@ def spec_list(paths):
     root, res = os.path.dirname(HERE), []
     for p in paths:
         given = p if os.path.isabs(p) or os.path.exists(p) else os.path.join(root, p)  # an argument: as the caller wrote it
-        inside = json.load(open(given)).get("specs")
+        inside = json.loads(pathlib.Path(given).read_text(encoding="utf-8")).get("specs")
         # the specs that a description names are paths of the repository, wherever the command runs
         res += [os.path.join(root, s) for s in inside] if inside else [given]
     return res
@@ -126,7 +127,7 @@ def transfers_of(spec_paths):
     cut = lambda blk, lo, hi: blk[lo - BASE:hi - BASE]
     ops = []
     for p in spec_paths:
-        for op in json.load(open(p))["ops"]:
+        for op in json.loads(pathlib.Path(p).read_text(encoding="utf-8"))["ops"]:
             lo = BASE + int(op.get("offset", "0"), 16)
             if op.get("block") == 0 and op.get("type") == "bytes" and segment(lo) in EARLY:
                 ops.append((lo, lo + len(op["new"]) // 2, os.path.basename(p)))

@@ -21,7 +21,8 @@ inside an op that changes bytes. The copy's source and destination come from too
 
 Exit status 1 on any FAIL.
 """
-import json, os, re, subprocess, sys, tempfile
+import json
+import pathlib, os, re, subprocess, sys, tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -34,7 +35,7 @@ ROOT = bootmem.ROOT
 
 def spec_list(args):
     if len(args) == 1:
-        d = json.load(open(args[0]))
+        d = json.loads(pathlib.Path(args[0]).read_text(encoding="utf-8"))
         if "specs" in d:
             return [os.path.join(ROOT, p) for p in d["specs"]]
     return args
@@ -44,7 +45,7 @@ def ops_of(paths):
     """[(spec name, block, offset, expect, new)] of the byte ops, in build order."""
     out = []
     for p in paths:
-        for op in json.load(open(p))["ops"]:
+        for op in json.loads(pathlib.Path(p).read_text(encoding="utf-8"))["ops"]:
             if op.get("type") == "bytes":
                 out.append((os.path.basename(p), op.get("block", 0), int(op["offset"], 16),
                             bytes.fromhex(op["expect"]), bytes.fromhex(op["new"])))

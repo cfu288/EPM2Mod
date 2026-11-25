@@ -215,8 +215,8 @@ Three layers. Each check is in one of them.
 
 | Layer | What | Where |
 |---|---|---|
-| Commit hooks | Fast and hard: machine paths, the document rules, prettier, black, mypy, the commit message. And one soft part: `epm2mod lint` of each staged build description, which prints warnings and never refuses | `.githooks/` |
-| Hard checks | `tools/ci.sh`: `epm2mod init --check` first (the set-up is the pinned one, and a variable that replaces a pinned tool is refused), then black, mypy, the unit tests (they hold pyflakes on the scripts, the document rules and the feature lists), the generated documents, the code-space map and the generated specs (a spec that git does not hold fails), the web checks. Then, for the pinned build and each build description that differs from the base commit, committed or not (the script prints the list): `epm2mod make` and the quick tier of `tools/checks.py` (free space with load order, op check, `boot-test`, `update-path-test`). A check that cannot run fails. No warnings | CI (`python.yml`, `web.yml`) runs this script and nothing else. Run it before a pull request |
+| Commit hooks | `epm2mod init --check` reports if they are on and does not count them as missing: no check's result depends on them. Fast and hard: machine paths, the document rules, prettier, black, mypy, the commit message. And one soft part: `epm2mod lint` of each staged build description, which prints warnings and never refuses | `.githooks/` |
+| Hard checks | `tools/ci.sh`: `epm2mod init --check` first (the set-up is the pinned one, and a variable that replaces a pinned tool is refused), then black, mypy, the unit tests (they hold pyflakes on the scripts, the document rules and the feature lists), the generated documents, the code-space map and the generated specs (a spec that git does not hold fails), the web checks. Then, for the pinned build, each build description that git holds and that differs from the base commit (committed or changed in the working tree) and each build named as an argument (`tools/ci.sh python NAME`, for a description that git does not hold yet; the script prints the list and names what it did not check): `epm2mod make` and the quick tier of `tools/checks.py` (free space with load order, op check, `boot-test`, `update-path-test`). A check that cannot run fails. No warnings | CI (`python.yml`, `web.yml`) runs this script and nothing else. Run it before a pull request |
 | Soft report | `uv run epm2mod lint NAME` (`tools/buildlint.py`): the allow-list rows of the load-order check that the build uses and that are safe by timing or inference only, the early-loaded space it uses, first code, words in new early-loaded bytes that can be late-loaded addresses, the cold start for the camera test. Exit status 0 with any number of warnings, 6 when the report cannot be made | by hand and from the commit hook. Never in CI |
 
 `tools/checks.py NAME.json --tier full` adds the scenario runs of `emulator/scenarios/` (20 minutes). Run it before a
@@ -285,6 +285,11 @@ started it:
 
 - the free-space ledger, the code-space map and the camera-tested areas come from `git ls-files`, plus the specs
   of the build that is checked (a candidate's new spec is not in git yet);
+- the generated build table, the feature guides, the camera-log files of the release plan and the release zip
+  take the files that git holds. `epm2mod builds` also lists a description that git does not hold, marked
+  "(not in git)", and names one that cannot be read;
+- no check writes to a file that git holds: `gen/run.sh --check` and the code-space map comparison keep a copy,
+  compare, and put the copy back, so a hand edit to a generated file fails the check and stays;
 - the emulator gets no option from the environment: `emuenv.tool_env` drops `E101_*`, `BOOTMS`, `WATCH`, `NO_OK` and
   the like (`emulator/emu-run`, a person's tool, keeps them);
 - `EPM2_BINUTILS`, `OM_EMU_DIR` and `OM_EMU_NODE` are refused when `CI` is set and said on stderr otherwise;

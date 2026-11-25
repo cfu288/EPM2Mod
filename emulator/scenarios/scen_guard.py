@@ -35,7 +35,8 @@ S26  The event pk_guard, for each image that has the probe (a jump at the ring h
 import os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(ROOT, "emulator"))
-_src = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scen_peaking.py")).read()
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scen_peaking.py")) as _f:
+    _src = _f.read()
 assert _src.rstrip().endswith("\nmain()")
 _sp = {"__file__": os.path.join(os.path.dirname(os.path.abspath(__file__)), "scen_peaking.py"), "__name__": "scen_peaking"}
 exec(compile(_src.rstrip()[:-len("main()")], "scen_peaking.py", "exec"), _sp)

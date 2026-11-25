@@ -303,9 +303,35 @@ def save_description(paths: RepoPaths, description: BuildDescription) -> Path:
     return path
 
 
-def all_descriptions(paths: RepoPaths) -> list[BuildDescription]:
-    """Return every description in the build folder, sorted by name."""
-    found = [load_checked(paths, path) for path in paths.builds.glob("*" + _SUFFIX)]
+def all_descriptions(
+    paths: RepoPaths, held_only: bool = False, problems: list[str] | None = None
+) -> list[BuildDescription]:
+    """Return the descriptions in the build folder, sorted by name.
+
+    Args:
+        paths: the project.
+        held_only: True for the descriptions that git holds: what a generated
+            document or a check is made from. A project that is not a git
+            checkout has no such difference, and every description counts.
+        problems: a list that gets a line for each description that git does
+            not hold and that cannot be read; without it, and for a
+            description that git holds, such a file is an error.
+
+    Raises:
+        BuildError: if a description is malformed (see ``problems``).
+    """
+    held = paths.tracked(paths.builds)
+    found = []
+    for path in sorted(paths.builds.glob("*" + _SUFFIX)):
+        is_held = held is None or path in held
+        if held_only and not is_held:
+            continue
+        try:
+            found.append(load_checked(paths, path))
+        except BuildError as error:
+            if is_held or problems is None:
+                raise
+            problems.append(f"{paths.relative(path)} (not in git): {error}")
     return sorted(found, key=lambda description: description.name)
 
 
