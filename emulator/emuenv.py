@@ -116,7 +116,14 @@ def blocks(image):
     root = os.environ.get("EMU_IMAGES") or os.path.join(REPO, "build", "emu")
     out = os.path.join(root, f"{name}-{sha256(path)[:8]}")
     if os.path.exists(os.path.join(out, "manifest.json")) and _block_sums(out) != _read(os.path.join(out, SUMS)):
-        shutil.rmtree(out)  # the unpacked blocks are not the ones that were written: unpack again
+        # the unpacked blocks are not the ones that were written: unpack again. The folder is moved away in one
+        # step, not emptied in place: two checks run at the same time, and the other one may be reading it
+        gone = f"{out}.bad{os.getpid()}"
+        try:
+            os.rename(out, gone)
+        except OSError:  # the other process moved it first
+            pass
+        shutil.rmtree(gone, ignore_errors=True)
     if not os.path.exists(os.path.join(out, "manifest.json")):
         os.makedirs(root, exist_ok=True)
         tmp = f"{out}.tmp{os.getpid()}"
@@ -137,8 +144,12 @@ SUMS = "sha256sums.txt"  # in a folder of unpacked blocks: the sha256 of each fi
 
 
 def _block_sums(folder):
-    """The sha256 of every file of an unpacked image but SUMS, one line each."""
-    return "".join(f"{sha256(os.path.join(folder, name))}  {name}\n" for name in sorted(os.listdir(folder)) if name != SUMS)
+    """The sha256 of every file of an unpacked image but SUMS, one line each; "" when the folder cannot be read
+    (another process is replacing it)."""
+    try:
+        return "".join(f"{sha256(os.path.join(folder, name))}  {name}\n" for name in sorted(os.listdir(folder)) if name != SUMS)
+    except OSError:
+        return ""
 
 
 def _read(path):
