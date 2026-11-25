@@ -160,6 +160,11 @@ class RepoPaths:
         return self.location("free_space_tool")
 
     @property
+    def lint_tool(self) -> Path:
+        """The script that prints the soft report of a build: what may be harmful and is not proven safe."""
+        return self.location("lint_tool")
+
+    @property
     def emulator_checks(self) -> tuple[Path, ...]:
         """The scripts that start a firmware image in the emulator, in order."""
         return self.locations("emulator_checks")

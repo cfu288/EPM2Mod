@@ -12,12 +12,12 @@ Labels: **V** = ran in the emulator and checked against an independent Python mo
 ## Setup
 
 ```sh
-emulator/setup.sh          # initialises emulator/om-emu at the pinned commit
+uv run epm2mod init          # initialises emulator/om-emu at the pinned commit
 ```
 
 - **om-emu** is the git submodule `emulator/om-emu`, our fork. The tools run its files as they are: nothing is copied or patched. E-PM2 support belongs in the fork, in upstream's layout; the fork's `docs/e101-boot-spec.md` says what it has.
 - **`OM_EMU_DIR`** overrides the checkout. The defaults are in `emuenv.py`.
-- **Node, the version in `.nvmrc` or newer:** `node` on PATH when it is new enough, else the newest Node that nvm has. The tools find it themselves. `tools/setup.sh` gets one. Override it with `OM_EMU_NODE`.
+- **Node, the version in `.nvmrc` or newer:** `node` on PATH when it is new enough, else the newest Node that nvm has. The tools find it themselves. `uv run epm2mod init` gets one. Override it with `OM_EMU_NODE`.
 - **Stock block 0:** `build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin`. This is the descrambled OE payload, sha256 `1b7c4bb1…71468d`; the harness checks it.
 
 The fork has a port of om-emu's lab to the E-PM2 (`MODELS.E101`, `src/fw/ports.mjs`), so its debug API (`emu/bin/debug.mjs`) runs E-PM2 functions with `OM_EMU_MODEL=E101`. No lab session runs on the E-PM2. A read of a device page om-emu does not model faults with reason 2 (**V**); `scenario.py` handles it.
@@ -33,7 +33,6 @@ The fork has a port of om-emu's lab to the E-PM2 (`MODELS.E101`, `src/fw/ports.m
 | `bootmem.py`, `scenario.py`, `osmodel.py`, `liveview.py`, `hookcheck.py` | Scenario runs; see "Scenario runs" below. |
 | `specs/rec-limit-3600.json` | Emulator test input only, not a camera patch: changes the recording-limit imm16 1740 to 3600 (2 bytes). |
 | `filmcheck.py` | The film check: `uv run python emulator/filmcheck.py data/builds/NAME.json`, after `gen/stock-films/structure.py` has written the layout of that build. As flashed, every Olympus art code selects in each colour stage (tone, look, matrix, six-axis, saturation, chroma, 12-region) what it selects on stock. With every entry loaded, each film code selects its RAM block, the identity look and a 12-region table with no record on. It also builds the blocks that the firmware packs for a job (gamma buffer, block A and the third block of a still, block B of live view) for six synthetic jobs: as flashed they are byte-equal to stock for every Olympus code, and a loaded film's blocks differ from Natural's only in the bytes of those seven stages, so a stage that nobody listed shows too. The script's docstring says what is not covered. Exit status 1 on any mismatch; about 35 s. Run it before you offer a build that changes the film structure or the loader. |
-| `setup.sh` | Initialises the submodule `emulator/om-emu` at the pinned commit; `--check` only reports. |
 | `emuenv.py` | Where om-emu, Node and the unpacked images are; used by every Python tool here. |
 | `boot-test`, `update-path-test`, `bootcheck.py`, `emu-run`, `mkstate`, `e101/`, `boot/` | The full boot: see [boot/README.md](boot/README.md). |
 

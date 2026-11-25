@@ -12,10 +12,10 @@ our scripts.
 ## Set up
 
 ```sh
-emulator/setup.sh          # initialises emulator/om-emu at the pinned commit
+uv run epm2mod init          # initialises emulator/om-emu at the pinned commit
 ```
 
-Node 26 or newer (`tools/setup.sh`; override: `OM_EMU_NODE`). No firmware is in the repository: an
+Node 26 or newer (`uv run epm2mod init`; override: `OM_EMU_NODE`). No firmware is in the repository: an
 IMAGE argument is `stock`, `data/builds/NAME.json` (its file `build/NAME.BIN`) or a `.BIN` file.
 
 ## The two checks

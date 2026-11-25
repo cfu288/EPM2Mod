@@ -37,7 +37,13 @@ import patchblock  # noqa: E402
 
 BASE = 0x7E421020
 EARLY = ("pre-reset", "kernel", "data-image", "sram-image", "segment-1")
-OBJDUMP = os.environ.get("OM_OBJDUMP") or os.path.join(os.path.dirname(HERE), "build", "toolchain", "bin", "mn10300-elf-objdump")
+sys.path.insert(0, os.path.join(os.path.dirname(HERE), "tools"))
+import toolchain  # noqa: E402
+
+try:
+    OBJDUMP = toolchain.binutils("objdump")  # EPM2_BINUTILS, else build/toolchain/bin, else PATH
+except toolchain.ToolchainError:  # not built: the path that `epm2mod init` makes, so that a caller can test for it
+    OBJDUMP = os.path.join(os.path.dirname(HERE), "build", "toolchain", "bin", "mn10300-elf-objdump")
 XFER = re.compile(r"^\s*([0-9a-f]+):\s+(?:[0-9a-f]{2} )+\s*\t(jmp|calls?|b[a-z]{1,2}|l[a-z]{2})\t(?:0x)?([0-9a-f]{8})\b")
 
 
@@ -69,14 +75,30 @@ def transfers(addr, code):
     return res
 
 
+CLASSES = ("proof", "inferred", "timing")
+
+
+class Allowed(str):
+    """Why a transfer is accepted (the text that check() prints), with the row of the allow list: its first column
+    (row), its class (cls: proof, inferred, timing; "" for --allow) and its reason."""
+
+    def __new__(cls, text, row="", klass="", reason=""):
+        self = super().__new__(cls, text)
+        self.row, self.cls, self.reason = row, klass, reason
+        return self
+
+
 def read_allow():
-    """{address: reason} of emulator/hookcheck-allow.tsv. Its first column is an address or a range LO-HI (inclusive)."""
+    """{address: Allowed} of emulator/hookcheck-allow.tsv. Its first column is an address or a range LO-HI (inclusive)."""
     allow = {}
     for line in open(os.path.join(HERE, "hookcheck-allow.tsv"), encoding="utf-8"):
         if line.strip() and not line.startswith("#"):
-            lo, _, hi = line.split("\t")[0].partition("-")
+            row, _date, cls, reason = line.rstrip("\n").split("\t")
+            if cls not in CLASSES:
+                sys.exit("hookcheck-allow.tsv: row %s: the class is %r, not one of %s" % (row, cls, ", ".join(CLASSES)))
+            lo, _, hi = row.partition("-")
             for a in range(int(lo, 16), int(hi or lo, 16) + 1):
-                allow[a] = "see emulator/hookcheck-allow.tsv"
+                allow[a] = Allowed("%s, see emulator/hookcheck-allow.tsv" % cls, row, cls, reason)
     return allow
 
 
@@ -88,8 +110,9 @@ def spec_list(paths):
     return res
 
 
-def check(spec_paths, allow=None, out=print):
-    """List the transfers that leave the build's patched early-loaded code. True when none FAILS."""
+def check(spec_paths, allow=None, out=print, used=None):
+    """List the transfers that leave the build's patched early-loaded code. True when none FAILS.
+    used: a list that gets the allow-list entry (an Allowed, or the text of --allow) of each accepted transfer."""
     allow = allow or {}
     spec_paths = spec_list(spec_paths)
     stock, image, _ = patchblock.patched_block0(spec_paths)
@@ -127,6 +150,8 @@ def check(spec_paths, allow=None, out=print):
         bad = t not in EARLY
         why = allow.get(ia)
         fails += bad and not why
+        if bad and why and used is not None:
+            used.append(why)
         out("%-5s 0x%08X (%s) %s -> 0x%08X (%s)%s  [%s]" % (
             ("ALLOWED" if why else "FAIL") if bad else "ok", ia, s, mn, tgt, t, "  allowed: " + why if bad and why else "", name))
     out("S0 boot-order check: %d transfers, %d FAIL, %d allowed%s" % (

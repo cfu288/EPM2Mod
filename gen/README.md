@@ -18,7 +18,12 @@ generator makes. A generator makes only the current version of its specs; a vers
 | `spot-core/` | `data/specs/spot-core-2.json` | Spot metering at the AF target, exposure part: `spot.s` (MN103) assembled into the exp debug printers after `lss-core`, and the hook on the zone builder's spot-window call. Version 2 also follows the special AF frame (a touch on the screen); version 1 (`spot-core.json`) is a committed spec file that the camera-tested build spot-af names. `experiments/2026-11-24-af-spot-metering/NOTES.md` |
 | `spot-menu/` | `data/specs/custom-menu-rows-4.json`, `data/specs/spot-menu.json` | The Custom Menu table with the row Spot Metering in E (custom-menu-rows-3 with one row more; that version stays as a committed spec file), and the page Spot Metering with its three On/Off rows. `experiments/2026-11-24-af-spot-metering/NOTES.md` |
 
-Run them all: `gen/run.sh`. It needs the MN103 binutils (`tools/setup.sh --binutils`) and Olympus's firmware
+Run them all: `gen/run.sh`. It needs the MN103 binutils (`uv run epm2mod init`) and Olympus's firmware
 (`uv run epm2mod fetch-stock`).
 
 `data/specs/peaking-gain-2x.json` is one byte written by hand. Every other spec that no folder here writes was made by an experiment script; its notes in `experiments/` are the record.
+
+Two generators (`interval/mkspec_v2.py`, `level-gauge/mkspec_step_b.py`) also compare their work with the E-PL6
+firmware when that file is on the computer, and print "no E-PL6 firmware" and go on when it is not. The file is not
+in the repository and no command fetches it: only the owner runs that comparison. `gen/run.sh --check` does not need
+it.

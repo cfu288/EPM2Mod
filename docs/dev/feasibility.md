@@ -181,7 +181,7 @@ Check every build that adds a hook with the boot test of the emulator before a f
 om-emu boots the E-PM2 firmware, stock or patched, from its reset vector on both cores. om-emu is
 the git submodule `emulator/om-emu`: our fork ([github.com/cfu288/om-emu](https://github.com/cfu288/om-emu),
 branch `e101`, MIT licence) of upstream om-emu, with the E-PM2's boot lab added in upstream's layout
-(`emu/src/boot/`, `emu/bin/boot.mjs`). Set up once with `emulator/setup.sh`. How it works, the
+(`emu/src/boot/`, `emu/bin/boot.mjs`). Set up once with `uv run epm2mod init`. How it works, the
 stand-ins and the limits are in
 [emulator/om-emu/docs/e101-boot-spec.md](../../emulator/om-emu/docs/e101-boot-spec.md); our checks
 and scripts in [emulator/boot/README.md](../../emulator/boot/README.md). Upstream lists this camera

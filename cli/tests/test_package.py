@@ -1296,6 +1296,15 @@ class CommandLineTests(RepoCase):
         self.assertIn("install --card DIR --build new --allow-untested", text)
         self.assertEqual(out.read_bytes(), self.repo.image)
 
+    def test_lint_warns_and_never_fails(self) -> None:
+        for status in (0, 1):  # the tool's own exit status does not reach the caller
+            script = (
+                f"import sys\nprint('WARN  stand-in', sys.argv[1])\nsys.exit({status})"
+            )
+            self.repo.write("tools/buildlint.py", script.encode())
+            self.assertEqual(self.run_cli("lint", "new")[0], 0)
+        self.assertEqual(self.run_cli("lint", "none")[0], 3)
+
     def test_a_build_is_named_not_given_as_a_path(self) -> None:
         for argv in (
             ("make", "data/builds/new.json"),

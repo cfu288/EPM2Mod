@@ -169,8 +169,7 @@ def check_free_space(paths: RepoPaths, description: BuildDescription) -> str:
         if not paths.firmware_map.exists():
             hint = (
                 f"\nThe firmware map ({paths.relative(paths.firmware_map)}) is "
-                "missing. A new build needs it: see "
-                f"{paths.relative(paths.free_space_tool)}."
+                "missing. A new build needs it: run 'epm2mod init'."
             )
         # The failures can be anywhere in a long report: show them, then the summary.
         lines = output.splitlines()
@@ -206,7 +205,7 @@ def check_in_emulator(paths: RepoPaths, image: Path) -> list[str]:
     for tool in paths.emulator_checks:
         not_run = UnavailableError(
             f"{tool.name} cannot run: the emulator is not set up "
-            f"(see {paths.relative(tool.parent)}). The build was not made."
+            "(run 'epm2mod init'). The build was not made."
         )
         if not tool.exists():
             raise not_run

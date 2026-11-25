@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import contextlib
+import dataclasses
 import io
 import sys
 import tempfile
@@ -62,26 +63,37 @@ class PlanTests(unittest.TestCase):
         (self.paths.camera_log / "2026-11-20-probe.md").write_text("sha256 " + "ab" * 32 + "\n")
         answers = {
             "status": "", "fetch": "", "rev-parse": "c0ffee", "describe": "v2026.11.20-rc.5",
-            "tag": "v2026.11.20-rc.5 v2026.11.20-probe.1", "log": "feat: a probe\nchore: x",
+            "tag": "v2026.11.20-rc.5 v2026.11.20-probe.9 v2026.11.25-probe.1", "log": "feat: a probe\nchore: x",
         }  # fmt: skip
         for fake in (
-            mock.patch.object(releasing, "_git", lambda paths, *args, given=None: answers[args[0]]),
+            mock.patch.object(releasing, "_git", lambda paths, *args: answers[args[0]]),
             mock.patch.object(releasing, "_ci_problems", return_value=[]),
+            mock.patch.object(releasing, "stamp", self.stamp),
+            mock.patch.object(releasing, "check_free_space", lambda paths, build: self.checked.append(build.label)),
+            mock.patch.object(releasing, "check_in_emulator", lambda paths, image: self.checked.append(image.name)),
             mock.patch.object(readme, "is_current", return_value=True),
             mock.patch.object(readme, "feature_problems", return_value=[]),
         ):
             fake.start()
             self.addCleanup(fake.stop)
 
+    def stamp(self, paths: RepoPaths, build: builds.BuildDescription, day: str) -> tuple[builds.BuildDescription, bytes]:
+        """Stand in for ``release.stamp``: the build with the label ``day`` and another sha256."""
+        return dataclasses.replace(build, label=day, sha256="cd" * 32), b"image"
+
     def test_a_named_build_is_a_test_release_with_its_notes(self) -> None:
+        self.checked: list[str] = []
         self.assertFalse(self.paths.pinned.exists())  # the pinned build is not needed
-        release, problems = releasing.plan(self.paths, final=False, build="probe")
+        release, problems = releasing.plan(self.paths, final=False, build="probe", day="2026.11.25")
         self.assertEqual(problems, [])
         assert release is not None
-        self.assertEqual((release.tag, release.commit), ("v2026.11.20-probe.2", "c0ffee"))
-        self.assertIn("Firmware: The probe build.", release.notes)
+        self.assertEqual((release.tag, release.commit), ("v2026.11.25-probe.2", "c0ffee"))
+        # the release holds the build with the day of the release as its label, checked as a candidate is
+        self.assertIn("Firmware: EPM2Mod 2026.11.25, sha256 `" + "cd" * 32 + "`.", release.notes)
+        self.assertIn("Camera-tested as sha256 `" + "ab" * 32 + "` (label 2026.11.20)", release.notes)
+        self.assertEqual(self.checked, ["2026.11.25", "probe.BIN"])
+        self.assertIn("\nThe probe build.\n", release.notes)
         self.assertIn("- feat: a probe\n", release.notes)
-        self.assertIn("Firmware sha256 `" + "ab" * 32 + "`.", release.notes)
 
     def test_an_untested_build_is_not_released(self) -> None:
         self.assertEqual(
@@ -90,7 +102,7 @@ class PlanTests(unittest.TestCase):
         )
 
     def test_a_named_build_is_never_a_final_release(self) -> None:
-        argv = ["--project", str(self.paths.root), "release", "--build", "probe", "--final", "--dry-run"]
+        argv = ["--project", str(self.paths.root), "release", "--build", "probe", "--final"]
         err = io.StringIO()
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
             self.assertEqual(cli.main(argv), 2)
@@ -99,14 +111,26 @@ class PlanTests(unittest.TestCase):
 
 class ReleaseNotesTests(unittest.TestCase):
     def test_the_notes_name_the_version_build_changes_and_sha(self) -> None:
-        notes = release_notes("2026.11.19-rc.2", "Film looks", "ab" * 32, "v2026.11.19-rc.1", ["feat: x"])
-        self.assertTrue(notes.startswith("EPM2Mod 2026.11.19-rc.2\n"))
-        self.assertIn("Firmware: Film looks.", notes)
-        self.assertIn("Changes since v2026.11.19-rc.1:\n\n- feat: x\n", notes)
-        self.assertIn("Firmware sha256 `" + "ab" * 32 + "`.", notes)
+        notes = release_notes("2026.11.25-rc.2", "2026.11.20", "Film looks", "ab" * 32, "v2026.11.25-rc.1", ["feat: x"])
+        self.assertTrue(notes.startswith("EPM2Mod 2026.11.25-rc.2\n"))
+        self.assertIn("Firmware: EPM2Mod 2026.11.20, sha256 `" + "ab" * 32 + "`.\n", notes)
+        self.assertIn("\nFilm looks.\n", notes)
+        self.assertIn("Changes since v2026.11.25-rc.1:\n\n- feat: x\n", notes)
+
+    def test_the_notes_say_when_the_firmware_is_the_same_as_before(self) -> None:
+        notes = release_notes("2026.11.26-rc.1", "2026.11.20", "Looks", "ab" * 32, "v2026.11.25-rc.1", [], unchanged=True)
+        self.assertIn("`. The camera-tested firmware is unchanged since v2026.11.25-rc.1.\n", notes)
+
+    def test_the_notes_of_a_stamped_build_give_both_sha256(self) -> None:
+        notes = release_notes("2026.11.26-rc.1", "2026.11.26", "Looks", "cd" * 32, None, [], tested=("ab" * 32, "2026.11.20"))
+        self.assertIn(
+            "Firmware: EPM2Mod 2026.11.26, sha256 `" + "cd" * 32 + "`. Camera-tested as sha256 `" + "ab" * 32
+            + "` (label 2026.11.20); differs only in the Firmware-screen date.\n",
+            notes,
+        )
 
     def test_no_changes_no_change_list(self) -> None:
-        self.assertNotIn("Changes", release_notes("2026.11.19", "Looks", "ab" * 32, None, []))
+        self.assertNotIn("Changes", release_notes("2026.11.19", "2026.11.19", "Looks", "ab" * 32, None, []))
 
 
 class FeatureListTests(unittest.TestCase):

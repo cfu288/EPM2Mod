@@ -19,7 +19,7 @@ from epm2mod.paths import MANIFEST  # noqa: E402
 
 STOCK_NEEDED = "needs Olympus's firmware (uv run epm2mod fetch-stock)"
 APP_NEEDED = "needs the built app page (cd web && npm ci && npm run build:app)"
-OBJDUMP_NEEDED = "needs the MN103 objdump (tools/setup.sh --binutils)"
+OBJDUMP_NEEDED = "needs the MN103 objdump (uv run epm2mod init)"
 
 
 def needs(present: object, what: str) -> Callable[[type], type]:

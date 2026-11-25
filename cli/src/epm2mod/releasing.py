@@ -1,30 +1,42 @@
-"""Start a release (``epm2mod release``): check, name and tag the pinned build.
+"""Plan a release (``epm2mod release``): check and name the next release of the pinned build.
 
-The tag is the release. The release workflow sees it, makes the
-zip with ``epm2mod package``, tests it on three systems and publishes it with
-the tag's message as the release notes. This module only decides whether the
-repository is ready, which version comes next, and what the notes say.
+The release workflow on GitHub (started by hand, ``workflow_dispatch``) runs
+this, makes the zip with ``epm2mod package``, tests it on three systems, and
+then creates the tag and the GitHub release in one step. No person pushes a
+tag. This module only decides whether the repository is ready, which version
+comes next, and what the notes say.
 
-The version is the pinned build's label, the date its Firmware screen shows:
-``2026.11.19`` for a final release, ``2026.11.19-rc.N`` for a test release, N
-one more than the highest existing for that date. A test release of another
-camera-tested build (``--build NAME``) is ``LABEL-NAME.N``, with that build's label.
+The version is a calendar version: the day of the release in UTC, and a
+number. ``2026.11.25-rc.N`` is a test release, N one more than the highest
+existing tag of that day (1 for the first); ``2026.11.25`` is a final release.
+A test release of another camera-tested build (``--build NAME``) is
+``2026.11.25-NAME.N``.
+
+The camera's Firmware screen shows the same date: the release holds the
+camera-tested build with its label set to the day of the release
+(``release.stamp``). That image differs from the tested one only in the date's
+bytes; ``plan`` runs the free-space check, with the load-order check, and the
+two start-up checks on it, and the notes give both sha256.
 """
 
 from __future__ import annotations
 
+import datetime
 import json
 import re
 import shutil
 import subprocess
+import tempfile
 from dataclasses import dataclass
+from pathlib import Path
 
 from . import readme
 from .builds import pinned_description
-from .errors import BuildError
-from .fileio import read_text
+from .errors import BuildError, Epm2ModError
+from .fileio import read_text, write_bytes
 from .paths import RepoPaths
-from .release import check_version
+from .pipeline import check_free_space, check_in_emulator
+from .release import check_version, stamp
 
 #: The tags of the pinned build's releases (final, second of a day, rc), as git globs. A test release of a named
 #: build (``vLABEL-NAME.N``) matches none, so the next release's changes are counted from the last of these.
@@ -32,12 +44,12 @@ RELEASE_TAGS = ("v????.??.??", "v????.??.??.*", "v????.??.??-rc.*")
 
 
 def next_version(
-    label: str, tags: list[str], final: bool, build: str | None = None
+    day: str, tags: list[str], final: bool, build: str | None = None
 ) -> str:
-    """Return the next calendar version for a build labelled ``label``.
+    """Return the next calendar version for a release made on ``day``.
 
     Args:
-        label: the build's label, like ``2026.11.19``.
+        day: the day of the release in UTC, like ``2026.11.19``.
         tags: the existing tag names, like ``v2026.11.19-rc.1``.
         final: True for a release for everyone, False for a test release.
         build: the name of the build of a test release that is not the pinned build.
@@ -45,7 +57,6 @@ def next_version(
     Raises:
         BuildError: if the final release of that date is already tagged.
     """
-    day = label
     if final:
         if f"v{day}" in tags:
             raise BuildError(f"v{day} is already tagged")
@@ -60,32 +71,58 @@ def next_version(
 
 
 def release_notes(
-    version: str, what: str, sha256: str, previous: str | None, changes: list[str]
+    version: str,
+    label: str,
+    what: str,
+    sha256: str,
+    previous: str | None,
+    changes: list[str],
+    unchanged: bool = False,
+    tested: tuple[str, str] | None = None,
 ) -> str:
     """Return the release notes: what is in the build and what changed.
 
     Args:
         version: the calendar version.
+        label: the build's label, which the camera's Firmware screen shows.
         what: the build's description.
         sha256: the firmware file's SHA-256.
         previous: the tag of the release before, if any.
         changes: the subjects of the feat and fix commits since ``previous``.
+        unchanged: True if the release ``previous`` holds the same camera-tested firmware.
+        tested: the sha256 and the label of the camera-tested build, if the release holds it with another label.
     """
-    lines = [f"EPM2Mod {version}", "", f"Firmware: {what}.", ""]
+    firmware = f"Firmware: EPM2Mod {label}, sha256 `{sha256}`."
+    if tested is not None:
+        firmware += (
+            f" Camera-tested as sha256 `{tested[0]}` (label {tested[1]}); "
+            "differs only in the Firmware-screen date."
+        )
+    if unchanged and previous:
+        firmware += f" The camera-tested firmware is unchanged since {previous}."
+    lines = [f"EPM2Mod {version}", "", firmware, "", f"{what}.", ""]
     if changes:
         lines += [f"Changes since {previous}:" if previous else "Changes:", ""]
         lines += [f"- {change}" for change in changes]
         lines.append("")
-    lines.append(f"Firmware sha256 `{sha256}`.")
-    return "\n".join(lines) + "\n"
+    return "\n".join(lines)
 
 
-def _git(paths: RepoPaths, *args: str, given: str | None = None) -> str:
-    """Run git in the repository, with ``given`` on its standard input, and return its output, stripped."""
+def _pinned_sha256_at(paths: RepoPaths, tag: str) -> str | None:
+    """Return the sha256 of the build that was pinned at ``tag``, or None if it cannot be read."""
+    try:
+        pinned = paths.relative(paths.pinned)
+        build = json.loads(_git(paths, "show", f"{tag}:{pinned}"))["build"]
+        return str(json.loads(_git(paths, "show", f"{tag}:{build}"))["sha256"])
+    except (BuildError, ValueError, KeyError, TypeError):
+        return None
+
+
+def _git(paths: RepoPaths, *args: str) -> str:
+    """Run git in the repository and return its output, stripped."""
     done = subprocess.run(
         ["git", *args],
         cwd=paths.root,
-        input=given,
         capture_output=True,
         text=True,
         check=False,
@@ -139,26 +176,31 @@ def _ci_problems(paths: RepoPaths, commit: str) -> list[str]:
 
 @dataclass(frozen=True)
 class Plan:
-    """A release that is ready to tag.
+    """A release that is ready to make.
 
     Attributes:
         tag: the tag name, like ``v2026.11.19-rc.1``.
         commit: the commit to tag.
-        notes: the tag message, which the workflow publishes as the notes.
+        notes: the release notes.
+        sha256: the sha256 of the firmware that the release installs.
     """
 
     tag: str
     commit: str
     notes: str
+    sha256: str
 
 
 def plan(
-    paths: RepoPaths, final: bool, build: str | None = None
+    paths: RepoPaths, final: bool, build: str | None = None, day: str | None = None
 ) -> tuple[Plan | None, list[str]]:
     """Check the repository and return the release to make, or the problems.
 
     ``build`` names the build of a test release in place of the pinned build.
+    ``day`` is the day of the release (default: today in UTC), like ``2026.11.25``.
     """
+    if day is None:
+        day = datetime.datetime.now(datetime.timezone.utc).strftime("%Y.%m.%d")
     problems: list[str] = []
     chosen = pinned_description(paths) if build is None else paths.build(build)
     which = "the pinned build" if build is None else "the build"
@@ -185,11 +227,23 @@ def plan(
     problems += _ci_problems(paths, commit)
     tags = _git(paths, "tag", "--list", "v*").split()
     try:
-        version = next_version(chosen.label, tags, final, build)
+        version = next_version(day, tags, final, build)
         check_version(version)
     except BuildError as error:
         return None, problems + [str(error)]
-    if problems:
+    released, tested = chosen, None
+    if not problems and chosen.label != day:
+        try:
+            released, image = stamp(paths, chosen, day)
+            check_free_space(paths, released)
+            with tempfile.TemporaryDirectory() as folder:
+                path = Path(folder) / f"{released.name}.BIN"
+                write_bytes(path, image, BuildError)
+                check_in_emulator(paths, path)
+            tested = (chosen.sha256, chosen.label)
+        except Epm2ModError as error:
+            problems.append(f"the build with the label {day}: {error}")
+    if problems or released.sha256 is None or released.label is None:
         return None, problems
     try:
         matches = [arg for pattern in RELEASE_TAGS for arg in ("--match", pattern)]
@@ -201,14 +255,17 @@ def plan(
     since = f"{previous}..HEAD" if previous else "HEAD"
     subjects = _git(paths, "log", "--format=%s", since).splitlines()
     changes = [s for s in subjects if re.match(r"(feat|fix)\b", s)]
-    notes = release_notes(version, chosen.what, chosen.sha256, previous, changes)
-    return Plan(f"v{version}", commit, notes), []
-
-
-def tag(paths: RepoPaths, release: Plan, push: bool) -> None:
-    """Create the annotated tag of ``release``; push it if ``push``."""
-    _git(
-        paths, "tag", "-a", release.tag, "-F", "-", release.commit, given=release.notes
+    unchanged = previous is not None and (
+        _pinned_sha256_at(paths, previous) == chosen.sha256
     )
-    if push:
-        _git(paths, "push", "origin", release.tag)
+    notes = release_notes(
+        version,
+        released.label,
+        released.what,
+        released.sha256,
+        previous,
+        changes,
+        unchanged,
+        tested,
+    )
+    return Plan(f"v{version}", commit, notes, released.sha256), []

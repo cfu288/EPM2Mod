@@ -1,6 +1,6 @@
 """Where the MN103 binutils are. Standard library only.
 
-`tools/setup.sh` builds them from the submodule third_party/binutils-gdb into build/toolchain/.
+`uv run epm2mod init` builds them from the submodule third_party/binutils-gdb into build/toolchain/.
 Nothing is looked for in fixed places of a home folder. (Node for the emulator: emulator/emuenv.py.)
 
     EPM2_BINUTILS   folder with mn10300-elf-objdump, -as and -ld. Default: build/toolchain/bin, else PATH.
@@ -11,7 +11,7 @@ import shutil
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PREFIX = "mn10300-elf-"
-SETUP_HINT = "run tools/setup.sh"
+SETUP_HINT = "run uv run epm2mod init"
 
 
 class ToolchainError(Exception):
