@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# tools/ci.sh [python|web]: the hard checks. CI runs this script and nothing else; run it before a pull request.
+# tools/ci.sh [python|web]: the hard checks, the same in CI and locally; run it before a pull request.
 #
 #   tools/ci.sh           # both parts
 #   tools/ci.sh web       # the web apps: format, lint, types, unit tests, both builds, browser tests
@@ -31,6 +31,7 @@ named="$*"
 for name in $named; do
   [ -f "data/builds/$name.json" ] || { echo "tools/ci.sh: no build description data/builds/$name.json" >&2; exit 2; }
 done
+export UV_LOCKED=1  # an out-of-date uv.lock is an error here, as in CI
 export CI=1  # the unit tests then fail where they would skip (cli/tests/support.py, needs); overrides are refused
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
@@ -75,6 +76,9 @@ step "unit tests (they also run pyflakes on the scripts, the document rules and 
 uv run python -W error::ResourceWarning -m unittest discover -s cli/tests 2>&1 | tee "$tmp/tests.log"
 if grep -q "ResourceWarning" "$tmp/tests.log"; then
   echo "tools/ci.sh: the unit tests left a file open (ResourceWarning above)" >&2; exit 1
+fi
+if grep -q "skipped=" "$tmp/tests.log"; then
+  echo "tools/ci.sh: a unit test was skipped" >&2; exit 1
 fi
 
 step "generated documents, the code-space map and generated specs"

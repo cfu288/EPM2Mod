@@ -18,7 +18,7 @@
     "build": "npm run build -w @epm2mod/site -w @epm2mod/local",
     "build:site": "npm run build -w @epm2mod/site",
     "build:app": "npm run build -w @epm2mod/local",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc -b packages/ui apps/site apps/local",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

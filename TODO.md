@@ -3,6 +3,18 @@
 Open work, most recent first. When an item is done, move its result to the camera log or the README
 and delete the item here.
 
+## Engineering checks
+
+From the ninth review of the clean-up (2026-11-25). First decide if the check is worth having.
+
+- `machine-paths` depends on the locale and misses some added lines.
+- CI does not check a build when only one of its specs changes. The test of the build selection matches text only.
+- The pre-commit hook reads the working tree, not the staged content, for documents and web files.
+- The pull request title check does not run when the title is edited.
+- `epm2mod init` accepts an edited binutils source as the pinned one.
+- Untracked files under `cli/`, `tools/`, `emulator/` and `gen/` take part in local checks.
+- The notarization step has no time limit (it hung for 6 hours on 2026-11-25).
+
 ## Film simulations
 
 - RAW Data Edit keeps the source RAW's ImageDescription, so a RAW re-developed with another film carries the old name

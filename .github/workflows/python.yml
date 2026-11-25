@@ -14,7 +14,7 @@ permissions:
 
 concurrency:
   group: python-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }} # on main each push has its own base to check
 
 jobs:
   check:
