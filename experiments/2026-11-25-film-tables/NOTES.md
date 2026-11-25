@@ -59,9 +59,8 @@ when this build is pinned.
 
 ## 3. Build `film-tables-fix` and checks
 
-`data/builds/film-tables-fix.json`: cold-start-fix with `stock-films-structure-4` in place of `-3`, label 2026.11.25 (the
-same label as cold-start-fix: the Firmware screen does not tell the two apart). sha256
-`43a4f4401472429075c935ab923e5420bbabeabdcd6e8bcba680b625fe7e4e86`.
+`data/builds/film-tables-fix.json`: cold-start-fix with `stock-films-structure-4` in place of `-3`, label 2026.11.26. sha256
+`e029facb38569880c0cec4c16b0f295ca2a96214ed75900fe00585f6b0cedd28`.
 
 | Check | Result |
 |---|---|
@@ -85,7 +84,7 @@ Mac, card at `/Volumes/Untitled`. The look pack on the card, the old log off it,
 ```sh
 scp USER@HOST:/path/to/epm2-tools/build/default-looks/EPM2LOOK.BIN /Volumes/Untitled/EPM2LOOK.BIN
 rm -f /Volumes/Untitled/EPM2LOG.BIN
-epm2flash film-tables-fix 43a4f4401472429075c935ab923e5420bbabeabdcd6e8bcba680b625fe7e4e86
+epm2flash film-tables-fix e029facb38569880c0cec4c16b0f295ca2a96214ed75900fe00585f6b0cedd28
 ```
 
 Go back: `epm2flash cold-start-fix eab0c64ea47d100c73a8b7889ab9ff1b83a91088dfc413073c1adb8268ba83d0`
@@ -94,7 +93,7 @@ This pack puts Double-X on Grainy Film (ART5), Provia on Gentle Sepia (ART9), Po
 Gold 200 on Key Line (ART11) and Vis 500T on Watercolor (ART12).
 
 1. **The build.** Update as in [flashing](../../docs/user/flashing.md). MENU → SETUP → wrench tab → Firmware.
-   Expected: `Body : 1.6  EPM2Mod 2026.11.25` (cold-start-fix reads the same).
+   Expected: `Body : 1.6  EPM2Mod 2026.11.26`.
 2. **Debug Log on.** MENU → SETUP → Custom Menu → J → Debug Log → On → OK.
 3. **Load the pack.** MENU → SETUP → Custom Menu → J → Load Looks → Load → OK. Expected: Loading, then Loaded.
 4. **P mode, five entries.** Mode dial P. Press OK, select Picture Mode, scroll right past Custom. Select Double-X,
