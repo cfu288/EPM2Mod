@@ -230,6 +230,13 @@ ends without a verdict. The references:
   camera-tested peaking build without the guard. It is judged too: it must show the fault in S19 to S24 and none in
   S25, or the check fails, because a scenario whose reference shows no fault proves nothing.
 
+Open, 2026-11-25: on the pinned build `cold-start-fix` the full tier ends 6 PASS, 1 FAIL. The FAIL is S1 (frames
+with the peaking request clear, against stock) in ART Key Line; Natural is the same as stock. What differs in Key
+Line: stock instructions of pass 9 (0x7E7266D9) that the adjacent hooks of `peaking-direct-4` and `log-menu-3` (PK9,
+TICK) replace, the Debug Log's new code at 0x7ECAD443, the device accesses, and one RAM word (0x602A4954). V
+emulator. Whether the device accesses and the RAM word are only the log's probes is U: until someone reads them,
+the result stays a FAIL and is not written off as expected.
+
 `tools/checks.py` keeps no results and makes the build again in memory first: it stops when `build/NAME.BIN` is not
 what the description and its specs make now. No build is exempt from a check. When a newer check refuses a
 camera-tested build that a pull request must touch, the pull request says so and the owner decides.
