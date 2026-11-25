@@ -230,24 +230,29 @@ ends without a verdict. The references:
   camera-tested peaking build without the guard. It is judged too: it must show the fault in S19 to S24 and none in
   S25, or the check fails, because a scenario whose reference shows no fault proves nothing.
 
-Open, 2026-11-25: on the pinned build `cold-start-fix` the full tier ends 6 PASS, 1 FAIL. The FAIL is S1 (frames
-with the peaking request clear, against stock) in ART Key Line; Natural is the same as stock. What the emulator
-shows for Key Line, three frames, all V emulator:
+S1 (frames with the peaking request clear, against stock) compares what must not change: every device access, the
+RAM that the stock firmware defines, the stock instructions that run, the mov state. What the mod does on purpose
+is stated in `emulator/scenarios/scen_peaking.py` and checked exactly; any other difference fails. The stated
+differences, found on `cold-start-fix` in ART Key Line on 2026-11-25, all V emulator:
 
 - **The output is the same.** Every write to a device register is the same, in the same order, with the same value
-  (2,542 writes in frame 1, 2,305 in frame 2). Each frame gives a picture, and the mov state is equal.
-- **Device reads:** the build makes two or three more per frame, all of the word 0x98900074, from the mod's code in
-  the kernel range (0x7E4C90EA, 0x7E4C9598, 0x7E4C97C2). Stock does not read that word in these frames. That it is
-  the timer the Debug Log stamps its records with is I.
-- **Instructions:** the stock instructions that the hooks of `peaking-direct-4` and `log-menu-3` (PK9, TICK) replace
-  in pass 9, and the mod's new code.
-- **One word of stock state differs:** 0x602A4954. The stock instruction 0x7E6CDA36 writes it, in the function
-  that `peaking-direct-4` hooks at 0x7E6CD9CF and 0x7E6CDAC6. In frame 1 both write 0x7D0EFBD4. In frame 2 stock
-  writes 0 and the build writes 0x605B1CF0. What reads the word, and which spec first made it differ, is U.
+  (2,542 writes in frame 1, 2,305 in frame 2).
+- **Reads of the log's timer.** The build reads timer channel 9 (0x98900074,
+  [logging.md](../reference/logging.md)) two or three times more per frame, from the Debug Log's code in the kernel
+  range: 0x7E4C90EA (pass 9 start, stored in the log's RAM), 0x7E4C9598 (the time of a record) and 0x7E4C97C2 (the
+  elapsed time of pass 9). V disassembly of the build. Any other extra read, and any write, fails.
+- **Stock instructions that a patch overwrote.** Where the hooks of `peaking-direct-4` and `log-menu-3` (PK9, TICK)
+  touch in pass 9, the changed run is long enough to count as new code.
+- **One RAM word that holds stack residue, 0x602A4954.** It is word 37 of the 49-word Key Line parameter block that
+  0x7E6CDA36 copies. The block is a local of the caller, and word 37 is not written between its allocation and the
+  copy. In stock it holds what an earlier callee left on the stack (a stack address in frame 1, 0 in frame 2). With
+  `log-menu-3` (the first spec of the build with which it differs) the last residue is a register that the log's
+  routine saved: 0x7E4C9514 writes 0x605B1CF0 to that stack word after the stock write and before the block is
+  allocated. V: a write log of the stack word in stock and in the build. No defined stock state changes.
 
-The Debug Log setting made no difference in this rig: the frames do not read it. So the result is for the state
-the rig starts in. Because stock state differs and its reader is not known, S1 stays a FAIL. It is not written off
-as expected, and it is not shown to be a fault a user can see: the output of these frames is the same.
+Not known: what reads word 37 of the copied block. Stock gives it stack residue too, and the device writes of
+these frames are the same with either value. The rig's frames do not read the Debug Log setting, so the result is
+the same for Off and On as far as the rig goes; the probes run in both cases.
 
 `tools/checks.py` keeps no results and makes the build again in memory first: it stops when `build/NAME.BIN` is not
 what the description and its specs make now. No build is exempt from a check. When a newer check refuses a

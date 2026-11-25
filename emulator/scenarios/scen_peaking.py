@@ -8,6 +8,11 @@
 Every scenario runs the pinned image and each patched image through the same steps and prints what differs.
 PINNED_BLOCK0 is the reference: tools/checks.py gives the stock firmware, so "pinned" in the texts below is stock.
 
+S1 compares what must not change with the request clear: the device accesses (every write: the output), the RAM
+that the stock firmware defines, the stock instructions that run, the mov state. What the mod does on purpose is
+stated and checked exactly: writes to its own RAM (MOD_RAM), reads of the log's timer from its own code, stock
+instructions that its patches overwrote, and the words of S1_RESIDUE. Any other difference fails.
+
 Exit status 1 when a scenario fails for a patched image: S1 "DIFFERENCES FOUND", S2 "NO PICTURE ..." or "anomalies",
 S3 an anomaly, S4 "LEFT SET", S5 "DIFFERS from pinned". Each such RESULT line starts its text with FAIL.
 """
@@ -31,6 +36,37 @@ OUT = print
 
 
 MOD_RAM = (0x7E4C9800, 0x7E4FE000)
+LOG_TIMER = 0x98900074  # timer channel 9, the time of the Debug Log's records (docs/reference/logging.md)
+# Stock RAM words that hold stack residue in the stock firmware too, so that the mod's use of the stack changes them
+# and no defined state with it. Each one is an exact expectation; any other differing word fails S1.
+#   0x602A4954: word 37 of the 49-word Key Line parameter block that 0x7E6CDA36 copies to the buffer of
+#   (0x605B0AF4). The block is a local of the caller, and word 37 is not written between its allocation and the
+#   copy: in the stock firmware it holds what an earlier callee left on the stack (frame 1: a stack address,
+#   0x7D0EFBD4; frame 2: 0 from 0x7E6CFFB6). With the Debug Log's probes the last residue is a register that
+#   log_chg saved (0x7E4C9514 writes 0x605B1CF0 there). Found 2026-11-25 with a write log of the stack word.
+S1_RESIDUE = (0x602A4954,)
+
+
+def device_same(base, patched, new):
+    """True when the build's device accesses are the reference's, but for reads of the log's timer from the mod's
+    new code (ranges ``new``). Every write is the same, in the same order, with the same value: the output. Every
+    other read is the same too."""
+    extra = lambda m: m[0] == "r" and m[1] == LOG_TIMER and m[4] is not None and any(lo <= m[4] < hi for lo, hi in new)  # noqa: E731
+    return [m[:4] for m in base] == [m[:4] for m in patched if not extra(m)]
+
+
+def _self_check():
+    """device_same on made-up accesses: only a read of the log's timer from new code is no difference."""
+    new, base = [(0x7E4C9000, 0x7E4C9800)], [("w", 0x98000010, 5, 4, 0x7E700000), ("r", 0x98000020, 0, 4, 0x7E700004)]
+    timer = ("r", LOG_TIMER, 0x3FFFFFFB, 4, 0x7E4C90EA)
+    assert device_same(base, base + [timer], new)
+    assert not device_same(base, base + [("r", LOG_TIMER, 1, 4, 0x7E700008)], new)  # the timer, read by stock code
+    assert not device_same(base, base + [("r", 0x98000024, 0, 4, 0x7E4C90EA)], new)  # another register
+    assert not device_same(base, base + [("w", LOG_TIMER, 0, 4, 0x7E4C90EA)], new)  # a write
+    assert not device_same(base, [("w", 0x98000010, 6, 4, 0x7E700000), base[1]], new)  # another value written
+
+
+_self_check()
 FAILED = []
 
 
@@ -155,14 +191,17 @@ def s1(pinned, patched):
                 wa, wb = fb.writes, fp.writes
                 same_seq = [(a, s, v) for a, s, v, _ in wa] == [(a, s, v) for a, s, v, _ in wb]
                 # Not a difference: the mod's own RAM, the gap between the kernel range and segment 1 that the stock
-                # firmware never writes (the Debug Log's state block is there: docs/dev/load-order.md, section 4, RAM).
-                dw = diff_writes(wa, wb, skip=[(L, L2 + 1), MOD_RAM])
+                # firmware never writes (the Debug Log's state block is there: docs/dev/load-order.md, section 4, RAM),
+                # and S1_RESIDUE.
+                dw = diff_writes(wa, wb, skip=[(L, L2 + 1), MOD_RAM] + [(a, a + 4) for a in S1_RESIDUE])
                 flagw = sorted(set((a, v) for a, s, v, _ in wb if L <= a <= L2))
                 d = diff_pcs(fb.pcs, fp.pcs, new, hooks)
                 # a stock `ret` right after a hook site that the routine replaces with its own `ret` (hooks A, B)
                 rets = [p for p in d["only_base"] if any(hi <= p < hi + 3 for lo, hi in hooks)]
-                d["only_base"] = [p for p in d["only_base"] if p not in rets]
-                dev = [m[1:4] for m in fb.mmio] == [m[1:4] for m in fp.mmio]
+                # a stock instruction that the patch overwrote cannot run: where two hooks touch, the changed run is
+                # long enough to count as new code, and the stock pcs in it are not "outside hook sites"
+                d["only_base"] = [p for p in d["only_base"] if p not in rets and not any(lo <= p < hi for lo, hi in new)]
+                dev = device_same(fb.mmio, fp.mmio, new)
                 ok = not dw and not d["only_base"] and not d["only_patched_stock"] and fb.state == fp.state and not fp.faults and dev
                 ok_all &= ok
                 OUT("  %-8s %-9s %-13s %s: %d writes (pinned %d), same order and values: %s; bytes that differ: %d; "
