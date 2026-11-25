@@ -1,0 +1,16 @@
+as flashed: 740 selections of 108 Olympus codes in 7 stages compared with the stock firmware
+loaded: Pop Art            code  79: every stage selects the film's place
+loaded: Soft Focus         code  75: every stage selects the film's place
+loaded: Pale&Light Color   code  71: every stage selects the film's place
+loaded: Light Tone         code  72: every stage selects the film's place
+loaded: Grainy Film        code  94: every stage selects the film's place
+loaded: Pin Hole           code  92: every stage selects the film's place
+loaded: Diorama            code 125: every stage selects the film's place
+loaded: Cross Process      code  85: every stage selects the film's place
+loaded: Gentle Sepia       code  98: every stage selects the film's place
+loaded: Dramatic Tone      code 144: every stage selects the film's place
+loaded: Key Line           code 156: every stage selects the film's place
+loaded: Watercolor         code 159: every stage selects the film's place
+as flashed: blocks G, A, 3, B of 109 codes in 6 jobs compared with the stock firmware
+loaded: blocks of 12 film codes in 6 jobs compared with Natural: they differ only in the films' stages
+RESULT PASS

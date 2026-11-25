@@ -1,0 +1,16 @@
+copied: film-tables-fix gives what cold-start-fix gives in 210 of 210 cases (10 routes, values 100 to 120)
+  mov_art still: 111 -> 94, 112 -> 98, 114 -> 144, 115 -> 156, 118 -> 159
+  mov_art movie (argument): 111 -> 94, 112 -> 98, 114 -> 144, 115 -> 156, 118 -> 159
+  mov_art movie (struct): 111 -> 94, 112 -> 98, 114 -> 144, 115 -> 156, 118 -> 159
+  mov_art still (wrapper): 111 -> 94, 112 -> 98, 114 -> 144, 115 -> 156, 118 -> 159
+  mov_art still, peaking on: 111 -> 3, 112 -> 3, 114 -> 3, 115 -> 3, 118 -> 3
+  0x7E6DBA95 still: 111 -> 94, 112 -> 98, 114 -> 144, 115 -> 156, 118 -> 159
+  0x7E6DBA95 movie: 111 -> 94, 112 -> 98, 114 -> 144, 115 -> 156, 118 -> 159
+  art_GetFilterType grade 1: 111 -> 94, 112 -> 98, 114 -> 144, 115 -> 156, 118 -> 159
+  art_GetFilterType grade 2: 111 -> 94, 112 -> 98, 114 -> 144, 115 -> 156, 118 -> 159
+  art_GetFilterType grade 3: 111 -> 94, 112 -> 98, 114 -> 144, 115 -> 156, 118 -> 159
+not copied (ff): film-tables-fix: 210 of 210 cases as copied, no fault, 0 instructions in late space
+not copied (ff): cold-start-fix: 50 cases fault or run late space, values [111, 112, 114, 115, 118] (first: fault 5 at pc 0x7ECB0A0F (0x7ECAD443+0x35CC): om-emu: MN10300 trap reason=5 pc=0x7ecb0a0f address=0x7ecb0a0f)
+not copied (random): film-tables-fix: 210 of 210 cases as copied, no fault, 0 instructions in late space
+not copied (random): cold-start-fix: 50 cases fault or run late space, values [111, 112, 114, 115, 118] (first: fault 3 at pc 0x7ECB0A10 (0x7ECAD443+0x35CD): om-emu: MN10300 trap reason=3 pc=0x7ecb0a10 address=0x000077cd)
+RESULT PASS
