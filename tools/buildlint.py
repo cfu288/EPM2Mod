@@ -9,7 +9,9 @@ this report. Exit status: 0, also with warnings; 2 when the report cannot be mad
 
 The warnings (the rule and the numbers behind them: docs/dev/load-order.md):
 
-1. Each row of emulator/hookcheck-allow.tsv that the build uses and that is not a proof: class inferred or timing.
+1. Every entry of emulator/hookcheck-allow.tsv that the build uses and that is not a proof (class inferred or
+   timing), by row, each address listed. And each transfer that the load-order check FAILS: lint does not hide
+   what the hard checks refuse.
 2. Early-loaded space (kernel range, segment 1, pre-reset): the bytes that the build's specs use in each free-space
    area, and what is left there. A hook into an early-loaded function needs its routine in this space.
 3. `first_code` in the description: code in an area where none has run on a camera.
@@ -45,16 +47,18 @@ def lint(description):
     warnings = []
 
     # 1. the allow-list rows
-    used, allow = [], hookcheck.read_allow()
-    hookcheck.check(specs, allow, out=lambda line: None, used=used)
+    used, lines = [], []
+    if not hookcheck.check(specs, hookcheck.read_allow(), out=lines.append, used=used):
+        fails = [line for line in lines if line.startswith("FAIL")]
+        warnings.append("load order, FAIL: %d transfers from early-loaded to late-loaded code that the allow list "
+                        "does not accept. The hard checks refuse this build:%s" % (len(fails), "".join("\n        " + line for line in fails)))
     rows = {}
     accepted = {address for address, _target, _entry in used}
     for address, _target, entry in used:
-        row = rows.setdefault((entry.cls, entry.row), [0, entry.reason, address])
-        row[0] += 1
+        rows.setdefault((entry.cls, entry.row), (entry.reason, []))[1].append(address)
     for cls, text in (("timing", "safe by timing only, an open risk"), ("inferred", "safe by inference, not by proof")):
-        mine = [("line %d, from 0x%08X" % (row, first), count, reason)
-                for (c, row), (count, reason, first) in sorted(rows.items()) if c == cls]
+        mine = [("line %d: %s" % (row, " ".join("%08X" % a for a in sorted(addresses))), len(addresses), reason)
+                for (c, row), (reason, addresses) in sorted(rows.items()) if c == cls]
         if mine:
             warnings.append("load order, %s: %d transfers from early-loaded to late-loaded code, by %d rows of "
                             "emulator/hookcheck-allow.tsv:%s" % (text, sum(r[1] for r in mine), len(mine), "".join(

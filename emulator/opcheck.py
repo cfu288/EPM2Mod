@@ -78,7 +78,7 @@ def sram_calls():
     os.write(fd, code)
     os.close(fd)
     try:
-        txt = subprocess.run([hookcheck.OBJDUMP, "-D", "-b", "binary", "-m", "am33-2", "-EL", "--adjust-vma=%#x" % dst, p],
+        txt = subprocess.run([hookcheck.toolchain.binutils("objdump"), "-D", "-b", "binary", "-m", "am33-2", "-EL", "--adjust-vma=%#x" % dst, p],
                              capture_output=True, text=True, check=True).stdout
     finally:
         os.unlink(p)

@@ -11,7 +11,7 @@ import hookcheck  # noqa: E402
 import support  # noqa: E402
 
 BUILD = json.loads((ROOT / "data" / "builds" / "spot-af-2.json").read_text())
-NEEDS = [ROOT / "firmware" / "stock" / "E-PM2" / BUILD["stock"], Path(hookcheck.OBJDUMP)]
+NEEDS = [ROOT / "firmware" / "stock" / "E-PM2" / BUILD["stock"], Path(hookcheck.toolchain.DEFAULT_DIR) / "mn10300-elf-objdump"]
 
 
 @support.needs(NEEDS[0].exists(), support.STOCK_NEEDED)
@@ -51,3 +51,38 @@ class BuiltBytes(unittest.TestCase):
         self.assertTrue(all(len(w) == 17 and w[8] == ">" for w in words), "an entry is ADDRESS>TARGET, never a range")
         self.assertEqual(len({w[:8] for w in words}), len(words))
         self.assertEqual(len(hookcheck.read_allow()), len(words))
+
+    def test_lint_shows_a_transfer_that_the_load_order_check_fails(self) -> None:
+        sys.path.insert(0, str(ROOT / "tools"))
+        import buildlint
+        from unittest import mock
+
+        pinned = str(ROOT / json.loads((ROOT / "data" / "pinned-build.json").read_text())["build"])
+        self.assertFalse([w for w in buildlint.lint(pinned) if w.startswith("load order, FAIL")])
+        allow = hookcheck.read_allow()
+        removed = sorted(allow)[0]
+        fewer = {key: why for key, why in allow.items() if key != removed}
+        with mock.patch.object(hookcheck, "read_allow", return_value=fewer):
+            warnings = buildlint.lint(pinned)
+        fails = [w for w in warnings if w.startswith("load order, FAIL")]
+        self.assertEqual(len(fails), 1, warnings)
+        self.assertIn("0x%08X" % removed[0], fails[0])
+
+    def test_lint_lists_every_entry_that_is_not_a_proof(self) -> None:
+        sys.path.insert(0, str(ROOT / "tools"))
+        import buildlint
+
+        pinned = str(ROOT / json.loads((ROOT / "data" / "pinned-build.json").read_text())["build"])
+        used: list[tuple[int, int, hookcheck.Allowed]] = []
+        hookcheck.check([pinned], hookcheck.read_allow(), lambda line: None, used)
+        text = "\n".join(buildlint.lint(pinned))
+        for address, _target, entry in used:
+            self.assertEqual("%08X" % address in text, entry.cls != "proof", hex(address))
+
+    def test_every_allow_entry_is_used_by_a_build_description(self) -> None:
+        unused = set(hookcheck.read_allow())
+        for name in ("cold-start-fix", "debug-log-movie-ab"):  # the pinned build of 2026-11-25, and movie-ab
+            used: list[tuple[int, int, str]] = []
+            hookcheck.check([str(ROOT / "data" / "builds" / f"{name}.json")], hookcheck.read_allow(), lambda line: None, used)
+            unused -= {(address, target) for address, target, _ in used}
+        self.assertEqual(unused, set())

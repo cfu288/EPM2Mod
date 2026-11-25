@@ -14,9 +14,16 @@ A test release of another camera-tested build (``--build NAME``) is
 
 The camera's Firmware screen shows the same date: the release holds the
 camera-tested build with its label set to the day of the release
-(``release.stamp``). That image differs from the tested one only in the date's
-bytes; ``plan`` runs the free-space check, with the load-order check, and the
-two start-up checks on it, and the notes give both sha256.
+(``release.stamp``). What covers the image that is released:
+
+- ``release.check_only_the_label_differs``: it differs from the tested image
+  only in the date's bytes (text in late-loaded segment 2) and the checksum;
+- the two start-up checks run on that image, in the emulator;
+- the free-space check, with the load-order check, runs on the build's specs.
+  It reads the specs, not the image, and the specs are those of the tested
+  build: it shows that they still pass today's rules, not more.
+
+The notes give both sha256.
 """
 
 from __future__ import annotations
@@ -136,10 +143,11 @@ def _git(paths: RepoPaths, *args: str) -> str:
 def _ci_problems(paths: RepoPaths, commit: str) -> list[str]:
     """Return why CI does not count as passed for ``commit``, if it doesn't.
 
-    Each workflow runs on main only for the paths it watches, so the commit
-    itself may have no run (a change to the documents only). What counts is the
-    newest run of each workflow on main: it must be finished, passed, and on
-    ``commit`` or one of its ancestors.
+    What counts is the newest run of each workflow on main: it must be finished
+    and passed. A workflow with a ``paths`` filter runs only for the paths it
+    watches, so its newest run may be on an ancestor of ``commit``. A workflow
+    without one runs for every commit: its newest run must be on ``commit``
+    itself.
     """
     gh = shutil.which("gh")
     if gh is None:
@@ -160,6 +168,16 @@ def _ci_problems(paths: RepoPaths, commit: str) -> list[str]:
             problems.append(f"{workflow}: no run on main found")
             continue
         run = runs[0]
+        filtered = any(
+            path.name == workflow and re.search(r"^\s+paths:", read_text(path), re.M)
+            for path in paths.workflows
+        )
+        if not filtered and run["headSha"] != commit:
+            problems.append(
+                f"{workflow}: it runs for every commit, and its newest run is for "
+                f"{run['headSha'][:7]}, not for this commit"
+            )
+            continue
         ancestor = subprocess.run(
             ["git", "merge-base", "--is-ancestor", run["headSha"], commit],
             cwd=paths.root, capture_output=True, check=False,
@@ -199,17 +217,26 @@ class Plan:
 
 
 def plan(
-    paths: RepoPaths, final: bool, build: str | None = None, day: str | None = None
+    paths: RepoPaths,
+    final: bool,
+    build: str | None = None,
+    day: str | None = None,
+    today: str | None = None,
 ) -> tuple[Plan | None, list[str]]:
     """Check the repository and return the release to make, or the problems.
 
     ``build`` names the build of a test release in place of the pinned build.
     ``day`` is the day of the release (default: today in UTC), like ``2026.11.25``. It decides the version and the
     image, so a release that follows a dry run is made with the day of the dry run.
+    It is not after ``today`` (default: today in UTC) and not before the day of the newest release tag.
     """
+    if today is None:
+        today = datetime.datetime.now(datetime.timezone.utc).strftime("%Y.%m.%d")
     if day is None:
-        day = datetime.datetime.now(datetime.timezone.utc).strftime("%Y.%m.%d")
+        day = today
     check_label(day, "the day of the release")
+    if day > today:
+        raise BuildError(f"the day of the release {day} is after today ({today}, UTC)")
     problems: list[str] = []
     chosen = pinned_description(paths) if build is None else paths.build(build)
     which = "the pinned build" if build is None else "the build"
@@ -235,6 +262,13 @@ def plan(
     problems += [f"feature list: {p}" for p in readme.feature_problems(paths)]
     problems += _ci_problems(paths, commit)
     tags = _git(paths, "tag", "--list", "v*").split()
+    days = [
+        m.group(1) for tag in tags if (m := re.match(r"v(\d{4}\.\d{2}\.\d{2})\b", tag))
+    ]
+    if days and day < max(days):
+        problems.append(
+            f"the day of the release {day} is before the newest release tag's day ({max(days)})"
+        )
     try:
         version = next_version(day, tags, final, build)
         check_version(version)

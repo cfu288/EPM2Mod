@@ -1,10 +1,19 @@
 #!/bin/sh
-# machine-paths: read a diff (git diff -U0) on standard input and refuse added lines with machine-specific details:
-# home-directory paths, session scratch paths, user@host targets. Use placeholders (/path/to/..., USER@HOST,
-# /tmp/scratch). The pre-commit hook gives it the staged changes, tools/ci.sh the changes of a branch.
+# machine-paths [--since BASE]: refuse added lines with machine-specific details: home-directory paths, session
+# scratch paths, user@host targets. Use placeholders (/path/to/..., USER@HOST, /tmp/scratch).
+#
+#   git diff --cached -U0 | .githooks/machine-paths     a diff on standard input (the pre-commit hook)
+#   .githooks/machine-paths --since BASE                each commit after BASE up to HEAD, one by one (tools/ci.sh):
+#                                                       a path that one commit adds and a later one removes is
+#                                                       still in the history, so it is refused
 # Exit status 1 when a line is refused.
 pattern='/home/[A-Za-z0-9._-]+/|/Users/[A-Za-z0-9._-]+/|/tmp/claude-[0-9]+|-home-[a-z0-9]+-|[A-Za-z0-9._-]+@[A-Za-z0-9-]+:[/~]'
 allow='USER@HOST:|git@github\.com:|/home/user/|/Users/user/'
+if [ "${1:-}" = "--since" ]; then
+  [ -n "${2:-}" ] || { echo "usage: machine-paths --since BASE" >&2; exit 2; }
+  git log -p --format= -U0 --no-color --no-renames --diff-filter=AM "$2..HEAD" -- . ':(exclude).githooks' | "$0"
+  exit $?
+fi
 # the allowed tokens are taken out of each line first: a line with one of them and a real path is still refused
 hits=$(grep -E '^\+' | grep -v -E '^\+\+\+ ' | sed -E "s#$allow##g" | grep -E "$pattern" | head -5)
 if [ -n "$hits" ]; then

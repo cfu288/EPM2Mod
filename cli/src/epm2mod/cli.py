@@ -1541,7 +1541,8 @@ def _arguments(
             "--day",
             metavar="YYYY.MM.DD",
             help="the day of the release, which is in the version and on the Firmware screen; "
-            "default: today in UTC. Give the day of the dry run to make the release that it showed",
+            "default: today in UTC. Give the day of the dry run to make the release that it showed. "
+            "Not after today, and not before the day of the newest release tag",
         )
         _add_json(parser)
 

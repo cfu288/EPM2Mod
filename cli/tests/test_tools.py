@@ -51,6 +51,7 @@ class MachinePathTests(unittest.TestCase):
                 self.assertFalse(self.refused(line))
 
 
+@support.needs(HAVE_STOCK, support.STOCK_NEEDED)
 class FirmwareMapTests(unittest.TestCase):
     def check(self, folder: str) -> subprocess.CompletedProcess[str]:
         command = [sys.executable, str(ROOT / "tools" / "fwmap.py"), "--out", folder, "check"]
@@ -65,9 +66,13 @@ class FirmwareMapTests(unittest.TestCase):
             done = self.check(folder)
             self.assertEqual(done.returncode, 1)
             self.assertIn(fwmap.FILES[-1], done.stderr)
-            (Path(folder) / fwmap.FILES[-1]).write_text("x")
-            self.assertEqual(self.check(folder).returncode, 0)
-        self.assertEqual(fwmap.FILES[-1], "tasks.tsv")  # what build writes last, and emulator/liveview.py reads
+            (Path(folder) / fwmap.FILES[-1]).write_text("firmware sha256 0\n")  # made from another firmware
+            done = self.check(folder)
+            self.assertEqual(done.returncode, 1)
+            self.assertIn("another firmware", done.stderr)
+            (Path(folder) / fwmap.FILES[-1]).write_text(fwmap.made_by())
+            self.assertEqual(self.check(folder).returncode, 0, done.stderr)
+        self.assertIn("tasks.tsv", fwmap.FILES)  # emulator/liveview.py reads it
 
 
 class ToolchainTests(unittest.TestCase):
@@ -82,6 +87,98 @@ class ToolchainTests(unittest.TestCase):
                 os.environ.pop("EPM2_BINUTILS", None)
                 with self.assertRaises(toolchain.ToolchainError):
                     toolchain.binutils_dir()
+
+    def test_an_override_is_honoured_or_is_an_error(self) -> None:
+        with tempfile.TemporaryDirectory() as folder, mock.patch("sys.stderr"):
+            with mock.patch.dict(os.environ, {"EPM2_BINUTILS": folder + "/absent", "CI": ""}):
+                with self.assertRaisesRegex(toolchain.ToolchainError, "EPM2_BINUTILS: no MN103 binutils"):
+                    toolchain.binutils_dir()  # no fall-back to build/toolchain
+            (Path(folder) / (toolchain.PREFIX + "objdump")).write_text("")
+            with mock.patch.dict(os.environ, {"EPM2_BINUTILS": folder, "CI": ""}):
+                self.assertEqual(toolchain.binutils_dir(), folder)
+            with mock.patch.dict(os.environ, {"EPM2_BINUTILS": folder, "CI": "1"}):
+                with self.assertRaisesRegex(toolchain.ToolchainError, "hard checks"):
+                    toolchain.binutils_dir()
+
+    def test_binutils_of_another_source_commit_are_refused(self) -> None:
+        with tempfile.TemporaryDirectory() as folder:
+            objdump = Path(folder) / "build" / "toolchain" / "bin" / (toolchain.PREFIX + "objdump")
+            objdump.parent.mkdir(parents=True)
+            objdump.write_text("")
+            record = objdump.parent.parent / "source-commit"
+            with mock.patch.object(toolchain, "REPO", folder), mock.patch.object(toolchain, "pinned_commit", return_value="abc"):
+                os.environ.pop("EPM2_BINUTILS", None)
+                with self.assertRaisesRegex(toolchain.ToolchainError, "source commit unknown"):
+                    toolchain.binutils_dir()
+                record.write_text("def\n")
+                with self.assertRaisesRegex(toolchain.ToolchainError, "source commit def"):
+                    toolchain.binutils_dir()
+                record.write_text("abc\n")
+                self.assertEqual(toolchain.binutils_dir(), str(objdump.parent))
+
+
+class EmulatorPinTests(unittest.TestCase):
+    def test_an_override_is_refused_in_the_hard_checks(self) -> None:
+        sys.path.insert(0, str(ROOT / "emulator"))
+        import emuenv
+
+        for name, call in (("OM_EMU_DIR", emuenv.om_emu_dir), ("OM_EMU_NODE", emuenv.node)):
+            with self.subTest(name=name), mock.patch("sys.stderr"):
+                with mock.patch.dict(os.environ, {name: "/x/elsewhere", "CI": "1"}):
+                    with self.assertRaisesRegex(emuenv.EmuSetupError, name):
+                        call()
+                with mock.patch.dict(os.environ, {name: "/x/elsewhere", "CI": ""}):
+                    self.assertEqual(call(), "/x/elsewhere")
+
+    def test_a_submodule_at_another_commit_is_refused(self) -> None:
+        sys.path.insert(0, str(ROOT / "emulator"))
+        import emuenv
+
+        other = mock.Mock(stdout="160000 0000000000000000000000000000000000000000 0\temulator/om-emu\n")
+        with mock.patch.dict(os.environ, {"OM_EMU_DIR": ""}), mock.patch.object(emuenv.os.path, "exists", return_value=True):
+            with mock.patch.object(emuenv.subprocess, "run", return_value=other):
+                with self.assertRaisesRegex(emuenv.EmuSetupError, "the repository pins 0000000"):
+                    emuenv.require_om_emu()
+
+
+class StrictTimesTests(unittest.TestCase):
+    def test_the_hard_tier_fails_a_start_whose_times_moved(self) -> None:
+        build = ROOT / pinned_build_path()
+        with mock.patch.object(checks, "current_image", return_value=Path("image.BIN")):
+            plan = {check.name: check for check in checks.plan(build, "quick")}
+        self.assertIn("--strict-times", plan["boot-test"].command)
+        self.assertTrue(all(check.judged for check in plan.values()))
+
+
+def pinned_build_path() -> str:
+    """Return the path of the pinned build's description, relative to the root."""
+    return str(json.loads((ROOT / "data" / "pinned-build.json").read_text())["build"])
+
+
+class MachinePathHistoryTests(unittest.TestCase):
+    def test_a_path_that_one_commit_adds_and_a_later_one_removes_is_refused(self) -> None:
+        with tempfile.TemporaryDirectory() as folder:
+
+            def git(*args: str) -> None:
+                identity = ["-c", "user.name=t", "-c", "user.email=t@example.invalid", "-c", "core.hooksPath=/dev/null"]
+                subprocess.run(["git", *identity, *args], cwd=folder, check=True, capture_output=True)
+
+            def commit(text: str) -> None:
+                (Path(folder) / "notes.txt").write_text(text)
+                git("add", "notes.txt")
+                git("commit", "-q", "-m", "x")
+
+            git("init", "-q")
+            commit("start\n")
+            git("tag", "base")
+            commit(f"see {REAL}notes\n")
+            git("tag", "added")
+            commit("see /path/to/notes\n")
+            tool = str(ROOT / ".githooks" / "machine-paths")
+            net = subprocess.run(["git", "diff", "-U0", "base", "HEAD"], cwd=folder, capture_output=True, text=True).stdout
+            self.assertEqual(subprocess.run([tool], input=net, capture_output=True, text=True).returncode, 0)
+            self.assertEqual(subprocess.run([tool, "--since", "base"], cwd=folder, capture_output=True).returncode, 1)
+            self.assertEqual(subprocess.run([tool, "--since", "added"], cwd=folder, capture_output=True).returncode, 0)
 
 
 class NodeVersionTests(unittest.TestCase):
@@ -108,9 +205,6 @@ class CurrentImageTests(unittest.TestCase):
             path.unlink()
             with self.assertRaisesRegex(ValueError, "is absent"):
                 checks.current_image(build.name, path)
-
-    def test_no_result_is_kept(self) -> None:
-        self.assertFalse(hasattr(checks, "CACHE"))
 
 
 class DocumentTests(unittest.TestCase):

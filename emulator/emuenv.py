@@ -30,10 +30,21 @@ class EmuSetupError(Exception):
 
 def om_emu_dir():
     """Return the om-emu checkout: OM_EMU_DIR, else the submodule emulator/om-emu."""
-    env = os.environ.get("OM_EMU_DIR")
+    env = _override("OM_EMU_DIR")
     if env:
         return env
     return os.path.join(REPO, "emulator", "om-emu")
+
+
+def _override(name):
+    """Return the value of an environment variable that replaces a pinned tool, or None. A set one is said on
+    stderr; when the environment has CI (the hard checks: tools/ci.sh), it is an error."""
+    value = os.environ.get(name)
+    if value:
+        if os.environ.get("CI"):
+            raise EmuSetupError(f"{name} is set ({value}): the hard checks use only what the repository pins. Unset it")
+        print(f"note: {name} is set: {value} is used, not what the repository pins", file=sys.stderr)
+    return value
 
 
 def require_om_emu():
@@ -41,13 +52,19 @@ def require_om_emu():
     d = om_emu_dir()
     if not os.path.exists(os.path.join(d, "emu", "bin", "boot.mjs")):
         raise EmuSetupError(f"no om-emu with the boot lab at {d}: run uv run epm2mod init (or set OM_EMU_DIR)")
+    if not os.environ.get("OM_EMU_DIR"):  # the submodule: at the commit that the repository pins, or no result
+        want = subprocess.run(["git", "ls-files", "-s", "emulator/om-emu"], cwd=REPO, capture_output=True, text=True).stdout.split()
+        have = subprocess.run(["git", "rev-parse", "HEAD"], cwd=d, capture_output=True, text=True).stdout.strip()
+        if len(want) < 2 or want[1] != have:
+            raise EmuSetupError(f"{d} is at the commit {have or 'unknown'}, and the repository pins {want[1] if len(want) > 1 else 'none'}: "
+                                "run uv run epm2mod init (git submodule update --init emulator/om-emu)")
     return d
 
 
 def node():
     """Return the Node executable of the version in .nvmrc (tools/node.sh finds it), or raise EmuSetupError.
     OM_EMU_NODE names another one."""
-    env = os.environ.get("OM_EMU_NODE")
+    env = _override("OM_EMU_NODE")
     if env:
         return env
     found = subprocess.run([os.path.join(REPO, "tools", "node.sh"), "node", "-p", "process.execPath"], capture_output=True, text=True)

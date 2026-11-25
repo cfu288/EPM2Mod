@@ -2,6 +2,8 @@
 # gen/run.sh [--check]: run every generator of gen/, in order. They write their patch specs into data/specs/.
 # --check: then fail if a committed spec differs from what its generator makes (CI runs this).
 # Needs: the MN103 binutils (uv run epm2mod init) and Olympus's firmware (uv run epm2mod fetch-stock).
+# Not needed and not checked: the E-PL6 firmware. interval/mkspec_v2.py and level-gauge/mkspec_step_b.py compare
+# their tables with it when it is on the computer and say "skipped" when it is not (gen/README.md).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 work=$(mktemp -d)
@@ -27,6 +29,8 @@ uv run python gen/spot-menu/mkspec.py
 # last: it reads the film loader's labels from the loader's spec, and the bytes it hooks from the build's other specs
 uv run python gen/log-menu/mkspec.py "$work/log-menu"
 if [ "${1:-}" = "--check" ]; then
-  git diff --exit-code --stat -- data/specs/ || { echo "gen/run.sh: a committed spec differs from its generator's output" >&2; exit 1; }
+  # status, not diff: a spec that a generator writes and git does not hold is a difference too
+  changed=$(git status --porcelain --untracked-files=all -- data/specs/)
+  [ -z "$changed" ] || { printf '%s\n' "$changed" >&2; echo "gen/run.sh: a spec is not committed as its generator writes it (changed, or not in git)" >&2; exit 1; }
   echo "gen/run.sh: every generated spec is as committed"
 fi

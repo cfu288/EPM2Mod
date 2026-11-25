@@ -34,7 +34,7 @@ Examples: `feat(cli)!: revision 3 of the CLI spec`, `docs(camera-log): the build
 | `tools/oetool.py` | The older command-line form of the container tool (unpack, pack, patch). It calls the package; `tools/_package.py` lets it import the package without an install. `gen/` and older scripts in `experiments/` import it. Do not use it to make firmware for a camera: use `uv run epm2mod make`. |
 | `tools/freespace.py`, `tools/fwmap.py`, `tools/disasm.py`, `tools/memmap_svg.py`, `emulator/` | Analysis tools: the free-space check, the function database of block 0, MN103 disassembly (GNU objdump from `uv run epm2mod init`, which builds it from the submodule `third_party/binutils-gdb` into `build/toolchain/`), the memory map figure, the emulator harness. |
 | `tools/ci.sh`, `tools/buildlint.py`, `tools/node.sh` | The hard checks, the soft report of a build (`epm2mod lint`), and the command that runs a program with the Node of `.nvmrc`. See *Checks*. |
-| `tools/checks.py`, `.githooks/doclint.py`, `.claude/hooks/doc_links.py`, `docs/links.json`, `tools/toolchain.py` | `checks.py` runs the off-camera checks of a build: only those its specs call for, in parallel, with a cache. `doclint.py` checks the documents that users read. The pre-commit hook runs it on staged files. `doc_links.py` tells the agent which other files repeat a fact when it edits one of them (the groups are in `docs/links.json`). `toolchain.py` says where the MN103 binutils are. |
+| `tools/checks.py`, `.githooks/doclint.py`, `.claude/hooks/doc_links.py`, `docs/links.json`, `tools/toolchain.py` | `checks.py` runs the off-camera checks of a build: only those its specs call for, in parallel. It keeps no results. `doclint.py` checks the documents that users read. The pre-commit hook runs it on staged files. `doc_links.py` tells the agent which other files repeat a fact when it edits one of them (the groups are in `docs/links.json`). `toolchain.py` says where the MN103 binutils are. |
 | `emulator/om-emu` | The emulator: our om-emu fork (branch `e101`, with the E-PM2's boot lab) as a git submodule; `uv run epm2mod init` initialises it. Emulator code goes into the fork, not into this repository. `emulator/boot-test` and `emulator/update-path-test` are the start-up checks of a build. |
 | `data/builds/`, `data/pinned-build.json` | One description per firmware build, and the pointer to the last camera-tested build. See *Making firmware*. |
 | `data/specs/` | One JSON spec per mod. Each operation states the bytes that it replaces. Specs never move: superseded and failed ones stay as a record, and `tools/space-ledger/superseded.tsv` marks them (`history` for those of earlier builds; their story is in `data/specs/HISTORY.md`). |
@@ -178,7 +178,9 @@ UTC would not be the one a dry run checked the day before: pass the day.
    and stops when one does not:
    - it differs from the camera-tested image (the pinned sha256) only in the 20 bytes of the date and in the
      checksum of block 0 (`release.check_only_the_label_differs`; the date has a fixed length, so nothing moves);
-   - the free-space check, which holds the load-order check, passes on it;
+   - the free-space check, which holds the load-order check, passes on the build's specs. It reads the specs and
+     not the image, and the specs are the tested build's: this shows that they pass today's rules. The stamped
+     bytes are text in late-loaded segment 2, which the first rule covers;
    - `emulator/boot-test` and `emulator/update-path-test` pass on it.
    The release notes give both: "Firmware: EPM2Mod LABEL, sha256 RELEASED. Camera-tested as sha256 TESTED (label
    L); differs only in the Firmware-screen date." The zip's manifest records the tested sha256 and label under
@@ -213,7 +215,7 @@ Three layers. Each check is in one of them.
 | Layer | What | Where |
 |---|---|---|
 | Commit hooks | Fast and hard: machine paths, the document rules, prettier, black, mypy, the commit message. And one soft part: `epm2mod lint` of each staged build description, which prints warnings and never refuses | `.githooks/` |
-| Hard checks | `tools/ci.sh`: black, mypy, the unit tests (they hold pyflakes on the scripts, the document rules and the feature lists), the generated documents and specs, the web checks. Then, for the pinned build and each build description that differs from the base commit: `epm2mod make` and the quick tier of `tools/checks.py` (free space with load order, op check, `boot-test`, `update-path-test`). A check that cannot run fails. No warnings | CI (`python.yml`, `web.yml`) runs this script and nothing else. Run it before a pull request |
+| Hard checks | `tools/ci.sh`: `epm2mod init --check` first (the set-up is the pinned one, and a variable that replaces a pinned tool is refused), then black, mypy, the unit tests (they hold pyflakes on the scripts, the document rules and the feature lists), the generated documents, the code-space map and the generated specs (a spec that git does not hold fails), the web checks. Then, for the pinned build and each build description that differs from the base commit, committed or not (the script prints the list): `epm2mod make` and the quick tier of `tools/checks.py` (free space with load order, op check, `boot-test`, `update-path-test`). A check that cannot run fails. No warnings | CI (`python.yml`, `web.yml`) runs this script and nothing else. Run it before a pull request |
 | Soft report | `uv run epm2mod lint NAME` (`tools/buildlint.py`): the allow-list rows of the load-order check that the build uses and that are safe by timing or inference only, the early-loaded space it uses, first code, words in new early-loaded bytes that can be late-loaded addresses, the cold start for the camera test. Exit status 0 with any number of warnings, 6 when the report cannot be made | by hand and from the commit hook. Never in CI |
 
 `tools/checks.py NAME.json --tier full` adds the scenario runs of `emulator/scenarios/` (20 minutes). Run it before a
@@ -222,6 +224,8 @@ build is offered for a flash. Its WARN results have RESULT lines that a person r
 `tools/checks.py` keeps no results and makes the build again in memory first: it stops when `build/NAME.BIN` is not
 what the description and its specs make now. No build is exempt from a check. When a newer check refuses a
 camera-tested build that a pull request must touch, the pull request says so and the owner decides.
+
+The quick tier runs `boot-test --strict-times`: time stamps that moved are a FAIL there, not a line to read.
 
 `emulator/hookcheck-allow.tsv` accepts a transfer by its address and its target together, one word per entry. The
 same address with another target fails. The check's last line counts the entries that match nothing in the build.
@@ -253,7 +257,6 @@ what is there:
 | Nothing more than the repository | The package works on a small made-up firmware: container, patch specs, build steps, card copy, download (with a stand-in for the network), every command. The README's generated parts are current. The film specs record the digest of the film list and fit files that are in the repository. |
 | numpy (`uv run` installs it) | Look packs made from the fit files are the ones the film records hold (`cli/tests/test_lookfile.py`). |
 | The maker's firmware file (`uv run epm2mod fetch-stock`) | Each build description that has a sha256 gives that sha256. The stock file survives a parse and a write without a change. |
-
 | The built installer page (`cd web && npm ci && npm run build:app`) | The release zip holds the page and installs from it. |
 
 Without one of these files the run skips its tests, and each skip names the command that makes the file

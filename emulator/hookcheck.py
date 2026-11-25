@@ -40,10 +40,7 @@ EARLY = ("pre-reset", "kernel", "data-image", "sram-image", "segment-1")
 sys.path.insert(0, os.path.join(os.path.dirname(HERE), "tools"))
 import toolchain  # noqa: E402
 
-try:
-    OBJDUMP = toolchain.binutils("objdump")  # EPM2_BINUTILS, else build/toolchain/bin, else PATH
-except toolchain.ToolchainError:  # not built: the path that `epm2mod init` makes, so that a caller can test for it
-    OBJDUMP = os.path.join(os.path.dirname(HERE), "build", "toolchain", "bin", "mn10300-elf-objdump")
+
 XFER = re.compile(r"^\s*([0-9a-f]+):\s+(?:[0-9a-f]{2} )+\s*\t(jmp|calls?|b[a-z]{1,2}|l[a-z]{2})\t(?:0x)?([0-9a-f]{8})\b")
 
 
@@ -63,7 +60,7 @@ def transfers(addr, code):
     os.write(fd, code)
     os.close(fd)
     try:
-        out = subprocess.run([OBJDUMP, "-D", "-b", "binary", "-m", "am33-2", "-EL", "--adjust-vma=%#x" % addr, p],
+        out = subprocess.run([toolchain.binutils("objdump"), "-D", "-b", "binary", "-m", "am33-2", "-EL", "--adjust-vma=%#x" % addr, p],
                              capture_output=True, text=True, check=True).stdout
     finally:
         os.unlink(p)
@@ -190,7 +187,10 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("specs", nargs="+", help="a build description, or the specs of a build in its order")
     a = ap.parse_args()
-    sys.exit(0 if check(a.specs, read_allow()) else 1)
+    try:
+        sys.exit(0 if check(a.specs, read_allow()) else 1)
+    except toolchain.ToolchainError as error:
+        sys.exit("hookcheck: cannot run: %s" % error)
 
 
 if __name__ == "__main__":

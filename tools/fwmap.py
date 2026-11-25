@@ -37,11 +37,11 @@ import argparse, bisect, collections, contextlib, os, re, subprocess, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import disasm  # noqa: E402  (objdump path, block cache, BASE)
+import toolchain  # noqa: E402
 
 OUT = os.path.join(ROOT, "build", "map")
 FW = disasm.DEFAULT_FW   # --fw, --base and --out override these three for other bodies or versions
 BASE = disasm.BASE
-BIN = os.path.join(disasm.ROOT, "build", "toolchain", "bin")  # made by uv run epm2mod init
 PAGE = 0x1000
 INSN = re.compile(r"^\s*([0-9a-f]+):\t(?:[0-9a-f ]+\t)?(\S+)\s*(.*)$")  # raw bytes column optional
 SYM = re.compile(r"^([0-9a-f]{8}) <(\w+)>:$")
@@ -197,6 +197,7 @@ def stage_elf(path, base, size, starts):
             f.write(f"\t.globl {name}\n\t.type {name},@function\n{name}:\n"
                     f"\t.incbin \"{path}\",{lo - base:#x},{hi - lo:#x}\n\t.size {name},{hi - lo:#x}\n")
     obj, elf = os.path.join(OUT, "fn.o"), os.path.join(OUT, "fn.elf")
+    BIN = toolchain.binutils_dir()
     subprocess.check_call([f"{BIN}/mn10300-elf-as", "-o", obj, asm])
     subprocess.check_call([f"{BIN}/mn10300-elf-ld", "-Ttext", f"{base:#x}", "-e", f"{base:#x}", "-o", elf, obj])
     dis = os.path.join(OUT, "functions.txt")
@@ -310,17 +311,32 @@ def stage_ptrs(data, base, strings, starts, code_pages):
                 f.write(f"{base + o:08x}\t{v:08x}\tstr\n")
 
 
-#: Every file that `build` writes, in the order it writes them. The last one is the mark that the build finished.
+#: Every file that `build` writes, in the order it writes them. The last one is the mark that the build finished:
+#: it says what made the database (made_by).
 FILES = ("linear.txt", "functions.txt", "calls.tsv", "strrefs.tsv", "functions.tsv", "fnidx.tsv", "ptrs.tsv",
-         "starts.tsv", "tasks.tsv")
+         "starts.tsv", "tasks.tsv", "made-by.txt")
+
+
+def made_by():
+    """What decides the database's content: the firmware file's sha256, the base, and the binutils' source commit."""
+    import hashlib
+    with open(FW, "rb") as f:
+        digest = hashlib.sha256(f.read()).hexdigest()
+    return "firmware sha256 %s\nbase %#x\nbinutils source commit %s\n" % (digest, BASE, toolchain.source_commit() or os.environ.get("EPM2_BINUTILS", "unknown"))
 
 
 def cmd_check(a):
-    """Exit status 0 when the database is complete: every file of FILES is there and not empty."""
+    """Exit status 0 when the database is complete and current: every file of FILES is there and not empty, and
+    the last one names today's firmware and binutils."""
     missing = [name for name in FILES if not os.path.isfile(os.path.join(OUT, name)) or not os.path.getsize(os.path.join(OUT, name))]
     if missing:
         sys.exit("the firmware map in %s is not complete (missing: %s): run tools/fwmap.py build" % (OUT, ", ".join(missing)))
-    print("the firmware map in %s is complete (%d files)" % (OUT, len(FILES)))
+    with open(os.path.join(OUT, FILES[-1])) as f:
+        was = f.read()
+    if was != made_by():
+        sys.exit("the firmware map in %s was made from another firmware or by other binutils: run tools/fwmap.py build\n"
+                 "made by:\n%snow:\n%s" % (OUT, was, made_by()))
+    print("the firmware map in %s is complete and current (%d files)" % (OUT, len(FILES)))
 
 
 def cmd_build(a):
@@ -356,6 +372,8 @@ def cmd_build(a):
     print(f"functions {n}, call edges {c}, string refs {r} -> {OUT}")
     with open(os.path.join(OUT, "tasks.tsv"), "w") as f, contextlib.redirect_stdout(f):
         cmd_tasks(a)  # the task table, which the scenario runs of emulator/liveview.py read
+    with open(os.path.join(OUT, FILES[-1]), "w") as f:
+        f.write(made_by())
 
 
 def load_tsv(name):

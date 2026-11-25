@@ -16,6 +16,9 @@ build/peaking-fast.BIN is absent, the run stops and names the command that makes
 Every run does every check again. No result is kept: a result depends on the scripts in tools/ and emulator/, the
 allow list, the firmware map and the emulator's commit, and a kept result could outlive a change to one of them.
 
+boot-test runs with --strict-times: a start whose time stamps moved (TIMES MOVED) is a FAIL here, because this
+tier has no result for "a person must read this". `epm2mod make` runs boot-test without it and prints the result.
+
 Results: PASS, FAIL, and in the full tier WARN: a scenario script that has no exit status. Read its RESULT lines,
 printed here. Nothing is skipped: a check that cannot run is a FAIL.
 Exit status: 0 when no check failed, 1 when one failed, 2 for a usage error.
@@ -124,7 +127,7 @@ def plan(description: Path, tier: str) -> list[Check]:
     checks = [
         Check("free-space", "quick", (py, "tools/freespace.py", "check", *specs, *first_code)),
         Check("op-check", "quick", (py, "emulator/opcheck.py", str(description))),
-        Check("boot-test", "quick", (py, "emulator/boot-test", str(image))),
+        Check("boot-test", "quick", (py, "emulator/boot-test", "--strict-times", str(image))),
         Check("update-path-test", "quick", (py, "emulator/update-path-test", str(image))),
     ]
     if tier == "quick":

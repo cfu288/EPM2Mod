@@ -42,7 +42,10 @@ CTOR_ENTRY, CTOR = 0x7F033AC8 + 4 * 44, 0x7EEC05FF   # segment 3's constructor t
 EXIF_DESC = 0x605BAEC0        # the EXIF template's ImageDescription, 32 B (template 0x605BA918 + 0x5A8)
 EXIF_DESC_STOCK = 0x7E8517C2  # "OLYMPUS DIGITAL CAMERA", which the boot copies there with 0x7E70B0F6
 BASE = slots.BLOCK0_BASE
-BIN = os.path.join(ROOT, "build", "toolchain", "bin")
+sys.path.insert(0, os.path.join(ROOT, "tools"))
+import toolchain  # noqa: E402
+
+BIN = toolchain.binutils_dir()
 STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
 # where the code goes: free runs of the segment-2 code areas, and for APPLY (.ap) the reclaimed code area of
 # segment 3 (docs/reference/code-space-map.md)

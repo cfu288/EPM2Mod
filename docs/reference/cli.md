@@ -715,7 +715,7 @@ epm2mod release [-h] [--final] [--build NAME] [--day YYYY.MM.DD] [--json]
 |---|---|---|
 | `--final` | a release for everyone (vYYYY.MM.DD); default: a test release (-rc.N) |  |
 | `--build NAME` | a test release of this camera-tested build in place of the pinned one (-NAME.N) |  |
-| `--day YYYY.MM.DD` | the day of the release, which is in the version and on the Firmware screen; default: today in UTC. Give the day of the dry run to make the release that it showed |  |
+| `--day YYYY.MM.DD` | the day of the release, which is in the version and on the Firmware screen; default: today in UTC. Give the day of the dry run to make the release that it showed. Not after today, and not before the day of the newest release tag |  |
 | `--json` | print one JSON document (schema 2) on stdout |  |
 
 `--json` keys beside the keys of every document:

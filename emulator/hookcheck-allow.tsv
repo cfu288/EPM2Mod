@@ -1,13 +1,16 @@
 # Hooks that emulator/hookcheck.py would fail, and that are accepted. Columns (tab-separated): address of the
 # jump or of the pointer word and its target as ADDRESS>TARGET (several of one reason: separated by spaces), date, class,
-# reason. An entry accepts that address with that target only. A range is not an entry: each word is listed. An entry needs evidence from the camera or a proof from the code. Keep this list short.
+# reason. An entry accepts that address with that target only. A range is not an entry: each word is listed.
+# Keep this list short. What an entry needs depends on its class:
 #
-# The class says how strong the reason is (the rule: docs/dev/load-order.md, section 2). `epm2mod lint` prints each
-# row of class inferred or timing that a build uses.
-#   proof     the code shows that the path starts only from late-loaded code.
-#   inferred  the path needs something the application does (a capture, a movie frame). The reading can be wrong.
-#   timing    the path can run from early-loaded code at any time; the camera's logs show that it runs after the
-#             copies, on the bodies and in the modes that were measured. An open risk.
+#   proof     a proof from the code that the path starts only from late-loaded code. No camera evidence is needed.
+#   inferred  a reading of the code: the path needs something the application does (a capture, a movie frame). The
+#             reading can be wrong. The reason says if a build with the entry was on a camera; an entry may be
+#             here before any camera test (the four of movie-ab, which data/builds/debug-log-movie-ab.json needs).
+#   timing    evidence from the camera: the path can run from early-loaded code at any time, and the logs show
+#             that it runs after the copies, on the bodies and in the modes that were measured. An open risk.
+# The rule behind the classes: docs/dev/load-order.md, section 2. `epm2mod lint` lists every entry of class
+# inferred or timing that a build uses. An entry that no build description in data/builds/ uses is removed.
 #
 # How each row got its class (2026-11-25, from the reason texts below and load-order.md sections 2 and 5):
 #   proof: the two task entry words 7E439C80 and 7E439C9C. The tasks are dormant in stock and the one call that

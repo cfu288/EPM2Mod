@@ -86,7 +86,7 @@ class PlanTests(unittest.TestCase):
     def test_a_named_build_is_a_test_release_with_its_notes(self) -> None:
         self.checked: list[str] = []
         self.assertFalse(self.paths.pinned.exists())  # the pinned build is not needed
-        release, problems = releasing.plan(self.paths, final=False, build="probe", day="2026.11.25")
+        release, problems = releasing.plan(self.paths, final=False, build="probe", day="2026.11.25", today="2026.11.25")
         self.assertEqual(problems, [])
         assert release is not None
         self.assertEqual((release.tag, release.commit), ("v2026.11.25-probe.2", "c0ffee"))
@@ -100,16 +100,39 @@ class PlanTests(unittest.TestCase):
     def test_a_build_with_the_label_of_the_day_is_released_as_tested_and_still_checked(self) -> None:
         self.checked = []
         with mock.patch.object(releasing, "stamp", lambda paths, build, day: (build, b"image")):
-            release, problems = releasing.plan(self.paths, final=False, build="probe", day="2026.11.20")
+            release, problems = releasing.plan(
+                self.paths, final=False, build="probe", day="2026.11.25", today="2026.11.26"
+            )
         self.assertEqual(problems, [])
         assert release is not None
-        self.assertEqual((release.sha256, release.day), ("ab" * 32, "2026.11.20"))
+        self.assertEqual((release.sha256, release.day), ("ab" * 32, "2026.11.25"))
         self.assertNotIn("Camera-tested as", release.notes)
         self.assertEqual(self.checked, ["2026.11.20", "probe.BIN"])  # the start-up and load-order checks ran
 
-    def test_the_day_is_a_real_date(self) -> None:
+    def test_the_day_is_a_real_date_not_after_today_and_not_before_the_newest_tag(self) -> None:
+        def plan(day: str) -> list[str]:
+            return releasing.plan(self.paths, final=False, build="probe", day=day, today="2026.11.26")[1]
+
         with self.assertRaises(BuildError):
-            releasing.plan(self.paths, final=False, build="probe", day="2026.13.01")
+            plan("2026.13.01")
+        with self.assertRaisesRegex(BuildError, "after today"):
+            plan("2026.11.27")
+        self.checked = []
+        self.assertEqual(plan("2026.11.26"), [])
+        self.assertEqual(plan("2026.11.25"), [])  # the day of the newest tag
+        self.assertEqual(plan("2026.11.24"), ["the day of the release 2026.11.24 is before the newest release tag's day (2026.11.25)"])
+
+    def test_a_workflow_that_runs_for_every_commit_must_have_run_for_this_commit(self) -> None:
+        for name, text in (("every.yml", "on:\n  push:\n    branches: [main]\n"), ("some.yml", "on:\n  push:\n    paths: ['web/**']\n")):
+            (self.paths.root / name).write_text(text)
+        self.paths.manifest["workflows"] = ["every.yml", "some.yml"]
+        listed = mock.Mock(returncode=0, stdout='[{"conclusion": "success", "status": "completed", "headSha": "0ldc0de"}]', stderr="")
+        with mock.patch.object(releasing.shutil, "which", return_value="gh"), mock.patch.object(
+            releasing.subprocess, "run", return_value=listed
+        ):
+            problems = CI_PROBLEMS(self.paths, "c0ffee")
+        # the run of an ancestor (git merge-base is faked to agree) counts for the workflow with a paths filter only
+        self.assertEqual(problems, ["every.yml: it runs for every commit, and its newest run is for 0ldc0de, not for this commit"])
 
     def test_a_failed_read_of_the_ci_runs_is_not_called_no_run(self) -> None:
         self.paths.manifest["workflows"] = [".github/workflows/python.yml"]

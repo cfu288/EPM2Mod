@@ -6,7 +6,8 @@
 #    today (UTC): give the day that a dry run printed to release what the dry run checked. The plan makes the
 #    image that is released: the pinned build with that day as its label (refused if it differs from the
 #    camera-tested image outside the date), or the tested image as it is when its label is that day already.
-#    The free-space, load-order and start-up checks run on that image in both cases.
+#    The start-up checks run on that image in both cases. The free-space and load-order checks read the build's
+#    specs, not the image: the date-only guard is what covers the stamped bytes.
 # 2. package: the zip, its start on three systems, the signed and notarized Mac disk image (package.yml). The
 #    environment "release" holds the signing secrets and asks for the owner's approval.
 # 3. publish, not with dry_run: the tag and the GitHub release, in one step.
