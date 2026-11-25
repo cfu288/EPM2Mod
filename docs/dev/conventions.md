@@ -219,7 +219,10 @@ Three layers. Each check is in one of them.
 | Soft report | `uv run epm2mod lint NAME` (`tools/buildlint.py`): the allow-list rows of the load-order check that the build uses and that are safe by timing or inference only, the early-loaded space it uses, first code, words in new early-loaded bytes that can be late-loaded addresses, the cold start for the camera test. Exit status 0 with any number of warnings, 6 when the report cannot be made | by hand and from the commit hook. Never in CI |
 
 `tools/checks.py NAME.json --tier full` adds the scenario runs of `emulator/scenarios/` (20 minutes). Run it before a
-build is offered for a flash. Its WARN results have RESULT lines that a person reads.
+build is offered for a flash. A scenario that prints "RESULT ...: FAIL" is a FAIL, whatever its exit status. A WARN
+is a scenario without an exit status that printed no FAIL: a person reads its RESULT lines. The reference build
+`peaking-fast` in these runs has no save guard and is of the films family: the save-guard scenario shows the fault
+on it (a REFERENCE line, not judged), and S6 judges the build under test by faults, not by a difference from it.
 
 `tools/checks.py` keeps no results and makes the build again in memory first: it stops when `build/NAME.BIN` is not
 what the description and its specs make now. No build is exempt from a check. When a newer check refuses a

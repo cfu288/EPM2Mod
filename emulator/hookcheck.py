@@ -73,6 +73,9 @@ def transfers(addr, code):
 
 
 CLASSES = ("proof", "inferred", "timing")
+#: The build descriptions, beside the pinned one, that use entries of the allow list. A test holds that every entry
+#: is used by the pinned build or one of these; an entry that none uses is removed.
+USED_BY = ("data/builds/debug-log-movie-ab.json",)
 
 
 class Allowed(str):
@@ -108,8 +111,14 @@ def spec_list(paths):
     """The spec paths: a build description (a JSON file with "specs") stands for its specs."""
     res = []
     for p in paths:
-        res += json.load(open(p)).get("specs") or [p]
-    return res
+        res += json.load(open(_rooted(p))).get("specs") or [p]
+    return [_rooted(p) for p in res]
+
+
+def _rooted(path):
+    """A path as given, or under the repository root when it is relative and not there under the working folder:
+    the result does not depend on where the command runs."""
+    return path if os.path.isabs(path) or os.path.exists(path) else os.path.join(os.path.dirname(HERE), path)
 
 
 def transfers_of(spec_paths):
@@ -141,7 +150,8 @@ def transfers_of(spec_paths):
             old, now = (transfers(lo - back, cut(b, lo - back, lo - back + 8))[:1] for b in (stock, image))
             if old and now and old[0][0] == now[0][0] == lo - back and old[0][2] != now[0][2] and segment(old[0][2]) in EARLY:
                 found[lo - back] = (now[0][1], now[0][2], name)
-        for a in range(lo, hi - 3):                       # a table word: a pointer to early code or data in stock
+        for a in range(lo - 3, hi):                       # a table word: a pointer to early code or data in stock.
+            # Every word that overlaps the run: an op that changes only the upper bytes of a stock pointer moves it too
             old, now = (int.from_bytes(cut(b, a, a + 4), "little") for b in (stock, image))
             if old != now and segment(old) in EARLY and segment(now) not in EARLY + ("outside block 0",):
                 found[a] = ("pointer", now, name)

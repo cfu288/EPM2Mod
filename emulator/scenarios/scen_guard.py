@@ -1,9 +1,11 @@
 """Scenario tests of the save guard (NOTES.md section 18). Uses emulator/liveview.py.
 
     python3 scen_guard.py SCENARIO NAME=BLOCK0 [NAME=BLOCK0 ...]
-    SCENARIO: s19 ... s26 or all. Each image runs alone; one line per image says PASS or FAIL.
-    An image whose NAME starts with "pinned" is judged as a build without the guard (use "pinned-fast", not "pinned":
-    scen_peaking.py gives an image of that exact name no request).
+    SCENARIO: s19 ... s26 or all. Each image runs alone; one RESULT line per image says PASS or FAIL.
+    An image whose NAME starts with "pinned" is the reference, a build without the guard (use "pinned-fast", not
+    "pinned": scen_peaking.py gives an image of that exact name no request). It gets a REFERENCE line and is not
+    judged: it shows the fault of 2026-11-16, which is what the scenario is for. Exit status 1 when a judged
+    image fails. Until 2026-11-25 the reference's FAIL decided the exit status, so the check failed for every build.
     The block-0 files are `block0_0100.bin` of `python3 tools/oetool.py unpack build/NAME.BIN /tmp/scratch/NAME`.
 
 What is modelled (the rig runs no capture: no TAKE_*, REC_* task, no development job):
@@ -146,6 +148,12 @@ class Run:
 def verdict(tag, runs):
     ok = True
     for name, bad in runs:
+        if name.startswith("pinned"):
+            # The reference: a build without the guard. It is run to show that the scenario finds the fault the guard
+            # is for, so what it shows is not a result of the build under test and does not decide the exit status.
+            OUT("  %s REFERENCE [%s], a build without the guard, not judged: %s" % (
+                tag, name, "no fault here" if not bad else "shows the fault: " + "; ".join(sorted(set(bad)))[:700]))
+            continue
         OUT("  %s RESULT [%s]: %s" % (tag, name, "PASS" if not bad else "FAIL: " + "; ".join(sorted(set(bad)))[:700]))
         ok &= not bad
     return ok

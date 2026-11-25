@@ -224,23 +224,36 @@ allow-listed jump; the three fills gave the same result in every run; 42 of 57 r
 `peaking-mf`: three entries reached 0x7ECB0B81, among them the real hook 0x7E6ECF91. The registers and RAM of
 these runs are not the camera's, so a clean run covers one path only.
 
-## 6. What a future check could look for
+## 6. What the checks look for, and what they do not
 
-Ideas only. Nothing here is built.
+State: 2026-11-25, after the engineering clean-up. The rules for the checks are in
+[conventions.md](conventions.md), section Checks.
 
-- **Run the load-order check on every build a branch changes,** not only on the pinned build. `freespace.py check`
-  already calls `hookcheck.py`, and `epm2mod make` calls it for a candidate; CI calls it for the pinned build only.
-- **A class per allow-list row** (proof, inferred, timing), and a report that prints each timing row a build uses
-  with its evidence, so a reviewer reads them in every PR.
-- **Jumps through a register and data reads.** `hookcheck.py` sees constant targets and changed stock pointers.
-  It does not see a pointer in new early-loaded code or a read of a late-loaded table. A scan of the patched
-  early-loaded bytes for any word that is a late-loaded address (in all four aliases) would list both.
-- **A cold-RAM run of each hook** in the function harness, as the trial in §5: differences between "copied" and
-  "noise" show a use of late-loaded memory that no static scan sees. It needs real state per hook to cover more
-  than one path.
-- **Callers, not only hooks.** Example 2 and the first row of §5 are both reached from one early function. A list
-  of the early-loaded functions that Usr0, USR_FAST and live view can reach before the last constructor walk
-  (from the call graph in `build/map/calls.tsv`) would turn "runs when" from a reading into a table.
-- **A cold start in the camera test of a build that touches early-loaded code:** 2 min off, and one body that is
-  known to show issue #6.
-- **Free early-loaded space as a number in the report,** so a PR shows what it spends of the 388 B.
+Built:
+
+- **The load-order check runs on every build a branch changes.** `tools/ci.sh` makes the pinned build and each
+  build description that differs from the base commit, and `tools/checks.py` runs `freespace.py check` (which calls
+  `emulator/hookcheck.py`) on each. V tool.
+- **A class per allow-list entry** (proof, inferred, timing) in `emulator/hookcheck-allow.tsv`. An entry is one
+  address with one target. `uv run epm2mod lint NAME` prints every entry of class inferred or timing that a build
+  uses, with its evidence. V tool.
+- **Pointers that an op rewrites, in whole or in part.** `hookcheck.py` looks at every 4-byte word that overlaps a
+  patched early-loaded run: a stock pointer to early-loaded space that points to late-loaded space in the build
+  fails, also when the op covers only some of its bytes. V tool (a test holds it).
+- **Words in new early-loaded bytes that can be late-loaded addresses,** in the four address forms: `epm2mod lint`
+  lists them (22 for `cold-start-fix`). It takes every byte position, so a hit can be chance. This is a warning,
+  not a check: nobody has gone through the 22. U which of them are pointers.
+- **Free early-loaded space as numbers:** `epm2mod lint` prints, for each free-space area the build uses in
+  early-loaded space, the bytes used and left (22 B and 228 B for `cold-start-fix`; the 138 B tail of segment 1 is
+  not printed, because that build has no bytes there).
+- **A cold start in the camera test:** `epm2mod lint` says so for a candidate that changes early-loaded bytes.
+
+Not built:
+
+- **Jumps through a register and reads of late-loaded data from new code.** No static check sees them beyond the
+  word list above.
+- **A cold-RAM run of each hook** in the function harness, as the trial in §5. It needs real state per hook to
+  cover more than one path.
+- **Callers, not only hooks.** A list of the early-loaded functions that Usr0, USR_FAST and live view can reach
+  before the last constructor walk (from `build/map/calls.tsv`) would turn "runs when" from a reading into a table.
+- **A body that shows issue #6** in the camera test.

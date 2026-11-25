@@ -19,8 +19,8 @@ allow list, the firmware map and the emulator's commit, and a kept result could 
 boot-test runs with --strict-times: a start whose time stamps moved (TIMES MOVED) is a FAIL here, because this
 tier has no result for "a person must read this". `epm2mod make` runs boot-test without it and prints the result.
 
-Results: PASS, FAIL, and in the full tier WARN: a scenario script that has no exit status. Read its RESULT lines,
-printed here. Nothing is skipped: a check that cannot run is a FAIL.
+Results: PASS, FAIL, and in the full tier WARN: a scenario script that has no exit status and printed no FAIL. Read
+its RESULT lines, printed here. A line "RESULT ...: FAIL" makes the check a FAIL whatever the exit status. Nothing is skipped: a check that cannot run is a FAIL.
 Exit status: 0 when no check failed, 1 when one failed, 2 for a usage error.
 
 The scenario checks of the superseded spec families films12 and log-core (colour stages, live view of the film
@@ -36,6 +36,7 @@ import dataclasses
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -45,6 +46,7 @@ ROOT = Path(__file__).resolve().parent.parent
 PEAKING = ROOT / "emulator" / "scenarios"
 TIERS = ("quick", "full")
 OUTPUT_TAIL = 4000  # characters of a check's output that are kept
+RESULT_FAIL = re.compile(r"RESULT.*: FAIL")
 
 
 @dataclasses.dataclass(frozen=True)
@@ -168,8 +170,11 @@ def run(check: Check, image: Path) -> Result:
         output, code = (done.stdout + done.stderr).strip(), done.returncode
     except (OSError, RuntimeError) as error:
         output, code = f"cannot run: {error}", 1
-    if code != 0:
+    printed_fail = any(RESULT_FAIL.search(line) for line in output.splitlines())
+    if code != 0 or printed_fail:  # a script that prints "RESULT ...: FAIL" and exits 0 has failed all the same
         status = "FAIL"
+        if code != 0:
+            output += f"\nexit status {code}"
     else:
         status = "PASS" if check.judged else "WARN"
     return Result(status, round(time.monotonic() - started, 1), output[-OUTPUT_TAIL:])
@@ -180,6 +185,8 @@ def summary(check: Check, result: Result) -> str:
     lines = result.output.splitlines()
     if result.status == "WARN" or result.status == "FAIL":
         marked = [line.strip() for line in lines if "RESULT" in line or line.startswith("FAIL")]
+        if result.status == "FAIL" and not any("FAIL" in line for line in marked):
+            marked += [line.strip() for line in lines[-4:]]  # no line says why: the end of the output, with the exit status
         return "\n      ".join(marked[-12:] or lines[-3:])
     return lines[-1].strip() if lines else ""
 

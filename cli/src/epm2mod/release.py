@@ -231,6 +231,8 @@ def check_only_the_label_differs(
         if index == block:
             same = same and a.payload[:start] == b.payload[:start]
             same = same and a.payload[end:] == b.payload[end:]
+            # the trailer is a copy of the header with the checksum in its last word: only that word may differ
+            same = same and a.trailer[:-4] == b.trailer[:-4]
         else:
             same = same and a.payload == b.payload and a.trailer == b.trailer
     if not same:

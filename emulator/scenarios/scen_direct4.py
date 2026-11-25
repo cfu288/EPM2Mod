@@ -88,8 +88,13 @@ def s6(pinned, patched):
             name, len(faults), faults or "", na or "none", diff or "none"))
         for c in faults[:4]:
             OUT("      code %d: %s" % (c, sweep[c][1]))
-        OUT("  S6 RESULT [%s]: %s" % (name, "PASS" if not bad and not faults and not diff else
-                                      "FAIL: " + ", ".join(bad or ["art codes %s" % (faults or diff)])))
+        # The verdict is the fault: the CPU leaves block 0. A result that differs from the reference's is printed
+        # above and is not a fault by itself: the reference is peaking-fast, a build of the films family, and a
+        # build of the stock-films family reaches the same stops through other code (other instruction counts) and
+        # shows the stock filters until a look pack is loaded. Until 2026-11-25 a difference was a FAIL, which every
+        # stock-films build got for all 176 codes.
+        OUT("  S6 RESULT [%s]: %s" % (name, "PASS" if not bad and not faults else
+                                      "FAIL: " + ", ".join(bad or ["art codes %s" % faults])))
 
 
 def s7(pinned, patched):

@@ -42,6 +42,8 @@ _CONFIGURE = (
     "--target=mn10300-elf --disable-nls --disable-werror --disable-gdb "
     "--disable-gdbserver --disable-sim --disable-gprofng --disable-gold"
 ).split()
+#: The environment variables that replace a pinned tool (the scripts that read them refuse them when CI is set).
+OVERRIDES = ("EPM2_BINUTILS", "OM_EMU_DIR", "OM_EMU_NODE")
 #: The file of the emulator submodule that shows it is the fork with the E-PM2's boot lab.
 _BOOT_LAB = ("emu", "bin", "boot.mjs")
 
@@ -191,6 +193,12 @@ def _emulator(paths: RepoPaths, update: bool) -> str:
             f"{relative} is at {have}, the checkout pins {want}: "
             f"git submodule update --init {relative}"
         )
+    changed = _run(["git", "status", "--porcelain"], folder, "git status")
+    if changed:
+        raise UnavailableError(
+            f"{relative} has changes that are not in its commit "
+            f"({changed.splitlines()[0].strip()}, ...): undo them"
+        )
     return have
 
 
@@ -200,6 +208,12 @@ def init(paths: RepoPaths, check: bool, log: Log) -> list[str]:
     Raises:
         Epm2ModError: without ``check``, if a step fails.
     """
+    for name in OVERRIDES:
+        if os.environ.get("CI") and os.environ.get(name):
+            raise UnavailableError(
+                f"{name} is set ({os.environ[name]}): it replaces a pinned tool, and the hard "
+                "checks use only what the checkout pins. Unset it"
+            )
     pinned_stock = paths.pinned_build().stock_firmware
     firmware_map = paths.firmware_map
     hooks = paths.relative(paths.location("hooks"))

@@ -9,7 +9,7 @@ call that reached it (read from the call instruction before MDR).
 Environment:
     OM_EMU_DIR   the om-emu checkout (default: the submodule emulator/om-emu, our fork with the E101 port;
                  uv run epm2mod init initialises it)
-    OM_EMU_NODE  Node >= 26 (default: `node` on PATH when it is new enough, else the newest Node of nvm)
+    OM_EMU_NODE  a Node executable (default: exactly the version in .nvmrc, from PATH or nvm: tools/node.sh)
 The defaults are in emuenv.py.
 """
 import json, os, struct, subprocess, sys, tempfile

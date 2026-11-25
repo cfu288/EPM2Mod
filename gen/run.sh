@@ -2,8 +2,8 @@
 # gen/run.sh [--check]: run every generator of gen/, in order. They write their patch specs into data/specs/.
 # --check: then fail if a committed spec differs from what its generator makes (CI runs this).
 # Needs: the MN103 binutils (uv run epm2mod init) and Olympus's firmware (uv run epm2mod fetch-stock).
-# Not needed and not checked: the E-PL6 firmware. interval/mkspec_v2.py and level-gauge/mkspec_step_b.py compare
-# their tables with it when it is on the computer and say "skipped" when it is not (gen/README.md).
+# Not read: the E-PL6 firmware. interval/mkspec_v2.py and level-gauge/mkspec_step_b.py compare their tables with it
+# only when its file is their argument, and this script gives none (gen/README.md).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 work=$(mktemp -d)

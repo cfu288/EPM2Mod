@@ -58,6 +58,10 @@ def require_om_emu():
         if len(want) < 2 or want[1] != have:
             raise EmuSetupError(f"{d} is at the commit {have or 'unknown'}, and the repository pins {want[1] if len(want) > 1 else 'none'}: "
                                 "run uv run epm2mod init (git submodule update --init emulator/om-emu)")
+        changed = subprocess.run(["git", "status", "--porcelain"], cwd=d, capture_output=True, text=True).stdout.strip()
+        if changed:  # the pinned commit with edited files is not the pinned emulator
+            raise EmuSetupError(f"{d} has changes that are not in its commit ({changed.splitlines()[0].strip()}, ...): "
+                                "undo them (git -C emulator/om-emu status), or set OM_EMU_DIR to say that another emulator is meant")
     return d
 
 
@@ -111,6 +115,8 @@ def blocks(image):
     name, path = image_bin(image)
     root = os.environ.get("EMU_IMAGES") or os.path.join(REPO, "build", "emu")
     out = os.path.join(root, f"{name}-{sha256(path)[:8]}")
+    if os.path.exists(os.path.join(out, "manifest.json")) and _block_sums(out) != _read(os.path.join(out, SUMS)):
+        shutil.rmtree(out)  # the unpacked blocks are not the ones that were written: unpack again
     if not os.path.exists(os.path.join(out, "manifest.json")):
         os.makedirs(root, exist_ok=True)
         tmp = f"{out}.tmp{os.getpid()}"
@@ -118,11 +124,29 @@ def blocks(image):
         if r.returncode != 0 or not os.path.exists(os.path.join(tmp, "manifest.json")):
             shutil.rmtree(tmp, ignore_errors=True)
             raise EmuSetupError(f"cannot unpack {path}: {(r.stderr or r.stdout).strip()[-300:]}")
+        with open(os.path.join(tmp, SUMS), "w") as f:
+            f.write(_block_sums(tmp))
         try:
             os.rename(tmp, out)
         except OSError:  # another process unpacked the same image in the meantime
             shutil.rmtree(tmp, ignore_errors=True)
     return out
+
+
+SUMS = "sha256sums.txt"  # in a folder of unpacked blocks: the sha256 of each file, written when it was unpacked
+
+
+def _block_sums(folder):
+    """The sha256 of every file of an unpacked image but SUMS, one line each."""
+    return "".join(f"{sha256(os.path.join(folder, name))}  {name}\n" for name in sorted(os.listdir(folder)) if name != SUMS)
+
+
+def _read(path):
+    try:
+        with open(path) as f:
+            return f.read()
+    except OSError:
+        return ""
 
 
 def tool_command(tool, args=()):

@@ -10,7 +10,8 @@
 #   timing    evidence from the camera: the path can run from early-loaded code at any time, and the logs show
 #             that it runs after the copies, on the bodies and in the modes that were measured. An open risk.
 # The rule behind the classes: docs/dev/load-order.md, section 2. `epm2mod lint` lists every entry of class
-# inferred or timing that a build uses. An entry that no build description in data/builds/ uses is removed.
+# inferred or timing that a build uses. An entry must be used by the pinned build or by a build description that
+# USED_BY in emulator/hookcheck.py names (a test checks those builds, not every description); else it is removed.
 #
 # How each row got its class (2026-11-25, from the reason texts below and load-order.md sections 2 and 5):
 #   proof: the two task entry words 7E439C80 and 7E439C9C. The tasks are dormant in stock and the one call that

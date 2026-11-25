@@ -90,7 +90,7 @@ def lint(description):
     for lo, hi in spans:
         if not early(lo):
             continue
-        for a in range(lo, hi - 3):
+        for a in range(lo - 3, hi):  # every word that overlaps the bytes, as emulator/hookcheck.py
             if a in accepted:  # a word that the allow list accepts with this target: warning 1 has it
                 continue
             word, old = (int.from_bytes(b[a - BASE:a - BASE + 4], "little") for b in (image, stock))

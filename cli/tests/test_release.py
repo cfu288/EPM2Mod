@@ -74,6 +74,12 @@ class StampTests(unittest.TestCase):
             bad = serialize(container.with_payloads(payloads))
             with self.subTest(offset=offset), self.assertRaises(BuildError):
                 release.check_only_the_label_differs(PATHS, self.tested_image, bad)
+        # the trailer of the label's block is a copy of the header: only its last word, the checksum, may differ
+        first = parse(self.image).blocks[block]
+        at = first.offset + len(first.header) + len(first.payload) + 4
+        flipped = self.image[:at] + bytes([self.image[at] ^ 1]) + self.image[at + 1 :]
+        with self.assertRaises(BuildError):
+            release.check_only_the_label_differs(PATHS, self.tested_image, flipped)
         other = parse(self.image)
         payloads = [b.payload if i == block else bytes([b.payload[0] ^ 1]) + b.payload[1:] for i, b in enumerate(other.blocks)]
         with self.assertRaises(BuildError):

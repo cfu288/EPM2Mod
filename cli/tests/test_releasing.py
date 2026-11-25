@@ -143,6 +143,13 @@ class PlanTests(unittest.TestCase):
             problems = CI_PROBLEMS(self.paths, "c0ffee")
         self.assertEqual(problems, ["python.yml: the runs cannot be read (gh: HTTP 401: Bad credentials)"])
 
+    def test_the_hint_is_the_command_for_the_release_that_was_planned(self) -> None:
+        self.checked = []
+        argv = ["--project", str(self.paths.root), "release", "--build", "probe", "--day", "2026.11.25"]
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(cli.main(argv), 0, err.getvalue())
+        self.assertIn("release -f kind=rc -f build=probe -f day=2026.11.25 -f dry_run=false", err.getvalue())
+
     def test_an_untested_build_is_not_released(self) -> None:
         self.assertEqual(
             releasing.plan(self.paths, final=False, build="untested"),

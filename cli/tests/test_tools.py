@@ -70,6 +70,10 @@ class FirmwareMapTests(unittest.TestCase):
             done = self.check(folder)
             self.assertEqual(done.returncode, 1)
             self.assertIn("another firmware", done.stderr)
+            self.assertIn("fwmap.py sha256", fwmap.made_by())  # a map of older map code is not current
+            older = fwmap.made_by().replace("fwmap.py sha256 ", "fwmap.py sha256 0")
+            (Path(folder) / fwmap.FILES[-1]).write_text(older)
+            self.assertEqual(self.check(folder).returncode, 1)
             (Path(folder) / fwmap.FILES[-1]).write_text(fwmap.made_by())
             self.assertEqual(self.check(folder).returncode, 0, done.stderr)
         self.assertIn("tasks.tsv", fwmap.FILES)  # emulator/liveview.py reads it
@@ -130,6 +134,19 @@ class EmulatorPinTests(unittest.TestCase):
                 with mock.patch.dict(os.environ, {name: "/x/elsewhere", "CI": ""}):
                     self.assertEqual(call(), "/x/elsewhere")
 
+    def test_an_edited_submodule_is_refused(self) -> None:
+        sys.path.insert(0, str(ROOT / "emulator"))
+        import emuenv
+
+        def run(command: list[str], **keywords: object) -> mock.Mock:
+            answers = {"ls-files": "160000 abc 0\temulator/om-emu\n", "rev-parse": "abc\n", "status": " M emu/bin/boot.mjs\n"}
+            return mock.Mock(stdout=answers[command[1]])
+
+        with mock.patch.dict(os.environ, {"OM_EMU_DIR": ""}), mock.patch.object(emuenv.os.path, "exists", return_value=True):
+            with mock.patch.object(emuenv.subprocess, "run", run):
+                with self.assertRaisesRegex(emuenv.EmuSetupError, "changes that are not in its commit"):
+                    emuenv.require_om_emu()
+
     def test_a_submodule_at_another_commit_is_refused(self) -> None:
         sys.path.insert(0, str(ROOT / "emulator"))
         import emuenv
@@ -139,6 +156,36 @@ class EmulatorPinTests(unittest.TestCase):
             with mock.patch.object(emuenv.subprocess, "run", return_value=other):
                 with self.assertRaisesRegex(emuenv.EmuSetupError, "the repository pins 0000000"):
                     emuenv.require_om_emu()
+
+
+@support.needs(HAVE_STOCK, support.STOCK_NEEDED)
+class UnpackedImageTests(unittest.TestCase):
+    def test_changed_blocks_in_the_folder_of_unpacked_images_are_not_reused(self) -> None:
+        sys.path.insert(0, str(ROOT / "emulator"))
+        import emuenv
+
+        with tempfile.TemporaryDirectory() as folder, mock.patch.dict(os.environ, {"EMU_IMAGES": folder}):
+            block = Path(emuenv.blocks("stock")) / "block0_0100.bin"
+            good = block.read_bytes()
+            block.write_bytes(bytes([good[0] ^ 1]) + good[1:])
+            self.assertEqual((Path(emuenv.blocks("stock")) / "block0_0100.bin").read_bytes(), good)
+
+
+class PrintedFailTests(unittest.TestCase):
+    def test_a_script_that_prints_a_failed_result_and_exits_0_has_failed(self) -> None:
+        def status(text: str) -> str:
+            check = checks.Check("s", "full", (sys.executable, "-c", f"print({text!r})"), judged=False)
+            return checks.run(check, Path("image.BIN")).status
+
+        self.assertEqual(status("  S6 RESULT [build]: FAIL: art codes [9]"), "FAIL")
+        self.assertEqual(status("  S6 RESULT [build]: PASS"), "WARN")
+
+    def test_a_failure_without_a_failed_result_line_shows_how_it_ended(self) -> None:
+        check = checks.Check("s", "full", (sys.executable, "-c", "print('S1 RESULT [b]: PASS'); raise SystemExit('boom')"))
+        result = checks.run(check, Path("image.BIN"))
+        self.assertEqual(result.status, "FAIL")
+        self.assertIn("boom", checks.summary(check, result))
+        self.assertIn("exit status 1", checks.summary(check, result))
 
 
 class StrictTimesTests(unittest.TestCase):

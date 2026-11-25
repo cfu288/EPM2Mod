@@ -75,14 +75,40 @@ class BuiltBytes(unittest.TestCase):
         pinned = str(ROOT / json.loads((ROOT / "data" / "pinned-build.json").read_text())["build"])
         used: list[tuple[int, int, hookcheck.Allowed]] = []
         hookcheck.check([pinned], hookcheck.read_allow(), lambda line: None, used)
-        text = "\n".join(buildlint.lint(pinned))
+        # the addresses of each row are on the row's own line, before its count and its reason
+        listed = set()
+        for line in "\n".join(buildlint.lint(pinned)).splitlines():
+            if line.strip().startswith("line "):
+                listed |= set(line.split(": ", 1)[1].split(" (", 1)[0].split())
         for address, _target, entry in used:
-            self.assertEqual("%08X" % address in text, entry.cls != "proof", hex(address))
+            self.assertEqual("%08X" % address in listed, entry.cls != "proof", hex(address))
+        self.assertEqual(len(listed), sum(entry.cls != "proof" for _, _, entry in used))
 
     def test_every_allow_entry_is_used_by_a_build_description(self) -> None:
         unused = set(hookcheck.read_allow())
-        for name in ("cold-start-fix", "debug-log-movie-ab"):  # the pinned build of 2026-11-25, and movie-ab
+        pinned = json.loads((ROOT / "data" / "pinned-build.json").read_text())["build"]
+        for build in (pinned, *hookcheck.USED_BY):  # not every description: one check of a build takes seconds
             used: list[tuple[int, int, str]] = []
-            hookcheck.check([str(ROOT / "data" / "builds" / f"{name}.json")], hookcheck.read_allow(), lambda line: None, used)
+            hookcheck.check([str(ROOT / build)], hookcheck.read_allow(), lambda line: None, used)
             unused -= {(address, target) for address, target, _ in used}
         self.assertEqual(unused, set())
+
+    def test_a_stock_pointer_that_an_op_rewrites_in_part_is_seen(self) -> None:
+        import tempfile
+
+        # the table word 0x7E78AEBC holds 0x7E56677A (segment 1) in stock. An op over its two upper bytes only
+        # makes it 0x7EBF677A (segment 2): the word starts before the op.
+        spec = {
+            "name": "partial",
+            "base": "firmware/stock/E-PM2/" + BUILD["stock"],
+            "base_sha256": json.loads((ROOT / BUILD["specs"][0]).read_text())["base_sha256"],
+            "ops": [{"type": "bytes", "block": 0, "offset": hex(0x7E78AEBC + 2 - hookcheck.BASE), "expect": "567e", "new": "bf7e"}],
+        }
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "partial.json"
+            path.write_text(json.dumps(spec))
+            lines: list[str] = []
+            self.assertFalse(hookcheck.check([str(path)], {}, lines.append))
+        fails = [line for line in lines if line.startswith("FAIL")]
+        self.assertEqual(len(fails), 1, lines)
+        self.assertIn("0x7E78AEBC (segment-1) pointer -> 0x7EBF677A (segment-2)", fails[0])

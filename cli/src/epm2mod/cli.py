@@ -1193,8 +1193,9 @@ def _release(args: argparse.Namespace, ctx: Context) -> int:
         print(release.notes)
         _hint(
             f"ready: {release.tag} on {release.commit[:7]}. To release it: "
-            f"gh workflow run release -f kind=rc -f day={release.day} -f dry_run=false "
-            "(kind=final for everyone)"
+            f"gh workflow run release -f kind={'final' if args.final else 'rc'} "
+            + (f"-f build={args.build} " if args.build else "")
+            + f"-f day={release.day} -f dry_run=false"
         )
     return DIFFERS if release is None else 0
 

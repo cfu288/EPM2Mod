@@ -23,7 +23,7 @@ Run them all: `gen/run.sh`. It needs the MN103 binutils (`uv run epm2mod init`) 
 
 `data/specs/peaking-gain-2x.json` is one byte written by hand. Every other spec that no folder here writes was made by an experiment script; its notes in `experiments/` are the record.
 
-Two generators (`interval/mkspec_v2.py`, `level-gauge/mkspec_step_b.py`) also compare their work with the E-PL6
-firmware when that file is on the computer, and print "no E-PL6 firmware" and go on when it is not. The file is not
-in the repository and no command fetches it: only the owner runs that comparison. `gen/run.sh --check` does not need
-it.
+Two generators (`interval/mkspec_v2.py`, `level-gauge/mkspec_step_b.py`) can also compare their work with the E-PL6
+firmware: `uv run python gen/interval/mkspec_v2.py /path/to/OLY_E_112_1400_0000_0000.BIN.lzma`. The file is not in
+the repository, no command fetches it and the generators look in no default place, so `gen/run.sh` never makes that
+comparison: only the owner runs it, by hand.

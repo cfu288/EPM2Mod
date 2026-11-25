@@ -318,11 +318,18 @@ FILES = ("linear.txt", "functions.txt", "calls.tsv", "strrefs.tsv", "functions.t
 
 
 def made_by():
-    """What decides the database's content: the firmware file's sha256, the base, and the binutils' source commit."""
+    """What decides the database's content: the firmware file's sha256, the base, the binutils' source commit, and
+    the code that writes it (this script and tools/disasm.py)."""
     import hashlib
-    with open(FW, "rb") as f:
-        digest = hashlib.sha256(f.read()).hexdigest()
-    return "firmware sha256 %s\nbase %#x\nbinutils source commit %s\n" % (digest, BASE, toolchain.source_commit() or os.environ.get("EPM2_BINUTILS", "unknown"))
+
+    def digest(path):
+        with open(path, "rb") as f:
+            return hashlib.sha256(f.read()).hexdigest()
+
+    here = os.path.dirname(os.path.abspath(__file__))
+    return "firmware sha256 %s\nbase %#x\nbinutils source commit %s\nfwmap.py sha256 %s\ndisasm.py sha256 %s\n" % (
+        digest(FW), BASE, toolchain.source_commit() or os.environ.get("EPM2_BINUTILS", "unknown"),
+        digest(os.path.join(here, "fwmap.py")), digest(os.path.join(here, "disasm.py")))
 
 
 def cmd_check(a):

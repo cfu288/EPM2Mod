@@ -10,9 +10,8 @@
 # firmware, the firmware map). EPM2_BINUTILS, OM_EMU_DIR and OM_EMU_NODE replace pinned tools: with one of them
 # set, the checks that use the tool fail here.
 # Exit status 0: every check passed. A check that cannot run is a failure, not a skip, and no build is exempt.
-# One exception, stated here because it is not a check of this repository: two generators also compare their
-# tables with the E-PL6 firmware when that file is on the computer (gen/README.md). No clone has it, the
-# generators say so in the log, and the committed specs are compared all the same.
+# No check reads a file that a clone does not have: two generators can compare their tables with the E-PL6
+# firmware, and they do so only when that file is given as their argument, which gen/run.sh never does.
 # Nothing here warns: the soft report of a build is `uv run epm2mod lint NAME`.
 #
 # The builds that the python part makes and checks: the pinned build, and each data/builds/*.json that differs

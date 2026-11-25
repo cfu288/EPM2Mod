@@ -11,6 +11,9 @@ from pathlib import Path
 from typing import Any, Callable
 
 ROOT = Path(__file__).resolve().parents[2]
+# Some tests run a command as a user does in the checkout, where the command finds the project from the working
+# folder. So the tests' results do not depend on where the test run was started.
+os.chdir(ROOT)
 if str(ROOT / "cli" / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "cli" / "src"))
 

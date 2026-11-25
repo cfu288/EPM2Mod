@@ -1340,6 +1340,37 @@ class CommandLineTests(RepoCase):
         neither = missing(0, "abc")
         self.assertNotIn("the firmware map", neither)
         self.assertNotIn("MN103 binutils", neither)
+        for (
+            name
+        ) in (
+            init.OVERRIDES
+        ):  # with CI set, a variable that replaces a pinned tool is refused here too
+            with mock.patch.dict(os.environ, {"CI": "1", name: "/x/elsewhere"}):
+                with self.assertRaisesRegex(UnavailableError, name):
+                    init.init(paths, True, lambda line: None)
+
+    def test_init_does_not_take_an_edited_emulator_for_the_pinned_one(self) -> None:
+        from epm2mod import init
+
+        paths = self.repo.paths
+        marker = paths.location("emulator").joinpath(*init._BOOT_LAB)
+        marker.parent.mkdir(parents=True)
+        marker.write_text("x")
+        answers = {"rev-parse": "abc", "status": " M emu/bin/boot.mjs"}
+        with (
+            mock.patch.object(init, "_pinned_commit", return_value="abc"),
+            mock.patch.object(
+                init,
+                "_run",
+                lambda command, cwd, what, env=None: answers[str(command[1])],
+            ),
+        ):
+            with self.assertRaisesRegex(
+                UnavailableError, "changes that are not in its commit"
+            ):
+                init._emulator(paths, False)
+            answers["status"] = ""
+            self.assertEqual(init._emulator(paths, False), "abc")
 
     def test_a_build_is_named_not_given_as_a_path(self) -> None:
         for argv in (
