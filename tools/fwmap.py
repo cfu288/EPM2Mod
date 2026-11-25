@@ -348,8 +348,9 @@ def cmd_check(a):
 
 def cmd_build(a):
     os.makedirs(OUT, exist_ok=True)
-    if os.path.exists(os.path.join(OUT, FILES[-1])):
-        os.remove(os.path.join(OUT, FILES[-1]))  # a build that stops half-way leaves no mark
+    for name in FILES:  # every file is written again: a file of an earlier build is not reused, and a build
+        if os.path.exists(os.path.join(OUT, name)):  # that stops half-way leaves no mark
+            os.remove(os.path.join(OUT, name))
     base = BASE
     path, data = block()
     strings, data_pages = string_index(data)

@@ -72,7 +72,7 @@ class PlanTests(unittest.TestCase):
             mock.patch.object(releasing, "_ci_problems", return_value=[]),
             mock.patch.object(releasing, "stamp", self.stamp),
             mock.patch.object(releasing, "check_free_space", lambda paths, build: self.checked.append(build.label)),
-            mock.patch.object(releasing, "check_in_emulator", lambda paths, image: self.checked.append(image.name)),
+            mock.patch.object(releasing, "check_in_emulator", lambda paths, image, strict_times=False: self.checked.append(image.name + " strict" * strict_times)),
             mock.patch.object(readme, "is_current", return_value=True),
             mock.patch.object(readme, "feature_problems", return_value=[]),
         ):
@@ -93,7 +93,7 @@ class PlanTests(unittest.TestCase):
         # the release holds the build with the day of the release as its label, checked as a candidate is
         self.assertIn("Firmware: EPM2Mod 2026.11.25, sha256 `" + "cd" * 32 + "`.", release.notes)
         self.assertIn("Camera-tested as sha256 `" + "ab" * 32 + "` (label 2026.11.20)", release.notes)
-        self.assertEqual(self.checked, ["2026.11.25", "probe.BIN"])
+        self.assertEqual(self.checked, ["2026.11.25", "probe.BIN strict"])
         self.assertIn("\nThe probe build.\n", release.notes)
         self.assertIn("- feat: a probe\n", release.notes)
 
@@ -107,7 +107,7 @@ class PlanTests(unittest.TestCase):
         assert release is not None
         self.assertEqual((release.sha256, release.day), ("ab" * 32, "2026.11.25"))
         self.assertNotIn("Camera-tested as", release.notes)
-        self.assertEqual(self.checked, ["2026.11.20", "probe.BIN"])  # the start-up and load-order checks ran
+        self.assertEqual(self.checked, ["2026.11.20", "probe.BIN strict"])  # the start-up and load-order checks ran
 
     def test_the_day_is_a_real_date_not_after_today_and_not_before_the_newest_tag(self) -> None:
         def plan(day: str) -> list[str]:
@@ -133,6 +133,40 @@ class PlanTests(unittest.TestCase):
             problems = CI_PROBLEMS(self.paths, "c0ffee")
         # the run of an ancestor (git merge-base is faked to agree) counts for the workflow with a paths filter only
         self.assertEqual(problems, ["every.yml: it runs for every commit, and its newest run is for 0ldc0de, not for this commit"])
+
+    def test_a_start_whose_times_moved_stops_the_release(self) -> None:
+        def moved(paths: RepoPaths, image: Path, strict_times: bool = False) -> list[str]:
+            if strict_times:  # what pipeline.check_in_emulator does for boot-test's exit status 1
+                raise BuildError("boot-test: TIMES MOVED: 2 time stamp(s)\nboot-test failed")
+            return ["boot-test: TIMES MOVED"]
+
+        self.checked = []
+        with mock.patch.object(releasing, "check_in_emulator", moved):
+            release, problems = releasing.plan(self.paths, final=False, build="probe", day="2026.11.25", today="2026.11.25")
+        self.assertIsNone(release)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("TIMES MOVED", problems[0])
+
+    def test_an_old_run_does_not_count_after_a_watched_file_changed(self) -> None:
+        (self.paths.root / "some.yml").write_text("on:\n  push:\n    paths: ['web/**', 'x.json']\n")
+        self.paths.manifest["workflows"] = ["some.yml"]
+        asked: list[list[str]] = []
+
+        def run(command: list[str], **keywords: object) -> mock.Mock:
+            asked.append(command)
+            if command[0] == "gh":
+                return mock.Mock(returncode=0, stdout='[{"conclusion": "success", "status": "completed", "headSha": "0ldc0de"}]', stderr="")
+            return mock.Mock(returncode=1 if command[1] == "diff" and changed else 0)
+
+        with mock.patch.object(releasing.shutil, "which", return_value="gh"), mock.patch.object(releasing.subprocess, "run", run):
+            changed = True
+            self.assertEqual(
+                CI_PROBLEMS(self.paths, "c0ffee"),
+                ["some.yml: files that it watches changed after its newest run (0ldc0de), and it has not run since"],
+            )
+            changed = False
+            self.assertEqual(CI_PROBLEMS(self.paths, "c0ffee"), [])
+        self.assertIn(["git", "diff", "--quiet", "0ldc0de", "c0ffee", "--", "web/**", "x.json"], asked)
 
     def test_a_failed_read_of_the_ci_runs_is_not_called_no_run(self) -> None:
         self.paths.manifest["workflows"] = [".github/workflows/python.yml"]

@@ -43,7 +43,7 @@ def binutils_dir():
     if not os.path.exists(os.path.join(folder, PREFIX + "objdump")):
         raise ToolchainError(f"no MN103 binutils in {folder}: {SETUP_HINT}")
     built, pinned = source_commit(), pinned_commit(SOURCE)
-    if built != pinned:
+    if not pinned or built != pinned:  # no pin that git can name is not a match
         raise ToolchainError(f"the MN103 binutils in {folder} are built from the source commit {built or 'unknown'}, "
                              f"and the repository pins {pinned or 'none'}: {SETUP_HINT}")
     return folder

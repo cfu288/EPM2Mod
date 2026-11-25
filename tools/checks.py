@@ -5,8 +5,8 @@
 
 quick   the static checks, the emulator start and the update path. Every result is PASS or FAIL: tools/ci.sh
         runs this tier. Run it after each change. Under a minute.
-full    quick, and the scenario runs of emulator/scenarios/ (the peaking save guard, the peaking scenarios).
-        About 20 minutes. Run it once before a build is offered for a flash.
+full    quick, and for a build with a peaking spec the scenario runs of emulator/scenarios/ (the save guard,
+        the peaking scenarios). About 20 minutes. Run it once before a build is offered for a flash.
 
 The image build/NAME.BIN must exist (`epm2mod make NAME`) and must be what the description and its specs make
 now: the run makes the build again in memory and stops when the sha256 differs, so the emulator never runs an
@@ -19,8 +19,12 @@ allow list, the firmware map and the emulator's commit, and a kept result could 
 boot-test runs with --strict-times: a start whose time stamps moved (TIMES MOVED) is a FAIL here, because this
 tier has no result for "a person must read this". `epm2mod make` runs boot-test without it and prints the result.
 
-Results: PASS, FAIL, and in the full tier WARN: a scenario script that has no exit status and printed no FAIL. Read
-its RESULT lines, printed here. A line "RESULT ...: FAIL" makes the check a FAIL whatever the exit status. Nothing is skipped: a check that cannot run is a FAIL.
+Results: PASS or FAIL, by the exit status of the check's script. No scenario that ran ends without a verdict. A
+line "RESULT ...: FAIL" with exit status 0 is a FAIL too. Every RESULT and REFERENCE line is printed.
+
+The references of the scenarios: the stock firmware for the peaking scenarios (with the request clear the build
+must do what stock does, but for writes to the mod's own RAM; S6 compares the verdict of each art code), and for
+the save guard the camera-tested build peaking-fast, a peaking build without the guard, which must show the fault.
 Exit status: 0 when no check failed, 1 when one failed, 2 for a usage error.
 
 The scenario checks of the superseded spec families films12 and log-core (colour stages, live view of the film
@@ -45,7 +49,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PEAKING = ROOT / "emulator" / "scenarios"
 TIERS = ("quick", "full")
-OUTPUT_TAIL = 4000  # characters of a check's output that are kept
 RESULT_FAIL = re.compile(r"RESULT.*: FAIL")
 
 
@@ -57,13 +60,11 @@ class Check:
         name: short name, shown in the report.
         tier: "quick" or "full".
         command: the command line, run in the repository root.
-        judged: True when the exit status says pass or fail; False for a script that only prints results.
     """
 
     name: str
     tier: str
     command: tuple[str, ...] = ()
-    judged: bool = True
 
 
 @dataclasses.dataclass(frozen=True)
@@ -137,14 +138,13 @@ def plan(description: Path, tier: str) -> list[Check]:
 
     peaking = has("data/specs/peaking-")
     name = description.stem
-    if has("peaking-save-guard"):
+    if peaking:
+        # for every peaking build, with the guard's spec or without: a build without the guard must fail here
         current_image("peaking-fast")
         script = PEAKING / "scen_guard.py"
         checks.append(Check("save-guard", "full", (py, str(script), "all", "pinned-fast={block0:peaking-fast}", f"{name}={{block0}}")))
-    if peaking:
-        current_image("peaking-fast")
         for label, script in (("peaking-s1-s5", PEAKING / "scen_peaking.py"), ("peaking-s6-s7", PEAKING / "scen_direct4.py")):
-            checks.append(Check(label, "full", (py, str(script), "all", "{block0:peaking-fast}", f"{name}={{block0}}"), judged=False))
+            checks.append(Check(label, "full", (py, str(script), "all", "{block0:stock}", f"{name}={{block0}}")))
     return checks
 
 
@@ -156,7 +156,8 @@ def resolve(command: tuple[str, ...], image: Path) -> list[str]:
             start = word.index("{block0")
             end = word.index("}", start)
             inner = word[start + 1 : end]
-            source = image if inner == "block0" else ROOT / "build" / (inner.split(":", 1)[1] + ".BIN")
+            other = inner.split(":", 1)[1] if ":" in inner else ""
+            source = image if not other else "stock" if other == "stock" else ROOT / "build" / (other + ".BIN")
             word = word[:start] + str(block0(source)) + word[end + 1 :]
         out.append(word)
     return out
@@ -171,23 +172,23 @@ def run(check: Check, image: Path) -> Result:
     except (OSError, RuntimeError) as error:
         output, code = f"cannot run: {error}", 1
     printed_fail = any(RESULT_FAIL.search(line) for line in output.splitlines())
-    if code != 0 or printed_fail:  # a script that prints "RESULT ...: FAIL" and exits 0 has failed all the same
+    if code != 0 or printed_fail:  # the exit status decides; a printed "RESULT ...: FAIL" with exit 0 fails all the same
         status = "FAIL"
         if code != 0:
             output += f"\nexit status {code}"
     else:
-        status = "PASS" if check.judged else "WARN"
-    return Result(status, round(time.monotonic() - started, 1), output[-OUTPUT_TAIL:])
+        status = "PASS"
+    return Result(status, round(time.monotonic() - started, 1), output)
 
 
 def summary(check: Check, result: Result) -> str:
     """Return the lines of a check's output that say its result."""
     lines = result.output.splitlines()
-    if result.status == "WARN" or result.status == "FAIL":
-        marked = [line.strip() for line in lines if "RESULT" in line or line.startswith("FAIL")]
+    marked = [line.strip()[:400] for line in lines if " RESULT" in line or " REFERENCE [" in line or line.startswith("FAIL")]
+    if marked or result.status == "FAIL":  # every result line of a scenario, none cut off
         if result.status == "FAIL" and not any("FAIL" in line for line in marked):
             marked += [line.strip() for line in lines[-4:]]  # no line says why: the end of the output, with the exit status
-        return "\n      ".join(marked[-12:] or lines[-3:])
+        return "\n      ".join(marked or lines[-3:])
     return lines[-1].strip() if lines else ""
 
 
@@ -218,7 +219,7 @@ def main(argv: list[str]) -> int:
         failed += result.status == "FAIL"
         took = f"{result.seconds:.0f} s"
         print(f"{result.status:6s} {check.name:18s} {took:>7s}  {summary(check, result)}")
-    counts = {s: sum(r.status == s for r in results) for s in ("PASS", "FAIL", "WARN")}
+    counts = {s: sum(r.status == s for r in results) for s in ("PASS", "FAIL")}
     print(f"{description.stem}, tier {args.tier}: " + ", ".join(f"{n} {s}" for s, n in counts.items() if n) + f"; {time.monotonic() - started:.0f} s")
     return 1 if failed else 0
 

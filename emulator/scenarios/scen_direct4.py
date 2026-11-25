@@ -9,6 +9,8 @@ S6  Picture Mode change to the Velvia entry (ART 7, picture mode 106) and back, 
     parameters: the dispatch of 0x7E56D1C3 (table 0x7E78C254, index code - 9), run as a code piece from 0x7E56D2AB
     (d3 = art code) to one of the function's own continuation points. Then the same piece for every art code 9-184.
     FAULT = the CPU leaves block 0. "n/a" = the handler needs job data that a piece does not have (Cross Process).
+    S6 fails for a FAULT and for a code whose verdict word is not the reference's (PINNED_BLOCK0: the stock firmware).
+    Exit status 1 when S6 or S7 fails.
     The live-view rig alone does not reach this stage (it gives the IMG library no colour work), which is why S1 to
     S5 missed the fault.
 S7  The sleep routine "pwr_standby start" 0x7E53A55C, called as the SRAM code calls it (frame of the call at
@@ -44,9 +46,25 @@ def six_axis(sc, code):
         return "ok", "reaches 0x%08X in %d instructions" % (pc, r.insns)
     if in_block0(sc, pc):
         # Cross Process (85, 87): the handler goes on into the scene statistics code, which needs the job data of
-        # a real call. The piece has none. The run stays in block 0; it counts only if it differs from pinned.
+        # a real call. The piece has none. The run stays in block 0. s6_fails() counts it when the reference's
+        # verdict for the code is another one: a code that is "ok" in the reference and ends here has a fault.
         return "n/a", "handler needs job data that the piece does not give (%s)" % r.fault.splitlines()[0][:60]
     return "FAULT", r.fault.splitlines()[0]
+
+
+FAILED = []
+
+
+def fail(text):
+    FAILED.append(text)
+    return text
+
+
+def s6_fails(sweep, reference):
+    """The art codes that fail S6: a FAULT (the CPU leaves block 0), or a verdict word (ok, n/a, FAULT) that is not
+    the reference's. The words are compared, not the texts: a build reaches the same stop through other code, in
+    another number of instructions, and that is no fault. The reference is the stock firmware."""
+    return [c for c in sweep if sweep[c][0] == "FAULT" or sweep[c][0] != reference[c][0]]
 
 
 def movie_code(image, pm):
@@ -88,13 +106,9 @@ def s6(pinned, patched):
             name, len(faults), faults or "", na or "none", diff or "none"))
         for c in faults[:4]:
             OUT("      code %d: %s" % (c, sweep[c][1]))
-        # The verdict is the fault: the CPU leaves block 0. A result that differs from the reference's is printed
-        # above and is not a fault by itself: the reference is peaking-fast, a build of the films family, and a
-        # build of the stock-films family reaches the same stops through other code (other instruction counts) and
-        # shows the stock filters until a look pack is loaded. Until 2026-11-25 a difference was a FAIL, which every
-        # stock-films build got for all 176 codes.
-        OUT("  S6 RESULT [%s]: %s" % (name, "PASS" if not bad and not faults else
-                                      "FAIL: " + ", ".join(bad or ["art codes %s" % faults])))
+        wrong = s6_fails(sweep, results["pinned"])
+        OUT("  S6 RESULT [%s]: %s" % (name, "PASS" if not bad and not wrong else
+                                      fail("FAIL: " + ", ".join(bad or ["art codes %s" % wrong]))))
 
 
 def s7(pinned, patched):
@@ -114,7 +128,7 @@ def s7(pinned, patched):
                 "instructions ran: %s; entered mov_art_set_line_yc_param at 0x7E6CD9D6: %s; end: %s" % (
                     name, same, stock_start, stray, (r.fault or "returned").splitlines()[0][:110]))
             OUT("  S7 RESULT [%s]: %s" % (name, "PASS" if same and stock_start and not stray else
-                                          "FAIL: the sleep routine is overwritten"))
+                                          fail("FAIL: the sleep routine is overwritten")))
 
 
 def main():
@@ -124,6 +138,8 @@ def main():
         if which in (n, "all"):
             fn(pinned, patched)
             OUT("")
+    sys.exit(1 if FAILED else 0)
 
 
-main()
+if __name__ == "__main__":
+    main()

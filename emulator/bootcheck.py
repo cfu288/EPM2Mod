@@ -284,6 +284,7 @@ def main(test, argv):
         ap.add_argument("--rule", action="store_true", help="print the comparison rule and stop")
         ap.add_argument("--strict-times", action="store_true", help=f"exit status 1 when only time stamps moved by more than {TIME_TOLERANCE_MS} ms (default: 0)")
     else:
+        ap.add_argument("--strict-times", action="store_true", help="accepted so that both start-up checks take the same arguments; this test has no time stamps to judge")
         ap.add_argument("--update-file", help="the file to put on the card as DCOLYMP/E1019999.BIN (default: the stock firmware file)")
     a = ap.parse_args(argv)
     if test is boot_test and a.rule:

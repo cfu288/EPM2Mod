@@ -1125,6 +1125,15 @@ class MakeTests(RepoCase):
         self.assertIn("boot-test cannot run", str(caught.exception))
         self.assertEqual(self.repo.outputs(), [])
 
+    def test_strict_times_reaches_the_start_up_checks(self) -> None:
+        script = "import sys\nprint('boot-test: TIMES MOVED')\nsys.exit('--strict-times' in sys.argv)\n"
+        for tool in self.repo.paths.emulator_checks:
+            self.repo.write(self.repo.paths.relative(tool), script.encode())
+        image = self.repo.write("x.BIN", b"image")
+        self.assertEqual(len(pipeline.check_in_emulator(self.repo.paths, image)), 2)
+        with self.assertRaisesRegex(BuildError, "TIMES MOVED"):
+            pipeline.check_in_emulator(self.repo.paths, image, strict_times=True)
+
     def test_a_candidate_that_fails_in_the_emulator_is_removed(self) -> None:
         self.repo.free_space_tool(0)
         self.repo.emulator_check("boot-test", 1)

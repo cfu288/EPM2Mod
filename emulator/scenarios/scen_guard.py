@@ -3,9 +3,9 @@
     python3 scen_guard.py SCENARIO NAME=BLOCK0 [NAME=BLOCK0 ...]
     SCENARIO: s19 ... s26 or all. Each image runs alone; one RESULT line per image says PASS or FAIL.
     An image whose NAME starts with "pinned" is the reference, a build without the guard (use "pinned-fast", not
-    "pinned": scen_peaking.py gives an image of that exact name no request). It gets a REFERENCE line and is not
-    judged: it shows the fault of 2026-11-16, which is what the scenario is for. Exit status 1 when a judged
-    image fails. Until 2026-11-25 the reference's FAIL decided the exit status, so the check failed for every build.
+    "pinned": scen_peaking.py gives an image of that exact name no request). It gets a REFERENCE line and is judged
+    for what it must show (REFERENCE_SHOWS_FAULT): the fault of 2026-11-16 where the scenario is for it, none
+    elsewhere. Exit status 1 when an image fails, the reference too.
     The block-0 files are `block0_0100.bin` of `python3 tools/oetool.py unpack build/NAME.BIN /tmp/scratch/NAME`.
 
 What is modelled (the rig runs no capture: no TAKE_*, REC_* task, no development job):
@@ -145,14 +145,23 @@ class Run:
             self.bad.append("held frame: L or the heap mode is not as the guard should leave it")
 
 
+#: The scenarios in which a build without the guard shows the fault (run of peaking-fast, 2026-11-25).
+REFERENCE_SHOWS_FAULT = {"S19": True, "S20": True, "S21": True, "S22": True, "S23": True, "S24": True, "S25": False, "S26": False}
+
+
 def verdict(tag, runs):
     ok = True
     for name, bad in runs:
         if name.startswith("pinned"):
-            # The reference: a build without the guard. It is run to show that the scenario finds the fault the guard
-            # is for, so what it shows is not a result of the build under test and does not decide the exit status.
-            OUT("  %s REFERENCE [%s], a build without the guard, not judged: %s" % (
-                tag, name, "no fault here" if not bad else "shows the fault: " + "; ".join(sorted(set(bad)))[:700]))
+            # The reference: a build without the guard. It is judged for what it must show: in the scenarios of
+            # REFERENCE_SHOWS_FAULT it must show the fault the guard is for (else the scenario no longer finds that
+            # fault, or the reference is not a build without the guard), and in the others it must show none.
+            must = REFERENCE_SHOWS_FAULT[tag]
+            right = bool(bad) == must
+            OUT("  %s REFERENCE [%s], a build without the guard: %s: %s" % (
+                tag, name, "PASS" if right else "FAIL", ("shows the fault, as it must" if must else "shows a fault it must not show") + ": " +
+                "; ".join(sorted(set(bad)))[:700] if bad else "no fault here" + ("" if not must else ", and it must show one")))
+            ok &= right
             continue
         OUT("  %s RESULT [%s]: %s" % (tag, name, "PASS" if not bad else "FAIL: " + "; ".join(sorted(set(bad)))[:700]))
         ok &= not bad
@@ -390,4 +399,5 @@ def main():
     sys.exit(0 if ok else 1)
 
 
-main()
+if __name__ == "__main__":
+    main()

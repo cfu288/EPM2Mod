@@ -18,8 +18,9 @@ commit, not today's.
 | Step 13, `epm2mod release --dry-run`, the version from the label | `epm2mod release` only plans (`--json`, `--day`); `--dry-run` and `--push` are gone. The version is the day of the release, and the release holds the pinned build with that day as its label |
 | Layer 4, "Everything else follows from the commit" | The version and the image also follow from the day: the input `day` of `release.yml` |
 
-Open: the full tier of `tools/checks.py` shows `save-guard` FAIL and S6 FAIL on the pinned build (hidden behind SKIP
-before); the workflows have not run on GitHub yet; the environment `release` must allow `main`.
+Open: the workflows have not run on GitHub yet; the environment `release` must allow `main`. The full tier of
+`tools/checks.py` was hidden behind SKIP before the work; what it showed on the pinned build and what became of it
+is in [conventions.md](conventions.md), section Checks.
 
 **The plan as written.** Nothing in it was done at that time. Date: 2026-11-25. Audited commit: `3b68278` (main). The fresh-clone test ran on `ccbad1a`, one merge
 earlier; the files it used did not change in between.

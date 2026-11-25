@@ -69,7 +69,8 @@ class ScriptImportTests(unittest.TestCase):
         self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
 
     def test_every_local_import_has_a_file(self) -> None:
-        scripts = [p for p in script_files() if p.endswith(".py")]
+        scripts = script_files()  # also boot-test, update-path-test, emu-run, mkstate: scripts without a suffix
+        self.assertIn("emulator/boot-test", scripts)
         self.assertTrue(scripts)
         missing = []
         for script in scripts:

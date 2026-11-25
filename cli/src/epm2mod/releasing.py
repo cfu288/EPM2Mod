@@ -140,6 +140,22 @@ def _git(paths: RepoPaths, *args: str) -> str:
     return done.stdout.strip()
 
 
+def _watched_paths_changed(
+    paths: RepoPaths, workflow: str, ran: str, commit: str
+) -> bool:
+    """Return True if a file that ``workflow`` watches (its first ``paths`` list) differs between ``ran`` and ``commit``."""
+    text = next(read_text(p) for p in paths.workflows if p.name == workflow)
+    listed = re.search(r"^\s+paths:\s*\[(.*)\]", text, re.M)
+    watched = re.findall(r"'([^']+)'", listed.group(1)) if listed else []
+    if not watched or ran == commit:
+        return False
+    done = subprocess.run(
+        ["git", "diff", "--quiet", ran, commit, "--", *watched],
+        cwd=paths.root, capture_output=True, check=False,
+    )  # fmt: skip
+    return done.returncode != 0
+
+
 def _ci_problems(paths: RepoPaths, commit: str) -> list[str]:
     """Return why CI does not count as passed for ``commit``, if it doesn't.
 
@@ -147,7 +163,8 @@ def _ci_problems(paths: RepoPaths, commit: str) -> list[str]:
     and passed. A workflow with a ``paths`` filter runs only for the paths it
     watches, so its newest run may be on an ancestor of ``commit``. A workflow
     without one runs for every commit: its newest run must be on ``commit``
-    itself.
+    itself. A run on an ancestor counts only while no watched file changed
+    after it.
     """
     gh = shutil.which("gh")
     if gh is None:
@@ -185,6 +202,11 @@ def _ci_problems(paths: RepoPaths, commit: str) -> list[str]:
         if ancestor.returncode != 0:
             problems.append(
                 f"{workflow}: the newest run is not on this commit's history"
+            )
+        elif _watched_paths_changed(paths, workflow, run["headSha"], commit):
+            problems.append(
+                f"{workflow}: files that it watches changed after its newest run "
+                f"({run['headSha'][:7]}), and it has not run since"
             )
         elif run["status"] != "completed":
             problems.append(
@@ -283,7 +305,9 @@ def plan(
             with tempfile.TemporaryDirectory() as folder:
                 path = Path(folder) / f"{released.name}.BIN"
                 write_bytes(path, image, BuildError)
-                check_in_emulator(paths, path)
+                check_in_emulator(
+                    paths, path, strict_times=True
+                )  # a release: only PASS counts
             if released.sha256 != chosen.sha256:
                 tested = (chosen.sha256, chosen.label)
         except Epm2ModError as error:

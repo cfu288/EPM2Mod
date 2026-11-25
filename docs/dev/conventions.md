@@ -181,7 +181,8 @@ UTC would not be the one a dry run checked the day before: pass the day.
    - the free-space check, which holds the load-order check, passes on the build's specs. It reads the specs and
      not the image, and the specs are the tested build's: this shows that they pass today's rules. The stamped
      bytes are text in late-loaded segment 2, which the first rule covers;
-   - `emulator/boot-test` and `emulator/update-path-test` pass on it.
+   - `emulator/boot-test` and `emulator/update-path-test` pass on it, with `--strict-times`: a start whose time
+     stamps moved stops the release.
    The release notes give both: "Firmware: EPM2Mod LABEL, sha256 RELEASED. Camera-tested as sha256 TESTED (label
    L); differs only in the Firmware-screen date." The zip's manifest records the tested sha256 and label under
    `camera_tested_as`, and the zip's build description holds the released sha256, which the installer checks.
@@ -219,10 +220,15 @@ Three layers. Each check is in one of them.
 | Soft report | `uv run epm2mod lint NAME` (`tools/buildlint.py`): the allow-list rows of the load-order check that the build uses and that are safe by timing or inference only, the early-loaded space it uses, first code, words in new early-loaded bytes that can be late-loaded addresses, the cold start for the camera test. Exit status 0 with any number of warnings, 6 when the report cannot be made | by hand and from the commit hook. Never in CI |
 
 `tools/checks.py NAME.json --tier full` adds the scenario runs of `emulator/scenarios/` (20 minutes). Run it before a
-build is offered for a flash. A scenario that prints "RESULT ...: FAIL" is a FAIL, whatever its exit status. A WARN
-is a scenario without an exit status that printed no FAIL: a person reads its RESULT lines. The reference build
-`peaking-fast` in these runs has no save guard and is of the films family: the save-guard scenario shows the fault
-on it (a REFERENCE line, not judged), and S6 judges the build under test by faults, not by a difference from it.
+build is offered for a flash. Every check ends PASS or FAIL by the exit status of its script: no scenario that ran
+ends without a verdict. The references:
+
+- the peaking scenarios (S1 to S7) compare with the stock firmware. With the request clear a build must do what
+  stock does; writes to the mod's own RAM (0x7E4C9800 to 0x7E4FE000) are not a difference. S6 compares the verdict
+  of each art code (ok, not judged, fault), not the number of instructions;
+- the save-guard scenarios (S19 to S25) run for every peaking build. Their reference is `peaking-fast`, a
+  camera-tested peaking build without the guard. It is judged too: it must show the fault in S19 to S24 and none in
+  S25, or the check fails, because a scenario whose reference shows no fault proves nothing.
 
 `tools/checks.py` keeps no results and makes the build again in memory first: it stops when `build/NAME.BIN` is not
 what the description and its specs make now. No build is exempt from a check. When a newer check refuses a
@@ -241,11 +247,12 @@ What decides a check's result is pinned where it can be:
 | The MN103 objdump | Built from the submodule `third_party/binutils-gdb`. `epm2mod init` records the source commit in `build/toolchain/source-commit` and reports the build as missing when it is another one. An objdump on PATH is never used; `EPM2_BINUTILS` is said on stderr in each run |
 | The emulator | The submodule `emulator/om-emu`; `epm2mod init --check` compares its commit |
 | Python packages, npm packages | `uv.lock` (`uv sync --locked` in CI), `web/package-lock.json` (`npm ci`) |
-| uv, Python, actions and runner images in CI | uv by version and wheel hash (`.github/uv-requirements.txt`), Python by its full version, actions by commit, images by release (`ubuntu-24.04`) |
+| Python | `.python-version`, a full version: `uv run` uses it on every computer and CI installs the same one |
+| uv, actions and runner images in CI | uv by version and wheel hash (`.github/uv-requirements.txt`), actions by commit, images by release (`ubuntu-24.04`) |
 
 Not pinned: bison, flex and texinfo, which build the objdump in CI (`apt-get` gives the image's versions and Ubuntu
 keeps no old ones to name; the built objdump's version line is in the run's log); the patch level of the runner
-images; a contributor's own Python (3.10 or newer) and gcc.
+images; a contributor's own gcc.
 
 Production tools and checks do not import or run anything under `experiments/`. A check script or an input that a
 tool needs moves to `emulator/`, `tools/` or `data/`.

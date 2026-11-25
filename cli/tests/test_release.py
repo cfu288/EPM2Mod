@@ -80,6 +80,11 @@ class StampTests(unittest.TestCase):
         flipped = self.image[:at] + bytes([self.image[at] ^ 1]) + self.image[at + 1 :]
         with self.assertRaises(BuildError):
             release.check_only_the_label_differs(PATHS, self.tested_image, flipped)
+        # the checksum word itself must be the right one
+        end = first.offset + len(first.header) + len(first.payload) + len(first.trailer) - 1
+        wrong = self.image[:end] + bytes([self.image[end] ^ 1]) + self.image[end + 1 :]
+        with self.assertRaises(BuildError):
+            release.check_only_the_label_differs(PATHS, self.tested_image, wrong)
         other = parse(self.image)
         payloads = [b.payload if i == block else bytes([b.payload[0] ^ 1]) + b.payload[1:] for i, b in enumerate(other.blocks)]
         with self.assertRaises(BuildError):

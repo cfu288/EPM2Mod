@@ -226,6 +226,9 @@ def check_only_the_label_differs(
     block, start, end = label_range(paths)
     old, new = parse(tested), parse(stamped)
     same = len(old.blocks) == len(new.blocks) and old.tail == new.tail
+    same = (
+        same and new.checksums_ok
+    )  # the one word that may differ must be the right checksum
     for index, (a, b) in enumerate(zip(old.blocks, new.blocks)):
         same = same and a.header == b.header and len(a.payload) == len(b.payload)
         if index == block:

@@ -6,6 +6,10 @@
     every other patched image gets it through its own hook at entryMfAssistOn.
 
 Every scenario runs the pinned image and each patched image through the same steps and prints what differs.
+PINNED_BLOCK0 is the reference: tools/checks.py gives the stock firmware, so "pinned" in the texts below is stock.
+
+Exit status 1 when a scenario fails for a patched image: S1 "DIFFERENCES FOUND", S2 "NO PICTURE ..." or "anomalies",
+S3 an anomaly, S4 "LEFT SET", S5 "DIFFERS from pinned". Each such RESULT line starts its text with FAIL.
 """
 import os, struct, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -24,6 +28,19 @@ EFFECT = {113: "Soft Focus (class 3)", 104: "Grainy Film (class 4)", 108: "Gentl
 ENTRY_ON, ENTRY_OFF = 0x7EB7D46C, 0x7EB7D43B    # CmpSts_MfAssist::entryMfAssistOn / entryMfAssistOff
 PASS9_GAIN, PASS7_EXPOSE = 0x7E72676D, 0x7E726428   # stock instructions after hooks K and J
 OUT = print
+
+
+MOD_RAM = (0x7E4C9800, 0x7E4FE000)
+FAILED = []
+
+
+def fail(text):
+    """Note a failed result and return its text with FAIL before it. None: the reference's own result, which is
+    printed and not counted."""
+    if text is None:
+        return ""
+    FAILED.append(text)
+    return "FAIL: " + text.lstrip() if text else "FAIL: "
 
 
 def is_d1(name):
@@ -137,7 +154,9 @@ def s1(pinned, patched):
             for k, (fb, fp) in enumerate(zip(bfs, fs)):
                 wa, wb = fb.writes, fp.writes
                 same_seq = [(a, s, v) for a, s, v, _ in wa] == [(a, s, v) for a, s, v, _ in wb]
-                dw = diff_writes(wa, wb, skip=[(L, L2 + 1)])
+                # Not a difference: the mod's own RAM, the gap between the kernel range and segment 1 that the stock
+                # firmware never writes (the Debug Log's state block is there: docs/dev/load-order.md, section 4, RAM).
+                dw = diff_writes(wa, wb, skip=[(L, L2 + 1), MOD_RAM])
                 flagw = sorted(set((a, v) for a, s, v, _ in wb if L <= a <= L2))
                 d = diff_pcs(fb.pcs, fp.pcs, new, hooks)
                 # a stock `ret` right after a hook site that the routine replaces with its own `ret` (hooks A, B)
@@ -159,7 +178,7 @@ def s1(pinned, patched):
                     OUT("           differs 0x%08X: pinned %s patched %s" % (a, dw[a][0], dw[a][1]))
                 if d["only_base"] or d["only_patched_stock"]:
                     OUT("           only pinned: %s | only patched: %s" % (fmt_funcs(d["only_base"]), fmt_funcs(d["only_patched_stock"])))
-    OUT("  S1 RESULT: %s" % ("patched = pinned with the request clear" if ok_all else "DIFFERENCES FOUND"))
+    OUT("  S1 RESULT: %s" % ("patched = pinned with the request clear" if ok_all else fail("DIFFERENCES FOUND")))
 
 
 # ------------------------------------------------------------------------------------------------ S2
@@ -190,8 +209,9 @@ def s2(pinned, patched):
                     verdict = "NO PICTURE in every frame while the request is set"
                     if all(any("refused" in x for x in b) for b in bad):
                         verdict += ": the heap refuses the art buffers in every frame (the camera fault of direct-1)"
+                    verdict = fail(verdict)
                 elif any(b for b in bad):
-                    verdict = "anomalies: %s" % bad
+                    verdict = fail("anomalies: %s" % bad)
                 else:
                     verdict = "every frame with the request gives a picture through the line job and the overlay pass"
                 OUT("  S2 RESULT [%s, art type %d]: %s; last frame after the request: picture %s, heap mode %d, live blocks %d"
@@ -232,7 +252,7 @@ def s3(pinned, patched):
                 if f.faults:
                     break
             OUT("  S3 RESULT [%s]: %s" % (name, "no anomaly in %d filter changes" % len(seq) if not found else
-                                          "; ".join("%s: %d frames (%s)" % (k, len(v), ", ".join(v[:6])) for k, v in found.items())))
+                                          fail("" if name != "pinned" else None) + "; ".join("%s: %d frames (%s)" % (k, len(v), ", ".join(v[:6])) for k, v in found.items())))
 
 
 # ------------------------------------------------------------------------------------------------ S4
@@ -288,7 +308,7 @@ def s4(pinned, patched):
                 OUT("  [%s] %-62s %s; writes to the flag bytes: %s; after: R=%d word=%d" % (
                     name, what, "FAULT " + r.fault if r.fault else "ran %d pcs" % len(r.pcs), w or "none", sc.r8(R), sc.r32(MFA)))
             OUT("  S4 RESULT [%s]: R at the end = %d%s" % (name, sc.r8(R), "" if name == "pinned" else
-                                                           " (0 = not left set)" if sc.r8(R) == 0 else " (LEFT SET after an internal zoom-off)"))
+                                                           " (0 = not left set)" if sc.r8(R) == 0 else fail(" (LEFT SET after an internal zoom-off)")))
 
 
 # ------------------------------------------------------------------------------------------------ S5
@@ -328,7 +348,7 @@ def s5(pinned, patched):
                     name, state, live, flags(lv), got, "FAULT " + r.fault if r.fault else "ok", len(new), sc.r8(L2), gain))
             if name != "pinned":
                 OUT("  S5 RESULT [%s]: %s" % (name, "same state, heap mode and still gain as pinned" if res == base else
-                                              "DIFFERS from pinned %s" % (base,)))
+                                              fail("DIFFERS from pinned %s" % (base,))))
 
 
 def main():
@@ -338,6 +358,7 @@ def main():
         if which in (n, "all"):
             fn(pinned, patched)
             OUT("")
+    sys.exit(1 if FAILED else 0)
 
 
 main()

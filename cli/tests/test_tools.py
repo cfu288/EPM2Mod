@@ -41,12 +41,14 @@ class MachinePathTests(unittest.TestCase):
         return done.returncode == 1
 
     def test_a_real_path_is_refused_also_beside_an_allowed_token(self) -> None:
-        for line in (f"+ see {REAL}notes", f"+ scp {REAL}secret USER@HOST:/x", f"+ a /home/user/x b {REAL}y"):
+        bare = REAL.rstrip("/")  # a home folder with nothing after it
+        for line in (f"+ see {REAL}notes", f"+ scp {REAL}secret USER@HOST:/x", f"+ a /home/user/x b {REAL}y", f"+cd {bare}",
+                     "+ssh alice" + "@box", "+ sftp -q bob" + "@host.example", "+ /home/user" + "name/x"):
             with self.subTest(line=line):
                 self.assertTrue(self.refused(line))
 
     def test_placeholders_and_removed_lines_pass(self) -> None:
-        for line in ("+ scp USER@HOST:/x /home/user/y", "+ git@github.com:cfu288/EPM2Mod.git", f"- old {REAL}x", "+++ b/home/x"):
+        for line in ("+ scp USER@HOST:/x /home/user/y", "+ cd /home/user", "+ ssh USER@HOST", "+ mail a@b.example", "+ git@github.com:cfu288/EPM2Mod.git", f"- old {REAL}x", "+++ b/home/x"):
             with self.subTest(line=line):
                 self.assertFalse(self.refused(line))
 
@@ -119,6 +121,10 @@ class ToolchainTests(unittest.TestCase):
                     toolchain.binutils_dir()
                 record.write_text("abc\n")
                 self.assertEqual(toolchain.binutils_dir(), str(objdump.parent))
+            record.unlink()  # no record and no pin that git can name: not a match
+            with mock.patch.object(toolchain, "REPO", folder), mock.patch.object(toolchain, "pinned_commit", return_value=""):
+                with self.assertRaises(toolchain.ToolchainError):
+                    toolchain.binutils_dir()
 
 
 class EmulatorPinTests(unittest.TestCase):
@@ -174,11 +180,17 @@ class UnpackedImageTests(unittest.TestCase):
 class PrintedFailTests(unittest.TestCase):
     def test_a_script_that_prints_a_failed_result_and_exits_0_has_failed(self) -> None:
         def status(text: str) -> str:
-            check = checks.Check("s", "full", (sys.executable, "-c", f"print({text!r})"), judged=False)
+            check = checks.Check("s", "full", (sys.executable, "-c", f"print({text!r})"))
             return checks.run(check, Path("image.BIN")).status
 
         self.assertEqual(status("  S6 RESULT [build]: FAIL: art codes [9]"), "FAIL")
-        self.assertEqual(status("  S6 RESULT [build]: PASS"), "WARN")
+        self.assertEqual(status("  S6 RESULT [build]: PASS"), "PASS")  # PASS or FAIL: no third result
+
+    def test_every_result_line_is_shown(self) -> None:
+        lines = [f"  S{n} RESULT [b]: PASS" for n in range(1, 40)] + ["x" * 9000]
+        check = checks.Check("s", "full", (sys.executable, "-c", f"print({chr(10).join(lines)!r})"))
+        shown = checks.summary(check, checks.run(check, Path("image.BIN")))
+        self.assertEqual(shown.count("RESULT"), 39)
 
     def test_a_failure_without_a_failed_result_line_shows_how_it_ended(self) -> None:
         check = checks.Check("s", "full", (sys.executable, "-c", "print('S1 RESULT [b]: PASS'); raise SystemExit('boom')"))
@@ -188,13 +200,78 @@ class PrintedFailTests(unittest.TestCase):
         self.assertIn("exit status 1", checks.summary(check, result))
 
 
+OBJDUMP = Path(toolchain.DEFAULT_DIR) / (toolchain.PREFIX + "objdump")
+
+
+@support.needs(HAVE_STOCK, support.STOCK_NEEDED)
+@support.needs(OBJDUMP.exists(), support.OBJDUMP_NEEDED)
+class ScenarioVerdictTests(unittest.TestCase):
+    """What the scenario scripts of the full tier decide, on made-up results (the runs take 20 minutes)."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        sys.path.insert(0, str(ROOT / "emulator" / "scenarios"))
+        sys.path.insert(0, str(ROOT / "emulator"))
+
+    def test_s6_fails_a_code_that_ends_in_block_0_where_the_reference_is_ok(self) -> None:
+        import scen_direct4
+
+        reference = {50: ("ok", "reaches 0x7E56D8D8 in 13 instructions"), 85: ("n/a", "needs job data"), 9: ("ok", "13")}
+        same = {50: ("ok", "reaches 0x7E56D8D8 in 66 instructions"), 85: ("n/a", "needs job data"), 9: ("ok", "66")}
+        self.assertEqual(scen_direct4.s6_fails(same, reference), [])  # other instruction counts are no fault
+        # the table entry of code 50 pointed at the Cross Process handler: the run stays in block 0
+        self.assertEqual(scen_direct4.s6_fails(same | {50: ("n/a", "needs job data")}, reference), [50])
+        self.assertEqual(scen_direct4.s6_fails(same | {9: ("FAULT", "pc 0")}, reference | {9: ("FAULT", "pc 0")}), [9])
+
+    def test_the_save_guard_reference_must_show_the_fault(self) -> None:
+        import scen_guard
+
+        with mock.patch.object(scen_guard, "OUT", lambda line: None):
+            self.assertTrue(scen_guard.verdict("S19", [("pinned-fast", ["art buffers refused"]), ("build", [])]))
+            # a reference that no longer shows the fault: the scenario proves nothing
+            self.assertFalse(scen_guard.verdict("S19", [("pinned-fast", []), ("build", [])]))
+            self.assertFalse(scen_guard.verdict("S19", [("pinned-fast", ["art buffers refused"]), ("build", ["no picture"])]))
+            self.assertFalse(scen_guard.verdict("S25", [("pinned-fast", ["a fault"]), ("build", [])]))
+        self.assertTrue(all(isinstance(v, bool) for v in scen_guard.REFERENCE_SHOWS_FAULT.values()))
+
+    def test_each_failure_text_of_the_peaking_scenarios_sets_the_exit_status(self) -> None:
+        source = (ROOT / "emulator" / "scenarios" / "scen_peaking.py").read_text()
+        self.assertTrue(source.rstrip().endswith("sys.exit(1 if FAILED else 0)\n\n\nmain()"))
+        for text in ("DIFFERENCES FOUND", "anomalies: ", " (LEFT SET", "DIFFERS from pinned"):
+            self.assertIn('fail("' + text, source, text)  # the failure text goes through fail(), which counts it
+        self.assertIn("verdict = fail(verdict)", source)  # S2, no picture
+        self.assertIn('fail("" if name != "pinned" else None)', source)  # S3, an anomaly
+
+
+class FirmwareMapUseTests(unittest.TestCase):
+    def test_the_free_space_check_refuses_a_map_that_is_not_current(self) -> None:
+        import freespace
+        import fwmap
+
+        with tempfile.TemporaryDirectory() as folder:
+            for name in ("linear.txt", "functions.tsv", fwmap.FILES[-1]):
+                (Path(folder) / name).write_text("addr\n")
+            with mock.patch.object(freespace, "LINEAR", folder + "/linear.txt"), mock.patch.object(freespace, "FUNCTIONS", folder + "/functions.tsv"):
+                with mock.patch.object(fwmap, "made_by", return_value="now\n"):
+                    with self.assertRaises(freespace.SiteError):
+                        freespace.Linear()
+
+
 class StrictTimesTests(unittest.TestCase):
     def test_the_hard_tier_fails_a_start_whose_times_moved(self) -> None:
         build = ROOT / pinned_build_path()
         with mock.patch.object(checks, "current_image", return_value=Path("image.BIN")):
             plan = {check.name: check for check in checks.plan(build, "quick")}
         self.assertIn("--strict-times", plan["boot-test"].command)
-        self.assertTrue(all(check.judged for check in plan.values()))
+
+    def test_every_peaking_build_gets_the_save_guard_scenario(self) -> None:
+        # also a peaking build without the guard's spec: the build that the scenario must fail
+        build = ROOT / "data" / "builds" / "peaking-fast.json"
+        self.assertNotIn("peaking-save-guard", build.read_text())
+        with mock.patch.object(checks, "current_image", return_value=Path("image.BIN")):
+            names = [check.name for check in checks.plan(build, "full")]
+        self.assertIn("save-guard", names)
+        self.assertIn("peaking-s1-s5", names)
 
 
 def pinned_build_path() -> str:
@@ -265,3 +342,15 @@ class DocumentTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PythonVersionTests(unittest.TestCase):
+    def test_one_full_version_everywhere(self) -> None:
+        import re
+
+        version = (ROOT / ".python-version").read_text().strip()
+        self.assertRegex(version, r"^\d+\.\d+\.\d+$")
+        self.assertEqual("%d.%d.%d" % sys.version_info[:3], version)  # what `uv run` gives
+        for workflow in sorted((ROOT / ".github" / "workflows").glob("*.yml")):
+            for named in re.findall(r"python-version: '([^']+)'", workflow.read_text()):
+                self.assertEqual(named, version, workflow.name)  # a job without the file names the same version
