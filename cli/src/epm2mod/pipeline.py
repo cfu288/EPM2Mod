@@ -64,6 +64,7 @@ from .errors import (
     ContainerError,
     LookFileError,
     NotFoundError,
+    UnavailableError,
 )
 from .fileio import Log, describe_os_error, part_path, read_bytes, silent, write_bytes
 from .hashing import sha256_bytes
@@ -194,21 +195,21 @@ def check_in_emulator(paths: RepoPaths, image: Path) -> list[str]:
     leave the camera with no way back.
 
     Returns:
-        One line for each check: its result, or that it was skipped because
-        the emulator is not set up on this computer.
+        One line for each check: its result.
 
     Raises:
+        UnavailableError: if a check cannot run (the emulator is not set up).
+            A build that was not started in the emulator is not made.
         BuildError: if a check fails.
     """
     lines = []
     for tool in paths.emulator_checks:
-        skipped = (
-            f"{tool.name}: SKIPPED, the emulator is not set up (see {paths.relative(tool.parent)}). "
-            "Do not flash this build before the check has passed."
+        not_run = UnavailableError(
+            f"{tool.name} cannot run: the emulator is not set up "
+            f"(see {paths.relative(tool.parent)}). The build was not made."
         )
         if not tool.exists():
-            lines.append(skipped)
-            continue
+            raise not_run
         try:
             done = subprocess.run(
                 [sys.executable, str(tool), str(image)],
@@ -222,14 +223,13 @@ def check_in_emulator(paths: RepoPaths, image: Path) -> list[str]:
             raise BuildError(f"{tool.name} cannot run: {error}") from None
         output = (done.stdout + done.stderr).strip()
         if done.returncode == _EMULATOR_NOT_SET_UP:
-            lines.append(skipped)
-        elif done.returncode != 0:
+            raise UnavailableError(f"{output[-_CHECK_OUTPUT_LIMIT:]}\n{not_run}")
+        if done.returncode != 0:
             raise BuildError(
                 f"{output[-_CHECK_OUTPUT_LIMIT:]}\n"
                 f"{tool.name} failed: the build was removed. Do not flash it."
             )
-        else:
-            lines.append(output.splitlines()[-1] if output else f"{tool.name}: PASS")
+        lines.append(output.splitlines()[-1] if output else f"{tool.name}: PASS")
     return lines
 
 

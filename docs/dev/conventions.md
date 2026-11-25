@@ -125,7 +125,11 @@ build.
    does not have. To make the map: `uv run python tools/fwmap.py build` (about 1 minute, 470 MB). This needs GNU objdump for the
    MN103 processor (`tools/setup.sh`, which builds it from the submodule `third_party/binutils-gdb` into `build/toolchain/`).
 
-   A tested build does not need the map: its result is compared with the recorded sha256.
+   The command then starts the result in the emulator (`emulator/boot-test`, `emulator/update-path-test`). When
+   a start-up check fails or cannot run (the emulator is not set up: `tools/setup.sh`), the build is not made
+   (exit status 6 for "cannot run"). No flag overrides this.
+
+   A tested build does not need the map or the emulator: its result is compared with the recorded sha256.
 
    The check also refuses new code in an area where no camera-tested build runs code yet, because
    only a flash can show that code runs there. When a build is meant to be that test, add
