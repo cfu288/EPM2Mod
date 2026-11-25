@@ -16,11 +16,11 @@ description. Times on one computer with other work running. An actionable line i
 | Sample | Step | Before | After | Actionable lines, before and after |
 |---|---|---|---|---|
 | document | hook | 0 lines, 0.1 s | 0 lines, 0.1 s | 0, 0 |
-| document | `tools/ci.sh python` | 249 lines, 311 s | CI_DOC_AFTER | 0, 0 |
+| document | `tools/ci.sh python` | 249 lines, 311 s | 14 lines, 218 s | 0, 0 |
 | site | hook | 2 lines, 0.6 s | 2 lines, 0.6 s | 0, 0 |
-| site | `tools/ci.sh web` | 225 lines, 42 s | CI_WEB_AFTER | 0, 0 |
-| firmware | hook (`epm2mod lint`) | 26 lines, 10 s | LINT_AFTER | 1, 1 (the cold start for the camera test) |
-| firmware | `tools/ci.sh python` | 268 lines, 367 s | CI_FW_AFTER | 0, 0 |
+| site | `tools/ci.sh web` | 225 lines, 42 s | 2 lines, 38 s | 0, 0 |
+| firmware | hook (`epm2mod lint`) | 26 lines, 10 s | 6 lines, 13 s | 1, 1 (the cold start for the camera test) |
+| firmware | `tools/ci.sh python` | 268 lines, 367 s | 16 lines, 250 s | 0, 0 |
 
 ## The hard checks
 

@@ -1,4 +1,4 @@
-"""The save guard of focus peaking, run by hand before a build that changes peaking is offered for a flash. About 10
+"""The save guard of focus peaking, run by hand before a build that changes peaking is offered for a flash. About 20
 minutes. No other check runs it. Background: experiments/2026-11-14-focus-peaking/NOTES.md section 18.
 
     uv run epm2mod make peaking-fast && uv run epm2mod make NAME
