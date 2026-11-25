@@ -1,0 +1,8 @@
+mode rand:1: stop {"why":"fault","code":6,"pc":2120811834} at lab ms 260.6, wall 1 s, problems: none
+first GUI state at - ms; first 0x5000 (live view starts) at - ms; first 0x2000 (power off) at - ms
+GUI states: 
+quick start log: 10.5 SetPermit[1] | 10.6 MainStart | 10.6 Flg-LensSetupStart | 10.6 F1a | 10.6 PowerAC | 10.6 UiONFact:0xc | 10.6 F1b | 10.6 F1c | 10.6 Lens-normal! | 10.6 LensSet!! | 16.8 Flg-ThroughStart | 16.8 F1d | 16.8 F1d | 16.8 OUT-TFT! | 16.8 F1e | 25.8 SetPermit[3] | 33.2 RhpSetCb | 33.4 RhpThrOverWait | 242.1 F1f | 242.1 DISP-TFT! | 242.1 F1j | 242.1 F1k
+firmware error log entries: 2 33.5 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9 ; 36.2 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9
+console tail: Usr3 / Pr2 / Usr4 / Pr4 / wb 2A001001 00007102 / wb 2A001001 00007102
+timeline:
+

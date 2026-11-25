@@ -1,0 +1,20 @@
+mode zero: stop {"why":"labtime","pc":2118424173} at lab ms 8000.1, wall 6 s, problems: none
+first GUI state at 31.3 ms; first 0x5000 (live view starts) at 293.2 ms; first 0x2000 (power off) at - ms
+GUI states: 31:1001 34:1002 35:1002 35:1003 293:5000 294:5100 294:5100 295:5100 295:5100 295:5100 295:5100 1313:5100
+quick start log: 10.5 SetPermit[1] | 10.6 MainStart | 10.6 Flg-LensSetupStart | 10.6 F1a | 10.6 PowerAC | 10.6 UiONFact:0xc | 10.6 ErrLeOK | 16.5 Flg-ThroughStart | 16.8 SetPermit[3] | 16.8 Flg-2ndChk | 16.8 2ndNoChk | 24.2 RhpSetCb | 24.3 RhpThrOverWait | 24.3 RhpThough[0][0x0] | 24.8 FastEndCb | 24.8 Flg-RhpTake | 24.9 RhpTake[0][0][0x0] | 30.5 MIE
+firmware error log entries: 2 36.1 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9 ; 37.6 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9
+console tail: Usr4 / Pr4 / Pr1 / BS.wb 2A001001 00007102 / wb 2A001001 00007102 / :-) Pr3
+timeline:
+    31.3 cpu0 GUI state 0x00001001
+    33.6 cpu0 GUI state 0x00001002
+    35.1 cpu0 GUI state 0x00001002
+    35.5 cpu0 GUI state 0x00001003
+   293.2 cpu0 GUI state 0x00005000
+   294.0 cpu0 GUI state 0x00005100
+   294.3 cpu0 GUI state 0x00005100
+   294.6 cpu0 GUI state 0x00005100
+   295.0 cpu0 GUI state 0x00005100
+   295.2 cpu0 GUI state 0x00005100
+   295.4 cpu0 GUI state 0x00005100
+  1312.7 cpu0 GUI state 0x00005100
+  3314.7 cpu0 GUI state 0x00005100

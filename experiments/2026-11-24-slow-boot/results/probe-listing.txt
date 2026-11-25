@@ -1,0 +1,57 @@
+
+probe.elf:     file format elf32-mn10300
+
+
+Disassembly of section .pn:
+
+7e69ec6b <T_LV>:
+7e69ec6b:	cf 88       	movm	[d2,other],(sp)
+7e69ec6d:	f2 e6       	mov	psw,d2
+7e69ec6f:	fc a8 a8 d0 	movbu	(be4fd0a8 <BUF+0xffffffe8>),d0
+7e69ec73:	4f be 
+7e69ec75:	a0 00       	cmp	0,d0
+7e69ec77:	c9 20       	bne	7e69ec97 <.L9^B1>
+7e69ec79:	80 01       	mov	1,d0
+7e69ec7b:	fc 82 a8 d0 	movbu	d0,(be4fd0a8 <BUF+0xffffffe8>)
+7e69ec7f:	4f be 
+7e69ec81:	fc a5 84 0b 	mov	(becb0b84 <BUF+0x7b3ac4>),d1
+7e69ec85:	cb be 
+7e69ec87:	fc a0 74 3b 	mov	(bf033b74 <BUF+0xb36ab4>),a0
+7e69ec8b:	03 bf 
+7e69ec8d:	2c 00 0a    	mov	2560,d0
+7e69ec90:	dd a1 a8 e2 	call	7e4c9531 <log_put>,[],0
+7e69ec94:	ff 00 00 
+
+7e69ec97 <.L9^B1>:
+7e69ec97:	f2 fb       	mov	d2,psw
+7e69ec99:	cb          	nop	
+7e69ec9a:	cb          	nop	
+7e69ec9b:	ce 88       	movm	(sp),[d2,other]
+7e69ec9d:	dc 6e a5 e2 	jmp	7e4c920b <T_A>
+7e69eca1:	ff 
+
+Disassembly of section .pw:
+
+7ebf2e9f <T_PW>:
+7ebf2e9f:	cf 08       	movm	[other],(sp)
+7ebf2ea1:	fc a9 e9 54 	movbu	(604154e9 <WAKE>),d1
+7ebf2ea5:	41 60 
+7ebf2ea7:	f8 c1 10    	asl	16,d1
+7ebf2eaa:	fc ac e6 54 	movhu	(604154e6 <PWRF>),d0
+7ebf2eae:	41 60 
+7ebf2eb0:	f2 11       	or	d0,d1
+7ebf2eb2:	fc a0 78 21 	mov	(604f2178 <WAKE+0xdcc8f>),a0
+7ebf2eb6:	4f 60 
+7ebf2eb8:	2c 01 0a    	mov	2561,d0
+7ebf2ebb:	dd 76 66 8d 	call	7e4c9531 <log_put>,[],0
+7ebf2ebf:	ff 00 00 
+7ebf2ec2:	ce 08       	movm	(sp),[other]
+7ebf2ec4:	dc a4 ff ff 	jmp	7ebf2e68 <T_CTOR>
+7ebf2ec8:	ff 
+
+Disassembly of section .hk:
+
+7e6ecf91 <_stack+0x7e66cf91>:
+7e6ecf91:	dc da 1c fb 	jmp	7e69ec6b <T_LV>
+7e6ecf95:	ff 
+7e6ecf96:	cb          	nop	
