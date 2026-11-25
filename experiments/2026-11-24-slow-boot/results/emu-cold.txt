@@ -1,0 +1,30 @@
+copied: cold-start-fix gives what spot-af-2 gives in 24 of 24 cases, no fault
+  R=0 Peaking=Off focus=C-AF GUI 0x5100: L=0 (lines off), instructions in late space 0
+  R=0 Peaking=Off focus=C-AF GUI 0x5101: L=0 (lines off), instructions in late space 0
+  R=0 Peaking=Off focus=MF   GUI 0x5100: L=0 (lines off), instructions in late space 0
+  R=0 Peaking=Off focus=MF   GUI 0x5101: L=0 (lines off), instructions in late space 0
+  R=0 Peaking=Off focus=S-AF GUI 0x5100: L=0 (lines off), instructions in late space 0
+  R=0 Peaking=Off focus=S-AF GUI 0x5101: L=0 (lines off), instructions in late space 0
+  R=0 Peaking=White focus=C-AF GUI 0x5100: L=0 (lines off), instructions in late space 0
+  R=0 Peaking=White focus=C-AF GUI 0x5101: L=0 (lines off), instructions in late space 0
+  R=0 Peaking=White focus=MF   GUI 0x5100: L=1 (lines on), instructions in late space 0
+  R=0 Peaking=White focus=MF   GUI 0x5101: L=0 (lines off), instructions in late space 0
+  R=0 Peaking=White focus=S-AF GUI 0x5100: L=0 (lines off), instructions in late space 0
+  R=0 Peaking=White focus=S-AF GUI 0x5101: L=0 (lines off), instructions in late space 0
+  R=1 Peaking=Off focus=C-AF GUI 0x5100: L=0 (lines off), instructions in late space 0
+  R=1 Peaking=Off focus=C-AF GUI 0x5101: L=0 (lines off), instructions in late space 0
+  R=1 Peaking=Off focus=MF   GUI 0x5100: L=0 (lines off), instructions in late space 0
+  R=1 Peaking=Off focus=MF   GUI 0x5101: L=0 (lines off), instructions in late space 0
+  R=1 Peaking=Off focus=S-AF GUI 0x5100: L=0 (lines off), instructions in late space 0
+  R=1 Peaking=Off focus=S-AF GUI 0x5101: L=0 (lines off), instructions in late space 0
+  R=1 Peaking=White focus=C-AF GUI 0x5100: L=1 (lines on), instructions in late space 0
+  R=1 Peaking=White focus=C-AF GUI 0x5101: L=1 (lines on), instructions in late space 0
+  R=1 Peaking=White focus=MF   GUI 0x5100: L=1 (lines on), instructions in late space 0
+  R=1 Peaking=White focus=MF   GUI 0x5101: L=1 (lines on), instructions in late space 0
+  R=1 Peaking=White focus=S-AF GUI 0x5100: L=1 (lines on), instructions in late space 0
+  R=1 Peaking=White focus=S-AF GUI 0x5101: L=1 (lines on), instructions in late space 0
+not copied (ff): cold-start-fix: 24 of 24 cases as copied, no fault, 0 instructions in late space
+not copied (ff): spot-af-2: 24 of 24 cases fault or run late space (first: fault 5 at pc 0x7ECB0B81 (0x7ECAD443+0x373E): om-emu: MN10300 trap reason=5 pc=0x7ecb0b81 address=0x7ecb0b81)
+not copied (random): cold-start-fix: 24 of 24 cases as copied, no fault, 0 instructions in late space
+not copied (random): spot-af-2: 24 of 24 cases fault or run late space (first: fault 3 at pc 0x7ECB0B82 (0x7ECAD443+0x373F): om-emu: MN10300 trap reason=3 pc=0x7ecb0b82 address=0x0000a3a3)
+RESULT PASS

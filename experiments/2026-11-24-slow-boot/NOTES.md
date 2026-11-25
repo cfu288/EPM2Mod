@@ -225,4 +225,137 @@ scp /Volumes/Untitled/EPM2LOG.BIN USER@HOST:/path/to/epm2-tools/.local/spot-af-l
 - `scripts/disasm_ranges.py`: disassembly of block-0 ranges.
 - `scripts/mkspec.py`: writes `data/specs/slow-boot-probe.json`.
 - `scripts/emu_tlv.mjs`: check of T_LV and T_PW.
+- `scripts/emu_cold.py`: the peaking latch with segments 2 and 3 copied and not copied (section 8).
 - `results/`: the outputs named above.
+
+## 8. The fix: build `cold-start-fix` (2026-11-25)
+
+### New evidence
+
+A contributor reproduced the slow start on another E-PM2 (comment on PR #10, 2026-11-25): after 60 s off, about 10 s
+until the camera can shoot, also with Peaking Off; after 10 s off, nearly instant. A local build of theirs that moves
+the MF test of the peaking latch from segment 2 to segment 1 started at once after 60 s off, also with peaking on
+(V camera, the contributor's body; their build is not in this repository). This confirms H1. The owner's two bodies
+do not show the slow start today.
+
+### The check that missed it
+
+`emulator/hookcheck.py` decoded each spec's own bytes, only hooks of 8 bytes or less, and no table words. It now makes
+the build's block 0 and decodes the built bytes of every op in early-loaded space (overlapping ops as one run), and
+lists stock pointers that an op changes. `cli/tests/test_hookcheck.py` holds the pinned build `spot-af-2` to one FAIL,
+the jump 0x7E4C93A4 (kernel) → 0x7ECB0B81 (segment 2).
+
+The audit of `spot-af-2` (`results/hookcheck-spot-af-2.txt`; 187 transfers leave patched early-loaded code, 88 of
+them into segments 2 or 3):
+
+| Transfers | Spec | Runs when | Before Usr1 ends? | Label |
+|---|---|---|---|---|
+| `jmp` 0x7E4C93A4 → T_MF 0x7ECB0B81 | peaking-mf | every live-view struct refresh, any Peaking setting, any focus mode | yes: the cause of issue #6 | V static, V the contributor's camera |
+| 2 `jmp`: 0x7E56C6A5, 0x7E546160 | stock-films-structure-3 | the colour stage of every image job, live view too | not seen: the first colour stage is 1.6–2.9 s after the start in the owner's logs, `seg_loaded` at 0.33 s; nothing waits for the copy | V log, safe by timing only |
+| 10 `jmp` in the ART BKT frame composer 0x7E5A75AE (5 were not seen before: 10-byte hooks) | stock-films-structure-3 | an ART bracket picture is taken | no: a capture needs the application | I |
+| 48 table words 0x7E78AEBC–0x7E78CB40: the colour stage's cases (chroma, tone hash, six-axis, saturation, look, 12-region) of the film codes 75, 92, 94, 98, 125, 144, 156, 159 | stock-films-structure-3 | the colour stage runs for a film code: a film simulation of a loaded look pack on the selected ART entry | as the two `jmp` of the colour stage | I, safe by timing only |
+| 25 table words 0x7E7FF034–0x7E7FF0A4, 0x7E807858–0x7E8078C8, 0x7E854A50–0x7E854A6C: the mov layer's live-view rows and art_GetFilterType rows of the hidden art values 111, 112, 114, 115, 118 | stock-films-structure-3 | live view is set up with a hidden art value: ART mode with a film simulation on Grainy Film, Gentle Sepia, Dramatic Tone, Key Line or Watercolor | **U**: a live-view set-up could read its row before the copy ends | U |
+| 2 table words 0x7E439C80, 0x7E439C9C: the entries of the tasks 0x90 and 0x91 | card-looks-9, log-menu-3 | the task starts; only T_GUI (segment 2) starts it | no (proof from the code) | V static |
+
+All but the first are in `emulator/hookcheck-allow.tsv` with this evidence. Probe for the U row: the start list of
+section 7 with a look pack loaded, mode ART, one of the five entries selected. It is not part of this fix: every
+build since stock-films (2026-11-18) has these words, and the reports of issue #6 begin with rc.3.
+
+### The options
+
+| | Option | New bytes in early-loaded space | What a mistake costs | Proof of the load order |
+|---|---|---|---|---|
+| a | T_MF, T_MF2, T_MF3 as one routine in segment 1 | 61 B, in an area where code ran on the camera (lss-core, spot-core-2, pana-ring-probe at this address) | a wrong routine shows in live view only (no lines, or a fault at a refresh); the update path has no live view | static: no transfer from early-loaded code to segment 2 is left; hookcheck 0 FAIL without an allow entry |
+| b | T_MF stays in segment 2; T_R tests a "segment 2 is loaded" flag first | about 20 B for the test (T_R's 10 B do not hold it), and a flag that T_CTOR sets and T_BOOT clears: changes in card-looks-9 / log-menu-3, flashed and working code | as (a), and a start that kept RAM reads an old flag unless T_BOOT runs before the first refresh; a mistake there is the same restart | by the order of three hooks, not static: the jump stays, with an allow entry |
+
+Chosen: **(a)**. It is the approach the contributor's camera confirmed, it needs no flag and no change outside
+peaking-mf, and the check proves it. Space: the kernel run has 22 B free in three pieces. Segment 1's reclaimed exp
+printers have 288 B at 0x7E69EC6B–0x7E69ED8B: the run of `pana-ring-probe`, a DEBUG probe that no later build names
+(`tools/space-ledger/superseded.tsv`: history). After the fix 227 B of it are free. The slow-boot probe's T_LV
+(section 6, not flashed) used the same run: the two are not for one build.
+
+### What was built
+
+`data/specs/peaking-mf-2.json` (`gen/peaking/mkspec_mf.py`), in place of `peaking-mf` in `spot-af-2`:
+
+- T_MF, 61 B at 0x7E69EC6B (segment 1): the instructions of T_MF, T_MF2 and T_MF3 in one run. R set → T_R's test
+  of the Peaking setting. R clear → the focus mode in use (prm 0xC021) with the kernel's settings getter 0x7E457C75;
+  MF and the GUI state word not 0x5101 → the test of the Peaking setting; else a1 and d1 restored and T_R's return 0.
+- T_R's first 10 B: `jmp T_MF` and 5 nop, as before with the new target. T_R's one caller is the latch T_A, which the
+  hook 0x7E6ECF91 in segment 1 reaches, so T_R cannot run before segment 1 is in RAM.
+- T_GS (12 B, 0x7EBF2F20, segment 2) and the GUI state setter's hook: unchanged. Their caller is segment-2 code.
+- The old runs 0x7ECB0B81 (21 B), 0x7ECB0FD8 (39 B) and 0x7EBF3B94 (23 B) hold stock bytes again.
+
+Before the first GUI state of a start the GUI state word holds what the last start left, or noise after a cold
+start. If it reads 0x5101 there are no lines until the first GUI state. `peaking-mf` had the same (I).
+
+At the first refresh of a cold start T_MF now calls the settings getter for prm 0xC021. The live-view code calls the
+same getter for the same prm in that phase (0x7E6CAAA7, R), and the contributor's build passed its cold starts (I
+that it calls the getter there).
+
+`data/builds/cold-start-fix.json`: `spot-af-2` with `peaking-mf-2`, label 2026.11.25, sha256
+`eab0c64ea47d100c73a8b7889ab9ff1b83a91088dfc413073c1adb8268ba83d0`.
+
+### Checks
+
+| Check | Result |
+|---|---|
+| `uv run epm2mod make cold-start-fix` | free space PASS (0 FAIL), boot-test PASS, update-path-test PASS (`results/make-cold-start-fix.txt`) |
+| `uv run python emulator/hookcheck.py data/builds/cold-start-fix.json` | 190 transfers, 0 FAIL, 87 allowed (`results/hookcheck-cold-start-fix.txt`); T_R → T_MF is kernel → segment 1 |
+| `scripts/emu_cold.py` (the latch from its hook to its return; R 0 / 1, Peaking Off / White, S-AF / MF / C-AF, GUI 0x5100 / 0x5101) | PASS (`results/emu-cold.txt`). Segments 2 and 3 copied: 24 of 24 cases as `spot-af-2`. Not copied (0xFF, random): `cold-start-fix` 24 of 24 as copied, no fault, 0 instructions in late-loaded space; `spot-af-2` faults at 0x7ECB0B81 in 24 of 24 |
+| `tools/checks.py --tier full` | free space, op-check, boot-test, update-path-test PASS; save-guard S24 / S25 PASS for the build (the "FAIL" is the reference's, as for peaking-mf and spot-af); peaking S4 R = 0 at the end, S5 as the reference, S7 PASS (`results/checks-cold-start-fix.txt`); S6 against the pinned `spot-af-2` PASS (`scen_direct4.py s6`, `results/s6-cold-start-fix.txt`) |
+| `emulator/boot/shotdiff.sh` against `spot-af-2`, P state: the Custom Menu tab, its groups, A page 1, MF Assist, Peaking and its list; E page 1 and its rows 2 to 8 (Spot Metering is row 4) | 0 of 6 and 0 of 8 differ |
+| `gen/run.sh --check`, `uv run python -m unittest discover -s cli/tests` | every generated spec as committed; 280 tests OK (6 skipped: they need the built app page) |
+
+Not checked off the camera: live view itself, the lines, the start time. The Firmware screen of this build was not
+drawn in the emulator; the label is written by `epm2mod make` as in every build since 2026-11-19.
+
+The emulator still cannot show the fault in a whole start (section 3): the harness shows the one function.
+
+### Camera test sheet
+
+The owner's bodies do not show the slow start, so this run shows that nothing broke. The contributor and the
+reporter of issue #6 can confirm the start time.
+
+Mac, card at `/Volumes/Untitled`. The old log off the card, then the flash:
+
+```sh
+rm -f /Volumes/Untitled/EPM2LOG.BIN
+epm2flash cold-start-fix eab0c64ea47d100c73a8b7889ab9ff1b83a91088dfc413073c1adb8268ba83d0
+```
+
+Go back: `epm2flash spot-af-2 86e8fdcaaeb1ff52410981adef1cb576486adcd14318261a8411079cf256a5be`
+
+1. **The build.** MENU → SETUP → wrench tab → Firmware. Expected: `Body : 1.6  EPM2Mod 2026.11.25`. `2026.11.20`:
+   the update did not run; flash again.
+2. **Debug Log on.** MENU → SETUP → Custom Menu → J → Debug Log → On → OK.
+3. **Peaking in MF.** Press OK, in the right column choose AF Mode → MF. MENU → SETUP → Custom Menu → A → Peaking →
+   White → OK. MENU → SETUP → Custom Menu → A → MF Assist → Off → OK. Point the camera at something with edges.
+   Expected: white lines in live view the whole time, no zoom. Half-press: the lines stop. Release: they come back.
+   Take a photo: the preview has no lines.
+4. **MF Assist.** Press OK, AF Mode → S-AF+MF. MENU → SETUP → Custom Menu → A → MF Assist → On → OK. Half-press and
+   turn the focus ring. Expected: the view zooms in, with white lines.
+5. **S-AF.** Press OK, AF Mode → S-AF. Expected: no lines.
+6. **Spot metering.** MENU → SETUP → Custom Menu → E. Exp/▣/ISO → Spot Metering → RIGHT → Spot → RIGHT → On → OK.
+   Press OK, in the right column choose the metering item → Spot. Tap a lamp on the screen, then a dark area.
+   Expected: the picture gets darker after the tap on the lamp and brighter after the tap on the dark area.
+7. **Starts.** Press OK, AF Mode → MF (Peaking stays White). For each start: press ON/OFF once, and count the
+   seconds until live view shows the picture. Write down the time, whether the lines show, and whether the screen
+   lit, went dark and lit again.
+   1. Off 2 min, then a start. Twice.
+   2. Battery out for 2 min. Battery in. Wait 10 s. A start. Twice.
+8. Turn the camera off. Card into the Mac:
+
+```sh
+scp /Volumes/Untitled/EPM2LOG.BIN USER@HOST:/path/to/epm2-tools/.local/spot-af-logs/EPM2LOG-cold-start-fix.BIN
+```
+
+| Result | Meaning |
+|---|---|
+| Steps 3 to 6 as expected, every start of step 7 about 2 s with lines | pass: pin the build; the start time on a body that shows the issue is for the contributor and the reporter |
+| No lines in step 3, lines in step 4 | T_MF's MF branch is wrong (the focus mode read or the GUI state word) |
+| No lines in steps 3 and 4 | T_MF does not reach T_R's test of the Peaking setting |
+| Lines in step 5 | T_MF's return 0 is wrong |
+| Live view freezes or the camera starts again when live view begins | a fault in T_MF: go back |
+| Step 6 fails | not from this change (spot-core-2 is byte for byte as flashed): go back and repeat step 6 on spot-af-2 |
+| A start of step 7 takes 8 s or more, or the screen lights twice | the issue shows on this body with the fix: the log tells whether `seg_loaded` came before the first live-view state; look at the colour-stage rows of the audit |
