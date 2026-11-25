@@ -131,6 +131,9 @@ candidate `osd-battery` are kept.
   simulation on the selected entry reaches one of them before the copy ends. Probe: the start list of
   `experiments/2026-11-24-slow-boot/NOTES.md` §7 in that state. A clean fix for 0x7E56C6A5 moves 219 bytes into a
   dead function of segment 1.
+  The candidate `film-tables-fix` removes 25 of the 73 table words from that list (the routes of the hidden art
+  values, `experiments/2026-11-25-film-tables/NOTES.md`); when it is pinned, remove their three rows from the allow list and
+  update `cli/tests/test_hookcheck.py`, which holds spot-af-2 to one FAIL.
 - Emulator ([emulator/boot/README.md](emulator/boot/README.md)), open points:
   - The row Time Lapse Settings is grey when the clock is not set. Start the emulator with
     `E101_RTC=2026-11-14T12:00:00`.

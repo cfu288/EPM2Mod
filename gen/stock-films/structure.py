@@ -1,12 +1,13 @@
-"""Write data/specs/stock-films-structure-3.json and build/stock-films/layout.json: what the stock-filters firmware
+"""Write data/specs/stock-films-structure-4.json and build/stock-films/layout.json: what the stock-filters firmware
 flashes for film simulations (experiments/2026-11-18-stock-filters/design.md, "One mechanism for all 12 entries").
 
     uv run python gen/stock-films/structure.py WORKDIR [LISTING.txt]
 
 Versions: 1 the structure; 2 the film codes' look on LKID (the stock identity look table) and the EXIF case "no art
 filter" (experiments/2026-11-20-film-name-exif/NOTES.md); 3 no 12-region table for the film codes
-(experiments/2026-11-20-model-calibration/NOTES.md §6). This file makes version 3; versions 1 and 2 are committed
-spec files, made by this file at earlier commits.
+(experiments/2026-11-20-model-calibration/NOTES.md §6); 4 the routes of the hidden stored values in segment 1
+(experiments/2026-11-25-film-tables/NOTES.md). This file makes version 4; the earlier versions are committed spec
+files, made by this file at earlier commits.
 
 Flashed, and reached only through a film code or a hidden stored value (so no stock filter changes):
   * one film code per menu entry; for each: a tone stub with three records that point at the entry's RAM block,
@@ -16,7 +17,9 @@ Flashed, and reached only through a film code or a hidden stored value (so no st
     and tone-hash entries for them and for 79 (target: the stock default; the loader switches it);
   * the art-matrix chain at the stock compare 0x7E56C6A5: film codes take their RAM matrix; the in-place codes 71, 72,
     79, 85 take a RAM pointer, 0 = the stock path; every other code goes through the stock compares unchanged;
-  * the hidden stored values 111, 112, 114, 115, 118: their routes to the film codes and their hash keys;
+  * the hidden stored values 111, 112, 114, 115, 118: their routes to the film codes and their hash keys. A route is
+    the value's own stock case stub with the film code as its immediate, or a stub in EARLY_AREA where the code does
+    not fit: live view follows the routes before segment 2 is in RAM (early_route);
   * codes 75 and 125: the four compares of the job block that treat them get an immediate no byte matches;
   * the 12-region stage: a case OFFCASE of the selector's worker 0x7E56E495 returns a descriptor whose table has enable
     mask 0 (a record that is off has no effect, camera-tested with the twelve-region probe's OVERLAP entry); the eight
@@ -42,7 +45,7 @@ from epm2mod.looks import slots  # noqa: E402
 
 # The version this generator makes. A camera-tested version stays as its committed spec file (a pinned build names it);
 # the generator that made it is in git history.
-SPEC = "stock-films-structure-3"
+SPEC = "stock-films-structure-4"
 OUT = "stock-films"   # build/OUT/layout.json
 LOOK_TAIL = 0x7E56EB0F          # the look stage's tail: a0 = the look table
 EXIF_OFF = 0x7E70DF1B           # rec_art_set_exif_data's default case: no ArtFilter written (Off)
@@ -99,6 +102,7 @@ BRACKET_SLOT = 24     # segment 2: the shared tone part, the chroma helper, the 
                                            # the stubs of the first six entries
 CODE_AREA = (0x7EBF38BC, 0x7EBF3B10)       # segment 2: the stubs of the other six (after the log's probes)
 DATA_AREA = (0x7EE541B4, 0x7EE548B0)
+EARLY_AREA = (0x7E69ECA8, 0x7E69ED8B)      # segment 1: the exp debug printers between peaking-mf-2 and spot-core-2
 TWELVE_DATA = (0x7EE40728, 0x7EE40877)     # segment 3, reclaim-space row 8 (version 3: the off descriptor)
 
 
@@ -183,6 +187,21 @@ def bracket_hooks(blk, extra):
             body += tail
             hooks.append((a - 1, n, body, "%s %s" % (x.entry, first[2])))
     return hooks
+
+
+def early_route(blk, row, tail, code):
+    """Where a hidden value's route (the table word at `row`) gets its film code: the address of the immediate of the
+    value's stock case stub, or None when the code does not fit there. The stub `mov imm,d2; jmp tail` is reached only
+    through that word. An imm8 is sign-extended: a code above 127 fits only before a tail that keeps the low byte."""
+    at = lambda a, n: bytes(blk[a - BASE:a - BASE + n])
+    stub = struct.unpack("<I", at(row, 4))[0]
+    assert bytes(blk).count(struct.pack("<I", stub)) == 1, "0x%08X has another pointer" % stub
+    size = {0x8A: 2, 0x2E: 3}[at(stub, 1)[0]]                         # mov imm8,d2 / mov imm16,d2
+    j = stub + size
+    jump = {0xCA: (1, "<b"), 0xCC: (2, "<h")}[at(j, 1)[0]]            # bra / jmp
+    assert j + struct.unpack(jump[1], at(j + 1, jump[0]))[0] == tail, hex(stub)
+    low_byte = at(tail, 2) == b"\x88\x14"                             # mov d2,d0; extbu d0
+    return stub + 1 if size == 3 or code < 0x80 or low_byte else None
 
 
 def run(*a):
@@ -320,6 +339,19 @@ OFFCASE: .byte 0xfc, 0xdc            # mov OFFDESC,a0 (as the stock cases)
 OFFDESC: .long OFFZERO - %d          # the table: of it only the enable mask (OFFZERO, 0) acts
     .long %s
 OFFZERO: .long 0""" % (TWELVE_MASK_AT, ", ".join("%#x" % a for a in iso)))
+    # the routes of the hidden values in early-loaded space: (table word, immediate to edit or None, code, what)
+    early = []
+    tables = [(slots.FILTER_TYPE_JUMP, slots.FILTER_TYPE_TAIL, "art_GetFilterType")]
+    tables += [(t, tail, "live-view " + what) for still, movie, tail in slots.LIVE_VIEW
+               for t, what in ((still, "still"), (movie, "movie"))]
+    asm.append(".section .se,\"ax\"")
+    for name, _, value, code, kind in ENTRIES:
+        for table, tail, what in tables if kind == "hidden" else ():
+            row = table + 4 * (value - slots.FIRST_ART_VALUE)
+            imm = early_route(blk, row, tail, code)
+            early.append((row, imm, code, "%s row of value %d" % (what, value)))
+            if imm is None:
+                asm.append("VE%d: mov %d,d2\n    jmp %#x" % (code, code, tail))
     extra = [x for x in slots.EXTRA_SLOTS if x.entry in {e[0] for e in ENTRIES if e[4] == "hidden"}]
     bhooks = bracket_hooks(blk, extra)
     slots_at = []
@@ -336,7 +368,7 @@ OFFZERO: .long 0""" % (TWELVE_MASK_AT, ", ".join("%#x" % a for a in iso)))
     args = ["--defsym=s_%s=0x%s" % (a, a) for a in calls]
     args += ["--section-start=.sc=%#x" % CODE_AREA[0], "--section-start=.sk=%#x" % SHARED_AREA[0],
              "--section-start=.hk=%#x" % MATRIX_HOOK, "--section-start=.hu=%#x" % HUE_SITE]
-    args += ["--section-start=.td=%#x" % TWELVE_DATA[0]]
+    args += ["--section-start=.td=%#x" % TWELVE_DATA[0], "--section-start=.se=%#x" % EARLY_AREA[0]]
     args += ["--section-start=.b%d=%#x" % (k, site) for k, (site, _, _, _) in enumerate(bhooks)]
     args += ["--section-start=.q%d=%#x" % (k, slots_at[k]) for k in range(len(bhooks))]
     s, o, e = (os.path.join(work, "structure." + x) for x in ("s", "o", "elf"))
@@ -377,6 +409,10 @@ OFFZERO: .long 0""" % (TWELVE_MASK_AT, ", ".join("%#x" % a for a in iso)))
     assert TWELVE_DATA[0] + len(td) <= TWELVE_DATA[1] and len(td) == 56
     op(TWELVE_DATA[0], td, "data, segment 3: OFFDESC, the 12-region descriptor of the film codes: table = OFFZERO - "
        "3024, the 12 stock flat ISO-weight pointers, then OFFZERO (u32 0: the table's enable mask, every record off)")
+    se = sect(".se")
+    assert EARLY_AREA[0] + len(se) <= EARLY_AREA[1]
+    op(EARLY_AREA[0], se, "new code, segment 1: the art_GetFilterType stubs of the film codes that do not fit in the "
+       "stock stub (%d B)" % len(se))
     op(MATRIX_HOOK, hook, "hook: the stock art-matrix compare chain jumps to CHAIN (film codes first, then the stock "
        "compares of 70 / 79 / 102 / 103 unchanged)")
     hu = sect(".hu")
@@ -467,23 +503,27 @@ OFFZERO: .long 0""" % (TWELVE_MASK_AT, ", ".join("%#x" % a for a in iso)))
         [("VM", s, m) for s, m, _ in slots.LIVE_VIEW[1:]]
     for name, stock_value, value, c, kind in ENTRIES:
         row = 4 * (value - slots.FIRST_ART_VALUE)
+        if kind == "hidden":
+            for a, w, note in ((slots.KIND_JUMP + row, slots.KIND_COLOUR_ONLY, "record kind of value %d" % value),
+                               (slots.EXIF_JUMP + row, EXIF_OFF, "EXIF case of value %d" % value),
+                               (slots.IS_ART_JUMP + row, slots.IS_ART_YES, "'is art' of value %d" % value)):
+                op(a, struct.pack("<I", w), note + " (hidden value: flashed)")
+            continue
         words = [(slots.FILTER_TYPE_JUMP + row, sym["VF%d" % c], "art_GetFilterType row of value %d" % value)]
         for (still, movie, _), stub in zip(slots.LIVE_VIEW, ("VL", "VM")):
             words.append((still + row, sym["%s%d" % (stub, c)], "live-view still row of value %d" % value))
             words.append((movie + row, sym["%s%d" % (stub, c)], "live-view movie row of value %d" % value))
-        if kind == "hidden":
-            words += [(slots.KIND_JUMP + row, slots.KIND_COLOUR_ONLY, "record kind of value %d" % value),
-                      (slots.EXIF_JUMP + row, EXIF_OFF, "EXIF case of value %d" % value),
-                      (slots.IS_ART_JUMP + row, slots.IS_ART_YES, "'is art' of value %d" % value)]
-            for a, w, note in words:
-                op(a, struct.pack("<I", w), note + " (hidden value: flashed)")
+        if kind == "route":
+            words.append((slots.KIND_JUMP + row, slots.KIND_COLOUR_ONLY, "record kind of value %d" % value))
+        words.append((slots.EXIF_JUMP + row, EXIF_OFF, "EXIF case of value %d" % value))
+        for a, w, note in words:
+            if word(a) != w:
+                switch[name].append((a, struct.pack("<I", w), get(a, 4), note))
+    for a, imm, c, what in early:
+        if imm is None:
+            op(a, struct.pack("<I", sym["VE%d" % c]), what + " -> its stub in segment 1 (hidden value: flashed)")
         else:
-            if kind == "route":
-                words.append((slots.KIND_JUMP + row, slots.KIND_COLOUR_ONLY, "record kind of value %d" % value))
-            words.append((slots.EXIF_JUMP + row, EXIF_OFF, "EXIF case of value %d" % value))
-            for a, w, note in words:
-                if word(a) != w:
-                    switch[name].append((a, struct.pack("<I", w), get(a, 4), note))
+            op(imm, bytes((c,)), "%s: its stock stub gives art code %d (hidden value: flashed)" % (what, c))
 
     # ---- hash keys of the hidden values (as films12-structure)
     def hash_add(table, key, like, note):
@@ -566,7 +606,11 @@ OFFZERO: .long 0""" % (TWELVE_MASK_AT, ", ".join("%#x" % a for a in iso)))
             (" Version 3 (experiments/2026-11-20-model-calibration/NOTES.md §6): no 12-region table for the film "
              "codes: OFFCASE returns a descriptor whose table has enable mask 0; the eight codes no stock entry "
              "reaches get a hash entry 0x7E78C6E4 -> OFFCASE; the in-place codes' entries hold the default case, "
-             "switched to OFFCASE by the loader.")),
+             "switched to OFFCASE by the loader.") +
+            (" Version 4 (experiments/2026-11-25-film-tables/NOTES.md): the routes of the hidden stored values are in "
+             "segment 1, which is in RAM before live view: 23 immediates of the values' own stock stubs, and 2 stubs at "
+             "0x7E69ECA8 (version 3 pointed 25 table words at stubs in segment 2; those stubs are unchanged and "
+             "unused).")),
         "base": STOCK, "base_sha256": stock_sha,
         "ops": ops,
     }, open(os.path.join(ROOT, "data", "specs", SPEC + ".json"), "w"), indent=1)

@@ -1,0 +1,28 @@
+cold-start-fix 0x7E6C5A23 mode 1: returned; late 0; reached 0x7E57A028, mov_art
+cold-start-fix 0x7E6C5A23 mode 100: returned; late 0; reached 0x7E57A028, mov_art
+cold-start-fix 0x7E6C5A23 mode 111: fault 5 at pc 0x7ECB0A0F (0x7ECAD443+0x35CC): om-emu: MN1030; late 1; reached mov_art
+cold-start-fix 0x7E6C5A23 mode 112: fault 5 at pc 0x7EBF3983 (0x7EBE2000+0x11983): om-emu: MN103; late 1; reached mov_art
+cold-start-fix 0x7E6C5A23 mode 114: fault 5 at pc 0x7EBF39CB (0x7EBE2000+0x119CB): om-emu: MN103; late 1; reached mov_art
+cold-start-fix 0x7E6C5A23 mode 115: fault 5 at pc 0x7EBF3A15 (0x7EBE2000+0x11A15): om-emu: MN103; late 1; reached mov_art
+cold-start-fix 0x7E6C5A23 mode 118: fault 5 at pc 0x7EBF3A5F (0x7EBE2000+0x11A5F): om-emu: MN103; late 1; reached mov_art
+cold-start-fix 0x7E6C410A mode 1: returned; late 0; reached art_GetFilterType, mov_art
+cold-start-fix 0x7E6C410A mode 100: returned; late 0; reached art_GetFilterType, mov_art
+cold-start-fix 0x7E6C410A mode 111: fault 5 at pc 0x7ECB0A0F (0x7ECAD443+0x35CC): om-emu: MN1030; late 1; reached mov_art
+cold-start-fix 0x7E6C410A mode 112: fault 5 at pc 0x7EBF3983 (0x7EBE2000+0x11983): om-emu: MN103; late 1; reached mov_art
+cold-start-fix 0x7E6C410A mode 114: fault 5 at pc 0x7EBF39CB (0x7EBE2000+0x119CB): om-emu: MN103; late 1; reached mov_art
+cold-start-fix 0x7E6C410A mode 115: fault 5 at pc 0x7EBF3A15 (0x7EBE2000+0x11A15): om-emu: MN103; late 1; reached mov_art
+cold-start-fix 0x7E6C410A mode 118: fault 5 at pc 0x7EBF3A5F (0x7EBE2000+0x11A5F): om-emu: MN103; late 1; reached mov_art
+film-tables-fix 0x7E6C5A23 mode 1: returned; late 0; reached 0x7E57A028, mov_art
+film-tables-fix 0x7E6C5A23 mode 100: returned; late 0; reached 0x7E57A028, mov_art
+film-tables-fix 0x7E6C5A23 mode 111: returned; late 0; reached 0x7E57A028, mov_art
+film-tables-fix 0x7E6C5A23 mode 112: returned; late 0; reached 0x7E57A028, mov_art
+film-tables-fix 0x7E6C5A23 mode 114: returned; late 0; reached 0x7E57A028, mov_art
+film-tables-fix 0x7E6C5A23 mode 115: returned; late 0; reached 0x7E57A028, mov_art
+film-tables-fix 0x7E6C5A23 mode 118: returned; late 0; reached 0x7E57A028, mov_art
+film-tables-fix 0x7E6C410A mode 1: returned; late 0; reached art_GetFilterType, mov_art
+film-tables-fix 0x7E6C410A mode 100: returned; late 0; reached art_GetFilterType, mov_art
+film-tables-fix 0x7E6C410A mode 111: returned; late 0; reached art_GetFilterType, mov_art
+film-tables-fix 0x7E6C410A mode 112: returned; late 0; reached art_GetFilterType, mov_art
+film-tables-fix 0x7E6C410A mode 114: returned; late 0; reached art_GetFilterType, mov_art
+film-tables-fix 0x7E6C410A mode 115: returned; late 0; reached art_GetFilterType, mov_art
+film-tables-fix 0x7E6C410A mode 118: returned; late 0; reached art_GetFilterType, mov_art
