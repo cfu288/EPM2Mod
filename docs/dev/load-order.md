@@ -1,8 +1,8 @@
 # Load order, space and what they cost
 
 What we know about how the E-PM2 firmware gets into RAM, the rule that follows for patch code, the space that is
-left, and the effects on speed and stability. State: 2026-11-25, build `cold-start-fix` (a candidate, not flashed by
-the owner).
+left, and the effects on speed and stability. State: 2026-11-25, build `film-tables-fix` (pinned, camera-tested
+2026-11-25).
 
 Labels: **V** verified (bytes, disassembly, an emulator run, a camera log, a stopwatch), **I** inferred, **U**
 unknown. Emulator times are lab times, not camera times. History is in the notes that each section links.
@@ -119,7 +119,7 @@ The fix `peaking-mf-2` puts T_MF in segment 1 (61 B). Details: slow-boot notes �
 
 ## 3. Space
 
-Free bytes of `cold-start-fix`. "Proven" means a camera-tested build runs code in the area. "Static" means the
+Free bytes of `film-tables-fix`. "Proven" means a camera-tested build runs code in the area. "Static" means the
 area passes every check of `tools/freespace.py` and no code has run there. Sources: `uv run python
 tools/freespace.py check` on the build's specs and `freespace.py area` (V tool, 2026-11-25), slow-boot notes §8,
 `experiments/2026-11-21-firmware-dive/NOTES.md` §1, `experiments/2026-11-13-reclaim-space/README.md`.
@@ -128,10 +128,10 @@ tools/freespace.py check` on the build's specs and `freespace.py area` (V tool, 
 | Region | Area | Size | Used by the mod | Free, proven | Free, static only | Reclaimable, and the cost of a mistake |
 |---|---|---|---|---|---|---|
 | kernel range | blank run 0x7E4C90CA–0x7E4C9800 | 1,846 | 1,824: `log-menu-3` 751, `peaking-direct-4` 420, `peaking-colours` 292, `peaking-fast` 149, `interval-frames-240` 128, `custom-menu-rows-4` 76, others 8 | **22**, in three pieces | 0 | G2 0x7E440010–0x7E448000, 32,752 B of 0xFF: no access in the emulator (V); it is CPU1's vector page (I). The copy's end word can grow by 26,624 B. A mistake in either can stop every start and the update path |
-| segment 1 | exp debug printers 0x7E69E9EA–0x7E69EEAF | 1,221 | 993: `lss-core` 641, `spot-core-2` 291, `peaking-mf-2` 61 | **228** (227 in one run) | 0 | four text runs, 12,739 B, found by the automatic rule only; 238 B of code with one caller each. A mistake shows on the update path too |
+| segment 1 | exp debug printers 0x7E69E9EA–0x7E69EEAF | 1,221 | 1,009: `lss-core` 641, `spot-core-2` 291, `peaking-mf-2` 61, `stock-films-structure-4` 16 | **212** (211 in one run) | 0 | four text runs, 12,739 B, found by the automatic rule only; 238 B of code with one caller each. A mistake shows on the update path too |
 | segment 1 | blank tail 0x7E880F5C–0x7E881000 | 164 | 26: `peaking-direct-3` | **138** | 0 | none |
-| segment 2 | `sdk` name list 0x7EBF1090–0x7EBF3BAD | 11,037 | 10,061: `interval-frames-240` 3,584, `level-adjust-row` 1,906, `custom-menu-rows-4` 1,525, `log-menu-3` 1,399, `stock-films-structure-3` 980, others 667 | **976**, in small pieces | 0 | the `sdk` shell handlers 0x7E9A171D–0x7E9BFA7E, 123,745 B: dead once their table words point at a stub (V static). A mistake is recovered by a card update |
-| segment 2 | blank tail 0x7ECB0888–0x7ECB1000 | 1,912 | 1,832: `interval-timelapse-v2` 831, `stock-films-structure-3` 761, `card-looks-9` 240 | **80** | 0 | |
+| segment 2 | `sdk` name list 0x7EBF1090–0x7EBF3BAD | 11,037 | 10,061: `interval-frames-240` 3,584, `level-adjust-row` 1,906, `custom-menu-rows-4` 1,525, `log-menu-3` 1,399, `stock-films-structure-4` 980, others 667 | **976**, in small pieces | 0 | the `sdk` shell handlers 0x7E9A171D–0x7E9BFA7E, 123,745 B: dead once their table words point at a stub (V static). A mistake is recovered by a card update |
+| segment 2 | blank tail 0x7ECB0888–0x7ECB1000 | 1,912 | 1,832: `interval-timelapse-v2` 831, `stock-films-structure-4` 761, `card-looks-9` 240 | **80** | 0 | |
 | segment 2 | Bluetooth strings 0x7EBB1F4C–0x7EBB304C | 4,352 | 3,029: `lss-menu` 2,936, `build-label` 93 | 0 for code | 1,323 (data) | |
 | segment 3 | seven runs of dead 3D helpers, and the blank tail 0x7F033B7C–0x7F034000 | 8,274 | 7,149: `card-looks-9` 4,550, `stock-films-structure-3` 1,352, `custom-menu-rows-4` 752, `gauge-info` 335, others 160 | the tool's verdict is "data"; `card-looks-9` runs code in two of them (V camera) | 1,125 | as segment 2 |
 | not loaded | 1,586,842 B | | 0 | 0 | 0 | needs a longer load range: U |
@@ -207,15 +207,14 @@ No restart loop and no failed update are recorded. V, `docs/camera-log/`.
 
 ## 5. Open risks
 
-`emulator/hookcheck.py data/builds/cold-start-fix.json`: 87 transfers go from early-loaded to late-loaded code, 12
-jumps and calls and 75 pointers. V tool. Two are safe by proof: the entry words of the tasks 0x90 and 0x91 (0x7E439C80
-to 0x7EE53830, 0x7E439C9C to 0x7EBF2BE4), dormant in stock and started only by T_GUI in segment 2. The other 85 are
-from `stock-films-structure-3`: 75 safe by timing only, 10 by inference, in the table below. The evidence word by word
+`emulator/hookcheck.py data/builds/film-tables-fix.json`: 62 transfers go from early-loaded to late-loaded code. V tool. Two are safe by proof: the entry words of the tasks 0x90 and 0x91 (0x7E439C80
+to 0x7EE53830, 0x7E439C9C to 0x7EBF2BE4), dormant in stock and started only by T_GUI in segment 2. The other 60 are
+from `stock-films-structure-4`: 50 safe by timing only, 10 by inference, in the table below. The evidence word by word
 is in git: `git show f41e8fd:emulator/hookcheck-allow.tsv` (the list of accepted transfers until 2026-11-25).
 
 | Risk | What is known | Probe |
 |---|---|---|
-| **25 jump-table words of the hidden art values 111, 112, 114, 115, 118** (0x7E7FF034–0x7E7FF0A4, 0x7E807858–0x7E8078C8, 0x7E854A50–0x7E854A6C) | Result of 2026-11-25, V static: the words are cases of three switches, in 0x7E6CBFD3, 0x7E6DBA95 and `art_GetFilterType` 0x7E71BD94. Each switch takes a picture-mode value of 100 to 120 and does `jmp (a0)` through the table. **0x7E6DBA95 is called at 0x7E6ECD73 by the struct refresh 0x7E6ECCAF, the function whose end ran before segment 2 was loaded in issue #6.** The call is reached when 0x7E6DB43E returns 4 or 5 (meaning U). Film simulations are chosen with Picture Mode in P, A, S and M, and the quick start does not refuse them. So on a body that shows issue #6, a cold start with one of the five entries selected can jump into segment 2 before the copy: I. Whether it does: U. Emulator, `hookhits.mjs` on `cold-start-fix`, quick start off and on: none of the three functions, the colour-matrix step or the latch ran before the last constructor walk at 32.4 ms; the run then faulted (code 6; the run stored in the slow-boot notes did not; cause not looked at), so it says nothing after that. V emulator, and no evidence for the camera | Camera, on a body that shows issue #6, `cold-start-fix`: load a look pack, select the film simulation on Grainy Film in P with Picture Mode, power off 2 min, start. Twice. A start of 8 s or more, or a screen that lights twice: the risk is real. Then the fix is the stubs in segment 1 (space: §3) |
+| **25 jump-table words of the hidden art values 111, 112, 114, 115, 118** (0x7E7FF034–0x7E7FF0A4, 0x7E807858–0x7E8078C8, 0x7E854A50–0x7E854A6C) | Fixed in `film-tables-fix` (`stock-films-structure-4`): the words point at stubs in segment 1. V harness: 210 of 210 cases with segments 2 and 3 not copied, no fault, no instruction in late-loaded space. V camera, 2026-11-25: the five film simulations in P and ART, starts after 2 min off and with the battery out, no fault in the log. Not seen on a body that shows issue #6 (`experiments/2026-11-25-film-tables/NOTES.md`) | none |
 | **48 jump-table words of the colour stage** (0x7E78AEBC–0x7E78CB40) and **the two colour-stage hooks** 0x7E56C6A5, 0x7E546160 | First colour stage 1.6–2.9 s after the start, 1.28 s after the copies, on the owner's bodies in P (V log). Not measured: a start with the shutter held, wake from sleep, a body that shows issue #6. The function harness reaches both hooks' jumps directly (V emulator) | The same camera run: the log's first `film_stage` against `seg_loaded`. No extra flash |
 | **10 hooks of the ART BKT frame composer** 0x7E5A75AE | Runs when an ART bracket picture is taken (V static); a capture needs the application (I) | Camera: ART BKT On, shutter held during a cold start. Low priority |
 | **4 hooks of `movie-ab`** (not in this build) | movie frames only (I); never on the camera | with that build's camera test |

@@ -25,5 +25,7 @@
   "data/specs/spot-core-2.json",
   "data/specs/spot-menu.json"
  ],
+ "sha256": "e029facb38569880c0cec4c16b0f295ca2a96214ed75900fe00585f6b0cedd28",
+ "camera_tested": "2026-11-25",
  "label": "2026.11.26"
 }
