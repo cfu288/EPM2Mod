@@ -460,7 +460,11 @@ def s5(pinned, patched):
             D = 0x7D600000
             sc.w8(L2, sc.r8(L2))
             sc.write(D, struct.pack("<H", 1)); sc.write(D + 0x40, bytes(64))
-            g = sc.piece(0x7E726761, [0x7E726770], {"a3": D + 0x40, "a2": D})
+            # Two stops: 0x7E726770, the stock instruction after the gain is stored, and 0x7E726779 for a build whose
+            # hooks cover that address (log-menu-3: PK9 at 0x7E72676D, 7 bytes, then TICK at 0x7E726774, 5 bytes;
+            # their routines come back at 0x7E726779). With the first stop only, such a build ran past it into code
+            # that needs a real stack, and the piece ended in a fault that is the rig's, not the build's.
+            g = sc.piece(0x7E726761, [0x7E726770, 0x7E726779], {"a3": D + 0x40, "a2": D})
             gain = sc.r16(D + 0x40 + 34)
             # every fault is part of the result: of a frame, of the chooser's call, of the pass-9 piece
             faults = ["frame fault in %s" % x.label for x in ran if x.faults]
@@ -474,7 +478,7 @@ def s5(pinned, patched):
                     name, state, live, flags(lv), got, "FAULT " + r.fault if r.fault else "ok", len(new), sc.r8(L2), gain))
             if name != "pinned":
                 OUT("  S5 RESULT [%s]: %s" % (name, "same state, heap mode and still gain as pinned" if res == base else
-                                              fail("DIFFERS from pinned %s" % (base,))))
+                                              fail("DIFFERS from pinned %s: %s" % (base, res))))
 
 
 def main():
