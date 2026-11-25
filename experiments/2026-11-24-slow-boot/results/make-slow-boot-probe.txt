@@ -1,0 +1,13 @@
+1/5 stock firmware: ok
+2/5 free-space check: check: PASS (0 FAIL)
+    FIRST CODE: this build runs code in an area that has never run code on a camera. The flash is the test of that area.
+3/5 applied 21 patch specs (25336 bytes changed)
+4/5 sha256 e783fbe686fc774a17b64590c8bd986ff1259bb84d189b703c5efc478aa675ca
+    CANDIDATE: this build is NOT camera-tested. Write the sha256 in the camera log before you flash it.
+    boot-test: PASS: /path/to/tmp/slow-boot-probe.BIN boots as stock does (2000 ms of lab time; lines with allowed differences: line 1, line 35, line 39, line 40)
+    update-path-test: PASS: /path/to/tmp/slow-boot-probe.BIN finds the update file as stock does (39 console lines equal up to the body-controller step, segment 2 not loaded, no fault)
+5/5 slow-boot-probe: DEBUG build, not for normal use: the pinned build peaking-mf with a Debug Log record of the first live-view struct refresh of every start (event lv_first, with two words that show whether segments 2 and 3 are in RAM at that moment), to see whether live view runs peaking's jump into segment 2 before the segment copies end (GitHub issue #6, slow cold start). Decode with `epm2mod log`
+    firmware: build/slow-boot-probe.BIN    for the card: build/DCOLYMP
+To write a card: epm2mod install --card DIR --build slow-boot-probe --allow-untested
+wrote /path/to/epm2-tools/build/slow-boot-probe.BIN (firmware, sha256 e783fbe686fc774a17b64590c8bd986ff1259bb84d189b703c5efc478aa675ca)
+wrote /path/to/epm2-tools/build/DCOLYMP/E1019999.BIN (firmware, sha256 e783fbe686fc774a17b64590c8bd986ff1259bb84d189b703c5efc478aa675ca)

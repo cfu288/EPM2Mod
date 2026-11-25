@@ -1,22 +1,31 @@
 #!/usr/bin/env python3
-"""S0: boot-order check of a patch spec's hooks. Static, no emulator.
+"""S0: boot-order check of a build's patched code. Static, no emulator.
 
-    python3 emulator/hookcheck.py SPEC.json [SPEC.json ...] [--allow 0xSITE=reason ...]
+    python3 emulator/hookcheck.py data/builds/NAME.json [--allow 0xSITE=reason ...]
+    python3 emulator/hookcheck.py SPEC.json [SPEC.json ...]        # all specs of a build, in the build's order
 
 Why: the boot code copies block 0 to RAM in steps (docs/reference/code-space-map.md, load map). The kernel and segment 1 are
 in RAM first; segment 2, segment 3 and usr1-third arrive later, from the Usr1 task, and never on the firmware-update
-path. A hook in early code that jumps to late code crashes when the hooked function runs before the copy. This
-happened: the hook of peaking-direct-2 in the heap mode chooser 0x7E714833 (segment 1) jumped to 0x7EBF1F74
-(segment 2), and the boot task calls that function before Usr1 loads segment 2.
+path. Early code that jumps to late code crashes when it runs before the copy. This happened twice: the hook of
+peaking-direct-2 in the heap mode chooser 0x7E714833 (segment 1) jumped to 0x7EBF1F74 (segment 2), and the boot task
+calls that function before Usr1 loads segment 2; and peaking-mf's `jmp` at 0x7E4C93A4 (kernel range, in code of an
+earlier spec) to 0x7ECB0B81 (segment 2) ran at the first live-view refresh of a cold start (GitHub issue #6).
 
-What it does: for every block-0 op that starts with a jump or call (a hook), and for every op that such a jump
-reaches (new code), it lists each jmp / call / branch with its source and target segment. A transfer from the
-pre-reset range, the kernel or segment 1 to anything loaded later, or to a range that no boot copy loads, FAILS,
-unless emulator/hookcheck-allow.tsv or --allow names the instruction's address with a reason (for example proof
-that the function cannot run before Usr1). Exit status 1 on any FAIL.
+What it does: it makes the build's block 0 (stock with the specs applied in order) and decodes the built bytes of
+every op that lies in the pre-reset range, the kernel or segment 1. Ops that overlap are decoded as one run, so a
+jump that a later spec writes into an earlier spec's code is seen. An op that changes only the target of a stock
+jump or call is decoded from that instruction's start. Each jmp / call / branch that leaves its run is listed. A
+transfer to anything loaded later, or to a range that no boot copy loads, FAILS, unless
+emulator/hookcheck-allow.tsv or --allow names the instruction's address with a reason (for example proof that the
+function cannot run before Usr1). Exit status 1 on any FAIL.
 
-Limits: only control transfers with a constant target are seen (not `jmp (a0)`, not data pointers, not RAM
-reads of late data). The classes come from tools/freespace.py's load model. It says nothing about the order of
+A word of an op that points into early-loaded code or data in stock and into
+late-loaded space in the build is listed as a `pointer` (a case of a switch table, a table address) and FAILS in the
+same way.
+
+Limits: only control transfers with a constant target and changed stock pointers are seen (not `jmp (a0)`, not a
+pointer in new code or a new table, not RAM reads of late data). A data op in early-loaded space is decoded as code too: a FAIL there is a false alarm, to be
+named in the allow list. The classes come from tools/freespace.py's load model. It says nothing about the order of
 tasks after the copies.
 """
 import argparse, json, os, re, subprocess, sys, tempfile
@@ -24,11 +33,12 @@ import argparse, json, os, re, subprocess, sys, tempfile
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import bootmem  # noqa: E402
+import patchblock  # noqa: E402
 
 BASE = 0x7E421020
 EARLY = ("pre-reset", "kernel", "data-image", "sram-image", "segment-1")
 OBJDUMP = os.environ.get("OM_OBJDUMP") or os.path.join(os.path.dirname(HERE), "build", "toolchain", "bin", "mn10300-elf-objdump")
-XFER = re.compile(r"^\s*([0-9a-f]+):\s+(?:[0-9a-f]{2} )+\s*\t(jmp|call|b[a-z]{1,2}|l[a-z]{2})\t(?:0x)?([0-9a-f]{8})\b")
+XFER = re.compile(r"^\s*([0-9a-f]+):\s+(?:[0-9a-f]{2} )+\s*\t(jmp|calls?|b[a-z]{1,2}|l[a-z]{2})\t(?:0x)?([0-9a-f]{8})\b")
 
 
 def segment(a):
@@ -59,54 +69,78 @@ def transfers(addr, code):
     return res
 
 
+def read_allow():
+    """{address: reason} of emulator/hookcheck-allow.tsv. Its first column is an address or a range LO-HI (inclusive)."""
+    allow = {}
+    for line in open(os.path.join(HERE, "hookcheck-allow.tsv"), encoding="utf-8"):
+        if line.strip() and not line.startswith("#"):
+            lo, _, hi = line.split("\t")[0].partition("-")
+            for a in range(int(lo, 16), int(hi or lo, 16) + 1):
+                allow[a] = "see emulator/hookcheck-allow.tsv"
+    return allow
+
+
+def spec_list(paths):
+    """The spec paths: a build description (a JSON file with "specs") stands for its specs."""
+    res = []
+    for p in paths:
+        res += json.load(open(p)).get("specs") or [p]
+    return res
+
+
 def check(spec_paths, allow=None, out=print):
+    """List the transfers that leave the build's patched early-loaded code. True when none FAILS."""
     allow = allow or {}
+    spec_paths = spec_list(spec_paths)
+    stock, image, _ = patchblock.patched_block0(spec_paths)
+    cut = lambda blk, lo, hi: blk[lo - BASE:hi - BASE]
     ops = []
     for p in spec_paths:
         for op in json.load(open(p))["ops"]:
-            if op.get("block") == 0 and op.get("type") == "bytes":
-                ops.append((BASE + int(op["offset"], 16), bytes.fromhex(op["new"]), os.path.basename(p)))
-    def op_at(a):
-        return next((o for o in ops if o[0] <= a < o[0] + len(o[1])), None)
-    todo = [o for o in ops if o[1][:1] in (b"\xdc", b"\xdd", b"\xcc", b"\xcd") and len(o[1]) <= 8]     # hook sites
-    seen, fails, rows = set(), 0, 0
-    while todo:
-        o = todo.pop(0)
-        if o[0] in seen:
-            continue
-        seen.add(o[0])
-        hook = len(o[1]) <= 8
-        for ia, mn, tgt in transfers(o[0], o[1]):
-            if hook and ia != o[0]:
-                continue                                  # a hook is one jump; the padding after it is not decoded
-            if o[0] <= tgt < o[0] + len(o[1]):
-                continue                                  # inside the same op
-            s, t = segment(ia), segment(tgt)
-            bad = s in EARLY and t not in EARLY
-            why = allow.get(ia)
-            verdict = "ok" if not bad else ("allowed: " + why if why else "FAIL")
-            fails += verdict == "FAIL"
-            rows += 1
-            out("%-5s %s 0x%08X (%s) %s -> 0x%08X (%s)%s  [%s]" % (
-                verdict.split(":")[0].upper() if bad else "ok", "hook" if hook else "code", ia, s, mn, tgt, t,
-                "" if verdict in ("ok", "FAIL") else "  " + verdict, o[2]))
-            nxt = op_at(tgt)
-            if nxt and nxt[0] not in seen:
-                todo.append(nxt)
-    out("S0 boot-order check: %d transfers, %d FAIL%s" % (rows, fails, "" if fails else
-        " (every transfer from early-loaded code stays in early-loaded code)"))
+            lo = BASE + int(op.get("offset", "0"), 16)
+            if op.get("block") == 0 and op.get("type") == "bytes" and segment(lo) in EARLY:
+                ops.append((lo, lo + len(op["new"]) // 2, os.path.basename(p)))
+    runs = []                                             # overlapping ops are one run of built bytes
+    for lo, hi, name in sorted(ops):
+        if runs and lo < runs[-1][1]:
+            names = runs[-1][3] if name in runs[-1][3] else runs[-1][3] + " + " + name
+            runs[-1] = (runs[-1][0], max(hi, runs[-1][1]), runs[-1][2] + [lo], names)
+        else:
+            runs.append((lo, hi, [lo], name))
+    found = {}                                            # address -> (mnemonic, target, specs)
+    for lo, hi, starts, name in runs:
+        for a, end in zip(starts, starts[1:] + [hi]):     # every op start is an instruction start
+            for ia, mn, tgt in transfers(a, cut(image, a, hi)):
+                if ia < end and not lo <= tgt < hi:       # not inside the same run
+                    found[ia] = (mn, tgt, name)
+        for back in range(1, 7):                          # the op starts inside a stock jump or call: its new target
+            old, now = (transfers(lo - back, cut(b, lo - back, lo - back + 8))[:1] for b in (stock, image))
+            if old and now and old[0][0] == now[0][0] == lo - back and old[0][2] != now[0][2] and segment(old[0][2]) in EARLY:
+                found[lo - back] = (now[0][1], now[0][2], name)
+        for a in range(lo, hi - 3):                       # a table word: a pointer to early code or data in stock
+            old, now = (int.from_bytes(cut(b, a, a + 4), "little") for b in (stock, image))
+            if old != now and segment(old) in EARLY and segment(now) not in EARLY + ("outside block 0",):
+                found[a] = ("pointer", now, name)
+    fails = 0
+    for ia, (mn, tgt, name) in sorted(found.items()):
+        s, t = segment(ia), segment(tgt)
+        bad = t not in EARLY
+        why = allow.get(ia)
+        fails += bad and not why
+        out("%-5s 0x%08X (%s) %s -> 0x%08X (%s)%s  [%s]" % (
+            ("ALLOWED" if why else "FAIL") if bad else "ok", ia, s, mn, tgt, t, "  allowed: " + why if bad and why else "", name))
+    out("S0 boot-order check: %d transfers, %d FAIL, %d allowed%s" % (
+        len(found), fails, sum(segment(v[1]) not in EARLY for v in found.values()) - fails, "" if fails else
+        " (every transfer from early-loaded code stays in early-loaded code, or is in the allow list)"))
     return fails == 0
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("specs", nargs="+")
+    ap.add_argument("specs", nargs="+", help="a build description, or the specs of a build in its order")
     ap.add_argument("--allow", nargs="*", default=[], metavar="0xADDR=reason")
     a = ap.parse_args()
-    allow = {}
-    for line in open(os.path.join(HERE, "hookcheck-allow.tsv"), encoding="utf-8"):      # the accepted hooks
-        if line.strip() and not line.startswith("#"):
-            allow[int(line.split("\t")[0], 16)] = "see emulator/hookcheck-allow.tsv"
+    allow = read_allow()
     allow.update({int(x.split("=", 1)[0], 16): x.split("=", 1)[1] for x in a.allow})
     sys.exit(0 if check(a.specs, allow) else 1)
 

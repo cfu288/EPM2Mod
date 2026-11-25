@@ -1,0 +1,44 @@
+{
+ "name": "peaking-mf-2",
+ "description": "Focus peaking whenever the focus mode in use is MF (prm 0xC021 = 1), with any lens and without the magnified view; the focus-ring trigger (MF Assist) as before. T_R's test of R goes through T_MF in segment 1 (version 1 had it in segment 2, which is not in RAM at the first live-view refresh of a cold start). experiments/2026-11-21-peaking-mf/NOTES.md, experiments/2026-11-24-slow-boot/NOTES.md section 8.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x27dc4b",
+   "expect": "78e6ffa028f062fcdce1fa7d7e18ddb678e6ffa028f86202fcdcf3fa7d7e18dda578e6ffa028f86204fcdc05fb7d7e18dd9478e6ffa028f86206fcdc17",
+   "new": "fca8c5e82b60a000c807dc39a7e2fffccc21c00000900004ddf28fdbffc00ca001c90efcacf0674fbefac80151c9ddfcddd01c5b600400dc33a7e2ffcb",
+   "_addr": "0x7e69ec6b",
+   "_note": "new code, segment 1: T_MF (the test of R, the focus mode, GUI state 0x5101: no lines) (61 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7d1f00",
+   "expect": "4c696e65496e666f00693132",
+   "new": "fc83f0674fbedc35f7ffffcb",
+   "_addr": "0x7ebf2f20",
+   "_note": "new code, segment 2: T_GS (keeps the GUI state) (12 B)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xa8384",
+   "expect": "fca8c5e82b60a000c829",
+   "new": "dcc7581d00cbcbcbcbcb",
+   "_addr": "0x7e4c93a4",
+   "_note": "T_R (custom-menu-rows-3): `movbu (R),d0 / cmp 0,d0 / beq` -> `jmp T_MF` + nop"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x8be6c4",
+   "expect": "dc772ff1ff",
+   "new": "dc3c38f1ff",
+   "_addr": "0x7ecdf6e4",
+   "_note": "the GUI state setter's hook (log-menu-3): `jmp T_GUI` -> `jmp T_GS`, which jumps on to T_GUI"
+  }
+ ]
+}

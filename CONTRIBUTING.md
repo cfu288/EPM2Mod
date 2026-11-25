@@ -47,7 +47,7 @@ A feature is one or more patch specs in `data/specs/` and a build description in
    ```sh
    uv run epm2mod make NAME
    uv run python tools/checks.py data/builds/NAME.json
-   uv run python emulator/hookcheck.py data/specs/YOUR-SPEC.json
+   uv run python emulator/hookcheck.py data/builds/NAME.json
    ```
 
    `make` runs the free-space check and starts the result in the emulator. A build that fails is not written.

@@ -1,0 +1,12 @@
+sess body kind found  boot_ms  heap_ms   gui_ms    lv_ms  errs build    poweron    first screens
+   1    A kept     1     101      199      525  -     0 afe27672 0x00000000 1001 2000 2001
+   2    A kept     2     101      199      525  -     0 afe27672 0x00000000 1001 2000 2001
+   3    A kept     3     101      208     1771     2130     0 afe27672 0x00000000 1001 1002 1003 5000
+   4    A kept     4     101      207     1770     2151     0 afe27672 0x00000000 1001 1002 1003 5000
+   5    A kept     5     101      207     1775     2136     0 afe27672 0x00000000 1001 1002 1003 5000
+   6    A kept     6     101      199      526  -     0 afe27672 0x00000000 1001 2000 2001
+   7    A kept     7     101      207     1466     1822     0 afe27672 0x00000000 1001 1002 1003 5000
+   8    A kept     8     101      208     1468     1822     0 afe27672 0x00000000 1001 1002 1003 5000
+
+medians of sessions that reached live view (ms): body kind build n gui lv
+A kept afe27672 5 gui 1770 (1466-1775) lv 2130 (1822-2151)

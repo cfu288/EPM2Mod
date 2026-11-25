@@ -112,16 +112,20 @@ candidate `osd-battery` are kept.
   `experiments/2026-11-15-feature-survey/`. Cheap ones: video bitrate and time limit (patches
   written), Light Box (hidden in this firmware), Add Effects on film simulations, more film simulations.
 
-- The load-order check (`python3 emulator/hookcheck.py SPEC...`) reports seven failures in the pinned build, all
-  from `stock-films-structure-3`: hooks in segment 1 that jump to code in segment 2 (two in the colour stage,
-  0x7E56C6A5 and 0x7E546160; five in the ART BKT frame composer). All seven are in
-  `emulator/hookcheck-allow.tsv`, and `python3 tools/freespace.py check` passes with them. They are accepted on
-  camera evidence: no start or update has failed since 2026-11-12 (0x7E56C6A5) and 2026-11-18 (the other six).
-  They are safe by timing only. The colour stage runs at power-on for live view, live view starts while Usr1
-  copies segment 2, and nothing waits for the copy (`experiments/2026-11-21-firmware-dive/NOTES.md` §2). The
-  emulator test of 2026-11-14 has no live view. The margin is not known: the build `films-start-texts` measures
-  it (criterion R1 of `experiments/2026-11-21-firmware-dive/plan.md`). A clean fix for 0x7E56C6A5
-  moves 219 bytes into a dead function of segment 1.
+- The load-order check (`uv run python emulator/hookcheck.py data/builds/NAME.json`) checks the built bytes since
+  2026-11-25. In the pinned build `spot-af-2` it fails with one jump: peaking-mf's `jmp` from T_R (kernel range) to
+  T_MF (segment 2), the cause of the slow cold start (GitHub issue #6). The candidate `cold-start-fix` has T_MF in
+  segment 1 (`docs/camera-log/2026-11-25-cold-start-fix.md`); until it is pinned, CI's free-space check of the pinned
+  build fails.
+- The same check lists 87 other transfers from segment 1 or the kernel into segments 2 and 3, all in
+  `emulator/hookcheck-allow.tsv` with their evidence. Two are task entries that only segment-2 code starts (proof).
+  The other 85 are from `stock-films-structure-3` and safe by timing only: the two colour-stage hooks 0x7E56C6A5 and
+  0x7E546160, ten hooks of the ART BKT frame composer, and 73 table words (the colour stage's cases of the film
+  codes, and the live-view rows of the hidden art values 111 to 118). Nothing waits for the segment-2 copy
+  (`experiments/2026-11-21-firmware-dive/NOTES.md` §2). Not known: whether a cold start in ART mode with a film
+  simulation on the selected entry reaches one of them before the copy ends. Probe: the start list of
+  `experiments/2026-11-24-slow-boot/NOTES.md` §7 in that state. A clean fix for 0x7E56C6A5 moves 219 bytes into a
+  dead function of segment 1.
 - Emulator ([emulator/boot/README.md](emulator/boot/README.md)), open points:
   - The row Time Lapse Settings is grey when the clock is not set. Start the emulator with
     `E101_RTC=2026-11-14T12:00:00`.

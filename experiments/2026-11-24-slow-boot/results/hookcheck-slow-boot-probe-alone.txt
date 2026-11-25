@@ -1,0 +1,4 @@
+ok    hook 0x7E6ECF91 (segment-1) jmp -> 0x7E69EC6B (segment-1)  [slow-boot-probe.json]
+ok    code 0x7E69EC90 (segment-1) call -> 0x7E4C9531 (kernel)  [slow-boot-probe.json]
+ok    code 0x7E69EC9D (segment-1) jmp -> 0x7E4C920B (kernel)  [slow-boot-probe.json]
+S0 boot-order check: 3 transfers, 0 FAIL (every transfer from early-loaded code stays in early-loaded code)
