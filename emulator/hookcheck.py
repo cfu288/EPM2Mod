@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """S0: boot-order check of a build's patched code. Static, no emulator.
 
-    python3 emulator/hookcheck.py data/builds/NAME.json [--allow 0xSITE=reason ...]
+    python3 emulator/hookcheck.py data/builds/NAME.json
     python3 emulator/hookcheck.py SPEC.json [SPEC.json ...]        # all specs of a build, in the build's order
 
 Why: the boot code copies block 0 to RAM in steps (docs/reference/code-space-map.md, load map). The kernel and segment 1 are
@@ -16,8 +16,8 @@ every op that lies in the pre-reset range, the kernel or segment 1. Ops that ove
 jump that a later spec writes into an earlier spec's code is seen. An op that changes only the target of a stock
 jump or call is decoded from that instruction's start. Each jmp / call / branch that leaves its run is listed. A
 transfer to anything loaded later, or to a range that no boot copy loads, FAILS, unless
-emulator/hookcheck-allow.tsv or --allow names the instruction's address with a reason (for example proof that the
-function cannot run before Usr1). Exit status 1 on any FAIL.
+emulator/hookcheck-allow.tsv names the instruction's address and this target, with a reason (for example proof that
+the function cannot run before Usr1). The same address with another target FAILS. Exit status 1 on any FAIL.
 
 A word of an op that points into early-loaded code or data in stock and into
 late-loaded space in the build is listed as a `pointer` (a case of a switch table, a table address) and FAILS in the
@@ -79,26 +79,31 @@ CLASSES = ("proof", "inferred", "timing")
 
 
 class Allowed(str):
-    """Why a transfer is accepted (the text that check() prints), with the row of the allow list: its first column
-    (row), its class (cls: proof, inferred, timing; "" for --allow) and its reason."""
+    """Why a transfer is accepted (the text that check() prints), with the row of the allow list: its number in the
+    file (row), its class (cls) and its reason."""
 
-    def __new__(cls, text, row="", klass="", reason=""):
+    def __new__(cls, text, row=0, klass="", reason=""):
         self = super().__new__(cls, text)
         self.row, self.cls, self.reason = row, klass, reason
         return self
 
 
-def read_allow():
-    """{address: Allowed} of emulator/hookcheck-allow.tsv. Its first column is an address or a range LO-HI (inclusive)."""
+def read_allow(path=None):
+    """{(address, target): Allowed} of emulator/hookcheck-allow.tsv. The first column of a row lists its words as
+    ADDRESS>TARGET, separated by spaces. An entry accepts that one transfer: another target at the address FAILS."""
     allow = {}
-    for line in open(os.path.join(HERE, "hookcheck-allow.tsv"), encoding="utf-8"):
+    path = path or os.path.join(HERE, "hookcheck-allow.tsv")
+    for number, line in enumerate(open(path, encoding="utf-8"), 1):
         if line.strip() and not line.startswith("#"):
-            row, _date, cls, reason = line.rstrip("\n").split("\t")
+            words, _date, cls, reason = line.rstrip("\n").split("\t")
             if cls not in CLASSES:
-                sys.exit("hookcheck-allow.tsv: row %s: the class is %r, not one of %s" % (row, cls, ", ".join(CLASSES)))
-            lo, _, hi = row.partition("-")
-            for a in range(int(lo, 16), int(hi or lo, 16) + 1):
-                allow[a] = Allowed("%s, see emulator/hookcheck-allow.tsv" % cls, row, cls, reason)
+                sys.exit("hookcheck-allow.tsv: line %d: the class is %r, not one of %s" % (number, cls, ", ".join(CLASSES)))
+            for word in words.split():
+                address, _, target = word.partition(">")
+                key = (int(address, 16), int(target, 16))
+                if key in allow:
+                    sys.exit("hookcheck-allow.tsv: line %d: %s is listed twice" % (number, word))
+                allow[key] = Allowed("%s, line %d of emulator/hookcheck-allow.tsv" % (cls, number), number, cls, reason)
     return allow
 
 
@@ -110,10 +115,9 @@ def spec_list(paths):
     return res
 
 
-def check(spec_paths, allow=None, out=print, used=None):
-    """List the transfers that leave the build's patched early-loaded code. True when none FAILS.
-    used: a list that gets the allow-list entry (an Allowed, or the text of --allow) of each accepted transfer."""
-    allow = allow or {}
+def transfers_of(spec_paths):
+    """{address: (mnemonic or "pointer", target, spec names)} of the transfers that leave the patched early-loaded
+    bytes of a build (its specs, in order)."""
     spec_paths = spec_list(spec_paths)
     stock, image, _ = patchblock.patched_block0(spec_paths)
     cut = lambda blk, lo, hi: blk[lo - BASE:hi - BASE]
@@ -144,30 +148,49 @@ def check(spec_paths, allow=None, out=print, used=None):
             old, now = (int.from_bytes(cut(b, a, a + 4), "little") for b in (stock, image))
             if old != now and segment(old) in EARLY and segment(now) not in EARLY + ("outside block 0",):
                 found[a] = ("pointer", now, name)
-    fails = 0
+    return found
+
+
+def check(spec_paths, allow=None, out=print, used=None):
+    """List the transfers that leave the build's patched early-loaded code. True when none FAILS.
+    allow: {(address, target): reason}, as read_allow() returns. A transfer to late-loaded space passes only when its
+    address and its target are both those of an entry. The entries that match nothing in the build are counted in the
+    last line: they belong to other builds, or they are stale.
+    used: a list that gets (address, target, the entry) of each accepted transfer."""
+    allow = allow or {}
+    found = transfers_of(spec_paths)
+    listed = {}
+    for address, target in allow:
+        listed.setdefault(address, []).append(target)
+    fails, matched = 0, set()
     for ia, (mn, tgt, name) in sorted(found.items()):
         s, t = segment(ia), segment(tgt)
         bad = t not in EARLY
-        why = allow.get(ia)
+        why = allow.get((ia, tgt)) if bad else None
         fails += bad and not why
-        if bad and why and used is not None:
-            used.append(why)
+        note = ""
+        if why:
+            matched.add((ia, tgt))
+            note = "  allowed: " + why
+            if used is not None:
+                used.append((ia, tgt, why))
+        elif bad and ia in listed:
+            note = "  the allow list accepts this address only for the target %s" % ", ".join("0x%08X" % x for x in listed[ia])
         out("%-5s 0x%08X (%s) %s -> 0x%08X (%s)%s  [%s]" % (
-            ("ALLOWED" if why else "FAIL") if bad else "ok", ia, s, mn, tgt, t, "  allowed: " + why if bad and why else "", name))
-    out("S0 boot-order check: %d transfers, %d FAIL, %d allowed%s" % (
-        len(found), fails, sum(segment(v[1]) not in EARLY for v in found.values()) - fails, "" if fails else
-        " (every transfer from early-loaded code stays in early-loaded code, or is in the allow list)"))
+            ("ALLOWED" if why else "FAIL") if bad else "ok", ia, s, mn, tgt, t, note, name))
+    unused = sorted(set(allow) - matched)
+    out("S0 boot-order check: %d transfers, %d FAIL, %d allowed%s; %d entries of the allow list match nothing in this build%s" % (
+        len(found), fails, len(matched), "" if fails else
+        " (every transfer from early-loaded code stays in early-loaded code, or is in the allow list)", len(unused),
+        ": " + " ".join("%08X>%08X" % x for x in unused[:8]) + (" ..." if len(unused) > 8 else "") if unused else ""))
     return fails == 0
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("specs", nargs="+", help="a build description, or the specs of a build in its order")
-    ap.add_argument("--allow", nargs="*", default=[], metavar="0xADDR=reason")
     a = ap.parse_args()
-    allow = read_allow()
-    allow.update({int(x.split("=", 1)[0], 16): x.split("=", 1)[1] for x in a.allow})
-    sys.exit(0 if check(a.specs, allow) else 1)
+    sys.exit(0 if check(a.specs, read_allow()) else 1)
 
 
 if __name__ == "__main__":

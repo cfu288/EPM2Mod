@@ -23,6 +23,8 @@ from epm2mod.errors import BuildError  # noqa: E402
 from epm2mod.paths import RepoPaths  # noqa: E402
 from epm2mod.releasing import next_version, release_notes  # noqa: E402
 
+CI_PROBLEMS = releasing._ci_problems  # the real one: PlanTests replaces it
+
 
 class NextVersionTests(unittest.TestCase):
     def test_the_first_test_release_of_a_day_is_rc_1(self) -> None:
@@ -94,6 +96,29 @@ class PlanTests(unittest.TestCase):
         self.assertEqual(self.checked, ["2026.11.25", "probe.BIN"])
         self.assertIn("\nThe probe build.\n", release.notes)
         self.assertIn("- feat: a probe\n", release.notes)
+
+    def test_a_build_with_the_label_of_the_day_is_released_as_tested_and_still_checked(self) -> None:
+        self.checked = []
+        with mock.patch.object(releasing, "stamp", lambda paths, build, day: (build, b"image")):
+            release, problems = releasing.plan(self.paths, final=False, build="probe", day="2026.11.20")
+        self.assertEqual(problems, [])
+        assert release is not None
+        self.assertEqual((release.sha256, release.day), ("ab" * 32, "2026.11.20"))
+        self.assertNotIn("Camera-tested as", release.notes)
+        self.assertEqual(self.checked, ["2026.11.20", "probe.BIN"])  # the start-up and load-order checks ran
+
+    def test_the_day_is_a_real_date(self) -> None:
+        with self.assertRaises(BuildError):
+            releasing.plan(self.paths, final=False, build="probe", day="2026.13.01")
+
+    def test_a_failed_read_of_the_ci_runs_is_not_called_no_run(self) -> None:
+        self.paths.manifest["workflows"] = [".github/workflows/python.yml"]
+        failed = mock.Mock(returncode=1, stdout="", stderr="HTTP 401: Bad credentials")
+        with mock.patch.object(releasing.shutil, "which", return_value="gh"), mock.patch.object(
+            releasing.subprocess, "run", return_value=failed
+        ):
+            problems = CI_PROBLEMS(self.paths, "c0ffee")
+        self.assertEqual(problems, ["python.yml: the runs cannot be read (gh: HTTP 401: Bad credentials)"])
 
     def test_an_untested_build_is_not_released(self) -> None:
         self.assertEqual(

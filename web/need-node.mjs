@@ -1,12 +1,12 @@
-// Stop with a message that names Node when it is older than package.json "engines" asks for.
+// Stop with a message that names Node when it is not the version of ../.nvmrc, the one place that names it.
 import { readFileSync } from 'node:fs'
 
-const want = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')).engines.node.replace('>=', '')
-const [major, minor] = want.split('.').map(Number)
-const [haveMajor, haveMinor] = process.versions.node.split('.').map(Number)
-if (haveMajor < major || (haveMajor === major && haveMinor < minor)) {
+const want = readFileSync(new URL('../.nvmrc', import.meta.url), 'utf8')
+  .trim()
+  .replace(/^v/, '')
+if (process.versions.node !== want) {
   console.error(
-    `error: the web apps need Node ${want} or newer; this is Node ${process.versions.node}. Run the command through ../tools/node.sh, or: nvm use`,
+    `error: the web apps need Node ${want} (.nvmrc); this is Node ${process.versions.node}. Run the command through ../tools/node.sh, or: nvm use`,
   )
   process.exit(1)
 }

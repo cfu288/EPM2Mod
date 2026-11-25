@@ -26,8 +26,8 @@ goes into `packages/ui` and is exported from its `src/index.ts`. Each app keeps 
 - `apps/site/public/404.html` and the script in `apps/site/index.html`: the GitHub Pages redirect back to the page for
   any path.
 
-Work on it with Node 24.15 or newer (the emulator needs 26, the version in `.nvmrc`), from `web/`. On an older Node
-`npm ci`, `check`, `test` and `e2e` stop and name the version. `../tools/node.sh COMMAND` runs a command with the
+Work on it with the Node version in `.nvmrc`, from `web/`. On another Node `npm ci`, `check`, `test` and `e2e` stop
+and name the version. `../tools/node.sh COMMAND` runs a command with the
 Node of `.nvmrc` from nvm, for example `../tools/node.sh npm run check`.
 
 ```sh

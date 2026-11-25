@@ -1,0 +1,2 @@
+# uv for the workflows: the version that release/start.sh pins, and the sha256 of its Linux x86_64 wheel on PyPI.
+uv==0.13.6 --hash=sha256:22759b8895e1103578de6fb4cd27e94b4399d021023378d29f01333717751fba

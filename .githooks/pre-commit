@@ -11,7 +11,8 @@
 #    Limit: `git commit PATH...` and `git commit -a` commit from a temporary index. The hook then checks the right
 #    files, but a file that black reformats is committed as it was. Run `git add` first and commit without paths.
 # 5. Soft, never refuses: for each staged build description, the report of `epm2mod lint` (what in the build may
-#    be harmful and is not proven safe). It needs the build's image: `uv run epm2mod make NAME`.
+#    be harmful and is not proven safe). It makes the build in memory from Olympus's firmware and the specs. When
+#    it cannot (the firmware or the objdump is missing), it says "not linted" and the commit goes on.
 root=$(git rev-parse --show-toplevel) || exit 1
 cd "$root" || exit 1
 if ! git diff --cached -U0 --no-color --no-renames --diff-filter=AM -- . ':(exclude).githooks' | .githooks/machine-paths; then

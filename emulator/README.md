@@ -17,7 +17,7 @@ uv run epm2mod init          # initialises emulator/om-emu at the pinned commit
 
 - **om-emu** is the git submodule `emulator/om-emu`, our fork. The tools run its files as they are: nothing is copied or patched. E-PM2 support belongs in the fork, in upstream's layout; the fork's `docs/e101-boot-spec.md` says what it has.
 - **`OM_EMU_DIR`** overrides the checkout. The defaults are in `emuenv.py`.
-- **Node, the version in `.nvmrc` or newer:** `node` on PATH when it is new enough, else the newest Node that nvm has. The tools find it themselves. `uv run epm2mod init` gets one. Override it with `OM_EMU_NODE`.
+- **Node, exactly the version in `.nvmrc`:** `node` on PATH when it is that version, else the one nvm has (`tools/node.sh`). The tools find it themselves. `uv run epm2mod init` gets one. Override it with `OM_EMU_NODE`.
 - **Stock block 0:** `build/blocks/OLY_E_101_1600_0000_0000.BIN.block0.bin`. This is the descrambled OE payload, sha256 `1b7c4bb1…71468d`; the harness checks it.
 
 The fork has a port of om-emu's lab to the E-PM2 (`MODELS.E101`, `src/fw/ports.mjs`), so its debug API (`emu/bin/debug.mjs`) runs E-PM2 functions with `OM_EMU_MODEL=E101`. No lab session runs on the E-PM2. A read of a device page om-emu does not model faults with reason 2 (**V**); `scenario.py` handles it.

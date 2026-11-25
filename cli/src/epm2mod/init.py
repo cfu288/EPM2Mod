@@ -80,6 +80,18 @@ def _objdump(paths: RepoPaths) -> Path:
     return paths.location("toolchain") / "bin" / "mn10300-elf-objdump"
 
 
+def _source_record(paths: RepoPaths) -> Path:
+    """Return the file in the toolchain folder that names the source commit the binutils were built from."""
+    return paths.location("toolchain") / "source-commit"
+
+
+def _pinned_commit(paths: RepoPaths, key: str) -> str:
+    """Return the commit that the checkout pins for the submodule at the location ``key``."""
+    relative = paths.relative(paths.location(key))
+    listed = _run(["git", "ls-files", "-s", relative], paths.root, "git ls-files")
+    return listed.split()[1] if listed else ""
+
+
 def _build_binutils(paths: RepoPaths) -> None:
     """Build the MN103 binutils from the submodule into the toolchain folder."""
     for tool in ("gcc", "make", "m4"):
@@ -140,6 +152,8 @@ def _build_binutils(paths: RepoPaths) -> None:
         env,
     )
     shutil.rmtree(work, ignore_errors=True)
+    built_from = _run(["git", "rev-parse", "HEAD"], source, "git rev-parse")
+    _source_record(paths).write_text(built_from + "\n", encoding="utf-8")
 
 
 def _node(paths: RepoPaths, install: bool = False) -> str:
@@ -170,8 +184,7 @@ def _emulator(paths: RepoPaths, update: bool) -> str:
         )
     if not folder.joinpath(*_BOOT_LAB).exists():
         raise UnavailableError(f"{relative} is not initialised, or has no boot lab")
-    listed = _run(["git", "ls-files", "-s", relative], paths.root, "git ls-files")
-    want = listed.split()[1] if listed else ""
+    want = _pinned_commit(paths, "emulator")
     have = _run(["git", "rev-parse", "HEAD"], folder, "git rev-parse")
     if want != have:
         raise UnavailableError(
@@ -202,14 +215,25 @@ def init(paths: RepoPaths, check: bool, log: Log) -> list[str]:
         """Return the version line of the built objdump."""
         if not _objdump(paths).exists():
             raise UnavailableError("not built")
-        return _run([_objdump(paths), "--version"], paths.root, "objdump").split("\n")[
-            0
-        ]
+        record = _source_record(paths)
+        built_from = record.read_text().strip() if record.is_file() else "unknown"
+        if built_from != _pinned_commit(paths, "binutils_source"):
+            raise UnavailableError(
+                f"built from the source commit {built_from}, not the one the checkout pins"
+            )
+        version = _run([_objdump(paths), "--version"], paths.root, "objdump")
+        note = ""
+        if os.environ.get("EPM2_BINUTILS"):
+            note = "; but EPM2_BINUTILS is set, and the tools use that folder"
+        return f"{version.splitlines()[0]}, source {built_from[:12]}{note}"
 
     def map_present() -> str:
         """Return the folder of the firmware map."""
-        if not firmware_map.exists():
-            raise UnavailableError("not made")
+        tool = paths.location("firmware_map_tool")
+        try:
+            _run([sys.executable, tool, "check"], paths.root, "the check of the map")
+        except UnavailableError:
+            raise UnavailableError("not made, or not complete") from None
         return paths.relative(firmware_map.parent)
 
     def hooks_present() -> str:

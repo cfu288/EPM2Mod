@@ -470,6 +470,10 @@ COMMANDS: dict[str, Command] = {
             True,
             "",
             ("epm2mod lint NAME",),
+            {},
+            {
+                6: "the report cannot be made (Olympus's firmware or the MN103 objdump is missing)"
+            },
         ),
         Command(
             "pin",
@@ -582,6 +586,8 @@ COMMANDS: dict[str, Command] = {
                 "commit": "the commit that the release is made from (null if not ready)",
                 "notes": "the release notes (null if not ready)",
                 "sha256": "the sha256 of the firmware that the release installs (null if not ready)",
+                "day": "the day of the release; give it as --day to plan the same release on a later day "
+                "(null if not ready)",
             },
             {1: "the repository is not ready for a release"},
         ),
@@ -967,7 +973,11 @@ def _init(args: argparse.Namespace, ctx: Context) -> int:
 
 
 def _lint(args: argparse.Namespace, ctx: Context) -> int:
-    """Run ``epm2mod lint``: the project's lint tool, ``TOOL DESCRIPTION``. Its warnings never fail the command."""
+    """Run ``epm2mod lint``: the project's lint tool, ``TOOL DESCRIPTION``.
+
+    Warnings do not fail the command. A report that cannot be made does (exit status 6): no warning is not the
+    same as no report.
+    """
     checkout = ctx.checkout()
     checkout.build(
         args.build
@@ -981,7 +991,10 @@ def _lint(args: argparse.Namespace, ctx: Context) -> int:
     except OSError as error:
         raise UnavailableError(f"the lint cannot run: {error}") from None
     if done.returncode != 0:
-        print(f"WARN  {args.build} is not linted: {checkout.relative(tool)} stopped")
+        raise UnavailableError(
+            f"{args.build} is not linted: {checkout.relative(tool)} could not make its report "
+            "(run 'epm2mod init --check')"
+        )
     return 0
 
 
@@ -1159,7 +1172,7 @@ def _release(args: argparse.Namespace, ctx: Context) -> int:
         raise UsageError(
             "--build makes a test release: a final release holds the pinned build"
         )
-    release, problems = plan(checkout, final=args.final, build=args.build)
+    release, problems = plan(checkout, final=args.final, build=args.build, day=args.day)
     if args.json:
         _document(
             args.command_name,
@@ -1171,6 +1184,7 @@ def _release(args: argparse.Namespace, ctx: Context) -> int:
             commit=release and release.commit,
             notes=release and release.notes,
             sha256=release and release.sha256,
+            day=release and release.day,
         )
     elif release is None:
         for problem in problems:
@@ -1179,7 +1193,8 @@ def _release(args: argparse.Namespace, ctx: Context) -> int:
         print(release.notes)
         _hint(
             f"ready: {release.tag} on {release.commit[:7]}. To release it: "
-            "gh workflow run release -f kind=rc -f dry_run=false (kind=final for everyone)"
+            f"gh workflow run release -f kind=rc -f day={release.day} -f dry_run=false "
+            "(kind=final for everyone)"
         )
     return DIFFERS if release is None else 0
 
@@ -1521,6 +1536,12 @@ def _arguments(
             "--build",
             metavar="NAME",
             help="a test release of this camera-tested build in place of the pinned one (-NAME.N)",
+        )
+        parser.add_argument(
+            "--day",
+            metavar="YYYY.MM.DD",
+            help="the day of the release, which is in the version and on the Firmware screen; "
+            "default: today in UTC. Give the day of the dry run to make the release that it showed",
         )
         _add_json(parser)
 

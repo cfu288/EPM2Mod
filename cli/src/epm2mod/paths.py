@@ -33,6 +33,9 @@ if TYPE_CHECKING:
 MANIFEST = "epm2mod.json"
 #: The manifest key that marks a release folder; its value is the release's version.
 RELEASE_KEY = "release"
+#: The key of a release's manifest that names the camera-tested build (its sha256 and label) when the release
+#: holds that build with another label.
+TESTED_KEY = "camera_tested_as"
 
 
 @dataclass(frozen=True)

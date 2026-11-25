@@ -5,7 +5,7 @@
   "description": "The web parts of EPM2Mod: the shared package (packages/ui), the public site (apps/site) and the local app (apps/local)",
   "type": "module",
   "engines": {
-    "node": ">=24.15"
+    "node": "26.7.0"
   },
   "workspaces": [
     "packages/ui",

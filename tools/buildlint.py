@@ -48,10 +48,13 @@ def lint(description):
     used, allow = [], hookcheck.read_allow()
     hookcheck.check(specs, allow, out=lambda line: None, used=used)
     rows = {}
-    for entry in used:
-        rows.setdefault((entry.cls, entry.row), [0, entry.reason])[0] += 1
+    accepted = {address for address, _target, _entry in used}
+    for address, _target, entry in used:
+        row = rows.setdefault((entry.cls, entry.row), [0, entry.reason, address])
+        row[0] += 1
     for cls, text in (("timing", "safe by timing only, an open risk"), ("inferred", "safe by inference, not by proof")):
-        mine = [(row, count, reason) for (c, row), (count, reason) in sorted(rows.items()) if c == cls]
+        mine = [("line %d, from 0x%08X" % (row, first), count, reason)
+                for (c, row), (count, reason, first) in sorted(rows.items()) if c == cls]
         if mine:
             warnings.append("load order, %s: %d transfers from early-loaded to late-loaded code, by %d rows of "
                             "emulator/hookcheck-allow.tsv:%s" % (text, sum(r[1] for r in mine), len(mine), "".join(
@@ -84,7 +87,7 @@ def lint(description):
         if not early(lo):
             continue
         for a in range(lo, hi - 3):
-            if a in allow:
+            if a in accepted:  # a word that the allow list accepts with this target: warning 1 has it
                 continue
             word, old = (int.from_bytes(b[a - BASE:a - BASE + 4], "little") for b in (image, stock))
             if word == old:

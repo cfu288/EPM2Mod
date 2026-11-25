@@ -34,7 +34,7 @@ from .container import parse
 from .errors import BuildError
 from .fileio import read_bytes
 from .label import PLACEHOLDER
-from .paths import MANIFEST, RELEASE_KEY, RepoPaths
+from .paths import MANIFEST, RELEASE_KEY, TESTED_KEY, RepoPaths
 from .spec import BytesOp, load_spec
 
 #: The time stamp of every file in the zip, so that the same files give the same zip.
@@ -195,10 +195,6 @@ def release_build(paths: RepoPaths, version: str) -> BuildDescription:
     return description
 
 
-#: The key of a release's manifest that names the camera-tested build of a release with a stamped label.
-TESTED_KEY = "camera_tested_as"
-
-
 def label_range(paths: RepoPaths) -> tuple[int, int, int]:
     """Return where the label spec writes the label's date: the block, and the first and the end offset in it.
 
@@ -251,7 +247,9 @@ def stamp(
 
     The camera's Firmware screen then shows the date of the release. The result
     has the sha256 of the new image; it is released only because
-    ``check_only_the_label_differs`` passed.
+    ``check_only_the_label_differs`` passed. Its text (``what``) names the new
+    label where it named the old one. A build whose label is ``day`` already
+    is returned as it is, with the image that was tested.
 
     Raises:
         BuildError: if the build has no label or no camera test, if it does not give its recorded sha256, or if the
@@ -265,7 +263,15 @@ def stamp(
         raise BuildError(f"{description.name} has no label or no camera test")
     stock_data = read_stock(paths, description.stock_firmware)
     tested, _ = build_image(description, load_specs(paths, description), stock_data)
-    relabelled = replace(description, label=day, sha256=None, camera_tested=None)
+    if description.label == day:
+        return description, tested.image
+    relabelled = replace(
+        description,
+        label=day,
+        sha256=None,
+        camera_tested=None,
+        what=description.what.replace(description.label, day),
+    )
     applied, digest = build_image(relabelled, load_specs(paths, relabelled), stock_data)
     check_only_the_label_differs(paths, tested.image, applied.image)
     stamped = replace(
@@ -278,15 +284,15 @@ def release_description(paths: RepoPaths, version: str) -> BuildDescription:
     """Return the description of the build that the release ``version`` installs.
 
     This is ``release_build`` with the label set to the day of the version (``stamp``), so that the camera's
-    Firmware screen and the release show one date. A ``-dev`` version, a build without a label and a build whose
-    label is that day already are not stamped.
+    Firmware screen and the release show one date. A ``-dev`` version and a build without a label are not stamped,
+    and a build whose label is that day already is released as it is.
 
     Raises:
         BuildError, NotFoundError, StockError: as ``release_build`` and ``stamp``.
     """
     description = release_build(paths, version)
     day = version[:10]
-    if version.endswith("-dev") or description.label in (None, day):
+    if version.endswith("-dev") or description.label is None:
         return description
     return stamp(paths, description, day)[0]
 

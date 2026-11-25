@@ -5,7 +5,8 @@
 # Exit status 1 when a line is refused.
 pattern='/home/[A-Za-z0-9._-]+/|/Users/[A-Za-z0-9._-]+/|/tmp/claude-[0-9]+|-home-[a-z0-9]+-|[A-Za-z0-9._-]+@[A-Za-z0-9-]+:[/~]'
 allow='USER@HOST:|git@github\.com:|/home/user/|/Users/user/'
-hits=$(grep -E '^\+' | grep -v -E '^\+\+\+ ' | grep -E "$pattern" | grep -v -E "$allow" | head -5)
+# the allowed tokens are taken out of each line first: a line with one of them and a real path is still refused
+hits=$(grep -E '^\+' | grep -v -E '^\+\+\+ ' | sed -E "s#$allow##g" | grep -E "$pattern" | head -5)
 if [ -n "$hits" ]; then
   echo "machine-specific paths or hosts in the changes (use /path/to, USER@HOST, /tmp/scratch):" >&2
   printf '%s\n' "$hits" | cut -c1-160 >&2

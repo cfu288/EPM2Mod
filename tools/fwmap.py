@@ -6,6 +6,7 @@
     python3 tools/fwmap.py str 'firmup'          # strings matching a regex, with the functions that use them
     python3 tools/fwmap.py range 0x7E6C3000 0x7E6CB000   # functions in a range with their first strings
     python3 tools/fwmap.py xref 0x7E80E86F       # code and data references to an address
+    python3 tools/fwmap.py check                 # exit 0 when every file of the database is there
     python3 tools/fwmap.py tasks                 # uITRON task table (v1.6 offsets)
     python3 tools/fwmap.py --fw OTHER.BIN --base 0x7E101020 --out DIR build   # another body (any command)
 
@@ -309,8 +310,23 @@ def stage_ptrs(data, base, strings, starts, code_pages):
                 f.write(f"{base + o:08x}\t{v:08x}\tstr\n")
 
 
+#: Every file that `build` writes, in the order it writes them. The last one is the mark that the build finished.
+FILES = ("linear.txt", "functions.txt", "calls.tsv", "strrefs.tsv", "functions.tsv", "fnidx.tsv", "ptrs.tsv",
+         "starts.tsv", "tasks.tsv")
+
+
+def cmd_check(a):
+    """Exit status 0 when the database is complete: every file of FILES is there and not empty."""
+    missing = [name for name in FILES if not os.path.isfile(os.path.join(OUT, name)) or not os.path.getsize(os.path.join(OUT, name))]
+    if missing:
+        sys.exit("the firmware map in %s is not complete (missing: %s): run tools/fwmap.py build" % (OUT, ", ".join(missing)))
+    print("the firmware map in %s is complete (%d files)" % (OUT, len(FILES)))
+
+
 def cmd_build(a):
     os.makedirs(OUT, exist_ok=True)
+    if os.path.exists(os.path.join(OUT, FILES[-1])):
+        os.remove(os.path.join(OUT, FILES[-1]))  # a build that stops half-way leaves no mark
     base = BASE
     path, data = block()
     strings, data_pages = string_index(data)
@@ -484,6 +500,7 @@ def main():
     ap.add_argument("--out", default=OUT, help="database directory")
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("build")
+    sub.add_parser("check")
     sub.add_parser("tasks")
     p = sub.add_parser("fn")
     p.add_argument("addr")
@@ -501,7 +518,7 @@ def main():
     a = ap.parse_args()
     FW, BASE, OUT = os.path.abspath(a.fw), int(a.base, 0), os.path.abspath(a.out)
     {"build": cmd_build, "fn": cmd_fn, "str": cmd_str, "range": cmd_range, "xref": cmd_xref,
-     "tasks": cmd_tasks}[a.cmd](a)
+     "tasks": cmd_tasks, "check": cmd_check}[a.cmd](a)
 
 
 if __name__ == "__main__":

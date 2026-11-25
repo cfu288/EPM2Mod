@@ -34,6 +34,7 @@ from . import readme
 from .builds import pinned_description
 from .errors import BuildError, Epm2ModError
 from .fileio import read_text, write_bytes
+from .label import check_label
 from .paths import RepoPaths
 from .pipeline import check_free_space, check_in_emulator
 from .release import check_version, stamp
@@ -150,7 +151,11 @@ def _ci_problems(paths: RepoPaths, commit: str) -> list[str]:
              "--event", "push", "--json", "conclusion,status,headSha", "--limit", "1"],
             cwd=paths.root, capture_output=True, text=True, check=False,
         )  # fmt: skip
-        runs = json.loads(done.stdout) if done.returncode == 0 else []
+        if done.returncode != 0:
+            reason = done.stderr.strip().splitlines()[-1:] or ["no output"]
+            problems.append(f"{workflow}: the runs cannot be read (gh: {reason[0]})")
+            continue
+        runs = json.loads(done.stdout)
         if not runs:
             problems.append(f"{workflow}: no run on main found")
             continue
@@ -183,12 +188,14 @@ class Plan:
         commit: the commit to tag.
         notes: the release notes.
         sha256: the sha256 of the firmware that the release installs.
+        day: the day of the release, which is in the version and on the Firmware screen.
     """
 
     tag: str
     commit: str
     notes: str
     sha256: str
+    day: str
 
 
 def plan(
@@ -197,10 +204,12 @@ def plan(
     """Check the repository and return the release to make, or the problems.
 
     ``build`` names the build of a test release in place of the pinned build.
-    ``day`` is the day of the release (default: today in UTC), like ``2026.11.25``.
+    ``day`` is the day of the release (default: today in UTC), like ``2026.11.25``. It decides the version and the
+    image, so a release that follows a dry run is made with the day of the dry run.
     """
     if day is None:
         day = datetime.datetime.now(datetime.timezone.utc).strftime("%Y.%m.%d")
+    check_label(day, "the day of the release")
     problems: list[str] = []
     chosen = pinned_description(paths) if build is None else paths.build(build)
     which = "the pinned build" if build is None else "the build"
@@ -232,7 +241,8 @@ def plan(
     except BuildError as error:
         return None, problems + [str(error)]
     released, tested = chosen, None
-    if not problems and chosen.label != day:
+    if not problems:
+        # the image that is released, with the label of the day or as tested: checked here, on this computer
         try:
             released, image = stamp(paths, chosen, day)
             check_free_space(paths, released)
@@ -240,7 +250,8 @@ def plan(
                 path = Path(folder) / f"{released.name}.BIN"
                 write_bytes(path, image, BuildError)
                 check_in_emulator(paths, path)
-            tested = (chosen.sha256, chosen.label)
+            if released.sha256 != chosen.sha256:
+                tested = (chosen.sha256, chosen.label)
         except Epm2ModError as error:
             problems.append(f"the build with the label {day}: {error}")
     if problems or released.sha256 is None or released.label is None:
@@ -268,4 +279,4 @@ def plan(
         unchanged,
         tested,
     )
-    return Plan(f"v{version}", commit, notes, released.sha256), []
+    return Plan(f"v{version}", commit, notes, released.sha256, day), []

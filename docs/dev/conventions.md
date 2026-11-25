@@ -157,11 +157,14 @@ to main does not release. Nobody pushes a tag: the workflow creates it, and a ta
 
 ```sh
 uv run epm2mod release                                   # the local preview: ready or not, the version, the notes
-gh workflow run release.yml -f kind=rc                   # a dry run: everything but the tag and the publication
-gh workflow run release.yml -f kind=rc -f dry_run=false  # the release
+gh workflow run release.yml -f kind=rc                                    # a dry run: everything but the tag and the publication
+gh workflow run release.yml -f kind=rc -f day=YYYY.MM.DD -f dry_run=false  # the release, with the day that the dry run printed
 ```
 
-1. **The version is the day of the release (UTC):** `vYYYY.MM.DD-rc.N`. N is 1 for the first release of a day and
+The day decides the version and the image. Without `day` it is today in UTC, so a release started after midnight
+UTC would not be the one a dry run checked the day before: pass the day.
+
+1. **The version is the day of the release** (the input `day`, `epm2mod release --day`; default today in UTC): `vYYYY.MM.DD-rc.N`. N is 1 for the first release of a day and
    one more than the highest existing tag of that day after that. Every release is a pre-release (`-rc.N`) for now;
    `kind=final` (`epm2mod release --final`) gives a plain `vYYYY.MM.DD`. A test release of a camera-tested build that
    is not pinned (`-f build=NAME`, `epm2mod release --build NAME`) is `vYYYY.MM.DD-NAME.N`; record its test first
@@ -169,7 +172,8 @@ gh workflow run release.yml -f kind=rc -f dry_run=false  # the release
 2. **The Firmware screen shows the same date.** A build's `"label"` (with the spec `data/specs/build-label.json`) is
    the date on its Firmware screen ("Body : 1.6  EPM2Mod 2026.11.19"). The release holds the pinned, camera-tested
    build with the label set to the day of the release (`release.stamp`). So the label of the description does not
-   have to be the release's day. When it is that day already, the tested image is released as it is.
+   have to be the release's day. When it is that day already, the tested image is released as it is; the checks of
+   item 3 run on it all the same.
 3. **The stamped image is not the image that was on the camera.** The tool releases it only when all of this holds,
    and stops when one does not:
    - it differs from the camera-tested image (the pinned sha256) only in the 20 bytes of the date and in the
@@ -210,13 +214,31 @@ Three layers. Each check is in one of them.
 |---|---|---|
 | Commit hooks | Fast and hard: machine paths, the document rules, prettier, black, mypy, the commit message. And one soft part: `epm2mod lint` of each staged build description, which prints warnings and never refuses | `.githooks/` |
 | Hard checks | `tools/ci.sh`: black, mypy, the unit tests (they hold pyflakes on the scripts, the document rules and the feature lists), the generated documents and specs, the web checks. Then, for the pinned build and each build description that differs from the base commit: `epm2mod make` and the quick tier of `tools/checks.py` (free space with load order, op check, `boot-test`, `update-path-test`). A check that cannot run fails. No warnings | CI (`python.yml`, `web.yml`) runs this script and nothing else. Run it before a pull request |
-| Soft report | `uv run epm2mod lint NAME` (`tools/buildlint.py`): the allow-list rows of the load-order check that the build uses and that are safe by timing or inference only, the early-loaded space it uses, first code, words in new early-loaded bytes that can be late-loaded addresses, the cold start for the camera test. Exit status 0 | by hand and from the commit hook. Never in CI |
+| Soft report | `uv run epm2mod lint NAME` (`tools/buildlint.py`): the allow-list rows of the load-order check that the build uses and that are safe by timing or inference only, the early-loaded space it uses, first code, words in new early-loaded bytes that can be late-loaded addresses, the cold start for the camera test. Exit status 0 with any number of warnings, 6 when the report cannot be made | by hand and from the commit hook. Never in CI |
 
 `tools/checks.py NAME.json --tier full` adds the scenario runs of `emulator/scenarios/` (20 minutes). Run it before a
 build is offered for a flash. Its WARN results have RESULT lines that a person reads.
 
-A camera-tested build that a newer check refuses gets a row in `tools/check-waivers.tsv` with the reason: its record
-cannot change, and `tools/ci.sh` then only compares its sha256.
+`tools/checks.py` keeps no results and makes the build again in memory first: it stops when `build/NAME.BIN` is not
+what the description and its specs make now. No build is exempt from a check. When a newer check refuses a
+camera-tested build that a pull request must touch, the pull request says so and the owner decides.
+
+`emulator/hookcheck-allow.tsv` accepts a transfer by its address and its target together, one word per entry. The
+same address with another target fails. The check's last line counts the entries that match nothing in the build.
+
+What decides a check's result is pinned where it can be:
+
+| Tool | Pinned by |
+|---|---|
+| Node | `.nvmrc`, a full version, matched exactly by `tools/node.sh` (the emulator, the web checks, CI). A test holds `web/package.json` `engines` to it |
+| The MN103 objdump | Built from the submodule `third_party/binutils-gdb`. `epm2mod init` records the source commit in `build/toolchain/source-commit` and reports the build as missing when it is another one. An objdump on PATH is never used; `EPM2_BINUTILS` is said on stderr in each run |
+| The emulator | The submodule `emulator/om-emu`; `epm2mod init --check` compares its commit |
+| Python packages, npm packages | `uv.lock` (`uv sync --locked` in CI), `web/package-lock.json` (`npm ci`) |
+| uv, Python, actions and runner images in CI | uv by version and wheel hash (`.github/uv-requirements.txt`), Python by its full version, actions by commit, images by release (`ubuntu-24.04`) |
+
+Not pinned: bison, flex and texinfo, which build the objdump in CI (`apt-get` gives the image's versions and Ubuntu
+keeps no old ones to name; the built objdump's version line is in the run's log); the patch level of the runner
+images; a contributor's own Python (3.10 or newer) and gcc.
 
 Production tools and checks do not import or run anything under `experiments/`. A check script or an input that a
 tool needs moves to `emulator/`, `tools/` or `data/`.

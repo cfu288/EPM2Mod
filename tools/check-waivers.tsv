@@ -1,3 +1,0 @@
-# Camera-tested builds that a check of today refuses. A test record never changes, so tools/ci.sh only makes such a
-# build (its sha256 is compared) and prints the reason. Columns (tab-separated): build name, reason with a date.
-# Remove a row when a newer build is pinned and nothing changes the old description any more.

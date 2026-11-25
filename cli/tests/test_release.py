@@ -271,6 +271,9 @@ class FromTheZipTests(unittest.TestCase):
             stamped = release.release_description(PATHS, "2026.11.18").sha256
             self.assertEqual(files[0]["sha256"], stamped)
             self.assertNotEqual(stamped, pinned_description(PATHS).sha256)
+            # and the installer does not call it "the build that was tested": it names the tested sha256
+            self.assertIn("with another date on the Firmware screen", done.stderr)
+            self.assertIn(f"sha256 {pinned_description(PATHS).sha256}", done.stderr)
             self.assertTrue((card / "DCOLYMP" / "E1019999.BIN").is_file())
             self.assertFalse((card / "EPM2LOOK.BIN").exists())  # no --film
             self.assertFalse((top / "build").exists())

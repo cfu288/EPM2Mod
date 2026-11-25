@@ -1,7 +1,27 @@
 # Engineering plan
 
-An audit of how the repository is built, checked and released, and a plan to clean it up. Nothing in this plan is
-done yet. Date: 2026-11-25. Audited commit: `3b68278` (main). The fresh-clone test ran on `ccbad1a`, one merge
+An audit of how the repository is built, checked and released, and a plan to clean it up. The text below the
+status table is the plan as written before the work: sections A and B describe the repository at the audited
+commit, not today's.
+
+**Status, 2026-11-25** (branch `chore/engineering-cleanup`). The current rules are in
+[conventions.md](conventions.md), sections Checks and Releases. Where the work differs from the plan:
+
+| Plan | What was done |
+|---|---|
+| Step 1, `tools/setup.sh` | `uv run epm2mod init` and `init --check` replace `tools/setup.sh` and `emulator/setup.sh` |
+| Step 3, `--allow-unchecked` | No flag: `make` stops (exit status 6) when a start-up check cannot run |
+| Step 6, a cache for the stock firmware | Not done: Olympus's firmware is downloaded in each run and stored nowhere |
+| Step 8, a file of waived builds | Not done: no build is exempt |
+| Step 10 | Also dropped: the checks of the superseded spec families films12 and log-core |
+| Step 11, `epm2mod check`, the cache of `tools/checks.py` | No `check` command. `tools/checks.py` keeps no results. The allow list names each word with its target |
+| Step 13, `epm2mod release --dry-run`, the version from the label | `epm2mod release` only plans (`--json`, `--day`); `--dry-run` and `--push` are gone. The version is the day of the release, and the release holds the pinned build with that day as its label |
+| Layer 4, "Everything else follows from the commit" | The version and the image also follow from the day: the input `day` of `release.yml` |
+
+Open: the full tier of `tools/checks.py` shows `save-guard` FAIL and S6 FAIL on the pinned build (hidden behind SKIP
+before); the workflows have not run on GitHub yet; the environment `release` must allow `main`.
+
+**The plan as written.** Nothing in it was done at that time. Date: 2026-11-25. Audited commit: `3b68278` (main). The fresh-clone test ran on `ccbad1a`, one merge
 earlier; the files it used did not change in between.
 
 Labels: **V** verified (a command was run, or the file says so), **I** inferred, **U** unknown.
@@ -244,7 +264,8 @@ The owner types `gh workflow run release.yml -f kind=final -f dry_run=false`, or
 `release` asks for the owner's approval before the signing step. `epm2mod release` stays as the local preview
 (`--dry-run`); `--push` is removed. A pushed tag starts nothing.
 
-Not deterministic: the `notes` input, and Apple's notarization ticket. Everything else follows from the commit.
+Not deterministic: the `notes` input, and Apple's notarization ticket. Everything else follows from the commit
+(and, since the release holds the day as its label, from the `day` input: see the status table).
 
 ## D. The plan
 

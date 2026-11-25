@@ -466,6 +466,8 @@ epm2mod lint [-h] BUILD
 |---|---|---|
 | `BUILD` | the name of a build |  |
 
+- Exit 6: the report cannot be made (Olympus's firmware or the MN103 objdump is missing).
+
 Examples:
 
 ```sh
@@ -703,7 +705,7 @@ epm2mod package --release-version 2026.11.19-dev
 Check that the repository is ready for the next release, and name it.
 
 ```
-epm2mod release [-h] [--final] [--build NAME] [--json]
+epm2mod release [-h] [--final] [--build NAME] [--day YYYY.MM.DD] [--json]
 ```
 
 - Output: the release notes and the tag's name. It creates no tag: the release workflow on GitHub runs this command, then makes, tests, tags and publishes the release.
@@ -713,6 +715,7 @@ epm2mod release [-h] [--final] [--build NAME] [--json]
 |---|---|---|
 | `--final` | a release for everyone (vYYYY.MM.DD); default: a test release (-rc.N) |  |
 | `--build NAME` | a test release of this camera-tested build in place of the pinned one (-NAME.N) |  |
+| `--day YYYY.MM.DD` | the day of the release, which is in the version and on the Firmware screen; default: today in UTC. Give the day of the dry run to make the release that it showed |  |
 | `--json` | print one JSON document (schema 2) on stdout |  |
 
 `--json` keys beside the keys of every document:
@@ -724,6 +727,7 @@ epm2mod release [-h] [--final] [--build NAME] [--json]
 - `commit`: the commit that the release is made from (null if not ready)
 - `notes`: the release notes (null if not ready)
 - `sha256`: the sha256 of the firmware that the release installs (null if not ready)
+- `day`: the day of the release; give it as --day to plan the same release on a later day (null if not ready)
 
 - Exit 1: the repository is not ready for a release.
 

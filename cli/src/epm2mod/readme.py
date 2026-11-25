@@ -60,13 +60,21 @@ def pinned_block(paths: RepoPaths, folder: Path) -> str:
     pinned = pinned_description(paths)
     stock = pinned.stock_firmware
     what = cell(pinned.what[:1].lower() + pinned.what[1:]).rstrip(".")
+    released = ""
+    if pinned.label is not None:
+        # a release shows its own day on the Firmware screen (release.stamp), so its sha256 is another one
+        what = what.replace(pinned.label, "YYYY.MM.DD, the day of the release")
+        released = (
+            "\nA release holds this build with the day of the release on the Firmware screen. "
+            "Its sha256 is then another one: the release notes give both.\n"
+        )
     return (
         f"The installer and `install` write the firmware **`{pinned.name}`**: {what}. "
         f"We tested this build on a real E-PM2 on {pinned.camera_tested} "
         f"([camera log]({link(paths.camera_log, folder)}/)).\n\n"
         "| | sha256 |\n|---|---|\n"
         f"| Stock firmware, `{stock.file_name}` | `{stock.sha256}` |\n"
-        f"| Pinned build, `{pinned.name}` | `{pinned.sha256}` |\n"
+        f"| Pinned build as tested, `{pinned.name}` | `{pinned.sha256}` |\n" + released
     )
 
 

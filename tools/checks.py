@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
-"""Run the off-camera checks of a build: only those its specs call for, in parallel, with a cache.
+"""Run the off-camera checks of a build: only those its specs call for, in parallel.
 
-    python3 tools/checks.py data/builds/NAME.json [--tier quick|full] [--jobs N] [--no-cache] [--list]
+    python3 tools/checks.py data/builds/NAME.json [--tier quick|full] [--jobs N] [--list]
 
 quick   the static checks, the emulator start and the update path. Every result is PASS or FAIL: tools/ci.sh
         runs this tier. Run it after each change. Under a minute.
 full    quick, and the scenario runs of emulator/scenarios/ (the peaking save guard, the peaking scenarios).
         About 20 minutes. Run it once before a build is offered for a flash.
 
-The image build/NAME.BIN must exist (`epm2mod make NAME`). A check runs again only when its inputs
-changed: the image, the patch specs, the check's own script and the files under tools/. Results are kept in
-build/check-cache/ (ignored by git). A scenario compares with the camera-tested build peaking-fast: when
+The image build/NAME.BIN must exist (`epm2mod make NAME`) and must be what the description and its specs make
+now: the run makes the build again in memory and stops when the sha256 differs, so the emulator never runs an
+image of yesterday's specs. A scenario compares with the camera-tested build peaking-fast, under the same rule: when
 build/peaking-fast.BIN is absent, the run stops and names the command that makes it.
+
+Every run does every check again. No result is kept: a result depends on the scripts in tools/ and emulator/, the
+allow list, the firmware map and the emulator's commit, and a kept result could outlive a change to one of them.
 
 Results: PASS, FAIL, and in the full tier WARN: a scenario script that has no exit status. Read its RESULT lines,
 printed here. Nothing is skipped: a check that cannot run is a FAIL.
@@ -36,7 +39,6 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-CACHE = ROOT / "build" / "check-cache"
 PEAKING = ROOT / "emulator" / "scenarios"
 TIERS = ("quick", "full")
 OUTPUT_TAIL = 4000  # characters of a check's output that are kept
@@ -50,31 +52,49 @@ class Check:
         name: short name, shown in the report.
         tier: "quick" or "full".
         command: the command line, run in the repository root.
-        inputs: files whose content decides the result, besides the command line itself.
         judged: True when the exit status says pass or fail; False for a script that only prints results.
     """
 
     name: str
     tier: str
     command: tuple[str, ...] = ()
-    inputs: tuple[Path, ...] = ()
     judged: bool = True
 
 
 @dataclasses.dataclass(frozen=True)
 class Result:
-    """The outcome of a check: status, seconds it took, the end of its output, and if it came from the cache."""
+    """The outcome of a check: status, seconds it took, the end of its output."""
 
     status: str
     seconds: float
     output: str
-    cached: bool = False
 
 
-def tool_files() -> tuple[Path, ...]:
-    """Return the Python and shell files under tools/: a change to one can change any check."""
-    found = [p for p in (ROOT / "tools").rglob("*") if p.suffix in (".py", ".mjs", ".sh", ".tsv") and "third_party" not in p.parts]
-    return tuple(sorted(found))
+def current_image(name: str, image: Path | None = None) -> Path:
+    """Return build/NAME.BIN (or ``image``) after a test that it is what the build's description and specs make now.
+
+    Raises:
+        ValueError: if the image is absent or is another build's bytes; the text names the command.
+    """
+    sys.path.insert(0, str(ROOT / "cli" / "src"))
+    from epm2mod import pipeline, stock
+    from epm2mod.errors import Epm2ModError
+    from epm2mod.paths import RepoPaths
+
+    image = image or ROOT / "build" / f"{name}.BIN"
+    again = f"run 'epm2mod make {name}'"
+    if not image.exists():
+        raise ValueError(f"{image} is absent: {again}")
+    paths = RepoPaths(ROOT)
+    try:
+        description = paths.build(name)
+        specs = pipeline.load_specs(paths, description)
+        _, digest = pipeline.build_image(description, specs, stock.read_stock(paths, description.stock_firmware))
+    except Epm2ModError as error:
+        raise ValueError(f"{name} cannot be made: {error}") from None
+    if hashlib.sha256(image.read_bytes()).hexdigest() != digest:
+        raise ValueError(f"{image} is not what the description and its specs make now: {again}")
+    return image
 
 
 def block0(image: Path) -> Path:
@@ -92,31 +112,20 @@ def plan(description: Path, tier: str) -> list[Check]:
     """Return the checks that the specs of a build call for, in report order.
 
     Raises:
-        ValueError: if the description cannot be read or its image is absent.
+        ValueError: if the description cannot be read, or an image is absent or stale (``current_image``).
     """
     raw = json.loads(description.read_text(encoding="utf-8"))
     specs = [str(s) for s in raw["specs"]]
-    image = ROOT / "build" / (description.stem + ".BIN")
-    if not image.exists():
-        raise ValueError(f"{image.relative_to(ROOT)} is absent: run 'epm2mod make {description.stem}' first")
-    spec_files = tuple(ROOT / s for s in specs)
-    tools = tool_files()
+    image = current_image(description.stem)
     py = sys.executable
     has = lambda part: any(part in s for s in specs)  # noqa: E731
 
-    def reference(name: str) -> Path:
-        """Return the image of the camera-tested build NAME that a scenario compares with."""
-        path = ROOT / "build" / f"{name}.BIN"
-        if not path.exists():  # not made here: make also writes the card folder build/DCOLYMP
-            raise ValueError(f"{path.relative_to(ROOT)} is absent: run 'epm2mod make {name}', then make {description.stem} again")
-        return path
-
     first_code = ["--first-code"] if raw.get("first_code") else []
     checks = [
-        Check("free-space", "quick", (py, "tools/freespace.py", "check", *specs, *first_code), spec_files + tools),
-        Check("op-check", "quick", (py, "emulator/opcheck.py", str(description)), spec_files + tools),
-        Check("boot-test", "quick", (py, "emulator/boot-test", str(image)), (image,) + tools),
-        Check("update-path-test", "quick", (py, "emulator/update-path-test", str(image)), (image,) + tools),
+        Check("free-space", "quick", (py, "tools/freespace.py", "check", *specs, *first_code)),
+        Check("op-check", "quick", (py, "emulator/opcheck.py", str(description))),
+        Check("boot-test", "quick", (py, "emulator/boot-test", str(image))),
+        Check("update-path-test", "quick", (py, "emulator/update-path-test", str(image))),
     ]
     if tier == "quick":
         return checks
@@ -124,24 +133,14 @@ def plan(description: Path, tier: str) -> list[Check]:
     peaking = has("data/specs/peaking-")
     name = description.stem
     if has("peaking-save-guard"):
-        base, script = reference("peaking-fast"), PEAKING / "scen_guard.py"
-        checks.append(Check("save-guard", "full", (py, str(script), "all", "pinned-fast={block0:peaking-fast}", f"{name}={{block0}}"),
-                            (image, base, script) + tools))
+        current_image("peaking-fast")
+        script = PEAKING / "scen_guard.py"
+        checks.append(Check("save-guard", "full", (py, str(script), "all", "pinned-fast={block0:peaking-fast}", f"{name}={{block0}}")))
     if peaking:
-        base = reference("peaking-fast")
+        current_image("peaking-fast")
         for label, script in (("peaking-s1-s5", PEAKING / "scen_peaking.py"), ("peaking-s6-s7", PEAKING / "scen_direct4.py")):
-            checks.append(Check(label, "full", (py, str(script), "all", "{block0:peaking-fast}", f"{name}={{block0}}"),
-                                (image, base, script) + tools, judged=False))
+            checks.append(Check(label, "full", (py, str(script), "all", "{block0:peaking-fast}", f"{name}={{block0}}"), judged=False))
     return checks
-
-
-def cache_key(check: Check) -> str:
-    """Return a key that changes when the command or the content of an input file changes."""
-    digest = hashlib.sha256("\0".join(check.command).encode())
-    for path in check.inputs:
-        digest.update(str(path.relative_to(ROOT)).encode())
-        digest.update(hashlib.sha256(path.read_bytes()).digest() if path.exists() else b"absent")
-    return digest.hexdigest()[:24]
 
 
 def resolve(command: tuple[str, ...], image: Path) -> list[str]:
@@ -158,12 +157,8 @@ def resolve(command: tuple[str, ...], image: Path) -> list[str]:
     return out
 
 
-def run(check: Check, image: Path, use_cache: bool) -> Result:
-    """Run one check, or take its result from the cache."""
-    record = CACHE / f"{check.name}-{cache_key(check)}.json"
-    if use_cache and record.exists():
-        saved = json.loads(record.read_text(encoding="utf-8"))
-        return Result(saved["status"], saved["seconds"], saved["output"], cached=True)
+def run(check: Check, image: Path) -> Result:
+    """Run one check."""
     started = time.monotonic()
     try:
         done = subprocess.run(resolve(check.command, image), cwd=ROOT, capture_output=True, text=True, errors="backslashreplace", check=False)
@@ -174,10 +169,7 @@ def run(check: Check, image: Path, use_cache: bool) -> Result:
         status = "FAIL"
     else:
         status = "PASS" if check.judged else "WARN"
-    result = Result(status, round(time.monotonic() - started, 1), output[-OUTPUT_TAIL:])
-    CACHE.mkdir(parents=True, exist_ok=True)
-    record.write_text(json.dumps(dataclasses.asdict(result)), encoding="utf-8")
-    return result
+    return Result(status, round(time.monotonic() - started, 1), output[-OUTPUT_TAIL:])
 
 
 def summary(check: Check, result: Result) -> str:
@@ -195,7 +187,6 @@ def main(argv: list[str]) -> int:
     parser.add_argument("build", type=Path, help="build description, data/builds/NAME.json")
     parser.add_argument("--tier", choices=TIERS, default="quick")
     parser.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) - 1))
-    parser.add_argument("--no-cache", action="store_true", help="run every check again")
     parser.add_argument("--list", action="store_true", help="print the checks and stop")
     args = parser.parse_args(argv)
     description = args.build if args.build.is_absolute() else Path.cwd() / args.build
@@ -211,11 +202,11 @@ def main(argv: list[str]) -> int:
     image = ROOT / "build" / (description.stem + ".BIN")
     started = time.monotonic()
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.jobs) as pool:
-        results = list(pool.map(lambda c: run(c, image, not args.no_cache), checks))
+        results = list(pool.map(lambda c: run(c, image), checks))
     failed = 0
     for check, result in zip(checks, results):
         failed += result.status == "FAIL"
-        took = "cached" if result.cached else f"{result.seconds:.0f} s"
+        took = f"{result.seconds:.0f} s"
         print(f"{result.status:6s} {check.name:18s} {took:>7s}  {summary(check, result)}")
     counts = {s: sum(r.status == s for r in results) for s in ("PASS", "FAIL", "WARN")}
     print(f"{description.stem}, tier {args.tier}: " + ", ".join(f"{n} {s}" for s, n in counts.items() if n) + f"; {time.monotonic() - started:.0f} s")

@@ -1296,14 +1296,50 @@ class CommandLineTests(RepoCase):
         self.assertIn("install --card DIR --build new --allow-untested", text)
         self.assertEqual(out.read_bytes(), self.repo.image)
 
-    def test_lint_warns_and_never_fails(self) -> None:
-        for status in (0, 1):  # the tool's own exit status does not reach the caller
+    def test_lint_warnings_do_not_fail_and_a_report_that_cannot_be_made_does(
+        self,
+    ) -> None:
+        for status, expected in (
+            (0, 0),
+            (2, 6),
+        ):  # 2: the tool could not make its report
             script = (
                 f"import sys\nprint('WARN  stand-in', sys.argv[1])\nsys.exit({status})"
             )
             self.repo.write("tools/buildlint.py", script.encode())
-            self.assertEqual(self.run_cli("lint", "new")[0], 0)
+            code, text = self.run_cli("lint", "new")
+            self.assertEqual(code, expected, text)
+        self.assertIn("new is not linted", text)
         self.assertEqual(self.run_cli("lint", "none")[0], 3)
+
+    def test_init_check_reports_an_incomplete_map_and_a_toolchain_of_another_source(
+        self,
+    ) -> None:
+        from epm2mod import init
+
+        paths = self.repo.paths
+        objdump = init._objdump(paths)
+        objdump.parent.mkdir(parents=True)
+        objdump.write_text("#!/bin/sh\necho 'GNU objdump (stand-in)'\n")
+        objdump.chmod(0o755)
+        paths.firmware_map.parent.mkdir(parents=True, exist_ok=True)
+        paths.firmware_map.write_text("x")  # the first file of the map only
+
+        def missing(map_status: int, built_from: str) -> list[str]:
+            self.repo.write(
+                "tools/fwmap.py", f"import sys\nsys.exit({map_status})".encode()
+            )
+            init._source_record(paths).write_text(built_from + "\n")
+            lines: list[str] = []
+            with mock.patch.object(init, "_pinned_commit", return_value="abc"):
+                return init.init(paths, True, lines.append)
+
+        both = missing(1, "def")
+        self.assertIn("the firmware map", both)
+        self.assertIn("MN103 binutils", both)
+        neither = missing(0, "abc")
+        self.assertNotIn("the firmware map", neither)
+        self.assertNotIn("MN103 binutils", neither)
 
     def test_a_build_is_named_not_given_as_a_path(self) -> None:
         for argv in (

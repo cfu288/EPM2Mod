@@ -6,7 +6,7 @@
 #   tools/ci.sh python    # the package, the scripts, the documents, the generators and the builds
 #
 # Needs a clone that is set up: uv run epm2mod init. Exit status 0: every check passed. A check that cannot run is a
-# failure, not a skip. Nothing here warns: the soft report of a build is `uv run epm2mod lint NAME`.
+# failure, not a skip, and no build is exempt. Nothing here warns: the soft report of a build is `uv run epm2mod lint NAME`.
 #
 # The builds that the python part makes and checks: the pinned build, and each data/builds/*.json that differs
 # from the base commit. CI_BASE names the base (default origin/main).
@@ -30,12 +30,11 @@ if [ "$part" != python ]; then
 fi
 [ "$part" = web ] && exit 0
 
-if [ ! -f cli/src/epm2mod/app/index.html ]; then
-  step "the installer page (the release tests need it)"
-  (cd web && ../tools/node.sh npm ci --ignore-scripts && ../tools/node.sh npm run build:app)
-fi
+# always: git ignores the page, so one that an earlier run built can be stale
+step "the installer page, built from this tree (the release tests read it)"
+(cd web && ../tools/node.sh npm ci --ignore-scripts && ../tools/node.sh npm run build:app)
 
-step "the staged or committed changes hold no machine path"
+step "the commits since the base hold no machine path"
 base=$(git merge-base "${CI_BASE:-origin/main}" HEAD)
 git diff -U0 --no-color --no-renames --diff-filter=AM "$base" HEAD -- . ':(exclude).githooks' | .githooks/machine-paths
 
@@ -55,13 +54,7 @@ changed=$(git diff --name-only --no-renames --diff-filter=AM "$base" HEAD -- 'da
 for name in $(printf '%s\n' "$pinned" $changed | sort -u); do
   step "build $name: make, free-space check, load-order check, start in the emulator"
   uv run epm2mod make "$name"
-  reason=$(grep -P "^$name\t" tools/check-waivers.tsv | cut -f2 || true)
-  if [ -n "$reason" ]; then
-    # a camera-tested build that a newer check refuses: its sha256 was compared, and the reason is on record
-    echo "the checks of today are not run on $name: $reason"
-  else
-    uv run python tools/checks.py "data/builds/$name.json" --no-cache
-  fi
+  uv run python tools/checks.py "data/builds/$name.json"
 done
 echo
 echo "tools/ci.sh: every check passed"
