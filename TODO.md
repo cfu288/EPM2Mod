@@ -84,7 +84,8 @@ candidate `osd-battery` are kept.
   Notes: `experiments/2026-11-17-anti-shock/NOTES.md`.
 
 - **On-screen information.** `osd-battery` is a candidate on the old films-12d base: rebase it on the pinned
-  build. It shows a battery percentage on the live-view screen. Next in the same label: the lens's focus distance,
+  build. It shows a battery percentage on the live-view screen. The owner released its bytes on 2026-11-26 (the Light
+  Box menu table uses 0x7EBF1FC0–0x7EBF1FCA of them), so the rebase needs space of its own. Next in the same label: the lens's focus distance,
   the shutter count, a calibration of the percentage scale, and a row in LV-Info to switch it.
   Notes: `experiments/2026-11-17-osd-info/NOTES.md`.
 

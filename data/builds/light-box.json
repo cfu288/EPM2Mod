@@ -1,0 +1,30 @@
+{
+ "what": "TEST build (not for use): film-tables-fix with Light Box: a Light Box row in Custom Menu D, ▶/Info Settings, ▶ Info and a ▶ Close Up Mode row (mode1 / mode2) in Custom Menu D, the two rows of the E-PL5; with both on, the INFO button in playback reaches the Light Box display (two pictures side by side). The Firmware screen shows Body : 1.6  EPM2Mod 2026.11.27",
+ "stock": "OLY_E_101_1600_0000_0000.BIN",
+ "specs": [
+  "data/specs/interval-timelapse-v2.json",
+  "data/specs/interval-frames-240.json",
+  "data/specs/level-gauge-lvinfo-row.json",
+  "data/specs/level-adjust-row.json",
+  "data/specs/peaking-direct-4.json",
+  "data/specs/peaking-gain-2x.json",
+  "data/specs/custom-menu-rows-5.json",
+  "data/specs/peaking-colours.json",
+  "data/specs/peaking-fast.json",
+  "data/specs/peaking-save-guard.json",
+  "data/specs/looks-menu-4.json",
+  "data/specs/stock-films-structure-4.json",
+  "data/specs/card-looks-9.json",
+  "data/specs/log-menu-3.json",
+  "data/specs/lss-menu.json",
+  "data/specs/lss-core.json",
+  "data/specs/build-label.json",
+  "data/specs/gauge-info.json",
+  "data/specs/gauge-bar-left-2.json",
+  "data/specs/peaking-mf-2.json",
+  "data/specs/spot-core-2.json",
+  "data/specs/spot-menu.json",
+  "data/specs/light-box-row.json"
+ ],
+ "label": "2026.11.27"
+}

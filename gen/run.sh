@@ -24,8 +24,10 @@ uv run python gen/gauge-info/mkspec_gauge_info.py
 uv run python gen/gauge-info/mkspec_gauge_bar_left.py
 uv run python gen/spot-core/mkspec.py "$work/spot-core"
 uv run python gen/spot-menu/mkspec.py
-# last: it reads the film loader's labels from the loader's spec, and the bytes it hooks from the build's other specs
+# then log-menu: it reads the film loader's labels from the loader's spec, and the bytes it hooks from the build's other specs
 uv run python gen/log-menu/mkspec.py "$work/log-menu"
+# after log-menu and spot-menu: it reads the bytes of every spec before its own in data/builds/light-box.json
+uv run python gen/light-box/mkspec.py
 if [ "${1:-}" = "--check" ]; then
   git diff --exit-code --stat -- data/specs/ || { echo "gen/run.sh: a committed spec differs from its generator's output" >&2; exit 1; }
   echo "gen/run.sh: every generated spec is as committed"
