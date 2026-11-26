@@ -28,7 +28,7 @@ Ops:
   5. H3, 0x7E9411AD in play_edit_raw_set_exif_default 0x7E94113F:
      `mov (a2),a2; movbu (16479,a2),d0` -> `jmp FIXDESC; nop`.
 
-Needs the MN103 binutils (tools/setup.sh --binutils) and Olympus's firmware
+Needs the MN103 binutils (uv run epm2mod init) and Olympus's firmware
 (uv run epm2mod fetch-stock).
 """
 
