@@ -122,18 +122,15 @@ candidate `osd-battery` are kept.
   `experiments/2026-11-15-feature-survey/`. Cheap ones: video bitrate and time limit (patches
   written), Light Box (hidden in this firmware), Add Effects on film simulations, more film simulations.
 
-- The load-order check (`uv run python emulator/hookcheck.py data/builds/NAME.json`) counts 87 transfers from segment 1
+- The load-order check (`uv run python emulator/hookcheck.py data/builds/NAME.json`) counts 62 transfers from segment 1
   or the kernel into segments 2 and 3 in the pinned build ([load-order.md](docs/dev/load-order.md), section 5). Two are task entries that only segment-2 code starts (proof).
-  The other 85 are from `stock-films-structure-3` and safe by timing only: the two colour-stage hooks 0x7E56C6A5 and
-  0x7E546160, ten hooks of the ART BKT frame composer, and 73 table words (the colour stage's cases of the film
-  codes, and the live-view rows of the hidden art values 111 to 118). Nothing waits for the segment-2 copy
+  The other 60 are from `stock-films-structure-4` and safe by timing only: the two colour-stage hooks 0x7E56C6A5 and
+  0x7E546160, ten hooks of the ART BKT frame composer, and 48 table words (the colour stage's cases of the film
+  codes). Nothing waits for the segment-2 copy
   (`experiments/2026-11-21-firmware-dive/NOTES.md` §2). Not known: whether a cold start in ART mode with a film
   simulation on the selected entry reaches one of them before the copy ends. Probe: the start list of
   `experiments/2026-11-24-slow-boot/NOTES.md` §7 in that state. A clean fix for 0x7E56C6A5 moves 219 bytes into a
   dead function of segment 1.
-  The candidate `film-tables-fix` removes 25 of the 73 table words from that list (the routes of the hidden art
-  values, `experiments/2026-11-25-film-tables/NOTES.md`); when it is pinned, remove their three rows from the allow list and
-  update `cli/tests/test_hookcheck.py`, which holds spot-af-2 to one FAIL.
 - Emulator ([emulator/boot/README.md](emulator/boot/README.md)), open points:
   - The row Time Lapse Settings is grey when the clock is not set. Start the emulator with
     `E101_RTC=2026-11-14T12:00:00`.
