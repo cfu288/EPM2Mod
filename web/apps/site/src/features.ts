@@ -96,13 +96,9 @@ export const features: Feature[] = [
     summary: 'Compare two similar shots side by side, for focus or expression.',
     steps: [
       'MENU → SETUP → Custom Menu → D → Info Settings → ▶ Info → Light Box → On.',
-      'MENU → SETUP → Custom Menu → D → ▶ Close Up Mode → mode2. Without it, Light Box does not show.',
       'In playback, press INFO until two pictures show. RIGHT or LEFT changes the right picture, OK moves it to the left.',
       'Turn the control dial to zoom in on both pictures.',
     ],
-    screens: [
-      { src: 'ui/light-box-info.png', alt: 'The ▶ Info list with Light Box set to On' },
-      { src: 'ui/light-box-close-up-mode.png', alt: 'Custom Menu D with ▶ Close Up Mode set to mode2' },
-    ],
+    screens: [{ src: 'ui/light-box-info.png', alt: 'The ▶ Info list with Light Box set to On' }],
   },
 ]

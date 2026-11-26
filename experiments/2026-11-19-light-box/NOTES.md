@@ -334,3 +334,132 @@ Light Box the control dial zooms and the arrows scroll (**V** camera, under "eve
 | 10 | Shooting, film simulations, peaking, interval, level gauge, spot metering as today | **pass** (C, the short checks of step 17; interval shooting was not among them) |
 
 The Debug Log of the run is pending (not sent yet).
+
+## Light Box as one switch (2026-11-26)
+
+Emulator and desk only. Not flashed. The owner, after the camera run of light-box: "light box should show up once
+enabled and shouldn't be hidden artificially". So Light Box becomes one switch, as on the E-M10 and later bodies: no
+▶ Close Up Mode row, no mode2 test. The build light-box and its test record stay as they are; it is not pinned. The
+new build is `light-box-2`: film-tables-fix (with main's `custom-menu-rows-4`) plus `light-box-row-2` and
+`light-box-switch`, label 2026.11.28. `gen/light-box/mkspec.py` writes both specs; `custom-menu-rows-5` and
+`light-box-row` stay as committed files that the build light-box names. In `tools/space-ledger/superseded.tsv`
+`light-box-row` → `light-box-row-2` is new; the rows `custom-menu-rows-4` → `custom-menu-rows-5` and osd-battery →
+history stay. `tools/ci.sh` runs the free-space check on each camera-tested build that the branch adds, here light-box
+too, and light-box's table overlaps osd-battery's first run (10 B) and main's `custom-menu-rows-4`: with either row
+removed that check fails (**V**: 10 FAIL, "overlaps ledgered spec"). With the version row, a build that names
+`custom-menu-rows-4` skips `custom-menu-rows-5` as its later version, so light-box-2 and film-tables-fix pass too.
+
+### The mode2 test
+
+`CPlaySingleFrame::getJumpState` 0x7ED09135, the INFO key in single-picture playback (**V**, disassembly):
+
+```
+7ed093d8  mov sp,a0; add 32,a0; mov 257,d0; call getSetting      ; (32,sp) = 257, Light Box
+7ed093e5  mov sp,a0; add 20,a0; mov 321,d0; call getSetting      ; (20,sp) = 321, ▶ Close Up Mode
+7ed093f9  call 0x7ed009d6                                       ; d0 = check 1
+7ed09400  mov (32,sp),d1; cmp 1,d1; bne 0x7ed0941e               ; Light Box On?
+7ed09406  mov (20,sp),d1
+7ed09408  cmp 2,d1                                               ; a5 02
+7ed0940a  bne 0x7ed0941e                                         ; c9 14  -> cb cb (nop nop)
+7ed0940c  cmp d3,d0; beq 0x7ed0941e                              ; check 1
+7ed0940f  setSetting(27, 11); return 11                          ; display mode 11: the next step is state 15
+```
+
+`light-box-switch` changes the 2 bytes of the `bne` at 0x7ED0940A, not the `cmp` at 0x7ED09408 that design.md §4
+named: with the branch gone, nothing tests 321, without relying on the flags of the `cmp 1,d1` before it. The same
+test is in a second method, 0x7ED09616 (**V**: 0x7ED097D3–0x7ED09817, `cmp 2,d1` at 0x7ED09803, `bne` at 0x7ED09805,
+`c9 15` → `cb cb`). The function index lists the same getJumpState string for it; it is called by 0x7ED0D77C, 0x7ED0D8D6,
+0x7ED0DFA0, the Light Box state's main-dial handler 0x7ED0E05B and the state-17 dial handler 0x7EDBD84E (**V**,
+`build/map/calls.tsv`), so it picks the display after a zoom with the dial (**I**). Both are patched: 4 bytes in all.
+
+The state-15 step (0x7ED095E8–0x7ED0960F, display mode 11) reads setting 257 and check 2 (0x7ED00A1D) only; neither
+check 0x7ED009D6 nor 0x7ED00A1D loads setting 321 in its own body (**V**; their callees are not traced, **I**). Other
+readers of 321 stay: the playback zoom (0x7ED0E891 and 0x7ED0F0DE, 0x7ED0F4FB, 0x7ED0F9D0: mode2's zoom frame) and
+0x7ED0D8D6 (`cmp 1` then 0x7ED0F073). They follow the stored value, which no menu can change in light-box-2 (**V**: no
+row). A camera that ran light-box keeps the value it stored there (**I**: the emulator keeps it from a light-box state:
+0x91A1 = 2 after the change of firmware); a camera that did not has mode1.
+
+### Checks
+
+sha256 **`f86d135efadbf0ff7adc2b46ec66fa488ac89681beeb2e0f5a2a6fa46cee1fec`** (`uv run epm2mod make light-box-2`).
+
+| Check | Result |
+|---|---|
+| `uv run epm2mod make light-box-2` | exit 0; free-space check PASS (0 FAIL), load-order check 62 transfers, 0 not in the pinned build; boot-test PASS; update-path-test PASS |
+| `uv run python emulator/hookcheck.py data/builds/light-box-2.json` | exit 0 |
+| `uv run epm2mod lint light-box-2` | 1 warning: "camera test: the build changes early-loaded bytes. Test a cold start". The early-loaded bytes are film-tables-fix's own (kernel-range code of `custom-menu-rows-4`, peaking); light-box-2 adds none (its 8 ops are in segment 3) |
+| `uv run epm2mod make light-box` | the tested build still comes out as 44925a07… |
+| Crawl `p-nocard-shallow`, `crawlcmp.py` against film-tables-fix | exit 0. 268 screens equal by name, 1 differs: the Firmware screen (2026.11.28, `results/switch/firmware-label.png`). Custom Menu rows: 84 screens, all 84 in both (lost 0, new 0): Custom Menu D is equal (`results/switch/d-rows-2.png`). Firmware errors equal |
+| Crawl `p-nocard-full`, `crawlcmp.py` against film-tables-fix | exit 0. Units other than the Custom Menu rows: 820 screens, all equal. Custom Menu rows, by content: 1,576 in both, 12 lost and 15 new, all of them the ▶ Info list and its value boxes (custrows03.00.00: 5 rows in place of 4). Custom Menu D, LV-Info, E with Spot Metering: equal. Firmware errors equal (92 × 0x2a001001). The setup unit ends early on both images (it does not reach the Firmware screen). No crawled screen shows panel 651, whose record 119 now reads Image Only (I: P mode without a card only) |
+| `tools/ci.sh python` (unit tests, generators, the builds) | exit 0: "every check passed. Builds made and checked: film-tables-fix light-box light-box-2"; film-tables-fix comes out as its pinned sha256 e029facb…, light-box as its tested 44925a07… |
+| `tools/ci.sh web` | exit 0 |
+
+### Emulator runs (`scripts/lbprobe.mjs`, two E-PM2 JPEGs, Overall Off)
+
+| Run | Result |
+|---|---|
+| New settings state | 0x91A1 = 1 (mode1), 0x9171 = 1, 1, 0, 0, 0; Spot tags 0 |
+| D → ▦/Info Settings → ▶ → ▶ Info → ▶ → ▼ ×4 → ▶ → ▼ → OK → OK | five rows, Light Box Off (`results/switch/info-off.png`); 0x9171[4] = 1, elements 0–3 and the Spot tags unchanged |
+| Restart with the kept state | 0x9171[4] = 1, the row shows On (`results/switch/info-on-after-restart.png`) |
+| Playback, Light Box On, 321 = 1 (mode1) | PLAY: 8. INFO: reads 257 = 1, 321 = 1, check1 = 1, display mode 11, returns **15**: two frames, "1x" (`results/switch/lightbox-display.png`). Then 2, 6; 8; 15 again. ▶ / ◀ change the right picture, OK moves it to the left (`results/switch/lightbox-ok.png`) |
+| Playback, Light Box On, a state saved by light-box (321 = 2) | 0x91A1 = 2 is kept; INFO returns 15, as with mode1 |
+| Playback, Light Box Off | INFO: 6, 8, 6, 8: the same as film-tables-fix with the same keys |
+| E → Spot Metering → ▶, each row On | the three tags set; the row, the page, the pickers and the way back draw the same as film-tables-fix (5 of 5 screens equal) |
+
+The dial's zoom in Light Box does not run in the emulator (no dial key in the lab); with mode1 it is the one unknown
+for the camera (0x7ED0D8D6 reads 321).
+
+### Acceptance criteria (design.md §5, for one switch)
+
+| # | Criterion | Result |
+|---|---|---|
+| 1 | No ▶ Close Up Mode row; Custom Menu D as film-tables-fix | **pass** (E, crawls) |
+| 2 | ▶ Info has a fifth row Light Box, Off / On, Off at first | **pass** (E) |
+| 3 | Light Box On alone: INFO reaches two pictures side by side | **pass** in the emulator for the GUI (state 15 with 321 = 1); the pictures: not checked (C) |
+| 4 | Choose the picture on each side, zoom both, scroll both | choosing: **pass** (E); zoom and scroll with mode1: not checked (C) |
+| 5 | (mode2's zoom frame) | dropped: no row for it |
+| 6 | Light Box kept after power-off | **pass** for a restart (E); a power-off: not checked (C) |
+| 7 | Every other Custom Menu row is where it was and works | **pass** (E: crawls, Spot Metering) |
+| 8 | The other ▶ Info rows and the LV-Info rows unchanged | ▶ Info rows 1–4: **pass** (E); LV-Info: **pass** (E, full crawl) |
+| 9 | Light Box Off: playback and the INFO cycle as today | the INFO cycle: **pass** (E); zoom: not checked (C) |
+| 10 | Shooting, film simulations, spot metering as today | not checked (C) |
+
+### Camera test (draft)
+
+Flash: `epm2flash light-box-2 f86d135efadbf0ff7adc2b46ec66fa488ac89681beeb2e0f5a2a6fa46cee1fec`
+
+Go back: `epm2flash film-tables-fix e029facb38569880c0cec4c16b0f295ca2a96214ed75900fe00585f6b0cedd28`
+
+light-box-2 has no ▶ Close Up Mode row. The camera keeps the value that light-box stored; step 14 of the last sheet
+set it to mode1. Light Box shows with mode1 and with mode2 (emulator); the value cannot be changed without the row,
+and only the dial's zoom may depend on it. Step 1 checks it while the row is still there. Menu paths as in the sheets
+above (E-PM2 manual p.57 and the firmware's texts; each walked in the emulator).
+
+1. Before the update, if the camera still runs light-box (the Firmware screen shows EPM2Mod 2026.11.27): MENU →
+   [SETUP] → OK → ▼ to Custom Menu (the gear) → ▶ → ▼ to D. Disp/♪/PC → ▶ → ▼ to ▶ Close Up Mode. Note the value.
+   mode2: ▶ → ▲ to mode1 → OK. Close the menu. (Another firmware: skip this step.)
+2. Update the firmware as usual. Then MENU → [SETUP] → OK → ▼ to Setup Menu (the wrench) → ▶ → ▼ to Firmware → ▶.
+   Expected: "Body : 1.6  EPM2Mod 2026.11.28". Another date: the update did not take; flash again.
+3. Take two photos (any subject; JPEG or RAW+JPEG). One in P is the normal photo of step 10.
+4. MENU → [SETUP] → OK → ▼ to Custom Menu → ▶ → ▼ to D. Disp/♪/PC → ▶, then ▼ through the rows.
+   Expected: LV Close Up Mode is followed by Backlit LCD: no ▶ Close Up Mode row.
+5. ▲ to ▦/Info Settings → ▶ → ▶ Info (the first row) → ▶.
+   Expected: five rows, Light Box last.
+6. ▼ to Light Box → ▶ → ▼ to On → OK → OK. Close the menu with MENU.
+   Expected: back in D, no message.
+7. Playback button, then INFO, one press at a time, up to six presses.
+   Expected: one press shows two pictures side by side, the right one in a green frame, "1x" at the bottom left.
+   Never: note the displays that came (Light Box does not work as one switch). A freeze: battery out, note the step.
+8. In the two-picture display: ▶, then OK.
+   Expected: ▶ changes the picture on the right; OK puts that picture on the left.
+9. Turn the control dial clockwise one step. Then ▲ ▼ ◀ ▶. Then turn the dial counterclockwise until "1x" shows.
+   Expected: the dial zooms both pictures, the arrows move the view of both, as on light-box. Note anything else:
+   this is the one point the emulator cannot show.
+10. MENU → [SETUP] → OK → ▼ to Custom Menu → ▶ → ▼ to D. Disp/♪/PC → ▶ → ▼ to ▦/Info Settings → ▶ → ▶ Info → ▶ →
+    ▼ to Light Box → ▶ → ▲ to Off → OK → OK. Close the menu. Playback button, then INFO up to six presses, then the
+    dial clockwise one step.
+    Expected: no two-picture display in the cycle; the dial zooms into the picture as on film-tables-fix.
+11. Short checks: the P photo of step 3 looks as usual; one photo with an ART film simulation; MENU → [SETUP] → OK →
+    ▼ to Custom Menu → ▶ → ▼ to E. Exp/▣/ISO → ▶ → ▼ to Spot Metering → ▶.
+    Expected: as on film-tables-fix; the Spot Metering page shows Spot, Spot Hilight and Spot Shadow with the values
+    set before.

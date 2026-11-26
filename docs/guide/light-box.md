@@ -4,13 +4,10 @@ Light Box shows two pictures side by side in playback, so you can compare two si
 
 ## Setup
 
-1. Go to **MENU → SETUP → Custom Menu → D → Info Settings → ▶ Info → Light Box**, press **RIGHT**, choose **On**,
-   and press **OK** twice.
-2. **▶ Close Up Mode** must be set to **mode2** to show Light Box: go to **MENU → SETUP → Custom Menu → D →
-   ▶ Close Up Mode**, press **RIGHT**, choose **mode2**, and press **OK**.
+Go to **MENU → SETUP → Custom Menu → D → Info Settings → ▶ Info → Light Box**, press **RIGHT**, choose **On**, and
+press **OK** twice.
 
 <img src="../images/ui/light-box-info.png" width="320" alt="The ▶ Info list with Light Box set to On">
-<img src="../images/ui/light-box-close-up-mode.png" width="320" alt="Custom Menu D with ▶ Close Up Mode set to mode2">
 
 If the menu has no Custom Menu tab (gears icon), enable it in **MENU → SETUP → Setup Menu (wrench tab) → Menu Display**.
 
