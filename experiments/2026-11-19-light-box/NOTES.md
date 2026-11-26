@@ -306,3 +306,31 @@ Looks is in use. ▲ ▼ ◀ ▶ are the arrow pad; "playback button" is the ▶
 17. Short checks (criterion 10): one photo in P; one with an ART film simulation; MF with Peaking on (the lines); INFO
     in shooting to the level gauge; with Spot Metering's Spot On, a photo in spot metering (as on film-tables-fix).
     Expected: as on film-tables-fix.
+
+### Camera run (2026-11-26)
+
+The owner flashed light-box (`44925a07…`) and ran the test sheet above. Their words: "Everything but fn set to
+magnify does not work, but idk if it was ever supposed to work considering normal review images also do not magnify
+with fn", and for step 3: "Spot on, other two off. Shadow was on but I turned it off." Read as: every step passed but
+the Fn parts of steps 12 and 13. Result and log row: [camera log](../../docs/camera-log/2026-11-26-light-box.md).
+Pinned on 2026-11-26.
+
+**The Fn steps of the sheet were wrong.** Fn set to Magnify does not zoom in playback on the E-PM2, also not for a
+normal review picture (**V** camera). That is stock: Magnify zooms in on the frame when focusing (E-PM2 manual p.79),
+and playback zooms with the control dial (p.38). Steps 12 and 13 took the Fn key from the E-PL5's zoom button. In
+Light Box the control dial zooms and the arrows scroll (**V** camera, under "everything").
+
+| # | Criterion | Camera result |
+|---|---|---|
+| 1 | Custom Menu D has ▶ Close Up Mode, mode1 / mode2, mode1 at first | **pass** (C) |
+| 2 | ▶ Info has a fifth row Light Box, Off / On, Off at first | **pass** (C) |
+| 3 | Light Box On + mode2: INFO reaches two pictures side by side | **pass** (C) |
+| 4 | Choose the picture on each side, zoom both, scroll both | **pass** (C: ▶ / ◀ and OK; the control dial and the arrows) |
+| 5 | mode2: the playback zoom shows a zoom frame first | **not checked**: the frame shows only with a zoom button, which the E-PM2 lacks; Fn's Magnify does not work in playback |
+| 6 | Both settings kept after power-off | **pass** (C); the Spot Metering values unchanged |
+| 7 | Every other Custom Menu row is where it was and works | **pass** (C) |
+| 8 | The other ▶ Info rows and the LV-Info rows unchanged | **pass** (C) |
+| 9 | Light Box Off or mode1: playback, INFO cycle and zoom as today | **pass** (C) |
+| 10 | Shooting, film simulations, peaking, interval, level gauge, spot metering as today | **pass** (C, the short checks of step 17; interval shooting was not among them) |
+
+The Debug Log of the run is pending (not sent yet).
