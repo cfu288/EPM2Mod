@@ -68,12 +68,13 @@ Other Olympus generations, and what each can be modded to do: [model-matrix.md](
 
 **Low effort: data edits, one camera check each**
 
-- Light Box, with data edits only. The display and its code were in the firmware; the menu row was missing. As on the
-  E-PL5 (rows Light Box and ▶ Close Up Mode, display only with mode2), camera-tested on 2026-11-26 (`light-box`). As
-  one switch, as on the E-M10 and later bodies (`light-box-row-2`, `light-box-switch`: the INFO key's rule without the
-  ▶ Close Up Mode test, 4 bytes): emulator only (`light-box-2`). The ▶ Info row re-uses a sub-item record and a picker
+- Light Box, as one switch, as on the E-M10 and later bodies: camera-tested and pinned on 2026-11-26 (`light-box-2`:
+  `light-box-row-2`, and `light-box-switch`, 4 bytes, the INFO key's rule without the ▶ Close Up Mode test). The display
+  and its code were in the firmware; the menu row was missing. The E-PL5's form (rows Light Box and ▶ Close Up Mode,
+  display only with mode2) passed too (`light-box`). The ▶ Info row re-uses a sub-item record and a picker
   list of panel 651 (Mode Dial Function), which no menu reaches on this body. Fn set to Magnify does not zoom in
-  playback; the control dial does (`experiments/2026-11-19-light-box/NOTES.md`).
+  playback; the control dial does, and sometimes it changes the picture instead, as on `light-box` (U why)
+  (`experiments/2026-11-19-light-box/NOTES.md`).
 - Add Effects on a film simulation (glow, vignette, white edge, frame).
 - Higher video bitrate and no 29-minute limit (`experiments/2026-11-12-hardware/`, patches written,
   not flashed).
