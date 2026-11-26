@@ -1,9 +1,8 @@
 # Load order, space and what they cost
 
 What we know about how the E-PM2 firmware gets into RAM, the rule that follows for patch code, the space that is
-left, and the effects on speed and stability. State: 2026-11-25, build `film-tables-fix` (camera-tested
-2026-11-25). The pinned build since 2026-11-26, `light-box`, adds data edits only: 16 B more of the `sdk` name list for
-its longer Custom Menu table and 16 B more of segment 3's reclaimed area 0x7EE3CBF2–0x7EE3CFE2 for its child list.
+left, and the effects on speed and stability. State: 2026-11-25, build `film-tables-fix` (pinned, camera-tested
+2026-11-25).
 
 Labels: **V** verified (bytes, disassembly, an emulator run, a camera log, a stopwatch), **I** inferred, **U**
 unknown. Emulator times are lab times, not camera times. History is in the notes that each section links.

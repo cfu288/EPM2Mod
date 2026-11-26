@@ -1,0 +1,26 @@
+{
+ "name": "light-box-switch",
+ "description": "Light Box as one switch, as on the E-M10 and later bodies: the INFO key in single-picture playback goes to the Light Box display when the \u25b6 Info row Light Box (setting 257) is On, whatever setting 321 (\u25b6 Close Up Mode, which has no menu row on the E-PM2) holds. CPlaySingleFrame::getJumpState 0x7ED09135 and its twin 0x7ED09616 test 257 = 1, 321 = 2 and check 0x7ED009D6 before they set display mode 11, the step before state 15 (ID_ST_DISP_LIGHTBOX_PREPARE); in both the `bne` of the 321 test becomes two `nop`. The state-15 step itself (0x7ED095E8) reads 257 and check 0x7ED00A1D only. 4 bytes, no new code. Needs data/specs/light-box-row-2.json for the row. See experiments/2026-11-19-light-box/NOTES.md, \"Light Box as one switch\".",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x8E83EA",
+   "expect": "c914",
+   "new": "cbcb",
+   "_addr": "0x7ED0940A",
+   "_note": "getJumpState 0x7ED09135: the `bne` after `cmp 2,d1` (setting 321, \u25b6 Close Up Mode, is mode2) -> two `nop`: Light Box On (setting 257 = 1) and check 1 (0x7ED009D6) decide alone"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x8E87E5",
+   "expect": "c915",
+   "new": "cbcb",
+   "_addr": "0x7ED09805",
+   "_note": "0x7ED09616, its twin, called by the zoom handlers: the `bne` after `cmp 2,d1` (setting 321, \u25b6 Close Up Mode, is mode2) -> two `nop`: Light Box On (setting 257 = 1) and check 1 (0x7ED009D6) decide alone"
+  }
+ ]
+}

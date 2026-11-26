@@ -1,0 +1,44 @@
+{
+ "name": "light-box-row-2",
+ "description": "Light Box (E-PL6 manual p.86): the row 'Light Box' in Custom Menu D > \u25b6/Info Settings > \u25b6 Info (panel 191, setting 257 = prm tag 0x9171, Off / On), as on the E-PL5. Data only, 4 edits in place, no free space: the sub-item record 119 of panel 651 ('Mode Dial Function', which no menu reaches on the E-PM2) and the records 139-142 hold panel 191's four rows in their order and then {191, title 150, setting 257, 2, 7, 1, text 868}; panel 191's child list gets the fifth entry (655, 257), its end entry moving into panel 192's old list, which nothing points at since data/specs/level-gauge-lvinfo-row.json. The row's picker is list 655 (panel 651's Myset4 list), its descriptor re-keyed to setting 257 with the stock Off/On items of 257: the stock picker 198 is the Spot row's since data/specs/spot-menu.json. The same edits as data/specs/light-box-row.json (the build light-box), here without custom-menu-rows-5; data/specs/light-box-switch.json makes the display need this row only. See experiments/2026-11-19-light-box/NOTES.md, \"Light Box as one switch\".",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBCEE28",
+   "expect": "8b024905ed01000002000000070001005f020000",
+   "new": "bf009600fd00000002000000070001004d030000",
+   "_addr": "0x7EFEFE48",
+   "_note": "sub-item record 119: panel 651 'Mode Dial Function' / setting 493 / text 607 'Myset4' (no menu reaches panel 651 on the E-PM2) -> panel 191's first row, '\u25b6 Info' / setting 253 / text 845 'Image Only'"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBCEFB8",
+   "expect": "bf009600fd00000002000000070001004d030000bf009600fe00000002000000070001009e030000bf009600ff00000002000000070001004c030000bf0096000001000002000000070001004a030000",
+   "new": "bf009600fe00000002000000070001009e030000bf009600ff00000002000000070001004c030000bf0096000001000002000000070001004a030000bf00960001010000020000000700010064030000",
+   "_addr": "0x7EFEFFD8",
+   "_note": "sub-item records 139-142: panel 191's rows 2-4 (settings 254, 255, 256), each one record earlier, and the fifth row: panel 191 '\u25b6 Info' (title 150) / setting 257 / text 868 'Light Box', equal to the E-PL5 row at 0x7EFF08D0. Panel 191's rows keep their order"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBEB76C",
+   "expect": "ed0109000000000001000000e8ba007f",
+   "new": "010102000000000001000000888c007f",
+   "_addr": "0x7F00C78C",
+   "_note": "list descriptor of 655 (the picker of panel 651's Myset4 row; no menu reaches panel 651): setting 493, 9 items at 0x7F00BAE8 -> setting 257, the stock Off/On items 0x7F008C88 of setting 257 (the descriptor of list 198 before spot-menu)"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xBD81FC",
+   "expect": "0000000000000000c8000000f4000000",
+   "new": "8f020000010100000000000000000000",
+   "_addr": "0x7EFF921C",
+   "_note": "child list of panel 191, in place: the fifth entry (list 655, setting 257) in place of the end entry, and the end entry in place of the first entry of panel 192's old list 0x7EFF9224 (no pointer to it since level-gauge-lvinfo-row). The E-PL5's list 0x7EFF9AE0 has list 198, which is Spot's picker here"
+  }
+ ]
+}
