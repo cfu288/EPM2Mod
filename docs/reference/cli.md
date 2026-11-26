@@ -459,7 +459,7 @@ Print what in a build may be harmful and is not proven safe.
 epm2mod lint [-h] BUILD
 ```
 
-- Output: WARN lines: jumps from early-loaded to late-loaded code, first code, a needed cold start. Warnings do not change the exit status.
+- Output: WARN lines: jumps from early-loaded to late-loaded code, first code. Warnings do not change the exit status.
 - Needs: a checkout. Network: never.
 
 | Argument | What | Default |

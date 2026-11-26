@@ -465,7 +465,7 @@ COMMANDS: dict[str, Command] = {
             "lint",
             DEVELOPERS,
             "Print what in a build may be harmful and is not proven safe.",
-            "WARN lines: jumps from early-loaded to late-loaded code, first code, a needed cold start. "
+            "WARN lines: jumps from early-loaded to late-loaded code, first code. "
             "Warnings do not change the exit status",
             True,
             "",
