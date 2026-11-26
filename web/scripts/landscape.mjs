@@ -79,7 +79,8 @@ const html = `<!doctype html><html><head><style>
 @font-face { font-family: Arimo; font-weight: 700; src: url(${font('arimo/files/arimo-latin-700-normal.woff2')}); }
 @font-face { font-family: Arimo; font-weight: 400; font-style: italic; src: url(${font('arimo/files/arimo-latin-400-italic.woff2')}); }
 body { margin: 0; width: ${WIDTH}px; background: #fff; color: #000; font-family: Arimo, sans-serif; }
-main { padding: 64px 80px 48px; }
+main { padding: 64px 80px 48px; position: relative; }
+.line + .line { margin-top: 70px; }
 h1 { border-top: 24px solid #000; margin: 0; padding-top: 40px; font: 800 58px Sora, sans-serif; letter-spacing: -0.02em; }
 .years { display: grid; grid-template-columns: repeat(${Math.min(years.length, PER_LINE)}, 1fr); margin-top: 52px; }
 .year { font: 800 48px Sora, sans-serif; padding-bottom: 14px; border-bottom: 4px solid #000; position: relative; }
@@ -99,7 +100,7 @@ h1 { border-top: 24px solid #000; margin: 0; padding-top: 40px; font: 800 58px S
 <h1>Olympus Custom Firmware</h1>
 ${lines
   .map(
-    (line) => `<div class="years">${line.map((y) => `<div class="year">${y}</div>`).join('')}</div>
+    (line) => `<div class="line"><div class="years">${line.map((y) => `<div class="year">${y}</div>`).join('')}</div>
 <div class="years" style="margin-top: 0">${line
       .map(
         (y) =>
@@ -108,9 +109,10 @@ ${lines
             .map(cell)
             .join('')}</div>`,
       )
-      .join('')}</div>`,
+      .join('')}</div></div>`,
   )
   .join('')}
+<svg id="bends" style="position: absolute; left: 0; top: 0; overflow: visible" width="1" height="1"></svg>
 <div class="legend">${legend}</div>
 </main></body></html>`
 
@@ -121,6 +123,26 @@ const browser = await chromium.launch()
 const page = await browser.newPage({ viewport: { width: WIDTH, height: 800 } })
 await page.goto(`file://${pageFile}`)
 await page.evaluate(() => document.fonts.ready)
+// one timeline: each line runs off its right end, back across the gap below it, and into the next line's start
+await page.evaluate(() => {
+  const main = document.querySelector('main').getBoundingClientRect()
+  const lines = [...document.querySelectorAll('.line')]
+  const R = 36
+  const G = 44
+  let d = ''
+  for (let i = 0; i + 1 < lines.length; i++) {
+    const end = [...lines[i].querySelectorAll('.year')].at(-1).getBoundingClientRect()
+    const start = lines[i + 1].querySelector('.year').getBoundingClientRect()
+    const x1 = end.right - main.left
+    const y1 = end.bottom - 2 - main.top
+    const x2 = start.left - main.left
+    const y2 = start.bottom - 2 - main.top
+    const mid = (lines[i].getBoundingClientRect().bottom + lines[i + 1].getBoundingClientRect().top) / 2 - main.top
+    d += `M ${x1} ${y1} H ${x1 + G - R} A ${R} ${R} 0 0 1 ${x1 + G} ${y1 + R} V ${mid - R} A ${R} ${R} 0 0 1 ${x1 + G - R} ${mid}`
+    d += ` H ${x2 - G + R} A ${R} ${R} 0 0 0 ${x2 - G} ${mid + R} V ${y2 - R} A ${R} ${R} 0 0 0 ${x2 - G + R} ${y2} H ${x2}`
+  }
+  document.getElementById('bends').innerHTML = `<path d="${d}" fill="none" stroke="#000" stroke-width="4"/>`
+})
 await page.screenshot({ path: OUT, fullPage: true })
 await browser.close()
 console.log(`wrote ${path.relative(ROOT, OUT)}: ${rows.length} cameras in ${years.length} years`)
