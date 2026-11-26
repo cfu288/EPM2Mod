@@ -281,7 +281,7 @@ Looks is in use. ▲ ▼ ◀ ▶ are the arrow pad; "playback button" is the ▶
    → ▶ → ▼ ▼ to Magnify → OK. Close the menu with MENU.
    Expected: Fn Function shows the magnifier. This puts the zoom button of the E-PL5 manual on Fn for steps 11–13;
    step 16 sets it back.
-9. Power off, power on. Walk the paths of steps 3, 4 and 6 and read the rows; close the menu.
+9. Power off, wait 2 minutes (a cold start: a short power-off keeps the RAM), power on. Walk the paths of steps 3, 4 and 6 and read the rows; close the menu.
    Expected: mode2, Light Box On, and the three Spot Metering values of step 3. mode1 or Off: that setting is not
    kept (criterion 6). A Spot value changed: the Light Box row writes a spot setting; note which, and go back.
 10. Playback button, then INFO, one press at a time, up to six presses.
