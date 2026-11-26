@@ -79,3 +79,32 @@ full card (A8), power-off during Busy (A7), keys during Busy, the time per JPEG 
 | `uv run --directory cli mypy`; black on the generator and its test | no issues; formatted |
 | `uv run python -m unittest discover -s cli/tests` | 284 OK, 6 skipped (they need the built web app page) |
 | `uv run epm2mod generate --check` | up to date |
+
+## 5. The candidate made again on film-tables-fix (2026-11-26)
+
+The pinned build is now film-tables-fix (cold-start-fix, spot metering, stock-films-structure-4). `data/builds/artbkt.json`
+is film-tables-fix's 22 specs + `raw-edit-art-bkt-3`, label 2026.11.29, sha256
+`dc1e31898fb0bc0a75c8a54d40a3cd25aa751dc104e1eeee0752ea7ce1afddd0`. The candidate of section 4 (on peaking-mf) was never
+flashed.
+
+| Item | Finding | Label |
+|---|---|---|
+| The spec on the new base | `gen/raw-edit-art-bkt/mkspec.py` writes `raw-edit-art-bkt-3.json` byte for byte as committed: card-looks-9 keeps FILMNAME at 0x7EE53C11, and no film-tables-fix spec changes a byte ART BKT changes | V |
+| Load order | Every byte ART BKT changes is in segment 2 or 3 (code 0x7EBB2AC4, list 0x7F00D564, H1, H2, H3); hookcheck 62 transfers, 0 not in the pinned build, as film-tables-fix | V |
+| Light Box (PR #9) | No byte in common with custom-menu-rows-5, light-box-row, light-box-row-2, light-box-switch | V |
+| `epm2mod make artbkt` | free space PASS (with the load-order check), FIRST CODE line, boot-test PASS, update-path-test PASS | V |
+| `epm2mod lint artbkt` | 2 warnings: first code; the cold start (the base specs change early-loaded bytes; ART BKT does not) | V |
+| `emulator/artbkt-test` | PASS: frame list [2, 100 … 109, 119, 120], frames 0-2 saved, error stop, Picture Mode back, ImageDescription OLYMPUS DIGITAL CAMERA, Portra 400, Velvia | V emulator |
+| `scripts/runs.py` (section 3's runs) | n = 0, 1, 3, Natural row, Current in ART 1, Custom1: the same lists, JPEGs and texts as in section 3 | V emulator |
+| RAW Data Edit screens, film-tables-fix and artbkt, same keys | Playback, the RAW menu and the screens after MENU equal; only the list differs (5 rows) | V emulator |
+| Menu crawl p-card-shallow, film-tables-fix and artbkt | 461 of 462 screens equal; the other is the Firmware screen (label 2026.11.29) | V emulator |
+| The look pack of the test sheet | `epm2mod films set` with ART 1 Portra 400, ART 2 Velvia, ART 5 Double-X gives `7b82124e…` again, the file in `build/artbkt-card/` | V |
+
+The checks were rebuilt on main (PR #14): `tools/checks.py` is gone. `emulator/artbkt-test` is now a by-hand check
+(`docs/dev/conventions.md`, Checks); it reads the test RAW from `emulator/testraw/`, a copy of
+`experiments/2026-11-09-film-portra/testraw/PB130001.ORF`. The test build films-start-texts-artbkt (2026-11-21) fails
+the load-order check against film-tables-fix (25 pointers of stock-films-structure-3 into segment 2), so its
+description moved to `../2026-11-20-raw-edit-art-bkt/films-start-texts-artbkt.json` as a record.
+
+Emulator limit seen again: after No at the end screen, playback shows "Picture Error" for the new JPEG, which the
+stand-ins leave empty; the pinned build of section 3 showed the same after a stock Current edit.

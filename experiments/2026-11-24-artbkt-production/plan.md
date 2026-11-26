@@ -268,3 +268,24 @@ Expected:
 
 Not owner questions (the findings answer them): the build goes on top of whatever build is pinned when the work starts;
 frame 0 stays (the capture ART BKT makes it too); the Busy screen stays stock.
+
+## 8. The criteria on artbkt 2026.11.29 (2026-11-26)
+
+Build `data/builds/artbkt.json` made again on the pinned film-tables-fix, sha256
+`dc1e31898fb0bc0a75c8a54d40a3cd25aa751dc104e1eeee0752ea7ce1afddd0` (`NOTES.md` section 5). E = emulator, C = camera.
+Not checked = the camera test of `test-sheet.md` settles it.
+
+| # | E | C |
+|---|---|---|
+| A1 | Pass: the ART BKT screen through Bracketing without OK; the rows keep their values; MENU leaves ART BKT `--` | Not checked (step 8) |
+| A2 | Pass: the RAW Data Edit screens against film-tables-fix, same keys: only the list differs (5 rows); the end screen Reset / No | Not checked (parts 1-3) |
+| A3 | Pass: n = 0, 1, 3 (with a Picture Mode row), 12 (frames 0-2), Natural not twice | Not checked (parts 1-3) |
+| A4 | Not shown: the emulator has no image engine | Not checked (parts 1, 4) |
+| A5 | Pass: ImageDescription per frame (OLYMPUS DIGITAL CAMERA, Portra 400, Velvia); Current takes the film name, Custom1 the RAW's | Not checked (EXIF row) |
+| A6 | Pass in part: new files take the next numbers; the RAW's size unchanged | Not checked |
+| A7 | Pass: the Picture Mode comes back at the normal end and at the error stop | Not checked (parts 6, 7: power-off, card full) |
+| A8 | Not shown: no full card in the emulator | Not checked (part 7) |
+| A9 | Pass in the runs above: no fault | Not checked |
+| A10 | Pass: boot-test, update-path-test, hookcheck 0 new transfers; menu crawl p-card-shallow 461 of 462 screens equal (the other is the Firmware label) | Not checked (part 7: peaking) |
+| A11 | Not run again: the row's text is stock text 1699 and no film-tables-fix spec changes it (inferred from the 2026-11-24 run in four languages) | Not needed |
+| A12 | Not shown | Not checked (part 1, the log) |

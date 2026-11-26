@@ -1,11 +1,12 @@
-# Camera test sheet: artbkt (2026-11-24)
+# Camera test sheet: artbkt (2026-11-26)
 
 One flash for every item that only the camera can show (`plan.md` sections 1.3 and 2.1, `NOTES.md` section 3):
 n = 0, 1, 3 and 12 with a Picture Mode row; Busy and its keys; a card that fills up; power-off during Busy; a
 RAW+JPEG source; a RAW shot in ART mode; Dramatic Tone, Key Line and Watercolor; each JPEG's film name; and that
 nothing else changed. The Debug Log is On for the whole test.
 
-Build `data/builds/artbkt.json`, sha256 `729e8db67bf303372f32706076c496edd9326b7f54267bfe398a187553463b78`. On this host: `build/artbkt.BIN`, and the look pack
+Build `data/builds/artbkt.json` (the pinned film-tables-fix with ART BKT, label 2026.11.29), sha256
+`dc1e31898fb0bc0a75c8a54d40a3cd25aa751dc104e1eeee0752ea7ce1afddd0`. On this host: `build/artbkt.BIN`, and the look pack
 `build/artbkt-card/EPM2LOOK.BIN` (sha256 `7b82124e415f624ecda0396aa8b8c1589bcdc9cfdf0c1be56cc937da5c25e451`:
 ART 1 Portra 400, ART 2 Velvia, ART 5 Double-X, Olympus's filters in the other entries). Menu paths: the camera
 manual (p. 28, 39, 61-63, 65, 100) and the emulator's screens of this build.
@@ -24,10 +25,14 @@ manual (p. 28, 39, 61-63, 65, 100) and the emulator's screens of this build.
 2. Flash (the command ejects the card):
 
    ```
-   epm2flash artbkt 729e8db67bf303372f32706076c496edd9326b7f54267bfe398a187553463b78
+   epm2flash artbkt dc1e31898fb0bc0a75c8a54d40a3cd25aa751dc104e1eeee0752ea7ce1afddd0
    ```
 
-   Go back: `epm2flash peaking-mf 6a47806dfafce15d281358eae2beffe397132e5999c50b28c69b2a2467efcf39`
+   Go back:
+
+   ```
+   epm2flash film-tables-fix e029facb38569880c0cec4c16b0f295ca2a96214ed75900fe00585f6b0cedd28
+   ```
 
 3. Card in the camera, camera off. Hold **OK** and **ON/OFF** together; let go when the orange lamp lights. Wait
    for it to blink, then switch off and on.
@@ -35,7 +40,7 @@ manual (p. 28, 39, 61-63, 65, 100) and the emulator's screens of this build.
 ## Set-up on the camera
 
 4. MENU → RIGHT to **SETUP** → OK. In the tab column (left), UP or DOWN to the tab whose title reads **Setup Menu**
-   → RIGHT → UP or DOWN to **Firmware** → RIGHT. Body reads **1.6  EPM2Mod 2026.11.24**. MENU until the live view
+   → RIGHT → UP or DOWN to **Firmware** → RIGHT. Body reads **1.6  EPM2Mod 2026.11.29**. MENU until the live view
    shows.
 5. MENU → RIGHT to **SETUP** → OK. Tab **Custom Menu** → RIGHT → UP or DOWN to **J** → RIGHT → **Debug Log** →
    RIGHT → **On** → OK. MENU until the live view shows.
@@ -136,7 +141,7 @@ and `uv run epm2mod log build/fw-test/artbkt-prod/EPM2LOG.BIN --json > build/fw-
 
 | Part | Expected | Other results |
 |---|---|---|
-| 4-7 | Firmware 1.6  EPM2Mod 2026.11.24; Debug Log On; Loaded | Another label = another build on the camera: flash again |
+| 4-7 | Firmware 1.6  EPM2Mod 2026.11.29; Debug Log On; Loaded | Another label = another build on the camera: flash again |
 | 1 | 13 JPEGs in this order: Natural, Portra 400, Velvia, Pale&Light Color, Light Tone, Double-X, Pin Hole, Diorama, Cross Process, Gentle Sepia, Dramatic Tone, Key Line, Watercolor; each looks like its film simulation or filter; about 35 s; Picture Mode Natural after | 4 rows in the list = old firmware. 1 JPEG = the loop did not go on. The same look in all = the Picture Mode does not reach the development. Another Picture Mode after = the restore failed. A freeze or restart: note the frame; the Debug Log has the last event |
 | 2 | 4 JPEGs: Natural, Velvia, Pin Hole, Monotone. MENU and ▶ during Busy do nothing | A key that stops the run or freezes the camera: note it (the guide states it) |
 | 3 | n = 1: 2 JPEGs (Natural, Watercolor); Reset shows the 5-row list. n = 0: 1 JPEG (Natural) | n = 0 with no JPEG and the list staying also passes; the guide states what happened |
