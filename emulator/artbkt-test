@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""artbkt-test BUILD.json [--keep DIR]: run the ART BKT loop of RAW Data Edit in the emulator and judge it.
+"""artbkt-test BUILD.json [--keep DIR]: run the ART BKT loop of RAW Data Edit in the emulator and judge it. Run it by
+hand before a build with a raw-edit-art-bkt spec is offered for a flash; no other check runs it. About a minute.
+
+    uv run epm2mod make NAME && uv run python emulator/artbkt-test data/builds/NAME.json
 
 Why: on 2026-11-21 the camera crashed at frame 1 of an ART BKT run (a call to a routine that a later spec had moved),
 and every static check had passed (docs/camera-log/2026-11-21-films-start-texts-artbkt.md). Only a run of the loop
@@ -7,7 +10,8 @@ finds that class of fault.
 
 What it does, on build/NAME.BIN:
   1. makes a P-mode settings state for the image (emulator/mkstate);
-  2. makes a card: the test RAW PB130001.ORF with its ImageDescription set to a marker, and a look pack with
+  2. makes a card: the test RAW emulator/testraw/PB130001.ORF (a copy of the one in
+     experiments/2026-11-09-film-portra/testraw/) with its ImageDescription set to a marker, and a look pack with
      ART 1 Portra 400 and ART 2 Velvia (`epm2mod films set -o`);
   3. runs emulator/boot/artbkt.mjs with its stand-ins: Custom Menu J > Load Looks > Load; then playback, OK,
      RAW Data Edit, ART BKT, Yes, with the ART BKT entries as an empty settings store has them (the 12 ART entries On).
@@ -33,7 +37,7 @@ REPO = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import emuenv  # noqa: E402
 
-RAW = os.path.join(REPO, "experiments", "2026-11-09-film-portra", "testraw", "PB130001.ORF")
+RAW = os.path.join(HERE, "testraw", "PB130001.ORF")
 RAW_DESC = 0x868  # IFD0 ImageDescription of PB130001.ORF, 32 B
 OLYMPUS = b"OLYMPUS DIGITAL CAMERA"
 MARKER = b"RAW IMAGE DESCRIPTION"
