@@ -121,7 +121,7 @@ candidate `osd-battery` are kept.
   with GCC for this processor and wraps the firmware's calls in one driver layer.
 - Feature candidates from the survey of 22 other bodies and of other mods:
   `experiments/2026-11-15-feature-survey/`. Cheap ones: video bitrate and time limit (patches
-  written), Light Box (hidden in this firmware), Add Effects on film simulations, more film simulations.
+  written), Add Effects on film simulations, more film simulations.
 
 - The load-order check (`uv run python emulator/hookcheck.py data/builds/NAME.json`) counts 62 transfers from segment 1
   or the kernel into segments 2 and 3 in the pinned build ([load-order.md](docs/dev/load-order.md), section 5). Two are task entries that only segment-2 code starts (proof).

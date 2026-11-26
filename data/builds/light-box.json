@@ -1,5 +1,5 @@
 {
- "what": "TEST build (not for use): film-tables-fix with Light Box: a Light Box row in Custom Menu D, ▶/Info Settings, ▶ Info and a ▶ Close Up Mode row (mode1 / mode2) in Custom Menu D, the two rows of the E-PL5; with both on, the INFO button in playback reaches the Light Box display (two pictures side by side). The Firmware screen shows Body : 1.6  EPM2Mod 2026.11.27",
+ "what": "The twelve Olympus art filters unchanged; film simulations loaded from the SD card with Custom Menu J, Load Looks, overwrite the entries the file lists, without Natural's selective colour changes on top, are applied at power-on before the first picture, and a photo taken with one records the film's name (EXIF ImageDescription); interval shooting with up to 240 frames, a level gauge with calibration that keeps the shooting information of the histogram screen (as the PEN-F does), and focus peaking, which in MF shows the lines in the normal live view the whole time (no magnified view needed, with any lens) and with MF Assist when the focus ring turns; a Debug Log row in Custom Menu J (Off by default) that writes EPM2LOG.BIN to the card for developers; a Lowest S/S Setting row in Custom Menu E (the shutter speed at which ISO Auto starts to rise in P and A); spot metering at the AF target: Custom Menu E, Spot Metering, has an On/Off row each for Spot, Spot Hilight and Spot Shadow (all Off by default); a variant set to On meters at the AF point set by a touch on the screen, or else at the selected AF target in single-target AF; Light Box, as on the E-PL5: Custom Menu D has a \u25b6 Close Up Mode row (mode1 / mode2, mode1 by default) and \u25b6/Info Settings, \u25b6 Info has a Light Box row (Off by default); with Light Box On and \u25b6 Close Up Mode mode2, INFO in playback shows two pictures side by side, to compare them; the names of the added menu rows read the same in every menu language; the Firmware screen shows the build's label (Body : 1.6  EPM2Mod 2026.11.27)",
  "stock": "OLY_E_101_1600_0000_0000.BIN",
  "specs": [
   "data/specs/interval-timelapse-v2.json",
@@ -26,5 +26,7 @@
   "data/specs/spot-menu.json",
   "data/specs/light-box-row.json"
  ],
+ "sha256": "44925a07bfc29cc203c86ac63b99ef7c134c46142f78233ff18c1d5c01c0363f",
+ "camera_tested": "2026-11-26",
  "label": "2026.11.27"
 }

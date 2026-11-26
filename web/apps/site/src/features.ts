@@ -90,4 +90,18 @@ export const features: Feature[] = [
       { src: 'ui/spot-metering-page.png', alt: 'The Spot Metering page with Spot, Spot Hilight and Spot Shadow' },
     ],
   },
+  {
+    id: 'light-box',
+    name: 'Light Box',
+    summary: 'Two pictures side by side in playback, to compare similar shots.',
+    steps: [
+      'MENU → SETUP → Custom Menu → D → Info Settings → ▶ Info → Light Box → On.',
+      'MENU → SETUP → Custom Menu → D → ▶ Close Up Mode → mode2. Light Box needs it.',
+      'In playback, press INFO until two pictures show. RIGHT or LEFT changes the right picture, OK moves it to the left.',
+    ],
+    screens: [
+      { src: 'ui/light-box-info.png', alt: 'The ▶ Info list with Light Box set to On' },
+      { src: 'ui/light-box-close-up-mode.png', alt: 'Custom Menu D with ▶ Close Up Mode set to mode2' },
+    ],
+  },
 ]
