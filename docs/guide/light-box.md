@@ -23,7 +23,6 @@ If the menu has no Custom Menu tab (gears icon), enable it in **MENU → SETUP �
 
 ## Limits
 
-- With **▶ Close Up Mode** set to **mode1**, playback works as before, without Light Box.
 - An **Fn** button set to **Magnify** does not zoom in playback. Zoom with the control dial.
 
 For implementation details, see the [notes](../../experiments/2026-11-19-light-box/NOTES.md).
