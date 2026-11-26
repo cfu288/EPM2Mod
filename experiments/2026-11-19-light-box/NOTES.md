@@ -440,7 +440,7 @@ above (E-PM2 manual p.57 and the firmware's texts; each walked in the emulator).
    mode2: ▶ → ▲ to mode1 → OK. Close the menu. (Another firmware: skip this step.)
 2. Update the firmware as usual. Then MENU → [SETUP] → OK → ▼ to Setup Menu (the wrench) → ▶ → ▼ to Firmware → ▶.
    Expected: "Body : 1.6  EPM2Mod 2026.11.28". Another date: the update did not take; flash again.
-3. Take two photos (any subject; JPEG or RAW+JPEG). One in P is the normal photo of step 10.
+3. Take two photos (any subject; JPEG or RAW+JPEG). One in P is the normal photo of step 11.
 4. MENU → [SETUP] → OK → ▼ to Custom Menu → ▶ → ▼ to D. Disp/♪/PC → ▶, then ▼ through the rows.
    Expected: LV Close Up Mode is followed by Backlit LCD: no ▶ Close Up Mode row.
 5. ▲ to ▦/Info Settings → ▶ → ▶ Info (the first row) → ▶.
