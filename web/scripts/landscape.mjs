@@ -22,9 +22,9 @@ const rows = fs
   .split('\n')
   .filter((line) => /^\| \d{4} \|/.test(line))
   .map((line) => {
-    const [year, camera, projects] = line
+    const [year, camera, , projects] = line
       .split('|')
-      .slice(1, 4)
+      .slice(1, 5)
       .map((cell) => cell.trim())
     const names = projects.split(/,\s*(?![^[]*\])/).map((p) => ({
       name: p
@@ -141,7 +141,14 @@ await page.evaluate(() => {
     d += `M ${x1} ${y1} H ${x1 + G - R} A ${R} ${R} 0 0 1 ${x1 + G} ${y1 + R} V ${mid - R} A ${R} ${R} 0 0 1 ${x1 + G - R} ${mid}`
     d += ` H ${x2 - G + R} A ${R} ${R} 0 0 0 ${x2 - G} ${mid + R} V ${y2 - R} A ${R} ${R} 0 0 0 ${x2 - G + R} ${y2} H ${x2}`
   }
-  document.getElementById('bends').innerHTML = `<path d="${d}" fill="none" stroke="#000" stroke-width="4"/>`
+  // an arrow at the end of the last line: the timeline goes on
+  const last = [...lines.at(-1).querySelectorAll('.year')].at(-1).getBoundingClientRect()
+  const ax = last.right - main.left
+  const ay = last.bottom - 2 - main.top
+  const arrow = `M ${ax} ${ay} H ${ax + 30} M ${ax + 14} ${ay - 14} L ${ax + 32} ${ay} L ${ax + 14} ${ay + 14}`
+  document.getElementById('bends').innerHTML =
+    `<path d="${d}" fill="none" stroke="#000" stroke-width="4"/>` +
+    `<path d="${arrow}" fill="none" stroke="#000" stroke-width="4" stroke-linecap="square"/>`
 })
 await page.screenshot({ path: OUT, fullPage: true })
 await browser.close()
