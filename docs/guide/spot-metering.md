@@ -1,7 +1,7 @@
 # Spot Metering
 
-Spot metering measures the light at your AF point, not at the centre, so an off-centre subject gets the right
-exposure without recomposing.
+Spot metering reads the light where you focus, so a subject away from the center of the frame is exposed correctly
+without recomposing.
 
 ## Setup
 
@@ -22,13 +22,13 @@ If the menu has no Custom Menu tab (gears icon), enable it in **MENU â†’ SETUP â
    - **Tap the subject** on the screen: the spot moves to the point you tap.
    - Or press **LEFT** and move a single AF target with the arrow keys: the spot moves with the target.
 
-Rows set to **Off** (the default) meter at the centre, as before.
+A mode whose row is **Off** (the default) meters at the center of the frame.
 
 ## Limits
 
-- In **All Targets** with no point tapped, the camera meters at the centre, as before.
+- In **All Targets** with no point tapped, the camera meters at the center of the frame.
 - Faces are ignored: with **Face Priority** on, the camera meters at the AF point, not at the face.
-- The row is greyed out in **iAUTO**.
+- The row is grayed out in **iAUTO**.
 - The **Spot Metering** row's name is English in every menu language.
 
 For implementation details, see the [notes](../../experiments/2026-11-24-af-spot-metering/NOTES.md).
