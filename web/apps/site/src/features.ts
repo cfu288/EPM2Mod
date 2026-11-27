@@ -79,7 +79,7 @@ export const features: Feature[] = [
   {
     id: 'spot-metering',
     name: 'Spot metering at the AF point',
-    summary: 'The right exposure for an off-centre subject, without recomposing.',
+    summary: 'Correct exposure for an off-center subject, without recomposing.',
     steps: [
       'MENU → SETUP → Custom Menu → E. Exp/▣/ISO → Spot Metering.',
       'Select Spot, Spot Hilight or Spot Shadow, press RIGHT, choose On, and press OK.',
