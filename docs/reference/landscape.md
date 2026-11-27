@@ -2,23 +2,32 @@
 
 ![A timeline of Olympus and OM SYSTEM cameras that have custom firmware projects, from the E-PL3 in 2011 to the OM-5 Mark II in 2025](../images/landscape.png)
 
-The list holds the Olympus custom firmware projects we know of: those on GitHub, in the [OM Firmware Atlas](https://github.com/xulfr/om-firmware-atlas) and in a [43rumors roundup](https://www.43rumors.com/new-mft-hacking-roundup-e-pm2-gains-focus-peaking-e-p7-gets-150mbps-4k-and-more-om-3-upgrades/), on 2026-11-21.
+The list holds the Olympus custom firmware projects we know of on 2026-11-26: those on GitHub, in the [OM Firmware Atlas](https://xulfr.github.io/om-firmware-atlas/), in Caduceus's [list of ports](https://github.com/cakelesscoder/caduceus-ep7/blob/main/docs/BODIES.md) and in the 43rumors roundups of [2026-11-21](https://www.43rumors.com/new-mft-hacking-roundup-e-pm2-gains-focus-peaking-e-p7-gets-150mbps-4k-and-more-om-3-upgrades/) and [2026-11-26](https://www.43rumors.com/micro-four-thirds-hacking-update-new-film-controls-focus-stacking-and-more/).
+
+[db firmware](https://db-firmware-support.vercel.app/en) ([releases](https://github.com/azqeurio/om-c-firmware/releases)) is one desktop tool that patches 24 bodies, from the E-PL5 to the OM-5 Mark II. The E-PM2 is not one of them. It is not repeated in each row below.
 
 | Announced | Camera | Projects |
 |---|---|---|
 | 2011 | E-PL3 | [E-PL3 research](https://github.com/sympho-ru/olympus-e-pl3-research) (research only) |
 | 2012 | E-PM2 | **EPM2Mod** |
+| 2014 | E-M10 | [om10mi-mods](https://meghnus.github.io/om10mi-mods/lut/), [E-M10 research](https://github.com/matozoid/em10_1) (research only) |
+| 2015 | E-M5 Mark II | [E-M5 II research](https://github.com/harshmandan/em5ii-fw) (research only) |
+| 2015 | E-M10 Mark II | [fenykl](https://github.com/atx/fenykl) |
 | 2016 | PEN-F | [PEN-F HSL](https://github.com/fishcu/oly_fw_analysis/releases) |
-| 2019 | E-M1X | [db firmware](https://github.com/azqeurio/om-c-firmware/releases) |
+| 2016 | E-M1 Mark II | [Caduceus port](https://github.com/emudojo/caduceus) (research only) |
+| 2017 | E-M10 Mark III | [battery icon fix](https://github.com/adrian3/olympus-e-m10-mark-iii-battery-icon-fix) |
+| 2018 | E-PL9 | [epl9-lab](https://github.com/RemeraLl1/epl9-lab) (research only) |
+| 2019 | E-M1X | [em1x-mod](https://github.com/bk2gf59w5d-ui/em1x-mod/releases) |
 | 2019 | E-M5 Mark III | [E-M5 III notes](https://github.com/nsud-dev/olympus-firmware-notes) (research only) |
-| 2021 | E-P7 | [Caduceus](https://github.com/cakelesscoder/caduceus-ep7/releases), [db firmware](https://github.com/azqeurio/om-c-firmware/releases) |
-| 2022 | OM-1 | [db firmware](https://github.com/azqeurio/om-c-firmware/releases) |
-| 2022 | OM-5 | [db firmware](https://github.com/azqeurio/om-c-firmware/releases) |
-| 2024 | OM-1 Mark II | [db firmware](https://github.com/azqeurio/om-c-firmware/releases) |
-| 2025 | OM-3 | [Caduceus](https://github.com/androidfanman/caduceus-om3/releases), [db firmware](https://github.com/azqeurio/om-c-firmware/releases) |
-| 2025 | OM-5 Mark II | [Caduceus](https://github.com/xulfr/caduceus-om5/releases), [db firmware](https://github.com/azqeurio/om-c-firmware/releases), [OMKit](https://github.com/necrostaz/omkit/releases) |
+| 2020 | E-M1 Mark III | [E-M1 III Mod Builder](https://github.com/dfeldt91-blip/E-M1-Miii/releases), [E-M1 III research](https://github.com/nivag8899/olympus-em1m3-research) (research only) |
+| 2021 | E-P7 | [Caduceus](https://cakelesscoder.github.io/caduceus-ep7/) |
+| 2022 | OM-1 | [OM Startrack](https://github.com/kingoflolz/om-startrack/releases) |
+| 2022 | OM-5 | [Caduceus port](https://github.com/tadejs/caduceus-om5) (research only), [OM-5 patches](https://github.com/przestaw/OM-5-firmware-patches) (research only) |
+| 2024 | OM-1 Mark II | [OM Startrack](https://github.com/kingoflolz/om-startrack/releases) |
+| 2025 | OM-3 | [Caduceus](https://androidfanman.github.io/caduceus-om3/), [Nostalgia-OM](https://github.com/SengokuCola/Nostalgia-OM/releases) |
+| 2025 | OM-5 Mark II | [Caduceus](https://xulfr.github.io/caduceus-om5/), [OMKit](https://github.com/necrostaz/omkit/releases), [JP English research](https://github.com/aabramovsky/om5-ii-jp-english-research) (research only) |
 
-Sources for the years: [E-PL3](https://petapixel.com/2011/06/30/olympus-announces-three-new-pens-the-e-p3-e-pl3-and-e-pm1/), [E-PM2](https://www.bgr.com/general/olympus-pen-e-pl5-and-e-pm2-release-date-october/), [PEN-F](https://old.imaging-resource.com/news/2016/01/27/brains-meets-beauty-new-olympus-pen-f-offers-premium-design-with-a-healthy), [E-M1X](https://www.sansmirror.com/newsviews-2/newsviews/2019-mirrorless-camera/jan-mar-2019-mirrorless/olympus-introduces-pro-e.html), [E-M5 Mark III](https://newsshooter.com/2019/10/17/olympus-releases-om-d-e-m5-mark-iii), [E-P7](https://old.imaging-resource.com/news/2021/06/09/olympus-announces-pen-e-p7-camera-for-international-markets), [OM-1](https://petapixel.com/2022/02/14/om-digital-unveils-om-1-camera-with-a-new-sensor-and-quad-pixel-af), [OM-5](https://www.photographyblog.com/news/om_system_om_5), [OM-1 Mark II](https://www.capturemag.com.au/news/om-system-announces-om-1-mark-ii), [OM-3](https://petapixel.com/2025/02/05/om-system-om-3-is-a-stylish-more-fun-om-1-ii-with-nearly-all-the-performance), [OM-5 Mark II](https://petapixel.com/2025/06/16/the-om-system-om-5-mark-ii-is-a-refined-compact-travel-camera).
+Sources for the years: [E-PL3](https://petapixel.com/2011/06/30/olympus-announces-three-new-pens-the-e-p3-e-pl3-and-e-pm1/), [E-PM2](https://www.bgr.com/general/olympus-pen-e-pl5-and-e-pm2-release-date-october/), [PEN-F](https://old.imaging-resource.com/news/2016/01/27/brains-meets-beauty-new-olympus-pen-f-offers-premium-design-with-a-healthy), [E-M5 Mark II](https://www.engadget.com/2015/02/05/olympus-om-d-e-m5-mark-ii/), [E-M10 Mark II](https://photorumors.com/2015/08/25/olympus-om-d-e-m10-mark-ii-camera-officially-announced/), [E-M1X](https://www.sansmirror.com/newsviews-2/newsviews/2019-mirrorless-camera/jan-mar-2019-mirrorless/olympus-introduces-pro-e.html), [E-M5 Mark III](https://newsshooter.com/2019/10/17/olympus-releases-om-d-e-m5-mark-iii), [E-P7](https://old.imaging-resource.com/news/2021/06/09/olympus-announces-pen-e-p7-camera-for-international-markets), [OM-1](https://petapixel.com/2022/02/14/om-digital-unveils-om-1-camera-with-a-new-sensor-and-quad-pixel-af), [OM-5](https://www.photographyblog.com/news/om_system_om_5), [OM-1 Mark II](https://www.capturemag.com.au/news/om-system-announces-om-1-mark-ii), [OM-3](https://petapixel.com/2025/02/05/om-system-om-3-is-a-stylish-more-fun-om-1-ii-with-nearly-all-the-performance), [OM-5 Mark II](https://petapixel.com/2025/06/16/the-om-system-om-5-mark-ii-is-a-refined-compact-travel-camera).
 
 ## Why EPM2Mod Is Not a Fork
 
