@@ -108,3 +108,20 @@ description moved to `../2026-11-20-raw-edit-art-bkt/films-start-texts-artbkt.js
 
 Emulator limit seen again: after No at the end screen, playback shows "Picture Error" for the new JPEG, which the
 stand-ins leave empty; the pinned build of section 3 showed the same after a stock Current edit.
+
+## 6. The candidate made again on light-box-2 (2026-11-27)
+
+`light-box-2` (Light Box as one switch) will be the pinned build (PR #9), so `data/builds/artbkt.json` is now its 24
+specs plus `raw-edit-art-bkt-3`, label 2026.11.29. `raw-edit-art-bkt-3` is unchanged: Light Box's specs change no
+byte that ART BKT changes (op ranges compared, section 5). sha256
+`467b126ff0a857589a384d5931f7ad48f6d0dff010e715412c00e446d09502c0`.
+
+| Check | Result |
+|---|---|
+| `uv run epm2mod make artbkt` | free-space check PASS (0 FAIL), with the FIRST CODE line; boot-test PASS; update-path-test PASS |
+| `uv run python emulator/artbkt-test data/builds/artbkt.json` | PASS: 3 frames saved, error stop, Picture Mode back, ImageDescription per frame |
+| `uv run epm2mod lint artbkt` | 1 warning: first code |
+| `tools/ci.sh python` (base: feat/light-box) | every check passed; builds made and checked: artbkt, light-box-2 |
+
+The test sheet names this build; the way back is `light-box-2`.
+

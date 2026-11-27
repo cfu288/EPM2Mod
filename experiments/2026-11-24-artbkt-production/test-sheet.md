@@ -5,8 +5,8 @@ n = 0, 1, 3 and 12 with a Picture Mode row; Busy and its keys; a card that fills
 RAW+JPEG source; a RAW shot in ART mode; Dramatic Tone, Key Line and Watercolor; each JPEG's film name; and that
 nothing else changed. The Debug Log is On for the whole test.
 
-Build `data/builds/artbkt.json` (the pinned film-tables-fix with ART BKT, label 2026.11.29), sha256
-`dc1e31898fb0bc0a75c8a54d40a3cd25aa751dc104e1eeee0752ea7ce1afddd0`. On this host: `build/artbkt.BIN`, and the look pack
+Build `data/builds/artbkt.json` (light-box-2 with ART BKT, label 2026.11.29), sha256
+`467b126ff0a857589a384d5931f7ad48f6d0dff010e715412c00e446d09502c0`. On this host: `build/artbkt.BIN`, and the look pack
 `build/artbkt-card/EPM2LOOK.BIN` (sha256 `7b82124e415f624ecda0396aa8b8c1589bcdc9cfdf0c1be56cc937da5c25e451`:
 ART 1 Portra 400, ART 2 Velvia, ART 5 Double-X, Olympus's filters in the other entries). Menu paths: the camera
 manual (p. 28, 39, 61-63, 65, 100) and the emulator's screens of this build.
@@ -25,13 +25,13 @@ manual (p. 28, 39, 61-63, 65, 100) and the emulator's screens of this build.
 2. Flash (the command ejects the card):
 
    ```
-   epm2flash artbkt dc1e31898fb0bc0a75c8a54d40a3cd25aa751dc104e1eeee0752ea7ce1afddd0
+   epm2flash artbkt 467b126ff0a857589a384d5931f7ad48f6d0dff010e715412c00e446d09502c0
    ```
 
    Go back:
 
    ```
-   epm2flash film-tables-fix e029facb38569880c0cec4c16b0f295ca2a96214ed75900fe00585f6b0cedd28
+   epm2flash light-box-2 f86d135efadbf0ff7adc2b46ec66fa488ac89681beeb2e0f5a2a6fa46cee1fec
    ```
 
 3. Card in the camera, camera off. Hold **OK** and **ON/OFF** together; let go when the orange lamp lights. Wait
