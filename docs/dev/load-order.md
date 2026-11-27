@@ -245,7 +245,6 @@ Built:
 - **Pointers that an op rewrites, in whole or in part.** `hookcheck.py` looks at every 4-byte word that overlaps a
   patched early-loaded run: a stock pointer to early-loaded space that points to late-loaded space in the build
   fails, also when the op covers only some of its bytes. V tool (a test holds it).
-- **A cold start in the camera test:** `epm2mod lint` says so for a candidate that changes early-loaded bytes.
 
 Not built:
 
