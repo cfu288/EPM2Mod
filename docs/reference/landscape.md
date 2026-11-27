@@ -29,24 +29,34 @@ The list holds the Olympus custom firmware projects we know of on 2026-11-26: th
 
 Sources for the years: [E-PL3](https://petapixel.com/2011/06/30/olympus-announces-three-new-pens-the-e-p3-e-pl3-and-e-pm1/), [E-PM2](https://www.bgr.com/general/olympus-pen-e-pl5-and-e-pm2-release-date-october/), [PEN-F](https://old.imaging-resource.com/news/2016/01/27/brains-meets-beauty-new-olympus-pen-f-offers-premium-design-with-a-healthy), [E-M5 Mark II](https://www.engadget.com/2015/02/05/olympus-om-d-e-m5-mark-ii/), [E-M10 Mark II](https://photorumors.com/2015/08/25/olympus-om-d-e-m10-mark-ii-camera-officially-announced/), [E-M1X](https://www.sansmirror.com/newsviews-2/newsviews/2019-mirrorless-camera/jan-mar-2019-mirrorless/olympus-introduces-pro-e.html), [E-M5 Mark III](https://newsshooter.com/2019/10/17/olympus-releases-om-d-e-m5-mark-iii), [E-P7](https://old.imaging-resource.com/news/2021/06/09/olympus-announces-pen-e-p7-camera-for-international-markets), [OM-1](https://petapixel.com/2022/02/14/om-digital-unveils-om-1-camera-with-a-new-sensor-and-quad-pixel-af), [OM-5](https://www.photographyblog.com/news/om_system_om_5), [OM-1 Mark II](https://www.capturemag.com.au/news/om-system-announces-om-1-mark-ii), [OM-3](https://petapixel.com/2025/02/05/om-system-om-3-is-a-stylish-more-fun-om-1-ii-with-nearly-all-the-performance), [OM-5 Mark II](https://petapixel.com/2025/06/16/the-om-system-om-5-mark-ii-is-a-refined-compact-travel-camera).
 
-## Hardware Generations
+## Features by Generation
 
-A body's image processor generation (TruePic VI to X) decides what carries over between bodies. Within one generation
-a port is possible but still work: Caduceus finds 36 % of its E-P7 edits in the E-M5 III (below). Across
-generations a mod is rewritten. Every generation runs its
-main code on the same CPU family, Panasonic MN103 ([model matrix](model-matrix.md), which has the details and what
-each kind of mod needs per generation):
+What each generation has (Stock), what a mod adds (Mod), what its parts allow but nobody has built (Not done), what a
+missing part rules out (Not possible), and what no source settles yet (Unknown). The [model matrix](model-matrix.md#2-features-by-generation)
+gives what each feature needs, the evidence and a link for each cell.
 
-| TruePic | Years | Firmware | Processors | Mods in the table |
-|---|---|---|---|---|
-| VI | 2011–13 | 13.5–15 MiB, not compressed; the load address differs per body | Two MN103 cores, no network processor | EPM2Mod, E-PL3 research |
-| VII | 2013–16 | 17–20 MiB; the E-M5 II, E-M10 II and PEN-F use the load address of today's bodies | MN103 | om10mi-mods, fenykl, PEN-F HSL, E-M5 II research |
-| VIII | 2016–21 | 22–26 MiB | MN103, and a Cortex-A9 for networking | Caduceus E-P7 and its ports, em1x-mod, the E-PL9 and E-M5 III work, battery icon fix |
-| IX | 2020–25 | 19.5–26 MiB; the E-M1 III and OM-5 store compressed code | MN103, and a Cortex-A9 | E-M1 III Mod Builder, Caduceus and OMKit on the OM-5 II, the OM-5 ports |
-| X | 2022–25 | 32 MiB, compressed resources, a new hardware register map | MN103, and a Cortex-A53 running Linux | Caduceus OM-3, Nostalgia-OM, OM Startrack |
-
-The E-PM2 shares TruePic VI only with the E-PL3, E-PL5, E-PL6, E-P5, STYLUS 1 and TG-2. The E-PL3 is not in the
-firmware survey that the model matrix is made from; its generation comes from its announcement year (I).
+| Feature | VI (E-PM2) | VII | VIII | IX | X |
+|---|---|---|---|---|---|
+| Film simulations | Mod: EPM2Mod | Mod: om10mi-mods | Mod: Caduceus | Mod: Caduceus, OMKit | Mod: Caduceus, Nostalgia-OM |
+| 12-color editing, photos | Not done: the stage exists | Stock on the PEN-F; Mod: PEN-F HSL | Stock on the E-P7; Mod: Caduceus | Mod: Caduceus, OMKit | Stock on the OM-3; Mod: Caduceus |
+| 12-color editing, live view and movie | Not possible: the stage is in the photo pipeline only | Stock on the PEN-F | Stock on the E-P7; Mod: Caduceus | Mod: OMKit | Stock on the OM-3; Mod: Caduceus |
+| Looks or code from the card | Mod: EPM2Mod, fenykl (E-PL3) | Mod: fenykl (E-M10 II) | Mod: Caduceus | Mod: OMKit, Caduceus | Mod: Caduceus |
+| Focus peaking | Stock on the E-P5; Mod: EPM2Mod | Stock | Stock | Stock | Stock |
+| Live ND | Unknown | Not done | Stock on the E-M1X; Mod: Caduceus | Stock | Stock |
+| Silent shutter | Unknown | Stock on the E-M5 II, E-M10 II, PEN-F | Stock | Stock | Stock |
+| Pro Capture | Unknown | Mod: fenykl (E-M10 II) | Stock on the E-M1 II, E-M1X, E-M5 III | Stock | Stock |
+| High Res Shot | Unknown | Stock on the E-M5 II, PEN-F | Stock on the E-M1 II, E-M1X, E-M5 III | Stock | Stock |
+| Longer movie limit | Not done: one file of at most 4 GiB | Mod: om10mi-mods | Mod: Caduceus, em1x-mod | Mod: E-M1 III Mod Builder | Stock |
+| Log or flat movie profile | Not done: a flat curve in an ART entry, 8-bit | Mod: em10-fw | Stock on the E-M1 II, E-M1X; Mod: Caduceus | Stock | Stock |
+| 10-bit movie | Unknown | Unknown | Unknown | Unknown | Stock |
+| Grain and other per-pixel effects | Not done: about 1.5–4.5 s per photo | Mod: em10-fw | Mod: Caduceus | Mod: OMKit | Stock on the OM-3; Mod: Caduceus |
+| Wi-Fi | Stock on the E-P5; Not possible on the others: no radio | Stock | Stock | Stock | Stock |
+| Tethering | Not done: no capture handler | Stock on the E-M1, E-M5 II | Stock on the E-M1 II, E-M1X | Stock | Stock on the OM-1, OM-1 II |
+| Star tracking | Unknown | Not done | Not done | Not done | Mod: OM Startrack |
+| Aperture ring (Panasonic lenses) | Mod: db firmware (E-PL5, E-PL6, E-P5); Unknown on the E-PM2 | Mod: db firmware | Mod: db firmware | Mod: db firmware | Mod: db firmware |
+| Body IS off at start | Mod: EPM2Mod `no-ibis` (not camera-tested) | Not done | Not done | Not done | Not done |
+| Focus stacking with any lens | Not done: no bracketing or merge in stock | Stock on the E-M1 | Mod: em1x-mod, Caduceus port | Mod: E-M1 III Mod Builder | Not done |
+| Lowest shutter speed for Auto ISO | Mod: EPM2Mod | Stock on the PEN-F; Mod: db firmware | Mod: db firmware, Caduceus | Unknown | Unknown |
 
 ## Why EPM2Mod Is Not a Fork
 
