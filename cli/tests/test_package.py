@@ -147,9 +147,7 @@ class TinyRepo:
 
     def emulator_check(self, name: str, status: int) -> None:
         """Install a stand-in for emulator/NAME that exits with ``status``."""
-        script = (
-            f"import sys\nprint('{name}: stand-in', sys.argv[1])\nsys.exit({status})\n"
-        )
+        script = f"import sys\nprint('{name}: stand-in', *sys.argv[1:])\nsys.exit({status})\n"
         self.write(f"emulator/{name}", script.encode())
 
     def outputs(self) -> list[str]:
@@ -777,6 +775,16 @@ class BuildDescriptionTests(unittest.TestCase):
             builds.description_from_json("my-build", tested.to_json()), tested
         )
 
+    def test_boot_differs_round_trip_and_are_checked(self) -> None:
+        entry = {"reference": "a", "image": "b", "why": "c"}
+        raw = {**self.GOOD, "boot_differs": [entry]}
+        described = builds.description_from_json("b", raw)
+        self.assertEqual(described.boot_differs, (("a", "b", "c"),))
+        self.assertEqual(described.to_json(), raw)
+        for bad in ({"reference": "a", "image": "b"}, {**entry, "why": ""}, "a"):
+            with self.subTest(bad=bad), self.assertRaises(BuildError):
+                builds.description_from_json("b", {**self.GOOD, "boot_differs": [bad]})
+
     def test_first_code_is_true_or_absent(self) -> None:
         marked = builds.description_from_json("b", {**self.GOOD, "first_code": True})
         self.assertTrue(marked.first_code)
@@ -1154,6 +1162,22 @@ class MakeTests(RepoCase):
         text = "\n".join(lines)
         self.assertIn("check data/specs/a.json --first-code", text)
         self.assertIn("FIRST CODE", text)
+
+    def test_boot_differs_reach_the_emulator_checks(self) -> None:
+        self.repo.free_space_tool(0)
+        lines: list[str] = []
+        self.make(self.repo.candidate, log=lines.append)
+        self.assertNotIn("--declared", "\n".join(lines))  # without the field: as before
+        changed = builds.BuildDescription(
+            "probe",
+            "A probe",
+            ("data/specs/a.json",),
+            stock=TINY_STOCK.file_name,
+            boot_differs=(("BC transactions 9", "BC transactions 0", "no BC start"),),
+        )
+        lines.clear()
+        self.make(changed, log=lines.append)
+        self.assertIn("probe.BIN --declared", "\n".join(lines))
 
     def test_a_missing_spec_is_found_before_the_free_space_check(self) -> None:
         self.repo.free_space_tool(1)

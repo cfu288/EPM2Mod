@@ -45,7 +45,17 @@ from .paths import RepoPaths, is_repo_relative
 from .stock import StockFirmware, stock_named
 
 _NAME = re.compile(r"[a-z0-9][a-z0-9._-]*")
-_KEYS = {"what", "stock", "specs", "sha256", "camera_tested", "first_code", "label"}
+_KEYS = {
+    "what",
+    "stock",
+    "specs",
+    "sha256",
+    "camera_tested",
+    "first_code",
+    "label",
+    "boot_differs",
+}
+_DIFFER_KEYS = ("reference", "image", "why")
 _SUFFIX = ".json"
 
 
@@ -107,6 +117,8 @@ class BuildDescription:
         label: the date ``YYYY.MM.DD`` that the camera's Firmware screen shows
             after "EPM2Mod"; present exactly when ``specs`` lists the label spec.
         stock: the name of the stock firmware the build starts from (``stock.STOCK_FIRMWARE``).
+        boot_differs: the lines of the emulator's boot report that the build
+            changes on purpose: (stock's line, the build's line, why) each.
     """
 
     name: str
@@ -117,6 +129,7 @@ class BuildDescription:
     first_code: bool = False
     label: str | None = None
     stock: str = field(kw_only=True)
+    boot_differs: tuple[tuple[str, str, str], ...] = field(default=(), kw_only=True)
 
     def __post_init__(self) -> None:
         """Check the description. Every instance is valid.
@@ -207,6 +220,10 @@ class BuildDescription:
             raw["first_code"] = True
         if self.label is not None:
             raw["label"] = self.label
+        if self.boot_differs:
+            raw["boot_differs"] = [
+                dict(zip(_DIFFER_KEYS, pair)) for pair in self.boot_differs
+            ]
         return raw
 
 
@@ -248,7 +265,31 @@ def description_from_json(name: str, raw: Any) -> BuildDescription:
         first_code="first_code" in raw,
         label=None if raw.get("label") is None else check_label(raw["label"], name),
         stock=stock,
+        boot_differs=_boot_differs(raw.get("boot_differs", []), name),
     )
+
+
+def _boot_differs(value: object, where: str) -> tuple[tuple[str, str, str], ...]:
+    """Return the pairs of a ``boot_differs`` list, else raise.
+
+    Each entry is an object with the strings ``reference`` (the stock report's
+    line), ``image`` (the build's line) and ``why`` (one line).
+    """
+    if not isinstance(value, list):
+        raise BuildError(f"{where}: 'boot_differs' must be a list")
+    pairs = []
+    for entry in value:
+        if (
+            not isinstance(entry, dict)
+            or set(entry) != set(_DIFFER_KEYS)
+            or not all(isinstance(entry[k], str) and entry[k] for k in _DIFFER_KEYS)
+        ):
+            raise BuildError(
+                f"{where}: each 'boot_differs' entry has the strings "
+                "'reference', 'image' and 'why'"
+            )
+        pairs.append((entry["reference"], entry["image"], entry["why"]))
+    return tuple(pairs)
 
 
 def load_description(path: Path) -> BuildDescription:

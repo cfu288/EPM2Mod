@@ -67,7 +67,7 @@ class PlanTests(unittest.TestCase):
             mock.patch.object(releasing, "_git", lambda paths, *args: answers[args[0]]),
             mock.patch.object(releasing, "stamp", self.stamp),
             mock.patch.object(releasing, "check_free_space", lambda paths, build: self.checked.append(build.label)),
-            mock.patch.object(releasing, "check_in_emulator", lambda paths, image: self.checked.append(image.name)),
+            mock.patch.object(releasing, "check_in_emulator", lambda paths, image, boot_differs=(): self.checked.append(image.name)),
             mock.patch.object(readme, "is_current", return_value=True),
             mock.patch.object(readme, "feature_problems", return_value=[]),
         ):
@@ -105,7 +105,7 @@ class PlanTests(unittest.TestCase):
         self.assertEqual(self.checked, ["2026.11.20", "probe.BIN"])  # the start-up and load-order checks ran
 
     def test_a_failed_start_up_check_stops_the_release(self) -> None:
-        def failed(paths: RepoPaths, image: Path) -> list[str]:
+        def failed(paths: RepoPaths, image: Path, boot_differs: object = ()) -> list[str]:
             raise BuildError("boot-test: TIMES MOVED: 2 time stamp(s)\nboot-test failed")
 
         self.checked = []
