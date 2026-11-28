@@ -32,6 +32,8 @@ export interface State {
   /** The furthest of CHOICE_STEPS reached: the timeline goes back and forward to any step up to it. */
   reached: number
   firmware: Firmware
+  /** EPM2Mod for a camera whose image stabilizer is broken (the Firmware step's Other options). */
+  noStabilizer: boolean
   zip: boolean
   /** The chosen card's path, '' for none. */
   card: string
@@ -49,6 +51,7 @@ export type Action =
   | { type: 'card'; card: string }
   | { type: 'cards'; cards: Card[] }
   | { type: 'firmware'; firmware: Firmware }
+  | { type: 'noStabilizer'; on: boolean }
   | { type: 'go'; step: StepId }
   | { type: 'customize'; on: boolean }
   | { type: 'make'; custom: boolean }
@@ -62,6 +65,7 @@ export const initial: State = {
   step: 'start',
   reached: 0,
   firmware: 'epm2mod',
+  noStabilizer: false,
   zip: false,
   card: '',
   customizing: false,
@@ -107,7 +111,10 @@ export function reduce(state: State, action: Action): State {
       return card === state.card ? state : { ...state, card }
     }
     case 'firmware':
-      return { ...state, firmware: action.firmware }
+      // the option belongs to the EPM2Mod firmware: another choice clears it
+      return { ...state, firmware: action.firmware, noStabilizer: state.noStabilizer && action.firmware === 'epm2mod' }
+    case 'noStabilizer':
+      return { ...state, noStabilizer: action.on && state.firmware === 'epm2mod' }
     case 'go':
       if (!canGo(state, action.step)) return state
       return {

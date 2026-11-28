@@ -86,4 +86,16 @@ describe('the installer flow', () => {
       'Put the SD card back in this computer, then select Refresh.',
     ])
   })
+
+  it('keeps the broken-stabilizer option only with the EPM2Mod firmware', () => {
+    const on = reduce(atFilms, { type: 'noStabilizer', on: true })
+    expect(initial.noStabilizer).toBe(false)
+    expect(on.noStabilizer).toBe(true)
+    expect(reduce(on, { type: 'go', step: 'firmware' }).noStabilizer).toBe(true)
+    expect(reduce(on, { type: 'firmware', firmware: 'epm2mod' }).noStabilizer).toBe(true)
+    const films = reduce(on, { type: 'firmware', firmware: 'films' })
+    expect(films.noStabilizer).toBe(false)
+    expect(reduce(films, { type: 'noStabilizer', on: true }).noStabilizer).toBe(false)
+    expect(reduce(on, { type: 'restart' }).noStabilizer).toBe(true)
+  })
 })

@@ -185,9 +185,43 @@ function StartStep(props: {
   )
 }
 
+/** The Other options of the EPM2Mod choice: open by itself when the option is on, so a chosen option is in view. */
+function StabilizerOption(props: { on: boolean; onChange: (on: boolean) => void }) {
+  const id = useId()
+  return (
+    <details open={props.on || undefined} className="mt-3 ml-7">
+      <summary className="cursor-pointer text-sm font-bold">Other options</summary>
+      <div className="mt-2 flex items-start gap-x-3">
+        <input
+          id={id}
+          type="checkbox"
+          aria-describedby={`${id}-line`}
+          checked={props.on}
+          onChange={(event) => {
+            props.onChange(event.target.checked)
+          }}
+          className="accent-ink mt-1 size-4"
+        />
+        <div>
+          <label htmlFor={id} className="block cursor-pointer text-sm">
+            My camera's image stabilizer is broken
+          </label>
+          <p id={`${id}-line`} className="text-ink-soft text-sm">
+            Choose this if the IS icon blinks when you turn the camera on. The camera then does not use its stabilizer.
+            On a camera whose stabilizer works, this turns stabilization off. To turn it back on, install EPM2Mod again
+            without this option.
+          </p>
+        </div>
+      </div>
+    </details>
+  )
+}
+
 function FirmwareStep(props: {
   firmware: Firmware
   onFirmware: (firmware: Firmware) => void
+  noStabilizer: boolean
+  onNoStabilizer: (on: boolean) => void
   onBack: () => void
   onNext: () => void
 }) {
@@ -212,7 +246,9 @@ function FirmwareStep(props: {
           onChoose={() => {
             props.onFirmware('epm2mod')
           }}
-        />
+        >
+          <StabilizerOption on={props.noStabilizer} onChange={props.onNoStabilizer} />
+        </Choice>
         <Choice
           group="firmware"
           title="Film simulations only"
@@ -510,7 +546,7 @@ export default function App() {
     // the firmware has Olympus's art filters: every EPM2Mod install gets a look file, loaded with Load Looks
     const wanted = firmware === 'original' ? [] : custom ? choicesOf(looks.items) : DEFAULT_CHOICES
     dispatch({ type: 'make', custom })
-    api.make(firmware, wanted, zip ? null : card).then(
+    api.make(firmware, wanted, zip ? null : card, state.noStabilizer).then(
       (started) => {
         dispatch({ type: 'job', job: started })
       },
@@ -581,6 +617,10 @@ export default function App() {
             firmware={firmware}
             onFirmware={(next) => {
               dispatch({ type: 'firmware', firmware: next })
+            }}
+            noStabilizer={state.noStabilizer}
+            onNoStabilizer={(on) => {
+              dispatch({ type: 'noStabilizer', on })
             }}
             onBack={() => {
               go('start')

@@ -64,8 +64,11 @@ async function json<T>(path: string, init?: RequestInit): Promise<T> {
 export const api = {
   build: () => json<Build>('/api/build'),
   cards: () => json<Card[]>('/api/cards'),
-  make: (firmware: Firmware, choices: string[], card: string | null) =>
-    json<Job>('/api/make', { method: 'POST', body: JSON.stringify({ firmware, choices, card }) }),
+  make: (firmware: Firmware, choices: string[], card: string | null, noStabilizer = false) =>
+    json<Job>('/api/make', {
+      method: 'POST',
+      body: JSON.stringify({ firmware, choices, card, no_stabilizer: noStabilizer }),
+    }),
   job: () => json<Job | null>('/api/job'),
   zip: async () => (await call('/api/zip')).blob(),
   ping: () => call('/api/ping'),

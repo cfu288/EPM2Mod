@@ -127,7 +127,7 @@ describe('the local app', () => {
     expect(screen.getByRole('heading', { name: 'Film simulations' })).toBeInTheDocument()
     expect(screen.getByText(/derived from/)).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Use the default film simulations' }))
-    expect(made).toEqual([{ firmware: 'epm2mod', choices: DEFAULT, card: CARD.path }])
+    expect(made).toEqual([{ firmware: 'epm2mod', choices: DEFAULT, card: CARD.path, no_stabilizer: false }])
     expect(await screen.findByRole('heading', { name: 'Install on the camera' })).toBeInTheDocument()
     const steps = screen.getByRole('list', { name: 'Install steps' })
     expect(steps).toHaveTextContent(
@@ -174,6 +174,24 @@ describe('the local app', () => {
     expect(screen.getByRole('heading', { name: 'Choose what to install' })).toBeInTheDocument()
   })
 
+  it('writes EPM2Mod for a broken image stabilizer from Other options', async () => {
+    const made = server()
+    const user = userEvent.setup()
+    render(<App />)
+    await next(user)
+    const option = screen.getByRole('checkbox', { name: "My camera's image stabilizer is broken" })
+    expect(option).not.toBeVisible() // Other options is closed
+    await user.click(screen.getByText('Other options'))
+    await user.click(option)
+    await next(user)
+    await user.click(screen.getByRole('button', { name: 'Back' }))
+    // back on the step, the chosen option is in view
+    expect(screen.getByRole('checkbox', { name: "My camera's image stabilizer is broken" })).toBeVisible()
+    await next(user)
+    await user.click(screen.getByRole('button', { name: 'Use the default film simulations' }))
+    expect(made).toEqual([{ firmware: 'epm2mod', choices: DEFAULT, card: CARD.path, no_stabilizer: true }])
+  })
+
   it('restores the original firmware without the film step', async () => {
     const made = server()
     const user = userEvent.setup()
@@ -182,7 +200,7 @@ describe('the local app', () => {
     await user.click(screen.getByRole('radio', { name: 'Olympus original' }))
     expect(screen.getByRole('navigation', { name: 'Steps' })).not.toHaveTextContent('Film simulations')
     await user.click(screen.getByRole('button', { name: 'Next' }))
-    expect(made).toEqual([{ firmware: 'original', choices: [], card: CARD.path }])
+    expect(made).toEqual([{ firmware: 'original', choices: [], card: CARD.path, no_stabilizer: false }])
     expect(await screen.findByRole('heading', { name: 'Install on the camera' })).toBeInTheDocument()
     expect(screen.getByRole('list', { name: 'Install steps' })).toHaveTextContent('such as Pop Art')
   })
@@ -205,7 +223,7 @@ describe('the local app', () => {
     await next(user)
     await next(user)
     await user.click(screen.getByRole('button', { name: 'Use the default film simulations' }))
-    expect(made).toEqual([{ firmware: 'epm2mod', choices: DEFAULT, card: OTHER.path }])
+    expect(made).toEqual([{ firmware: 'epm2mod', choices: DEFAULT, card: OTHER.path, no_stabilizer: false }])
   })
 
   it('asks for a card when none is plugged in', async () => {
@@ -228,7 +246,7 @@ describe('the local app', () => {
     expect(screen.getByText('The menu is full. Remove a film simulation (×) to add one.')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Write to the card' }))
     await waitFor(() => {
-      expect(made).toEqual([{ firmware: 'epm2mod', choices: DEFAULT, card: CARD.path }])
+      expect(made).toEqual([{ firmware: 'epm2mod', choices: DEFAULT, card: CARD.path, no_stabilizer: false }])
     })
   })
 
