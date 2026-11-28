@@ -1,0 +1,26 @@
+{
+ "name": "no-ibis",
+ "description": "For a body whose image stabilizer is broken: the firmware treats the body as one without a stabilizer, so it does not start or check the unit at power-on. Three bytes, the patch tested by the reporter of issue 7 on their body. See experiments/2026-11-27-no-ibis/NOTES.md.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0xe5fc3",
+   "expect": "01",
+   "new": "00",
+   "_addr": "0x7E506FE3",
+   "_note": "0x7E506FE2, called once by Usr0 at 0x7E503FA0: `mov 1,d0` -> `mov 0,d0`, so the stabilizer type 0x604F3464 is 0. BC start 0x7E53E130 then does not start the stage, and the updater prints NON_STAB and skips only the stabilizer's own firmware"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x11ccbe",
+   "expect": "c916",
+   "new": "cbcb",
+   "_addr": "0x7E53DCDE",
+   "_note": "BC sync request 30 (0x7E53DCD3, sent by the mechanism power control 0x7E517207/0x7E5172CE): the `bne` after `cmp 2,d0` (damage byte 0x60503AD1) -> two `nop`, so the request always takes the existing 'unavailable' path (reply 0x8202) and is never sent to the unit; it does not check the stabilizer type"
+  }
+ ]
+}
