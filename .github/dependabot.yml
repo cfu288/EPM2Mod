@@ -4,6 +4,10 @@ updates:
     directories: [/, /.github/actions/setup]
     schedule:
       interval: weekly
+    # One pull request a week updates every pinned action.
+    groups:
+      actions:
+        patterns: ['*']
     # The prefix gives a title that the PR title check accepts.
     commit-message:
       prefix: ci

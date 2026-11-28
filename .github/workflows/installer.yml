@@ -43,7 +43,7 @@ permissions:
 
 concurrency:
   # Each push gets its own group, because a newer run would otherwise replace a waiting one and leave its push unchecked.
-  group: installer-${{ github.event_name }}-${{ github.ref }}-${{ github.event_name == 'push' && github.sha || '' }}
+  group: installer-${{ github.ref }}-${{ github.event_name == 'push' && github.sha || '' }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
@@ -115,7 +115,8 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
-          python-version: '3.12' # It runs the smoke test only. setup-python has no 3.12.16 for macOS and Windows.
+          # This Python runs only the smoke test. setup-python has no 3.12.16 for macOS and Windows.
+          python-version: '3.12'
       - name: Download the zip
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:

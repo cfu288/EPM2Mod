@@ -38,7 +38,7 @@ jobs:
         with:
           path: build/toolchain
           key: mn103-binutils-${{ runner.os }}-${{ runner.arch }}-${{ steps.binutils.outputs.commit }}-${{ hashFiles('cli/src/epm2mod/init.py') }}
-      - name: Set up the clone
+      - name: Build the objdump and get the emulator and Olympus's firmware
         run: uv run epm2mod init
       - name: Run the checks
         env:

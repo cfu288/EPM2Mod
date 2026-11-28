@@ -21,8 +21,8 @@ permissions:
   contents: read
 
 concurrency:
-  # Each push gets its own group, because a newer run would otherwise replace a waiting one and leave its push unchecked.
-  group: site-${{ github.ref }}-${{ github.event_name == 'push' && github.sha || '' }}
+  # On main, a newer run replaces a waiting one, so the site is deployed in push order and the newest push wins.
+  group: site-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
@@ -61,7 +61,7 @@ jobs:
     permissions:
       pages: write
       id-token: write
-    # One deploy runs at a time and is never cut off. A newer deploy replaces a waiting one, so the newest site wins.
+    # A deploy that has started is never cut off.
     concurrency:
       group: site-deploy
       cancel-in-progress: false
