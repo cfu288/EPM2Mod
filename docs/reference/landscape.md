@@ -1,33 +1,65 @@
 # Olympus Custom Firmware
 
-![A timeline of Olympus and OM SYSTEM cameras that have custom firmware projects, from the E-PL3 in 2011 to the OM-5 Mark II in 2025](../images/landscape.png)
+![A timeline of Olympus and OM SYSTEM cameras that have custom firmware projects, one lane per TruePic generation, from the E-PL3 in 2011 to the OM-5 Mark II in 2025](../images/landscape.png)
 
 The list holds the Olympus custom firmware projects we know of on 2026-11-26: those on GitHub, in the [OM Firmware Atlas](https://xulfr.github.io/om-firmware-atlas/), in Caduceus's [list of ports](https://github.com/cakelesscoder/caduceus-ep7/blob/main/docs/BODIES.md) and in the 43rumors roundups of [2026-11-21](https://www.43rumors.com/new-mft-hacking-roundup-e-pm2-gains-focus-peaking-e-p7-gets-150mbps-4k-and-more-om-3-upgrades/) and [2026-11-26](https://www.43rumors.com/micro-four-thirds-hacking-update-new-film-controls-focus-stacking-and-more/).
 
 [db firmware](https://db-firmware-support.vercel.app/en) ([releases](https://github.com/azqeurio/om-c-firmware/releases)) is one desktop tool that patches 24 bodies, from the E-PL5 to the OM-5 Mark II. The E-PM2 is not one of them. It is not repeated in each row below.
 
-| Announced | Camera | Projects |
-|---|---|---|
-| 2011 | E-PL3 | [E-PL3 research](https://github.com/sympho-ru/olympus-e-pl3-research) (research only) |
-| 2012 | E-PM2 | **EPM2Mod** |
-| 2014 | E-M10 | [om10mi-mods](https://meghnus.github.io/om10mi-mods/lut/), [E-M10 research](https://github.com/matozoid/em10_1) (research only) |
-| 2015 | E-M5 Mark II | [E-M5 II research](https://github.com/harshmandan/em5ii-fw) (research only) |
-| 2015 | E-M10 Mark II | [fenykl](https://github.com/atx/fenykl) |
-| 2016 | PEN-F | [PEN-F HSL](https://github.com/fishcu/oly_fw_analysis/releases) |
-| 2016 | E-M1 Mark II | [Caduceus port](https://github.com/emudojo/caduceus) (research only) |
-| 2017 | E-M10 Mark III | [battery icon fix](https://github.com/adrian3/olympus-e-m10-mark-iii-battery-icon-fix) |
-| 2018 | E-PL9 | [epl9-lab](https://github.com/RemeraLl1/epl9-lab) (research only) |
-| 2019 | E-M1X | [em1x-mod](https://github.com/bk2gf59w5d-ui/em1x-mod/releases) |
-| 2019 | E-M5 Mark III | [E-M5 III notes](https://github.com/nsud-dev/olympus-firmware-notes) (research only) |
-| 2020 | E-M1 Mark III | [E-M1 III Mod Builder](https://github.com/dfeldt91-blip/E-M1-Miii/releases), [E-M1 III research](https://github.com/nivag8899/olympus-em1m3-research) (research only) |
-| 2021 | E-P7 | [Caduceus](https://cakelesscoder.github.io/caduceus-ep7/) |
-| 2022 | OM-1 | [OM Startrack](https://github.com/kingoflolz/om-startrack/releases) |
-| 2022 | OM-5 | [Caduceus port](https://github.com/tadejs/caduceus-om5) (research only), [OM-5 patches](https://github.com/przestaw/OM-5-firmware-patches) (research only) |
-| 2024 | OM-1 Mark II | [OM Startrack](https://github.com/kingoflolz/om-startrack/releases) |
-| 2025 | OM-3 | [Caduceus](https://androidfanman.github.io/caduceus-om3/), [Nostalgia-OM](https://github.com/SengokuCola/Nostalgia-OM/releases) |
-| 2025 | OM-5 Mark II | [Caduceus](https://xulfr.github.io/caduceus-om5/), [OMKit](https://github.com/necrostaz/omkit/releases), [JP English research](https://github.com/aabramovsky/om5-ii-jp-english-research) (research only) |
+| Announced | Camera | TruePic | Projects |
+|---|---|---|---|
+| 2011 | E-PL3 | VI | [E-PL3 research](https://github.com/sympho-ru/olympus-e-pl3-research) (research only) |
+| 2012 | E-PM2 | VI | **EPM2Mod** |
+| 2014 | E-M10 | VII | [om10mi-mods](https://meghnus.github.io/om10mi-mods/lut/), [E-M10 research](https://github.com/matozoid/em10_1) (research only) |
+| 2015 | E-M5 Mark II | VII | [E-M5 II research](https://github.com/harshmandan/em5ii-fw) (research only) |
+| 2015 | E-M10 Mark II | VII | [fenykl](https://github.com/atx/fenykl) |
+| 2016 | PEN-F | VII | [PEN-F HSL](https://github.com/fishcu/oly_fw_analysis/releases) |
+| 2016 | E-M1 Mark II | VIII | [Caduceus port](https://github.com/emudojo/caduceus) (research only) |
+| 2017 | E-M10 Mark III | VIII | [battery icon fix](https://github.com/adrian3/olympus-e-m10-mark-iii-battery-icon-fix) |
+| 2018 | E-PL9 | VIII | [epl9-lab](https://github.com/RemeraLl1/epl9-lab) (research only) |
+| 2019 | E-M1X | VIII | [em1x-mod](https://github.com/bk2gf59w5d-ui/em1x-mod/releases) |
+| 2019 | E-M5 Mark III | VIII | [E-M5 III notes](https://github.com/nsud-dev/olympus-firmware-notes) (research only) |
+| 2020 | E-M1 Mark III | IX | [E-M1 III Mod Builder](https://github.com/dfeldt91-blip/E-M1-Miii/releases), [E-M1 III research](https://github.com/nivag8899/olympus-em1m3-research) (research only) |
+| 2021 | E-P7 | VIII | [Caduceus](https://cakelesscoder.github.io/caduceus-ep7/) |
+| 2022 | OM-1 | X | [OM Startrack](https://github.com/kingoflolz/om-startrack/releases) |
+| 2022 | OM-5 | IX | [Caduceus port](https://github.com/tadejs/caduceus-om5) (research only), [OM-5 patches](https://github.com/przestaw/OM-5-firmware-patches) (research only) |
+| 2024 | OM-1 Mark II | X | [OM Startrack](https://github.com/kingoflolz/om-startrack/releases) |
+| 2025 | OM-3 | X | [Caduceus](https://androidfanman.github.io/caduceus-om3/), [Nostalgia-OM](https://github.com/SengokuCola/Nostalgia-OM/releases) |
+| 2025 | OM-5 Mark II | IX | [Caduceus](https://xulfr.github.io/caduceus-om5/), [OMKit](https://github.com/necrostaz/omkit/releases), [JP English research](https://github.com/aabramovsky/om5-ii-jp-english-research) (research only) |
 
 Sources for the years: [E-PL3](https://petapixel.com/2011/06/30/olympus-announces-three-new-pens-the-e-p3-e-pl3-and-e-pm1/), [E-PM2](https://www.bgr.com/general/olympus-pen-e-pl5-and-e-pm2-release-date-october/), [PEN-F](https://old.imaging-resource.com/news/2016/01/27/brains-meets-beauty-new-olympus-pen-f-offers-premium-design-with-a-healthy), [E-M5 Mark II](https://www.engadget.com/2015/02/05/olympus-om-d-e-m5-mark-ii/), [E-M10 Mark II](https://photorumors.com/2015/08/25/olympus-om-d-e-m10-mark-ii-camera-officially-announced/), [E-M1X](https://www.sansmirror.com/newsviews-2/newsviews/2019-mirrorless-camera/jan-mar-2019-mirrorless/olympus-introduces-pro-e.html), [E-M5 Mark III](https://newsshooter.com/2019/10/17/olympus-releases-om-d-e-m5-mark-iii), [E-P7](https://old.imaging-resource.com/news/2021/06/09/olympus-announces-pen-e-p7-camera-for-international-markets), [OM-1](https://petapixel.com/2022/02/14/om-digital-unveils-om-1-camera-with-a-new-sensor-and-quad-pixel-af), [OM-5](https://www.photographyblog.com/news/om_system_om_5), [OM-1 Mark II](https://www.capturemag.com.au/news/om-system-announces-om-1-mark-ii), [OM-3](https://petapixel.com/2025/02/05/om-system-om-3-is-a-stylish-more-fun-om-1-ii-with-nearly-all-the-performance), [OM-5 Mark II](https://petapixel.com/2025/06/16/the-om-system-om-5-mark-ii-is-a-refined-compact-travel-camera).
+
+## Features by Generation
+
+Each cell gives the default (Yes, Some bodies, No or Unknown), then + and the mods that add the feature. Features
+that more generations have by default come first. In the VI
+column the default is the E-PM2's. The [model matrix](model-matrix.md#2-features-by-generation) gives what each
+feature needs, the evidence and a link for each cell.
+
+![Features by generation: what each TruePic generation has by default, and what mods add on top](../images/features-by-generation.png)
+
+| Feature | VI (E-PM2) | VII | VIII | IX | X |
+|---|---|---|---|---|---|
+| Focus peaking | No + EPM2Mod | Yes | Yes | Yes | Yes |
+| Wi-Fi | No | Yes | Yes | Yes | Yes |
+| Silent shutter | Unknown | Some bodies | Yes | Yes | Yes |
+| High Res Shot | Unknown | Some bodies | Some bodies | Yes | Yes |
+| Log or flat movie profile | No | No + em10-fw | Some bodies + Caduceus | Yes | Yes |
+| Live ND | Unknown | No | Some bodies + Caduceus | Yes | Yes |
+| Pro Capture | Unknown | No + fenykl (E-M10 II) | Some bodies | Yes | Yes |
+| Tethering | No | Some bodies | Some bodies | Yes | Some bodies |
+| 12-color editing, photos | No | Some bodies + PEN-F HSL | Some bodies + Caduceus | No + Caduceus, OMKit | Some bodies + Caduceus |
+| 12-color editing, live view and movie | No | Some bodies | Some bodies + Caduceus | No + OMKit | Some bodies + Caduceus |
+| Longer movie limit | No | No + om10mi-mods | No + Caduceus, em1x-mod | No + E-M1 III Mod Builder | Yes |
+| 10-bit movie | Unknown | Unknown | Unknown | Unknown | Yes |
+| Grain and other per-pixel effects | No | No + em10-fw | No + Caduceus | No + OMKit | Some bodies + Caduceus |
+| Lowest shutter speed for Auto ISO | No + EPM2Mod | Some bodies + db firmware | No + db firmware, Caduceus | Unknown | Unknown |
+| Focus stacking with any lens | No | Some bodies | No + em1x-mod, Caduceus port | No + E-M1 III Mod Builder | No |
+| Film simulations | No + EPM2Mod | No + om10mi-mods | No + Caduceus | No + Caduceus, OMKit | No + Caduceus, Nostalgia-OM |
+| Looks or code from the card | No + EPM2Mod, fenykl (E-PL3) | No + fenykl (E-M10 II) | No + Caduceus | No + OMKit, Caduceus | No + Caduceus |
+| Aperture ring (Panasonic lenses) | Unknown + db firmware (E-PL5, E-PL6, E-P5) | No + db firmware | No + db firmware | No + db firmware | No + db firmware |
+| Star tracking | Unknown | No | No | No | No + OM Startrack |
+| Body IS off at start | No + EPM2Mod (untested) | No | No | No | No |
 
 ## Why EPM2Mod Is Not a Fork
 
