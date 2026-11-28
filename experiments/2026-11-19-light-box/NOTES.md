@@ -463,3 +463,110 @@ above (E-PM2 manual p.57 and the firmware's texts; each walked in the emulator).
     ▼ to Custom Menu → ▶ → ▼ to E. Exp/▣/ISO → ▶ → ▼ to Spot Metering → ▶.
     Expected: as on film-tables-fix; the Spot Metering page shows Spot, Spot Hilight and Spot Shadow with the values
     set before.
+
+## Light Box dial (2026-11-28)
+
+Emulator and desk only. Not flashed. On the pinned artbkt (light-box-2 + ART BKT) the owner saw the control dial in
+Light Box "sometimes zoom in and out, sometimes flip to the next photo"; the same on light-box. The owner: "Fix light
+box". The build is `light-box-dial`: artbkt's 25 specs + `light-box-dial` (`gen/light-box/mkspec.py`), label
+2026.12.02.
+
+### What the dial does (stock code)
+
+Read from SS_PLAY_SINGLE's descriptor 0x7EFD7BAC and run with `scripts/dialprobe.mjs` (**V**, unless marked):
+
+1. The dial posts ST_CHANGE_MAIN_DIAL 0x9032; the filter 0x7EDC4F9D makes the delta ±1. `0x7ED01A81` reads setting
+   342 (Custom Menu B, Dial Function, ▶ row, E-PM2 manual p.71); in a new settings state it is 6, the zoom choice
+   (manual p.38: the dial zooms in playback).
+2. State 16, the two-picture view (green "1x"): the dial handler 0x7EDBAF84 calls 0x7ED0DFA0 (342 = 6): no zoom out at
+   1x, no zoom in at 14x, else state 20, whose entry 0x7EDBA14F calls CPlayLightBox::zoomImage 0x7ED05F5E once, then
+   state 17. With 342 ≠ 6 it calls 0x7ED0E05B and the dial moves the right picture (the E-PL5's design, its manual
+   p.39). ◀ ▶ move the right picture, ▲ ▼ scroll, OK sets the right picture as the left one (state 21).
+3. State 17, the zoom view (yellow "Nx" with ▲▼ marks): the dial handler 0x7EDBD84E calls zoomImage itself
+   (0x7EDBD8F5) and returns 20, whose entry zooms again with the same delta. So a detent was two steps (2x, 5x, 10x,
+   14x). ▲ 0x7EDBD761 and ▼ 0x7EDBD794 zoom one step themselves and return 20 too; the entry then zooms by 0. OK and
+   INFO go back to state 16 with the zoom kept.
+4. At the ends the entry's zoom asks for the ratio already shown. The play component (0x7EB35BED) answers
+   API_REDUCE_MIN or API_ENLARGE_MAX; zoomImage posts GUI_PLAY_ERROR 0x9A40 (0x7ED060A0). Its handler 0x7EDBCF4B maps
+   states 16 and 18-21 to 16, but state 17 to getJumpState(0) (0x7EDBCF96), which returns 15: Light Box starts again,
+   the right picture becomes the left one and the right shows the next photo. That is the "flip". In the emulator
+   0x9A40 always arrived in state 17; on the camera the order of events may differ (**U**), which may be the
+   "sometimes".
+5. With INFO held, a dial turn steps the INFO display cycle (getJumpState(1) clockwise, the twin 0x7ED09616(1)
+   counterclockwise) on every build. `light-box-switch`'s 4 bytes are not on the zoom path: getJumpState(0) returns 15
+   through the state-15 step, which does not reach 0x7ED0940A.
+
+### What was built
+
+`data/specs/light-box-dial.json`, 2 ops, 27 bytes in segment 3 (`hookcheck.segment()`), no new code area:
+
+| Address | Bytes | Why it is safe |
+|---|---|---|
+| 0x7EDBD8F5 | `dd 69 86 f4 ff b0 a8` (call 0x7ED05F5E,[d2,a2,a3],168) → `cb` ×7 | The handler sets d2 = 20 before the call; zoomImage saves and restores d2, and after the call only d2 is read (`extbu d2; mov d2,d0; exthu d0; ret [d2,d3],12`). The call's frame is its own, so the stack is unchanged. No branch goes into the 7 bytes (the stay and INFO paths branch to 0x7EDBD8FC). The handler's checks before it (0x7EDBD8D3–0x7EDBD8E9) still stop at 1x and 14x |
+| 0x7EDBCF76 | `a0 10 c8 12 a0 12 c8 0e a0 13 c8 0a a0 14 c8 06 a0 15 c9 06` (cmp 16, 18, 19, 20, 21) → `28 f0 a0 05 c7 10 ca 12` + `cb` ×12 (add -16,d0; cmp 5,d0; bls 0x7EDBCF8A; bra 0x7EDBCF8E) | States 16-21 go to "state 16" (0x7EDBCF8A), the others to getJumpState(0) as before (states 1, 2 and 15 are tested earlier). d0 is not read after the test: 0x7EDBCF8A sets d2, 0x7EDBCF8E's path clears d0 first. The 12 `nop` after the `bra` are not reached |
+
+The first op alone fixed the dial (two steps per detent, no restart). It did not stop the restart for ▲ and ▼ in the
+zoom view: ▲ to 14x and ▼ to 1x still restarted Light Box in the emulator, because the state-20 entry zooms by 0
+after their own step. The second op is the error handler's own rule for 16 and 18-21, applied to 17.
+
+### Checks
+
+sha256 **`1b45771d883b80ec66d5cf79aa00665e714846c68ad473c9c548b2975f45c770`** (`uv run epm2mod make light-box-dial`).
+
+| Check | Result |
+|---|---|
+| `uv run epm2mod make light-box-dial` | exit 0; free-space check PASS (0 FAIL); boot-test PASS; update-path-test PASS |
+| `uv run python emulator/hookcheck.py data/builds/light-box-dial.json` | exit 0; load-order check 62 transfers, 0 not in the pinned build |
+| `uv run epm2mod lint light-box-dial` | 0 warnings |
+| `uv run epm2mod make artbkt` | the pinned 467b126f… |
+| `CI_BASE=origin/feat/artbkt-production tools/ci.sh python` | exit 0: "every check passed. Builds made and checked: artbkt light-box-dial" |
+
+### Emulator runs (`scripts/dialprobe.mjs`, three E-PM2 JPEGs, Overall Off, Light Box On, ▶ once: pair 3 / 2)
+
+| Run | artbkt | light-box-dial |
+|---|---|---|
+| Zoom view (yellow): dial clockwise ×8, then counterclockwise ×8 | 2x, 5x, 10x, then 0x9A40 in state 17 and a restart at 1x with the pair 2 / 3; counterclockwise from 2x: another restart (pair 3 / 1) | 2x, 3x, 5x, 7x, 10x, 14x, 14x, 14x; 10x, 7x, 5x, 3x, 2x, 1x, 1x, 1x; no 0x9A40; pair 3 / 2 throughout; OK: state 16 at 1x |
+| Two-picture view (green): OK before each detent, clockwise ×7 and counterclockwise ×7 | 2x … 14x, 14x; 10x … 1x, 1x; no 0x9A40 | the same |
+| ▲ ×7 from 2x, then ▼ ×8 (zoom view) | 3x, 5x, 7x, 10x, then 0x9A40 and a restart at 1x | 3x, 5x, 7x, 10x, 14x (0x9A40 in state 17 → state 16 at 14x, pair kept); then state 16, where ▲ ▼ scroll |
+| Dial clockwise ×2, then ▼ ×3 (zoom view) | 2x, 5x; ▼ 3x, 2x, then 0x9A40 and a restart at 1x with the pair 2 / 3 | 2x, 3x; ▼ 2x, then 0x9A40 in state 17 → state 16 at 1x, pair 3 / 2; ▼ again: state 16 |
+| The first op alone (sha 9aa6d680…, not kept) | | dial: as light-box-dial; ▲ to 14x and ▼ to 1x in the zoom view: 0x9A40 and a restart |
+| INFO held, dial ±3; then ◀ ▶ | display cycle 16 → 6 → 8 → 16 and back; ◀ ▶ change the right picture | the same; screenshots equal to artbkt's |
+
+In the green view, OK at 14x or at 1x (state 16) puts the right picture on the left: that is OK's job there (rule 2),
+on both builds.
+
+### Camera test (draft)
+
+Flash: `epm2flash light-box-dial 1b45771d883b80ec66d5cf79aa00665e714846c68ad473c9c548b2975f45c770`
+
+Go back: `epm2flash artbkt 467b126ff0a857589a384d5931f7ad48f6d0dff010e715412c00e446d09502c0`
+
+The card needs at least three photos. Light Box stays On from artbkt; if it is Off, step 3 turns it on.
+
+1. Update the firmware as usual. Then MENU → [SETUP] → OK → ▼ to Setup Menu (the wrench) → ▶ → ▼ to Firmware → ▶.
+   Expected: "Body : 1.6  EPM2Mod 2026.12.02". Another date: the update did not take; flash again.
+2. Playback button, then INFO, one press at a time, up to six presses.
+   Expected: two pictures side by side, the right one in a green frame, a green "1x" at the bottom left.
+   Never: go to step 3.
+3. (Only if step 2 found no two pictures.) MENU → [SETUP] → OK → ▼ to Custom Menu → ▶ → ▼ to D. Disp/♪/PC → ▶ → ▼ to
+   ▦/Info Settings → ▶ → ▶ Info → ▶ → ▼ to Light Box → ▶ → ▼ to On → OK → OK. Close the menu with MENU. Then step 2.
+4. Press ▶ once. Note the picture numbers at the bottom of the left and the right picture.
+5. Turn the control dial clockwise one click at a time, slowly, ten clicks.
+   Expected: the label turns yellow with small ▲▼ marks and reads 2x, 3x, 5x, 7x, 10x, 14x, then stays at 14x. The
+   picture numbers stay as in step 4.
+   Two steps per click (2x, 5x, 10x): the build is not the new one. Back to 1x with other numbers: the restart is
+   still there; note the click.
+6. Turn the dial counterclockwise one click at a time, ten clicks.
+   Expected: 10x, 7x, 5x, 3x, 2x, 1x, then it stays at 1x (yellow). The picture numbers stay as in step 4.
+7. Press OK.
+   Expected: the label turns green "1x"; the numbers stay.
+8. Turn the dial clockwise one click, press OK; repeat until 14x, then one more click and OK.
+   Expected: each click is one step; the green label shows the zoom after each OK. The last OK, at 14x, puts the
+   right picture on the left (OK's job in the green view).
+9. Press ▲ and ▼ in the yellow view: turn the dial one click (yellow), then ▲ until 14x and once more; then ▼ until
+   1x and once more.
+   Expected: ▲ and ▼ zoom one step; at 14x or 1x the label turns green and the numbers stay.
+10. With the label green at 1x: ◀ and ▶, then OK.
+    Expected: ◀ ▶ change the right picture; OK puts it on the left, as on artbkt.
+11. Hold INFO and turn the dial one click, then release INFO.
+    Expected: the display changes (one picture), as on artbkt; INFO alone brings Light Box back in the cycle.
