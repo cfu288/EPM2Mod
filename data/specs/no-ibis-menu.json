@@ -1,0 +1,44 @@
+{
+ "name": "no-ibis-menu",
+ "description": "For no-ibis: the Image Stabilizer settings (Shooting Menu 2's row, setting 296; still IS, setting 157, which Live Control checks; movie IS, setting 160) get a row check that always fails, so the menus no longer offer a stabilizer the body does not use. 7 bytes of menu data in segment 2: check-table entry 62, which no setting uses, points to an existing function that returns 1, and each of the three settings' check 84 becomes check 62. See experiments/2026-11-27-no-ibis/NOTES.md.",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7fb440",
+   "expect": "36989e7e",
+   "new": "e013467e",
+   "_addr": "0x7EC1C460",
+   "_note": "app_check function table 0x7EC1C368, entry 62: 0x7E9E9836 (`clr d0; retf`, in no setting's check list; the table's three readers 0x7E9E8CCD, 0x7E9E9208, 0x7E9EA144 index it only through those lists) -> 0x7E4613E0 (kernel, `mov 1,d0; retf [],0`): the check always fails"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7fb7a0",
+   "expect": "54",
+   "new": "3e",
+   "_addr": "0x7EC1C7C0",
+   "_note": "check list of setting 296 (Image Stabilizer, Shooting Menu 2), [2, 84] at 0x7EC1C7BF, used by no other setting: 84 -> 62"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7fbff5",
+   "expect": "54",
+   "new": "3e",
+   "_addr": "0x7EC1D015",
+   "_note": "check list of setting 157 (still IS, checked by Live Control), [2, 84] at 0x7EC1D014, used by no other setting: 84 -> 62"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x7fbdcd",
+   "expect": "54",
+   "new": "3e",
+   "_addr": "0x7EC1CDED",
+   "_note": "check list of setting 160 (movie IS), [2, 18, 22, 29, 84] at 0x7EC1CDE9, used by no other setting: 84 -> 62"
+  }
+ ]
+}

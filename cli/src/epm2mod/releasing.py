@@ -181,7 +181,7 @@ def plan(
             with tempfile.TemporaryDirectory() as folder:
                 path = Path(folder) / f"{released.name}.BIN"
                 write_bytes(path, image, BuildError)
-                check_in_emulator(paths, path)
+                check_in_emulator(paths, path, released.boot_differs)
             if released.sha256 != chosen.sha256:
                 tested = (chosen.sha256, chosen.label)
         except Epm2ModError as error:

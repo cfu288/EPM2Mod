@@ -66,7 +66,15 @@ from .errors import (
     NotFoundError,
     UnavailableError,
 )
-from .fileio import Log, describe_os_error, part_path, read_bytes, silent, write_bytes
+from .fileio import (
+    Log,
+    describe_os_error,
+    part_path,
+    read_bytes,
+    silent,
+    write_bytes,
+    write_json,
+)
 from .hashing import sha256_bytes
 from .label import with_label
 from .looks import lookfile
@@ -185,13 +193,18 @@ def check_free_space(paths: RepoPaths, description: BuildDescription) -> str:
 _EMULATOR_NOT_SET_UP = 3
 
 
-def check_in_emulator(paths: RepoPaths, image: Path) -> list[str]:
+def check_in_emulator(
+    paths: RepoPaths,
+    image: Path,
+    boot_differs: tuple[tuple[str, str, str], ...] = (),
+) -> list[str]:
     """Start a firmware image in the emulator: the normal start and the update path.
 
     The checks are the project's emulator checks, each run as ``CHECK IMAGE``: the
     normal start and the update path. An image that does not start as the
     stock firmware does, or does not find an update file with OK held, could
-    leave the camera with no way back.
+    leave the camera with no way back. A build's ``boot_differs`` (the boot
+    report lines it changes on purpose) go to each check as ``--declared FILE``.
 
     Returns:
         One line for each check: its result.
@@ -201,6 +214,19 @@ def check_in_emulator(paths: RepoPaths, image: Path) -> list[str]:
             A build that was not started in the emulator is not made.
         BuildError: if a check fails.
     """
+    with tempfile.TemporaryDirectory() as folder:
+        declared: list[str] = []
+        if boot_differs:
+            declared = ["--declared", str(Path(folder) / "declared")]
+            keys = ("reference", "image", "why")
+            write_json(Path(declared[1]), [dict(zip(keys, p)) for p in boot_differs])
+        return _run_emulator_checks(paths, image, declared)
+
+
+def _run_emulator_checks(
+    paths: RepoPaths, image: Path, declared: list[str]
+) -> list[str]:
+    """Run each emulator check as ``CHECK IMAGE [--declared FILE]``; see ``check_in_emulator``."""
     lines = []
     for tool in paths.emulator_checks:
         not_run = UnavailableError(
@@ -211,7 +237,7 @@ def check_in_emulator(paths: RepoPaths, image: Path) -> list[str]:
             raise not_run
         try:
             done = subprocess.run(
-                [sys.executable, str(tool), str(image)],
+                [sys.executable, str(tool), str(image), *declared],
                 cwd=paths.root,
                 capture_output=True,
                 text=True,
@@ -296,12 +322,14 @@ def firmware(
             "Write the sha256 in the camera log before you flash it."
         )
         if emulator_image is not None:
-            lines = check_in_emulator(checkout, emulator_image)
+            lines = check_in_emulator(
+                checkout, emulator_image, description.boot_differs
+            )
         else:
             with tempfile.TemporaryDirectory() as folder:
                 image = Path(folder) / f"{description.name}.BIN"
                 write_bytes(image, applied.image, BuildError)
-                lines = check_in_emulator(checkout, image)
+                lines = check_in_emulator(checkout, image, description.boot_differs)
         for line in lines:
             log("    " + line)
     step(4)

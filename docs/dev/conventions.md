@@ -131,6 +131,9 @@ build.
    only a flash can show that code runs there. When a build is meant to be that test, add
    `"first_code": true` to its description. The script then accepts the area if it passes every
    static check, and prints a FIRST CODE line. Say in the camera log which area is new.
+
+   A build that changes the start-up on purpose lists each boot-test report line it changes in
+   `"boot_differs"`: `[{"reference": STOCK_LINE, "image": BUILD_LINE, "why": ONE_LINE}]`.
 3. **Log it** in the [camera log](../camera-log/README.md) with that sha256. Write it to the card with
    `uv run epm2mod install --card DIR --build NAME --allow-untested`, then flash it.
 4. **If the camera test passes:**
@@ -209,7 +212,7 @@ Each check is in one layer.
 |---|---|---|
 | Commit hooks | Staged files: machine paths, the document rules, prettier, black, mypy, the commit message. `epm2mod lint` of each staged build description only warns | `.githooks/` |
 | Hard checks | No warnings: `tools/ci.sh` (its first lines say what it makes and checks) | CI runs it (`python.yml`, `web.yml`), and `release.yml` on the released commit. Run it before a pull request |
-| Checks of a candidate | The free-space check (with the load-order check), `boot-test` and `update-path-test`. A start whose time stamps moved (TIMES MOVED) fails | `epm2mod make NAME`: a candidate is not made without them |
+| Checks of a candidate | The free-space check (with the load-order check), `boot-test` and `update-path-test`. A start whose time stamps moved (TIMES MOVED) fails. `boot-test` passes a build whose report differs from stock's only in the lines of its `boot_differs`, each present | `epm2mod make NAME`: a candidate is not made without them |
 | Soft report | Load-order transfers that the pinned build does not have, first code. Exit status 0 with any number of warnings | `uv run epm2mod lint NAME`, by hand and from the commit hook. Never in CI |
 | By hand | `emulator/scenarios/scen_guard.py`, before a build that changes peaking is offered for a flash; `emulator/filmcheck.py`, before one that changes the film structure or the loader; `uv run python tools/freespace.py map`, when the code-space map is needed | the script's first lines |
 
