@@ -47,7 +47,7 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0 # The plan needs the tags and the commits since the last release.
-      - name: Set up Python, Node and uv
+      - name: Set up the tools
         uses: ./.github/actions/setup
       - name: Set up the clone
         run: uv run epm2mod init
@@ -98,6 +98,11 @@ jobs:
     permissions:
       contents: write # The job creates the tag and the GitHub release.
     steps:
+      - name: Check out the publish script
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: release
+          persist-credentials: false
       - name: Download the zip, the disk image and the notes
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
@@ -111,24 +116,4 @@ jobs:
           COMMIT: ${{ needs.plan.outputs.commit }}
           CHECKED: ${{ needs.plan.outputs.sha256 }}
           PACKAGED: ${{ needs.package.outputs.sha256 }}
-        # A draft creates no tag, so a failed upload leaves only a draft. Publishing the draft creates the tag.
-        # A draft that a failed run left is deleted first. A published release with the tag stops the step.
-        run: |
-          if [ -z "$CHECKED" ] || [ "$CHECKED" != "$PACKAGED" ]; then
-            echo "::error::The zip installs the firmware $PACKAGED, but the plan checked $CHECKED."
-            exit 1
-          fi
-          if draft=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft 2> "$RUNNER_TEMP/view.err"); then
-            if [ "$draft" != true ]; then
-              echo "::error::The release $TAG is already published."
-              exit 1
-            fi
-            gh release delete "$TAG" --repo "$GITHUB_REPOSITORY" --yes
-          elif ! grep -q 'release not found' "$RUNNER_TEMP/view.err"; then
-            cat "$RUNNER_TEMP/view.err" >&2
-            exit 1
-          fi
-          gh release create "$TAG" release-zip/*.zip release-dmg/*.dmg --draft --prerelease="$PRERELEASE" \
-            --repo "$GITHUB_REPOSITORY" --target "$COMMIT" --title "EPM2Mod $VERSION" \
-            --notes-file release-notes/notes.md
-          gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --draft=false
+        run: release/publish.sh "$TAG" "$VERSION" "$PRERELEASE" "$COMMIT" "$CHECKED" "$PACKAGED"

@@ -142,8 +142,8 @@ def check_free_space(paths: RepoPaths, description: BuildDescription) -> str:
     """Run the free-space check on a build's spec list.
 
     The check is the project's free-space tool: ``TOOL check --build FILE``, with the build's description file, so
-    that the tool reads the specs and ``first_code`` as the hard checks have it do. A stamped release build has the specs
-    of its file; a description whose specs differ from its file is refused. It fails if two specs
+    that the tool reads the specs and ``first_code`` from the same file as the hard checks. A stamped release build
+    has the specs of its file. A description whose specs differ from its file is refused. It fails if two specs
     put bytes in the same place, or a spec puts bytes where the camera does
     not load the firmware, or a spec puts code in an area where no
     camera-tested build runs code yet. The last rule is waived for a

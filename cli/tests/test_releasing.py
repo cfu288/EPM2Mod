@@ -132,7 +132,8 @@ class PlanTests(unittest.TestCase):
         with contextlib.redirect_stdout(io.StringIO()) as out, contextlib.redirect_stderr(io.StringIO()) as err:
             self.assertEqual(cli.main(argv), 0, err.getvalue())
         self.assertIn("""-f build=probe -f summary='It'"'"'s new.' -f dry_run=false""", err.getvalue())
-        self.assertIn("\n\nIt's new.\n\n", out.getvalue())
+        self.assertTrue(out.getvalue().startswith("EPM2Mod 2026.11"))  # the preview shows the title
+        self.assertIn("\nIt's new.\n\n", out.getvalue())
 
     def test_the_json_of_a_plan_that_is_not_ready_has_no_prerelease(self) -> None:
         argv = ["--project", str(self.paths.root), "release", "--build", "untested", "--json"]
@@ -156,34 +157,33 @@ class PlanTests(unittest.TestCase):
 
 
 class ReleaseNotesTests(unittest.TestCase):
-    def test_the_notes_name_the_version_build_changes_and_sha(self) -> None:
-        notes = release_notes(
-            "2026.11.25-rc.2", "2026.11.20", "ab" * 32, "v2026.11.25-rc.1", ["feat: x", "fix(films): y (#13)"]
-        )
-        self.assertTrue(notes.startswith("EPM2Mod 2026.11.25-rc.2\n"))
+    def test_the_notes_name_the_changes_and_the_firmware_without_a_title(self) -> None:
+        notes = release_notes("2026.11.20", "ab" * 32, "v2026.11.25-rc.1", ["feat: x", "fix(films): y (#13)"])
+        self.assertNotIn("EPM2Mod 2026.11.25", notes)  # the release page shows the title
+        self.assertTrue(notes.startswith("Changes since v2026.11.25-rc.1:\n"))
         self.assertIn("Firmware: EPM2Mod 2026.11.20, sha256 `" + "ab" * 32 + "`.\n", notes)
         self.assertIn("Changes since v2026.11.25-rc.1:\n\n- x\n- y (#13)\n", notes)
 
     def test_the_notes_of_a_stamped_build_give_both_sha256(self) -> None:
-        notes = release_notes("2026.11.26-rc.1", "2026.11.26", "cd" * 32, None, [], tested=("ab" * 32, "2026.11.20"))
+        notes = release_notes("2026.11.26", "cd" * 32, None, [], tested=("ab" * 32, "2026.11.20"))
         self.assertIn(
             "Firmware: EPM2Mod 2026.11.26, sha256 `" + "cd" * 32 + "`. It is the camera-tested build (sha256 `"
             + "ab" * 32 + "`) with the release's date on the Firmware screen.\n",
             notes,
         )
 
-    def test_the_summary_comes_under_the_title_and_the_install_steps_last(self) -> None:
+    def test_the_summary_comes_first_and_the_install_steps_last(self) -> None:
         notes = release_notes(
-            "2026.11.28-rc.1", "2026.11.28", "ab" * 32, None, ["feat: x"], summary=" New dial. \n", install="**Install**\n"
+            "2026.11.28", "ab" * 32, None, ["feat: x"], summary=" New dial. \n", install="**Install**\n"
         )
-        self.assertTrue(notes.startswith("EPM2Mod 2026.11.28-rc.1\n\nNew dial.\n\nChanges:\n"))
+        self.assertTrue(notes.startswith("New dial.\n\nChanges:\n"))
         self.assertTrue(notes.endswith("`.\n\n**Install**\n"))
 
     def test_no_summary_no_empty_paragraph(self) -> None:
-        self.assertTrue(release_notes("2026.11.28", "2026.11.28", "ab" * 32, None, []).startswith("EPM2Mod 2026.11.28\n\nFirmware"))
+        self.assertTrue(release_notes("2026.11.28", "ab" * 32, None, []).startswith("Firmware"))
 
     def test_no_changes_no_change_list(self) -> None:
-        self.assertNotIn("Changes", release_notes("2026.11.19", "2026.11.19", "ab" * 32, None, []))
+        self.assertNotIn("Changes", release_notes("2026.11.19", "ab" * 32, None, []))
 
 
 class FeatureListTests(unittest.TestCase):

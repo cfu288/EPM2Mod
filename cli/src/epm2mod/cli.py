@@ -1194,6 +1194,7 @@ def _release(args: argparse.Namespace, ctx: Context) -> int:
         for problem in problems:
             print(f"not ready: {problem}")
     else:
+        print(f"EPM2Mod {release.tag[1:]}\n")  # the title that the release page shows
         print(release.notes)
         _hint(
             f"ready: {release.tag} on {release.commit[:7]}. To release it: "

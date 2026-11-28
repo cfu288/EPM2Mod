@@ -72,7 +72,6 @@ def next_version(
 
 
 def release_notes(
-    version: str,
     label: str,
     sha256: str,
     previous: str | None,
@@ -81,19 +80,20 @@ def release_notes(
     summary: str = "",
     install: str = "",
 ) -> str:
-    """Return the release notes: the title, the summary, the changes, the firmware and the install steps.
+    """Return the release notes: the summary, the changes, the firmware and the install steps.
+
+    The release page shows the title (``EPM2Mod VERSION``) above them, so the notes do not repeat it.
 
     Args:
-        version: the calendar version.
         label: the build's label, which the camera's Firmware screen shows.
         sha256: the firmware file's SHA-256.
         previous: the tag of the release before, if any.
         changes: the subjects of the feat and fix commits since ``previous``.
         tested: the sha256 and the label of the camera-tested build, if the release holds it with another label.
-        summary: what is new, in sentences that a person writes. It comes under the title.
+        summary: what is new, in sentences that a person writes. It comes first.
         install: the install steps (the manifest's ``release_notes`` file). They come last.
     """
-    lines = [f"EPM2Mod {version}", ""]
+    lines: list[str] = []
     if summary.strip():
         lines += [summary.strip(), ""]
     if changes:
@@ -211,7 +211,6 @@ def plan(
     subjects = _git(paths, "log", "--format=%s", since).splitlines()
     changes = [s for s in subjects if re.match(r"(feat|fix)\b", s)]
     notes = release_notes(
-        version,
         released.label,
         released.sha256,
         previous,

@@ -48,7 +48,8 @@ quiet uv run --directory cli black --check .
 quiet uv run --directory cli mypy
 
 step "the package compiles under Python 3.10, the oldest that cli/pyproject.toml allows"
-quiet env -u UV_LOCKED PYTHONPYCACHEPREFIX="$tmp/pycache" uv run --no-project --python 3.10 python -m compileall -q cli/src/epm2mod
+# uv warns when UV_LOCKED is set with --no-project, so the variable is removed for this step only.
+quiet env -u UV_LOCKED PYTHONPYCACHEPREFIX="$tmp/pycache" uv run --no-project --python 3.10.22 python -m compileall -q cli/src/epm2mod
 
 step "unit tests (they also run pyflakes on the scripts, and hold the feature lists)"
 quiet uv run python -m unittest discover -s cli/tests
