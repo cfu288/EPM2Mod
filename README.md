@@ -21,7 +21,7 @@ Repository containing the current work for creating a custom firmware mod for th
 
 The E-PM2 came out in 2012. The [landscape page](docs/reference/landscape.md) lists the other Olympus custom firmware projects we know of.
 
-[![A timeline of Olympus and OM SYSTEM cameras that have custom firmware projects, from the E-PL3 in 2011 to the OM-5 Mark II in 2025](docs/images/landscape.png)](docs/reference/landscape.md)
+[![A timeline of Olympus and OM SYSTEM cameras that have custom firmware projects, one lane per TruePic generation, from the E-PL3 in 2011 to the OM-5 Mark II in 2025](docs/images/landscape.png)](docs/reference/landscape.md)
 
 ## Install
 

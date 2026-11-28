@@ -1,6 +1,6 @@
 # Olympus Custom Firmware
 
-![A timeline of Olympus and OM SYSTEM cameras that have custom firmware projects, from the E-PL3 in 2011 to the OM-5 Mark II in 2025](../images/landscape.png)
+![A timeline of Olympus and OM SYSTEM cameras that have custom firmware projects, one lane per TruePic generation, from the E-PL3 in 2011 to the OM-5 Mark II in 2025](../images/landscape.png)
 
 The list holds the Olympus custom firmware projects we know of on 2026-11-26: those on GitHub, in the [OM Firmware Atlas](https://xulfr.github.io/om-firmware-atlas/), in Caduceus's [list of ports](https://github.com/cakelesscoder/caduceus-ep7/blob/main/docs/BODIES.md) and in the 43rumors roundups of [2026-11-21](https://www.43rumors.com/new-mft-hacking-roundup-e-pm2-gains-focus-peaking-e-p7-gets-150mbps-4k-and-more-om-3-upgrades/) and [2026-11-26](https://www.43rumors.com/micro-four-thirds-hacking-update-new-film-controls-focus-stacking-and-more/).
 
@@ -36,7 +36,6 @@ missing part rules out (Not possible), and what no source settles yet (Unknown).
 status comes first. The [model matrix](model-matrix.md#2-features-by-generation)
 gives what each feature needs, the evidence and a link for each cell.
 
-![Features by generation: for each feature and TruePic generation, whether it is stock, added by a mod, not done, not possible or unknown](../images/features-by-generation.png)
 
 | Feature | VI (E-PM2) | VII | VIII | IX | X |
 |---|---|---|---|---|---|
