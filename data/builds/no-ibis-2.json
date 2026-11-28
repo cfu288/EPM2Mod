@@ -29,6 +29,8 @@
   "data/specs/no-ibis.json",
   "data/specs/no-ibis-menu.json"
  ],
+ "sha256": "0bf03267a2508e39c9b51fcb31343858e0c960484f223032245a1fe10548971f",
+ "camera_tested": "2026-11-28",
  "label": "2026.12.01",
  "boot_differs": [
   {
