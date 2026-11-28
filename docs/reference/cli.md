@@ -725,7 +725,7 @@ epm2mod release [-h] [--final] [--build NAME] [--summary TEXT] [--json]
 - `problems`: why not, if it cannot
 - `tag`: the tag of the release, like v2026.11.19-rc.1 (null if not ready)
 - `release_version`: the release's version: the tag without its v (null if not ready)
-- `prerelease`: true for a test release, false for a release for everyone
+- `prerelease`: true for a test release, false for a release for everyone (null if not ready)
 - `commit`: the commit that the release is made from (null if not ready)
 - `notes`: the release notes (null if not ready)
 - `sha256`: the sha256 of the firmware that the release installs (null if not ready)

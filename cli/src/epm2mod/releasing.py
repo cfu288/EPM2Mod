@@ -40,6 +40,9 @@ from .release import check_version, stamp
 #: build (``vLABEL-NAME.N``) matches none, so the next release's changes are counted from the last of these.
 RELEASE_TAGS = ("v????.??.??", "v????.??.??.*", "v????.??.??-rc.*")
 
+#: The type and scope of a commit subject, which the notes leave out: "fix(films): x (#13)" becomes "x (#13)".
+_TYPE = re.compile(r"^[a-z]+(\([^)]*\))?!?: ")
+
 
 def next_version(
     day: str, tags: list[str], final: bool, build: str | None = None
@@ -95,10 +98,7 @@ def release_notes(
         lines += [summary.strip(), ""]
     if changes:
         lines += [f"Changes since {previous}:" if previous else "Changes:", ""]
-        # a commit subject without its type and scope: "fix(films): x (#13)" -> "x (#13)"
-        lines += [
-            f"- {re.sub(r'^[a-z]+(\([^)]*\))?!?: ', '', change)}" for change in changes
-        ]
+        lines += [f"- {_TYPE.sub('', change)}" for change in changes]
         lines.append("")
     firmware = f"Firmware: EPM2Mod {label}, sha256 `{sha256}`."
     if tested is not None:

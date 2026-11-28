@@ -47,6 +47,9 @@ step "black, mypy (the files that cli/pyproject.toml names)"
 quiet uv run --directory cli black --check .
 quiet uv run --directory cli mypy
 
+step "the package compiles under Python 3.10, the oldest that cli/pyproject.toml allows"
+quiet env -u UV_LOCKED PYTHONPYCACHEPREFIX="$tmp/pycache" uv run --no-project --python 3.10 python -m compileall -q cli/src/epm2mod
+
 step "unit tests (they also run pyflakes on the scripts, and hold the feature lists)"
 quiet uv run python -m unittest discover -s cli/tests
 
@@ -64,7 +67,7 @@ for name in $builds; do
   quiet uv run epm2mod make "$name"  # a candidate: with the three checks
   # make compares a camera-tested build with its sha256 only, so the checks run here.
   if jq -e '.camera_tested != null' "data/builds/$name.json" > /dev/null; then
-    quiet uv run python tools/freespace.py check --build "$name"
+    quiet uv run python tools/freespace.py check --build "data/builds/$name.json"
     quiet uv run python emulator/boot-test "build/$name.BIN"
     quiet uv run python emulator/update-path-test "build/$name.BIN"
   fi

@@ -26,6 +26,7 @@ import contextlib
 import io
 import json
 import os
+import shlex
 import signal
 import subprocess
 import sys
@@ -584,7 +585,7 @@ COMMANDS: dict[str, Command] = {
                 "problems": "why not, if it cannot",
                 "tag": "the tag of the release, like v2026.11.19-rc.1 (null if not ready)",
                 "release_version": "the release's version: the tag without its v (null if not ready)",
-                "prerelease": "true for a test release, false for a release for everyone",
+                "prerelease": "true for a test release, false for a release for everyone (null if not ready)",
                 "commit": "the commit that the release is made from (null if not ready)",
                 "notes": "the release notes (null if not ready)",
                 "sha256": "the sha256 of the firmware that the release installs (null if not ready)",
@@ -1184,7 +1185,7 @@ def _release(args: argparse.Namespace, ctx: Context) -> int:
             problems=problems,
             tag=release and release.tag,
             release_version=release and release.tag[1:],
-            prerelease=not args.final,
+            prerelease=release and not args.final,
             commit=release and release.commit,
             notes=release and release.notes,
             sha256=release and release.sha256,
@@ -1198,6 +1199,7 @@ def _release(args: argparse.Namespace, ctx: Context) -> int:
             f"ready: {release.tag} on {release.commit[:7]}. To release it: "
             f"gh workflow run release -f kind={'final' if args.final else 'rc'} "
             + (f"-f build={args.build} " if args.build else "")
+            + (f"-f summary={shlex.quote(args.summary)} " if args.summary else "")
             + "-f dry_run=false"
         )
     return DIFFERS if release is None else 0

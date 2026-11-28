@@ -52,7 +52,13 @@ from pathlib import Path
 from typing import Any
 
 from . import cardio, catalogue
-from .builds import BuildDescription, check_test_date, pin, save_description
+from .builds import (
+    BuildDescription,
+    check_test_date,
+    description_path,
+    pin,
+    save_description,
+)
 from .camera_steps import Step, copy_text, film_steps, firmware_reads, flash_steps
 from .cardio import FILMS, FIRMWARE, Content, Planned, planned_file
 from .catalogue import Locator
@@ -135,7 +141,9 @@ def build_image(
 def check_free_space(paths: RepoPaths, description: BuildDescription) -> str:
     """Run the free-space check on a build's spec list.
 
-    The check is the project's free-space tool: ``TOOL check SPEC...``. It fails if two specs
+    The check is the project's free-space tool: ``TOOL check --build FILE``, with the build's description file, so
+    that the tool reads the specs and ``first_code`` as the hard checks have it do. A stamped release build has the specs
+    of its file; a description whose specs differ from its file is refused. It fails if two specs
     put bytes in the same place, or a spec puts bytes where the camera does
     not load the firmware, or a spec puts code in an area where no
     camera-tested build runs code yet. The last rule is waived for a
@@ -149,9 +157,19 @@ def check_free_space(paths: RepoPaths, description: BuildDescription) -> str:
     Raises:
         BuildError: if the check fails or cannot run.
     """
-    command = [sys.executable, str(paths.free_space_tool), "check", *description.specs]
-    if description.first_code:
-        command.append("--first-code")
+    saved = paths.build(description.name)
+    if (saved.specs, saved.first_code) != (description.specs, description.first_code):
+        raise BuildError(
+            f"{description.name}: the specs differ from its description file, which the free-space check reads"
+        )
+    path = description_path(paths, description.name)
+    command = [
+        sys.executable,
+        str(paths.free_space_tool),
+        "check",
+        "--build",
+        str(path),
+    ]
     try:
         done = subprocess.run(
             command,

@@ -8,6 +8,7 @@ from __future__ import annotations
 import contextlib
 import dataclasses
 import io
+import json
 import sys
 import tempfile
 import unittest
@@ -124,6 +125,21 @@ class PlanTests(unittest.TestCase):
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()) as err:
             self.assertEqual(cli.main(argv), 0, err.getvalue())
         self.assertIn("release -f kind=rc -f build=probe -f dry_run=false", err.getvalue())
+
+    def test_the_hint_passes_the_summary_quoted(self) -> None:
+        self.checked = []
+        argv = ["--project", str(self.paths.root), "release", "--build", "probe", "--summary", "It's new."]
+        with contextlib.redirect_stdout(io.StringIO()) as out, contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(cli.main(argv), 0, err.getvalue())
+        self.assertIn("""-f build=probe -f summary='It'"'"'s new.' -f dry_run=false""", err.getvalue())
+        self.assertIn("\n\nIt's new.\n\n", out.getvalue())
+
+    def test_the_json_of_a_plan_that_is_not_ready_has_no_prerelease(self) -> None:
+        argv = ["--project", str(self.paths.root), "release", "--build", "untested", "--json"]
+        with contextlib.redirect_stdout(io.StringIO()) as out, contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(cli.main(argv), 1)
+        document = json.loads(out.getvalue())
+        self.assertEqual((document["ready"], document["prerelease"]), (False, None))
 
     def test_an_untested_build_is_not_released(self) -> None:
         self.assertEqual(

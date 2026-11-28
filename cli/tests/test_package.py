@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import ast
 import contextlib
+import dataclasses
 import datetime
 import errno
 import http.client
@@ -1076,11 +1077,24 @@ class MakeTests(RepoCase):
         result = self.make(self.repo.candidate, log=lines.append)
         self.assertEqual(result.sha256, self.repo.sha256)
         text = "\n".join(lines)
-        self.assertIn("check: stand-in", text)
+        # the tool reads the specs from the description file, as tools/ci.sh has it do
+        self.assertIn(
+            f"check: stand-in check --build {builds.description_path(self.repo.paths, 'new')}",
+            text,
+        )
         self.assertIn("NOT camera-tested", text)
         self.repo.paths.free_space_tool.unlink()
         with self.assertRaises(BuildError):
             self.make(self.repo.candidate)
+
+    def test_the_free_space_check_refuses_specs_that_its_file_does_not_hold(
+        self,
+    ) -> None:
+        self.repo.free_space_tool(0)
+        other = dataclasses.replace(self.repo.candidate, specs=("data/specs/b.json",))
+        with self.assertRaises(BuildError) as caught:
+            pipeline.check_free_space(self.repo.paths, other)
+        self.assertIn("differ from its description file", str(caught.exception))
 
     def test_make_downloads_the_stock_firmware_if_it_is_absent(self) -> None:
         stock.stock_path(self.repo.paths, TINY_STOCK).unlink()
@@ -1149,10 +1163,13 @@ class MakeTests(RepoCase):
             first_code=True,
             stock=TINY_STOCK.file_name,
         )
+        path = builds.save_description(self.repo.paths, first)
         lines.clear()
         self.make(first, log=lines.append)
         text = "\n".join(lines)
-        self.assertIn("check data/specs/a.json --first-code", text)
+        # the tool reads first_code from the file that it is given
+        self.assertIn(f"check --build {path}", text)
+        self.assertTrue(json.loads(path.read_text(encoding="utf-8"))["first_code"])
         self.assertIn("FIRST CODE", text)
 
     def test_a_missing_spec_is_found_before_the_free_space_check(self) -> None:

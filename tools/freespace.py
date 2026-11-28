@@ -3,7 +3,7 @@
 
     python3 tools/freespace.py map                    # regenerate docs/reference/code-space-map.md and .tsv
     python3 tools/freespace.py check SPEC [SPEC ...]  # verify the bytes that specs add in free areas
-    python3 tools/freespace.py check --build NAME     # the same for the specs of data/builds/NAME.json
+    python3 tools/freespace.py check --build FILE     # the same for the specs of the build description FILE
     python3 tools/freespace.py area 0x7E4C9100        # all checks for the area that holds an address
     python3 tools/freespace.py selftest               # known facts; a few seconds
 
@@ -1486,8 +1486,8 @@ def main():
     sub.add_parser("map")
     c = sub.add_parser("check")
     c.add_argument("specs", nargs="*")
-    c.add_argument("--build", metavar="NAME",
-                   help="check the specs of data/builds/NAME.json, with --first-code if the build sets first_code")
+    c.add_argument("--build", metavar="FILE",
+                   help="check the specs of the build description FILE, with --first-code if it sets first_code")
     c.add_argument("--first-code", action="store_true",
                    help="accept code in an area that passes every static check but has never run code (the flash is the test)")
     c = sub.add_parser("area")
@@ -1510,14 +1510,14 @@ def main():
             return 1
         show_area(sp, ar)
         return 0
+    if bool(a.specs) == bool(a.build):
+        ap.error("check needs either SPEC arguments or --build FILE")
     paths, first_code = list(a.specs), a.first_code
     if a.build:
-        with open(os.path.join(ROOT, "data/builds", a.build + ".json"), encoding="utf-8") as f:
+        with open(a.build, encoding="utf-8") as f:
             build = json.load(f)
-        paths += [os.path.join(ROOT, spec) for spec in build["specs"]]
+        paths = [os.path.join(ROOT, spec) for spec in build["specs"]]
         first_code = first_code or bool(build.get("first_code"))
-    if not paths:
-        ap.error("check needs SPEC or --build NAME")
     specs = []
     for p in paths:
         ap_ = os.path.abspath(p)
