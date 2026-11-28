@@ -77,22 +77,34 @@ if [found["path"] for found in document("cards")["cards"]] != [str(card)]:
     sys.exit("cards: the stand-in card is not listed")
 run("make", installed["build"]["name"], status=6)
 
-server = subprocess.Popen(
-    launcher + ["serve", "--no-browser", "--port", "8765"],
-    cwd=folder,
-    stdout=subprocess.PIPE,
-    stderr=subprocess.STDOUT,
-    text=True,
-)
+log = Path(tempfile.mkdtemp()) / "serve.log"
+with open(log, "w") as output:
+    server = subprocess.Popen(
+        launcher + ["serve", "--no-browser", "--port", "8765"],
+        cwd=folder,
+        stdout=output,
+        stderr=subprocess.STDOUT,
+    )
+
+
+def printed() -> str:
+    """Return what serve has printed so far."""
+    return log.read_text(encoding="utf-8", errors="replace")
+
+
 try:
-    line = ""
+    # The log is a file, so the wait ends at the deadline even when serve prints nothing.
     deadline = time.time() + 300
-    while "token=" not in line and time.time() < deadline:
-        line = server.stdout.readline()
-        print(line, end="")
-        if not line and server.poll() is not None:
+    while not (found := re.search(r"#token=([\w-]+)", printed())):
+        if server.poll() is not None:
+            print(printed())
             sys.exit("serve ended before it printed its address")
-    token = re.search(r"#token=([\w-]+)", line).group(1)
+        if time.time() > deadline:
+            print(printed())
+            sys.exit("serve printed no address in 300 seconds")
+        time.sleep(1)
+    print(printed())
+    token = found.group(1)
 
     def get(path: str, token: str) -> int:
         request = urllib.request.Request(f"http://127.0.0.1:8765{path}", headers={"X-EPM2-Token": token})

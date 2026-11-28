@@ -1,23 +1,16 @@
-# A release: started by hand (Actions, "Run workflow", or `gh workflow run release.yml -f kind=rc -f dry_run=false`),
-# from main. A merge does not release, and a pushed tag starts nothing: this workflow creates the tag.
-#
-# 1. plan: the hard checks (tools/ci.sh) run on the commit. Then `epm2mod release` checks that the build has a camera
-#    test, makes the image with today (UTC) as its label, checks it, and names the version and the notes.
-# 2. package: the zip, its start on three systems, the signed and notarized Mac disk image (package.yml). The
-#    environment "release" holds the signing secrets and restricts them to its branches and tags.
-# 3. publish, not with dry_run: the tag and the GitHub release, in one step.
+# A release, started by hand from main. See docs/dev/conventions.md, section "Releases".
 name: release
 
 on:
   workflow_dispatch:
     inputs:
       kind:
-        description: rc is a test release (a pre-release). final is for everyone.
+        description: An rc release is a test release (a pre-release). A final release is for everyone.
         type: choice
         options: [rc, final]
         default: rc
       build:
-        description: Only for a test release of a build that is not pinned, its name. Empty is the pinned build.
+        description: For a test release of a build that is not pinned, give its name. Leave it empty for the pinned build.
         type: string
         default: ''
       notes:
@@ -25,7 +18,7 @@ on:
         type: string
         default: ''
       dry_run:
-        description: Do everything but the tag and the publication.
+        description: Do everything except create the tag and publish the release.
         type: boolean
         default: true
 
@@ -39,57 +32,48 @@ concurrency:
 jobs:
   plan:
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     outputs:
       tag: ${{ steps.plan.outputs.tag }}
       release_version: ${{ steps.plan.outputs.release_version }}
+      prerelease: ${{ steps.plan.outputs.prerelease }}
       commit: ${{ steps.plan.outputs.commit }}
       sha256: ${{ steps.plan.outputs.sha256 }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-          fetch-depth: 0 # the tags and the commits since the last release
-      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
-        with:
-          python-version-file: .python-version
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version-file: .nvmrc
-          package-manager-cache: false
-      # what the checks of the build with the release's label need; no cache from other runs
-      - run: python -m pip install --quiet --require-hashes -r .github/uv-requirements.txt && uv sync --locked
-      - run: sudo apt-get install -y --no-install-recommends bison flex texinfo
-      - run: uv run epm2mod init
-      - run: tools/ci.sh
+          fetch-depth: 0 # The plan needs the tags and the commits since the last release.
+      # No cache: a cache that another run wrote could change what a release checks.
+      - name: Set up
+        uses: ./.github/actions/setup
+      - name: Set up the clone
+        run: uv run epm2mod init
+      - name: Run the checks
         env:
-          CI_BASE: ${{ github.sha }} # nothing changed since: the pinned build is made and checked
+          CI_BASE: ${{ github.sha }} # Nothing has changed since the base, so the checks make the pinned build only.
           PLAYWRIGHT_INSTALL: --with-deps
-      - id: plan
+        run: tools/ci.sh
+      - name: Plan the release
+        id: plan
         env:
           KIND: ${{ inputs.kind }}
           BUILD: ${{ inputs.build }}
-          NOTES: ${{ inputs.notes }}
+          SUMMARY: ${{ inputs.notes }}
         run: |
-          set -- release --json
-          [ "$KIND" = final ] && set -- "$@" --final
-          [ -n "$BUILD" ] && set -- "$@" --build "$BUILD"
-          uv run epm2mod "$@" > plan.json || true
-          python - <<'EOF'
-          import json, os, sys
-          plan = json.load(open("plan.json"))
-          if not plan.get("ready"):
-              sys.exit("not ready: " + "; ".join(plan.get("problems") or [str(plan.get("error"))]))
-          with open(os.environ["GITHUB_OUTPUT"], "a") as out:
-              for key in ("tag", "release_version", "commit", "sha256"):
-                  out.write(f"{key}={plan[key]}\n")
-          extra = os.environ["NOTES"].strip()
-          install = open("release/NOTES.md", encoding="utf-8").read()
-          with open("notes.md", "w", encoding="utf-8") as notes:
-              head, _, rest = plan["notes"].partition("\n\n")
-              notes.write(head + "\n\n" + (extra + "\n\n" if extra else "") + rest + "\n" + install)
-          print(open("notes.md", encoding="utf-8").read())
-          EOF
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+          args=(--json --summary "$SUMMARY")
+          if [ "$KIND" = final ]; then args+=(--final); fi
+          if [ -n "$BUILD" ]; then args+=(--build "$BUILD"); fi
+          status=0
+          uv run epm2mod release "${args[@]}" > plan.json || status=$?
+          jq -r '(.problems[]? | "::error::Not ready: \(.)"), (.error.message? // empty | "::error::\(.)")' plan.json
+          [ "$status" -eq 0 ] || exit "$status"
+          jq -r '"tag=\(.tag)", "release_version=\(.release_version)", "prerelease=\(.prerelease)",
+            "commit=\(.commit)", "sha256=\(.sha256)"' plan.json >> "$GITHUB_OUTPUT"
+          jq -r .notes plan.json | tee notes.md
+      - name: Upload the notes
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-notes
           path: notes.md
@@ -101,40 +85,36 @@ jobs:
     with:
       release_version: ${{ needs.plan.outputs.release_version }}
       sign: true
-    secrets: inherit
 
   publish:
     needs: [plan, package]
     if: ${{ !inputs.dry_run }}
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment: release
     permissions:
-      contents: write # create the tag and the GitHub release, and upload its files
+      contents: write # The job creates the tag and the GitHub release.
     steps:
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+      - name: Download the zip, the disk image and the notes
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
-          name: release-zip
-          path: zip
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
-        with:
-          name: release-dmg
-          path: dmg
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
-        with:
-          name: release-notes
-          path: notes
-      - env:
+          pattern: release-*
+      - name: Publish the release
+        env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ needs.plan.outputs.tag }}
+          VERSION: ${{ needs.plan.outputs.release_version }}
+          PRERELEASE: ${{ needs.plan.outputs.prerelease }}
           COMMIT: ${{ needs.plan.outputs.commit }}
           CHECKED: ${{ needs.plan.outputs.sha256 }}
           PACKAGED: ${{ needs.package.outputs.sha256 }}
-        # a tag with a hyphen (v2026.11.18-rc.1) is a pre-release: for testing, not yet for everyone.
-        # gh creates the tag on the commit that was checked and built.
+        # A draft creates no tag, so a failed upload leaves only a draft. Publishing the draft creates the tag.
         run: |
-          # the zip installs the firmware that the plan checked
-          [ -n "$CHECKED" ] && [ "$CHECKED" = "$PACKAGED" ] || { echo "the zip's firmware $PACKAGED is not the checked $CHECKED" >&2; exit 1; }
-          pre=""
-          case "$TAG" in *-*) pre="--prerelease" ;; esac
-          gh release create "$TAG" zip/*.zip dmg/*.dmg $pre --repo "$GITHUB_REPOSITORY" --target "$COMMIT" \
-            --title "EPM2Mod ${TAG#v}" \
-            --notes-file notes/notes.md
+          if [ -z "$CHECKED" ] || [ "$CHECKED" != "$PACKAGED" ]; then
+            echo "::error::The zip installs the firmware $PACKAGED, but the plan checked $CHECKED."
+            exit 1
+          fi
+          gh release create "$TAG" release-zip/*.zip release-dmg/*.dmg --draft --prerelease="$PRERELEASE" \
+            --repo "$GITHUB_REPOSITORY" --target "$COMMIT" --title "EPM2Mod $VERSION" \
+            --notes-file release-notes/notes.md
+          gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --draft=false

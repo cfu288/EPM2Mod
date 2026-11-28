@@ -1,23 +1,29 @@
-# The release zip for users who don't code (epm2mod package): built once, then unpacked and started with each
-# system's launcher on Linux, macOS and Windows, which makes the pinned build from OM's firmware; and the Mac disk
-# image. On a pull request and on main this is a check, and nothing is published. The release workflow calls it
-# (workflow_call) with the version of the release and has the disk image signed.
-#
-# Secrets: the Mac signing secrets are in the environment "release". Only the dmg job's signing step reads them, and
-# only when the release workflow asks for it. Actions are pinned by commit; values from inputs reach the shell
-# through env, never as ${{ }} in a script.
+# The release zip and the Mac disk image, started on three systems. See docs/dev/conventions.md, section "Releases".
 name: package
 
 on:
   push:
     branches: [main]
-    paths: ['cli/src/**', 'release/**', 'web/**', 'data/builds/**', 'data/specs/**', 'epm2mod.json', 'data/pinned-build.json', 'data/films/film-records.json', '.github/workflows/package.yml', '.github/scripts/release_smoke.py']
+    paths: &paths
+      - 'cli/src/**'
+      - 'release/**'
+      - 'web/**'
+      - 'data/builds/**'
+      - 'data/specs/**'
+      - 'data/pinned-build.json'
+      - 'data/films/film-records.json'
+      - 'epm2mod.json'
+      - '.nvmrc'
+      - '.python-version'
+      - '.github/workflows/package.yml'
+      - '.github/scripts/release_smoke.py'
   pull_request:
-    paths: ['cli/src/**', 'release/**', 'web/**', 'data/builds/**', 'data/specs/**', 'epm2mod.json', 'data/pinned-build.json', 'data/films/film-records.json', '.github/workflows/package.yml', '.github/scripts/release_smoke.py']
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths: *paths
   workflow_call:
     inputs:
       release_version:
-        description: The version of the release, like 2026.11.19-rc.1. Empty for a check, which uses the commit's date and -dev.
+        description: The version of the release, like 2026.11.19-rc.1. A check leaves it empty and gets the commit's date with -dev.
         type: string
         default: ''
       sign:
@@ -26,59 +32,66 @@ on:
         default: false
     outputs:
       name:
-        description: The name of the zip without .zip
+        description: The name of the zip without .zip.
         value: ${{ jobs.build.outputs.name }}
       sha256:
-        description: The sha256 of the firmware that the zip makes
+        description: The sha256 of the firmware that the zip installs.
         value: ${{ jobs.build.outputs.sha256 }}
 
 permissions:
   contents: read
 
 concurrency:
-  group: package-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-package-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
     outputs:
       name: ${{ steps.zip.outputs.name }}
       sha256: ${{ steps.zip.outputs.sha256 }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      - name: Set up Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
-          # no cache: a cache that another run wrote could change what a release signs and publishes
+          # A cache that another run wrote could change what a release signs and publishes.
           package-manager-cache: false
-      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version-file: .python-version
-      # no install scripts: a dependency can not run code at install time (none needs one)
-      - run: npm ci --ignore-scripts && npm run build:app
+      - name: Build the installer page
         working-directory: web
-      - id: zip
+        # No dependency needs an install script, so none may run one.
+        run: npm ci --ignore-scripts && npm run build:app
+      - name: Make the zip
+        id: zip
         env:
+          # The system Python with no installed packages, as the zip's launchers start it.
           PYTHONPATH: cli/src
           RELEASE_VERSION: ${{ inputs.release_version }}
         run: |
-          # the release's version, or for a check the date of the commit with -dev: the same commit gives the same name
+          # The same commit gives the same check version.
           version="${RELEASE_VERSION:-$(git show -s --format=%cd --date=format:%Y.%m.%d HEAD)-dev}"
-          # a release holds the pinned build with the day of the release as its label: that needs Olympus's firmware,
-          # downloaded from Olympus for this run
           python -m epm2mod fetch-stock
-          python -m epm2mod package --out-dir dist --release-version "$version"
-          name=$(basename dist/*.zip .zip)
-          echo "name=$name" >> "$GITHUB_OUTPUT"
-          echo "sha256=$(python -c 'import sys; from epm2mod.release import release_description; from epm2mod.paths import repo_paths; print(release_description(repo_paths(), sys.argv[1]).sha256)' "$version")" >> "$GITHUB_OUTPUT"
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+          python -m epm2mod package --out-dir dist --release-version "$version" --json > "$RUNNER_TEMP/package.json"
+          jq -r '"name=\(.zip | split("/")[-1] | rtrimstr(".zip"))", "sha256=\(.firmware_sha256)"' \
+            "$RUNNER_TEMP/package.json" >> "$GITHUB_OUTPUT"
+      - name: Upload the zip
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-zip
           path: dist/*.zip
           if-no-files-found: error
+          retention-days: ${{ inputs.release_version && 90 || 7 }}
 
   smoke:
     needs: build
@@ -87,97 +100,90 @@ jobs:
       matrix:
         os: [ubuntu-24.04, macos-15, windows-2025]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     env:
       NAME: ${{ needs.build.outputs.name }}
       SHA256: ${{ needs.build.outputs.sha256 }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check out the smoke test
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           sparse-checkout: .github/scripts
           persist-credentials: false
-      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
-          python-version: '3.12' # runs the smoke script only; setup-python has no 3.12.16 for macOS and Windows
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+          python-version: '3.12' # It runs the smoke test only. setup-python has no 3.12.16 for macOS and Windows.
+      - name: Download the zip
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: release-zip
           path: zip
-      # unpack as each system's own tool does
-      - if: runner.os == 'Linux'
+      # Each system unpacks the zip with its own tool, as a user does.
+      - name: Unpack the zip
+        if: runner.os == 'Linux'
         run: unzip -q "zip/$NAME.zip" -d unpacked
-      - if: runner.os == 'macOS'
+      - name: Unpack the zip
+        if: runner.os == 'macOS'
         run: ditto -x -k "zip/$NAME.zip" unpacked
-      - if: runner.os == 'Windows'
+      - name: Unpack the zip
+        if: runner.os == 'Windows'
         shell: pwsh
         run: Expand-Archive -LiteralPath "zip/$env:NAME.zip" -DestinationPath unpacked
-      # bash on Windows too: in PowerShell, $NAME is not the environment variable
-      - shell: bash
+      - name: Start the zip with this system's launcher
+        shell: bash # In PowerShell, $NAME is not the environment variable.
         run: python .github/scripts/release_smoke.py "unpacked/$NAME" "$SHA256"
 
-  # The Mac download: the zip's folder in EPM2Mod.app, in a disk image (release/mac/make-dmg.sh). For a release it is
-  # signed with the Developer ID certificate and Apple notarizes it, so it opens without Open Anyway; a check signs
-  # it ad hoc.
   dmg:
     needs: build
     runs-on: macos-15
-    # the signing secrets: for a release only. The environment only restricts which branches and tags may use them
+    timeout-minutes: 60
+    # Only a release uses the environment that holds the signing secrets.
     environment: ${{ inputs.sign && 'release' || '' }}
     env:
       NAME: ${{ needs.build.outputs.name }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check out the Mac files
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           sparse-checkout: release/mac
           persist-credentials: false
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+      - name: Download the zip
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: release-zip
           path: zip
-      - if: inputs.sign
+      - name: Make the signing keychain
+        if: inputs.sign
         env:
           MAC_CERT_P12: ${{ secrets.MAC_CERT_P12 }}
           MAC_CERT_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
-          # Apple's Developer ID G2 intermediate certificate (https://www.apple.com/certificateauthority/)
-          CA_SHA256: f16cd3c54c7f83cea4bf1a3e6a0819c8aaa8e4a1528fd144715f350643d2df3a
-        # a keychain for this run only, as the default one, so that codesign and notarytool find the certificate and
-        # the notarization login (profile epm2mod); deleted before anything from the zip runs
-        run: |
-          KC="$RUNNER_TEMP/sign.keychain-db"
-          KCPASS=$(openssl rand -hex 16)
-          echo "::add-mask::$KCPASS"
-          security create-keychain -p "$KCPASS" "$KC"
-          security set-keychain-settings -lut 21600 "$KC"
-          security unlock-keychain -p "$KCPASS" "$KC"
-          security default-keychain -s "$KC"
-          security list-keychains -d user -s "$KC"
-          curl -fsSL -o "$RUNNER_TEMP/ca.cer" https://www.apple.com/certificateauthority/DeveloperIDG2CA.cer
-          echo "$CA_SHA256  $RUNNER_TEMP/ca.cer" | shasum -a 256 -c -
-          security import "$RUNNER_TEMP/ca.cer" -k "$KC"
-          printf %s "$MAC_CERT_P12" | base64 --decode > "$RUNNER_TEMP/cert.p12"
-          security import "$RUNNER_TEMP/cert.p12" -k "$KC" -P "$MAC_CERT_PASSWORD" -T /usr/bin/codesign
-          rm -f "$RUNNER_TEMP/cert.p12"
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KCPASS" "$KC" > /dev/null
-          xcrun notarytool store-credentials epm2mod --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD"
-          echo "EPM2MOD_SIGN_IDENTITY=Developer ID Application" >> "$GITHUB_ENV"
-          echo "EPM2MOD_NOTARY_PROFILE=epm2mod" >> "$GITHUB_ENV"
-      # make-dmg.sh copies the zip's files into the app and signs it; it runs none of them
-      - name: Make the disk image; for a release sign it and wait for Apple's notarization (at most 45 minutes)
-        timeout-minutes: 45 # Apple's service can hang (6 hours on 2026-11-25); the normal time is a few minutes
+        run: release/mac/keychain.sh create "$RUNNER_TEMP/sign.keychain-db"
+      # make-dmg.sh copies the zip's files into the app and signs it. It runs none of them.
+      - name: Make the disk image
+        timeout-minutes: 45 # Apple's service once hung for 6 hours (2026-11-25). It normally takes a few minutes.
+        env:
+          EPM2MOD_SIGN_IDENTITY: ${{ inputs.sign && 'Developer ID Application' || '' }}
+          EPM2MOD_NOTARY_PROFILE: ${{ inputs.sign && 'epm2mod' || '' }}
         run: release/mac/make-dmg.sh "zip/$NAME.zip" dist
-      - if: always() && inputs.sign
-        run: security delete-keychain "$RUNNER_TEMP/sign.keychain-db" || true
-      # the app's start, from the disk image (the keychain is gone): copy to Application Support, uv, Python, --version
-      - run: |
+      # The keychain is deleted before anything from the zip runs.
+      - name: Delete the signing keychain
+        if: always() && inputs.sign
+        run: release/mac/keychain.sh delete "$RUNNER_TEMP/sign.keychain-db"
+      - name: Start the app from the disk image
+        run: |
           hdiutil attach -nobrowse -readonly -mountpoint "$RUNNER_TEMP/dmg" dist/*.dmg
           "$RUNNER_TEMP/dmg/EPM2Mod.app/Contents/Resources/launch.sh" --version \
             || { cat "$HOME/Library/Application Support/EPM2Mod/start.log"; exit 1; }
           cat "$HOME/Library/Application Support/EPM2Mod/start.log"
           hdiutil detach "$RUNNER_TEMP/dmg"
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      - name: Upload the disk image
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-dmg
           path: dist/*.dmg
           if-no-files-found: error
+          retention-days: ${{ inputs.release_version && 90 || 7 }}
