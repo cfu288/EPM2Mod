@@ -1,6 +1,6 @@
 <h1><img src="docs/images/banner.png" alt="EPM2Mod"></h1>
 
-Repository containing the current work for creating a custom firmware mod for the Olympus PEN **E-PM2**. It swaps the art filters for [film simulations](https://cfu288.github.io/EPM2Mod/films) and adds interval shooting, a level gauge, focus peaking, a lowest shutter speed and AF-point spot metering.
+Repository containing the current work for creating a custom firmware mod for the Olympus PEN **E-PM2**. It swaps the art filters for [film simulations](https://cfu288.github.io/EPM2Mod/films) and adds interval shooting, a level gauge, focus peaking, a lowest shutter speed and AF-point spot metering. Light Box shows two photos side by side in playback.
 
 > This project was created with heavy use of AI assistance.
 
@@ -14,6 +14,7 @@ Repository containing the current work for creating a custom firmware mod for th
 | [Focus peaking](docs/guide/focus-peaking.md) | <img src="docs/images/ui/peaking-list.png" width="240" alt="Custom Menu A with the Peaking list"> |
 | [Lowest shutter speed for ISO Auto](docs/guide/lowest-shutter-speed.md) | <img src="docs/images/ui/lowest-ss-list.png" width="240" alt="Lowest S/S Setting set to 1/15"> |
 | [Spot metering at the AF point](docs/guide/spot-metering.md) | <img src="docs/images/ui/spot-metering-page.png" width="240" alt="The Spot Metering page with Spot, Spot Hilight and Spot Shadow"> |
+| [Light Box](docs/guide/light-box.md) | <img src="docs/images/ui/light-box-info.png" width="240" alt="The ▶ Info list with Light Box set to On"> |
 
 [![Nine photos, each developed in the camera with Natural and the film simulations](docs/images/film-sim-comparison.jpg)](https://cfu288.github.io/EPM2Mod/films)
 
