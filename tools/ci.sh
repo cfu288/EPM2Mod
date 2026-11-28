@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # tools/ci.sh [python|web]: the hard checks, the same in CI and locally; run it before a pull request.
 #
-# Needs a clone that is set up: uv run epm2mod init. A check that cannot run is a failure, not a skip. The builds that
-# the python part makes and checks: the pinned build, and each data/builds/*.json that differs from the base commit
-# (CI_BASE; default: origin's main). Nothing here warns: the soft report of a build is `uv run epm2mod lint NAME`.
+# Needs jq and a clone that is set up: uv run epm2mod init.
+# A check that cannot run is a failure, not a skip. The builds that the python part makes and checks: the pinned build,
+# and each data/builds/*.json that differs from the base commit (CI_BASE; default: origin's main). Nothing here warns:
+# the soft report of a build is `uv run epm2mod lint NAME`.
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 part=${1:-all}
@@ -48,8 +49,10 @@ quiet uv run --directory cli black --check .
 quiet uv run --directory cli mypy
 
 step "the package compiles under Python 3.10, the oldest that cli/pyproject.toml allows"
+# The pin moves together with requires-python in cli/pyproject.toml.
 # uv warns when UV_LOCKED is set with --no-project, so the variable is removed for this step only.
-quiet env -u UV_LOCKED PYTHONPYCACHEPREFIX="$tmp/pycache" uv run --no-project --python 3.10.22 python -m compileall -q cli/src/epm2mod
+quiet env -u UV_LOCKED PYTHONPYCACHEPREFIX="$tmp/pycache" \
+  uv run --no-project --python 3.10.22 python -m compileall -q cli/src/epm2mod
 
 step "unit tests (they also run pyflakes on the scripts, and hold the feature lists)"
 quiet uv run python -m unittest discover -s cli/tests

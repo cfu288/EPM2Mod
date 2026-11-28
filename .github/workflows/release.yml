@@ -38,6 +38,7 @@ jobs:
     outputs:
       tag: ${{ steps.plan.outputs.tag }}
       release_version: ${{ steps.plan.outputs.release_version }}
+      title: ${{ steps.plan.outputs.title }}
       prerelease: ${{ steps.plan.outputs.prerelease }}
       commit: ${{ steps.plan.outputs.commit }}
       sha256: ${{ steps.plan.outputs.sha256 }}
@@ -49,7 +50,7 @@ jobs:
           fetch-depth: 0 # The plan needs the tags and the commits since the last release.
       - name: Set up the tools
         uses: ./.github/actions/setup
-      - name: Set up the clone
+      - name: Build the objdump and get the emulator and Olympus's firmware
         run: uv run epm2mod init
       - name: Run the checks
         env:
@@ -62,17 +63,7 @@ jobs:
           KIND: ${{ inputs.kind }}
           BUILD: ${{ inputs.build }}
           SUMMARY: ${{ inputs.summary }}
-        run: |
-          args=(--json --summary "$SUMMARY")
-          if [ "$KIND" = final ]; then args+=(--final); fi
-          if [ -n "$BUILD" ]; then args+=(--build "$BUILD"); fi
-          status=0
-          uv run epm2mod release "${args[@]}" > plan.json || status=$?
-          jq -r '(.problems[]? | "::error::Not ready: \(.)"), (.error.message? // empty | "::error::\(.)")' plan.json
-          [ "$status" -eq 0 ] || exit "$status"
-          jq -r '"tag=\(.tag)", "release_version=\(.release_version)", "prerelease=\(.prerelease)",
-            "commit=\(.commit)", "sha256=\(.sha256)"' plan.json >> "$GITHUB_OUTPUT"
-          jq -r .notes plan.json | tee notes.md
+        run: release/plan.sh notes.md
       - name: Upload the notes
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -81,7 +72,7 @@ jobs:
           if-no-files-found: error
 
   package:
-    name: Make the installer
+    name: Installer
     needs: plan
     uses: ./.github/workflows/installer.yml
     with:
@@ -111,9 +102,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ needs.plan.outputs.tag }}
-          VERSION: ${{ needs.plan.outputs.release_version }}
+          TITLE: ${{ needs.plan.outputs.title }}
           PRERELEASE: ${{ needs.plan.outputs.prerelease }}
           COMMIT: ${{ needs.plan.outputs.commit }}
           CHECKED: ${{ needs.plan.outputs.sha256 }}
           PACKAGED: ${{ needs.package.outputs.sha256 }}
-        run: release/publish.sh "$TAG" "$VERSION" "$PRERELEASE" "$COMMIT" "$CHECKED" "$PACKAGED"
+        run: release/publish.sh "$TAG" "$TITLE" "$PRERELEASE" "$COMMIT" "$CHECKED" "$PACKAGED"

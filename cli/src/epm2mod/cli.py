@@ -585,6 +585,7 @@ COMMANDS: dict[str, Command] = {
                 "problems": "why not, if it cannot",
                 "tag": "the tag of the release, like v2026.11.19-rc.1 (null if not ready)",
                 "release_version": "the release's version: the tag without its v (null if not ready)",
+                "title": "the title of the release page, like EPM2Mod 2026.11.19-rc.1 (null if not ready)",
                 "prerelease": "true for a test release, false for a release for everyone (null if not ready)",
                 "commit": "the commit that the release is made from (null if not ready)",
                 "notes": "the release notes (null if not ready)",
@@ -1185,6 +1186,7 @@ def _release(args: argparse.Namespace, ctx: Context) -> int:
             problems=problems,
             tag=release and release.tag,
             release_version=release and release.tag[1:],
+            title=release and release.title,
             prerelease=release and not args.final,
             commit=release and release.commit,
             notes=release and release.notes,
@@ -1194,7 +1196,7 @@ def _release(args: argparse.Namespace, ctx: Context) -> int:
         for problem in problems:
             print(f"not ready: {problem}")
     else:
-        print(f"EPM2Mod {release.tag[1:]}\n")  # the title that the release page shows
+        print(f"{release.title}\n")  # the release page shows this title above the notes
         print(release.notes)
         _hint(
             f"ready: {release.tag} on {release.commit[:7]}. To release it: "

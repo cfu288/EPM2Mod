@@ -82,7 +82,7 @@ def release_notes(
 ) -> str:
     """Return the release notes: the summary, the changes, the firmware and the install steps.
 
-    The release page shows the title (``EPM2Mod VERSION``) above them, so the notes do not repeat it.
+    The release page shows the title (``Plan.title``) above them, so the notes do not repeat it.
 
     Args:
         label: the build's label, which the camera's Firmware screen shows.
@@ -141,6 +141,11 @@ class Plan:
     commit: str
     notes: str
     sha256: str
+
+    @property
+    def title(self) -> str:
+        """The title of the release page, like ``EPM2Mod 2026.11.19-rc.1``."""
+        return f"EPM2Mod {self.tag[1:]}"
 
 
 def plan(

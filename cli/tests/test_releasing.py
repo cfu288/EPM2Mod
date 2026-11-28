@@ -140,7 +140,18 @@ class PlanTests(unittest.TestCase):
         with contextlib.redirect_stdout(io.StringIO()) as out, contextlib.redirect_stderr(io.StringIO()):
             self.assertEqual(cli.main(argv), 1)
         document = json.loads(out.getvalue())
-        self.assertEqual((document["ready"], document["prerelease"]), (False, None))
+        self.assertEqual((document["ready"], document["prerelease"], document["title"]), (False, None, None))
+
+    def test_the_json_names_the_title_that_the_preview_prints(self) -> None:
+        self.checked = []
+        argv = ["--project", str(self.paths.root), "release", "--build", "probe"]
+        with contextlib.redirect_stdout(io.StringIO()) as out, contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(cli.main([*argv, "--json"]), 0)
+        document = json.loads(out.getvalue())
+        self.assertEqual((document["title"], document["prerelease"]), ("EPM2Mod " + document["release_version"], True))
+        with contextlib.redirect_stdout(io.StringIO()) as out, contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(cli.main(argv), 0)
+        self.assertTrue(out.getvalue().startswith(document["title"] + "\n\n"))
 
     def test_an_untested_build_is_not_released(self) -> None:
         self.assertEqual(
