@@ -54,7 +54,7 @@ step "generated documents and generated specs"
 quiet uv run epm2mod generate --check
 quiet gen/run.sh --check
 
-pinned=$(uv run epm2mod builds --json | uv run python -c 'import json, sys; print(json.load(sys.stdin)["pinned"])')
+pinned=$(uv run epm2mod builds --json | jq -r .pinned)
 # the descriptions git holds, against the working tree: an edit is checked before it is committed
 changed=$(git diff --name-only --no-renames --diff-filter=AM "$base" -- 'data/builds/*.json' | xargs -r -n1 basename -s .json)
 # shellcheck disable=SC2086
@@ -62,9 +62,9 @@ builds=$(printf '%s\n' "$pinned" $changed | sort -u)
 for name in $builds; do
   step "build $name: make, free-space check, load-order check, start in the emulator"
   quiet uv run epm2mod make "$name"  # a candidate: with the three checks
-  if grep -q '"camera_tested"' "data/builds/$name.json"; then  # make compares a tested build with its sha256 only
-    # shellcheck disable=SC2046
-    quiet uv run python tools/freespace.py check $(uv run python -c 'import json, sys; b = json.load(open(sys.argv[1])); print(*b["specs"], *["--first-code"] * bool(b.get("first_code")))' "data/builds/$name.json")
+  # make compares a camera-tested build with its sha256 only, so the checks run here.
+  if jq -e '.camera_tested != null' "data/builds/$name.json" > /dev/null; then
+    quiet uv run python tools/freespace.py check --build "$name"
     quiet uv run python emulator/boot-test "build/$name.BIN"
     quiet uv run python emulator/update-path-test "build/$name.BIN"
   fi
