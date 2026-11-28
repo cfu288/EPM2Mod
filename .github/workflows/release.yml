@@ -21,7 +21,7 @@ on:
         type: string
         default: ''
       notes:
-        description: What is new, in plain sentences for users. It goes under the title, above the change list.
+        description: Describe what is new in this release in plain sentences for users. The text appears under the title.
         type: string
         default: ''
       dry_run:

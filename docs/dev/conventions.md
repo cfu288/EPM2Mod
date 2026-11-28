@@ -181,9 +181,8 @@ gh workflow run release.yml -f kind=rc -f dry_run=false     # the release
    The description in `data/builds/` is not changed.
 4. **`epm2mod release` checks** that the build has a camera test (`epm2mod pin` recorded it), the tree is clean and at
    `origin/main`, and the generated documents and the feature lists are current. It writes the notes: the feat and
-   fix commits since the last release, without their type and scope, and the firmware line. The workflow's input
-   `notes` goes under the title: what is new, in plain sentences for users. The build's description is not in the
-   notes.
+   fix commits since the last release, without their type and scope, and the firmware line. The text of the workflow's
+   input `notes` appears under the title. It describes what is new in plain sentences for users.
 5. **The workflow** runs the hard checks (`tools/ci.sh`) on the commit, then that command (job `plan`), makes the zip
    and the Mac disk image and starts them on three systems (`package.yml`), and then creates the tag and the GitHub
    release in one step (`gh release create`), unless `dry_run` is true, the default.
