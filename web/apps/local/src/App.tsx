@@ -12,7 +12,7 @@ import {
   type Looks,
 } from '@epm2mod/ui'
 import { api, type Build, type Card, type Firmware, type Job } from './api'
-import { FLOWS, initial, labels, onTimeline, reduce, startReady } from './flow'
+import { FLOWS, initial, labels, noStabilizer, onTimeline, reduce, startReady } from './flow'
 import { Timeline } from './Timeline'
 
 const ZIP_NAME = 'EPM2Mod-card.zip'
@@ -185,35 +185,49 @@ function StartStep(props: {
   )
 }
 
-/** The Other options of the EPM2Mod choice: open by itself when the option is on, so a chosen option is in view. */
+/** What the Other options' stabilizer choice makes, as the Build and Install steps name it. */
+const NO_STABILIZER = 'EPM2Mod for a camera with a broken image stabilizer'
+
+/** The Other options of the EPM2Mod choice: open at first when the option is on; the summary says when it is on. */
 function StabilizerOption(props: { on: boolean; onChange: (on: boolean) => void }) {
   const id = useId()
+  const [open, setOpen] = useState(props.on)
   return (
-    <details open={props.on || undefined} className="mt-3 ml-7">
-      <summary className="cursor-pointer text-sm font-bold">Other options</summary>
-      <div className="mt-2 flex items-start gap-x-3">
-        <input
-          id={id}
-          type="checkbox"
-          aria-describedby={`${id}-line`}
-          checked={props.on}
-          onChange={(event) => {
-            props.onChange(event.target.checked)
-          }}
-          className="accent-ink mt-1 size-4"
-        />
-        <div>
-          <label htmlFor={id} className="block cursor-pointer text-sm">
-            My camera's image stabilizer is broken
-          </label>
-          <p id={`${id}-line`} className="text-ink-soft text-sm">
-            Choose this if the IS icon blinks when you turn the camera on. The camera then does not use its stabilizer.
-            On a camera whose stabilizer works, this turns stabilization off. To turn it back on, install EPM2Mod again
-            without this option.
-          </p>
+    <div className="mt-3 ml-7">
+      <details
+        open={open}
+        onToggle={(event) => {
+          setOpen(event.currentTarget.open)
+        }}
+      >
+        <summary className="cursor-pointer text-sm font-bold">
+          {props.on ? 'Other options: image stabilizer off' : 'Other options'}
+        </summary>
+        <div className="mt-2 flex items-start gap-x-3">
+          <input
+            id={id}
+            type="checkbox"
+            aria-describedby={`${id}-line`}
+            checked={props.on}
+            onChange={(event) => {
+              props.onChange(event.target.checked)
+            }}
+            className="accent-ink mt-1 size-4"
+          />
+          <div>
+            <label htmlFor={id} className="block cursor-pointer text-sm">
+              My camera's image stabilizer is broken
+            </label>
+            <p id={`${id}-line`} className="text-ink-soft text-sm">
+              Choose this if the IS icon blinks when you turn the camera on. Photos and movies then have no image
+              stabilization. If your stabilizer works, leave this off. To get stabilization back, install EPM2Mod again
+              without this option.
+            </p>
+          </div>
         </div>
-      </div>
-    </details>
+      </details>
+      {!open && <p className="text-ink-soft text-sm">For a camera whose IS icon blinks when you turn it on.</p>}
+    </div>
   )
 }
 
@@ -359,7 +373,13 @@ function FilmsStep(props: {
   )
 }
 
-function BuildStep(props: { job: Job | null; firmware: Firmware; onRetry: () => void; onBack: () => void }) {
+function BuildStep(props: {
+  job: Job | null
+  firmware: Firmware
+  noStabilizer: boolean
+  onRetry: () => void
+  onBack: () => void
+}) {
   const { job } = props
   const failed = job?.error != null
   const list = stages(job, props.firmware)
@@ -389,6 +409,7 @@ function BuildStep(props: { job: Job | null; firmware: Firmware; onRetry: () => 
         )
       }
     >
+      {props.noStabilizer && <p className="font-bold">{NO_STABILIZER}.</p>}
       <ol aria-label="Progress" aria-live="polite" className="space-y-2">
         {list.map((stage, index) => {
           const state = index < doneCount ? 'done' : index === doneCount ? (failed ? 'failed' : 'now') : 'later'
@@ -425,6 +446,7 @@ function BuildStep(props: { job: Job | null; firmware: Firmware; onRetry: () => 
 function InstallStep(props: {
   job: Job
   cardName: string
+  noStabilizer: boolean
   onZip: () => void
   onRestart: () => void
   onFinish: () => void
@@ -432,9 +454,11 @@ function InstallStep(props: {
   const { job } = props
   const zip = job.card === null
   const films = job.firmware === 'films'
-  const what = { original: "Olympus's original firmware is", epm2mod: 'EPM2Mod is', films: 'The film simulations are' }[
-    job.firmware
-  ]
+  const what = props.noStabilizer
+    ? `${NO_STABILIZER} is`
+    : { original: "Olympus's original firmware is", epm2mod: 'EPM2Mod is', films: 'The film simulations are' }[
+        job.firmware
+      ]
   const flash = job.camera_steps.findIndex((step) => step.id === 'flash') + 1
   return (
     <Step
@@ -451,7 +475,11 @@ function InstallStep(props: {
       }
     >
       <p className="font-bold">
-        {zip ? 'The zip is ready.' : `${what} on the SD card${props.cardName ? ` ${props.cardName}` : ''}.`}
+        {zip
+          ? props.noStabilizer
+            ? `The zip with ${NO_STABILIZER} is ready.`
+            : 'The zip is ready.'
+          : `${what} on the SD card${props.cardName ? ` ${props.cardName}` : ''}.`}
       </p>
       {zip && (
         <button type="button" onClick={props.onZip} className={`${primary} w-full`}>
@@ -546,7 +574,7 @@ export default function App() {
     // the firmware has Olympus's art filters: every EPM2Mod install gets a look file, loaded with Load Looks
     const wanted = firmware === 'original' ? [] : custom ? choicesOf(looks.items) : DEFAULT_CHOICES
     dispatch({ type: 'make', custom })
-    api.make(firmware, wanted, zip ? null : card, state.noStabilizer).then(
+    api.make(firmware, wanted, zip ? null : card, noStabilizer(state)).then(
       (started) => {
         dispatch({ type: 'job', job: started })
       },
@@ -650,6 +678,7 @@ export default function App() {
           <BuildStep
             job={job}
             firmware={firmware}
+            noStabilizer={noStabilizer(state)}
             onRetry={() => {
               startBuild(state.lastCustom)
             }}
@@ -661,6 +690,7 @@ export default function App() {
         {step === 'install' && job && (
           <InstallStep
             job={job}
+            noStabilizer={noStabilizer(state)}
             cardName={cards.find((c) => c.path === job.card && c.name !== '')?.name ?? ''}
             onZip={downloadZip}
             onFinish={() => {

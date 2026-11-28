@@ -10,7 +10,7 @@ const CARD = {
 
 /** Answer the calls of `epm2mod serve`; a job ends at its second poll. Returns the bodies of /api/make. */
 async function fakeServer(page: Page) {
-  const made: { firmware: string; choices: string[]; card: string | null }[] = []
+  const made: { firmware: string; choices: string[]; card: string | null; no_stabilizer: boolean }[] = []
   let polls = 0
   const job = (done: boolean) => {
     const body = made.at(-1)
@@ -45,7 +45,7 @@ async function fakeServer(page: Page) {
       return route.fulfill({ json: { name: 'card-looks-4', what: 'Film simulations', sha256: null } })
     if (path === '/api/cards') return route.fulfill({ json: [CARD] })
     if (path === '/api/make') {
-      made.push(request.postDataJSON() as { firmware: string; choices: string[]; card: string | null })
+      made.push(request.postDataJSON() as (typeof made)[number])
       polls = 0
       return route.fulfill({ status: 202, json: job(false) })
     }
@@ -95,4 +95,21 @@ test('customizes the films and downloads the zip', async ({ page }) => {
   expect(made[0]?.choices).toContain('ART2=c200')
   expect(made[0]?.card).toBeNull()
   await expect(page.getByRole('list', { name: 'Install steps' })).toContainText('Load Looks → Load → OK.')
+})
+
+test('makes the zip of EPM2Mod for a broken image stabilizer', async ({ page }) => {
+  const made = await fakeServer(page)
+  await page.goto('/#token=t0k3n')
+  await page.getByRole('radio', { name: /Download a zip/ }).check()
+  await page.getByRole('button', { name: 'Next' }).click()
+  await page.getByText('Other options').click()
+  await page.getByRole('checkbox', { name: "My camera's image stabilizer is broken" }).check()
+  await page.getByText('Other options: image stabilizer off').click()
+  await page.getByRole('button', { name: 'Next' }).click()
+  await page.getByRole('button', { name: 'Use the default film simulations' }).click()
+  await expect(
+    page.getByText('The zip with EPM2Mod for a camera with a broken image stabilizer is ready.'),
+  ).toBeVisible()
+  expect(made[0]?.no_stabilizer).toBe(true)
+  expect(made[0]?.card).toBeNull()
 })

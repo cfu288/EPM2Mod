@@ -181,8 +181,16 @@ describe('the local app', () => {
     await next(user)
     const option = screen.getByRole('checkbox', { name: "My camera's image stabilizer is broken" })
     expect(option).not.toBeVisible() // Other options is closed
+    expect(screen.getByText('For a camera whose IS icon blinks when you turn it on.')).toBeInTheDocument()
     await user.click(screen.getByText('Other options'))
     await user.click(option)
+    // collapsed again, the summary still says the option is on
+    await user.click(screen.getByText('Other options: image stabilizer off'))
+    expect(screen.getByRole('checkbox', { name: "My camera's image stabilizer is broken" })).not.toBeVisible()
+    // another firmware and back: the tick stays
+    await user.click(screen.getByRole('radio', { name: 'Film simulations only' }))
+    await user.click(screen.getByRole('radio', { name: 'EPM2Mod' }))
+    expect(screen.getByRole('checkbox', { name: "My camera's image stabilizer is broken" })).toBeChecked()
     await next(user)
     await user.click(screen.getByRole('button', { name: 'Back' }))
     // back on the step, the chosen option is in view
@@ -190,6 +198,21 @@ describe('the local app', () => {
     await next(user)
     await user.click(screen.getByRole('button', { name: 'Use the default film simulations' }))
     expect(made).toEqual([{ firmware: 'epm2mod', choices: DEFAULT, card: CARD.path, no_stabilizer: true }])
+    expect(
+      await screen.findByText('EPM2Mod for a camera with a broken image stabilizer is on the SD card CARD.'),
+    ).toBeInTheDocument()
+  })
+
+  it('sends the tick only with the EPM2Mod firmware', async () => {
+    const made = server()
+    const user = userEvent.setup()
+    render(<App />)
+    await next(user)
+    await user.click(screen.getByText('Other options'))
+    await user.click(screen.getByRole('checkbox', { name: "My camera's image stabilizer is broken" }))
+    await user.click(screen.getByRole('radio', { name: 'Olympus original' }))
+    await user.click(screen.getByRole('button', { name: 'Next' }))
+    expect(made).toEqual([{ firmware: 'original', choices: [], card: CARD.path, no_stabilizer: false }])
   })
 
   it('restores the original firmware without the film step', async () => {

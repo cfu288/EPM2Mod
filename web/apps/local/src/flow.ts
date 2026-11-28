@@ -78,6 +78,10 @@ export const initial: State = {
 /** The first step is done: there is a card, or the user wants a zip. */
 export const startReady = (state: State) => state.zip || state.card !== ''
 
+/** The job is EPM2Mod for a broken image stabilizer: the tick stays when the user tries another firmware, but only
+ * EPM2Mod uses it. */
+export const noStabilizer = (state: State) => state.noStabilizer && state.firmware === 'epm2mod'
+
 /** Whether the user can go to a step now (Next, Back, or the timeline). */
 export function canGo(state: State, step: StepId): boolean {
   const target = CHOICE_STEPS.indexOf(step)
@@ -111,10 +115,9 @@ export function reduce(state: State, action: Action): State {
       return card === state.card ? state : { ...state, card }
     }
     case 'firmware':
-      // the option belongs to the EPM2Mod firmware: another choice clears it
-      return { ...state, firmware: action.firmware, noStabilizer: state.noStabilizer && action.firmware === 'epm2mod' }
+      return { ...state, firmware: action.firmware }
     case 'noStabilizer':
-      return { ...state, noStabilizer: action.on && state.firmware === 'epm2mod' }
+      return { ...state, noStabilizer: action.on }
     case 'go':
       if (!canGo(state, action.step)) return state
       return {
