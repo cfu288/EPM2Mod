@@ -1,0 +1,26 @@
+{
+ "name": "light-box-dial",
+ "description": "Light Box zoom with the control dial: one zoom step per dial detent, and no restart at 1x or 14x. In the Light Box zoom view (SS_PLAY_SINGLE state 17, the yellow ratio label) the main-dial handler 0x7EDBD84E called CPlayLightBox::zoomImage itself and returned state 20, whose entry 0x7EDBA14F zooms again with the same delta: two steps per detent (2x, 5x, 10x, 14x), and at the ends the second request repeated the shown ratio, the play component answered API_REDUCE_MIN or API_ENLARGE_MAX, and GUI_PLAY_ERROR (0x7EDBCF4B, getJumpState(0) in state 17) restarted Light Box with the right picture moved to the left. The handler's call (7 bytes) becomes `nop`; the state-20 entry makes the one step, and the handler's own checks stop at 1x and 14x. \u25b2 and \u25bc in that view still repeated the ratio at the ends (the state-20 entry zooms by 0 after their own step), so GUI_PLAY_ERROR's handler 0x7EDBCF4B now maps state 17 to state 16, as it maps 16 and 18-21 (20 bytes: five compares become one range test). No new code area. See experiments/2026-11-19-light-box/NOTES.md, \"Light Box dial (2026-11-28)\".",
+ "base": "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN",
+ "base_sha256": "34d339ac3986ba8c10f494dbe2e4ae8f143ebf5bbfaa356e3ff9b7f40fc3e300",
+ "ops": [
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x99C8D5",
+   "expect": "dd6986f4ffb0a8",
+   "new": "cbcbcbcbcbcbcb",
+   "_addr": "0x7EDBD8F5",
+   "_note": "0x7EDBD84E, the main-dial handler of the Light Box zoom view (state 17): its call of CPlayLightBox::zoomImage 0x7ED05F5E -> seven `nop`. The handler still returns state 20 (d2, set before the call, which the callee saves and restores); the entry of state 20 (0x7EDBA14F) zooms one step with the dial's delta, and the handler's checks above (no zoom out at 100, no zoom in at 1400) stop at the ends, so no zoom request repeats the shown ratio and no GUI_PLAY_ERROR restarts Light Box"
+  },
+  {
+   "type": "bytes",
+   "block": 0,
+   "offset": "0x99BF56",
+   "expect": "a010c812a012c80ea013c80aa014c806a015c906",
+   "new": "28f0a005c710ca12cbcbcbcbcbcbcbcbcbcbcbcb",
+   "_addr": "0x7EDBCF76",
+   "_note": "0x7EDBCF4B, the handler of GUI_PLAY_ERROR 0x9A40 (d0 = the state): the compares 16, 18, 19, 20, 21 -> 'go to state 16' become one range test 16-21, so state 17, the Light Box zoom view, also goes to state 16 (the view with the same zoom) instead of getJumpState(0), which starts Light Box again with another pair. A zoom with \u25b2 or \u25bc to 1x or 14x in that view repeats the shown ratio in the entry of state 20 and gets API_REDUCE_MIN or API_ENLARGE_MAX. d0 is not read after the test: state 16 sets d2, the other path clears d0 before getJumpState. The 12 bytes after the `bra` are not reached"
+  }
+ ]
+}
