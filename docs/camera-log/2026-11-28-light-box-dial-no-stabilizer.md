@@ -1,0 +1,5 @@
+# 2026-11-28: light-box-dial, no-stabilizer version
+
+| Date (UTC) | Build | sha256 | Result |
+|---|---|---|---|
+| 2026-11-28 | The no-stabilizer version of the pinned build `data/builds/light-box-dial.json` (`uv run epm2mod make light-box-dial --no-stabilizer`): light-box-dial with `no-ibis` and `no-ibis-menu`, the specs that no-ibis-2 added to light-box-2, for the owner's body with the broken stabilizer; label 2026.12.02. Before the flash, emulator: free space PASS, hookcheck 0 new transfers, boot-test PASS with the variant's four declared lines, update-path-test PASS; light-box-dial's own boot-test with those four lines FAILS (each declared line did not happen), so the pinned build still starts its stabilizer. To see on the camera: no blinking IS icon at power-on, Shooting Menu 2's Image Stabilizer grayed out, a photo, Light Box and the Firmware screen; on the working body, the normal light-box-dial flashed after it brings the stabilizer back | `9025cdee76b9afd2f9cd39088ce730fbe333c0f1ddbacf3c9a07ad1965332ada` | **Candidate, not flashed.** |
