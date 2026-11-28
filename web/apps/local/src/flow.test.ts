@@ -1,5 +1,5 @@
 import type { Job } from './api'
-import { canGo, initial, onTimeline, reduce, type Action, type State } from './flow'
+import { canGo, initial, noStabilizer, onTimeline, reduce, type Action, type State } from './flow'
 
 const run = (...actions: Action[]) => actions.reduce(reduce, initial)
 const CARD = { path: '/media/u/CARD', name: 'CARD', size: 32e9, free: 31e9, label: 'CARD' }
@@ -85,5 +85,17 @@ describe('the installer flow', () => {
       'start',
       'Put the SD card back in this computer, then select Refresh.',
     ])
+  })
+
+  it('keeps the broken-stabilizer tick and uses it only with the EPM2Mod firmware', () => {
+    const on = reduce(atFilms, { type: 'noStabilizer', on: true })
+    expect(noStabilizer(initial)).toBe(false)
+    expect(noStabilizer(on)).toBe(true)
+    expect(noStabilizer(reduce(on, { type: 'go', step: 'firmware' }))).toBe(true)
+    const films = reduce(on, { type: 'firmware', firmware: 'films' })
+    expect([films.noStabilizer, noStabilizer(films)]).toEqual([true, false])
+    expect(noStabilizer(reduce(films, { type: 'firmware', firmware: 'epm2mod' }))).toBe(true)
+    expect(noStabilizer(reduce(on, { type: 'restart' }))).toBe(true)
+    expect(noStabilizer(reduce(on, { type: 'noStabilizer', on: false }))).toBe(false)
   })
 })

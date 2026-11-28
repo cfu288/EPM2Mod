@@ -115,4 +115,15 @@ export const features: Feature[] = [
       { src: 'ui/art-bkt-raw-edit.png', alt: 'RAW Data Edit with Current, Custom1, Custom2, ART BKT and No' },
     ],
   },
+  {
+    id: 'broken-stabilizer',
+    name: 'Broken image stabilizer',
+    summary: 'A camera with a broken image stabilizer can start without it and without the blinking IS icon.',
+    steps: [
+      'In the installer, select EPM2Mod and open Other options.',
+      "Select My camera's image stabilizer is broken, and install as usual.",
+      'MENU → SETUP → Shooting Menu 2 → Image Stabilizer is then grayed out.',
+    ],
+    screens: [{ src: 'ui/image-stabilizer-gray.png', alt: 'Shooting Menu 2 with Image Stabilizer grayed out' }],
+  },
 ]

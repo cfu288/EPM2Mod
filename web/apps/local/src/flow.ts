@@ -32,6 +32,8 @@ export interface State {
   /** The furthest of CHOICE_STEPS reached: the timeline goes back and forward to any step up to it. */
   reached: number
   firmware: Firmware
+  /** EPM2Mod for a camera whose image stabilizer is broken (the Firmware step's Other options). */
+  noStabilizer: boolean
   zip: boolean
   /** The chosen card's path, '' for none. */
   card: string
@@ -49,6 +51,7 @@ export type Action =
   | { type: 'card'; card: string }
   | { type: 'cards'; cards: Card[] }
   | { type: 'firmware'; firmware: Firmware }
+  | { type: 'noStabilizer'; on: boolean }
   | { type: 'go'; step: StepId }
   | { type: 'customize'; on: boolean }
   | { type: 'make'; custom: boolean }
@@ -62,6 +65,7 @@ export const initial: State = {
   step: 'start',
   reached: 0,
   firmware: 'epm2mod',
+  noStabilizer: false,
   zip: false,
   card: '',
   customizing: false,
@@ -73,6 +77,10 @@ export const initial: State = {
 
 /** The first step is done: there is a card, or the user wants a zip. */
 export const startReady = (state: State) => state.zip || state.card !== ''
+
+/** The job is EPM2Mod for a broken image stabilizer: the tick stays when the user tries another firmware, but only
+ * EPM2Mod uses it. */
+export const noStabilizer = (state: State) => state.noStabilizer && state.firmware === 'epm2mod'
 
 /** Whether the user can go to a step now (Next, Back, or the timeline). */
 export function canGo(state: State, step: StepId): boolean {
@@ -108,6 +116,8 @@ export function reduce(state: State, action: Action): State {
     }
     case 'firmware':
       return { ...state, firmware: action.firmware }
+    case 'noStabilizer':
+      return { ...state, noStabilizer: action.on }
     case 'go':
       if (!canGo(state, action.step)) return state
       return {

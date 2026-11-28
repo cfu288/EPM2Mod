@@ -27,6 +27,10 @@ The comparison rule of the boot test (RULE below is printed with --rule):
   S-DIV0's count and the refused MMIO accesses, CPU1's state and the problems line.
   A patch that makes the start-up do something else on purpose (one more console line, one more
   flash write) fails this rule. Read the printed lines, then decide by hand; do not widen the rule.
+  When the change is intended, the build description lists each changed line in "boot_differs"
+  (the reference's line, the image's line, why), and make passes them with --declared FILE. A
+  declared pair matches a differing line that equals it under the rule; the image passes only if
+  every differing line matches a declared pair and every declared pair matches a line.
 
   The three results:
     PASS         every line is equal under the rule. Exit status 0.
@@ -38,6 +42,7 @@ The comparison rule of the boot test (RULE below is printed with --rule):
                  time, image time, difference), then one line with the total. Exit status 1.
 """
 
+import json
 import os
 import re
 import shutil
@@ -73,23 +78,39 @@ def normalise(report):
     return out
 
 
-def compare_reports(ref, new, times=True):
+def _same(x, y):
+    """True if two normalised lines are equal under the rule."""
+    (tx, sx), (ty, sy) = x, y
+    return tx == ty and len(sx) == len(sy) and all(abs(u - v) <= TIME_TOLERANCE_MS + 1e-9 for u, v in zip(sx, sy))
+
+
+def compare_reports(ref, new, times=True, declared=()):
     """Return a list of differences (strings) between two boot reports under the rule. Empty = equal.
 
     times=False leaves out the lines whose only difference is a moved time stamp (see moved_stamps).
+    declared: (reference line, image line) pairs that the image changes on purpose. A differing line
+    that equals a pair under the rule is not a difference; a pair that matches no line is one.
     """
     a, b = normalise(ref), normalise(new)
+    pairs = [(normalise(x)[0], normalise(y)[0]) for x, y in declared]
+    unused = list(range(len(pairs)))
     ra, rb = ref.rstrip("\n").split("\n"), new.rstrip("\n").split("\n")
     diffs = []
     if len(a) != len(b):
         diffs.append(f"the reports have {len(a)} and {len(b)} lines")
     for i, ((ta, sa), (tb, sb)) in enumerate(zip(a, b)):
         if ta != tb or len(sa) != len(sb):
+            k = next((k for k in unused if _same(pairs[k][0], (ta, sa)) and _same(pairs[k][1], (tb, sb))), None)
+            if k is not None:
+                unused.remove(k)
+                continue
             diffs.append(f"line {i + 1} differs:\n  reference: {_cut(ra[i], rb[i])[0]}\n  image:     {_cut(ra[i], rb[i])[1]}")
             continue
         worst = max((abs(x - y) for x, y in zip(sa, sb)), default=0.0)
         if times and worst > TIME_TOLERANCE_MS + 1e-9:
             diffs.append(f"line {i + 1}: a time stamp moved by {worst:.1f} ms (more than {TIME_TOLERANCE_MS} ms):\n  reference: {_cut(ra[i], rb[i])[0]}\n  image:     {_cut(ra[i], rb[i])[1]}")
+    for k in unused:
+        diffs.append(f"a declared difference did not happen:\n  reference: {declared[k][0][:200]}\n  image:     {declared[k][1][:200]}")
     return diffs
 
 
@@ -155,9 +176,9 @@ def _why_no_boot(code, out, err):
     return f"exit {code}; {tail}"
 
 
-def boot_test(image, ref="stock", ms=2000, out_dir=None, say=print):
+def boot_test(image, ref="stock", ms=2000, out_dir=None, say=print, declared=()):
     """Run the boot test. Return OK or FAIL (also for TIMES MOVED); raise emuenv.EmuSetupError when the emulator cannot
-    run."""
+    run. declared: the (reference line, image line) pairs the image changes on purpose (compare_reports)."""
     (rc, rout, rerr), (ic, iout, ierr) = _run_pair("stage2-boot.mjs", [ref, image], [str(ms)])
     _save(out_dir, "boot-reference.txt", rout + rerr)
     _save(out_dir, "boot-image.txt", iout + ierr)
@@ -167,7 +188,7 @@ def boot_test(image, ref="stock", ms=2000, out_dir=None, say=print):
     if ic != 0 or "STAGE 2: PASS" not in iout:
         say(f"boot-test: FAIL: {image} does not reach the end of start-up in {ms} ms of lab time ({_why_no_boot(ic, iout, ierr)})")
         return FAIL
-    diffs = compare_reports(rout, iout, times=False)
+    diffs = compare_reports(rout, iout, times=False, declared=declared)
     moved = moved_stamps(rout, iout)
     if diffs:
         say(f"boot-test: FAIL: {image} boots, but its report differs from {ref}'s in {len(diffs)} place(s) that the rule does not allow (--rule prints it):")
@@ -185,7 +206,8 @@ def boot_test(image, ref="stock", ms=2000, out_dir=None, say=print):
     if diffs or moved:
         return FAIL
     allowed = allowed_differences(rout, iout)
-    say(f"boot-test: PASS: {image} boots as {ref} does ({ms} ms of lab time; lines with allowed differences: {', '.join(allowed) or 'none'})")
+    intended = f"; {len(declared)} declared difference(s), each present" if declared else ""
+    say(f"boot-test: PASS: {image} boots as {ref} does ({ms} ms of lab time; lines with allowed differences: {', '.join(allowed) or 'none'}{intended})")
     return OK
 
 
@@ -274,6 +296,7 @@ def main(test, argv):
     ap.add_argument("--ref", default="stock", help="the reference image (default: stock)")
     ap.add_argument("--ms", type=int, default=2000 if test is boot_test else 3000, help="lab time in ms")
     ap.add_argument("--out", help="folder for the two raw reports")
+    ap.add_argument("--declared", help="JSON file: a build's boot_differs list, the lines the image changes on purpose (boot-test; update-path-test does not use it)")
     if test is boot_test:
         ap.add_argument("--rule", action="store_true", help="print the comparison rule and stop")
     else:
@@ -287,7 +310,11 @@ def main(test, argv):
         return USAGE
     try:
         if test is boot_test:
-            return boot_test(a.image, a.ref, a.ms, a.out)
+            declared = ()
+            if a.declared:
+                with open(a.declared) as f:
+                    declared = [(d["reference"], d["image"]) for d in json.load(f)]
+            return boot_test(a.image, a.ref, a.ms, a.out, declared=declared)
         return update_path_test(a.image, a.ref, a.ms, a.out, update_file=a.update_file)
     except emuenv.EmuSetupError as e:
         print(f"{name}: cannot run: {e}", file=sys.stderr)

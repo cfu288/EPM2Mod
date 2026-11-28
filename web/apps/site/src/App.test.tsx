@@ -13,10 +13,10 @@ beforeEach(() => {
 })
 
 describe('App', () => {
-  it('starts on the home page with the eight camera features', () => {
+  it('starts on the home page with the nine camera features', () => {
     render(<App />)
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('EPM2Mod')
-    expect(within(screen.getByRole('region', { name: 'Features' })).getAllByRole('listitem')).toHaveLength(8)
+    expect(within(screen.getByRole('region', { name: 'Features' })).getAllByRole('listitem')).toHaveLength(9)
     expect(within(nav()).getByRole('link', { name: /GitHub/ })).toHaveAttribute(
       'href',
       'https://github.com/cfu288/EPM2Mod',

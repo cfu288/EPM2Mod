@@ -55,7 +55,10 @@ def data_files(paths: RepoPaths, version: str) -> list[tuple[str, bytes]]:
     description = release_description(paths, version)
     build = description_path(paths, description.name)
     sources = [build, paths.film_records]
-    sources += [paths.spec_file(spec) for spec in description.specs]
+    variant = (
+        () if description.no_stabilizer is None else description.no_stabilizer.specs
+    )
+    sources += [paths.spec_file(spec) for spec in description.specs + variant]
     missing = [str(source) for source in sources if not source.is_file()]
     if missing:
         raise BuildError("missing for the release: " + ", ".join(missing))

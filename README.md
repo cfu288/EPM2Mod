@@ -16,6 +16,7 @@ Repository containing the current work for creating a custom firmware mod for th
 | [Spot metering at the AF point](docs/guide/spot-metering.md) | <img src="docs/images/ui/spot-metering-page.png" width="240" alt="The Spot Metering page with Spot, Spot Hilight and Spot Shadow"> |
 | [Light Box](docs/guide/light-box.md) | <img src="docs/images/ui/light-box-info.png" width="240" alt="The ▶ Info list with Light Box set to On"> |
 | [ART BKT in RAW Data Edit](docs/guide/art-bkt.md) | <img src="docs/images/ui/art-bkt-raw-edit.png" width="240" alt="RAW Data Edit with Current, Custom1, Custom2, ART BKT and No"> |
+| [A version for a broken image stabilizer](docs/guide/broken-stabilizer.md) | <img src="docs/images/ui/image-stabilizer-gray.png" width="240" alt="Shooting Menu 2 with Image Stabilizer grayed out"> |
 
 [![Nine photos, each developed in the camera with Natural and the film simulations](docs/images/film-sim-comparison.jpg)](https://cfu288.github.io/EPM2Mod/films)
 

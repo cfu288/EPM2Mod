@@ -33,7 +33,7 @@ from .builds import pinned_description
 from .errors import BuildError, Epm2ModError
 from .fileio import read_text, write_bytes
 from .paths import RepoPaths
-from .pipeline import check_free_space, check_in_emulator
+from .pipeline import check_free_space, check_in_emulator, no_stabilizer_image
 from .release import check_version, stamp
 
 #: The tags of the pinned build's releases (final, second of a day, rc), as git globs. A test release of a named
@@ -199,6 +199,13 @@ def plan(
                 path = Path(folder) / f"{released.name}.BIN"
                 write_bytes(path, image, BuildError)
                 check_in_emulator(paths, path)
+                if released.no_stabilizer is not None:
+                    variant = released.with_no_stabilizer()
+                    check_free_space(paths, variant)
+                    write_bytes(
+                        path, no_stabilizer_image(paths, released)[0], BuildError
+                    )
+                    check_in_emulator(paths, path, variant.boot_differs)
             if released.sha256 != chosen.sha256:
                 tested = (chosen.sha256, chosen.label)
         except Epm2ModError as error:

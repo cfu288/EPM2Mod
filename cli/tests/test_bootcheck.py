@@ -59,5 +59,29 @@ class CompareReports(unittest.TestCase):
         self.assertTrue(bootcheck.compare_reports(REPORT, REPORT.replace("  CPU0!\n", "")))
 
 
+class DeclaredDifferences(unittest.TestCase):
+    OLD, NEW = "S-DIV0 1", "S-DIV0 0"
+
+    def compare(self, new: str, declared: list[tuple[str, str]]) -> list[str]:
+        return bootcheck.compare_reports(REPORT, new, declared=declared)
+
+    def test_a_declared_difference_passes(self) -> None:
+        line = next(x for x in REPORT.splitlines() if self.OLD in x)
+        pair = (line, line.replace(self.OLD, self.NEW))
+        self.assertEqual(self.compare(REPORT.replace(self.OLD, self.NEW), [pair]), [])
+
+    def test_an_undeclared_extra_or_a_missing_declared_difference_fails(self) -> None:
+        line = next(x for x in REPORT.splitlines() if self.OLD in x)
+        pair = (line, line.replace(self.OLD, self.NEW))
+        extra = REPORT.replace(self.OLD, self.NEW).replace("  CPU0!", "  CPU0?")
+        self.assertEqual(len(self.compare(extra, [pair])), 1)
+        missing = self.compare(REPORT, [pair])
+        self.assertEqual(len(missing), 1)
+        self.assertIn("did not happen", missing[0])
+
+    def test_without_declared_differences_the_rule_is_unchanged(self) -> None:
+        self.assertEqual(len(self.compare(REPORT.replace(self.OLD, self.NEW), [])), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -11,6 +11,7 @@ show that they need no checkout. ``JsonTests`` compares the keys of real ``--jso
 from __future__ import annotations
 
 import contextlib
+import dataclasses
 import io
 import json
 import os
@@ -52,6 +53,7 @@ from epm2mod import (  # noqa: E402
     spec,
 )
 from epm2mod.errors import (  # noqa: E402
+    BuildError,
     CardError,
     CheckError,
     NotFoundError,
@@ -316,6 +318,29 @@ class InstallTests(CardCase):
                 with self.assertRaisesRegex(UsageError, words):
                     self.install(choices=choices)
         self.assertEqual(self.card_files(), [])
+
+    def test_no_stabilizer_writes_the_pinned_build_with_the_variant_specs(self) -> None:
+        with self.assertRaisesRegex(BuildError, "image stabilizer is broken"):
+            self.install(no_stabilizer=True)  # this build has no variant
+        variant_op = {**BYTE_OP, "offset": "0x12", "expect": "1213", "new": "eeff"}
+        self.repo.write_json("data/specs/b.json", spec_json("b", [variant_op]))
+        pinned = dataclasses.replace(
+            self.repo.films_build,
+            no_stabilizer=builds.Variant(("data/specs/b.json",)),
+        )
+        builds.pin(self.repo.paths, pinned)
+        lines: list[str] = []
+        outcome = self.install(no_stabilizer=True, log=lines.append)
+        written = (self.card / FIRMWARE).read_bytes()
+        names = (*self.repo.films_build.specs, "data/specs/b.json")
+        specs = [spec.load_spec(self.repo.paths.resolve(name)) for name in names]
+        expected = spec.apply_specs(TINY, specs).image
+        self.assertEqual(written, expected)
+        self.assertNotEqual(written, self.repo.films_image)
+        self.assertIn("this is the build that was tested on 2026-11-14", "\n".join(lines))
+        self.assertIn(f"sha256 {sha256_bytes(expected)}", "\n".join(lines))
+        assert outcome.build is not None
+        self.assertEqual(outcome.build.name, "films-no-stabilizer")
 
     def test_an_untested_build_needs_allow_untested(self) -> None:
         self.repo.free_space_tool(0)

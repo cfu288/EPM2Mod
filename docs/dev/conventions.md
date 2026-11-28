@@ -147,6 +147,15 @@ build.
    - write the result in the camera log, and commit.
 5. **If it fails:** write the result in the camera log. Keep or delete the description; never pin it.
 
+The pinned build has a version for a camera whose image stabilizer is broken: its `"no_stabilizer"` key lists the
+specs that it adds (`data/specs/no-ibis.json`, `data/specs/no-ibis-menu.json`) and the boot-test lines that they
+change on purpose, `"boot_differs": [{"reference": STOCK_LINE, "image": VARIANT_LINE, "why": ONE_LINE}]`. Copy
+the key into the description of each new build that is to be pinned. `uv run epm2mod make NAME --no-stabilizer` makes
+that version as a candidate, with the three checks; only its `boot-test` gets those lines. `tools/ci.sh` also runs
+the build's own `boot-test` with them, which must fail, so the build itself still starts its stabilizer. A release
+checks both versions. The no-stabilizer version is camera-tested on a body whose stabilizer is broken when its specs
+change, and written in the camera log with its sha256.
+
 A test record is never changed. A build that changes after its test gets a description with a new
 name.
 
@@ -224,7 +233,7 @@ Each check is in one layer.
 | Commit hooks | Staged files: machine paths, the document rules, prettier, black, mypy, the commit message. `epm2mod lint` of each staged build description only warns | `.githooks/` |
 | Hard checks | No warnings: `tools/ci.sh` (its first lines say what it makes and checks) | CI runs it (Firmware checks, Website), and Release on the released commit. Run it before a pull request. CI skips draft pull requests and runs when a draft is marked ready |
 | Pull request title | The title follows the rule of the commit-msg hook, because it becomes the commit subject of a squash merge | PR title, which runs again when the title is edited |
-| Checks of a candidate | The free-space check (with the load-order check), `boot-test` and `update-path-test`. A start whose time stamps moved (TIMES MOVED) fails | `epm2mod make NAME`: a candidate is not made without them |
+| Checks of a candidate | The free-space check (with the load-order check), `boot-test` and `update-path-test`. A start whose time stamps moved (TIMES MOVED) fails. `boot-test` passes a no-stabilizer version whose report differs from stock's only in the lines of its `boot_differs`, each present | `epm2mod make NAME`: a candidate is not made without them |
 | Soft report | Load-order transfers that the pinned build does not have, first code. Exit status 0 with any number of warnings | `uv run epm2mod lint NAME`, by hand and from the commit hook. Never in CI |
 | By hand | `emulator/scenarios/scen_guard.py`, before a build that changes peaking is offered for a flash; `emulator/filmcheck.py`, before one that changes the film structure or the loader; `emulator/artbkt-test`, before one with a `raw-edit-art-bkt` spec; `uv run python tools/freespace.py map`, when the code-space map is needed | the script's first lines |
 

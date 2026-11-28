@@ -8,7 +8,11 @@ A build description is a JSON file in the project's build folder (``RepoPaths.bu
       "specs": [SPEC, ...],            (paths of patch specs)
       "sha256": "...",                 (only after a camera test)
       "camera_tested": "2026-11-13",   (only after a camera test)
-      "first_code": true               (optional; see below)
+      "first_code": true,              (optional; see below)
+      "no_stabilizer": {               (optional; see below)
+        "specs": [SPEC, ...],
+        "boot_differs": [{"reference": LINE, "image": LINE, "why": TEXT}, ...]
+      }
     }
 
 The name of a build is the name of its file without ``.json``; it is not
@@ -21,6 +25,11 @@ folder (``RepoPaths.specs``), written relative to the project folder, and are ap
 where no camera-tested build runs code yet. The free-space check refuses such
 a build unless the description says so, because only the flash can show that
 code runs there. The key is either absent or ``true``.
+
+``no_stabilizer`` describes the build's variant for a body whose image stabilizer is broken
+(``BuildDescription.with_no_stabilizer``): the build with ``specs`` added. ``boot_differs`` lists each line of the
+emulator's boot report that those specs change on purpose: the stock report's line, the variant's line, and why. Only
+the variant's boot check gets them, so the build's own check still fails if its stabilizer does not start.
 
 The project's pinned file (``RepoPaths.pinned``) holds ``{"build": PATH}``, the path of a
 description in the build folder: the description of the last build that passed a camera test.
@@ -45,8 +54,23 @@ from .paths import RepoPaths, is_repo_relative
 from .stock import StockFirmware, stock_named
 
 _NAME = re.compile(r"[a-z0-9][a-z0-9._-]*")
-_KEYS = {"what", "stock", "specs", "sha256", "camera_tested", "first_code", "label"}
+_KEYS = {
+    "what",
+    "stock",
+    "specs",
+    "sha256",
+    "camera_tested",
+    "first_code",
+    "label",
+    "no_stabilizer",
+}
+_DIFFER_KEYS = ("reference", "image", "why")
 _SUFFIX = ".json"
+#: The end of the name of a build's no-stabilizer variant.
+NO_STABILIZER = "-no-stabilizer"
+
+#: Boot report lines that a build changes on purpose: (the stock report's line, the build's line, why) each.
+BootDiffers = tuple[tuple[str, str, str], ...]
 
 
 def _check_sha256(value: object, where: str) -> str:
@@ -93,6 +117,14 @@ def check_spec_path(text: object, where: str) -> str:
 
 
 @dataclass(frozen=True)
+class Variant:
+    """The no-stabilizer variant of a build: the specs added to it, and the boot report lines they change."""
+
+    specs: tuple[str, ...]
+    boot_differs: BootDiffers = ()
+
+
+@dataclass(frozen=True)
 class BuildDescription:
     """One firmware build.
 
@@ -107,6 +139,8 @@ class BuildDescription:
         label: the date ``YYYY.MM.DD`` that the camera's Firmware screen shows
             after "EPM2Mod"; present exactly when ``specs`` lists the label spec.
         stock: the name of the stock firmware the build starts from (``stock.STOCK_FIRMWARE``).
+        no_stabilizer: the build's variant for a body whose stabilizer is broken, or None.
+        boot_differs: the boot report lines this build changes on purpose; only a variant has them.
     """
 
     name: str
@@ -117,6 +151,8 @@ class BuildDescription:
     first_code: bool = False
     label: str | None = None
     stock: str = field(kw_only=True)
+    no_stabilizer: Variant | None = field(default=None, kw_only=True)
+    boot_differs: BootDiffers = field(default=(), kw_only=True)
 
     def __post_init__(self) -> None:
         """Check the description. Every instance is valid.
@@ -172,6 +208,27 @@ class BuildDescription:
         """True if the build passed a camera test and its SHA-256 is recorded."""
         return self.sha256 is not None
 
+    def with_no_stabilizer(self) -> BuildDescription:
+        """Return the build's no-stabilizer variant: a candidate with the variant's specs added.
+
+        Raises:
+            BuildError: if the build has no such variant.
+        """
+        if self.no_stabilizer is None:
+            raise BuildError(
+                f"{self.name} has no version for a camera whose image stabilizer is broken"
+            )
+        return BuildDescription(
+            name=self.name + NO_STABILIZER,
+            what="For a body whose image stabilizer is broken: the camera does not start the "
+            f"stabilizer, and its settings are grayed out. Otherwise as {self.name}: {self.what}",
+            specs=self.specs + self.no_stabilizer.specs,
+            first_code=self.first_code,
+            label=self.label,
+            stock=self.stock,
+            boot_differs=self.no_stabilizer.boot_differs,
+        )
+
     def as_tested(self, sha256: str, date: str) -> BuildDescription:
         """Return a copy that records a passed camera test.
 
@@ -207,6 +264,14 @@ class BuildDescription:
             raw["first_code"] = True
         if self.label is not None:
             raw["label"] = self.label
+        if self.no_stabilizer is not None:
+            raw["no_stabilizer"] = {
+                "specs": list(self.no_stabilizer.specs),
+                "boot_differs": [
+                    dict(zip(_DIFFER_KEYS, line))
+                    for line in self.no_stabilizer.boot_differs
+                ],
+            }
         return raw
 
 
@@ -226,6 +291,8 @@ def description_from_json(name: str, raw: Any) -> BuildDescription:
     """
     if not isinstance(raw, dict):
         raise BuildError(f"{name}: a build description must be a JSON object")
+    if name.endswith(NO_STABILIZER):
+        raise BuildError(f"{name}: a name ending in {NO_STABILIZER} names a variant")
     unknown = sorted(set(raw) - _KEYS)
     if unknown:
         raise BuildError(f"{name}: unknown key(s): {', '.join(unknown)}")
@@ -248,7 +315,38 @@ def description_from_json(name: str, raw: Any) -> BuildDescription:
         first_code="first_code" in raw,
         label=None if raw.get("label") is None else check_label(raw["label"], name),
         stock=stock,
+        no_stabilizer=(
+            None
+            if raw.get("no_stabilizer") is None
+            else _variant(raw["no_stabilizer"], name)
+        ),
     )
+
+
+def _variant(raw: object, where: str) -> Variant:
+    """Return the ``no_stabilizer`` variant of its JSON form, else raise."""
+    if not isinstance(raw, dict) or set(raw) != {"specs", "boot_differs"}:
+        raise BuildError(
+            f"{where}: 'no_stabilizer' is an object with 'specs' and 'boot_differs'"
+        )
+    specs, differs = raw["specs"], raw["boot_differs"]
+    if not isinstance(specs, list) or not specs or not isinstance(differs, list):
+        raise BuildError(
+            f"{where}: 'no_stabilizer' needs a list of specs and a list 'boot_differs'"
+        )
+    lines = []
+    for entry in differs:
+        if (
+            not isinstance(entry, dict)
+            or set(entry) != set(_DIFFER_KEYS)
+            or not all(isinstance(entry[k], str) and entry[k] for k in _DIFFER_KEYS)
+        ):
+            raise BuildError(
+                f"{where}: each 'boot_differs' entry has the strings "
+                "'reference', 'image' and 'why'"
+            )
+        lines.append((entry["reference"], entry["image"], entry["why"]))
+    return Variant(tuple(check_spec_path(s, where) for s in specs), tuple(lines))
 
 
 def load_description(path: Path) -> BuildDescription:

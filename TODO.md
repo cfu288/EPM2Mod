@@ -87,6 +87,17 @@ candidate `osd-battery` are kept.
   the shutter count, a calibration of the percentage scale, and a row in LV-Info to switch it.
   Notes: `experiments/2026-11-17-osd-info/NOTES.md`.
 
+## Stabilizer
+
+- **Skip a broken stabilizer with no separate version.** The pinned build has a no-stabilizer version for a body
+  whose stabilizer is broken (`no_stabilizer` in its description). Next: one firmware that, after the stabilizer's
+  start-up fails (error 0x8228, the fault flag), treats the body as having no stabilizer from then on, plus an
+  optional Custom Menu row (Off by default) that switches a working stabilizer off for a start about 0.9 s faster
+  (both bodies take 1.77 s to the first screen with the stabilizer and about 0.85 s without). Test on a working and a
+  broken body. Notes: `experiments/2026-11-27-no-ibis/NOTES.md`.
+- **Find the 0.3 s.** The owner's earlier build (log build id 8bf70fea) reached the first screen at 1.47 s; the
+  builds since then take 1.77 s on the same body.
+
 ## Foundations
 
 - From the firmware review of 2026-11-21 (`experiments/2026-11-21-firmware-dive/NOTES.md`). The owner's rule
