@@ -12,9 +12,9 @@ export interface Feature {
 
 export const features: Feature[] = [
   {
-    id: 'film-looks',
+    id: 'film-simulations',
     name: 'Film simulations',
-    summary: 'Film colours straight out of the camera.',
+    summary: 'Film simulations replace the Olympus art filters with film looks like Portra and Ektachrome.',
     steps: [
       'Install EPM2Mod with the installer. It puts the film simulations on the SD card.',
       'MENU → SETUP → Custom Menu → J → Load Looks → Load. Until then the camera has the Olympus art filters.',
@@ -23,9 +23,9 @@ export const features: Feature[] = [
     screens: [{ src: 'ui/quick-menu-portra.png', alt: 'The quick menu with Picture Mode on Portra 400' }],
   },
   {
-    id: 'interval',
+    id: 'interval-shooting',
     name: 'Interval shooting',
-    summary: 'Time-lapses without a remote.',
+    summary: 'Interval shooting takes up to 240 photos for a time-lapse without a remote.',
     steps: [
       'Press MENU, select P on the first screen, and press OK. Set the camera clock.',
       'MENU → SETUP → Shooting Menu 2 → Time Lapse Settings → On. Set the frames and the interval.',
@@ -38,9 +38,9 @@ export const features: Feature[] = [
     ],
   },
   {
-    id: 'level',
+    id: 'level-gauge',
     name: 'Level gauge',
-    summary: 'Keep horizons straight.',
+    summary: 'A level gauge helps you keep horizons straight by showing you when you are tilted.',
     steps: [
       'MENU → SETUP → Custom Menu → D → Info Settings → LV-Info → Level Gauge.',
       'In live view, press INFO until the bars appear.',
@@ -52,20 +52,20 @@ export const features: Feature[] = [
     ],
   },
   {
-    id: 'peaking',
+    id: 'focus-peaking',
     name: 'Focus peaking',
-    summary: 'Easier manual focus, with any lens.',
+    summary: 'Focus peaking outlines what is in focus so manual focus is easier with any lens.',
     steps: [
       'Set the focus mode to MF: the lines show in live view.',
-      'To change the colour: MENU → SETUP → Custom Menu → A → Peaking.',
+      'To change the color: MENU → SETUP → Custom Menu → A → Peaking.',
       'To also zoom in when you turn the focus ring: MENU → SETUP → Custom Menu → A → MF Assist → On.',
     ],
     screens: [{ src: 'ui/peaking-list.png', alt: 'Custom Menu A with the Peaking list' }],
   },
   {
-    id: 'lowest-ss',
+    id: 'lowest-shutter-speed',
     name: 'Lowest shutter speed',
-    summary: 'Sharp moving subjects, or less noise on still ones, in dim light.',
+    summary: 'Lowest shutter speed sets how slow Auto ISO lets the shutter go before it raises the ISO.',
     steps: [
       'Set the shooting mode to P or A, and ISO to Auto.',
       'MENU → SETUP → Custom Menu → E. Exp/▣/ISO → Lowest S/S Setting.',
@@ -79,7 +79,7 @@ export const features: Feature[] = [
   {
     id: 'spot-metering',
     name: 'Spot metering at the AF point',
-    summary: 'Correct exposure for an off-center subject, without recomposing.',
+    summary: 'Spot metering measures the light at your AF point so an off-center subject is exposed correctly.',
     steps: [
       'MENU → SETUP → Custom Menu → E. Exp/▣/ISO → Spot Metering.',
       'Select Spot, Spot Hilight or Spot Shadow, press RIGHT, choose On, and press OK.',

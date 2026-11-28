@@ -173,7 +173,7 @@ class FeatureListTests(unittest.TestCase):
             problems = readme.feature_problems(RepoPaths(root))
         self.assertIn("README.md does not link docs/guide/new-thing.md", problems)
         self.assertIn("docs/guide/new-thing.md is not in readme.SITE_IDS: add its site id, or None", problems)
-        self.assertIn("web/apps/site/src/features.ts has no feature 'level'", problems)
+        self.assertIn("web/apps/site/src/features.ts has no feature 'level-gauge'", problems)
 
 
 if __name__ == "__main__":
