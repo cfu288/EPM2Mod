@@ -31,7 +31,8 @@ Sources for the years: [E-PL3](https://petapixel.com/2011/06/30/olympus-announce
 
 ## Features by Generation
 
-Each cell gives the default (Yes, Some bodies, No or Unknown), then + and the mods that add the feature. In the VI
+Each cell gives the default (Yes, Some bodies, No or Unknown), then + and the mods that add the feature. Features
+that more generations have by default come first. In the VI
 column the default is the E-PM2's. The [model matrix](model-matrix.md#2-features-by-generation) gives what each
 feature needs, the evidence and a link for each cell.
 
@@ -39,26 +40,26 @@ feature needs, the evidence and a link for each cell.
 
 | Feature | VI (E-PM2) | VII | VIII | IX | X |
 |---|---|---|---|---|---|
-| Film simulations | No + EPM2Mod | No + om10mi-mods | No + Caduceus | No + Caduceus, OMKit | No + Caduceus, Nostalgia-OM |
+| Focus peaking | No + EPM2Mod | Yes | Yes | Yes | Yes |
+| Wi-Fi | No | Yes | Yes | Yes | Yes |
+| Silent shutter | Unknown | Some bodies | Yes | Yes | Yes |
+| High Res Shot | Unknown | Some bodies | Some bodies | Yes | Yes |
+| Log or flat movie profile | No | No + em10-fw | Some bodies + Caduceus | Yes | Yes |
+| Live ND | Unknown | No | Some bodies + Caduceus | Yes | Yes |
+| Pro Capture | Unknown | No + fenykl (E-M10 II) | Some bodies | Yes | Yes |
+| Tethering | No | Some bodies | Some bodies | Yes | Some bodies |
 | 12-color editing, photos | No | Some bodies + PEN-F HSL | Some bodies + Caduceus | No + Caduceus, OMKit | Some bodies + Caduceus |
 | 12-color editing, live view and movie | No | Some bodies | Some bodies + Caduceus | No + OMKit | Some bodies + Caduceus |
-| Looks or code from the card | No + EPM2Mod, fenykl (E-PL3) | No + fenykl (E-M10 II) | No + Caduceus | No + OMKit, Caduceus | No + Caduceus |
-| Focus peaking | No + EPM2Mod | Yes | Yes | Yes | Yes |
-| Live ND | Unknown | No | Some bodies + Caduceus | Yes | Yes |
-| Silent shutter | Unknown | Some bodies | Yes | Yes | Yes |
-| Pro Capture | Unknown | No + fenykl (E-M10 II) | Some bodies | Yes | Yes |
-| High Res Shot | Unknown | Some bodies | Some bodies | Yes | Yes |
 | Longer movie limit | No | No + om10mi-mods | No + Caduceus, em1x-mod | No + E-M1 III Mod Builder | Yes |
-| Log or flat movie profile | No | No + em10-fw | Some bodies + Caduceus | Yes | Yes |
 | 10-bit movie | Unknown | Unknown | Unknown | Unknown | Yes |
 | Grain and other per-pixel effects | No | No + em10-fw | No + Caduceus | No + OMKit | Some bodies + Caduceus |
-| Wi-Fi | No | Yes | Yes | Yes | Yes |
-| Tethering | No | Some bodies | Some bodies | Yes | Some bodies |
-| Star tracking | Unknown | No | No | No | No + OM Startrack |
-| Aperture ring (Panasonic lenses) | Unknown + db firmware (E-PL5, E-PL6, E-P5) | No + db firmware | No + db firmware | No + db firmware | No + db firmware |
-| Body IS off at start | No + EPM2Mod (untested) | No | No | No | No |
-| Focus stacking with any lens | No | Some bodies | No + em1x-mod, Caduceus port | No + E-M1 III Mod Builder | No |
 | Lowest shutter speed for Auto ISO | No + EPM2Mod | Some bodies + db firmware | No + db firmware, Caduceus | Unknown | Unknown |
+| Focus stacking with any lens | No | Some bodies | No + em1x-mod, Caduceus port | No + E-M1 III Mod Builder | No |
+| Film simulations | No + EPM2Mod | No + om10mi-mods | No + Caduceus | No + Caduceus, OMKit | No + Caduceus, Nostalgia-OM |
+| Looks or code from the card | No + EPM2Mod, fenykl (E-PL3) | No + fenykl (E-M10 II) | No + Caduceus | No + OMKit, Caduceus | No + Caduceus |
+| Aperture ring (Panasonic lenses) | Unknown + db firmware (E-PL5, E-PL6, E-P5) | No + db firmware | No + db firmware | No + db firmware | No + db firmware |
+| Star tracking | Unknown | No | No | No | No + OM Startrack |
+| Body IS off at start | No + EPM2Mod (untested) | No | No | No | No |
 
 ## Why EPM2Mod Is Not a Fork
 
