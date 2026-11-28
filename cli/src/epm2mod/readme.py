@@ -359,11 +359,11 @@ def rewrite(paths: RepoPaths) -> list[Path]:
 #: The site's id (in the site's feature list) of each feature guide (by its
 #: file name, without the suffix); None for a guide that is deliberately not on the site.
 SITE_IDS: dict[str, str | None] = {
-    "film-looks": "film-looks",
-    "interval-shooting": "interval",
-    "level-gauge": "level",
-    "focus-peaking": "peaking",
-    "lowest-shutter-speed": "lowest-ss",
+    "film-looks": "film-simulations",
+    "interval-shooting": "interval-shooting",
+    "level-gauge": "level-gauge",
+    "focus-peaking": "focus-peaking",
+    "lowest-shutter-speed": "lowest-shutter-speed",
     "spot-metering": "spot-metering",
     "light-box": "light-box",
     "art-bkt": "art-bkt",
