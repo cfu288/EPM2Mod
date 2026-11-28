@@ -104,7 +104,7 @@ export const features: Feature[] = [
   {
     id: 'art-bkt',
     name: 'ART BKT in RAW Data Edit',
-    summary: 'Compare one RAW in several film simulations, without a computer.',
+    summary: 'ART BKT develops one RAW in each film simulation you choose so you can compare them in the camera.',
     steps: [
       'MENU → SETUP → Shooting Menu 2 → Bracketing → ART BKT. Highlight On without pressing OK, and press RIGHT.',
       'Set each film simulation you want to On.',
