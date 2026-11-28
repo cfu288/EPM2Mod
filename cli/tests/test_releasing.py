@@ -53,6 +53,8 @@ class PlanTests(unittest.TestCase):
         folder = tempfile.TemporaryDirectory()
         self.addCleanup(folder.cleanup)
         self.paths = RepoPaths(write_manifest(Path(folder.name)))
+        self.paths.release_notes.parent.mkdir(parents=True)
+        self.paths.release_notes.write_text("**Install**\n", encoding="utf-8")
         label_spec = self.paths.relative(self.paths.label_spec)
         for name, sha, date in (("probe", "ab" * 32, "2026-11-20"), ("untested", None, None)):
             builds.save_description(self.paths, builds.BuildDescription(
@@ -91,6 +93,7 @@ class PlanTests(unittest.TestCase):
         self.assertEqual(self.checked, ["2026.11.25", "probe.BIN"])
         self.assertNotIn("The probe build.", release.notes)  # the build description is not in the notes
         self.assertIn("- a probe\n", release.notes)
+        self.assertTrue(release.notes.endswith("\n**Install**\n"))  # release/NOTES.md comes last
 
     def test_a_build_with_the_label_of_the_day_is_released_as_tested_and_still_checked(self) -> None:
         self.checked = []
@@ -152,6 +155,16 @@ class ReleaseNotesTests(unittest.TestCase):
             + "ab" * 32 + "`) with the release's date on the Firmware screen.\n",
             notes,
         )
+
+    def test_the_summary_comes_under_the_title_and_the_install_steps_last(self) -> None:
+        notes = release_notes(
+            "2026.11.28-rc.1", "2026.11.28", "ab" * 32, None, ["feat: x"], summary=" New dial. \n", install="**Install**\n"
+        )
+        self.assertTrue(notes.startswith("EPM2Mod 2026.11.28-rc.1\n\nNew dial.\n\nChanges:\n"))
+        self.assertTrue(notes.endswith("`.\n\n**Install**\n"))
+
+    def test_no_summary_no_empty_paragraph(self) -> None:
+        self.assertTrue(release_notes("2026.11.28", "2026.11.28", "ab" * 32, None, []).startswith("EPM2Mod 2026.11.28\n\nFirmware"))
 
     def test_no_changes_no_change_list(self) -> None:
         self.assertNotIn("Changes", release_notes("2026.11.19", "2026.11.19", "ab" * 32, None, []))

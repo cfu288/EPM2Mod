@@ -562,6 +562,7 @@ COMMANDS: dict[str, Command] = {
                 "dry_run": "true if nothing was written",
                 "zip": "the zip's path",
                 "sha256": "the zip's sha256 (null for a dry run)",
+                "firmware_sha256": "the sha256 of the firmware that the zip installs",
                 "contents": "the files in the zip",
             },
         ),
@@ -583,6 +584,7 @@ COMMANDS: dict[str, Command] = {
                 "problems": "why not, if it cannot",
                 "tag": "the tag of the release, like v2026.11.19-rc.1 (null if not ready)",
                 "release_version": "the release's version: the tag without its v (null if not ready)",
+                "prerelease": "true for a test release, false for a release for everyone",
                 "commit": "the commit that the release is made from (null if not ready)",
                 "notes": "the release notes (null if not ready)",
                 "sha256": "the sha256 of the firmware that the release installs (null if not ready)",
@@ -1137,7 +1139,7 @@ def _package(args: argparse.Namespace, ctx: Context) -> int:
 
     checkout = ctx.checkout()
     version = args.release_version
-    release_description(checkout, version)  # refuses a bad version
+    firmware = release_description(checkout, version)  # refuses a bad version
     folder = Path(args.out_dir) if args.out_dir else checkout.output_folder()
     contents = [name for name, _ in release_files(checkout, version)]
     if args.dry_run:
@@ -1152,6 +1154,7 @@ def _package(args: argparse.Namespace, ctx: Context) -> int:
             dry_run=args.dry_run,
             zip=str(out),
             sha256=digest,
+            firmware_sha256=firmware.sha256,
             contents=contents,
         )
     elif args.dry_run:
@@ -1170,7 +1173,9 @@ def _release(args: argparse.Namespace, ctx: Context) -> int:
         raise UsageError(
             "--build makes a test release: a final release holds the pinned build"
         )
-    release, problems = plan(checkout, final=args.final, build=args.build)
+    release, problems = plan(
+        checkout, final=args.final, build=args.build, summary=args.summary
+    )
     if args.json:
         _document(
             args.command_name,
@@ -1179,6 +1184,7 @@ def _release(args: argparse.Namespace, ctx: Context) -> int:
             problems=problems,
             tag=release and release.tag,
             release_version=release and release.tag[1:],
+            prerelease=not args.final,
             commit=release and release.commit,
             notes=release and release.notes,
             sha256=release and release.sha256,
@@ -1534,6 +1540,12 @@ def _arguments(
             "--build",
             metavar="NAME",
             help="a test release of this camera-tested build in place of the pinned one (-NAME.N)",
+        )
+        parser.add_argument(
+            "--summary",
+            default="",
+            metavar="TEXT",
+            help="what is new in this release, in plain sentences for users; the notes show it under the title",
         )
         _add_json(parser)
 

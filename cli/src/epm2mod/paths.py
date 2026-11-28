@@ -218,6 +218,11 @@ class RepoPaths:
         return self.location("package")
 
     @property
+    def release_notes(self) -> Path:
+        """The install steps at the end of every release's notes."""
+        return self.location("release_notes")
+
+    @property
     def release_files(self) -> tuple[Path, ...]:
         """The files that the release zip holds at its top: the launchers, their README and the licences."""
         return self.locations("release_files")

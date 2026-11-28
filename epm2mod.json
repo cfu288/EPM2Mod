@@ -28,6 +28,7 @@
  "cache": "firmware/stock/E-PM2",
  "app": "cli/src/epm2mod/app",
  "package": "cli/src/epm2mod",
+ "release_notes": "release/NOTES.md",
  "release_files": [
   "LICENSE",
   "NOTICE.md",

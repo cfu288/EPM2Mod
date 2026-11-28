@@ -2,7 +2,7 @@
 
 The release workflow on GitHub (started by hand, ``workflow_dispatch``) runs
 the hard checks and this, makes the zip with ``epm2mod package``, tests it on
-three systems, and then creates the tag and the GitHub release in one step. No
+three systems, and then publishes the GitHub release, which creates the tag. No
 person pushes a tag. This module only decides whether the repository is ready,
 which version comes next, and what the notes say.
 
@@ -31,7 +31,7 @@ from pathlib import Path
 from . import readme
 from .builds import pinned_description
 from .errors import BuildError, Epm2ModError
-from .fileio import write_bytes
+from .fileio import read_text, write_bytes
 from .paths import RepoPaths
 from .pipeline import check_free_space, check_in_emulator
 from .release import check_version, stamp
@@ -75,10 +75,10 @@ def release_notes(
     previous: str | None,
     changes: list[str],
     tested: tuple[str, str] | None = None,
+    summary: str = "",
+    install: str = "",
 ) -> str:
-    """Return the release notes: the changes and the firmware.
-
-    The release workflow puts its ``notes`` input, the summary a person writes, above them.
+    """Return the release notes: the title, the summary, the changes, the firmware and the install steps.
 
     Args:
         version: the calendar version.
@@ -87,8 +87,12 @@ def release_notes(
         previous: the tag of the release before, if any.
         changes: the subjects of the feat and fix commits since ``previous``.
         tested: the sha256 and the label of the camera-tested build, if the release holds it with another label.
+        summary: what is new, in sentences that a person writes. It comes under the title.
+        install: the install steps (the manifest's ``release_notes`` file). They come last.
     """
     lines = [f"EPM2Mod {version}", ""]
+    if summary.strip():
+        lines += [summary.strip(), ""]
     if changes:
         lines += [f"Changes since {previous}:" if previous else "Changes:", ""]
         # a commit subject without its type and scope: "fix(films): x (#13)" -> "x (#13)"
@@ -103,6 +107,8 @@ def release_notes(
             " Firmware screen."
         )
     lines += [firmware, ""]
+    if install:
+        lines += [install.rstrip("\n"), ""]
     return "\n".join(lines)
 
 
@@ -142,11 +148,13 @@ def plan(
     final: bool,
     build: str | None = None,
     day: str | None = None,
+    summary: str = "",
 ) -> tuple[Plan | None, list[str]]:
     """Check the repository and return the release to make, or the problems.
 
     ``build`` names the build of a test release in place of the pinned build.
     ``day`` is the day of the release, like ``2026.11.25`` (default: today in UTC).
+    ``summary`` is what is new, in sentences that a person writes. The notes show it under the title.
     """
     if day is None:
         day = datetime.datetime.now(datetime.timezone.utc).strftime("%Y.%m.%d")
@@ -209,5 +217,7 @@ def plan(
         previous,
         changes,
         tested,
+        summary,
+        read_text(paths.release_notes, BuildError),
     )
     return Plan(f"v{version}", commit, notes, released.sha256), []

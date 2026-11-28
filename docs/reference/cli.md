@@ -692,6 +692,7 @@ epm2mod package [-h] [--out-dir DIR] --release-version V [--dry-run] [--json]
 - `dry_run`: true if nothing was written
 - `zip`: the zip's path
 - `sha256`: the zip's sha256 (null for a dry run)
+- `firmware_sha256`: the sha256 of the firmware that the zip installs
 - `contents`: the files in the zip
 
 Examples:
@@ -705,7 +706,7 @@ epm2mod package --release-version 2026.11.19-dev
 Check that the repository is ready for the next release, and name it.
 
 ```
-epm2mod release [-h] [--final] [--build NAME] [--json]
+epm2mod release [-h] [--final] [--build NAME] [--summary TEXT] [--json]
 ```
 
 - Output: the release notes and the tag's name. It creates no tag: the release workflow on GitHub runs this command, then makes, tests, tags and publishes the release.
@@ -715,6 +716,7 @@ epm2mod release [-h] [--final] [--build NAME] [--json]
 |---|---|---|
 | `--final` | a release for everyone (vYYYY.MM.DD); default: a test release (-rc.N) |  |
 | `--build NAME` | a test release of this camera-tested build in place of the pinned one (-NAME.N) |  |
+| `--summary TEXT` | what is new in this release, in plain sentences for users; the notes show it under the title |  |
 | `--json` | print one JSON document (schema 2) on stdout |  |
 
 `--json` keys beside the keys of every document:
@@ -723,6 +725,7 @@ epm2mod release [-h] [--final] [--build NAME] [--json]
 - `problems`: why not, if it cannot
 - `tag`: the tag of the release, like v2026.11.19-rc.1 (null if not ready)
 - `release_version`: the release's version: the tag without its v (null if not ready)
+- `prerelease`: true for a test release, false for a release for everyone
 - `commit`: the commit that the release is made from (null if not ready)
 - `notes`: the release notes (null if not ready)
 - `sha256`: the sha256 of the firmware that the release installs (null if not ready)
