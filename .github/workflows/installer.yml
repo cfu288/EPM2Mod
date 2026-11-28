@@ -1,6 +1,5 @@
-# This workflow builds the release zip and the Mac disk image and starts them on three systems. See
-# docs/dev/conventions.md, section "Releases".
-name: package
+# This workflow makes sure every change still gives an installer that starts on Linux, macOS and Windows.
+name: Installer
 
 on:
   push:
@@ -16,7 +15,7 @@ on:
       - 'epm2mod.json'
       - '.nvmrc'
       - '.python-version'
-      - '.github/workflows/package.yml'
+      - '.github/workflows/installer.yml'
       - '.github/scripts/release_smoke.py'
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -43,11 +42,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-package-${{ github.ref }}
+  group: installer-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
+    name: Build the installer
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     runs-on: ubuntu-24.04
     timeout-minutes: 15
@@ -95,6 +95,7 @@ jobs:
           retention-days: ${{ inputs.release_version && 90 || 7 }}
 
   smoke:
+    name: Start the installer on ${{ matrix.os }}
     needs: build
     strategy:
       fail-fast: false
@@ -136,6 +137,7 @@ jobs:
         run: python .github/scripts/release_smoke.py "unpacked/$NAME" "$SHA256"
 
   dmg:
+    name: Make the Mac disk image
     needs: build
     runs-on: macos-15
     timeout-minutes: 60

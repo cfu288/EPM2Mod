@@ -1,6 +1,5 @@
-# This workflow runs the hard checks of the Python side (tools/ci.sh python). See docs/dev/conventions.md, section
-# "Checks".
-name: python
+# This workflow makes sure every change still builds working firmware.
+name: Firmware checks
 
 on:
   push:
@@ -13,11 +12,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: python-${{ github.ref }}
+  group: firmware-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }} # On main, each push has its own base to check.
 
 jobs:
   check:
+    name: Check the firmware
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     runs-on: ubuntu-24.04
     timeout-minutes: 20

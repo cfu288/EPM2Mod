@@ -1,5 +1,5 @@
 #!/bin/sh
-# Make or delete the keychain that signs and notarizes the disk image in CI (package.yml, job dmg).
+# Make or delete the keychain that signs and notarizes the disk image in CI (.github/workflows/installer.yml).
 #   keychain.sh create KEYCHAIN
 #   keychain.sh delete KEYCHAIN
 # create makes KEYCHAIN the default keychain, so that codesign and notarytool find the certificate. It also stores

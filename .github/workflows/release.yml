@@ -1,6 +1,5 @@
-# This workflow checks, makes and publishes a release. A person starts it by hand from main. See docs/dev/conventions.md,
-# section "Releases".
-name: release
+# This workflow checks a release, makes its installer and publishes it when a person starts it by hand from main.
+name: Release
 
 on:
   workflow_dispatch:
@@ -32,6 +31,7 @@ concurrency:
 
 jobs:
   plan:
+    name: Plan the release
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -81,13 +81,15 @@ jobs:
           if-no-files-found: error
 
   package:
+    name: Make the installer
     needs: plan
-    uses: ./.github/workflows/package.yml
+    uses: ./.github/workflows/installer.yml
     with:
       release_version: ${{ needs.plan.outputs.release_version }}
       sign: true
 
   publish:
+    name: Publish the release
     needs: [plan, package]
     if: ${{ !inputs.dry_run }}
     runs-on: ubuntu-24.04

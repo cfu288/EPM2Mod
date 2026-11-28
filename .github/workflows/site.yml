@@ -1,10 +1,11 @@
-# This workflow checks the web apps in web/ and deploys the GitHub Pages site from main. See web/README.md.
-name: web
+# This workflow makes sure every change keeps the website and the installer page working, and publishes the website
+# from main.
+name: Website
 
 on:
   push:
     branches: [main]
-    paths: &paths ['web/**', 'data/films/film-records.json', '.github/workflows/web.yml', '.nvmrc', 'tools/ci.sh', 'tools/node.sh']
+    paths: &paths ['web/**', 'data/films/film-records.json', '.github/workflows/site.yml', '.nvmrc', 'tools/ci.sh', 'tools/node.sh']
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     paths: *paths
@@ -14,11 +15,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: web-${{ github.ref }}
+  group: site-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }} # A deploy to Pages is never cut off.
 
 jobs:
   check:
+    name: Check the website
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     runs-on: ubuntu-24.04
     timeout-minutes: 15
@@ -44,6 +46,7 @@ jobs:
           path: web/apps/site/dist
 
   deploy:
+    name: Publish the website
     needs: check
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04

@@ -1,5 +1,5 @@
-# The title of a pull request becomes the commit subject of its squash merge, so it follows the commit-msg hook's rule.
-name: pr-title
+# This workflow makes sure a pull request's title can become the commit message of its merge.
+name: PR title
 
 on:
   pull_request:
@@ -14,6 +14,7 @@ concurrency:
 
 jobs:
   check:
+    name: Check the title
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
