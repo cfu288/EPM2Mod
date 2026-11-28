@@ -36,6 +36,8 @@ missing part rules out (Not possible), and what no source settles yet (Unknown).
 status comes first. The [model matrix](model-matrix.md#2-features-by-generation)
 gives what each feature needs, the evidence and a link for each cell.
 
+![Features by generation: what each TruePic generation has by default, and what mods add on top](../images/features-by-generation.png)
+
 
 | Feature | VI (E-PM2) | VII | VIII | IX | X |
 |---|---|---|---|---|---|
