@@ -29,5 +29,7 @@
   "data/specs/raw-edit-art-bkt-3.json",
   "data/specs/light-box-dial.json"
  ],
+ "sha256": "1b45771d883b80ec66d5cf79aa00665e714846c68ad473c9c548b2975f45c770",
+ "camera_tested": "2026-11-28",
  "label": "2026.12.02"
 }
