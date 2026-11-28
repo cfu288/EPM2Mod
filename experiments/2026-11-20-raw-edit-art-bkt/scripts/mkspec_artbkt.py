@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Write data/specs/raw-edit-art-bkt.json: an ART BKT row in RAW Data Edit (NOTES.md section 8).
 
-    uv run python experiments/2026-11-20-raw-edit-art-bkt/scripts/mkspec_artbkt.py [WORKDIR]
+    uv run python experiments/2026-11-20-raw-edit-art-bkt/scripts/mkspec_artbkt.py [WORKDIR [BUILD SPEC]]
+
+BUILD (default films-look-exif) is the build the spec joins; SPEC (default raw-edit-art-bkt) the spec's name.
 
 Research code. The source below (ASM) is assembled with the MN103 binutils into the free run 0x7EBB2AC4-0x7EBB2FEC
 (segment 2, reclaim-space row 2). Ops:
@@ -11,8 +13,9 @@ Research code. The source below (ASM) is assembled with the MN103 binutils into 
   4. H2, 0x7EDF812C in RawEditProcessCallback 0x7EDF7F60 (command 47, status 164 = job done):
      `mov d2,d0; mov d0,d1; call 0x7EDC712F` -> `jmp CBDONE; nop x 4`.
 The expect bytes are stock: no spec of data/builds/films-look-exif.json changes these bytes (asserted).
-FILMNAME is card-looks-6's routine (experiments/2026-11-20-film-name-exif/NOTES.md section 3); its first bytes are
-checked in card-looks-6's op.
+FILMNAME is card-looks' routine (experiments/2026-11-20-film-name-exif/NOTES.md section 3). Its address is found by
+its first bytes in BUILD's specs: card-looks-8 moved it from 0x7EE53BFE to 0x7EE53C11, and the fixed address of the
+first version crashed the camera at frame 1 (camera log 2026-11-21-films-start-texts-artbkt).
 """
 import hashlib
 import json
@@ -27,13 +30,29 @@ import disasm, oetool  # noqa: E402
 
 BASE = 0x7E421020
 STOCK = "firmware/stock/E-PM2/OLY_E_101_1600_0000_0000.BIN"
-BUILD = "data/builds/films-look-exif.json"
+BUILD = "data/builds/%s.json" % (sys.argv[2] if len(sys.argv) > 3 else "films-look-exif")
+SPEC = sys.argv[3] if len(sys.argv) > 3 else "raw-edit-art-bkt"
 AREA, AREA_END = 0x7EBB2AC4, 0x7EBB2FEC          # free in the ledger (tools/freespace.py area 0x7EBB2AC4)
 H1, H2 = 0x7EDF7DF3, 0x7EDF812C
 COUNT, ITEMS_PTR = 0x7F00D564, 0x7F00D568
 STOCK_ITEMS = 0x7F00D368                          # Current 1760, Custom1 1761, Custom2 1762, No 496 (12 B each)
-FILMNAME = 0x7EE53BFE
 FILMNAME_HEAD = bytes.fromhex("cff0f8fef4fccc81940000")   # movm [d2,d3,a2,a3],(sp); add -12,sp; mov 0x9481,d0
+
+
+def find_filmname() -> int:
+    """FILMNAME's address: the one place in BUILD's block-0 ops that starts with FILMNAME_HEAD."""
+    hits = []
+    for path in json.load(open(os.path.join(ROOT, BUILD)))["specs"]:
+        for op in json.load(open(os.path.join(ROOT, path)))["ops"]:
+            new = bytes.fromhex(op["new"])
+            i = new.find(FILMNAME_HEAD)
+            if op.get("block", 0) == 0 and i >= 0:
+                hits.append(BASE + int(op["offset"], 16) + i)
+    assert len(hits) == 1, "FILMNAME found %d times in %s" % (len(hits), BUILD)
+    return hits[0]
+
+
+FILMNAME = find_filmname()
 TEXT_ART_BKT = 1699                               # the title of the ART BKT screen (NOTES.md section 8.1)
 
 EXT = {
@@ -269,25 +288,21 @@ def main():
     items = code[syms["ITEMS"] - AREA:syms["ITEMS"] - AREA + 60]
     assert items[:36] == stock_items[:36] and items[48:] == stock_items[36:], items.hex()
 
-    # nothing of the base build changes these bytes; FILMNAME is where card-looks-6 puts it
+    # nothing of the base build changes these bytes
     ranges = [(AREA, AREA + len(code)), (H1, H1 + 5), (H2, H2 + 9), (COUNT, COUNT + 8)]
-    found = False
     for path in json.load(open(os.path.join(ROOT, BUILD)))["specs"]:
         for op in json.load(open(os.path.join(ROOT, path)))["ops"]:
             if op.get("block", 0) != 0:
                 continue
             a, new = BASE + int(op["offset"], 16), bytes.fromhex(op["new"])
             assert not any(a < hi and a + len(new) > lo for lo, hi in ranges), (path, hex(a))
-            if a <= FILMNAME < a + len(new):
-                found = new[FILMNAME - a:FILMNAME - a + len(FILMNAME_HEAD)] == FILMNAME_HEAD and path.endswith("card-looks-6.json")
-    assert found, "FILMNAME is not at %#x in card-looks-6" % FILMNAME
 
     def op(addr, new, note):
         return {"type": "bytes", "block": 0, "offset": "%#x" % (addr - BASE), "expect": stock(addr, len(new)).hex(),
                 "new": new.hex(), "_addr": "%#X" % addr, "_note": note}
 
     spec = {
-        "name": "raw-edit-art-bkt",
+        "name": SPEC,
         "description": "An ART BKT row in RAW Data Edit (Current, Custom1, Custom2, ART BKT, No). It develops the RAW once "
                        "per frame of the camera's ART BKT selection, as an ART bracket shot lists them: the current "
                        "Picture Mode first, then each entry that is On. Frame 0 is a stock [Current] edit with its "
@@ -305,7 +320,7 @@ def main():
             op(H2, h2, "H2: a done job of RawEditProcessCallback goes through CBDONE (the displaced call is in it)"),
         ],
     }
-    p = os.path.join(ROOT, "data", "specs", "raw-edit-art-bkt.json")
+    p = os.path.join(ROOT, "data", "specs", SPEC + ".json")
     json.dump(spec, open(p, "w"), indent=1)
     print("wrote", os.path.relpath(p, ROOT), len(code), "bytes;", spec["_symbols"])
 

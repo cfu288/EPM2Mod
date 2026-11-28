@@ -15,11 +15,9 @@ From the ninth review of the clean-up (2026-11-25). First decide if the check is
 
 ## Film simulations
 
-- RAW Data Edit keeps the source RAW's ImageDescription, so a RAW re-developed with another film carries the old name
-  (the playback EXIF path, `experiments/2026-11-20-film-name-exif/NOTES.md`).
-- RAW Data Edit → ART BKT (one RAW developed in every selected ART entry), a developer tool for film-simulation tests,
-  not for release: works on the camera (calibration run and the films-twelve-off round, 2026-11-20); kept in test
-  builds only (`experiments/2026-11-20-raw-edit-art-bkt/NOTES.md`).
+- RAW Data Edit → Custom1 and Custom2 keep the source RAW's ImageDescription, so a RAW re-developed with another
+  film carries the old name (seen in the emulator; Current and ART BKT record the current film's name since `artbkt`,
+  `experiments/2026-11-24-artbkt-production/NOTES.md`).
 - One more correction round from the 2026-11-21 readings, weighted for skin and grays: 12 films lost 0.07–0.24 on skin
   against films-look-exif, and grays improved less than model3 predicted (0.75 against 0.63)
   (`experiments/2026-11-20-model-calibration/NOTES.md` §11).

@@ -33,5 +33,12 @@ force-exclude = '^/tests/(?!support\.py$|test_package\.py$)'
 [tool.mypy]
 python_version = "3.10"
 strict = true
-files = ["src/epm2mod", "tests/support.py", "tests/test_package.py", "tests/test_eventlog.py"]
-mypy_path = ["src", "tests"]
+files = [
+    "src/epm2mod",
+    "tests/support.py",
+    "tests/test_package.py",
+    "tests/test_eventlog.py",
+    "tests/test_gen_raw_edit_art_bkt.py",
+    "../gen/raw-edit-art-bkt/mkspec.py",
+]
+mypy_path = ["src", "tests", "../tools"]

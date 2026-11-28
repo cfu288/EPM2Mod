@@ -263,3 +263,21 @@ go on after the first save (the callback path); the same look in every file = th
 development (8.1); Picture Mode other than Natural after the run = the restore failed; a freeze or restart = note the
 part and frame, then the Debug Log tells the last event; a list with a frame missing or extra = the composer's list
 differs from the ART BKT screen.
+
+## 9. Crash on films-start-texts-artbkt, and raw-edit-art-bkt-2 (2026-11-21)
+
+Camera (owner, 2026-11-21), build films-start-texts-artbkt sha256 `2118fc0a…` (the pinned films-start-texts +
+raw-edit-art-bkt): ART BKT on the first site RAW (P3250060) wrote one JPEG (PB220250, Natural, frame 0), then the camera
+crashed. Debug Log (`build/fw-test/site-photos/crash-1/`): session 157 ends without a flush; its last record is the
+first preview's work-buffer switch (pk_heap_mode 1, caller 0x7E94C579) at 31.2 s. The same log holds the earlier good
+runs (sessions 50-134, log-menu-2 builds): one such switch per frame, about 2.7 s apart.
+
+| Item | Finding | Label |
+|---|---|---|
+| Cause | PMSET calls FILMNAME at the fixed address 0x7EE53BFE (card-looks-6 and -7). card-looks-8 (in films-start-texts) moved FILMNAME to 0x7EE53C11; 0x7EE53BFE is now inside other code. The first PMSET is the step to frame 1, after frame 0's save | V spec bytes |
+| Emulator, crashed build | Frame 0 saved (one JPEG), PRM_SET for frame 1, then a fault at pc 0x801E (`results/artbkt-run-filmname-crashed.log`) | V |
+| Fix | `scripts/mkspec_artbkt.py` finds FILMNAME by its first bytes in the target build's specs. `mkspec_artbkt.py WORK films-start-texts raw-edit-art-bkt-2` writes `data/specs/raw-edit-art-bkt-2.json`: one byte differs (the call's displacement), the call lands on 0x7EE53C11. The default run still writes raw-edit-art-bkt.json byte for byte | V |
+| Emulator, fixed build | Frames 0, 1, 2 saved, then the emulator's third-save limit (8.3), STOP, Picture Mode back (`results/artbkt-run-filmname-fixed.log`) | V |
+| Why the checks missed it | hookcheck checks only that a transfer stays in early-loaded code, not that the target is the routine's entry. Before the flash only the list screen was run in the emulator, not the loop | V |
+
+Run the loop (`scripts/artbkt.mjs` to at least frame 1) on every build that carries an ART BKT spec.

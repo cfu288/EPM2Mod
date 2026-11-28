@@ -1,0 +1,35 @@
+10.7 PRM_SET 0x9481 = 2 from 7e67f8f2
+229.5 PRM_SET 0x9481 = 7 from 7e67f8f2
+STEP w:500 1500.1
+STEP key:PLAY 2000.1
+STEP w:1500 2520.1
+STEP key:OK 4020.1
+STEP w:800 4540.1
+STEP key:OK 5340.1
+STEP w:1500 5860.1
+STEP key:DOWN 7360.1
+STEP w:300 7880.1
+STEP key:DOWN 8180.1
+STEP w:300 8700.1
+STEP key:DOWN 9000.1
+STEP w:300 9520.1
+STEP key:OK 9820.1
+9844.9 ROWS row 3
+9844.9 SETUP list [7,100,101,102,103,104,105,106,107,108,109,119,120] PM0 7 ACT 1 PH 0 K 0
+9846.1 ERaw state_start_current_mode 
+9849 developer: take bdc0c800 mode byte +16479 = 7
+9853.4 developer: take bdc0c800 mode byte +16479 = 7
+10310.4 CB cmd 47 status 164 result 0
+10310.4 CBDONE ACT 1 PH 0 K 0 result 0
+STEP w:8000 10340.1
+STEP shot:yesno 18340.1
+STEP key:OK 18340.1
+18367.3 ERaw save_current_start (ImageDescription "OLYMPUS DIGITAL CAMERA")
+18369.6 play_save_raw 
+18369.6 api_rec_Reserve_Media 
+STEP w:15000 18860.1
+19225 CB cmd 47 status 164 result 0
+19225 CBDONE ACT 1 PH 2 K 0 result 0
+19225 PRM_SET 0x9481 = 100 from 7ebb2c7e
+{"end":{"why":"fault","code":3,"pc":32798},"ms":19225.1,"pc":"801e","files":["/DCIM/100OLYMP/PB130001.ORF 13632500","/DCIM/100OLYMP/PB140002.JPG 4023296"],"errlog":["39.9 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9","41.5 0x2a001001 from 7e579dcc(fn 7e579dbf) args 0x8ff00004 0x7e5075f9"],"problem":"none"}
+[sp+10] 7ebb2ba0(fn 7ebae000) | [sp+6c] 7e96d20e(fn 7e96d205) | [sp+80] 7e972c6a(fn 7e972c46) | [sp+94] 7e972d14(fn 7e972c6d) | [sp+a8] 7e507306(fn 7e5072fb) | [sp+ac] 7e681105(fn 7e6810f0) | [sp+c0] 7e96cd90(fn 7e96cbd6 "WARNING: CB THINNING OUT") | [sp+e8] 7e96ce9f(fn 7e96ce8f) | [sp+f0] 7e431a29(fn 7e4319a3) | [sp+f4] 7e431a29(fn 7e4319a3)

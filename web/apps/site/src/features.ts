@@ -101,4 +101,18 @@ export const features: Feature[] = [
     ],
     screens: [{ src: 'ui/light-box-info.png', alt: 'The ▶ Info list with Light Box set to On' }],
   },
+  {
+    id: 'art-bkt',
+    name: 'ART BKT in RAW Data Edit',
+    summary: 'ART BKT develops one RAW in each film simulation you choose so you can compare them in the camera.',
+    steps: [
+      'MENU → SETUP → Shooting Menu 2 → Bracketing → ART BKT. Highlight On without pressing OK, and press RIGHT.',
+      'Set each film simulation you want to On.',
+      'In playback, show a RAW photo, press OK, and select RAW Data Edit → ART BKT → Yes.',
+    ],
+    screens: [
+      { src: 'ui/art-bkt-rows.png', alt: 'The ART BKT screen with Portra 400 and Velvia set to On' },
+      { src: 'ui/art-bkt-raw-edit.png', alt: 'RAW Data Edit with Current, Custom1, Custom2, ART BKT and No' },
+    ],
+  },
 ]

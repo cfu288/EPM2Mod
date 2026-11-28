@@ -1,0 +1,158 @@
+#!/usr/bin/env python3
+"""artbkt-test BUILD.json [--keep DIR]: run the ART BKT loop of RAW Data Edit in the emulator and judge it. Run it by
+hand before a build with a raw-edit-art-bkt spec is offered for a flash; no other check runs it. About a minute.
+
+    uv run epm2mod make NAME && uv run python emulator/artbkt-test data/builds/NAME.json
+
+Why: on 2026-11-21 the camera crashed at frame 1 of an ART BKT run (a call to a routine that a later spec had moved),
+and every static check had passed (docs/camera-log/2026-11-21-films-start-texts-artbkt.md). Only a run of the loop
+finds that class of fault.
+
+What it does, on build/NAME.BIN:
+  1. makes a P-mode settings state for the image (emulator/mkstate);
+  2. makes a card: the test RAW emulator/testraw/PB130001.ORF (a copy of the one in
+     experiments/2026-11-09-film-portra/testraw/) with its ImageDescription set to a marker, and a look pack with
+     ART 1 Portra 400 and ART 2 Velvia (`epm2mod films set -o`);
+  3. runs emulator/boot/artbkt.mjs with its stand-ins: Custom Menu J > Load Looks > Load; then playback, OK,
+     RAW Data Edit, ART BKT, Yes, with the ART BKT entries as an empty settings store has them (the 12 ART entries On).
+The emulator fails every third RAW save of a session (experiments/2026-11-20-raw-edit-art-bkt/NOTES.md section 8.3),
+so the run saves frames 0, 1 and 2 and then stops on that error, which also runs the error stop.
+
+Pass: no fault; the frame list is the Picture Mode at the start, then the 12 entries in menu order; 3 JPEGs; after the
+stop the Picture Mode is the one at the start; and, when the spec has FIXDESC, each JPEG's ImageDescription is its
+frame's: Olympus's text for Natural, Portra 400, Velvia (not the RAW's marker).
+Exit status: 0 pass, 1 fail, 2 usage, 3 the emulator is not set up.
+"""
+import json
+import os
+import re
+import shutil
+import struct
+import subprocess
+import sys
+import tempfile
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+REPO = os.path.dirname(HERE)
+sys.path.insert(0, HERE)
+import emuenv  # noqa: E402
+
+RAW = os.path.join(HERE, "testraw", "PB130001.ORF")
+RAW_DESC = 0x868  # IFD0 ImageDescription of PB130001.ORF, 32 B
+OLYMPUS = b"OLYMPUS DIGITAL CAMERA"
+MARKER = b"RAW IMAGE DESCRIPTION"
+RTC = "2026-11-24T12:00:00"
+# Custom Menu J > Load Looks (the seventh row; Eye-Fi, greyed out, is skipped) > Load
+LOAD = ("key:MENU key:RIGHT key:OK" + " key:DOWN" * 3 + " key:RIGHT" + " key:DOWN" * 9 + " key:RIGHT" + " key:DOWN" * 5
+        + " key:RIGHT key:DOWN key:OK w:1000 key:MENU key:MENU w:1500").split()
+# playback, OK > RAW Data Edit > OK > ART BKT (row 4) > OK, the preview, Yes > OK, the run
+RUN = ("w:500 key:PLAY w:1500 key:OK w:800 key:OK w:1500" + " key:DOWN w:300" * 3 + " key:OK w:8000 key:OK w:15000").split()
+# the frames after frame 0 with ART 1 and 2 loaded: the ART entries' values in menu order (stock 104 and 119 for the
+# entries 5 and 11 without a film); run A of NOTES section 8.3 shows the hidden values when those have films
+ENTRIES = [100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 119, 120]
+DESCRIPTIONS = [OLYMPUS.decode(), "Portra 400", "Velvia"]
+
+
+def image_description(jpeg):
+    """Return IFD0's ImageDescription of a JPEG's EXIF block (the text before the first NUL, trailing spaces cut)."""
+    if jpeg[:4] != b"\xff\xd8\xff\xe1" or jpeg[6:12] != b"Exif\0\0":
+        return None
+    tiff = jpeg[12:]
+    order = "<" if tiff[:2] == b"II" else ">"
+    (ifd,) = struct.unpack(order + "I", tiff[4:8])
+    (n,) = struct.unpack(order + "H", tiff[ifd:ifd + 2])
+    for k in range(n):
+        tag, kind, count, value = struct.unpack(order + "HHII", tiff[ifd + 2 + 12 * k:ifd + 14 + 12 * k])
+        if tag == 0x010E and kind == 2:
+            text = tiff[value:value + count] if count > 4 else tiff[ifd + 10 + 12 * k:ifd + 10 + 12 * k + count]
+            return text.split(b"\0")[0].decode("latin1").rstrip()
+    return None
+
+
+def judge(out, heads, fixdesc):
+    """Return the list of failures of one run's output (stdout of artbkt.mjs) and JPEG heads."""
+    fails = []
+    end = [json.loads(line) for line in out.splitlines() if line.startswith("{")]
+    if not end or end[-1].get("end") != "done" or end[-1].get("problem") != "none":
+        fails.append(f"the run did not end normally: {end[-1] if end else 'no end line'}")
+    setup = re.search(r"SETUP list (\[[0-9,]*\]) PM0 (\d+)", out)
+    if not setup:
+        return fails + ["no SETUP line: the ART BKT row did not start a run"]
+    frames, pm0 = json.loads(setup.group(1)), int(setup.group(2))
+    if frames != [pm0] + ENTRIES:
+        fails.append(f"frame list {frames}, expected {[pm0] + ENTRIES}")
+    jpegs = sorted(f for f in os.listdir(heads) if f.endswith(".JPG")) if os.path.isdir(heads) else []
+    if len(jpegs) != 3:
+        fails.append(f"{len(jpegs)} JPEGs, expected 3 (frames 0-2, then the emulator's save error)")
+    after = out[out.find(" STOP "):] if " STOP " in out else ""
+    sets = re.findall(r"PRM_SET 0x9481 = (\d+)", after)
+    if not after or not sets or int(sets[-1]) != pm0:
+        fails.append(f"the Picture Mode after the stop is {sets[-1] if sets else 'not set'}, expected {pm0}")
+    if fixdesc:
+        got = [image_description(open(os.path.join(heads, f), "rb").read()) for f in jpegs]
+        if got != DESCRIPTIONS[:len(got)]:
+            fails.append(f"ImageDescription {got}, expected {DESCRIPTIONS[:len(got)]}")
+    return fails
+
+
+def main(argv):
+    """Run the test; return the exit status."""
+    if len(argv) not in (1, 3) or (len(argv) == 3 and argv[1] != "--keep") or not argv[0].endswith(".json"):
+        print(__doc__)
+        return 2
+    description = os.path.abspath(argv[0])
+    name = os.path.splitext(os.path.basename(description))[0]
+    image = os.path.join(REPO, "build", name + ".BIN")
+    specs = [s for s in json.load(open(description))["specs"] if "raw-edit-art-bkt" in s]
+    if not os.path.exists(image) or len(specs) != 1:
+        print(f"artbkt-test: needs build/{name}.BIN (epm2mod make {name}) and one raw-edit-art-bkt spec in {argv[0]}")
+        return 2
+    spec = os.path.join(REPO, specs[0])
+    fixdesc = "FIXDESC" in json.load(open(spec))["_symbols"]
+    work = os.path.abspath(argv[2]) if len(argv) == 3 else tempfile.mkdtemp(prefix="artbkt-test-")
+    try:
+        card = os.path.join(work, "card")
+        shutil.rmtree(card, ignore_errors=True)
+        os.makedirs(os.path.join(card, "DCIM", "100OLYMP"))
+        raw = bytearray(open(RAW, "rb").read())
+        if raw[RAW_DESC:RAW_DESC + len(OLYMPUS)] != OLYMPUS:
+            print(f"artbkt-test: {RAW} has no ImageDescription at {RAW_DESC:#x}")
+            return 2
+        raw[RAW_DESC:RAW_DESC + 32] = MARKER.ljust(31) + b"\0"
+        open(os.path.join(card, "DCIM", "100OLYMP", "PB130001.ORF"), "wb").write(raw)
+        pack = [sys.executable, "-m", "epm2mod", "films", "set", "-o", os.path.join(card, "EPM2LOOK.BIN"),
+                "--film", "ART1=portra-400", "--film", "ART2=velvia"]
+        subprocess.run(pack, cwd=REPO, check=True, capture_output=True)
+        state = os.path.join(work, "state-p.json")
+        made = subprocess.run([sys.executable, os.path.join(HERE, "mkstate"), image, state, "p"], capture_output=True, text=True)
+        if made.returncode:
+            print(f"artbkt-test: mkstate failed: {(made.stdout + made.stderr).strip()[-500:]}")
+            return 3 if made.returncode == 3 else 1
+        heads = os.path.join(work, "heads")
+        shutil.rmtree(heads, ignore_errors=True)
+        env = {"E101_STATE": state, "E101_CARD": card, "E101_RTC": RTC, "SYMS": spec, "STANDIN": "1", "HEADS": heads}
+        done = emuenv.run_tool("artbkt.mjs", image, ["w:500", *LOAD, *RUN], env)
+        open(os.path.join(work, "run.log"), "w").write(done.stdout + done.stderr)
+        fails = judge(done.stdout, heads, fixdesc)
+        if done.returncode:
+            fails.insert(0, f"artbkt.mjs exit {done.returncode}: {done.stdout.strip().splitlines()[-2:]}")
+        for line in done.stdout.splitlines():
+            if re.search(r"SETUP list|STOP|PRM_SET 0x9481|save_current_start|CB cmd", line):
+                print("  " + line)
+        if fails:
+            print("\n".join("FAIL " + f for f in fails))
+            return 1
+        frames = "ImageDescription per frame" if fixdesc else "no FIXDESC: ImageDescription not judged"
+        print(f"artbkt-test: PASS: {name}: 3 frames saved, error stop, Picture Mode back, {frames}")
+        return 0
+    finally:
+        if len(argv) == 1:
+            shutil.rmtree(work, ignore_errors=True)
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main(sys.argv[1:]))
+    except emuenv.EmuSetupError as error:
+        print(f"artbkt-test: cannot run: {error}", file=sys.stderr)
+        sys.exit(3)

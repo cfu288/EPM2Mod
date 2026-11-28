@@ -211,7 +211,7 @@ Each check is in one layer.
 | Hard checks | No warnings: `tools/ci.sh` (its first lines say what it makes and checks) | CI runs it (`python.yml`, `web.yml`), and `release.yml` on the released commit. Run it before a pull request |
 | Checks of a candidate | The free-space check (with the load-order check), `boot-test` and `update-path-test`. A start whose time stamps moved (TIMES MOVED) fails | `epm2mod make NAME`: a candidate is not made without them |
 | Soft report | Load-order transfers that the pinned build does not have, first code. Exit status 0 with any number of warnings | `uv run epm2mod lint NAME`, by hand and from the commit hook. Never in CI |
-| By hand | `emulator/scenarios/scen_guard.py`, before a build that changes peaking is offered for a flash; `emulator/filmcheck.py`, before one that changes the film structure or the loader; `uv run python tools/freespace.py map`, when the code-space map is needed | the script's first lines |
+| By hand | `emulator/scenarios/scen_guard.py`, before a build that changes peaking is offered for a flash; `emulator/filmcheck.py`, before one that changes the film structure or the loader; `emulator/artbkt-test`, before one with a `raw-edit-art-bkt` spec; `uv run python tools/freespace.py map`, when the code-space map is needed | the script's first lines |
 
 The load-order check compares a build with the pinned build, by address and target: a transfer from early-loaded to
 late-loaded code that the pinned build does not have fails. The rule and the known transfers:

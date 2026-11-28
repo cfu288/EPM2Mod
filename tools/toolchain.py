@@ -18,7 +18,7 @@ class ToolchainError(Exception):
     """A program is missing. The text says what to do."""
 
 
-def binutils_dir():
+def binutils_dir() -> str:
     """Return the folder that holds the MN103 binutils programs."""
     folder = os.environ.get("EPM2_BINUTILS") or DEFAULT_DIR
     if not os.path.exists(os.path.join(folder, PREFIX + "objdump")):
@@ -26,6 +26,6 @@ def binutils_dir():
     return folder
 
 
-def binutils(tool):
+def binutils(tool: str) -> str:
     """Return the path of one MN103 binutils program: "objdump", "as" or "ld"."""
     return os.path.join(binutils_dir(), PREFIX + tool)

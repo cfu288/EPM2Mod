@@ -40,3 +40,4 @@ path that moved. A folder row covers every file in it.
 | `tools/checks.py`, `emulator/opcheck.py` | removed: `uv run epm2mod make NAME` holds these checks of a candidate, `tools/ci.sh` runs them on a tested build | 2026-11-25 |
 | `emulator/hookcheck-allow.tsv` | removed: the check compares with the pinned build; the evidence is in git at f41e8fd and in `docs/dev/load-order.md` section 5 | 2026-11-25 |
 | `experiments/2026-11-14-focus-peaking/scripts/scen_guard.py` | `emulator/scenarios/scen_guard.py` | 2026-11-25 |
+| `data/builds/films-start-texts-artbkt.json` | `experiments/2026-11-20-raw-edit-art-bkt/films-start-texts-artbkt.json` (a record: the load-order check refuses its specs against film-tables-fix, so it is not a build to make again) | 2026-11-26 |

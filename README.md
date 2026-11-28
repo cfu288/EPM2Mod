@@ -1,6 +1,6 @@
 <h1><img src="docs/images/banner.png" alt="EPM2Mod"></h1>
 
-Repository containing the current work for creating a custom firmware mod for the Olympus PEN **E-PM2**. It swaps the art filters for [film simulations](https://cfu288.github.io/EPM2Mod/films) and adds interval shooting, a level gauge, focus peaking, a lowest shutter speed and AF-point spot metering. Light Box shows two photos side by side in playback.
+Repository containing the current work for creating a custom firmware mod for the Olympus PEN **E-PM2**. It swaps the art filters for [film simulations](https://cfu288.github.io/EPM2Mod/films) and adds interval shooting, a level gauge, focus peaking, a lowest shutter speed and AF-point spot metering. Light Box shows two photos side by side in playback, and ART BKT in RAW Data Edit develops one RAW in several film simulations.
 
 > This project was created with heavy use of AI assistance.
 
@@ -15,6 +15,7 @@ Repository containing the current work for creating a custom firmware mod for th
 | [Lowest shutter speed for ISO Auto](docs/guide/lowest-shutter-speed.md) | <img src="docs/images/ui/lowest-ss-list.png" width="240" alt="Lowest S/S Setting set to 1/15"> |
 | [Spot metering at the AF point](docs/guide/spot-metering.md) | <img src="docs/images/ui/spot-metering-page.png" width="240" alt="The Spot Metering page with Spot, Spot Hilight and Spot Shadow"> |
 | [Light Box](docs/guide/light-box.md) | <img src="docs/images/ui/light-box-info.png" width="240" alt="The ▶ Info list with Light Box set to On"> |
+| [ART BKT in RAW Data Edit](docs/guide/art-bkt.md) | <img src="docs/images/ui/art-bkt-raw-edit.png" width="240" alt="RAW Data Edit with Current, Custom1, Custom2, ART BKT and No"> |
 
 [![Nine photos, each developed in the camera with Natural and the film simulations](docs/images/film-sim-comparison.jpg)](https://cfu288.github.io/EPM2Mod/films)
 

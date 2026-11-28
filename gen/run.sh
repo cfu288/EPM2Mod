@@ -28,6 +28,8 @@ uv run python gen/spot-menu/mkspec.py
 uv run python gen/log-menu/mkspec.py "$work/log-menu"
 # after log-menu and spot-menu: it reads the bytes of every spec before its own in data/builds/light-box-2.json
 uv run python gen/light-box/mkspec.py
+# last: its base is the other specs of data/builds/artbkt.json (FILMNAME's address, the bytes it must find stock)
+uv run python gen/raw-edit-art-bkt/mkspec.py "$work/raw-edit-art-bkt"
 if [ "${1:-}" = "--check" ]; then
   git diff --exit-code --stat -- data/specs/ || { echo "gen/run.sh: a committed spec differs from its generator's output" >&2; exit 1; }
   echo "gen/run.sh: every generated spec is as committed"

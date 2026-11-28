@@ -199,7 +199,7 @@ All of the mod's RAM is in the gap between the kernel range and segment 1 (0x7E4
 | `peaking-direct-2` (2026-11-14): crash at every start | example 1 | `boot-test`, before any flash | |
 | `peaking-direct-3` (2026-11-14): crash on one film entry | a spec overwrote one byte of another spec's handler | camera | `epm2mod make` refuses it since (a byte that an earlier spec covers and keeps) |
 | Restart at a focus-ring turn after a shot (2026-11-16) | heap re-divided under a still block in use | a user report and the log's ring | a scenario with a capture; the emulator takes no pictures |
-| ART BKT crash at frame 1 (`films-start-texts-artbkt`, 2026-11-21) | recorded on the branch `feat/artbkt-production`, not on this one | camera | `emulator/artbkt-test` on that branch |
+| ART BKT crash at frame 1 (`films-start-texts-artbkt`, 2026-11-21) | a call to FILMNAME at card-looks-7's address, which card-looks-8 had moved | camera | `emulator/artbkt-test`, written after |
 | Slow cold start (issue #6) | example 2 | users, on other bodies | the built-image `hookcheck.py`, against the build before it; a cold start on a body that shows it |
 | Wrong menu texts outside English; a wrong look curve on the card path | English-only text patches; a handler that was not the identity | emulator crawls; a camera round | |
 
