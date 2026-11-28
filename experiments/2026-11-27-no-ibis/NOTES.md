@@ -135,3 +135,89 @@ What each other result means:
 - A freeze or restart at power-on: take the battery out, then update with the Go back line (step 15).
 - Blurred photos in step 8 only at 1/60, or a shifted frame: the loose sensor shows; note which and keep the photos.
 - The update in step 15 fails: note the lamp; try again with the stock file (`uv run epm2mod restore`).
+
+## Camera run of no-ibis (2026-11-28)
+
+On the owner's body with the broken stabilizer: the blinking IS icon is gone, start-up is quieter and faster, a short
+noise remains (accepted by the owner), a handheld 1/125 s photo is sharp and not shifted, and the Debug Log's 19
+sessions have no fault. The Image Stabilizer settings are still offered and do nothing
+([camera log](../../docs/camera-log/2026-11-27-no-ibis.md)).
+
+The remaining noise (I): BC init 0x7E53D90C lets the stabilizer's controller out of reset at every start (GPIO 88 set
+to 1 through 0x7E53E75B at 0x7E53D93C, whatever the type; emulator: reached at 8.5 ms). The unit then runs its own
+firmware. No-ibis sends it nothing in 3 s of emulated start (V): the standby request at 215 ms (BC_MAIN code 5,
+handler 0x7E53DE15, resource 3) reaches the wake handler 0x7E5404C8, which returns at once.
+
+## no-ibis-2: the Image Stabilizer settings grayed out
+
+Build `no-ibis-2` = no-ibis + `data/specs/no-ibis-menu.json` (7 bytes of menu data in segment 2, no code, no hook),
+label 2026.12.01.
+
+The menus decide per setting whether a row can be used: `app_check_mode` 0x7E9E8CCD runs the checks of the setting's
+list (records 0x7EC1D098, functions 0x7EC1C368); a check that returns not 0 grays the row (V). Stock reads the
+stabilizer type in no menu code (V: the getter's 8 callers). The stabilizer settings have generic checks only:
+
+| Setting | Where | Check list | Change |
+|---|---|---|---|
+| 296 | Shooting Menu 2 → Image Stabilizer | 0x7EC1C7BF [2, 84] | 84 → 62 |
+| 157 | still IS; Live Control checks it | 0x7EC1D014 [2, 84] | 84 → 62 |
+| 160 | movie IS | 0x7EC1CDE9 [2, 18, 22, 29, 84] | 84 → 62 |
+
+Check-table entry 62 (0x7EC1C460) points to 0x7E4613E0, an existing kernel function `mov 1,d0; retf [],0`, so the
+check always fails. Index 62 is in no setting's list (V); the table's only readers (0x7E9E8CCD, 0x7E9E9208,
+0x7E9EA144) index it through those lists, and nothing else refers to entry 62 or to its old function 0x7E9E9836 (V,
+references). Each changed list byte is used by its own setting only (V).
+
+Emulator (2026-11-28), mode P and movie:
+
+| Screen | no-ibis-2 | no-ibis |
+|---|---|---|
+| Shooting Menu 2 | Image Stabilizer gray; the cursor skips it (▼ from the drive row goes to Bracketing) | black, opens |
+| Live Control | the S-IS item is drawn gray in the column; ▲ ▲ still reaches it, ◀ does not change it (S-IS1 stays) | ◀ selects OFF |
+| Movie mode, Live Control | ◀ does not change M-IS2 | – |
+| Live view | the S-IS1 icon stays | the same |
+
+The Super Control Panel was not checked (it needs Control Settings changed). The stored values stay S-IS1 and
+M-IS2; they have no effect with type 0.
+
+<img src="results/no-ibis-2-shooting-menu-2.png" width="320" alt="Shooting Menu 2 with Image Stabilizer gray">
+<img src="results/no-ibis-2-live-control-is-left.png" width="320" alt="Live Control: the stabilizer item keeps S-IS1">
+<img src="results/no-ibis-2-movie-is-left.png" width="320" alt="Movie mode Live Control: the item keeps M-IS2">
+
+Checks: free space PASS, hookcheck 0 new transfers, lint 0 warnings, boot-test PASS with the four declared lines of
+no-ibis, update-path-test PASS.
+
+### Camera test of no-ibis-2 (draft)
+
+Flash: `epm2flash no-ibis-2 0bf03267a2508e39c9b51fcb31343858e0c960484f223032245a1fe10548971f`
+
+Go back: `epm2flash light-box-2 f86d135efadbf0ff7adc2b46ec66fa488ac89681beeb2e0f5a2a6fa46cee1fec`
+
+Body: the owner's E-PM2 with the broken stabilizer, on no-ibis, Debug Log On. Menu paths as in the no-ibis test
+above (manual p.17, p.26, p.46, p.57). Use a lens without its own stabilizer, or set its IS switch to Off.
+
+1. Update the firmware with the Flash line above (hold OK at power-on, as usual).
+2. MENU → [SETUP] → OK → ▼ to Setup Menu (the wrench) → ▶ → ▼ to Firmware → ▶.
+   Expected: "Body : 1.6  EPM2Mod 2026.12.01". Another date: the update did not take; flash again.
+3. Power off, then on. Expected: the short noise of no-ibis, no blinking IS icon.
+4. MENU → [SETUP] → OK → ▼ to Shooting Menu 2 → ▶ → ▼.
+   Expected: the cursor goes from the drive row (□/self-timer) to Bracketing; Image Stabilizer is gray. Close the menu
+   with MENU.
+5. In live view: OK (Live Control) → ▲ ▲ to the stabilizer item → ◀.
+   Expected: the item is gray in the column, and ◀ leaves S-IS1. If it changes to OFF: note it. OK to close.
+6. MENU (the top menu) → ◀ ▶ to the movie mode icon → OK. OK → ▲ ▲ → ◀.
+   Expected: M-IS2 stays. OK to close.
+7. MENU → ◀ ▶ to the P/A/S/M column → ▲ ▼ to S → OK. On a tripod, a detailed subject at 1–3 m: press ▲, then ▲ ▼
+   until 60 shows; take a photo. Press ▲, then ▲ ▼ until 250 shows; take a photo.
+   Expected: both sharp and not shifted, as on no-ibis.
+8. Press the movie button (the red dot), record 5 seconds, press it again. Expected: the movie is saved.
+9. Go back: update with the Go back line above, then step 2. Expected: "EPM2Mod 2026.11.28". Then update with the
+   Flash line again and check step 2 shows 2026.12.01.
+10. Copy the photos and the log (card in the Mac):
+    `scp /Volumes/Untitled/EPM2LOG.BIN /Volumes/Untitled/DCIM/100OLYMP/* USER@HOST:/path/to/epm2-tools/build/fw-test/no-ibis-2/ && diskutil eject /Volumes/Untitled`
+
+What each other result means:
+
+- Image Stabilizer black in step 4, or ◀ changes the value in step 5 or 6: that place does not use the row check;
+  note which, it does no harm (type 0 ignores the setting).
+- A freeze or restart: take the battery out, then update with the Go back line.
