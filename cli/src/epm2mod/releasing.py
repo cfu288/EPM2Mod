@@ -71,34 +71,38 @@ def next_version(
 def release_notes(
     version: str,
     label: str,
-    what: str,
     sha256: str,
     previous: str | None,
     changes: list[str],
     tested: tuple[str, str] | None = None,
 ) -> str:
-    """Return the release notes: what is in the build and what changed.
+    """Return the release notes: the changes and the firmware.
+
+    The release workflow puts its ``notes`` input, the summary a person writes, above them.
 
     Args:
         version: the calendar version.
         label: the build's label, which the camera's Firmware screen shows.
-        what: the build's description.
         sha256: the firmware file's SHA-256.
         previous: the tag of the release before, if any.
         changes: the subjects of the feat and fix commits since ``previous``.
         tested: the sha256 and the label of the camera-tested build, if the release holds it with another label.
     """
+    lines = [f"EPM2Mod {version}", ""]
+    if changes:
+        lines += [f"Changes since {previous}:" if previous else "Changes:", ""]
+        # a commit subject without its type and scope: "fix(films): x (#13)" -> "x (#13)"
+        lines += [
+            f"- {re.sub(r'^[a-z]+(\([^)]*\))?!?: ', '', change)}" for change in changes
+        ]
+        lines.append("")
     firmware = f"Firmware: EPM2Mod {label}, sha256 `{sha256}`."
     if tested is not None:
         firmware += (
-            f" Camera-tested as sha256 `{tested[0]}` (label {tested[1]}); "
-            "differs only in the Firmware-screen date."
+            f" It is the camera-tested build (sha256 `{tested[0]}`) with the release's date on the"
+            " Firmware screen."
         )
-    lines = [f"EPM2Mod {version}", "", firmware, "", f"{what}.", ""]
-    if changes:
-        lines += [f"Changes since {previous}:" if previous else "Changes:", ""]
-        lines += [f"- {change}" for change in changes]
-        lines.append("")
+    lines += [firmware, ""]
     return "\n".join(lines)
 
 
@@ -201,7 +205,6 @@ def plan(
     notes = release_notes(
         version,
         released.label,
-        released.what,
         released.sha256,
         previous,
         changes,

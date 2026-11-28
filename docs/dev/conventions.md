@@ -175,13 +175,15 @@ gh workflow run release.yml -f kind=rc -f dry_run=false     # the release
      checksum of block 0 (`release.check_only_the_label_differs`; the date has a fixed length, so nothing moves);
    - the free-space check, with the load-order check, passes on the build's specs;
    - `emulator/boot-test` and `emulator/update-path-test` pass on it.
-   The release notes give both: "Firmware: EPM2Mod LABEL, sha256 RELEASED. Camera-tested as sha256 TESTED (label
-   L); differs only in the Firmware-screen date." The zip's manifest records the tested sha256 and label under
+   The release notes give both: "Firmware: EPM2Mod LABEL, sha256 RELEASED. It is the camera-tested build (sha256
+   TESTED) with the release's date on the Firmware screen." The zip's manifest records the tested sha256 and label under
    `camera_tested_as`, and the zip's build description holds the released sha256, which the installer checks.
    The description in `data/builds/` is not changed.
 4. **`epm2mod release` checks** that the build has a camera test (`epm2mod pin` recorded it), the tree is clean and at
-   `origin/main`, and the generated documents and the feature lists are current. It writes the notes: the firmware
-   line, the build's description, and the feat and fix commits since the last release.
+   `origin/main`, and the generated documents and the feature lists are current. It writes the notes: the feat and
+   fix commits since the last release, without their type and scope, and the firmware line. The workflow's input
+   `notes` goes under the title: what is new, in plain sentences for users. The build's description is not in the
+   notes.
 5. **The workflow** runs the hard checks (`tools/ci.sh`) on the commit, then that command (job `plan`), makes the zip
    and the Mac disk image and starts them on three systems (`package.yml`), and then creates the tag and the GitHub
    release in one step (`gh release create`), unless `dry_run` is true, the default.

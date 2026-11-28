@@ -21,7 +21,7 @@ on:
         type: string
         default: ''
       notes:
-        description: Text to put above the generated release notes.
+        description: What is new, in plain sentences for users. It goes under the title, above the change list.
         type: string
         default: ''
       dry_run:
@@ -85,7 +85,8 @@ jobs:
           extra = os.environ["NOTES"].strip()
           install = open("release/NOTES.md", encoding="utf-8").read()
           with open("notes.md", "w", encoding="utf-8") as notes:
-              notes.write((extra + "\n\n" if extra else "") + plan["notes"] + "\n" + install)
+              head, _, rest = plan["notes"].partition("\n\n")
+              notes.write(head + "\n\n" + (extra + "\n\n" if extra else "") + rest + "\n" + install)
           print(open("notes.md", encoding="utf-8").read())
           EOF
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
