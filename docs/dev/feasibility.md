@@ -81,6 +81,12 @@ Other Olympus generations, and what each can be modded to do: [model-matrix.md](
 
 **Medium effort: new code, method known**
 
+- ~~RAW Data Edit with ART BKT~~ **Done on 2026-11-27** (`artbkt`, `raw-edit-art-bkt-3`; `docs/guide/art-bkt.md`):
+  a fifth row in RAW Data Edit's list runs one stock Current edit per frame of the camera's ART BKT selection, with
+  the stored Picture Mode set before each, in 596 B of segment 2. Each JPEG records its frame's film name. Camera:
+  13 JPEGs in menu order with the right names, no fault in the Debug Log. Not camera-tested: keys and power-off
+  during the run, a full card. Dramatic Tone, Key Line and Watercolor frames have Natural's brightness and colour
+  (2026-11-22) (`experiments/2026-11-24-artbkt-production/NOTES.md`).
 - ~~Looks loaded from a file on the card~~ **Done on 2026-11-17** (`docs/guide/film-looks.md`): our own task
   reads the file when Load Looks → Load runs, keeps it in the EEROM settings bank's unused tail (53,680 bytes,
   empty on this camera, saved by the firmware) and writes each listed entry's tables into its RAM block. Every

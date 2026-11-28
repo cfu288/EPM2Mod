@@ -366,6 +366,7 @@ SITE_IDS: dict[str, str | None] = {
     "lowest-shutter-speed": "lowest-ss",
     "spot-metering": "spot-metering",
     "light-box": "light-box",
+    "art-bkt": "art-bkt",
 }
 
 

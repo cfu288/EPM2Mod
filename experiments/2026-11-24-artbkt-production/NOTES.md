@@ -125,3 +125,13 @@ byte that ART BKT changes (op ranges compared, section 5). sha256
 
 The test sheet names this build; the way back is `light-box-2`.
 
+
+## 7. Camera test and pin (2026-11-27)
+
+`artbkt` (`467b126f…`) on the camera: one ART BKT run on PB130001.ORF with the owner's look pack in all 12 entries
+gave 13 JPEGs, Natural first, then the 12 entries in menu order, each with its film's ImageDescription; Double-X
+black and white; the Debug Log has no fault (camera log 2026-11-26-artbkt). V camera. The owner ran only this part
+of `test-sheet.md`. Criteria on the camera: A2, A3 (n = 12), A5, A9 pass; A1 in part (the rows were set); A4 for
+film simulations only; A6, A7, A8, A12 and keys or power-off during the run not tested. Olympus filters as frames:
+the 2026-11-22 finding (Dramatic Tone, Key Line and Watercolor with Natural's look) stands. Pinned on 2026-11-27; guide
+`docs/guide/art-bkt.md`.
