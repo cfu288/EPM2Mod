@@ -65,8 +65,10 @@ for name in $builds; do
   if grep -q '"camera_tested"' "data/builds/$name.json"; then  # make compares a tested build with its sha256 only
     # shellcheck disable=SC2046
     quiet uv run python tools/freespace.py check $(uv run python -c 'import json, sys; b = json.load(open(sys.argv[1])); print(*b["specs"], *["--first-code"] * bool(b.get("first_code")))' "data/builds/$name.json")
-    quiet uv run python emulator/boot-test "build/$name.BIN"
-    quiet uv run python emulator/update-path-test "build/$name.BIN"
+    # the boot report lines the build changes on purpose, as make passes them
+    uv run python -c 'import json, sys; json.dump(json.load(open(sys.argv[1])).get("boot_differs", []), open(sys.argv[2], "w"))' "data/builds/$name.json" "$tmp/declared"
+    quiet uv run python emulator/boot-test "build/$name.BIN" --declared "$tmp/declared"
+    quiet uv run python emulator/update-path-test "build/$name.BIN" --declared "$tmp/declared"
   fi
 done
 echo
