@@ -73,6 +73,7 @@ descriptions, patch specs and film lists are data: they are also relative to the
 | `output` | The output folder (`make --out-dir DIR` replaces it) |
 | `cache` | The folder that keeps Olympus's firmware (`--cache DIR` replaces it; `--stock FILE` uses a copy) |
 | `app`, `package`, `release_files` | The installer page, the package, and the files at the top of the release zip |
+| `release_notes` | The install steps at the end of the notes of every release (`epm2mod release`) |
 
 ## Production code and research code
 
@@ -155,9 +156,9 @@ A release is made on GitHub by the workflow `.github/workflows/release.yml`, whi
 to main does not release. Nobody pushes a tag: the workflow creates it, and a tag pushed by hand starts nothing.
 
 ```sh
-uv run epm2mod release                                   # the local preview: ready or not, the version, the notes
-gh workflow run release.yml -f kind=rc                      # a dry run: everything but the tag and the publication
-gh workflow run release.yml -f kind=rc -f dry_run=false     # the release
+uv run epm2mod release --summary "TEXT"                         # the local preview: ready or not, the version, the notes
+gh workflow run release.yml -f kind=rc -f notes="TEXT"             # a dry run: everything but the tag and the publication
+gh workflow run release.yml -f kind=rc -f notes="TEXT" -f dry_run=false  # the release
 ```
 
 1. **The version is the day of the release** (UTC): `vYYYY.MM.DD-rc.N`. N is 1 for the first release of a day and
@@ -180,12 +181,16 @@ gh workflow run release.yml -f kind=rc -f dry_run=false     # the release
    `camera_tested_as`, and the zip's build description holds the released sha256, which the installer checks.
    The description in `data/builds/` is not changed.
 4. **`epm2mod release` checks** that the build has a camera test (`epm2mod pin` recorded it), the tree is clean and at
-   `origin/main`, and the generated documents and the feature lists are current. It writes the notes. They list the
-   feat and fix commits since the last release and then the firmware line. The text of the workflow's
-   input `notes` appears under the title. It describes what is new in plain sentences for users.
-5. **The workflow** runs the hard checks (`tools/ci.sh`) on the commit, then that command (job `plan`), makes the zip
-   and the Mac disk image and starts them on three systems (`package.yml`), and then creates the tag and the GitHub
-   release in one step (`gh release create`), unless `dry_run` is true, the default.
+   `origin/main`, and the generated documents and the feature lists are current. It writes the whole notes. The title
+   comes first. The text of `--summary` comes under it. The workflow passes its input `notes` there, which describes
+   what is new in plain sentences for users. The feat and fix commits since the last release follow, then the
+   firmware line, and then the install steps from `release/NOTES.md`. The local preview shows the same notes as the
+   release.
+5. **The workflow** runs the hard checks (`tools/ci.sh`) on the commit and then that command (job `plan`). It makes the
+   zip and the Mac disk image and starts them on three systems (`package.yml`). Unless `dry_run` is true, which is the
+   default, job `publish` checks that the zip installs the firmware that the plan checked. It then uploads the files
+   to a draft release and publishes the draft. A draft creates no tag, so a failed upload leaves only a draft.
+   Publishing the draft creates the tag on the checked commit. Job `publish` runs in the environment `release`.
 
 `uv run epm2mod package --release-version V` makes the same zip locally, without publishing. `package.yml` also runs
 for pull requests and main, as a check, with the version `DATE-dev` (the commit's date): a `-dev` zip holds the tested
@@ -195,9 +200,10 @@ A release also publishes `EPM2Mod-V.dmg` for Macs (job `dmg` of `package.yml`, `
 with the zip's folder in it, signed with the owner's Developer ID Application certificate and notarized by Apple, so
 macOS opens it without Open Anyway. The signing secrets are in the GitHub environment `release`: `MAC_CERT_P12` (the
 certificate and its key as a base64 `.p12`), `MAC_CERT_PASSWORD`, `APPLE_ID`, `APPLE_TEAM_ID` and
-`APPLE_APP_PASSWORD`. The environment must allow the branch `main` (the workflow runs there, not on a tag). It
-restricts the branches and tags that may use the secrets; it asks for no approval. The job stops after 45 minutes when
-Apple's notarization does not answer. If the certificate expires or the Apple Developer membership lapses, the job
+`APPLE_APP_PASSWORD`. `release/mac/keychain.sh` puts them in a keychain for the run and deletes it before anything
+from the zip runs. The environment must allow the branch `main`, because the workflow runs there and not on a tag. It
+restricts the branches and tags that may use the secrets and publish a release. It asks for no approval. The disk image
+step stops after 45 minutes when Apple's notarization does not answer. If the certificate expires or the Apple Developer membership lapses, the job
 fails and nothing is published. Renew it, then set the secrets again with `gh secret set NAME --env release`. On a
 Mac, `release/mac/make-dmg.sh ZIP` makes the disk image locally, signed ad hoc unless `EPM2MOD_SIGN_IDENTITY` and
 `EPM2MOD_NOTARY_PROFILE` are set.
@@ -209,7 +215,8 @@ Each check is in one layer.
 | Layer | What | Where |
 |---|---|---|
 | Commit hooks | Staged files: machine paths, the document rules, prettier, black, mypy, the commit message. `epm2mod lint` of each staged build description only warns | `.githooks/` |
-| Hard checks | No warnings: `tools/ci.sh` (its first lines say what it makes and checks) | CI runs it (`python.yml`, `web.yml`), and `release.yml` on the released commit. Run it before a pull request |
+| Hard checks | No warnings: `tools/ci.sh` (its first lines say what it makes and checks) | CI runs it (`python.yml`, `web.yml`), and `release.yml` on the released commit. Run it before a pull request. CI skips draft pull requests and runs when a draft is marked ready |
+| Pull request title | The title follows the rule of the commit-msg hook, because it becomes the commit subject of a squash merge | `pr-title.yml`, which runs again when the title is edited |
 | Checks of a candidate | The free-space check (with the load-order check), `boot-test` and `update-path-test`. A start whose time stamps moved (TIMES MOVED) fails | `epm2mod make NAME`: a candidate is not made without them |
 | Soft report | Load-order transfers that the pinned build does not have, first code. Exit status 0 with any number of warnings | `uv run epm2mod lint NAME`, by hand and from the commit hook. Never in CI |
 | By hand | `emulator/scenarios/scen_guard.py`, before a build that changes peaking is offered for a flash; `emulator/filmcheck.py`, before one that changes the film structure or the loader; `emulator/artbkt-test`, before one with a `raw-edit-art-bkt` spec; `uv run python tools/freespace.py map`, when the code-space map is needed | the script's first lines |
@@ -221,8 +228,9 @@ must touch, the pull request says so and the owner decides.
 
 What decides a check's result is pinned: Node (`.nvmrc`, `tools/node.sh`), Python (`.python-version`), the packages
 (`uv.lock`, `web/package-lock.json`), the MN103 objdump and the emulator (submodules; `epm2mod init --check` compares
-their commits), and uv, the actions and the runner images in CI. bison, flex and texinfo, which build the objdump in
-CI, come from the runner's Ubuntu release.
+their commits), and uv, the actions and the runner images in CI. Dependabot proposes new versions of the actions
+each week (`.github/dependabot.yml`). bison, flex and texinfo, which build the objdump in CI, come from the runner's
+Ubuntu release. `tools/ci.sh` also needs `jq`.
 
 Production tools and checks do not import or run anything under `experiments/`. A check script or an input that a
 tool needs moves to `emulator/`, `tools/` or `data/`.
