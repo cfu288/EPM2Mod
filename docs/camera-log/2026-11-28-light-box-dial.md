@@ -1,0 +1,5 @@
+# 2026-11-28: data/builds/light-box-dial.json
+
+| Date (UTC) | Build | sha256 | Result |
+|---|---|---|---|
+| 2026-11-28 | `data/builds/light-box-dial.json`: the pinned artbkt (its 25 specs) + `light-box-dial` (2 ops, 27 bytes in segment 3, no new code area), label 2026.12.02. In Light Box's zoom view the control dial zoomed two steps per click, and at 1x or 14x (also with ▲ ▼) the zoom request repeated the shown ratio; GUI_PLAY_ERROR then started Light Box again with another pair of pictures. The dial handler's own zoom call (0x7EDBD8F5) becomes `nop`, and GUI_PLAY_ERROR's handler maps the zoom view (state 17) to the two-picture view as it maps 16 and 18-21 (0x7EDBCF76) (`experiments/2026-11-19-light-box/NOTES.md`, "Light Box dial (2026-11-28)"). Before the flash: free space PASS, boot-test PASS, update-path-test PASS, hookcheck PASS, lint 0 warnings; emulator (`scripts/dialprobe.mjs`): one step per click (1x, 2x, 3x, 5x, 7x, 10x, 14x), the pair kept past both ends with the dial and with ▲ ▼; INFO-held dial and ◀ ▶ as on artbkt | `1b45771d883b80ec66d5cf79aa00665e714846c68ad473c9c548b2975f45c770` | **Candidate, not flashed.** |
