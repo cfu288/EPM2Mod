@@ -143,9 +143,8 @@ await page.evaluate(() => document.fonts.ready)
 await page.screenshot({ path: OUT, fullPage: true })
 console.log(`wrote ${path.relative(ROOT, OUT)}: ${rows.length} cameras in ${GENS.length} generations`)
 
-// The features image: per feature and generation, the default (stock) layer and the mods layered on it. A cell of the
-// page's feature table is "; "-separated parts: "Stock[ on the …]", "Mod: a, b", or a status (Not done, Not
-// possible, Unknown) with its reason.
+// The features image: per feature and generation, the default and the mods layered on it. A cell of the page's
+// feature table is "Default[ + mods]", the default one of Yes, Some bodies, No, Unknown.
 const md = fs.readFileSync(SOURCE, 'utf8').split('\n')
 const head = md.findIndex((line) => line.startsWith('| Feature |'))
 if (head < 0) throw new Error(`no feature table in ${SOURCE}`)
@@ -161,24 +160,12 @@ for (let i = head + 2; md[i]?.startsWith('|'); i++) {
     .map((c) => c.trim().replace(/`/g, ''))
   features.push({ name: cells[0], cells: cells.slice(1) })
 }
-// the first part is the default of the column's body (in the VI column, the E-PM2): "Stock…" or a status; a cell
-// that starts with "Mod" has no default there
-const layers = (cell) => {
-  const parts = cell.split(';').map((p) => p.trim())
-  const first = parts[0]
-  const mod = parts.find((p) => /^Mod/.test(p))
-  return {
-    stock: /^Stock/.test(first) ? first : undefined,
-    mods: mod ? mod.replace(/^Mod:\s*/, '') : '',
-    rest: /^(Stock|Mod)/.test(first) ? undefined : first,
-  }
-}
+const DEFAULTS = { Yes: 'yes', 'Some bodies': 'some', No: 'no', Unknown: 'unknown' }
 const featureCell = (cell) => {
-  const { stock, mods, rest } = layers(cell)
-  const base = stock
-    ? `<div class="stock">${stock === 'Stock' ? 'Default' : stock.replace(/^Stock/, 'Default')}</div>`
-    : `<div class="none">${rest ? rest.split(':')[0] : 'No'}</div>`
-  return `<td>${base}${mods ? `<div class="mod">+ ${mods}</div>` : ''}</td>`
+  const [value, mods] = cell.split(' + ')
+  if (!(value in DEFAULTS))
+    throw new Error(`${SOURCE}: "${cell}" does not start with ${Object.keys(DEFAULTS).join(', ')}`)
+  return `<td><div class="${DEFAULTS[value]}">${value}</div>${mods ? `<div class="mod">+ ${mods}</div>` : ''}</td>`
 }
 const featuresHtml = `<!doctype html><html><head><style>
 @font-face { font-family: Sora; font-weight: 800; src: url(${font('sora/files/sora-latin-800-normal.woff2')}); }
@@ -192,8 +179,10 @@ th { font: 800 30px Sora, sans-serif; text-align: left; padding: 0 0 10px; }
 th.feature { width: 360px; }
 td { vertical-align: top; padding: 0; font-size: 19px; line-height: 1.3; }
 td.feature { font-weight: 700; font-size: 21px; padding-top: 8px; }
-.stock { background: #000; color: #fff; padding: 8px 10px; }
-.none { background: #f0f0f0; color: #888; padding: 8px 10px; }
+.yes { background: #000; color: #fff; padding: 8px 10px; }
+.some { background: #555; color: #fff; padding: 8px 10px; }
+.no { background: #f0f0f0; color: #666; padding: 8px 10px; }
+.unknown { background: #fff; border: 2px dashed #aaa; color: #888; padding: 6px 8px; }
 .mod { border: 3px solid #000; border-top: none; padding: 6px 10px; }
 .legend { display: flex; gap: 50px; margin-top: 30px; font-size: 22px; color: #333; align-items: center; }
 .legend .chip { display: inline-block; padding: 4px 10px; margin-right: 10px; }
@@ -201,7 +190,7 @@ td.feature { font-weight: 700; font-size: 21px; padding-top: 8px; }
 <h1>Features by Generation</h1>
 <table><tr><th class="feature"></th>${featureGens.map((g) => `<th>TruePic ${g}</th>`).join('')}</tr>
 ${features.map((f) => `<tr><td class="feature">${f.name}</td>${f.cells.map(featureCell).join('')}</tr>`).join('\n')}</table>
-<div class="legend"><div><span class="chip stock">Default</span>the camera has it</div><div><span class="chip mod" style="border-top: 3px solid #000">+ Mod</span>what a mod adds</div><div><span class="chip none">Not done, Not possible, Unknown</span>no default and no mod; the page says why</div></div>
+<div class="legend"><div><span class="chip yes">Yes</span>by default</div><div><span class="chip some">Some bodies</span>by default on some bodies of the generation</div><div><span class="chip no">No</span></div><div><span class="chip unknown">Unknown</span></div><div><span class="chip mod" style="border-top: 3px solid #000">+ Mod</span>a mod adds it</div></div>
 </main></body></html>`
 const FEATURES_OUT = path.join(ROOT, 'docs/images/features-by-generation.png')
 const featuresFile = path.join(ROOT, 'build/features-by-generation.html')

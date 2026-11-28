@@ -31,36 +31,34 @@ Sources for the years: [E-PL3](https://petapixel.com/2011/06/30/olympus-announce
 
 ## Features by Generation
 
-What each generation has (Stock), what a mod adds (Mod), what its parts allow but nobody has built (Not done), what a
-missing part rules out (Not possible), and what no source settles yet (Unknown). In the VI column the E-PM2's
-status comes first. The [model matrix](model-matrix.md#2-features-by-generation)
-gives what each feature needs, the evidence and a link for each cell.
+Each cell gives the default (Yes, Some bodies, No or Unknown), then + and the mods that add the feature. In the VI
+column the default is the E-PM2's. The [model matrix](model-matrix.md#2-features-by-generation) gives what each
+feature needs, the evidence and a link for each cell.
 
 ![Features by generation: what each TruePic generation has by default, and what mods add on top](../images/features-by-generation.png)
 
-
 | Feature | VI (E-PM2) | VII | VIII | IX | X |
 |---|---|---|---|---|---|
-| Film simulations | Mod: EPM2Mod | Mod: om10mi-mods | Mod: Caduceus | Mod: Caduceus, OMKit | Mod: Caduceus, Nostalgia-OM |
-| 12-color editing, photos | Not done: the stage exists | Stock on the PEN-F; Mod: PEN-F HSL | Stock on the E-P7; Mod: Caduceus | Mod: Caduceus, OMKit | Stock on the OM-3; Mod: Caduceus |
-| 12-color editing, live view and movie | Not possible: the stage is in the photo pipeline only | Stock on the PEN-F | Stock on the E-P7; Mod: Caduceus | Mod: OMKit | Stock on the OM-3; Mod: Caduceus |
-| Looks or code from the card | Mod: EPM2Mod, fenykl (E-PL3) | Mod: fenykl (E-M10 II) | Mod: Caduceus | Mod: OMKit, Caduceus | Mod: Caduceus |
-| Focus peaking | Mod: EPM2Mod; Stock on the E-P5 | Stock | Stock | Stock | Stock |
-| Live ND | Unknown | Not done | Stock on the E-M1X; Mod: Caduceus | Stock | Stock |
-| Silent shutter | Unknown | Stock on the E-M5 II, E-M10 II, PEN-F | Stock | Stock | Stock |
-| Pro Capture | Unknown | Mod: fenykl (E-M10 II) | Stock on the E-M1 II, E-M1X, E-M5 III | Stock | Stock |
-| High Res Shot | Unknown | Stock on the E-M5 II, PEN-F | Stock on the E-M1 II, E-M1X, E-M5 III | Stock | Stock |
-| Longer movie limit | Not done: one file of at most 4 GiB | Mod: om10mi-mods | Mod: Caduceus, em1x-mod | Mod: E-M1 III Mod Builder | Stock |
-| Log or flat movie profile | Not done: a flat curve in an ART entry, 8-bit | Mod: em10-fw | Stock on the E-M1 II, E-M1X; Mod: Caduceus | Stock | Stock |
-| 10-bit movie | Unknown | Unknown | Unknown | Unknown | Stock |
-| Grain and other per-pixel effects | Not done: about 1.5–4.5 s per photo | Mod: em10-fw | Mod: Caduceus | Mod: OMKit | Stock on the OM-3; Mod: Caduceus |
-| Wi-Fi | Not possible: no radio; Stock on the E-P5 | Stock | Stock | Stock | Stock |
-| Tethering | Not done: no capture handler | Stock on the E-M1, E-M5 II | Stock on the E-M1 II, E-M1X | Stock | Stock on the OM-1, OM-1 II |
-| Star tracking | Unknown | Not done | Not done | Not done | Mod: OM Startrack |
-| Aperture ring (Panasonic lenses) | Unknown on the E-PM2; Mod: db firmware on the E-PL5, E-PL6, E-P5 | Mod: db firmware | Mod: db firmware | Mod: db firmware | Mod: db firmware |
-| Body IS off at start | Mod: EPM2Mod `no-ibis` (not camera-tested) | Not done | Not done | Not done | Not done |
-| Focus stacking with any lens | Not done: no bracketing or merge in stock | Stock on the E-M1 | Mod: em1x-mod, Caduceus port | Mod: E-M1 III Mod Builder | Not done |
-| Lowest shutter speed for Auto ISO | Mod: EPM2Mod | Stock on the PEN-F; Mod: db firmware | Mod: db firmware, Caduceus | Unknown | Unknown |
+| Film simulations | No + EPM2Mod | No + om10mi-mods | No + Caduceus | No + Caduceus, OMKit | No + Caduceus, Nostalgia-OM |
+| 12-color editing, photos | No | Some bodies + PEN-F HSL | Some bodies + Caduceus | No + Caduceus, OMKit | Some bodies + Caduceus |
+| 12-color editing, live view and movie | No | Some bodies | Some bodies + Caduceus | No + OMKit | Some bodies + Caduceus |
+| Looks or code from the card | No + EPM2Mod, fenykl (E-PL3) | No + fenykl (E-M10 II) | No + Caduceus | No + OMKit, Caduceus | No + Caduceus |
+| Focus peaking | No + EPM2Mod | Yes | Yes | Yes | Yes |
+| Live ND | Unknown | No | Some bodies + Caduceus | Yes | Yes |
+| Silent shutter | Unknown | Some bodies | Yes | Yes | Yes |
+| Pro Capture | Unknown | No + fenykl (E-M10 II) | Some bodies | Yes | Yes |
+| High Res Shot | Unknown | Some bodies | Some bodies | Yes | Yes |
+| Longer movie limit | No | No + om10mi-mods | No + Caduceus, em1x-mod | No + E-M1 III Mod Builder | Yes |
+| Log or flat movie profile | No | No + em10-fw | Some bodies + Caduceus | Yes | Yes |
+| 10-bit movie | Unknown | Unknown | Unknown | Unknown | Yes |
+| Grain and other per-pixel effects | No | No + em10-fw | No + Caduceus | No + OMKit | Some bodies + Caduceus |
+| Wi-Fi | No | Yes | Yes | Yes | Yes |
+| Tethering | No | Some bodies | Some bodies | Yes | Some bodies |
+| Star tracking | Unknown | No | No | No | No + OM Startrack |
+| Aperture ring (Panasonic lenses) | Unknown + db firmware (E-PL5, E-PL6, E-P5) | No + db firmware | No + db firmware | No + db firmware | No + db firmware |
+| Body IS off at start | No + EPM2Mod (untested) | No | No | No | No |
+| Focus stacking with any lens | No | Some bodies | No + em1x-mod, Caduceus port | No + E-M1 III Mod Builder | No |
+| Lowest shutter speed for Auto ISO | No + EPM2Mod | Some bodies + db firmware | No + db firmware, Caduceus | Unknown | Unknown |
 
 ## Why EPM2Mod Is Not a Fork
 
