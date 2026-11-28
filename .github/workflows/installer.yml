@@ -42,7 +42,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: installer-${{ github.event_name }}-${{ github.ref }}
+  # Each push gets its own group, because a newer run would otherwise replace a waiting one and leave its push unchecked.
+  group: installer-${{ github.event_name }}-${{ github.ref }}-${{ github.event_name == 'push' && github.sha || '' }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
@@ -63,7 +64,6 @@ jobs:
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
-          # A cache that another run wrote could change what a release signs and publishes.
           package-manager-cache: false
       - name: Set up Python
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
@@ -132,7 +132,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: Expand-Archive -LiteralPath "zip/$env:NAME.zip" -DestinationPath unpacked
-      - name: Start the zip with this system's launcher
+      - name: Start the installer with this system's launcher
         shell: bash # In PowerShell, $NAME is not the environment variable.
         run: python .github/scripts/release_smoke.py "unpacked/$NAME" "$SHA256"
 

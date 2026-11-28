@@ -5,7 +5,13 @@ name: Website
 on:
   push:
     branches: [main]
-    paths: &paths ['web/**', 'data/films/film-records.json', '.github/workflows/site.yml', '.nvmrc', 'tools/ci.sh', 'tools/node.sh']
+    paths: &paths
+      - 'web/**'
+      - 'data/films/film-records.json'
+      - '.nvmrc'
+      - 'tools/ci.sh'
+      - 'tools/node.sh'
+      - '.github/workflows/site.yml'
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     paths: *paths
@@ -15,8 +21,9 @@ permissions:
   contents: read
 
 concurrency:
-  group: site-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }} # A deploy to Pages is never cut off.
+  # Each push gets its own group, because a newer run would otherwise replace a waiting one and leave its push unchecked.
+  group: site-${{ github.ref }}-${{ github.event_name == 'push' && github.sha || '' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check:
@@ -54,6 +61,10 @@ jobs:
     permissions:
       pages: write
       id-token: write
+    # One deploy runs at a time and is never cut off. A newer deploy replaces a waiting one, so the newest site wins.
+    concurrency:
+      group: site-deploy
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

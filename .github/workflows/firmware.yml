@@ -12,8 +12,9 @@ permissions:
   contents: read
 
 concurrency:
-  group: firmware-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }} # On main, each push has its own base to check.
+  # Each push gets its own group, because a newer run would otherwise replace a waiting one and leave its push unchecked.
+  group: firmware-${{ github.ref }}-${{ github.event_name == 'push' && github.sha || '' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check:
@@ -27,7 +28,7 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0 # tools/ci.sh compares the tree with the base commit.
-      - name: Set up Python, Node and uv
+      - name: Set up the tools
         uses: ./.github/actions/setup
       - name: Find the binutils commit
         id: binutils

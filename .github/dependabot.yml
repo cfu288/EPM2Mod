@@ -4,3 +4,6 @@ updates:
     directories: [/, /.github/actions/setup]
     schedule:
       interval: weekly
+    # The prefix gives a title that the PR title check accepts.
+    commit-message:
+      prefix: ci

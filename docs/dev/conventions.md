@@ -184,17 +184,19 @@ gh workflow run release.yml -f kind=rc -f summary="TEXT" -f dry_run=false
    `camera_tested_as`, and the zip's build description holds the released sha256, which the installer checks.
    The description in `data/builds/` is not changed.
 4. **`epm2mod release` checks** that the build has a camera test (`epm2mod pin` recorded it), the tree is clean and at
-   `origin/main`, and the generated documents and the feature lists are current. It writes the whole notes. The title
-   comes first. The text of `--summary` comes under it. The workflow passes its input `summary` there, which describes
-   what is new in plain sentences for users. The feat and fix commits since the last release follow, then the firmware
-   line, and then the install steps from `release/NOTES.md`. The local preview shows the same notes as the release.
+   `origin/main`, and the generated documents and the feature lists are current. It writes the whole notes. The text of
+   `--summary` comes first. The release workflow passes its `summary` input to `--summary`. Write it in plain sentences
+   for users. The feat and fix commits since the last release follow, then the firmware line, and then the install steps
+   from `release/NOTES.md`. The release page shows the title `EPM2Mod VERSION` above the notes, so the notes do not
+   repeat it. The local preview prints the title and then the same notes as the release.
 5. **The workflow** runs the hard checks (`tools/ci.sh`) on the commit and then that command, in the job "Plan the
    release". It makes the zip and the Mac disk image and starts them on three systems (`installer.yml`). Unless
-   `dry_run` is true, which is the default, the job "Publish the release" checks that the zip installs the firmware that
-   the plan checked. It then uploads the files to a draft release and publishes the draft. A draft creates no tag, so a
-   failed upload leaves only a draft. The next run deletes that draft before it uploads again. Publishing the draft
-   creates the tag on the checked commit. The job "Publish the release" runs in the environment `release`. The job "Plan
-   the release" runs only from main, so a run from another branch stops at once.
+   `dry_run` is true, which is the default, the job "Publish the release" runs `release/publish.sh`. The script checks
+   that the zip installs the firmware that the plan checked. It then uploads the files to a draft release and publishes
+   the draft. A draft creates no tag, so a failed upload leaves only a draft. The next run deletes a draft with the same
+   tag before it uploads again. Publishing the draft creates the tag on the checked commit. The job "Publish the
+   release" runs in the environment `release`. The job "Plan the release" runs only from main, so a run from another
+   branch stops at once.
 
 `uv run epm2mod package --release-version V` makes the same zip locally, without publishing. `installer.yml` also runs
 for pull requests and main, as a check, with the version `DATE-dev` (the commit's date): a `-dev` zip holds the tested
