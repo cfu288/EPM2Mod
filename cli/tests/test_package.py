@@ -148,9 +148,7 @@ class TinyRepo:
 
     def emulator_check(self, name: str, status: int) -> None:
         """Install a stand-in for emulator/NAME that exits with ``status``."""
-        script = (
-            f"import sys\nprint('{name}: stand-in', sys.argv[1])\nsys.exit({status})\n"
-        )
+        script = f"import sys\nprint('{name}: stand-in', *sys.argv[1:])\nsys.exit({status})\n"
         self.write(f"emulator/{name}", script.encode())
 
     def outputs(self) -> list[str]:
@@ -778,6 +776,35 @@ class BuildDescriptionTests(unittest.TestCase):
             builds.description_from_json("my-build", tested.to_json()), tested
         )
 
+    def test_the_no_stabilizer_variant_round_trips_and_adds_its_specs(self) -> None:
+        line = {"reference": "BC 9", "image": "BC 0", "why": "no stabilizer"}
+        variant = {"specs": ["data/specs/b.json"], "boot_differs": [line]}
+        raw = {**self.GOOD, "no_stabilizer": variant}
+        described = builds.description_from_json("b", raw)
+        self.assertEqual(described.to_json(), raw)
+        made = described.with_no_stabilizer()
+        self.assertEqual(made.name, "b-no-stabilizer")
+        self.assertEqual(made.specs, ("data/specs/a.json", "data/specs/b.json"))
+        self.assertEqual(made.boot_differs, (("BC 9", "BC 0", "no stabilizer"),))
+        self.assertFalse(made.tested)
+        self.assertEqual(described.boot_differs, ())  # the build's own check gets none
+        with self.assertRaises(BuildError):
+            builds.description_from_json("b", self.GOOD).with_no_stabilizer()
+        with self.assertRaises(BuildError):
+            builds.description_from_json("b-no-stabilizer", self.GOOD)
+        bads: list[dict[str, Any]] = [
+            {"specs": []},
+            {"specs": ["data/specs/b.json"]},
+            {**variant, "boot_differs": [{"reference": "a", "image": "b"}]},
+            {**variant, "boot_differs": [{**line, "why": ""}]},
+            {**variant, "specs": ["data/specs/a.json"]},  # named twice in the variant
+        ]
+        for bad in bads:
+            with self.subTest(bad=bad), self.assertRaises(BuildError):
+                builds.description_from_json(
+                    "b", {**self.GOOD, "no_stabilizer": bad}
+                ).with_no_stabilizer()
+
     def test_first_code_is_true_or_absent(self) -> None:
         marked = builds.description_from_json("b", {**self.GOOD, "first_code": True})
         self.assertTrue(marked.first_code)
@@ -1171,6 +1198,33 @@ class MakeTests(RepoCase):
         self.assertIn(f"check --build {path}", text)
         self.assertTrue(json.loads(path.read_text(encoding="utf-8"))["first_code"])
         self.assertIn("FIRST CODE", text)
+
+    def test_only_the_variant_checks_get_the_variant_lines(self) -> None:
+        self.repo.free_space_tool(0)
+        self.repo.write_json(
+            "data/specs/b.json",
+            spec_json("b", [{**BYTE_OP, "offset": "0x12", "expect": "1213"}]),
+        )
+        line = ("BC transactions 9", "BC transactions 0", "no stabilizer")
+        candidate = dataclasses.replace(
+            self.repo.candidate,
+            no_stabilizer=builds.Variant(("data/specs/b.json",), (line,)),
+        )
+        path = builds.save_description(self.repo.paths, candidate)
+        lines: list[str] = []
+        self.make(candidate, log=lines.append)
+        text = "\n".join(lines)
+        self.assertIn("new.BIN", text)
+        self.assertNotIn(
+            "--declared", text
+        )  # the build's own check: the stabilizer starts
+        self.assertNotIn("--no-stabilizer", text)
+        lines.clear()
+        result = self.make(candidate.with_no_stabilizer(), log=lines.append)
+        text = "\n".join(lines)
+        self.assertIn(f"check --build {path} --no-stabilizer", text)
+        self.assertIn("new-no-stabilizer.BIN --declared", text)
+        self.assertEqual(result.image.name, "new-no-stabilizer.BIN")
 
     def test_a_missing_spec_is_found_before_the_free_space_check(self) -> None:
         self.repo.free_space_tool(1)

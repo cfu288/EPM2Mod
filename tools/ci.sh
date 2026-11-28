@@ -75,6 +75,18 @@ for name in $builds; do
     quiet uv run python emulator/boot-test "build/$name.BIN"
     quiet uv run python emulator/update-path-test "build/$name.BIN"
   fi
+  if jq -e '.no_stabilizer != null' "data/builds/$name.json" > /dev/null; then
+    step "build $name, its variant for a broken image stabilizer: make with the three checks"
+    quiet uv run epm2mod make "$name" --no-stabilizer  # a candidate: its checks get the variant's boot_differs
+    # the variant's declared lines are only the variant's: the build itself starts its stabilizer, so its boot check
+    # with those lines fails (exit 1: a declared difference did not happen)
+    jq '.no_stabilizer.boot_differs' "data/builds/$name.json" > "$tmp/declared.json"
+    status=0
+    uv run python emulator/boot-test "build/$name.BIN" --declared "$tmp/declared.json" > "$tmp/log" 2>&1 || status=$?
+    if [ "$status" != 1 ] || ! grep -q "a declared difference did not happen" "$tmp/log"; then
+      cat "$tmp/log"; echo "tools/ci.sh: $name's boot check with its variant's lines did not fail as it must" >&2; exit 1
+    fi
+  fi
 done
 echo
 # shellcheck disable=SC2086

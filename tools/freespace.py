@@ -4,6 +4,7 @@
     python3 tools/freespace.py map                    # regenerate docs/reference/code-space-map.md and .tsv
     python3 tools/freespace.py check SPEC [SPEC ...]  # verify the bytes that specs add in free areas
     python3 tools/freespace.py check --build FILE     # the same for the specs of the build description FILE
+    python3 tools/freespace.py check --build FILE --no-stabilizer   # ... with its no_stabilizer variant's specs
     python3 tools/freespace.py area 0x7E4C9100        # all checks for the area that holds an address
     python3 tools/freespace.py selftest               # known facts; a few seconds
 
@@ -1490,6 +1491,8 @@ def main():
                    help="check the specs of the build description FILE, with --first-code if it sets first_code")
     c.add_argument("--first-code", action="store_true",
                    help="accept code in an area that passes every static check but has never run code (the flash is the test)")
+    c.add_argument("--no-stabilizer", action="store_true",
+                   help="with --build: add the specs of the build's no_stabilizer variant")
     c = sub.add_parser("area")
     c.add_argument("addr")
     sub.add_parser("selftest")
@@ -1516,7 +1519,8 @@ def main():
     if a.build:
         with open(a.build, encoding="utf-8") as f:
             build = json.load(f)
-        paths = [os.path.join(ROOT, spec) for spec in build["specs"]]
+        extra = build["no_stabilizer"]["specs"] if a.no_stabilizer else []
+        paths = [os.path.join(ROOT, spec) for spec in build["specs"] + extra]
         first_code = first_code or bool(build.get("first_code"))
     specs = []
     for p in paths:

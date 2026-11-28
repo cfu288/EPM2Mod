@@ -114,8 +114,9 @@ class FakeRunner:
         self.release = threading.Event()
         self.release.set()
 
-    def __call__(self, paths, choices, card, log, step):  # type: ignore[no-untyped-def]
+    def __call__(self, paths, choices, card, log, step, no_stabilizer):  # type: ignore[no-untyped-def]
         self.calls.append((choices, card))
+        self.no_stabilizer = no_stabilizer
         log("1/5 stock firmware: ok")
         step(1)
         self.release.wait(10)
@@ -212,6 +213,22 @@ class ServerTests(unittest.TestCase):
                 archive.namelist(), ["DCOLYMP/E1019999.BIN", "EPM2LOOK.BIN"]
             )
             self.assertEqual(archive.read("DCOLYMP/E1019999.BIN"), b"firmware")
+        self.assertFalse(self.runner.no_stabilizer)
+
+    def test_no_stabilizer_reaches_the_install_only_with_epm2mod(self) -> None:
+        body = {"firmware": "epm2mod", "choices": [], "card": None}
+        status, data = self.server.request(
+            "POST", "/api/make", {**body, "no_stabilizer": True}
+        )
+        self.assertEqual(status, 202, data)
+        self.server.wait()
+        self.assertTrue(self.runner.no_stabilizer)
+        for wrong in ({"firmware": "original"}, {"no_stabilizer": "yes"}):
+            with self.subTest(wrong=wrong):
+                status, _ = self.server.request(
+                    "POST", "/api/make", {**body, "no_stabilizer": True, **wrong}
+                )
+                self.assertEqual(status, 400)
 
     def test_a_listed_card_is_used_and_an_unlisted_one_refused(self) -> None:
         status, data = self.server.request("GET", "/api/cards")

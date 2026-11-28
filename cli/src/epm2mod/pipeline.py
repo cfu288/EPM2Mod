@@ -53,6 +53,8 @@ from typing import Any
 
 from . import cardio, catalogue
 from .builds import (
+    NO_STABILIZER,
+    BootDiffers,
     BuildDescription,
     check_test_date,
     description_path,
@@ -72,7 +74,15 @@ from .errors import (
     NotFoundError,
     UnavailableError,
 )
-from .fileio import Log, describe_os_error, part_path, read_bytes, silent, write_bytes
+from .fileio import (
+    Log,
+    describe_os_error,
+    part_path,
+    read_bytes,
+    silent,
+    write_bytes,
+    write_json,
+)
 from .hashing import sha256_bytes
 from .label import with_label
 from .looks import lookfile
@@ -157,19 +167,23 @@ def check_free_space(paths: RepoPaths, description: BuildDescription) -> str:
     Raises:
         BuildError: if the check fails or cannot run.
     """
-    saved = paths.build(description.name)
+    name = description.name.removesuffix(NO_STABILIZER)
+    saved = paths.build(name)
+    variant = name != description.name  # the tool adds the variant's specs itself
+    if variant:
+        saved = saved.with_no_stabilizer()
     if (saved.specs, saved.first_code) != (description.specs, description.first_code):
         raise BuildError(
             f"{description.name}: the specs differ from its description file, which the free-space check reads"
         )
-    path = description_path(paths, description.name)
+    path = description_path(paths, name)
     command = [
         sys.executable,
         str(paths.free_space_tool),
         "check",
         "--build",
         str(path),
-    ]
+    ] + (["--no-stabilizer"] if variant else [])
     try:
         done = subprocess.run(
             command,
@@ -203,13 +217,16 @@ def check_free_space(paths: RepoPaths, description: BuildDescription) -> str:
 _EMULATOR_NOT_SET_UP = 3
 
 
-def check_in_emulator(paths: RepoPaths, image: Path) -> list[str]:
+def check_in_emulator(
+    paths: RepoPaths, image: Path, boot_differs: BootDiffers = ()
+) -> list[str]:
     """Start a firmware image in the emulator: the normal start and the update path.
 
     The checks are the project's emulator checks, each run as ``CHECK IMAGE``: the
     normal start and the update path. An image that does not start as the
     stock firmware does, or does not find an update file with OK held, could
-    leave the camera with no way back.
+    leave the camera with no way back. ``boot_differs``, the boot report lines
+    that the image changes on purpose, go to each check as ``--declared FILE``.
 
     Returns:
         One line for each check: its result.
@@ -219,6 +236,20 @@ def check_in_emulator(paths: RepoPaths, image: Path) -> list[str]:
             A build that was not started in the emulator is not made.
         BuildError: if a check fails.
     """
+    with tempfile.TemporaryDirectory() as folder:
+        declared = []
+        if boot_differs:
+            declared = ["--declared", str(Path(folder) / "declared")]
+            keys = ("reference", "image", "why")
+            entries = [dict(zip(keys, line)) for line in boot_differs]
+            write_json(Path(declared[1]), entries, BuildError)
+        return _run_emulator_checks(paths, image, declared)
+
+
+def _run_emulator_checks(
+    paths: RepoPaths, image: Path, declared: list[str]
+) -> list[str]:
+    """Run each emulator check as ``CHECK IMAGE [--declared FILE]``; see ``check_in_emulator``."""
     lines = []
     for tool in paths.emulator_checks:
         not_run = UnavailableError(
@@ -229,7 +260,7 @@ def check_in_emulator(paths: RepoPaths, image: Path) -> list[str]:
             raise not_run
         try:
             done = subprocess.run(
-                [sys.executable, str(tool), str(image)],
+                [sys.executable, str(tool), str(image), *declared],
                 cwd=paths.root,
                 capture_output=True,
                 text=True,
@@ -313,16 +344,35 @@ def firmware(
             f"4/5 sha256 {digest}\n    CANDIDATE: this build is NOT camera-tested. "
             "Write the sha256 in the camera log before you flash it."
         )
+        differs = description.boot_differs
         if emulator_image is not None:
-            lines = check_in_emulator(checkout, emulator_image)
+            lines = check_in_emulator(checkout, emulator_image, differs)
         else:
             with tempfile.TemporaryDirectory() as folder:
                 image = Path(folder) / f"{description.name}.BIN"
                 write_bytes(image, applied.image, BuildError)
-                lines = check_in_emulator(checkout, image)
+                lines = check_in_emulator(checkout, image, differs)
         for line in lines:
             log("    " + line)
     step(4)
+    return applied.image, digest
+
+
+def no_stabilizer_image(
+    paths: Locator, description: BuildDescription
+) -> tuple[bytes, str]:
+    """Return the image of a build's no-stabilizer variant, and its SHA-256, with no checks.
+
+    The caller has made the build itself with ``firmware``, so the stock firmware is on this computer and the build
+    gives its recorded SHA-256. The variant's emulator checks run with ``make`` and when a release is planned.
+
+    Raises:
+        BuildError: if the build has no variant (``BuildDescription.with_no_stabilizer``).
+        SpecError: if a spec of the variant does not fit the firmware.
+    """
+    variant = description.with_no_stabilizer()
+    stock_data = read_stock(paths, variant.stock_firmware)
+    applied, digest = build_image(variant, load_specs(paths, variant), stock_data)
     return applied.image, digest
 
 
@@ -430,6 +480,7 @@ def install(
     log: Log = silent,
     step: Callable[[int], None] = no_step,
     is_card: Callable[[Path], bool] = cardio.is_card,
+    no_stabilizer: bool = False,
 ) -> Outcome:
     """Make the firmware and write it, and the film file of the choices, to a card (``epm2mod install``).
 
@@ -445,19 +496,22 @@ def install(
         log: where progress lines go.
         step: called with 1 to ``STEPS`` as each step ends.
         is_card: says whether a folder is an SD card (``cardio.is_card``).
+        no_stabilizer: True for the build's variant for a body whose image stabilizer is broken
+            (``no_stabilizer_image``).
 
     Raises:
         Epm2ModError: with a message for the user, if a step fails. The card then holds the files it had before,
             except a file that a failed write had already replaced in full.
     """
     description = catalogue.build_to_install(paths, build, allow_untested)
-    load_specs(paths, description)
+    written = description.with_no_stabilizer() if no_stabilizer else description
+    load_specs(paths, written)
     stock = description.stock_firmware
     films: bytes | None = None
     looks: list[lookfile.Look] = []
     if choices:
         films, looks = _film_file(paths, choices)
-    expected = Content(stock.size, description.sha256)
+    expected = Content(stock.size, written.sha256)
     planned_files: dict[str, Content] = {FIRMWARE: expected}
     if films is not None:
         planned_files[FILMS] = Content.of(films)
@@ -465,6 +519,9 @@ def install(
         cardio.plan(card, planned_files, is_card)
     if not dry_run:
         image, _ = firmware(paths, description, log, step)
+        if no_stabilizer:
+            image, digest = no_stabilizer_image(paths, description)
+            log(f"    sha256 {digest}: this build with the image stabilizer off")
         cardio.check_model(image)
         planned_files[FIRMWARE] = Content.of(image)
     eject_error = None
@@ -496,7 +553,7 @@ def install(
         dry_run,
         card,
         ejected,
-        description,
+        written,
         tuple(looks),
         eject_error,
     )

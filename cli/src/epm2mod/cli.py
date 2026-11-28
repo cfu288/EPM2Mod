@@ -37,7 +37,12 @@ from pathlib import Path
 from typing import Any, NoReturn
 
 from . import __version__, camera_steps, catalogue, readme
-from .builds import BuildDescription, check_test_date, description_path
+from .builds import (
+    NO_STABILIZER,
+    BuildDescription,
+    check_test_date,
+    description_path,
+)
 from .cardio import Planned, output_path
 from .catalogue import Locator
 from .errors import (
@@ -757,6 +762,7 @@ def _install(args: argparse.Namespace, ctx: Context) -> int:
         dry_run=args.dry_run,
         eject=args.eject,
         log=_progress,
+        no_stabilizer=args.no_stabilizer,
     )
     return _report_outcome(args, outcome)
 
@@ -911,10 +917,13 @@ def _make(args: argparse.Namespace, ctx: Context) -> int:
     the build.
     """
     checkout = ctx.checkout()
+    name = args.build + (NO_STABILIZER if args.no_stabilizer else "")
     if not args.dry_run:
         clear_outputs(checkout, None)
-        clear_outputs(checkout, args.build)
+        clear_outputs(checkout, name)
     description = checkout.build(args.build)
+    if args.no_stabilizer:  # a candidate, so that make runs the checks on it
+        description = description.with_no_stabilizer()
     result: MakeResult = make(
         checkout,
         description,
@@ -934,9 +943,11 @@ def _make(args: argparse.Namespace, ctx: Context) -> int:
     else:
         print("\n".join(_file_lines(result.files, args.dry_run)))
     if not args.dry_run:
+        tested = checkout.build(args.build).tested
         _hint(
-            f"To write a card: epm2mod install --card DIR --build {description.name}"
-            + ("" if description.tested else " --allow-untested")
+            f"To write a card: epm2mod install --card DIR --build {args.build}"
+            + (" --no-stabilizer" if args.no_stabilizer else "")
+            + ("" if tested else " --allow-untested")
         )
     return 0
 
@@ -1321,6 +1332,15 @@ def _add_films(parser: argparse.ArgumentParser, name: str, required: bool) -> No
     )
 
 
+def _add_no_stabilizer(parser: argparse.ArgumentParser) -> None:
+    """Add ``--no-stabilizer``: the build's variant for a camera whose image stabilizer is broken."""
+    parser.add_argument(
+        "--no-stabilizer",
+        action="store_true",
+        help="for a camera whose image stabilizer is broken: the camera does not start it",
+    )
+
+
 def _add_stock(parser: argparse.ArgumentParser) -> None:
     """Add ``--cache DIR`` and ``--stock FILE``: where Olympus's firmware is."""
     parser.add_argument(
@@ -1384,6 +1404,7 @@ def _arguments(
             action="store_true",
             help="allow a build that has no passed camera test",
         )
+        _add_no_stabilizer(parser)
         _add_stock(parser)
         _add_dry_run(parser)
         _add_eject(parser)
@@ -1442,6 +1463,7 @@ def _arguments(
             metavar="DIR",
             help="the output folder; default: the project's output folder",
         )
+        _add_no_stabilizer(parser)
         _add_stock(parser)
         _add_dry_run(parser)
         _add_json(parser)

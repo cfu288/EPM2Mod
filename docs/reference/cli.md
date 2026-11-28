@@ -81,7 +81,7 @@ epm2mod cards
 Write EPM2Mod to the SD card, and the look pack if --film is given.
 
 ```
-epm2mod install [-h] --card DIR [--film ARTn=FILM] [--build BUILD] [--allow-untested] [--cache DIR] [--stock FILE] [--dry-run] [--eject] [--json]
+epm2mod install [-h] --card DIR [--film ARTn=FILM] [--build BUILD] [--allow-untested] [--no-stabilizer] [--cache DIR] [--stock FILE] [--dry-run] [--eject] [--json]
 ```
 
 - Output: the firmware on the card, and the look pack if --film is given; then the camera steps.
@@ -93,6 +93,7 @@ epm2mod install [-h] --card DIR [--film ARTn=FILM] [--build BUILD] [--allow-unte
 | `--film ARTn=FILM` | a film simulation for an ART slot: ART1 (Pop Art) to ART12 (Watercolor), names from 'epm2mod films'. Give it once per slot. The slots that are not named keep their Olympus art filter |  |
 | `--build BUILD` | the name of another build; default: the pinned build |  |
 | `--allow-untested` | allow a build that has no passed camera test |  |
+| `--no-stabilizer` | for a camera whose image stabilizer is broken: the camera does not start it |  |
 | `--cache DIR` | the folder that keeps Olympus's firmware; default: the project's cache folder |  |
 | `--stock FILE` | use this copy of Olympus's firmware (checked by its sha256); download nothing |  |
 | `--dry-run` | print what would be written and replaced; write nothing |  |
@@ -349,7 +350,7 @@ These commands need a checkout.
 Make a build into the output folder.
 
 ```
-epm2mod make [-h] [-o FILE] [--out-dir DIR] [--cache DIR] [--stock FILE] [--dry-run] [--json] BUILD
+epm2mod make [-h] [-o FILE] [--out-dir DIR] [--no-stabilizer] [--cache DIR] [--stock FILE] [--dry-run] [--json] BUILD
 ```
 
 - Output: NAME.BIN, and DCOLYMP with the firmware as on the card, in the output folder.
@@ -360,6 +361,7 @@ epm2mod make [-h] [-o FILE] [--out-dir DIR] [--cache DIR] [--stock FILE] [--dry-
 | `BUILD` | the name of a build |  |
 | `-o, --out FILE` | also write the firmware to FILE; not on an SD card |  |
 | `--out-dir DIR` | the output folder; default: the project's output folder |  |
+| `--no-stabilizer` | for a camera whose image stabilizer is broken: the camera does not start it |  |
 | `--cache DIR` | the folder that keeps Olympus's firmware; default: the project's cache folder |  |
 | `--stock FILE` | use this copy of Olympus's firmware (checked by its sha256); download nothing |  |
 | `--dry-run` | print what would be written and replaced; write nothing |  |

@@ -14,7 +14,8 @@ API (JSON):
 - ``GET /api/build``: the pinned build (name, what, sha256).
 - ``GET /api/cards``: the cards plugged in.
 - ``POST /api/make`` with ``{"firmware": "epm2mod", "original" or "films", "choices": ["ART2=velvia", ...], "card": PATH or
-  null}``: start a job. No choices: no film file. ``original`` is Olympus's own firmware (``pipeline.restore``), with
+  null}``, and optionally ``"no_stabilizer": true`` with ``epm2mod`` (the variant for a camera whose image stabilizer
+  is broken, ``pipeline.install``): start a job. No choices: no film file. ``original`` is Olympus's own firmware (``pipeline.restore``), with
   no choices. ``films`` is the film file only (``pipeline.set_films``). One job at a time; a wrong request, or one while a job runs, gets 400 and the reason.
 - ``GET /api/job``: the last job: its progress lines, and when it is done, the error or the result with the camera
   steps (``camera_steps``).
@@ -120,6 +121,7 @@ def run_job(
     card: Path | None,
     log: Log,
     step: Callable[[int], None],
+    no_stabilizer: bool = False,
 ) -> Outcome:
     """Make the pinned build's firmware and the film file, and write them to a card if one is given (``install``).
 
@@ -129,11 +131,14 @@ def run_job(
         card: the top folder of the SD card, or None for the files only.
         log: where progress lines go.
         step: called with each step as it ends (``pipeline.STEPS``).
+        no_stabilizer: True for the variant for a camera whose image stabilizer is broken.
 
     Raises:
         Epm2ModError: if a step fails (the message is for the user).
     """
-    return install(paths, card, choices, log=log, step=step)
+    return install(
+        paths, card, choices, log=log, step=step, no_stabilizer=no_stabilizer
+    )
 
 
 def plain_message(error: Epm2ModError) -> str:
@@ -254,13 +259,23 @@ class App:
         Raises:
             BuildError: if the body is wrong, the card is not listed, or a job runs.
         """
-        if not isinstance(body, dict) or set(body) != {"firmware", "choices", "card"}:
+        keys = {"firmware", "choices", "card"}
+        if not isinstance(body, dict) or not keys <= set(body) <= keys | {
+            "no_stabilizer"
+        }:
             raise BuildError(
-                "the request needs exactly 'firmware', 'choices' and 'card'"
+                "the request needs 'firmware', 'choices' and 'card', and may have 'no_stabilizer'"
             )
         firmware, choices, card = body["firmware"], body["choices"], body["card"]
+        no_stabilizer = body.get("no_stabilizer", False)
         if firmware not in ("epm2mod", "original", "films"):
             raise BuildError("'firmware' is 'epm2mod', 'original' or 'films'")
+        if not isinstance(no_stabilizer, bool) or (
+            no_stabilizer and firmware != "epm2mod"
+        ):
+            raise BuildError(
+                "'no_stabilizer' is true or false, and true only for 'epm2mod'"
+            )
         if firmware == "original" and choices:
             raise BuildError("Olympus's original firmware takes no film simulations")
         if not isinstance(choices, list) or not all(
@@ -288,11 +303,13 @@ class App:
             )
             self.job = job
         threading.Thread(
-            target=self._work, args=(job, choices, target), daemon=True
+            target=self._work, args=(job, choices, target, no_stabilizer), daemon=True
         ).start()
         return job
 
-    def _work(self, job: Job, choices: list[str], card: Path | None) -> None:
+    def _work(
+        self, job: Job, choices: list[str], card: Path | None, no_stabilizer: bool
+    ) -> None:
         """Run a job and record its end; its lines also go to the terminal."""
 
         def step(number: int) -> None:
@@ -311,7 +328,7 @@ class App:
                 outcome = self.run_films(self.paths, choices, card)
                 step(1)
             else:
-                outcome = self.run(self.paths, choices, card, log, step)
+                outcome = self.run(self.paths, choices, card, log, step, no_stabilizer)
             job.sha256 = outcome.files[0].content.sha256
             job.files = outcome.file_data()
             job.camera_steps = [item.to_json() for item in outcome.steps]

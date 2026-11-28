@@ -31,5 +31,33 @@
  ],
  "sha256": "1b45771d883b80ec66d5cf79aa00665e714846c68ad473c9c548b2975f45c770",
  "camera_tested": "2026-11-28",
- "label": "2026.12.02"
+ "label": "2026.12.02",
+ "no_stabilizer": {
+  "specs": [
+   "data/specs/no-ibis.json",
+   "data/specs/no-ibis-menu.json"
+  ],
+  "boot_differs": [
+   {
+    "reference": "  BS.wb 2A001001 00007102",
+    "image": "  wb 2A001001 00007102",
+    "why": "The stabilizer is not started, so its fault report (error 0x8228 in the emulator) and the settings save that goes with it do not happen; 'BS.' is printed with that save"
+   },
+   {
+    "reference": "file task: 16.5 cmd 0x00000031 0x00000006 0xf0000000 0x60002740",
+    "image": "file task: 16.4 cmd 0x00000031 0x00000006 0xf0000000 0x60002440",
+    "why": "A buffer address of the file task's first command is 0x300 lower: the stabilizer start's memory is not allocated"
+   },
+   {
+    "reference": "stand-ins and observers hit: S-GIOTIMER x3216, S-CONSOLE x389, boot-mark x173, S-OSDFILL x4, S-FLASHREAD0 x31, S-BANKRESTORE x2, S-FLASHWRITE x3, S-FLASHERASE x6, idle x275, idle x9096, S-ROLC x122, S-DIV0 x1, S-GIOIN x3180, S-PWM x2, S-PWM-duty x2, S-BC x9, S-BATT x2, errlog x2, oxf-event x259, api_exec_start x8, api_exec_post x8, fileclbk-cmd x1, usrfast-log x18, S-DMA-reserve x246, S-DMA x246, S-DMA-finish x246, S-IIC-write x31, S-IIC-read x50, S-SIO x70, S-SIORAW-tx x8, S-SIORAW-rx x7, S-CAM x2, S-TAKEAPI x8, S-ACC-out x20, S-OSDFILL(cpu1) x2",
+    "image": "stand-ins and observers hit: S-GIOTIMER x3216, S-CONSOLE x386, boot-mark x173, S-OSDFILL x4, S-FLASHREAD0 x31, S-BANKRESTORE x1, S-FLASHWRITE x3, S-FLASHERASE x6, idle x275, idle x9091, S-ROLC x122, S-DIV0 x1, S-GIOIN x3180, S-PWM x2, S-PWM-duty x2, S-BATT x2, errlog x2, oxf-event x259, api_exec_start x8, api_exec_post x8, fileclbk-cmd x1, usrfast-log x18, S-DMA-reserve x246, S-DMA x246, S-DMA-finish x246, S-IIC-write x31, S-IIC-read x50, S-SIO x70, S-SIORAW-tx x8, S-SIORAW-rx x7, S-CAM x2, S-TAKEAPI x8, S-ACC-out x20, S-OSDFILL(cpu1) x2",
+    "why": "S-BC, the stand-in for the stabilizer, is not called; one bank save fewer (the fault report's) and 3 console characters fewer ('BS.')"
+   },
+   {
+    "reference": "I2C transfers 81 | SIO client transfers 70 | BC transactions 9 | SD commands 0 | DMA 246 | S-DIV0 1 | refused MMIO 0",
+    "image": "I2C transfers 81 | SIO client transfers 70 | BC transactions 0 | SD commands 0 | DMA 246 | S-DIV0 1 | refused MMIO 0",
+    "why": "No transaction is sent to the stabilizer"
+   }
+  ]
+ }
 }
