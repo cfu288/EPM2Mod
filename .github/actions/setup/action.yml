@@ -1,4 +1,4 @@
-name: Set up the checkout
+name: Set up the tools
 description: Install Python, Node, uv, the locked Python packages and the tools that build binutils.
 runs:
   using: composite
@@ -11,6 +11,7 @@ runs:
       uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
       with:
         node-version-file: .nvmrc
+        # The cache is off because a cache that another run wrote could change what a release checks.
         package-manager-cache: false
     - name: Install uv and the locked packages
       shell: bash

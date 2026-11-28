@@ -1,4 +1,4 @@
-# The checks of the web apps in web/, and the GitHub Pages site from main. See web/README.md.
+# This workflow checks the web apps in web/ and deploys the GitHub Pages site from main. See web/README.md.
 name: web
 
 on:

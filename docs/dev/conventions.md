@@ -156,9 +156,12 @@ A release is made on GitHub by the workflow `.github/workflows/release.yml`, whi
 to main does not release. Nobody pushes a tag: the workflow creates it, and a tag pushed by hand starts nothing.
 
 ```sh
-uv run epm2mod release --summary "TEXT"                         # the local preview: ready or not, the version, the notes
-gh workflow run release.yml -f kind=rc -f notes="TEXT"             # a dry run: everything but the tag and the publication
-gh workflow run release.yml -f kind=rc -f notes="TEXT" -f dry_run=false  # the release
+# The local preview: ready or not, the version and the notes.
+uv run epm2mod release --summary "TEXT"
+# A dry run does everything except create the tag and publish the release.
+gh workflow run release.yml -f kind=rc -f summary="TEXT"
+# The release.
+gh workflow run release.yml -f kind=rc -f summary="TEXT" -f dry_run=false
 ```
 
 1. **The version is the day of the release** (UTC): `vYYYY.MM.DD-rc.N`. N is 1 for the first release of a day and
@@ -182,15 +185,15 @@ gh workflow run release.yml -f kind=rc -f notes="TEXT" -f dry_run=false  # the r
    The description in `data/builds/` is not changed.
 4. **`epm2mod release` checks** that the build has a camera test (`epm2mod pin` recorded it), the tree is clean and at
    `origin/main`, and the generated documents and the feature lists are current. It writes the whole notes. The title
-   comes first. The text of `--summary` comes under it. The workflow passes its input `notes` there, which describes
-   what is new in plain sentences for users. The feat and fix commits since the last release follow, then the
-   firmware line, and then the install steps from `release/NOTES.md`. The local preview shows the same notes as the
-   release.
+   comes first. The text of `--summary` comes under it. The workflow passes its input `summary` there, which describes
+   what is new in plain sentences for users. The feat and fix commits since the last release follow, then the firmware
+   line, and then the install steps from `release/NOTES.md`. The local preview shows the same notes as the release.
 5. **The workflow** runs the hard checks (`tools/ci.sh`) on the commit and then that command (job `plan`). It makes the
    zip and the Mac disk image and starts them on three systems (`package.yml`). Unless `dry_run` is true, which is the
-   default, job `publish` checks that the zip installs the firmware that the plan checked. It then uploads the files
-   to a draft release and publishes the draft. A draft creates no tag, so a failed upload leaves only a draft.
-   Publishing the draft creates the tag on the checked commit. Job `publish` runs in the environment `release`.
+   default, job `publish` checks that the zip installs the firmware that the plan checked. It then uploads the files to
+   a draft release and publishes the draft. A draft creates no tag, so a failed upload leaves only a draft. The next run
+   deletes that draft before it uploads again. Publishing the draft creates the tag on the checked commit. Job `publish`
+   runs in the environment `release`. Job `plan` runs only from main, so a run from another branch stops at once.
 
 `uv run epm2mod package --release-version V` makes the same zip locally, without publishing. `package.yml` also runs
 for pull requests and main, as a check, with the version `DATE-dev` (the commit's date): a `-dev` zip holds the tested
@@ -199,13 +202,13 @@ image as it is.
 A release also publishes `EPM2Mod-V.dmg` for Macs (job `dmg` of `package.yml`, `release/mac/make-dmg.sh`): EPM2Mod.app
 with the zip's folder in it, signed with the owner's Developer ID Application certificate and notarized by Apple, so
 macOS opens it without Open Anyway. The signing secrets are in the GitHub environment `release`: `MAC_CERT_P12` (the
-certificate and its key as a base64 `.p12`), `MAC_CERT_PASSWORD`, `APPLE_ID`, `APPLE_TEAM_ID` and
-`APPLE_APP_PASSWORD`. `release/mac/keychain.sh` puts them in a keychain for the run and deletes it before anything
-from the zip runs. The environment must allow the branch `main`, because the workflow runs there and not on a tag. It
-restricts the branches and tags that may use the secrets and publish a release. It asks for no approval. The disk image
-step stops after 45 minutes when Apple's notarization does not answer. If the certificate expires or the Apple Developer membership lapses, the job
-fails and nothing is published. Renew it, then set the secrets again with `gh secret set NAME --env release`. On a
-Mac, `release/mac/make-dmg.sh ZIP` makes the disk image locally, signed ad hoc unless `EPM2MOD_SIGN_IDENTITY` and
+certificate and its key as a base64 `.p12`), `MAC_CERT_PASSWORD`, `APPLE_ID`, `APPLE_TEAM_ID` and `APPLE_APP_PASSWORD`.
+`release/mac/keychain.sh` puts them in a keychain for the run and deletes it before anything from the zip runs. The
+environment must allow the branch `main`, because the workflow runs there and not on a tag. It restricts the branches
+and tags that may use the secrets and publish a release. It asks for no approval. The disk image step stops after 45
+minutes when Apple's notarization does not answer. If the certificate expires or the Apple Developer membership lapses,
+the job fails and nothing is published. Renew it, then set the secrets again with `gh secret set NAME --env release`. On
+a Mac, `release/mac/make-dmg.sh ZIP` makes the disk image locally, signed ad hoc unless `EPM2MOD_SIGN_IDENTITY` and
 `EPM2MOD_NOTARY_PROFILE` are set.
 
 ## Checks

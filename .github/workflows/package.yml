@@ -1,4 +1,5 @@
-# The release zip and the Mac disk image, started on three systems. See docs/dev/conventions.md, section "Releases".
+# This workflow builds the release zip and the Mac disk image and starts them on three systems. See
+# docs/dev/conventions.md, section "Releases".
 name: package
 
 on:
@@ -75,7 +76,7 @@ jobs:
       - name: Make the zip
         id: zip
         env:
-          # The system Python with no installed packages, as the zip's launchers start it.
+          # This step runs the system Python with no installed packages, as the zip's launchers do.
           PYTHONPATH: cli/src
           RELEASE_VERSION: ${{ inputs.release_version }}
         run: |

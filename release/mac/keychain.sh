@@ -6,12 +6,15 @@
 # the notarization login as the profile epm2mod. It reads MAC_CERT_P12 (a base64 .p12), MAC_CERT_PASSWORD, APPLE_ID,
 # APPLE_TEAM_ID and APPLE_APP_PASSWORD from the environment.
 set -eu
-ACTION=$1
-KC=$2
+ACTION=${1:-}
+KC=${2:-}
 # Apple's Developer ID G2 intermediate certificate (https://www.apple.com/certificateauthority/).
 CA_URL=https://www.apple.com/certificateauthority/DeveloperIDG2CA.cer
 CA_SHA256=f16cd3c54c7f83cea4bf1a3e6a0819c8aaa8e4a1528fd144715f350643d2df3a
 
+if [ -z "$KC" ]; then
+  ACTION=usage
+fi
 case $ACTION in
   create)
     WORK=$(mktemp -d)

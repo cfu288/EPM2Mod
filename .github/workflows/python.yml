@@ -1,4 +1,5 @@
-# The hard checks of the Python side (tools/ci.sh python). See docs/dev/conventions.md, section "Checks".
+# This workflow runs the hard checks of the Python side (tools/ci.sh python). See docs/dev/conventions.md, section
+# "Checks".
 name: python
 
 on:
@@ -26,12 +27,12 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0 # tools/ci.sh compares the tree with the base commit.
-      - name: Set up
+      - name: Set up Python, Node and uv
         uses: ./.github/actions/setup
       - name: Find the binutils commit
         id: binutils
         run: echo "commit=$(git rev-parse HEAD:third_party/binutils-gdb)" >> "$GITHUB_OUTPUT"
-      - name: Restore the objdump
+      - name: Cache the objdump
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: build/toolchain
