@@ -1,0 +1,193 @@
+# This workflow makes sure every change still gives an installer that starts on Linux, macOS and Windows.
+name: Installer
+
+on:
+  push:
+    branches: [main]
+    paths: &paths
+      - 'cli/src/**'
+      - 'release/**'
+      - 'web/**'
+      - 'data/builds/**'
+      - 'data/specs/**'
+      - 'data/pinned-build.json'
+      - 'data/films/film-records.json'
+      - 'epm2mod.json'
+      - '.nvmrc'
+      - '.python-version'
+      - '.github/workflows/installer.yml'
+      - '.github/scripts/release_smoke.py'
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths: *paths
+  workflow_call:
+    inputs:
+      release_version:
+        description: The version of the release, like 2026.11.19-rc.1. A check leaves it empty and gets the commit's date with -dev.
+        type: string
+        default: ''
+      sign:
+        description: Sign the Mac disk image with the Developer ID certificate and have Apple notarize it.
+        type: boolean
+        default: false
+    outputs:
+      name:
+        description: The name of the zip without .zip.
+        value: ${{ jobs.build.outputs.name }}
+      sha256:
+        description: The sha256 of the firmware that the zip installs.
+        value: ${{ jobs.build.outputs.sha256 }}
+
+permissions:
+  contents: read
+
+concurrency:
+  # Each push gets its own group, because a newer run would otherwise replace a waiting one and leave its push unchecked.
+  group: installer-${{ github.ref }}-${{ github.event_name == 'push' && github.sha || '' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    name: Build the installer
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      name: ${{ steps.zip.outputs.name }}
+      sha256: ${{ steps.zip.outputs.sha256 }}
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version-file: .python-version
+      - name: Build the installer page
+        working-directory: web
+        # No dependency needs an install script, so none may run one.
+        run: npm ci --ignore-scripts && npm run build:app
+      - name: Make the zip
+        id: zip
+        env:
+          # This step runs the system Python with no installed packages, as the zip's launchers do.
+          PYTHONPATH: cli/src
+          RELEASE_VERSION: ${{ inputs.release_version }}
+        run: |
+          # The same commit gives the same check version.
+          version="${RELEASE_VERSION:-$(git show -s --format=%cd --date=format:%Y.%m.%d HEAD)-dev}"
+          python -m epm2mod fetch-stock
+          python -m epm2mod package --out-dir dist --release-version "$version" --json > "$RUNNER_TEMP/package.json"
+          jq -r '"name=\(.zip | split("/")[-1] | rtrimstr(".zip"))", "sha256=\(.firmware_sha256)"' \
+            "$RUNNER_TEMP/package.json" >> "$GITHUB_OUTPUT"
+      - name: Upload the zip
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-zip
+          path: dist/*.zip
+          if-no-files-found: error
+          retention-days: ${{ inputs.release_version && 90 || 7 }}
+
+  smoke:
+    name: Start the installer on ${{ matrix.os }}
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15, windows-2025]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    env:
+      NAME: ${{ needs.build.outputs.name }}
+      SHA256: ${{ needs.build.outputs.sha256 }}
+    steps:
+      - name: Check out the smoke test
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: .github/scripts
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          # This Python runs only the smoke test. setup-python has no 3.12.16 for macOS and Windows.
+          python-version: '3.12'
+      - name: Download the zip
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release-zip
+          path: zip
+      # Each system unpacks the zip with its own tool, as a user does.
+      - name: Unpack the zip
+        if: runner.os == 'Linux'
+        run: unzip -q "zip/$NAME.zip" -d unpacked
+      - name: Unpack the zip
+        if: runner.os == 'macOS'
+        run: ditto -x -k "zip/$NAME.zip" unpacked
+      - name: Unpack the zip
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Expand-Archive -LiteralPath "zip/$env:NAME.zip" -DestinationPath unpacked
+      - name: Start the installer with this system's launcher
+        shell: bash # In PowerShell, $NAME is not the environment variable.
+        run: python .github/scripts/release_smoke.py "unpacked/$NAME" "$SHA256"
+
+  dmg:
+    name: Make the Mac disk image
+    needs: build
+    runs-on: macos-15
+    timeout-minutes: 60
+    # Only a release uses the environment that holds the signing secrets.
+    environment: ${{ inputs.sign && 'release' || '' }}
+    env:
+      NAME: ${{ needs.build.outputs.name }}
+    steps:
+      - name: Check out the Mac files
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: release/mac
+          persist-credentials: false
+      - name: Download the zip
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release-zip
+          path: zip
+      - name: Make the signing keychain
+        if: inputs.sign
+        env:
+          MAC_CERT_P12: ${{ secrets.MAC_CERT_P12 }}
+          MAC_CERT_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        run: release/mac/keychain.sh create "$RUNNER_TEMP/sign.keychain-db"
+      # make-dmg.sh copies the zip's files into the app and signs it. It runs none of them.
+      - name: Make the disk image
+        timeout-minutes: 45 # Apple's service once hung for 6 hours (2026-11-25). It normally takes a few minutes.
+        env:
+          EPM2MOD_SIGN_IDENTITY: ${{ inputs.sign && 'Developer ID Application' || '' }}
+          EPM2MOD_NOTARY_PROFILE: ${{ inputs.sign && 'epm2mod' || '' }}
+        run: release/mac/make-dmg.sh "zip/$NAME.zip" dist
+      # The keychain is deleted before anything from the zip runs.
+      - name: Delete the signing keychain
+        if: always() && inputs.sign
+        run: release/mac/keychain.sh delete "$RUNNER_TEMP/sign.keychain-db"
+      - name: Start the app from the disk image
+        run: |
+          hdiutil attach -nobrowse -readonly -mountpoint "$RUNNER_TEMP/dmg" dist/*.dmg
+          "$RUNNER_TEMP/dmg/EPM2Mod.app/Contents/Resources/launch.sh" --version \
+            || { cat "$HOME/Library/Application Support/EPM2Mod/start.log"; exit 1; }
+          cat "$HOME/Library/Application Support/EPM2Mod/start.log"
+          hdiutil detach "$RUNNER_TEMP/dmg"
+      - name: Upload the disk image
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-dmg
+          path: dist/*.dmg
+          if-no-files-found: error
+          retention-days: ${{ inputs.release_version && 90 || 7 }}

@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # tools/ci.sh [python|web]: the hard checks, the same in CI and locally; run it before a pull request.
 #
-# Needs a clone that is set up: uv run epm2mod init. A check that cannot run is a failure, not a skip. The builds that
-# the python part makes and checks: the pinned build, and each data/builds/*.json that differs from the base commit
-# (CI_BASE; default: origin's main). Nothing here warns: the soft report of a build is `uv run epm2mod lint NAME`.
+# Needs jq and a clone that is set up: uv run epm2mod init.
+# A check that cannot run is a failure, not a skip. The builds that the python part makes and checks: the pinned build,
+# and each data/builds/*.json that differs from the base commit (CI_BASE; default: origin's main). Nothing here warns:
+# the soft report of a build is `uv run epm2mod lint NAME`.
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 part=${1:-all}
@@ -47,6 +48,12 @@ step "black, mypy (the files that cli/pyproject.toml names)"
 quiet uv run --directory cli black --check .
 quiet uv run --directory cli mypy
 
+step "the package compiles under Python 3.10, the oldest that cli/pyproject.toml allows"
+# The pin moves together with requires-python in cli/pyproject.toml.
+# uv warns when UV_LOCKED is set with --no-project, so the variable is removed for this step only.
+quiet env -u UV_LOCKED PYTHONPYCACHEPREFIX="$tmp/pycache" \
+  uv run --no-project --python 3.10.22 python -m compileall -q cli/src/epm2mod
+
 step "unit tests (they also run pyflakes on the scripts, and hold the feature lists)"
 quiet uv run python -m unittest discover -s cli/tests
 
@@ -54,7 +61,7 @@ step "generated documents and generated specs"
 quiet uv run epm2mod generate --check
 quiet gen/run.sh --check
 
-pinned=$(uv run epm2mod builds --json | uv run python -c 'import json, sys; print(json.load(sys.stdin)["pinned"])')
+pinned=$(uv run epm2mod builds --json | jq -r .pinned)
 # the descriptions git holds, against the working tree: an edit is checked before it is committed
 changed=$(git diff --name-only --no-renames --diff-filter=AM "$base" -- 'data/builds/*.json' | xargs -r -n1 basename -s .json)
 # shellcheck disable=SC2086
@@ -62,9 +69,9 @@ builds=$(printf '%s\n' "$pinned" $changed | sort -u)
 for name in $builds; do
   step "build $name: make, free-space check, load-order check, start in the emulator"
   quiet uv run epm2mod make "$name"  # a candidate: with the three checks
-  if grep -q '"camera_tested"' "data/builds/$name.json"; then  # make compares a tested build with its sha256 only
-    # shellcheck disable=SC2046
-    quiet uv run python tools/freespace.py check $(uv run python -c 'import json, sys; b = json.load(open(sys.argv[1])); print(*b["specs"], *["--first-code"] * bool(b.get("first_code")))' "data/builds/$name.json")
+  # make compares a camera-tested build with its sha256 only, so the checks run here.
+  if jq -e '.camera_tested != null' "data/builds/$name.json" > /dev/null; then
+    quiet uv run python tools/freespace.py check --build "data/builds/$name.json"
     quiet uv run python emulator/boot-test "build/$name.BIN"
     quiet uv run python emulator/update-path-test "build/$name.BIN"
   fi

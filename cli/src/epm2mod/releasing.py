@@ -2,7 +2,7 @@
 
 The release workflow on GitHub (started by hand, ``workflow_dispatch``) runs
 the hard checks and this, makes the zip with ``epm2mod package``, tests it on
-three systems, and then creates the tag and the GitHub release in one step. No
+three systems, and then publishes the GitHub release, which creates the tag. No
 person pushes a tag. This module only decides whether the repository is ready,
 which version comes next, and what the notes say.
 
@@ -31,7 +31,7 @@ from pathlib import Path
 from . import readme
 from .builds import pinned_description
 from .errors import BuildError, Epm2ModError
-from .fileio import write_bytes
+from .fileio import read_text, write_bytes
 from .paths import RepoPaths
 from .pipeline import check_free_space, check_in_emulator
 from .release import check_version, stamp
@@ -39,6 +39,9 @@ from .release import check_version, stamp
 #: The tags of the pinned build's releases (final, second of a day, rc), as git globs. A test release of a named
 #: build (``vLABEL-NAME.N``) matches none, so the next release's changes are counted from the last of these.
 RELEASE_TAGS = ("v????.??.??", "v????.??.??.*", "v????.??.??-rc.*")
+
+#: The type and scope of a commit subject, which the notes leave out: "fix(films): x (#13)" becomes "x (#13)".
+_TYPE = re.compile(r"^[a-z]+(\([^)]*\))?!?: ")
 
 
 def next_version(
@@ -69,36 +72,43 @@ def next_version(
 
 
 def release_notes(
-    version: str,
     label: str,
-    what: str,
     sha256: str,
     previous: str | None,
     changes: list[str],
     tested: tuple[str, str] | None = None,
+    summary: str = "",
+    install: str = "",
 ) -> str:
-    """Return the release notes: what is in the build and what changed.
+    """Return the release notes: the summary, the changes, the firmware and the install steps.
+
+    The release page shows the title (``Plan.title``) above them, so the notes do not repeat it.
 
     Args:
-        version: the calendar version.
         label: the build's label, which the camera's Firmware screen shows.
-        what: the build's description.
         sha256: the firmware file's SHA-256.
         previous: the tag of the release before, if any.
         changes: the subjects of the feat and fix commits since ``previous``.
         tested: the sha256 and the label of the camera-tested build, if the release holds it with another label.
+        summary: what is new, in sentences that a person writes. It comes first.
+        install: the install steps (the manifest's ``release_notes`` file). They come last.
     """
+    lines: list[str] = []
+    if summary.strip():
+        lines += [summary.strip(), ""]
+    if changes:
+        lines += [f"Changes since {previous}:" if previous else "Changes:", ""]
+        lines += [f"- {_TYPE.sub('', change)}" for change in changes]
+        lines.append("")
     firmware = f"Firmware: EPM2Mod {label}, sha256 `{sha256}`."
     if tested is not None:
         firmware += (
-            f" Camera-tested as sha256 `{tested[0]}` (label {tested[1]}); "
-            "differs only in the Firmware-screen date."
+            f" It is the camera-tested build (sha256 `{tested[0]}`) with the release's date on the"
+            " Firmware screen."
         )
-    lines = [f"EPM2Mod {version}", "", firmware, "", f"{what}.", ""]
-    if changes:
-        lines += [f"Changes since {previous}:" if previous else "Changes:", ""]
-        lines += [f"- {change}" for change in changes]
-        lines.append("")
+    lines += [firmware, ""]
+    if install:
+        lines += [install.rstrip("\n"), ""]
     return "\n".join(lines)
 
 
@@ -132,17 +142,24 @@ class Plan:
     notes: str
     sha256: str
 
+    @property
+    def title(self) -> str:
+        """The title of the release page, like ``EPM2Mod 2026.11.19-rc.1``."""
+        return f"EPM2Mod {self.tag[1:]}"
+
 
 def plan(
     paths: RepoPaths,
     final: bool,
     build: str | None = None,
     day: str | None = None,
+    summary: str = "",
 ) -> tuple[Plan | None, list[str]]:
     """Check the repository and return the release to make, or the problems.
 
     ``build`` names the build of a test release in place of the pinned build.
     ``day`` is the day of the release, like ``2026.11.25`` (default: today in UTC).
+    ``summary`` is what is new, in sentences that a person writes. The notes show it under the title.
     """
     if day is None:
         day = datetime.datetime.now(datetime.timezone.utc).strftime("%Y.%m.%d")
@@ -199,12 +216,12 @@ def plan(
     subjects = _git(paths, "log", "--format=%s", since).splitlines()
     changes = [s for s in subjects if re.match(r"(feat|fix)\b", s)]
     notes = release_notes(
-        version,
         released.label,
-        released.what,
         released.sha256,
         previous,
         changes,
         tested,
+        summary,
+        read_text(paths.release_notes, BuildError),
     )
     return Plan(f"v{version}", commit, notes, released.sha256), []

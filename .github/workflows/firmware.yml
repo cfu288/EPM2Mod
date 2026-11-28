@@ -1,0 +1,47 @@
+# This workflow makes sure every change still builds working firmware.
+name: Firmware checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # Each push gets its own group, because a newer run would otherwise replace a waiting one and leave its push unchecked.
+  group: firmware-${{ github.ref }}-${{ github.event_name == 'push' && github.sha || '' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    name: Check the firmware
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0 # tools/ci.sh compares the tree with the base commit.
+      - name: Set up the tools
+        uses: ./.github/actions/setup
+      - name: Find the binutils commit
+        id: binutils
+        run: echo "commit=$(git rev-parse HEAD:third_party/binutils-gdb)" >> "$GITHUB_OUTPUT"
+      - name: Cache the objdump
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: build/toolchain
+          key: mn103-binutils-${{ runner.os }}-${{ runner.arch }}-${{ steps.binutils.outputs.commit }}-${{ hashFiles('cli/src/epm2mod/init.py') }}
+      - name: Build the objdump and get the emulator and Olympus's firmware
+        run: uv run epm2mod init
+      - name: Run the checks
+        env:
+          # A pull request is compared with its base branch. A push to main is compared with the commit before it.
+          CI_BASE: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || github.event.before }}
+        run: tools/ci.sh python

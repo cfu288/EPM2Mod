@@ -26,6 +26,7 @@ import contextlib
 import io
 import json
 import os
+import shlex
 import signal
 import subprocess
 import sys
@@ -562,6 +563,7 @@ COMMANDS: dict[str, Command] = {
                 "dry_run": "true if nothing was written",
                 "zip": "the zip's path",
                 "sha256": "the zip's sha256 (null for a dry run)",
+                "firmware_sha256": "the sha256 of the firmware that the zip installs",
                 "contents": "the files in the zip",
             },
         ),
@@ -583,6 +585,8 @@ COMMANDS: dict[str, Command] = {
                 "problems": "why not, if it cannot",
                 "tag": "the tag of the release, like v2026.11.19-rc.1 (null if not ready)",
                 "release_version": "the release's version: the tag without its v (null if not ready)",
+                "title": "the title of the release page, like EPM2Mod 2026.11.19-rc.1 (null if not ready)",
+                "prerelease": "true for a test release, false for a release for everyone (null if not ready)",
                 "commit": "the commit that the release is made from (null if not ready)",
                 "notes": "the release notes (null if not ready)",
                 "sha256": "the sha256 of the firmware that the release installs (null if not ready)",
@@ -1137,7 +1141,7 @@ def _package(args: argparse.Namespace, ctx: Context) -> int:
 
     checkout = ctx.checkout()
     version = args.release_version
-    release_description(checkout, version)  # refuses a bad version
+    firmware = release_description(checkout, version)  # refuses a bad version
     folder = Path(args.out_dir) if args.out_dir else checkout.output_folder()
     contents = [name for name, _ in release_files(checkout, version)]
     if args.dry_run:
@@ -1152,6 +1156,7 @@ def _package(args: argparse.Namespace, ctx: Context) -> int:
             dry_run=args.dry_run,
             zip=str(out),
             sha256=digest,
+            firmware_sha256=firmware.sha256,
             contents=contents,
         )
     elif args.dry_run:
@@ -1170,7 +1175,9 @@ def _release(args: argparse.Namespace, ctx: Context) -> int:
         raise UsageError(
             "--build makes a test release: a final release holds the pinned build"
         )
-    release, problems = plan(checkout, final=args.final, build=args.build)
+    release, problems = plan(
+        checkout, final=args.final, build=args.build, summary=args.summary
+    )
     if args.json:
         _document(
             args.command_name,
@@ -1179,6 +1186,8 @@ def _release(args: argparse.Namespace, ctx: Context) -> int:
             problems=problems,
             tag=release and release.tag,
             release_version=release and release.tag[1:],
+            title=release and release.title,
+            prerelease=release and not args.final,
             commit=release and release.commit,
             notes=release and release.notes,
             sha256=release and release.sha256,
@@ -1187,11 +1196,13 @@ def _release(args: argparse.Namespace, ctx: Context) -> int:
         for problem in problems:
             print(f"not ready: {problem}")
     else:
+        print(f"{release.title}\n")  # the release page shows this title above the notes
         print(release.notes)
         _hint(
             f"ready: {release.tag} on {release.commit[:7]}. To release it: "
             f"gh workflow run release -f kind={'final' if args.final else 'rc'} "
             + (f"-f build={args.build} " if args.build else "")
+            + (f"-f summary={shlex.quote(args.summary)} " if args.summary else "")
             + "-f dry_run=false"
         )
     return DIFFERS if release is None else 0
@@ -1534,6 +1545,12 @@ def _arguments(
             "--build",
             metavar="NAME",
             help="a test release of this camera-tested build in place of the pinned one (-NAME.N)",
+        )
+        parser.add_argument(
+            "--summary",
+            default="",
+            metavar="TEXT",
+            help="what is new in this release, in plain sentences for users; the notes show it under the title",
         )
         _add_json(parser)
 

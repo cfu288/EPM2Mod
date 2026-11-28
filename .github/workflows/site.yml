@@ -1,0 +1,76 @@
+# This workflow makes sure every change keeps the website and the installer page working, and publishes the website
+# from main.
+name: Website
+
+on:
+  push:
+    branches: [main]
+    paths: &paths
+      - 'web/**'
+      - 'data/films/film-records.json'
+      - '.nvmrc'
+      - 'tools/ci.sh'
+      - 'tools/node.sh'
+      - '.github/workflows/site.yml'
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths: *paths
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # On main, a newer run replaces a waiting one, so the site is deployed in push order and the newest push wins.
+  group: site-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    name: Check the website
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Run the checks
+        env:
+          PLAYWRIGHT_INSTALL: --with-deps
+        run: tools/ci.sh web
+      - name: Upload the site
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: web/apps/site/dist
+
+  deploy:
+    name: Publish the website
+    needs: check
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    # A deploy that has started is never cut off.
+    concurrency:
+      group: site-deploy
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure Pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - name: Deploy the site
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

@@ -8,6 +8,7 @@ from __future__ import annotations
 import contextlib
 import dataclasses
 import io
+import json
 import sys
 import tempfile
 import unittest
@@ -53,6 +54,8 @@ class PlanTests(unittest.TestCase):
         folder = tempfile.TemporaryDirectory()
         self.addCleanup(folder.cleanup)
         self.paths = RepoPaths(write_manifest(Path(folder.name)))
+        self.paths.release_notes.parent.mkdir(parents=True)
+        self.paths.release_notes.write_text("**Install**\n", encoding="utf-8")
         label_spec = self.paths.relative(self.paths.label_spec)
         for name, sha, date in (("probe", "ab" * 32, "2026-11-20"), ("untested", None, None)):
             builds.save_description(self.paths, builds.BuildDescription(
@@ -87,10 +90,11 @@ class PlanTests(unittest.TestCase):
         self.assertEqual((release.tag, release.commit), ("v2026.11.25-probe.2", "c0ffee"))
         # the release holds the build with the day of the release as its label, checked as a candidate is
         self.assertIn("Firmware: EPM2Mod 2026.11.25, sha256 `" + "cd" * 32 + "`.", release.notes)
-        self.assertIn("Camera-tested as sha256 `" + "ab" * 32 + "` (label 2026.11.20)", release.notes)
+        self.assertIn("camera-tested build (sha256 `" + "ab" * 32 + "`)", release.notes)
         self.assertEqual(self.checked, ["2026.11.25", "probe.BIN"])
-        self.assertIn("\nThe probe build.\n", release.notes)
-        self.assertIn("- feat: a probe\n", release.notes)
+        self.assertNotIn("The probe build.", release.notes)  # the build description is not in the notes
+        self.assertIn("- a probe\n", release.notes)
+        self.assertTrue(release.notes.endswith("\n**Install**\n"))  # release/NOTES.md comes last
 
     def test_a_build_with_the_label_of_the_day_is_released_as_tested_and_still_checked(self) -> None:
         self.checked = []
@@ -101,7 +105,7 @@ class PlanTests(unittest.TestCase):
         self.assertEqual(problems, [])
         assert release is not None
         self.assertEqual(release.sha256, "ab" * 32)
-        self.assertNotIn("Camera-tested as", release.notes)
+        self.assertNotIn("camera-tested build", release.notes)
         self.assertEqual(self.checked, ["2026.11.20", "probe.BIN"])  # the start-up and load-order checks ran
 
     def test_a_failed_start_up_check_stops_the_release(self) -> None:
@@ -122,6 +126,33 @@ class PlanTests(unittest.TestCase):
             self.assertEqual(cli.main(argv), 0, err.getvalue())
         self.assertIn("release -f kind=rc -f build=probe -f dry_run=false", err.getvalue())
 
+    def test_the_hint_passes_the_summary_quoted(self) -> None:
+        self.checked = []
+        argv = ["--project", str(self.paths.root), "release", "--build", "probe", "--summary", "It's new."]
+        with contextlib.redirect_stdout(io.StringIO()) as out, contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(cli.main(argv), 0, err.getvalue())
+        self.assertIn("""-f build=probe -f summary='It'"'"'s new.' -f dry_run=false""", err.getvalue())
+        self.assertTrue(out.getvalue().startswith("EPM2Mod 2026.11"))  # the preview shows the title
+        self.assertIn("\nIt's new.\n\n", out.getvalue())
+
+    def test_the_json_of_a_plan_that_is_not_ready_has_no_prerelease(self) -> None:
+        argv = ["--project", str(self.paths.root), "release", "--build", "untested", "--json"]
+        with contextlib.redirect_stdout(io.StringIO()) as out, contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(cli.main(argv), 1)
+        document = json.loads(out.getvalue())
+        self.assertEqual((document["ready"], document["prerelease"], document["title"]), (False, None, None))
+
+    def test_the_json_names_the_title_that_the_preview_prints(self) -> None:
+        self.checked = []
+        argv = ["--project", str(self.paths.root), "release", "--build", "probe"]
+        with contextlib.redirect_stdout(io.StringIO()) as out, contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(cli.main([*argv, "--json"]), 0)
+        document = json.loads(out.getvalue())
+        self.assertEqual((document["title"], document["prerelease"]), ("EPM2Mod " + document["release_version"], True))
+        with contextlib.redirect_stdout(io.StringIO()) as out, contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(cli.main(argv), 0)
+        self.assertTrue(out.getvalue().startswith(document["title"] + "\n\n"))
+
     def test_an_untested_build_is_not_released(self) -> None:
         self.assertEqual(
             releasing.plan(self.paths, final=False, build="untested"),
@@ -137,23 +168,33 @@ class PlanTests(unittest.TestCase):
 
 
 class ReleaseNotesTests(unittest.TestCase):
-    def test_the_notes_name_the_version_build_changes_and_sha(self) -> None:
-        notes = release_notes("2026.11.25-rc.2", "2026.11.20", "Film looks", "ab" * 32, "v2026.11.25-rc.1", ["feat: x"])
-        self.assertTrue(notes.startswith("EPM2Mod 2026.11.25-rc.2\n"))
+    def test_the_notes_name_the_changes_and_the_firmware_without_a_title(self) -> None:
+        notes = release_notes("2026.11.20", "ab" * 32, "v2026.11.25-rc.1", ["feat: x", "fix(films): y (#13)"])
+        self.assertNotIn("EPM2Mod 2026.11.25", notes)  # the release page shows the title
+        self.assertTrue(notes.startswith("Changes since v2026.11.25-rc.1:\n"))
         self.assertIn("Firmware: EPM2Mod 2026.11.20, sha256 `" + "ab" * 32 + "`.\n", notes)
-        self.assertIn("\nFilm looks.\n", notes)
-        self.assertIn("Changes since v2026.11.25-rc.1:\n\n- feat: x\n", notes)
+        self.assertIn("Changes since v2026.11.25-rc.1:\n\n- x\n- y (#13)\n", notes)
 
     def test_the_notes_of_a_stamped_build_give_both_sha256(self) -> None:
-        notes = release_notes("2026.11.26-rc.1", "2026.11.26", "Looks", "cd" * 32, None, [], tested=("ab" * 32, "2026.11.20"))
+        notes = release_notes("2026.11.26", "cd" * 32, None, [], tested=("ab" * 32, "2026.11.20"))
         self.assertIn(
-            "Firmware: EPM2Mod 2026.11.26, sha256 `" + "cd" * 32 + "`. Camera-tested as sha256 `" + "ab" * 32
-            + "` (label 2026.11.20); differs only in the Firmware-screen date.\n",
+            "Firmware: EPM2Mod 2026.11.26, sha256 `" + "cd" * 32 + "`. It is the camera-tested build (sha256 `"
+            + "ab" * 32 + "`) with the release's date on the Firmware screen.\n",
             notes,
         )
 
+    def test_the_summary_comes_first_and_the_install_steps_last(self) -> None:
+        notes = release_notes(
+            "2026.11.28", "ab" * 32, None, ["feat: x"], summary=" New dial. \n", install="**Install**\n"
+        )
+        self.assertTrue(notes.startswith("New dial.\n\nChanges:\n"))
+        self.assertTrue(notes.endswith("`.\n\n**Install**\n"))
+
+    def test_no_summary_no_empty_paragraph(self) -> None:
+        self.assertTrue(release_notes("2026.11.28", "ab" * 32, None, []).startswith("Firmware"))
+
     def test_no_changes_no_change_list(self) -> None:
-        self.assertNotIn("Changes", release_notes("2026.11.19", "2026.11.19", "Looks", "ab" * 32, None, []))
+        self.assertNotIn("Changes", release_notes("2026.11.19", "ab" * 32, None, []))
 
 
 class FeatureListTests(unittest.TestCase):

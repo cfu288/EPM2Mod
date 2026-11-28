@@ -1,0 +1,25 @@
+name: Set up the tools
+description: Install Python, Node, uv, the locked Python packages and the tools that build binutils.
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+      with:
+        python-version-file: .python-version
+    - name: Set up Node
+      uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      with:
+        node-version-file: .nvmrc
+        # The cache is off because a cache that another run wrote could change what a release checks, signs or publishes.
+        package-manager-cache: false
+    - name: Install uv and the locked packages
+      shell: bash
+      run: |
+        python -m pip install --quiet --require-hashes -r .github/uv-requirements.txt
+        uv sync --locked
+    - name: Install the binutils build tools
+      shell: bash
+      run: |
+        sudo apt-get update -q
+        sudo apt-get install -y --no-install-recommends bison flex texinfo
