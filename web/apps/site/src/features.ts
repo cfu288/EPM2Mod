@@ -93,7 +93,7 @@ export const features: Feature[] = [
   {
     id: 'light-box',
     name: 'Light Box',
-    summary: 'Compare two similar shots side by side, for focus or expression.',
+    summary: 'Light Box shows two photos side by side so you can compare them.',
     steps: [
       'MENU → SETUP → Custom Menu → D → Info Settings → ▶ Info → Light Box → On.',
       'In playback, press INFO until two pictures show. RIGHT or LEFT changes the right picture, OK moves it to the left.',
